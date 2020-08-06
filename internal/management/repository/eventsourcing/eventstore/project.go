@@ -80,6 +80,33 @@ func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*pro
 	return repo.ProjectEvents.ReactivateProject(ctx, id)
 }
 
+func (repo *ProjectRepo) RemoveProject(ctx context.Context, projectID string) error {
+	proj := proj_model.NewProject(projectID)
+	aggregates := make([]*es_models.Aggregate, 0)
+	project, agg, err := repo.ProjectEvents.PrepareRemoveProject(ctx, proj)
+	if err != nil {
+		return err
+	}
+	aggregates = append(aggregates, agg)
+
+	// remove user_grants
+	usergrants, err := repo.View.UserGrantsByProjectID(projectID)
+	if err != nil {
+		return err
+	}
+	for _, grant := range usergrants {
+		_, aggs, err := repo.UserGrantEvents.PrepareRemoveUserGrant(ctx, grant.ID, true)
+		if err != nil {
+			return err
+		}
+		for _, agg := range aggs {
+			aggregates = append(aggregates, agg)
+		}
+	}
+
+	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, project.AppendEvents, aggregates...)
+}
+
 func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model.ProjectViewSearchRequest) (*proj_model.ProjectViewSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, err := repo.View.GetLatestProjectSequence()

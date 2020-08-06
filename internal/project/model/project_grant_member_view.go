@@ -1,8 +1,9 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/model"
 	"time"
+
+	"github.com/caos/zitadel/internal/model"
 )
 
 type ProjectGrantMemberView struct {
@@ -38,6 +39,7 @@ const (
 	ProjectGrantMemberSearchKeyLastName
 	ProjectGrantMemberSearchKeyGrantID
 	ProjectGrantMemberSearchKeyUserID
+	ProjectGrantMemberSearchKeyProjectID
 )
 
 type ProjectGrantMemberSearchQuery struct {

@@ -2,18 +2,20 @@ package model
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	"github.com/lib/pq"
-	"time"
 )
 
 const (
 	ProjectGrantMemberKeyUserID    = "user_id"
 	ProjectGrantMemberKeyGrantID   = "grant_id"
+	ProjectGrantMemberKeyProjectID = "project_id"
 	ProjectGrantMemberKeyUserName  = "user_name"
 	ProjectGrantMemberKeyEmail     = "email"
 	ProjectGrantMemberKeyFirstName = "first_name"

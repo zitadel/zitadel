@@ -246,7 +246,10 @@ func request_AuthService_GetMyUserChanges_0(ctx context.Context, marshaler runti
 	var protoReq ChangesRequest
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_AuthService_GetMyUserChanges_0); err != nil {
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_AuthService_GetMyUserChanges_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1024,63 +1027,63 @@ func RegisterAuthServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 }
 
 var (
-	pattern_AuthService_Healthz_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"healthz"}, ""))
+	pattern_AuthService_Healthz_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"healthz"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_Ready_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"ready"}, ""))
+	pattern_AuthService_Ready_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"ready"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_Validate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"validate"}, ""))
+	pattern_AuthService_Validate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"validate"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_GetMyUserSessions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"me", "usersessions"}, ""))
+	pattern_AuthService_GetMyUserSessions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"me", "usersessions"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_GetMyUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"users", "me"}, ""))
+	pattern_AuthService_GetMyUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"users", "me"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_GetMyUserProfile_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "profile"}, ""))
+	pattern_AuthService_GetMyUserProfile_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "profile"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_UpdateMyUserProfile_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "profile"}, ""))
+	pattern_AuthService_UpdateMyUserProfile_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "profile"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_GetMyUserEmail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "email"}, ""))
+	pattern_AuthService_GetMyUserEmail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "email"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_ChangeMyUserEmail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "email"}, ""))
+	pattern_AuthService_ChangeMyUserEmail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "email"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_VerifyMyUserEmail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"users", "me", "email", "_verify"}, ""))
+	pattern_AuthService_VerifyMyUserEmail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"users", "me", "email", "_verify"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_ResendMyEmailVerificationMail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"users", "me", "email", "_resendverification"}, ""))
+	pattern_AuthService_ResendMyEmailVerificationMail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"users", "me", "email", "_resendverification"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_GetMyUserPhone_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "phone"}, ""))
+	pattern_AuthService_GetMyUserPhone_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "phone"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_ChangeMyUserPhone_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "phone"}, ""))
+	pattern_AuthService_ChangeMyUserPhone_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "phone"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_RemoveMyUserPhone_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "phone"}, ""))
+	pattern_AuthService_RemoveMyUserPhone_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "phone"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_VerifyMyUserPhone_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"users", "me", "phone", "_verify"}, ""))
+	pattern_AuthService_VerifyMyUserPhone_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"users", "me", "phone", "_verify"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_ResendMyPhoneVerificationCode_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"users", "me", "phone", "_resendverification"}, ""))
+	pattern_AuthService_ResendMyPhoneVerificationCode_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"users", "me", "phone", "_resendverification"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_GetMyUserAddress_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "address"}, ""))
+	pattern_AuthService_GetMyUserAddress_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_GetMyUserChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "changes"}, ""))
+	pattern_AuthService_GetMyUserChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "changes"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_UpdateMyUserAddress_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "address"}, ""))
+	pattern_AuthService_UpdateMyUserAddress_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_GetMyMfas_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "mfas"}, ""))
+	pattern_AuthService_GetMyMfas_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "mfas"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_ChangeMyPassword_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"users", "me", "passwords", "_change"}, ""))
+	pattern_AuthService_ChangeMyPassword_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"users", "me", "passwords", "_change"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_GetMyPasswordComplexityPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "complexity"}, ""))
+	pattern_AuthService_GetMyPasswordComplexityPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "complexity"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_AddMfaOTP_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"users", "me", "mfa", "otp"}, ""))
+	pattern_AuthService_AddMfaOTP_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"users", "me", "mfa", "otp"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_VerifyMfaOTP_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"users", "me", "mfa", "otp", "_verify"}, ""))
+	pattern_AuthService_VerifyMfaOTP_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"users", "me", "mfa", "otp", "_verify"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_RemoveMfaOTP_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"users", "me", "mfa", "otp"}, ""))
+	pattern_AuthService_RemoveMfaOTP_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"users", "me", "mfa", "otp"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_SearchMyUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"usergrants", "me", "_search"}, ""))
+	pattern_AuthService_SearchMyUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"usergrants", "me", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_SearchMyProjectOrgs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"global", "projectorgs", "_search"}, ""))
+	pattern_AuthService_SearchMyProjectOrgs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"global", "projectorgs", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_GetMyZitadelPermissions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"permissions", "zitadel", "me"}, ""))
+	pattern_AuthService_GetMyZitadelPermissions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"permissions", "zitadel", "me"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AuthService_GetMyProjectPermissions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"permissions", "me"}, ""))
+	pattern_AuthService_GetMyProjectPermissions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"permissions", "me"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

@@ -35,7 +35,7 @@ func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
 }
 
 // Filter mocks base method
-func (m *MockRepository) Filter(arg0 context.Context, arg1 *models.SearchQuery) ([]*models.Event, error) {
+func (m *MockRepository) Filter(arg0 context.Context, arg1 *models.SearchQueryFactory) ([]*models.Event, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Filter", arg0, arg1)
 	ret0, _ := ret[0].([]*models.Event)
@@ -61,6 +61,21 @@ func (m *MockRepository) Health(arg0 context.Context) error {
 func (mr *MockRepositoryMockRecorder) Health(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Health", reflect.TypeOf((*MockRepository)(nil).Health), arg0)
+}
+
+// LatestSequence mocks base method
+func (m *MockRepository) LatestSequence(arg0 context.Context, arg1 *models.SearchQueryFactory) (uint64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LatestSequence", arg0, arg1)
+	ret0, _ := ret[0].(uint64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LatestSequence indicates an expected call of LatestSequence
+func (mr *MockRepositoryMockRecorder) LatestSequence(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LatestSequence", reflect.TypeOf((*MockRepository)(nil).LatestSequence), arg0, arg1)
 }
 
 // PushAggregates mocks base method
