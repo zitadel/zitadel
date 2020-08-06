@@ -70,6 +70,8 @@ func (p *ProjectMember) processProjectMember(event *models.Event) (err error) {
 			return err
 		}
 		return p.view.DeleteProjectMember(event.AggregateID, member.UserID, event.Sequence)
+	case proj_es_model.ProjectRemoved:
+		return p.view.DeleteProjectMembersByProjectID(event.AggregateID)
 	default:
 		return p.view.ProcessedProjectMemberSequence(event.Sequence)
 	}

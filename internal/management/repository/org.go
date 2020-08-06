@@ -9,6 +9,7 @@ import (
 type OrgRepository interface {
 	OrgByID(ctx context.Context, id string) (*org_model.OrgView, error)
 	OrgByDomainGlobal(ctx context.Context, domain string) (*org_model.OrgView, error)
+	CreateOrg(ctx context.Context, name string) (*org_model.Org, error)
 	UpdateOrg(ctx context.Context, org *org_model.Org) (*org_model.Org, error)
 	DeactivateOrg(ctx context.Context, id string) (*org_model.Org, error)
 	ReactivateOrg(ctx context.Context, id string) (*org_model.Org, error)

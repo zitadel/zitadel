@@ -110,6 +110,25 @@ Registration:
   Password: Passwort
   Password2: Passwort wiederholen
 
+RegistrationOrg:
+  Title: Organisations Registration
+  Description: Gib deinen Organisationsnamen und deine Benutzerangaben an.
+  OrgName: Organisationsname
+  OrgDomain: Domäne
+  Email: E-Mail
+  Username: Benutzername
+  Firstname: Vorname
+  Lastname: Nachname
+  Language: Sprache
+  German: Deutsch
+  English: English
+  Gender: Geschlecht
+  Female: weiblich
+  Male: männlich
+  Diverse: diverse
+  Password: Passwort
+  Password2: Passwort wiederholen
+
 LogoutDone:
   Title: Ausgeloggt
   Description: Du wurdest erfolgreich ausgeloggt.
@@ -123,6 +142,7 @@ Actions:
   Register: registrieren
   ForgotPassword: Password zurücksetzen
   Cancel: Abbrechen
+  Save: speichern
 
 Errors:
   Internal: Es ist ein interner Fehler aufgetreten

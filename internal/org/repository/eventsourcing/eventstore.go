@@ -38,6 +38,7 @@ type OrgConfig struct {
 func StartOrg(conf OrgConfig, defaults systemdefaults.SystemDefaults) *OrgEventstore {
 	policy := defaults.DefaultPolicies.OrgIam
 	policy.Default = true
+	policy.IamDomain = conf.IAMDomain
 	verificationAlg, err := crypto.NewAESCrypto(defaults.DomainVerification.VerificationKey)
 	logging.Log("EVENT-aZ22d").OnError(err).Panic("cannot create verificationAlgorithm for domain verification")
 	verificationGen := crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, verificationAlg)

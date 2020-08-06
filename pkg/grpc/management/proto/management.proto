@@ -523,6 +523,17 @@ service ManagementService {
         };
     }
 
+    rpc CreateOrg(OrgCreateRequest) returns (Org) {
+        option (google.api.http) = {
+            post: "/orgs"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "org.create"
+        };
+    }
+
     rpc GetMyOrg(google.protobuf.Empty) returns (OrgView) {
         option (google.api.http) = {
             get: "/orgs/me"
@@ -758,6 +769,17 @@ service ManagementService {
 
         option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.write"
+            check_field_name: "Id"
+        };
+    }
+
+    rpc RemoveProject(ProjectID) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/projects/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "project.delete"
             check_field_name: "Id"
         };
     }
@@ -1881,6 +1903,10 @@ message OrgIamPolicy {
 
 message OrgID {
     string id = 1;
+}
+
+message OrgCreateRequest {
+    string name = 1;
 }
 
 message Org {
