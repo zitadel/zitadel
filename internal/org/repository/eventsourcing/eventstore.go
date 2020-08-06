@@ -26,6 +26,7 @@ type OrgEventstore struct {
 	verificationAlgorithm crypto.EncryptionAlgorithm
 	verificationGenerator crypto.Generator
 	defaultOrgIamPolicy   *org_model.OrgIamPolicy
+	verificationValidator func(domain string, token string, verifier string, checkType http_utils.CheckType) error
 }
 
 type OrgConfig struct {
@@ -45,6 +46,7 @@ func StartOrg(conf OrgConfig, defaults systemdefaults.SystemDefaults) *OrgEvents
 		idGenerator:           id.SonyFlakeGenerator,
 		verificationAlgorithm: verificationAlg,
 		verificationGenerator: verificationGen,
+		verificationValidator: http_utils.ValidateDomain,
 		IAMDomain:             conf.IAMDomain,
 		defaultOrgIamPolicy:   &policy,
 	}
@@ -158,7 +160,7 @@ func (es *OrgEventstore) ReactivateOrg(ctx context.Context, orgID string) (*org_
 }
 
 func (es *OrgEventstore) AddOrgDomain(ctx context.Context, domain *org_model.OrgDomain) (*org_model.OrgDomain, error) {
-	if !domain.IsValid() {
+	if domain == nil || !domain.IsValid() {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-8sFJW", "Errors.Org.InvalidDomain")
 	}
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
@@ -181,8 +183,12 @@ func (es *OrgEventstore) AddOrgDomain(ctx context.Context, domain *org_model.Org
 }
 
 func (es *OrgEventstore) GenerateOrgDomainValidation(ctx context.Context, domain *org_model.OrgDomain) (string, string, error) {
-	if !domain.IsValid() {
+	if domain == nil || !domain.IsValid() {
 		return "", "", errors.ThrowPreconditionFailed(nil, "EVENT-R24hb", "Errors.Org.InvalidDomain")
+	}
+	checkType, ok := domain.ValidationType.CheckType()
+	if !ok {
+		return "", "", errors.ThrowPreconditionFailed(nil, "EVENT-Gsw31", "Errors.Org.DomainVerificationTypeInvalid")
 	}
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
 	if err != nil {
@@ -192,15 +198,17 @@ func (es *OrgEventstore) GenerateOrgDomainValidation(ctx context.Context, domain
 	if d == nil {
 		return "", "", errors.ThrowPreconditionFailed(nil, "EVENT-AGD31", "Errors.Org.DomainNotOnOrg")
 	}
+	if d.Verified {
+		return "", "", errors.ThrowPreconditionFailed(nil, "EVENT-HGw21", "Errors.Org.DomainAlreadyVerified")
+	}
 	token, err := domain.GenerateVerificationCode(es.verificationGenerator)
 	if err != nil {
 		return "", "", err
 	}
-	checkType, ok := domain.ValidationType.CheckType()
-	if !ok {
-		return "", "", errors.ThrowPreconditionFailed(nil, "EVENT-Gsw31", "Errors.Org.DomainVerificationTypeInvalid")
-	}
 	url, err := http_utils.TokenUrl(domain.Domain, token, checkType)
+	if err != nil {
+		return "", "", errors.ThrowPreconditionFailed(err, "EVENT-Bae21", "Errors.Org.DomainVerificationTypeInvalid")
+	}
 
 	repoOrg := model.OrgFromModel(existing)
 	repoDomain := model.OrgDomainFromModel(domain)
@@ -214,7 +222,7 @@ func (es *OrgEventstore) GenerateOrgDomainValidation(ctx context.Context, domain
 }
 
 func (es *OrgEventstore) ValidateOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error {
-	if !domain.IsValid() {
+	if domain == nil || !domain.IsValid() {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-R24hb", "Errors.Org.InvalidDomain")
 	}
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
@@ -238,7 +246,7 @@ func (es *OrgEventstore) ValidateOrgDomain(ctx context.Context, domain *org_mode
 	repoOrg := model.OrgFromModel(existing)
 	repoDomain := model.OrgDomainFromModel(domain)
 	checkType, _ := d.ValidationType.CheckType()
-	err = http_utils.ValidateDomain(d.Domain, validationCode, validationCode, checkType)
+	err = es.verificationValidator(d.Domain, validationCode, validationCode, checkType)
 	if err == nil {
 		orgAggregates, err := OrgDomainVerifiedAggregate(ctx, es.Eventstore.AggregateCreator(), repoOrg, repoDomain)
 		if err != nil {
@@ -253,7 +261,7 @@ func (es *OrgEventstore) ValidateOrgDomain(ctx context.Context, domain *org_mode
 }
 
 func (es *OrgEventstore) SetPrimaryOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error {
-	if !domain.IsValid() {
+	if domain == nil || !domain.IsValid() {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-SsDG2", "Errors.Org.InvalidDomain")
 	}
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))

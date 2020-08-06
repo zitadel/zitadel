@@ -88,7 +88,6 @@ func (o *Org) appendVerificationDomainEvent(event *es_models.Event) error {
 		return err
 	}
 	for _, d := range o.Domains {
-		d.Primary = false
 		if d.Domain == domain.Domain {
 			d.ValidationType = domain.ValidationType
 			d.ValidationCode = domain.ValidationCode
