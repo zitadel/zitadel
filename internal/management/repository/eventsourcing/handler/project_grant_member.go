@@ -70,6 +70,9 @@ func (p *ProjectGrantMember) processProjectGrantMember(event *models.Event) (err
 			return err
 		}
 		return p.view.DeleteProjectGrantMember(member.GrantID, member.UserID, event.Sequence)
+	case proj_es_model.ProjectRemoved:
+		return p.view.DeleteProjectGrantMembersByProjectID(event.AggregateID)
+
 	default:
 		return p.view.ProcessedProjectGrantMemberSequence(event.Sequence)
 	}

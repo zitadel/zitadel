@@ -2,6 +2,8 @@ package model
 
 import (
 	"encoding/json"
+
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/org/model"
@@ -10,9 +12,11 @@ import (
 type OrgDomain struct {
 	es_models.ObjectRoot `json:"-"`
 
-	Domain   string `json:"domain"`
-	Verified bool   `json:"-"`
-	Primary  bool   `json:"-"`
+	Domain         string              `json:"domain"`
+	Verified       bool                `json:"-"`
+	Primary        bool                `json:"-"`
+	ValidationType int32               `json:"validationType"`
+	ValidationCode *crypto.CryptoValue `json:"validationCode"`
 }
 
 func GetDomain(domains []*OrgDomain, domain string) (int, *OrgDomain) {
@@ -77,6 +81,21 @@ func (o *Org) appendPrimaryDomainEvent(event *es_models.Event) error {
 	return nil
 }
 
+func (o *Org) appendVerificationDomainEvent(event *es_models.Event) error {
+	domain := new(OrgDomain)
+	err := domain.SetData(event)
+	if err != nil {
+		return err
+	}
+	for _, d := range o.Domains {
+		if d.Domain == domain.Domain {
+			d.ValidationType = domain.ValidationType
+			d.ValidationCode = domain.ValidationCode
+		}
+	}
+	return nil
+}
+
 func (m *OrgDomain) SetData(event *es_models.Event) error {
 	err := json.Unmarshal(event.Data, m)
 	if err != nil {
@@ -95,10 +114,12 @@ func OrgDomainsFromModel(domains []*model.OrgDomain) []*OrgDomain {
 
 func OrgDomainFromModel(domain *model.OrgDomain) *OrgDomain {
 	return &OrgDomain{
-		ObjectRoot: domain.ObjectRoot,
-		Domain:     domain.Domain,
-		Verified:   domain.Verified,
-		Primary:    domain.Primary,
+		ObjectRoot:     domain.ObjectRoot,
+		Domain:         domain.Domain,
+		Verified:       domain.Verified,
+		Primary:        domain.Primary,
+		ValidationType: int32(domain.ValidationType),
+		ValidationCode: domain.ValidationCode,
 	}
 }
 
@@ -112,9 +133,11 @@ func OrgDomainsToModel(domains []*OrgDomain) []*model.OrgDomain {
 
 func OrgDomainToModel(domain *OrgDomain) *model.OrgDomain {
 	return &model.OrgDomain{
-		ObjectRoot: domain.ObjectRoot,
-		Domain:     domain.Domain,
-		Verified:   domain.Verified,
-		Primary:    domain.Primary,
+		ObjectRoot:     domain.ObjectRoot,
+		Domain:         domain.Domain,
+		Primary:        domain.Primary,
+		Verified:       domain.Verified,
+		ValidationType: model.OrgDomainValidationType(domain.ValidationType),
+		ValidationCode: domain.ValidationCode,
 	}
 }

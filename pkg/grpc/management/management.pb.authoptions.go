@@ -229,6 +229,11 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/CreateOrg": authz.Option{
+		Permission: "org.create",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/GetMyOrg": authz.Option{
 		Permission: "org.read",
 		CheckParam: "",
@@ -255,6 +260,21 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 	},
 
 	"/caos.zitadel.management.api.v1.ManagementService/AddMyOrgDomain": authz.Option{
+		Permission: "org.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GenerateMyOrgDomainValidation": authz.Option{
+		Permission: "org.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/ValidateMyOrgDomain": authz.Option{
+		Permission: "org.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/SetMyPrimaryOrgDomain": authz.Option{
 		Permission: "org.write",
 		CheckParam: "",
 	},
@@ -321,6 +341,11 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 
 	"/caos.zitadel.management.api.v1.ManagementService/ReactivateProject": authz.Option{
 		Permission: "project.write",
+		CheckParam: "Id",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveProject": authz.Option{
+		Permission: "project.delete",
 		CheckParam: "Id",
 	},
 

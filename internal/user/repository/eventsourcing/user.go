@@ -118,9 +118,9 @@ func UserCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCre
 	}, nil
 }
 
-func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, resourceOwner string, emailCode *model.EmailCode, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
-	if user == nil || resourceOwner == "" || emailCode == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-duxk2", "user, resourceowner, emailcode should not be nothing")
+func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, resourceOwner string, initCode *model.InitUserCode, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
+	if user == nil || resourceOwner == "" || initCode == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-duxk2", "user, resourceowner, initcode should not be nothing")
 	}
 
 	agg, err := UserAggregateOverwriteContext(ctx, aggCreator, user, resourceOwner, user.AggregateID)
@@ -140,7 +140,7 @@ func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateC
 	if err != nil {
 		return nil, err
 	}
-	agg, err = agg.AppendEvent(model.UserEmailCodeAdded, emailCode)
+	agg, err = agg.AppendEvent(model.InitializedUserCodeAdded, initCode)
 	if err != nil {
 		return nil, err
 	}

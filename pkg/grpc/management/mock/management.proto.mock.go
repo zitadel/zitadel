@@ -357,6 +357,26 @@ func (mr *MockManagementServiceClientMockRecorder) CreateOIDCApplication(arg0, a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOIDCApplication", reflect.TypeOf((*MockManagementServiceClient)(nil).CreateOIDCApplication), varargs...)
 }
 
+// CreateOrg mocks base method
+func (m *MockManagementServiceClient) CreateOrg(arg0 context.Context, arg1 *management.OrgCreateRequest, arg2 ...grpc.CallOption) (*management.Org, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateOrg", varargs...)
+	ret0, _ := ret[0].(*management.Org)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateOrg indicates an expected call of CreateOrg
+func (mr *MockManagementServiceClientMockRecorder) CreateOrg(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrg", reflect.TypeOf((*MockManagementServiceClient)(nil).CreateOrg), varargs...)
+}
+
 // CreatePasswordAgePolicy mocks base method
 func (m *MockManagementServiceClient) CreatePasswordAgePolicy(arg0 context.Context, arg1 *management.PasswordAgePolicyCreate, arg2 ...grpc.CallOption) (*management.PasswordAgePolicy, error) {
 	m.ctrl.T.Helper()
@@ -695,6 +715,26 @@ func (mr *MockManagementServiceClientMockRecorder) DeleteUser(arg0, arg1 interfa
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockManagementServiceClient)(nil).DeleteUser), varargs...)
+}
+
+// GenerateMyOrgDomainValidation mocks base method
+func (m *MockManagementServiceClient) GenerateMyOrgDomainValidation(arg0 context.Context, arg1 *management.OrgDomainValidationRequest, arg2 ...grpc.CallOption) (*management.OrgDomainValidationResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GenerateMyOrgDomainValidation", varargs...)
+	ret0, _ := ret[0].(*management.OrgDomainValidationResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GenerateMyOrgDomainValidation indicates an expected call of GenerateMyOrgDomainValidation
+func (mr *MockManagementServiceClientMockRecorder) GenerateMyOrgDomainValidation(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateMyOrgDomainValidation", reflect.TypeOf((*MockManagementServiceClient)(nil).GenerateMyOrgDomainValidation), varargs...)
 }
 
 // GetDefaultPasswordComplexityPolicy mocks base method
@@ -1457,6 +1497,26 @@ func (mr *MockManagementServiceClientMockRecorder) RemoveMyOrgMember(arg0, arg1 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMyOrgMember", reflect.TypeOf((*MockManagementServiceClient)(nil).RemoveMyOrgMember), varargs...)
 }
 
+// RemoveProject mocks base method
+func (m *MockManagementServiceClient) RemoveProject(arg0 context.Context, arg1 *management.ProjectID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RemoveProject", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemoveProject indicates an expected call of RemoveProject
+func (mr *MockManagementServiceClientMockRecorder) RemoveProject(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveProject", reflect.TypeOf((*MockManagementServiceClient)(nil).RemoveProject), varargs...)
+}
+
 // RemoveProjectGrant mocks base method
 func (m *MockManagementServiceClient) RemoveProjectGrant(arg0 context.Context, arg1 *management.ProjectGrantID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
@@ -1897,6 +1957,26 @@ func (mr *MockManagementServiceClientMockRecorder) SetInitialPassword(arg0, arg1
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetInitialPassword", reflect.TypeOf((*MockManagementServiceClient)(nil).SetInitialPassword), varargs...)
 }
 
+// SetMyPrimaryOrgDomain mocks base method
+func (m *MockManagementServiceClient) SetMyPrimaryOrgDomain(arg0 context.Context, arg1 *management.PrimaryOrgDomainRequest, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SetMyPrimaryOrgDomain", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SetMyPrimaryOrgDomain indicates an expected call of SetMyPrimaryOrgDomain
+func (mr *MockManagementServiceClientMockRecorder) SetMyPrimaryOrgDomain(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetMyPrimaryOrgDomain", reflect.TypeOf((*MockManagementServiceClient)(nil).SetMyPrimaryOrgDomain), varargs...)
+}
+
 // UnlockUser mocks base method
 func (m *MockManagementServiceClient) UnlockUser(arg0 context.Context, arg1 *management.UserID, arg2 ...grpc.CallOption) (*management.User, error) {
 	m.ctrl.T.Helper()
@@ -2175,4 +2255,24 @@ func (mr *MockManagementServiceClientMockRecorder) Validate(arg0, arg1 interface
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Validate", reflect.TypeOf((*MockManagementServiceClient)(nil).Validate), varargs...)
+}
+
+// ValidateMyOrgDomain mocks base method
+func (m *MockManagementServiceClient) ValidateMyOrgDomain(arg0 context.Context, arg1 *management.ValidateOrgDomainRequest, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ValidateMyOrgDomain", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ValidateMyOrgDomain indicates an expected call of ValidateMyOrgDomain
+func (mr *MockManagementServiceClientMockRecorder) ValidateMyOrgDomain(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateMyOrgDomain", reflect.TypeOf((*MockManagementServiceClient)(nil).ValidateMyOrgDomain), varargs...)
 }

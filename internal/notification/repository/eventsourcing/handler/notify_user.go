@@ -119,7 +119,7 @@ func (u *NotifyUser) fillLoginNamesOnOrgUsers(event *models.Event) error {
 			return err
 		}
 	}
-	return nil
+	return u.view.ProcessedNotifyUserSequence(event.Sequence)
 }
 
 func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {

@@ -2,17 +2,25 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/logging"
 	"strings"
+	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/sdk"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+
+
+)
+
+const (
+	orgOwnerRole = "ORG_OWNER"
 )
 
 type OrgRepository struct {
@@ -37,6 +45,27 @@ func (repo *OrgRepository) OrgByDomainGlobal(ctx context.Context, domain string)
 		return nil, err
 	}
 	return repo.OrgByID(ctx, verifiedDomain.OrgID)
+}
+
+func (repo *OrgRepository) CreateOrg(ctx context.Context, name string) (*org_model.Org, error) {
+	org, aggregates, err := repo.OrgEventstore.PrepareCreateOrg(ctx, &org_model.Org{Name: name})
+	if err != nil {
+		return nil, err
+	}
+
+	member := org_model.NewOrgMemberWithRoles(org.AggregateID, authz.GetCtxData(ctx).UserID, orgOwnerRole)
+	_, memberAggregate, err := repo.OrgEventstore.PrepareAddOrgMember(ctx, member, org.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	aggregates = append(aggregates, memberAggregate)
+
+	err = sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, org.AppendEvents, aggregates...)
+	if err != nil {
+		return nil, err
+	}
+
+	return org_es_model.OrgToModel(org), nil
 }
 
 func (repo *OrgRepository) UpdateOrg(ctx context.Context, org *org_model.Org) (*org_model.Org, error) {
@@ -80,6 +109,21 @@ func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_
 func (repo *OrgRepository) AddMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) (*org_model.OrgDomain, error) {
 	domain.AggregateID = authz.GetCtxData(ctx).OrgID
 	return repo.OrgEventstore.AddOrgDomain(ctx, domain)
+}
+
+func (repo *OrgRepository) GenerateMyOrgDomainValidation(ctx context.Context, domain *org_model.OrgDomain) (string, string, error) {
+	domain.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.GenerateOrgDomainValidation(ctx, domain)
+}
+
+func (repo *OrgRepository) ValidateMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error {
+	domain.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.ValidateOrgDomain(ctx, domain)
+}
+
+func (repo *OrgRepository) SetMyPrimaryOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error {
+	domain.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.SetPrimaryOrgDomain(ctx, domain)
 }
 
 func (repo *OrgRepository) RemoveMyOrgDomain(ctx context.Context, domain string) error {

@@ -345,6 +345,93 @@ func TestReactivateProject(t *testing.T) {
 	}
 }
 
+func TestRemoveProject(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es       *ProjectEventstore
+		ctx      context.Context
+		existing *model.Project
+	}
+	type res struct {
+		result  *model.Project
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove project, ok",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existing: &model.Project{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					Name:       "Name",
+					Members:    []*model.ProjectMember{&model.ProjectMember{UserID: "UserID", Roles: []string{"Roles"}}},
+				},
+			},
+			res: res{
+				result: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+		},
+		{
+			name: "no projectid",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existing: &model.Project{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+					Name:       "Name",
+					Members:    []*model.ProjectMember{&model.ProjectMember{UserID: "UserID", Roles: []string{"Roles"}}},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "project not existing",
+			args: args{
+				es:       GetMockManipulateProject(ctrl),
+				ctx:      authz.NewMockContext("orgID", "userID"),
+				existing: &model.Project{},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing not found",
+			args: args{
+				es:       GetMockManipulateProjectNoEvents(ctrl),
+				ctx:      authz.NewMockContext("orgID", "userID"),
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "OtherAggregateID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemoveProject(tt.args.ctx, tt.args.existing)
+
+			if !tt.res.wantErr && err != nil {
+				t.Errorf("should not get err")
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
 func TestProjectMemberByIDs(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
