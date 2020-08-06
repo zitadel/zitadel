@@ -16,7 +16,6 @@ const (
 
 type registerOrgFormData struct {
 	OrgName   string `schema:"orgname"`
-	OrgDomain string `schema:"orgdomain"`
 	Email     string `schema:"email"`
 	Username  string `schema:"username"`
 	Firstname string `schema:"firstname"`
