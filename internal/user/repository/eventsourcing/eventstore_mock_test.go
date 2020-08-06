@@ -135,6 +135,18 @@ func GetMockManipulateUserWithInitCodeGen(ctrl *gomock.Controller, user model.Us
 	return GetMockedEventstoreWithPw(ctrl, mockEs, true, false, false, false)
 }
 
+func GetMockManipulateUserWithPasswordInitCodeGen(ctrl *gomock.Controller, user model.User) *UserEventstore {
+	data, _ := json.Marshal(user)
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: data},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstoreWithPw(ctrl, mockEs, true, false, false, true)
+}
+
 func GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl *gomock.Controller, user model.User) *UserEventstore {
 	data, _ := json.Marshal(user)
 	events := []*es_models.Event{

@@ -11,6 +11,7 @@ InternalAuthZ:
         - "iam.member.write"
         - "iam.member.delete"
         - "org.read"
+        - "org.create"
         - "org.write"
         - "org.member.read"
         - "org.member.write"
@@ -71,6 +72,7 @@ InternalAuthZ:
     - Role: 'ORG_OWNER'
       Permissions:
         - "org.read"
+        - "org.create"
         - "org.write"
         - "org.member.read"
         - "org.member.write"

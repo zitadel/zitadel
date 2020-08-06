@@ -52,6 +52,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		tmplChangePasswordDone: "change_password_done.html",
 		tmplRegister:           "register.html",
 		tmplLogoutDone:         "logout_done.html",
+		tmplRegisterOrg:        "register_org.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -107,6 +108,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		},
 		"registrationUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointRegister)
+		},
+		"orgRegistrationUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointRegisterOrg)
 		},
 		"selectedLanguage": func(l string) bool {
 			return false

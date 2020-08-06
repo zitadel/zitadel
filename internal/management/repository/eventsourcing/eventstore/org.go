@@ -3,6 +3,8 @@ package eventstore
 import (
 	"context"
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/eventstore/sdk"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"strings"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -13,6 +15,10 @@ import (
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+)
+
+const (
+	orgOwnerRole = "ORG_OWNER"
 )
 
 type OrgRepository struct {
@@ -37,6 +43,27 @@ func (repo *OrgRepository) OrgByDomainGlobal(ctx context.Context, domain string)
 		return nil, err
 	}
 	return repo.OrgByID(ctx, verifiedDomain.OrgID)
+}
+
+func (repo *OrgRepository) CreateOrg(ctx context.Context, name string) (*org_model.Org, error) {
+	org, aggregates, err := repo.OrgEventstore.PrepareCreateOrg(ctx, &org_model.Org{Name: name})
+	if err != nil {
+		return nil, err
+	}
+
+	member := org_model.NewOrgMemberWithRoles(org.AggregateID, authz.GetCtxData(ctx).UserID, orgOwnerRole)
+	_, memberAggregate, err := repo.OrgEventstore.PrepareAddOrgMember(ctx, member, org.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	aggregates = append(aggregates, memberAggregate)
+
+	err = sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, org.AppendEvents, aggregates...)
+	if err != nil {
+		return nil, err
+	}
+
+	return org_es_model.OrgToModel(org), nil
 }
 
 func (repo *OrgRepository) UpdateOrg(ctx context.Context, org *org_model.Org) (*org_model.Org, error) {

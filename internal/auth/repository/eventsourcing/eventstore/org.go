@@ -3,15 +3,27 @@ package eventstore
 import (
 	"context"
 	"github.com/caos/logging"
+	auth_model "github.com/caos/zitadel/internal/auth/model"
 	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
+	"github.com/caos/zitadel/internal/eventstore/sdk"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
+	policy_model "github.com/caos/zitadel/internal/policy/model"
+	policy_es "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
+	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+)
+
+const (
+	orgOwnerRole = "ORG_OWNER"
 )
 
 type OrgRepository struct {
-	SearchLimit uint64
-	*org_es.OrgEventstore
+	SearchLimit      uint64
+	OrgEventstore    *org_es.OrgEventstore
+	UserEventstore   *usr_es.UserEventstore
+	PolicyEventstore *policy_es.PolicyEventstore
+
 	View *auth_view.View
 }
 
@@ -34,4 +46,44 @@ func (repo *OrgRepository) SearchOrgs(ctx context.Context, request *org_model.Or
 		result.Timestamp = sequence.CurrentTimestamp
 	}
 	return result, nil
+}
+
+func (repo *OrgRepository) RegisterOrg(ctx context.Context, register *auth_model.RegisterOrg) (*auth_model.RegisterOrg, error) {
+	pwPolicy, err := repo.PolicyEventstore.GetPasswordComplexityPolicy(ctx, policy_model.DefaultPolicy)
+	if err != nil {
+		return nil, err
+	}
+	orgPolicy, err := repo.OrgEventstore.GetOrgIamPolicy(ctx, policy_model.DefaultPolicy)
+	if err != nil {
+		return nil, err
+	}
+	org, aggregates, err := repo.OrgEventstore.PrepareCreateOrg(ctx, register.Org)
+	if err != nil {
+		return nil, err
+	}
+	user, userAggregates, err := repo.UserEventstore.PrepareRegisterUser(ctx, register.User, pwPolicy, orgPolicy, org.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	aggregates = append(aggregates, userAggregates...)
+	registerModel := &Register{Org: org, User: user}
+
+	member := org_model.NewOrgMemberWithRoles(org.AggregateID, user.AggregateID, orgOwnerRole)
+	_, memberAggregate, err := repo.OrgEventstore.PrepareAddOrgMember(ctx, member, org.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	aggregates = append(aggregates, memberAggregate)
+
+	err = sdk.PushAggregates(ctx, repo.OrgEventstore.PushAggregates, registerModel.AppendEvents, aggregates...)
+	if err != nil {
+		return nil, err
+	}
+
+	return RegisterToModel(registerModel), nil
+}
+
+func (repo *OrgRepository) GetOrgIamPolicy(ctx context.Context, orgID string) (*org_model.OrgIamPolicy, error) {
+	return repo.OrgEventstore.GetOrgIamPolicy(ctx, policy_model.DefaultPolicy)
 }
