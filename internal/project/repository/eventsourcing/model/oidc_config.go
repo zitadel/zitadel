@@ -21,6 +21,7 @@ type OIDCConfig struct {
 	ApplicationType        int32               `json:"applicationType,omitempty"`
 	AuthMethodType         int32               `json:"authMethodType,omitempty"`
 	PostLogoutRedirectUris []string            `json:"postLogoutRedirectUris,omitempty"`
+	DevMode                bool                `json:"devMode,omitempty"`
 }
 
 func (c *OIDCConfig) Changes(changed *OIDCConfig) map[string]interface{} {
@@ -43,6 +44,9 @@ func (c *OIDCConfig) Changes(changed *OIDCConfig) map[string]interface{} {
 	}
 	if !reflect.DeepEqual(c.PostLogoutRedirectUris, changed.PostLogoutRedirectUris) {
 		changes["postLogoutRedirectUris"] = changed.PostLogoutRedirectUris
+	}
+	if c.DevMode != changed.DevMode {
+		changes["devMode"] = changed.DevMode
 	}
 	return changes
 }
@@ -68,6 +72,7 @@ func OIDCConfigFromModel(config *model.OIDCConfig) *OIDCConfig {
 		ApplicationType:        int32(config.ApplicationType),
 		AuthMethodType:         int32(config.AuthMethodType),
 		PostLogoutRedirectUris: config.PostLogoutRedirectUris,
+		DevMode:                config.DevMode,
 	}
 }
 
@@ -92,6 +97,7 @@ func OIDCConfigToModel(config *OIDCConfig) *model.OIDCConfig {
 		ApplicationType:        model.OIDCApplicationType(config.ApplicationType),
 		AuthMethodType:         model.OIDCAuthMethodType(config.AuthMethodType),
 		PostLogoutRedirectUris: config.PostLogoutRedirectUris,
+		DevMode:                config.DevMode,
 	}
 	oidcConfig.FillCompliance()
 	return oidcConfig

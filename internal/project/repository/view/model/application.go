@@ -38,6 +38,7 @@ type ApplicationView struct {
 	OIDCPostLogoutRedirectUris pq.StringArray `json:"postLogoutRedirectUris" gorm:"column:oidc_post_logout_redirect_uris"`
 	NoneCompliant              bool           `json:"-" gorm:"column:none_compliant"`
 	ComplianceProblems         pq.StringArray `json:"-" gorm:"column:compliance_problems"`
+	DevMode                    bool           `json:"devMode" gorm:"column:dev_mode"`
 
 	Sequence uint64 `json:"-" gorm:"sequence"`
 }
@@ -60,6 +61,7 @@ func ApplicationViewFromModel(app *model.ApplicationView) *ApplicationView {
 		OIDCApplicationType:        int32(app.OIDCApplicationType),
 		OIDCAuthMethodType:         int32(app.OIDCAuthMethodType),
 		OIDCPostLogoutRedirectUris: app.OIDCPostLogoutRedirectUris,
+		DevMode:                    app.DevMode,
 	}
 }
 
@@ -100,6 +102,7 @@ func ApplicationViewToModel(app *ApplicationView) *model.ApplicationView {
 		OIDCPostLogoutRedirectUris: app.OIDCPostLogoutRedirectUris,
 		NoneCompliant:              app.NoneCompliant,
 		ComplianceProblems:         app.ComplianceProblems,
+		DevMode:                    app.DevMode,
 	}
 }
 

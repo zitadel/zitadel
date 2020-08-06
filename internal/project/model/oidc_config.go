@@ -26,6 +26,7 @@ type OIDCConfig struct {
 	PostLogoutRedirectUris []string
 	OIDCVersion            OIDCVersion
 	Compliance             *Compliance
+	DevMode                bool
 }
 
 type OIDCVersion int32

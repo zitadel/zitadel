@@ -24,6 +24,7 @@ type ApplicationView struct {
 	OIDCPostLogoutRedirectUris []string
 	NoneCompliant              bool
 	ComplianceProblems         []string
+	DevMode                    bool
 
 	Sequence uint64
 }
