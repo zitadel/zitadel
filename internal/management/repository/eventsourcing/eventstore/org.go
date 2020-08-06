@@ -2,19 +2,21 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/eventstore/sdk"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"strings"
+	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/sdk"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+
+
 )
 
 const (
@@ -107,6 +109,21 @@ func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_
 func (repo *OrgRepository) AddMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) (*org_model.OrgDomain, error) {
 	domain.AggregateID = authz.GetCtxData(ctx).OrgID
 	return repo.OrgEventstore.AddOrgDomain(ctx, domain)
+}
+
+func (repo *OrgRepository) GenerateMyOrgDomainValidation(ctx context.Context, domain *org_model.OrgDomain) (string, string, error) {
+	domain.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.GenerateOrgDomainValidation(ctx, domain)
+}
+
+func (repo *OrgRepository) ValidateMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error {
+	domain.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.ValidateOrgDomain(ctx, domain)
+}
+
+func (repo *OrgRepository) SetMyPrimaryOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error {
+	domain.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.SetPrimaryOrgDomain(ctx, domain)
 }
 
 func (repo *OrgRepository) RemoveMyOrgDomain(ctx context.Context, domain string) error {

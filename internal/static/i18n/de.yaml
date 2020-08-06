@@ -55,6 +55,11 @@ Errors:
     InvalidDomain: Domäne ist ungültig
     DomainMissing: Domäne fehlt
     DomainNotOnOrg: Domäne fehlt auf Organisation
+    DomainNotVerified: Domäne ist nicht verifiziert
+    DomainAlreadyVerified: Domain ist bereits verifiziert
+    DomainVerificationTypeInvalid: Verifikationstyp der Domäne ist ungültig
+    DomainVerificationMissing: Verifikation der Domäne noch nicht erstellt
+    DomainVerificationFailed: Verifikation der Domäne ist fehlgeschlagen
     PrimaryDomainNotDeletable: Primäre Domäne kann nicht gelöscht werden
     DomainNotFound: Domäne konnte nicht gefunden werden
     MemberIDMissing: Member ID fehlt

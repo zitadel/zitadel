@@ -599,6 +599,38 @@ service ManagementService {
         };
     }
 
+    rpc GenerateMyOrgDomainValidation(OrgDomainValidationRequest) returns (OrgDomainValidationResponse) {
+        option (google.api.http) = {
+            post: "/orgs/me/domains/{domain}/validation/create"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
+    rpc ValidateMyOrgDomain(ValidateOrgDomainRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/orgs/me/domains/{domain}/validation/check"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
+    rpc SetMyPrimaryOrgDomain(PrimaryOrgDomainRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/orgs/me/domains/{domain}/_primary"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
     rpc RemoveMyOrgDomain(RemoveOrgDomainRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             delete: "/orgs/me/domains/{domain}"
@@ -1930,6 +1962,30 @@ message OrgDomainView {
 }
 
 message AddOrgDomainRequest {
+    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message OrgDomainValidationRequest {
+    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    OrgDomainValidationType type = 2 [(validate.rules).enum = {not_in: [0]}];
+}
+
+enum OrgDomainValidationType {
+    ORGDOMAINVALIDATIONTYPE_UNSPECIFIED = 0;
+    ORGDOMAINVALIDATIONTYPE_HTTP = 1;
+    ORGDOMAINVALIDATIONTYPE_DNS = 2;
+}
+
+message OrgDomainValidationResponse {
+    string token = 1;
+    string url = 2;
+}
+
+message ValidateOrgDomainRequest {
+    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message PrimaryOrgDomainRequest {
     string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
