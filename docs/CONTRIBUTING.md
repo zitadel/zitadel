@@ -56,4 +56,4 @@ Writing documentation in country specific languages is highly endorsed. The stat
 
 Where `filename` represents the name of the file (see section [File name](#file-name)), `language-id` is an *optional* language identifier (see the list of [ISO 639-1 codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)), and the mandatory file extension `.md`.
 
-**Note:** If a file name does not specify a language identifier we consider the file name to be implicitely written in English language (defaulting to `.en`).
+**Note:** If a file name does not specify a language identifier we consider the file name to be implicitly written in English language (defaulting to `.en`).
