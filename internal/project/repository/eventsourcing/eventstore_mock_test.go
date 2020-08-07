@@ -3,6 +3,8 @@ package eventsourcing
 import (
 	"encoding/json"
 
+	"github.com/golang/mock/gomock"
+
 	mock_cache "github.com/caos/zitadel/internal/cache/mock"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/mock"
@@ -11,7 +13,6 @@ import (
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	repo_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"github.com/golang/mock/gomock"
 )
 
 func GetMockedEventstore(ctrl *gomock.Controller, mockEs *mock.MockEventstore) *ProjectEventstore {
@@ -131,13 +132,14 @@ func GetMockManipulateProjectWithRole(ctrl *gomock.Controller) *ProjectEventstor
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
-func GetMockManipulateProjectWithOIDCApp(ctrl *gomock.Controller) *ProjectEventstore {
+func GetMockManipulateProjectWithOIDCApp(ctrl *gomock.Controller, authMethod proj_model.OIDCAuthMethodType) *ProjectEventstore {
 	data, _ := json.Marshal(model.Project{Name: "Name"})
 	appData, _ := json.Marshal(model.Application{AppID: "AppID", Name: "Name"})
 	oidcData, _ := json.Marshal(model.OIDCConfig{
-		AppID:         "AppID",
-		ResponseTypes: []int32{int32(proj_model.OIDCResponseTypeCode)},
-		GrantTypes:    []int32{int32(proj_model.OIDCGrantTypeAuthorizationCode)},
+		AppID:          "AppID",
+		ResponseTypes:  []int32{int32(proj_model.OIDCResponseTypeCode)},
+		GrantTypes:     []int32{int32(proj_model.OIDCGrantTypeAuthorizationCode)},
+		AuthMethodType: int32(authMethod),
 	})
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.ProjectAdded, Data: data},
