@@ -740,6 +740,37 @@ func TestOnlyLocalhostIsHttp(t *testing.T) {
 			},
 			result: false,
 		},
+		{
+			name: "http localhost/",
+			args: args{
+				uris: []string{
+					"https://zitadel.com",
+					"http://localhost/auth/callback",
+				},
+			},
+			result: true,
+		},
+		{
+			name: "http not localhost:",
+			args: args{
+				uris: []string{
+					"https://zitadel.com",
+					"http://localhost:9090",
+				},
+			},
+			result: true,
+		},
+		{
+			name: "http not localhost",
+			args: args{
+				uris: []string{
+					"https://zitadel.com",
+					"http://localhost:9090",
+					"http://zitadel.ch",
+				},
+			},
+			result: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

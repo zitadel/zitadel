@@ -42,6 +42,9 @@ func (c *OIDCConfig) Changes(changed *OIDCConfig) map[string]interface{} {
 	if c.AuthMethodType != changed.AuthMethodType {
 		changes["authMethodType"] = changed.AuthMethodType
 	}
+	if c.Version != changed.Version {
+		changes["oidcVersion"] = changed.Version
+	}
 	if !reflect.DeepEqual(c.PostLogoutRedirectUris, changed.PostLogoutRedirectUris) {
 		changes["postLogoutRedirectUris"] = changed.PostLogoutRedirectUris
 	}
