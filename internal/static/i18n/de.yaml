@@ -93,6 +93,7 @@ Errors:
     AppNotExisting: Applikation exisitert nicht
     OIDCConfigInvalid: OIDC Konfiguration ist ungültig
     AppIsNotOIDC: Applikation ist nicht vom Typ OIDC
+    OIDCAuthMethodNoneSecret: OIDC Auth Method None benötigt kein Secret
     RequiredFieldsMissing: Benötigte Felder fehlen
     GrantNotFound: Grant konnte nicht gefunden werden
     GrantInvalid: Projekt Grant ist ungültig
