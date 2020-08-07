@@ -54,13 +54,13 @@ func TestGetOIDCC1Compliance(t *testing.T) {
 			},
 		},
 		{
-			name: "Native: codeflow http://loclhost redirect (none compliant)",
+			name: "Native: codeflow http://localhost redirect (none compliant)",
 			args: args{
 				appType:    OIDCApplicationTypeNative,
 				grantTypes: []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
 				authMethod: OIDCAuthMethodTypeNone,
 				redirectUris: []string{
-					"http://zitadel.ch/auth/callback",
+					"http://localhost/auth/callback",
 				},
 			},
 			result: result{
