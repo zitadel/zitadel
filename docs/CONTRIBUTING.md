@@ -18,7 +18,7 @@ We urge you to always add captions to listings, code snippets, tables, graphics 
 Numbering is **required** for captions. See next section.
 
 ## Numbering of captions
-Numbering has to be continuous using arabic style numbers. The caption is composed of a prefix and a descriptive text. The prefix is composed of the item type (Listing, Table, Image, Graphic), and incrementing number in arabic style followed by a period and a description.
+Numbering has to be continuous using arabic style numbers. The caption is composed of a prefix and a descriptive text. The prefix is composed of the item type (Listing, Table, Image, Graphic), an incrementing number in arabic style followed by a period and a description.
 
 If the description consists of **one term** only you must omit any trailing punctuation. If the description represents a complete sentense you must terminate it with a period.
 
@@ -56,4 +56,4 @@ Writing documentation in country specific languages is highly endorsed. The stat
 
 Where `filename` represents the name of the file (see section [File name](#file-name)), `language-id` is an *optional* language identifier (see the list of [ISO 639-1 codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)), and the mandatory file extension `.md`.
 
-**Note:** If a file name does not specify a language identifier we consider the file name to be implicitly written in English language (defaulting to `.en`).
+**Note:** If a file name does not specify a language identifier we consider the file name to be implicitly written in English language (defaulting to `.en`). This is also important for the rendering of the language-dependent content navigation as the content navigation will always only include pages in their respective language they represent. This means that Markdown files without language identifier will **only** be rendered in the content navigation of the English documentation variant and will **not be visible at all** in the contemt navigations of other language variants.
