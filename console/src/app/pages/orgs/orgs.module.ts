@@ -11,6 +11,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
+import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/member-create-dialog.module';
 import { CardModule } from 'src/app/modules/card/card.module';
@@ -21,11 +22,11 @@ import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module
 
 import { ChangesModule } from '../../modules/changes/changes.module';
 import { AddDomainDialogModule } from './org-detail/add-domain-dialog/add-domain-dialog.module';
+import { DomainVerificationComponent } from './org-detail/domain-verification/domain-verification.component';
 import { OrgDetailComponent } from './org-detail/org-detail.component';
 import { OrgGridComponent } from './org-grid/org-grid.component';
 import { OrgsRoutingModule } from './orgs-routing.module';
 import { PolicyGridComponent } from './policy-grid/policy-grid.component';
-import { DomainVerificationComponent } from './org-detail/domain-verification/domain-verification.component';
 
 @NgModule({
     declarations: [OrgDetailComponent, OrgGridComponent, PolicyGridComponent, DomainVerificationComponent],
@@ -54,6 +55,7 @@ import { DomainVerificationComponent } from './org-detail/domain-verification/do
         TranslateModule,
         SharedModule,
         ContributorsModule,
+        CopyToClipboardModule,
     ],
 })
 export class OrgsModule { }

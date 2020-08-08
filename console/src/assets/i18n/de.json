@@ -268,6 +268,7 @@
             "ORGDOMAIN_VERIFICATION":"Stelle deine Domain bereit und überprüfe deren Besitz indem du eine Bestätigungsdatei herunterladen und unter der unten angegebenen URL hochladen. Klicken zum Abschluss auf die Schaltfläche, um diese zu überprüfen.",
             "ORGDOMAIN_VERIFICATION_SKIP":"Du kannst die Überprüfung vorerst überspringen und deine Organisation weiter erstellen. Um deine Organisation jedoch verwenden zu können, muss dieser Schritt abgeschlossen sein!",
             "ORGDETAILUSER_TITLE":"Organisationsbesitzer hinzufügen",
+            "ORGDOMAIN_VERIFICATION_VALIDATION_DESC":"Die Tokens werden regelmäßig überprüft, um sicherzustellen, dass sie weiterhin Besitzer der domain sind",
             "DOWNLOAD_FILE":"Datei download",
             "SELECTORGTOOLTIP":"Wähle diese Organisation",
             "PRIMARYDOMAIN":"Primäre Domain",

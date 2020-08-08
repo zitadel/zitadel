@@ -1,6 +1,6 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { OrgDomainValidationType, OrgDomainView } from 'src/app/proto/generated/management_pb';
+import { OrgDomainValidationResponse, OrgDomainValidationType, OrgDomainView } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 
 @Component({
@@ -8,19 +8,31 @@ import { OrgService } from 'src/app/services/org.service';
     templateUrl: './domain-verification.component.html',
     styleUrls: ['./domain-verification.component.scss'],
 })
-export class DomainVerificationComponent implements OnInit {
+export class DomainVerificationComponent {
     public domain!: OrgDomainView.AsObject;
 
     public OrgDomainValidationType: any = OrgDomainValidationType;
+
+    public http!: OrgDomainValidationResponse.AsObject;
+    public dns!: OrgDomainValidationResponse.AsObject;
+    public copied: string = '';
     constructor(
         public dialogRef: MatDialogRef<DomainVerificationComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         private orgService: OrgService,
     ) {
         this.domain = data.domain;
+
+        this.loadTokens();
     }
 
-    ngOnInit(): void {
+    async loadTokens(): Promise<void> {
+        this.http = (await this.orgService.GenerateMyOrgDomainValidation(
+            this.domain.domain,
+            OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_HTTP)).toObject();
+        this.dns = (await this.orgService.GenerateMyOrgDomainValidation(
+            this.domain.domain,
+            OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_DNS)).toObject();
     }
 
     public closeDialog(): void {
