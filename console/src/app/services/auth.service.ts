@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
 import { catchError, filter, finalize, first, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
@@ -31,7 +30,6 @@ export class AuthService {
         private userService: AuthUserService,
         private storage: StorageService,
         private statehandler: StatehandlerService,
-        private router: Router,
     ) {
         this.user = merge(
             of(this.oauthService.getAccessToken()).pipe(
