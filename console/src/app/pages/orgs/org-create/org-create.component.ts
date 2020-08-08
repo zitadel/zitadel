@@ -64,8 +64,6 @@ export class OrgCreateComponent {
         private fb: FormBuilder,
         private orgService: OrgService,
     ) {
-        const validators: Validators[] = [];
-
         this.orgForm = this.fb.group({
             name: ['', [Validators.required]],
             domain: [''],

@@ -56,7 +56,8 @@
         "REACTIVATE":"Reactivate",
         "DEACTIVATE":"Deactivate",
         "REFRESH":"Refresh",
-        "LOGIN":"Login"
+        "LOGIN":"Login",
+        "EDIT":"Edit"
     },
     "ERRORS": {
         "REQUIRED": "Some required fields are missing!",
@@ -414,6 +415,10 @@
                 "DEACTIVATE": {
                     "TITLE":"Deactivate project",
                     "DESCRIPTION":"Do you really want to deactivate your project?"
+                },
+                "DELETE": {
+                    "TITLE":"Projekt löschen",
+                    "DESCRIPTION":"Wollen Sie das Project wirklich löschen?"
                 }
             }
         },
@@ -534,7 +539,8 @@
             "REACTIVATED":"Reactivated!",
             "DEACTIVATED":"Deactivated!",
             "UPDATED":"Project changed!",
-            "GRANTUPDATED":"Grant changed!"
+            "GRANTUPDATED":"Grant changed!",
+            "DELETED":"Deleted Project!"
         }
     },
     "APP": {

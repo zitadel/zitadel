@@ -6,10 +6,16 @@
             </a>
             <h1>{{ 'PROJECT.PAGES.TITLE' | translate }} {{project?.name}}</h1>
             <ng-template appHasRole [appHasRole]="['project.write:'+projectId, 'project.write']">
-                <button mat-icon-button (click)="editstate = !editstate" aria-label="Edit project name"
-                    *ngIf="isZitadel === false">
+                <button matTooltip="{{'ACTIONS.EDIT' | translate}}" mat-icon-button (click)="editstate = !editstate"
+                    aria-label="Edit project name" *ngIf="isZitadel === false">
                     <mat-icon *ngIf="!editstate">edit</mat-icon>
                     <mat-icon *ngIf="editstate">close</mat-icon>
+                </button>
+            </ng-template>
+            <ng-template appHasRole [appHasRole]="['project.delete:'+projectId, 'project.delete']">
+                <button matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" mat-icon-button
+                    (click)="deleteProject()" aria-label="Edit project name" *ngIf="isZitadel === false">
+                    <i class="las la-trash"></i>
                 </button>
             </ng-template>
 

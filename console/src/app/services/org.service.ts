@@ -9,6 +9,7 @@ import {
     Domain,
     Iam,
     Org,
+    OrgCreateRequest,
     OrgDomain,
     OrgDomainSearchQuery,
     OrgDomainSearchRequest,
@@ -138,7 +139,6 @@ export class OrgService {
         );
     }
 
-
     public async ValidateMyOrgDomain(domain: string):
         Promise<Empty> {
         const req: ValidateOrgDomainRequest = new ValidateOrgDomainRequest();
@@ -167,6 +167,16 @@ export class OrgService {
         req.setDomain(domain);
         return await this.request(
             c => c.getOrgByDomainGlobal,
+            req,
+            f => f,
+        );
+    }
+
+    public async CreateOrg(name: string): Promise<Org> {
+        const req = new OrgCreateRequest();
+        req.setName(name);
+        return await this.request(
+            c => c.createOrg,
             req,
             f => f,
         );

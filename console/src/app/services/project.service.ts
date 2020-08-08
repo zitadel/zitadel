@@ -10,6 +10,7 @@ import {
     ApplicationSearchRequest,
     ApplicationSearchResponse,
     ApplicationUpdate,
+    ApplicationView,
     GrantedProjectSearchRequest,
     OIDCApplicationCreate,
     OIDCConfig,
@@ -493,7 +494,7 @@ export class ProjectService {
         );
     }
 
-    public async GetApplicationById(projectId: string, applicationId: string): Promise<Application> {
+    public async GetApplicationById(projectId: string, applicationId: string): Promise<ApplicationView> {
         const req = new ApplicationID();
         req.setProjectId(projectId);
         req.setId(applicationId);
@@ -519,6 +520,16 @@ export class ProjectService {
         req.setProjectId(projectId);
         return await this.request(
             c => c.projectGrantByID,
+            req,
+            f => f,
+        );
+    }
+
+    public async RemoveProject(id: string): Promise<Empty> {
+        const req = new ProjectID();
+        req.setId(id);
+        return await this.request(
+            c => c.removeProject,
             req,
             f => f,
         );

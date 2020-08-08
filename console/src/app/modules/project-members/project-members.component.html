@@ -1,4 +1,4 @@
-<app-detail-layout [backRouterLink]="[ '/projects', project.projectId]"
+<app-detail-layout *ngIf="project" [backRouterLink]="[ '/projects', project?.projectId]"
     title="{{projectName}} {{ 'PROJECT.MEMBER.TITLE' | translate }}"
     description="{{ 'PROJECT.MEMBER.DESCRIPTION' | translate }}">
     <app-refresh-table *ngIf="project" (refreshed)="changePage()" [dataSize]="dataSource.totalResult"
