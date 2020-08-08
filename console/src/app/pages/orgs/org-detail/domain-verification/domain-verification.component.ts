@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { saveAs } from 'file-saver';
 import { OrgDomainValidationResponse, OrgDomainValidationType, OrgDomainView } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
     selector: 'app-domain-verification',
@@ -17,8 +18,9 @@ export class DomainVerificationComponent {
     public http!: OrgDomainValidationResponse.AsObject;
     public dns!: OrgDomainValidationResponse.AsObject;
     public copied: string = '';
-    // @ViewChild('link') public link!: any;
+
     constructor(
+        private toast: ToastService,
         public dialogRef: MatDialogRef<DomainVerificationComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         private orgService: OrgService,
@@ -44,6 +46,8 @@ export class DomainVerificationComponent {
     public validate(): void {
         this.orgService.ValidateMyOrgDomain(this.domain.domain).then(() => {
             this.dialogRef.close(false);
+        }).catch((error) => {
+            this.toast.showError(error);
         });
     }
 
