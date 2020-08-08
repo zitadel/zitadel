@@ -37,6 +37,7 @@ import {
     ProjectGrantCreate,
     RemoveOrgDomainRequest,
     RemoveOrgMemberRequest,
+    ValidateOrgDomainRequest,
 } from '../proto/generated/management_pb';
 import { GrpcBackendService } from './grpc-backend.service';
 import { GrpcService, RequestFactory, ResponseMapper } from './grpc.service';
@@ -132,6 +133,19 @@ export class OrgService {
 
         return await this.request(
             c => c.generateMyOrgDomainValidation,
+            req,
+            f => f,
+        );
+    }
+
+
+    public async ValidateMyOrgDomain(domain: string):
+        Promise<Empty> {
+        const req: ValidateOrgDomainRequest = new ValidateOrgDomainRequest();
+        req.setDomain(domain);
+
+        return await this.request(
+            c => c.validateMyOrgDomain,
             req,
             f => f,
         );

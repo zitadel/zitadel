@@ -16,6 +16,11 @@
   .title {
     font-size: 16px;
     margin-right: 1rem;
+    cursor: pointer;
+
+    &:hover {
+        text-decoration: underline;
+    }
   }
 
   .verified,

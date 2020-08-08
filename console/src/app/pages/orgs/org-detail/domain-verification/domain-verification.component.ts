@@ -16,6 +16,7 @@ export class DomainVerificationComponent {
     public http!: OrgDomainValidationResponse.AsObject;
     public dns!: OrgDomainValidationResponse.AsObject;
     public copied: string = '';
+    // @ViewChild('link') public link!: any;
     constructor(
         public dialogRef: MatDialogRef<DomainVerificationComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
@@ -23,7 +24,11 @@ export class DomainVerificationComponent {
     ) {
         this.domain = data.domain;
 
-        this.loadTokens();
+        this.loadTokens().then(() => {
+            const blob = new Blob([this.http.token], { type: 'octet/stream' });
+            const link: any = document.getElementById('link');
+            link.href = window.URL.createObjectURL(blob);
+        });
     }
 
     async loadTokens(): Promise<void> {
@@ -39,7 +44,9 @@ export class DomainVerificationComponent {
         this.dialogRef.close(false);
     }
 
-    public verify(type: OrgDomainValidationType): void {
-        this.orgService.GenerateMyOrgDomainValidation(this.domain.domain, type);
+    public validate(): void {
+        this.orgService.ValidateMyOrgDomain(this.domain.domain).then(() => {
+            this.dialogRef.close(false);
+        });
     }
 }
