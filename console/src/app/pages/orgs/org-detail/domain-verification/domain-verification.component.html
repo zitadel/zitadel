@@ -6,7 +6,8 @@
     <p class="entry">{{http?.url}}.txt</p>
 
     <div class="btn-container">
-        <a mat-stroked-button id="link" #link color="primary">{{ 'ORG.PAGES.DOWNLOAD_FILE' | translate }}</a>
+        <button mat-stroked-button (click)="saveFile()"
+            color="primary">{{ 'ORG.PAGES.DOWNLOAD_FILE' | translate }}</button>
 
         <button color="primary" type="submit" mat-raised-button
             (click)="validate()">{{ 'ACTIONS.VERIFY' | translate }}</button>

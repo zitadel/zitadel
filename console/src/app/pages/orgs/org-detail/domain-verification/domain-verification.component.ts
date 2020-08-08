@@ -1,5 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { saveAs } from 'file-saver';
 import { OrgDomainValidationResponse, OrgDomainValidationType, OrgDomainView } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 
@@ -24,11 +25,7 @@ export class DomainVerificationComponent {
     ) {
         this.domain = data.domain;
 
-        this.loadTokens().then(() => {
-            const blob = new Blob([this.http.token], { type: 'octet/stream' });
-            const link: any = document.getElementById('link');
-            link.href = window.URL.createObjectURL(blob);
-        });
+        this.loadTokens();
     }
 
     async loadTokens(): Promise<void> {
@@ -48,5 +45,10 @@ export class DomainVerificationComponent {
         this.orgService.ValidateMyOrgDomain(this.domain.domain).then(() => {
             this.dialogRef.close(false);
         });
+    }
+
+    public saveFile(): void {
+        const blob = new Blob([this.http.token], { type: 'text/plain;charset=utf-8' });
+        saveAs(blob, this.http.token + '.txt');
     }
 }
