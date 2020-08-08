@@ -129,7 +129,6 @@ export class AuthService {
         this.oauthService.logOut();
         this._authenticated = false;
         this._authenticationChanged.next(false);
-        this.router.navigate(['/']);
     }
 
     public get activeOrgChanged(): Observable<Org.AsObject> {
