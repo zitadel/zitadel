@@ -1,0 +1,24 @@
+.btn-container {
+    display: flex;
+    margin: -.5rem;
+
+    button {
+        margin: 1rem .5rem;
+        border-radius: 0.5rem;
+    }
+}
+
+.action {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+  
+    .ok-button {
+      margin-left: .5rem;
+    }
+  
+    button {
+      border-radius: .5rem;
+    }
+}
+  

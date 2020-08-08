@@ -13,6 +13,9 @@ import {
     OrgDomainSearchQuery,
     OrgDomainSearchRequest,
     OrgDomainSearchResponse,
+    OrgDomainValidationRequest,
+    OrgDomainValidationResponse,
+    OrgDomainValidationType,
     OrgIamPolicy,
     OrgID,
     OrgMemberRoles,
@@ -116,6 +119,19 @@ export class OrgService {
 
         return await this.request(
             c => c.searchMyOrgDomains,
+            req,
+            f => f,
+        );
+    }
+
+    public async GenerateMyOrgDomainValidation(domain: string, type: OrgDomainValidationType):
+        Promise<OrgDomainValidationResponse> {
+        const req: OrgDomainValidationRequest = new OrgDomainValidationRequest();
+        req.setDomain(domain);
+        req.setType(type);
+
+        return await this.request(
+            c => c.generateMyOrgDomainValidation,
             req,
             f => f,
         );

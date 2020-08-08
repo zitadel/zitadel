@@ -1,0 +1,34 @@
+<span class="title" mat-dialog-title>{{domain.domain}} {{'ORG.PAGES.ORGDOMAIN_TITLE' | translate}} </span>
+<div mat-dialog-content>
+    <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION' | translate }}</p>
+
+    <p>HTTP TOKEN</p>
+    <p>{{domain?.domain}}/.well-known/zitadel-challenge/[token].txt</p>
+
+    <div class="btn-container">
+        <button color="primary" type="submit" mat-stroked-button>{{ 'ORG.PAGES.DOWNLOAD_FILE' | translate }}</button>
+
+        <button color="primary" type="submit" mat-raised-button
+            (click)="verify(OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_HTTP)">{{ 'ACTIONS.VERIFY' | translate }}</button>
+    </div>
+
+    <p>DNS TOKEN</p>
+    <p>{{domain?.domain}}/.well-known/zitadel-challenge/[token])</p>
+
+    <div class="btn-container">
+        <button color="primary" type="submit" mat-stroked-button>{{ 'ORG.PAGES.DOWNLOAD_FILE' | translate }}</button>
+
+        <button color="primary" type="submit" mat-raised-button
+            (click)="verify(OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_DNS)">{{ 'ACTIONS.VERIFY' | translate }}</button>
+    </div>
+</div>
+<div mat-dialog-actions class="action">
+    <button mat-button (click)="closeDialog()">
+        <!-- {{'ACTIONS.CANCEL' | translate}} -->
+        {{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION_SKIP' | translate }}
+    </button>
+
+    <button mat-button class="ok-button" (click)="closeDialog()">
+        {{'ACTIONS.CLOSE' | translate}}
+    </button>
+</div>

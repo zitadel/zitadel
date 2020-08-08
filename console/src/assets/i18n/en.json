@@ -265,7 +265,7 @@
             "CREATE":"Create organisation",
             "ORGDETAIL_TITLE":"Enter the name and domain of your new organisation.",
             "ORGDOMAIN_TITLE":"Organisation domain ownership verification",
-            "ORGDOMAIN_VERIFICATION":"Provide your web domain and verify their ownership. You need to download a verification file and upload it at the provided URL listed below. To complete, click the button to verify.",
+            "ORGDOMAIN_VERIFICATION":"Verify ownership of your domain. You need to download a verification file and upload it at the provided URL listed below or place a TXT Record at the provided Url. To complete, click the button to verify.",
             "ORGDOMAIN_VERIFICATION_SKIP":"You can skip verification for now and continue to create your organisation, but in order to use your organisation this step has to be completed!",
             "ORGDETAILUSER_TITLE":"Configure Organisation Owner",
             "DOWNLOAD_FILE":"Download file",

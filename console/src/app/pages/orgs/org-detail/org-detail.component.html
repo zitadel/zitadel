@@ -8,6 +8,8 @@
                 <span class="title">{{domain.domain}}</span>
                 <i matTooltip="verified" *ngIf="domain.verified" class="verified las la-check-circle"></i>
                 <i matTooltip="primary" *ngIf="domain.primary" class="primary las la-star"></i>
+                <button *ngIf="!domain.verified" (click)="verifyDomain(domain)" class="verify-btn"
+                    mat-stroked-button>Verify</button>
                 <span class="fill-space"></span>
                 <button matTooltip="Remove domain" color="warn" mat-icon-button (click)="removeDomain(domain.domain)"><i
                         class="las la-trash"></i></button>

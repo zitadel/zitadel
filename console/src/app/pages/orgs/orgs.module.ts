@@ -25,9 +25,10 @@ import { OrgDetailComponent } from './org-detail/org-detail.component';
 import { OrgGridComponent } from './org-grid/org-grid.component';
 import { OrgsRoutingModule } from './orgs-routing.module';
 import { PolicyGridComponent } from './policy-grid/policy-grid.component';
+import { DomainVerificationComponent } from './org-detail/domain-verification/domain-verification.component';
 
 @NgModule({
-    declarations: [OrgDetailComponent, OrgGridComponent, PolicyGridComponent],
+    declarations: [OrgDetailComponent, OrgGridComponent, PolicyGridComponent, DomainVerificationComponent],
     imports: [
         CommonModule,
         OrgsRoutingModule,

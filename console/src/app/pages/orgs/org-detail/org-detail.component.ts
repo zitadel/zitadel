@@ -23,6 +23,7 @@ import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AddDomainDialogComponent } from './add-domain-dialog/add-domain-dialog.component';
+import { DomainVerificationComponent } from './domain-verification/domain-verification.component';
 
 
 @Component({
@@ -181,5 +182,19 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         if (this.org?.state === OrgState.ORGSTATE_ACTIVE) {
             this.router.navigate(['org/members']);
         }
+    }
+
+    public verifyDomain(domain: OrgDomainView.AsObject): void {
+        const dialogRef = this.dialog.open(DomainVerificationComponent, {
+            data: {
+                domain: domain,
+            },
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                console.log(resp);
+            }
+        });
     }
 }
