@@ -25,7 +25,7 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: export
-        path: __sapper__/export
+        path: site/__sapper__/export
   deploydocs:
     name: Deploy
     needs: builddocs
