@@ -30,6 +30,9 @@ jobs:
     name: Deploy
     needs: builddocs
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./site
     # if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout Repo
