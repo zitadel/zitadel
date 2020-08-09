@@ -1,7 +1,0 @@
-{
-    "title": "Das ist unser Doc generator",
-    "description":"Eine work in progress demo finden sie ",
-    "description_link":"hier",
-    "instruction_header_0":"Um diesen Generator in Ihr Repository zu integrieren, fügen Sie diesen Build Ihrem Workflow hinzu!",
-    "instruction_header_1":"Die nötigen conventions finden Sie in der Dokumentation!"
-}

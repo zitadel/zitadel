@@ -1,7 +1,0 @@
-{
-    "title": "This is the doc generator",
-    "description":"Please take a look at the demo ",
-    "description_link":"here",
-    "instruction_header_0":"To integrate this generator to your repository, add this build to your workflow!",
-    "instruction_header_1":"Read the docs to learn more about the conventions used."
-}

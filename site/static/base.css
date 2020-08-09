@@ -67,11 +67,27 @@
 }
 
 body {
-	--font: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
-	--font-mono: 'Lato', 'Fira Mono', monospace;
+	--font: 'Rubik', -apple-system, BlinkMacSystemFont, sans-serif;
+	--font-mono: 'Rubik', 'Fira Mono', monospace;
 }
 
 /*	fonts ---------------------------------- */
+
+@font-face {
+	font-family: 'Rubik';
+	font-style: normal;
+	font-weight: 300;
+	src: local('Rubik Regular'), local('Rubik-Regular'),
+		url('/fonts/rubik/Rubik-Regular.ttf') format('ttf');
+}
+
+@font-face {
+	font-family: 'Rubik';
+	font-style: normal;
+	font-weight: 600;
+	src: local('Rubik Bold'), local('Rubik-Bold'),
+		url('/fonts/rubik/Rubik-Bold.ttf') format('ttf');
+}
 
 @font-face {
 	font-family: 'ailerons';
@@ -84,14 +100,14 @@ html {
 	-webkit-text-size-adjust: 100%;
 	-ms-overflow-style: -ms-autohiding-scrollbar;
 	box-sizing: border-box;
-    border-collapse: collapse;
+	border-collapse: collapse;
 }
 
 html,
 body,
 #sapper {
 	width: 100%;
-    height: 100%;
+	height: 100%;
 }
 
 * {
@@ -126,6 +142,7 @@ body {
 	font: 300 var(--h4)/var(--lh) var(--font);
 	background-color: var(--back);
 	color: var(--text);
+
 	/* default spacing of Overpass is a bit too airy */
 	/* letter-spacing: -.013em; */
 }
@@ -382,22 +399,6 @@ th {
 	text-align: left;
 	border-bottom: 1px solid #eee;
 	padding: 0.4rem 0.8rem 0.4rem 0;
-}
-
-td[align='right'] {
-    text-align: right !important;
-}
-
-th[align='right'] {
-    text-align: right !important;
-}
-
-td[align='left'] {
-    text-align: left !important;
-}
-
-th[align='left'] {
-    text-align: left !important;
 }
 
 table code,

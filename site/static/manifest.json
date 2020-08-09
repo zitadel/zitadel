@@ -1,11 +1,11 @@
 {
 	"background_color": "#ffffff",
 	"theme_color": "#159794",
-    "name": "Caos Docs",
+    "name": "Zitadel Docs",
     "lang": "en",
-	"short_name": "Caos Docs",
+	"short_name": "Zitadel Docs",
 	"display": "minimal-ui",
-	"start_url": "/site/",
+	"start_url": "/",
 	"icons": [
         {
           "src": "icons/android-chrome-256x256.png",
