@@ -36,7 +36,7 @@ pre[class*="language-"] {
 	padding: 1em;
 	margin: .5em 0;
 	overflow: auto;
-	background: #1e1e1e;
+	background: #001F40;
 }
 
 :not(pre) > code[class*="language-"] {
@@ -88,7 +88,7 @@ pre[class*="language-"] {
 .language-css .token.string,
 .style .token.string {
 	color: #d4d4d4;
-	background: #1e1e1e;
+	background: #001F40;
 }
 
 .token.atrule,

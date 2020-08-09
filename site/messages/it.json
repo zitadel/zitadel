@@ -1,7 +1,0 @@
-{
-    "title": "Questo è il nostro site generator",
-    "description":"Visita la nostra documentazione ",
-    "description_link":"qui",
-    "instruction_header_0":"Per integrare questo generatore nel tuo repository, aggiungi questa build al tuo workflow di github",
-    "instruction_header_1":"Leggi la documentazione per saperne di più sulle convenzioni utilizzate."
-}

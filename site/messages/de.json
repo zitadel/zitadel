@@ -1,7 +1,7 @@
 {
-    "title": "Das ist unser Doc generator",
-    "description":"Eine work in progress demo finden sie ",
-    "description_link":"hier",
-    "instruction_header_0":"Um diesen Generator in Ihr Repository zu integrieren, fügen Sie diesen Build Ihrem Workflow hinzu!",
-    "instruction_header_1":"Die nötigen conventions finden Sie in der Dokumentation!"
+    "title": "Zitadel Identity and Access Management",
+    "description":"Die meisten Apps müssen die Identität eines Benutzers kennen. Wenn Sie die Identität eines Benutzers kennen, kann eine App Benutzerdaten sicher speichern und auf allen Geräten des Benutzers dieselbe personalisierte Erfahrung bieten.",
+    "description2":"Die Zitadel-Authentifizierung bietet Backend-Dienste, benutzerfreundliche SDKs und vorgefertigte UI-Bibliotheken zur Authentifizierung von Benutzern bei Ihrer App. Es unterstützt die Authentifizierung mithilfe von Passwörtern und bietet weitere Sicherheitsmechanismen, wie einen zweiten Faktor über OTP um einen sicheren Zugang zu gewährleisten.",
+    "description3":"Zitadel nutzt Industriestandards wie OAuth 2.0 und OpenID Connect, sodass sie problemlos in Ihr benutzerdefiniertes Backend integriert werden kann.",
+    "button":"Erfahren Sie wie sie starten"
 }
