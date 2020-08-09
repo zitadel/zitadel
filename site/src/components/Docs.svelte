@@ -5,7 +5,7 @@
   import manifest from '../../static/manifest.json';
 export let lang = manifest.lang;
   export let owner = "caos";
-  export let project = "site";
+  export let project = "zitadel/site";
   export let path = "/docs";
   export let dir = "";
   export let edit_title = "edit this section";

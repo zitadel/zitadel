@@ -23,4 +23,4 @@
 	{/each}
 </svelte:head>
 
-<Docs {sections} project="site" dir="{slug}"/>
+<Docs {sections} project="zitadel/site" dir="{slug}"/>
