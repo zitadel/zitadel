@@ -73,6 +73,7 @@
         width: 200px;
         line-height: 22px;
         font-size: 22px;
+        display: none;
     }
 
     .home:hover {
@@ -89,6 +90,12 @@
 		color: inherit;
 		border-bottom: none;
         transition: none;
+    }
+
+    @media (min-width: 400px) {
+        .home {
+            display: inline-block;
+        }
     }
 
     a img {
@@ -110,6 +117,7 @@
         color: var(--prime);
         transition: background-color .2 ease;
         margin: 0 1rem;
+        min-width: 120px;
     }
 
     button:hover {

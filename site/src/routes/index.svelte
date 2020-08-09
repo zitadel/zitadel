@@ -17,7 +17,7 @@
     .caos-back {
         position: absolute;
         top: 80px;
-        height: 70vh;
+        height: 60vh;
         right: 0;
     }
     .section {
@@ -27,10 +27,11 @@
     @media screen and (min-width: 768px) {
         .caos-back {
             right: 0;
+            height: 70vh;
         }
         .section {
             width: 50%;
-            margin-top: 100px;
+            margin-top: 50px;
         }
     }
 </style>

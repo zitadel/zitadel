@@ -420,7 +420,7 @@ export let lang = manifest.lang;
 <aside bind:this={aside} class="sidebar-container" class:open={show_contents}>
   <div class="sidebar" on:click={() => (show_contents = false)}>
     <!-- scroll container -->
-    <GuideContents {lang} {dir} {sections} {active_section} {show_contents} />
+    <GuideContents {dir} {sections} {active_section} {show_contents} />
   </div>
 
   <button on:click={() => (show_contents = !show_contents)}>
