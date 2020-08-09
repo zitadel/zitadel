@@ -30,9 +30,9 @@ jobs:
     name: Deploy
     needs: builddocs
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./site
+    # defaults:
+    #   run:
+    #     working-directory: ./site
     # if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout Repo
@@ -43,11 +43,11 @@ jobs:
           name: export
           path: site/__sapper__/export
       - name: Add CNAME file
-        run: echo "docs.zitadel.ch" > __sapper__/export/CNAME
+        run: echo "docs.zitadel.ch" > site/__sapper__/export/CNAME
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BRANCH: gh-pages
-          FOLDER: __sapper__/export
+          FOLDER: site/__sapper__/export
           CLEAN: true
