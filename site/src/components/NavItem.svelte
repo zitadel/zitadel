@@ -1,13 +1,29 @@
+<style>
+    a {
+        display: flex;
+        align-items: center;
+        color: var(--text);
+        text-decoration: none;
+        border: none;
+        padding: 0;
+    }
+
+    a:hover {
+        text-decoration: none;
+        border: none;
+        padding: 0;
+    }
+</style>
+
 <script>
 	import { getContext } from 'svelte';
 	export let segment = null;
     export let external = null;
-    export let lang = false;
     const current = getContext('nav');
 </script>
 
 {#if external}
-	<li><a href={external}><slot></slot></a></li>
+	<a href={external}><slot></slot></a>
 {:else}
-	<li class:active="{$current === segment}" class:lang="{lang}"><a rel="prefetch" href={segment}><slot></slot></a></li>
+	<a rel="prefetch" href={segment}><slot></slot></a>
 {/if}

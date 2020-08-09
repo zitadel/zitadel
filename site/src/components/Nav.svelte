@@ -1,29 +1,17 @@
 <script>
     import LanguageSwitcher from './LanguageSwitcher.svelte'
+    import NavItem from './NavItem.svelte'
 	import { onMount, setContext } from 'svelte';
 	import { writable } from 'svelte/store';
 	import Icon from './Icon.svelte';
 	export let segment;
-	export let page;
     export let logo;
     export let title;
-	export let home_title = 'Homepage';
+    import { _ } from 'svelte-i18n';
 	const current = writable(null);
 	setContext('nav', current);
-	let open = false;
 	let visible = true;
-	// hide nav whenever we navigate
-	page.subscribe(() => {
-		open = false;
-	});
-	function intercept_touchstart(event) {
-		if (!open) {
-			event.preventDefault();
-			event.stopPropagation();
-			open = true;
-		}
-	}
-	// Prevents navbar to show/hide when clicking in docs sidebar
+	
 	let hash_changed = false;
 	function handle_hashchange() {
 		hash_changed = true;
@@ -80,69 +68,6 @@
     .fill-space {
         flex: 1;
     }
-
-	.primary {
-		list-style: none;
-		margin: 0;
-		line-height: 1;
-	}
-	ul :global(li) {
-		display: block;
-        display: none;
-	}
-	ul :global(li).active {
-		display: block;
-    }
-
-    ul :global(li).lang :global(a) {
-        font-size: 16px;
-    }
-    
-	ul {
-        /* display: flex;
-        align-items: center; */
-        position: relative;
-        text-align: center;
-	}
-	ul::after {
-		/* prevent clicks from registering if nav is closed */
-		position: absolute;
-		content: '';
-		width: 100%;
-		height: 100%;
-		left: 0;
-		top: 0;
-	}
-	ul.open {
-		padding: 3rem 1rem;
-        background-color: #212224;
-        align-self: start;
-        border: 1px solid #ffffff;
-	}
-	ul.open :global(li) {
-		display: block;
-		text-align: right
-	}
-	ul.open::after {
-		display: none;
-	}
-	ul :global(li) :global(a) {
-        font-weight: 500;
-        padding: 1rem .5rem;
-		border: none;
-        color: inherit;
-        text-decoration: none;
-	}
-	ul.open :global(li) :global(a) {
-        display: block;
-        padding: .5rem .5rem;
-        height: 30px;
-    }
-    
-	.primary :global(svg) {
-		width: 2rem;
-		height: 2rem;
-    }
     
 	.home {
         width: 200px;
@@ -160,105 +85,76 @@
         display: block;
     }
     
-	ul :global(li).active :global(a) {
-		color: rgb(187,89,131);
-	}
-
-	.modal-background {
-		position: fixed;
-		width: 100%;
-		height: 100%;
-		left: 0;
-		top: 0;
-    }
-    
 	a {
 		color: inherit;
 		border-bottom: none;
         transition: none;
     }
-    
-	@media (min-width: 840px) {
-		ul {
-			padding: 0;
-            background: none;
-        }
-        
-		ul.open {
-			padding: 0;
-            background-color: transparent;
-			border: none;
-			align-self: initial;
-        }
-        
-		ul.open :global(li) {
-			display: inline;
-			text-align: left;
-        }
-        
-		ul.open :global(li) :global(a) {
-			display: inline;
-        }
-        
-		ul::after {
-			display: none;
-        }
-        
-		ul :global(li) {
-            display: inline !important;
-        }
-        
-		.hide-if-desktop {
-			display: none !important;
-        }
-    }
-    
-    .hide {
-        display: none;
+
+    a img {
+        max-height: 40px;
     }
 
     .switcher-wrapper {
         padding: 0 1rem;
     }
+
+    button {
+        display: flex;
+        align-items: center;
+        border-radius: 8px;
+        border: 1px solid hsla(0,0%,100%,.12);
+        box-shadow: 0 0 0 0 rgba(0,0,0,.2), 0 0 0 0 rgba(0,0,0,.14), 0 0 0 0 rgba(0,0,0,.12);
+        padding: 0 15px;
+        height: 36px;
+        color: var(--prime);
+        transition: background-color .2 ease;
+        margin: 0 1rem;
+    }
+
+    button:hover {
+        background-color: #5282c110;
+    }
+    button:active {
+        background-color: #5282c120;
+    }
+
+    button span {
+        font-size: 14px;
+        line-height: 14px;
+    }
 </style>
 
 <svelte:window on:hashchange={handle_hashchange} on:scroll={handle_scroll} />
 
-<header class:visible="{visible || open}">
+<header class:visible="{visible}">
 	<nav>
 		<a
 			rel="prefetch"
 			href="."
 			class="home"
-			title="{home_title}"
+			title="{title}"
 		>
             {#if logo}
-                <img src={logo} alt={home_title} />
-            {/if}
-            {#if title}
+                <img src={logo} alt={title} />
+            {:else if title}
                 {title}
             {/if}
         </a>
 
-		{#if open}
-			<div class="modal-background hide-if-desktop" on:click="{() => open = false}"></div>
-		{/if}
-
         <span class="fill-space"></span>
+
+        <a href='https://console.zitadel.ch'><button>
+            <span>{$_('toconsole')}</span>
+        </button>
+        </a>
+
+        <NavItem external="https://github.com/caos" title="GitHub Repo">
+            <Icon name="lab la-github" size="24px"></Icon>
+        </NavItem>
 
         <div class="switcher-wrapper">
             <LanguageSwitcher></LanguageSwitcher>
         </div>
-
-        <ul
-			class="primary"
-			class:open
-			on:touchstart|capture={intercept_touchstart}
-			on:mouseenter="{() => open = true}"
-			on:mouseleave="{() => open = false}"
-		>
-			<slot></slot>
-            <i class="hide-if-desktop las la-chevron-down" class:hide={open}></i>
-		</ul>
 	</nav>
 </header>

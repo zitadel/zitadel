@@ -97,7 +97,7 @@
 		.section:hover,
 		.subsection:hover,
 		.active {
-			color: white
+			color: #5282c1;
 		}
 	}
 </style>

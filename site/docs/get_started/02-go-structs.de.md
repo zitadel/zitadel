@@ -1,22 +1,13 @@
 ---
-title: Concluding
+title: Go structs
 ---
 
-#### Overview
+### Go structures
 
-The `manifest.json`, and `favicon.ico` are mandatory. If its all set and done, reensure all of this listed files are commited and pushed.
+You can reference go struct tables from our go struct generator.
+Provide a `doc_assets` folder with all generated files in it.
+Make sure that the `.md` file consists of no other than the table itself and metadata which defines name and description of the struct
 
-```bash
-├ docs
-  ├ manifest.json
-  ├ static
-  │ ├ favicon.ico
-  └ index.svelte
-```
-
-
-## Structure 
- 
 
 | Attribute                   | Description                                                                     | Default | Collection  |
 | --------------------------- | ------------------------------------------------------------------------------- | ------- | ----------  |
@@ -35,3 +26,7 @@ The `manifest.json`, and `favicon.ico` are mandatory. If its all set and done, r
 | argocd                      | Spec for the Argo-CD , [here](argocd/Argocd.md)                                 |         |             |
 | prometheus                  | Spec for the Prometheus instance , [here](Prometheus.md)                        |         |             |
 | loki                        | Spec for the Loki instance , [here](Loki.md)                                    |         |             |
+
+#### References
+
+To reference a table ...

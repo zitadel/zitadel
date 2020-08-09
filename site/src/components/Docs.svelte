@@ -384,13 +384,13 @@ export let lang = manifest.lang;
   }
 
   section :global(blockquote) {
-    color: hsl(204, 100%, 50%);
+    color: #e91e63;
     border: 2px solid var(--flash);
   }
 
   section :global(blockquote) :global(code) {
     background: hsl(204, 100%, 95%) !important;
-    color: hsl(204, 100%, 50%);
+    color: #e91e63;
   }
 </style>
 

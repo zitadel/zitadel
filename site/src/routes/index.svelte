@@ -16,15 +16,18 @@
     }
     .caos-back {
         position: absolute;
-        top: 0;
-        right: 0;
+        top: 80px;
         height: 70vh;
+        right: 0;
     }
     .section {
         width: 100%;
         margin-top: 70vh;
     }
     @media screen and (min-width: 768px) {
+        .caos-back {
+            right: 0;
+        }
         .section {
             width: 50%;
             margin-top: 100px;

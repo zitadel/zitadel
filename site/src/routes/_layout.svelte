@@ -18,11 +18,7 @@
   }
 </style>
 
-<Nav {segment} {page} title="{manifest.name}">
-    <NavItem external="https://github.com/caos" title="GitHub Repo">
-        <Icon name="lab la-github" size="24px"></Icon>
-    </NavItem>
-</Nav>
+<Nav {segment} {page} title="{manifest.name}" logo="logos/zitadel-logo-oneline-darkdesign.svg"></Nav>
 
 <main>
   <slot />
