@@ -31,19 +31,17 @@
 
 /*	theme vars */
 .theme-default {
-	--back: #212224;
+    --back: #1D1133;
+    --back1: #1D1133;
+    --back2: #001F40;
 	--back-light: transparent;
-	--back-api: #2d2e30;
+	--back-api: #1D1133;
 	--prime: #f81f6b;
     --second: orange;
     --flash: #f54381;
 
-    --nav-back: #212224;
-    --side-nav-back: #212224;
-
-    --primary-card: #2d2e30;
-    --secondary-card: #2d2e30;
-    --third-card: #2d2e30;
+    --nav-back: #1D1133;
+    --side-nav-back: #1D1133;
 
 	--heading: #e8eaed;
     --text: #eff8ff;
@@ -67,27 +65,11 @@
 }
 
 body {
-	--font: 'Rubik', -apple-system, BlinkMacSystemFont, sans-serif;
-	--font-mono: 'Rubik', 'Fira Mono', monospace;
+	--font: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
+	--font-mono: 'Lato', 'Fira Mono', monospace;
 }
 
 /*	fonts ---------------------------------- */
-
-@font-face {
-	font-family: 'Rubik';
-	font-style: normal;
-	font-weight: 300;
-	src: local('Rubik Regular'), local('Rubik-Regular'),
-		url('/fonts/rubik/Rubik-Regular.ttf') format('ttf');
-}
-
-@font-face {
-	font-family: 'Rubik';
-	font-style: normal;
-	font-weight: 600;
-	src: local('Rubik Bold'), local('Rubik-Bold'),
-		url('/fonts/rubik/Rubik-Bold.ttf') format('ttf');
-}
 
 @font-face {
 	font-family: 'ailerons';
@@ -100,14 +82,14 @@ html {
 	-webkit-text-size-adjust: 100%;
 	-ms-overflow-style: -ms-autohiding-scrollbar;
 	box-sizing: border-box;
-	border-collapse: collapse;
+    border-collapse: collapse;
 }
 
 html,
 body,
 #sapper {
 	width: 100%;
-	height: 100%;
+    height: 100%;
 }
 
 * {
@@ -140,9 +122,8 @@ a:focus {
 /*	typography ----------------------------- */
 body {
 	font: 300 var(--h4)/var(--lh) var(--font);
-	background-color: var(--back);
+	background-color: var(--back1);
 	color: var(--text);
-
 	/* default spacing of Overpass is a bit too airy */
 	/* letter-spacing: -.013em; */
 }
@@ -399,6 +380,22 @@ th {
 	text-align: left;
 	border-bottom: 1px solid #eee;
 	padding: 0.4rem 0.8rem 0.4rem 0;
+}
+
+td[align='right'] {
+    text-align: right !important;
+}
+
+th[align='right'] {
+    text-align: right !important;
+}
+
+td[align='left'] {
+    text-align: left !important;
+}
+
+th[align='left'] {
+    text-align: left !important;
 }
 
 table code,
