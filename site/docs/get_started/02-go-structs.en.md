@@ -14,18 +14,18 @@ Make sure that the `.md` file consists of no other than the table itself and met
 | boomVersion                 | Version of BOOM which should be reconciled                                      |         |             |
 | forceApply                  | Relative folder path where the currentstate is written to                       |         |             |
 | currentStatePath            | Flag if --force should be used by apply of resources                            |         |             |
-| preApply                    | Spec for the yaml-files applied before applications , [here](PreApply.md)       |         |             |
-| postApply                   | Spec for the yaml-files applied after applications , [here](PostApply.md)       |         |             |
-| prometheus-operator         | Spec for the Prometheus-Operator , [here](PrometheusOperator.md)                |         |             |
-| logging-operator            | Spec for the Banzaicloud Logging-Operator , [here](LoggingOperator.md)          |         |             |
-| prometheus-node-exporter    | Spec for the Prometheus-Node-Exporter , [here](PrometheusNodeExporter.md)       |         |             |
-| prometheus-systemd-exporter | Spec for the Prometheus-Systemd-Exporter , [here](PrometheusSystemdExporter.md) |         |             |
-| grafana                     | Spec for the Grafana , [here](grafana/Grafana.md)                               |         |             |
-| ambassador                  | Spec for the Ambassador , [here](Ambassador.md)                                 |         |             |
-| kube-state-metrics          | Spec for the Kube-State-Metrics , [here](KubeStateMetrics.md)                   |         |             |
-| argocd                      | Spec for the Argo-CD , [here](argocd/Argocd.md)                                 |         |             |
-| prometheus                  | Spec for the Prometheus instance , [here](Prometheus.md)                        |         |             |
-| loki                        | Spec for the Loki instance , [here](Loki.md)                                    |         |             |
+| preApply                    | Spec for the yaml-files applied before applications   |         |             |
+| postApply                   | Spec for the yaml-files applied after applicatio      |         |             |
+| prometheus-operator         | Spec for the Prometheus-Operator ,               |         |             |
+| logging-operator            | Spec for the Banzaicloud Logging-Operator ,         |         |             |
+| prometheus-node-exporter    | Spec for the Prometheus-Node-Exporter ,        |         |             |
+| prometheus-systemd-exporter | Spec for the Prometheus-Systemd-Exporter , |         |             |
+| grafana                     | Spec for the Grafana , [                          |         |             |
+| ambassador                  | Spec for the Ambassador ,                                |         |             |
+| kube-state-metrics          | Spec for the Kube-State-Metrics ,                 |         |             |
+| argocd                      | Spec for the Argo-CD ,                              |         |             |
+| prometheus                  | Spec for the Prometheus instance ,                    |         |             |
+| loki                        | Spec for the Loki instance ,             |         |             |
 
 #### References
 
