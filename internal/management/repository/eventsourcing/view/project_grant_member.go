@@ -15,7 +15,11 @@ func (v *View) ProjectGrantMemberByIDs(projectID, userID string) (*model.Project
 	return view.ProjectGrantMemberByIDs(v.Db, projectGrantMemberTable, projectID, userID)
 }
 
-func (v *View) SearchProjectGrantMembers(request *proj_model.ProjectGrantMemberSearchRequest) ([]*model.ProjectGrantMemberView, int, error) {
+func (v *View) ProjectGrantMembersByProjectID(projectID string) ([]*model.ProjectGrantMemberView, error) {
+	return view.ProjectGrantMembersByProjectID(v.Db, projectGrantMemberTable, projectID)
+}
+
+func (v *View) SearchProjectGrantMembers(request *proj_model.ProjectGrantMemberSearchRequest) ([]*model.ProjectGrantMemberView, uint64, error) {
 	return view.SearchProjectGrantMembers(v.Db, projectGrantMemberTable, request)
 }
 
@@ -37,6 +41,10 @@ func (v *View) DeleteProjectGrantMember(grantID, userID string, eventSequence ui
 		return nil
 	}
 	return v.ProcessedProjectGrantMemberSequence(eventSequence)
+}
+
+func (v *View) DeleteProjectGrantMembersByProjectID(projectID string) error {
+	return view.DeleteProjectGrantMembersByProjectID(v.Db, projectGrantMemberTable, projectID)
 }
 
 func (v *View) GetLatestProjectGrantMemberSequence() (*repository.CurrentSequence, error) {

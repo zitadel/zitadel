@@ -5,7 +5,7 @@
         <qrcode *ngIf="data" class="qrcode" [qrdata]="data" [width]="150" [errorCorrectionLevel]="'M'"></qrcode>
     </div>
 
-    <mat-form-field label="Access Code" required="true">
+    <mat-form-field class="form-field" label="Access Code" required="true">
         <mat-label>Code</mat-label>
         <input matInput [(ngModel)]="code" />
     </mat-form-field>

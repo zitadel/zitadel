@@ -79,10 +79,12 @@ export const navAnimations: Array<AnimationTriggerMetadata> = [
 
 export const routeAnimations: AnimationTriggerMetadata = trigger('routeAnimations', [
     transition('HomePage => AddPage', [
-        style({ transform: 'translateX(100%)' }),
-        animate('250ms ease-in-out', style({ transform: 'translateX(0%)' })),
+        style({ transform: 'translateX(100%)', opacity: 0.5 }),
+        animate('250ms ease-out', style({ transform: 'translateX(0%)', opacity: 1 })),
     ]),
-    transition('AddPage => HomePage', [animate('250ms', style({ transform: 'translateX(100%)' }))]),
+    transition('AddPage => HomePage',
+        [animate('250ms', style({ transform: 'translateX(100%)', opacity: 0.5 }))],
+    ),
     transition('HomePage => DetailPage', [
         query(':enter, :leave', style({ position: 'absolute', left: 0, right: 0 }), {
             optional: true,

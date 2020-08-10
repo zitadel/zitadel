@@ -59,7 +59,7 @@ func UsersByOrgID(db *gorm.DB, table, orgID string) ([]*model.UserView, error) {
 	return users, err
 }
 
-func SearchUsers(db *gorm.DB, table string, req *usr_model.UserSearchRequest) ([]*model.UserView, int, error) {
+func SearchUsers(db *gorm.DB, table string, req *usr_model.UserSearchRequest) ([]*model.UserView, uint64, error) {
 	users := make([]*model.UserView, 0)
 	query := repository.PrepareSearchQuery(table, model.UserSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &users)

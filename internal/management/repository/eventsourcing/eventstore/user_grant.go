@@ -13,10 +13,6 @@ import (
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
-const (
-	projectReadPerm = "project.read"
-)
-
 type UserGrantRepo struct {
 	SearchLimit     uint64
 	UserGrantEvents *grant_event.UserGrantEventStore

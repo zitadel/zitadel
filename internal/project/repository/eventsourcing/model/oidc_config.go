@@ -11,6 +11,7 @@ import (
 
 type OIDCConfig struct {
 	es_models.ObjectRoot
+	Version                int32               `json:"oidcVersion,omitempty"`
 	AppID                  string              `json:"appId"`
 	ClientID               string              `json:"clientId,omitempty"`
 	ClientSecret           *crypto.CryptoValue `json:"clientSecret,omitempty"`
@@ -20,6 +21,7 @@ type OIDCConfig struct {
 	ApplicationType        int32               `json:"applicationType,omitempty"`
 	AuthMethodType         int32               `json:"authMethodType,omitempty"`
 	PostLogoutRedirectUris []string            `json:"postLogoutRedirectUris,omitempty"`
+	DevMode                bool                `json:"devMode,omitempty"`
 }
 
 func (c *OIDCConfig) Changes(changed *OIDCConfig) map[string]interface{} {
@@ -40,8 +42,14 @@ func (c *OIDCConfig) Changes(changed *OIDCConfig) map[string]interface{} {
 	if c.AuthMethodType != changed.AuthMethodType {
 		changes["authMethodType"] = changed.AuthMethodType
 	}
+	if c.Version != changed.Version {
+		changes["oidcVersion"] = changed.Version
+	}
 	if !reflect.DeepEqual(c.PostLogoutRedirectUris, changed.PostLogoutRedirectUris) {
 		changes["postLogoutRedirectUris"] = changed.PostLogoutRedirectUris
+	}
+	if c.DevMode != changed.DevMode {
+		changes["devMode"] = changed.DevMode
 	}
 	return changes
 }
@@ -58,6 +66,7 @@ func OIDCConfigFromModel(config *model.OIDCConfig) *OIDCConfig {
 	return &OIDCConfig{
 		ObjectRoot:             config.ObjectRoot,
 		AppID:                  config.AppID,
+		Version:                int32(config.OIDCVersion),
 		ClientID:               config.ClientID,
 		ClientSecret:           config.ClientSecret,
 		RedirectUris:           config.RedirectUris,
@@ -66,6 +75,7 @@ func OIDCConfigFromModel(config *model.OIDCConfig) *OIDCConfig {
 		ApplicationType:        int32(config.ApplicationType),
 		AuthMethodType:         int32(config.AuthMethodType),
 		PostLogoutRedirectUris: config.PostLogoutRedirectUris,
+		DevMode:                config.DevMode,
 	}
 }
 
@@ -78,9 +88,10 @@ func OIDCConfigToModel(config *OIDCConfig) *model.OIDCConfig {
 	for i, rt := range config.GrantTypes {
 		grantTypes[i] = model.OIDCGrantType(rt)
 	}
-	return &model.OIDCConfig{
+	oidcConfig := &model.OIDCConfig{
 		ObjectRoot:             config.ObjectRoot,
 		AppID:                  config.AppID,
+		OIDCVersion:            model.OIDCVersion(config.Version),
 		ClientID:               config.ClientID,
 		ClientSecret:           config.ClientSecret,
 		RedirectUris:           config.RedirectUris,
@@ -89,7 +100,10 @@ func OIDCConfigToModel(config *OIDCConfig) *model.OIDCConfig {
 		ApplicationType:        model.OIDCApplicationType(config.ApplicationType),
 		AuthMethodType:         model.OIDCAuthMethodType(config.AuthMethodType),
 		PostLogoutRedirectUris: config.PostLogoutRedirectUris,
+		DevMode:                config.DevMode,
 	}
+	oidcConfig.FillCompliance()
+	return oidcConfig
 }
 
 func (p *Project) appendAddOIDCConfigEvent(event *es_models.Event) error {

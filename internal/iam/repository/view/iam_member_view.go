@@ -22,7 +22,7 @@ func IamMemberByIDs(db *gorm.DB, table, orgID, userID string) (*model.IamMemberV
 	return member, err
 }
 
-func SearchIamMembers(db *gorm.DB, table string, req *iam_model.IamMemberSearchRequest) ([]*model.IamMemberView, int, error) {
+func SearchIamMembers(db *gorm.DB, table string, req *iam_model.IamMemberSearchRequest) ([]*model.IamMemberView, uint64, error) {
 	members := make([]*model.IamMemberView, 0)
 	query := repository.PrepareSearchQuery(table, model.IamMemberSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &members)

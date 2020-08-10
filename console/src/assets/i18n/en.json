@@ -144,7 +144,7 @@
         },
         "PASSWORD": {
             "TITLE": "Password",
-            "DESCRIPTION": "## TODO - Replace with Password Policy text - TODO ##",
+            "DESCRIPTION": "Enter the new password according to the policy below.",
             "OLD": "Current Password",
             "NEW": "New Password",
             "CONFIRM": "Confirm new Password",
@@ -152,7 +152,7 @@
             "SET":"Set new Password",
             "RESENDNOTIFICATION": "Resend Password Reset Link",
             "REQUIRED": "Some required fields are missing!",
-            "MINLENGTHERROR":"Password has to be at least {{value}} characters long",
+            "MINLENGTHERROR":"The Password has to be at least {{value}} characters long",
             "NOTEQUAL":"The password provided is not equal!"
         },
         "EMAIL": "Email",
@@ -461,6 +461,8 @@
             "DETAIL": {
                 "TITLE":"Managers of the granted organisation",
                 "DESC":"These are the Managers of the granted organisation. You can select which users are allowed to maintain control of the project.",
+                "MEMBERTITLE":"Managers",
+                "MEMBERDESC":"These are the managers of the granted organisation. Add users here, who should gain access to edit data of the project.",
                 "PROJECTNAME":"Project Name",
                 "RESOURCEOWNER":"Resource Owner"
             },
@@ -561,6 +563,9 @@
             "TYPETITLE":"What type of application do you want to create?",
             "REDIRECTTITLE":"Specify the urls where the login will redirect to.",
             "POSTREDIRECTTITLE":"This is the redirect after logout.",
+            "REDIRECTDESCRIPTIONWEB":"The redirect has to begin with https://. http:// is only valid for testing purposes!",
+            "REDIRECTDESCRIPTIONNATIVE":"The redirect has to begin with your own protocol or http://localhost!",
+            "REDIRECTNOTVALID":"This redirect is not valid!",
             "TYPEREQUIRED":"The type is required!",
             "TITLE": "OIDC Configuration",
             "CLIENTID": "Client ID",
@@ -640,6 +645,7 @@
         "ORG_POLICY_EDITOR":"Org. Policy Editor",
         "ORG_POLICY_VIEWER":"Org. Policy Viewer",
         "PROJECT_OWNER":"Project Owner",
+        "PROJECT_OWNER_VIEWER":"Project Owner Viewer",
         "PROJECT_MEMBER_EDITOR":"Project Member Editor",
         "PROJECT_APP_EDITOR":"Project App Editor",
         "PROJECT_APP_VIEWER":"Project App Viewer",

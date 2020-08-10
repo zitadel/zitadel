@@ -2,11 +2,11 @@ $dark-background: #2d2e30;
 $light-background: #fafafa;
 
 :root {
-    transition: none;
+  transition: none;
 }
 
 .theme-app {
-    position: relative;
+  position: relative;
 }
 
 .theme-content {
@@ -20,9 +20,9 @@ $light-background: #fafafa;
   border-radius: 100%;
   width: 6rem;
   height: 6rem;
-  background: linear-gradient(40deg, #FF0080,#FF8C00 70%);
+  background: linear-gradient(40deg, #ff0080, #ff8c00 70%);
   margin: auto;
-  box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, .12);
 }
 
 .crescent {
@@ -34,10 +34,10 @@ $light-background: #fafafa;
   background: $light-background;
   transform: scale(0);
   transform-origin: top right;
-  transition: transform .4s cubic-bezier(0.645, 0.045, 0.355, 1);
+  transition: transform .4s cubic-bezier(.645, .045, .355, 1);
 }
 
-p { 
+p {
   font-size: 90%;
 }
 
@@ -48,28 +48,29 @@ p {
 }
 
 .desc {
-    font-size: 14px;
-    color: #8795a1;
+  font-size: 14px;
+  color: #8795a1;
 }
 
-label, .toggle {
+label,
+.toggle {
   height: 2.8rem;
   border-radius: 100px;
 }
 
 label {
   width: 100%;
-  background-color: rgba(0,0,0,.1);
+  background-color: rgba(0, 0, 0, .1);
   border-radius: 100px;
   position: relative;
-  margin: 1rem 0 1rem 0; 
+  margin: 1rem 0 1rem 0;
   cursor: pointer;
 }
 
 .toggle {
   position: absolute;
   background-color: $light-background;
-  box-shadow: 0 2px 15px rgba(0,0,0,.15);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, .15);
 }
 
 .names {
@@ -88,33 +89,33 @@ label {
   display: none;
 }
 
-[type="checkbox"]:checked + .theme-app .toggle{
+[type="checkbox"]:checked + .theme-app .toggle {
   transform: translateX(100%);
   background-color: $dark-background;
 }
 
-[type="checkbox"]:checked + .theme-app .dark{
+[type="checkbox"]:checked + .theme-app .dark {
   opacity: 1;
 }
 
-[type="checkbox"]:checked + .theme-app .light{
+[type="checkbox"]:checked + .theme-app .light {
   opacity: .5;
 }
 
-[type="checkbox"]:checked + .theme-app{
+[type="checkbox"]:checked + .theme-app {
   background-color: inherit;
   color: inherit;
 }
 
-[type="checkbox"]:checked + .theme-app .crescent{
+[type="checkbox"]:checked + .theme-app .crescent {
   transform: scale(1);
   background: $dark-background;
 }
 
-[type="checkbox"]:checked + .theme-app .circle{
-  background: linear-gradient(40deg, #8983F7, #A3DAFB 70%);
+[type="checkbox"]:checked + .theme-app .circle {
+  background: linear-gradient(40deg, #8983f7, #a3dafb 70%);
 }
 
-[type="checkbox"]:checked + .theme-app .main-circle{
-  background: linear-gradient(40deg, #8983F7, #A3DAFB 70%);
+[type="checkbox"]:checked + .theme-app .main-circle {
+  background: linear-gradient(40deg, #8983f7, #a3dafb 70%);
 }

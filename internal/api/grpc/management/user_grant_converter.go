@@ -58,7 +58,6 @@ func userGrantUpdateToModel(u *management.UserGrantUpdate) *grant_model.UserGran
 	return &grant_model.UserGrant{
 		ObjectRoot: models.ObjectRoot{AggregateID: u.Id},
 		RoleKeys:   u.RoleKeys,
-		GrantID:    u.GrantId,
 	}
 }
 
@@ -68,29 +67,6 @@ func userGrantRemoveBulkToModel(u *management.UserGrantRemoveBulk) []string {
 		ids[i] = id
 	}
 	return ids
-}
-
-func projectUserGrantUpdateToModel(u *management.ProjectUserGrantUpdate) *grant_model.UserGrant {
-	return &grant_model.UserGrant{
-		ObjectRoot: models.ObjectRoot{AggregateID: u.Id},
-		RoleKeys:   u.RoleKeys,
-	}
-}
-
-func projectGrantUserGrantCreateToModel(u *management.ProjectGrantUserGrantCreate) *grant_model.UserGrant {
-	return &grant_model.UserGrant{
-		UserID:    u.UserId,
-		ProjectID: u.ProjectId,
-		RoleKeys:  u.RoleKeys,
-		GrantID:   u.ProjectGrantId,
-	}
-}
-
-func projectGrantUserGrantUpdateToModel(u *management.ProjectGrantUserGrantUpdate) *grant_model.UserGrant {
-	return &grant_model.UserGrant{
-		ObjectRoot: models.ObjectRoot{AggregateID: u.Id},
-		RoleKeys:   u.RoleKeys,
-	}
 }
 
 func userGrantSearchRequestsToModel(project *management.UserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
@@ -127,6 +103,8 @@ func userGrantSearchKeyToModel(key management.UserGrantSearchKey) grant_model.Us
 		return grant_model.UserGrantSearchKeyUserID
 	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_ROLE_KEY:
 		return grant_model.UserGrantSearchKeyRoleKey
+	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_GRANT_ID:
+		return grant_model.UserGrantSearchKeyGrantID
 	default:
 		return grant_model.UserGrantSearchKeyUnspecified
 	}

@@ -11,6 +11,7 @@ type OrgIamPolicy struct {
 	State                 PolicyState
 	UserLoginMustBeDomain bool
 	Default               bool
+	IamDomain             string
 }
 
 type PolicyState int32

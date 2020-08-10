@@ -1,6 +1,8 @@
 package systemdefaults
 
 import (
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/notification/providers/chat"
@@ -9,21 +11,21 @@ import (
 	"github.com/caos/zitadel/internal/notification/templates"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	pol "github.com/caos/zitadel/internal/policy"
-	"golang.org/x/text/language"
 )
 
 type SystemDefaults struct {
-	DefaultLanguage          language.Tag
-	ZitadelDocs              ZitadelDocs
-	SecretGenerators         SecretGenerators
-	UserVerificationKey      *crypto.KeyConfig
+	DefaultLanguage       language.Tag
+	ZitadelDocs           ZitadelDocs
+	SecretGenerators      SecretGenerators
+	UserVerificationKey   *crypto.KeyConfig
 	IDPConfigVerificationKey *crypto.KeyConfig
-	Multifactors             MultifactorConfig
-	VerificationLifetimes    VerificationLifetimes
-	DefaultPolicies          DefaultPolicies
-	IamID                    string
-	SetUp                    types.IAMSetUp
-	Notifications            Notifications
+	Multifactors          MultifactorConfig
+	VerificationLifetimes VerificationLifetimes
+	DefaultPolicies       DefaultPolicies
+	DomainVerification    DomainVerification
+	IamID                 string
+	SetUp                 types.IAMSetUp
+	Notifications         Notifications
 }
 
 type ZitadelDocs struct {
@@ -61,6 +63,11 @@ type DefaultPolicies struct {
 	Complexity pol.PasswordComplexityPolicyDefault
 	Lockout    pol.PasswordLockoutPolicyDefault
 	OrgIam     org_model.OrgIamPolicy
+}
+
+type DomainVerification struct {
+	VerificationKey       *crypto.KeyConfig
+	VerificationGenerator crypto.GeneratorConfig
 }
 
 type Notifications struct {

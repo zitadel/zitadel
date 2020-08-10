@@ -15,6 +15,10 @@ func (v *View) ProjectRoleByIDs(projectID, orgID, key string) (*model.ProjectRol
 	return view.ProjectRoleByIDs(v.Db, projectRoleTable, projectID, orgID, key)
 }
 
+func (v *View) ProjectRolesByProjectID(projectID string) ([]*model.ProjectRoleView, error) {
+	return view.ProjectRolesByProjectID(v.Db, projectRoleTable, projectID)
+}
+
 func (v *View) ResourceOwnerProjectRolesByKey(projectID, resourceowner, key string) ([]*model.ProjectRoleView, error) {
 	return view.ResourceOwnerProjectRolesByKey(v.Db, projectRoleTable, projectID, resourceowner, key)
 }
@@ -23,7 +27,7 @@ func (v *View) ResourceOwnerProjectRoles(projectID, resourceowner string) ([]*mo
 	return view.ResourceOwnerProjectRoles(v.Db, projectRoleTable, projectID, resourceowner)
 }
 
-func (v *View) SearchProjectRoles(request *proj_model.ProjectRoleSearchRequest) ([]*model.ProjectRoleView, int, error) {
+func (v *View) SearchProjectRoles(request *proj_model.ProjectRoleSearchRequest) ([]*model.ProjectRoleView, uint64, error) {
 	return view.SearchProjectRoles(v.Db, projectRoleTable, request)
 }
 
@@ -41,6 +45,10 @@ func (v *View) DeleteProjectRole(projectID, orgID, key string, eventSequence uin
 		return nil
 	}
 	return v.ProcessedProjectRoleSequence(eventSequence)
+}
+
+func (v *View) DeleteProjectRolesByProjectID(projectID string) error {
+	return view.DeleteProjectRolesByProjectID(v.Db, projectRoleTable, projectID)
 }
 
 func (v *View) GetLatestProjectRoleSequence() (*repository.CurrentSequence, error) {

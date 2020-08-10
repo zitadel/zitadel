@@ -1,60 +1,61 @@
 @import '~@angular/material/theming';
 
-
 .header {
-    display: block;
-    margin-bottom: 1rem;
-    font-weight: 400;
-    margin-top: 1rem;
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: 400;
+  margin-top: 1rem;
 }
 
 @mixin changes-theme($theme) {
+  .scroll-container {
+    max-height: 60vh;
+    overflow-y: scroll;
 
-    .scroll-container {
-        max-height: 60vh;
-        overflow-y: scroll;
+    .item {
+      box-sizing: border-box;
+      padding: .5rem;
+      margin: .25rem 0;
+      border-radius: .5rem;
+      display: flex;
+      flex-direction: column;
 
-        .item {
-            box-sizing: border-box;
-            padding: .5rem;
-            margin: .25rem 0;
-            border-radius: .5rem;
-            display: flex;
-            flex-direction: column;
-            .editor {
-                color: #8795a1;
-                font-size: 12px;
-                align-self: flex-end;
-            }
-            .seq {
-                color: #8795a1;
-                font-size: 12px;
-                align-self: flex-end;
-            }
+      .editor {
+        color: #8795a1;
+        font-size: 12px;
+        align-self: flex-end;
+      }
 
-            .desc {
-                overflow-x: auto;
-                font-size: 14px;
-            }
+      .seq {
+        color: #8795a1;
+        font-size: 12px;
+        align-self: flex-end;
+      }
 
-            $primary: map-get($theme, primary);
-            $primary-dark: mat-color($primary, A800);
-            
-            &.change-item-back {
-                background-color: rgba($primary-dark, 0.93);
-                transition: background-color .4s ease-in-out;
-            }
-        }
+      .desc {
+        overflow-x: auto;
+        font-size: 14px;
+      }
+      /* stylelint-disable */
+      $primary: map-get($theme, primary);
+      $primary-dark: mat-color($primary, A800);
+      /* stylelint-enable */
 
-        .sp-wrapper {
-            padding: .5rem;
-            display: flex;
-            justify-content: center;
-        }
-
-        .end-container {
-            font-size: 12px;
-            color: #8795a1;
-        }
+      &.change-item-back {
+        background-color: rgba($primary-dark, .93);
+        transition: background-color .4s ease-in-out;
+      }
     }
+
+    .sp-wrapper {
+      padding: .5rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .end-container {
+      font-size: 12px;
+      color: #8795a1;
+    }
+  }
 }

@@ -55,7 +55,7 @@ func ProjectGrantsByProjectIDAndRoleKey(db *gorm.DB, table, projectID, roleKey s
 	return projectGrants, err
 }
 
-func SearchProjectGrants(db *gorm.DB, table string, req *proj_model.ProjectGrantViewSearchRequest) ([]*model.ProjectGrantView, int, error) {
+func SearchProjectGrants(db *gorm.DB, table string, req *proj_model.ProjectGrantViewSearchRequest) ([]*model.ProjectGrantView, uint64, error) {
 	projectGrants := make([]*model.ProjectGrantView, 0)
 	query := repository.PrepareSearchQuery(table, model.ProjectGrantSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &projectGrants)
@@ -70,5 +70,10 @@ func PutProjectGrant(db *gorm.DB, table string, project *model.ProjectGrantView)
 
 func DeleteProjectGrant(db *gorm.DB, table, grantID string) error {
 	delete := repository.PrepareDeleteByKey(table, model.ProjectGrantSearchKey(proj_model.GrantedProjectSearchKeyGrantID), grantID)
+	return delete(db)
+}
+
+func DeleteProjectGrantsByProjectID(db *gorm.DB, table, projectID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.ProjectGrantSearchKey(proj_model.GrantedProjectSearchKeyProjectID), projectID)
 	return delete(db)
 }

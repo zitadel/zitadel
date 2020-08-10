@@ -26,6 +26,7 @@ export ZITADEL_OTP_VERIFICATION_KEY=OTPVerificationKey_1
 export ZITADEL_OIDC_KEYS_ID=OIDCKey_1
 export ZITADEL_COOKIE_KEY=CookieKey_1
 export ZITADEL_CSRF_KEY=CookieKey_1
+export ZITADEL_DOMAIN_VERIFICATION_KEY=DomainVerificationKey_1
 
 # Notifications
 export DEBUG_MODE=TRUE

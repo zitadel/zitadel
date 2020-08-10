@@ -11,8 +11,6 @@ export abstract class StatehandlerService {
     public abstract initStateHandler(): void;
 }
 
-// TODO: Add Angular decorator.
-// TODO: Add Angular decorator.
 @Injectable()
 export class StatehandlerServiceImpl
     implements StatehandlerService, OnDestroy {

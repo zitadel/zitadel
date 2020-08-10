@@ -12,6 +12,7 @@ type ProjectRepository interface {
 	UpdateProject(ctx context.Context, project *model.Project) (*model.Project, error)
 	DeactivateProject(ctx context.Context, id string) (*model.Project, error)
 	ReactivateProject(ctx context.Context, id string) (*model.Project, error)
+	RemoveProject(ctx context.Context, id string) error
 	SearchProjects(ctx context.Context, request *model.ProjectViewSearchRequest) (*model.ProjectViewSearchResponse, error)
 	SearchProjectGrants(ctx context.Context, request *model.ProjectGrantViewSearchRequest) (*model.ProjectGrantViewSearchResponse, error)
 	SearchGrantedProjects(ctx context.Context, request *model.ProjectGrantViewSearchRequest) (*model.ProjectGrantViewSearchResponse, error)
@@ -31,7 +32,7 @@ type ProjectRepository interface {
 	ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*model.ProjectChanges, error)
 	BulkAddProjectRole(ctx context.Context, role []*model.ProjectRole) error
 
-	ApplicationByID(ctx context.Context, appID string) (*model.ApplicationView, error)
+	ApplicationByID(ctx context.Context, projectID, appID string) (*model.ApplicationView, error)
 	AddApplication(ctx context.Context, app *model.Application) (*model.Application, error)
 	ChangeApplication(ctx context.Context, app *model.Application) (*model.Application, error)
 	DeactivateApplication(ctx context.Context, projectID, appID string) (*model.Application, error)

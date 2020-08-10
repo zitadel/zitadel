@@ -74,10 +74,10 @@ export class UserGrantCreateComponent implements OnDestroy {
     public addGrant(): void {
         switch (this.context) {
             case UserGrantContext.OWNED_PROJECT:
-                this.userService.CreateProjectUserGrant(
-                    this.projectId,
+                this.userService.CreateUserGrant(
                     this.userId,
                     this.rolesList,
+                    this.projectId,
                 ).then((data: UserGrant) => {
                     this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTADDED', true);
                     this.close();
@@ -86,12 +86,11 @@ export class UserGrantCreateComponent implements OnDestroy {
                 });
                 break;
             case UserGrantContext.GRANTED_PROJECT:
-                this.userService.CreateProjectGrantUserGrant(
-                    this.org.id,
-                    this.projectId,
-                    this.grantId,
+                this.userService.CreateUserGrant(
                     this.userId,
                     this.rolesList,
+                    this.projectId,
+                    this.grantId,
                 ).then((data: UserGrant) => {
                     this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
                     this.close();

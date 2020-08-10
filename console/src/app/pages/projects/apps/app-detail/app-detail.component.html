@@ -27,6 +27,9 @@
                     <mat-label>{{ 'APP.NAME' | translate }}</mat-label>
                     <input matInput formControlName="name" />
                 </mat-form-field>
+
+                <p class="docs-line" *ngIf="docs?.discoveryEndpoint">Discovery Endpoint: {{docs.discoveryEndpoint}}</p>
+                <p class="docs-line" *ngIf="docs?.issuer">Issuer: {{docs.issuer}}</p>
             </div>
             <div class="btn-container">
                 <button type="submit" color="primary" [disabled]="appNameForm.invalid || name?.disabled"
@@ -42,12 +45,12 @@
         </div>
         <form *ngIf="appForm" [formGroup]="appForm" (ngSubmit)="saveOIDCApp()">
             <div class="content">
-                <mat-form-field appearance="outline">
+                <mat-form-field class="formfield" appearance="outline">
                     <mat-label>{{ 'APP.OIDC.CLIENTID' | translate }}</mat-label>
                     <input matInput formControlName="clientId" />
                 </mat-form-field>
 
-                <mat-form-field appearance="outline">
+                <mat-form-field class="formfield" appearance="outline">
                     <mat-label>{{ 'APP.OIDC.RESPONSE' | translate }}</mat-label>
                     <mat-select formControlName="responseTypesList" multiple>
                         <mat-option *ngFor="let type of oidcResponseTypes" [value]="type">
@@ -56,7 +59,7 @@
                     </mat-select>
                 </mat-form-field>
 
-                <mat-form-field appearance="outline">
+                <mat-form-field class="formfield" appearance="outline">
                     <mat-label>{{ 'APP.OIDC.GRANT' | translate }}</mat-label>
                     <mat-select formControlName="grantTypesList" multiple>
                         <mat-option *ngFor="let grant of oidcGrantTypes" [value]="grant">
@@ -82,11 +85,17 @@
                         </mat-option>
                     </mat-select>
                 </mat-form-field>
+                <p class="step-description"
+                    *ngIf="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
+                    {{'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate}}</p>
+                <p class="step-description"
+                    *ngIf="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB || applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT">
+                    {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</p>
 
-                <mat-form-field class="full-width" appearance="outline">
+                <mat-form-field class="formfield full-width" appearance="outline">
                     <mat-label>{{ 'APP.OIDC.REDIRECT' | translate }}</mat-label>
                     <mat-chip-list #chipRedirectList>
-                        <mat-chip *ngFor="let redirect of redirectUrisList" selected
+                        <mat-chip class="chip" *ngFor="let redirect of redirectUrisList" selected
                             [matTooltip]="!redirect.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
                             [color]="!redirect.startsWith('https://') ? 'warn': 'green'"
                             (removed)="remove(redirect, RedirectType.REDIRECT)">
@@ -94,15 +103,18 @@
                             <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
                         </mat-chip>
                         <input [matChipInputFor]="chipRedirectList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                            [matChipInputAddOnBlur]="addOnBlur"
+                            [matChipInputAddOnBlur]="addOnBlur" [formControl]="redirectControl"
                             (matChipInputTokenEnd)="add($event, RedirectType.REDIRECT)">
                     </mat-chip-list>
                 </mat-form-field>
 
-                <mat-form-field class="full-width" appearance="outline">
+                <p *ngIf="redirectControl.value && redirectControl.invalid" class="error">
+                    {{'APP.OIDC.REDIRECTNOTVALID' | translate}}</p>
+
+                <mat-form-field class="formfield full-width" appearance="outline">
                     <mat-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</mat-label>
                     <mat-chip-list #chipPostRedirectList>
-                        <mat-chip *ngFor="let redirect of postLogoutRedirectUrisList" selected
+                        <mat-chip class="chip" *ngFor="let redirect of postLogoutRedirectUrisList" selected
                             (removed)="remove(redirect, RedirectType.POSTREDIRECT)"
                             [matTooltip]="!redirect.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
                             [color]="!redirect.startsWith('https://') ? 'warn': 'green'">
@@ -111,13 +123,17 @@
                         </mat-chip>
                         <input [matChipInputFor]="chipPostRedirectList"
                             [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
-                            (matChipInputTokenEnd)="add($event, RedirectType.POSTREDIRECT)">
+                            (matChipInputTokenEnd)="add($event, RedirectType.POSTREDIRECT)"
+                            [formControl]="postRedirectControl">
                     </mat-chip-list>
                 </mat-form-field>
+
+                <p *ngIf="postRedirectControl.value && postRedirectControl.invalid" class="error">
+                    {{'APP.OIDC.REDIRECTNOTVALID' | translate}}</p>
             </div>
             <div class="btn-container">
 
-                <button type="submit" color="primary" [disabled]="appForm.invalid"
+                <button class="submit-button" type="submit" color="primary" [disabled]="appForm.invalid"
                     mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
             </div>
         </form>

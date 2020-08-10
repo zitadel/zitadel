@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/golang/mock/gomock"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
-	"github.com/golang/mock/gomock"
 )
 
 func TestProjectByID(t *testing.T) {
@@ -337,6 +338,93 @@ func TestReactivateProject(t *testing.T) {
 			}
 			if !tt.res.wantErr && result.State != tt.res.project.State {
 				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.project.State, result.State)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestRemoveProject(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es       *ProjectEventstore
+		ctx      context.Context
+		existing *model.Project
+	}
+	type res struct {
+		result  *model.Project
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove project, ok",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existing: &model.Project{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					Name:       "Name",
+					Members:    []*model.ProjectMember{&model.ProjectMember{UserID: "UserID", Roles: []string{"Roles"}}},
+				},
+			},
+			res: res{
+				result: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+		},
+		{
+			name: "no projectid",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existing: &model.Project{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+					Name:       "Name",
+					Members:    []*model.ProjectMember{&model.ProjectMember{UserID: "UserID", Roles: []string{"Roles"}}},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "project not existing",
+			args: args{
+				es:       GetMockManipulateProject(ctrl),
+				ctx:      authz.NewMockContext("orgID", "userID"),
+				existing: &model.Project{},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing not found",
+			args: args{
+				es:       GetMockManipulateProjectNoEvents(ctrl),
+				ctx:      authz.NewMockContext("orgID", "userID"),
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "OtherAggregateID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemoveProject(tt.args.ctx, tt.args.existing)
+
+			if !tt.res.wantErr && err != nil {
+				t.Errorf("should not get err")
 			}
 			if tt.res.wantErr && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
@@ -1024,7 +1112,6 @@ func TestAddApplication(t *testing.T) {
 	}
 	type res struct {
 		result  *model.Application
-		wantErr bool
 		errFunc func(err error) bool
 	}
 	tests := []struct {
@@ -1057,6 +1144,32 @@ func TestAddApplication(t *testing.T) {
 			},
 		},
 		{
+			name: "add app (none), ok",
+			args: args{
+				es:  GetMockManipulateProjectWithPw(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "Name",
+					OIDCConfig: &model.OIDCConfig{
+						ResponseTypes:  []model.OIDCResponseType{model.OIDCResponseTypeCode},
+						GrantTypes:     []model.OIDCGrantType{model.OIDCGrantTypeAuthorizationCode},
+						AuthMethodType: model.OIDCAuthMethodTypeNone,
+					},
+				},
+			},
+			res: res{
+				result: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					Name: "Name",
+					OIDCConfig: &model.OIDCConfig{
+						ResponseTypes:  []model.OIDCResponseType{model.OIDCResponseTypeCode},
+						GrantTypes:     []model.OIDCGrantType{model.OIDCGrantTypeAuthorizationCode},
+						AuthMethodType: model.OIDCAuthMethodTypeNone,
+					},
+				},
+			},
+		},
+		{
 			name: "invalid app",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
@@ -1064,7 +1177,6 @@ func TestAddApplication(t *testing.T) {
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
-				wantErr: true,
 				errFunc: caos_errs.IsPreconditionFailed,
 			},
 		},
@@ -1083,7 +1195,6 @@ func TestAddApplication(t *testing.T) {
 				},
 			},
 			res: res{
-				wantErr: true,
 				errFunc: caos_errs.IsNotFound,
 			},
 		},
@@ -1091,21 +1202,23 @@ func TestAddApplication(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.AddApplication(tt.args.ctx, tt.args.app)
-
-			if !tt.res.wantErr && result.AppID == "" {
+			if tt.res.errFunc == nil && err != nil {
+				t.Errorf("no error expected got:%T %v", err, err)
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("wrong error got %T: %v", err, err)
+			}
+			if tt.res.result != nil && result.AppID == "" {
 				t.Errorf("result has no id")
 			}
-			if !tt.res.wantErr && result.OIDCConfig == nil && result.OIDCConfig.ClientSecretString == "" {
+			if tt.res.result != nil && (tt.res.result.OIDCConfig.AuthMethodType != model.OIDCAuthMethodTypeNone && result.OIDCConfig.ClientSecretString == "") {
 				t.Errorf("result has no client secret")
 			}
-			if !tt.res.wantErr && result.OIDCConfig == nil && result.OIDCConfig.ClientID == "" {
+			if tt.res.result != nil && result.OIDCConfig.ClientID == "" {
 				t.Errorf("result has no clientid")
 			}
-			if !tt.res.wantErr && result.Name != tt.res.result.Name {
+			if tt.res.result != nil && tt.res.result.Name != result.Name {
 				t.Errorf("got wrong result key: expected: %v, actual: %v ", tt.res.result.Name, result.Name)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -1131,7 +1244,7 @@ func TestChangeApp(t *testing.T) {
 		{
 			name: "change app, ok",
 			args: args{
-				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
+				es:  GetMockManipulateProjectWithOIDCApp(ctrl, model.OIDCAuthMethodTypeBasic),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
@@ -1241,7 +1354,7 @@ func TestRemoveApp(t *testing.T) {
 		{
 			name: "remove app, ok",
 			args: args{
-				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
+				es:  GetMockManipulateProjectWithOIDCApp(ctrl, model.OIDCAuthMethodTypeBasic),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
@@ -1323,7 +1436,7 @@ func TestDeactivateApp(t *testing.T) {
 		{
 			name: "deactivate, ok",
 			args: args{
-				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
+				es:  GetMockManipulateProjectWithOIDCApp(ctrl, model.OIDCAuthMethodTypeBasic),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
@@ -1433,7 +1546,7 @@ func TestReactivateApp(t *testing.T) {
 		{
 			name: "reactivate, ok",
 			args: args{
-				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
+				es:  GetMockManipulateProjectWithOIDCApp(ctrl, model.OIDCAuthMethodTypeBasic),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
@@ -1543,7 +1656,7 @@ func TestChangeOIDCConfig(t *testing.T) {
 		{
 			name: "change oidc config, ok",
 			args: args{
-				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
+				es:  GetMockManipulateProjectWithOIDCApp(ctrl, model.OIDCAuthMethodTypeBasic),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				config: &model.OIDCConfig{
 					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1669,7 +1782,7 @@ func TestChangeOIDCConfigSecret(t *testing.T) {
 		{
 			name: "change oidc config secret, ok",
 			args: args{
-				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
+				es:  GetMockManipulateProjectWithOIDCApp(ctrl, model.OIDCAuthMethodTypeBasic),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				config: &model.OIDCConfig{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1678,11 +1791,27 @@ func TestChangeOIDCConfigSecret(t *testing.T) {
 			},
 			res: res{
 				result: &model.OIDCConfig{
-					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-					AppID:         "AppID",
-					ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeIDToken},
-					GrantTypes:    []model.OIDCGrantType{model.OIDCGrantTypeImplicit},
+					ObjectRoot:     es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					AppID:          "AppID",
+					ResponseTypes:  []model.OIDCResponseType{model.OIDCResponseTypeCode},
+					GrantTypes:     []model.OIDCGrantType{model.OIDCGrantTypeAuthorizationCode},
+					AuthMethodType: model.OIDCAuthMethodTypeBasic,
 				},
+			},
+		},
+		{
+			name: "auth method none, error",
+			args: args{
+				es:  GetMockManipulateProjectWithOIDCApp(ctrl, model.OIDCAuthMethodTypeNone),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				config: &model.OIDCConfig{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					AppID:      "AppID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1757,7 +1886,7 @@ func TestChangeOIDCConfigSecret(t *testing.T) {
 				t.Errorf("got wrong result AppID: expected: %v, actual: %v ", tt.res.result.AppID, result.AppID)
 			}
 			if !tt.res.wantErr && result.ClientSecretString == "" {
-				t.Errorf("got wrong result should habe client secret")
+				t.Errorf("got wrong result must have client secret")
 			}
 			if tt.res.wantErr && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)

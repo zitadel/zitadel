@@ -170,7 +170,7 @@ func grantRespToOrgResp(grants *grant_model.UserGrantSearchResponse) *grant_mode
 	return resp
 }
 
-func orgRespToOrgResp(orgs []*org_view_model.OrgView, count int) *grant_model.ProjectOrgSearchResponse {
+func orgRespToOrgResp(orgs []*org_view_model.OrgView, count uint64) *grant_model.ProjectOrgSearchResponse {
 	resp := &grant_model.ProjectOrgSearchResponse{
 		TotalResult: uint64(count),
 	}

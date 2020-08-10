@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/authz"
 
 	"github.com/golang/protobuf/ptypes/empty"
 
@@ -193,4 +194,15 @@ func (s *Server) GetUserMfas(ctx context.Context, userID *management.UserID) (*m
 		return nil, err
 	}
 	return &management.MultiFactors{Mfas: mfasFromModel(mfas)}, nil
+}
+
+func (s *Server) SearchUserMemberships(ctx context.Context, in *management.UserMembershipSearchRequest) (*management.UserMembershipSearchResponse, error) {
+	request := userMembershipSearchRequestsToModel(in)
+	request.AppendResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	request.AppendUserIDQuery(in.UserId)
+	response, err := s.user.SearchUserMemberships(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return userMembershipSearchResponseFromModel(response), nil
 }

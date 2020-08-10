@@ -1,91 +1,110 @@
 .head {
-    display: flex;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #ffffff20;
+  flex-wrap: wrap;
+
+  a {
+    display: block;
+  }
+
+  h1 {
+    font-size: 1.2rem;
+    margin: 0 1rem;
+    margin-left: 2rem;
+    font-weight: normal;
+  }
+
+  .desc {
+    width: 100%;
+    display: block;
+    font-size: .9rem;
+    color: #8795a1;
+  }
+
+  .zitadel-warning {
+    font-size: 14px;
+    color: rgb(201, 51, 71);
+  }
+}
+
+.err-container {
+  color: rgb(201, 51, 71);
+  font-size: 14px;
+}
+
+.card-actions {
+  button {
+    border-radius: .5rem;
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 0 -.5rem;
+
+  &.nowrap {
+    flex-wrap: nowrap;
+  }
+
+  &.center {
     align-items: center;
-    border-bottom: 1px solid #ffffff20;
-    flex-wrap: wrap;
-  
-    a {
-        display: block;
-    }
-  
-    h1 {
-      font-size: 1.2rem;
-      margin: 0 1rem;
-      margin-left: 2rem;
-      font-weight: normal;
-    }
-  
-    .desc {
-        width: 100%;
-        display: block;
-        font-size: .9rem;
-        color: #8795a1;
-    }
+  }
 
-    .zitadel-warning {
-        font-size: 14px;
-        color: rgb(201,51,71);
+  .formfield {
+    flex: 1 1 30%;
+    margin: 0 .5rem;
+
+    &.full-width {
+      flex-basis: 100%;
     }
   }
 
-  .err-container {
-      color: rgb(201,51,71);
-        font-size: 14px;
+  .step-description {
+    font-size: .9rem;
+    color: #8795a1;
+    flex-basis: 100%;
+    margin: 0 .5rem 1rem .5rem;
   }
 
-  .card-actions {
-      button {
-          border-radius: .5rem;
-      }
+  .error {
+    font-size: 13px;
+    color: #f44336;
+    margin: 0 .5rem 1.5rem .5rem;
   }
 
-  .content {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin: 0 -.5rem; 
-  
-    &.nowrap{
-      flex-wrap: nowrap;
-    }
-  
-    &.center {
-      align-items: center;
-    }
-  
-    mat-form-field {
-      flex: 1 1 30%;
-      margin: 0 .5rem;
-    }  
+  .docs-line {
+    flex-basis: 100%;
+    font-size: 14px;
+    color: #8795a1;
+    margin-top: 0;
+  }
 
-    .full-width {
-        flex-basis: 100%;
-    }
+  .toggle {
+    align-self: flex-start;
+    margin-bottom: 1rem;
+    margin-right: 1rem;
+    border-radius: .5rem;
 
-    .toggle {
-      align-self: flex-start;
-      margin-bottom: 1rem;
+    i {
       margin-right: 1rem;
-      border-radius: .5rem;
-
-      i {
-          margin-right: 1rem;
-      }
-    }
-    
-  }
-  
-  .btn-container {
-    display: flex;
-    justify-content: flex-end;
-    margin: 0 -.5rem;
-  
-    button {
-      border-radius: .5rem;
-      margin: 0 .5rem;
     }
   }
+}
 
-  mat-chip[color='green'] {
-      background-color: #56a392 !important;
+.btn-container {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 -.5rem;
+
+  .submit-button {
+    border-radius: .5rem;
+    margin: 0 .5rem;
   }
+}
+
+.chip[color='green'] {
+  background-color: #56a392 !important;
+}

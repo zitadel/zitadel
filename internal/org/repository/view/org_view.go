@@ -18,7 +18,7 @@ func OrgByID(db *gorm.DB, table, orgID string) (*model.OrgView, error) {
 	return org, err
 }
 
-func SearchOrgs(db *gorm.DB, table string, req *org_model.OrgSearchRequest) ([]*model.OrgView, int, error) {
+func SearchOrgs(db *gorm.DB, table string, req *org_model.OrgSearchRequest) ([]*model.OrgView, uint64, error) {
 	orgs := make([]*model.OrgView, 0)
 	query := repository.PrepareSearchQuery(table, model.OrgSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &orgs)

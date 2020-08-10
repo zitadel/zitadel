@@ -14,6 +14,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 
 import { ProjectGrantDetailRoutingModule } from './project-grant-detail-routing.module';
 import { ProjectGrantDetailComponent } from './project-grant-detail.component';
@@ -41,6 +42,7 @@ import { ProjectGrantMembersModule } from './project-grant-members/project-grant
         FormsModule,
         TranslateModule,
         MatSelectModule,
+        DetailLayoutModule,
     ],
 })
 export class ProjectGrantDetailModule { }

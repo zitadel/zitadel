@@ -33,7 +33,7 @@ func VerifiedOrgDomain(db *gorm.DB, table, domain string) (*model.OrgDomainView,
 	return domainView, err
 }
 
-func SearchOrgDomains(db *gorm.DB, table string, req *org_model.OrgDomainSearchRequest) ([]*model.OrgDomainView, int, error) {
+func SearchOrgDomains(db *gorm.DB, table string, req *org_model.OrgDomainSearchRequest) ([]*model.OrgDomainView, uint64, error) {
 	members := make([]*model.OrgDomainView, 0)
 	query := repository.PrepareSearchQuery(table, model.OrgDomainSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &members)

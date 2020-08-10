@@ -26,6 +26,7 @@ import (
 
 type Config struct {
 	SearchLimit uint64
+	Domain      string
 	Eventstore  es_int.Config
 	AuthRequest cache.Config
 	View        types.SQL
@@ -118,7 +119,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 	if err != nil {
 		return nil, err
 	}
-	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es}, systemDefaults)
+	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain}, systemDefaults)
 
 	repos := handler.EventstoreRepos{UserEvents: user, ProjectEvents: project, OrgEvents: org, IamEvents: iam}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos, systemDefaults)
@@ -167,8 +168,11 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 			AuthZRepo:   authZRepo,
 		},
 		eventstore.OrgRepository{
-			SearchLimit: conf.SearchLimit,
-			View:        view,
+			SearchLimit:      conf.SearchLimit,
+			View:             view,
+			OrgEventstore:    org,
+			PolicyEventstore: policy,
+			UserEventstore:   user,
 		},
 		eventstore.IamRepository{
 			IamEvents: iam,

@@ -24,7 +24,7 @@
     <div class="spinner-container" *ngIf="dataSource?.loading$ | async">
         <mat-spinner diameter="50"></mat-spinner>
     </div>
-    <table mat-table class="full-width-table" aria-label="Elements"
+    <table mat-table class="table" aria-label="Elements"
         [ngClass]="{'background-style': type == ProjectType.PROJECTTYPE_OWNED}" [dataSource]="dataSource">
         <ng-container matColumnDef="select">
             <th class="selection" mat-header-cell *matHeaderCellDef>
@@ -85,7 +85,7 @@
         </tr>
     </table>
 
-    <mat-paginator [ngClass]="{'background-style': type == ProjectType.PROJECTTYPE_OWNED}" #paginator [pageSize]="50"
-        [pageSizeOptions]="[25, 50, 100, 250]">
+    <mat-paginator class="paginator" [ngClass]="{'background-style': type == ProjectType.PROJECTTYPE_OWNED}" #paginator
+        [pageSize]="50" [pageSizeOptions]="[25, 50, 100, 250]">
     </mat-paginator>
 </div>

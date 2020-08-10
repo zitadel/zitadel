@@ -1,40 +1,41 @@
 
-  .add-row {
-      display: flex;
-      margin: -.5rem;
+.add-row {
+  display: flex;
+  margin: -.5rem;
 
-      button {
-          border-radius: .5rem;
-          margin: .5rem;
-          margin-top: 1rem;
+  .button {
+    border-radius: .5rem;
+    margin: .5rem;
+    margin-top: 1rem;
 
-          mat-icon {
-              margin-right: .5rem;
-          }
-      }
-  }
-
-  .centered {
-      display: flex;
-      align-items: center;
-
-      i {
-          margin-left: 1rem;
-          color: #5282c1;
-      }
-  }
-
-  table {
-    width: 100%;
-
-    td, th {
-        &:first-child {
-            padding-left: 0;
-            padding-right: 1rem;
-        }
-
-        &:last-child {
-            padding-right: 0;
-        }
+    .icon {
+      margin-right: .5rem;
     }
   }
+}
+
+.centered {
+  display: flex;
+  align-items: center;
+
+  i {
+    margin-left: 1rem;
+    color: #5282c1;
+  }
+}
+
+.table {
+  width: 100%;
+
+  td,
+  th {
+    &:first-child {
+      padding-left: 0;
+      padding-right: 1rem;
+    }
+
+    &:last-child {
+      padding-right: 0;
+    }
+  }
+}

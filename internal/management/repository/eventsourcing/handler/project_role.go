@@ -53,6 +53,8 @@ func (p *ProjectRole) Reduce(event *models.Event) (err error) {
 			return err
 		}
 		return p.view.DeleteProjectRole(event.AggregateID, event.ResourceOwner, role.Key, event.Sequence)
+	case es_model.ProjectRemoved:
+		return p.view.DeleteProjectRolesByProjectID(event.AggregateID)
 	default:
 		return p.view.ProcessedProjectRoleSequence(event.Sequence)
 	}

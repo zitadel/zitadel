@@ -9,6 +9,7 @@ import (
 type OrgRepository interface {
 	OrgByID(ctx context.Context, id string) (*org_model.OrgView, error)
 	OrgByDomainGlobal(ctx context.Context, domain string) (*org_model.OrgView, error)
+	CreateOrg(ctx context.Context, name string) (*org_model.Org, error)
 	UpdateOrg(ctx context.Context, org *org_model.Org) (*org_model.Org, error)
 	DeactivateOrg(ctx context.Context, id string) (*org_model.Org, error)
 	ReactivateOrg(ctx context.Context, id string) (*org_model.Org, error)
@@ -16,6 +17,9 @@ type OrgRepository interface {
 
 	SearchMyOrgDomains(ctx context.Context, request *org_model.OrgDomainSearchRequest) (*org_model.OrgDomainSearchResponse, error)
 	AddMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) (*org_model.OrgDomain, error)
+	GenerateMyOrgDomainValidation(ctx context.Context, domain *org_model.OrgDomain) (string, string, error)
+	ValidateMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error
+	SetMyPrimaryOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error
 	RemoveMyOrgDomain(ctx context.Context, domain string) error
 
 	SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error)

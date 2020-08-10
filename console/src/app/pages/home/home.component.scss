@@ -1,80 +1,82 @@
 
 .wrapper {
-    padding-bottom: 100px;
-	.header {
-		display: flex;
-		flex-direction: column;
-		margin: 4rem 0;
+  padding-bottom: 100px;
+
+  .header {
+    display: flex;
+    flex-direction: column;
+    margin: 4rem 0;
+    align-items: center;
+
+    h3 {
+      font-size: 24px;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .wlc_stnce {
+      color: #8795a1;
+      font-size: 16px;
+    }
+
+    .avatar {
+      outline: none;
+      cursor: pointer;
+    }
+  }
+
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -1rem;
+    justify-content: space-evenly;
+
+    .item {
+      flex: 1 1 45%;
+      margin: 0 1rem;
+      display: flex;
+      flex-direction: column;
+
+      .top {
+        h2 {
+          margin-top: .5rem;
+          display: flex;
+          align-items: center;
+        }
+
+        p {
+          display: block;
+          color: #8795a1;
+          font-size: .9rem;
+        }
+
+        i {
+          font-size: 2.5rem;
+          margin-right: 1rem;
+          transition: color .1s;
+        }
+      }
+
+      .fill-space {
+        flex: 1;
+      }
+
+      .footer {
+        display: flex;
         align-items: center;
+        border-top: 1px solid #ffffff20;
+        padding-top: 1rem;
 
-        h3 {
-            font-size: 24px;
-            margin-bottom: 1rem;
+        a {
+          border-radius: .5rem;
         }
-        
-        .wlc_stnce {
-            color: #8795a1;
-            font-size: 16px;
-        }
-
-        .avatar {
-            outline: none;
-            cursor: pointer;
-        }
-	}
-
-	.container {
-		display: flex;
-		flex-wrap: wrap;
-		margin: -1rem;
-		justify-content: space-evenly;
-
-		.item {
-			flex: 1 1 45%;
-			margin: 0 1rem;
-			display: flex;
-            flex-direction: column;
-
-			.top {
-				h2 {
-					margin-top: .5rem;
-                    display: flex;
-                    align-items: center;
-				}
-
-				p {
-					display: block;
-					color: #8795a1;
-					font-size: .9rem;
-                }
-                
-                 i{
-                     font-size: 2.5rem;
-                     margin-right: 1rem;
-                     transition: color .1s;
-                 }
-			}
-
-			.fill-space {
-				flex: 1;
-			}
-
-			.footer {
-				display: flex;
-				align-items: center;
-                border-top: 1px solid #ffffff20;
-                padding-top: 1rem;
-                
-                a {
-                    border-radius: .5rem;
-                }
-			}
-		}
+      }
     }
-    
-    .disclaimer {
-        color: #8795a1;
-        font-size: 14px;
-        margin-top: 3rem;
-    }
+  }
+
+  .disclaimer {
+    color: #8795a1;
+    font-size: 14px;
+    margin-top: 3rem;
+  }
 }

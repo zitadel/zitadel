@@ -40,6 +40,11 @@ func (s *Server) ReactivateProject(ctx context.Context, in *management.ProjectID
 	return projectFromModel(project), nil
 }
 
+func (s *Server) RemoveProject(ctx context.Context, in *management.ProjectID) (*empty.Empty, error) {
+	err := s.project.RemoveProject(ctx, in.Id)
+	return &empty.Empty{}, err
+}
+
 func (s *Server) SearchProjects(ctx context.Context, in *management.ProjectSearchRequest) (*management.ProjectSearchResponse, error) {
 	request := projectSearchRequestsToModel(in)
 	request.AppendMyResourceOwnerQuery(grpc_util.GetHeader(ctx, http.ZitadelOrgID))

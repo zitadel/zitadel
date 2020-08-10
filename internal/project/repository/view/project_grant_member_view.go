@@ -22,7 +22,20 @@ func ProjectGrantMemberByIDs(db *gorm.DB, table, grantID, userID string) (*model
 	return role, err
 }
 
-func SearchProjectGrantMembers(db *gorm.DB, table string, req *proj_model.ProjectGrantMemberSearchRequest) ([]*model.ProjectGrantMemberView, int, error) {
+func ProjectGrantMembersByProjectID(db *gorm.DB, table, projectID string) ([]*model.ProjectGrantMemberView, error) {
+	members := make([]*model.ProjectGrantMemberView, 0)
+	queries := []*proj_model.ProjectGrantMemberSearchQuery{
+		&proj_model.ProjectGrantMemberSearchQuery{Key: proj_model.ProjectGrantMemberSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
+	}
+	query := repository.PrepareSearchQuery(table, model.ProjectGrantMemberSearchRequest{Queries: queries})
+	_, err := query(db, &members)
+	if err != nil {
+		return nil, err
+	}
+	return members, nil
+}
+
+func SearchProjectGrantMembers(db *gorm.DB, table string, req *proj_model.ProjectGrantMemberSearchRequest) ([]*model.ProjectGrantMemberView, uint64, error) {
 	roles := make([]*model.ProjectGrantMemberView, 0)
 	query := repository.PrepareSearchQuery(table, model.ProjectGrantMemberSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &roles)
@@ -56,5 +69,10 @@ func DeleteProjectGrantMember(db *gorm.DB, table, grantID, userID string) error 
 		return err
 	}
 	delete := repository.PrepareDeleteByObject(table, role)
+	return delete(db)
+}
+
+func DeleteProjectGrantMembersByProjectID(db *gorm.DB, table, projectID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.ProjectGrantMemberSearchKey(proj_model.ProjectGrantMemberSearchKeyProjectID), projectID)
 	return delete(db)
 }

@@ -37,4 +37,6 @@ type UserRepository interface {
 
 	AddressByID(ctx context.Context, userID string) (*model.Address, error)
 	ChangeAddress(ctx context.Context, address *model.Address) (*model.Address, error)
+
+	SearchUserMemberships(ctx context.Context, request *model.UserMembershipSearchRequest) (*model.UserMembershipSearchResponse, error)
 }

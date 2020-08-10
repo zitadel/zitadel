@@ -56,6 +56,7 @@ import {
     UserGrantCreate,
     UserGrantSearchQuery,
     UserGrantSearchResponse,
+    ZitadelDocs,
 } from '../proto/generated/management_pb';
 import { GrpcBackendService } from './grpc-backend.service';
 import { GrpcService, RequestFactory, ResponseMapper } from './grpc.service';
@@ -106,6 +107,16 @@ export class ProjectService {
         }
         return await this.request(
             c => c.searchGrantedProjects,
+            req,
+            f => f,
+        );
+    }
+
+
+    public async GetZitadelDocs(): Promise<ZitadelDocs> {
+        const req = new Empty();
+        return await this.request(
+            c => c.getZitadelDocs,
             req,
             f => f,
         );
@@ -535,47 +546,6 @@ export class ProjectService {
             f => f,
         );
     }
-
-    // ********* */
-
-    public async SearchProjectUserGrants(
-        projectId: string,
-        offset: number,
-        limit: number,
-        queryList?: UserGrantSearchQuery[],
-    ): Promise<UserGrantSearchResponse> {
-        const req = new ProjectUserGrantSearchRequest();
-        req.setLimit(limit);
-        req.setOffset(offset);
-        req.setProjectId(projectId);
-        if (queryList) {
-            req.setQueriesList(queryList);
-        }
-        return await this.request(
-            c => c.searchProjectUserGrants,
-            req,
-            f => f,
-        );
-    }
-
-    public async CreateProjectUserGrant(
-        projectId: string,
-        userId: string,
-        roleKeysList: string[],
-    ): Promise<UserGrant> {
-        const req = new UserGrantCreate();
-        req.setProjectId(projectId);
-        req.setRoleKeysList(roleKeysList);
-        req.setUserId(userId);
-
-        return await this.request(
-            c => c.createProjectUserGrant,
-            req,
-            f => f,
-        );
-    }
-
-    // ********* */
 
     public async CreateOIDCApp(app: OIDCApplicationCreate.AsObject): Promise<Application> {
         const req = new OIDCApplicationCreate();

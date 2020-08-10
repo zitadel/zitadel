@@ -3,6 +3,8 @@ package eventstore
 import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	global_model "github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/view/repository"
 
 	"github.com/caos/logging"
 
@@ -96,7 +98,7 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, err := repo.View.GetLatestUserSequence()
 	logging.Log("EVENT-Lcn7d").OnError(err).Warn("could not read latest user sequence")
-	projects, count, err := repo.View.SearchUsers(request)
+	users, count, err := repo.View.SearchUsers(request)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +106,7 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
-		Result:      model.UsersToModel(projects),
+		Result:      model.UsersToModel(users),
 	}
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
@@ -214,4 +216,72 @@ func (repo *UserRepo) AddressByID(ctx context.Context, userID string) (*usr_mode
 
 func (repo *UserRepo) ChangeAddress(ctx context.Context, address *usr_model.Address) (*usr_model.Address, error) {
 	return repo.UserEvents.ChangeAddress(ctx, address)
+}
+
+func (repo *UserRepo) SearchUserMemberships(ctx context.Context, request *usr_model.UserMembershipSearchRequest) (*usr_model.UserMembershipSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	sequence, err := repo.View.GetLatestUserMembershipSequence()
+	logging.Log("EVENT-Dn7sf").OnError(err).Warn("could not read latest user sequence")
+
+	result := handleSearchUserMembershipsPermissions(ctx, request, sequence)
+	if result != nil {
+		return result, nil
+	}
+
+	memberships, count, err := repo.View.SearchUserMemberships(request)
+	if err != nil {
+		return nil, err
+	}
+	result = &usr_model.UserMembershipSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.UserMembershipsToModel(memberships),
+	}
+	if err == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
+	}
+	return result, nil
+}
+
+func handleSearchUserMembershipsPermissions(ctx context.Context, request *usr_model.UserMembershipSearchRequest, sequence *repository.CurrentSequence) *usr_model.UserMembershipSearchResponse {
+	permissions := authz.GetAllPermissionsFromCtx(ctx)
+	orgPerm := authz.HasGlobalExplicitPermission(permissions, orgMemberReadPerm)
+	projectPerm := authz.HasGlobalExplicitPermission(permissions, projectMemberReadPerm)
+	projectGrantPerm := authz.HasGlobalExplicitPermission(permissions, projectGrantMemberReadPerm)
+	if orgPerm && projectPerm && projectGrantPerm {
+		return nil
+	}
+
+	if !orgPerm {
+		request.Queries = append(request.Queries, &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyMemberType, Method: global_model.SearchMethodNotEquals, Value: usr_model.MemberTypeOrganisation})
+	}
+
+	ids := authz.GetExplicitPermissionCtxIDs(permissions, projectMemberReadPerm)
+	ids = append(ids, authz.GetExplicitPermissionCtxIDs(permissions, projectGrantMemberReadPerm)...)
+	if _, q := request.GetSearchQuery(usr_model.UserMembershipSearchKeyObjectID); q != nil {
+		containsID := false
+		for _, id := range ids {
+			if id == q.Value {
+				containsID = true
+				break
+			}
+		}
+		if !containsID {
+			result := &usr_model.UserMembershipSearchResponse{
+				Offset:      request.Offset,
+				Limit:       request.Limit,
+				TotalResult: uint64(0),
+				Result:      []*usr_model.UserMembershipView{},
+			}
+			if sequence != nil {
+				result.Sequence = sequence.CurrentSequence
+				result.Timestamp = sequence.CurrentTimestamp
+			}
+			return result
+		}
+	}
+	request.Queries = append(request.Queries, &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyObjectID, Method: global_model.SearchMethodIsOneOf, Value: ids})
+	return nil
 }

@@ -373,6 +373,17 @@ service ManagementService {
         };
     }
 
+    rpc SearchUserMemberships(UserMembershipSearchRequest) returns (UserMembershipSearchResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/memberships/_search"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.membership.read"
+        };
+    }
+
     // returns default policy if nothing other set on organisation
     rpc GetPasswordComplexityPolicy(google.protobuf.Empty) returns (PasswordComplexityPolicy) {
         option (google.api.http) = {
@@ -512,6 +523,17 @@ service ManagementService {
         };
     }
 
+    rpc CreateOrg(OrgCreateRequest) returns (Org) {
+        option (google.api.http) = {
+            post: "/orgs"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "org.create"
+        };
+    }
+
     rpc GetMyOrg(google.protobuf.Empty) returns (OrgView) {
         option (google.api.http) = {
             get: "/orgs/me"
@@ -570,6 +592,38 @@ service ManagementService {
         option (google.api.http) = {
             post: "/orgs/me/domains"
             body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
+    rpc GenerateMyOrgDomainValidation(OrgDomainValidationRequest) returns (OrgDomainValidationResponse) {
+        option (google.api.http) = {
+            post: "/orgs/me/domains/{domain}/validation/create"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
+    rpc ValidateMyOrgDomain(ValidateOrgDomainRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/orgs/me/domains/{domain}/validation/check"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
+    rpc SetMyPrimaryOrgDomain(PrimaryOrgDomainRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/orgs/me/domains/{domain}/_primary"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -715,6 +769,17 @@ service ManagementService {
 
         option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.write"
+            check_field_name: "Id"
+        };
+    }
+
+    rpc RemoveProject(ProjectID) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/projects/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "project.delete"
             check_field_name: "Id"
         };
     }
@@ -1180,184 +1245,6 @@ service ManagementService {
 
         option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.grant.delete"
-        };
-    }
-
-    // search user grants based on a project
-    // This request is required that the user authorizations of zitadel can be differentiated
-    rpc SearchProjectUserGrants(ProjectUserGrantSearchRequest) returns (UserGrantSearchResponse) {
-        option deprecated = true;
-        option (google.api.http) = {
-            post: "/projects/{project_id}/users/grants/_search"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.user.grant.read"
-            check_field_name: "ProjectId"
-        };
-    }
-
-    // get user grant based on a project
-    // This request is required that the user authorizations of zitadel can be differentiated
-    rpc ProjectUserGrantByID(ProjectUserGrantID) returns (UserGrantView) {
-        option deprecated = true;
-        option (google.api.http) = {
-            get: "/projects/{project_id}/users/{user_id}/grants/{id}"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.user.grant.read"
-            check_field_name: "ProjectId"
-        };
-    }
-
-    // create user grant based on a project
-    // This request is required that the user authorizations of zitadel can be differentiated
-    rpc CreateProjectUserGrant(UserGrantCreate) returns (UserGrant) {
-        option deprecated = true;
-        option (google.api.http) = {
-            post: "/projects/{project_id}/users/{user_id}/grants"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.user.grant.write"
-            check_field_name: "ProjectId"
-        };
-    }
-
-    // update user grant based on a project
-    // This request is required that the user authorizations of zitadel can be differentiated
-    rpc UpdateProjectUserGrant(ProjectUserGrantUpdate) returns (UserGrant) {
-        option deprecated = true;
-        option (google.api.http) = {
-            put: "/projects/{project_id}/users/{user_id}/grants/{id}"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.user.grant.write"
-            check_field_name: "ProjectId"
-        };
-    }
-
-    // deactivate user grant based on a project
-    // This request is required that the user authorizations of zitadel can be differentiated
-    rpc DeactivateProjectUserGrant(ProjectUserGrantID) returns (UserGrant) {
-        option deprecated = true;
-        option (google.api.http) = {
-            put: "/projects/{project_id}/users/{user_id}/grants/{id}/_deactivate"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.user.grant.write"
-            check_field_name: "ProjectId"
-        };
-    }
-
-    // reactivate user grant based on a project
-    // This request is required that the user authorizations of zitadel can be differentiated
-    rpc ReactivateProjectUserGrant(ProjectUserGrantID) returns (UserGrant) {
-        option deprecated = true;
-        option (google.api.http) = {
-            put: "/projects/{project_id}/users/{user_id}/grants/{id}/_reactivate"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.user.grant.write"
-            check_field_name: "ProjectId"
-        };
-    }
-
-    // search user grants based on a projectgrant
-    // This request is required that the user authorizations of zitadel can be differentiated
-    rpc SearchProjectGrantUserGrants(ProjectGrantUserGrantSearchRequest) returns (UserGrantSearchResponse) {
-        option deprecated = true;
-        option (google.api.http) = {
-            post: "/projectgrants/{project_grant_id}/users/grants/_search"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.grant.user.grant.read"
-            check_field_name: "ProjectGrantId"
-        };
-    }
-
-    // get user grant based on a projectgrant
-    // This request is required that the user authorizations of zitadel can be differentiated
-    rpc ProjectGrantUserGrantByID(ProjectGrantUserGrantID) returns (UserGrantView) {
-        option deprecated = true;
-        option (google.api.http) = {
-            get: "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.grant.user.grant.read"
-            check_field_name: "ProjectGrantId"
-        };
-    }
-
-    // create user grant based on a projectgrant
-    // This request is required that the user authorizations of zitadel can be differentiated
-    rpc CreateProjectGrantUserGrant(ProjectGrantUserGrantCreate) returns (UserGrant) {
-        option deprecated = true;
-        option (google.api.http) = {
-            post: "/projectgrants/{project_grant_id}/users/{user_id}/grants"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.grant.user.grant.write"
-            check_field_name: "ProjectGrantId"
-        };
-    }
-
-    // update user grant based on a projectgrant
-    // This request is required that the user authorizations of zitadel can be differentiated
-    rpc UpdateProjectGrantUserGrant(ProjectGrantUserGrantUpdate) returns (UserGrant) {
-        option deprecated = true;
-        option (google.api.http) = {
-            put: "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.grant.user.grant.write"
-            check_field_name: "ProjectGrantId"
-        };
-    }
-
-    // deactivate user grant based on a projectgrant
-    // This request is required that the user authorizations of zitadel can be differentiated
-    rpc DeactivateProjectGrantUserGrant(ProjectGrantUserGrantID) returns (UserGrant) {
-        option deprecated = true;
-        option (google.api.http) = {
-            put: "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}/_deactivate"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.grant.user.grant.write"
-            check_field_name: "ProjectGrantId"
-        };
-    }
-
-    // reactivate user grant based on a projectgrant
-    // This request is required that the user authorizations of zitadel can be differentiated
-    rpc ReactivateProjectGrantUserGrant(ProjectGrantUserGrantID) returns (UserGrant) {
-        option deprecated = true;
-        option (google.api.http) = {
-            put: "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}/_reactivate"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.grant.user.grant.write"
-            check_field_name: "ProjectGrantId"
         };
     }
 }
@@ -1840,6 +1727,10 @@ message OrgID {
     string id = 1;
 }
 
+message OrgCreateRequest {
+    string name = 1;
+}
+
 message Org {
     string id = 1;
     OrgState state = 2;
@@ -1893,6 +1784,30 @@ message OrgDomainView {
 }
 
 message AddOrgDomainRequest {
+    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message OrgDomainValidationRequest {
+    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    OrgDomainValidationType type = 2 [(validate.rules).enum = {not_in: [0]}];
+}
+
+enum OrgDomainValidationType {
+    ORGDOMAINVALIDATIONTYPE_UNSPECIFIED = 0;
+    ORGDOMAINVALIDATIONTYPE_HTTP = 1;
+    ORGDOMAINVALIDATIONTYPE_DNS = 2;
+}
+
+message OrgDomainValidationResponse {
+    string token = 1;
+    string url = 2;
+}
+
+message ValidateOrgDomainRequest {
+    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message PrimaryOrgDomainRequest {
     string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
@@ -2242,6 +2157,10 @@ message OIDCConfig {
     string client_secret = 6;
     OIDCAuthMethodType auth_method_type = 7;
     repeated string post_logout_redirect_uris = 8;
+    OIDCVersion version = 9;
+    bool none_compliant = 10;
+    repeated caos.zitadel.api.v1.LocalizedMessage compliance_problems = 11;
+    bool dev_mode = 12;
 }
 
 message OIDCApplicationCreate {
@@ -2253,6 +2172,12 @@ message OIDCApplicationCreate {
     OIDCApplicationType application_type = 6;
     OIDCAuthMethodType auth_method_type = 7;
     repeated string post_logout_redirect_uris = 8;
+    OIDCVersion version = 9;
+    bool dev_mode = 10;
+}
+
+enum OIDCVersion {
+    OIDCV1_0 = 0;
 }
 
 message OIDCConfigUpdate {
@@ -2264,6 +2189,7 @@ message OIDCConfigUpdate {
     OIDCApplicationType application_type = 6;
     OIDCAuthMethodType auth_method_type = 7;
     repeated string post_logout_redirect_uris = 8;
+    bool dev_mode = 9;
 }
 
 enum OIDCResponseType {
@@ -2526,7 +2452,6 @@ message UserGrantUpdate {
     string user_id = 1;
     string id = 2;
     repeated string role_keys = 3;
-    string grant_id = 4;
 }
 
 message UserGrantRemoveBulk {
@@ -2536,39 +2461,6 @@ message UserGrantRemoveBulk {
 message UserGrantID {
     string user_id = 1;
     string id = 2;
-}
-
-message ProjectUserGrantID {
-    string project_id = 1;
-    string user_id = 2;
-    string id = 3;
-}
-
-message ProjectUserGrantUpdate {
-    string project_id = 1;
-    string user_id = 2;
-    string id = 3;
-    repeated string role_keys = 4;
-}
-
-message ProjectGrantUserGrantID {
-    string project_grant_id = 1;
-    string user_id = 2;
-    string id = 3;
-}
-
-message ProjectGrantUserGrantCreate {
-    string user_id = 1;
-    string project_grant_id = 2;
-    string project_id = 3 [(validate.rules).string.min_len = 1];
-    repeated string role_keys = 4;
-}
-
-message ProjectGrantUserGrantUpdate {
-    string project_grant_id = 1;
-    string user_id = 2;
-    string id = 3;
-    repeated string role_keys = 4;
 }
 
 enum UserGrantState {
@@ -2626,6 +2518,7 @@ enum UserGrantSearchKey {
     USERGRANTSEARCHKEY_USER_ID = 2;
     USERGRANTSEARCHKEY_ORG_ID = 3;
     USERGRANTSEARCHKEY_ROLE_KEY = 4;
+    USERGRANTSEARCHKEY_GRANT_ID = 5;
 }
 
 message ProjectUserGrantSearchRequest {
@@ -2640,4 +2533,52 @@ message ProjectGrantUserGrantSearchRequest {
     uint64 offset = 2;
     uint64 limit = 3;
     repeated UserGrantSearchQuery queries = 4;
+}
+
+message UserMembershipSearchResponse {
+    uint64 offset = 1;
+    uint64 limit = 2;
+    uint64 total_result = 3;
+    repeated UserMembershipView result = 4;
+    uint64 processed_sequence = 5;
+    google.protobuf.Timestamp view_timestamp = 6;
+}
+
+message UserMembershipSearchRequest {
+    string user_id = 1;
+    uint64 offset = 2;
+    uint64 limit = 3;
+    repeated UserMembershipSearchQuery queries = 4;
+}
+
+message UserMembershipSearchQuery {
+    UserMembershipSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
+    SearchMethod method = 2 [(validate.rules).enum = {in: [0]}];
+    string value = 3;
+}
+
+enum UserMembershipSearchKey {
+    USERMEMBERSHIPSEARCHKEY_UNSPECIFIED = 0;
+    USERMEMBERSHIPSEARCHKEY_TYPE = 1;
+    USERMEMBERSHIPSEARCHKEY_OBJECT_ID = 2;
+}
+
+message UserMembershipView {
+    string user_id = 1;
+    MemberType member_type = 2;
+    string aggregate_id = 3;
+    string object_id = 4;
+    repeated string roles = 5;
+    string display_name = 6;
+    google.protobuf.Timestamp creation_date = 7;
+    google.protobuf.Timestamp change_date = 8;
+    uint64 sequence = 9;
+    string resource_owner = 10;
+}
+
+enum MemberType {
+    MEMBERTYPE_UNSPECIFIED = 0;
+    MEMBERTYPE_ORGANISATION = 1;
+    MEMBERTYPE_PROJECT = 2;
+    MEMBERTYPE_PROJECT_GRANT = 3;
 }
