@@ -70,42 +70,22 @@ export class AuthService {
         });
     }
 
-    public isAllowed(roles: string[] | RegExp[], each: boolean = false, isRegexp: boolean = false): Observable<boolean> {
+    public isAllowed(roles: string[] | RegExp[]): Observable<boolean> {
         if (roles && roles.length > 0) {
             return this.zitadelPermissions.pipe(switchMap(zroles => {
-                return of(this.hasRoles(zroles, roles, each, isRegexp));
+                return of(this.hasRoles(zroles, roles));
             }));
         } else {
-            console.log('falsess');
             return of(false);
         }
     }
 
-    public hasRoles(userRoles: string[], requestedRoles: string[] | RegExp[],
-        each: boolean = false, isRegexp: boolean = false): boolean {
-        if (isRegexp) {
-            if (each) {
-                return requestedRoles.every((regexp: any) => {
-                    return userRoles.findIndex(role => (regexp as RegExp).test(role)) > -1;
-                });
-            } else {
-                return requestedRoles.findIndex((regexp: any) => {
-                    const index = userRoles.findIndex(role => (regexp as RegExp).test(role));
-                    return true;
-                }) > -1;
-            }
-        } else {
-            if (each) {
-                return requestedRoles.every((role: any) => userRoles.includes(role));
-            } else {
-                // return requestedRoles.findIndex((role: any) => {
-                //     return userRoles.includes(role);
-                // }) > -1;
-                return requestedRoles.findIndex((role: any) => {
-                    return userRoles.findIndex(i => i.includes(role)) > -1;
-                }) > -1;
-            }
-        }
+    public hasRoles(userRoles: string[], requestedRoles: string[] | RegExp[]): boolean {
+        return requestedRoles.findIndex((regexp: any) => {
+            return userRoles.findIndex(role => {
+                return (new RegExp(regexp)).test(role);
+            }) > -1;
+        }) > -1;
     }
 
     public get authenticated(): boolean {
