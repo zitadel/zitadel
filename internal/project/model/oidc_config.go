@@ -1,8 +1,15 @@
 package model
 
 import (
+	"fmt"
+	"strings"
+
+	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/id"
 	"strings"
 )
 
@@ -82,6 +89,34 @@ func (c *OIDCConfig) IsValid() bool {
 		}
 	}
 	return true
+}
+
+//ClientID random_number@projectname (eg. 495894098234@zitadel)
+func (c *OIDCConfig) GenerateNewClientID(idGenerator id.Generator, project *Project) error {
+	rndID, err := idGenerator.Next()
+	if err != nil {
+		return err
+	}
+
+	c.ClientID = fmt.Sprintf("%v@%v", rndID, strings.ReplaceAll(strings.ToLower(project.Name), " ", "_"))
+	return nil
+}
+
+func (c *OIDCConfig) GenerateClientSecretIfNeeded(generator crypto.Generator) (string, error) {
+	if c.AuthMethodType == OIDCAuthMethodTypeNone {
+		return "", nil
+	}
+	return c.GenerateNewClientSecret(generator)
+}
+
+func (c *OIDCConfig) GenerateNewClientSecret(generator crypto.Generator) (string, error) {
+	cryptoValue, stringSecret, err := crypto.NewCode(generator)
+	if err != nil {
+		logging.Log("MODEL-UpnTI").OnError(err).Error("unable to create client secret")
+		return "", errors.ThrowInternal(err, "MODEL-gH2Wl", "Errors.Project.CouldNotGenerateClientSecret")
+	}
+	c.ClientSecret = cryptoValue
+	return stringSecret, nil
 }
 
 func (c *OIDCConfig) FillCompliance() {

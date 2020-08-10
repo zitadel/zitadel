@@ -93,6 +93,7 @@ Errors:
     AppNotExisting: Application doesn't exist
     OIDCConfigInvalid: OIDC configuration is invalid
     AppIsNotOIDC: Application is not type oidc
+    OIDCAuthMethodNoneSecret: OIDC Auth Method None does not require a secret
     RequiredFieldsMissing: Some required fields are missing
     GrantNotFound: Grant not found
     GrantInvalid: Project grant is invalid

@@ -511,19 +511,16 @@ func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model
 	app.AppID = id
 
 	var stringPw string
-	var cryptoPw *crypto.CryptoValue
 	if app.OIDCConfig != nil {
 		app.OIDCConfig.AppID = id
-		stringPw, cryptoPw, err = generateNewClientSecret(es.pwGenerator)
+		err := app.OIDCConfig.GenerateNewClientID(es.idGenerator, existing)
 		if err != nil {
 			return nil, err
 		}
-		app.OIDCConfig.ClientSecret = cryptoPw
-		clientID, err := generateNewClientID(es.idGenerator, existing)
+		stringPw, err = app.OIDCConfig.GenerateClientSecretIfNeeded(es.pwGenerator)
 		if err != nil {
 			return nil, err
 		}
-		app.OIDCConfig.ClientID = clientID
 	}
 	repoProject := model.ProjectFromModel(existing)
 	repoApp := model.AppFromModel(app)
@@ -757,14 +754,17 @@ func (es *ProjectEventstore) ChangeOIDCConfigSecret(ctx context.Context, project
 	if app.Type != proj_model.AppTypeOIDC {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dile4", "Errors.Project.AppIsNotOIDC")
 	}
+	if app.OIDCConfig.AuthMethodType == proj_model.OIDCAuthMethodTypeNone {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-GDrg2", "Errors.Project.OIDCAuthMethodNoneSecret")
+	}
 	repoProject := model.ProjectFromModel(existing)
 
-	stringPw, crypto, err := generateNewClientSecret(es.pwGenerator)
+	stringPw, err := app.OIDCConfig.GenerateNewClientSecret(es.pwGenerator)
 	if err != nil {
 		return nil, err
 	}
 
-	projectAggregate := OIDCConfigSecretChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, appID, crypto)
+	projectAggregate := OIDCConfigSecretChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, appID, app.OIDCConfig.ClientSecret)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	if err != nil {
 		return nil, err
