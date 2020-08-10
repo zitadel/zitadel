@@ -2,8 +2,10 @@ package eventstore
 
 import (
 	"context"
-	"strings"
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"strings"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
@@ -15,8 +17,6 @@ import (
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-
-
 )
 
 const (
@@ -26,9 +26,10 @@ const (
 type OrgRepository struct {
 	SearchLimit uint64
 	*org_es.OrgEventstore
-	UserEvents *usr_es.UserEventstore
-	View       *mgmt_view.View
-	Roles      []string
+	UserEvents     *usr_es.UserEventstore
+	View           *mgmt_view.View
+	Roles          []string
+	SystemDefaults systemdefaults.SystemDefaults
 }
 
 func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.OrgView, error) {
@@ -199,4 +200,62 @@ func (repo *OrgRepository) GetOrgMemberRoles() []string {
 		}
 	}
 	return roles
+}
+
+func (repo *OrgRepository) IdpConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IdpConfigView, error) {
+	//idp, err := repo.View.IdpConfigByID(idpConfigID)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//return iam_es_model.IdpConfigViewToModel(idp), nil
+	return nil, nil
+}
+func (repo *OrgRepository) AddOidcIdpConfig(ctx context.Context, idp *iam_model.IdpConfig) (*iam_model.IdpConfig, error) {
+	idp.AggregateID = repo.SystemDefaults.IamID
+	return repo.OrgEventstore.AddIdpConfiguration(ctx, idp)
+}
+
+func (repo *OrgRepository) ChangeIdpConfig(ctx context.Context, idp *iam_model.IdpConfig) (*iam_model.IdpConfig, error) {
+	idp.AggregateID = repo.SystemDefaults.IamID
+	return repo.OrgEventstore.ChangeIdpConfiguration(ctx, idp)
+}
+
+func (repo *OrgRepository) DeactivateIdpConfig(ctx context.Context, idpConfigID string) (*iam_model.IdpConfig, error) {
+	return repo.OrgEventstore.DeactivateIdpConfiguration(ctx, repo.SystemDefaults.IamID, idpConfigID)
+}
+
+func (repo *OrgRepository) ReactivateIdpConfig(ctx context.Context, idpConfigID string) (*iam_model.IdpConfig, error) {
+	return repo.OrgEventstore.ReactivateIdpConfiguration(ctx, repo.SystemDefaults.IamID, idpConfigID)
+}
+
+func (repo *OrgRepository) RemoveIdpConfig(ctx context.Context, idpConfigID string) error {
+	idp := iam_model.NewIdpConfig(repo.SystemDefaults.IamID, idpConfigID)
+	return repo.OrgEventstore.RemoveIdpConfiguration(ctx, idp)
+}
+
+func (repo *OrgRepository) ChangeOidcIdpConfig(ctx context.Context, oidcConfig *iam_model.OidcIdpConfig) (*iam_model.OidcIdpConfig, error) {
+	oidcConfig.AggregateID = repo.SystemDefaults.IamID
+	return repo.OrgEventstore.ChangeIdpOidcConfiguration(ctx, oidcConfig)
+}
+
+func (repo *OrgRepository) SearchIdpConfigs(ctx context.Context, request *iam_model.IdpConfigSearchRequest) (*iam_model.IdpConfigSearchResponse, error) {
+	//request.EnsureLimit(repo.SearchLimit)
+	//sequence, err := repo.View.GetLatestIdpConfigSequence()
+	//logging.Log("EVENT-Dk8si").OnError(err).Warn("could not read latest idp config sequence")
+	//idps, count, err := repo.View.SearchIdpConfigs(request)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//result := &iam_model.IdpConfigSearchResponse{
+	//	Offset:      request.Offset,
+	//	Limit:       request.Limit,
+	//	TotalResult: uint64(count),
+	//	Result:      iam_es_model.IdpConfigViewsToModel(idps),
+	//}
+	//if err == nil {
+	//	result.Sequence = sequence.CurrentSequence
+	//	result.Timestamp = sequence.CurrentTimestamp
+	//}
+	//return result, nil
+	return nil, nil
 }
