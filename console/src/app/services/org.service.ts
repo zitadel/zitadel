@@ -6,6 +6,7 @@ import { ManagementServicePromiseClient } from '../proto/generated/management_gr
 import {
     AddOrgDomainRequest,
     AddOrgMemberRequest,
+    ChangeOrgMemberRequest,
     Domain,
     Iam,
     Org,
@@ -19,6 +20,7 @@ import {
     OrgDomainValidationType,
     OrgIamPolicy,
     OrgID,
+    OrgMember,
     OrgMemberRoles,
     OrgMemberSearchRequest,
     OrgMemberSearchResponse,
@@ -194,6 +196,18 @@ export class OrgService {
             f => f,
         );
     }
+
+    public async ChangeMyOrgMember(userId: string, rolesList: string[]): Promise<OrgMember> {
+        const req = new ChangeOrgMemberRequest();
+        req.setUserId(userId);
+        req.setRolesList(rolesList);
+        return await this.request(
+            c => c.changeMyOrgMember,
+            req,
+            f => f,
+        );
+    }
+
 
     public async RemoveMyOrgMember(userId: string): Promise<Empty> {
         const req = new RemoveOrgMemberRequest();
