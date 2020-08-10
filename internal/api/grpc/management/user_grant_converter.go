@@ -69,29 +69,6 @@ func userGrantRemoveBulkToModel(u *management.UserGrantRemoveBulk) []string {
 	return ids
 }
 
-func projectUserGrantUpdateToModel(u *management.ProjectUserGrantUpdate) *grant_model.UserGrant {
-	return &grant_model.UserGrant{
-		ObjectRoot: models.ObjectRoot{AggregateID: u.Id},
-		RoleKeys:   u.RoleKeys,
-	}
-}
-
-func projectGrantUserGrantCreateToModel(u *management.ProjectGrantUserGrantCreate) *grant_model.UserGrant {
-	return &grant_model.UserGrant{
-		UserID:    u.UserId,
-		ProjectID: u.ProjectId,
-		RoleKeys:  u.RoleKeys,
-		GrantID:   u.ProjectGrantId,
-	}
-}
-
-func projectGrantUserGrantUpdateToModel(u *management.ProjectGrantUserGrantUpdate) *grant_model.UserGrant {
-	return &grant_model.UserGrant{
-		ObjectRoot: models.ObjectRoot{AggregateID: u.Id},
-		RoleKeys:   u.RoleKeys,
-	}
-}
-
 func userGrantSearchRequestsToModel(project *management.UserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
 	return &grant_model.UserGrantSearchRequest{
 		Offset:  project.Offset,

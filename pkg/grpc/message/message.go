@@ -11,3 +11,7 @@ func (m *LocalizedMessage) SetLocalizedMessage(message string) {
 func NewLocalizedEventType(key string) *LocalizedMessage {
 	return &LocalizedMessage{Key: "EventTypes." + key}
 }
+
+func NewLocalizedMessage(key string) *LocalizedMessage {
+	return &LocalizedMessage{Key: key}
+}

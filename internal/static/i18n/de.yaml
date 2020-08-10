@@ -291,3 +291,24 @@ EventTypes:
       removed: ZITADEL Mitglied entfernt
   key_pair:
     added: Schlüsselpaar hinzugefügt
+Application:
+  OIDC:
+    V1:
+      NotCompliant: Deine Konfiguration ist nicht konform und weicht vom OIDC 1.0 Standard ab.
+      NotAllCombinationsAreAllowed: Die Konfiguration ist konform, jedoch werden nicht alle möglichen Kombinationen erlaubt.
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: Grant Type Code erlaubt http Redirect Uris nur für den Apptype Web.
+          CustomOnlyForNative: Grant Type Code erlaubt custom Redirect Uris nur für den Apptype Native. (z.B appname:// )
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: Grant Type Implicit erlaubt keine custom Redirect Uris.
+          HttpNotAllowed: Grant Type Implicit erlaubt keine http Redirect Uris.
+          NativeShouldBeHttpLocalhost: Grant Type Implicit erlaubt beim Apptype Native http nur mit localhost (http://localhost)
+          HttpLocalhostOnlyForNative: Http://localhost Redirect Uri ist nur für Native Applikationen erlaubt.
+      Native:
+        AuthMethodType:
+          NotNone: Bei Native Applikationen sollte der AuthMethodType none sein.
+      UserAgent:
+        AuthMethodType:
+          NotNone: Bei einem User Agent sollte der AuthMethodType none sein.

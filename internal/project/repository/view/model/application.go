@@ -28,6 +28,7 @@ type ApplicationView struct {
 	State        int32     `json:"-" gorm:"column:app_state"`
 
 	IsOIDC                     bool           `json:"-" gorm:"column:is_oidc"`
+	OIDCVersion                int32          `json:"oidcVersion" gorm:"column:oidc_version"`
 	OIDCClientID               string         `json:"clientId" gorm:"column:oidc_client_id"`
 	OIDCRedirectUris           pq.StringArray `json:"redirectUris" gorm:"column:oidc_redirect_uris"`
 	OIDCResponseTypes          pq.Int64Array  `json:"responseTypes" gorm:"column:oidc_response_types"`
@@ -35,6 +36,9 @@ type ApplicationView struct {
 	OIDCApplicationType        int32          `json:"applicationType" gorm:"column:oidc_application_type"`
 	OIDCAuthMethodType         int32          `json:"authMethodType" gorm:"column:oidc_auth_method_type"`
 	OIDCPostLogoutRedirectUris pq.StringArray `json:"postLogoutRedirectUris" gorm:"column:oidc_post_logout_redirect_uris"`
+	NoneCompliant              bool           `json:"-" gorm:"column:none_compliant"`
+	ComplianceProblems         pq.StringArray `json:"-" gorm:"column:compliance_problems"`
+	DevMode                    bool           `json:"devMode" gorm:"column:dev_mode"`
 
 	Sequence uint64 `json:"-" gorm:"sequence"`
 }
@@ -57,6 +61,7 @@ func ApplicationViewFromModel(app *model.ApplicationView) *ApplicationView {
 		OIDCApplicationType:        int32(app.OIDCApplicationType),
 		OIDCAuthMethodType:         int32(app.OIDCAuthMethodType),
 		OIDCPostLogoutRedirectUris: app.OIDCPostLogoutRedirectUris,
+		DevMode:                    app.DevMode,
 	}
 }
 
@@ -87,6 +92,7 @@ func ApplicationViewToModel(app *ApplicationView) *model.ApplicationView {
 		ChangeDate:   app.ChangeDate,
 
 		IsOIDC:                     app.IsOIDC,
+		OIDCVersion:                model.OIDCVersion(app.OIDCVersion),
 		OIDCClientID:               app.OIDCClientID,
 		OIDCRedirectUris:           app.OIDCRedirectUris,
 		OIDCResponseTypes:          OIDCResponseTypesToModel(app.OIDCResponseTypes),
@@ -94,6 +100,9 @@ func ApplicationViewToModel(app *ApplicationView) *model.ApplicationView {
 		OIDCApplicationType:        model.OIDCApplicationType(app.OIDCApplicationType),
 		OIDCAuthMethodType:         model.OIDCAuthMethodType(app.OIDCAuthMethodType),
 		OIDCPostLogoutRedirectUris: app.OIDCPostLogoutRedirectUris,
+		NoneCompliant:              app.NoneCompliant,
+		ComplianceProblems:         app.ComplianceProblems,
+		DevMode:                    app.DevMode,
 	}
 }
 
@@ -132,9 +141,17 @@ func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 	case es_model.OIDCConfigAdded:
 		a.IsOIDC = true
 		err = a.SetData(event)
+		if err != nil {
+			return err
+		}
+		a.setCompliance()
 	case es_model.OIDCConfigChanged,
 		es_model.ApplicationChanged:
 		err = a.SetData(event)
+		if err != nil {
+			return err
+		}
+		a.setCompliance()
 	case es_model.ApplicationDeactivated:
 		a.State = int32(model.AppStateInactive)
 	case es_model.ApplicationReactivated:
@@ -153,4 +170,10 @@ func (a *ApplicationView) SetData(event *models.Event) error {
 		return caos_errs.ThrowInternal(err, "MODEL-8suie", "Could not unmarshal data")
 	}
 	return nil
+}
+
+func (a *ApplicationView) setCompliance() {
+	compliance := model.GetOIDCCompliance(model.OIDCVersion(a.OIDCVersion), model.OIDCApplicationType(a.OIDCApplicationType), OIDCGrantTypesToModel(a.OIDCGrantTypes), OIDCResponseTypesToModel(a.OIDCResponseTypes), model.OIDCAuthMethodType(a.OIDCAuthMethodType), a.OIDCPostLogoutRedirectUris)
+	a.NoneCompliant = compliance.NoneCompliant
+	a.ComplianceProblems = compliance.Problems
 }
