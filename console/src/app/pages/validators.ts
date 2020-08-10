@@ -1,7 +1,7 @@
 import { FormControl } from '@angular/forms';
 
 export function symbolValidator(c: FormControl): any {
-    const REGEXP = /[^a-z0-9]/gi;
+    const REGEXP: RegExp = /[^a-z0-9]/gi;
 
     return REGEXP.test(c.value) ? null : {
         invalid: true,
