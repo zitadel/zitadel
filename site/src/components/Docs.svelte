@@ -3,7 +3,6 @@
   import GuideContents from "./GuideContents.svelte"; // TODO rename
   import Icon from "./Icon.svelte";
   import manifest from '../../static/manifest.json';
-export let lang = manifest.lang;
   export let owner = "caos";
   export let project = "zitadel/site";
   export let path = "/docs";

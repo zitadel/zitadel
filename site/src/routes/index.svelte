@@ -23,6 +23,7 @@
     .section {
         width: 100%;
         margin-top: 70vh;
+        min-height: 80vh;
     }
     @media screen and (min-width: 768px) {
         .caos-back {
@@ -42,15 +43,15 @@
   </title>
 </svelte:head>
 
-<img class="caos-back" src="logos/zitadel-logo-solo-darkdesign.svg" alt="caos logo">
+    <img class="caos-back" src="logos/zitadel-logo-solo-darkdesign.svg" alt="caos logo">
 
-<Section>
-    <div class="section">
-        <h2>{$_('title')}</h2>
-        <p>{$_('description')}</p>
-        <p>{$_('description2')}</p>
-        <p>{$_('description3')}</p>
+    <Section>
+        <div class="section">
+            <h2>{$_('title')}</h2>
+            <p>{$_('description')}</p>
+            <p>{$_('description2')}</p>
+            <p>{$_('description3')}</p>
 
-        <a href="/get_started" >{$_('button')}</a>
-    </div>
-</Section>
+            <a href="/get_started" >{$_('button')}</a>
+        </div>
+    </Section>

@@ -2,9 +2,9 @@ import { getLocaleFromNavigator, init, locale as $locale, register } from 'svelt
 
 import { getCookie, setCookie } from './modules/cookie.js';
 
-const INIT_OPTIONS = {
+export const INIT_OPTIONS = {
     fallbackLocale: 'en',
-    initialLocale: null,
+    initialLocale: 'en',
     loadingDelay: 200,
     formats: {},
     warnOnMissingMessages: true,
@@ -12,8 +12,8 @@ const INIT_OPTIONS = {
 
 let currentLocale = null;
 
-register('en', () => import('../messages/en.json'));
-register('de', () => import('../messages/de.json'));
+register('en', () => import('./messages/en.json'));
+register('de', () => import('./messages/de.json'));
 
 $locale.subscribe((value) => {
     if (value == null) return;

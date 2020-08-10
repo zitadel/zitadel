@@ -13,8 +13,7 @@
     $:setLocale(group);
     function setLocale(language) {
         if (typeof window !== 'undefined') {
-            setCookie('locale', language);
-            startClient();
+            locale.set(language);
         }
     }
 </script>
