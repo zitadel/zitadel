@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/authz"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
@@ -46,6 +47,7 @@ func ProjectCreateAggregate(aggCreator *es_models.AggregateCreator, project *mod
 		}
 		validationQuery := es_models.NewSearchQuery().
 			AggregateTypeFilter(model.ProjectAggregate).
+			ResourceOwnerFilter(authz.GetCtxData(ctx).OrgID).
 			EventTypesFilter(model.ProjectAdded, model.ProjectChanged, model.ProjectRemoved)
 
 		validation := addProjectValidation(project.Name)

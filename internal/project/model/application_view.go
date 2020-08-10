@@ -14,6 +14,7 @@ type ApplicationView struct {
 	State        AppState
 
 	IsOIDC                     bool
+	OIDCVersion                OIDCVersion
 	OIDCClientID               string
 	OIDCRedirectUris           []string
 	OIDCResponseTypes          []OIDCResponseType
@@ -21,6 +22,9 @@ type ApplicationView struct {
 	OIDCApplicationType        OIDCApplicationType
 	OIDCAuthMethodType         OIDCAuthMethodType
 	OIDCPostLogoutRedirectUris []string
+	NoneCompliant              bool
+	ComplianceProblems         []string
+	DevMode                    bool
 
 	Sequence uint64
 }

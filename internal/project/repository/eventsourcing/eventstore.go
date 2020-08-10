@@ -534,6 +534,7 @@ func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model
 	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
 		converted := model.AppToModel(a)
 		converted.OIDCConfig.ClientSecretString = stringPw
+		converted.OIDCConfig.FillCompliance()
 		return converted, nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-GvPct", "Errors.Internal")

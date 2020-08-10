@@ -296,10 +296,31 @@ func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequ
 	return changes, nil
 }
 
-func (repo *ProjectRepo) ApplicationByID(ctx context.Context, appID string) (*proj_model.ApplicationView, error) {
-	app, err := repo.View.ApplicationByID(appID)
-	if err != nil {
-		return nil, err
+func (repo *ProjectRepo) ApplicationByID(ctx context.Context, projectID, appID string) (*proj_model.ApplicationView, error) {
+	app, viewErr := repo.View.ApplicationByID(appID)
+	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
+		return nil, viewErr
+	}
+	if caos_errs.IsNotFound(viewErr) {
+		app = new(model.ApplicationView)
+	}
+
+	events, esErr := repo.ProjectEvents.ProjectEventsByID(ctx, projectID, app.Sequence)
+	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-Fshu8", "Errors.Application.NotFound")
+	}
+
+	if esErr != nil {
+		logging.Log("EVENT-SLCo9").WithError(viewErr).Debug("error retrieving new events")
+		return model.ApplicationViewToModel(app), nil
+	}
+
+	viewApp := *app
+	for _, event := range events {
+		err := app.AppendEvent(event)
+		if err != nil {
+			return model.ApplicationViewToModel(&viewApp), nil
+		}
 	}
 	return model.ApplicationViewToModel(app), nil
 }
