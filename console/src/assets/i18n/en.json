@@ -270,6 +270,8 @@
             "ORGDOMAIN_VERIFICATION_SKIP":"You can skip verification for now and continue to create your organisation, but in order to use your organisation this step has to be completed!",
             "ORGDETAILUSER_TITLE":"Configure Organisation Owner",
             "ORGDOMAIN_VERIFICATION_VALIDATION_DESC":"The tokens are checked regularly to ensure you are still owner of the domain.",
+            "ORGDOMAIN_VERIFICATION_NEWTOKEN_TITLE":"Request new token",
+            "ORGDOMAIN_VERIFICATION_NEWTOKEN_DESC":"If you want to request a new token, select you preferred method, if you want to validate a persisting token, click on the button above.",
             "DOWNLOAD_FILE":"Download file",
             "SELECTORGTOOLTIP":"Select this organisation",
             "PRIMARYDOMAIN":"Primary Domain",

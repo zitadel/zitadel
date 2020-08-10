@@ -2,34 +2,43 @@
 <div mat-dialog-content>
     <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION' | translate }}</p>
 
-    <p>HTTP TOKEN</p>
-    <p class="entry">{{http?.url}}.txt</p>
-
-    <div class="btn-container">
-        <button mat-stroked-button (click)="saveFile()"
-            color="primary">{{ 'ORG.PAGES.DOWNLOAD_FILE' | translate }}</button>
-
-        <button color="primary" type="submit" mat-raised-button
-            (click)="validate()">{{ 'ACTIONS.VERIFY' | translate }}</button>
-    </div>
-
-    <p>DNS TOKEN</p>
-    <div class="line" *ngIf="dns?.token">
-        <p class="entry">{{dns?.token}}</p>
-        <button color="primary" [disabled]="copied == data.clientSecret" matTooltip="copy to clipboard"
-            appCopyToClipboard [valueToCopy]="dns.token" (copiedValue)="copied = $event" mat-icon-button>
-            <i *ngIf="copied != dns.token" class="las la-clipboard"></i>
-            <i *ngIf="copied == dns.token" class="las la-clipboard-check"></i>
-        </button>
-    </div>
-    <p class="entry">{{dns?.url}}</p>
-
-    <div class="btn-container">
-        <button color="primary" type="submit" mat-raised-button
-            (click)="validate()">{{ 'ACTIONS.VERIFY' | translate }}</button>
-    </div>
-
     <p class="desc warn">{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION_VALIDATION_DESC' | translate }}</p>
+
+
+    <div class="btn-container">
+        <button color="primary" type="submit" mat-raised-button
+            (click)="validate()">{{ 'ACTIONS.VERIFY' | translate }}</button>
+    </div>
+
+    <p>{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION_NEWTOKEN_TITLE' | translate }}</p>
+    <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION_NEWTOKEN_DESC' | translate }}</p>
+
+    <div class="btn-container" *ngIf="!(http || dns)">
+        <button color="primary" mat-raised-button (click)="loadHttpToken()">HTTP</button>
+        <button color="primary" mat-raised-button (click)="loadDnsToken()">DNS</button>
+    </div>
+    <div *ngIf="http">
+        <p>HTTP TOKEN</p>
+        <p class="entry">{{http?.url}}.txt</p>
+
+        <div class="btn-container">
+            <button mat-stroked-button (click)="saveFile()"
+                color="primary">{{ 'ORG.PAGES.DOWNLOAD_FILE' | translate }}</button>
+        </div>
+    </div>
+
+    <div *ngIf="dns">
+        <p>DNS TOKEN</p>
+        <div class="line" *ngIf="dns?.token">
+            <p class="entry">{{dns?.token}}</p>
+            <button color="primary" [disabled]="copied == data.clientSecret" matTooltip="copy to clipboard"
+                appCopyToClipboard [valueToCopy]="dns.token" (copiedValue)="copied = $event" mat-icon-button>
+                <i *ngIf="copied != dns.token" class="las la-clipboard"></i>
+                <i *ngIf="copied == dns.token" class="las la-clipboard-check"></i>
+            </button>
+        </div>
+        <p class="entry">{{dns?.url}}</p>
+    </div>
 </div>
 <div mat-dialog-actions class="action">
     <button mat-button class="ok-button" (click)="closeDialog()">

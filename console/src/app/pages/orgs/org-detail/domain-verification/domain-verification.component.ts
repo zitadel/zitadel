@@ -26,14 +26,15 @@ export class DomainVerificationComponent {
         private orgService: OrgService,
     ) {
         this.domain = data.domain;
-
-        this.loadTokens();
     }
 
-    async loadTokens(): Promise<void> {
+    async loadHttpToken(): Promise<void> {
         this.http = (await this.orgService.GenerateMyOrgDomainValidation(
             this.domain.domain,
             OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_HTTP)).toObject();
+    }
+
+    async loadDnsToken(): Promise<void> {
         this.dns = (await this.orgService.GenerateMyOrgDomainValidation(
             this.domain.domain,
             OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_DNS)).toObject();
