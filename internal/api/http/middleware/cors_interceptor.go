@@ -31,8 +31,8 @@ var (
 		ExposedHeaders: []string{
 			http_utils.Location,
 		},
-		AllowedOrigins: []string{
-			"http://localhost:*",
+		AllowOriginFunc: func(_ string) bool {
+			return true
 		},
 	}
 )
