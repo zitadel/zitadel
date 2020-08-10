@@ -2,12 +2,12 @@ package handler
 
 import (
 	"github.com/caos/logging"
+	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
-	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
 type IdpConfig struct {
@@ -15,7 +15,7 @@ type IdpConfig struct {
 }
 
 const (
-	idpConfigTable = "adminapi.idp_configs"
+	idpConfigTable = "management.idp_configs"
 )
 
 func (m *IdpConfig) ViewModel() string {
@@ -28,20 +28,20 @@ func (m *IdpConfig) EventQuery() (*models.SearchQuery, error) {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.IamAggregate).
+		AggregateTypeFilter(model.OrgAggregate).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (m *IdpConfig) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
-	case model.IamAggregate:
+	case model.OrgAggregate:
 		err = m.processIdpConfig(event)
 	}
 	return err
 }
 
 func (m *IdpConfig) processIdpConfig(event *models.Event) (err error) {
-	idp := new(iam_model.IdpConfigView)
+	idp := new(org_model.IdpConfigView)
 	switch event.Type {
 	case model.IdpConfigAdded:
 		err = idp.AppendEvent(event)
@@ -72,6 +72,6 @@ func (m *IdpConfig) processIdpConfig(event *models.Event) (err error) {
 }
 
 func (m *IdpConfig) OnError(event *models.Event, err error) error {
-	logging.LogWithFields("SPOOL-Mslo9", "id", event.AggregateID).WithError(err).Warn("something went wrong in idp config handler")
+	logging.LogWithFields("SPOOL-Nxu8s", "id", event.AggregateID).WithError(err).Warn("something went wrong in idp config handler")
 	return spooler.HandleError(event, err, m.view.GetLatestIdpConfigFailedEvent, m.view.ProcessedIdpConfigFailedEvent, m.view.ProcessedIdpConfigSequence, m.errorCountUntilSkip)
 }

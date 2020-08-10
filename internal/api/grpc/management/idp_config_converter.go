@@ -3,6 +3,7 @@ package management
 import (
 	"github.com/caos/logging"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/golang/protobuf/ptypes"
 )
@@ -58,7 +59,7 @@ func idpFromModel(idp *iam_model.IdpConfig) *management.Idp {
 	}
 }
 
-func idpViewFromModel(idp *iam_model.IdpConfigView) *management.IdpView {
+func idpViewFromModel(idp *org_model.IdpConfigView) *management.IdpView {
 	creationDate, err := ptypes.TimestampProto(idp.CreationDate)
 	logging.Log("GRPC-8dju8").OnError(err).Debug("date parse failed")
 
@@ -94,7 +95,7 @@ func oidcIdpConfigFromModel(idp *iam_model.OidcIdpConfig) *management.OidcIdpCon
 	}
 }
 
-func idpConfigViewFromModel(idp *iam_model.IdpConfigView) *management.IdpView_OidcConfig {
+func idpConfigViewFromModel(idp *org_model.IdpConfigView) *management.IdpView_OidcConfig {
 	if idp.IsOidc {
 		return &management.IdpView_OidcConfig{
 			OidcConfig: oidcIdpConfigViewFromModel(idp),
@@ -103,7 +104,7 @@ func idpConfigViewFromModel(idp *iam_model.IdpConfigView) *management.IdpView_Oi
 	return nil
 }
 
-func oidcIdpConfigViewFromModel(idp *iam_model.IdpConfigView) *management.OidcIdpConfigView {
+func oidcIdpConfigViewFromModel(idp *org_model.IdpConfigView) *management.OidcIdpConfigView {
 	return &management.OidcIdpConfigView{
 		ClientId: idp.OidcClientID,
 		Issuer:   idp.OidcIssuer,
@@ -122,16 +123,16 @@ func idpConfigStateFromModel(state iam_model.IdpConfigState) management.IdpState
 	}
 }
 
-func idpConfigSearchRequestToModel(request *management.IdpSearchRequest) *iam_model.IdpConfigSearchRequest {
-	return &iam_model.IdpConfigSearchRequest{
+func idpConfigSearchRequestToModel(request *management.IdpSearchRequest) *org_model.IdpConfigSearchRequest {
+	return &org_model.IdpConfigSearchRequest{
 		Limit:   request.Limit,
 		Offset:  request.Offset,
 		Queries: idpConfigSearchQueriesToModel(request.Queries),
 	}
 }
 
-func idpConfigSearchQueriesToModel(queries []*management.IdpSearchQuery) []*iam_model.IdpConfigSearchQuery {
-	modelQueries := make([]*iam_model.IdpConfigSearchQuery, len(queries))
+func idpConfigSearchQueriesToModel(queries []*management.IdpSearchQuery) []*org_model.IdpConfigSearchQuery {
+	modelQueries := make([]*org_model.IdpConfigSearchQuery, len(queries))
 	for i, query := range queries {
 		modelQueries[i] = idpConfigSearchQueryToModel(query)
 	}
@@ -139,26 +140,26 @@ func idpConfigSearchQueriesToModel(queries []*management.IdpSearchQuery) []*iam_
 	return modelQueries
 }
 
-func idpConfigSearchQueryToModel(query *management.IdpSearchQuery) *iam_model.IdpConfigSearchQuery {
-	return &iam_model.IdpConfigSearchQuery{
+func idpConfigSearchQueryToModel(query *management.IdpSearchQuery) *org_model.IdpConfigSearchQuery {
+	return &org_model.IdpConfigSearchQuery{
 		Key:    idpConfigSearchKeyToModel(query.Key),
 		Method: searchMethodToModel(query.Method),
 		Value:  query.Value,
 	}
 }
 
-func idpConfigSearchKeyToModel(key management.IdpSearchKey) iam_model.IdpConfigSearchKey {
+func idpConfigSearchKeyToModel(key management.IdpSearchKey) org_model.IdpConfigSearchKey {
 	switch key {
 	case management.IdpSearchKey_IDPSEARCHKEY_IDP_CONFIG_ID:
-		return iam_model.IdpConfigSearchKeyIdpConfigID
+		return org_model.IdpConfigSearchKeyIdpConfigID
 	case management.IdpSearchKey_IDPSEARCHKEY_NAME:
-		return iam_model.IdpConfigSearchKeyName
+		return org_model.IdpConfigSearchKeyName
 	default:
-		return iam_model.IdpConfigSearchKeyUnspecified
+		return org_model.IdpConfigSearchKeyUnspecified
 	}
 }
 
-func idpConfigSearchResponseFromModel(resp *iam_model.IdpConfigSearchResponse) *management.IdpSearchResponse {
+func idpConfigSearchResponseFromModel(resp *org_model.IdpConfigSearchResponse) *management.IdpSearchResponse {
 	timestamp, err := ptypes.TimestampProto(resp.Timestamp)
 	logging.Log("GRPC-KSi8c").OnError(err).Debug("date parse failed")
 	return &management.IdpSearchResponse{
@@ -171,7 +172,7 @@ func idpConfigSearchResponseFromModel(resp *iam_model.IdpConfigSearchResponse) *
 	}
 }
 
-func idpConfigsFromView(viewIdps []*iam_model.IdpConfigView) []*management.IdpView {
+func idpConfigsFromView(viewIdps []*org_model.IdpConfigView) []*management.IdpView {
 	idps := make([]*management.IdpView, len(viewIdps))
 	for i, idp := range viewIdps {
 		idps[i] = idpViewFromModel(idp)
