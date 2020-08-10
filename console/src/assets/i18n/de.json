@@ -354,7 +354,8 @@
             "DOMAINADDED":"Domain hinzugefügt!",
             "DOMAINREMOVED":"Domain entfernt!",
             "MEMBERADDED":"Manager hinzugefügt!",
-            "MEMBERREMOVED":"Manager entfernt!"
+            "MEMBERREMOVED":"Manager entfernt!",
+            "MEMBERCHANGED":"Manager verändert!"
         }
     },
     "ORG_DETAIL": {
