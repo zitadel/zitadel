@@ -32,7 +32,8 @@
                 <p class="docs-line" *ngIf="docs?.issuer">Issuer: {{docs.issuer}}</p>
             </div>
             <div class="btn-container">
-                <button type="submit" color="primary" [disabled]="appNameForm.invalid || name?.disabled"
+                <button class="submit-button" type="submit" color="primary"
+                    [disabled]="appNameForm.invalid || name?.disabled"
                     mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
             </div>
         </form>
