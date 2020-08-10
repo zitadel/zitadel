@@ -173,7 +173,45 @@ service ManagementService {
         };
     }
 
+    rpc AddServiceAccountKey(ServiceAccountAddKeyRequest) returns (ServiceAccountKeyResponse) {
+        option (google.api.http) = {
+            post: "/serviceaccounts/{service_account_id}/keys"
+        };
 
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "serviceaccount.write"
+        };
+    }
+
+    rpc UpdateServiceAccountKey(ServiceAccountUpdateKeyRequest) returns (ServiceAccountKeyResponse) {
+        option (google.api.http) = {
+            post: "/serviceaccounts/{service_account_id}/keys/{key_id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "serviceaccount.write"
+        };
+    }
+
+    rpc DeleteServiceAccountKey(ServiceAccountKeyIDRequest) returns (ServiceAccountKeyResponse) {
+        option (google.api.http) = {
+            post: "/serviceaccounts/{service_account_id}/keys/{key_id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "serviceaccount.write"
+        };
+    }
+
+    rpc IsUserUnique(UniqueUserRequest) returns (UniqueUserResponse) {
+        option (google.api.http) = {
+            get: "/users/_isunique"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.read"
+        };
+    }
 
     rpc GetUserByID(UserID) returns (UserView) {
         option (google.api.http) = {
@@ -201,16 +239,6 @@ service ManagementService {
         option (google.api.http) = {
             post: "/users/_search"
             body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.read"
-        };
-    }
-
-    rpc IsUserUnique(UniqueUserRequest) returns (UniqueUserResponse) {
-        option (google.api.http) = {
-            get: "/users/_isunique"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -1213,7 +1241,7 @@ service ManagementService {
 
     rpc SearchUserGrants(UserGrantSearchRequest) returns (UserGrantSearchResponse) {
         option (google.api.http) = {
-            post: "/users/grants/_search"
+            post: "/usergrants/_search"
             body: "*"
         };
 
@@ -1289,7 +1317,7 @@ service ManagementService {
     // remove a list of user grants in one request
     rpc BulkRemoveUserGrant(UserGrantRemoveBulk) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/usersgrants/_bulk"
+            delete: "/usergrants/_bulk"
             body: "*"
         };
 
@@ -2762,36 +2790,100 @@ message ServiceAccountIDRequest {
 }
 
 message CreateServiceAccountRequest {
-    string name = 1;
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string description = 2 [(validate.rules).string = {min_len: 1, max_len: 500}];
 }
 
 message UpdateServiceAccountRequest {
     string id = 1;
-    string name = 2;
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string description = 3 [(validate.rules).string.max_len = 500];
 }
 
 message ServiceAccountUniqueRequest {
-
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message ServiceAccountUniqueResponse {}
+message ServiceAccountUniqueResponse {
+    bool isUnique = 1;
+}
 
 message ServiceAccountChangesRequest {
     string id = 1;
 }
 
-message ServiceAccountChangesResponse {}
-
+message ServiceAccountChangesResponse {
+    Changes changes = 1;
+}
 
 message ServiceAccountResponse {
     string id = 1;
     string name = 2;
-    repeated ServiceAccountKey keys = 3;
+    repeated ServiceAccountKeyResponse keys = 3;
+    google.protobuf.Timestamp creation_date = 4;
+    google.protobuf.Timestamp change_date = 5;
+    uint64 sequence = 6;
+    string resource_owner = 7;
 }
 
-message ServiceAccountKey {
-    string id = 1;
+message ServiceAccountAddKeyRequest {
+    ServiceAccountKeyType type = 1;
+    google.protobuf.Timestamp expiration_date = 2;
+    string service_account_id = 3;
 }
+
+message ServiceAccountAddKeyResponse {
+    string key_id = 1;
+    string service_account_id = 2;
+    string key = 3;
+    google.protobuf.Timestamp expiration_date = 4;
+    repeated ServiceAccountKeyResponse keys = 5;
+
+    google.protobuf.Timestamp creation_date = 6;
+    google.protobuf.Timestamp change_date = 7;
+    uint64 sequence = 8;
+    string resource_owner = 9;
+}
+
+message ServiceAccountKeyIDRequest {
+    string key_id = 1;
+    string service_account_id = 2;
+}
+
+message ServiceAccountUpdateKeyRequest {
+    string key_id = 1;
+    string service_account_id = 2;
+    google.protobuf.Timestamp expiration_date = 3;
+    repeated ServiceAccountKeyResponse keys = 4;
+}
+
+message ServiceAccountKeyResponse {
+    string key_id = 1;
+    string service_account_id = 2;
+    google.protobuf.Timestamp expiration_date = 3;
+
+    google.protobuf.Timestamp creation_date = 4;
+    google.protobuf.Timestamp change_date = 5;
+    uint64 sequence = 6;
+    string resource_owner = 7;
+}
+
+message ServiceAccountDeleteKeyRequest {
+    string key_id = 1;
+    string service_account_id = 2;
+}
+
+enum ServiceAccountKeyType {
+    SERVICEACCOUNTKEY_UNSPECIFIED = 0;
+    SERVICEACCOUNTKEY_JSON = 1;
+}
+
+enum ServiceAccountState {
+    SERVICEACCOUNT_UNSPECIFIED = 0;
+    SERVICEACCOUNT_ACTIVE = 1;
+    SERVICEACCOUNT_INACTIVE = 2;
+}
+
 message UserMembershipSearchResponse {
     uint64 offset = 1;
     uint64 limit = 2;

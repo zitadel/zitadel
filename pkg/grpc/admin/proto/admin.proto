@@ -280,7 +280,7 @@ message OrgSearchQuery {
 
 enum OrgSearchKey {
     ORGSEARCHKEY_UNSPECIFIED = 0;
-    ORGSEARCHKEY_ORG_NAME = 1;
+    ORGSEARCHKEY_NAME = 1;
     ORGSEARCHKEY_DOMAIN = 2;
     ORGSEARCHKEY_STATE = 3;
 }

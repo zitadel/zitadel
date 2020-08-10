@@ -247,7 +247,7 @@ func orgQueryKeyToModel(key admin.OrgSearchKey) org_model.OrgSearchKey {
 	switch key {
 	case admin.OrgSearchKey_ORGSEARCHKEY_DOMAIN:
 		return org_model.OrgSearchKeyOrgDomain
-	case admin.OrgSearchKey_ORGSEARCHKEY_ORG_NAME:
+	case admin.OrgSearchKey_ORGSEARCHKEY_NAME:
 		return org_model.OrgSearchKeyOrgName
 	case admin.OrgSearchKey_ORGSEARCHKEY_STATE:
 		return org_model.OrgSearchKeyState
