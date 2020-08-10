@@ -20,7 +20,7 @@ func IdpByID(db *gorm.DB, table, idpID string) (*model.IdpConfigView, error) {
 	return idp, err
 }
 
-func SearchIdps(db *gorm.DB, table string, req *iam_model.IdpConfigSearchRequest) ([]*model.IdpConfigView, int, error) {
+func SearchIdps(db *gorm.DB, table string, req *iam_model.IdpConfigSearchRequest) ([]*model.IdpConfigView, uint64, error) {
 	idps := make([]*model.IdpConfigView, 0)
 	query := repository.PrepareSearchQuery(table, model.IdpConfigSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &idps)

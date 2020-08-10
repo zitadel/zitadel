@@ -14,12 +14,13 @@ const (
 
 type Iam struct {
 	es_models.ObjectRoot
-	SetUpStarted bool         `json:"-"`
-	SetUpDone    bool         `json:"-"`
-	GlobalOrgID  string       `json:"globalOrgId,omitempty"`
-	IamProjectID string       `json:"iamProjectId,omitempty"`
-	Members      []*IamMember `json:"-"`
-	IDPs         []*IdpConfig `json:"-"`
+	SetUpStarted       bool         `json:"-"`
+	SetUpDone          bool         `json:"-"`
+	GlobalOrgID        string       `json:"globalOrgId,omitempty"`
+	IamProjectID       string       `json:"iamProjectId,omitempty"`
+	Members            []*IamMember `json:"-"`
+	IDPs               []*IdpConfig `json:"-"`
+	DefaultLoginPolicy *LoginPolicy
 }
 
 func IamFromModel(iam *model.Iam) *Iam {
@@ -33,6 +34,9 @@ func IamFromModel(iam *model.Iam) *Iam {
 		IamProjectID: iam.IamProjectID,
 		Members:      members,
 		IDPs:         idps,
+	}
+	if iam.DefaultLoginPolicy != nil {
+		converted.DefaultLoginPolicy = LoginPolicyFromModel(iam.DefaultLoginPolicy)
 	}
 	return converted
 }
@@ -48,6 +52,9 @@ func IamToModel(iam *Iam) *model.Iam {
 		IamProjectID: iam.IamProjectID,
 		Members:      members,
 		IDPs:         idps,
+	}
+	if iam.DefaultLoginPolicy != nil {
+		converted.DefaultLoginPolicy = LoginPolicyToModel(iam.DefaultLoginPolicy)
 	}
 	return converted
 }

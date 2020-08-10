@@ -24,4 +24,9 @@ const (
 
 	SamlIdpConfigAdded   models.EventType = "iam.idp.saml.config.added"
 	SamlIdpConfigChanged models.EventType = "iam.idp.saml.config.changed"
+
+	LoginPolicyAdded              models.EventType = "iam.policy.login.added"
+	LoginPolicyChanged            models.EventType = "iam.policy.login.changed"
+	LoginPolicyIdpProviderAdded   models.EventType = "iam.policy.login.idpprovider.added"
+	LoginPolicyIdpProviderRemoved models.EventType = "iam.policy.login.idpprovider.removed"
 )

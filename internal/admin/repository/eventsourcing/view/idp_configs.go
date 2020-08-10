@@ -16,7 +16,7 @@ func (v *View) IdpConfigByID(idpID string) (*model.IdpConfigView, error) {
 	return view.IdpByID(v.Db, idpConfigTable, idpID)
 }
 
-func (v *View) SearchIdpConfigs(request *iam_model.IdpConfigSearchRequest) ([]*model.IdpConfigView, int, error) {
+func (v *View) SearchIdpConfigs(request *iam_model.IdpConfigSearchRequest) ([]*model.IdpConfigView, uint64, error) {
 	return view.SearchIdps(v.Db, idpConfigTable, request)
 }
 

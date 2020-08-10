@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
@@ -326,6 +327,112 @@ func OrgDomainRemovedAggregate(ctx context.Context, aggCreator *es_models.Aggreg
 		return nil, err
 	}
 	return append(aggregates, domainAgregate), nil
+}
+
+func IdpConfigurationAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, idp *iam_es_model.IdpConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if idp == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-MSki8", "Errors.Internal")
+		}
+		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
+		if err != nil {
+			return nil, err
+		}
+		agg.AppendEvent(model.IdpConfigAdded, idp)
+		if idp.OIDCIDPConfig != nil {
+			agg.AppendEvent(model.OidcIdpConfigAdded, idp.OIDCIDPConfig)
+		}
+		return agg, nil
+	}
+}
+
+func IdpConfigurationChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, idp *iam_es_model.IdpConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if idp == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Akdi8", "Errors.Internal")
+		}
+		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
+		if err != nil {
+			return nil, err
+		}
+		var changes map[string]interface{}
+		for _, i := range existing.IDPs {
+			if i.IDPConfigID == idp.IDPConfigID {
+				changes = i.Changes(idp)
+			}
+		}
+		agg.AppendEvent(model.IdpConfigChanged, changes)
+
+		return agg, nil
+	}
+}
+
+func IdpConfigurationRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, idp *iam_es_model.IdpConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if idp == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Mlso9", "Errors.Internal")
+		}
+		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
+		if err != nil {
+			return nil, err
+		}
+		agg.AppendEvent(model.IdpConfigRemoved, &iam_es_model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
+
+		return agg, nil
+	}
+}
+
+func IdpConfigurationDeactivatedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, idp *iam_es_model.IdpConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if idp == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-3sz7d", "Errors.Internal")
+		}
+		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
+		if err != nil {
+			return nil, err
+		}
+		agg.AppendEvent(model.IdpConfigDeactivated, &iam_es_model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
+
+		return agg, nil
+	}
+}
+
+func IdpConfigurationReactivatedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, idp *iam_es_model.IdpConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if idp == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-4jdiS", "Errors.Internal")
+		}
+		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
+		if err != nil {
+			return nil, err
+		}
+		agg.AppendEvent(model.IdpConfigReactivated, &iam_es_model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
+
+		return agg, nil
+	}
+}
+
+func OIDCIdpConfigurationChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, config *iam_es_model.OidcIdpConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if config == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-6Fjso", "Errors.Internal")
+		}
+		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
+		if err != nil {
+			return nil, err
+		}
+		var changes map[string]interface{}
+		for _, idp := range existing.IDPs {
+			if idp.IDPConfigID == config.IdpConfigID {
+				if idp.OIDCIDPConfig != nil {
+					changes = idp.OIDCIDPConfig.Changes(config)
+				}
+			}
+		}
+		agg.AppendEvent(model.OidcIdpConfigChanged, changes)
+
+		return agg, nil
+	}
 }
 
 func isEventValidation(aggregate *es_models.Aggregate, eventType es_models.EventType) func(...*es_models.Event) error {

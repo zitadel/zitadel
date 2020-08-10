@@ -91,7 +91,7 @@ func IdpConfigToModel(idp *IdpConfig) *model.IdpConfig {
 
 func (iam *Iam) appendAddIdpConfigEvent(event *es_models.Event) error {
 	idp := new(IdpConfig)
-	err := idp.setData(event)
+	err := idp.SetData(event)
 	if err != nil {
 		return err
 	}
@@ -102,19 +102,19 @@ func (iam *Iam) appendAddIdpConfigEvent(event *es_models.Event) error {
 
 func (iam *Iam) appendChangeIdpConfigEvent(event *es_models.Event) error {
 	idp := new(IdpConfig)
-	err := idp.setData(event)
+	err := idp.SetData(event)
 	if err != nil {
 		return err
 	}
 	if i, a := GetIdpConfig(iam.IDPs, idp.IDPConfigID); a != nil {
-		iam.IDPs[i].setData(event)
+		iam.IDPs[i].SetData(event)
 	}
 	return nil
 }
 
 func (iam *Iam) appendRemoveIdpConfigEvent(event *es_models.Event) error {
 	idp := new(IdpConfig)
-	err := idp.setData(event)
+	err := idp.SetData(event)
 	if err != nil {
 		return err
 	}
@@ -128,7 +128,7 @@ func (iam *Iam) appendRemoveIdpConfigEvent(event *es_models.Event) error {
 
 func (iam *Iam) appendIdpConfigStateEvent(event *es_models.Event, state model.IdpConfigState) error {
 	idp := new(IdpConfig)
-	err := idp.setData(event)
+	err := idp.SetData(event)
 	if err != nil {
 		return err
 	}
@@ -140,7 +140,7 @@ func (iam *Iam) appendIdpConfigStateEvent(event *es_models.Event, state model.Id
 	return nil
 }
 
-func (c *IdpConfig) setData(event *es_models.Event) error {
+func (c *IdpConfig) SetData(event *es_models.Event) error {
 	c.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, c); err != nil {
 		logging.Log("EVEN-Msj9w").WithError(err).Error("could not unmarshal event data")

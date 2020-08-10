@@ -6,12 +6,13 @@ import (
 
 type Iam struct {
 	es_models.ObjectRoot
-	GlobalOrgID  string
-	IamProjectID string
-	SetUpDone    bool
-	SetUpStarted bool
-	Members      []*IamMember
-	IDPs         []*IdpConfig
+	GlobalOrgID        string
+	IamProjectID       string
+	SetUpDone          bool
+	SetUpStarted       bool
+	Members            []*IamMember
+	IDPs               []*IdpConfig
+	DefaultLoginPolicy *LoginPolicy
 }
 
 func (iam *Iam) GetMember(userID string) (int, *IamMember) {

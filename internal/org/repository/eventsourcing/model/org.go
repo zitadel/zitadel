@@ -2,6 +2,8 @@ package model
 
 import (
 	"encoding/json"
+	"github.com/caos/zitadel/internal/iam/model"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -18,20 +20,23 @@ type Org struct {
 	Name  string `json:"name,omitempty"`
 	State int32  `json:"-"`
 
-	Domains      []*OrgDomain  `json:"-"`
-	Members      []*OrgMember  `json:"-"`
-	OrgIamPolicy *OrgIamPolicy `json:"-"`
+	Domains      []*OrgDomain              `json:"-"`
+	Members      []*OrgMember              `json:"-"`
+	OrgIamPolicy *OrgIamPolicy             `json:"-"`
+	IDPs         []*iam_es_model.IdpConfig `json:"-"`
 }
 
 func OrgFromModel(org *org_model.Org) *Org {
 	members := OrgMembersFromModel(org.Members)
 	domains := OrgDomainsFromModel(org.Domains)
+	idps := iam_es_model.IdpConfigsFromModel(org.IDPs)
 	converted := &Org{
 		ObjectRoot: org.ObjectRoot,
 		Name:       org.Name,
 		State:      int32(org.State),
 		Domains:    domains,
 		Members:    members,
+		IDPs:       idps,
 	}
 	if org.OrgIamPolicy != nil {
 		converted.OrgIamPolicy = OrgIamPolicyFromModel(org.OrgIamPolicy)
@@ -46,6 +51,7 @@ func OrgToModel(org *Org) *org_model.Org {
 		State:      org_model.OrgState(org.State),
 		Domains:    OrgDomainsToModel(org.Domains),
 		Members:    OrgMembersToModel(org.Members),
+		IDPs:       iam_es_model.IdpConfigsToModel(org.IDPs),
 	}
 	if org.OrgIamPolicy != nil {
 		converted.OrgIamPolicy = OrgIamPolicyToModel(org.OrgIamPolicy)
@@ -127,6 +133,20 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 		o.appendChangeOrgIamPolicyEvent(event)
 	case OrgIamPolicyRemoved:
 		o.appendRemoveOrgIamPolicyEvent()
+	case IdpConfigAdded:
+		return o.appendAddIdpConfigEvent(event)
+	case IdpConfigChanged:
+		return o.appendChangeIdpConfigEvent(event)
+	case IdpConfigRemoved:
+		return o.appendRemoveIdpConfigEvent(event)
+	case IdpConfigDeactivated:
+		return o.appendIdpConfigStateEvent(event, model.IdpConfigStateInactive)
+	case IdpConfigReactivated:
+		return o.appendIdpConfigStateEvent(event, model.IdpConfigStateActive)
+	case OidcIdpConfigAdded:
+		return o.appendAddOidcIdpConfigEvent(event)
+	case OidcIdpConfigChanged:
+		return o.appendChangeOidcIdpConfigEvent(event)
 	}
 
 	o.ObjectRoot.AppendEvent(event)

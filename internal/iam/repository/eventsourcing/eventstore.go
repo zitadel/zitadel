@@ -32,7 +32,7 @@ func StartIam(conf IamConfig, systemDefaults sd.SystemDefaults) (*IamEventstore,
 		return nil, err
 	}
 
-	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.UserVerificationKey)
+	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.IDPConfigVerificationKey)
 	if err != nil {
 		return nil, err
 	}

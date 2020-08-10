@@ -68,6 +68,10 @@ Errors:
     UserIDMissing: User ID fehlt
     PolicyAlreadyExists: Policy existiert bereits
     PolicyNotExisting: Policy existiert nicht
+    IdpInvalid: IDP Konfiguration ist ungültig
+    IdpNotExisting: IDP Konfiguration existiert nicht
+    OIDCConfigInvalid: OIDC IDP Konfiguration ist ungültig
+    IdpIsNotOIDC: IDP Konfiguration ist nicht vom Typ OIDC
   Project:
     ProjectIDMissing: Project Id fehlt
     AlreadyExists: Project existiert bereits auf der Organisation
@@ -225,6 +229,28 @@ EventTypes:
         added: System Richtlinie der Organisation hinzugefügt
         changed: System Richtlinie der Organisation geändert
         removed: System Richtlinie der Organisation entfernt
+    idp:
+      config:
+        added: IDP Konfiguration hinzugefügt
+        changed: IDP Konfiguration geändert
+        removed: IDP Konfiguration gelöscht
+        deactivated: IDP Konfiguration deaktiviert
+        reactivated: IDP Konfiguration reaktiviert
+      oidc:
+        config:
+          added: OIDC IDP Konfiguration hinzugefügt
+          changed: OIDC IDP Konfiguration geändert
+      saml:
+        config:
+          added: SAML IDP Konfiguration hinzugefügt
+          changed: SAML IDP Konfiguration geändert
+    policy:
+      login:
+        added: Login Policy hinzugefügt
+        changed: Login Policy geändert
+        idpprovider:
+          added: Idp Provider zu Login Policy hinzugefügt
+          removed: Idp Provider aus Login Policy gelöscht
   project:
     added: Projekt hinzugefügt
     changed: Project geändert
@@ -308,6 +334,13 @@ EventTypes:
         config:
           added: SAML IDP Konfiguration hinzugefügt
           changed: SAML IDP Konfiguration geändert
+    policy:
+      login:
+        added: Default Login Policy hinzugefügt
+        changed: Default Login Policy geändert
+        idpprovider:
+          added: Idp Provider zu Default Login Policy hinzugefügt
+          removed: Idp Provider aus Default Login Policy gelöscht
   key_pair:
     added: Schlüsselpaar hinzugefügt
 Application:

@@ -61,7 +61,7 @@ func OidcIdpConfigToModel(config *OidcIdpConfig) *model.OidcIdpConfig {
 
 func (iam *Iam) appendAddOidcIdpConfigEvent(event *es_models.Event) error {
 	config := new(OidcIdpConfig)
-	err := config.setData(event)
+	err := config.SetData(event)
 	if err != nil {
 		return err
 	}
@@ -75,18 +75,18 @@ func (iam *Iam) appendAddOidcIdpConfigEvent(event *es_models.Event) error {
 
 func (iam *Iam) appendChangeOidcIdpConfigEvent(event *es_models.Event) error {
 	config := new(OidcIdpConfig)
-	err := config.setData(event)
+	err := config.SetData(event)
 	if err != nil {
 		return err
 	}
 
 	if i, a := GetIdpConfig(iam.IDPs, config.IdpConfigID); a != nil {
-		iam.IDPs[i].OIDCIDPConfig.setData(event)
+		iam.IDPs[i].OIDCIDPConfig.SetData(event)
 	}
 	return nil
 }
 
-func (o *OidcIdpConfig) setData(event *es_models.Event) error {
+func (o *OidcIdpConfig) SetData(event *es_models.Event) error {
 	o.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, o); err != nil {
 		logging.Log("EVEN-Msh8s").WithError(err).Error("could not unmarshal event data")

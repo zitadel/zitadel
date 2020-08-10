@@ -32,4 +32,21 @@ const (
 	OrgIamPolicyAdded   models.EventType = "org.iam.policy.added"
 	OrgIamPolicyChanged models.EventType = "org.iam.policy.changed"
 	OrgIamPolicyRemoved models.EventType = "org.iam.policy.removed"
+
+	IdpConfigAdded       models.EventType = "org.idp.config.added"
+	IdpConfigChanged     models.EventType = "org.idp.config.changed"
+	IdpConfigRemoved     models.EventType = "org.idp.config.removed"
+	IdpConfigDeactivated models.EventType = "org.idp.config.deactivated"
+	IdpConfigReactivated models.EventType = "org.idp.config.reactivated"
+
+	OidcIdpConfigAdded   models.EventType = "org.idp.oidc.config.added"
+	OidcIdpConfigChanged models.EventType = "org.idp.oidc.config.changed"
+
+	SamlIdpConfigAdded   models.EventType = "org.idp.saml.config.added"
+	SamlIdpConfigChanged models.EventType = "org.idp.saml.config.changed"
+
+	LoginPolicyAdded              models.EventType = "org.idp.policy.login.added"
+	LoginPolicyChanged            models.EventType = "org.idp.policy.login.changed"
+	LoginPolicyIdpProviderAdded   models.EventType = "org.idp.policy.login.idpprovider.added"
+	LoginPolicyIdpProviderRemoved models.EventType = "org.idp.policy.login.idpprovider.removed"
 )

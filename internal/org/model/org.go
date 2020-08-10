@@ -2,6 +2,7 @@ package model
 
 import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"strings"
 )
@@ -15,6 +16,8 @@ type Org struct {
 
 	Members      []*OrgMember
 	OrgIamPolicy *OrgIamPolicy
+
+	IDPs []*iam_model.IdpConfig
 }
 type OrgChanges struct {
 	Changes      []*OrgChange
@@ -53,6 +56,15 @@ func (o *Org) GetDomain(domain *OrgDomain) (int, *OrgDomain) {
 	for i, d := range o.Domains {
 		if d.Domain == domain.Domain {
 			return i, d
+		}
+	}
+	return -1, nil
+}
+
+func (o *Org) GetIDP(idpID string) (int, *iam_model.IdpConfig) {
+	for i, idp := range o.IDPs {
+		if idp.IDPConfigID == idpID {
+			return i, idp
 		}
 	}
 	return -1, nil
