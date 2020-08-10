@@ -72,6 +72,24 @@ func TestGetOIDCC1Compliance(t *testing.T) {
 			},
 		},
 		{
+			name: "Native: codeflow http://localhost: redirect (none compliant)",
+			args: args{
+				appType:    OIDCApplicationTypeNative,
+				grantTypes: []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
+				authMethod: OIDCAuthMethodTypeNone,
+				redirectUris: []string{
+					"http://localhost:1234/auth/callback",
+				},
+			},
+			result: result{
+				noneCompliant: true,
+				complianceProblems: []string{
+					"Application.OIDC.V1.NotCompliant",
+					"Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb",
+				},
+			},
+		},
+		{
 			name: "Native: codeflow https redirect (compliant)",
 			args: args{
 				appType:    OIDCApplicationTypeNative,
@@ -147,6 +165,20 @@ func TestGetOIDCC1Compliance(t *testing.T) {
 				authMethod: OIDCAuthMethodTypeNone,
 				redirectUris: []string{
 					"http://localhost/auth/callback",
+				},
+			},
+			result: result{
+				noneCompliant: false,
+			},
+		},
+		{
+			name: "Native: implicit http://localhost: redirect uri (compliant)",
+			args: args{
+				appType:    OIDCApplicationTypeNative,
+				grantTypes: []OIDCGrantType{OIDCGrantTypeImplicit},
+				authMethod: OIDCAuthMethodTypeNone,
+				redirectUris: []string{
+					"http://localhost:1234/auth/callback",
 				},
 			},
 			result: result{
@@ -314,6 +346,24 @@ func TestGetOIDCC1Compliance(t *testing.T) {
 			},
 		},
 		{
+			name: "Web: implicit http://localhost: redirect uri (none compliant)",
+			args: args{
+				appType:    OIDCApplicationTypeWeb,
+				grantTypes: []OIDCGrantType{OIDCGrantTypeImplicit},
+				authMethod: OIDCAuthMethodTypeNone,
+				redirectUris: []string{
+					"http://localhost:1234/auth/callback",
+				},
+			},
+			result: result{
+				noneCompliant: true,
+				complianceProblems: []string{
+					"Application.OIDC.V1.NotCompliant",
+					"Application.OIDC.V1.Implicit.RedirectUris.HttpNotAllowed",
+				},
+			},
+		},
+		{
 			name: "Web: implicit and code (compliant)",
 			args: args{
 				appType:    OIDCApplicationTypeWeb,
@@ -387,6 +437,24 @@ func TestGetOIDCC1Compliance(t *testing.T) {
 				authMethod: OIDCAuthMethodTypeNone,
 				redirectUris: []string{
 					"http://localhost/auth/callback",
+				},
+			},
+			result: result{
+				noneCompliant: true,
+				complianceProblems: []string{
+					"Application.OIDC.V1.NotCompliant",
+					"Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb",
+				},
+			},
+		},
+		{
+			name: "UserAgent: code http:localhost redirect (not compliant)",
+			args: args{
+				appType:    OIDCApplicationTypeUserAgent,
+				grantTypes: []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
+				authMethod: OIDCAuthMethodTypeNone,
+				redirectUris: []string{
+					"http://localhost:1234/auth/callback",
 				},
 			},
 			result: result{
@@ -490,7 +558,25 @@ func TestGetOIDCC1Compliance(t *testing.T) {
 				grantTypes: []OIDCGrantType{OIDCGrantTypeImplicit},
 				authMethod: OIDCAuthMethodTypeNone,
 				redirectUris: []string{
-					"http://loclahost/auth/callback",
+					"http://localhost/auth/callback",
+				},
+			},
+			result: result{
+				noneCompliant: true,
+				complianceProblems: []string{
+					"Application.OIDC.V1.NotCompliant",
+					"Application.OIDC.V1.Implicit.RedirectUris.HttpNotAllowed",
+				},
+			},
+		},
+		{
+			name: "UserAgent: implicit http://localhost: redirect (none compliant)",
+			args: args{
+				appType:    OIDCApplicationTypeUserAgent,
+				grantTypes: []OIDCGrantType{OIDCGrantTypeImplicit},
+				authMethod: OIDCAuthMethodTypeNone,
+				redirectUris: []string{
+					"http://localhost:1234/auth/callback",
 				},
 			},
 			result: result{
