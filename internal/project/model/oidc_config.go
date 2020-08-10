@@ -213,11 +213,11 @@ func CheckRedirectUrisImplicitAndCode(compliance *Compliance, appType OIDCApplic
 		compliance.NoneCompliant = true
 		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.CustomNotAllowed")
 	}
-	if urlContainsPrefix(redirectUris, httpLocalhost) || urlContainsPrefix(redirectUris, httpLocalhost2) && appType != OIDCApplicationTypeNative {
+	if (urlContainsPrefix(redirectUris, httpLocalhost) || urlContainsPrefix(redirectUris, httpLocalhost2)) && appType != OIDCApplicationTypeNative {
 		compliance.NoneCompliant = true
 		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.HttpLocalhostOnlyForNative")
 	}
-	if urlContainsPrefix(redirectUris, http) && (!urlContainsPrefix(redirectUris, httpLocalhost) || urlContainsPrefix(redirectUris, httpLocalhost2)) && appType != OIDCApplicationTypeWeb {
+	if urlContainsPrefix(redirectUris, http) && !(urlContainsPrefix(redirectUris, httpLocalhost) || urlContainsPrefix(redirectUris, httpLocalhost2)) && appType != OIDCApplicationTypeWeb {
 		compliance.NoneCompliant = true
 		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
 	}
