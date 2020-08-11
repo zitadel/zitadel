@@ -196,11 +196,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 input.value = '';
             }
         }
-
     }
 
     public remove(redirect: any, target: RedirectType): void {
-
         if (target === RedirectType.POSTREDIRECT) {
             const index = this.postLogoutRedirectUrisList.indexOf(redirect);
 
