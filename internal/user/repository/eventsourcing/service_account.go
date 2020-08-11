@@ -1,0 +1,63 @@
+package eventsourcing
+
+import (
+	"context"
+
+	"github.com/caos/zitadel/internal/errors"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+)
+
+func ServiceAccountCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, account *model.ServiceAccount, resourceOwner string) (_ []*es_models.Aggregate, err error) {
+	agg, err := UserAggregate(ctx, aggCreator, &account.ObjectRoot)
+	if err != nil {
+		return nil, err
+	}
+	agg, err = agg.AppendEvent(model.ServiceAccountAdded, account)
+	if err != nil {
+		return nil, err
+	}
+
+	uniqueAggregates, err := getUniqueUserAggregates(ctx, aggCreator, account.Name, account.Email, resourceOwner, false)
+	if err != nil {
+		return nil, err
+	}
+	return []*es_models.Aggregate{
+		agg,
+		uniqueAggregates[0],
+		uniqueAggregates[1],
+	}, nil
+}
+
+func ServiceAccountChangeAggregate(aggCreator *es_models.AggregateCreator, existingAccount *model.ServiceAccount, updatedAccount *model.ServiceAccount) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if updatedAccount == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "Errors.Internal")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, &existingAccount.ObjectRoot)
+		if err != nil {
+			return nil, err
+		}
+		changes := existingAccount.Changes(updatedAccount)
+		if len(changes) == 0 {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-0spow", "Errors.NoChangesFound")
+		}
+		return agg.AppendEvent(model.UserProfileChanged, changes)
+	}
+}
+
+func ServiceAccountDeactivateAggregate(aggCreator *es_models.AggregateCreator, account *model.ServiceAccount) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return userStateAggregate(aggCreator, &model.User{ObjectRoot: account.ObjectRoot}, model.ServiceAccountDeactivated)
+}
+
+func ServiceAccountReactivateAggregate(aggCreator *es_models.AggregateCreator, account *model.ServiceAccount) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return userStateAggregate(aggCreator, &model.User{ObjectRoot: account.ObjectRoot}, model.ServiceAccountReactivated)
+}
+
+func ServiceAccountLockAggregate(aggCreator *es_models.AggregateCreator, account *model.ServiceAccount) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return userStateAggregate(aggCreator, &model.User{ObjectRoot: account.ObjectRoot}, model.ServiceAccountLocked)
+}
+
+func ServiceAccountUnlockAggregate(aggCreator *es_models.AggregateCreator, account *model.ServiceAccount) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return userStateAggregate(aggCreator, &model.User{ObjectRoot: account.ObjectRoot}, model.ServiceAccountUnlocked)
+}

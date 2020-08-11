@@ -22,7 +22,7 @@ type Server struct {
 	policy         repository.PolicyRepository
 	org            repository.OrgRepository
 	user           repository.UserRepository
-	serviceAccount repository.Repository
+	serviceAccount repository.ServiceAccountRepository
 	usergrant      repository.UserGrantRepository
 	iam            repository.IamRepository
 	authZ          authz.Config
@@ -41,6 +41,7 @@ func CreateServer(repo repository.Repository, sd systemdefaults.SystemDefaults) 
 		user:           repo,
 		usergrant:      repo,
 		iam:            repo,
+		serviceAccount: repo,
 		systemDefaults: sd,
 	}
 }

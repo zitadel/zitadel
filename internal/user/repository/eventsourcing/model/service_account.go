@@ -6,16 +6,16 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/service_account/model"
+	"github.com/caos/zitadel/internal/user/model"
 )
 
 type ServiceAccount struct {
-	models.ObjectRoot
+	models.ObjectRoot `json:"-"`
 
-	Name        string
-	Email       string
-	Description string
-	State       int32
+	Name        string `json:"name,omitempty"`
+	Email       string `json:"email,omitempty"`
+	Description string `json:"description,omitempty"`
+	State       int32  `json:"-"`
 }
 
 func (sa *ServiceAccount) AppendEvents(events ...*models.Event) error {
@@ -60,6 +60,14 @@ func (sa *ServiceAccount) setData(event *models.Event) error {
 		return errors.ThrowInternal(err, "MODEL-GwjY9", "could not unmarshal event")
 	}
 	return nil
+}
+
+func (sa *ServiceAccount) Changes(updatedAccount *ServiceAccount) map[string]interface{} {
+	changes := make(map[string]interface{})
+	if updatedAccount.Description != "" && updatedAccount.Description != sa.Description {
+		changes["description"] = updatedAccount.Description
+	}
+	return changes
 }
 
 func ServiceAccountFromModel(serviceAccount *model.ServiceAccount) *ServiceAccount {

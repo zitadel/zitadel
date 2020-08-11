@@ -156,6 +156,34 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, 
 	return model.UserToModel(repoUser), nil
 }
 
+func (es *UserEventstore) PrepareCreateServiceAccount(ctx context.Context, account *usr_model.ServiceAccount, resourceOwner string) (*model.ServiceAccount, []*es_models.Aggregate, error) {
+	id, err := es.idGenerator.Next()
+	if err != nil {
+		return nil, nil, err
+	}
+	account.AggregateID = id
+
+	serviceAccount := model.ServiceAccountFromModel(account)
+
+	createAggregates, err := ServiceAccountCreateAggregate(ctx, es.AggregateCreator(), serviceAccount, resourceOwner)
+
+	return serviceAccount, createAggregates, nil
+}
+
+func (es *UserEventstore) CreateServiceAccount(ctx context.Context, account *usr_model.ServiceAccount) (*usr_model.ServiceAccount, error) {
+	serviceAccount, aggregates, err := es.PrepareCreateServiceAccount(ctx, account, "")
+	if err != nil {
+		return nil, err
+	}
+
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, serviceAccount.AppendEvents, aggregates...)
+	if err != nil {
+		return nil, err
+	}
+
+	return model.ServiceAccountToModel(serviceAccount), nil
+}
+
 func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, orgIamPolicy *org_model.OrgIamPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	err := user.CheckOrgIamPolicy(orgIamPolicy)
 	if err != nil {
