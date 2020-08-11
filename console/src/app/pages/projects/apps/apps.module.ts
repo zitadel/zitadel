@@ -14,6 +14,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
@@ -57,6 +58,7 @@ import { AppsRoutingModule } from './apps-routing.module';
         MatStepperModule,
         MatRadioModule,
         CopyToClipboardModule,
+        MatSlideToggleModule,
     ],
     exports: [TranslateModule],
 })
