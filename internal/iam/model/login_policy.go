@@ -18,10 +18,8 @@ type LoginPolicy struct {
 
 type IdpProvider struct {
 	models.ObjectRoot
-	IdpProviderID   string
-	Type            IdpProviderType
-	IdpConfigID     string
-	IdpCustomConfig *IdpConfig
+	Type        IdpProviderType
+	IdpConfigID string
 }
 
 type PolicyState int32
@@ -34,6 +32,6 @@ const (
 type IdpProviderType int32
 
 const (
-	IdpProviderTypePreConfigured IdpProviderType = iota
-	IdpProviderTypeCustom
+	IdpProviderTypeSystem IdpProviderType = iota
+	IdpProviderTypeOrg
 )
