@@ -368,3 +368,45 @@ func (es *IamEventstore) ChangeIdpOidcConfiguration(ctx context.Context, config 
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-Sldk8", "Errors.Internal")
 }
+
+func (es *IamEventstore) AddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
+	if policy == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.Iam.LoginPolicyNil")
+	}
+	existing, err := es.IamByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	repoIam := model.IamFromModel(existing)
+	repoLoginPolicy := model.LoginPolicyFromModel(policy)
+
+	addAggregate := LoginPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoLoginPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIam(repoIam)
+	return model.LoginPolicyToModel(repoIam.DefaultLoginPolicy), nil
+}
+
+func (es *IamEventstore) ChangeLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
+	if policy == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.Iam.LoginPolicyNil")
+	}
+	existing, err := es.IamByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	repoIam := model.IamFromModel(existing)
+	repoLoginPolicy := model.LoginPolicyFromModel(policy)
+
+	addAggregate := LoginPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoLoginPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIam(repoIam)
+	return model.LoginPolicyToModel(repoIam.DefaultLoginPolicy), nil
+}
