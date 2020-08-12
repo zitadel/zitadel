@@ -18,6 +18,8 @@ var (
 			http_utils.AcceptLanguage,
 			http_utils.Authorization,
 			http_utils.ZitadelOrgID,
+			http_utils.XUserAgent,
+			http_utils.XGrpcWeb,
 		},
 		AllowedMethods: []string{
 			http.MethodOptions,
@@ -30,6 +32,7 @@ var (
 		},
 		ExposedHeaders: []string{
 			http_utils.Location,
+			http_utils.ContentLength,
 		},
 		AllowOriginFunc: func(_ string) bool {
 			return true
