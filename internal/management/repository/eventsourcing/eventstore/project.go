@@ -322,6 +322,9 @@ func (repo *ProjectRepo) ApplicationByID(ctx context.Context, projectID, appID s
 		if err != nil {
 			return model.ApplicationViewToModel(&viewApp), nil
 		}
+		if app.State == int32(proj_model.AppStateRemoved) {
+			return nil, caos_errs.ThrowNotFound(nil, "EVENT-Msl96", "Errors.Application.NotFound")
+		}
 	}
 	return model.ApplicationViewToModel(app), nil
 }
