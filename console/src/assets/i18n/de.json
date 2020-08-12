@@ -269,7 +269,7 @@
             "ORGDOMAIN_VERIFICATION":"Überprüfen Sie den Besitz ihrer Domain indem Sie eine Bestätigungsdatei herunterladen und unter der angegebenen URL hochladen oder Sie sie mit einem DNS Eintrag verifizieren.",
             "ORGDOMAIN_VERIFICATION_SKIP":"Du kannst die Überprüfung vorerst überspringen und deine Organisation weiter erstellen. Um deine Organisation jedoch verwenden zu können, muss dieser Schritt abgeschlossen sein!",
             "ORGDETAILUSER_TITLE":"Organisationsbesitzer hinzufügen",
-            "ORGDOMAIN_VERIFICATION_VALIDATION_DESC":"Die Tokens werden regelmäßig überprüft, um sicherzustellen, dass sie weiterhin Besitzer der domain sind.",
+            "ORGDOMAIN_VERIFICATION_VALIDATION_DESC":"Die Tokens werden regelmäßig überprüft, um sicherzustellen, dass sie weiterhin Besitzer der Domain sind.",
             "ORGDOMAIN_VERIFICATION_NEWTOKEN_TITLE":"Neues Token anfordern",
             "ORGDOMAIN_VERIFICATION_NEWTOKEN_DESC":"Wenn Sie ein neues Token anfordern wollen, klicken Sie auf die gewünschte Methode. Wenn Sie ein vorhandenes Token validieren möchten Klicken Sie auf Validieren.",
             "DOWNLOAD_FILE":"Datei download",
