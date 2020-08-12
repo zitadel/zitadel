@@ -58,17 +58,17 @@
 
     td,
     th {
-        padding-left: .5rem;
+      padding-left: .5rem;
+      padding-right: .5rem;
+
+      &:first-child {
+        padding-left: 0;
         padding-right: .5rem;
+      }
 
-        &:first-child {
-            padding-left: 0;
-            padding-right: .5rem;
-        }
-
-        &:last-child {
-            padding-right: 0;
-        }
+      &:last-child {
+        padding-right: 0;
+      }
     }
 
     .data-row {
