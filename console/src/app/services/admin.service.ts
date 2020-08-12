@@ -5,6 +5,7 @@ import { Metadata } from 'grpc-web';
 import { AdminServicePromiseClient } from '../proto/generated/admin_grpc_web_pb';
 import {
     AddIamMemberRequest,
+    ChangeIamMemberRequest,
     CreateOrgRequest,
     CreateUserRequest,
     IamMember,
@@ -134,6 +135,20 @@ export class AdminService {
         );
     }
 
+    public async ChangeIamMember(
+        userId: string,
+        rolesList: string[],
+    ): Promise<IamMember> {
+        const req = new ChangeIamMemberRequest();
+        req.setUserId(userId);
+        req.setRolesList(rolesList);
+
+        return await this.request(
+            c => c.changeIamMember,
+            req,
+            f => f,
+        );
+    }
 
     public async GetOrgIamPolicy(orgId: string): Promise<OrgIamPolicy> {
         const req = new OrgIamPolicyID();

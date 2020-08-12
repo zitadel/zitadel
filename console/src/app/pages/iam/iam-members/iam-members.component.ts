@@ -2,10 +2,11 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { IamMemberView } from 'src/app/proto/generated/admin_pb';
+import { IamMember, IamMemberView } from 'src/app/proto/generated/admin_pb';
 import { ProjectMember, ProjectType, User } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -25,6 +26,7 @@ export class IamMembersComponent implements AfterViewInit {
     public dataSource!: IamMembersDataSource;
     public selection: SelectionModel<IamMemberView.AsObject> = new SelectionModel<IamMemberView.AsObject>(true, []);
 
+    public memberRoleOptions: string[] = [];
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'firstname', 'lastname', 'username', 'email', 'roles'];
 
@@ -34,6 +36,7 @@ export class IamMembersComponent implements AfterViewInit {
 
         this.dataSource = new IamMembersDataSource(this.adminService);
         this.dataSource.loadMembers(0, 25);
+        this.getRoleOptions();
     }
 
     public ngAfterViewInit(): void {
@@ -50,6 +53,25 @@ export class IamMembersComponent implements AfterViewInit {
             this.paginator.pageSize,
         );
     }
+
+    public getRoleOptions(): void {
+        this.adminService.GetIamMemberRoles().then(resp => {
+            this.memberRoleOptions = resp.toObject().rolesList;
+        }).catch(error => {
+            this.toast.showError(error);
+        });
+    }
+
+    updateRoles(member: IamMemberView.AsObject, selectionChange: MatSelectChange): void {
+        console.log(member.userId, selectionChange.value);
+        this.adminService.ChangeIamMember(member.userId, selectionChange.value)
+            .then((newmember: IamMember) => {
+                this.toast.showInfo('ORG.TOAST.MEMBERCHANGED', true);
+            }).catch(error => {
+                this.toast.showError(error);
+            });
+    }
+
 
     public removeProjectMemberSelection(): void {
         Promise.all(this.selection.selected.map(member => {

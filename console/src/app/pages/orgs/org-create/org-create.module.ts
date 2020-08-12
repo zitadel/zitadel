@@ -7,7 +7,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslateModule } from '@ngx-translate/core';
+import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { PasswordComplexityViewModule } from 'src/app/modules/password-complexity-view/password-complexity-view.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 
@@ -28,8 +30,10 @@ import { OrgCreateComponent } from './org-create.component';
         MatSelectModule,
         HasRolePipeModule,
         TranslateModule,
+        HasRoleModule,
         MatCheckboxModule,
         PasswordComplexityViewModule,
+        MatSlideToggleModule,
     ],
 })
 export class OrgCreateModule { }

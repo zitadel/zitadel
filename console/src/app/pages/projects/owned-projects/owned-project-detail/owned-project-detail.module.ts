@@ -11,6 +11,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/member-create-dialog.module';
@@ -50,6 +51,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         MatIconModule,
         ContributorsModule,
         WarnDialogModule,
+        MatTooltipModule,
         ProjectRolesModule,
         HasRolePipeModule,
         UserGrantsModule,

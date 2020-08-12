@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
 import { catchError, filter, finalize, first, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
@@ -31,7 +30,6 @@ export class AuthService {
         private userService: AuthUserService,
         private storage: StorageService,
         private statehandler: StatehandlerService,
-        private router: Router,
     ) {
         this.user = merge(
             of(this.oauthService.getAccessToken()).pipe(
@@ -66,25 +64,28 @@ export class AuthService {
             first(),
             switchMap(() => from(this.userService.GetMyzitadelPermissions())),
             map(rolesResp => rolesResp.toObject().permissionsList),
-        ).subscribe(roles => this.zitadelPermissions.next(roles));
+        ).subscribe(roles => {
+            console.log(roles);
+            this.zitadelPermissions.next(roles);
+        });
     }
 
-    public isAllowed(roles: string[], each: boolean = false): Observable<boolean> {
+    public isAllowed(roles: string[] | RegExp[]): Observable<boolean> {
         if (roles && roles.length > 0) {
             return this.zitadelPermissions.pipe(switchMap(zroles => {
-                return of(this.hasRoles(zroles, roles, each));
+                return of(this.hasRoles(zroles, roles));
             }));
         } else {
             return of(false);
         }
     }
 
-    public hasRoles(userRoles: string[], requestedRoles: string[], each: boolean = false): boolean {
-        return each ?
-            requestedRoles.every(role => userRoles.includes(role)) :
-            requestedRoles.findIndex(role => {
-                return userRoles.findIndex(i => i.includes(role)) > -1;
+    public hasRoles(userRoles: string[], requestedRoles: string[] | RegExp[]): boolean {
+        return requestedRoles.findIndex((regexp: any) => {
+            return userRoles.findIndex(role => {
+                return (new RegExp(regexp)).test(role);
             }) > -1;
+        }) > -1;
     }
 
     public get authenticated(): boolean {
@@ -129,7 +130,6 @@ export class AuthService {
         this.oauthService.logOut();
         this._authenticated = false;
         this._authenticationChanged.next(false);
-        this.router.navigate(['/']);
     }
 
     public get activeOrgChanged(): Observable<Org.AsObject> {

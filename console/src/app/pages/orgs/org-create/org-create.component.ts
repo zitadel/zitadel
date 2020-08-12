@@ -2,11 +2,14 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { Router } from '@angular/router';
+import { take } from 'rxjs/operators';
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
 import { CreateOrgRequest, CreateUserRequest, Gender, OrgSetUpResponse } from 'src/app/proto/generated/admin_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/auth_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { AuthService } from 'src/app/services/auth.service';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -56,6 +59,8 @@ export class OrgCreateComponent {
 
     public policy!: PasswordComplexityPolicy.AsObject;
     public usePassword: boolean = false;
+
+    public forSelf: boolean = true;
     constructor(
         private router: Router,
         private toast: ToastService,
@@ -63,8 +68,13 @@ export class OrgCreateComponent {
         private _location: Location,
         private fb: FormBuilder,
         private orgService: OrgService,
+        private authService: AuthService,
     ) {
-        const validators: Validators[] = [];
+        this.authService.isAllowed(['iam.write']).pipe(take(1)).subscribe((allowed) => {
+            if (allowed) {
+                this.forSelf = false;
+            }
+        });
 
         this.orgForm = this.fb.group({
             name: ['', [Validators.required]],
@@ -161,6 +171,36 @@ export class OrgCreateComponent {
             this.pwdForm = this.fb.group({
                 password: ['', []],
                 confirmPassword: ['', []],
+            });
+        }
+    }
+
+    public changeSelf(change: MatSlideToggleChange): void {
+        console.log(change.checked);
+
+        if (change.checked) {
+            this.createSteps = 1;
+
+            this.orgForm = this.fb.group({
+                name: ['', [Validators.required]],
+            });
+        } else {
+            this.createSteps = 2;
+
+            this.orgForm = this.fb.group({
+                name: ['', [Validators.required]],
+                domain: [''],
+            });
+        }
+    }
+
+    public createOrgForSelf(): void {
+        console.log('create for self');
+        if (this.name && this.name.value) {
+            this.orgService.CreateOrg(this.name.value).then((org) => {
+                this.router.navigate(['orgs', org.toObject().id]);
+            }).catch(error => {
+                this.toast.showError(error);
             });
         }
     }

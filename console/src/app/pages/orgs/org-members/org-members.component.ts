@@ -2,10 +2,11 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { Org, OrgMemberView, ProjectMember, ProjectType, User } from 'src/app/proto/generated/management_pb';
+import { Org, OrgMember, OrgMemberView, ProjectMember, ProjectType, User } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -25,17 +26,23 @@ export class OrgMembersComponent implements AfterViewInit {
     public dataSource!: OrgMembersDataSource;
     public selection: SelectionModel<OrgMemberView.AsObject> = new SelectionModel<OrgMemberView.AsObject>(true, []);
 
+    public memberRoleOptions: string[] = [];
+
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'firstname', 'lastname', 'username', 'email', 'roles'];
 
-    constructor(private orgService: OrgService,
+    constructor(
+        private orgService: OrgService,
         private dialog: MatDialog,
-        private toast: ToastService) {
+        private toast: ToastService,
+    ) {
         this.orgService.GetMyOrg().then(org => {
             this.org = org.toObject();
             this.dataSource = new OrgMembersDataSource(this.orgService);
             this.dataSource.loadMembers(0, 25);
         });
+
+        this.getRoleOptions();
     }
 
     public ngAfterViewInit(): void {
@@ -44,7 +51,24 @@ export class OrgMembersComponent implements AfterViewInit {
                 tap(() => this.loadMembersPage()),
             )
             .subscribe();
+    }
 
+    public getRoleOptions(): void {
+        this.orgService.GetOrgMemberRoles().then(resp => {
+            this.memberRoleOptions = resp.toObject().rolesList;
+        }).catch(error => {
+            this.toast.showError(error);
+        });
+    }
+
+    updateRoles(member: OrgMemberView.AsObject, selectionChange: MatSelectChange): void {
+        console.log(member.userId, selectionChange.value);
+        this.orgService.ChangeMyOrgMember(member.userId, selectionChange.value)
+            .then((newmember: OrgMember) => {
+                this.toast.showInfo('ORG.TOAST.MEMBERCHANGED', true);
+            }).catch(error => {
+                this.toast.showError(error);
+            });
     }
 
     private loadMembersPage(): void {
