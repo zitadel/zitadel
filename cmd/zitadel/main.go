@@ -18,8 +18,11 @@ import (
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/config/types"
+	es_int "github.com/caos/zitadel/internal/eventstore"
 	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/notification"
+	"github.com/caos/zitadel/internal/setup"
 	tracing "github.com/caos/zitadel/internal/tracing/config"
 	"github.com/caos/zitadel/internal/ui"
 	"github.com/caos/zitadel/internal/ui/console"
@@ -43,8 +46,17 @@ type Config struct {
 	Notification notification.Config
 }
 
+type setupConfig struct {
+	Log logging.Config
+
+	Eventstore     es_int.Config
+	SystemDefaults sd.SystemDefaults
+	SetUp          types.IAMSetUp
+}
+
 var (
 	configPaths         = config.NewArrayFlags("authz.yaml", "startup.yaml", "system-defaults.yaml")
+	setupPaths          = config.NewArrayFlags("system-defaults.yaml", "setup.yaml")
 	adminEnabled        = flag.Bool("admin", true, "enable admin api")
 	managementEnabled   = flag.Bool("management", true, "enable management api")
 	authEnabled         = flag.Bool("auth", true, "enable auth api")
@@ -55,12 +67,29 @@ var (
 	localDevMode        = flag.Bool("localDevMode", false, "enable local development specific configs")
 )
 
+const (
+	cmdStart = "start"
+	cmdSetup = "setup"
+)
+
 func main() {
 	flag.Var(configPaths, "config-files", "paths to the config files")
+	flag.Var(configPaths, "setup-files", "paths to the setup files")
 	flag.Parse()
+	arg := flag.Arg(0)
+	switch arg {
+	case cmdStart:
+		startZitadel(configPaths.Values())
+	case cmdSetup:
+		startSetup(setupPaths.Values(), *localDevMode)
+	default:
+		logging.Log("MAIN-afEQ2").Fatal("please provide an valid argument [start, setup]")
+	}
+}
 
+func startZitadel(configPaths []string) {
 	conf := new(Config)
-	err := config.Read(conf, configPaths.Values()...)
+	err := config.Read(conf, configPaths...)
 	logging.Log("MAIN-FaF2r").OnError(err).Fatal("cannot read config")
 
 	ctx := context.Background()
@@ -124,4 +153,17 @@ func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsReposit
 		apis.RegisterHandler("/oauth/v2", op.HttpHandler())
 	}
 	apis.Start(ctx)
+}
+
+func startSetup(configPaths []string, localDevMode bool) {
+	conf := new(setupConfig)
+	err := config.Read(conf, configPaths...)
+	logging.Log("MAIN-FaF2r").OnError(err).Fatal("cannot read config")
+
+	ctx := context.Background()
+
+	setup, err := setup.StartSetup(conf.Eventstore, conf.SystemDefaults)
+	logging.Log("SERVE-fD252").OnError(err).Panic("failed to start setup")
+	err = setup.Execute(ctx, conf.SetUp, localDevMode)
+	logging.Log("SERVE-djs3R").OnError(err).Panic("failed to execute setup")
 }
