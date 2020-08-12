@@ -50,12 +50,7 @@ import {
     ProjectSearchRequest,
     ProjectSearchResponse,
     ProjectUpdateRequest,
-    ProjectUserGrantSearchRequest,
     ProjectView,
-    UserGrant,
-    UserGrantCreate,
-    UserGrantSearchQuery,
-    UserGrantSearchResponse,
     ZitadelDocs,
 } from '../proto/generated/management_pb';
 import { GrpcBackendService } from './grpc-backend.service';
@@ -588,6 +583,7 @@ export class ProjectService {
         req.setPostLogoutRedirectUrisList(oidcConfig.postLogoutRedirectUrisList);
         req.setGrantTypesList(oidcConfig.grantTypesList);
         req.setApplicationType(oidcConfig.applicationType);
+        req.setDevMode(oidcConfig.devMode);
         return await this.request(
             c => c.updateApplicationOIDCConfig,
             req,

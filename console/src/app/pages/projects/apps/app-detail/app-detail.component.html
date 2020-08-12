@@ -43,6 +43,12 @@
             <button mat-stroked-button
                 (click)="regenerateOIDCClientSecret()">{{'APP.OIDC.REGENERATESECRET' | translate}}</button>
         </div>
+
+        <div class="compliance">
+            <p class="problem" *ngFor="let problem of app.oidcConfig.complianceProblemsList">
+                {{problem.localizedMessage}}
+            </p>
+        </div>
         <form *ngIf="appForm" [formGroup]="appForm" (ngSubmit)="saveOIDCApp()">
             <div class="content">
                 <mat-form-field class="formfield" appearance="outline">
@@ -85,6 +91,12 @@
                         </mat-option>
                     </mat-select>
                 </mat-form-field>
+
+                <mat-slide-toggle color="primary" class="devmode" formControlName="devMode" name="devMode">
+                    {{ 'APP.OIDC.DEVMODE' | translate }}
+                </mat-slide-toggle>
+
+                <p class="step-description">{{'APP.OIDC.DEVMODEDESC' | translate}}</p>
                 <p class="step-description"
                     *ngIf="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
                     {{'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate}}</p>
