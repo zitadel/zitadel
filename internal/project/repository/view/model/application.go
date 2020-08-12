@@ -182,7 +182,7 @@ func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 		a.State = int32(model.AppStateInactive)
 	case es_model.ApplicationReactivated:
 		a.State = int32(model.AppStateActive)
-	case es_model.ApplicationRemoved:
+	case es_model.ApplicationRemoved, es_model.ProjectRemoved:
 		a.State = int32(model.AppStateRemoved)
 	}
 	return err
