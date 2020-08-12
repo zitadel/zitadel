@@ -185,16 +185,10 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     }
 
     public verifyDomain(domain: OrgDomainView.AsObject): void {
-        const dialogRef = this.dialog.open(DomainVerificationComponent, {
+        this.dialog.open(DomainVerificationComponent, {
             data: {
                 domain: domain,
             },
-        });
-
-        dialogRef.afterClosed().subscribe(resp => {
-            if (resp) {
-                console.log(resp);
-            }
         });
     }
 }

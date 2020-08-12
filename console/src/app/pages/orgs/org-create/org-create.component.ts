@@ -176,8 +176,6 @@ export class OrgCreateComponent {
     }
 
     public changeSelf(change: MatSlideToggleChange): void {
-        console.log(change.checked);
-
         if (change.checked) {
             this.createSteps = 1;
 
@@ -195,7 +193,6 @@ export class OrgCreateComponent {
     }
 
     public createOrgForSelf(): void {
-        console.log('create for self');
         if (this.name && this.name.value) {
             this.orgService.CreateOrg(this.name.value).then((org) => {
                 this.router.navigate(['orgs', org.toObject().id]);

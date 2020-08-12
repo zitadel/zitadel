@@ -62,7 +62,6 @@ export class OrgMembersComponent implements AfterViewInit {
     }
 
     updateRoles(member: OrgMemberView.AsObject, selectionChange: MatSelectChange): void {
-        console.log(member.userId, selectionChange.value);
         this.orgService.ChangeMyOrgMember(member.userId, selectionChange.value)
             .then((newmember: OrgMember) => {
                 this.toast.showInfo('ORG.TOAST.MEMBERCHANGED', true);
