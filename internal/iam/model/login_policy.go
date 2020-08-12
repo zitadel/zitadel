@@ -8,7 +8,6 @@ type LoginPolicy struct {
 	models.ObjectRoot
 
 	State                 PolicyState
-	UserLoginMustBeDomain bool
 	Default               bool
 	AllowUsernamePassword bool
 	AllowRegister         bool
@@ -35,3 +34,20 @@ const (
 	IdpProviderTypeSystem IdpProviderType = iota
 	IdpProviderTypeOrg
 )
+
+func (p *LoginPolicy) IsValid() bool {
+	return p.ObjectRoot.AggregateID != ""
+}
+
+func (p *IdpProvider) IsValid() bool {
+	return p.ObjectRoot.AggregateID != "" && p.IdpConfigID != ""
+}
+
+func GetIdpProvider(providers []*IdpProvider, id string) (int, *IdpProvider) {
+	for i, m := range providers {
+		if m.IdpConfigID == id {
+			return i, m
+		}
+	}
+	return -1, nil
+}

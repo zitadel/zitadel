@@ -370,8 +370,8 @@ func (es *IamEventstore) ChangeIdpOidcConfiguration(ctx context.Context, config 
 }
 
 func (es *IamEventstore) AddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
-	if policy == nil {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.Iam.LoginPolicyNil")
+	if policy == nil && !policy.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.Iam.LoginPolicyInvalid")
 	}
 	existing, err := es.IamByID(ctx, policy.AggregateID)
 	if err != nil {
@@ -391,8 +391,8 @@ func (es *IamEventstore) AddLoginPolicy(ctx context.Context, policy *iam_model.L
 }
 
 func (es *IamEventstore) ChangeLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
-	if policy == nil {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.Iam.LoginPolicyNil")
+	if policy == nil && !policy.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.Iam.LoginPolicyInvalid")
 	}
 	existing, err := es.IamByID(ctx, policy.AggregateID)
 	if err != nil {
@@ -409,4 +409,50 @@ func (es *IamEventstore) ChangeLoginPolicy(ctx context.Context, policy *iam_mode
 	}
 	es.iamCache.cacheIam(repoIam)
 	return model.LoginPolicyToModel(repoIam.DefaultLoginPolicy), nil
+}
+
+func (es *IamEventstore) AddIdpProviderToLoginPolicy(ctx context.Context, provider *iam_model.IdpProvider) (*iam_model.IdpProvider, error) {
+	if provider == nil && !provider.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.IdpProviderInvalid")
+	}
+	existing, err := es.IamByID(ctx, provider.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	repoIam := model.IamFromModel(existing)
+	repoProvider := model.IdpProviderFromModel(provider)
+
+	addAggregate := LoginPolicyIdpProviderAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoProvider)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIam(repoIam)
+	if _, m := model.GetIdpProvider(repoIam.DefaultLoginPolicy.IdpProviders, provider.IdpConfigID); m != nil {
+		return model.IdpProviderToModel(m), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-Slf9s", "Errors.Internal")
+}
+
+func (es *IamEventstore) RemoveIdpProviderToLoginPolicy(ctx context.Context, provider *iam_model.IdpProvider) (*iam_model.IdpProvider, error) {
+	if provider == nil && !provider.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Esi8c", "Errors.IdpProviderInvalid")
+	}
+	existing, err := es.IamByID(ctx, provider.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	repoIam := model.IamFromModel(existing)
+	addAggregate := LoginPolicyIdpProviderRemovedAggregate(es.Eventstore.AggregateCreator(), repoIam, &model.IdpProviderID{provider.IdpConfigID})
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIam(repoIam)
+	if _, m := model.GetIdpProvider(repoIam.DefaultLoginPolicy.IdpProviders, provider.IdpConfigID); m != nil {
+		return model.IdpProviderToModel(m), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-Wsi8d", "Errors.Internal")
 }

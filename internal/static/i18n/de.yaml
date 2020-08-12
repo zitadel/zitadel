@@ -116,7 +116,8 @@ Errors:
     IdpNotExisting: IDP Konfiguration existiert nicht
     OIDCConfigInvalid: OIDC IDP Konfiguration ist ungültig
     IdpIsNotOIDC: IDP Konfiguration ist nicht vom Typ OIDC
-    LoginPolicyNil: Login Policy ist nicht vorhanden
+    LoginPolicyInvalid: Login Policy ist ungültig
+    IdpProviderInvalid: Idp Provider ist ungültig
   Policy:
     AlreadyExists: Policy existiert bereits
   UserGrant:

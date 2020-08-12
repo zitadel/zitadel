@@ -261,6 +261,7 @@ func LoginPolicyIdpProviderAddedAggregate(aggCreator *es_models.AggregateCreator
 		if err != nil {
 			return nil, err
 		}
+		//TODO: Check if idp provider existing
 		return agg.AppendEvent(model.LoginPolicyIdpProviderAdded, provider)
 	}
 }
