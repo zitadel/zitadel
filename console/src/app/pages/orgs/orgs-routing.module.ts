@@ -13,7 +13,7 @@ const routes: Routes = [
         component: OrgCreateComponent,
         canActivate: [RoleGuard],
         data: {
-            roles: ['org.create'],
+            roles: ['(org.create)?(iam.write)?'],
         },
         loadChildren: () => import('./org-create/org-create.module').then(m => m.OrgCreateModule),
     },
