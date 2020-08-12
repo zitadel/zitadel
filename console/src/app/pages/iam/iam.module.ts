@@ -20,18 +20,19 @@ import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
+import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
+import { FailedEventsComponent } from './failed-events/failed-events.component';
 import { IamRoutingModule } from './iam-routing.module';
 import { IamViewsComponent } from './iam-views/iam-views.component';
 import { IamComponent } from './iam.component';
 
 
-
 @NgModule({
-    declarations: [IamComponent, IamViewsComponent],
+    declarations: [IamComponent, IamViewsComponent, FailedEventsComponent],
     imports: [
         CommonModule,
         IamRoutingModule,
@@ -59,6 +60,7 @@ import { IamComponent } from './iam.component';
         LocalizedDatePipeModule,
         TimestampToDatePipeModule,
         SharedModule,
+        RefreshTableModule,
     ],
 })
 export class IamModule { }

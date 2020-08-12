@@ -238,13 +238,26 @@
             "DESCRIPTION": "Manger können die Organisation editieren und Projekte verwalten."
         },
         "VIEWS": {
-            "TITLE":"Views und Events",
-            "DESCRIPTION":"Diese Ansicht zeigt die ZITADEL Views, du kannst diese zurücksetzen und fehlgeschlagene Events entfernen.",
+            "TITLE":"Views",
+            "DESCRIPTION":"Diese Ansicht zeigt die ZITADEL Views. Diese können bei Bedarf zurückgesetzt werden.",
             "VIEWNAME":"Name",
             "DATABASE":"Datenbank",
             "SEQUENCE":"Sequenz",
+            "TIMESTAMP":"Zeitstempel",
             "ACTIONS":"Aktionen",
             "CLEAR":"Aufräumen"
+        },
+        "FAILEDEVENTS": {
+            "TITLE":"Gescheiterte Events",
+            "DESCRIPTION":"Das sind die gescheiterten Events.",
+            "VIEWNAME":"Name",
+            "DATABASE":"Datenbank",
+            "FAILEDSEQUENCE":"betroffene Sequenz",
+            "FAILURECOUNT":"Fehleranzahl",
+            "ERRORMESSAGE":"Meldung",
+            "ACTIONS":"Aktionen",
+            "DELETE":"Entfernen",
+            "DELETESUCCESS":"Gescheiterte Events entfernt!"
         },
         "TOAST":{
             "MEMBERREMOVED":"Manager entfernt!",

@@ -1,25 +1,25 @@
 <div class="container">
-  <div class="abort-container">
-    <button (click)="close()" mat-icon-button>
-      <mat-icon>close</mat-icon>
-    </button>
-    <span class="abort">{{ 'PROJECT.PAGES.CREATE' | translate }}</span><span class="abort-2">Step
-      {{ currentCreateStep }} of
-      {{ createSteps }}</span>
-  </div>
-
-  <h1>{{'PROJECT.PAGES.CREATE_DESC' | translate}}</h1>
-  <form (ngSubmit)="saveProject()">
-    <div class="column">
-      <mat-form-field class="formfield" hintLabel="The name is required!">
-        <mat-label>{{'PROJECT.NAME' | translate}}</mat-label>
-        <input matInput autofocus [(ngModel)]="project.name" [ngModelOptions]="{ standalone: true }" />
-      </mat-form-field>
+    <div class="abort-container">
+        <button (click)="close()" mat-icon-button>
+            <mat-icon>close</mat-icon>
+        </button>
+        <span class="abort">{{ 'PROJECT.PAGES.CREATE' | translate }}</span><span class="abort-2">Step
+            {{ currentCreateStep }} of
+            {{ createSteps }}</span>
     </div>
 
-    <button color="primary" mat-raised-button class="continue-button" [disabled]="!project.name" cdkFocusInitial
-      type="submit">
-      {{'CONTINUE' | translate}}
-    </button>
-  </form>
+    <h1>{{'PROJECT.PAGES.CREATE_DESC' | translate}}</h1>
+    <form (ngSubmit)="saveProject()">
+        <div class="column">
+            <mat-form-field class="formfield" hintLabel="The name is required!">
+                <mat-label>{{'PROJECT.NAME' | translate}}</mat-label>
+                <input matInput autofocus [(ngModel)]="project.name" [ngModelOptions]="{ standalone: true }" />
+            </mat-form-field>
+        </div>
+
+        <button color="primary" mat-raised-button class="continue-button" [disabled]="!project.name" cdkFocusInitial
+            type="submit">
+            {{'CONTINUE' | translate}}
+        </button>
+    </form>
 </div>
