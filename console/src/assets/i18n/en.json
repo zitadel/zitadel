@@ -573,7 +573,7 @@
             "CLIENTSECRET_DESCRIPTION": "Save your Client Secret as it will disappear once the dialog is closed!",
             "REGENERATESECRET": "Regenerate Client Secret",
             "DEVMODE":"Dev Mode",
-            "DEVMODEDESC":"With enabled dev mode, redirects will not be validated!",
+            "DEVMODEDESC":"With enabled dev mode, redirect uris will not be validated!",
             "REDIRECT": "Redirect URIs",
             "REDIRECTSECTION": "Redirect URIs",
             "POSTLOGOUTREDIRECT":"Post logout URIs",
