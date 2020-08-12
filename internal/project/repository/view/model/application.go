@@ -145,7 +145,7 @@ func (a *ApplicationView) AppendEventIfMyApp(event *models.Event) (err error) {
 			return err
 		}
 	case es_model.ApplicationRemoved:
-		err = view.SetData(event)
+		return view.SetData(event)
 	case es_model.ProjectRemoved:
 		return a.AppendEvent(event)
 	default:
