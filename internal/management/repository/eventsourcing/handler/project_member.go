@@ -89,6 +89,9 @@ func (p *ProjectMember) processUser(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
+		if len(members) == 0 {
+			return p.view.ProcessedProjectGrantMemberSequence(event.Sequence)
+		}
 		user, err := p.userEvents.UserByID(context.Background(), event.AggregateID)
 		if err != nil {
 			return err

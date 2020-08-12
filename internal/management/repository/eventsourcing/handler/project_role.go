@@ -36,7 +36,7 @@ func (p *ProjectRole) Reduce(event *models.Event) (err error) {
 	role := new(view_model.ProjectRoleView)
 	switch event.Type {
 	case es_model.ProjectRoleAdded:
-		role.AppendEvent(event)
+		err = role.AppendEvent(event)
 	case es_model.ProjectRoleChanged:
 		err := role.SetData(event)
 		if err != nil {
