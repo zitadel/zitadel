@@ -130,6 +130,32 @@ func ApplicationViewsToModel(roles []*ApplicationView) []*model.ApplicationView 
 	return result
 }
 
+func (a *ApplicationView) AppendEventIfMyApp(event *models.Event) (err error) {
+	view := new(ApplicationView)
+	switch event.Type {
+	case es_model.ApplicationAdded:
+		err = view.SetData(event)
+	case es_model.ApplicationChanged,
+		es_model.OIDCConfigAdded,
+		es_model.OIDCConfigChanged,
+		es_model.ApplicationDeactivated,
+		es_model.ApplicationReactivated:
+		err := view.SetData(event)
+		if err != nil {
+			return err
+		}
+	case es_model.ApplicationRemoved:
+		err = view.SetData(event)
+	case es_model.ProjectRemoved:
+		return a.AppendEvent(event)
+	default:
+		return nil
+	}
+	if view.ID == a.ID {
+		return a.AppendEvent(event)
+	}
+	return nil
+}
 func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 	a.Sequence = event.Sequence
 	a.ChangeDate = event.CreationDate
@@ -156,6 +182,8 @@ func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 		a.State = int32(model.AppStateInactive)
 	case es_model.ApplicationReactivated:
 		a.State = int32(model.AppStateActive)
+	case es_model.ApplicationRemoved:
+		a.State = int32(model.AppStateRemoved)
 	}
 	return err
 }
