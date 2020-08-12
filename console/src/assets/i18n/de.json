@@ -562,7 +562,7 @@
             "TITLEFIRST":"Geben Sie zuerst einen Namen ein!",
             "TYPETITLE":"Welche Art von Applikation möchtest du erstellen?",
             "REDIRECTTITLE":"Wohin soll nach dem Login weitergeleitet werden?",
-            "REDIRECTDESCRIPTIONWEB":"Der redirect muss mit https:// beginnen. http:// ist nur im devmode zulässig!",
+            "REDIRECTDESCRIPTIONWEB":"Der redirect muss mit https:// beginnen. http:// ist nur im Dev Mode zulässig!",
             "REDIRECTDESCRIPTIONNATIVE":"Die Weiterleitung muss mit einem eigenen Protokoll oder http://localhost beginnen!",
             "REDIRECTNOTVALID":"Diese Weiterleitung ist nicht zulässig!",
             "POSTREDIRECTTITLE":"Das ist die Weiterleitung nach einem logout.",
