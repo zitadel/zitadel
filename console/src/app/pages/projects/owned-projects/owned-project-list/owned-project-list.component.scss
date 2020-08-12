@@ -70,14 +70,17 @@ h1 {
 
     td,
     th {
-      &:first-child {
-        padding-left: 0;
-        padding-right: 1rem;
-      }
+        padding-left: .5rem;
+        padding-right: .5rem;
 
-      &:last-child {
-        padding-right: 0;
-      }
+        &:first-child {
+            padding-left: 0;
+            padding-right: .5rem;
+        }
+
+        &:last-child {
+            padding-right: 0;
+        }
     }
 
     .data-row {
