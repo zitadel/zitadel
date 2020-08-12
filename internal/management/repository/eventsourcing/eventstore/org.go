@@ -229,6 +229,7 @@ func (repo *OrgRepository) ReactivateIdpConfig(ctx context.Context, idpConfigID 
 }
 
 func (repo *OrgRepository) RemoveIdpConfig(ctx context.Context, idpConfigID string) error {
+	//TODO: Remove from all policies and users
 	idp := iam_model.NewIdpConfig(repo.SystemDefaults.IamID, idpConfigID)
 	return repo.OrgEventstore.RemoveIdpConfiguration(ctx, idp)
 }

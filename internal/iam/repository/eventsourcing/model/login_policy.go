@@ -23,6 +23,10 @@ type IdpProvider struct {
 	IdpConfigID string `json:"idpConfigId"`
 }
 
+type IdpProviderID struct {
+	IdpConfigID string `json:"idpConfigId"`
+}
+
 func GetIdpProvider(providers []*IdpProvider, id string) (int, *IdpProvider) {
 	for i, p := range providers {
 		if p.IdpConfigID == id {

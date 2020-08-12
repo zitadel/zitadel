@@ -132,9 +132,12 @@ func IdpConfigurationAddedAggregate(aggCreator *es_models.AggregateCreator, exis
 		if err != nil {
 			return nil, err
 		}
-		agg.AppendEvent(model.IdpConfigAdded, idp)
+		agg, err = agg.AppendEvent(model.IdpConfigAdded, idp)
+		if err != nil {
+			return nil, err
+		}
 		if idp.OIDCIDPConfig != nil {
-			agg.AppendEvent(model.OidcIdpConfigAdded, idp.OIDCIDPConfig)
+			return agg.AppendEvent(model.OidcIdpConfigAdded, idp.OIDCIDPConfig)
 		}
 		return agg, nil
 	}
@@ -155,9 +158,7 @@ func IdpConfigurationChangedAggregate(aggCreator *es_models.AggregateCreator, ex
 				changes = i.Changes(idp)
 			}
 		}
-		agg.AppendEvent(model.IdpConfigChanged, changes)
-
-		return agg, nil
+		return agg.AppendEvent(model.IdpConfigChanged, changes)
 	}
 }
 
@@ -170,9 +171,7 @@ func IdpConfigurationRemovedAggregate(aggCreator *es_models.AggregateCreator, ex
 		if err != nil {
 			return nil, err
 		}
-		agg.AppendEvent(model.IdpConfigRemoved, &model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
-
-		return agg, nil
+		return agg.AppendEvent(model.IdpConfigRemoved, &model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
 	}
 }
 
@@ -185,9 +184,7 @@ func IdpConfigurationDeactivatedAggregate(aggCreator *es_models.AggregateCreator
 		if err != nil {
 			return nil, err
 		}
-		agg.AppendEvent(model.IdpConfigDeactivated, &model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
-
-		return agg, nil
+		return agg.AppendEvent(model.IdpConfigDeactivated, &model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
 	}
 }
 
@@ -200,9 +197,7 @@ func IdpConfigurationReactivatedAggregate(aggCreator *es_models.AggregateCreator
 		if err != nil {
 			return nil, err
 		}
-		agg.AppendEvent(model.IdpConfigReactivated, &model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
-
-		return agg, nil
+		return agg.AppendEvent(model.IdpConfigReactivated, &model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
 	}
 }
 
@@ -223,8 +218,62 @@ func OIDCIdpConfigurationChangedAggregate(aggCreator *es_models.AggregateCreator
 				}
 			}
 		}
-		agg.AppendEvent(model.OidcIdpConfigChanged, changes)
+		return agg.AppendEvent(model.OidcIdpConfigChanged, changes)
+	}
+}
 
-		return agg, nil
+func LoginPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, policy *model.LoginPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if policy == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Smla8", "Errors.Internal")
+		}
+		agg, err := IamAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.LoginPolicyAdded, policy)
+	}
+}
+
+func LoginPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, policy *model.LoginPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if policy == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Mlco9", "Errors.Internal")
+		}
+		agg, err := IamAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		changes := existing.DefaultLoginPolicy.Changes(policy)
+		if len(changes) == 0 {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Smk8d", "Errors.NoChangesFound")
+		}
+		return agg.AppendEvent(model.LoginPolicyChanged, changes)
+	}
+}
+
+func LoginPolicyIdpProviderAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, provider *model.IdpProvider) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if provider == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sml9d", "Errors.Internal")
+		}
+		agg, err := IamAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.LoginPolicyIdpProviderAdded, provider)
+	}
+}
+
+func LoginPolicyIdpProviderRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, provider *model.IdpProviderID) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if provider == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sml9d", "Errors.Internal")
+		}
+		agg, err := IamAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.LoginPolicyIdpProviderRemoved, provider)
 	}
 }
