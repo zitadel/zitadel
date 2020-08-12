@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"github.com/caos/oidc/pkg/oidc"
 	"time"
 
 	"github.com/caos/oidc/pkg/op"
@@ -27,7 +28,7 @@ func (c *Client) ApplicationType() op.ApplicationType {
 	return op.ApplicationType(c.OIDCApplicationType)
 }
 
-func (c *Client) GetAuthMethod() op.AuthMethod {
+func (c *Client) AuthMethod() op.AuthMethod {
 	return authMethodToOIDC(c.OIDCAuthMethodType)
 }
 
@@ -45,6 +46,14 @@ func (c *Client) RedirectURIs() []string {
 
 func (c *Client) PostLogoutRedirectURIs() []string {
 	return c.OIDCPostLogoutRedirectUris
+}
+
+func (c *Client) ResponseTypes() []oidc.ResponseType {
+	return responseTypesToOIDC(c.OIDCResponseTypes)
+}
+
+func (c *Client) DevMode() bool {
+	return c.ApplicationView.DevMode
 }
 
 func (c *Client) AccessTokenLifetime() time.Duration {
@@ -69,5 +78,26 @@ func authMethodToOIDC(authType model.OIDCAuthMethodType) op.AuthMethod {
 		return op.AuthMethodNone
 	default:
 		return op.AuthMethodBasic
+	}
+}
+
+func responseTypesToOIDC(responseTypes []model.OIDCResponseType) []oidc.ResponseType {
+	oidcTypes := make([]oidc.ResponseType, len(responseTypes))
+	for i, t := range responseTypes {
+		oidcTypes[i] = responseTypeToOIDC(t)
+	}
+	return oidcTypes
+}
+
+func responseTypeToOIDC(responseType model.OIDCResponseType) oidc.ResponseType {
+	switch responseType {
+	case model.OIDCResponseTypeCode:
+		return oidc.ResponseTypeCode
+	case model.OIDCResponseTypeIDTokenToken:
+		return oidc.ResponseTypeIDToken
+	case model.OIDCResponseTypeIDToken:
+		return oidc.ResponseTypeIDTokenOnly
+	default:
+		return oidc.ResponseTypeCode
 	}
 }

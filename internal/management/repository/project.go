@@ -32,7 +32,7 @@ type ProjectRepository interface {
 	ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*model.ProjectChanges, error)
 	BulkAddProjectRole(ctx context.Context, role []*model.ProjectRole) error
 
-	ApplicationByID(ctx context.Context, appID string) (*model.ApplicationView, error)
+	ApplicationByID(ctx context.Context, projectID, appID string) (*model.ApplicationView, error)
 	AddApplication(ctx context.Context, app *model.Application) (*model.Application, error)
 	ChangeApplication(ctx context.Context, app *model.Application) (*model.Application, error)
 	DeactivateApplication(ctx context.Context, projectID, appID string) (*model.Application, error)

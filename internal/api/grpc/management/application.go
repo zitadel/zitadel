@@ -17,7 +17,7 @@ func (s *Server) SearchApplications(ctx context.Context, in *management.Applicat
 }
 
 func (s *Server) ApplicationByID(ctx context.Context, in *management.ApplicationID) (*management.ApplicationView, error) {
-	app, err := s.project.ApplicationByID(ctx, in.Id)
+	app, err := s.project.ApplicationByID(ctx, in.ProjectId, in.Id)
 	if err != nil {
 		return nil, err
 	}

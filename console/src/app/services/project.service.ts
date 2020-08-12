@@ -547,47 +547,6 @@ export class ProjectService {
         );
     }
 
-    // ********* */
-
-    public async SearchProjectUserGrants(
-        projectId: string,
-        offset: number,
-        limit: number,
-        queryList?: UserGrantSearchQuery[],
-    ): Promise<UserGrantSearchResponse> {
-        const req = new ProjectUserGrantSearchRequest();
-        req.setLimit(limit);
-        req.setOffset(offset);
-        req.setProjectId(projectId);
-        if (queryList) {
-            req.setQueriesList(queryList);
-        }
-        return await this.request(
-            c => c.searchProjectUserGrants,
-            req,
-            f => f,
-        );
-    }
-
-    public async CreateProjectUserGrant(
-        projectId: string,
-        userId: string,
-        roleKeysList: string[],
-    ): Promise<UserGrant> {
-        const req = new UserGrantCreate();
-        req.setProjectId(projectId);
-        req.setRoleKeysList(roleKeysList);
-        req.setUserId(userId);
-
-        return await this.request(
-            c => c.createProjectUserGrant,
-            req,
-            f => f,
-        );
-    }
-
-    // ********* */
-
     public async CreateOIDCApp(app: OIDCApplicationCreate.AsObject): Promise<Application> {
         const req = new OIDCApplicationCreate();
         req.setProjectId(app.projectId);
