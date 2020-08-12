@@ -573,7 +573,7 @@
             "CLIENTSECRET_DESCRIPTION": "Speichere das Client Secret, da es verschwindet, sobald der Dialog geschlossen wird!",
             "REGENERATESECRET": "Client Secret neu generieren",
             "DEVMODE":"Dev Mode",
-            "DEVMODEDESC":"Bei eingeschaltetem Dev Mode werden redirects im OIDC flow nicht validiert.",
+            "DEVMODEDESC":"Bei eingeschaltetem Dev Mode werden die Redirect Uris im OIDC Flow nicht validiert.",
             "REDIRECT": "Redirect URIs",
             "REDIRECTSECTION": "Redirect URIs",
             "POSTLOGOUTREDIRECT":"Post logout URIs",
