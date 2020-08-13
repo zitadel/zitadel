@@ -87,6 +87,9 @@ func (m *IamMember) processUser(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
+		if len(members) == 0 {
+			return m.view.ProcessedIamMemberSequence(event.Sequence)
+		}
 		user, err := m.userEvents.UserByID(context.Background(), event.AggregateID)
 		if err != nil {
 			return err

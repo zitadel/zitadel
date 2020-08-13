@@ -9,9 +9,11 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func ApplicationByID(db *gorm.DB, table, appID string) (*model.ApplicationView, error) {
+func ApplicationByID(db *gorm.DB, table, projectID, appID string) (*model.ApplicationView, error) {
 	app := new(model.ApplicationView)
-	query := repository.PrepareGetByKey(table, model.ApplicationSearchKey(proj_model.AppSearchKeyAppID), appID)
+	projectIDQuery := &model.ApplicationSearchQuery{Key: proj_model.AppSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals}
+	appIDQuery := &model.ApplicationSearchQuery{Key: proj_model.AppSearchKeyAppID, Value: appID, Method: global_model.SearchMethodEquals}
+	query := repository.PrepareGetByQuery(table, projectIDQuery, appIDQuery)
 	err := query(db, app)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-DGdfx", "Errors.Application.NotFound")
