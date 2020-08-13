@@ -58,7 +58,7 @@ func (m *OrgMember) processOrgMember(event *models.Event) (err error) {
 		}
 		err = m.fillData(member)
 	case model.OrgMemberChanged:
-		err := member.SetData(event)
+		err = member.SetData(event)
 		if err != nil {
 			return err
 		}
@@ -68,7 +68,7 @@ func (m *OrgMember) processOrgMember(event *models.Event) (err error) {
 		}
 		err = member.AppendEvent(event)
 	case model.OrgMemberRemoved:
-		err := member.SetData(event)
+		err = member.SetData(event)
 		if err != nil {
 			return err
 		}

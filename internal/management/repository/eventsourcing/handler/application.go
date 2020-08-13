@@ -42,7 +42,7 @@ func (p *Application) Reduce(event *models.Event) (err error) {
 		es_model.OIDCConfigChanged,
 		es_model.ApplicationDeactivated,
 		es_model.ApplicationReactivated:
-		err := app.SetData(event)
+		err = app.SetData(event)
 		if err != nil {
 			return err
 		}
@@ -52,7 +52,7 @@ func (p *Application) Reduce(event *models.Event) (err error) {
 		}
 		err = app.AppendEvent(event)
 	case es_model.ApplicationRemoved:
-		err := app.SetData(event)
+		err = app.SetData(event)
 		if err != nil {
 			return err
 		}
