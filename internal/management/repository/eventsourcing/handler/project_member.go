@@ -55,7 +55,7 @@ func (p *ProjectMember) processProjectMember(event *models.Event) (err error) {
 		member.AppendEvent(event)
 		p.fillData(member)
 	case proj_es_model.ProjectMemberChanged:
-		err := member.SetData(event)
+		err = member.SetData(event)
 		if err != nil {
 			return err
 		}
@@ -63,7 +63,7 @@ func (p *ProjectMember) processProjectMember(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		member.AppendEvent(event)
+		err = member.AppendEvent(event)
 	case proj_es_model.ProjectMemberRemoved:
 		err := member.SetData(event)
 		if err != nil {
