@@ -36,7 +36,7 @@ func (p *Application) Reduce(event *models.Event) (err error) {
 	app := new(view_model.ApplicationView)
 	switch event.Type {
 	case es_model.ApplicationAdded:
-		app.AppendEvent(event)
+		err = app.AppendEvent(event)
 	case es_model.ApplicationChanged,
 		es_model.OIDCConfigAdded,
 		es_model.OIDCConfigChanged,
@@ -50,7 +50,7 @@ func (p *Application) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		app.AppendEvent(event)
+		err = app.AppendEvent(event)
 	case es_model.ApplicationRemoved:
 		err := app.SetData(event)
 		if err != nil {
