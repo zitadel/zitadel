@@ -231,6 +231,13 @@ func LoginPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, existing 
 		if err != nil {
 			return nil, err
 		}
+		validationQuery := es_models.NewSearchQuery().
+			AggregateTypeFilter(model.IamAggregate).
+			EventTypesFilter(model.LoginPolicyAdded).
+			AggregateIDFilter(existing.AggregateID)
+
+		validation := checkExistingLoginPolicyValidation()
+		agg.SetPrecondition(validationQuery, validation)
 		return agg.AppendEvent(model.LoginPolicyAdded, policy)
 	}
 }
@@ -261,7 +268,12 @@ func LoginPolicyIdpProviderAddedAggregate(aggCreator *es_models.AggregateCreator
 		if err != nil {
 			return nil, err
 		}
-		//TODO: Check if idp provider existing
+		validationQuery := es_models.NewSearchQuery().
+			AggregateTypeFilter(model.IamAggregate).
+			AggregateIDFilter(existing.AggregateID)
+
+		validation := checkExistingLoginPolicyIdpProviderValidation(provider.IdpConfigID)
+		agg.SetPrecondition(validationQuery, validation)
 		return agg.AppendEvent(model.LoginPolicyIdpProviderAdded, provider)
 	}
 }
@@ -276,5 +288,46 @@ func LoginPolicyIdpProviderRemovedAggregate(aggCreator *es_models.AggregateCreat
 			return nil, err
 		}
 		return agg.AppendEvent(model.LoginPolicyIdpProviderRemoved, provider)
+	}
+}
+
+func checkExistingLoginPolicyValidation() func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		for _, event := range events {
+			switch event.Type {
+			case model.LoginPolicyAdded:
+				return errors.ThrowPreconditionFailed(nil, "EVENT-Ski9d", "Errors.Iam.LoginPolicy.AlreadyExists")
+			}
+		}
+		return nil
+	}
+}
+
+func checkExistingLoginPolicyIdpProviderValidation(idpConfigID string) func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		idps := make([]*model.IdpProvider, 0)
+		for _, event := range events {
+			switch event.Type {
+			case model.LoginPolicyIdpProviderAdded:
+				idp := new(model.IdpProvider)
+				idp.SetData(event)
+			case model.LoginPolicyIdpProviderRemoved:
+				idp := new(model.IdpProvider)
+				idp.SetData(event)
+				for i, p := range idps {
+					if p.IdpConfigID == idp.IdpConfigID {
+						idps[i] = idps[len(idps)-1]
+						idps[len(idps)-1] = nil
+						idps = idps[:len(idps)-1]
+					}
+				}
+			}
+		}
+		for _, p := range idps {
+			if p.IdpConfigID == idpConfigID {
+				return errors.ThrowPreconditionFailed(nil, "EVENT-us5Zw", "Errors.Iam.LoginPolicy.IdpProviderAlreadyExisting")
+			}
+		}
+		return nil
 	}
 }

@@ -106,6 +106,22 @@ func GetMockManipulateIamWithOIDCIdp(ctrl *gomock.Controller) *IamEventstore {
 	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
 	return GetMockedEventstore(ctrl, mockEs)
 }
+
+func GetMockManipulateIamWithLoginPolicy(ctrl *gomock.Controller) *IamEventstore {
+	policyData, _ := json.Marshal(model.LoginPolicy{AllowRegister: true, AllowUsernamePassword: true, AllowExternalIdp: true})
+	idpProviderData, _ := json.Marshal(model.IdpProvider{IdpConfigID: "IdpConfigID", Type: 1})
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.IamSetupStarted},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyAdded, Data: policyData},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyIdpProviderAdded, Data: idpProviderData},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
 func GetMockManipulateIamNotExisting(ctrl *gomock.Controller) *IamEventstore {
 	events := []*es_models.Event{}
 	mockEs := mock.NewMockEventstore(ctrl)

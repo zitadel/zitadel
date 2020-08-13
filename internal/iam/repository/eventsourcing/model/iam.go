@@ -98,6 +98,14 @@ func (i *Iam) AppendEvent(event *es_models.Event) (err error) {
 		return i.appendAddOidcIdpConfigEvent(event)
 	case OidcIdpConfigChanged:
 		return i.appendChangeOidcIdpConfigEvent(event)
+	case LoginPolicyAdded:
+		return i.appendAddLoginPolicyEvent(event)
+	case LoginPolicyChanged:
+		return i.appendChangeLoginPolicyEvent(event)
+	case LoginPolicyIdpProviderAdded:
+		return i.appendAddIdpProviderToLoginPolicyEvent(event)
+	case LoginPolicyIdpProviderRemoved:
+		return i.appendRemoveIdpProviderFromLoginPolicyEvent(event)
 	}
 
 	return err

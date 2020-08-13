@@ -118,6 +118,10 @@ Errors:
     IdpIsNotOIDC: IDP Konfiguration ist nicht vom Typ OIDC
     LoginPolicyInvalid: Login Policy ist ungültig
     IdpProviderInvalid: Idp Provider ist ungültig
+    LoginPolicy:
+      AlreadyExists: Default Login Policy existiert bereits
+      IdpProviderAlreadyExisting: Idp Provider existiert bereits
+      IdpProviderNotExisting: Idp Provider existiert nicht
   Policy:
     AlreadyExists: Policy existiert bereits
   UserGrant:

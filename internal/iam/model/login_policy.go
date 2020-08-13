@@ -43,8 +43,8 @@ func (p *IdpProvider) IsValid() bool {
 	return p.ObjectRoot.AggregateID != "" && p.IdpConfigID != ""
 }
 
-func GetIdpProvider(providers []*IdpProvider, id string) (int, *IdpProvider) {
-	for i, m := range providers {
+func (p *LoginPolicy) GetIdpProvider(id string) (int, *IdpProvider) {
+	for i, m := range p.IdpProviders {
 		if m.IdpConfigID == id {
 			return i, m
 		}

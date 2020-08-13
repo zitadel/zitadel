@@ -1255,3 +1255,351 @@ func TestChangeOIDCIDPConfig(t *testing.T) {
 		})
 	}
 }
+
+func TestAddLoginPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IamEventstore
+		ctx    context.Context
+		policy *iam_model.LoginPolicy
+	}
+	type res struct {
+		result  *iam_model.LoginPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add login policy, ok",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.LoginPolicy{
+					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					AllowRegister: true,
+				},
+			},
+			res: res{
+				result: &iam_model.LoginPolicy{
+					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					AllowRegister: true,
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.LoginPolicy{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIamNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.LoginPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddLoginPolicy(tt.args.ctx, tt.args.policy)
+
+			if !tt.res.wantErr && result.AllowRegister != tt.res.result.AllowRegister {
+				t.Errorf("got wrong result AllowRegister: expected: %v, actual: %v ", tt.res.result.AllowRegister, result.AllowRegister)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangeLoginPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IamEventstore
+		ctx    context.Context
+		policy *iam_model.LoginPolicy
+	}
+	type res struct {
+		result  *iam_model.LoginPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add login policy, ok",
+			args: args{
+				es:  GetMockManipulateIamWithLoginPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.LoginPolicy{
+					ObjectRoot:            es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					AllowRegister:         true,
+					AllowExternalIdp:      false,
+					AllowUsernamePassword: false,
+				},
+			},
+			res: res{
+				result: &iam_model.LoginPolicy{
+					ObjectRoot:            es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					AllowRegister:         true,
+					AllowExternalIdp:      false,
+					AllowUsernamePassword: false,
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.LoginPolicy{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIamNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.LoginPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeLoginPolicy(tt.args.ctx, tt.args.policy)
+
+			if !tt.res.wantErr && result.AllowRegister != tt.res.result.AllowRegister {
+				t.Errorf("got wrong result AllowRegister: expected: %v, actual: %v ", tt.res.result.AllowRegister, result.AllowRegister)
+			}
+			if !tt.res.wantErr && result.AllowUsernamePassword != tt.res.result.AllowUsernamePassword {
+				t.Errorf("got wrong result AllowUsernamePassword: expected: %v, actual: %v ", tt.res.result.AllowUsernamePassword, result.AllowUsernamePassword)
+			}
+			if !tt.res.wantErr && result.AllowExternalIdp != tt.res.result.AllowExternalIdp {
+				t.Errorf("got wrong result AllowExternalIdp: expected: %v, actual: %v ", tt.res.result.AllowExternalIdp, result.AllowExternalIdp)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestAddIdpProviderToLoginPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es       *IamEventstore
+		ctx      context.Context
+		provider *iam_model.IdpProvider
+	}
+	type res struct {
+		result  *iam_model.IdpProvider
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add idp to login policy, ok",
+			args: args{
+				es:  GetMockManipulateIamWithLoginPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				provider: &iam_model.IdpProvider{
+					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					IdpConfigID: "IdpConfigID2",
+					Type:        iam_model.IdpProviderTypeSystem,
+				},
+			},
+			res: res{
+				result: &iam_model.IdpProvider{IdpConfigID: "IdpConfigID2"},
+			},
+		},
+		{
+			name: "add idp to login policy, already existing",
+			args: args{
+				es:  GetMockManipulateIamWithLoginPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				provider: &iam_model.IdpProvider{
+					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					IdpConfigID: "IdpConfigID",
+					Type:        iam_model.IdpProviderTypeSystem,
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsErrorAlreadyExists,
+			},
+		},
+		{
+			name: "invalid provider",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				provider: &iam_model.IdpProvider{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIamNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				provider: &iam_model.IdpProvider{
+					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					IdpConfigID: "IdpConfigID2",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddIdpProviderToLoginPolicy(tt.args.ctx, tt.args.provider)
+
+			if !tt.res.wantErr && result.IdpConfigID != tt.res.result.IdpConfigID {
+				t.Errorf("got wrong result IdpConfigID: expected: %v, actual: %v ", tt.res.result.IdpConfigID, result.IdpConfigID)
+			}
+			if !tt.res.wantErr && result.Type != tt.res.result.Type {
+				t.Errorf("got wrong result Type: expected: %v, actual: %v ", tt.res.result.Type, result.Type)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestRemoveIdpProviderFromLoginPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es       *IamEventstore
+		ctx      context.Context
+		provider *iam_model.IdpProvider
+	}
+	type res struct {
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove idp to login policy, ok",
+			args: args{
+				es:  GetMockManipulateIamWithLoginPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				provider: &iam_model.IdpProvider{
+					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					IdpConfigID: "IdpConfigID",
+					Type:        iam_model.IdpProviderTypeSystem,
+				},
+			},
+			res: res{},
+		},
+		{
+			name: "remove idp to login policy, not existing",
+			args: args{
+				es:  GetMockManipulateIamWithLoginPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				provider: &iam_model.IdpProvider{
+					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					IdpConfigID: "IdpConfigID2",
+					Type:        iam_model.IdpProviderTypeSystem,
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "invalid provider",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				provider: &iam_model.IdpProvider{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIamNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				provider: &iam_model.IdpProvider{
+					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					IdpConfigID: "IdpConfigID2",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemoveIdpProviderFromLoginPolicy(tt.args.ctx, tt.args.provider)
+
+			if !tt.res.wantErr && err != nil {
+				t.Errorf("should not get err: %v ", err)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
