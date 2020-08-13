@@ -297,7 +297,7 @@ func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequ
 }
 
 func (repo *ProjectRepo) ApplicationByID(ctx context.Context, projectID, appID string) (*proj_model.ApplicationView, error) {
-	app, viewErr := repo.View.ApplicationByID(appID)
+	app, viewErr := repo.View.ApplicationByID(projectID, appID)
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
