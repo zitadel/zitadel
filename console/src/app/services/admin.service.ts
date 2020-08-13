@@ -8,6 +8,8 @@ import {
     ChangeIamMemberRequest,
     CreateOrgRequest,
     CreateUserRequest,
+    FailedEventID,
+    FailedEvents,
     IamMember,
     IamMemberRoles,
     IamMemberSearchQuery,
@@ -78,12 +80,32 @@ export class AdminService {
         );
     }
 
+    public async GetFailedEvents(): Promise<FailedEvents> {
+        return await this.request(
+            c => c.getFailedEvents,
+            new Empty(),
+            f => f,
+        );
+    }
+
     public async ClearView(viewname: string, db: string): Promise<Empty> {
         const req: ViewID = new ViewID();
         req.setDatabase(db);
         req.setViewName(viewname);
         return await this.request(
             c => c.clearView,
+            req,
+            f => f,
+        );
+    }
+
+    public async RemoveFailedEvent(viewname: string, db: string, sequence: number): Promise<Empty> {
+        const req: FailedEventID = new FailedEventID();
+        req.setDatabase(db);
+        req.setViewName(viewname);
+        req.setFailedSequence(sequence);
+        return await this.request(
+            c => c.removeFailedEvent,
             req,
             f => f,
         );

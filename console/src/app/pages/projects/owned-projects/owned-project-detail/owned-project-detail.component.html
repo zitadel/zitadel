@@ -34,7 +34,7 @@
                         <mat-form-field *ngIf="editstate && project?.name" class="formfield"
                             hintLabel="The name is required!">
                             <mat-label>{{'PROJECT.NAME' | translate}}</mat-label>
-                            <input matInput [(ngModel)]="project.name" />
+                            <input matInput [(ngModel)]="project.name" name="name" />
                         </mat-form-field>
                         <button class="icon-button" *ngIf="editstate" mat-icon-button (click)="updateName()">
                             <mat-icon>check</mat-icon>

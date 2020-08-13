@@ -239,13 +239,26 @@
             "DESCRIPTION":"Managers can add and edit organisations and make changes to their corresponding projects and apps"
         },
         "VIEWS": {
-            "TITLE":"Views and Events",
-            "DESCRIPTION":"This Card shows your Zitadel Views, you can clear them and remove failed events.",
+            "TITLE":"Views",
+            "DESCRIPTION":"This Card shows your Zitadel Views.",
             "VIEWNAME":"Name",
             "DATABASE":"Database",
             "SEQUENCE":"Sequence",
+            "TIMESTAMP":"Timestamp",
             "ACTIONS":"Actions",
             "CLEAR":"Clear"
+        },
+        "FAILEDEVENTS": {
+            "TITLE":"Failed Events",
+            "DESCRIPTION":"This Card shows your failed Events.",
+            "VIEWNAME":"Name",
+            "DATABASE":"Database",
+            "FAILEDSEQUENCE":"Failed Sequence",
+            "FAILURECOUNT":"Failure Count",
+            "ERRORMESSAGE":"Error message",
+            "ACTIONS":"Actions",
+            "DELETE":"Remove",
+            "DELETESUCCESS":"Failed Events removed!"
         },
         "TOAST":{
             "MEMBERREMOVED":"Manager removed!",
