@@ -38,7 +38,7 @@ func (p *ProjectRole) Reduce(event *models.Event) (err error) {
 	case es_model.ProjectRoleAdded:
 		err = role.AppendEvent(event)
 	case es_model.ProjectRoleChanged:
-		err := role.SetData(event)
+		err = role.SetData(event)
 		if err != nil {
 			return err
 		}
@@ -46,9 +46,9 @@ func (p *ProjectRole) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		role.AppendEvent(event)
+		err = role.AppendEvent(event)
 	case es_model.ProjectRoleRemoved:
-		err := role.SetData(event)
+		err = role.SetData(event)
 		if err != nil {
 			return err
 		}

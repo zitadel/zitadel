@@ -56,8 +56,11 @@ func (p *User) ProcessUser(event *models.Event) (err error) {
 	switch event.Type {
 	case es_model.UserAdded,
 		es_model.UserRegistered:
-		user.AppendEvent(event)
-		p.fillLoginNames(user)
+		err = user.AppendEvent(event)
+		if err != nil {
+			return err
+		}
+		err = p.fillLoginNames(user)
 	case es_model.UserProfileChanged,
 		es_model.UserEmailChanged,
 		es_model.UserEmailVerified,

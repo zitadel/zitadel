@@ -52,10 +52,13 @@ func (m *OrgMember) processOrgMember(event *models.Event) (err error) {
 	member := new(org_model.OrgMemberView)
 	switch event.Type {
 	case model.OrgMemberAdded:
-		member.AppendEvent(event)
-		m.fillData(member)
+		err = member.AppendEvent(event)
+		if err != nil {
+			return err
+		}
+		err = m.fillData(member)
 	case model.OrgMemberChanged:
-		err := member.SetData(event)
+		err = member.SetData(event)
 		if err != nil {
 			return err
 		}
@@ -63,9 +66,9 @@ func (m *OrgMember) processOrgMember(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		member.AppendEvent(event)
+		err = member.AppendEvent(event)
 	case model.OrgMemberRemoved:
-		err := member.SetData(event)
+		err = member.SetData(event)
 		if err != nil {
 			return err
 		}
