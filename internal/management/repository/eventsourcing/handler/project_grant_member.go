@@ -52,10 +52,13 @@ func (p *ProjectGrantMember) processProjectGrantMember(event *models.Event) (err
 	member := new(view_model.ProjectGrantMemberView)
 	switch event.Type {
 	case proj_es_model.ProjectGrantMemberAdded:
-		member.AppendEvent(event)
+		err = member.AppendEvent(event)
+		if err != nil {
+			return err
+		}
 		p.fillData(member)
 	case proj_es_model.ProjectGrantMemberChanged:
-		err := member.SetData(event)
+		err = member.SetData(event)
 		if err != nil {
 			return err
 		}
@@ -63,9 +66,9 @@ func (p *ProjectGrantMember) processProjectGrantMember(event *models.Event) (err
 		if err != nil {
 			return err
 		}
-		member.AppendEvent(event)
+		err = member.AppendEvent(event)
 	case proj_es_model.ProjectGrantMemberRemoved:
-		err := member.SetData(event)
+		err = member.SetData(event)
 		if err != nil {
 			return err
 		}
