@@ -138,4 +138,29 @@ var AdminService_AuthMethods = authz.MethodMapping{
 		Permission: "iam.idp.read",
 		CheckParam: "",
 	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultLoginPolicy": authz.Option{
+		Permission: "iam.policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/UpdateDefaultLoginPolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultLoginPolicyIdpProviders": authz.Option{
+		Permission: "iam.policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/AddIdpProviderToDefaultLoginPolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/RemoveIdpProviderFromDefaultLoginPolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
 }

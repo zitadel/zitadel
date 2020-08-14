@@ -649,6 +649,90 @@
         ]
       }
     },
+    "/policies/login": {
+      "put": {
+        "operationId": "UpdateDefaultLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultLoginPolicy"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DefaultLoginPolicy"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/login/idpproviders": {
+      "post": {
+        "operationId": "AddIdpProviderToDefaultLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IdpProviderID"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1IdpProviderID"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/login/idpproviders/{idp_config_id}": {
+      "post": {
+        "operationId": "RemoveIdpProviderFromDefaultLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "idp_config_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1IdpProviderID"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/ready": {
       "get": {
         "summary": "Ready returns status OK as soon as all dependent services are available",
@@ -890,6 +974,40 @@
         }
       }
     },
+    "v1DefaultLoginPolicy": {
+      "type": "object",
+      "properties": {
+        "allow_username_password": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "allow_register": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "allow_external_idp": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "v1DefaultLoginPolicyView": {
+      "type": "object",
+      "properties": {
+        "allow_username_password": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "allow_register": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "allow_external_idp": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
     "v1FailedEvent": {
       "type": "object",
       "properties": {
@@ -1126,6 +1244,72 @@
         }
       }
     },
+    "v1IdpProviderID": {
+      "type": "object",
+      "properties": {
+        "idp_config_id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1IdpProviderSearchRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1IdpProviderSearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1IdpProviderView"
+          }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1IdpProviderView": {
+      "type": "object",
+      "properties": {
+        "idp_config_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1IdpType"
+        }
+      }
+    },
     "v1IdpSearchKey": {
       "type": "string",
       "enum": [
@@ -1207,6 +1391,15 @@
         "IDPCONFIGSTATE_INACTIVE"
       ],
       "default": "IDPCONFIGSTATE_UNSPECIFIED"
+    },
+    "v1IdpType": {
+      "type": "string",
+      "enum": [
+        "IDPTYPE_UNSPECIFIED",
+        "IDPTYPE_OIDC",
+        "IDPTYPE_SAML"
+      ],
+      "default": "IDPTYPE_UNSPECIFIED"
     },
     "v1IdpUpdate": {
       "type": "object",

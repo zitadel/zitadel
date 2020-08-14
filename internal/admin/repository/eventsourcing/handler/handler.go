@@ -1,6 +1,7 @@
 package handler
 
 import (
+	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"time"
 
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
@@ -24,6 +25,7 @@ type handler struct {
 
 type EventstoreRepos struct {
 	UserEvents *usr_event.UserEventstore
+	IamEvents  *iam_event.IamEventstore
 }
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, repos EventstoreRepos) []query.Handler {
@@ -31,6 +33,8 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, re
 		&Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount}},
 		&IamMember{handler: handler{view, bulkLimit, configs.cycleDuration("IamMember"), errorCount}, userEvents: repos.UserEvents},
 		&IdpConfig{handler: handler{view, bulkLimit, configs.cycleDuration("IdpConfig"), errorCount}},
+		&LoginPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount}},
+		&IdpProvider{handler: handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount}, iamEvents: repos.IamEvents},
 	}
 }
 

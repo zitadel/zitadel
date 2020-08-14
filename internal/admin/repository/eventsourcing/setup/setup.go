@@ -97,6 +97,12 @@ func (s *Setup) Execute(ctx context.Context) error {
 		createdProjects: make(map[string]*proj_model.Project),
 	}
 
+	err = setUp.loginPolicy(ctx, s.setUpConfig.DefaultLoginPolicy)
+	if err != nil {
+		logging.Log("SETUP-Hdu8S").WithError(err).Error("unable to create login policy")
+		return err
+	}
+
 	pwComplexityPolicy, err := s.repos.PolicyEvents.GetPasswordComplexityPolicy(ctx, policy_model.DefaultPolicy)
 	if err != nil {
 		logging.Log("SETUP-9osWF").WithError(err).Error("unable to read complexity policy")
@@ -155,6 +161,20 @@ func (s *Setup) waitForSetupDone(ctx context.Context) error {
 			return caos_errs.ThrowInternal(ctx.Err(), "SETUP-dsjg3", "Timeout exceeded for setup")
 		}
 	}
+}
+
+func (setUp *initializer) loginPolicy(ctx context.Context, policy types.LoginPolicy) error {
+	logging.Log("SETUP-4djul").Info("setting up login policy")
+	loginPolicy := &iam_model.LoginPolicy{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: setUp.iamID,
+		},
+		AllowRegister:         policy.AllowRegister,
+		AllowUsernamePassword: policy.AllowUsernamePassword,
+		AllowExternalIdp:      policy.AllowExternalIdp,
+	}
+	_, err := setUp.repos.IamEvents.AddLoginPolicy(ctx, loginPolicy)
+	return err
 }
 
 func (setUp *initializer) orgs(ctx context.Context, orgs []types.Org) error {

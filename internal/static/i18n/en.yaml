@@ -119,6 +119,7 @@ Errors:
     LoginPolicyInvalid: Login Policy is invalid
     IdpProviderInvalid: Idp Provider is invalid
     LoginPolicy:
+      NotExisting: Default Login Policy not existig
       AlreadyExists: Default Login Policy already exists
       IdpProviderAlreadyExisting: Idp Provider already existing
       IdpProviderNotExisting: Idp Provider not existing

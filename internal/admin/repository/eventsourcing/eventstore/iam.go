@@ -64,6 +64,16 @@ func (repo *IamRepository) SearchIamMembers(ctx context.Context, request *iam_mo
 	return result, nil
 }
 
+func (repo *IamRepository) GetIamMemberRoles() []string {
+	roles := make([]string, 0)
+	for _, roleMap := range repo.Roles {
+		if strings.HasPrefix(roleMap, "IAM") {
+			roles = append(roles, roleMap)
+		}
+	}
+	return roles
+}
+
 func (repo *IamRepository) IdpConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IdpConfigView, error) {
 	idp, err := repo.View.IdpConfigByID(idpConfigID)
 	if err != nil {
@@ -121,12 +131,52 @@ func (repo *IamRepository) SearchIdpConfigs(ctx context.Context, request *iam_mo
 	return result, nil
 }
 
-func (repo *IamRepository) GetIamMemberRoles() []string {
-	roles := make([]string, 0)
-	for _, roleMap := range repo.Roles {
-		if strings.HasPrefix(roleMap, "IAM") {
-			roles = append(roles, roleMap)
-		}
+func (repo *IamRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
+	policy, err := repo.View.LoginPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
 	}
-	return roles
+	return iam_es_model.LoginPolicyViewToModel(policy), err
+}
+
+func (repo *IamRepository) AddDefaultLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IamEventstore.AddLoginPolicy(ctx, policy)
+}
+
+func (repo *IamRepository) ChangeDefaultLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IamEventstore.ChangeLoginPolicy(ctx, policy)
+}
+
+func (repo *IamRepository) SearchDefaultIdpProviders(ctx context.Context, request *iam_model.IdpProviderSearchRequest) (*iam_model.IdpProviderSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	request.AppendAggregateIDQuery(repo.SystemDefaults.IamID)
+	sequence, err := repo.View.GetLatestIdpProviderSequence()
+	logging.Log("EVENT-Tuiks").OnError(err).Warn("could not read latest iam sequence")
+	providers, count, err := repo.View.SearchIdpProviders(request)
+	if err != nil {
+		return nil, err
+	}
+	result := &iam_model.IdpProviderSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: count,
+		Result:      iam_es_model.IdpProviderViewsToModel(providers),
+	}
+	if err == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
+	}
+	return result, nil
+}
+
+func (repo *IamRepository) AddIdpProviderToLoginPolicy(ctx context.Context, provider *iam_model.IdpProvider) (*iam_model.IdpProvider, error) {
+	provider.AggregateID = repo.SystemDefaults.IamID
+	return repo.IamEventstore.AddIdpProviderToLoginPolicy(ctx, provider)
+}
+
+func (repo *IamRepository) RemoveIdpProviderFromIdpProvider(ctx context.Context, provider *iam_model.IdpProvider) error {
+	provider.AggregateID = repo.SystemDefaults.IamID
+	return repo.IamEventstore.RemoveIdpProviderFromLoginPolicy(ctx, provider)
 }

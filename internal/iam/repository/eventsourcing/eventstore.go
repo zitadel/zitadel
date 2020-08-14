@@ -199,6 +199,17 @@ func (es *IamEventstore) RemoveIamMember(ctx context.Context, member *iam_model.
 	return err
 }
 
+func (es *IamEventstore) GetIdpConfiguration(ctx context.Context, aggregateID, idpConfigID string) (*iam_model.IdpConfig, error) {
+	existing, err := es.IamByID(ctx, aggregateID)
+	if err != nil {
+		return nil, err
+	}
+	if _, i := existing.GetIDP(idpConfigID); i != nil {
+		return i, nil
+	}
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-Scj8s", "Errors.Iam.IdpNotExisting")
+}
+
 func (es *IamEventstore) AddIdpConfiguration(ctx context.Context, idp *iam_model.IdpConfig) (*iam_model.IdpConfig, error) {
 	if idp == nil || !idp.IsValid(true) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Ms89d", "Errors.Iam.IdpInvalid")
