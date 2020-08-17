@@ -3,9 +3,9 @@ package eventstore
 import (
 	"context"
 	"github.com/caos/logging"
-
 	admin_model "github.com/caos/zitadel/internal/admin/model"
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/sdk"
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -28,7 +28,8 @@ type OrgRepo struct {
 
 	View *admin_view.View
 
-	SearchLimit uint64
+	SearchLimit    uint64
+	SystemDefaults systemdefaults.SystemDefaults
 }
 
 func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) (*admin_model.SetupOrg, error) {

@@ -593,4 +593,34 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		Permission: "org.idp.read",
 		CheckParam: "",
 	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GetLoginPolicy": authz.Option{
+		Permission: "policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/UpdateLoginPolicy": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveLoginPolicy": authz.Option{
+		Permission: "policy.delete",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GetLoginPolicyIdpProviders": authz.Option{
+		Permission: "policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/AddIdpProviderToLoginPolicy": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveIdpProviderFromLoginPolicy": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
 }

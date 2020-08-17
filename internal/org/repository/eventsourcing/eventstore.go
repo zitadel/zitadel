@@ -748,6 +748,17 @@ func (es *OrgEventstore) RemoveLoginPolicy(ctx context.Context, policy *iam_mode
 	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
 }
 
+func (es *OrgEventstore) GetIdpConfiguration(ctx context.Context, aggregateID, idpConfigID string) (*iam_model.IdpConfig, error) {
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(aggregateID))
+	if err != nil {
+		return nil, err
+	}
+	if _, i := existing.GetIDP(idpConfigID); i != nil {
+		return i, nil
+	}
+	return nil, errors.ThrowNotFound(nil, "EVENT-Qlo0d", "Errors.Org.IdpNotExisting")
+}
+
 func (es *OrgEventstore) AddIdpProviderToLoginPolicy(ctx context.Context, provider *iam_model.IdpProvider) (*iam_model.IdpProvider, error) {
 	if provider == nil || !provider.IsValid() {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sjd8e", "Errors.Org.IdpProviderInvalid")

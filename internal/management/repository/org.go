@@ -40,4 +40,12 @@ type OrgRepository interface {
 	ReactivateIdpConfig(ctx context.Context, idpConfigID string) (*iam_model.IdpConfig, error)
 	RemoveIdpConfig(ctx context.Context, idpConfigID string) error
 	ChangeOidcIdpConfig(ctx context.Context, oidcConfig *iam_model.OidcIdpConfig) (*iam_model.OidcIdpConfig, error)
+
+	GetLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error)
+	AddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error)
+	ChangeLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error)
+	RemoveLoginPolicy(ctx context.Context) error
+	SearchIdpProviders(ctx context.Context, request *iam_model.IdpProviderSearchRequest) (*iam_model.IdpProviderSearchResponse, error)
+	AddIdpProviderToLoginPolicy(ctx context.Context, provider *iam_model.IdpProvider) (*iam_model.IdpProvider, error)
+	RemoveIdpProviderFromLoginPolicy(ctx context.Context, provider *iam_model.IdpProvider) error
 }

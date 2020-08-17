@@ -97,6 +97,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 			PolicyEventstore: policy,
 			View:             view,
 			SearchLimit:      conf.SearchLimit,
+			SystemDefaults:   systemDefaults,
 		},
 		IamRepository: eventstore.IamRepository{
 			IamEventstore:  iam,

@@ -1333,6 +1333,72 @@ service ManagementService {
             permission: "org.idp.read"
         };
     }
+
+
+    rpc GetLoginPolicy(google.protobuf.Empty) returns (LoginPolicyView) {
+        option (google.api.http) = {
+            put: "/policies/login"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+
+    rpc UpdateLoginPolicy(LoginPolicy) returns (LoginPolicy) {
+        option (google.api.http) = {
+            put: "/policies/login"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    rpc RemoveLoginPolicy(google.protobuf.Empty) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/policies/login"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.delete"
+        };
+    }
+
+    rpc GetLoginPolicyIdpProviders(IdpProviderSearchRequest) returns (IdpProviderSearchResponse) {
+        option (google.api.http) = {
+            post: "/policies/login/idpproviders"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+
+    rpc AddIdpProviderToLoginPolicy(IdpProviderID) returns (IdpProviderID) {
+        option (google.api.http) = {
+            post: "/policies/login/idpproviders"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    rpc RemoveIdpProviderFromLoginPolicy(IdpProviderID) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/policies/login/idpproviders/{idp_config_id}"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
 }
 
 message ZitadelDocs {
@@ -2766,4 +2832,51 @@ enum IdpSearchKey {
     IDPSEARCHKEY_UNSPECIFIED = 0;
     IDPSEARCHKEY_IDP_CONFIG_ID = 1;
     IDPSEARCHKEY_NAME = 2;
+}
+
+message LoginPolicy {
+    bool allow_username_password = 1;
+    bool allow_register = 2;
+    bool allow_external_idp = 3;
+}
+
+message IdpProviderID {
+    string idp_config_id = 1;
+}
+
+message LoginPolicyView {
+    bool default = 1;
+    bool allow_username_password = 2;
+    bool allow_register = 3;
+    bool allow_external_idp = 4;
+}
+
+message IdpProviderViews {
+    repeated IdpProviderView providers = 1;
+}
+
+message IdpProviderView {
+    string idp_config_id = 1;
+    string name = 2;
+    IdpType type = 3;
+}
+
+enum IdpType {
+    IDPTYPE_UNSPECIFIED = 0;
+    IDPTYPE_OIDC = 1;
+    IDPTYPE_SAML = 2;
+}
+
+message IdpProviderSearchResponse {
+    uint64 offset = 1;
+    uint64 limit = 2;
+    uint64 total_result = 3;
+    repeated IdpProviderView result = 4;
+    uint64 processed_sequence = 5;
+    google.protobuf.Timestamp view_timestamp = 6;
+}
+
+message IdpProviderSearchRequest {
+    uint64 offset = 1;
+    uint64 limit = 2;
 }

@@ -4,7 +4,9 @@ import (
 	"context"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	"strings"
 
@@ -258,4 +260,71 @@ func (repo *OrgRepository) SearchIdpConfigs(ctx context.Context, request *org_mo
 		result.Timestamp = sequence.CurrentTimestamp
 	}
 	return result, nil
+}
+
+func (repo *OrgRepository) GetLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
+	policy, err := repo.View.LoginPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if errors.IsNotFound(err) {
+		policy, err = repo.View.LoginPolicyByAggregateID(repo.SystemDefaults.IamID)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.LoginPolicyViewToModel(policy), err
+}
+
+func (repo *OrgRepository) AddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
+	policy.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.AddLoginPolicy(ctx, policy)
+}
+
+func (repo *OrgRepository) ChangeLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
+	policy.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.ChangeLoginPolicy(ctx, policy)
+}
+
+func (repo *OrgRepository) RemoveLoginPolicy(ctx context.Context) error {
+	policy := &iam_model.LoginPolicy{ObjectRoot: models.ObjectRoot{
+		AggregateID: authz.GetCtxData(ctx).OrgID,
+	}}
+	return repo.OrgEventstore.RemoveLoginPolicy(ctx, policy)
+}
+
+func (repo *OrgRepository) SearchIdpProviders(ctx context.Context, request *iam_model.IdpProviderSearchRequest) (*iam_model.IdpProviderSearchResponse, error) {
+	_, err := repo.View.LoginPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			request.AppendAggregateIDQuery(authz.GetCtxData(ctx).OrgID)
+		}
+	} else {
+		request.AppendAggregateIDQuery(repo.SystemDefaults.IamID)
+	}
+	request.EnsureLimit(repo.SearchLimit)
+	sequence, err := repo.View.GetLatestIdpProviderSequence()
+	logging.Log("EVENT-Tuiks").OnError(err).Warn("could not read latest iam sequence")
+	providers, count, err := repo.View.SearchIdpProviders(request)
+	if err != nil {
+		return nil, err
+	}
+	result := &iam_model.IdpProviderSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: count,
+		Result:      iam_es_model.IdpProviderViewsToModel(providers),
+	}
+	if err == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
+	}
+	return result, nil
+}
+
+func (repo *OrgRepository) AddIdpProviderToLoginPolicy(ctx context.Context, provider *iam_model.IdpProvider) (*iam_model.IdpProvider, error) {
+	provider.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.AddIdpProviderToLoginPolicy(ctx, provider)
+}
+
+func (repo *OrgRepository) RemoveIdpProviderFromIdpProvider(ctx context.Context, provider *iam_model.IdpProvider) error {
+	provider.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.RemoveIdpProviderFromLoginPolicy(ctx, provider)
 }
