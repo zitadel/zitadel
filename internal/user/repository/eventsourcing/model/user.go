@@ -133,7 +133,8 @@ func (u *User) AppendEvent(event *es_models.Event) (err error) {
 	switch event.Type {
 	case UserAdded,
 		UserRegistered,
-		UserProfileChanged:
+		UserProfileChanged,
+		DomainClaimed:
 		u.setData(event)
 	case UserDeactivated:
 		u.appendDeactivatedEvent()

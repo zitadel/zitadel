@@ -15,6 +15,7 @@ import (
 
 type SystemDefaults struct {
 	DefaultLanguage       language.Tag
+	DefaultDomain         string
 	ZitadelDocs           ZitadelDocs
 	SecretGenerators      SecretGenerators
 	UserVerificationKey   *crypto.KeyConfig

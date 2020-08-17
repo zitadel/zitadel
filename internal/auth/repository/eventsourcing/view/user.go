@@ -26,6 +26,11 @@ func (v *View) UserByLoginName(loginName string) (*model.UserView, error) {
 func (v *View) UsersByOrgID(orgID string) ([]*model.UserView, error) {
 	return view.UsersByOrgID(v.Db, userTable, orgID)
 }
+
+func (v *View) UserIDsByDomain(domain string) ([]string, error) {
+	return view.UserIDsByDomain(v.Db, userTable, domain)
+}
+
 func (v *View) SearchUsers(request *usr_model.UserSearchRequest) ([]*model.UserView, uint64, error) {
 	return view.SearchUsers(v.Db, userTable, request)
 }

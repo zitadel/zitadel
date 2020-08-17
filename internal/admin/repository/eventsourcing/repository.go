@@ -86,7 +86,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 	err = setup.StartSetup(systemDefaults, eventstoreRepos).Execute(ctx)
 	logging.Log("SERVE-djs3R").OnError(err).Panic("failed to execute setup")
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, handler.EventstoreRepos{UserEvents: user})
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, handler.EventstoreRepos{UserEvents: user, OrgEvents: org})
 
 	return &EsRepository{
 		spooler: spool,

@@ -676,7 +676,7 @@ func TestOrgDomainVerifiedAggregates(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := OrgDomainVerifiedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.org, tt.args.domain)
+			got, err := OrgDomainVerifiedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.org, tt.args.domain, nil)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got %T: %v", err, err)
 			}

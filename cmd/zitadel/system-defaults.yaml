@@ -1,5 +1,6 @@
 SystemDefaults:
   DefaultLanguage: 'de'
+  DefaultDomain: $ZITADEL_DEFAULT_DOMAIN
   ZitadelDocs:
     Issuer: $ZITADEL_ISSUER
     DiscoveryEndpoint: '$ZITADEL_ISSUER/.well-known/openid-configuration'

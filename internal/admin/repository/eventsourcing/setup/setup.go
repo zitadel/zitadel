@@ -211,7 +211,7 @@ func (setUp *initializer) org(ctx context.Context, org types.Org) (*org_model.Or
 		Name:    org.Name,
 		Domains: []*org_model.OrgDomain{{Domain: org.Domain}},
 	}
-	return setUp.repos.OrgEvents.CreateOrg(ctx, createOrg)
+	return setUp.repos.OrgEvents.CreateOrg(ctx, createOrg, nil)
 }
 
 func (setUp *initializer) iamorgpolicy(ctx context.Context, org *org_model.Org) (*org_model.OrgIamPolicy, error) {

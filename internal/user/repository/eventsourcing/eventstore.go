@@ -3,13 +3,15 @@ package eventsourcing
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/caos/logging"
+	"github.com/golang/protobuf/ptypes"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/id"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	policy_model "github.com/caos/zitadel/internal/policy/model"
-	"github.com/golang/protobuf/ptypes"
 
 	"github.com/pquerna/otp/totp"
 
@@ -30,6 +32,7 @@ type UserEventstore struct {
 	es_int.Eventstore
 	userCache                *UserCache
 	idGenerator              id.Generator
+	defaultDomain            string
 	PasswordAlg              crypto.HashAlgorithm
 	InitializeUserCode       crypto.Generator
 	EmailVerificationCode    crypto.Generator
@@ -65,6 +68,7 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 		Eventstore:               conf.Eventstore,
 		userCache:                userCache,
 		idGenerator:              id.SonyFlakeGenerator,
+		defaultDomain:            systemDefaults.DefaultDomain,
 		InitializeUserCode:       initCodeGen,
 		EmailVerificationCode:    emailVerificationCode,
 		PhoneVerificationCode:    phoneVerificationCode,
@@ -1083,4 +1087,33 @@ func (es *UserEventstore) SignOut(ctx context.Context, agentID string, userIDs [
 		return err
 	}
 	return nil
+}
+
+func (es *UserEventstore) PrepareDomainClaimed(ctx context.Context, userIDs []string) ([]*es_models.Aggregate, error) {
+	aggregates := make([]*es_models.Aggregate, 0)
+	for _, userID := range userIDs {
+		user, err := es.UserByID(ctx, userID)
+		if err != nil {
+			return nil, err
+		}
+		repoUser := model.UserFromModel(user)
+		name, err := es.generateTemporaryLoginName()
+		if err != nil {
+			return nil, err
+		}
+		userAgg, err := DomainClaimedAggregate(ctx, es.AggregateCreator(), repoUser, name)
+		if err != nil {
+			return nil, err
+		}
+		aggregates = append(aggregates, userAgg...)
+	}
+	return aggregates, nil
+}
+
+func (es *UserEventstore) generateTemporaryLoginName() (string, error) {
+	id, err := es.idGenerator.Next()
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s@temporary.%s", id, es.defaultDomain), nil
 }

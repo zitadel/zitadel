@@ -190,6 +190,22 @@ func reservedUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.
 	return aggregate.SetPrecondition(UserUserNameUniqueQuery(uniqueUserName), isEventValidation(aggregate, model.UserUserNameReserved)), nil
 }
 
+func releasedUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, username string) (aggregate *es_models.Aggregate, err error) {
+	aggregate, err = aggCreator.NewAggregate(ctx, username, model.UserUserNameAggregate, model.UserVersion, 0)
+	if resourceOwner != "" {
+		aggregate, err = aggCreator.NewAggregate(ctx, username, model.UserUserNameAggregate, model.UserVersion, 0, es_models.OverwriteResourceOwner(resourceOwner))
+	}
+	if err != nil {
+		return nil, err
+	}
+	aggregate, err = aggregate.AppendEvent(model.UserUserNameReleased, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return aggregate.SetPrecondition(UserUserNameUniqueQuery(username), isEventValidation(aggregate, model.UserUserNameReleased)), nil
+}
+
 func reservedUniqueEmailAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, email string) (aggregate *es_models.Aggregate, err error) {
 	aggregate, err = aggCreator.NewAggregate(ctx, email, model.UserEmailAggregate, model.UserVersion, 0)
 	if resourceOwner != "" {
@@ -656,6 +672,30 @@ func SignOutAggregates(aggCreator *es_models.AggregateCreator, existingUsers []*
 	}
 }
 
+func DomainClaimedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existingUser *model.User, tempName string) ([]*es_models.Aggregate, error) {
+	aggregates := make([]*es_models.Aggregate, 3)
+	userAggregate, err := UserAggregateOverwriteContext(ctx, aggCreator, existingUser, existingUser.ResourceOwner, existingUser.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	userAggregate, err = userAggregate.AppendEvent(model.DomainClaimed, map[string]interface{}{"userName": tempName})
+	if err != nil {
+		return nil, err
+	}
+	aggregates[0] = userAggregate
+	releasedUniqueAggregate, err := releasedUniqueUserNameAggregate(ctx, aggCreator, existingUser.ResourceOwner, existingUser.UserName)
+	if err != nil {
+		return nil, err
+	}
+	aggregates[1] = releasedUniqueAggregate
+	reservedUniqueAggregate, err := reservedUniqueUserNameAggregate(ctx, aggCreator, existingUser.ResourceOwner, tempName, false)
+	if err != nil {
+		return nil, err
+	}
+	aggregates[2] = reservedUniqueAggregate
+	return aggregates, nil
+}
+
 func isEventValidation(aggregate *es_models.Aggregate, eventType es_models.EventType) func(...*es_models.Event) error {
 	return func(events ...*es_models.Event) error {
 		if len(events) == 0 {
@@ -678,6 +718,7 @@ func addUserNameValidation(userName string) func(...*es_models.Event) error {
 			case org_es_model.OrgDomainAdded:
 				domain := new(org_es_model.OrgDomain)
 				domain.SetData(event)
+				domains = append(domains, domain)
 			case org_es_model.OrgDomainVerified:
 				domain := new(org_es_model.OrgDomain)
 				domain.SetData(event)
@@ -694,6 +735,7 @@ func addUserNameValidation(userName string) func(...*es_models.Event) error {
 						domains[i] = domains[len(domains)-1]
 						domains[len(domains)-1] = nil
 						domains = domains[:len(domains)-1]
+						break
 					}
 				}
 			}
