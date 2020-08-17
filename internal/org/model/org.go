@@ -16,6 +16,7 @@ type Org struct {
 
 	Members      []*OrgMember
 	OrgIamPolicy *OrgIamPolicy
+	LoginPolicy  *iam_model.LoginPolicy
 
 	IDPs []*iam_model.IdpConfig
 }

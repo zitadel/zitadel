@@ -47,6 +47,7 @@ const (
 
 	LoginPolicyAdded              models.EventType = "org.idp.policy.login.added"
 	LoginPolicyChanged            models.EventType = "org.idp.policy.login.changed"
+	LoginPolicyRemoved            models.EventType = "org.idp.policy.login.removed"
 	LoginPolicyIdpProviderAdded   models.EventType = "org.idp.policy.login.idpprovider.added"
 	LoginPolicyIdpProviderRemoved models.EventType = "org.idp.policy.login.idpprovider.removed"
 )

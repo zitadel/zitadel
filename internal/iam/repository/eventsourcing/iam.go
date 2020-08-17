@@ -280,7 +280,7 @@ func LoginPolicyIdpProviderAddedAggregate(aggCreator *es_models.AggregateCreator
 
 func LoginPolicyIdpProviderRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, provider *model.IdpProviderID) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if provider == nil {
+		if provider == nil || existing == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sml9d", "Errors.Internal")
 		}
 		agg, err := IamAggregate(ctx, aggCreator, existing)

@@ -23,6 +23,7 @@ type Org struct {
 	Domains      []*OrgDomain              `json:"-"`
 	Members      []*OrgMember              `json:"-"`
 	OrgIamPolicy *OrgIamPolicy             `json:"-"`
+	LoginPolicy  *iam_es_model.LoginPolicy `json:"-"`
 	IDPs         []*iam_es_model.IdpConfig `json:"-"`
 }
 
@@ -41,6 +42,9 @@ func OrgFromModel(org *org_model.Org) *Org {
 	if org.OrgIamPolicy != nil {
 		converted.OrgIamPolicy = OrgIamPolicyFromModel(org.OrgIamPolicy)
 	}
+	if org.LoginPolicy != nil {
+		converted.LoginPolicy = iam_es_model.LoginPolicyFromModel(org.LoginPolicy)
+	}
 	return converted
 }
 
@@ -55,6 +59,9 @@ func OrgToModel(org *Org) *org_model.Org {
 	}
 	if org.OrgIamPolicy != nil {
 		converted.OrgIamPolicy = OrgIamPolicyToModel(org.OrgIamPolicy)
+	}
+	if org.LoginPolicy != nil {
+		converted.LoginPolicy = iam_es_model.LoginPolicyToModel(org.LoginPolicy)
 	}
 	return converted
 }
@@ -147,6 +154,17 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 		return o.appendAddOidcIdpConfigEvent(event)
 	case OidcIdpConfigChanged:
 		return o.appendChangeOidcIdpConfigEvent(event)
+	case LoginPolicyAdded:
+		return o.appendAddLoginPolicyEvent(event)
+	case LoginPolicyChanged:
+		return o.appendChangeLoginPolicyEvent(event)
+	case LoginPolicyRemoved:
+		o.appendRemoveLoginPolicyEvent(event)
+		return nil
+	case LoginPolicyIdpProviderAdded:
+		return o.appendAddIdpProviderToLoginPolicyEvent(event)
+	case LoginPolicyIdpProviderRemoved:
+		return o.appendRemoveIdpProviderFromLoginPolicyEvent(event)
 	}
 
 	o.ObjectRoot.AppendEvent(event)

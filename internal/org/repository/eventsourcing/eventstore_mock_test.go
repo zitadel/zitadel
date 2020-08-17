@@ -3,6 +3,7 @@ package eventsourcing
 import (
 	"encoding/json"
 	"github.com/caos/zitadel/internal/crypto"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/id"
 
@@ -44,6 +45,8 @@ func GetMockChangesOrgOK(ctrl *gomock.Controller) *OrgEventstore {
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -77,6 +80,22 @@ func GetMockChangesOrgWithOIDCIdp(ctrl *gomock.Controller) *OrgEventstore {
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.OrgAdded, Data: orgData},
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.IdpConfigAdded, Data: idpData},
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.OidcIdpConfigAdded, Data: oidcData},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
+func GetMockChangesOrgWithLoginPolicy(ctrl *gomock.Controller) *OrgEventstore {
+	orgData, _ := json.Marshal(model.Org{Name: "MusterOrg"})
+	loginPolicy, _ := json.Marshal(iam_es_model.LoginPolicy{AllowRegister: true, AllowExternalIdp: true, AllowUsernamePassword: true})
+	idpData, _ := json.Marshal(iam_es_model.IdpProvider{IdpConfigID: "IdpConfigID", Type: int32(iam_model.IdpProviderTypeSystem)})
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.OrgAdded, Data: orgData},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyAdded, Data: loginPolicy},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyIdpProviderAdded, Data: idpData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
