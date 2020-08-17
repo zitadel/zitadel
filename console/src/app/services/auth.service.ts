@@ -65,7 +65,6 @@ export class AuthService {
             switchMap(() => from(this.userService.GetMyzitadelPermissions())),
             map(rolesResp => rolesResp.toObject().permissionsList),
         ).subscribe(roles => {
-            console.log(roles);
             this.zitadelPermissions.next(roles);
         });
     }

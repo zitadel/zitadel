@@ -63,7 +63,6 @@ export class IamMembersComponent implements AfterViewInit {
     }
 
     updateRoles(member: IamMemberView.AsObject, selectionChange: MatSelectChange): void {
-        console.log(member.userId, selectionChange.value);
         this.adminService.ChangeIamMember(member.userId, selectionChange.value)
             .then((newmember: IamMember) => {
                 this.toast.showInfo('ORG.TOAST.MEMBERCHANGED', true);

@@ -3,7 +3,7 @@ import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/cor
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
-import { merge } from 'rxjs';
+import { merge, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Application } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
@@ -26,7 +26,6 @@ export class ApplicationsComponent implements AfterViewInit, OnInit {
     public dataSource!: ProjectApplicationsDataSource;
     public selection: SelectionModel<Application.AsObject> = new SelectionModel<Application.AsObject>(true, []);
 
-    /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'name'];
 
     constructor(private projectService: ProjectService, private toast: ToastService) { }
@@ -37,13 +36,11 @@ export class ApplicationsComponent implements AfterViewInit, OnInit {
     }
 
     public ngAfterViewInit(): void {
-        this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
-        merge(this.sort.sortChange, this.paginator.page)
+        merge(this.sort ? this.sort?.sortChange : of(null), this.paginator.page)
             .pipe(
                 tap(() => this.loadRolesPage()),
             )
             .subscribe();
-
     }
 
     private loadRolesPage(): void {
