@@ -32,7 +32,7 @@ type UserEventstore struct {
 	es_int.Eventstore
 	userCache                *UserCache
 	idGenerator              id.Generator
-	defaultDomain            string
+	domain                   string
 	PasswordAlg              crypto.HashAlgorithm
 	InitializeUserCode       crypto.Generator
 	EmailVerificationCode    crypto.Generator
@@ -68,7 +68,7 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 		Eventstore:               conf.Eventstore,
 		userCache:                userCache,
 		idGenerator:              id.SonyFlakeGenerator,
-		defaultDomain:            systemDefaults.DefaultDomain,
+		domain:                   systemDefaults.Domain,
 		InitializeUserCode:       initCodeGen,
 		EmailVerificationCode:    emailVerificationCode,
 		PhoneVerificationCode:    phoneVerificationCode,
@@ -1115,5 +1115,5 @@ func (es *UserEventstore) generateTemporaryLoginName() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%s@temporary.%s", id, es.defaultDomain), nil
+	return fmt.Sprintf("%s@temporary.%s", id, es.domain), nil
 }

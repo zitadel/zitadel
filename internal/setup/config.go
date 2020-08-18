@@ -39,4 +39,5 @@ type OIDCApp struct {
 	ApplicationType        string
 	AuthMethodType         string
 	PostLogoutRedirectUris []string
+	DevMode                bool
 }

@@ -106,7 +106,7 @@ func StartSetup(esConfig es_int.Config, sd systemdefaults.SystemDefaults) (*Setu
 	return setup, nil
 }
 
-func (s *Setup) Execute(ctx context.Context, setUpConfig IAMSetUp, localDevMode bool) error {
+func (s *Setup) Execute(ctx context.Context, setUpConfig IAMSetUp) error {
 	iam, err := s.IamEvents.IamByID(ctx, s.iamID)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
@@ -136,7 +136,7 @@ func (s *Setup) Execute(ctx context.Context, setUpConfig IAMSetUp, localDevMode 
 	}
 	setUp.pwComplexityPolicy = pwComplexityPolicy
 
-	err = setUp.orgs(ctx, setUpConfig.Orgs, localDevMode)
+	err = setUp.orgs(ctx, setUpConfig.Orgs)
 	if err != nil {
 		logging.Log("SETUP-p4oWq").WithError(err).Error("unable to set up orgs")
 		return err
@@ -170,7 +170,7 @@ func (s *Setup) Execute(ctx context.Context, setUpConfig IAMSetUp, localDevMode 
 	return nil
 }
 
-func (setUp *initializer) orgs(ctx context.Context, orgs []Org, localDevMode bool) error {
+func (setUp *initializer) orgs(ctx context.Context, orgs []Org) error {
 	logging.Log("SETUP-dsTh3").Info("setting up orgs")
 	for _, iamOrg := range orgs {
 		org, err := setUp.org(ctx, iamOrg)
@@ -208,7 +208,7 @@ func (setUp *initializer) orgs(ctx context.Context, orgs []Org, localDevMode boo
 			return err
 		}
 
-		err = setUp.projects(ctx, iamOrg.Projects, localDevMode)
+		err = setUp.projects(ctx, iamOrg.Projects)
 		if err != nil {
 			logging.LogWithFields("SETUP-wUzqY", "Org", iamOrg.Name).WithError(err).Error("unable to set up org projects")
 			return err
@@ -342,7 +342,7 @@ func (setUp *initializer) orgOwner(ctx context.Context, org *org_model.Org, user
 	return err
 }
 
-func (setUp *initializer) projects(ctx context.Context, projects []Project, localDevMode bool) error {
+func (setUp *initializer) projects(ctx context.Context, projects []Project) error {
 	for _, project := range projects {
 		createdProject, err := setUp.project(ctx, project)
 		if err != nil {
@@ -350,7 +350,7 @@ func (setUp *initializer) projects(ctx context.Context, projects []Project, loca
 		}
 		setUp.createdProjects[createdProject.Name] = createdProject
 		for _, oidc := range project.OIDCApps {
-			app, err := setUp.oidcApp(ctx, createdProject, oidc, localDevMode)
+			app, err := setUp.oidcApp(ctx, createdProject, oidc)
 			if err != nil {
 				return err
 			}
@@ -367,7 +367,7 @@ func (setUp *initializer) project(ctx context.Context, project Project) (*proj_m
 	return setUp.ProjectEvents.CreateProject(ctx, addProject)
 }
 
-func (setUp *initializer) oidcApp(ctx context.Context, project *proj_model.Project, oidc OIDCApp, localDevMode bool) (*proj_model.Application, error) {
+func (setUp *initializer) oidcApp(ctx context.Context, project *proj_model.Project, oidc OIDCApp) (*proj_model.Application, error) {
 	addOIDCApp := &proj_model.Application{
 		ObjectRoot: models.ObjectRoot{AggregateID: project.AggregateID},
 		Name:       oidc.Name,
@@ -378,7 +378,7 @@ func (setUp *initializer) oidcApp(ctx context.Context, project *proj_model.Proje
 			ApplicationType:        getOIDCApplicationType(oidc.ApplicationType),
 			AuthMethodType:         getOIDCAuthMethod(oidc.AuthMethodType),
 			PostLogoutRedirectUris: oidc.PostLogoutRedirectUris,
-			DevMode:                localDevMode,
+			DevMode:                oidc.DevMode,
 		},
 	}
 	return setUp.ProjectEvents.AddApplication(ctx, addOIDCApp)

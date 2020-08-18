@@ -163,6 +163,6 @@ func startSetup(configPaths []string, localDevMode bool) {
 
 	setup, err := setup.StartSetup(conf.Eventstore, conf.SystemDefaults)
 	logging.Log("SERVE-fD252").OnError(err).Panic("failed to start setup")
-	err = setup.Execute(ctx, conf.SetUp, localDevMode)
+	err = setup.Execute(ctx, conf.SetUp)
 	logging.Log("SERVE-djs3R").OnError(err).Panic("failed to execute setup")
 }
