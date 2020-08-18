@@ -20,6 +20,10 @@ export enum CreationType {
 })
 export class MemberCreateDialogComponent {
     private projectId: string = '';
+    private grantId: string = '';
+    public preselectedUsers: Array<User.AsObject> = [];
+
+
     public creationType!: CreationType;
     public creationTypes: CreationType[] = [
         CreationType.IAM,
@@ -44,6 +48,10 @@ export class MemberCreateDialogComponent {
         if (data?.projectId) {
             this.projectId = data.projectId;
         }
+        if (data?.user) {
+            this.preselectedUsers = [data.user];
+        }
+
         if (data?.creationType) {
             this.creationType = data.creationType;
             this.loadRoles();
@@ -62,7 +70,7 @@ export class MemberCreateDialogComponent {
                     this.toastService.showError(error);
                 });
                 break;
-            case CreationType.PROJECT_GRANTED:
+            case CreationType.PROJECT_OWNED:
                 this.projectService.GetProjectMemberRoles().then(resp => {
                     this.memberRoleOptions = resp.toObject().rolesList;
                 }).catch(error => {
@@ -81,6 +89,9 @@ export class MemberCreateDialogComponent {
 
     public selectProject(project: ProjectView.AsObject | ProjectGrantView.AsObject | any): void {
         this.projectId = project.projectId;
+        if (project.id) {
+            this.grantId = project.id;
+        }
     }
 
     public closeDialog(): void {
@@ -88,7 +99,13 @@ export class MemberCreateDialogComponent {
     }
 
     public closeDialogWithSuccess(): void {
-        this.dialogRef.close({ users: this.users, roles: this.roles, projectId: this.projectId });
+        this.dialogRef.close({
+            users: this.users,
+            roles: this.roles,
+            creationType: this.creationType,
+            projectId: this.projectId,
+            grantId: this.grantId,
+        });
     }
 
     public setOrgMemberRoles(roles: string[]): void {
