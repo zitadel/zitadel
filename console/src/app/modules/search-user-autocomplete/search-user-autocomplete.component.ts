@@ -103,6 +103,7 @@ export class SearchUserAutocompleteComponent {
 
         if (index >= 0) {
             this.users.splice(index, 1);
+            this.selectionChanged.emit(this.users);
         }
     }
 

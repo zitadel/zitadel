@@ -50,6 +50,7 @@ export class MemberCreateDialogComponent {
         }
         if (data?.user) {
             this.preselectedUsers = [data.user];
+            this.users = [data.user];
         }
 
         if (data?.creationType !== undefined) {
