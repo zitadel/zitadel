@@ -132,6 +132,9 @@ func GetOIDCCompliance(version OIDCVersion, appType OIDCApplicationType, grantTy
 
 func GetOIDCV1Compliance(appType OIDCApplicationType, grantTypes []OIDCGrantType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
 	compliance := &Compliance{NoneCompliant: false}
+	if redirectUris == nil || len(redirectUris) == 0 {
+		compliance.Problems = append([]string{"Application.OIDC.V1.NoRedirectUris"}, compliance.Problems...)
+	}
 	if containsOIDCGrantType(grantTypes, OIDCGrantTypeImplicit) && containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
 		CheckRedirectUrisImplicitAndCode(compliance, appType, redirectUris)
 	} else {

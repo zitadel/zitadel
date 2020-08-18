@@ -298,6 +298,7 @@ Application:
   OIDC:
     V1:
       NotCompliant: Deine Konfiguration ist nicht konform und weicht vom OIDC 1.0 Standard ab.
+      NoRedirectUris: Es sollte im Minimum eine Redirect URI erfasst sein.
       NotAllCombinationsAreAllowed: Die Konfiguration ist konform, jedoch werden nicht alle möglichen Kombinationen erlaubt.
       Code:
         RedirectUris:
