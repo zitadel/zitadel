@@ -578,6 +578,7 @@ func TestOrgEventstore_ValidateOrgDomain(t *testing.T) {
 	type args struct {
 		ctx    context.Context
 		domain *org_model.OrgDomain
+		users  func(ctx context.Context, domain string) ([]*es_models.Aggregate, error)
 	}
 	tests := []struct {
 		name   string
@@ -683,6 +684,26 @@ func TestOrgEventstore_ValidateOrgDomain(t *testing.T) {
 			},
 		},
 		{
+			name: "(user) aggregate fails",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{orgCreatedEvent(), orgDomainAddedEvent(), orgDomainVerificationAddedEvent("token")}, nil).
+				expectDecrypt().
+				expectVerification(true).
+				expectAggregateCreator().
+				expectPushEvents(0, errors.ThrowInternal(nil, "EVENT-S8WzW", "test")),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "hodor-org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+				users: func(ctx context.Context, domain string) ([]*es_models.Aggregate, error) {
+					return nil, errors.ThrowInternal(nil, "id", "internal error")
+				},
+			},
+			res: res{
+				isErr: errors.IsPreconditionFailed,
+			},
+		},
+		{
 			name: "push failed",
 			fields: fields{Eventstore: newTestEventstore(t).
 				expectFilterEvents([]*es_models.Event{orgCreatedEvent(), orgDomainAddedEvent(), orgDomainVerificationAddedEvent("token")}, nil).
@@ -719,7 +740,7 @@ func TestOrgEventstore_ValidateOrgDomain(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.fields.Eventstore.ValidateOrgDomain(tt.args.ctx, tt.args.domain)
+			err := tt.fields.Eventstore.ValidateOrgDomain(tt.args.ctx, tt.args.domain, tt.args.users)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got:%T %v", err, err)
 			}

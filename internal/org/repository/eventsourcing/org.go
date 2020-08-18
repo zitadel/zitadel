@@ -289,7 +289,7 @@ func OrgDomainVerifiedAggregate(ctx context.Context, aggCreator *es_models.Aggre
 	aggregates = append(aggregates, domainAgregate)
 	userAggregates, err := users(ctx, domain.Domain)
 	if err != nil {
-		return nil, err
+		return nil, errors.ThrowPreconditionFailed(err, "EVENT-HBwsw", "Errors.Internal")
 	}
 	aggregates = append(aggregates, userAggregates...)
 	return append(aggregates, agg), nil
