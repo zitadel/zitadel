@@ -510,7 +510,8 @@
                 "PROJECTGRANTMEMBERADDED":"Grant Manager added!",
                 "PROJECTGRANTMEMBERCHANGED":"Grant Manager changed!",
                 "PROJECTGRANTMEMBERREMOVED":"Grant Manager removed!"
-            }
+            },
+            "ROLES":"Project Roles"
         },
         "APP": {
             "TITLE": "Applications",
@@ -651,7 +652,8 @@
             "3":"IAM",
             "2":"Organisation",
             "0":"Owned Project",
-            "1":"Granted Project"
+            "1":"Granted Project",
+            "4":"Project"
         }
     },
     "ROLES": {

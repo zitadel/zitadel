@@ -6,13 +6,21 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { forkJoin, from } from 'rxjs';
 import { debounceTime, switchMap, tap } from 'rxjs/operators';
 import {
+    ProjectGrantSearchResponse,
     ProjectGrantView,
     ProjectSearchKey,
     ProjectSearchQuery,
+    ProjectSearchResponse,
     ProjectView,
     SearchMethod,
 } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
+
+
+export enum ProjectAutocompleteType {
+    PROJECT_OWNED = 0,
+    PROJECT_GRANTED = 1,
+}
 
 @Component({
     selector: 'app-search-project-autocomplete',
@@ -32,6 +40,7 @@ export class SearchProjectAutocompleteComponent {
     @ViewChild('nameInput') public nameInput!: ElementRef<HTMLInputElement>;
     @ViewChild('auto') public matAutocomplete!: MatAutocomplete;
     @Input() public singleOutput: boolean = false;
+    @Input() public autocompleteType!: ProjectAutocompleteType;
     @Output() public selectionChanged: EventEmitter<
         ProjectGrantView.AsObject[]
         | ProjectGrantView.AsObject
@@ -48,14 +57,39 @@ export class SearchProjectAutocompleteComponent {
                     query.setKey(ProjectSearchKey.PROJECTSEARCHKEY_PROJECT_NAME);
                     query.setValue(value);
                     query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
-                    return forkJoin([
-                        from(this.projectService.SearchGrantedProjects(10, 0, [query])),
-                        from(this.projectService.SearchProjects(10, 0, [query])),
-                    ]);
+
+                    switch (this.autocompleteType) {
+                        case ProjectAutocompleteType.PROJECT_GRANTED:
+                            return from(this.projectService.SearchGrantedProjects(10, 0, [query]));
+                        case ProjectAutocompleteType.PROJECT_OWNED:
+                            return from(this.projectService.SearchProjects(10, 0, [query]));
+                        default:
+                            return forkJoin([
+                                from(this.projectService.SearchGrantedProjects(10, 0, [query])),
+                                from(this.projectService.SearchProjects(10, 0, [query])),
+                            ]);
+                    }
                 }),
-            ).subscribe(([granted, owned]) => {
-                this.isLoading = false;
-                this.filteredProjects = [...owned.toObject().resultList, ...granted.toObject().resultList];
+            ).subscribe((returnValue) => {
+                switch (this.autocompleteType) {
+                    case ProjectAutocompleteType.PROJECT_GRANTED:
+                        this.isLoading = false;
+                        this.filteredProjects = [...(returnValue as ProjectGrantSearchResponse).toObject().resultList];
+                        break;
+                    case ProjectAutocompleteType.PROJECT_OWNED:
+                        this.isLoading = false;
+                        this.filteredProjects = [...(returnValue as ProjectSearchResponse).toObject().resultList];
+                        break;
+                    default:
+                        this.isLoading = false;
+                        this.filteredProjects = [
+                            ...(returnValue as (ProjectSearchResponse | ProjectGrantSearchResponse)[])[0]
+                                .toObject().resultList,
+                            ...(returnValue as (ProjectSearchResponse | ProjectGrantSearchResponse)[])[1]
+                                .toObject().resultList,
+                        ];
+                        break;
+                }
             });
     }
 

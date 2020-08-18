@@ -65,7 +65,7 @@ export class MembershipsComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-
+                console.log(resp);
             }
         });
     }

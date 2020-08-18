@@ -1,9 +1,11 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ProjectRole, User } from 'src/app/proto/generated/management_pb';
+import { ProjectGrantView, ProjectRole, ProjectView, User } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
+
+import { ProjectAutocompleteType } from '../search-project-autocomplete/search-project-autocomplete.component';
 
 export enum CreationType {
     PROJECT_OWNED = 0,
@@ -17,6 +19,7 @@ export enum CreationType {
     styleUrls: ['./member-create-dialog.component.scss'],
 })
 export class MemberCreateDialogComponent {
+    private projectId: string = '';
     public creationType!: CreationType;
     public creationTypes: CreationType[] = [
         CreationType.IAM,
@@ -27,6 +30,7 @@ export class MemberCreateDialogComponent {
     public users: Array<User.AsObject> = [];
     public roles: Array<ProjectRole.AsObject> | string[] = [];
     public CreationType: any = CreationType;
+    public ProjectAutocompleteType: any = ProjectAutocompleteType;
     public memberRoleOptions: string[] = [];
 
     public showCreationTypeSelector: boolean = false;
@@ -37,6 +41,9 @@ export class MemberCreateDialogComponent {
         @Inject(MAT_DIALOG_DATA) public data: any,
         private toastService: ToastService,
     ) {
+        if (data?.projectId) {
+            this.projectId = data.projectId;
+        }
         if (data?.creationType) {
             this.creationType = data.creationType;
             this.loadRoles();
@@ -46,6 +53,7 @@ export class MemberCreateDialogComponent {
     }
 
     public loadRoles(): void {
+        console.log(this.creationType);
         switch (this.creationType) {
             case CreationType.PROJECT_GRANTED:
                 this.projectService.GetProjectGrantMemberRoles().then(resp => {
@@ -71,12 +79,16 @@ export class MemberCreateDialogComponent {
         }
     }
 
+    public selectProject(project: ProjectView.AsObject | ProjectGrantView.AsObject | any): void {
+        this.projectId = project.projectId;
+    }
+
     public closeDialog(): void {
         this.dialogRef.close(false);
     }
 
     public closeDialogWithSuccess(): void {
-        this.dialogRef.close({ users: this.users, roles: this.roles });
+        this.dialogRef.close({ users: this.users, roles: this.roles, projectId: this.projectId });
     }
 
     public setOrgMemberRoles(roles: string[]): void {

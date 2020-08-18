@@ -510,7 +510,8 @@
                 "PROJECTGRANTMEMBERADDED":"Berechtigungsmanager hinzugefügt!",
                 "PROJECTGRANTMEMBERCHANGED":"Berechtigungsmanager verändert!",
                 "PROJECTGRANTMEMBERREMOVED":"Berechtigungsmanager entfernt!"
-            }
+            },
+            "ROLES":"Projekt Rollen"
         },
         "APP": {
             "TITLE": "Applikationen",
@@ -651,7 +652,8 @@
             "3":"IAM",
             "2":"Organisation",
             "0":"Eigenes Projekt",
-            "1":"Berechtigtes Projekt"
+            "1":"Berechtigtes Projekt",
+            "4":"Projekt"
         }
     },
     "ROLES": {
