@@ -536,7 +536,8 @@ func TestOrgCreatedAggregates(t *testing.T) {
 					},
 					Name: "caos",
 					Domains: []*model.OrgDomain{{
-						Domain: "caos.ch",
+						Domain:   "caos.ch",
+						Verified: true,
 					}},
 				},
 				users: func(ctx context.Context, domain string) ([]*es_models.Aggregate, error) {
