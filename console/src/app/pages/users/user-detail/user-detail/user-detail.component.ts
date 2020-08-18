@@ -7,14 +7,20 @@ import { ChangeType } from 'src/app/modules/changes/changes.component';
 import {
     Gender,
     NotificationType,
+    ProjectGrantMemberSearchKey,
+    ProjectGrantMemberSearchQuery,
+    ProjectGrantMemberView,
+    ProjectMemberSearchKey,
+    ProjectMemberSearchQuery,
+    ProjectMemberView,
     UserEmail,
     UserPhone,
     UserProfile,
     UserState,
     UserView,
 } from 'src/app/proto/generated/management_pb';
-import { AuthUserService } from 'src/app/services/auth-user.service';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
+import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -37,13 +43,16 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     public UserState: any = UserState;
     public copied: string = '';
 
+    usergrants: ProjectGrantMemberView.AsObject[] = [];
+    projectmembers: ProjectMemberView.AsObject[] = [];
+
     constructor(
         public translate: TranslateService,
         private route: ActivatedRoute,
         private toast: ToastService,
         private mgmtUserService: MgmtUserService,
         private _location: Location,
-        public authUserService: AuthUserService,
+        public projectService: ProjectService,
     ) { }
 
     public ngOnInit(): void {
@@ -51,10 +60,32 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             const { id } = params;
             this.mgmtUserService.GetUserByID(id).then(user => {
                 this.user = user.toObject();
+                this.loadManager(this.user.id);
             }).catch(err => {
                 console.error(err);
             });
         });
+    }
+
+    public async loadManager(userId: string): Promise<void> {
+        console.log('load managers');
+        // manager of granted project
+        const projectGrantQuery = new ProjectGrantMemberSearchQuery();
+        projectGrantQuery.setKey(ProjectGrantMemberSearchKey.PROJECTGRANTMEMBERSEARCHKEY_USER_ID);
+        projectGrantQuery.setValue(userId);
+
+        this.usergrants = (await this.mgmtUserService.SearchProjectGrantMembers(100, 0, [projectGrantQuery]))
+            .toObject().resultList;
+        console.log(this.usergrants);
+
+        // manager of granted project
+        const projectMemberQuery = new ProjectMemberSearchQuery();
+        projectMemberQuery.setKey(ProjectMemberSearchKey.PROJECTMEMBERSEARCHKEY_USER_ID);
+        projectMemberQuery.setValue(userId);
+
+        this.projectmembers = (await this.mgmtUserService.SearchProjectMembers(100, 0, [projectMemberQuery]))
+            .toObject().resultList;
+        console.log(this.projectmembers);
     }
 
     public ngOnDestroy(): void {

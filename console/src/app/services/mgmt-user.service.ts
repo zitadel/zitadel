@@ -15,6 +15,9 @@ import {
     ProjectGrantMemberSearchQuery,
     ProjectGrantMemberSearchRequest,
     ProjectGrantMemberSearchResponse,
+    ProjectMemberSearchQuery,
+    ProjectMemberSearchRequest,
+    ProjectMemberSearchResponse,
     ProjectRoleAdd,
     SetPasswordNotificationRequest,
     UpdateUserAddressRequest,
@@ -93,6 +96,21 @@ export class MgmtUserService {
         req.setId(id);
         return await this.request(
             c => c.getUserByID,
+            req,
+            f => f,
+        );
+    }
+
+    public async SearchProjectMembers(
+        limit: number, offset: number, queryList?: ProjectMemberSearchQuery[]): Promise<ProjectMemberSearchResponse> {
+        const req = new ProjectMemberSearchRequest();
+        req.setLimit(limit);
+        req.setOffset(offset);
+        if (queryList) {
+            req.setQueriesList(queryList);
+        }
+        return await this.request(
+            c => c.searchProjectMembers,
             req,
             f => f,
         );
