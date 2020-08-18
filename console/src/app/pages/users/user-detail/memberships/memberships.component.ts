@@ -1,15 +1,8 @@
+import { animate, animateChild, keyframes, query, stagger, style, transition, trigger } from '@angular/animations';
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import {
-    ProjectGrantMemberSearchKey,
-    ProjectGrantMemberSearchQuery,
-    ProjectGrantMemberView,
-    ProjectMemberSearchKey,
-    ProjectMemberSearchQuery,
-    ProjectMemberView,
-    User,
-} from 'src/app/proto/generated/management_pb';
+import { MemberType, User, UserMembershipSearchResponse } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { OrgService } from 'src/app/services/org.service';
@@ -20,12 +13,29 @@ import { ToastService } from 'src/app/services/toast.service';
     selector: 'app-memberships',
     templateUrl: './memberships.component.html',
     styleUrls: ['./memberships.component.scss'],
+    animations: [
+        trigger('cardAnimation', [
+            transition('* => *', [
+                query('@animate', stagger('40ms', animateChild()), { optional: true }),
+            ]),
+        ]),
+        trigger('animate', [
+            transition(':enter', [
+                animate('.2s ease-in', keyframes([
+                    style({ opacity: 0, offset: 0 }),
+                    style({ opacity: .5, transform: 'scale(1.05)', offset: 0.3 }),
+                    style({ opacity: 1, transform: 'scale(1)', offset: 1 }),
+                ])),
+            ]),
+        ]),
+    ],
 })
 export class MembershipsComponent implements OnInit {
-    usergrants: ProjectGrantMemberView.AsObject[] = [];
-    projectmembers: ProjectMemberView.AsObject[] = [];
+    public loading: boolean = false;
+    public memberships!: UserMembershipSearchResponse.AsObject;
 
-    @Input() public user: string = '';
+    @Input() public user!: User.AsObject;
+    public MemberType: any = MemberType;
 
     constructor(
         private orgService: OrgService,
@@ -37,37 +47,15 @@ export class MembershipsComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        // this.loadManager(this.userId);
+        this.loadManager(this.user.id);
     }
 
     public async loadManager(userId: string): Promise<void> {
-        console.log('load managers');
-        // manager of granted project
-        const projectGrantQuery = new ProjectGrantMemberSearchQuery();
-        projectGrantQuery.setKey(ProjectGrantMemberSearchKey.PROJECTGRANTMEMBERSEARCHKEY_USER_ID);
-        projectGrantQuery.setValue(userId);
-
-        this.usergrants = (await this.mgmtUserService.SearchProjectGrantMembers(100, 0, [projectGrantQuery]))
-            .toObject().resultList;
-        console.log(this.usergrants);
-
-        // manager of owned project
-        const projectMemberQuery = new ProjectMemberSearchQuery();
-        projectMemberQuery.setKey(ProjectMemberSearchKey.PROJECTMEMBERSEARCHKEY_USER_ID);
-        projectMemberQuery.setValue(userId);
-
-        this.projectmembers = (await this.mgmtUserService.SearchProjectMembers(100, 0, [projectMemberQuery]))
-            .toObject().resultList;
-        console.log(this.projectmembers);
-
-        // manager of organization
-        // const projectMemberQuery = new ProjectMemberSearchQuery();
-        // projectMemberQuery.setKey(ProjectMemberSearchKey.PROJECTMEMBERSEARCHKEY_USER_ID);
-        // projectMemberQuery.setValue(userId);
-
-        // this.projectmembers = (await this.mgmtUserService.searchor(100, 0, [projectMemberQuery]))
-        //     .toObject().resultList;
-        // console.log(this.projectmembers);
+        this.mgmtUserService.SearchUserMemberships(userId, 100, 0, []).then(response => {
+            console.log(response.toObject());
+            this.memberships = response.toObject();
+            this.loading = false;
+        });
     }
 
     public addMember(): void {
@@ -163,5 +151,40 @@ export class MembershipsComponent implements OnInit {
                     });
             });
         }
+    }
+
+    getColor(type: MemberType): string {
+        const gen = type.toString();
+        const colors = [
+            '#B44D51',
+            '#B75073',
+            '#84498E',
+            '#705998',
+            '#5C6598',
+            '#7F90D3',
+            '#3E93B9',
+            '#3494A0',
+            '#25716A',
+            '#427E41',
+            '#89A568',
+            '#90924D',
+            '#E2B032',
+            '#C97358',
+            '#6D5B54',
+            '#6B7980',
+        ];
+
+        let hash = 0;
+        if (gen.length === 0) {
+            return colors[hash];
+        }
+        for (let i = 0; i < gen.length; i++) {
+            // tslint:disable-next-line: no-bitwise
+            hash = gen.charCodeAt(i) + ((hash << 5) - hash);
+            // tslint:disable-next-line: no-bitwise
+            hash = hash & hash;
+        }
+        hash = ((hash % colors.length) + colors.length) % colors.length;
+        return colors[hash];
     }
 }

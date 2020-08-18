@@ -37,6 +37,9 @@ import {
     UserGrantUpdate,
     UserGrantView,
     UserID,
+    UserMembershipSearchQuery,
+    UserMembershipSearchRequest,
+    UserMembershipSearchResponse,
     UserPhone,
     UserProfile,
     UserSearchQuery,
@@ -111,6 +114,22 @@ export class MgmtUserService {
         }
         return await this.request(
             c => c.searchProjectMembers,
+            req,
+            f => f,
+        );
+    }
+
+    public async SearchUserMemberships(userId: string,
+        limit: number, offset: number, queryList?: UserMembershipSearchQuery[]): Promise<UserMembershipSearchResponse> {
+        const req = new UserMembershipSearchRequest();
+        req.setLimit(limit);
+        req.setOffset(offset);
+        req.setUserId(userId);
+        if (queryList) {
+            req.setQueriesList(queryList);
+        }
+        return await this.request(
+            c => c.searchUserMemberships,
             req,
             f => f,
         );

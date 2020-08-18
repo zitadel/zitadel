@@ -1,7 +1,99 @@
-.header {
-    display: block;
-    margin-bottom: 1rem;
-    font-weight: 400;
-    margin-top: 1rem;
+@import '~@angular/material/theming';
+
+@mixin membership-theme($theme) {
+  /* stylelint-disable */
+  $primary: map-get($theme, primary);
+  $primary-dark: mat-color($primary, A900);
+  $accent: map-get($theme, accent);
+  $accent-color: mat-color($accent, 500);
+  /* stylelint-enable */
+
+.membership-groups {
+    padding-top: 1rem;
+  
+    .header {
+      display: block;
+      margin-bottom: 1rem;
+      font-weight: 400;
+    }
+  
+    .sub-header {
+      font-size: .8rem;
+      color: #8795a1;
+    }
+  
+    .people {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+  
+      .owner {
+        margin-right: 1rem;
+      }
+  
+      .img-list {
+        width: 100%;
+        margin-top: .5rem;
+        margin-left: 1rem;
+        display: flex;
+        align-items: center;
+  
+        .spinner {
+          margin-left: -15px;
+          margin-right: 20px;
+        }
+  
+        .add-img {
+          float: left;
+          margin: 0 8px 0 -15px;
+        }
+  
+        .avatar-circle {
+          float: left;
+          margin: 0 8px 0 -15px;
+          height: 40px;
+          width: 40px;
+          border-radius: 50%;
+          -webkit-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
+          -moz-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
+          box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          .membership-avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            color: white;
+            outline: none;
+            padding: 3px;
+            text-align: center;
+              height: 40px;
+              width: 40px;
+              box-sizing: border-box;
+              font-size: 1rem;
+                border-radius: .5rem;
+                border: 2px solid #00000020 inset;
+                font-weight: 800;
+                background-color: $primary-dark;
+                transition: background-color .2s ease-in-out;
+                background-color: $accent-color;
+
+                i {
+                    font-size: 1.2rem;
+                }
+
+            }
+        }
+  
+        .margin-neg {
+          margin-left: -1rem;
+        }
+      }
+    }
 }
   
+}
