@@ -56,7 +56,8 @@
         "REACTIVATE":"Reactivate",
         "DEACTIVATE":"Deactivate",
         "REFRESH":"Refresh",
-        "LOGIN":"Login"
+        "LOGIN":"Login",
+        "EDIT":"Edit"
     },
     "ERRORS": {
         "REQUIRED": "Some required fields are missing!",
@@ -238,13 +239,26 @@
             "DESCRIPTION":"Managers can add and edit organisations and make changes to their corresponding projects and apps"
         },
         "VIEWS": {
-            "TITLE":"Views and Events",
-            "DESCRIPTION":"This Card shows your Zitadel Views, you can clear them and remove failed events.",
+            "TITLE":"Views",
+            "DESCRIPTION":"This Card shows your Zitadel Views.",
             "VIEWNAME":"Name",
             "DATABASE":"Database",
             "SEQUENCE":"Sequence",
+            "TIMESTAMP":"Timestamp",
             "ACTIONS":"Actions",
             "CLEAR":"Clear"
+        },
+        "FAILEDEVENTS": {
+            "TITLE":"Failed Events",
+            "DESCRIPTION":"This Card shows your failed Events.",
+            "VIEWNAME":"Name",
+            "DATABASE":"Database",
+            "FAILEDSEQUENCE":"Failed Sequence",
+            "FAILURECOUNT":"Failure Count",
+            "ERRORMESSAGE":"Error message",
+            "ACTIONS":"Actions",
+            "DELETE":"Remove",
+            "DELETESUCCESS":"Failed Events removed!"
         },
         "TOAST":{
             "MEMBERREMOVED":"Manager removed!",
@@ -265,9 +279,13 @@
             "CREATE":"Create organisation",
             "ORGDETAIL_TITLE":"Enter the name and domain of your new organisation.",
             "ORGDOMAIN_TITLE":"Organisation domain ownership verification",
-            "ORGDOMAIN_VERIFICATION":"Provide your web domain and verify their ownership. You need to download a verification file and upload it at the provided URL listed below. To complete, click the button to verify.",
+            "ORGDOMAIN_VERIFICATION":"Verify ownership of your domain. You need to download a verification file and upload it at the provided URL listed below or place a TXT Record at the provided Url. To complete, click the button to verify.",
             "ORGDOMAIN_VERIFICATION_SKIP":"You can skip verification for now and continue to create your organisation, but in order to use your organisation this step has to be completed!",
             "ORGDETAILUSER_TITLE":"Configure Organisation Owner",
+            "ORGDOMAIN_VERIFICATION_VALIDATION_DESC":"The tokens are checked regularly to ensure you are still owner of the domain.",
+            "ORGDOMAIN_VERIFICATION_NEWTOKEN_TITLE":"Request new token",
+            "ORGDOMAIN_VERIFICATION_NEWTOKEN_DESC":"If you want to request a new token, select you preferred method, if you want to validate a persisting token, click on the button above.",
+            "ORGDOMAIN_VERIFICATION_VALIDATION_ONGOING":"A verification token has already been requested. Click on the button to trigger a verification check!",
             "DOWNLOAD_FILE":"Download file",
             "SELECTORGTOOLTIP":"Select this organisation",
             "PRIMARYDOMAIN":"Primary Domain",
@@ -350,7 +368,8 @@
             "DOMAINADDED":"Added domain!",
             "DOMAINREMOVED":"Removed domain!",
             "MEMBERADDED":"Manager added!",
-            "MEMBERREMOVED":"Manager removed!"
+            "MEMBERREMOVED":"Manager removed!",
+            "MEMBERCHANGED":"Manager changed!"
         }
     },
     "ORG_DETAIL": {
@@ -413,6 +432,10 @@
                 "DEACTIVATE": {
                     "TITLE":"Deactivate project",
                     "DESCRIPTION":"Do you really want to deactivate your project?"
+                },
+                "DELETE": {
+                    "TITLE":"Projekt löschen",
+                    "DESCRIPTION":"Wollen Sie das Project wirklich löschen?"
                 }
             }
         },
@@ -533,7 +556,8 @@
             "REACTIVATED":"Reactivated!",
             "DEACTIVATED":"Deactivated!",
             "UPDATED":"Project changed!",
-            "GRANTUPDATED":"Grant changed!"
+            "GRANTUPDATED":"Grant changed!",
+            "DELETED":"Deleted Project!"
         }
     },
     "APP": {
@@ -563,8 +587,8 @@
             "TYPETITLE":"What type of application do you want to create?",
             "REDIRECTTITLE":"Specify the urls where the login will redirect to.",
             "POSTREDIRECTTITLE":"This is the redirect after logout.",
-            "REDIRECTDESCRIPTIONWEB":"The redirect has to begin with https://. http:// is only valid for testing purposes!",
-            "REDIRECTDESCRIPTIONNATIVE":"The redirect has to begin with your own protocol or http://localhost!",
+            "REDIRECTDESCRIPTIONWEB":"Redirects must begin with https://. http:// is only valid with enabled dev mode.",
+            "REDIRECTDESCRIPTIONNATIVE":"Redirects must begin with your own protocol or http://localhost!",
             "REDIRECTNOTVALID":"This redirect is not valid!",
             "TYPEREQUIRED":"The type is required!",
             "TITLE": "OIDC Configuration",
@@ -572,6 +596,8 @@
             "CLIENTSECRET": "Client Secret",
             "CLIENTSECRET_DESCRIPTION": "Save your Client Secret as it will disappear once the dialog is closed!",
             "REGENERATESECRET": "Regenerate Client Secret",
+            "DEVMODE":"Dev Mode",
+            "DEVMODEDESC":"With enabled dev mode, redirect uris will not be validated!",
             "REDIRECT": "Redirect URIs",
             "REDIRECTSECTION": "Redirect URIs",
             "POSTLOGOUTREDIRECT":"Post logout URIs",

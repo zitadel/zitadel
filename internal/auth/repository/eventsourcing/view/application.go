@@ -14,8 +14,8 @@ const (
 	applicationTable = "auth.applications"
 )
 
-func (v *View) ApplicationByID(appID string) (*model.ApplicationView, error) {
-	return view.ApplicationByID(v.Db, applicationTable, appID)
+func (v *View) ApplicationByID(projectID, appID string) (*model.ApplicationView, error) {
+	return view.ApplicationByID(v.Db, applicationTable, projectID, appID)
 }
 
 func (v *View) SearchApplications(request *proj_model.ApplicationSearchRequest) ([]*model.ApplicationView, uint64, error) {

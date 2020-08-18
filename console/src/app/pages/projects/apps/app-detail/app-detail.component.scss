@@ -39,6 +39,10 @@
   }
 }
 
+.compliance .problem {
+  font-size: 14px;
+}
+
 .content {
   display: flex;
   flex-direction: row;
@@ -60,6 +64,11 @@
     &.full-width {
       flex-basis: 100%;
     }
+  }
+
+  .devmode {
+    flex: 1 1 100%;
+    margin: 1rem .5rem;
   }
 
   .step-description {

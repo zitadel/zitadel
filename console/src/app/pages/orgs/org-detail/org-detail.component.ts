@@ -23,6 +23,7 @@ import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AddDomainDialogComponent } from './add-domain-dialog/add-domain-dialog.component';
+import { DomainVerificationComponent } from './domain-verification/domain-verification.component';
 
 
 @Component({
@@ -118,7 +119,18 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
                 this.orgService.AddMyOrgDomain(resp).then(domain => {
-                    this.domains.push(domain.toObject());
+                    const newDomain = domain;
+
+                    const newDomainView = new OrgDomainView();
+                    newDomainView.setChangeDate(newDomain.getChangeDate());
+                    newDomainView.setCreationDate(newDomain.getCreationDate());
+                    newDomainView.setDomain(newDomain.getDomain());
+                    newDomainView.setOrgId(newDomain.getOrgId());
+                    newDomainView.setPrimary(newDomain.getPrimary());
+                    newDomainView.setSequence(newDomain.getSequence());
+                    newDomainView.setVerified(newDomain.getVerified());
+
+                    this.domains.push(newDomainView.toObject());
                     this.toast.showInfo('ORG.TOAST.DOMAINADDED', true);
                 });
             }
@@ -181,5 +193,13 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         if (this.org?.state === OrgState.ORGSTATE_ACTIVE) {
             this.router.navigate(['org/members']);
         }
+    }
+
+    public verifyDomain(domain: OrgDomainView.AsObject): void {
+        this.dialog.open(DomainVerificationComponent, {
+            data: {
+                domain: domain,
+            },
+        });
     }
 }

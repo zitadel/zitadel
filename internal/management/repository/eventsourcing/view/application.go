@@ -11,8 +11,8 @@ const (
 	applicationTable = "management.applications"
 )
 
-func (v *View) ApplicationByID(appID string) (*model.ApplicationView, error) {
-	return view.ApplicationByID(v.Db, applicationTable, appID)
+func (v *View) ApplicationByID(projectID, appID string) (*model.ApplicationView, error) {
+	return view.ApplicationByID(v.Db, applicationTable, projectID, appID)
 }
 
 func (v *View) ApplicationsByProjectID(ProjectID string) ([]*model.ApplicationView, error) {

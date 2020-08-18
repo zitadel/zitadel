@@ -5,16 +5,17 @@
         <app-card title="{{ 'ORG.DOMAINS.TITLE' | translate }}"
             description="{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}">
             <div *ngFor="let domain of domains" class="domain">
-                <span class="title">{{domain.domain}}</span>
+                <span (click)="verifyDomain(domain)" class="title">{{domain.domain}}</span>
                 <i matTooltip="verified" *ngIf="domain.verified" class="verified las la-check-circle"></i>
                 <i matTooltip="primary" *ngIf="domain.primary" class="primary las la-star"></i>
+
                 <span class="fill-space"></span>
                 <button matTooltip="Remove domain" color="warn" mat-icon-button (click)="removeDomain(domain.domain)"><i
                         class="las la-trash"></i></button>
             </div>
 
             <p class="new-desc">{{'ORG.PAGES.ORGDOMAIN_VERIFICATION' | translate}}</p>
-            <button matTooltip="Add domain" mat-raised-button color="primary"
+            <button class="add-button" matTooltip="Add domain" mat-raised-button color="primary"
                 (click)="addNewDomain()">{{'ORG.DOMAINS.NEW' | translate}} </button>
         </app-card>
 

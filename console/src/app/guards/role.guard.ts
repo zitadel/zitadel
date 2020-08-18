@@ -15,6 +15,6 @@ export class RoleGuard implements CanActivate {
         route: ActivatedRouteSnapshot,
         state: RouterStateSnapshot,
     ): Observable<boolean> {
-        return this.authService.isAllowed(route.data['roles'], true);
+        return this.authService.isAllowed(route.data['roles']);
     }
 }

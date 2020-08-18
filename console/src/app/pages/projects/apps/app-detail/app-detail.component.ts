@@ -98,6 +98,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             name: ['', [Validators.required]],
         });
         this.appForm = this.fb.group({
+            devMode: [false, []],
             clientId: [{ value: '', disabled: true }],
             responseTypesList: [],
             grantTypesList: [],
@@ -195,11 +196,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 input.value = '';
             }
         }
-
     }
 
     public remove(redirect: any, target: RedirectType): void {
-
         if (target === RedirectType.POSTREDIRECT) {
             const index = this.postLogoutRedirectUrisList.indexOf(redirect);
 
@@ -228,6 +227,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.app.oidcConfig.authMethodType = this.authMethodType?.value;
                 this.app.oidcConfig.redirectUrisList = this.redirectUrisList;
                 this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
+                this.app.oidcConfig.devMode = this.devMode?.value;
 
                 this.projectService
                     .UpdateOIDCAppConfig(this.projectId, this.app.id, this.app.oidcConfig)
@@ -283,5 +283,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     public get authMethodType(): AbstractControl | null {
         return this.appForm.get('authMethodType');
+    }
+
+    public get devMode(): AbstractControl | null {
+        return this.appForm.get('devMode');
     }
 }

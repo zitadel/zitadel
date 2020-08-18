@@ -52,10 +52,13 @@ func (p *ProjectMember) processProjectMember(event *models.Event) (err error) {
 	member := new(view_model.ProjectMemberView)
 	switch event.Type {
 	case proj_es_model.ProjectMemberAdded:
-		member.AppendEvent(event)
+		err = member.AppendEvent(event)
+		if err != nil {
+			return err
+		}
 		p.fillData(member)
 	case proj_es_model.ProjectMemberChanged:
-		err := member.SetData(event)
+		err = member.SetData(event)
 		if err != nil {
 			return err
 		}
@@ -63,9 +66,9 @@ func (p *ProjectMember) processProjectMember(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		member.AppendEvent(event)
+		err = member.AppendEvent(event)
 	case proj_es_model.ProjectMemberRemoved:
-		err := member.SetData(event)
+		err = member.SetData(event)
 		if err != nil {
 			return err
 		}
@@ -88,6 +91,9 @@ func (p *ProjectMember) processUser(event *models.Event) (err error) {
 		members, err := p.view.ProjectMembersByUserID(event.AggregateID)
 		if err != nil {
 			return err
+		}
+		if len(members) == 0 {
+			return p.view.ProcessedProjectMemberSequence(event.Sequence)
 		}
 		user, err := p.userEvents.UserByID(context.Background(), event.AggregateID)
 		if err != nil {

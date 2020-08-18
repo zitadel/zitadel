@@ -28,10 +28,7 @@ export class GrpcService {
     public async loadAppEnvironment(): Promise<any> {
         return this.http.get('./assets/environment.json')
             .toPromise().then((data: any) => {
-                console.log('init grpc');
-
                 if (data && data.authServiceUrl && data.mgmtServiceUrl && data.issuer) {
-                    console.log('init grpc promiseclients');
                     this.auth = new AuthServicePromiseClient(data.authServiceUrl);
                     this.mgmt = new ManagementServicePromiseClient(data.mgmtServiceUrl);
                     this.admin = new AdminServicePromiseClient(data.adminServiceUrl);
