@@ -6,10 +6,10 @@
 <div mat-dialog-content>
 
     <mat-form-field *ngIf="showCreationTypeSelector" class="full-width" appearance="outline">
-        <mat-label>{{ 'PROJECT.GRANT.TITLE' | translate }}</mat-label>
-        <mat-select [(ngModel)]="creationType" (change)="loadRoles()">
-            <mat-option *ngFor="let type of CreationType" [value]="type">
-                {{ type }}
+        <mat-label>{{ 'MEMBER.CREATIONTYPE' | translate }}</mat-label>
+        <mat-select [(ngModel)]="creationType" (selectionChange)="loadRoles()">
+            <mat-option *ngFor="let type of creationTypes" [value]="type">
+                {{ 'MEMBER.CREATIONTYPES.'+type | translate}}
             </mat-option>
         </mat-select>
     </mat-form-field>

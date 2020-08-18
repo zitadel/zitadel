@@ -227,6 +227,9 @@
             "DEACTIVATED":"User deactivated",
             "SELECTEDREACTIVATED":"Selected Users reactivated",
             "SELECTEDDEACTIVATED":"Selected Users deactivated"
+        },
+        "MEMBERSHIPS": {
+            "TITLE":"Memberships"
         }
     },
     "IAM": {
@@ -642,7 +645,14 @@
         "en": "English"
     },
     "MEMBER":{
-        "ADD":"Add a manager"
+        "ADD":"Add a manager",
+        "CREATIONTYPE":"Creation Type",
+        "CREATIONTYPES":{
+            "3":"IAM",
+            "2":"Organisation",
+            "0":"Owned Project",
+            "1":"Granted Project"
+        }
     },
     "ROLES": {
         "ORG_OWNER": "Org. Owner",

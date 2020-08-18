@@ -158,6 +158,8 @@
             </div>
         </div>
 
+        <app-memberships [userId]="user.id"></app-memberships>
+
         <app-changes class="changes" [changeType]="ChangeType.USER" [id]="user.id"></app-changes>
     </div>
 </app-meta-layout>

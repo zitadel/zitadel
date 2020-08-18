@@ -18,6 +18,12 @@ export enum CreationType {
 })
 export class MemberCreateDialogComponent {
     public creationType!: CreationType;
+    public creationTypes: CreationType[] = [
+        CreationType.IAM,
+        CreationType.ORG,
+        CreationType.PROJECT_OWNED,
+        CreationType.PROJECT_GRANTED,
+    ];
     public users: Array<User.AsObject> = [];
     public roles: Array<ProjectRole.AsObject> | string[] = [];
     public CreationType: any = CreationType;
@@ -31,9 +37,8 @@ export class MemberCreateDialogComponent {
         @Inject(MAT_DIALOG_DATA) public data: any,
         private toastService: ToastService,
     ) {
-        this.creationType = data.creationType;
-
-        if (this.creationType) {
+        if (data?.creationType) {
+            this.creationType = data.creationType;
             this.loadRoles();
         } else {
             this.showCreationTypeSelector = true;

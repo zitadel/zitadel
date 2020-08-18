@@ -1,4 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import {
     ProjectGrantMemberSearchKey,
     ProjectGrantMemberSearchQuery,
@@ -20,7 +22,7 @@ export class MembershipsComponent implements OnInit {
 
     @Input() public userId: string = '';
 
-    constructor(private mgmtUserService: MgmtUserService) { }
+    constructor(private mgmtUserService: MgmtUserService, private dialog: MatDialog) { }
 
     ngOnInit(): void {
         this.loadManager(this.userId);
@@ -54,5 +56,17 @@ export class MembershipsComponent implements OnInit {
         // this.projectmembers = (await this.mgmtUserService.searchor(100, 0, [projectMemberQuery]))
         //     .toObject().resultList;
         // console.log(this.projectmembers);
+    }
+
+    public addMember(): void {
+        const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+
+            }
+        });
     }
 }
