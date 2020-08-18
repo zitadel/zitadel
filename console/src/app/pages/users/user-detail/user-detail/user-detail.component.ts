@@ -78,7 +78,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             .toObject().resultList;
         console.log(this.usergrants);
 
-        // manager of granted project
+        // manager of owned project
         const projectMemberQuery = new ProjectMemberSearchQuery();
         projectMemberQuery.setKey(ProjectMemberSearchKey.PROJECTMEMBERSEARCHKEY_USER_ID);
         projectMemberQuery.setValue(userId);
@@ -86,6 +86,15 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         this.projectmembers = (await this.mgmtUserService.SearchProjectMembers(100, 0, [projectMemberQuery]))
             .toObject().resultList;
         console.log(this.projectmembers);
+
+        // manager of organization
+        // const projectMemberQuery = new ProjectMemberSearchQuery();
+        // projectMemberQuery.setKey(ProjectMemberSearchKey.PROJECTMEMBERSEARCHKEY_USER_ID);
+        // projectMemberQuery.setValue(userId);
+
+        // this.projectmembers = (await this.mgmtUserService.searchor(100, 0, [projectMemberQuery]))
+        //     .toObject().resultList;
+        // console.log(this.projectmembers);
     }
 
     public ngOnDestroy(): void {
