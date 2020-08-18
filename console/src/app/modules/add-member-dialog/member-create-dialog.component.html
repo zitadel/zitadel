@@ -2,7 +2,18 @@
     <span class="title">{{'MEMBER.ADD' | translate}}</span>
 </h1>
 <p class="desc"> {{'ORG_DETAIL.MEMBER.ADDDESCRIPTION' | translate}}</p>
+
 <div mat-dialog-content>
+
+    <mat-form-field *ngIf="showCreationTypeSelector" class="full-width" appearance="outline">
+        <mat-label>{{ 'PROJECT.GRANT.TITLE' | translate }}</mat-label>
+        <mat-select [(ngModel)]="creationType" (change)="loadRoles()">
+            <mat-option *ngFor="let type of CreationType" [value]="type">
+                {{ type }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
     <app-search-user-autocomplete (selectionChanged)="users = $event"></app-search-user-autocomplete>
 
     <mat-form-field class="full-width" appearance="outline"

@@ -17,40 +17,52 @@ export enum CreationType {
     styleUrls: ['./member-create-dialog.component.scss'],
 })
 export class MemberCreateDialogComponent {
-    public projectId: string = '';
     public creationType!: CreationType;
     public users: Array<User.AsObject> = [];
     public roles: Array<ProjectRole.AsObject> | string[] = [];
     public CreationType: any = CreationType;
     public memberRoleOptions: string[] = [];
+
+    public showCreationTypeSelector: boolean = false;
     constructor(
         private projectService: ProjectService,
         private adminService: AdminService,
         public dialogRef: MatDialogRef<MemberCreateDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
-        toastService: ToastService,
+        private toastService: ToastService,
     ) {
         this.creationType = data.creationType;
-        this.projectId = data.projectId;
 
-        if (this.creationType === CreationType.PROJECT_GRANTED) {
-            this.projectService.GetProjectGrantMemberRoles().then(resp => {
-                this.memberRoleOptions = resp.toObject().rolesList;
-            }).catch(error => {
-                toastService.showError(error);
-            });
-        } else if (this.creationType === CreationType.PROJECT_OWNED) {
-            this.projectService.GetProjectMemberRoles().then(resp => {
-                this.memberRoleOptions = resp.toObject().rolesList;
-            }).catch(error => {
-                toastService.showError(error);
-            });
-        } else if (this.creationType === CreationType.IAM) {
-            this.adminService.GetIamMemberRoles().then(resp => {
-                this.memberRoleOptions = resp.toObject().rolesList;
-            }).catch(error => {
-                toastService.showError(error);
-            });
+        if (this.creationType) {
+            this.loadRoles();
+        } else {
+            this.showCreationTypeSelector = true;
+        }
+    }
+
+    public loadRoles(): void {
+        switch (this.creationType) {
+            case CreationType.PROJECT_GRANTED:
+                this.projectService.GetProjectGrantMemberRoles().then(resp => {
+                    this.memberRoleOptions = resp.toObject().rolesList;
+                }).catch(error => {
+                    this.toastService.showError(error);
+                });
+                break;
+            case CreationType.PROJECT_GRANTED:
+                this.projectService.GetProjectMemberRoles().then(resp => {
+                    this.memberRoleOptions = resp.toObject().rolesList;
+                }).catch(error => {
+                    this.toastService.showError(error);
+                });
+                break;
+            case CreationType.IAM:
+                this.adminService.GetIamMemberRoles().then(resp => {
+                    this.memberRoleOptions = resp.toObject().rolesList;
+                }).catch(error => {
+                    this.toastService.showError(error);
+                });
+                break;
         }
     }
 
