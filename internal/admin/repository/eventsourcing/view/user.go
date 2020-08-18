@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	userTable = "management.users"
+	userTable = "adminapi.users"
 )
 
 func (v *View) UserByID(userID string) (*model.UserView, error) {

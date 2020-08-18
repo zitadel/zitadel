@@ -285,6 +285,7 @@
             "ORGDOMAIN_VERIFICATION_VALIDATION_DESC":"The tokens are checked regularly to ensure you are still owner of the domain.",
             "ORGDOMAIN_VERIFICATION_NEWTOKEN_TITLE":"Request new token",
             "ORGDOMAIN_VERIFICATION_NEWTOKEN_DESC":"If you want to request a new token, select you preferred method, if you want to validate a persisting token, click on the button above.",
+            "ORGDOMAIN_VERIFICATION_VALIDATION_ONGOING":"A verification token has already been requested. Click on the button to trigger a verification check!",
             "DOWNLOAD_FILE":"Download file",
             "SELECTORGTOOLTIP":"Select this organisation",
             "PRIMARYDOMAIN":"Primary Domain",

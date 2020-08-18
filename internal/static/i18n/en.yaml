@@ -203,6 +203,9 @@ EventTypes:
     removed: Organization removed
     domain:
       added: Domain added
+      verification:
+        added: Domain verification added
+        failed: Domain verification failed
       verified: Domain verified
       removed: Domain removed
       primary:
