@@ -1,6 +1,7 @@
 import { animate, animateChild, keyframes, query, stagger, style, transition, trigger } from '@angular/animations';
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { MemberType, User, UserMembershipSearchResponse } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -44,6 +45,7 @@ export class MembershipsComponent implements OnInit {
         private adminService: AdminService,
         private dialog: MatDialog,
         private toast: ToastService,
+        private router: Router,
     ) { }
 
     ngOnInit(): void {
@@ -58,6 +60,14 @@ export class MembershipsComponent implements OnInit {
         });
     }
 
+    public navigateToObject(memberType: MemberType, objectId: string): void {
+        switch (memberType) {
+            case MemberType.MEMBERTYPE_PROJECT:
+                this.router.navigate(['projects', objectId]);
+                break;
+        }
+    }
+
     public addMember(): void {
         const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
             width: '400px',
@@ -68,7 +78,6 @@ export class MembershipsComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp && resp.creationType !== undefined) {
-                console.log(resp);
                 switch (resp.creationType) {
                     case CreationType.IAM:
                         this.createIamMember(resp);

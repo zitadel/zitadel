@@ -10,11 +10,14 @@
                     <div @animate class="avatar-circle"
                         matTooltip="{{ membership.displayName }} | {{membership.rolesList?.join(' ')}}"
                         [ngStyle]="{'z-index': 100 - i}">
-                        <div class="membership-avatar"
+                        <div class="membership-avatar" (click)="membership.memberType == MemberType.MEMBERTYPE_PROJECT ?
+                            navigateToObject(membership.memberType, membership.objectId) : null"
                             [ngStyle]="{'background-color': getColor(membership.memberType)}">
                             <i *ngIf="membership.memberType == MemberType.MEMBERTYPE_ORGANISATION"
                                 class="las la-archway"></i>
                             <i *ngIf="membership.memberType == MemberType.MEMBERTYPE_PROJECT"
+                                class="icon las la-layer-group"></i>
+                            <i *ngIf="membership.memberType == MemberType.MEMBERTYPE_PROJECT_GRANT"
                                 class="icon las la-layer-group"></i>
 
                             {{membership.displayName[0]}} {{membership.displayName[1]}}
