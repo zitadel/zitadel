@@ -3,14 +3,14 @@ package repository
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/service_account/model"
+	"github.com/caos/zitadel/internal/user/model"
 )
 
 type ServiceAccountRepository interface {
-	CreateServiceAccount(ctx context.Context, user *model.ServiceAccount) (*model.ServiceAccount, error)
-	UpdateServiceAccount(ctx context.Context, user *model.ServiceAccount) (*model.ServiceAccount, error)
-	DeactivateServiceAccount(ctx context.Context, id string) (*model.ServiceAccount, error)
-	ReactivateServiceAccount(ctx context.Context, id string) (*model.ServiceAccount, error)
-	LockServiceAccount(ctx context.Context, id string) (*model.ServiceAccount, error)
-	UnlockServiceAccount(ctx context.Context, id string) (*model.ServiceAccount, error)
+	CreateServiceAccount(ctx context.Context, user *model.Machine) (*model.Machine, error)
+	UpdateServiceAccount(ctx context.Context, user *model.Machine) (*model.Machine, error)
+	DeactivateServiceAccount(ctx context.Context, id string) (*model.Machine, error)
+	ReactivateServiceAccount(ctx context.Context, id string) (*model.Machine, error)
+	LockServiceAccount(ctx context.Context, id string) (*model.Machine, error)
+	UnlockServiceAccount(ctx context.Context, id string) (*model.Machine, error)
 }

@@ -7,5 +7,5 @@ import (
 
 type SetupOrg struct {
 	*org_model.Org
-	*usr_model.User
+	*usr_model.Human
 }

@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -32,18 +33,18 @@ func OTPToModel(otp *OTP) *model.OTP {
 	}
 }
 
-func (u *User) appendOtpAddedEvent(event *es_models.Event) error {
+func (u *Human) appendOtpAddedEvent(event *es_models.Event) error {
 	u.OTP = &OTP{
 		State: int32(model.MfaStateNotReady),
 	}
 	return u.OTP.setData(event)
 }
 
-func (u *User) appendOtpVerifiedEvent() {
+func (u *Human) appendOtpVerifiedEvent() {
 	u.OTP.State = int32(model.MfaStateReady)
 }
 
-func (u *User) appendOtpRemovedEvent() {
+func (u *Human) appendOtpRemovedEvent() {
 	u.OTP = nil
 }
 

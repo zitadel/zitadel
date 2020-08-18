@@ -8,28 +8,28 @@ import (
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
-func ServiceAccountCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, account *model.ServiceAccount, resourceOwner string) (_ []*es_models.Aggregate, err error) {
-	agg, err := UserAggregate(ctx, aggCreator, &account.ObjectRoot)
+func ServiceAccountCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, account *model.Machine, resourceOwner string) (_ []*es_models.Aggregate, err error) {
+	accountAggregate, err := UserAggregate(ctx, aggCreator, &account.ObjectRoot)
 	if err != nil {
 		return nil, err
 	}
-	agg, err = agg.AppendEvent(model.ServiceAccountAdded, account)
+	accountAggregate, err = accountAggregate.AppendEvent(model.MachineAdded, account)
 	if err != nil {
 		return nil, err
 	}
 
-	uniqueAggregates, err := getUniqueUserAggregates(ctx, aggCreator, account.Name, account.Email, resourceOwner, false)
+	uniqueName, err := reservedUniqueUserNameAggregate(ctx, aggCreator, resourceOwner, account.Name, true)
 	if err != nil {
 		return nil, err
 	}
+
 	return []*es_models.Aggregate{
-		agg,
-		uniqueAggregates[0],
-		uniqueAggregates[1],
+		accountAggregate,
+		uniqueName,
 	}, nil
 }
 
-func ServiceAccountChangeAggregate(aggCreator *es_models.AggregateCreator, existingAccount *model.ServiceAccount, updatedAccount *model.ServiceAccount) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ServiceAccountChangeAggregate(aggCreator *es_models.AggregateCreator, existingAccount *model.Machine, updatedAccount *model.Machine) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if updatedAccount == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "Errors.Internal")
@@ -42,22 +42,22 @@ func ServiceAccountChangeAggregate(aggCreator *es_models.AggregateCreator, exist
 		if len(changes) == 0 {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-0spow", "Errors.NoChangesFound")
 		}
-		return agg.AppendEvent(model.UserProfileChanged, changes)
+		return agg.AppendEvent(model.MachineChanged, changes)
 	}
 }
 
-func ServiceAccountDeactivateAggregate(aggCreator *es_models.AggregateCreator, account *model.ServiceAccount) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return userStateAggregate(aggCreator, &model.User{ObjectRoot: account.ObjectRoot}, model.ServiceAccountDeactivated)
+func ServiceAccountDeactivateAggregate(aggCreator *es_models.AggregateCreator, aggregate *es_models.ObjectRoot) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return userStateAggregate(aggCreator, aggregate, model.ServiceAccountDeactivated)
 }
 
-func ServiceAccountReactivateAggregate(aggCreator *es_models.AggregateCreator, account *model.ServiceAccount) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return userStateAggregate(aggCreator, &model.User{ObjectRoot: account.ObjectRoot}, model.ServiceAccountReactivated)
+func ServiceAccountReactivateAggregate(aggCreator *es_models.AggregateCreator, aggregate *es_models.ObjectRoot) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return userStateAggregate(aggCreator, aggregate, model.ServiceAccountReactivated)
 }
 
-func ServiceAccountLockAggregate(aggCreator *es_models.AggregateCreator, account *model.ServiceAccount) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return userStateAggregate(aggCreator, &model.User{ObjectRoot: account.ObjectRoot}, model.ServiceAccountLocked)
+func ServiceAccountLockAggregate(aggCreator *es_models.AggregateCreator, aggregate *es_models.ObjectRoot) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return userStateAggregate(aggCreator, aggregate, model.ServiceAccountLocked)
 }
 
-func ServiceAccountUnlockAggregate(aggCreator *es_models.AggregateCreator, account *model.ServiceAccount) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return userStateAggregate(aggCreator, &model.User{ObjectRoot: account.ObjectRoot}, model.ServiceAccountUnlocked)
+func ServiceAccountUnlockAggregate(aggCreator *es_models.AggregateCreator, aggregate *es_models.ObjectRoot) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return userStateAggregate(aggCreator, aggregate, model.ServiceAccountUnlocked)
 }

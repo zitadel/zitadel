@@ -113,7 +113,7 @@ func (m *OrgMember) fillData(member *org_model.OrgMemberView) (err error) {
 	return nil
 }
 
-func (m *OrgMember) fillUserData(member *org_model.OrgMemberView, user *usr_model.User) {
+func (m *OrgMember) fillUserData(member *org_model.OrgMemberView, user *usr_model.Human) {
 	member.UserName = user.UserName
 	member.FirstName = user.FirstName
 	member.LastName = user.LastName

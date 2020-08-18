@@ -137,8 +137,8 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplRegister], data, funcs)
 }
 
-func (d registerFormData) toUserModel() *usr_model.User {
-	return &usr_model.User{
+func (d registerFormData) toUserModel() *usr_model.Human {
+	return &usr_model.Human{
 		Profile: &usr_model.Profile{
 			FirstName:         d.Firstname,
 			LastName:          d.Lastname,

@@ -24,10 +24,10 @@ func TestUserByID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
 		es   *UserEventstore
-		user *model.User
+		user *model.Human
 	}
 	type res struct {
-		user    *model.User
+		user    *model.Human
 		errFunc func(err error) bool
 	}
 	tests := []struct {
@@ -38,18 +38,18 @@ func TestUserByID(t *testing.T) {
 		{
 			name: "user from events, ok",
 			args: args{
-				es:   GetMockUserByIDOK(ctrl, repo_model.User{Profile: &repo_model.Profile{UserName: "UserName"}}),
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockUserByIDOK(ctrl, repo_model.Human{Profile: &repo_model.Profile{UserName: "UserName"}}),
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Profile: &model.Profile{UserName: "UserName"}},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Profile: &model.Profile{UserName: "UserName"}},
 			},
 		},
 		{
 			name: "no events found",
 			args: args{
 				es:   GetMockUserByIDNoEvents(ctrl),
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -59,7 +59,7 @@ func TestUserByID(t *testing.T) {
 			name: "no id",
 			args: args{
 				es:   GetMockUserByIDNoEvents(ctrl),
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -88,12 +88,12 @@ func TestCreateUser(t *testing.T) {
 	type args struct {
 		es        *UserEventstore
 		ctx       context.Context
-		user      *model.User
+		user      *model.Human
 		policy    *policy_model.PasswordComplexityPolicy
 		orgPolicy *org_model.OrgIamPolicy
 	}
 	type res struct {
-		user    *model.User
+		user    *model.Human
 		errFunc func(err error) bool
 	}
 	tests := []struct {
@@ -104,9 +104,9 @@ func TestCreateUser(t *testing.T) {
 		{
 			name: "init mail because no pw",
 			args: args{
-				es:  GetMockManipulateUserWithInitCodeGen(ctrl, repo_model.User{Profile: &repo_model.Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true}}),
+				es:  GetMockManipulateUserWithInitCodeGen(ctrl, repo_model.Human{Profile: &repo_model.Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true}}),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				user: &model.User{
+				user: &model.Human{
 					ObjectRoot: es_models.ObjectRoot{Sequence: 1},
 					Profile: &model.Profile{
 						UserName:  "UserName",
@@ -122,7 +122,7 @@ func TestCreateUser(t *testing.T) {
 				orgPolicy: &org_model.OrgIamPolicy{},
 			},
 			res: res{
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
 					Profile: &model.Profile{
 						UserName:  "UserName",
 						FirstName: "FirstName",
@@ -138,9 +138,9 @@ func TestCreateUser(t *testing.T) {
 		{
 			name: "email as username",
 			args: args{
-				es:  GetMockManipulateUserWithInitCodeGen(ctrl, repo_model.User{Profile: &repo_model.Profile{UserName: "EmailAddress", FirstName: "FirstName", LastName: "LastName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true}}),
+				es:  GetMockManipulateUserWithInitCodeGen(ctrl, repo_model.Human{Profile: &repo_model.Profile{UserName: "EmailAddress", FirstName: "FirstName", LastName: "LastName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true}}),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
 					Profile: &model.Profile{
 						FirstName: "FirstName",
 						LastName:  "LastName",
@@ -154,7 +154,7 @@ func TestCreateUser(t *testing.T) {
 				orgPolicy: &org_model.OrgIamPolicy{UserLoginMustBeDomain: false},
 			},
 			res: res{
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
 					Profile: &model.Profile{
 						UserName:  "EmailAddress",
 						FirstName: "FirstName",
@@ -170,9 +170,9 @@ func TestCreateUser(t *testing.T) {
 		{
 			name: "with verified phone number",
 			args: args{
-				es:  GetMockManipulateUserWithInitCodeGen(ctrl, repo_model.User{Profile: &repo_model.Profile{UserName: "EmailAddress", FirstName: "FirstName", LastName: "LastName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true}, Phone: &repo_model.Phone{PhoneNumber: "+41711234567", IsPhoneVerified: true}}),
+				es:  GetMockManipulateUserWithInitCodeGen(ctrl, repo_model.Human{Profile: &repo_model.Profile{UserName: "EmailAddress", FirstName: "FirstName", LastName: "LastName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true}, Phone: &repo_model.Phone{PhoneNumber: "+41711234567", IsPhoneVerified: true}}),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
 					Profile: &model.Profile{
 						FirstName: "FirstName",
 						LastName:  "LastName",
@@ -191,7 +191,7 @@ func TestCreateUser(t *testing.T) {
 				orgPolicy: &org_model.OrgIamPolicy{},
 			},
 			res: res{
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
 					Profile: &model.Profile{
 						UserName:  "UserName",
 						FirstName: "FirstName",
@@ -211,9 +211,9 @@ func TestCreateUser(t *testing.T) {
 		{
 			name: "with password",
 			args: args{
-				es:  GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl, repo_model.User{Profile: &repo_model.Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true}}),
+				es:  GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl, repo_model.Human{Profile: &repo_model.Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true}}),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
 					Profile: &model.Profile{
 						FirstName: "FirstName",
 						LastName:  "LastName",
@@ -229,7 +229,7 @@ func TestCreateUser(t *testing.T) {
 				orgPolicy: &org_model.OrgIamPolicy{},
 			},
 			res: res{
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
 					Profile: &model.Profile{
 						UserName:  "UserName",
 						FirstName: "FirstName",
@@ -247,7 +247,7 @@ func TestCreateUser(t *testing.T) {
 			args: args{
 				es:        GetMockManipulateUser(ctrl),
 				ctx:       authz.NewMockContext("orgID", "userID"),
-				user:      &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				user:      &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 				policy:    &policy_model.PasswordComplexityPolicy{},
 				orgPolicy: &org_model.OrgIamPolicy{},
 			},
@@ -260,7 +260,7 @@ func TestCreateUser(t *testing.T) {
 			args: args{
 				es:        GetMockManipulateUser(ctrl),
 				ctx:       authz.NewMockContext("orgID", "userID"),
-				user:      &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				user:      &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 				orgPolicy: &org_model.OrgIamPolicy{},
 			},
 			res: res{
@@ -272,7 +272,7 @@ func TestCreateUser(t *testing.T) {
 			args: args{
 				es:     GetMockManipulateUser(ctrl),
 				ctx:    authz.NewMockContext("orgID", "userID"),
-				user:   &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				user:   &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 				policy: &policy_model.PasswordComplexityPolicy{},
 			},
 			res: res{
@@ -312,13 +312,13 @@ func TestRegisterUser(t *testing.T) {
 	type args struct {
 		es            *UserEventstore
 		ctx           context.Context
-		user          *model.User
+		user          *model.Human
 		resourceOwner string
 		policy        *policy_model.PasswordComplexityPolicy
 		orgPolicy     *org_model.OrgIamPolicy
 	}
 	type res struct {
-		user    *model.User
+		user    *model.Human
 		errFunc func(err error) bool
 	}
 	tests := []struct {
@@ -329,9 +329,9 @@ func TestRegisterUser(t *testing.T) {
 		{
 			name: "register user, ok",
 			args: args{
-				es:  GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl, repo_model.User{Profile: &repo_model.Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress"}}),
+				es:  GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl, repo_model.Human{Profile: &repo_model.Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress"}}),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				user: &model.User{
+				user: &model.Human{
 					ObjectRoot: es_models.ObjectRoot{Sequence: 1},
 					Profile: &model.Profile{
 						UserName:  "UserName",
@@ -350,7 +350,7 @@ func TestRegisterUser(t *testing.T) {
 				resourceOwner: "ResourceOwner",
 			},
 			res: res{
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
 					Profile: &model.Profile{
 						UserName:  "UserName",
 						FirstName: "FirstName",
@@ -365,9 +365,9 @@ func TestRegisterUser(t *testing.T) {
 		{
 			name: "email as username",
 			args: args{
-				es:  GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl, repo_model.User{Profile: &repo_model.Profile{UserName: "EmailAddress", FirstName: "FirstName", LastName: "LastName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress"}}),
+				es:  GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl, repo_model.Human{Profile: &repo_model.Profile{UserName: "EmailAddress", FirstName: "FirstName", LastName: "LastName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress"}}),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
 					Profile: &model.Profile{
 						FirstName: "FirstName",
 						LastName:  "LastName",
@@ -384,7 +384,7 @@ func TestRegisterUser(t *testing.T) {
 				resourceOwner: "ResourceOwner",
 			},
 			res: res{
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
 					Profile: &model.Profile{
 						UserName:  "EmailAddress",
 						FirstName: "FirstName",
@@ -401,7 +401,7 @@ func TestRegisterUser(t *testing.T) {
 			args: args{
 				es:            GetMockManipulateUser(ctrl),
 				ctx:           authz.NewMockContext("orgID", "userID"),
-				user:          &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1}},
+				user:          &model.Human{ObjectRoot: es_models.ObjectRoot{Sequence: 1}},
 				policy:        &policy_model.PasswordComplexityPolicy{},
 				orgPolicy:     &org_model.OrgIamPolicy{},
 				resourceOwner: "ResourceOwner",
@@ -415,7 +415,7 @@ func TestRegisterUser(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateUser(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
 					Profile: &model.Profile{
 						UserName:  "EmailAddress",
 						FirstName: "FirstName",
@@ -438,7 +438,7 @@ func TestRegisterUser(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateUser(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
 					Profile: &model.Profile{
 						UserName:  "EmailAddress",
 						FirstName: "FirstName",
@@ -460,7 +460,7 @@ func TestRegisterUser(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateUser(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
 					Profile: &model.Profile{
 						UserName:  "EmailAddress",
 						FirstName: "FirstName",
@@ -481,7 +481,7 @@ func TestRegisterUser(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateUser(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
 					Profile: &model.Profile{
 						UserName:  "EmailAddress",
 						FirstName: "FirstName",
@@ -520,10 +520,10 @@ func TestDeactivateUser(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		existing *model.User
+		existing *model.Human
 	}
 	type res struct {
-		user    *model.User
+		user    *model.Human
 		errFunc func(err error) bool
 	}
 	tests := []struct {
@@ -536,10 +536,10 @@ func TestDeactivateUser(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.UserStateInactive},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.UserStateInactive},
 			},
 		},
 		{
@@ -547,7 +547,7 @@ func TestDeactivateUser(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateInactiveUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -558,7 +558,7 @@ func TestDeactivateUser(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -587,10 +587,10 @@ func TestReactivateUser(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		existing *model.User
+		existing *model.Human
 	}
 	type res struct {
-		user    *model.User
+		user    *model.Human
 		errFunc func(err error) bool
 	}
 	tests := []struct {
@@ -603,10 +603,10 @@ func TestReactivateUser(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateInactiveUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.UserStateActive},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.UserStateActive},
 			},
 		},
 		{
@@ -614,7 +614,7 @@ func TestReactivateUser(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -625,7 +625,7 @@ func TestReactivateUser(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -654,10 +654,10 @@ func TestLockUser(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		existing *model.User
+		existing *model.Human
 	}
 	type res struct {
-		user    *model.User
+		user    *model.Human
 		errFunc func(err error) bool
 	}
 	tests := []struct {
@@ -670,10 +670,10 @@ func TestLockUser(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.UserStateLocked},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.UserStateLocked},
 			},
 		},
 		{
@@ -681,7 +681,7 @@ func TestLockUser(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateLockedUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -692,7 +692,7 @@ func TestLockUser(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -721,10 +721,10 @@ func TestUnlockUser(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		existing *model.User
+		existing *model.Human
 	}
 	type res struct {
-		user    *model.User
+		user    *model.Human
 		errFunc func(err error) bool
 	}
 	tests := []struct {
@@ -737,10 +737,10 @@ func TestUnlockUser(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateLockedUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.UserStateActive},
+				user: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.UserStateActive},
 			},
 		},
 		{
@@ -748,7 +748,7 @@ func TestUnlockUser(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -759,7 +759,7 @@ func TestUnlockUser(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -788,7 +788,7 @@ func TestGetInitCodeByID(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		existing *model.User
+		existing *model.Human
 	}
 	type res struct {
 		code    *model.InitUserCode
@@ -803,14 +803,14 @@ func TestGetInitCodeByID(t *testing.T) {
 			name: "get by id, ok",
 			args: args{
 				es: GetMockManipulateUserWithInitCode(ctrl,
-					repo_model.User{
+					repo_model.Human{
 						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
 						Profile: &repo_model.Profile{
 							UserName: "UserName",
 						},
 					}),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				code: &model.InitUserCode{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Expiry: time.Hour * 30},
@@ -821,7 +821,7 @@ func TestGetInitCodeByID(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -832,7 +832,7 @@ func TestGetInitCodeByID(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -861,7 +861,7 @@ func TestCreateInitCode(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		existing *model.User
+		existing *model.Human
 	}
 	type res struct {
 		code    *model.InitUserCode
@@ -875,9 +875,9 @@ func TestCreateInitCode(t *testing.T) {
 		{
 			name: "create init code",
 			args: args{
-				es:       GetMockManipulateUserWithInitCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}}),
+				es:       GetMockManipulateUserWithInitCodeGen(ctrl, repo_model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}}),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				code: &model.InitUserCode{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Expiry: time.Hour * 1},
@@ -888,7 +888,7 @@ func TestCreateInitCode(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -899,7 +899,7 @@ func TestCreateInitCode(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -928,7 +928,7 @@ func TestInitCodeSent(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		existing *model.User
+		existing *model.Human
 	}
 	type res struct {
 		errFunc func(err error) bool
@@ -943,7 +943,7 @@ func TestInitCodeSent(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{},
 		},
@@ -952,7 +952,7 @@ func TestInitCodeSent(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -963,7 +963,7 @@ func TestInitCodeSent(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -1006,7 +1006,7 @@ func TestInitCodeVerify(t *testing.T) {
 			name: "verify init code, no pw",
 			args: args{
 				es: GetMockManipulateUserWithInitCode(ctrl,
-					repo_model.User{
+					repo_model.Human{
 						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
 						Email: &repo_model.Email{
 							EmailAddress: "EmailAddress",
@@ -1023,7 +1023,7 @@ func TestInitCodeVerify(t *testing.T) {
 			name: "verify init code, pw",
 			args: args{
 				es: GetMockManipulateUserWithInitCode(ctrl,
-					repo_model.User{
+					repo_model.Human{
 						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
 						Email: &repo_model.Email{
 							EmailAddress:    "EmailAddress",
@@ -1042,7 +1042,7 @@ func TestInitCodeVerify(t *testing.T) {
 			name: "verify init code, email and pw",
 			args: args{
 				es: GetMockManipulateUserWithInitCode(ctrl,
-					repo_model.User{
+					repo_model.Human{
 						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
 						Email: &repo_model.Email{
 							EmailAddress: "EmailAddress",
@@ -1118,7 +1118,7 @@ func TestSkipMfaInit(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		existing *model.User
+		existing *model.Human
 	}
 	type res struct {
 		errFunc func(err error) bool
@@ -1133,7 +1133,7 @@ func TestSkipMfaInit(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{},
 		},
@@ -1142,7 +1142,7 @@ func TestSkipMfaInit(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -1153,7 +1153,7 @@ func TestSkipMfaInit(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -1179,7 +1179,7 @@ func TestPasswordID(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		existing *model.User
+		existing *model.Human
 	}
 	type res struct {
 		password *model.Password
@@ -1195,7 +1195,7 @@ func TestPasswordID(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserFull(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, ChangeRequired: true},
@@ -1206,7 +1206,7 @@ func TestPasswordID(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -1217,7 +1217,7 @@ func TestPasswordID(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -1228,7 +1228,7 @@ func TestPasswordID(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -1272,7 +1272,7 @@ func TestSetOneTimePassword(t *testing.T) {
 		{
 			name: "create one time pw",
 			args: args{
-				es:       GetMockManipulateUserWithPasswordCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}}),
+				es:       GetMockManipulateUserWithPasswordCodeGen(ctrl, repo_model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}}),
 				ctx:      authz.NewMockContext("orgID", "userID"),
 				policy:   &policy_model.PasswordComplexityPolicy{},
 				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SecretString: "Password"},
@@ -1344,7 +1344,7 @@ func TestCheckPassword(t *testing.T) {
 			name: "check pw ok",
 			args: args{
 				es: GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl,
-					repo_model.User{
+					repo_model.Human{
 						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
 						Password: &repo_model.Password{Secret: &crypto.CryptoValue{
 							CryptoType: crypto.TypeHash,
@@ -1396,7 +1396,7 @@ func TestCheckPassword(t *testing.T) {
 			name: "no password",
 			args: args{
 				es: GetMockUserByIDOK(ctrl,
-					repo_model.User{
+					repo_model.Human{
 						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
 					},
 				),
@@ -1412,7 +1412,7 @@ func TestCheckPassword(t *testing.T) {
 			name: "invalid password",
 			args: args{
 				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
-					repo_model.User{
+					repo_model.Human{
 						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
 						Password: &repo_model.Password{Secret: &crypto.CryptoValue{
 							CryptoType: crypto.TypeHash,
@@ -1475,7 +1475,7 @@ func TestSetPassword(t *testing.T) {
 			name: "create pw",
 			args: args{
 				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
-					repo_model.User{
+					repo_model.Human{
 						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
 						PasswordCode: &repo_model.PasswordCode{Code: &crypto.CryptoValue{
 							CryptoType: crypto.TypeEncryption,
@@ -1525,7 +1525,7 @@ func TestSetPassword(t *testing.T) {
 			name: "no passcode",
 			args: args{
 				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
-					repo_model.User{
+					repo_model.Human{
 						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
 					},
 				),
@@ -1543,7 +1543,7 @@ func TestSetPassword(t *testing.T) {
 			name: "invalid passcode",
 			args: args{
 				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
-					repo_model.User{
+					repo_model.Human{
 						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
 						PasswordCode: &repo_model.PasswordCode{Code: &crypto.CryptoValue{
 							CryptoType: crypto.TypeEncryption,
@@ -1601,7 +1601,7 @@ func TestChangePassword(t *testing.T) {
 			name: "change pw",
 			args: args{
 				es: GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl,
-					repo_model.User{
+					repo_model.Human{
 						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
 						Password: &repo_model.Password{Secret: &crypto.CryptoValue{
 							CryptoType: crypto.TypeHash,
@@ -1652,7 +1652,7 @@ func TestChangePassword(t *testing.T) {
 			name: "no password",
 			args: args{
 				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
-					repo_model.User{
+					repo_model.Human{
 						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
 					},
 				),
@@ -1670,7 +1670,7 @@ func TestChangePassword(t *testing.T) {
 			name: "invalid password",
 			args: args{
 				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
-					repo_model.User{
+					repo_model.Human{
 						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
 						Password: &repo_model.Password{Secret: &crypto.CryptoValue{
 							CryptoType: crypto.TypeHash,
@@ -1693,7 +1693,7 @@ func TestChangePassword(t *testing.T) {
 			name: "no policy",
 			args: args{
 				es: GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl,
-					repo_model.User{
+					repo_model.Human{
 						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
 						Password: &repo_model.Password{Secret: &crypto.CryptoValue{
 							CryptoType: crypto.TypeHash,
@@ -1749,7 +1749,7 @@ func TestRequestSetPassword(t *testing.T) {
 		{
 			name: "create pw",
 			args: args{
-				es:         GetMockManipulateUserWithPasswordCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}}),
+				es:         GetMockManipulateUserWithPasswordCodeGen(ctrl, repo_model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}}),
 				ctx:        authz.NewMockContext("orgID", "userID"),
 				userID:     "AggregateID",
 				notifyType: model.NotificationTypeEmail,
@@ -1800,7 +1800,7 @@ func TestPasswordCodeSent(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		existing *model.User
+		existing *model.Human
 	}
 	type res struct {
 		errFunc func(err error) bool
@@ -1815,7 +1815,7 @@ func TestPasswordCodeSent(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{},
 		},
@@ -1824,7 +1824,7 @@ func TestPasswordCodeSent(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -1835,7 +1835,7 @@ func TestPasswordCodeSent(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -1861,7 +1861,7 @@ func TestProfileByID(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		existing *model.User
+		existing *model.Human
 	}
 	type res struct {
 		profile *model.Profile
@@ -1877,7 +1877,7 @@ func TestProfileByID(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserFull(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				profile: &model.Profile{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserName: "UserName"},
@@ -1888,7 +1888,7 @@ func TestProfileByID(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -1899,7 +1899,7 @@ func TestProfileByID(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -1995,7 +1995,7 @@ func TestEmailByID(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		existing *model.User
+		existing *model.Human
 	}
 	type res struct {
 		email   *model.Email
@@ -2011,7 +2011,7 @@ func TestEmailByID(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserFull(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				email: &model.Email{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, EmailAddress: "EmailAddress"},
@@ -2022,7 +2022,7 @@ func TestEmailByID(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -2033,7 +2033,7 @@ func TestEmailByID(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -2087,7 +2087,7 @@ func TestChangeEmail(t *testing.T) {
 		{
 			name: "change email not verified, getting code",
 			args: args{
-				es:    GetMockManipulateUserWithEmailCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Profile: &repo_model.Profile{UserName: "UserName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress"}}),
+				es:    GetMockManipulateUserWithEmailCodeGen(ctrl, repo_model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Profile: &repo_model.Profile{UserName: "UserName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress"}}),
 				ctx:   authz.NewMockContext("orgID", "userID"),
 				email: &model.Email{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, EmailAddress: "EmailAddressChanged", IsEmailVerified: false},
 			},
@@ -2243,7 +2243,7 @@ func TestCreateEmailVerificationCode(t *testing.T) {
 		{
 			name: "create email verification code ok",
 			args: args{
-				es:     GetMockManipulateUserWithEmailCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Profile: &repo_model.Profile{UserName: "UserName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress"}}),
+				es:     GetMockManipulateUserWithEmailCodeGen(ctrl, repo_model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Profile: &repo_model.Profile{UserName: "UserName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress"}}),
 				ctx:    authz.NewMockContext("orgID", "userID"),
 				userID: "userID",
 			},
@@ -2312,7 +2312,7 @@ func TestEmailVerificationCodeSent(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		existing *model.User
+		existing *model.Human
 	}
 	type res struct {
 		errFunc func(err error) bool
@@ -2327,7 +2327,7 @@ func TestEmailVerificationCodeSent(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{},
 		},
@@ -2336,7 +2336,7 @@ func TestEmailVerificationCodeSent(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -2347,7 +2347,7 @@ func TestEmailVerificationCodeSent(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -2373,7 +2373,7 @@ func TestPhoneByID(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		existing *model.User
+		existing *model.Human
 	}
 	type res struct {
 		phone   *model.Phone
@@ -2389,7 +2389,7 @@ func TestPhoneByID(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserFull(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "PhoneNumber"},
@@ -2400,7 +2400,7 @@ func TestPhoneByID(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -2411,7 +2411,7 @@ func TestPhoneByID(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -2465,7 +2465,7 @@ func TestChangePhone(t *testing.T) {
 		{
 			name: "change phone not verified, getting code",
 			args: args{
-				es:    GetMockManipulateUserWithPhoneCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Profile: &repo_model.Profile{UserName: "UserName"}, Phone: &repo_model.Phone{PhoneNumber: "PhoneNumber"}}),
+				es:    GetMockManipulateUserWithPhoneCodeGen(ctrl, repo_model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Profile: &repo_model.Profile{UserName: "UserName"}, Phone: &repo_model.Phone{PhoneNumber: "PhoneNumber"}}),
 				ctx:   authz.NewMockContext("orgID", "userID"),
 				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "+41711234567", IsPhoneVerified: false},
 			},
@@ -2685,7 +2685,7 @@ func TestCreatePhoneVerificationCode(t *testing.T) {
 		{
 			name: "create phone verification code okk",
 			args: args{
-				es:     GetMockManipulateUserWithPhoneCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Profile: &repo_model.Profile{UserName: "UserName"}, Phone: &repo_model.Phone{PhoneNumber: "PhoneNumber"}}),
+				es:     GetMockManipulateUserWithPhoneCodeGen(ctrl, repo_model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Profile: &repo_model.Profile{UserName: "UserName"}, Phone: &repo_model.Phone{PhoneNumber: "PhoneNumber"}}),
 				ctx:    authz.NewMockContext("orgID", "userID"),
 				userID: "userID",
 			},
@@ -2754,7 +2754,7 @@ func TestPhoneVerificationCodeSent(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		existing *model.User
+		existing *model.Human
 	}
 	type res struct {
 		errFunc func(err error) bool
@@ -2769,7 +2769,7 @@ func TestPhoneVerificationCodeSent(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{},
 		},
@@ -2778,7 +2778,7 @@ func TestPhoneVerificationCodeSent(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -2789,7 +2789,7 @@ func TestPhoneVerificationCodeSent(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -2815,7 +2815,7 @@ func TestAddressByID(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		existing *model.User
+		existing *model.Human
 	}
 	type res struct {
 		address *model.Address
@@ -2831,7 +2831,7 @@ func TestAddressByID(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserFull(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				address: &model.Address{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Country: "Country"},
@@ -2842,7 +2842,7 @@ func TestAddressByID(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -2853,7 +2853,7 @@ func TestAddressByID(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -3259,7 +3259,7 @@ func TestRemoveOTP(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		existing *model.User
+		existing *model.Human
 	}
 	type res struct {
 		errFunc func(err error) bool
@@ -3274,7 +3274,7 @@ func TestRemoveOTP(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserWithOTP(ctrl, false, true),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 		},
 		{
@@ -3282,7 +3282,7 @@ func TestRemoveOTP(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -3293,7 +3293,7 @@ func TestRemoveOTP(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -3304,7 +3304,7 @@ func TestRemoveOTP(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				existing: &model.Human{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,

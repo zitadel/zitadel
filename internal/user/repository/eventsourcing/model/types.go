@@ -2,11 +2,15 @@ package model
 
 import "github.com/caos/zitadel/internal/eventstore/models"
 
+//aggregates
 const (
 	UserAggregate         models.AggregateType = "user"
 	UserUserNameAggregate models.AggregateType = "user.username"
 	UserEmailAggregate    models.AggregateType = "user.email"
+)
 
+// the following consts are for user v1 events
+const (
 	UserAdded                     models.EventType = "user.added"
 	UserRegistered                models.EventType = "user.selfregistered"
 	InitializedUserCodeAdded      models.EventType = "user.initialization.code.added"
@@ -18,12 +22,6 @@ const (
 	UserUserNameReleased models.EventType = "user.username.released"
 	UserEmailReserved    models.EventType = "user.email.reserved"
 	UserEmailReleased    models.EventType = "user.email.released"
-
-	UserLocked      models.EventType = "user.locked"
-	UserUnlocked    models.EventType = "user.unlocked"
-	UserDeactivated models.EventType = "user.deactivated"
-	UserReactivated models.EventType = "user.reactivated"
-	UserRemoved     models.EventType = "user.removed"
 
 	UserPasswordChanged        models.EventType = "user.password.changed"
 	UserPasswordCodeAdded      models.EventType = "user.password.code.added"
@@ -57,18 +55,66 @@ const (
 	SignedOut models.EventType = "user.signed.out"
 )
 
+//the following consts are for user(v2)
 const (
-	ServiceAccountAggregate models.AggregateType = "serviceaccount"
+	UserNameReserved   models.EventType = "user.username.reserved"
+	UserNameReleased   models.EventType = "user.username.released"
+	HumanEmailReserved models.EventType = "user.email.reserved"
+	HumanEmailReleased models.EventType = "user.email.released"
 
-	ServiceAccountAdded   models.EventType = "serviceaccount.added"
-	ServiceAccountChanged models.EventType = "serviceaccount.changed"
+	UserLocked      models.EventType = "user.locked"
+	UserUnlocked    models.EventType = "user.unlocked"
+	UserDeactivated models.EventType = "user.deactivated"
+	UserReactivated models.EventType = "user.reactivated"
+	UserRemoved     models.EventType = "user.removed"
+)
 
-	ServiceAccountLocked      models.EventType = "serviceaccount.locked"
-	ServiceAccountUnlocked    models.EventType = "serviceaccount.unlocked"
-	ServiceAccountDeactivated models.EventType = "serviceaccount.deactivated"
-	ServiceAccountReactivated models.EventType = "serviceaccount.reactivated"
-	ServiceAccountRemoved     models.EventType = "serviceaccount.removed"
+// the following consts are for user(v2).human
+const (
+	HumanAdded                     models.EventType = "user.human.added"
+	HumanRegistered                models.EventType = "user.human.selfregistered"
+	InitializedHumanCodeAdded      models.EventType = "user.human.initialization.code.added"
+	InitializedHumanCodeSent       models.EventType = "user.human.initialization.code.sent"
+	InitializedHumanCheckSucceeded models.EventType = "user.human.initialization.check.succeeded"
+	InitializedHumanCheckFailed    models.EventType = "user.human.initialization.check.failed"
 
-	KeyAdded   models.EventType = "serviceaccount.key.added"
-	KeyRemoved models.EventType = "serviceaccount.key.removed"
+	HumanPasswordChanged        models.EventType = "user.human.password.changed"
+	HumanPasswordCodeAdded      models.EventType = "user.human.password.code.added"
+	HumanPasswordCodeSent       models.EventType = "user.human.password.code.sent"
+	HumanPasswordCheckSucceeded models.EventType = "user.human.password.check.succeeded"
+	HumanPasswordCheckFailed    models.EventType = "user.human.password.check.failed"
+
+	HumanEmailChanged            models.EventType = "user.human.email.changed"
+	HumanEmailVerified           models.EventType = "user.human.email.verified"
+	HumanEmailVerificationFailed models.EventType = "user.human.email.verification.failed"
+	HumanEmailCodeAdded          models.EventType = "user.human.email.code.added"
+	HumanEmailCodeSent           models.EventType = "user.human.email.code.sent"
+
+	HumanPhoneChanged            models.EventType = "user.human.phone.changed"
+	HumanPhoneRemoved            models.EventType = "user.human.phone.removed"
+	HumanPhoneVerified           models.EventType = "user.human.phone.verified"
+	HumanPhoneVerificationFailed models.EventType = "user.human.phone.verification.failed"
+	HumanPhoneCodeAdded          models.EventType = "user.human.phone.code.added"
+	HumanPhoneCodeSent           models.EventType = "user.human.phone.code.sent"
+
+	HumanProfileChanged models.EventType = "user.human.profile.changed"
+	HumanAddressChanged models.EventType = "user.human.address.changed"
+
+	HumanMfaOtpAdded          models.EventType = "user.human.mfa.otp.added"
+	HumanMfaOtpVerified       models.EventType = "user.human.mfa.otp.verified"
+	HumanMfaOtpRemoved        models.EventType = "user.human.mfa.otp.removed"
+	HumanMfaOtpCheckSucceeded models.EventType = "user.human.mfa.otp.check.succeeded"
+	HumanMfaOtpCheckFailed    models.EventType = "user.human.mfa.otp.check.failed"
+	HumanMfaInitSkipped       models.EventType = "user.human.mfa.init.skipped"
+
+	HumanSignedOut models.EventType = "user.human.signed.out"
+)
+
+// the following consts are for user(v2).machines
+const (
+	MachineAdded   models.EventType = "user.machine.added"
+	MachineChanged models.EventType = "user.machine.changed"
+
+	KeyAdded   models.EventType = "user.machine.key.added"
+	KeyRemoved models.EventType = "user.machine.key.removed"
 )

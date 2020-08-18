@@ -71,26 +71,6 @@ service ManagementService {
         };
     }
 
-    rpc GetServiceAccountById(ServiceAccountIDRequest) returns (ServiceAccountResponse){
-        option (google.api.http) = {
-            get: "/serviceaccounts/{id}"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "serviceaccount.read"
-        };
-    }
-
-    rpc IsServiceAccountUnique(ServiceAccountUniqueRequest) returns (ServiceAccountUniqueResponse){
-        option (google.api.http) = {
-            get: "/serviceaccounts/_isunique"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "serviceaccount.read"
-        };
-    }
-
     rpc CreateServiceAccount(CreateServiceAccountRequest) returns (ServiceAccountResponse){
         option (google.api.http) = {
             post: "/serviceaccounts"
@@ -163,45 +143,25 @@ service ManagementService {
         };
     }
 
-    rpc SerivceAccountChanges(ServiceAccountChangesRequest) returns (ServiceAccountChangesResponse) {
-        option (google.api.http) = {
-            get: "/serviceaccounts/{id}/changes"
-        };
+    // rpc AddServiceAccountKey(ServiceAccountAddKeyRequest) returns (ServiceAccountKeyResponse) {
+    //     option (google.api.http) = {
+    //         post: "/serviceaccounts/{service_account_id}/keys"
+    //     };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "serviceaccount.read"
-        };
-    }
+    //     option (caos.zitadel.utils.v1.auth_option) = {
+    //         permission: "serviceaccount.write"
+    //     };
+    // }
 
-    rpc AddServiceAccountKey(ServiceAccountAddKeyRequest) returns (ServiceAccountKeyResponse) {
-        option (google.api.http) = {
-            post: "/serviceaccounts/{service_account_id}/keys"
-        };
+    // rpc DeleteServiceAccountKey(ServiceAccountKeyIDRequest) returns (ServiceAccountKeyResponse) {
+    //     option (google.api.http) = {
+    //         post: "/serviceaccounts/{service_account_id}/keys/{key_id}"
+    //     };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "serviceaccount.write"
-        };
-    }
-
-    rpc UpdateServiceAccountKey(ServiceAccountUpdateKeyRequest) returns (ServiceAccountKeyResponse) {
-        option (google.api.http) = {
-            post: "/serviceaccounts/{service_account_id}/keys/{key_id}"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "serviceaccount.write"
-        };
-    }
-
-    rpc DeleteServiceAccountKey(ServiceAccountKeyIDRequest) returns (ServiceAccountKeyResponse) {
-        option (google.api.http) = {
-            post: "/serviceaccounts/{service_account_id}/keys/{key_id}"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "serviceaccount.write"
-        };
-    }
+    //     option (caos.zitadel.utils.v1.auth_option) = {
+    //         permission: "serviceaccount.write"
+    //     };
+    // }
 
     rpc IsUserUnique(UniqueUserRequest) returns (UniqueUserResponse) {
         option (google.api.http) = {
@@ -2796,34 +2756,18 @@ message CreateServiceAccountRequest {
 
 message UpdateServiceAccountRequest {
     string id = 1;
-    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string description = 3 [(validate.rules).string.max_len = 500];
-}
-
-message ServiceAccountUniqueRequest {
-    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-}
-
-message ServiceAccountUniqueResponse {
-    bool isUnique = 1;
-}
-
-message ServiceAccountChangesRequest {
-    string id = 1;
-}
-
-message ServiceAccountChangesResponse {
-    Changes changes = 1;
+    string description = 2 [(validate.rules).string.max_len = 500];
 }
 
 message ServiceAccountResponse {
     string id = 1;
     string name = 2;
-    repeated ServiceAccountKeyResponse keys = 3;
-    google.protobuf.Timestamp creation_date = 4;
-    google.protobuf.Timestamp change_date = 5;
-    uint64 sequence = 6;
-    string resource_owner = 7;
+    string description = 3;
+    repeated ServiceAccountKeyResponse keys = 4;
+    google.protobuf.Timestamp creation_date = 5;
+    google.protobuf.Timestamp change_date = 6;
+    uint64 sequence = 7;
+    string resource_owner = 8;
 }
 
 message ServiceAccountAddKeyRequest {
@@ -2848,13 +2792,6 @@ message ServiceAccountAddKeyResponse {
 message ServiceAccountKeyIDRequest {
     string key_id = 1;
     string service_account_id = 2;
-}
-
-message ServiceAccountUpdateKeyRequest {
-    string key_id = 1;
-    string service_account_id = 2;
-    google.protobuf.Timestamp expiration_date = 3;
-    repeated ServiceAccountKeyResponse keys = 4;
 }
 
 message ServiceAccountKeyResponse {
@@ -2882,6 +2819,8 @@ enum ServiceAccountState {
     SERVICEACCOUNT_UNSPECIFIED = 0;
     SERVICEACCOUNT_ACTIVE = 1;
     SERVICEACCOUNT_INACTIVE = 2;
+    SERVICEACCOUNT_DELETED = 3;
+    SERVICEACCOUNT_LOCKED = 4;
 }
 
 message UserMembershipSearchResponse {

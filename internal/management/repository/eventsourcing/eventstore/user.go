@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/view/repository"
@@ -50,7 +51,7 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserV
 	return model.UserToModel(&userCopy), nil
 }
 
-func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
+func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.Human) (*usr_model.Human, error) {
 	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
@@ -62,7 +63,7 @@ func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*us
 	return repo.UserEvents.CreateUser(ctx, user, pwPolicy, orgPolicy)
 }
 
-func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*usr_model.User, error) {
+func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.Human, resourceOwner string) (*usr_model.Human, error) {
 	policyResourceOwner := authz.GetCtxData(ctx).OrgID
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner
@@ -78,19 +79,19 @@ func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, re
 	return repo.UserEvents.RegisterUser(ctx, user, pwPolicy, orgPolicy, resourceOwner)
 }
 
-func (repo *UserRepo) DeactivateUser(ctx context.Context, id string) (*usr_model.User, error) {
+func (repo *UserRepo) DeactivateUser(ctx context.Context, id string) (*usr_model.Human, error) {
 	return repo.UserEvents.DeactivateUser(ctx, id)
 }
 
-func (repo *UserRepo) ReactivateUser(ctx context.Context, id string) (*usr_model.User, error) {
+func (repo *UserRepo) ReactivateUser(ctx context.Context, id string) (*usr_model.Human, error) {
 	return repo.UserEvents.ReactivateUser(ctx, id)
 }
 
-func (repo *UserRepo) LockUser(ctx context.Context, id string) (*usr_model.User, error) {
+func (repo *UserRepo) LockUser(ctx context.Context, id string) (*usr_model.Human, error) {
 	return repo.UserEvents.LockUser(ctx, id)
 }
 
-func (repo *UserRepo) UnlockUser(ctx context.Context, id string) (*usr_model.User, error) {
+func (repo *UserRepo) UnlockUser(ctx context.Context, id string) (*usr_model.Human, error) {
 	return repo.UserEvents.UnlockUser(ctx, id)
 }
 

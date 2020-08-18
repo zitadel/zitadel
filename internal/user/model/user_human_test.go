@@ -6,7 +6,7 @@ import (
 
 func TestIsUserValid(t *testing.T) {
 	type args struct {
-		user *User
+		user *Human
 	}
 	tests := []struct {
 		name    string
@@ -17,7 +17,7 @@ func TestIsUserValid(t *testing.T) {
 		{
 			name: "user with minimal data",
 			args: args{
-				user: &User{
+				user: &Human{
 					Profile: &Profile{
 						UserName:  "UserName",
 						FirstName: "FirstName",
@@ -33,7 +33,7 @@ func TestIsUserValid(t *testing.T) {
 		{
 			name: "user with phone data",
 			args: args{
-				user: &User{
+				user: &Human{
 					Profile: &Profile{
 						UserName:  "UserName",
 						FirstName: "FirstName",
@@ -52,7 +52,7 @@ func TestIsUserValid(t *testing.T) {
 		{
 			name: "user with address data",
 			args: args{
-				user: &User{
+				user: &Human{
 					Profile: &Profile{
 						UserName:  "UserName",
 						FirstName: "FirstName",
@@ -74,7 +74,7 @@ func TestIsUserValid(t *testing.T) {
 		{
 			name: "user with all data",
 			args: args{
-				user: &User{
+				user: &Human{
 					Profile: &Profile{
 						UserName:  "UserName",
 						FirstName: "FirstName",

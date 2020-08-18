@@ -52,13 +52,13 @@ func (u *User) Reduce(event *models.Event) (err error) {
 	}
 }
 
-func (p *User) ProcessUser(event *models.Event) (err error) {
+func (u *User) ProcessUser(event *models.Event) (err error) {
 	user := new(view_model.UserView)
 	switch event.Type {
 	case es_model.UserAdded,
 		es_model.UserRegistered:
 		user.AppendEvent(event)
-		p.fillLoginNames(user)
+		u.fillLoginNames(user)
 	case es_model.UserProfileChanged,
 		es_model.UserEmailChanged,
 		es_model.UserEmailVerified,
@@ -75,20 +75,20 @@ func (p *User) ProcessUser(event *models.Event) (err error) {
 		es_model.MfaOtpRemoved,
 		es_model.MfaInitSkipped,
 		es_model.UserPasswordChanged:
-		user, err = p.view.UserByID(event.AggregateID)
+		user, err = u.view.UserByID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		err = user.AppendEvent(event)
 	case es_model.UserRemoved:
-		err = p.view.DeleteUser(event.AggregateID, event.Sequence)
+		err = u.view.DeleteUser(event.AggregateID, event.Sequence)
 	default:
-		return p.view.ProcessedUserSequence(event.Sequence)
+		return u.view.ProcessedUserSequence(event.Sequence)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutUser(user, user.Sequence)
+	return u.view.PutUser(user, user.Sequence)
 }
 
 func (u *User) fillLoginNames(user *view_model.UserView) (err error) {

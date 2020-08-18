@@ -1077,26 +1077,6 @@ func (mr *MockManagementServiceClientMockRecorder) GetProjectMemberRoles(arg0, a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectMemberRoles", reflect.TypeOf((*MockManagementServiceClient)(nil).GetProjectMemberRoles), varargs...)
 }
 
-// GetServiceAccountById mocks base method
-func (m *MockManagementServiceClient) GetServiceAccountById(arg0 context.Context, arg1 *management.ServiceAccountIDRequest, arg2 ...grpc.CallOption) (*management.ServiceAccountResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetServiceAccountById", varargs...)
-	ret0, _ := ret[0].(*management.ServiceAccountResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetServiceAccountById indicates an expected call of GetServiceAccountById
-func (mr *MockManagementServiceClientMockRecorder) GetServiceAccountById(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServiceAccountById", reflect.TypeOf((*MockManagementServiceClient)(nil).GetServiceAccountById), varargs...)
-}
-
 // GetUserAddress mocks base method
 func (m *MockManagementServiceClient) GetUserAddress(arg0 context.Context, arg1 *management.UserID, arg2 ...grpc.CallOption) (*management.UserAddressView, error) {
 	m.ctrl.T.Helper()
@@ -1275,26 +1255,6 @@ func (mr *MockManagementServiceClientMockRecorder) Healthz(arg0, arg1 interface{
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Healthz", reflect.TypeOf((*MockManagementServiceClient)(nil).Healthz), varargs...)
-}
-
-// IsServiceAccountUnique mocks base method
-func (m *MockManagementServiceClient) IsServiceAccountUnique(arg0 context.Context, arg1 *management.ServiceAccountUniqueRequest, arg2 ...grpc.CallOption) (*management.ServiceAccountUniqueResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "IsServiceAccountUnique", varargs...)
-	ret0, _ := ret[0].(*management.ServiceAccountUniqueResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// IsServiceAccountUnique indicates an expected call of IsServiceAccountUnique
-func (mr *MockManagementServiceClientMockRecorder) IsServiceAccountUnique(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsServiceAccountUnique", reflect.TypeOf((*MockManagementServiceClient)(nil).IsServiceAccountUnique), varargs...)
 }
 
 // IsUserUnique mocks base method
@@ -2215,26 +2175,6 @@ func (mr *MockManagementServiceClientMockRecorder) SendSetPasswordNotification(a
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendSetPasswordNotification", reflect.TypeOf((*MockManagementServiceClient)(nil).SendSetPasswordNotification), varargs...)
-}
-
-// SerivceAccountChanges mocks base method
-func (m *MockManagementServiceClient) SerivceAccountChanges(arg0 context.Context, arg1 *management.ServiceAccountChangesRequest, arg2 ...grpc.CallOption) (*management.ServiceAccountChangesResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "SerivceAccountChanges", varargs...)
-	ret0, _ := ret[0].(*management.ServiceAccountChangesResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SerivceAccountChanges indicates an expected call of SerivceAccountChanges
-func (mr *MockManagementServiceClientMockRecorder) SerivceAccountChanges(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SerivceAccountChanges", reflect.TypeOf((*MockManagementServiceClient)(nil).SerivceAccountChanges), varargs...)
 }
 
 // SetInitialPassword mocks base method

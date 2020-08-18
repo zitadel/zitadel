@@ -32,7 +32,7 @@ func (repo *UserRepo) Health(ctx context.Context) error {
 	return repo.UserEvents.Health(ctx)
 }
 
-func (repo *UserRepo) Register(ctx context.Context, registerUser *model.User, orgMember *org_model.OrgMember, resourceOwner string) (*model.User, error) {
+func (repo *UserRepo) Register(ctx context.Context, registerUser *model.Human, orgMember *org_model.OrgMember, resourceOwner string) (*model.Human, error) {
 	policyResourceOwner := authz.GetCtxData(ctx).OrgID
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner
@@ -50,7 +50,7 @@ func (repo *UserRepo) Register(ctx context.Context, registerUser *model.User, or
 		return nil, err
 	}
 	if orgMember != nil {
-		orgMember.UserID = user.AggregateID
+		// orgMember.UserID = user.AggregateID
 		_, memberAggregate, err := repo.OrgEvents.PrepareAddOrgMember(ctx, orgMember, policyResourceOwner)
 		if err != nil {
 			return nil, err
@@ -62,7 +62,7 @@ func (repo *UserRepo) Register(ctx context.Context, registerUser *model.User, or
 	if err != nil {
 		return nil, err
 	}
-	return usr_model.UserToModel(user), nil
+	return usr_model.HumanToModel(user), nil
 }
 
 func (repo *UserRepo) MyUser(ctx context.Context) (*model.UserView, error) {

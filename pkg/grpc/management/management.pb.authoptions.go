@@ -19,16 +19,6 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetServiceAccountById": authz.Option{
-		Permission: "serviceaccount.read",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/IsServiceAccountUnique": authz.Option{
-		Permission: "serviceaccount.read",
-		CheckParam: "",
-	},
-
 	"/caos.zitadel.management.api.v1.ManagementService/CreateServiceAccount": authz.Option{
 		Permission: "serviceaccount.write",
 		CheckParam: "",
@@ -61,11 +51,6 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 
 	"/caos.zitadel.management.api.v1.ManagementService/DeleteServiceAccount": authz.Option{
 		Permission: "serviceaccount.write",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/SerivceAccountChanges": authz.Option{
-		Permission: "serviceaccount.read",
 		CheckParam: "",
 	},
 

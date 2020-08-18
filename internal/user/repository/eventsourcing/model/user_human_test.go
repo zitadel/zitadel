@@ -2,27 +2,28 @@ package model
 
 import (
 	"encoding/json"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/user/model"
 	"testing"
 	"time"
+
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/user/model"
 )
 
 func TestAppendDeactivatedEvent(t *testing.T) {
 	type args struct {
-		user *User
+		user *Human
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *User
+		result *Human
 	}{
 		{
 			name: "append deactivate event",
 			args: args{
-				user: &User{},
+				user: &Human{},
 			},
-			result: &User{State: int32(model.UserStateInactive)},
+			result: &Human{State: int32(model.UserStateInactive)},
 		},
 	}
 	for _, tt := range tests {
@@ -37,19 +38,19 @@ func TestAppendDeactivatedEvent(t *testing.T) {
 
 func TestAppendReactivatedEvent(t *testing.T) {
 	type args struct {
-		user *User
+		user *Human
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *User
+		result *Human
 	}{
 		{
 			name: "append reactivate event",
 			args: args{
-				user: &User{},
+				user: &Human{},
 			},
-			result: &User{State: int32(model.UserStateActive)},
+			result: &Human{State: int32(model.UserStateActive)},
 		},
 	}
 	for _, tt := range tests {
@@ -64,19 +65,19 @@ func TestAppendReactivatedEvent(t *testing.T) {
 
 func TestAppendLockEvent(t *testing.T) {
 	type args struct {
-		user *User
+		user *Human
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *User
+		result *Human
 	}{
 		{
 			name: "append lock event",
 			args: args{
-				user: &User{},
+				user: &Human{},
 			},
-			result: &User{State: int32(model.UserStateLocked)},
+			result: &Human{State: int32(model.UserStateLocked)},
 		},
 	}
 	for _, tt := range tests {
@@ -91,19 +92,19 @@ func TestAppendLockEvent(t *testing.T) {
 
 func TestAppendUnlockEvent(t *testing.T) {
 	type args struct {
-		user *User
+		user *Human
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *User
+		result *Human
 	}{
 		{
 			name: "append unlock event",
 			args: args{
-				user: &User{},
+				user: &Human{},
 			},
-			result: &User{State: int32(model.UserStateActive)},
+			result: &Human{State: int32(model.UserStateActive)},
 		},
 	}
 	for _, tt := range tests {
@@ -118,23 +119,23 @@ func TestAppendUnlockEvent(t *testing.T) {
 
 func TestAppendInitUserCodeEvent(t *testing.T) {
 	type args struct {
-		user  *User
+		user  *Human
 		code  *InitUserCode
 		event *es_models.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *User
+		result *Human
 	}{
 		{
 			name: "append init user code event",
 			args: args{
-				user:  &User{},
+				user:  &Human{},
 				code:  &InitUserCode{Expiry: time.Hour * 30},
 				event: &es_models.Event{},
 			},
-			result: &User{InitCode: &InitUserCode{Expiry: time.Hour * 30}},
+			result: &Human{InitCode: &InitUserCode{Expiry: time.Hour * 30}},
 		},
 	}
 	for _, tt := range tests {

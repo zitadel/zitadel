@@ -16,11 +16,11 @@ type UserRepo struct {
 	OrgEvents    *org_event.OrgEventstore
 }
 
-func (repo *UserRepo) UserByID(ctx context.Context, id string) (project *usr_model.User, err error) {
+func (repo *UserRepo) UserByID(ctx context.Context, id string) (project *usr_model.Human, err error) {
 	return repo.UserEvents.UserByID(ctx, id)
 }
 
-func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
+func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.Human) (*usr_model.Human, error) {
 	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*us
 	return repo.UserEvents.CreateUser(ctx, user, pwPolicy, orgPolicy)
 }
 
-func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*usr_model.User, error) {
+func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.Human, resourceOwner string) (*usr_model.Human, error) {
 	policyResourceOwner := authz.GetCtxData(ctx).OrgID
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner

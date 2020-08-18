@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -60,7 +61,7 @@ func AddressToModel(address *Address) *model.Address {
 	}
 }
 
-func (u *User) appendUserAddressChangedEvent(event *es_models.Event) error {
+func (u *Human) appendUserAddressChangedEvent(event *es_models.Event) error {
 	if u.Address == nil {
 		u.Address = new(Address)
 	}

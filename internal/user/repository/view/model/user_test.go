@@ -11,7 +11,7 @@ import (
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
-func mockUserData(user *es_model.User) []byte {
+func mockUserData(user *es_model.Human) []byte {
 	data, _ := json.Marshal(user)
 	return data
 }
@@ -41,8 +41,8 @@ func mockAddressData(address *es_model.Address) []byte {
 	return data
 }
 
-func getFullUser(password *es_model.Password) *es_model.User {
-	return &es_model.User{
+func getFullUser(password *es_model.Password) *es_model.Human {
+	return &es_model.Human{
 		Profile: &es_model.Profile{
 			UserName:  "UserName",
 			FirstName: "FirstName",

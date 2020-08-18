@@ -15,7 +15,6 @@ import (
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_pol "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
-	es_svcacc "github.com/caos/zitadel/internal/service_account/repository/eventsourcing"
 	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_grant "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 )
@@ -75,10 +74,6 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 	if err != nil {
 		return nil, err
 	}
-	serviceAccount, err := es_svcacc.StartServiceAccount(es_svcacc.ServiceAccountConfig{})
-	if err != nil {
-		return nil, err
-	}
 	usergrant, err := es_grant.StartUserGrant(es_grant.UserGrantConfig{
 		Eventstore: es,
 		Cache:      conf.Eventstore.Cache,
@@ -106,7 +101,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 		UserGrantRepo:      eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
 		PolicyRepo:         eventstore.PolicyRepo{policy},
 		IamRepository:      eventstore.IamRepository{iam},
-		ServiceAccountRepo: eventstore.ServiceAccountRepo{serviceAccount},
+		ServiceAccountRepo: eventstore.ServiceAccountRepo{user},
 	}, nil
 }
 

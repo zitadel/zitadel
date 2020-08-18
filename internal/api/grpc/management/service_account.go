@@ -8,21 +8,6 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
-//TODO: should be in user
-func (s *Server) GetServiceAccountById(ctx context.Context, in *management.ServiceAccountIDRequest) (*management.ServiceAccountResponse, error) {
-	return nil, errors.ThrowUnimplemented(nil, "ID", "Errors.*")
-}
-
-//TODO: should be in user
-func (s *Server) IsServiceAccountUnique(ctx context.Context, in *management.ServiceAccountUniqueRequest) (*management.ServiceAccountUniqueResponse, error) {
-	return nil, errors.ThrowUnimplemented(nil, "ID", "Errors.*")
-}
-
-//TODO: should be in user
-func (s *Server) SerivceAccountChanges(ctx context.Context, in *management.ServiceAccountChangesRequest) (*management.ServiceAccountChangesResponse, error) {
-	return nil, errors.ThrowUnimplemented(nil, "ID", "Errors.*")
-}
-
 func (s *Server) CreateServiceAccount(ctx context.Context, in *management.CreateServiceAccountRequest) (*management.ServiceAccountResponse, error) {
 	serviceAccount, err := s.serviceAccount.CreateServiceAccount(ctx, createServiceAccountToModel(in))
 	if err != nil {

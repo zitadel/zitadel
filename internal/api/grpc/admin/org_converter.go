@@ -32,10 +32,10 @@ func orgCreateRequestToModel(org *admin.CreateOrgRequest) *org_model.Org {
 	return o
 }
 
-func userCreateRequestToModel(user *admin.CreateUserRequest) *usr_model.User {
+func userCreateRequestToModel(user *admin.CreateUserRequest) *usr_model.Human {
 	preferredLanguage, err := language.Parse(user.PreferredLanguage)
 	logging.Log("GRPC-30hwz").OnError(err).Debug("unable to parse language")
-	result := &usr_model.User{
+	result := &usr_model.Human{
 		Profile: &usr_model.Profile{
 			UserName:          user.UserName,
 			FirstName:         user.FirstName,
@@ -126,7 +126,7 @@ func orgViewFromModel(org *org_model.OrgView) *admin.Org {
 	}
 }
 
-func userFromModel(user *usr_model.User) *admin.User {
+func userFromModel(user *usr_model.Human) *admin.User {
 	creationDate, err := ptypes.TimestampProto(user.CreationDate)
 	logging.Log("GRPC-8duwe").OnError(err).Debug("unable to parse timestamp")
 

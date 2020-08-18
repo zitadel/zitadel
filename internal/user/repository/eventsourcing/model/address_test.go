@@ -2,8 +2,9 @@ package model
 
 import (
 	"encoding/json"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"testing"
+
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 )
 
 func TestAddressChanges(t *testing.T) {
@@ -52,23 +53,23 @@ func TestAddressChanges(t *testing.T) {
 
 func TestAppendUserAddressChangedEvent(t *testing.T) {
 	type args struct {
-		user    *User
+		user    *Human
 		address *Address
 		event   *es_models.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *User
+		result *Human
 	}{
 		{
 			name: "append user address event",
 			args: args{
-				user:    &User{Address: &Address{Locality: "Locality", Country: "Country"}},
+				user:    &Human{Address: &Address{Locality: "Locality", Country: "Country"}},
 				address: &Address{Locality: "LocalityChanged", PostalCode: "PostalCode"},
 				event:   &es_models.Event{},
 			},
-			result: &User{Address: &Address{Locality: "LocalityChanged", Country: "Country", PostalCode: "PostalCode"}},
+			result: &Human{Address: &Address{Locality: "LocalityChanged", Country: "Country", PostalCode: "PostalCode"}},
 		},
 	}
 	for _, tt := range tests {

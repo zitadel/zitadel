@@ -66,7 +66,7 @@ func GetMockPwGenerator(ctrl *gomock.Controller) crypto.Generator {
 	return generator
 }
 
-func GetMockUserByIDOK(ctrl *gomock.Controller, user model.User) *UserEventstore {
+func GetMockUserByIDOK(ctrl *gomock.Controller, user model.Human) *UserEventstore {
 	data, _ := json.Marshal(user)
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: data},
@@ -84,7 +84,7 @@ func GetMockUserByIDNoEvents(ctrl *gomock.Controller) *UserEventstore {
 }
 
 func GetMockManipulateUser(ctrl *gomock.Controller) *UserEventstore {
-	user := model.User{
+	user := model.Human{
 		Profile: &model.Profile{
 			UserName: "UserName",
 		},
@@ -101,7 +101,7 @@ func GetMockManipulateUser(ctrl *gomock.Controller) *UserEventstore {
 }
 
 func GetMockManipulateUserWithPWGenerator(ctrl *gomock.Controller, init, email, phone, password bool) *UserEventstore {
-	user := model.User{
+	user := model.Human{
 		Profile: &model.Profile{
 			UserName: "UserName",
 		},
@@ -123,7 +123,7 @@ func GetMockManipulateUserWithPWGenerator(ctrl *gomock.Controller, init, email, 
 	return GetMockedEventstoreWithPw(ctrl, mockEs, init, email, phone, password)
 }
 
-func GetMockManipulateUserWithInitCodeGen(ctrl *gomock.Controller, user model.User) *UserEventstore {
+func GetMockManipulateUserWithInitCodeGen(ctrl *gomock.Controller, user model.Human) *UserEventstore {
 	data, _ := json.Marshal(user)
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: data},
@@ -135,7 +135,7 @@ func GetMockManipulateUserWithInitCodeGen(ctrl *gomock.Controller, user model.Us
 	return GetMockedEventstoreWithPw(ctrl, mockEs, true, false, false, false)
 }
 
-func GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl *gomock.Controller, user model.User) *UserEventstore {
+func GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl *gomock.Controller, user model.Human) *UserEventstore {
 	data, _ := json.Marshal(user)
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: data},
@@ -147,7 +147,7 @@ func GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl *gomock.Controller, u
 	return GetMockedEventstoreWithPw(ctrl, mockEs, false, true, false, true)
 }
 
-func GetMockManipulateUserWithEmailCodeGen(ctrl *gomock.Controller, user model.User) *UserEventstore {
+func GetMockManipulateUserWithEmailCodeGen(ctrl *gomock.Controller, user model.Human) *UserEventstore {
 	data, _ := json.Marshal(user)
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: data},
@@ -159,7 +159,7 @@ func GetMockManipulateUserWithEmailCodeGen(ctrl *gomock.Controller, user model.U
 	return GetMockedEventstoreWithPw(ctrl, mockEs, false, true, false, false)
 }
 
-func GetMockManipulateUserWithPhoneCodeGen(ctrl *gomock.Controller, user model.User) *UserEventstore {
+func GetMockManipulateUserWithPhoneCodeGen(ctrl *gomock.Controller, user model.Human) *UserEventstore {
 	data, _ := json.Marshal(user)
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: data},
@@ -171,7 +171,7 @@ func GetMockManipulateUserWithPhoneCodeGen(ctrl *gomock.Controller, user model.U
 	return GetMockedEventstoreWithPw(ctrl, mockEs, false, false, true, false)
 }
 
-func GetMockManipulateUserWithPasswordCodeGen(ctrl *gomock.Controller, user model.User) *UserEventstore {
+func GetMockManipulateUserWithPasswordCodeGen(ctrl *gomock.Controller, user model.Human) *UserEventstore {
 	data, _ := json.Marshal(user)
 	code, _ := json.Marshal(user.PasswordCode)
 	events := []*es_models.Event{
@@ -186,7 +186,7 @@ func GetMockManipulateUserWithPasswordCodeGen(ctrl *gomock.Controller, user mode
 }
 
 func GetMockManipulateUserWithOTPGen(ctrl *gomock.Controller) *UserEventstore {
-	user := model.User{
+	user := model.Human{
 		Profile: &model.Profile{
 			UserName: "UserName",
 		},
@@ -212,7 +212,7 @@ func GetMockManipulateUserWithOTPGen(ctrl *gomock.Controller) *UserEventstore {
 }
 
 func GetMockManipulateInactiveUser(ctrl *gomock.Controller) *UserEventstore {
-	user := model.User{
+	user := model.Human{
 		Profile: &model.Profile{
 			UserName: "UserName",
 		},
@@ -230,7 +230,7 @@ func GetMockManipulateInactiveUser(ctrl *gomock.Controller) *UserEventstore {
 }
 
 func GetMockManipulateLockedUser(ctrl *gomock.Controller) *UserEventstore {
-	user := model.User{
+	user := model.Human{
 		Profile: &model.Profile{
 			UserName: "UserName",
 		},
@@ -247,7 +247,7 @@ func GetMockManipulateLockedUser(ctrl *gomock.Controller) *UserEventstore {
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
-func GetMockManipulateUserWithInitCode(ctrl *gomock.Controller, user model.User) *UserEventstore {
+func GetMockManipulateUserWithInitCode(ctrl *gomock.Controller, user model.Human) *UserEventstore {
 	code := model.InitUserCode{Code: &crypto.CryptoValue{
 		CryptoType: crypto.TypeEncryption,
 		Algorithm:  "enc",
@@ -268,7 +268,7 @@ func GetMockManipulateUserWithInitCode(ctrl *gomock.Controller, user model.User)
 }
 
 func GetMockManipulateUserWithEmailCode(ctrl *gomock.Controller) *UserEventstore {
-	user := model.User{
+	user := model.Human{
 		Profile: &model.Profile{
 			UserName: "UserName",
 		},
@@ -295,7 +295,7 @@ func GetMockManipulateUserWithEmailCode(ctrl *gomock.Controller) *UserEventstore
 	return GetMockedEventstoreWithPw(ctrl, mockEs, false, true, false, false)
 }
 func GetMockManipulateUserVerifiedEmail(ctrl *gomock.Controller) *UserEventstore {
-	user := model.User{
+	user := model.Human{
 		Profile: &model.Profile{
 			UserName: "UserName",
 		},
@@ -316,7 +316,7 @@ func GetMockManipulateUserVerifiedEmail(ctrl *gomock.Controller) *UserEventstore
 }
 
 func GetMockManipulateUserWithPhoneCode(ctrl *gomock.Controller) *UserEventstore {
-	user := model.User{
+	user := model.Human{
 		Profile: &model.Profile{
 			UserName: "UserName",
 		},
@@ -344,7 +344,7 @@ func GetMockManipulateUserWithPhoneCode(ctrl *gomock.Controller) *UserEventstore
 }
 
 func GetMockManipulateUserVerifiedPhone(ctrl *gomock.Controller) *UserEventstore {
-	user := model.User{
+	user := model.Human{
 		Profile: &model.Profile{
 			UserName: "UserName",
 		},
@@ -365,7 +365,7 @@ func GetMockManipulateUserVerifiedPhone(ctrl *gomock.Controller) *UserEventstore
 }
 
 func GetMockManipulateUserFull(ctrl *gomock.Controller) *UserEventstore {
-	user := model.User{
+	user := model.Human{
 		Profile: &model.Profile{
 			UserName:  "UserName",
 			FirstName: "FirstName",
@@ -397,7 +397,7 @@ func GetMockManipulateUserFull(ctrl *gomock.Controller) *UserEventstore {
 }
 
 func GetMockManipulateUserWithOTP(ctrl *gomock.Controller, decrypt, verified bool) *UserEventstore {
-	user := model.User{
+	user := model.Human{
 		Profile: &model.Profile{
 			UserName: "UserName",
 		},

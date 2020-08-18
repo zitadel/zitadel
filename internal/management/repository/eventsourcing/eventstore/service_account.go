@@ -3,45 +3,45 @@ package eventstore
 import (
 	"context"
 
-	svcacc_model "github.com/caos/zitadel/internal/service_account/model"
-	svcacc_event "github.com/caos/zitadel/internal/service_account/repository/eventsourcing"
+	svcacc_model "github.com/caos/zitadel/internal/user/model"
+	svcacc_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type ServiceAccountRepo struct {
-	ServiceAccountEvents *svcacc_event.ServiceAccountEventstore
+	UserEvents *svcacc_event.UserEventstore
 }
 
-func (repo *ServiceAccountRepo) CreateServiceAccount(ctx context.Context, account *svcacc_model.ServiceAccount) (*svcacc_model.ServiceAccount, error) {
+func (repo *ServiceAccountRepo) CreateServiceAccount(ctx context.Context, account *svcacc_model.Machine) (*svcacc_model.Machine, error) {
 	//TODO: create logic
-	return repo.ServiceAccountEvents.CreateServiceAccount(ctx, account)
+	return repo.UserEvents.CreateServiceAccount(ctx, account)
 }
 
-func (repo *ServiceAccountRepo) UpdateServiceAccount(ctx context.Context, account *svcacc_model.ServiceAccount) (*svcacc_model.ServiceAccount, error) {
+func (repo *ServiceAccountRepo) UpdateServiceAccount(ctx context.Context, account *svcacc_model.Machine) (*svcacc_model.Machine, error) {
 	//TODO: update logic
-	return repo.ServiceAccountEvents.UpdateServiceAccount(ctx, account)
+	return repo.UserEvents.UpdateServiceAccount(ctx, account)
 }
 
-func (repo *ServiceAccountRepo) DeactivateServiceAccount(ctx context.Context, id string) (*svcacc_model.ServiceAccount, error) {
+func (repo *ServiceAccountRepo) DeactivateServiceAccount(ctx context.Context, id string) (*svcacc_model.Machine, error) {
 	//TODO: deactivate logic
-	return repo.ServiceAccountEvents.DeactivateServiceAccount(ctx, id)
+	return repo.UserEvents.DeactivateServiceAccount(ctx, id)
 }
 
-func (repo *ServiceAccountRepo) ReactivateServiceAccount(ctx context.Context, id string) (*svcacc_model.ServiceAccount, error) {
+func (repo *ServiceAccountRepo) ReactivateServiceAccount(ctx context.Context, id string) (*svcacc_model.Machine, error) {
 	//TODO: reactivate logic
-	return repo.ServiceAccountEvents.ReactivateServiceAccount(ctx, id)
+	return repo.UserEvents.ReactivateServiceAccount(ctx, id)
 }
 
-func (repo *ServiceAccountRepo) LockServiceAccount(ctx context.Context, id string) (*svcacc_model.ServiceAccount, error) {
+func (repo *ServiceAccountRepo) LockServiceAccount(ctx context.Context, id string) (*svcacc_model.Machine, error) {
 	//TODO: lock logic
-	return repo.ServiceAccountEvents.LockServiceAccount(ctx, id)
+	return repo.UserEvents.LockServiceAccount(ctx, id)
 }
 
-func (repo *ServiceAccountRepo) UnlockServiceAccount(ctx context.Context, id string) (*svcacc_model.ServiceAccount, error) {
+func (repo *ServiceAccountRepo) UnlockServiceAccount(ctx context.Context, id string) (*svcacc_model.Machine, error) {
 	//TODO: unlock logic
-	return repo.ServiceAccountEvents.UnlockServiceAccount(ctx, id)
+	return repo.UserEvents.UnlockServiceAccount(ctx, id)
 }
 
 func (repo *ServiceAccountRepo) DeleteServiceAccount(ctx context.Context, id string) error {
 	//TODO: delete logic
-	return repo.ServiceAccountEvents.DeleteServiceAccount(ctx, id)
+	return repo.UserEvents.DeleteServiceAccount(ctx, id)
 }

@@ -58,6 +58,7 @@ func (a *Aggregate) AppendEvent(typ EventType, payload interface{}) (*Aggregate,
 }
 
 func (a *Aggregate) SetPrecondition(query *SearchQuery, validateFunc func(...*Event) error) *Aggregate {
+
 	a.Precondition = &precondition{Query: query, Validation: validateFunc}
 	return a
 }
@@ -86,9 +87,6 @@ func (a *Aggregate) Validate() error {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-eBYUW", "resource owner not set")
 	}
 	if a.Precondition != nil && (a.Precondition.Query == nil || a.Precondition.Validation == nil) {
-		if err := a.Precondition.Query.Validate(); err != nil {
-			return err
-		}
 		return errors.ThrowPreconditionFailed(nil, "MODEL-EEUvA", "invalid precondition")
 	}
 

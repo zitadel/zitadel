@@ -15,7 +15,7 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/message"
 )
 
-func userFromModel(user *usr_model.User) *management.User {
+func userFromModel(user *usr_model.Human) *management.User {
 	creationDate, err := ptypes.TimestampProto(user.CreationDate)
 	logging.Log("GRPC-8duwe").OnError(err).Debug("unable to parse timestamp")
 
@@ -54,11 +54,11 @@ func userFromModel(user *usr_model.User) *management.User {
 	return converted
 }
 
-func userCreateToModel(u *management.CreateUserRequest) *usr_model.User {
+func userCreateToModel(u *management.CreateUserRequest) *usr_model.Human {
 	preferredLanguage, err := language.Parse(u.PreferredLanguage)
 	logging.Log("GRPC-cK5k2").OnError(err).Debug("language malformed")
 
-	user := &usr_model.User{
+	user := &usr_model.Human{
 		Profile: &usr_model.Profile{
 			UserName:          u.UserName,
 			FirstName:         u.FirstName,
