@@ -52,7 +52,7 @@ export class MemberCreateDialogComponent {
             this.preselectedUsers = [data.user];
         }
 
-        if (data?.creationType) {
+        if (data?.creationType !== undefined) {
             this.creationType = data.creationType;
             this.loadRoles();
         } else {
@@ -61,7 +61,6 @@ export class MemberCreateDialogComponent {
     }
 
     public loadRoles(): void {
-        console.log(this.creationType);
         switch (this.creationType) {
             case CreationType.PROJECT_GRANTED:
                 this.projectService.GetProjectGrantMemberRoles().then(resp => {
