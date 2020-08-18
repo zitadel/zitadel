@@ -54,7 +54,6 @@ export class MembershipsComponent implements OnInit {
 
     public async loadManager(userId: string): Promise<void> {
         this.mgmtUserService.SearchUserMemberships(userId, 100, 0, []).then(response => {
-            console.log(response.toObject());
             this.memberships = response.toObject();
             this.loading = false;
         });
