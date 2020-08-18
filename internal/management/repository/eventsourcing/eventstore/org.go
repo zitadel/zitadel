@@ -12,6 +12,7 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/sdk"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	global_model "github.com/caos/zitadel/internal/model"
@@ -52,7 +53,7 @@ func (repo *OrgRepository) OrgByDomainGlobal(ctx context.Context, domain string)
 }
 
 func (repo *OrgRepository) CreateOrg(ctx context.Context, name string) (*org_model.Org, error) {
-	org, aggregates, err := repo.OrgEventstore.PrepareCreateOrg(ctx, &org_model.Org{Name: name})
+	org, aggregates, err := repo.OrgEventstore.PrepareCreateOrg(ctx, &org_model.Org{Name: name}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +123,14 @@ func (repo *OrgRepository) GenerateMyOrgDomainValidation(ctx context.Context, do
 
 func (repo *OrgRepository) ValidateMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error {
 	domain.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.ValidateOrgDomain(ctx, domain)
+	users := func(ctx context.Context, domain string) ([]*es_models.Aggregate, error) {
+		userIDs, err := repo.View.UserIDsByDomain(domain)
+		if err != nil {
+			return nil, err
+		}
+		return repo.UserEvents.PrepareDomainClaimed(ctx, userIDs)
+	}
+	return repo.OrgEventstore.ValidateOrgDomain(ctx, domain, users)
 }
 
 func (repo *OrgRepository) SetMyPrimaryOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error {

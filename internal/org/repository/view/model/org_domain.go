@@ -2,12 +2,14 @@ package model
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/org/model"
 	es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	"time"
 )
 
 const (
@@ -18,11 +20,12 @@ const (
 )
 
 type OrgDomainView struct {
-	Domain   string `json:"domain" gorm:"column:domain;primary_key"`
-	OrgID    string `json:"-" gorm:"column:org_id;primary_key"`
-	Verified bool   `json:"-" gorm:"column:verified"`
-	Primary  bool   `json:"-" gorm:"column:primary_domain"`
-	Sequence uint64 `json:"-" gorm:"column:sequence"`
+	Domain         string `json:"domain" gorm:"column:domain;primary_key"`
+	OrgID          string `json:"-" gorm:"column:org_id;primary_key"`
+	Verified       bool   `json:"-" gorm:"column:verified"`
+	Primary        bool   `json:"-" gorm:"column:primary_domain"`
+	ValidationType int32  `json:"validationType" gorm:"column:validation_type"`
+	Sequence       uint64 `json:"-" gorm:"column:sequence"`
 
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
@@ -30,23 +33,25 @@ type OrgDomainView struct {
 
 func OrgDomainViewFromModel(domain *model.OrgDomainView) *OrgDomainView {
 	return &OrgDomainView{
-		OrgID:        domain.OrgID,
-		Domain:       domain.Domain,
-		Primary:      domain.Primary,
-		Verified:     domain.Verified,
-		CreationDate: domain.CreationDate,
-		ChangeDate:   domain.ChangeDate,
+		OrgID:          domain.OrgID,
+		Domain:         domain.Domain,
+		Primary:        domain.Primary,
+		Verified:       domain.Verified,
+		ValidationType: int32(domain.ValidationType),
+		CreationDate:   domain.CreationDate,
+		ChangeDate:     domain.ChangeDate,
 	}
 }
 
 func OrgDomainToModel(domain *OrgDomainView) *model.OrgDomainView {
 	return &model.OrgDomainView{
-		OrgID:        domain.OrgID,
-		Domain:       domain.Domain,
-		Primary:      domain.Primary,
-		Verified:     domain.Verified,
-		CreationDate: domain.CreationDate,
-		ChangeDate:   domain.ChangeDate,
+		OrgID:          domain.OrgID,
+		Domain:         domain.Domain,
+		Primary:        domain.Primary,
+		Verified:       domain.Verified,
+		ValidationType: model.OrgDomainValidationType(domain.ValidationType),
+		CreationDate:   domain.CreationDate,
+		ChangeDate:     domain.ChangeDate,
 	}
 }
 
@@ -65,6 +70,8 @@ func (d *OrgDomainView) AppendEvent(event *models.Event) (err error) {
 	case es_model.OrgDomainAdded:
 		d.setRootData(event)
 		d.CreationDate = event.CreationDate
+		err = d.SetData(event)
+	case es_model.OrgDomainVerificationAdded:
 		err = d.SetData(event)
 	case es_model.OrgDomainVerified:
 		d.Verified = true

@@ -61,7 +61,7 @@ func StartOrg(conf OrgConfig, defaults systemdefaults.SystemDefaults) *OrgEvents
 	}
 }
 
-func (es *OrgEventstore) PrepareCreateOrg(ctx context.Context, orgModel *org_model.Org) (*model.Org, []*es_models.Aggregate, error) {
+func (es *OrgEventstore) PrepareCreateOrg(ctx context.Context, orgModel *org_model.Org, users func(context.Context, string) ([]*es_models.Aggregate, error)) (*model.Org, []*es_models.Aggregate, error) {
 	if orgModel == nil || !orgModel.IsValid() {
 		return nil, nil, errors.ThrowInvalidArgument(nil, "EVENT-OeLSk", "Errors.Org.Invalid")
 	}
@@ -74,13 +74,13 @@ func (es *OrgEventstore) PrepareCreateOrg(ctx context.Context, orgModel *org_mod
 	orgModel.AggregateID = id
 	org := model.OrgFromModel(orgModel)
 
-	aggregates, err := orgCreatedAggregates(ctx, es.AggregateCreator(), org)
+	aggregates, err := orgCreatedAggregates(ctx, es.AggregateCreator(), org, users)
 
 	return org, aggregates, err
 }
 
-func (es *OrgEventstore) CreateOrg(ctx context.Context, orgModel *org_model.Org) (*org_model.Org, error) {
-	org, aggregates, err := es.PrepareCreateOrg(ctx, orgModel)
+func (es *OrgEventstore) CreateOrg(ctx context.Context, orgModel *org_model.Org, users func(context.Context, string) ([]*es_models.Aggregate, error)) (*org_model.Org, error) {
+	org, aggregates, err := es.PrepareCreateOrg(ctx, orgModel, users)
 	err = es_sdk.PushAggregates(ctx, es.PushAggregates, org.AppendEvents, aggregates...)
 	if err != nil {
 		return nil, err
@@ -230,7 +230,7 @@ func (es *OrgEventstore) GenerateOrgDomainValidation(ctx context.Context, domain
 	return token, url, err
 }
 
-func (es *OrgEventstore) ValidateOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error {
+func (es *OrgEventstore) ValidateOrgDomain(ctx context.Context, domain *org_model.OrgDomain, users func(context.Context, string) ([]*es_models.Aggregate, error)) error {
 	if domain == nil || !domain.IsValid() {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-R24hb", "Errors.Org.InvalidDomain")
 	}
@@ -257,7 +257,7 @@ func (es *OrgEventstore) ValidateOrgDomain(ctx context.Context, domain *org_mode
 	checkType, _ := d.ValidationType.CheckType()
 	err = es.verificationValidator(d.Domain, validationCode, validationCode, checkType)
 	if err == nil {
-		orgAggregates, err := OrgDomainVerifiedAggregate(ctx, es.Eventstore.AggregateCreator(), repoOrg, repoDomain)
+		orgAggregates, err := OrgDomainVerifiedAggregate(ctx, es.Eventstore.AggregateCreator(), repoOrg, repoDomain, users)
 		if err != nil {
 			return err
 		}

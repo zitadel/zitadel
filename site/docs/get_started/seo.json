@@ -1,0 +1,16 @@
+{
+    "tags": [
+        {
+            "name": "twitter:title",
+            "content":"Docs demo page"
+        },
+        {
+            "name": "twitter:description",
+            "content":"Docs demo page description"
+        },
+        {
+            "name": "Description",
+            "content":"Docs demo page description"
+        }
+    ]
+}

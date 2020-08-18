@@ -115,6 +115,9 @@ func (u *UserGrant) processUser(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
+		if len(grants) == 0 {
+			return u.view.ProcessedUserGrantSequence(event.Sequence)
+		}
 		user, err := u.userEvents.UserByID(context.Background(), event.AggregateID)
 		if err != nil {
 			return err

@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
@@ -40,10 +41,10 @@ func OrgQuery(latestSequence uint64) *es_models.SearchQuery {
 }
 
 func OrgAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, id string, sequence uint64) (*es_models.Aggregate, error) {
-	return aggCreator.NewAggregate(ctx, id, model.OrgAggregate, model.OrgVersion, sequence)
+	return aggCreator.NewAggregate(ctx, id, model.OrgAggregate, model.OrgVersion, sequence, es_models.OverwriteResourceOwner(id))
 }
 
-func orgCreatedAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, org *model.Org) (_ []*es_models.Aggregate, err error) {
+func orgCreatedAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, org *model.Org, users func(context.Context, string) ([]*es_models.Aggregate, error)) (_ []*es_models.Aggregate, err error) {
 	if org == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kdie7", "Errors.Internal")
 	}
@@ -57,7 +58,7 @@ func orgCreatedAggregates(ctx context.Context, aggCreator *es_models.AggregateCr
 		return nil, err
 	}
 	aggregates := make([]*es_models.Aggregate, 0)
-	aggregates, err = addDomainAggregateAndEvents(ctx, aggCreator, agg, aggregates, org)
+	aggregates, err = addDomainAggregateAndEvents(ctx, aggCreator, agg, aggregates, org, users)
 	if err != nil {
 		return nil, err
 	}
@@ -69,22 +70,18 @@ func orgCreatedAggregates(ctx context.Context, aggCreator *es_models.AggregateCr
 	return append(aggregates, agg), nil
 }
 
-func addDomainAggregateAndEvents(ctx context.Context, aggCreator *es_models.AggregateCreator, orgAggregate *es_models.Aggregate, aggregates []*es_models.Aggregate, org *model.Org) ([]*es_models.Aggregate, error) {
+func addDomainAggregateAndEvents(ctx context.Context, aggCreator *es_models.AggregateCreator, orgAggregate *es_models.Aggregate, aggregates []*es_models.Aggregate, org *model.Org, users func(context.Context, string) ([]*es_models.Aggregate, error)) ([]*es_models.Aggregate, error) {
 	for _, domain := range org.Domains {
 		orgAggregate, err := orgAggregate.AppendEvent(model.OrgDomainAdded, domain)
 		if err != nil {
 			return nil, err
 		}
 		if domain.Verified {
-			domainAggregate, err := reservedUniqueDomainAggregate(ctx, aggCreator, org.AggregateID, domain.Domain)
+			domainAggregates, err := orgDomainVerified(ctx, aggCreator, orgAggregate, org, domain, users)
 			if err != nil {
 				return nil, err
 			}
-			aggregates = append(aggregates, domainAggregate)
-			orgAggregate, err = orgAggregate.AppendEvent(model.OrgDomainVerified, domain)
-			if err != nil {
-				return nil, err
-			}
+			aggregates = append(aggregates, domainAggregates...)
 		}
 		if domain.Primary {
 			orgAggregate, err = orgAggregate.AppendEvent(model.OrgDomainPrimarySet, domain)
@@ -183,7 +180,6 @@ func reservedUniqueDomainAggregate(ctx context.Context, aggCreator *es_models.Ag
 	if err != nil {
 		return nil, err
 	}
-
 	return aggregate.SetPrecondition(OrgDomainUniqueQuery(domain), isEventValidation(aggregate, model.OrgDomainReserved)), nil
 }
 
@@ -274,7 +270,7 @@ func OrgDomainValidationFailedAggregate(aggCreator *es_models.AggregateCreator, 
 	}
 }
 
-func OrgDomainVerifiedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Org, domain *model.OrgDomain) ([]*es_models.Aggregate, error) {
+func OrgDomainVerifiedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Org, domain *model.OrgDomain, users func(context.Context, string) ([]*es_models.Aggregate, error)) ([]*es_models.Aggregate, error) {
 	if domain == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-DHs7s", "Errors.Internal")
 	}
@@ -282,8 +278,16 @@ func OrgDomainVerifiedAggregate(ctx context.Context, aggCreator *es_models.Aggre
 	if err != nil {
 		return nil, err
 	}
-	aggregates := make([]*es_models.Aggregate, 0, 2)
-	agg, err = agg.AppendEvent(model.OrgDomainVerified, domain)
+
+	aggregates, err := orgDomainVerified(ctx, aggCreator, agg, existing, domain, users)
+	if err != nil {
+		return nil, err
+	}
+	return append(aggregates, agg), nil
+}
+
+func orgDomainVerified(ctx context.Context, aggCreator *es_models.AggregateCreator, agg *es_models.Aggregate, existing *model.Org, domain *model.OrgDomain, users func(context.Context, string) ([]*es_models.Aggregate, error)) ([]*es_models.Aggregate, error) {
+	agg, err := agg.AppendEvent(model.OrgDomainVerified, domain)
 	if err != nil {
 		return nil, err
 	}
@@ -291,8 +295,15 @@ func OrgDomainVerifiedAggregate(ctx context.Context, aggCreator *es_models.Aggre
 	if err != nil {
 		return nil, err
 	}
-	aggregates = append(aggregates, domainAgregate)
-	return append(aggregates, agg), nil
+	aggregates := []*es_models.Aggregate{domainAgregate}
+	if users != nil {
+		userAggregates, err := users(ctx, domain.Domain)
+		if err != nil {
+			return nil, errors.ThrowPreconditionFailed(err, "EVENT-HBwsw", "Errors.Internal")
+		}
+		aggregates = append(aggregates, userAggregates...)
+	}
+	return aggregates, nil
 }
 
 func OrgDomainSetPrimaryAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, domain *model.OrgDomain) func(ctx context.Context) (*es_models.Aggregate, error) {

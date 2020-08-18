@@ -70,6 +70,9 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
+		if len(sessions) == 0 {
+			return u.view.ProcessedUserSessionSequence(event.Sequence)
+		}
 		for _, session := range sessions {
 			if err := u.updateSession(session, event); err != nil {
 				return err

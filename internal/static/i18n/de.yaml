@@ -218,6 +218,9 @@ EventTypes:
     removed: Organisation entfernt
     domain:
       added: Domäne hinzugefügt
+      verification:
+        added: Domänenverifizierung hinzugefügt
+        failed: Domänenverifizierung fehlgeschlagen
       verified: Domäne verifiziert
       removed: Domäne entfernt
       primary:

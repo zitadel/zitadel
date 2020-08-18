@@ -1,4 +1,4 @@
-package types
+package setup
 
 type IAMSetUp struct {
 	GlobalOrg          string
@@ -46,4 +46,5 @@ type OIDCApp struct {
 	ApplicationType        string
 	AuthMethodType         string
 	PostLogoutRedirectUris []string
+	DevMode                bool
 }

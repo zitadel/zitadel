@@ -2,11 +2,13 @@ package eventstore
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	admin_model "github.com/caos/zitadel/internal/admin/model"
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/eventstore"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/sdk"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
@@ -41,7 +43,14 @@ func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) 
 	if err != nil {
 		return nil, err
 	}
-	org, aggregates, err := repo.OrgEventstore.PrepareCreateOrg(ctx, setUp.Org)
+	users := func(ctx context.Context, domain string) ([]*es_models.Aggregate, error) {
+		userIDs, err := repo.View.UserIDsByDomain(domain)
+		if err != nil {
+			return nil, err
+		}
+		return repo.UserEventstore.PrepareDomainClaimed(ctx, userIDs)
+	}
+	org, aggregates, err := repo.OrgEventstore.PrepareCreateOrg(ctx, setUp.Org, users)
 	if err != nil {
 		return nil, err
 	}

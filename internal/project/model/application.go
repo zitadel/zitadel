@@ -33,6 +33,7 @@ type AppState int32
 const (
 	AppStateActive AppState = iota
 	AppStateInactive
+	AppStateRemoved
 )
 
 type AppType int32

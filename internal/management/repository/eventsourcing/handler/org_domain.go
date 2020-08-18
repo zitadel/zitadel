@@ -44,8 +44,9 @@ func (d *OrgDomain) processOrgDomain(event *models.Event) (err error) {
 	domain := new(org_model.OrgDomainView)
 	switch event.Type {
 	case model.OrgDomainAdded:
-		domain.AppendEvent(event)
-	case model.OrgDomainVerified:
+		err = domain.AppendEvent(event)
+	case model.OrgDomainVerified,
+		model.OrgDomainVerificationAdded:
 		err = domain.SetData(event)
 		if err != nil {
 			return err
@@ -54,7 +55,7 @@ func (d *OrgDomain) processOrgDomain(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		domain.AppendEvent(event)
+		err = domain.AppendEvent(event)
 	case model.OrgDomainPrimarySet:
 		err = domain.SetData(event)
 		if err != nil {
@@ -75,7 +76,7 @@ func (d *OrgDomain) processOrgDomain(event *models.Event) (err error) {
 				return err
 			}
 		}
-		domain.AppendEvent(event)
+		err = domain.AppendEvent(event)
 	case model.OrgDomainRemoved:
 		err = domain.SetData(event)
 		if err != nil {

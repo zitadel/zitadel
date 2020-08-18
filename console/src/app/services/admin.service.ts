@@ -5,8 +5,11 @@ import { Metadata } from 'grpc-web';
 import { AdminServicePromiseClient } from '../proto/generated/admin_grpc_web_pb';
 import {
     AddIamMemberRequest,
+    ChangeIamMemberRequest,
     CreateOrgRequest,
     CreateUserRequest,
+    FailedEventID,
+    FailedEvents,
     IamMember,
     IamMemberRoles,
     IamMemberSearchQuery,
@@ -77,12 +80,32 @@ export class AdminService {
         );
     }
 
+    public async GetFailedEvents(): Promise<FailedEvents> {
+        return await this.request(
+            c => c.getFailedEvents,
+            new Empty(),
+            f => f,
+        );
+    }
+
     public async ClearView(viewname: string, db: string): Promise<Empty> {
         const req: ViewID = new ViewID();
         req.setDatabase(db);
         req.setViewName(viewname);
         return await this.request(
             c => c.clearView,
+            req,
+            f => f,
+        );
+    }
+
+    public async RemoveFailedEvent(viewname: string, db: string, sequence: number): Promise<Empty> {
+        const req: FailedEventID = new FailedEventID();
+        req.setDatabase(db);
+        req.setViewName(viewname);
+        req.setFailedSequence(sequence);
+        return await this.request(
+            c => c.removeFailedEvent,
             req,
             f => f,
         );
@@ -134,6 +157,20 @@ export class AdminService {
         );
     }
 
+    public async ChangeIamMember(
+        userId: string,
+        rolesList: string[],
+    ): Promise<IamMember> {
+        const req = new ChangeIamMemberRequest();
+        req.setUserId(userId);
+        req.setRolesList(rolesList);
+
+        return await this.request(
+            c => c.changeIamMember,
+            req,
+            f => f,
+        );
+    }
 
     public async GetOrgIamPolicy(orgId: string): Promise<OrgIamPolicy> {
         const req = new OrgIamPolicyID();

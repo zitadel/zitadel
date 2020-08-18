@@ -70,7 +70,7 @@ func (p *ProjectGrant) Reduce(event *models.Event) (err error) {
 		p.fillOrgData(grantedProject, org, resourceOwner)
 	case es_model.ProjectGrantChanged, es_model.ProjectGrantCascadeChanged:
 		grant := new(view_model.ProjectGrant)
-		err := grant.SetData(event)
+		err = grant.SetData(event)
 		if err != nil {
 			return err
 		}

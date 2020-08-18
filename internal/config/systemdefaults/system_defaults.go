@@ -15,6 +15,7 @@ import (
 
 type SystemDefaults struct {
 	DefaultLanguage       language.Tag
+	Domain                string
 	ZitadelDocs           ZitadelDocs
 	SecretGenerators      SecretGenerators
 	UserVerificationKey   *crypto.KeyConfig
@@ -24,7 +25,6 @@ type SystemDefaults struct {
 	DefaultPolicies       DefaultPolicies
 	DomainVerification    DomainVerification
 	IamID                 string
-	SetUp                 types.IAMSetUp
 	Notifications         Notifications
 }
 

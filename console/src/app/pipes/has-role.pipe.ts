@@ -7,10 +7,9 @@ import { AuthService } from '../services/auth.service';
     name: 'hasRole',
 })
 export class HasRolePipe implements PipeTransform {
-
     constructor(private authService: AuthService) { }
 
-    public transform(values: string[], each: boolean = false): Observable<boolean> {
-        return this.authService.isAllowed(values, each);
+    public transform(values: string[]): Observable<boolean> {
+        return this.authService.isAllowed(values);
     }
 }

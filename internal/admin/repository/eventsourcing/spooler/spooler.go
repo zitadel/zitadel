@@ -21,7 +21,7 @@ func StartSpooler(c SpoolerConfig, es eventstore.Eventstore, view *view.View, sq
 		Eventstore:        es,
 		Locker:            &locker{dbClient: sql},
 		ConcurrentWorkers: c.ConcurrentWorkers,
-		ViewHandlers:      handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, repos),
+		ViewHandlers:      handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, repos),
 	}
 	spool := spoolerConfig.New()
 	spool.Start()
