@@ -2,13 +2,11 @@ package setup
 
 import (
 	"context"
-	"time"
 
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/config/types"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -108,17 +106,13 @@ func StartSetup(esConfig es_int.Config, sd systemdefaults.SystemDefaults) (*Setu
 	return setup, nil
 }
 
-func (s *Setup) Execute(ctx context.Context, setUpConfig types.IAMSetUp, localDevMode bool) error {
+func (s *Setup) Execute(ctx context.Context, setUpConfig IAMSetUp, localDevMode bool) error {
 	iam, err := s.IamEvents.IamByID(ctx, s.iamID)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
 	}
-	if iam != nil && iam.SetUpDone {
+	if iam != nil && (iam.SetUpStarted || iam.SetUpDone) {
 		return nil
-	}
-
-	if iam != nil && iam.SetUpStarted {
-		return s.waitForSetupDone(ctx)
 	}
 
 	logging.Log("SETUP-hwG32").Info("starting setup")
@@ -176,26 +170,7 @@ func (s *Setup) Execute(ctx context.Context, setUpConfig types.IAMSetUp, localDe
 	return nil
 }
 
-func (s *Setup) waitForSetupDone(ctx context.Context) error {
-	logging.Log("SETUP-hws22").Info("waiting for setup to be done")
-	ctx, cancel := context.WithDeadline(ctx, time.Now().UTC().Add(10*time.Second))
-	defer cancel()
-
-	for {
-		select {
-		case <-time.After(1 * time.Second):
-			iam, _ := s.IamEvents.IamByID(ctx, s.iamID)
-			if iam != nil && iam.SetUpDone {
-				return nil
-			}
-			logging.Log("SETUP-d23g1").Info("setup not done yet")
-		case <-ctx.Done():
-			return caos_errs.ThrowInternal(ctx.Err(), "SETUP-dsjg3", "Timeout exceeded for setup")
-		}
-	}
-}
-
-func (setUp *initializer) orgs(ctx context.Context, orgs []types.Org, localDevMode bool) error {
+func (setUp *initializer) orgs(ctx context.Context, orgs []Org, localDevMode bool) error {
 	logging.Log("SETUP-dsTh3").Info("setting up orgs")
 	for _, iamOrg := range orgs {
 		org, err := setUp.org(ctx, iamOrg)
@@ -243,7 +218,7 @@ func (setUp *initializer) orgs(ctx context.Context, orgs []types.Org, localDevMo
 	return nil
 }
 
-func (setUp *initializer) org(ctx context.Context, org types.Org) (*org_model.Org, error) {
+func (setUp *initializer) org(ctx context.Context, org Org) (*org_model.Org, error) {
 	ctx = setSetUpContextData(ctx, "")
 	createOrg := &org_model.Org{
 		Name:    org.Name,
@@ -311,7 +286,7 @@ func (setUp *initializer) setIamProject(ctx context.Context, iamProjectName stri
 	return nil
 }
 
-func (setUp *initializer) users(ctx context.Context, users []types.User, orgPolicy *org_model.OrgIamPolicy) error {
+func (setUp *initializer) users(ctx context.Context, users []User, orgPolicy *org_model.OrgIamPolicy) error {
 	for _, user := range users {
 		created, err := setUp.user(ctx, user, orgPolicy)
 		if err != nil {
@@ -323,7 +298,7 @@ func (setUp *initializer) users(ctx context.Context, users []types.User, orgPoli
 	return nil
 }
 
-func (setUp *initializer) user(ctx context.Context, user types.User, orgPolicy *org_model.OrgIamPolicy) (*usr_model.User, error) {
+func (setUp *initializer) user(ctx context.Context, user User, orgPolicy *org_model.OrgIamPolicy) (*usr_model.User, error) {
 	createUser := &usr_model.User{
 		Profile: &usr_model.Profile{
 			UserName:  user.UserName,
@@ -367,7 +342,7 @@ func (setUp *initializer) orgOwner(ctx context.Context, org *org_model.Org, user
 	return err
 }
 
-func (setUp *initializer) projects(ctx context.Context, projects []types.Project, localDevMode bool) error {
+func (setUp *initializer) projects(ctx context.Context, projects []Project, localDevMode bool) error {
 	for _, project := range projects {
 		createdProject, err := setUp.project(ctx, project)
 		if err != nil {
@@ -385,14 +360,14 @@ func (setUp *initializer) projects(ctx context.Context, projects []types.Project
 	return nil
 }
 
-func (setUp *initializer) project(ctx context.Context, project types.Project) (*proj_model.Project, error) {
+func (setUp *initializer) project(ctx context.Context, project Project) (*proj_model.Project, error) {
 	addProject := &proj_model.Project{
 		Name: project.Name,
 	}
 	return setUp.ProjectEvents.CreateProject(ctx, addProject)
 }
 
-func (setUp *initializer) oidcApp(ctx context.Context, project *proj_model.Project, oidc types.OIDCApp, localDevMode bool) (*proj_model.Application, error) {
+func (setUp *initializer) oidcApp(ctx context.Context, project *proj_model.Project, oidc OIDCApp, localDevMode bool) (*proj_model.Application, error) {
 	addOIDCApp := &proj_model.Application{
 		ObjectRoot: models.ObjectRoot{AggregateID: project.AggregateID},
 		Name:       oidc.Name,

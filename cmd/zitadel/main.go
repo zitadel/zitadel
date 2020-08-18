@@ -18,7 +18,6 @@ import (
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/config/types"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/notification"
@@ -51,7 +50,7 @@ type setupConfig struct {
 
 	Eventstore     es_int.Config
 	SystemDefaults sd.SystemDefaults
-	SetUp          types.IAMSetUp
+	SetUp          setup.IAMSetUp
 }
 
 var (

@@ -1,4 +1,4 @@
-package types
+package setup
 
 type IAMSetUp struct {
 	GlobalOrg  string
