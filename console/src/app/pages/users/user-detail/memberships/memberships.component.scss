@@ -81,11 +81,11 @@
                 background-color: $primary-dark;
                 transition: background-color .2s ease-in-out;
                 background-color: $accent-color;
+                cursor: default;
 
                 i {
                     font-size: 1.2rem;
                 }
-
             }
         }
   

@@ -12,7 +12,7 @@
                         [ngStyle]="{'z-index': 100 - i}">
                         <div class="membership-avatar" (click)="membership.memberType == MemberType.MEMBERTYPE_PROJECT ?
                             navigateToObject(membership.memberType, membership.objectId) : null"
-                            [ngStyle]="{'background-color': getColor(membership.memberType)}">
+                            [ngStyle]="{'background-color': getColor(membership.memberType), 'cursor': membership.memberType == MemberType.MEMBERTYPE_PROJECT ? 'pointer': 'default'}">
                             <i *ngIf="membership.memberType == MemberType.MEMBERTYPE_ORGANISATION"
                                 class="las la-archway"></i>
                             <i *ngIf="membership.memberType == MemberType.MEMBERTYPE_PROJECT"
