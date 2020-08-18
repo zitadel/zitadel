@@ -40,7 +40,7 @@ func OrgQuery(latestSequence uint64) *es_models.SearchQuery {
 }
 
 func OrgAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, id string, sequence uint64) (*es_models.Aggregate, error) {
-	return aggCreator.NewAggregate(ctx, id, model.OrgAggregate, model.OrgVersion, sequence)
+	return aggCreator.NewAggregate(ctx, id, model.OrgAggregate, model.OrgVersion, sequence, es_models.OverwriteResourceOwner(id))
 }
 
 func orgCreatedAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, org *model.Org, users func(context.Context, string) ([]*es_models.Aggregate, error)) (_ []*es_models.Aggregate, err error) {
@@ -76,7 +76,7 @@ func addDomainAggregateAndEvents(ctx context.Context, aggCreator *es_models.Aggr
 			return nil, err
 		}
 		if domain.Verified {
-			domainAggregates, err := OrgDomainVerifiedAggregate(ctx, aggCreator, org, domain, users)
+			domainAggregates, err := orgDomainVerified(ctx, aggCreator, orgAggregate, org, domain, users)
 			if err != nil {
 				return nil, err
 			}
@@ -277,8 +277,16 @@ func OrgDomainVerifiedAggregate(ctx context.Context, aggCreator *es_models.Aggre
 	if err != nil {
 		return nil, err
 	}
-	aggregates := make([]*es_models.Aggregate, 0, 2)
-	agg, err = agg.AppendEvent(model.OrgDomainVerified, domain)
+
+	aggregates, err := orgDomainVerified(ctx, aggCreator, agg, existing, domain, users)
+	if err != nil {
+		return nil, err
+	}
+	return append(aggregates, agg), nil
+}
+
+func orgDomainVerified(ctx context.Context, aggCreator *es_models.AggregateCreator, agg *es_models.Aggregate, existing *model.Org, domain *model.OrgDomain, users func(context.Context, string) ([]*es_models.Aggregate, error)) ([]*es_models.Aggregate, error) {
+	agg, err := agg.AppendEvent(model.OrgDomainVerified, domain)
 	if err != nil {
 		return nil, err
 	}
@@ -286,7 +294,7 @@ func OrgDomainVerifiedAggregate(ctx context.Context, aggCreator *es_models.Aggre
 	if err != nil {
 		return nil, err
 	}
-	aggregates = append(aggregates, domainAgregate)
+	aggregates := []*es_models.Aggregate{domainAgregate}
 	if users != nil {
 		userAggregates, err := users(ctx, domain.Domain)
 		if err != nil {
@@ -294,7 +302,7 @@ func OrgDomainVerifiedAggregate(ctx context.Context, aggCreator *es_models.Aggre
 		}
 		aggregates = append(aggregates, userAggregates...)
 	}
-	return append(aggregates, agg), nil
+	return aggregates, nil
 }
 
 func OrgDomainSetPrimaryAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, domain *model.OrgDomain) func(ctx context.Context) (*es_models.Aggregate, error) {
