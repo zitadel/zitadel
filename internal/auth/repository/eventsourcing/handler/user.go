@@ -27,12 +27,12 @@ const (
 	userTable = "auth.users"
 )
 
-func (p *User) ViewModel() string {
+func (u *User) ViewModel() string {
 	return userTable
 }
 
-func (p *User) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestUserSequence()
+func (u *User) EventQuery() (*models.SearchQuery, error) {
+	sequence, err := u.view.GetLatestUserSequence()
 	if err != nil {
 		return nil, err
 	}
@@ -52,13 +52,16 @@ func (u *User) Reduce(event *models.Event) (err error) {
 	}
 }
 
-func (p *User) ProcessUser(event *models.Event) (err error) {
+func (u *User) ProcessUser(event *models.Event) (err error) {
 	user := new(view_model.UserView)
 	switch event.Type {
 	case es_model.UserAdded,
 		es_model.UserRegistered:
-		user.AppendEvent(event)
-		p.fillLoginNames(user)
+		err = user.AppendEvent(event)
+		if err != nil {
+			return err
+		}
+		u.fillLoginNames(user)
 	case es_model.UserProfileChanged,
 		es_model.UserEmailChanged,
 		es_model.UserEmailVerified,
@@ -75,20 +78,30 @@ func (p *User) ProcessUser(event *models.Event) (err error) {
 		es_model.MfaOtpRemoved,
 		es_model.MfaInitSkipped,
 		es_model.UserPasswordChanged:
-		user, err = p.view.UserByID(event.AggregateID)
+		user, err = u.view.UserByID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		err = user.AppendEvent(event)
+	case es_model.DomainClaimed:
+		user, err = u.view.UserByID(event.AggregateID)
+		if err != nil {
+			return err
+		}
+		err = user.AppendEvent(event)
+		if err != nil {
+			return err
+		}
+		err = u.fillLoginNames(user)
 	case es_model.UserRemoved:
-		err = p.view.DeleteUser(event.AggregateID, event.Sequence)
+		err = u.view.DeleteUser(event.AggregateID, event.Sequence)
 	default:
-		return p.view.ProcessedUserSequence(event.Sequence)
+		return u.view.ProcessedUserSequence(event.Sequence)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutUser(user, user.Sequence)
+	return u.view.PutUser(user, user.Sequence)
 }
 
 func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
@@ -169,7 +182,7 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
 	return nil
 }
 
-func (p *User) OnError(event *models.Event, err error) error {
+func (u *User) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-is8wa", "id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
-	return spooler.HandleError(event, err, p.view.GetLatestUserFailedEvent, p.view.ProcessedUserFailedEvent, p.view.ProcessedUserSequence, p.errorCountUntilSkip)
+	return spooler.HandleError(event, err, u.view.GetLatestUserFailedEvent, u.view.ProcessedUserFailedEvent, u.view.ProcessedUserSequence, u.errorCountUntilSkip)
 }

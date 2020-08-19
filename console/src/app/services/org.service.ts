@@ -6,15 +6,21 @@ import { ManagementServicePromiseClient } from '../proto/generated/management_gr
 import {
     AddOrgDomainRequest,
     AddOrgMemberRequest,
+    ChangeOrgMemberRequest,
     Domain,
     Iam,
     Org,
+    OrgCreateRequest,
     OrgDomain,
     OrgDomainSearchQuery,
     OrgDomainSearchRequest,
     OrgDomainSearchResponse,
+    OrgDomainValidationRequest,
+    OrgDomainValidationResponse,
+    OrgDomainValidationType,
     OrgIamPolicy,
     OrgID,
+    OrgMember,
     OrgMemberRoles,
     OrgMemberSearchRequest,
     OrgMemberSearchResponse,
@@ -34,6 +40,7 @@ import {
     ProjectGrantCreate,
     RemoveOrgDomainRequest,
     RemoveOrgMemberRequest,
+    ValidateOrgDomainRequest,
 } from '../proto/generated/management_pb';
 import { GrpcBackendService } from './grpc-backend.service';
 import { GrpcService, RequestFactory, ResponseMapper } from './grpc.service';
@@ -121,6 +128,31 @@ export class OrgService {
         );
     }
 
+    public async GenerateMyOrgDomainValidation(domain: string, type: OrgDomainValidationType):
+        Promise<OrgDomainValidationResponse> {
+        const req: OrgDomainValidationRequest = new OrgDomainValidationRequest();
+        req.setDomain(domain);
+        req.setType(type);
+
+        return await this.request(
+            c => c.generateMyOrgDomainValidation,
+            req,
+            f => f,
+        );
+    }
+
+    public async ValidateMyOrgDomain(domain: string):
+        Promise<Empty> {
+        const req: ValidateOrgDomainRequest = new ValidateOrgDomainRequest();
+        req.setDomain(domain);
+
+        return await this.request(
+            c => c.validateMyOrgDomain,
+            req,
+            f => f,
+        );
+    }
+
     public async SearchMyOrgMembers(limit: number, offset: number): Promise<OrgMemberSearchResponse> {
         const req = new OrgMemberSearchRequest();
         req.setLimit(limit);
@@ -142,6 +174,16 @@ export class OrgService {
         );
     }
 
+    public async CreateOrg(name: string): Promise<Org> {
+        const req = new OrgCreateRequest();
+        req.setName(name);
+        return await this.request(
+            c => c.createOrg,
+            req,
+            f => f,
+        );
+    }
+
     public async AddMyOrgMember(userId: string, rolesList: string[]): Promise<Empty> {
         const req = new AddOrgMemberRequest();
         req.setUserId(userId);
@@ -154,6 +196,18 @@ export class OrgService {
             f => f,
         );
     }
+
+    public async ChangeMyOrgMember(userId: string, rolesList: string[]): Promise<OrgMember> {
+        const req = new ChangeOrgMemberRequest();
+        req.setUserId(userId);
+        req.setRolesList(rolesList);
+        return await this.request(
+            c => c.changeMyOrgMember,
+            req,
+            f => f,
+        );
+    }
+
 
     public async RemoveMyOrgMember(userId: string): Promise<Empty> {
         const req = new RemoveOrgMemberRequest();

@@ -4,7 +4,7 @@ go 1.14
 
 require (
 	cloud.google.com/go v0.61.0 // indirect
-	contrib.go.opencensus.io/exporter/stackdriver v0.13.2
+	contrib.go.opencensus.io/exporter/stackdriver v0.13.3
 	github.com/BurntSushi/toml v0.3.1
 	github.com/DATA-DOG/go-sqlmock v1.4.1
 	github.com/Masterminds/goutils v1.1.0 // indirect
@@ -18,7 +18,7 @@ require (
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.7.0
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
-	github.com/cockroachdb/cockroach-go/v2 v2.0.4
+	github.com/cockroachdb/cockroach-go/v2 v2.0.5
 	github.com/envoyproxy/protoc-gen-validate v0.4.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
@@ -34,7 +34,7 @@ require (
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.10 // indirect
 	github.com/inconshreveable/log15 v0.0.0-20200109203555-b30bc20e4fd1 // indirect
-	github.com/jinzhu/gorm v1.9.15
+	github.com/jinzhu/gorm v1.9.16
 	github.com/kevinburke/go-types v0.0.0-20200309064045-f2d4aea18a7a // indirect
 	github.com/kevinburke/go.uuid v1.2.0 // indirect
 	github.com/kevinburke/rest v0.0.0-20200429221318-0d2892b400f8 // indirect

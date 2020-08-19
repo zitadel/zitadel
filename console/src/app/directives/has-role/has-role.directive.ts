@@ -8,7 +8,7 @@ import { AuthService } from 'src/app/services/auth.service';
 
 export class HasRoleDirective {
     private hasView: boolean = false;
-    @Input() public set appHasRole(roles: string[]) {
+    @Input() public set appHasRole(roles: string[] | RegExp[]) {
         if (roles && roles.length > 0) {
             this.authService.isAllowed(roles).subscribe(isAllowed => {
                 if (isAllowed && !this.hasView) {

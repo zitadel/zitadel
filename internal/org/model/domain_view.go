@@ -1,17 +1,19 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/model"
 	"time"
+
+	"github.com/caos/zitadel/internal/model"
 )
 
 type OrgDomainView struct {
-	OrgID        string
-	CreationDate time.Time
-	ChangeDate   time.Time
-	Domain       string
-	Primary      bool
-	Verified     bool
+	OrgID          string
+	CreationDate   time.Time
+	ChangeDate     time.Time
+	Domain         string
+	Primary        bool
+	Verified       bool
+	ValidationType OrgDomainValidationType
 }
 
 type OrgDomainSearchRequest struct {

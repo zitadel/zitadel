@@ -297,12 +297,13 @@ func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequ
 }
 
 func (repo *ProjectRepo) ApplicationByID(ctx context.Context, projectID, appID string) (*proj_model.ApplicationView, error) {
-	app, viewErr := repo.View.ApplicationByID(appID)
+	app, viewErr := repo.View.ApplicationByID(projectID, appID)
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
 	if caos_errs.IsNotFound(viewErr) {
 		app = new(model.ApplicationView)
+		app.ID = appID
 	}
 
 	events, esErr := repo.ProjectEvents.ProjectEventsByID(ctx, projectID, app.Sequence)
@@ -317,9 +318,12 @@ func (repo *ProjectRepo) ApplicationByID(ctx context.Context, projectID, appID s
 
 	viewApp := *app
 	for _, event := range events {
-		err := app.AppendEvent(event)
+		err := app.AppendEventIfMyApp(event)
 		if err != nil {
 			return model.ApplicationViewToModel(&viewApp), nil
+		}
+		if app.State == int32(proj_model.AppStateRemoved) {
+			return nil, caos_errs.ThrowNotFound(nil, "EVENT-Msl96", "Errors.Application.NotFound")
 		}
 	}
 	return model.ApplicationViewToModel(app), nil

@@ -466,6 +466,7 @@ func TestOrgCreatedAggregates(t *testing.T) {
 		ctx        context.Context
 		aggCreator *es_models.AggregateCreator
 		org        *model.Org
+		users      func(ctx context.Context, domain string) ([]*es_models.Aggregate, error)
 	}
 	tests := []struct {
 		name string
@@ -524,6 +525,30 @@ func TestOrgCreatedAggregates(t *testing.T) {
 			},
 		},
 		{
+			name: "org with domain users aggregate error",
+			args: args{
+				ctx:        authz.NewMockContext("org", "user"),
+				aggCreator: es_models.NewAggregateCreator("test"),
+				org: &model.Org{
+					ObjectRoot: es_models.ObjectRoot{
+						AggregateID: "sdaf",
+						Sequence:    5,
+					},
+					Name: "caos",
+					Domains: []*model.OrgDomain{{
+						Domain:   "caos.ch",
+						Verified: true,
+					}},
+				},
+				users: func(ctx context.Context, domain string) ([]*es_models.Aggregate, error) {
+					return nil, errors.ThrowInternal(nil, "id", "internal error")
+				},
+			},
+			res: res{
+				isErr: errors.IsPreconditionFailed,
+			},
+		},
+		{
 			name: "no name error",
 			args: args{
 				ctx:        authz.NewMockContext("org", "user"),
@@ -543,7 +568,7 @@ func TestOrgCreatedAggregates(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := orgCreatedAggregates(tt.args.ctx, tt.args.aggCreator, tt.args.org)
+			got, err := orgCreatedAggregates(tt.args.ctx, tt.args.aggCreator, tt.args.org, tt.args.users)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got %T: %v", err, err)
 			}
@@ -676,7 +701,7 @@ func TestOrgDomainVerifiedAggregates(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := OrgDomainVerifiedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.org, tt.args.domain)
+			got, err := OrgDomainVerifiedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.org, tt.args.domain, nil)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got %T: %v", err, err)
 			}

@@ -166,6 +166,28 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
         }
     }
 
+    public deleteProject(): void {
+        const dialogRef = this.dialog.open(WarnDialogComponent, {
+            data: {
+                confirmKey: 'ACTIONS.DELETE',
+                cancelKey: 'ACTIONS.CANCEL',
+                titleKey: 'PROJECT.PAGES.DIALOG.DELETE.TITLE',
+                descriptionKey: 'PROJECT.PAGES.DIALOG.DELETE.DESCRIPTION',
+            },
+            width: '400px',
+        });
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                this.projectService.RemoveProject(this.projectId).then(() => {
+                    this.toast.showInfo('PROJECT.TOAST.DELETED', true);
+                    this.router.navigate(['/projects']);
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
+            }
+        });
+    }
+
     public saveProject(): void {
         this.projectService.UpdateProject(this.project.projectId, this.project.name).then(() => {
             this.toast.showInfo('PROJECT.TOAST.UPDATED', true);

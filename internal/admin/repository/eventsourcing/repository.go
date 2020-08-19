@@ -2,12 +2,9 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/handler"
-	es_policy "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 
-	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/eventstore"
-	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/setup"
+	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/handler"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/spooler"
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
@@ -16,7 +13,7 @@ import (
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	es_policy "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
@@ -51,14 +48,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 
 	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain}, systemDefaults)
 
-	project, err := es_proj.StartProject(es_proj.ProjectConfig{
-		Eventstore: es,
-		Cache:      conf.Eventstore.Cache,
-	}, systemDefaults)
-	if err != nil {
-		return nil, err
-	}
-
 	user, err := es_usr.StartUser(es_usr.UserConfig{
 		Eventstore: es,
 		Cache:      conf.Eventstore.Cache,
@@ -82,11 +71,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 		return nil, err
 	}
 
-	eventstoreRepos := setup.EventstoreRepos{OrgEvents: org, UserEvents: user, ProjectEvents: project, IamEvents: iam, PolicyEvents: policy}
-	err = setup.StartSetup(systemDefaults, eventstoreRepos).Execute(ctx)
-	logging.Log("SERVE-djs3R").OnError(err).Panic("failed to execute setup")
-
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, handler.EventstoreRepos{UserEvents: user})
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, handler.EventstoreRepos{UserEvents: user, OrgEvents: org})
 
 	return &EsRepository{
 		spooler: spool,

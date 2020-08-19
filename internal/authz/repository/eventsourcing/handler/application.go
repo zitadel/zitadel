@@ -44,7 +44,7 @@ func (p *Application) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		app, err = p.view.ApplicationByID(app.ID)
+		app, err = p.view.ApplicationByID(event.AggregateID, app.ID)
 		if err != nil {
 			return err
 		}
