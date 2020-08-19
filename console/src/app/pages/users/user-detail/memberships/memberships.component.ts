@@ -55,16 +55,13 @@ export class MembershipsComponent implements OnInit {
     public async loadManager(userId: string): Promise<void> {
         this.mgmtUserService.SearchUserMemberships(userId, 100, 0, []).then(response => {
             this.memberships = response.toObject();
+            console.log(this.memberships);
             this.loading = false;
         });
     }
 
-    public navigateToObject(memberType: MemberType, objectId: string): void {
-        switch (memberType) {
-            case MemberType.MEMBERTYPE_PROJECT:
-                this.router.navigate(['projects', objectId]);
-                break;
-        }
+    public navigateToObject(): void {
+        this.router.navigate(['/users', this.user.id, 'memberships']);
     }
 
     public addMember(): void {
@@ -95,7 +92,7 @@ export class MembershipsComponent implements OnInit {
         });
     }
 
-    private createIamMember(response: any): void {
+    public createIamMember(response: any): void {
         const users: User.AsObject[] = response.users;
         const roles: string[] = response.roles;
 

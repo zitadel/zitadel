@@ -229,7 +229,18 @@
             "SELECTEDDEACTIVATED":"Selektierte User deaktiviert!"
         },
         "MEMBERSHIPS": {
-            "TITLE":"Memberships"
+            "TITLE":"Mitgliedschaften",
+            "DESCRIPTION":"Dies sind alle Mitgliedschaften des Benutzers. Sie können die entsprechenden Rechte auch auf der Organisations-, Project-, or Iam detail seite aufrufen und modifizieren",
+            "CREATIONDATE":"Erstelldatum",
+            "CHANGEDATE":"Letzte Änderung",
+            "DISPLAYNAME":"Anzeigename",
+            "TYPE":"Typ",
+            "TYPES":{
+                "0":"Unbekannt",
+                "1":"Organisation",
+                "2":"Projekt",
+                "3":"Berechtigtes Projekt"
+            }
         }
     },
     "IAM": {

@@ -229,7 +229,18 @@
             "SELECTEDDEACTIVATED":"Selected Users deactivated"
         },
         "MEMBERSHIPS": {
-            "TITLE":"Memberships"
+            "TITLE":"Memberships",
+            "DESCRIPTION":"These are all member grants of the user. You can modify them also on organisation-, project-, or iam detail pages.",
+            "CREATIONDATE":"Creation Date",
+            "CHANGEDATE":"Last Modified",
+            "DISPLAYNAME":"Displayname",
+            "TYPE":"Type",
+            "TYPES":{
+                "0":"Unknown",
+                "1":"Organisation",
+                "2":"Project",
+                "3":"Granted Project"
+            }
         }
     },
     "IAM": {
