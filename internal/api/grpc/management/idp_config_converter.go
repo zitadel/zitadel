@@ -165,6 +165,8 @@ func idpConfigSearchKeyToModel(key management.IdpSearchKey) iam_model.IdpConfigS
 		return iam_model.IdpConfigSearchKeyIdpConfigID
 	case management.IdpSearchKey_IDPSEARCHKEY_NAME:
 		return iam_model.IdpConfigSearchKeyName
+	case management.IdpSearchKey_IDPSEARCHKEY_PROVIDER_TYPE:
+		return iam_model.IdpConfigSearchKeyIdpProviderType
 	default:
 		return iam_model.IdpConfigSearchKeyUnspecified
 	}

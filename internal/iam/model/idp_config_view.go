@@ -37,8 +37,9 @@ type IdpConfigSearchKey int32
 const (
 	IdpConfigSearchKeyUnspecified IdpConfigSearchKey = iota
 	IdpConfigSearchKeyName
-	IdpConfigSearchKeyIamID
+	IdpConfigSearchKeyAggregateID
 	IdpConfigSearchKeyIdpConfigID
+	IdpConfigSearchKeyIdpProviderType
 )
 
 type IdpConfigSearchQuery struct {
@@ -60,4 +61,8 @@ func (r *IdpConfigSearchRequest) EnsureLimit(limit uint64) {
 	if r.Limit == 0 || r.Limit > limit {
 		r.Limit = limit
 	}
+}
+
+func (r *IdpConfigSearchRequest) AppendMyOrgQuery(orgID, iamID string) {
+	r.Queries = append(r.Queries, &IdpConfigSearchQuery{Key: IdpConfigSearchKeyAggregateID, Method: model.SearchMethodIsOneOf, Value: []string{orgID, iamID}})
 }

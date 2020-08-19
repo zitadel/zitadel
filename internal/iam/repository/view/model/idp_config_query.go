@@ -51,12 +51,14 @@ func (req IdpConfigSearchQuery) GetValue() interface{} {
 
 func (key IdpConfigSearchKey) ToColumnName() string {
 	switch iam_model.IdpConfigSearchKey(key) {
-	case iam_model.IdpConfigSearchKeyIamID:
-		return IdpConfigKeyIamID
+	case iam_model.IdpConfigSearchKeyAggregateID:
+		return IdpConfigKeyAggregateID
 	case iam_model.IdpConfigSearchKeyIdpConfigID:
 		return IdpConfigKeyIdpConfigID
 	case iam_model.IdpConfigSearchKeyName:
 		return IdpConfigKeyName
+	case iam_model.IdpConfigSearchKeyIdpProviderType:
+		return IdpConfigKeyProviderType
 	default:
 		return ""
 	}

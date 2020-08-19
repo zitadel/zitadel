@@ -38,7 +38,7 @@ func (m *IdpConfig) Reduce(event *models.Event) (err error) {
 	case model.OrgAggregate:
 		err = m.processIdpConfig(iam_model.IdpProviderTypeOrg, event)
 	case iam_es_model.IamAggregate:
-		err = m.processIdpConfig(iam_model.IdpProviderTypeOrg, event)
+		err = m.processIdpConfig(iam_model.IdpProviderTypeSystem, event)
 	}
 	return err
 }

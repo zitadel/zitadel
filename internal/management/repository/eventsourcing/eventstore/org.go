@@ -251,6 +251,8 @@ func (repo *OrgRepository) ChangeOidcIdpConfig(ctx context.Context, oidcConfig *
 
 func (repo *OrgRepository) SearchIdpConfigs(ctx context.Context, request *iam_model.IdpConfigSearchRequest) (*iam_model.IdpConfigSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
+	request.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID, repo.SystemDefaults.IamID)
+
 	sequence, err := repo.View.GetLatestIdpConfigSequence()
 	logging.Log("EVENT-Dk8si").OnError(err).Warn("could not read latest idp config sequence")
 	idps, count, err := repo.View.SearchIdpConfigs(request)

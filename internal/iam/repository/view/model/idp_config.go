@@ -16,9 +16,10 @@ import (
 )
 
 const (
-	IdpConfigKeyIdpConfigID = "idp_config_id"
-	IdpConfigKeyIamID       = "iam_id"
-	IdpConfigKeyName        = "name"
+	IdpConfigKeyIdpConfigID  = "idp_config_id"
+	IdpConfigKeyAggregateID  = "aggregate_id"
+	IdpConfigKeyName         = "name"
+	IdpConfigKeyProviderType = "idp_provider_type"
 )
 
 type IdpConfigView struct {
