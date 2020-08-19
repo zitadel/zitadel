@@ -3,12 +3,10 @@
     <app-refresh-table class="refresh-table" (refreshed)="refreshPage()" [dataSize]="dataSource?.totalResult"
         [selection]="selection" [loading]="dataSource?.loading$ | async">
 
-        <!-- <ng-template appHasRole [appHasRole]="['org.member.delete:'+org.id,'org.member.delete']">
-            <button (click)="removeProjectMemberSelection()" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}"
-                class="icon-button" mat-icon-button *ngIf="selection.hasValue()" color="warn">
-                <i class="las la-trash"></i>
-            </button>
-        </ng-template> -->
+        <button actions (click)="removeSelectedMemberships()" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}"
+            class="icon-button" mat-icon-button *ngIf="selection.hasValue()" color="warn">
+            <i class="las la-trash"></i>
+        </button>
 
         <a actions color="primary" class="add-button" (click)="addMember()" color="primary" mat-raised-button>
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
@@ -55,10 +53,11 @@
                     </td>
                 </ng-container>
 
-                <!-- <ng-container matColumnDef="roles">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.ROLES' | translate }} </th>
-                <td class="pointer" mat-cell *matCellDef="let member">
-                    <mat-form-field class="form-field" appearance="outline">
+                <ng-container matColumnDef="roles">
+                    <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.ROLES' | translate }} </th>
+                    <td class="pointer" mat-cell *matCellDef="let member">
+                        {{member.rolesList}}
+                        <!-- <mat-form-field class="form-field" appearance="outline">
                         <mat-label>{{ 'PROJECT.GRANT.TITLE' | translate }}</mat-label>
                         <mat-select [(ngModel)]="member.rolesList" multiple
                             [disabled]="(['org.member.write'] | hasRole | async) == false"
@@ -67,9 +66,9 @@
                                 {{ role  }}
                             </mat-option>
                         </mat-select>
-                    </mat-form-field>
-                </td>
-            </ng-container> -->
+                    </mat-form-field> -->
+                    </td>
+                </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                 <tr class="data-row" mat-row *matRowDef="let row; columns: displayedColumns;">

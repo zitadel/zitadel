@@ -6,7 +6,13 @@ import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { User, UserMembershipSearchResponse, UserMembershipView, UserView } from 'src/app/proto/generated/management_pb';
+import {
+    MemberType,
+    User,
+    UserMembershipSearchResponse,
+    UserMembershipView,
+    UserView,
+} from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { OrgService } from 'src/app/services/org.service';
@@ -32,7 +38,7 @@ export class MembershipDetailComponent implements AfterViewInit {
     public memberRoleOptions: string[] = [];
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-    public displayedColumns: string[] = ['select', 'memberType', 'displayName', 'creationDate', 'changeDate', /* 'roles'*/];
+    public displayedColumns: string[] = ['select', 'memberType', 'displayName', 'creationDate', 'changeDate', 'roles'];
 
     public loading: boolean = false;
     public memberships!: UserMembershipSearchResponse.AsObject;
@@ -97,15 +103,18 @@ export class MembershipDetailComponent implements AfterViewInit {
         );
     }
 
-    // public removeProjectMemberSelection(): void {
-    //     Promise.all(this.selection.selected.map(member => {
-    //         return this.mgmtUserService.RemoveMyOrgMember(member.userId).then(() => {
-    //             this.toast.showInfo('ORG.TOAST.MEMBERREMOVED', true);
-    //         }).catch(error => {
-    //             this.toast.showError(error);
-    //         });
-    //     }));
-    // }
+    public removeMemberships(): void {
+        Promise.all(this.selection.selected.map(membership => {
+            switch (membership.memberType) {
+                case MemberType.MEMBERTYPE_ORGANISATION:
+                    return this.orgService.RemoveMyOrgMember(membership.objectId);
+                case MemberType.MEMBERTYPE_PROJECT:
+                    return this.projectService.RemoveProjectMember(membership.objectId, this.user.id);
+                case MemberType.MEMBERTYPE_PROJECT_GRANT:
+                    return this.projectService.RemoveProjectGrantMember(membership.objectId, this.user.id);
+            }
+        }));
+    }
 
     // public removeMember(member: ProjectMember.AsObject): void {
     //     this.orgService.RemoveMyOrgMember(member.userId).then(() => {

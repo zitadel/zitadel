@@ -307,12 +307,10 @@ export class ProjectService {
     }
 
     public async RemoveProjectGrantMember(
-        projectId: string,
         grantId: string,
         userId: string,
     ): Promise<Empty> {
         const req = new ProjectGrantMemberRemove();
-        req.setProjectId(projectId);
         req.setGrantId(grantId);
         req.setUserId(userId);
         return await this.request(

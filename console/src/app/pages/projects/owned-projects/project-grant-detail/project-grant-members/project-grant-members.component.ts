@@ -86,7 +86,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
 
     public removeProjectMemberSelection(): void {
         Promise.all(this.selection.selected.map(member => {
-            return this.projectService.RemoveProjectGrantMember(this.projectId, this.grantId, member.userId).then(() => {
+            return this.projectService.RemoveProjectGrantMember(this.grantId, member.userId).then(() => {
                 this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERREMOVED', true);
             }).catch(error => {
                 this.toast.showError(error);
@@ -95,7 +95,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
     }
 
     public removeMember(member: ProjectMember.AsObject): void {
-        this.projectService.RemoveProjectGrantMember(this.projectId, this.grantId, member.userId).then(() => {
+        this.projectService.RemoveProjectGrantMember(this.grantId, member.userId).then(() => {
             this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERREMOVED', true);
         }).catch(error => {
             this.toast.showError(error);
