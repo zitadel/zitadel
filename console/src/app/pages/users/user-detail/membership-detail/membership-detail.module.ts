@@ -10,6 +10,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
+import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
@@ -41,6 +42,7 @@ const routes: Routes = [
         HasRoleModule,
         MatIconModule,
         MatButtonModule,
+        RefreshTableModule,
     ],
 })
 export class MembershipDetailModule { }

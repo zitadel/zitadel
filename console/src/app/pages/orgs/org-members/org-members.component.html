@@ -72,10 +72,10 @@
             </ng-container>
 
             <ng-container matColumnDef="roles">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.ROLES' | translate }} </th>
+                <th mat-header-cell *matHeaderCellDef> {{ 'ROLESLABEL' | translate }} </th>
                 <td class="pointer" mat-cell *matCellDef="let member">
                     <mat-form-field class="form-field" appearance="outline">
-                        <mat-label>{{ 'PROJECT.GRANT.TITLE' | translate }}</mat-label>
+                        <mat-label>{{ 'ROLESLABEL' | translate }}</mat-label>
                         <mat-select [(ngModel)]="member.rolesList" multiple
                             [disabled]="(['org.member.write'] | hasRole | async) == false"
                             (selectionChange)="updateRoles(member, $event)">

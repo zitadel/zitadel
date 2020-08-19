@@ -127,4 +127,9 @@ export class IamMembersComponent implements AfterViewInit {
             }
         });
     }
+
+    public refreshPage(): void {
+        this.selection.clear();
+        this.dataSource.loadMembers(this.paginator.pageIndex, this.paginator.pageSize);
+    }
 }

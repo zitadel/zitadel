@@ -52,7 +52,11 @@ export class MembershipDetailComponent implements AfterViewInit {
                 this.mgmtUserService.GetUserByID(id).then(user => {
                     this.user = user.toObject();
                     this.dataSource = new MembershipDetailDataSource(this.mgmtUserService);
-                    this.loadMembershipsPage();
+                    this.dataSource.loadMemberships(
+                        this.user.id,
+                        0,
+                        50,
+                    );
                 }).catch(err => {
                     console.error(err);
                 });
@@ -222,5 +226,10 @@ export class MembershipDetailComponent implements AfterViewInit {
                     });
             });
         }
+    }
+
+    public refreshPage(): void {
+        this.selection.clear();
+        this.dataSource.loadMemberships(this.user.id, this.paginator.pageIndex, this.paginator.pageSize);
     }
 }
