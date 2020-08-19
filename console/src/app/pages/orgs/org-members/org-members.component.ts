@@ -6,7 +6,7 @@ import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { Org, OrgMember, OrgMemberView, ProjectMember, ProjectType, User } from 'src/app/proto/generated/management_pb';
+import { Org, OrgMemberView, ProjectType, User } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -63,7 +63,7 @@ export class OrgMembersComponent implements AfterViewInit {
 
     updateRoles(member: OrgMemberView.AsObject, selectionChange: MatSelectChange): void {
         this.orgService.ChangeMyOrgMember(member.userId, selectionChange.value)
-            .then((newmember: OrgMember) => {
+            .then(() => {
                 this.toast.showInfo('ORG.TOAST.MEMBERCHANGED', true);
             }).catch(error => {
                 this.toast.showError(error);
@@ -85,14 +85,6 @@ export class OrgMembersComponent implements AfterViewInit {
                 this.toast.showError(error);
             });
         }));
-    }
-
-    public removeMember(member: ProjectMember.AsObject): void {
-        this.orgService.RemoveMyOrgMember(member.userId).then(() => {
-            this.toast.showInfo('ORG.TOAST.MEMBERREMOVED', true);
-        }).catch(error => {
-            this.toast.showError(error);
-        });
     }
 
     public isAllSelected(): boolean {

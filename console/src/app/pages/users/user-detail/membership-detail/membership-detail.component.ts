@@ -103,7 +103,7 @@ export class MembershipDetailComponent implements AfterViewInit {
         );
     }
 
-    public removeMemberships(): void {
+    public removeSelectedMemberships(): void {
         Promise.all(this.selection.selected.map(membership => {
             switch (membership.memberType) {
                 case MemberType.MEMBERTYPE_ORGANISATION:
@@ -115,14 +115,6 @@ export class MembershipDetailComponent implements AfterViewInit {
             }
         }));
     }
-
-    // public removeMember(member: ProjectMember.AsObject): void {
-    //     this.orgService.RemoveMyOrgMember(member.userId).then(() => {
-    //         this.toast.showInfo('ORG.TOAST.MEMBERREMOVED', true);
-    //     }).catch(error => {
-    //         this.toast.showError(error);
-    //     });
-    // }
 
     public isAllSelected(): boolean {
         const numSelected = this.selection.selected.length;

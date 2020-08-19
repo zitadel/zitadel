@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
@@ -12,7 +12,7 @@ import { ToastService } from 'src/app/services/toast.service';
     templateUrl: './failed-events.component.html',
     styleUrls: ['./failed-events.component.scss'],
 })
-export class FailedEventsComponent {
+export class FailedEventsComponent implements AfterViewInit {
     @ViewChild(MatPaginator) public eventPaginator!: MatPaginator;
     public eventDataSource!: MatTableDataSource<FailedEvent.AsObject>;
 
@@ -21,6 +21,10 @@ export class FailedEventsComponent {
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     constructor(private adminService: AdminService, private toast: ToastService) {
+        this.loadEvents();
+    }
+
+    ngAfterViewInit(): void {
         this.loadEvents();
     }
 
