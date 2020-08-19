@@ -2,12 +2,13 @@ package handler
 
 import (
 	"github.com/caos/logging"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 )
 
 type IdpConfig struct {
@@ -41,11 +42,12 @@ func (m *IdpConfig) Reduce(event *models.Event) (err error) {
 }
 
 func (m *IdpConfig) processIdpConfig(event *models.Event) (err error) {
-	idp := new(iam_model.IdpConfigView)
+	idp := new(iam_view_model.IdpConfigView)
 	switch event.Type {
 	case model.IdpConfigAdded:
-		err = idp.AppendEvent(event)
+		err = idp.AppendEvent(iam_model.IdpProviderTypeSystem, event)
 	case model.IdpConfigChanged,
+		model.OidcIdpConfigAdded,
 		model.OidcIdpConfigChanged:
 		err = idp.SetData(event)
 		if err != nil {
@@ -55,7 +57,7 @@ func (m *IdpConfig) processIdpConfig(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		err = idp.AppendEvent(event)
+		err = idp.AppendEvent(iam_model.IdpProviderTypeSystem, event)
 	case model.IdpConfigRemoved:
 		err = idp.SetData(event)
 		if err != nil {

@@ -5,14 +5,15 @@ CREATE TABLE adminapi.idp_configs (
     creation_date TIMESTAMPTZ,
     change_date TIMESTAMPTZ,
     sequence BIGINT,
-    iam_id TEXT,
+    aggregate_id TEXT,
     name TEXT,
     logo_src TEXT,
     idp_state SMALLINT,
+    idp_provider_type SMALLINT,
 
     is_oidc BOOLEAN,
     oidc_client_id TEXT,
-    oidc_client_secret BYTEA,
+    oidc_client_secret JSONB,
     oidc_issuer TEXT,
     oidc_scopes TEXT ARRAY,
 
@@ -26,14 +27,15 @@ CREATE TABLE management.idp_configs (
     creation_date TIMESTAMPTZ,
     change_date TIMESTAMPTZ,
     sequence BIGINT,
-    resource_owner TEXT,
+    aggregate_id TEXT,
     name TEXT,
     logo_src TEXT,
     idp_state SMALLINT,
+    idp_provider_type SMALLINT,
 
     is_oidc BOOLEAN,
     oidc_client_id TEXT,
-    oidc_client_secret BYTEA,
+    oidc_client_secret JSONB
     oidc_issuer TEXT,
     oidc_scopes TEXT ARRAY,
 

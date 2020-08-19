@@ -129,7 +129,7 @@ func (s *Setup) Execute(ctx context.Context, setUpConfig IAMSetUp) error {
 		createdProjects: make(map[string]*proj_model.Project),
 	}
 
-	err = setUp.loginPolicy(ctx, s.setUpConfig.DefaultLoginPolicy)
+	err = setUp.loginPolicy(ctx, setUpConfig.DefaultLoginPolicy)
 	if err != nil {
 		logging.Log("SETUP-Hdu8S").WithError(err).Error("unable to create login policy")
 		return err
@@ -176,8 +176,7 @@ func (s *Setup) Execute(ctx context.Context, setUpConfig IAMSetUp) error {
 	return nil
 }
 
-
-func (setUp *initializer) loginPolicy(ctx context.Context, policy types.LoginPolicy) error {
+func (setUp *initializer) loginPolicy(ctx context.Context, policy LoginPolicy) error {
 	logging.Log("SETUP-4djul").Info("setting up login policy")
 	loginPolicy := &iam_model.LoginPolicy{
 		ObjectRoot: models.ObjectRoot{
@@ -187,7 +186,7 @@ func (setUp *initializer) loginPolicy(ctx context.Context, policy types.LoginPol
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		AllowExternalIdp:      policy.AllowExternalIdp,
 	}
-	_, err := setUp.repos.IamEvents.AddLoginPolicy(ctx, loginPolicy)
+	_, err := setUp.IamEvents.AddLoginPolicy(ctx, loginPolicy)
 	return err
 }
 

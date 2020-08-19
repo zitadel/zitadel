@@ -227,6 +227,9 @@ func (es *IamEventstore) AddIdpConfiguration(ctx context.Context, idp *iam_model
 	if idp.OIDCConfig != nil {
 		idp.OIDCConfig.IDPConfigID = id
 		err = idp.OIDCConfig.CryptSecret(es.secretCrypto)
+		if err != nil {
+			return nil, err
+		}
 	}
 	repoIam := model.IamFromModel(existing)
 	repoIdp := model.IdpConfigFromModel(idp)

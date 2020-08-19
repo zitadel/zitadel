@@ -7,18 +7,19 @@ import (
 )
 
 type IdpConfigView struct {
-	IamID        string
-	IdpConfigID  string
-	Name         string
-	LogoSrc      string
-	State        IdpConfigState
-	CreationDate time.Time
-	ChangeDate   time.Time
-	Sequence     uint64
+	AggregateID     string
+	IdpConfigID     string
+	Name            string
+	LogoSrc         string
+	State           IdpConfigState
+	CreationDate    time.Time
+	ChangeDate      time.Time
+	Sequence        uint64
+	IdpProviderType IdpProviderType
 
 	IsOidc           bool
 	OidcClientID     string
-	OidcClientSecret crypto.CryptoValue
+	OidcClientSecret *crypto.CryptoValue
 	OidcIssuer       string
 	OidcScopes       []string
 }

@@ -2,9 +2,9 @@ package view
 
 import (
 	"github.com/caos/zitadel/internal/errors"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	"github.com/caos/zitadel/internal/org/repository/view"
-	"github.com/caos/zitadel/internal/org/repository/view/model"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/iam/repository/view"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	global_view "github.com/caos/zitadel/internal/view/repository"
 )
 
@@ -12,15 +12,15 @@ const (
 	idpConfigTable = "management.idp_configs"
 )
 
-func (v *View) IdpConfigByID(idpID string) (*model.IdpConfigView, error) {
+func (v *View) IdpConfigByID(idpID string) (*iam_es_model.IdpConfigView, error) {
 	return view.IdpByID(v.Db, idpConfigTable, idpID)
 }
 
-func (v *View) SearchIdpConfigs(request *org_model.IdpConfigSearchRequest) ([]*model.IdpConfigView, uint64, error) {
+func (v *View) SearchIdpConfigs(request *iam_model.IdpConfigSearchRequest) ([]*iam_es_model.IdpConfigView, uint64, error) {
 	return view.SearchIdps(v.Db, idpConfigTable, request)
 }
 
-func (v *View) PutIdpConfig(idp *model.IdpConfigView, sequence uint64) error {
+func (v *View) PutIdpConfig(idp *iam_es_model.IdpConfigView, sequence uint64) error {
 	err := view.PutIdp(v.Db, idpConfigTable, idp)
 	if err != nil {
 		return err

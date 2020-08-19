@@ -44,9 +44,9 @@ func (m *LoginPolicy) Reduce(event *models.Event) (err error) {
 func (m *LoginPolicy) processLoginPolicy(event *models.Event) (err error) {
 	policy := new(iam_model.LoginPolicyView)
 	switch event.Type {
-	case model.LoginPolicyAdded:
+	case iam_es_model.LoginPolicyAdded, model.LoginPolicyAdded:
 		err = policy.AppendEvent(event)
-	case model.LoginPolicyChanged:
+	case iam_es_model.LoginPolicyChanged, model.LoginPolicyChanged:
 		policy, err = m.view.LoginPolicyByAggregateID(event.AggregateID)
 		if err != nil {
 			return err

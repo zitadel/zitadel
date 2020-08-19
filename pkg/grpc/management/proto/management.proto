@@ -2805,10 +2805,11 @@ message IdpView {
     google.protobuf.Timestamp change_date = 4;
     string name = 5;
     string logo_src = 6;
+    IdpProviderType provider_type = 7;
     oneof idp_config_view {
-        OidcIdpConfigView oidc_config = 7;
+        OidcIdpConfigView oidc_config = 8;
     }
-    uint64 sequence = 8;
+    uint64 sequence = 9;
 }
 
 message OidcIdpConfigView {
@@ -2833,6 +2834,7 @@ enum IdpSearchKey {
     IDPSEARCHKEY_UNSPECIFIED = 0;
     IDPSEARCHKEY_IDP_CONFIG_ID = 1;
     IDPSEARCHKEY_NAME = 2;
+    IDPSEARCHKEY_PROVIDER_TYPE = 3;
 }
 
 message LoginPolicy {
@@ -2866,6 +2868,12 @@ enum IdpType {
     IDPTYPE_UNSPECIFIED = 0;
     IDPTYPE_OIDC = 1;
     IDPTYPE_SAML = 2;
+}
+
+enum IdpProviderType {
+  IDPPROVIDERTYPE_UNSPECIFIED = 0;
+  IDPPROVIDERTYPE_SYSTEM = 1;
+  IDPPROVIDERTYPE_ORG = 2;
 }
 
 message IdpProviderSearchResponse {

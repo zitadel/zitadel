@@ -30,9 +30,9 @@ func SearchIdps(db *gorm.DB, table string, req *iam_model.IdpConfigSearchRequest
 	return idps, count, nil
 }
 
-func PutIdp(db *gorm.DB, table string, role *model.IdpConfigView) error {
+func PutIdp(db *gorm.DB, table string, idp *model.IdpConfigView) error {
 	save := repository.PrepareSave(table)
-	return save(db, role)
+	return save(db, idp)
 }
 
 func DeleteIdp(db *gorm.DB, table, idpID string) error {

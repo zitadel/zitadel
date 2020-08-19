@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
+	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"strings"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -213,12 +213,12 @@ func (repo *OrgRepository) GetOrgMemberRoles() []string {
 	return roles
 }
 
-func (repo *OrgRepository) IdpConfigByID(ctx context.Context, idpConfigID string) (*org_model.IdpConfigView, error) {
+func (repo *OrgRepository) IdpConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IdpConfigView, error) {
 	idp, err := repo.View.IdpConfigByID(idpConfigID)
 	if err != nil {
 		return nil, err
 	}
-	return org_view_model.IdpConfigViewToModel(idp), nil
+	return iam_view_model.IdpConfigViewToModel(idp), nil
 }
 func (repo *OrgRepository) AddOidcIdpConfig(ctx context.Context, idp *iam_model.IdpConfig) (*iam_model.IdpConfig, error) {
 	idp.AggregateID = repo.SystemDefaults.IamID
@@ -249,7 +249,7 @@ func (repo *OrgRepository) ChangeOidcIdpConfig(ctx context.Context, oidcConfig *
 	return repo.OrgEventstore.ChangeIdpOidcConfiguration(ctx, oidcConfig)
 }
 
-func (repo *OrgRepository) SearchIdpConfigs(ctx context.Context, request *org_model.IdpConfigSearchRequest) (*org_model.IdpConfigSearchResponse, error) {
+func (repo *OrgRepository) SearchIdpConfigs(ctx context.Context, request *iam_model.IdpConfigSearchRequest) (*iam_model.IdpConfigSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, err := repo.View.GetLatestIdpConfigSequence()
 	logging.Log("EVENT-Dk8si").OnError(err).Warn("could not read latest idp config sequence")
@@ -257,11 +257,11 @@ func (repo *OrgRepository) SearchIdpConfigs(ctx context.Context, request *org_mo
 	if err != nil {
 		return nil, err
 	}
-	result := &org_model.IdpConfigSearchResponse{
+	result := &iam_model.IdpConfigSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
-		Result:      org_view_model.IdpConfigViewsToModel(idps),
+		Result:      iam_view_model.IdpConfigViewsToModel(idps),
 	}
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
