@@ -34,7 +34,7 @@
         <mat-label>{{ 'ROLESLABEL' | translate }}</mat-label>
         <mat-select [(ngModel)]="roles" multiple>
             <mat-option *ngFor="let role of memberRoleOptions" [value]="role">
-                {{ 'ROLES.'+role | translate }}
+                {{ role }}
             </mat-option>
         </mat-select>
     </mat-form-field>

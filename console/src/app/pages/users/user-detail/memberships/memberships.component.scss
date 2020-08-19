@@ -9,12 +9,11 @@
   /* stylelint-enable */
 
   .membership-groups {
-    padding-top: 1rem;
-
     .header {
       display: block;
       margin-bottom: 1rem;
       font-weight: 400;
+      margin-top: 0;
     }
 
     .sub-header {
@@ -74,16 +73,20 @@
             height: 40px;
             width: 40px;
             box-sizing: border-box;
-            font-size: 1rem;
+            font-size: 8px;
             border-radius: .5rem;
-            border: 2px solid #00000020 inset;
             font-weight: 800;
             transition: background-color .2s ease-in-out;
             background-color: $accent-color;
             cursor: default;
+            flex-direction: column;
+            overflow: hidden;
+            text-overflow: ellipsis;
 
             i {
               font-size: 1.2rem;
+              flex-basis: 100%;
+              width: 100%;
             }
           }
         }

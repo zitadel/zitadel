@@ -73,7 +73,7 @@
                     <mat-select [(ngModel)]="member.rolesList" multiple [disabled]="disabled"
                         (selectionChange)="updateRoles(member, $event)">
                         <mat-option *ngFor="let role of memberRoleOptions" [value]="role">
-                            {{ 'ROLES.'+role | translate }}
+                            {{ role }}
                         </mat-option>
                     </mat-select>
                 </mat-form-field>
