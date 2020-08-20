@@ -1,4 +1,4 @@
-![ZITADEL](./docs/img/zitadel-logo-dark.svg)
+![ZITADEL](./docs/img/zitadel-logo-dark.svg | height=100)
 
 # ZITADEL
 
