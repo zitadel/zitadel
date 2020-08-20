@@ -37,7 +37,7 @@
 		justify-content: space-between;
 		width: 100vw;
 		height: var(--nav-h);
-		padding: 0 3rem;
+		padding: 0 16px;
 		margin: 0 auto;
 		box-shadow: 0 -0.4rem 0.9rem 0.2rem rgba(0,0,0,.5);
 		z-index: 100;
@@ -56,7 +56,7 @@
 		left: 0;
 		width: 100vw;
 		height: var(--nav-h);
-		padding: 0 3rem 0 3rem;
+		padding: 0 16px 0 16px;
 		display: flex;
 		align-items: center;
 		background-color: transparent;
@@ -90,6 +90,7 @@
 		color: inherit;
 		border-bottom: none;
         transition: none;
+        padding: 0;
     }
 
     @media (min-width: 400px) {
@@ -99,7 +100,9 @@
     }
 
     a img {
-        max-height: 40px;
+        width: 160px;
+        max-height: 45px;
+        padding: 0;
     }
 
     .switcher-wrapper {
