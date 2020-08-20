@@ -150,4 +150,9 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
                 this.toast.showError(error);
             });
     }
+
+    public refreshPage(): void {
+        this.selection.clear();
+        this.dataSource.loadGrantMembers(this.projectId, this.grantId, this.paginator.pageIndex, this.paginator.pageSize);
+    }
 }

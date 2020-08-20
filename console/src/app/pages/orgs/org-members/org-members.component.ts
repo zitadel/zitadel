@@ -3,7 +3,6 @@ import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
-import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { Org, OrgMemberView, ProjectType, User } from 'src/app/proto/generated/management_pb';
@@ -22,7 +21,6 @@ export class OrgMembersComponent implements AfterViewInit {
     public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
     public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    @ViewChild(MatTable) public table!: MatTable<OrgMemberView.AsObject>;
     public dataSource!: OrgMembersDataSource;
     public selection: SelectionModel<OrgMemberView.AsObject> = new SelectionModel<OrgMemberView.AsObject>(true, []);
 
@@ -123,5 +121,10 @@ export class OrgMembersComponent implements AfterViewInit {
                 }
             }
         });
+    }
+
+    public refreshPage(): void {
+        this.selection.clear();
+        this.dataSource.loadMembers(this.paginator.pageIndex, this.paginator.pageSize);
     }
 }

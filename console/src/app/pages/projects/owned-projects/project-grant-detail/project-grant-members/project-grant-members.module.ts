@@ -16,6 +16,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SearchUserAutocompleteModule } from 'src/app/modules/search-user-autocomplete/search-user-autocomplete.module';
 
 import {
@@ -46,6 +47,7 @@ import { ProjectGrantMembersComponent } from './project-grant-members.component'
         MatProgressSpinnerModule,
         FormsModule,
         TranslateModule,
+        RefreshTableModule,
     ],
     exports: [
         ProjectGrantMembersComponent,

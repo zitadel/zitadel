@@ -78,23 +78,6 @@ export class MembershipDetailComponent implements AfterViewInit {
             .subscribe();
     }
 
-    // public getRoleOptions(): void {
-    //     this.orgService.GetOrgMemberRoles().then(resp => {
-    //         this.memberRoleOptions = resp.toObject().rolesList;
-    //     }).catch(error => {
-    //         this.toast.showError(error);
-    //     });
-    // }
-
-    // updateRoles(member: OrgMemberView.AsObject, selectionChange: MatSelectChange): void {
-    //     this.orgService.ChangeMyOrgMember(member.userId, selectionChange.value)
-    //         .then((newmember: OrgMember) => {
-    //             this.toast.showInfo('ORG.TOAST.MEMBERCHANGED', true);
-    //         }).catch(error => {
-    //             this.toast.showError(error);
-    //         });
-    // }
-
     private loadMembershipsPage(): void {
         this.dataSource.loadMemberships(
             this.user.id,

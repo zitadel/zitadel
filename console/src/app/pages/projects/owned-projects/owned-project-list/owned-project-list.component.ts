@@ -1,10 +1,11 @@
 import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { PageEvent } from '@angular/material/paginator';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { ProjectView } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
@@ -36,8 +37,12 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class OwnedProjectListComponent implements OnInit, OnDestroy {
     public totalResult: number = 0;
+    public viewTimestamp!: Timestamp.AsObject;
+
     public dataSource: MatTableDataSource<ProjectView.AsObject> =
         new MatTableDataSource<ProjectView.AsObject>();
+
+    @ViewChild(MatPaginator) public paginator!: MatPaginator;
 
     public ownedProjectList: ProjectView.AsObject[] = [];
     public displayedColumns: string[] = ['select', 'name', 'state', 'creationDate', 'changeDate'];
@@ -125,5 +130,10 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
         }).catch(error => {
             this.toast.showError(error);
         });
+    }
+
+    public refreshPage(): void {
+        this.selection.clear();
+        this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
     }
 }

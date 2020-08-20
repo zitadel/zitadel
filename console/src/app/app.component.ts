@@ -8,7 +8,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Router, RouterOutlet } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of, Subscription } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import { accountCard, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { Org, UserProfileView } from './proto/generated/auth_pb';
@@ -213,7 +213,7 @@ export class AppComponent implements OnDestroy {
     }
 
     private getProjectCount(): void {
-        this.authService.isAllowed(['project.read']).pipe(take(1)).subscribe((allowed) => {
+        this.authService.isAllowed(['project.read']).subscribe((allowed) => {
             if (allowed) {
                 this.projectService.SearchProjects(0, 0).then(res => {
                     this.ownedProjectsCount = res.toObject().totalResult;
