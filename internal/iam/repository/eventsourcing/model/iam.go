@@ -20,7 +20,7 @@ type Iam struct {
 	IamProjectID       string       `json:"iamProjectId,omitempty"`
 	Members            []*IamMember `json:"-"`
 	IDPs               []*IdpConfig `json:"-"`
-	DefaultLoginPolicy *LoginPolicy
+	DefaultLoginPolicy *LoginPolicy `json:"-"`
 }
 
 func IamFromModel(iam *model.Iam) *Iam {

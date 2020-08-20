@@ -323,8 +323,7 @@ service AdminService {
 
     rpc GetDefaultLoginPolicy(google.protobuf.Empty) returns (DefaultLoginPolicyView) {
         option (google.api.http) = {
-            put: "/policies/login"
-            body: "*"
+            get: "/policies/login"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -345,7 +344,7 @@ service AdminService {
 
     rpc GetDefaultLoginPolicyIdpProviders(IdpProviderSearchRequest) returns (IdpProviderSearchResponse) {
         option (google.api.http) = {
-            post: "/policies/login/idpproviders"
+            post: "/policies/login/idpproviders/_search"
             body: "*"
         };
 

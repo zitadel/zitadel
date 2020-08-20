@@ -650,6 +650,20 @@
       }
     },
     "/policies/login": {
+      "get": {
+        "operationId": "GetDefaultLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultLoginPolicyView"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      },
       "put": {
         "operationId": "UpdateDefaultLoginPolicy",
         "responses": {
@@ -693,6 +707,32 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/v1IdpProviderID"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/login/idpproviders/_search": {
+      "post": {
+        "operationId": "GetDefaultLoginPolicyIdpProviders",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IdpProviderSearchResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1IdpProviderSearchRequest"
             }
           }
         ],
