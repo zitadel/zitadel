@@ -1129,6 +1129,20 @@ func (es *UserEventstore) DomainClaimedSent(ctx context.Context, userID string) 
 	return nil
 }
 
+func (es *UserEventstore) ChangeUsername(ctx context.Context, policy *policy_model.PasswordComplexityPolicy, userID, old, new string) (*usr_model.Password, error) {
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if user.Password == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Fds3s", "Errors.User.Password.Empty")
+	}
+	if err := crypto.CompareHash(user.Password.SecretCrypto, []byte(old), es.PasswordAlg); err != nil {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-s56a3", "Errors.User.Password.Invalid")
+	}
+	return es.changedPassword(ctx, user, policy, new, false)
+}
+
 func (es *UserEventstore) generateTemporaryLoginName() (string, error) {
 	id, err := es.idGenerator.Next()
 	if err != nil {

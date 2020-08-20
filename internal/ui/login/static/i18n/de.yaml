@@ -21,6 +21,11 @@ UserSelection:
   SessionState0: aktiv
   SessionState1: inaktiv
 
+UsernameChange:
+  Title: Usernamen ändern
+  Description: Wähle deinen neuen Benutzernamen
+  Username: Benutzernamen
+
 MfaVerify:
   Title: Multifaktor verifizieren
   Description: Verifiziere deinen Multifaktor

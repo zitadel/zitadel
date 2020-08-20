@@ -278,6 +278,11 @@ func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, li
 	return changes, nil
 }
 
+func (repo *UserRepo) ChangeUsername(ctx context.Context, userID, username string) error {
+	//return repo.UserEvents.ChangeUsername(ctx, userID, username)
+	return nil
+}
+
 func checkIDs(ctx context.Context, obj es_models.ObjectRoot) error {
 	if obj.AggregateID != authz.GetCtxData(ctx).UserID {
 		return errors.ThrowPermissionDenied(nil, "EVENT-kFi9w", "object does not belong to user")

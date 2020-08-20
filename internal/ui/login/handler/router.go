@@ -13,6 +13,7 @@ const (
 	EndpointLogin            = "/login"
 	EndpointLoginName        = "/loginname"
 	EndpointUserSelection    = "/userselection"
+	EndpointChangeUsername   = "/username/change"
 	EndpointPassword         = "/password"
 	EndpointInitPassword     = "/password/init"
 	EndpointChangePassword   = "/password/change"

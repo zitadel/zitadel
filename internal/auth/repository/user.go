@@ -24,6 +24,8 @@ type UserRepository interface {
 	AddMfaOTP(ctx context.Context, userID string) (*model.OTP, error)
 	VerifyMfaOTPSetup(ctx context.Context, userID, code string) error
 
+	ChangeUsername(ctx context.Context, userID, username string) error
+
 	SignOut(ctx context.Context, agentID string) error
 
 	UserByID(ctx context.Context, userID string) (*model.UserView, error)

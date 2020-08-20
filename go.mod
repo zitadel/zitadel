@@ -62,3 +62,6 @@ require (
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/square/go-jose.v2 v2.5.1
 )
+
+
+replace github.com/caos/oidc => /Users/livio/workspaces/go/src/github.com/caos/oidc

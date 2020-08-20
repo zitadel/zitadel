@@ -21,6 +21,11 @@ Password:
   HasNumber: Number
   HasSymbol: Symbol
 
+UsernameChange:
+  Title: Change Username
+  Description: Set your new username
+  Username: Username
+
 MfaVerify:
   Title: Verify Multificator
   Description: Verify your multifactor
