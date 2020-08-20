@@ -1,4 +1,4 @@
-<img src="./docs/img/zitadel-logo-dark.svg" style="height=50px;"/>
+<img src="./docs/img/zitadel-logo-dark@2x.png" style="height=50px;"/>
 
 # ZITADEL
 
