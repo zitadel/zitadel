@@ -96,7 +96,7 @@ export class ProjectMembersComponent {
                     this.toast.showError(error);
                 });
             } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
-                return this.projectService.RemoveProjectGrantMember(this.grantId,
+                return this.projectService.RemoveProjectGrantMember(this.project.projectId, this.grantId,
                     member.userId).then(() => {
                         this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
                     }).catch(error => {

@@ -65,7 +65,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            align-items: center;
             text-transform: uppercase;
             color: white;
             outline: none;
@@ -83,12 +82,12 @@
             overflow: hidden;
 
             span {
-                max-width: 30px;
-                text-overflow: ellipsis;
-                font-weight: 800;
-                display: block;
-                white-space: nowrap;
-                overflow: hidden;
+              max-width: 30px;
+              text-overflow: ellipsis;
+              font-weight: 800;
+              display: block;
+              white-space: nowrap;
+              overflow: hidden;
             }
 
             i {

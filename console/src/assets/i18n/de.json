@@ -234,6 +234,7 @@
             "CREATIONDATE":"Erstelldatum",
             "CHANGEDATE":"Letzte Änderung",
             "DISPLAYNAME":"Anzeigename",
+            "REMOVE":"Entfernen",
             "TYPE":"Typ",
             "TYPES":{
                 "0":"Unbekannt",

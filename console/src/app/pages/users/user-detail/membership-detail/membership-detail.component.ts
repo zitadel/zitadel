@@ -6,13 +6,7 @@ import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import {
-    MemberType,
-    User,
-    UserMembershipSearchResponse,
-    UserMembershipView,
-    UserView,
-} from 'src/app/proto/generated/management_pb';
+import { User, UserMembershipSearchResponse, UserMembershipView, UserView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { OrgService } from 'src/app/services/org.service';
@@ -86,18 +80,18 @@ export class MembershipDetailComponent implements AfterViewInit {
         );
     }
 
-    public removeSelectedMemberships(): void {
-        Promise.all(this.selection.selected.map(membership => {
-            switch (membership.memberType) {
-                case MemberType.MEMBERTYPE_ORGANISATION:
-                    return this.orgService.RemoveMyOrgMember(membership.objectId);
-                case MemberType.MEMBERTYPE_PROJECT:
-                    return this.projectService.RemoveProjectMember(membership.objectId, this.user.id);
-                case MemberType.MEMBERTYPE_PROJECT_GRANT:
-                    return this.projectService.RemoveProjectGrantMember(membership.objectId, this.user.id);
-            }
-        }));
-    }
+    // public removeSelectedMemberships(): void {
+    //     Promise.all(this.selection.selected.map(membership => {
+    //         switch (membership.memberType) {
+    //             case MemberType.MEMBERTYPE_ORGANISATION:
+    //                 return this.orgService.RemoveMyOrgMember(membership.objectId);
+    //             case MemberType.MEMBERTYPE_PROJECT:
+    //                 return this.projectService.RemoveProjectMember(membership.objectId, this.user.id);
+    //             // case MemberType.MEMBERTYPE_PROJECT_GRANT:
+    //             //     return this.projectService.RemoveProjectGrantMember(membership.objectId, this.user.id);
+    //         }
+    //     }));
+    // }
 
     public isAllSelected(): boolean {
         const numSelected = this.selection.selected.length;

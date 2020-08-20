@@ -234,6 +234,7 @@
             "CREATIONDATE":"Creation Date",
             "CHANGEDATE":"Last Modified",
             "DISPLAYNAME":"Displayname",
+            "REMOVE":"Remove",
             "TYPE":"Type",
             "TYPES":{
                 "0":"Unknown",

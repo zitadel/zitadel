@@ -11,7 +11,7 @@
                         matTooltip="{{ membership.displayName }} | {{membership.rolesList?.join(' ')}}"
                         [ngStyle]="{'z-index': 100 - i}">
                         <div class="membership-avatar"
-                            [ngStyle]="{'background-color': getColor(membership.memberType), 'cursor': membership.memberType == MemberType.MEMBERTYPE_PROJECT ? 'pointer': 'default'}">
+                            [ngStyle]="{'background-color': getColor(membership.memberType)}">
                             <i *ngIf="membership.memberType == MemberType.MEMBERTYPE_ORGANISATION"
                                 class="las la-archway"></i>
                             <i *ngIf="membership.memberType == MemberType.MEMBERTYPE_PROJECT"
