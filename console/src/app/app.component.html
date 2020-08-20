@@ -2,7 +2,7 @@
     <ng-container *ngIf="((['iam.read','iam.write'] | hasRole)) as iamuser$">
         <mat-toolbar class="root-header">
             <button aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
-                <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+                <i class="icon las la-bars"></i>
             </button>
             <a *ngIf="(isHandset$ | async) == false" class="title" [routerLink]="['/']">
                 <img class="logo" alt="zitadel logo" *ngIf="componentCssClass == 'dark-theme'; else lighttheme"
@@ -28,7 +28,7 @@
                     {{temporg?.name ? temporg.name : 'NO NAME'}}
                 </button>
 
-                <ng-template appHasRole [appHasRole]="['iam.write']">
+                <ng-template appHasRole [appHasRole]="['(org.create)?(iam.write)?']">
                     <button mat-menu-item [routerLink]="[ '/org/create' ]">
                         <mat-icon class="avatar">add</mat-icon>
                         {{'MENU.NEWORG' | translate}}
@@ -79,7 +79,7 @@
                                 </a>
                             </ng-template>
 
-                            <ng-template appHasRole [appHasRole]="['project.read']">
+                            <ng-template appHasRole [appHasRole]="['project.read(:[0-9]*)?']">
                                 <div @navitem class="divider">
                                     <div class="line"></div>
                                     <span>{{'MENU.PROJECTSSECTION' | translate}}</span>
@@ -108,7 +108,7 @@
                                 </a>
                             </ng-template>
 
-                            <ng-template appHasRole [appHasRole]="['user.read']">
+                            <ng-template appHasRole [appHasRole]="['user.read(:[0-9]*)?']">
                                 <div @navitem class="divider">
                                     <div class="line"></div>
                                     <span class="label">

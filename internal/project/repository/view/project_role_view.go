@@ -23,6 +23,19 @@ func ProjectRoleByIDs(db *gorm.DB, table, projectID, orgID, key string) (*model.
 	return role, err
 }
 
+func ProjectRolesByProjectID(db *gorm.DB, table, projectID string) ([]*model.ProjectRoleView, error) {
+	roles := make([]*model.ProjectRoleView, 0)
+	queries := []*proj_model.ProjectRoleSearchQuery{
+		&proj_model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
+	}
+	query := repository.PrepareSearchQuery(table, model.ProjectRoleSearchRequest{Queries: queries})
+	_, err := query(db, &roles)
+	if err != nil {
+		return nil, err
+	}
+	return roles, nil
+}
+
 func ResourceOwnerProjectRolesByKey(db *gorm.DB, table, projectID, resourceOwner, key string) ([]*model.ProjectRoleView, error) {
 	roles := make([]*model.ProjectRoleView, 0)
 	queries := []*proj_model.ProjectRoleSearchQuery{
@@ -74,4 +87,10 @@ func DeleteProjectRole(db *gorm.DB, table, projectID, orgID, key string) error {
 	}
 	delete := repository.PrepareDeleteByObject(table, role)
 	return delete(db)
+}
+
+func DeleteProjectRolesByProjectID(db *gorm.DB, table, projectID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.ProjectRoleSearchKey(proj_model.ProjectRoleSearchKeyProjectID), projectID)
+	return delete(db)
+
 }

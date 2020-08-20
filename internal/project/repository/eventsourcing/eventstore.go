@@ -163,6 +163,35 @@ func (es *ProjectEventstore) ReactivateProject(ctx context.Context, id string) (
 	return model.ProjectToModel(repoExisting), nil
 }
 
+func (es *ProjectEventstore) RemoveProject(ctx context.Context, proj *proj_model.Project) error {
+	project, aggregate, err := es.PrepareRemoveProject(ctx, proj)
+	if err != nil {
+		return err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, project.AppendEvents, aggregate)
+	if err != nil {
+		return err
+	}
+	es.projectCache.cacheProject(project)
+	return nil
+}
+
+func (es *ProjectEventstore) PrepareRemoveProject(ctx context.Context, proj *proj_model.Project) (*model.Project, *es_models.Aggregate, error) {
+	if proj.AggregateID == "" {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Akbov", "Errors.ProjectInvalid")
+	}
+	existing, err := es.ProjectByID(ctx, proj.AggregateID)
+	if err != nil {
+		return nil, nil, err
+	}
+	repoProject := model.ProjectFromModel(existing)
+	projectAggregate, err := ProjectRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoProject, projectAggregate, nil
+}
+
 func (es *ProjectEventstore) ProjectMemberByIDs(ctx context.Context, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
 	if member.UserID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-ld93d", "Errors.Project.UserIDMissing")
@@ -202,7 +231,7 @@ func (es *ProjectEventstore) AddProjectMember(ctx context.Context, member *proj_
 	if _, m := model.GetProjectMember(repoProject.Members, member.UserID); m != nil {
 		return model.ProjectMemberToModel(m), nil
 	}
-	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Errors.Internal")
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-rfQWv", "Errors.Internal")
 }
 
 func (es *ProjectEventstore) ChangeProjectMember(ctx context.Context, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
@@ -229,7 +258,7 @@ func (es *ProjectEventstore) ChangeProjectMember(ctx context.Context, member *pr
 	if _, m := model.GetProjectMember(repoProject.Members, member.UserID); m != nil {
 		return model.ProjectMemberToModel(m), nil
 	}
-	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Errors.Internal")
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-pLyzi", "Errors.Internal")
 }
 
 func (es *ProjectEventstore) RemoveProjectMember(ctx context.Context, member *proj_model.ProjectMember) error {
@@ -253,6 +282,29 @@ func (es *ProjectEventstore) RemoveProjectMember(ctx context.Context, member *pr
 	}
 	es.projectCache.cacheProject(repoProject)
 	return err
+}
+
+func (es *ProjectEventstore) PrepareRemoveProjectMember(ctx context.Context, member *proj_model.ProjectMember) (*model.ProjectMember, *es_models.Aggregate, error) {
+	if member.UserID == "" {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-tCXHE", "Errors.Project.MemberInvalid")
+	}
+	existing, err := es.ProjectByID(ctx, member.AggregateID)
+	if err != nil {
+		return nil, nil, err
+	}
+	if _, m := existing.GetMember(member.UserID); m == nil {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-wPcg5", "Errors.Project.MemberNotExisting")
+	}
+	repoProject := model.ProjectFromModel(existing)
+	repoMember := model.ProjectMemberFromModel(member)
+
+	projectAggregate := ProjectMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
+	agg, err := projectAggregate(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return repoMember, agg, err
 }
 
 func (es *ProjectEventstore) AddProjectRoles(ctx context.Context, roles ...*proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
@@ -459,19 +511,16 @@ func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model
 	app.AppID = id
 
 	var stringPw string
-	var cryptoPw *crypto.CryptoValue
 	if app.OIDCConfig != nil {
 		app.OIDCConfig.AppID = id
-		stringPw, cryptoPw, err = generateNewClientSecret(es.pwGenerator)
+		err := app.OIDCConfig.GenerateNewClientID(es.idGenerator, existing)
 		if err != nil {
 			return nil, err
 		}
-		app.OIDCConfig.ClientSecret = cryptoPw
-		clientID, err := generateNewClientID(es.idGenerator, existing)
+		stringPw, err = app.OIDCConfig.GenerateClientSecretIfNeeded(es.pwGenerator)
 		if err != nil {
 			return nil, err
 		}
-		app.OIDCConfig.ClientID = clientID
 	}
 	repoProject := model.ProjectFromModel(existing)
 	repoApp := model.AppFromModel(app)
@@ -485,9 +534,10 @@ func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model
 	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
 		converted := model.AppToModel(a)
 		converted.OIDCConfig.ClientSecretString = stringPw
+		converted.OIDCConfig.FillCompliance()
 		return converted, nil
 	}
-	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Errors.Internal")
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-GvPct", "Errors.Internal")
 }
 
 func (es *ProjectEventstore) ChangeApplication(ctx context.Context, app *proj_model.Application) (*proj_model.Application, error) {
@@ -536,6 +586,27 @@ func (es *ProjectEventstore) RemoveApplication(ctx context.Context, app *proj_mo
 	}
 	es.projectCache.cacheProject(repoProject)
 	return nil
+}
+
+func (es *ProjectEventstore) PrepareRemoveApplication(ctx context.Context, app *proj_model.Application) (*model.Application, *es_models.Aggregate, error) {
+	if app.AppID == "" {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-xu0Wy", "Errors.Project.IDMissing")
+	}
+	existing, err := es.ProjectByID(ctx, app.AggregateID)
+	if err != nil {
+		return nil, nil, err
+	}
+	if _, app := existing.GetApp(app.AppID); app == nil {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-gaOD2", "Errors.Project.AppNotExisting")
+	}
+	repoProject := model.ProjectFromModel(existing)
+	appRepo := model.AppFromModel(app)
+	projectAggregate := ApplicationRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, appRepo)
+	agg, err := projectAggregate(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	return appRepo, agg, nil
 }
 
 func (es *ProjectEventstore) ApplicationChanges(ctx context.Context, projectID string, appID string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ApplicationChanges, error) {
@@ -683,14 +754,17 @@ func (es *ProjectEventstore) ChangeOIDCConfigSecret(ctx context.Context, project
 	if app.Type != proj_model.AppTypeOIDC {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dile4", "Errors.Project.AppIsNotOIDC")
 	}
+	if app.OIDCConfig.AuthMethodType == proj_model.OIDCAuthMethodTypeNone {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-GDrg2", "Errors.Project.OIDCAuthMethodNoneSecret")
+	}
 	repoProject := model.ProjectFromModel(existing)
 
-	stringPw, crypto, err := generateNewClientSecret(es.pwGenerator)
+	stringPw, err := app.OIDCConfig.GenerateNewClientSecret(es.pwGenerator)
 	if err != nil {
 		return nil, err
 	}
 
-	projectAggregate := OIDCConfigSecretChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, appID, crypto)
+	projectAggregate := OIDCConfigSecretChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, appID, app.OIDCConfig.ClientSecret)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	if err != nil {
 		return nil, err
@@ -927,7 +1001,7 @@ func (es *ProjectEventstore) ProjectGrantMemberByIDs(ctx context.Context, member
 			return m, nil
 		}
 	}
-	return nil, caos_errs.ThrowNotFound(nil, "EVENT-3udjs", "Errors.Project.MemberNotFound")
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-LxiBI", "Errors.Project.MemberNotFound")
 }
 
 func (es *ProjectEventstore) AddProjectGrantMember(ctx context.Context, member *proj_model.ProjectGrantMember) (*proj_model.ProjectGrantMember, error) {
@@ -955,7 +1029,7 @@ func (es *ProjectEventstore) AddProjectGrantMember(ctx context.Context, member *
 			return model.GrantMemberToModel(m), nil
 		}
 	}
-	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Errors.Internal")
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-BBcGD", "Errors.Internal")
 }
 
 func (es *ProjectEventstore) ChangeProjectGrantMember(ctx context.Context, member *proj_model.ProjectGrantMember) (*proj_model.ProjectGrantMember, error) {

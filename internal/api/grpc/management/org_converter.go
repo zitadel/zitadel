@@ -68,6 +68,43 @@ func addOrgDomainToModel(domain *management.AddOrgDomainRequest) *org_model.OrgD
 	return &org_model.OrgDomain{Domain: domain.Domain}
 }
 
+func orgDomainValidationToModel(domain *management.OrgDomainValidationRequest) *org_model.OrgDomain {
+	return &org_model.OrgDomain{
+		Domain:         domain.Domain,
+		ValidationType: orgDomainValidationTypeToModel(domain.Type),
+	}
+}
+
+func validateOrgDomainToModel(domain *management.ValidateOrgDomainRequest) *org_model.OrgDomain {
+	return &org_model.OrgDomain{Domain: domain.Domain}
+}
+
+func orgDomainValidationTypeToModel(key management.OrgDomainValidationType) org_model.OrgDomainValidationType {
+	switch key {
+	case management.OrgDomainValidationType_ORGDOMAINVALIDATIONTYPE_HTTP:
+		return org_model.OrgDomainValidationTypeHTTP
+	case management.OrgDomainValidationType_ORGDOMAINVALIDATIONTYPE_DNS:
+		return org_model.OrgDomainValidationTypeDNS
+	default:
+		return org_model.OrgDomainValidationTypeUnspecified
+	}
+}
+
+func orgDomainValidationTypeFromModel(key org_model.OrgDomainValidationType) management.OrgDomainValidationType {
+	switch key {
+	case org_model.OrgDomainValidationTypeHTTP:
+		return management.OrgDomainValidationType_ORGDOMAINVALIDATIONTYPE_HTTP
+	case org_model.OrgDomainValidationTypeDNS:
+		return management.OrgDomainValidationType_ORGDOMAINVALIDATIONTYPE_DNS
+	default:
+		return management.OrgDomainValidationType_ORGDOMAINVALIDATIONTYPE_UNSPECIFIED
+	}
+}
+
+func primaryOrgDomainToModel(domain *management.PrimaryOrgDomainRequest) *org_model.OrgDomain {
+	return &org_model.OrgDomain{Domain: domain.Domain}
+}
+
 func orgDomainFromModel(domain *org_model.OrgDomain) *management.OrgDomain {
 	creationDate, err := ptypes.TimestampProto(domain.CreationDate)
 	logging.Log("GRPC-u8Ksj").OnError(err).Debug("unable to get timestamp from time")
@@ -93,12 +130,13 @@ func orgDomainViewFromModel(domain *org_model.OrgDomainView) *management.OrgDoma
 	logging.Log("GRPC-8iSji").OnError(err).Debug("unable to get timestamp from time")
 
 	return &management.OrgDomainView{
-		ChangeDate:   changeDate,
-		CreationDate: creationDate,
-		OrgId:        domain.OrgID,
-		Domain:       domain.Domain,
-		Verified:     domain.Verified,
-		Primary:      domain.Primary,
+		ChangeDate:     changeDate,
+		CreationDate:   creationDate,
+		OrgId:          domain.OrgID,
+		Domain:         domain.Domain,
+		Verified:       domain.Verified,
+		Primary:        domain.Primary,
+		ValidationType: orgDomainValidationTypeFromModel(domain.ValidationType),
 	}
 }
 

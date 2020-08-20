@@ -14,7 +14,7 @@ import (
 
 const (
 	NotifyUserKeyUserID        = "id"
-	NotifyUserKeyResourceOwner = "id"
+	NotifyUserKeyResourceOwner = "resource_owner"
 )
 
 type NotifyUser struct {

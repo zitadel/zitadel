@@ -53,6 +53,8 @@ const (
 	MfaInitSkipped       models.EventType = "user.mfa.init.skipped"
 
 	SignedOut models.EventType = "user.signed.out"
+
+	DomainClaimed models.EventType = "user.domain.claimed"
 )
 
 //the following consts are for user(v2)

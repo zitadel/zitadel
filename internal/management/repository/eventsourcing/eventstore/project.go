@@ -80,6 +80,33 @@ func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*pro
 	return repo.ProjectEvents.ReactivateProject(ctx, id)
 }
 
+func (repo *ProjectRepo) RemoveProject(ctx context.Context, projectID string) error {
+	proj := proj_model.NewProject(projectID)
+	aggregates := make([]*es_models.Aggregate, 0)
+	project, agg, err := repo.ProjectEvents.PrepareRemoveProject(ctx, proj)
+	if err != nil {
+		return err
+	}
+	aggregates = append(aggregates, agg)
+
+	// remove user_grants
+	usergrants, err := repo.View.UserGrantsByProjectID(projectID)
+	if err != nil {
+		return err
+	}
+	for _, grant := range usergrants {
+		_, aggs, err := repo.UserGrantEvents.PrepareRemoveUserGrant(ctx, grant.ID, true)
+		if err != nil {
+			return err
+		}
+		for _, agg := range aggs {
+			aggregates = append(aggregates, agg)
+		}
+	}
+
+	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, project.AppendEvents, aggregates...)
+}
+
 func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model.ProjectViewSearchRequest) (*proj_model.ProjectViewSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, err := repo.View.GetLatestProjectSequence()
@@ -269,10 +296,35 @@ func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequ
 	return changes, nil
 }
 
-func (repo *ProjectRepo) ApplicationByID(ctx context.Context, appID string) (*proj_model.ApplicationView, error) {
-	app, err := repo.View.ApplicationByID(appID)
-	if err != nil {
-		return nil, err
+func (repo *ProjectRepo) ApplicationByID(ctx context.Context, projectID, appID string) (*proj_model.ApplicationView, error) {
+	app, viewErr := repo.View.ApplicationByID(projectID, appID)
+	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
+		return nil, viewErr
+	}
+	if caos_errs.IsNotFound(viewErr) {
+		app = new(model.ApplicationView)
+		app.ID = appID
+	}
+
+	events, esErr := repo.ProjectEvents.ProjectEventsByID(ctx, projectID, app.Sequence)
+	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-Fshu8", "Errors.Application.NotFound")
+	}
+
+	if esErr != nil {
+		logging.Log("EVENT-SLCo9").WithError(viewErr).Debug("error retrieving new events")
+		return model.ApplicationViewToModel(app), nil
+	}
+
+	viewApp := *app
+	for _, event := range events {
+		err := app.AppendEventIfMyApp(event)
+		if err != nil {
+			return model.ApplicationViewToModel(&viewApp), nil
+		}
+		if app.State == int32(proj_model.AppStateRemoved) {
+			return nil, caos_errs.ThrowNotFound(nil, "EVENT-Msl96", "Errors.Application.NotFound")
+		}
 	}
 	return model.ApplicationViewToModel(app), nil
 }

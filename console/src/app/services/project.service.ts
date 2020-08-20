@@ -10,6 +10,7 @@ import {
     ApplicationSearchRequest,
     ApplicationSearchResponse,
     ApplicationUpdate,
+    ApplicationView,
     GrantedProjectSearchRequest,
     OIDCApplicationCreate,
     OIDCConfig,
@@ -50,12 +51,7 @@ import {
     ProjectSearchRequest,
     ProjectSearchResponse,
     ProjectUpdateRequest,
-    ProjectUserGrantSearchRequest,
     ProjectView,
-    UserGrant,
-    UserGrantCreate,
-    UserGrantSearchQuery,
-    UserGrantSearchResponse,
     ZitadelDocs,
 } from '../proto/generated/management_pb';
 import { GrpcBackendService } from './grpc-backend.service';
@@ -493,7 +489,7 @@ export class ProjectService {
         );
     }
 
-    public async GetApplicationById(projectId: string, applicationId: string): Promise<Application> {
+    public async GetApplicationById(projectId: string, applicationId: string): Promise<ApplicationView> {
         const req = new ApplicationID();
         req.setProjectId(projectId);
         req.setId(applicationId);
@@ -524,6 +520,16 @@ export class ProjectService {
         );
     }
 
+    public async RemoveProject(id: string): Promise<Empty> {
+        const req = new ProjectID();
+        req.setId(id);
+        return await this.request(
+            c => c.removeProject,
+            req,
+            f => f,
+        );
+    }
+
 
     public async DeactivateProjectGrant(id: string, projectId: string): Promise<ProjectGrant> {
         const req = new ProjectGrantID();
@@ -546,47 +552,6 @@ export class ProjectService {
             f => f,
         );
     }
-
-    // ********* */
-
-    public async SearchProjectUserGrants(
-        projectId: string,
-        offset: number,
-        limit: number,
-        queryList?: UserGrantSearchQuery[],
-    ): Promise<UserGrantSearchResponse> {
-        const req = new ProjectUserGrantSearchRequest();
-        req.setLimit(limit);
-        req.setOffset(offset);
-        req.setProjectId(projectId);
-        if (queryList) {
-            req.setQueriesList(queryList);
-        }
-        return await this.request(
-            c => c.searchProjectUserGrants,
-            req,
-            f => f,
-        );
-    }
-
-    public async CreateProjectUserGrant(
-        projectId: string,
-        userId: string,
-        roleKeysList: string[],
-    ): Promise<UserGrant> {
-        const req = new UserGrantCreate();
-        req.setProjectId(projectId);
-        req.setRoleKeysList(roleKeysList);
-        req.setUserId(userId);
-
-        return await this.request(
-            c => c.createProjectUserGrant,
-            req,
-            f => f,
-        );
-    }
-
-    // ********* */
 
     public async CreateOIDCApp(app: OIDCApplicationCreate.AsObject): Promise<Application> {
         const req = new OIDCApplicationCreate();
@@ -629,6 +594,7 @@ export class ProjectService {
         req.setPostLogoutRedirectUrisList(oidcConfig.postLogoutRedirectUrisList);
         req.setGrantTypesList(oidcConfig.grantTypesList);
         req.setApplicationType(oidcConfig.applicationType);
+        req.setDevMode(oidcConfig.devMode);
         return await this.request(
             c => c.updateApplicationOIDCConfig,
             req,

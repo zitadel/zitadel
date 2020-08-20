@@ -2,6 +2,8 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -45,6 +47,7 @@ func ProjectCreateAggregate(aggCreator *es_models.AggregateCreator, project *mod
 		}
 		validationQuery := es_models.NewSearchQuery().
 			AggregateTypeFilter(model.ProjectAggregate).
+			ResourceOwnerFilter(authz.GetCtxData(ctx).OrgID).
 			EventTypesFilter(model.ProjectAdded, model.ProjectChanged, model.ProjectRemoved)
 
 		validation := addProjectValidation(project.Name)
@@ -97,6 +100,17 @@ func projectStateAggregate(aggCreator *es_models.AggregateCreator, project *mode
 		}
 		return agg.AppendEvent(state, nil)
 	}
+}
+
+func ProjectRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Project) (*es_models.Aggregate, error) {
+	if existing == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Cj7lb", "Errors.Internal")
+	}
+	agg, err := ProjectAggregate(ctx, aggCreator, existing)
+	if err != nil {
+		return nil, err
+	}
+	return agg.AppendEvent(model.ProjectRemoved, existing)
 }
 
 func ProjectMemberAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, member *model.ProjectMember) func(ctx context.Context) (*es_models.Aggregate, error) {

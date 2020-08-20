@@ -15,6 +15,10 @@ func (v *View) ProjectMemberByIDs(projectID, userID string) (*model.ProjectMembe
 	return view.ProjectMemberByIDs(v.Db, projectMemberTable, projectID, userID)
 }
 
+func (v *View) ProjectMembersByProjectID(projectID string) ([]*model.ProjectMemberView, error) {
+	return view.ProjectMembersByProjectID(v.Db, projectMemberTable, projectID)
+}
+
 func (v *View) SearchProjectMembers(request *proj_model.ProjectMemberSearchRequest) ([]*model.ProjectMemberView, uint64, error) {
 	return view.SearchProjectMembers(v.Db, projectMemberTable, request)
 }
@@ -37,6 +41,10 @@ func (v *View) DeleteProjectMember(projectID, userID string, eventSequence uint6
 		return nil
 	}
 	return v.ProcessedProjectMemberSequence(eventSequence)
+}
+
+func (v *View) DeleteProjectMembersByProjectID(projectID string) error {
+	return view.DeleteProjectMembersByProjectID(v.Db, projectMemberTable, projectID)
 }
 
 func (v *View) GetLatestProjectMemberSequence() (*repository.CurrentSequence, error) {

@@ -68,6 +68,11 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 	u.ObjectRoot.AppendEvent(event)
 
 	switch event.Type {
+	case UserAdded,
+		UserRegistered,
+		UserProfileChanged,
+		DomainClaimed:
+		u.setData(event)
 	case UserDeactivated:
 		u.appendDeactivatedEvent()
 	case UserReactivated:

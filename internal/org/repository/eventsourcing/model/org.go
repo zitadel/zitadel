@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -112,6 +113,8 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 		o.removeMember(member.UserID)
 	case OrgDomainAdded:
 		o.appendAddDomainEvent(event)
+	case OrgDomainVerificationAdded:
+		o.appendVerificationDomainEvent(event)
 	case OrgDomainVerified:
 		o.appendVerifyDomainEvent(event)
 	case OrgDomainPrimarySet:

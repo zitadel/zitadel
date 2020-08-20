@@ -24,6 +24,7 @@ const (
 	EndpointMailVerification = "/mail/verification"
 	EndpointMailVerified     = "/mail/verified"
 	EndpointRegister         = "/register"
+	EndpointRegisterOrg      = "/register/org"
 	EndpointLogoutDone       = "/logout/done"
 
 	EndpointResources = "/resources"
@@ -56,5 +57,7 @@ func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.M
 	router.HandleFunc(EndpointRegister, login.handleRegisterCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointLogoutDone, login.handleLogoutDone).Methods(http.MethodGet)
 	router.PathPrefix(EndpointResources).Handler(login.handleResources(staticDir)).Methods(http.MethodGet)
+	router.HandleFunc(EndpointRegisterOrg, login.handleRegisterOrg).Methods(http.MethodGet)
+	router.HandleFunc(EndpointRegisterOrg, login.handleRegisterOrgCheck).Methods(http.MethodPost)
 	return router
 }

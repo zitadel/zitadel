@@ -26,7 +26,7 @@
             <button [disabled]="complexityPolicy" [routerLink]="[ 'policy', PolicyComponentType.COMPLEXITY,'create' ]"
                 color="primary" mat-raised-button>{{'ORG.POLICY.BTN_INSTALL' | translate}}</button>
             <button [disabled]="!complexityPolicy" [routerLink]="[ 'policy', PolicyComponentType.COMPLEXITY ]"
-                mat-raised-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
+                mat-stroked-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
         </div>
     </div>
 
@@ -55,7 +55,7 @@
                     <button [disabled]="iamPolicy" [routerLink]="[ 'policy', PolicyComponentType.IAM_POLICY,'create' ]"
                         color="primary" mat-raised-button>{{'ORG.POLICY.BTN_INSTALL' | translate}}</button>
                     <button [disabled]="!iamPolicy" [routerLink]="[ 'policy', PolicyComponentType.IAM_POLICY ]"
-                        mat-raised-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
+                        mat-stroked-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
                 </ng-template>
             </div>
         </div>

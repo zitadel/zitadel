@@ -36,9 +36,9 @@ func (p *ProjectRole) Reduce(event *models.Event) (err error) {
 	role := new(view_model.ProjectRoleView)
 	switch event.Type {
 	case es_model.ProjectRoleAdded:
-		role.AppendEvent(event)
+		err = role.AppendEvent(event)
 	case es_model.ProjectRoleChanged:
-		err := role.SetData(event)
+		err = role.SetData(event)
 		if err != nil {
 			return err
 		}
@@ -46,13 +46,15 @@ func (p *ProjectRole) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		role.AppendEvent(event)
+		err = role.AppendEvent(event)
 	case es_model.ProjectRoleRemoved:
-		err := role.SetData(event)
+		err = role.SetData(event)
 		if err != nil {
 			return err
 		}
 		return p.view.DeleteProjectRole(event.AggregateID, event.ResourceOwner, role.Key, event.Sequence)
+	case es_model.ProjectRemoved:
+		return p.view.DeleteProjectRolesByProjectID(event.AggregateID)
 	default:
 		return p.view.ProcessedProjectRoleSequence(event.Sequence)
 	}

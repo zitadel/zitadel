@@ -63,6 +63,8 @@ func (key ProjectGrantMemberSearchKey) ToColumnName() string {
 		return ProjectGrantMemberKeyUserID
 	case proj_model.ProjectGrantMemberSearchKeyGrantID:
 		return ProjectGrantMemberKeyGrantID
+	case proj_model.ProjectGrantMemberSearchKeyProjectID:
+		return ProjectGrantMemberKeyProjectID
 	default:
 		return ""
 	}

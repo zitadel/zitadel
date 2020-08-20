@@ -25,6 +25,7 @@ export ZITADEL_OTP_VERIFICATION_KEY=OTPVerificationKey_1
 export ZITADEL_OIDC_KEYS_ID=OIDCKey_1
 export ZITADEL_COOKIE_KEY=CookieKey_1
 export ZITADEL_CSRF_KEY=CookieKey_1
+export ZITADEL_DOMAIN_VERIFICATION_KEY=DomainVerificationKey_1
 
 # Notifications
 export DEBUG_MODE=TRUE
@@ -65,3 +66,8 @@ export ZITADEL_DEFAULT_DOMAIN=zitadel.ch
 
 #Tracing
 export TRACING_TYPE=google
+
+#Setup
+export ZITADEL_CONSOLE_RESPONSE_TYPE='ID_TOKEN TOKEN'
+export ZITADEL_CONSOLE_GRANT_TYPE='IMPLICIT'
+export ZITADEL_CONSOLE_DEV_MODE=true

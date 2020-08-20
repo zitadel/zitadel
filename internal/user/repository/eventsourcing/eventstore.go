@@ -3,13 +3,15 @@ package eventsourcing
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/caos/logging"
+	"github.com/golang/protobuf/ptypes"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/id"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	policy_model "github.com/caos/zitadel/internal/policy/model"
-	"github.com/golang/protobuf/ptypes"
 
 	"github.com/pquerna/otp/totp"
 
@@ -30,6 +32,7 @@ type UserEventstore struct {
 	es_int.Eventstore
 	userCache                *UserCache
 	idGenerator              id.Generator
+	domain                   string
 	PasswordAlg              crypto.HashAlgorithm
 	InitializeUserCode       crypto.Generator
 	EmailVerificationCode    crypto.Generator
@@ -65,6 +68,7 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 		Eventstore:               conf.Eventstore,
 		userCache:                userCache,
 		idGenerator:              id.SonyFlakeGenerator,
+		domain:                   systemDefaults.Domain,
 		InitializeUserCode:       initCodeGen,
 		EmailVerificationCode:    emailVerificationCode,
 		PhoneVerificationCode:    phoneVerificationCode,
@@ -195,15 +199,15 @@ func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_mod
 	if err != nil {
 		return nil, nil, err
 	}
-	err = user.GenerateEmailCodeIfNeeded(es.EmailVerificationCode)
+	err = user.GenerateInitCodeIfNeeded(es.InitializeUserCode)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	repoUser := model.UserFromModel(user)
-	repoEmailCode := model.EmailCodeFromModel(user.EmailCode)
+	repoInitCode := model.InitCodeFromModel(user.InitCode)
 
-	aggregates, err := UserRegisterAggregate(ctx, es.AggregateCreator(), repoUser, resourceOwner, repoEmailCode, orgIamPolicy.UserLoginMustBeDomain)
+	aggregates, err := UserRegisterAggregate(ctx, es.AggregateCreator(), repoUser, resourceOwner, repoInitCode, orgIamPolicy.UserLoginMustBeDomain)
 	return repoUser, aggregates, err
 }
 
@@ -1103,4 +1107,33 @@ func (es *UserEventstore) SignOut(ctx context.Context, agentID string, userIDs [
 		return err
 	}
 	return nil
+}
+
+func (es *UserEventstore) PrepareDomainClaimed(ctx context.Context, userIDs []string) ([]*es_models.Aggregate, error) {
+	aggregates := make([]*es_models.Aggregate, 0)
+	for _, userID := range userIDs {
+		user, err := es.UserByID(ctx, userID)
+		if err != nil {
+			return nil, err
+		}
+		repoUser := model.UserFromModel(user)
+		name, err := es.generateTemporaryLoginName()
+		if err != nil {
+			return nil, err
+		}
+		userAgg, err := DomainClaimedAggregate(ctx, es.AggregateCreator(), repoUser, name)
+		if err != nil {
+			return nil, err
+		}
+		aggregates = append(aggregates, userAgg...)
+	}
+	return aggregates, nil
+}
+
+func (es *UserEventstore) generateTemporaryLoginName() (string, error) {
+	id, err := es.idGenerator.Next()
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s@temporary.%s", id, es.domain), nil
 }

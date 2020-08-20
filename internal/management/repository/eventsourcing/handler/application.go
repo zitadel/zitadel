@@ -36,27 +36,29 @@ func (p *Application) Reduce(event *models.Event) (err error) {
 	app := new(view_model.ApplicationView)
 	switch event.Type {
 	case es_model.ApplicationAdded:
-		app.AppendEvent(event)
+		err = app.AppendEvent(event)
 	case es_model.ApplicationChanged,
 		es_model.OIDCConfigAdded,
 		es_model.OIDCConfigChanged,
 		es_model.ApplicationDeactivated,
 		es_model.ApplicationReactivated:
-		err := app.SetData(event)
+		err = app.SetData(event)
 		if err != nil {
 			return err
 		}
-		app, err = p.view.ApplicationByID(app.ID)
+		app, err = p.view.ApplicationByID(event.AggregateID, app.ID)
 		if err != nil {
 			return err
 		}
-		app.AppendEvent(event)
+		err = app.AppendEvent(event)
 	case es_model.ApplicationRemoved:
-		err := app.SetData(event)
+		err = app.SetData(event)
 		if err != nil {
 			return err
 		}
 		return p.view.DeleteApplication(app.ID, event.Sequence)
+	case es_model.ProjectRemoved:
+		return p.view.DeleteApplicationsByProjectID(event.AggregateID)
 	default:
 		return p.view.ProcessedApplicationSequence(event.Sequence)
 	}

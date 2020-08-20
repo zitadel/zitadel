@@ -55,6 +55,11 @@ Errors:
     InvalidDomain: Domäne ist ungültig
     DomainMissing: Domäne fehlt
     DomainNotOnOrg: Domäne fehlt auf Organisation
+    DomainNotVerified: Domäne ist nicht verifiziert
+    DomainAlreadyVerified: Domain ist bereits verifiziert
+    DomainVerificationTypeInvalid: Verifikationstyp der Domäne ist ungültig
+    DomainVerificationMissing: Verifikation der Domäne noch nicht erstellt
+    DomainVerificationFailed: Verifikation der Domäne ist fehlgeschlagen
     PrimaryDomainNotDeletable: Primäre Domäne kann nicht gelöscht werden
     DomainNotFound: Domäne konnte nicht gefunden werden
     MemberIDMissing: Member ID fehlt
@@ -88,6 +93,7 @@ Errors:
     AppNotExisting: Applikation exisitert nicht
     OIDCConfigInvalid: OIDC Konfiguration ist ungültig
     AppIsNotOIDC: Applikation ist nicht vom Typ OIDC
+    OIDCAuthMethodNoneSecret: OIDC Auth Method None benötigt kein Secret
     RequiredFieldsMissing: Benötigte Felder fehlen
     GrantNotFound: Grant konnte nicht gefunden werden
     GrantInvalid: Projekt Grant ist ungültig
@@ -197,6 +203,9 @@ EventTypes:
     removed: Organisation entfernt
     domain:
       added: Domäne hinzugefügt
+      verification:
+        added: Domänenverifizierung hinzugefügt
+        failed: Domänenverifizierung fehlgeschlagen
       verified: Domäne verifiziert
       removed: Domäne entfernt
       primary:
@@ -285,3 +294,25 @@ EventTypes:
       removed: ZITADEL Mitglied entfernt
   key_pair:
     added: Schlüsselpaar hinzugefügt
+Application:
+  OIDC:
+    V1:
+      NotCompliant: Deine Konfiguration ist nicht konform und weicht vom OIDC 1.0 Standard ab.
+      NoRedirectUris: Es muss mindestens eine Redirect URI erfasst sein.
+      NotAllCombinationsAreAllowed: Die Konfiguration ist konform, jedoch werden nicht alle möglichen Kombinationen erlaubt.
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: Grant Type Code erlaubt http Redirect Uris nur für den Apptype Web.
+          CustomOnlyForNative: Grant Type Code erlaubt custom Redirect Uris nur für den Apptype Native. (z.B appname:// )
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: Grant Type Implicit erlaubt keine custom Redirect Uris.
+          HttpNotAllowed: Grant Type Implicit erlaubt keine http Redirect Uris.
+          NativeShouldBeHttpLocalhost: Grant Type Implicit erlaubt beim Apptype Native http nur mit localhost (http://localhost)
+          HttpLocalhostOnlyForNative: Http://localhost Redirect Uri ist nur für Native Applikationen erlaubt.
+      Native:
+        AuthMethodType:
+          NotNone: Bei Native Applikationen sollte der AuthMethodType none sein.
+      UserAgent:
+        AuthMethodType:
+          NotNone: Bei einem User Agent sollte der AuthMethodType none sein.

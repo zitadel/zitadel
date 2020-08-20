@@ -30,14 +30,14 @@ func (o *Org) EventQuery() (*es_models.SearchQuery, error) {
 	return eventsourcing.OrgQuery(sequence.CurrentSequence), nil
 }
 
-func (o *Org) Reduce(event *es_models.Event) error {
+func (o *Org) Reduce(event *es_models.Event) (err error) {
 	org := new(org_model.OrgView)
 
 	switch event.Type {
 	case model.OrgAdded:
-		org.AppendEvent(event)
+		err = org.AppendEvent(event)
 	case model.OrgChanged:
-		err := org.SetData(event)
+		err = org.SetData(event)
 		if err != nil {
 			return err
 		}
@@ -46,13 +46,12 @@ func (o *Org) Reduce(event *es_models.Event) error {
 			return err
 		}
 		err = org.AppendEvent(event)
-		if err != nil {
-			return err
-		}
 	default:
 		return o.view.ProcessedOrgSequence(event.Sequence)
 	}
-
+	if err != nil {
+		return err
+	}
 	return o.view.PutOrg(org)
 }
 

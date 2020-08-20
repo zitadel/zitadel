@@ -266,7 +266,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 	type args struct {
 		ctx           context.Context
 		new           *model.User
-		emailCode     *model.EmailCode
+		initCode      *model.InitUserCode
 		resourceOwner string
 		aggCreator    *models.AggregateCreator
 	}
@@ -290,13 +290,13 @@ func TestUserRegisterAggregate(t *testing.T) {
 						Email:   &model.Email{EmailAddress: "EmailAddress"},
 					},
 				},
-				emailCode:     &model.EmailCode{},
+				initCode:      &model.InitUserCode{},
 				resourceOwner: "newResourceowner",
 				aggCreator:    models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{model.UserRegistered, model.UserEmailCodeAdded},
+				eventTypes: []models.EventType{model.UserRegistered, model.InitializedUserCodeAdded},
 			},
 		},
 		{
@@ -304,7 +304,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContext("orgID", "userID"),
 				new:           nil,
-				emailCode:     &model.EmailCode{},
+				initCode:      &model.InitUserCode{},
 				resourceOwner: "newResourceowner",
 				aggCreator:    models.NewAggregateCreator("Test"),
 			},
@@ -330,7 +330,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 			},
 		},
 		{
-			name: "create with email code",
+			name: "create with init code",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
 				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
@@ -340,12 +340,12 @@ func TestUserRegisterAggregate(t *testing.T) {
 					},
 				},
 				resourceOwner: "newResourceowner",
-				emailCode:     &model.EmailCode{},
+				initCode:      &model.InitUserCode{},
 				aggCreator:    models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{model.UserRegistered, model.UserEmailCodeAdded},
+				eventTypes: []models.EventType{model.UserRegistered, model.InitializedUserCodeAdded},
 			},
 		},
 		{
@@ -358,7 +358,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 						Email:   &model.Email{EmailAddress: "EmailAddress"},
 					},
 				},
-				emailCode:  &model.EmailCode{},
+				initCode:   &model.InitUserCode{},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -368,7 +368,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			aggregates, err := UserRegisterAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.new, tt.args.resourceOwner, tt.args.emailCode, false)
+			aggregates, err := UserRegisterAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.new, tt.args.resourceOwner, tt.args.initCode, false)
 
 			if tt.res.errFunc == nil && len(aggregates[0].Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(aggregates[0].Events))

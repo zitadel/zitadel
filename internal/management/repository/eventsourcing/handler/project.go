@@ -36,7 +36,7 @@ func (p *Project) Reduce(event *models.Event) (err error) {
 	project := new(view_model.ProjectView)
 	switch event.Type {
 	case es_model.ProjectAdded:
-		project.AppendEvent(event)
+		err = project.AppendEvent(event)
 	case es_model.ProjectChanged,
 		es_model.ProjectDeactivated,
 		es_model.ProjectReactivated:
@@ -45,6 +45,8 @@ func (p *Project) Reduce(event *models.Event) (err error) {
 			return err
 		}
 		err = project.AppendEvent(event)
+	case es_model.ProjectRemoved:
+		return p.view.DeleteProject(event.AggregateID, event.Sequence)
 	default:
 		return p.view.ProcessedProjectSequence(event.Sequence)
 	}

@@ -9,14 +9,29 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func ApplicationByID(db *gorm.DB, table, appID string) (*model.ApplicationView, error) {
+func ApplicationByID(db *gorm.DB, table, projectID, appID string) (*model.ApplicationView, error) {
 	app := new(model.ApplicationView)
-	query := repository.PrepareGetByKey(table, model.ApplicationSearchKey(proj_model.AppSearchKeyAppID), appID)
+	projectIDQuery := &model.ApplicationSearchQuery{Key: proj_model.AppSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals}
+	appIDQuery := &model.ApplicationSearchQuery{Key: proj_model.AppSearchKeyAppID, Value: appID, Method: global_model.SearchMethodEquals}
+	query := repository.PrepareGetByQuery(table, projectIDQuery, appIDQuery)
 	err := query(db, app)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-DGdfx", "Errors.Application.NotFound")
 	}
 	return app, err
+}
+
+func ApplicationsByProjectID(db *gorm.DB, table, projectID string) ([]*model.ApplicationView, error) {
+	applications := make([]*model.ApplicationView, 0)
+	queries := []*proj_model.ApplicationSearchQuery{
+		&proj_model.ApplicationSearchQuery{Key: proj_model.AppSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
+	}
+	query := repository.PrepareSearchQuery(table, model.ApplicationSearchRequest{Queries: queries})
+	_, err := query(db, &applications)
+	if err != nil {
+		return nil, err
+	}
+	return applications, nil
 }
 
 func ApplicationByOIDCClientID(db *gorm.DB, table, clientID string) (*model.ApplicationView, error) {
@@ -56,5 +71,10 @@ func PutApplication(db *gorm.DB, table string, app *model.ApplicationView) error
 
 func DeleteApplication(db *gorm.DB, table, appID string) error {
 	delete := repository.PrepareDeleteByKey(table, model.ApplicationSearchKey(proj_model.AppSearchKeyAppID), appID)
+	return delete(db)
+}
+
+func DeleteApplicationsByProjectID(db *gorm.DB, table, projectID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.ApplicationSearchKey(proj_model.AppSearchKeyProjectID), projectID)
 	return delete(db)
 }

@@ -371,7 +371,7 @@ func TestRegisterUser(t *testing.T) {
 		{
 			name: "register user, ok",
 			args: args{
-				es: GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl, repo_model.User{
+				es: GetMockManipulateUserWithPasswordInitCodeGen(ctrl, repo_model.User{
 					Human: &repo_model.Human{
 						Profile: &repo_model.Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName"},
 						Email:   &repo_model.Email{EmailAddress: "EmailAddress"}}},
@@ -415,7 +415,7 @@ func TestRegisterUser(t *testing.T) {
 		{
 			name: "email as username",
 			args: args{
-				es: GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl, repo_model.User{
+				es: GetMockManipulateUserWithPasswordInitCodeGen(ctrl, repo_model.User{
 					Human: &repo_model.Human{
 						Profile: &repo_model.Profile{UserName: "EmailAddress", FirstName: "FirstName", LastName: "LastName"},
 						Email:   &repo_model.Email{EmailAddress: "EmailAddress"}}},
@@ -943,7 +943,7 @@ func TestCreateInitCode(t *testing.T) {
 		{
 			name: "create init code",
 			args: args{
-				es:       GetMockManipulateUserWithInitCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}}),
+				es:       GetMockManipulateUserWithPasswordInitCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}}),
 				ctx:      authz.NewMockContext("orgID", "userID"),
 				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},

@@ -11,8 +11,12 @@ const (
 	applicationTable = "management.applications"
 )
 
-func (v *View) ApplicationByID(appID string) (*model.ApplicationView, error) {
-	return view.ApplicationByID(v.Db, applicationTable, appID)
+func (v *View) ApplicationByID(projectID, appID string) (*model.ApplicationView, error) {
+	return view.ApplicationByID(v.Db, applicationTable, projectID, appID)
+}
+
+func (v *View) ApplicationsByProjectID(ProjectID string) ([]*model.ApplicationView, error) {
+	return view.ApplicationsByProjectID(v.Db, applicationTable, ProjectID)
 }
 
 func (v *View) SearchApplications(request *proj_model.ApplicationSearchRequest) ([]*model.ApplicationView, uint64, error) {
@@ -33,6 +37,10 @@ func (v *View) DeleteApplication(appID string, eventSequence uint64) error {
 		return nil
 	}
 	return v.ProcessedApplicationSequence(eventSequence)
+}
+
+func (v *View) DeleteApplicationsByProjectID(ProjectID string) error {
+	return view.DeleteApplicationsByProjectID(v.Db, applicationTable, ProjectID)
 }
 
 func (v *View) GetLatestApplicationSequence() (*repository.CurrentSequence, error) {

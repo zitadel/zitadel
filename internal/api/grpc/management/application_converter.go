@@ -52,6 +52,10 @@ func oidcConfigFromModel(config *proj_model.OIDCConfig) *management.OIDCConfig {
 		ClientSecret:           config.ClientSecretString,
 		AuthMethodType:         oidcAuthMethodTypeFromModel(config.AuthMethodType),
 		PostLogoutRedirectUris: config.PostLogoutRedirectUris,
+		Version:                oidcVersionFromModel(config.OIDCVersion),
+		NoneCompliant:          config.Compliance.NoneCompliant,
+		ComplianceProblems:     complianceProblemsToLocalizedMessages(config.Compliance.Problems),
+		DevMode:                config.DevMode,
 	}
 }
 
@@ -64,7 +68,20 @@ func oidcConfigFromApplicationViewModel(app *proj_model.ApplicationView) *manage
 		ClientId:               app.OIDCClientID,
 		AuthMethodType:         oidcAuthMethodTypeFromModel(app.OIDCAuthMethodType),
 		PostLogoutRedirectUris: app.OIDCPostLogoutRedirectUris,
+		Version:                oidcVersionFromModel(app.OIDCVersion),
+		NoneCompliant:          app.NoneCompliant,
+		ComplianceProblems:     complianceProblemsToLocalizedMessages(app.ComplianceProblems),
+		DevMode:                app.DevMode,
 	}
+}
+
+func complianceProblemsToLocalizedMessages(problems []string) []*message.LocalizedMessage {
+	converted := make([]*message.LocalizedMessage, len(problems))
+	for i, p := range problems {
+		converted[i] = message.NewLocalizedMessage(p)
+	}
+	return converted
+
 }
 
 func oidcAppCreateToModel(app *management.OIDCApplicationCreate) *proj_model.Application {
@@ -75,12 +92,14 @@ func oidcAppCreateToModel(app *management.OIDCApplicationCreate) *proj_model.App
 		Name: app.Name,
 		Type: proj_model.AppTypeOIDC,
 		OIDCConfig: &proj_model.OIDCConfig{
+			OIDCVersion:            oidcVersionToModel(app.Version),
 			RedirectUris:           app.RedirectUris,
 			ResponseTypes:          oidcResponseTypesToModel(app.ResponseTypes),
 			GrantTypes:             oidcGrantTypesToModel(app.GrantTypes),
 			ApplicationType:        oidcApplicationTypeToModel(app.ApplicationType),
 			AuthMethodType:         oidcAuthMethodTypeToModel(app.AuthMethodType),
 			PostLogoutRedirectUris: app.PostLogoutRedirectUris,
+			DevMode:                app.DevMode,
 		},
 	}
 }
@@ -107,6 +126,7 @@ func oidcConfigUpdateToModel(app *management.OIDCConfigUpdate) *proj_model.OIDCC
 		ApplicationType:        oidcApplicationTypeToModel(app.ApplicationType),
 		AuthMethodType:         oidcAuthMethodTypeToModel(app.AuthMethodType),
 		PostLogoutRedirectUris: app.PostLogoutRedirectUris,
+		DevMode:                app.DevMode,
 	}
 }
 
@@ -284,6 +304,14 @@ func oidcApplicationTypeToModel(appType management.OIDCApplicationType) proj_mod
 	return proj_model.OIDCApplicationTypeWeb
 }
 
+func oidcVersionToModel(version management.OIDCVersion) proj_model.OIDCVersion {
+	switch version {
+	case management.OIDCVersion_OIDCV1_0:
+		return proj_model.OIDCVersionV1
+	}
+	return proj_model.OIDCVersionV1
+}
+
 func oidcApplicationTypeFromModel(appType proj_model.OIDCApplicationType) management.OIDCApplicationType {
 	switch appType {
 	case proj_model.OIDCApplicationTypeWeb:
@@ -320,6 +348,15 @@ func oidcAuthMethodTypeFromModel(authType proj_model.OIDCAuthMethodType) managem
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE
 	default:
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC
+	}
+}
+
+func oidcVersionFromModel(version proj_model.OIDCVersion) management.OIDCVersion {
+	switch version {
+	case proj_model.OIDCVersionV1:
+		return management.OIDCVersion_OIDCV1_0
+	default:
+		return management.OIDCVersion_OIDCV1_0
 	}
 }
 

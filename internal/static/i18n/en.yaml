@@ -55,6 +55,11 @@ Errors:
     InvalidDomain: Invalid domain
     DomainMissing: Domain missing
     DomainNotOnOrg: Domain doesn't exist on organisation
+    DomainNotVerified: Domain is not verified
+    DomainAlreadyVerified: Domain is already verified
+    DomainVerificationTypeInvalid: Domain verification type is invalid
+    DomainVerificationMissing: Domain verification not yet startet
+    DomainVerificationFailed: Domain verification failed
     PrimaryDomainNotDeletable: Primary domain must not be deleted
     DomainNotFound: Domain not found
     MemberIDMissing: Member ID missing
@@ -88,6 +93,7 @@ Errors:
     AppNotExisting: Application doesn't exist
     OIDCConfigInvalid: OIDC configuration is invalid
     AppIsNotOIDC: Application is not type oidc
+    OIDCAuthMethodNoneSecret: OIDC Auth Method None does not require a secret
     RequiredFieldsMissing: Some required fields are missing
     GrantNotFound: Grant not found
     GrantInvalid: Project grant is invalid
@@ -197,6 +203,9 @@ EventTypes:
     removed: Organization removed
     domain:
       added: Domain added
+      verification:
+        added: Domain verification added
+        failed: Domain verification failed
       verified: Domain verified
       removed: Domain removed
       primary:
@@ -285,3 +294,25 @@ EventTypes:
       removed: ZITADEL member removed
   key_pair:
     added: Key pair added
+Application:
+  OIDC:
+    V1:
+      NotCompliant: Your configuration is not compliant and differs from OIDC 1.0 standard.
+      NoRedirectUris: At least one redirect uri must be registered.
+      NotAllCombinationsAreAllowed: Configuration is compliant, but not all possible combinations are allowed.
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: Grant type code only allowed http redirect uris for apptype web.
+          CustomOnlyForNative: Grant type code only allowes custom redirect uris for apptype native  (e.g appname:// )
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: Grant type implicit doesn't allow custom redirect uris
+          HttpNotAllowed: Grant tpye implicit doesn't allow http redirect uris
+          NativeShouldBeHttpLocalhost: Grant tpye implicit only allowed http://localhost for native apptype
+          HttpLocalhostOnlyForNative: Http://localhost redirect uri is only allowed for native applications.
+      Native:
+        AuthMethodType:
+          NotNone: Native applications should have authmethodtype none.
+      UserAgent:
+        AuthMethodType:
+          NotNone: User agent app should have authmethodtype none.

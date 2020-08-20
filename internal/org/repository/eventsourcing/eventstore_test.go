@@ -7,8 +7,11 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/caos/zitadel/internal/api/authz"
+	http_util "github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_mock "github.com/caos/zitadel/internal/eventstore/mock"
@@ -23,8 +26,17 @@ type testOrgEventstore struct {
 }
 
 func newTestEventstore(t *testing.T) *testOrgEventstore {
-	mock := mockEventstore(t)
-	return &testOrgEventstore{OrgEventstore: OrgEventstore{Eventstore: mock}, mockEventstore: mock}
+	ctrl := gomock.NewController(t)
+	mock := es_mock.NewMockEventstore(ctrl)
+	verificationAlgorithm := crypto.NewMockEncryptionAlgorithm(ctrl)
+	verificationGenerator := crypto.NewMockGenerator(ctrl)
+	return &testOrgEventstore{
+		OrgEventstore: OrgEventstore{
+			Eventstore:            mock,
+			verificationAlgorithm: verificationAlgorithm,
+			verificationGenerator: verificationGenerator,
+		},
+		mockEventstore: mock}
 }
 
 func (es *testOrgEventstore) expectFilterEvents(events []*es_models.Event, err error) *testOrgEventstore {
@@ -51,11 +63,49 @@ func (es *testOrgEventstore) expectAggregateCreator() *testOrgEventstore {
 	return es
 }
 
-func mockEventstore(t *testing.T) *es_mock.MockEventstore {
-	ctrl := gomock.NewController(t)
-	e := es_mock.NewMockEventstore(ctrl)
+func (es *testOrgEventstore) expectGenerateVerification(r rune) *testOrgEventstore {
+	generator, _ := es.verificationGenerator.(*crypto.MockGenerator)
+	generator.EXPECT().Length().Return(uint(2))
+	generator.EXPECT().Runes().Return([]rune("aa"))
+	generator.EXPECT().Alg().Return(es.verificationAlgorithm)
+	return es
+}
 
-	return e
+func (es *testOrgEventstore) expectEncrypt() *testOrgEventstore {
+	algorithm, _ := es.verificationAlgorithm.(*crypto.MockEncryptionAlgorithm)
+	algorithm.EXPECT().Encrypt(gomock.Any()).DoAndReturn(
+		func(value []byte) (*crypto.CryptoValue, error) {
+			return &crypto.CryptoValue{
+				CryptoType: crypto.TypeEncryption,
+				Algorithm:  "enc",
+				KeyID:      "id",
+				Crypted:    value,
+			}, nil
+		})
+	algorithm.EXPECT().Algorithm().Return("enc")
+	algorithm.EXPECT().EncryptionKeyID().Return("id")
+	return es
+}
+
+func (es *testOrgEventstore) expectDecrypt() *testOrgEventstore {
+	algorithm, _ := es.verificationAlgorithm.(*crypto.MockEncryptionAlgorithm)
+	algorithm.EXPECT().Algorithm().AnyTimes().Return("enc")
+	algorithm.EXPECT().DecryptionKeyIDs().Return([]string{"id"})
+	algorithm.EXPECT().DecryptString(gomock.Any(), gomock.Any()).DoAndReturn(
+		func(value []byte, id string) (string, error) {
+			return string(value), nil
+		})
+	return es
+}
+
+func (es *testOrgEventstore) expectVerification(success bool) *testOrgEventstore {
+	es.verificationValidator = func(_, _, _ string, _ http_util.CheckType) error {
+		if success {
+			return nil
+		}
+		return errors.ThrowInvalidArgument(nil, "id", "invalid token")
+	}
+	return es
 }
 
 func TestOrgEventstore_OrgByID(t *testing.T) {
@@ -346,6 +396,467 @@ func TestOrgEventstore_ReactivateOrg(t *testing.T) {
 			}
 			if tt.res.expectedSequence != 0 && tt.res.expectedSequence != got.Sequence {
 				t.Errorf("org should have sequence %d but had %d", tt.res.expectedSequence, got.Sequence)
+			}
+		})
+	}
+}
+
+func TestOrgEventstore_GenerateOrgDomainValidation(t *testing.T) {
+	type fields struct {
+		Eventstore *testOrgEventstore
+	}
+	type res struct {
+		token string
+		url   string
+		isErr func(error) bool
+	}
+	type args struct {
+		ctx    context.Context
+		domain *org_model.OrgDomain
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name:   "no domain",
+			fields: fields{Eventstore: newTestEventstore(t)},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: nil,
+			},
+			res: res{
+				token: "",
+				url:   "",
+				isErr: errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "validation type invalid error",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{orgCreatedEvent()}, nil).
+				expectGenerateVerification(65).
+				expectEncrypt(),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "hodor-org"}, Domain: "hodor.org"},
+			},
+			res: res{
+				token: "",
+				url:   "",
+				isErr: errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "org doesn't exist error",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{}, nil),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+			},
+			res: res{
+				token: "",
+				url:   "",
+				isErr: errors.IsNotFound,
+			},
+		},
+		{
+			name: "domain doesn't exist error",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{orgCreatedEvent()}, nil),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "hodor-org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+			},
+			res: res{
+				token: "",
+				url:   "",
+				isErr: errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "domain already verified error",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{orgCreatedEvent(), orgDomainAddedEvent(), orgDomainVerifiedEvent()}, nil),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "hodor-org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+			},
+			res: res{
+				token: "",
+				url:   "",
+				isErr: errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "push failed",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{orgCreatedEvent(), orgDomainAddedEvent()}, nil).
+				expectGenerateVerification(65).
+				expectEncrypt().
+				expectAggregateCreator().
+				expectPushEvents(0, errors.ThrowInternal(nil, "EVENT-S8WzW", "test")),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "hodor-org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+			},
+			res: res{
+				token: "",
+				url:   "",
+				isErr: errors.IsInternal,
+			},
+		},
+		{
+			name: "push correct http",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{orgCreatedEvent(), orgDomainAddedEvent()}, nil).
+				expectGenerateVerification(65).
+				expectEncrypt().
+				expectAggregateCreator().
+				expectPushEvents(6, nil),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "hodor-org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+			},
+			res: res{
+				token: "aa",
+				url:   "https://hodor.org/.well-known/zitadel-challenge/aa",
+				isErr: nil,
+			},
+		},
+		{
+			name: "push correct dns",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{orgCreatedEvent(), orgDomainAddedEvent()}, nil).
+				expectGenerateVerification(65).
+				expectEncrypt().
+				expectAggregateCreator().
+				expectPushEvents(6, nil),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "hodor-org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeDNS},
+			},
+			res: res{
+				token: "aa",
+				url:   "_zitadel-challenge.hodor.org",
+				isErr: nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			token, url, err := tt.fields.Eventstore.GenerateOrgDomainValidation(tt.args.ctx, tt.args.domain)
+			if tt.res.isErr == nil && err != nil {
+				t.Errorf("no error expected got:%T %v", err, err)
+			}
+			if tt.res.isErr != nil && !tt.res.isErr(err) {
+				t.Errorf("wrong error got %T: %v", err, err)
+			}
+			assert.Equal(t, tt.res.token, token)
+			assert.Equal(t, tt.res.url, url)
+		})
+	}
+}
+
+func TestOrgEventstore_ValidateOrgDomain(t *testing.T) {
+	type fields struct {
+		Eventstore *testOrgEventstore
+	}
+	type res struct {
+		isErr func(error) bool
+	}
+	type args struct {
+		ctx    context.Context
+		domain *org_model.OrgDomain
+		users  func(ctx context.Context, domain string) ([]*es_models.Aggregate, error)
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name:   "no domain",
+			fields: fields{Eventstore: newTestEventstore(t)},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: nil,
+			},
+			res: res{
+				isErr: errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "org doesn't exist error",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{}, nil),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+			},
+			res: res{
+				isErr: errors.IsNotFound,
+			},
+		},
+		{
+			name: "domain doesn't exist error",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{orgCreatedEvent()}, nil),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "hodor-org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+			},
+			res: res{
+				isErr: errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "domain already verified error",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{orgCreatedEvent(), orgDomainAddedEvent(), orgDomainVerifiedEvent()}, nil),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "hodor-org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+			},
+			res: res{
+				isErr: errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "domain validation not created error",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{orgCreatedEvent(), orgDomainAddedEvent()}, nil),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "hodor-org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+			},
+			res: res{
+				isErr: errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "verification fails",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{orgCreatedEvent(), orgDomainAddedEvent(), orgDomainVerificationAddedEvent("token")}, nil).
+				expectDecrypt().
+				expectVerification(false).
+				expectAggregateCreator().
+				expectPushEvents(0, nil),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "hodor-org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+			},
+			res: res{
+				isErr: errors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "verification and push fails",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{orgCreatedEvent(), orgDomainAddedEvent(), orgDomainVerificationAddedEvent("token")}, nil).
+				expectDecrypt().
+				expectVerification(false).
+				expectAggregateCreator().
+				expectPushEvents(0, errors.ThrowInternal(nil, "EVENT-S8WzW", "test")),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "hodor-org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+			},
+			res: res{
+				isErr: errors.IsInternal,
+			},
+		},
+		{
+			name: "(user) aggregate fails",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{orgCreatedEvent(), orgDomainAddedEvent(), orgDomainVerificationAddedEvent("token")}, nil).
+				expectDecrypt().
+				expectVerification(true).
+				expectAggregateCreator().
+				expectPushEvents(0, errors.ThrowInternal(nil, "EVENT-S8WzW", "test")),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "hodor-org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+				users: func(ctx context.Context, domain string) ([]*es_models.Aggregate, error) {
+					return nil, errors.ThrowInternal(nil, "id", "internal error")
+				},
+			},
+			res: res{
+				isErr: errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "push failed",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{orgCreatedEvent(), orgDomainAddedEvent(), orgDomainVerificationAddedEvent("token")}, nil).
+				expectDecrypt().
+				expectVerification(true).
+				expectAggregateCreator().
+				expectPushEvents(0, errors.ThrowInternal(nil, "EVENT-S8WzW", "test")),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "hodor-org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+			},
+			res: res{
+				isErr: errors.IsInternal,
+			},
+		},
+		{
+			name: "push correct",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{orgCreatedEvent(), orgDomainAddedEvent(), orgDomainVerificationAddedEvent("token")}, nil).
+				expectDecrypt().
+				expectVerification(true).
+				expectAggregateCreator().
+				expectPushEvents(6, nil),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "hodor-org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+			},
+			res: res{
+				isErr: nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.fields.Eventstore.ValidateOrgDomain(tt.args.ctx, tt.args.domain, tt.args.users)
+			if tt.res.isErr == nil && err != nil {
+				t.Errorf("no error expected got:%T %v", err, err)
+			}
+			if tt.res.isErr != nil && !tt.res.isErr(err) {
+				t.Errorf("wrong error got %T: %v", err, err)
+			}
+		})
+	}
+}
+
+func TestOrgEventstore_SetPrimaryOrgDomain(t *testing.T) {
+	type fields struct {
+		Eventstore *testOrgEventstore
+	}
+	type res struct {
+		isErr func(error) bool
+	}
+	type args struct {
+		ctx    context.Context
+		domain *org_model.OrgDomain
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name:   "no domain",
+			fields: fields{Eventstore: newTestEventstore(t)},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: nil,
+			},
+			res: res{
+				isErr: errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "org doesn't exist error",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{}, nil),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+			},
+			res: res{
+				isErr: errors.IsNotFound,
+			},
+		},
+		{
+			name: "domain doesn't exist error",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{orgCreatedEvent()}, nil),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "hodor-org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+			},
+			res: res{
+				isErr: errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "domain not verified error",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{orgCreatedEvent(), orgDomainAddedEvent()}, nil),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "hodor-org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+			},
+			res: res{
+				isErr: errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "push failed",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{orgCreatedEvent(), orgDomainAddedEvent(), orgDomainVerifiedEvent()}, nil).
+				expectAggregateCreator().
+				expectPushEvents(0, errors.ThrowInternal(nil, "EVENT-S8WzW", "test")),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "hodor-org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+			},
+			res: res{
+				isErr: errors.IsInternal,
+			},
+		},
+		{
+			name: "push correct",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{orgCreatedEvent(), orgDomainAddedEvent(), orgDomainVerifiedEvent()}, nil).
+				expectAggregateCreator().
+				expectPushEvents(6, nil),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("org", "user"),
+				domain: &org_model.OrgDomain{ObjectRoot: es_models.ObjectRoot{AggregateID: "hodor-org"}, Domain: "hodor.org", ValidationType: org_model.OrgDomainValidationTypeHTTP},
+			},
+			res: res{
+				isErr: nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.fields.Eventstore.SetPrimaryOrgDomain(tt.args.ctx, tt.args.domain)
+			if tt.res.isErr == nil && err != nil {
+				t.Errorf("no error expected got:%T %v", err, err)
+			}
+			if tt.res.isErr != nil && !tt.res.isErr(err) {
+				t.Errorf("wrong error got %T: %v", err, err)
 			}
 		})
 	}
@@ -1003,13 +1514,71 @@ func orgCreatedEvent() *es_models.Event {
 		AggregateType:    model.OrgAggregate,
 		AggregateVersion: "v1",
 		CreationDate:     time.Now().Add(-1 * time.Minute),
-		Data:             []byte(`{"name": "hodor-org", "domain":"hodor.org"}`),
+		Data:             []byte(`{"name": "hodor-org"}`),
 		EditorService:    "testsvc",
 		EditorUser:       "testuser",
 		ID:               "sdlfö4t23kj",
 		ResourceOwner:    "hodor-org",
 		Sequence:         32,
 		Type:             model.OrgAdded,
+	}
+}
+
+func orgDomainAddedEvent() *es_models.Event {
+	return &es_models.Event{
+		AggregateID:      "hodor-org",
+		AggregateType:    model.OrgAggregate,
+		AggregateVersion: "v1",
+		CreationDate:     time.Now().Add(-1 * time.Minute),
+		Data:             []byte(`{"domain":"hodor.org"}`),
+		EditorService:    "testsvc",
+		EditorUser:       "testuser",
+		ID:               "sdlfö4t23kj",
+		ResourceOwner:    "hodor-org",
+		Sequence:         33,
+		Type:             model.OrgDomainAdded,
+	}
+}
+
+func orgDomainVerificationAddedEvent(token string) *es_models.Event {
+	data, _ := json.Marshal(&org_model.OrgDomain{
+		Domain:         "hodor.org",
+		ValidationType: org_model.OrgDomainValidationTypeDNS,
+		ValidationCode: &crypto.CryptoValue{
+			CryptoType: crypto.TypeEncryption,
+			Algorithm:  "enc",
+			KeyID:      "id",
+			Crypted:    []byte(token),
+		},
+	})
+	return &es_models.Event{
+		AggregateID:      "hodor-org",
+		AggregateType:    model.OrgAggregate,
+		AggregateVersion: "v1",
+		CreationDate:     time.Now().Add(-1 * time.Minute),
+		Data:             data,
+		EditorService:    "testsvc",
+		EditorUser:       "testuser",
+		ID:               "sdlfö4t23kj",
+		ResourceOwner:    "hodor-org",
+		Sequence:         34,
+		Type:             model.OrgDomainVerificationAdded,
+	}
+}
+
+func orgDomainVerifiedEvent() *es_models.Event {
+	return &es_models.Event{
+		AggregateID:      "hodor-org",
+		AggregateType:    model.OrgAggregate,
+		AggregateVersion: "v1",
+		CreationDate:     time.Now().Add(-1 * time.Minute),
+		Data:             []byte(`{"domain":"hodor.org"}`),
+		EditorService:    "testsvc",
+		EditorUser:       "testuser",
+		ID:               "sdlfö4t23kj",
+		ResourceOwner:    "hodor-org",
+		Sequence:         35,
+		Type:             model.OrgDomainVerified,
 	}
 }
 
