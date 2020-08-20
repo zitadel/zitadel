@@ -1,4 +1,4 @@
-<img src="./docs/img/zitadel-logo-oneline-lightdesign@2x.png" alt="Zitadel Logo" height="100px" width="auto" />
+<img src="./docs/img/zitadel-logo-dark@2x.png" alt="Zitadel Logo" height="100px" width="auto" />
 
 # ZITADEL
 
