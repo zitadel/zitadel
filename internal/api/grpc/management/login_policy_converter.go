@@ -23,6 +23,7 @@ func loginPolicyFromModel(policy *iam_model.LoginPolicy) *management.LoginPolicy
 
 func loginPolicyViewFromModel(policy *iam_model.LoginPolicyView) *management.LoginPolicyView {
 	return &management.LoginPolicyView{
+		Default:               policy.Default,
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		AllowRegister:         policy.AllowRegister,

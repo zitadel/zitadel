@@ -10,6 +10,7 @@ type LoginPolicyView struct {
 	AllowUsernamePassword bool
 	AllowRegister         bool
 	AllowExternalIdp      bool
+	Default               bool
 
 	CreationDate time.Time
 	ChangeDate   time.Time

@@ -276,6 +276,10 @@ func (repo *OrgRepository) GetLoginPolicy(ctx context.Context) (*iam_model.Login
 	policy, err := repo.View.LoginPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if errors.IsNotFound(err) {
 		policy, err = repo.View.LoginPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
+		policy.Default = true
 	}
 	if err != nil {
 		return nil, err

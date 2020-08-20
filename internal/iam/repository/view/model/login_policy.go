@@ -25,6 +25,7 @@ type LoginPolicyView struct {
 	AllowRegister         bool `json:"allowRegister" gorm:"column:allow_register"`
 	AllowUsernamePassword bool `json:"allowUsernamePassword" gorm:"column:allow_username_password"`
 	AllowExternalIdp      bool `json:"allowExternalIdp" gorm:"column:allow_external_idp"`
+	Default               bool `json:"-" gorm:"-"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }
@@ -38,6 +39,7 @@ func LoginPolicyViewFromModel(policy *model.LoginPolicyView) *LoginPolicyView {
 		AllowRegister:         policy.AllowRegister,
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		AllowUsernamePassword: policy.AllowUsernamePassword,
+		Default:               policy.Default,
 	}
 }
 
@@ -50,6 +52,7 @@ func LoginPolicyViewToModel(policy *LoginPolicyView) *model.LoginPolicyView {
 		AllowRegister:         policy.AllowRegister,
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		AllowUsernamePassword: policy.AllowUsernamePassword,
+		Default:               policy.Default,
 	}
 }
 

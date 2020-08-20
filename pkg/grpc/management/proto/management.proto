@@ -1337,8 +1337,7 @@ service ManagementService {
 
     rpc GetLoginPolicy(google.protobuf.Empty) returns (LoginPolicyView) {
         option (google.api.http) = {
-            put: "/policies/login"
-            body: "*"
+            get: "/orgs/me/policies/login"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -1348,7 +1347,7 @@ service ManagementService {
 
     rpc UpdateLoginPolicy(LoginPolicy) returns (LoginPolicy) {
         option (google.api.http) = {
-            put: "/policies/login"
+            put: "/orgs/me/policies/login"
             body: "*"
         };
 
@@ -1359,7 +1358,7 @@ service ManagementService {
 
     rpc RemoveLoginPolicy(google.protobuf.Empty) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/policies/login"
+            delete: "/orgs/me/policies/login"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -1369,7 +1368,7 @@ service ManagementService {
 
     rpc GetLoginPolicyIdpProviders(IdpProviderSearchRequest) returns (IdpProviderSearchResponse) {
         option (google.api.http) = {
-            post: "/policies/login/idpproviders"
+            post: "/orgs/me/policies/login/idpproviders/_search"
             body: "*"
         };
 
@@ -1380,7 +1379,7 @@ service ManagementService {
 
     rpc AddIdpProviderToLoginPolicy(IdpProviderID) returns (IdpProviderID) {
         option (google.api.http) = {
-            post: "/policies/login/idpproviders"
+            post: "/orgs/me/policies/login/idpproviders"
             body: "*"
         };
 
@@ -1391,7 +1390,7 @@ service ManagementService {
 
     rpc RemoveIdpProviderFromLoginPolicy(IdpProviderID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            post: "/policies/login/idpproviders/{idp_config_id}"
+            post: "/orgs/me/policies/login/idpproviders/{idp_config_id}"
             body: "*"
         };
 
