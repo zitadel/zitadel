@@ -161,9 +161,9 @@ export class MembershipsComponent implements OnInit {
     getColor(type: MemberType): string {
         const gen = type.toString();
         const colors = [
-            'rgb(51 114 193)',
-            '#e41f62',
-            '#37a77d',
+            'rgb(201, 115, 88)',
+            'rgb(226, 176, 50)',
+            'rgb(112, 89, 152)',
         ];
 
         let hash = 0;

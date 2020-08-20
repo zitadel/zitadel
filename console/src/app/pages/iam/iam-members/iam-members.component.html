@@ -1,8 +1,8 @@
 <app-detail-layout [backRouterLink]="[ '/iam']" title="{{ 'IAM.MEMBER.TITLE' | translate }}"
     description="{{ 'IAM.MEMBER.DESCRIPTION' | translate }}">
 
-    <app-refresh-table (refreshed)="refreshPage()" [dataSize]="dataSource.totalResult" [selection]="selection"
-        [loading]="dataSource.loading$ | async">
+    <app-refresh-table (refreshed)="refreshPage()" [dataSize]="dataSource.totalResult"
+        [timestamp]="dataSource?.viewTimestamp" [selection]="selection" [loading]="dataSource.loading$ | async">
 
         <ng-template appHasRole actions [appHasRole]="['iam.member.delete']">
             <button color="warn" (click)="removeProjectMemberSelection()"
