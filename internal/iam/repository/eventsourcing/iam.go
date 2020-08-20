@@ -305,12 +305,28 @@ func checkExistingLoginPolicyValidation() func(...*es_models.Event) error {
 
 func checkExistingLoginPolicyIdpProviderValidation(idpConfigID string) func(...*es_models.Event) error {
 	return func(events ...*es_models.Event) error {
+		idpConfigs := make([]*model.IdpConfig, 0)
 		idps := make([]*model.IdpProvider, 0)
 		for _, event := range events {
 			switch event.Type {
+			case model.IdpConfigAdded:
+				config := new(model.IdpConfig)
+				config.SetData(event)
+				idpConfigs = append(idpConfigs, config)
+			case model.IdpConfigRemoved:
+				config := new(model.IdpConfig)
+				config.SetData(event)
+				for i, p := range idpConfigs {
+					if p.IDPConfigID == config.IDPConfigID {
+						idpConfigs[i] = idpConfigs[len(idpConfigs)-1]
+						idpConfigs[len(idpConfigs)-1] = nil
+						idpConfigs = idpConfigs[:len(idpConfigs)-1]
+					}
+				}
 			case model.LoginPolicyIdpProviderAdded:
 				idp := new(model.IdpProvider)
 				idp.SetData(event)
+				idps = append(idps, idp)
 			case model.LoginPolicyIdpProviderRemoved:
 				idp := new(model.IdpProvider)
 				idp.SetData(event)
@@ -322,6 +338,15 @@ func checkExistingLoginPolicyIdpProviderValidation(idpConfigID string) func(...*
 					}
 				}
 			}
+		}
+		exists := false
+		for _, p := range idpConfigs {
+			if p.IDPConfigID == idpConfigID {
+				exists = true
+			}
+		}
+		if !exists {
+			return errors.ThrowPreconditionFailed(nil, "EVENT-Djlo9", "Errors.Iam.IdpNotExisting")
 		}
 		for _, p := range idps {
 			if p.IdpConfigID == idpConfigID {
