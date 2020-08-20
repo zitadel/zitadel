@@ -2,7 +2,7 @@
     title="{{projectName}} {{ 'PROJECT.MEMBER.TITLE' | translate }}"
     description="{{ 'PROJECT.MEMBER.DESCRIPTION' | translate }}">
     <app-refresh-table *ngIf="project" (refreshed)="changePage()" [dataSize]="dataSource.totalResult"
-        [selection]="selection" [loading]="dataSource?.loading$ | async">
+        [timestamp]="dataSource.viewTimestamp" [selection]="selection" [loading]="dataSource?.loading$ | async">
         <ng-template appHasRole actions
             [appHasRole]="['project.member.delete:' + project.projectId, 'project.member.delete']">
             <button (click)="removeProjectMemberSelection()" color="warn"
