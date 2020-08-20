@@ -91,10 +91,14 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
     private async getData(limit: number, offset: number): Promise<void> {
         this.loadingSubject.next(true);
         this.projectService.SearchProjects(limit, offset).then(res => {
-            this.ownedProjectList = res.toObject().resultList;
-            this.totalResult = res.toObject().totalResult;
+            const response = res.toObject();
+            this.ownedProjectList = response.resultList;
+            this.totalResult = response.totalResult;
             if (this.totalResult > 10) {
                 this.grid = false;
+            }
+            if (response.viewTimestamp) {
+                this.viewTimestamp = response.viewTimestamp;
             }
             this.dataSource.data = this.ownedProjectList;
             this.loadingSubject.next(false);

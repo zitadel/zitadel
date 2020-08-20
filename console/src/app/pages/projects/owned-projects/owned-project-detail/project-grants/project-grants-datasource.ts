@@ -1,4 +1,5 @@
 import { DataSource } from '@angular/cdk/collections';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { ProjectGrant } from 'src/app/proto/generated/management_pb';
@@ -11,6 +12,7 @@ import { ProjectService } from 'src/app/services/project.service';
  */
 export class ProjectGrantsDataSource extends DataSource<ProjectGrant.AsObject> {
     public totalResult: number = 0;
+    public viewTimestamp!: Timestamp.AsObject;
     public grantsSubject: BehaviorSubject<ProjectGrant.AsObject[]> = new BehaviorSubject<ProjectGrant.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
@@ -25,8 +27,12 @@ export class ProjectGrantsDataSource extends DataSource<ProjectGrant.AsObject> {
         this.loadingSubject.next(true);
         from(this.projectService.SearchProjectGrants(projectId, pageSize, offset)).pipe(
             map(resp => {
-                this.totalResult = resp.toObject().totalResult;
-                return resp.toObject().resultList;
+                const response = resp.toObject();
+                this.totalResult = response.totalResult;
+                if (response.viewTimestamp) {
+                    this.viewTimestamp = response.viewTimestamp;
+                }
+                return response.resultList;
             }),
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
