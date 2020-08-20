@@ -193,7 +193,7 @@ func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_
 	result := &org_model.OrgMemberSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
-		TotalResult: uint64(count),
+		TotalResult: count,
 		Result:      model.OrgMembersToModel(members),
 	}
 	if err == nil {
@@ -221,31 +221,31 @@ func (repo *OrgRepository) IdpConfigByID(ctx context.Context, idpConfigID string
 	return iam_view_model.IdpConfigViewToModel(idp), nil
 }
 func (repo *OrgRepository) AddOidcIdpConfig(ctx context.Context, idp *iam_model.IdpConfig) (*iam_model.IdpConfig, error) {
-	idp.AggregateID = repo.SystemDefaults.IamID
+	idp.AggregateID = authz.GetCtxData(ctx).OrgID
 	return repo.OrgEventstore.AddIdpConfiguration(ctx, idp)
 }
 
 func (repo *OrgRepository) ChangeIdpConfig(ctx context.Context, idp *iam_model.IdpConfig) (*iam_model.IdpConfig, error) {
-	idp.AggregateID = repo.SystemDefaults.IamID
+	idp.AggregateID = authz.GetCtxData(ctx).OrgID
 	return repo.OrgEventstore.ChangeIdpConfiguration(ctx, idp)
 }
 
 func (repo *OrgRepository) DeactivateIdpConfig(ctx context.Context, idpConfigID string) (*iam_model.IdpConfig, error) {
-	return repo.OrgEventstore.DeactivateIdpConfiguration(ctx, repo.SystemDefaults.IamID, idpConfigID)
+	return repo.OrgEventstore.DeactivateIdpConfiguration(ctx, authz.GetCtxData(ctx).OrgID, idpConfigID)
 }
 
 func (repo *OrgRepository) ReactivateIdpConfig(ctx context.Context, idpConfigID string) (*iam_model.IdpConfig, error) {
-	return repo.OrgEventstore.ReactivateIdpConfiguration(ctx, repo.SystemDefaults.IamID, idpConfigID)
+	return repo.OrgEventstore.ReactivateIdpConfiguration(ctx, authz.GetCtxData(ctx).OrgID, idpConfigID)
 }
 
 func (repo *OrgRepository) RemoveIdpConfig(ctx context.Context, idpConfigID string) error {
 	//TODO: Remove from all policies and users
-	idp := iam_model.NewIdpConfig(repo.SystemDefaults.IamID, idpConfigID)
+	idp := iam_model.NewIdpConfig(authz.GetCtxData(ctx).OrgID, idpConfigID)
 	return repo.OrgEventstore.RemoveIdpConfiguration(ctx, idp)
 }
 
 func (repo *OrgRepository) ChangeOidcIdpConfig(ctx context.Context, oidcConfig *iam_model.OidcIdpConfig) (*iam_model.OidcIdpConfig, error) {
-	oidcConfig.AggregateID = repo.SystemDefaults.IamID
+	oidcConfig.AggregateID = authz.GetCtxData(ctx).OrgID
 	return repo.OrgEventstore.ChangeIdpOidcConfiguration(ctx, oidcConfig)
 }
 
