@@ -56,5 +56,6 @@ const (
 
 	SignedOut models.EventType = "user.signed.out"
 
-	DomainClaimed models.EventType = "user.domain.claimed"
+	DomainClaimed     models.EventType = "user.domain.claimed"
+	DomainClaimedSent models.EventType = "user.domain.claimed.sent"
 )

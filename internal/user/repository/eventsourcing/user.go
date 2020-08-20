@@ -696,6 +696,16 @@ func DomainClaimedAggregate(ctx context.Context, aggCreator *es_models.Aggregate
 	return aggregates, nil
 }
 
+func DomainClaimedSentAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.DomainClaimedSent, nil)
+	}
+}
+
 func isEventValidation(aggregate *es_models.Aggregate, eventType es_models.EventType) func(...*es_models.Event) error {
 	return func(events ...*es_models.Event) error {
 		if len(events) == 0 {
