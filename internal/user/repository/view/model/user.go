@@ -181,7 +181,8 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	case es_model.UserPasswordChanged:
 		err = u.setPasswordData(event)
 	case es_model.UserProfileChanged,
-		es_model.UserAddressChanged:
+		es_model.UserAddressChanged,
+		es_model.DomainClaimed:
 		err = u.setData(event)
 	case es_model.UserEmailChanged:
 		u.IsEmailVerified = false

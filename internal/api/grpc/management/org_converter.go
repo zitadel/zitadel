@@ -90,6 +90,17 @@ func orgDomainValidationTypeToModel(key management.OrgDomainValidationType) org_
 	}
 }
 
+func orgDomainValidationTypeFromModel(key org_model.OrgDomainValidationType) management.OrgDomainValidationType {
+	switch key {
+	case org_model.OrgDomainValidationTypeHTTP:
+		return management.OrgDomainValidationType_ORGDOMAINVALIDATIONTYPE_HTTP
+	case org_model.OrgDomainValidationTypeDNS:
+		return management.OrgDomainValidationType_ORGDOMAINVALIDATIONTYPE_DNS
+	default:
+		return management.OrgDomainValidationType_ORGDOMAINVALIDATIONTYPE_UNSPECIFIED
+	}
+}
+
 func primaryOrgDomainToModel(domain *management.PrimaryOrgDomainRequest) *org_model.OrgDomain {
 	return &org_model.OrgDomain{Domain: domain.Domain}
 }
@@ -119,12 +130,13 @@ func orgDomainViewFromModel(domain *org_model.OrgDomainView) *management.OrgDoma
 	logging.Log("GRPC-8iSji").OnError(err).Debug("unable to get timestamp from time")
 
 	return &management.OrgDomainView{
-		ChangeDate:   changeDate,
-		CreationDate: creationDate,
-		OrgId:        domain.OrgID,
-		Domain:       domain.Domain,
-		Verified:     domain.Verified,
-		Primary:      domain.Primary,
+		ChangeDate:     changeDate,
+		CreationDate:   creationDate,
+		OrgId:          domain.OrgID,
+		Domain:         domain.Domain,
+		Verified:       domain.Verified,
+		Primary:        domain.Primary,
+		ValidationType: orgDomainValidationTypeFromModel(domain.ValidationType),
 	}
 }
 

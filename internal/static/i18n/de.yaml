@@ -203,6 +203,9 @@ EventTypes:
     removed: Organisation entfernt
     domain:
       added: Domäne hinzugefügt
+      verification:
+        added: Domänenverifizierung hinzugefügt
+        failed: Domänenverifizierung fehlgeschlagen
       verified: Domäne verifiziert
       removed: Domäne entfernt
       primary:
@@ -295,6 +298,7 @@ Application:
   OIDC:
     V1:
       NotCompliant: Deine Konfiguration ist nicht konform und weicht vom OIDC 1.0 Standard ab.
+      NoRedirectUris: Es muss mindestens eine Redirect URI erfasst sein.
       NotAllCombinationsAreAllowed: Die Konfiguration ist konform, jedoch werden nicht alle möglichen Kombinationen erlaubt.
       Code:
         RedirectUris:

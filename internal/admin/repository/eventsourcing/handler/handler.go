@@ -5,7 +5,9 @@ import (
 
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/types"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/query"
+	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
@@ -24,12 +26,14 @@ type handler struct {
 
 type EventstoreRepos struct {
 	UserEvents *usr_event.UserEventstore
+	OrgEvents  *org_event.OrgEventstore
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, repos EventstoreRepos) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos) []query.Handler {
 	return []query.Handler{
 		&Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount}},
 		&IamMember{handler: handler{view, bulkLimit, configs.cycleDuration("IamMember"), errorCount}, userEvents: repos.UserEvents},
+		&User{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount}, eventstore: eventstore, orgEvents: repos.OrgEvents},
 	}
 }
 

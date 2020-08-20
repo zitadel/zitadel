@@ -14,4 +14,6 @@ const (
 	SearchMethodLessThan
 	SearchMethodIsOneOf
 	SearchMethodListContains
+	SearchMethodEndsWith
+	SearchMethodEndsWithIgnoreCase
 )

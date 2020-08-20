@@ -45,7 +45,8 @@ func (d *OrgDomain) processOrgDomain(event *models.Event) (err error) {
 	switch event.Type {
 	case model.OrgDomainAdded:
 		err = domain.AppendEvent(event)
-	case model.OrgDomainVerified:
+	case model.OrgDomainVerified,
+		model.OrgDomainVerificationAdded:
 		err = domain.SetData(event)
 		if err != nil {
 			return err

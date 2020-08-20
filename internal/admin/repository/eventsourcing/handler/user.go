@@ -23,7 +23,7 @@ type User struct {
 }
 
 const (
-	userTable = "management.users"
+	userTable = "adminapi.users"
 )
 
 func (u *User) ViewModel() string {

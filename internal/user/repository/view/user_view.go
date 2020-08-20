@@ -2,6 +2,7 @@ package view
 
 import (
 	"github.com/caos/zitadel/internal/view/repository"
+
 	"github.com/jinzhu/gorm"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -56,6 +57,30 @@ func UsersByOrgID(db *gorm.DB, table, orgID string) ([]*model.UserView, error) {
 		Queries: []*usr_model.UserSearchQuery{orgIDQuery},
 	})
 	_, err := query(db, &users)
+	return users, err
+}
+
+func UserIDsByDomain(db *gorm.DB, table, domain string) ([]string, error) {
+	type id struct {
+		Id string
+	}
+	ids := make([]id, 0)
+	orgIDQuery := &usr_model.UserSearchQuery{
+		Key:    usr_model.UserSearchKeyUserName,
+		Method: global_model.SearchMethodEndsWithIgnoreCase,
+		Value:  "%" + domain,
+	}
+	query := repository.PrepareSearchQuery(table, model.UserSearchRequest{
+		Queries: []*usr_model.UserSearchQuery{orgIDQuery},
+	})
+	_, err := query(db, &ids)
+	if err != nil {
+		return nil, err
+	}
+	users := make([]string, len(ids))
+	for i, id := range ids {
+		users[i] = id.Id
+	}
 	return users, err
 }
 
