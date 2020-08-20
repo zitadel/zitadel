@@ -1,4 +1,4 @@
-<img src="./docs/img/zitadel-logo-dark@2x.png" style="height=40px;"/>
+![ZITADEL](./docs/img/zitadel-logo-dark@2x.png)
 
 # ZITADEL
 
