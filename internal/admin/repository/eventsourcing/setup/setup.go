@@ -39,7 +39,7 @@ type EventstoreRepos struct {
 
 type initializer struct {
 	*Setup
-	createdUsers       map[string]*usr_model.Human
+	createdUsers       map[string]*usr_model.User
 	createdOrgs        map[string]*org_model.Org
 	createdProjects    map[string]*proj_model.Project
 	pwComplexityPolicy *policy_model.PasswordComplexityPolicy
@@ -92,7 +92,7 @@ func (s *Setup) Execute(ctx context.Context) error {
 
 	setUp := &initializer{
 		Setup:           s,
-		createdUsers:    make(map[string]*usr_model.Human),
+		createdUsers:    make(map[string]*usr_model.User),
 		createdOrgs:     make(map[string]*org_model.Org),
 		createdProjects: make(map[string]*proj_model.Project),
 	}
@@ -285,19 +285,21 @@ func (setUp *initializer) users(ctx context.Context, users []types.User, orgPoli
 	return nil
 }
 
-func (setUp *initializer) user(ctx context.Context, user types.User, orgPolicy *org_model.OrgIamPolicy) (*usr_model.Human, error) {
-	createUser := &usr_model.Human{
-		Profile: &usr_model.Profile{
-			UserName:  user.UserName,
-			FirstName: user.FirstName,
-			LastName:  user.LastName,
-		},
-		Email: &usr_model.Email{
-			EmailAddress:    user.Email,
-			IsEmailVerified: true,
-		},
-		Password: &usr_model.Password{
-			SecretString: user.Password,
+func (setUp *initializer) user(ctx context.Context, user types.User, orgPolicy *org_model.OrgIamPolicy) (*usr_model.User, error) {
+	createUser := &usr_model.User{
+		Human: &usr_model.Human{
+			Profile: &usr_model.Profile{
+				UserName:  user.UserName,
+				FirstName: user.FirstName,
+				LastName:  user.LastName,
+			},
+			Email: &usr_model.Email{
+				EmailAddress:    user.Email,
+				IsEmailVerified: true,
+			},
+			Password: &usr_model.Password{
+				SecretString: user.Password,
+			},
 		},
 	}
 	return setUp.repos.UserEvents.CreateUser(ctx, createUser, setUp.pwComplexityPolicy, orgPolicy)
@@ -319,7 +321,7 @@ func (setUp *initializer) orgOwners(ctx context.Context, org *org_model.Org, own
 	return nil
 }
 
-func (setUp *initializer) orgOwner(ctx context.Context, org *org_model.Org, user *usr_model.Human) error {
+func (setUp *initializer) orgOwner(ctx context.Context, org *org_model.Org, user *usr_model.User) error {
 	addMember := &org_model.OrgMember{
 		ObjectRoot: models.ObjectRoot{AggregateID: org.AggregateID},
 		UserID:     user.AggregateID,

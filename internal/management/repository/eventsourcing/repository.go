@@ -35,7 +35,7 @@ type EsRepository struct {
 	eventstore.UserGrantRepo
 	eventstore.PolicyRepo
 	eventstore.IamRepository
-	eventstore.ServiceAccountRepo
+	// eventstore.ServiceAccountRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRepository, error) {
@@ -94,14 +94,14 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos)
 
 	return &EsRepository{
-		spooler:            spool,
-		OrgRepository:      eventstore.OrgRepository{conf.SearchLimit, org, user, view, roles},
-		ProjectRepo:        eventstore.ProjectRepo{es, conf.SearchLimit, project, usergrant, user, view, roles},
-		UserRepo:           eventstore.UserRepo{conf.SearchLimit, user, policy, org, view},
-		UserGrantRepo:      eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
-		PolicyRepo:         eventstore.PolicyRepo{policy},
-		IamRepository:      eventstore.IamRepository{iam},
-		ServiceAccountRepo: eventstore.ServiceAccountRepo{user},
+		spooler:       spool,
+		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, org, user, view, roles},
+		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, project, usergrant, user, view, roles},
+		UserRepo:      eventstore.UserRepo{conf.SearchLimit, user, policy, org, view},
+		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
+		PolicyRepo:    eventstore.PolicyRepo{policy},
+		IamRepository: eventstore.IamRepository{iam},
+		// ServiceAccountRepo: eventstore.ServiceAccountRepo{user},
 	}, nil
 }
 

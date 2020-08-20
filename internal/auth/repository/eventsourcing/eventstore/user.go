@@ -32,7 +32,7 @@ func (repo *UserRepo) Health(ctx context.Context) error {
 	return repo.UserEvents.Health(ctx)
 }
 
-func (repo *UserRepo) Register(ctx context.Context, registerUser *model.Human, orgMember *org_model.OrgMember, resourceOwner string) (*model.Human, error) {
+func (repo *UserRepo) Register(ctx context.Context, registerUser *model.User, orgMember *org_model.OrgMember, resourceOwner string) (*model.User, error) {
 	policyResourceOwner := authz.GetCtxData(ctx).OrgID
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner
@@ -62,7 +62,7 @@ func (repo *UserRepo) Register(ctx context.Context, registerUser *model.Human, o
 	if err != nil {
 		return nil, err
 	}
-	return usr_model.HumanToModel(user), nil
+	return usr_model.UserToModel(user), nil
 }
 
 func (repo *UserRepo) MyUser(ctx context.Context) (*model.UserView, error) {

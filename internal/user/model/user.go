@@ -54,3 +54,13 @@ func (u *User) IsInactive() bool {
 func (u *User) IsLocked() bool {
 	return u.State == UserStateLocked
 }
+
+func (u *User) IsValid() bool {
+	if u.Human == nil && u.Machine == nil {
+		return false
+	}
+	if u.Human != nil {
+		return u.Human.IsValid()
+	}
+	return u.Machine.IsValid()
+}

@@ -137,19 +137,21 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplRegister], data, funcs)
 }
 
-func (d registerFormData) toUserModel() *usr_model.Human {
-	return &usr_model.Human{
-		Profile: &usr_model.Profile{
-			FirstName:         d.Firstname,
-			LastName:          d.Lastname,
-			PreferredLanguage: language.Make(d.Language),
-			Gender:            usr_model.Gender(d.Gender),
-		},
-		Password: &usr_model.Password{
-			SecretString: d.Password,
-		},
-		Email: &usr_model.Email{
-			EmailAddress: d.Email,
+func (d registerFormData) toUserModel() *usr_model.User {
+	return &usr_model.User{
+		Human: &usr_model.Human{
+			Profile: &usr_model.Profile{
+				FirstName:         d.Firstname,
+				LastName:          d.Lastname,
+				PreferredLanguage: language.Make(d.Language),
+				Gender:            usr_model.Gender(d.Gender),
+			},
+			Password: &usr_model.Password{
+				SecretString: d.Password,
+			},
+			Email: &usr_model.Email{
+				EmailAddress: d.Email,
+			},
 		},
 	}
 }

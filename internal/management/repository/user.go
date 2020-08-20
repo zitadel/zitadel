@@ -8,12 +8,12 @@ import (
 
 type UserRepository interface {
 	UserByID(ctx context.Context, id string) (*model.UserView, error)
-	CreateUser(ctx context.Context, user *model.Human) (*model.Human, error)
-	RegisterUser(ctx context.Context, user *model.Human, resourceOwner string) (*model.Human, error)
-	DeactivateUser(ctx context.Context, id string) (*model.Human, error)
-	ReactivateUser(ctx context.Context, id string) (*model.Human, error)
-	LockUser(ctx context.Context, id string) (*model.Human, error)
-	UnlockUser(ctx context.Context, id string) (*model.Human, error)
+	CreateUser(ctx context.Context, user *model.User) (*model.User, error)
+	RegisterUser(ctx context.Context, user *model.User, resourceOwner string) (*model.User, error)
+	DeactivateUser(ctx context.Context, id string) (*model.User, error)
+	ReactivateUser(ctx context.Context, id string) (*model.User, error)
+	LockUser(ctx context.Context, id string) (*model.User, error)
+	UnlockUser(ctx context.Context, id string) (*model.User, error)
 	SearchUsers(ctx context.Context, request *model.UserSearchRequest) (*model.UserSearchResponse, error)
 	UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error)
 	GetGlobalUserByEmail(ctx context.Context, email string) (*model.UserView, error)

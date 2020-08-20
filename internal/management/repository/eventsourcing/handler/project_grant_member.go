@@ -113,7 +113,8 @@ func (p *ProjectGrantMember) fillData(member *view_model.ProjectGrantMemberView)
 	return nil
 }
 
-func (p *ProjectGrantMember) fillUserData(member *view_model.ProjectGrantMemberView, user *usr_model.Human) {
+//TODO: specific for user data
+func (p *ProjectGrantMember) fillUserData(member *view_model.ProjectGrantMemberView, user *usr_model.User) {
 	member.UserName = user.UserName
 	member.FirstName = user.FirstName
 	member.LastName = user.LastName

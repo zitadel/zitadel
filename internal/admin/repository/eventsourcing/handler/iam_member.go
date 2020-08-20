@@ -113,7 +113,8 @@ func (m *IamMember) fillData(member *iam_model.IamMemberView) (err error) {
 	return nil
 }
 
-func (m *IamMember) fillUserData(member *iam_model.IamMemberView, user *usr_model.Human) {
+//TODO: specific for user data
+func (m *IamMember) fillUserData(member *iam_model.IamMemberView, user *usr_model.User) {
 	member.UserName = user.UserName
 	member.FirstName = user.FirstName
 	member.LastName = user.LastName

@@ -18,11 +18,11 @@ const (
 var _ management.ManagementServiceServer = (*Server)(nil)
 
 type Server struct {
-	project        repository.ProjectRepository
-	policy         repository.PolicyRepository
-	org            repository.OrgRepository
-	user           repository.UserRepository
-	serviceAccount repository.ServiceAccountRepository
+	project repository.ProjectRepository
+	policy  repository.PolicyRepository
+	org     repository.OrgRepository
+	user    repository.UserRepository
+	// serviceAccount repository.ServiceAccountRepository
 	usergrant      repository.UserGrantRepository
 	iam            repository.IamRepository
 	authZ          authz.Config
@@ -35,13 +35,13 @@ type Config struct {
 
 func CreateServer(repo repository.Repository, sd systemdefaults.SystemDefaults) *Server {
 	return &Server{
-		project:        repo,
-		policy:         repo,
-		org:            repo,
-		user:           repo,
-		usergrant:      repo,
-		iam:            repo,
-		serviceAccount: repo,
+		project:   repo,
+		policy:    repo,
+		org:       repo,
+		user:      repo,
+		usergrant: repo,
+		iam:       repo,
+		// serviceAccount: repo,
 		systemDefaults: sd,
 	}
 }

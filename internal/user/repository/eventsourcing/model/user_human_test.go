@@ -11,19 +11,19 @@ import (
 
 func TestAppendDeactivatedEvent(t *testing.T) {
 	type args struct {
-		user *Human
+		user *User
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *Human
+		result *User
 	}{
 		{
 			name: "append deactivate event",
 			args: args{
-				user: &Human{},
+				user: &User{},
 			},
-			result: &Human{State: int32(model.UserStateInactive)},
+			result: &User{State: int32(model.UserStateInactive)},
 		},
 	}
 	for _, tt := range tests {
@@ -38,19 +38,19 @@ func TestAppendDeactivatedEvent(t *testing.T) {
 
 func TestAppendReactivatedEvent(t *testing.T) {
 	type args struct {
-		user *Human
+		user *User
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *Human
+		result *User
 	}{
 		{
 			name: "append reactivate event",
 			args: args{
-				user: &Human{},
+				user: &User{},
 			},
-			result: &Human{State: int32(model.UserStateActive)},
+			result: &User{State: int32(model.UserStateActive)},
 		},
 	}
 	for _, tt := range tests {
@@ -65,19 +65,19 @@ func TestAppendReactivatedEvent(t *testing.T) {
 
 func TestAppendLockEvent(t *testing.T) {
 	type args struct {
-		user *Human
+		user *User
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *Human
+		result *User
 	}{
 		{
 			name: "append lock event",
 			args: args{
-				user: &Human{},
+				user: &User{},
 			},
-			result: &Human{State: int32(model.UserStateLocked)},
+			result: &User{State: int32(model.UserStateLocked)},
 		},
 	}
 	for _, tt := range tests {
@@ -92,19 +92,19 @@ func TestAppendLockEvent(t *testing.T) {
 
 func TestAppendUnlockEvent(t *testing.T) {
 	type args struct {
-		user *Human
+		user *User
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *Human
+		result *User
 	}{
 		{
 			name: "append unlock event",
 			args: args{
-				user: &Human{},
+				user: &User{},
 			},
-			result: &Human{State: int32(model.UserStateActive)},
+			result: &User{State: int32(model.UserStateActive)},
 		},
 	}
 	for _, tt := range tests {

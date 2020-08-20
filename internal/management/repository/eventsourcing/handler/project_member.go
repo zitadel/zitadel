@@ -113,7 +113,8 @@ func (p *ProjectMember) fillData(member *view_model.ProjectMemberView) (err erro
 	return nil
 }
 
-func (p *ProjectMember) fillUserData(member *view_model.ProjectMemberView, user *usr_model.Human) {
+//TODO: secific for user data
+func (p *ProjectMember) fillUserData(member *view_model.ProjectMemberView, user *usr_model.User) {
 	member.UserName = user.UserName
 	member.FirstName = user.FirstName
 	member.LastName = user.LastName

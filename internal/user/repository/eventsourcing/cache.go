@@ -19,15 +19,15 @@ func StartCache(conf *config.CacheConfig) (*UserCache, error) {
 	return &UserCache{userCache: userCache}, nil
 }
 
-func (c *UserCache) getUser(id string) *model.Human {
-	user := &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: id}}
+func (c *UserCache) getUser(id string) *model.User {
+	user := &model.User{ObjectRoot: models.ObjectRoot{AggregateID: id}}
 	if err := c.userCache.Get(id, user); err != nil {
 		logging.Log("EVENT-AtS0S").WithError(err).Debug("error in getting cache")
 	}
 	return user
 }
 
-func (c *UserCache) cacheUser(user *model.Human) {
+func (c *UserCache) cacheUser(user *model.User) {
 	err := c.userCache.Set(user.AggregateID, user)
 	if err != nil {
 		logging.Log("EVENT-0V2gX").WithError(err).Debug("error in setting project cache")

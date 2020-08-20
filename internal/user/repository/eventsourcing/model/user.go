@@ -30,7 +30,43 @@ func (u *User) AppendEvents(events ...*es_models.Event) error {
 	return nil
 }
 
+func UserFromModel(user *model.User) *User {
+	var human *Human
+	if user.Human != nil {
+		human = HumanFromModel(user.Human)
+	}
+	var machine *Machine
+	if user.Machine != nil {
+		machine = MachineFromModel(user.Machine)
+	}
+	return &User{
+		ObjectRoot: user.ObjectRoot,
+		State:      int32(user.State),
+		Human:      human,
+		Machine:    machine,
+	}
+}
+
+func UserToModel(user *User) *model.User {
+	var human *model.Human
+	if user.Human != nil {
+		human = HumanToModel(user.Human)
+	}
+	var machine *model.Machine
+	if user.Machine != nil {
+		machine = MachineToModel(user.Machine)
+	}
+	return &model.User{
+		ObjectRoot: user.ObjectRoot,
+		State:      model.UserState(user.State),
+		Human:      human,
+		Machine:    machine,
+	}
+}
+
 func (u *User) AppendEvent(event *es_models.Event) error {
+	u.ObjectRoot.AppendEvent(event)
+
 	switch event.Type {
 	case UserDeactivated:
 		u.appendDeactivatedEvent()
@@ -43,35 +79,19 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 	}
 
 	if u.Human != nil {
-		u.Human.objectRoot = u.ObjectRoot
-		u.Human.state = u.State
-		err := u.Human.AppendEvent(event)
-		u.State = u.Human.state
-		return err
+		u.Human.User = u
+		return u.Human.AppendEvent(event)
 	} else if u.Machine != nil {
-		u.Machine.objectRoot = u.ObjectRoot
-		u.Machine.state = u.State
-		err := u.Machine.AppendEvent(event)
-		u.State = u.Machine.state
-		return err
+		u.Machine.User = u
+		return u.Machine.AppendEvent(event)
 	}
 	if strings.HasPrefix(string(event.Type), "user.human") || event.AggregateVersion == "v1" {
-		u.Human = &Human{
-			objectRoot: u.ObjectRoot,
-			state:      u.State,
-		}
-		err := u.Human.AppendEvent(event)
-		u.State = u.Human.state
-		return err
+		u.Human = &Human{User: u}
+		return u.Human.AppendEvent(event)
 	}
 	if strings.HasPrefix(string(event.Type), "user.machine") {
-		u.Machine = &Machine{
-			objectRoot: u.ObjectRoot,
-			state:      u.State,
-		}
-		err := u.Machine.AppendEvent(event)
-		u.State = u.Machine.state
-		return err
+		u.Machine = &Machine{User: u}
+		return u.Machine.AppendEvent(event)
 	}
 
 	return errors.ThrowNotFound(nil, "MODEL-x9TaX", "Errors.UserType.Undefined")

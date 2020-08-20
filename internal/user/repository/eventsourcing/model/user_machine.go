@@ -10,8 +10,7 @@ import (
 )
 
 type Machine struct {
-	objectRoot models.ObjectRoot
-	state      int32 `json:"-"`
+	*User `json:"-"`
 
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
@@ -29,7 +28,6 @@ func (sa *Machine) AppendEvents(events ...*models.Event) error {
 func (sa *Machine) AppendEvent(event *models.Event) (err error) {
 	switch event.Type {
 	case MachineAdded, MachineChanged:
-		sa.state = int32(model.UserStateActive)
 		err = sa.setData(event)
 	case KeyAdded:
 		fallthrough
@@ -56,14 +54,14 @@ func (sa *Machine) Changes(updatedAccount *Machine) map[string]interface{} {
 	return changes
 }
 
-func ServiceAccountFromModel(serviceAccount *model.Machine) *Machine {
+func MachineFromModel(serviceAccount *model.Machine) *Machine {
 	return &Machine{
 		Description: serviceAccount.Description,
 		Name:        serviceAccount.Name,
 	}
 }
 
-func ServiceAccountToModel(serviceAccount *Machine) *model.Machine {
+func MachineToModel(serviceAccount *Machine) *model.Machine {
 	return &model.Machine{
 		Description: serviceAccount.Description,
 		Name:        serviceAccount.Name,

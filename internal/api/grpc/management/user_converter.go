@@ -15,7 +15,7 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/message"
 )
 
-func userFromModel(user *usr_model.Human) *management.User {
+func userFromModel(user *usr_model.User) *management.User {
 	creationDate, err := ptypes.TimestampProto(user.CreationDate)
 	logging.Log("GRPC-8duwe").OnError(err).Debug("unable to parse timestamp")
 
@@ -54,29 +54,31 @@ func userFromModel(user *usr_model.Human) *management.User {
 	return converted
 }
 
-func userCreateToModel(u *management.CreateUserRequest) *usr_model.Human {
+func userCreateToModel(u *management.CreateUserRequest) *usr_model.User {
 	preferredLanguage, err := language.Parse(u.PreferredLanguage)
 	logging.Log("GRPC-cK5k2").OnError(err).Debug("language malformed")
 
-	user := &usr_model.Human{
-		Profile: &usr_model.Profile{
-			UserName:          u.UserName,
-			FirstName:         u.FirstName,
-			LastName:          u.LastName,
-			NickName:          u.NickName,
-			PreferredLanguage: preferredLanguage,
-			Gender:            genderToModel(u.Gender),
-		},
-		Email: &usr_model.Email{
-			EmailAddress:    u.Email,
-			IsEmailVerified: u.IsEmailVerified,
-		},
-		Address: &usr_model.Address{
-			Country:       u.Country,
-			Locality:      u.Locality,
-			PostalCode:    u.PostalCode,
-			Region:        u.Region,
-			StreetAddress: u.StreetAddress,
+	user := &usr_model.User{
+		Human: &usr_model.Human{
+			Profile: &usr_model.Profile{
+				UserName:          u.UserName,
+				FirstName:         u.FirstName,
+				LastName:          u.LastName,
+				NickName:          u.NickName,
+				PreferredLanguage: preferredLanguage,
+				Gender:            genderToModel(u.Gender),
+			},
+			Email: &usr_model.Email{
+				EmailAddress:    u.Email,
+				IsEmailVerified: u.IsEmailVerified,
+			},
+			Address: &usr_model.Address{
+				Country:       u.Country,
+				Locality:      u.Locality,
+				PostalCode:    u.PostalCode,
+				Region:        u.Region,
+				StreetAddress: u.StreetAddress,
+			},
 		},
 	}
 	if u.Password != "" {

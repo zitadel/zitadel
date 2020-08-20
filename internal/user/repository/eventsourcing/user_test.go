@@ -104,7 +104,7 @@ func TestUserQuery(t *testing.T) {
 func TestUserCreateAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		new        *model.Human
+		new        *model.User
 		initCode   *model.InitUserCode
 		phoneCode  *model.PhoneCode
 		aggCreator *models.AggregateCreator
@@ -126,9 +126,11 @@ func TestUserCreateAggregate(t *testing.T) {
 			name: "user create aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
-					Email:   &model.Email{EmailAddress: "EmailAddress"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+						Email:   &model.Email{EmailAddress: "EmailAddress"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -155,9 +157,11 @@ func TestUserCreateAggregate(t *testing.T) {
 			name: "create with init code",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
-					Email:   &model.Email{EmailAddress: "EmailAddress"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+						Email:   &model.Email{EmailAddress: "EmailAddress"},
+					},
 				},
 				initCode:   &model.InitUserCode{},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -173,9 +177,11 @@ func TestUserCreateAggregate(t *testing.T) {
 			name: "create with phone code",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
-					Email:   &model.Email{EmailAddress: "EmailAddress"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+						Email:   &model.Email{EmailAddress: "EmailAddress"},
+					},
 				},
 				phoneCode:  &model.PhoneCode{},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -191,9 +197,11 @@ func TestUserCreateAggregate(t *testing.T) {
 			name: "create with email verified",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
-					Email:   &model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+						Email:   &model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -208,10 +216,12 @@ func TestUserCreateAggregate(t *testing.T) {
 			name: "create with phone verified",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
-					Email:   &model.Email{EmailAddress: "EmailAddress"},
-					Phone:   &model.Phone{PhoneNumber: "PhoneNumber", IsPhoneVerified: true},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+						Email:   &model.Email{EmailAddress: "EmailAddress"},
+						Phone:   &model.Phone{PhoneNumber: "PhoneNumber", IsPhoneVerified: true},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -255,7 +265,7 @@ func TestUserCreateAggregate(t *testing.T) {
 func TestUserRegisterAggregate(t *testing.T) {
 	type args struct {
 		ctx           context.Context
-		new           *model.Human
+		new           *model.User
 		emailCode     *model.EmailCode
 		resourceOwner string
 		aggCreator    *models.AggregateCreator
@@ -274,9 +284,11 @@ func TestUserRegisterAggregate(t *testing.T) {
 			name: "user register aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
-					Email:   &model.Email{EmailAddress: "EmailAddress"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+						Email:   &model.Email{EmailAddress: "EmailAddress"},
+					},
 				},
 				emailCode:     &model.EmailCode{},
 				resourceOwner: "newResourceowner",
@@ -305,9 +317,11 @@ func TestUserRegisterAggregate(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContext("orgID", "userID"),
 				resourceOwner: "newResourceowner",
-				new: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
-					Email:   &model.Email{EmailAddress: "EmailAddress"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+						Email:   &model.Email{EmailAddress: "EmailAddress"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -319,9 +333,11 @@ func TestUserRegisterAggregate(t *testing.T) {
 			name: "create with email code",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
-					Email:   &model.Email{EmailAddress: "EmailAddress"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+						Email:   &model.Email{EmailAddress: "EmailAddress"},
+					},
 				},
 				resourceOwner: "newResourceowner",
 				emailCode:     &model.EmailCode{},
@@ -336,9 +352,11 @@ func TestUserRegisterAggregate(t *testing.T) {
 			name: "create no resourceowner",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
-					Email:   &model.Email{EmailAddress: "EmailAddress"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+						Email:   &model.Email{EmailAddress: "EmailAddress"},
+					},
 				},
 				emailCode:  &model.EmailCode{},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -373,7 +391,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 func TestUserDeactivateAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		new        *model.Human
+		new        *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -390,8 +408,10 @@ func TestUserDeactivateAggregate(t *testing.T) {
 			name: "user deactivate aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -432,7 +452,7 @@ func TestUserDeactivateAggregate(t *testing.T) {
 func TestUserReactivateAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		new        *model.Human
+		new        *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -449,8 +469,10 @@ func TestUserReactivateAggregate(t *testing.T) {
 			name: "user reactivate aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -491,7 +513,7 @@ func TestUserReactivateAggregate(t *testing.T) {
 func TestUserLockedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		new        *model.Human
+		new        *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -508,8 +530,10 @@ func TestUserLockedAggregate(t *testing.T) {
 			name: "user locked aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -550,7 +574,7 @@ func TestUserLockedAggregate(t *testing.T) {
 func TestUserUnlockedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		new        *model.Human
+		new        *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -567,8 +591,10 @@ func TestUserUnlockedAggregate(t *testing.T) {
 			name: "user unlocked aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -609,7 +635,7 @@ func TestUserUnlockedAggregate(t *testing.T) {
 func TestUserInitCodeAggregate(t *testing.T) {
 	type args struct {
 		ctx      context.Context
-		existing *model.Human
+		existing *model.User
 		code     *model.InitUserCode
 
 		aggCreator *models.AggregateCreator
@@ -628,8 +654,10 @@ func TestUserInitCodeAggregate(t *testing.T) {
 			name: "user unlocked aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+					},
 				},
 				code:       &model.InitUserCode{Expiry: time.Hour * 1},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -643,8 +671,10 @@ func TestUserInitCodeAggregate(t *testing.T) {
 			name: "code nil",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -673,7 +703,7 @@ func TestUserInitCodeAggregate(t *testing.T) {
 func TestInitCodeSentAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -690,7 +720,7 @@ func TestInitCodeSentAggregate(t *testing.T) {
 			name: "user init code sent aggregate ok",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
+				existing:   &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -721,7 +751,7 @@ func TestInitCodeSentAggregate(t *testing.T) {
 func TestInitCodeVerifiedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		password   *model.Password
 		aggCreator *models.AggregateCreator
 	}
@@ -739,9 +769,11 @@ func TestInitCodeVerifiedAggregate(t *testing.T) {
 			name: "user init code only email verify",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
-					Email:   &model.Email{EmailAddress: "EmailAddress"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+						Email:   &model.Email{EmailAddress: "EmailAddress"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -754,9 +786,11 @@ func TestInitCodeVerifiedAggregate(t *testing.T) {
 			name: "user init code only password",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
-					Email:   &model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+						Email:   &model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -769,9 +803,11 @@ func TestInitCodeVerifiedAggregate(t *testing.T) {
 			name: "user init code email and pw",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
-					Email:   &model.Email{EmailAddress: "EmailAddress"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+						Email:   &model.Email{EmailAddress: "EmailAddress"},
+					},
 				},
 				password:   &model.Password{Secret: &crypto.CryptoValue{}, ChangeRequired: false},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -804,7 +840,7 @@ func TestInitCodeVerifiedAggregate(t *testing.T) {
 func TestInitCodeCheckFailedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -821,8 +857,10 @@ func TestInitCodeCheckFailedAggregate(t *testing.T) {
 			name: "mfa skipped init ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -852,7 +890,7 @@ func TestInitCodeCheckFailedAggregate(t *testing.T) {
 func TestSkipMfaAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -869,8 +907,10 @@ func TestSkipMfaAggregate(t *testing.T) {
 			name: "init code check failed",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -900,7 +940,7 @@ func TestSkipMfaAggregate(t *testing.T) {
 func TestChangePasswordAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		password   *model.Password
 		aggCreator *models.AggregateCreator
 	}
@@ -918,8 +958,10 @@ func TestChangePasswordAggregate(t *testing.T) {
 			name: "user password aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+					},
 				},
 				password:   &model.Password{ChangeRequired: true},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -933,8 +975,10 @@ func TestChangePasswordAggregate(t *testing.T) {
 			name: "password nil",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -963,7 +1007,7 @@ func TestChangePasswordAggregate(t *testing.T) {
 func TestRequestSetPasswordAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		request    *model.PasswordCode
 		aggCreator *models.AggregateCreator
 	}
@@ -981,8 +1025,10 @@ func TestRequestSetPasswordAggregate(t *testing.T) {
 			name: "user password aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+					},
 				},
 				request:    &model.PasswordCode{Expiry: time.Hour * 1},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -996,8 +1042,10 @@ func TestRequestSetPasswordAggregate(t *testing.T) {
 			name: "request nil",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1026,7 +1074,7 @@ func TestRequestSetPasswordAggregate(t *testing.T) {
 func TestPasswordCodeSentAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -1043,7 +1091,7 @@ func TestPasswordCodeSentAggregate(t *testing.T) {
 			name: "user password code sent aggregate ok",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
+				existing:   &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -1074,7 +1122,7 @@ func TestPasswordCodeSentAggregate(t *testing.T) {
 func TestChangeProfileAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		profile    *model.Profile
 		aggCreator *models.AggregateCreator
 	}
@@ -1092,8 +1140,10 @@ func TestChangeProfileAggregate(t *testing.T) {
 			name: "user profile aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{FirstName: "FirstName"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{FirstName: "FirstName"},
+					},
 				},
 				profile:    &model.Profile{FirstName: "FirstNameChanged"},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -1107,8 +1157,10 @@ func TestChangeProfileAggregate(t *testing.T) {
 			name: "profile nil",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Profile: &model.Profile{UserName: "UserName"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1137,7 +1189,7 @@ func TestChangeProfileAggregate(t *testing.T) {
 func TestChangeEmailAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		email      *model.Email
 		code       *model.EmailCode
 		aggCreator *models.AggregateCreator
@@ -1156,8 +1208,10 @@ func TestChangeEmailAggregate(t *testing.T) {
 			name: "change email aggregate, verified email",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Email: &model.Email{EmailAddress: "EmailAddress"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Email: &model.Email{EmailAddress: "EmailAddress"},
+					},
 				},
 				email:      &model.Email{EmailAddress: "Changed", IsEmailVerified: true},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -1171,8 +1225,10 @@ func TestChangeEmailAggregate(t *testing.T) {
 			name: "with code",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Email: &model.Email{EmailAddress: "EmailAddress"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Email: &model.Email{EmailAddress: "EmailAddress"},
+					},
 				},
 				email:      &model.Email{EmailAddress: "Changed"},
 				code:       &model.EmailCode{Expiry: time.Hour * 1},
@@ -1187,8 +1243,10 @@ func TestChangeEmailAggregate(t *testing.T) {
 			name: "email nil",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Email: &model.Email{EmailAddress: "Changed"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Email: &model.Email{EmailAddress: "Changed"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1200,8 +1258,10 @@ func TestChangeEmailAggregate(t *testing.T) {
 			name: "email verified and code not nil",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Email: &model.Email{EmailAddress: "Changed", IsEmailVerified: true},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Email: &model.Email{EmailAddress: "Changed", IsEmailVerified: true},
+					},
 				},
 				code:       &model.EmailCode{Expiry: time.Hour * 1},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -1214,8 +1274,10 @@ func TestChangeEmailAggregate(t *testing.T) {
 			name: "email not verified and code nil",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Email: &model.Email{EmailAddress: "Changed"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Email: &model.Email{EmailAddress: "Changed"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1249,7 +1311,7 @@ func TestChangeEmailAggregate(t *testing.T) {
 func TestVerifyEmailAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -1266,7 +1328,7 @@ func TestVerifyEmailAggregate(t *testing.T) {
 			name: "user email verified aggregate ok",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
+				existing:   &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -1297,7 +1359,7 @@ func TestVerifyEmailAggregate(t *testing.T) {
 func TestVerificationFailedEmailAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -1314,7 +1376,7 @@ func TestVerificationFailedEmailAggregate(t *testing.T) {
 			name: "user email verification failed aggregate ok",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
+				existing:   &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -1345,7 +1407,7 @@ func TestVerificationFailedEmailAggregate(t *testing.T) {
 func TestCreateEmailCodeAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		code       *model.EmailCode
 		aggCreator *models.AggregateCreator
 	}
@@ -1363,8 +1425,10 @@ func TestCreateEmailCodeAggregate(t *testing.T) {
 			name: "with code",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Email: &model.Email{EmailAddress: "EmailAddress"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Email: &model.Email{EmailAddress: "EmailAddress"},
+					},
 				},
 				code:       &model.EmailCode{Expiry: time.Hour * 1},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -1378,8 +1442,10 @@ func TestCreateEmailCodeAggregate(t *testing.T) {
 			name: "code nil",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Email: &model.Email{EmailAddress: "Changed"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Email: &model.Email{EmailAddress: "Changed"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1413,7 +1479,7 @@ func TestCreateEmailCodeAggregate(t *testing.T) {
 func TestEmailCodeSentAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -1430,7 +1496,7 @@ func TestEmailCodeSentAggregate(t *testing.T) {
 			name: "user email code sent aggregate ok",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
+				existing:   &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -1461,7 +1527,7 @@ func TestEmailCodeSentAggregate(t *testing.T) {
 func TestChangePhoneAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		phone      *model.Phone
 		code       *model.PhoneCode
 		aggCreator *models.AggregateCreator
@@ -1480,8 +1546,10 @@ func TestChangePhoneAggregate(t *testing.T) {
 			name: "phone change aggregate verified phone",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Phone: &model.Phone{PhoneNumber: "+41791234567"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Phone: &model.Phone{PhoneNumber: "+41791234567"},
+					},
 				},
 				phone:      &model.Phone{PhoneNumber: "+41799876543", IsPhoneVerified: true},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -1495,8 +1563,10 @@ func TestChangePhoneAggregate(t *testing.T) {
 			name: "with code",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Phone: &model.Phone{PhoneNumber: "PhoneNumber"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Phone: &model.Phone{PhoneNumber: "PhoneNumber"},
+					},
 				},
 				phone:      &model.Phone{PhoneNumber: "Changed"},
 				code:       &model.PhoneCode{Expiry: time.Hour * 1},
@@ -1511,8 +1581,10 @@ func TestChangePhoneAggregate(t *testing.T) {
 			name: "phone nil",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Phone: &model.Phone{PhoneNumber: "Changed"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Phone: &model.Phone{PhoneNumber: "Changed"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1524,8 +1596,10 @@ func TestChangePhoneAggregate(t *testing.T) {
 			name: "phone verified and code not nil",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Phone: &model.Phone{PhoneNumber: "Changed"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Phone: &model.Phone{PhoneNumber: "Changed"},
+					},
 				},
 				phone:      &model.Phone{PhoneNumber: "Changed", IsPhoneVerified: true},
 				code:       &model.PhoneCode{Expiry: time.Hour * 1},
@@ -1539,8 +1613,10 @@ func TestChangePhoneAggregate(t *testing.T) {
 			name: "phone not verified and code nil",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Phone: &model.Phone{PhoneNumber: "Changed"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Phone: &model.Phone{PhoneNumber: "Changed"},
+					},
 				},
 				phone:      &model.Phone{PhoneNumber: "Changed"},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -1575,7 +1651,7 @@ func TestChangePhoneAggregate(t *testing.T) {
 func TestVerifyPhoneAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -1592,8 +1668,10 @@ func TestVerifyPhoneAggregate(t *testing.T) {
 			name: "user phone verified aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Phone: &model.Phone{PhoneNumber: "PhoneNumber"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Phone: &model.Phone{PhoneNumber: "PhoneNumber"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1625,7 +1703,7 @@ func TestVerifyPhoneAggregate(t *testing.T) {
 func TestRemovePhoneAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -1642,8 +1720,10 @@ func TestRemovePhoneAggregate(t *testing.T) {
 			name: "user phone removed aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Phone: &model.Phone{PhoneNumber: "PhoneNumber"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Phone: &model.Phone{PhoneNumber: "PhoneNumber"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1675,7 +1755,7 @@ func TestRemovePhoneAggregate(t *testing.T) {
 func TestVerificationFailedPhoneAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -1692,8 +1772,10 @@ func TestVerificationFailedPhoneAggregate(t *testing.T) {
 			name: "user phone verification failed aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Phone: &model.Phone{PhoneNumber: "PhoneNumber"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Phone: &model.Phone{PhoneNumber: "PhoneNumber"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1725,7 +1807,7 @@ func TestVerificationFailedPhoneAggregate(t *testing.T) {
 func TestCreatePhoneCodeAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		code       *model.PhoneCode
 		aggCreator *models.AggregateCreator
 	}
@@ -1743,8 +1825,10 @@ func TestCreatePhoneCodeAggregate(t *testing.T) {
 			name: "with code",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Email: &model.Email{EmailAddress: "EmailAddress"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Email: &model.Email{EmailAddress: "EmailAddress"},
+					},
 				},
 				code:       &model.PhoneCode{Expiry: time.Hour * 1},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -1758,8 +1842,10 @@ func TestCreatePhoneCodeAggregate(t *testing.T) {
 			name: "code nil",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Email: &model.Email{EmailAddress: "Changed"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Email: &model.Email{EmailAddress: "Changed"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1793,7 +1879,7 @@ func TestCreatePhoneCodeAggregate(t *testing.T) {
 func TestPhoneCodeSentAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -1810,7 +1896,7 @@ func TestPhoneCodeSentAggregate(t *testing.T) {
 			name: "user phone code sent aggregate ok",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
+				existing:   &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -1841,7 +1927,7 @@ func TestPhoneCodeSentAggregate(t *testing.T) {
 func TestChangeAddressAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		address    *model.Address
 		aggCreator *models.AggregateCreator
 	}
@@ -1859,8 +1945,10 @@ func TestChangeAddressAggregate(t *testing.T) {
 			name: "user address change aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Address: &model.Address{Locality: "Locality"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Address: &model.Address{Locality: "Locality"},
+					},
 				},
 				address:    &model.Address{Locality: "Changed"},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -1874,8 +1962,10 @@ func TestChangeAddressAggregate(t *testing.T) {
 			name: "address nil",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Address: &model.Address{Locality: "Changed"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Human: &model.Human{
+						Address: &model.Address{Locality: "Changed"},
+					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1909,7 +1999,7 @@ func TestChangeAddressAggregate(t *testing.T) {
 func TestOtpAddAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		otp        *model.OTP
 		aggCreator *models.AggregateCreator
 	}
@@ -1927,7 +2017,7 @@ func TestOtpAddAggregate(t *testing.T) {
 			name: "user otp change aggregate ok",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
+				existing:   &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
 				otp:        &model.OTP{},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1940,7 +2030,7 @@ func TestOtpAddAggregate(t *testing.T) {
 			name: "otp nil",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
+				existing:   &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -1973,7 +2063,7 @@ func TestOtpAddAggregate(t *testing.T) {
 func TestOtpVerifyAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -1990,7 +2080,7 @@ func TestOtpVerifyAggregate(t *testing.T) {
 			name: "user otp change aggregate ok",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
+				existing:   &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -2021,7 +2111,7 @@ func TestOtpVerifyAggregate(t *testing.T) {
 func TestOtpRemoveAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model.Human
+		existing   *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -2038,7 +2128,7 @@ func TestOtpRemoveAggregate(t *testing.T) {
 			name: "user otp change aggregate ok",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Human{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
+				existing:   &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{

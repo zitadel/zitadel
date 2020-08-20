@@ -31,6 +31,6 @@ func (s *Setup) AppendEvents(events ...*es_models.Event) error {
 func SetupToModel(setup *Setup) *admin_model.SetupOrg {
 	return &admin_model.SetupOrg{
 		Org:  model.OrgToModel(setup.Org),
-		User: usr_es.HumanToModel(setup.User),
+		User: usr_es.UserToModel(setup.User),
 	}
 }
