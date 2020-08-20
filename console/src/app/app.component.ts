@@ -8,7 +8,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Router, RouterOutlet } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 
 import { accountCard, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { Org, UserProfileView } from './proto/generated/auth_pb';
@@ -212,13 +212,17 @@ export class AppComponent implements OnDestroy {
         this.router.navigate(['/']);
     }
 
-    private async getProjectCount(): Promise<any> {
-        this.ownedProjectsCount = await this.projectService.SearchProjects(0, 0).then(res => {
-            return res.toObject().totalResult;
-        });
+    private getProjectCount(): void {
+        this.authService.isAllowed(['project.read']).pipe(take(1)).subscribe((allowed) => {
+            if (allowed) {
+                this.projectService.SearchProjects(0, 0).then(res => {
+                    this.ownedProjectsCount = res.toObject().totalResult;
+                });
 
-        this.grantedProjectsCount = await this.projectService.SearchGrantedProjects(0, 0).then(res => {
-            return res.toObject().totalResult;
+                this.projectService.SearchGrantedProjects(0, 0).then(res => {
+                    this.grantedProjectsCount = res.toObject().totalResult;
+                });
+            }
         });
     }
 }

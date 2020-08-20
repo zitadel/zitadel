@@ -1,7 +1,7 @@
 <app-detail-layout [backRouterLink]="[ '/org']" title="{{user?.displayName}} {{ 'USER.MEMBERSHIPS.TITLE' | translate }}"
     description="{{ 'USER.MEMBERSHIPS.DESCRIPTION' | translate }}">
     <app-refresh-table class="refresh-table" (refreshed)="refreshPage()" [dataSize]="dataSource?.totalResult"
-        [selection]="selection" [loading]="dataSource?.loading$ | async">
+        [timestamp]="dataSource?.viewTimestamp" [selection]="selection" [loading]="dataSource?.loading$ | async">
 
         <button actions (click)="removeSelectedMemberships()" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}"
             class="icon-button" mat-icon-button *ngIf="selection.hasValue()" color="warn">
@@ -56,7 +56,7 @@
                 <ng-container matColumnDef="roles">
                     <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.ROLES' | translate }} </th>
                     <td class="pointer" mat-cell *matCellDef="let member">
-                        {{member.rolesList}}
+                        {{member.rolesList.join(', ')}}
                         <!-- <mat-form-field class="form-field" appearance="outline">
                         <mat-label>{{ 'PROJECT.GRANT.TITLE' | translate }}</mat-label>
                         <mat-select [(ngModel)]="member.rolesList" multiple

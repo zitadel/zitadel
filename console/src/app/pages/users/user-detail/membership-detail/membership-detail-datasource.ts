@@ -1,4 +1,5 @@
 import { DataSource } from '@angular/cdk/collections';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { UserMembershipView } from 'src/app/proto/generated/management_pb';
@@ -6,6 +7,7 @@ import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 
 export class MembershipDetailDataSource extends DataSource<UserMembershipView.AsObject> {
     public totalResult: number = 0;
+    public viewTimestamp!: Timestamp.AsObject;
     public membersSubject: BehaviorSubject<UserMembershipView.AsObject[]>
         = new BehaviorSubject<UserMembershipView.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -21,8 +23,12 @@ export class MembershipDetailDataSource extends DataSource<UserMembershipView.As
         this.loadingSubject.next(true);
         from(this.mgmtUserService.SearchUserMemberships(userId, pageSize, offset)).pipe(
             map(resp => {
-                this.totalResult = resp.toObject().totalResult;
-                return resp.toObject().resultList;
+                const response = resp.toObject();
+                this.totalResult = response.totalResult;
+                if (response.viewTimestamp) {
+                    this.viewTimestamp = response.viewTimestamp;
+                }
+                return response.resultList;
             }),
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),

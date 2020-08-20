@@ -65,6 +65,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            align-items: center;
             text-transform: uppercase;
             color: white;
             outline: none;
@@ -75,18 +76,27 @@
             box-sizing: border-box;
             font-size: 8px;
             border-radius: .5rem;
-            font-weight: 800;
             transition: background-color .2s ease-in-out;
             background-color: $accent-color;
             cursor: default;
             flex-direction: column;
             overflow: hidden;
-            text-overflow: ellipsis;
+
+            span {
+                max-width: 30px;
+                text-overflow: ellipsis;
+                font-weight: 800;
+                display: block;
+                white-space: nowrap;
+                overflow: hidden;
+            }
 
             i {
               font-size: 1.2rem;
               flex-basis: 100%;
               width: 100%;
+              height: 1.2rem;
+              max-height: 1.2rem;
             }
           }
         }
