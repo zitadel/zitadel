@@ -308,10 +308,10 @@ func (repo *OrgRepository) SearchIdpProviders(ctx context.Context, request *iam_
 	_, err := repo.View.LoginPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			request.AppendAggregateIDQuery(authz.GetCtxData(ctx).OrgID)
+			request.AppendAggregateIDQuery(repo.SystemDefaults.IamID)
 		}
 	} else {
-		request.AppendAggregateIDQuery(repo.SystemDefaults.IamID)
+		request.AppendAggregateIDQuery(authz.GetCtxData(ctx).OrgID)
 	}
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, err := repo.View.GetLatestIdpProviderSequence()

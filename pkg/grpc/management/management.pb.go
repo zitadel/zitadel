@@ -14027,8 +14027,8 @@ type IdpProviderAdd struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	IdpConfigId      string          `protobuf:"bytes,1,opt,name=idp_config_id,json=idpConfigId,proto3" json:"idp_config_id,omitempty"`
-	IdpProvider_Type IdpProviderType `protobuf:"varint,2,opt,name=idp_provider_Type,json=idpProviderType,proto3,enum=caos.zitadel.management.api.v1.IdpProviderType" json:"idp_provider_Type,omitempty"`
+	IdpConfigId     string          `protobuf:"bytes,1,opt,name=idp_config_id,json=idpConfigId,proto3" json:"idp_config_id,omitempty"`
+	IdpProviderType IdpProviderType `protobuf:"varint,2,opt,name=idp_provider_type,json=idpProviderType,proto3,enum=caos.zitadel.management.api.v1.IdpProviderType" json:"idp_provider_type,omitempty"`
 }
 
 func (x *IdpProviderAdd) Reset() {
@@ -14070,9 +14070,9 @@ func (x *IdpProviderAdd) GetIdpConfigId() string {
 	return ""
 }
 
-func (x *IdpProviderAdd) GetIdpProvider_Type() IdpProviderType {
+func (x *IdpProviderAdd) GetIdpProviderType() IdpProviderType {
 	if x != nil {
-		return x.IdpProvider_Type
+		return x.IdpProviderType
 	}
 	return IdpProviderType_IDPPROVIDERTYPE_UNSPECIFIED
 }
@@ -16555,7 +16555,7 @@ var file_management_proto_rawDesc = []byte{
 	0x12, 0x22, 0x0a, 0x0d, 0x69, 0x64, 0x70, 0x5f, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x5f, 0x69,
 	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x69, 0x64, 0x70, 0x43, 0x6f, 0x6e, 0x66,
 	0x69, 0x67, 0x49, 0x64, 0x12, 0x5b, 0x0a, 0x11, 0x69, 0x64, 0x70, 0x5f, 0x70, 0x72, 0x6f, 0x76,
-	0x69, 0x64, 0x65, 0x72, 0x5f, 0x54, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32,
+	0x69, 0x64, 0x65, 0x72, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32,
 	0x2f, 0x2e, 0x63, 0x61, 0x6f, 0x73, 0x2e, 0x7a, 0x69, 0x74, 0x61, 0x64, 0x65, 0x6c, 0x2e, 0x6d,
 	0x61, 0x6e, 0x61, 0x67, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31,
 	0x2e, 0x49, 0x64, 0x70, 0x50, 0x72, 0x6f, 0x76, 0x69, 0x64, 0x65, 0x72, 0x54, 0x79, 0x70, 0x65,
@@ -18699,7 +18699,7 @@ var file_management_proto_depIdxs = []int32{
 	190, // 193: caos.zitadel.management.api.v1.IdpSearchRequest.queries:type_name -> caos.zitadel.management.api.v1.IdpSearchQuery
 	32,  // 194: caos.zitadel.management.api.v1.IdpSearchQuery.key:type_name -> caos.zitadel.management.api.v1.IdpSearchKey
 	3,   // 195: caos.zitadel.management.api.v1.IdpSearchQuery.method:type_name -> caos.zitadel.management.api.v1.SearchMethod
-	34,  // 196: caos.zitadel.management.api.v1.IdpProviderAdd.idp_provider_Type:type_name -> caos.zitadel.management.api.v1.IdpProviderType
+	34,  // 196: caos.zitadel.management.api.v1.IdpProviderAdd.idp_provider_type:type_name -> caos.zitadel.management.api.v1.IdpProviderType
 	34,  // 197: caos.zitadel.management.api.v1.IdpProvider.idp_provider_Type:type_name -> caos.zitadel.management.api.v1.IdpProviderType
 	198, // 198: caos.zitadel.management.api.v1.IdpProviderViews.providers:type_name -> caos.zitadel.management.api.v1.IdpProviderView
 	33,  // 199: caos.zitadel.management.api.v1.IdpProviderView.type:type_name -> caos.zitadel.management.api.v1.IdpType

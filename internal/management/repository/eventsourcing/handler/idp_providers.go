@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
@@ -17,8 +18,9 @@ import (
 
 type IdpProvider struct {
 	handler
-	iamEvents *eventsourcing.IamEventstore
-	orgEvents *org_es.OrgEventstore
+	systemDefaults systemdefaults.SystemDefaults
+	iamEvents      *eventsourcing.IamEventstore
+	orgEvents      *org_es.OrgEventstore
 }
 
 const (
@@ -41,9 +43,7 @@ func (m *IdpProvider) EventQuery() (*models.SearchQuery, error) {
 
 func (m *IdpProvider) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
-	case model.IamAggregate:
-		err = m.processIdpProvider(event)
-	case org_es_model.OrgAggregate:
+	case model.IamAggregate, org_es_model.OrgAggregate:
 		err = m.processIdpProvider(event)
 	}
 	return err
@@ -52,19 +52,19 @@ func (m *IdpProvider) Reduce(event *models.Event) (err error) {
 func (m *IdpProvider) processIdpProvider(event *models.Event) (err error) {
 	provider := new(iam_view_model.IdpProviderView)
 	switch event.Type {
-	case model.LoginPolicyIdpProviderAdded:
+	case model.LoginPolicyIdpProviderAdded, org_es_model.LoginPolicyIdpProviderAdded:
 		err = provider.AppendEvent(event)
 		if err != nil {
 			return err
 		}
 		err = m.fillData(provider)
-	case model.LoginPolicyIdpProviderRemoved:
+	case model.LoginPolicyIdpProviderRemoved, org_es_model.LoginPolicyIdpProviderRemoved:
 		err = provider.SetData(event)
 		if err != nil {
 			return err
 		}
 		return m.view.DeleteIdpProvider(event.AggregateID, provider.IdpConfigID, event.Sequence)
-	case model.IdpConfigChanged:
+	case model.IdpConfigChanged, org_es_model.IdpConfigChanged:
 		config := new(iam_model.IdpConfig)
 		config.AppendEvent(event)
 		providers, err := m.view.IdpProvidersByIdpConfigID(event.AggregateID, config.IDPConfigID)
@@ -95,7 +95,7 @@ func (m *IdpProvider) processIdpProvider(event *models.Event) (err error) {
 func (m *IdpProvider) fillData(provider *iam_view_model.IdpProviderView) (err error) {
 	var config *iam_model.IdpConfig
 	if provider.IdpProviderType == int32(iam_model.IdpProviderTypeSystem) {
-		config, err = m.iamEvents.GetIdpConfiguration(context.Background(), provider.AggregateID, provider.IdpConfigID)
+		config, err = m.iamEvents.GetIdpConfiguration(context.Background(), m.systemDefaults.IamID, provider.IdpConfigID)
 	} else {
 		config, err = m.orgEvents.GetIdpConfiguration(context.Background(), provider.AggregateID, provider.IdpConfigID)
 	}

@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"time"
 
 	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
@@ -60,11 +61,11 @@ func (i *LoginPolicyView) AppendEvent(event *models.Event) (err error) {
 	i.Sequence = event.Sequence
 	i.ChangeDate = event.CreationDate
 	switch event.Type {
-	case es_model.LoginPolicyAdded:
+	case es_model.LoginPolicyAdded, org_es_model.LoginPolicyAdded:
 		i.setRootData(event)
 		i.CreationDate = event.CreationDate
 		err = i.SetData(event)
-	case es_model.LoginPolicyChanged:
+	case es_model.LoginPolicyChanged, org_es_model.LoginPolicyChanged:
 		err = i.SetData(event)
 	}
 	return err

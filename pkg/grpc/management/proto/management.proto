@@ -2865,7 +2865,7 @@ message IdpProviderID {
 
 message IdpProviderAdd {
   string idp_config_id = 1;
-  IdpProviderType idp_provider_Type = 2;
+  IdpProviderType idp_provider_type = 2;
 }
 
 message IdpProvider {

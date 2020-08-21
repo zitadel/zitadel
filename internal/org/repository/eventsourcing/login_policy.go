@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
@@ -57,7 +58,7 @@ func LoginPolicyRemovedAggregate(aggCreator *es_models.AggregateCreator, existin
 	}
 }
 
-func LoginPolicyIdpProviderAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, provider *iam_es_model.IdpProvider) func(ctx context.Context) (*es_models.Aggregate, error) {
+func LoginPolicyIdpProviderAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, provider *iam_es_model.IdpProvider, iamID string) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if provider == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sml9d", "Errors.Internal")
@@ -68,9 +69,9 @@ func LoginPolicyIdpProviderAddedAggregate(aggCreator *es_models.AggregateCreator
 		}
 		validationQuery := es_models.NewSearchQuery().
 			AggregateTypeFilter(model.OrgAggregate, iam_es_model.IamAggregate).
-			AggregateIDFilter(existing.AggregateID)
+			AggregateIDsFilter(existing.AggregateID, iamID)
 
-		validation := checkExistingLoginPolicyIdpProviderValidation(provider.IdpConfigID)
+		validation := checkExistingLoginPolicyIdpProviderValidation(provider)
 		agg.SetPrecondition(validationQuery, validation)
 		return agg.AppendEvent(model.LoginPolicyIdpProviderAdded, provider)
 	}
@@ -107,7 +108,7 @@ func checkExistingLoginPolicyValidation() func(...*es_models.Event) error {
 	}
 }
 
-func checkExistingLoginPolicyIdpProviderValidation(idpConfigID string) func(...*es_models.Event) error {
+func checkExistingLoginPolicyIdpProviderValidation(idpProvider *iam_es_model.IdpProvider) func(...*es_models.Event) error {
 	return func(events ...*es_models.Event) error {
 		idpConfigs := make([]*iam_es_model.IdpConfig, 0)
 		idps := make([]*iam_es_model.IdpProvider, 0)
@@ -117,6 +118,11 @@ func checkExistingLoginPolicyIdpProviderValidation(idpConfigID string) func(...*
 				config := new(iam_es_model.IdpConfig)
 				config.SetData(event)
 				idpConfigs = append(idpConfigs, config)
+				if event.AggregateType == model.OrgAggregate {
+					config.Type = int32(iam_model.IdpProviderTypeOrg)
+				} else {
+					config.Type = int32(iam_model.IdpProviderTypeSystem)
+				}
 			case model.IdpConfigRemoved, iam_es_model.IdpConfigRemoved:
 				config := new(iam_es_model.IdpConfig)
 				config.SetData(event)
@@ -144,7 +150,7 @@ func checkExistingLoginPolicyIdpProviderValidation(idpConfigID string) func(...*
 		}
 		exists := false
 		for _, p := range idpConfigs {
-			if p.IDPConfigID == idpConfigID {
+			if p.IDPConfigID == idpProvider.IdpConfigID && p.Type == idpProvider.Type {
 				exists = true
 			}
 		}
@@ -152,7 +158,7 @@ func checkExistingLoginPolicyIdpProviderValidation(idpConfigID string) func(...*
 			return errors.ThrowPreconditionFailed(nil, "EVENT-Djlo9", "Errors.Iam.IdpNotExisting")
 		}
 		for _, p := range idps {
-			if p.IdpConfigID == idpConfigID {
+			if p.IdpConfigID == idpProvider.IdpConfigID {
 				return errors.ThrowPreconditionFailed(nil, "EVENT-us5Zw", "Errors.Org.LoginPolicy.IdpProviderAlreadyExisting")
 			}
 		}

@@ -35,7 +35,7 @@ CREATE TABLE management.idp_configs (
 
     is_oidc BOOLEAN,
     oidc_client_id TEXT,
-    oidc_client_secret JSONB
+    oidc_client_secret JSONB,
     oidc_issuer TEXT,
     oidc_scopes TEXT ARRAY,
 

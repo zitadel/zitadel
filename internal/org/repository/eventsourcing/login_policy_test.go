@@ -317,7 +317,7 @@ func TestLoginPolicyIdpProviderAddedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LoginPolicyIdpProviderAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := LoginPolicyIdpProviderAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new, "IAMID")(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

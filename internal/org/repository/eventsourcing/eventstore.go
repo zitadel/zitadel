@@ -24,6 +24,7 @@ import (
 type OrgEventstore struct {
 	eventstore.Eventstore
 	IAMDomain             string
+	IamID                 string
 	idGenerator           id.Generator
 	verificationAlgorithm crypto.EncryptionAlgorithm
 	verificationGenerator crypto.Generator
@@ -56,6 +57,7 @@ func StartOrg(conf OrgConfig, defaults systemdefaults.SystemDefaults) *OrgEvents
 		verificationGenerator: verificationGen,
 		verificationValidator: http_utils.ValidateDomain,
 		IAMDomain:             conf.IAMDomain,
+		IamID:                 defaults.IamID,
 		defaultOrgIamPolicy:   &policy,
 		secretCrypto:          aesCrypto,
 	}
@@ -776,7 +778,7 @@ func (es *OrgEventstore) AddIdpProviderToLoginPolicy(ctx context.Context, provid
 	repoOrg := model.OrgFromModel(existing)
 	repoProvider := iam_es_model.IdpProviderFromModel(provider)
 
-	addAggregate := LoginPolicyIdpProviderAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoProvider)
+	addAggregate := LoginPolicyIdpProviderAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoProvider, es.IamID)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
 	if err != nil {
 		return nil, err

@@ -63,7 +63,7 @@ func idpProviderToModel(provider *management.IdpProviderID) *iam_model.IdpProvid
 func idpProviderAddToModel(provider *management.IdpProviderAdd) *iam_model.IdpProvider {
 	return &iam_model.IdpProvider{
 		IdpConfigID: provider.IdpConfigId,
-		Type:        idpProviderTypeToModel(provider.IdpProvider_Type),
+		Type:        idpProviderTypeToModel(provider.IdpProviderType),
 	}
 }
 
