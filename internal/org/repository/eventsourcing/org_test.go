@@ -1030,6 +1030,7 @@ func TestIdpConfigurationRemovedAggregate(t *testing.T) {
 		ctx        context.Context
 		existing   *model.Org
 		new        *iam_es_model.IdpConfig
+		provider   *iam_es_model.IdpProvider
 		aggCreator *es_models.AggregateCreator
 	}
 	type res struct {
@@ -1066,6 +1067,31 @@ func TestIdpConfigurationRemovedAggregate(t *testing.T) {
 			},
 		},
 		{
+			name: "remove idp config with provider",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existing: &model.Org{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+					Name:       "Name",
+					IDPs: []*iam_es_model.IdpConfig{
+						{IDPConfigID: "IdpConfigID", Name: "Name"},
+					}},
+				new: &iam_es_model.IdpConfig{
+					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID"},
+					IDPConfigID: "IdpConfigID",
+					Name:        "Name",
+				},
+				provider: &iam_es_model.IdpProvider{
+					IdpConfigID: "IdpConfigID",
+				},
+				aggCreator: es_models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []es_models.EventType{model.IdpConfigRemoved, model.LoginPolicyIdpProviderCascadeRemoved},
+			},
+		},
+		{
 			name: "existing iam nil",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
@@ -1093,7 +1119,7 @@ func TestIdpConfigurationRemovedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := IdpConfigurationRemovedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := IdpConfigurationRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.new, tt.args.provider)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

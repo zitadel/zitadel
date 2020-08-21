@@ -53,6 +53,8 @@ func (key IdpProviderSearchKey) ToColumnName() string {
 	switch iam_model.IdpProviderSearchKey(key) {
 	case iam_model.IdpProviderSearchKeyAggregateID:
 		return IdpProviderKeyAggregateID
+	case iam_model.IdpProviderSearchKeyIdpConfigID:
+		return IdpProviderKeyIdpConfigID
 	default:
 		return ""
 	}

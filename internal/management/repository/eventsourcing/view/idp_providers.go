@@ -48,6 +48,14 @@ func (v *View) DeleteIdpProvider(aggregateID, idpConfigID string, eventSequence 
 	return v.ProcessedIdpProviderSequence(eventSequence)
 }
 
+func (v *View) DeleteIdpProvidersByAggregateID(aggregateID string, eventSequence uint64) error {
+	err := view.DeleteIdpProvidersByAggregateID(v.Db, idpProviderTable, aggregateID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedIdpProviderSequence(eventSequence)
+}
+
 func (v *View) GetLatestIdpProviderSequence() (*global_view.CurrentSequence, error) {
 	return v.latestSequence(idpProviderTable)
 }

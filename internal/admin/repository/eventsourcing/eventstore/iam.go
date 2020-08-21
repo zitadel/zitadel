@@ -5,7 +5,10 @@ import (
 	"github.com/caos/logging"
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"strings"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -15,6 +18,7 @@ import (
 type IamRepository struct {
 	SearchLimit uint64
 	*iam_es.IamEventstore
+	OrgEvents      *org_es.OrgEventstore
 	View           *admin_view.View
 	SystemDefaults systemdefaults.SystemDefaults
 	Roles          []string
@@ -100,9 +104,28 @@ func (repo *IamRepository) ReactivateIdpConfig(ctx context.Context, idpConfigID 
 }
 
 func (repo *IamRepository) RemoveIdpConfig(ctx context.Context, idpConfigID string) error {
-	//TODO: Remove from all policies and users
+	aggregates := make([]*es_models.Aggregate, 0)
 	idp := iam_model.NewIdpConfig(repo.SystemDefaults.IamID, idpConfigID)
-	return repo.IamEventstore.RemoveIdpConfiguration(ctx, idp)
+	_, agg, err := repo.IamEventstore.PrepareRemoveIdpConfiguration(ctx, idp)
+	if err != nil {
+		return err
+	}
+	aggregates = append(aggregates, agg)
+
+	providers, err := repo.View.IdpProvidersByIdpConfigID(idpConfigID)
+	if err != nil {
+		return err
+	}
+	for _, p := range providers {
+		provider := &iam_model.IdpProvider{ObjectRoot: es_models.ObjectRoot{AggregateID: p.AggregateID}, IdpConfigID: p.IdpConfigID}
+		_, providerAgg, err := repo.OrgEvents.PrepareRemoveIdpProviderFromLoginPolicy(ctx, provider, true)
+		if err != nil {
+			return err
+		}
+		aggregates = append(aggregates, providerAgg)
+	}
+
+	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
 }
 
 func (repo *IamRepository) ChangeOidcIdpConfig(ctx context.Context, oidcConfig *iam_model.OidcIdpConfig) (*iam_model.OidcIdpConfig, error) {

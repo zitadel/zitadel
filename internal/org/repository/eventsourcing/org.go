@@ -378,19 +378,20 @@ func IdpConfigurationChangedAggregate(aggCreator *es_models.AggregateCreator, ex
 	}
 }
 
-func IdpConfigurationRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, idp *iam_es_model.IdpConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if idp == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Mlso9", "Errors.Internal")
-		}
-		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
-		if err != nil {
-			return nil, err
-		}
-		agg.AppendEvent(model.IdpConfigRemoved, &iam_es_model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
-
-		return agg, nil
+func IdpConfigurationRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Org, idp *iam_es_model.IdpConfig, provider *iam_es_model.IdpProvider) (*es_models.Aggregate, error) {
+	if idp == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Mlso9", "Errors.Internal")
 	}
+	agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
+	if err != nil {
+		return nil, err
+	}
+	agg.AppendEvent(model.IdpConfigRemoved, &iam_es_model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
+	if provider != nil {
+		agg.AppendEvent(model.LoginPolicyIdpProviderCascadeRemoved, &iam_es_model.IdpProviderID{IdpConfigID: provider.IdpConfigID})
+	}
+	return agg, nil
+
 }
 
 func IdpConfigurationDeactivatedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, idp *iam_es_model.IdpConfig) func(ctx context.Context) (*es_models.Aggregate, error) {

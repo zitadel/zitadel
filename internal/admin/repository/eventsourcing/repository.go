@@ -71,7 +71,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 		return nil, err
 	}
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, handler.EventstoreRepos{UserEvents: user, OrgEvents: org, IamEvents: iam})
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, handler.EventstoreRepos{UserEvents: user, OrgEvents: org, IamEvents: iam}, systemDefaults)
 
 	return &EsRepository{
 		spooler: spool,
@@ -86,6 +86,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 		},
 		IamRepository: eventstore.IamRepository{
 			IamEventstore:  iam,
+			OrgEvents:      org,
 			View:           view,
 			SystemDefaults: systemDefaults,
 			SearchLimit:    conf.SearchLimit,

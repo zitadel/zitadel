@@ -15,6 +15,7 @@ import (
 
 const (
 	IdpProviderKeyAggregateID = "aggregate_id"
+	IdpProviderKeyIdpConfigID = "idp_config_id"
 )
 
 type IdpProviderView struct {

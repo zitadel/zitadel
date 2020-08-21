@@ -593,21 +593,36 @@ func (es *OrgEventstore) ChangeIdpConfiguration(ctx context.Context, idp *iam_mo
 	return nil, errors.ThrowInternal(nil, "EVENT-Ml9xs", "Errors.Internal")
 }
 
-func (es *OrgEventstore) RemoveIdpConfiguration(ctx context.Context, idp *iam_model.IdpConfig) error {
+func (es *OrgEventstore) PrepareRemoveIdpConfiguration(ctx context.Context, idp *iam_model.IdpConfig) (*model.Org, *es_models.Aggregate, error) {
 	if idp.IDPConfigID == "" {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-Wz7sD", "Errors.Org.IDMissing")
+		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-Wz7sD", "Errors.Org.IDMissing")
 	}
-	existing, err := es.OrgByID(ctx, org_model.NewOrg(idp.IDPConfigID))
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(idp.AggregateID))
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 	if _, i := existing.GetIDP(idp.IDPConfigID); i == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-Smiu8", "Errors.Org.IdpNotExisting")
+		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-Smiu8", "Errors.Org.IdpNotExisting")
 	}
 	repoOrg := model.OrgFromModel(existing)
 	repoIdp := iam_es_model.IdpConfigFromModel(idp)
-	projectAggregate := IdpConfigurationRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoIdp)
-	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, projectAggregate)
+	provider := new(iam_es_model.IdpProvider)
+	if repoOrg.LoginPolicy != nil {
+		_, provider = iam_es_model.GetIdpProvider(repoOrg.LoginPolicy.IdpProviders, idp.IDPConfigID)
+	}
+	agg, err := IdpConfigurationRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoOrg, repoIdp, provider)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoOrg, agg, nil
+}
+
+func (es *OrgEventstore) RemoveIdpConfiguration(ctx context.Context, idp *iam_model.IdpConfig) error {
+	repoOrg, agg, err := es.PrepareRemoveIdpConfiguration(ctx, idp)
+	if err != nil {
+		return err
+	}
+	return es_sdk.PushAggregates(ctx, es.PushAggregates, repoOrg.AppendEvents, agg)
 }
 
 func (es *OrgEventstore) DeactivateIdpConfiguration(ctx context.Context, orgID, idpID string) (*iam_model.IdpConfig, error) {
@@ -789,18 +804,30 @@ func (es *OrgEventstore) AddIdpProviderToLoginPolicy(ctx context.Context, provid
 	return nil, errors.ThrowInternal(nil, "EVENT-Slf9s", "Errors.Internal")
 }
 
-func (es *OrgEventstore) RemoveIdpProviderFromLoginPolicy(ctx context.Context, provider *iam_model.IdpProvider) error {
+func (es *OrgEventstore) PrepareRemoveIdpProviderFromLoginPolicy(ctx context.Context, provider *iam_model.IdpProvider, cascade bool) (*model.Org, *es_models.Aggregate, error) {
 	if provider == nil || !provider.IsValid() {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-Esi8c", "Errors.IdpProviderInvalid")
+		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-Esi8c", "Errors.IdpProviderInvalid")
 	}
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(provider.AggregateID))
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 	if _, m := existing.LoginPolicy.GetIdpProvider(provider.IdpConfigID); m == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-29skr", "Errors.Iam.LoginPolicy.IdpProviderNotExisting")
+		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-29skr", "Errors.Iam.LoginPolicy.IdpProviderNotExisting")
 	}
 	repoOrg := model.OrgFromModel(existing)
-	addAggregate := LoginPolicyIdpProviderRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg, &iam_es_model.IdpProviderID{provider.IdpConfigID})
-	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+	providerID := &iam_es_model.IdpProviderID{provider.IdpConfigID}
+	providerAggregates, err := LoginPolicyIdpProviderRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoOrg, providerID, cascade)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoOrg, providerAggregates, nil
+}
+
+func (es *OrgEventstore) RemoveIdpProviderFromLoginPolicy(ctx context.Context, provider *iam_model.IdpProvider) error {
+	repoOrg, agg, err := es.PrepareRemoveIdpProviderFromLoginPolicy(ctx, provider, false)
+	if err != nil {
+		return err
+	}
+	return es_sdk.PushAggregates(ctx, es.PushAggregates, repoOrg.AppendEvents, agg)
 }

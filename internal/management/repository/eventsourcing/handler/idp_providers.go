@@ -58,7 +58,8 @@ func (m *IdpProvider) processIdpProvider(event *models.Event) (err error) {
 			return err
 		}
 		err = m.fillData(provider)
-	case model.LoginPolicyIdpProviderRemoved, org_es_model.LoginPolicyIdpProviderRemoved:
+	case model.LoginPolicyIdpProviderRemoved, model.LoginPolicyIdpProviderCascadeRemoved,
+		org_es_model.LoginPolicyIdpProviderRemoved, org_es_model.LoginPolicyIdpProviderCascadeRemoved:
 		err = provider.SetData(event)
 		if err != nil {
 			return err
@@ -83,6 +84,8 @@ func (m *IdpProvider) processIdpProvider(event *models.Event) (err error) {
 			m.fillConfigData(provider, config)
 		}
 		return m.view.PutIdpProviders(event.Sequence, providers...)
+	case org_es_model.LoginPolicyRemoved:
+		return m.view.DeleteIdpProvidersByAggregateID(event.AggregateID, event.Sequence)
 	default:
 		return m.view.ProcessedIdpProviderSequence(event.Sequence)
 	}

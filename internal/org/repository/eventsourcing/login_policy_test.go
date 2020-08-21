@@ -343,6 +343,7 @@ func TestLoginPolicyIdpProviderRemovedAggregate(t *testing.T) {
 		ctx        context.Context
 		existing   *model.Org
 		new        *iam_es_model.IdpProviderID
+		cascade    bool
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -379,6 +380,29 @@ func TestLoginPolicyIdpProviderRemovedAggregate(t *testing.T) {
 			},
 		},
 		{
+			name: "remove idp provider to login policy cascade",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existing: &model.Org{
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
+					LoginPolicy: &iam_es_model.LoginPolicy{
+						AllowUsernamePassword: true,
+						IdpProviders: []*iam_es_model.IdpProvider{
+							{IdpConfigID: "IdpConfigID", Type: int32(iam_model.IdpProviderTypeSystem)},
+						},
+					}},
+				new: &iam_es_model.IdpProviderID{
+					IdpConfigID: "IdpConfigID",
+				},
+				cascade:    true,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.LoginPolicyIdpProviderCascadeRemoved},
+			},
+		},
+		{
 			name: "existing org nil",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
@@ -406,7 +430,7 @@ func TestLoginPolicyIdpProviderRemovedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LoginPolicyIdpProviderRemovedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := LoginPolicyIdpProviderRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.new, tt.args.cascade)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

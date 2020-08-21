@@ -45,9 +45,10 @@ const (
 	SamlIdpConfigAdded   models.EventType = "org.idp.saml.config.added"
 	SamlIdpConfigChanged models.EventType = "org.idp.saml.config.changed"
 
-	LoginPolicyAdded              models.EventType = "org.policy.login.added"
-	LoginPolicyChanged            models.EventType = "org.policy.login.changed"
-	LoginPolicyRemoved            models.EventType = "org.policy.login.removed"
-	LoginPolicyIdpProviderAdded   models.EventType = "org.policy.login.idpprovider.added"
-	LoginPolicyIdpProviderRemoved models.EventType = "org.policy.login.idpprovider.removed"
+	LoginPolicyAdded                     models.EventType = "org.policy.login.added"
+	LoginPolicyChanged                   models.EventType = "org.policy.login.changed"
+	LoginPolicyRemoved                   models.EventType = "org.policy.login.removed"
+	LoginPolicyIdpProviderAdded          models.EventType = "org.policy.login.idpprovider.added"
+	LoginPolicyIdpProviderRemoved        models.EventType = "org.policy.login.idpprovider.removed"
+	LoginPolicyIdpProviderCascadeRemoved models.EventType = "org.policy.login.idpprovider.cascade.removed"
 )

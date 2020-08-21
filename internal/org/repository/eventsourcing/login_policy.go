@@ -77,17 +77,19 @@ func LoginPolicyIdpProviderAddedAggregate(aggCreator *es_models.AggregateCreator
 	}
 }
 
-func LoginPolicyIdpProviderRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, provider *iam_es_model.IdpProviderID) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if provider == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sml9d", "Errors.Internal")
-		}
-		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
-		if err != nil {
-			return nil, err
-		}
-		return agg.AppendEvent(model.LoginPolicyIdpProviderRemoved, provider)
+func LoginPolicyIdpProviderRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Org, provider *iam_es_model.IdpProviderID, cascade bool) (*es_models.Aggregate, error) {
+	if provider == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sml9d", "Errors.Internal")
 	}
+	agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
+	if err != nil {
+		return nil, err
+	}
+	eventType := model.LoginPolicyIdpProviderRemoved
+	if cascade {
+		eventType = model.LoginPolicyIdpProviderCascadeRemoved
+	}
+	return agg.AppendEvent(eventType, provider)
 }
 
 func checkExistingLoginPolicyValidation() func(...*es_models.Event) error {

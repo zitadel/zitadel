@@ -69,3 +69,10 @@ func DeleteIdpProvider(db *gorm.DB, table, aggregateID, idpConfigID string) erro
 	)
 	return delete(db)
 }
+
+func DeleteIdpProvidersByAggregateID(db *gorm.DB, table, aggregateID string) error {
+	delete := repository.PrepareDeleteByKeys(table,
+		repository.Key{Key: model.IdpProviderSearchKey(iam_model.IdpProviderSearchKeyAggregateID), Value: aggregateID},
+	)
+	return delete(db)
+}

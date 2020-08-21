@@ -162,17 +162,22 @@ func IdpConfigurationChangedAggregate(aggCreator *es_models.AggregateCreator, ex
 	}
 }
 
-func IdpConfigurationRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, idp *model.IdpConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if idp == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-se23g", "Errors.Internal")
-		}
-		agg, err := IamAggregate(ctx, aggCreator, existing)
-		if err != nil {
-			return nil, err
-		}
-		return agg.AppendEvent(model.IdpConfigRemoved, &model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
+func IdpConfigurationRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Iam, idp *model.IdpConfig, provider *model.IdpProvider) (*es_models.Aggregate, error) {
+	if idp == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-se23g", "Errors.Internal")
 	}
+	agg, err := IamAggregate(ctx, aggCreator, existing)
+	if err != nil {
+		return nil, err
+	}
+	agg, err = agg.AppendEvent(model.IdpConfigRemoved, &model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
+	if err != nil {
+		return nil, err
+	}
+	if provider != nil {
+		return agg.AppendEvent(model.LoginPolicyIdpProviderCascadeRemoved, &model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
+	}
+	return agg, nil
 }
 
 func IdpConfigurationDeactivatedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, idp *model.IdpConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
