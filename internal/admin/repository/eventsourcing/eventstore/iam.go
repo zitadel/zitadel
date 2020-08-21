@@ -117,8 +117,12 @@ func (repo *IamRepository) RemoveIdpConfig(ctx context.Context, idpConfigID stri
 		return err
 	}
 	for _, p := range providers {
+		if p.IdpProviderType == int32(iam_model.IdpProviderTypeSystem) {
+			continue
+		}
 		provider := &iam_model.IdpProvider{ObjectRoot: es_models.ObjectRoot{AggregateID: p.AggregateID}, IdpConfigID: p.IdpConfigID}
-		_, providerAgg, err := repo.OrgEvents.PrepareRemoveIdpProviderFromLoginPolicy(ctx, provider, true)
+		providerAgg := new(es_models.Aggregate)
+		_, providerAgg, err = repo.OrgEvents.PrepareRemoveIdpProviderFromLoginPolicy(ctx, provider, true)
 		if err != nil {
 			return err
 		}
