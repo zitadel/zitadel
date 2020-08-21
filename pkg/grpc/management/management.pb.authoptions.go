@@ -599,6 +599,11 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/CreateLoginPolicy": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/UpdateLoginPolicy": authz.Option{
 		Permission: "policy.write",
 		CheckParam: "",

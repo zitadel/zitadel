@@ -84,16 +84,16 @@ func (o *Org) AppendEvents(events ...*es_models.Event) error {
 	return nil
 }
 
-func (o *Org) AppendEvent(event *es_models.Event) error {
+func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 	switch event.Type {
 	case OrgAdded:
 		*o = Org{}
-		err := o.setData(event)
+		err = o.setData(event)
 		if err != nil {
 			return err
 		}
 	case OrgChanged:
-		err := o.setData(event)
+		err = o.setData(event)
 		if err != nil {
 			return err
 		}
@@ -125,50 +125,50 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 		}
 		o.removeMember(member.UserID)
 	case OrgDomainAdded:
-		o.appendAddDomainEvent(event)
+		err = o.appendAddDomainEvent(event)
 	case OrgDomainVerificationAdded:
-		o.appendVerificationDomainEvent(event)
+		err = o.appendVerificationDomainEvent(event)
 	case OrgDomainVerified:
-		o.appendVerifyDomainEvent(event)
+		err = o.appendVerifyDomainEvent(event)
 	case OrgDomainPrimarySet:
-		o.appendPrimaryDomainEvent(event)
+		err = o.appendPrimaryDomainEvent(event)
 	case OrgDomainRemoved:
-		o.appendRemoveDomainEvent(event)
+		err = o.appendRemoveDomainEvent(event)
 	case OrgIamPolicyAdded:
-		o.appendAddOrgIamPolicyEvent(event)
+		err = o.appendAddOrgIamPolicyEvent(event)
 	case OrgIamPolicyChanged:
-		o.appendChangeOrgIamPolicyEvent(event)
+		err = o.appendChangeOrgIamPolicyEvent(event)
 	case OrgIamPolicyRemoved:
 		o.appendRemoveOrgIamPolicyEvent()
 	case IdpConfigAdded:
-		return o.appendAddIdpConfigEvent(event)
+		err = o.appendAddIdpConfigEvent(event)
 	case IdpConfigChanged:
-		return o.appendChangeIdpConfigEvent(event)
+		err = o.appendChangeIdpConfigEvent(event)
 	case IdpConfigRemoved:
-		return o.appendRemoveIdpConfigEvent(event)
+		err = o.appendRemoveIdpConfigEvent(event)
 	case IdpConfigDeactivated:
-		return o.appendIdpConfigStateEvent(event, model.IdpConfigStateInactive)
+		err = o.appendIdpConfigStateEvent(event, model.IdpConfigStateInactive)
 	case IdpConfigReactivated:
-		return o.appendIdpConfigStateEvent(event, model.IdpConfigStateActive)
+		err = o.appendIdpConfigStateEvent(event, model.IdpConfigStateActive)
 	case OidcIdpConfigAdded:
-		return o.appendAddOidcIdpConfigEvent(event)
+		err = o.appendAddOidcIdpConfigEvent(event)
 	case OidcIdpConfigChanged:
-		return o.appendChangeOidcIdpConfigEvent(event)
+		err = o.appendChangeOidcIdpConfigEvent(event)
 	case LoginPolicyAdded:
-		return o.appendAddLoginPolicyEvent(event)
+		err = o.appendAddLoginPolicyEvent(event)
 	case LoginPolicyChanged:
-		return o.appendChangeLoginPolicyEvent(event)
+		err = o.appendChangeLoginPolicyEvent(event)
 	case LoginPolicyRemoved:
 		o.appendRemoveLoginPolicyEvent(event)
-		return nil
 	case LoginPolicyIdpProviderAdded:
-		return o.appendAddIdpProviderToLoginPolicyEvent(event)
+		err = o.appendAddIdpProviderToLoginPolicyEvent(event)
 	case LoginPolicyIdpProviderRemoved:
-		return o.appendRemoveIdpProviderFromLoginPolicyEvent(event)
+		err = o.appendRemoveIdpProviderFromLoginPolicyEvent(event)
 	}
-
+	if err != nil {
+		return err
+	}
 	o.ObjectRoot.AppendEvent(event)
-
 	return nil
 }
 

@@ -14,6 +14,14 @@ func (s *Server) GetLoginPolicy(ctx context.Context, _ *empty.Empty) (*managemen
 	return loginPolicyViewFromModel(result), nil
 }
 
+func (s *Server) CreateLoginPolicy(ctx context.Context, policy *management.LoginPolicyAdd) (*management.LoginPolicy, error) {
+	result, err := s.org.AddLoginPolicy(ctx, loginPolicyAddToModel(policy))
+	if err != nil {
+		return nil, err
+	}
+	return loginPolicyFromModel(result), nil
+}
+
 func (s *Server) UpdateLoginPolicy(ctx context.Context, policy *management.LoginPolicy) (*management.LoginPolicy, error) {
 	result, err := s.org.ChangeLoginPolicy(ctx, loginPolicyToModel(policy))
 	if err != nil {
@@ -35,8 +43,8 @@ func (s *Server) GetLoginPolicyIdpProviders(ctx context.Context, request *manage
 	return idpProviderSearchResponseFromModel(result), nil
 }
 
-func (s *Server) AddIdpProviderToLoginPolicy(ctx context.Context, provider *management.IdpProviderID) (*management.IdpProviderID, error) {
-	result, err := s.org.AddIdpProviderToLoginPolicy(ctx, idpProviderToModel(provider))
+func (s *Server) AddIdpProviderToLoginPolicy(ctx context.Context, provider *management.IdpProviderAdd) (*management.IdpProvider, error) {
+	result, err := s.org.AddIdpProviderToLoginPolicy(ctx, idpProviderAddToModel(provider))
 	if err != nil {
 		return nil, err
 	}

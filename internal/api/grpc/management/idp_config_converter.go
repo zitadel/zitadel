@@ -123,17 +123,6 @@ func idpConfigStateFromModel(state iam_model.IdpConfigState) management.IdpState
 	}
 }
 
-func idpProviderTypeFromModel(providerType iam_model.IdpProviderType) management.IdpProviderType {
-	switch providerType {
-	case iam_model.IdpProviderTypeSystem:
-		return management.IdpProviderType_IDPPROVIDERTYPE_SYSTEM
-	case iam_model.IdpProviderTypeOrg:
-		return management.IdpProviderType_IDPPROVIDERTYPE_ORG
-	default:
-		return management.IdpProviderType_IDPPROVIDERTYPE_UNSPECIFIED
-	}
-}
-
 func idpConfigSearchRequestToModel(request *management.IdpSearchRequest) *iam_model.IdpConfigSearchRequest {
 	return &iam_model.IdpConfigSearchRequest{
 		Limit:   request.Limit,

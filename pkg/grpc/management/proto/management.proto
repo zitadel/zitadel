@@ -1345,6 +1345,17 @@ service ManagementService {
         };
     }
 
+    rpc CreateLoginPolicy(LoginPolicyAdd) returns (LoginPolicy) {
+      option (google.api.http) = {
+              post: "/orgs/me/policies/login"
+              body: "*"
+          };
+
+      option (caos.zitadel.utils.v1.auth_option) = {
+              permission: "policy.write"
+          };
+    }
+
     rpc UpdateLoginPolicy(LoginPolicy) returns (LoginPolicy) {
         option (google.api.http) = {
             put: "/orgs/me/policies/login"
@@ -1377,7 +1388,7 @@ service ManagementService {
         };
     }
 
-    rpc AddIdpProviderToLoginPolicy(IdpProviderID) returns (IdpProviderID) {
+    rpc AddIdpProviderToLoginPolicy(IdpProviderAdd) returns (IdpProvider) {
         option (google.api.http) = {
             post: "/orgs/me/policies/login/idpproviders"
             body: "*"
@@ -2842,8 +2853,24 @@ message LoginPolicy {
     bool allow_external_idp = 3;
 }
 
+message LoginPolicyAdd {
+  bool allow_username_password = 1;
+  bool allow_register = 2;
+  bool allow_external_idp = 3;
+}
+
 message IdpProviderID {
     string idp_config_id = 1;
+}
+
+message IdpProviderAdd {
+  string idp_config_id = 1;
+  IdpProviderType idp_provider_Type = 2;
+}
+
+message IdpProvider {
+  string idp_config_id = 1;
+  IdpProviderType idp_provider_Type = 2;
 }
 
 message LoginPolicyView {

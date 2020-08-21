@@ -767,6 +767,9 @@ func (es *OrgEventstore) AddIdpProviderToLoginPolicy(ctx context.Context, provid
 	if err != nil {
 		return nil, err
 	}
+	if existing.LoginPolicy == nil {
+		return nil, errors.ThrowAlreadyExists(nil, "EVENT-sk9fW", "Errors.Org.LoginPolicy.NotExisting")
+	}
 	if _, m := existing.LoginPolicy.GetIdpProvider(provider.IdpConfigID); m != nil {
 		return nil, errors.ThrowAlreadyExists(nil, "EVENT-Lso9f", "Errors.Org.LoginPolicy.IdpProviderAlreadyExisting")
 	}

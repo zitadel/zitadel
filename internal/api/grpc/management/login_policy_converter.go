@@ -5,6 +5,13 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
+func loginPolicyAddToModel(policy *management.LoginPolicyAdd) *iam_model.LoginPolicy {
+	return &iam_model.LoginPolicy{
+		AllowUsernamePassword: policy.AllowUsernamePassword,
+		AllowExternalIdp:      policy.AllowExternalIdp,
+		AllowRegister:         policy.AllowRegister,
+	}
+}
 func loginPolicyToModel(policy *management.LoginPolicy) *iam_model.LoginPolicy {
 	return &iam_model.LoginPolicy{
 		AllowUsernamePassword: policy.AllowUsernamePassword,
@@ -53,9 +60,23 @@ func idpProviderToModel(provider *management.IdpProviderID) *iam_model.IdpProvid
 	}
 }
 
-func idpProviderFromModel(provider *iam_model.IdpProvider) *management.IdpProviderID {
+func idpProviderAddToModel(provider *management.IdpProviderAdd) *iam_model.IdpProvider {
+	return &iam_model.IdpProvider{
+		IdpConfigID: provider.IdpConfigId,
+		Type:        idpProviderTypeToModel(provider.IdpProvider_Type),
+	}
+}
+
+func idpProviderIDFromModel(provider *iam_model.IdpProvider) *management.IdpProviderID {
 	return &management.IdpProviderID{
 		IdpConfigId: provider.IdpConfigID,
+	}
+}
+
+func idpProviderFromModel(provider *iam_model.IdpProvider) *management.IdpProvider {
+	return &management.IdpProvider{
+		IdpConfigId:      provider.IdpConfigID,
+		IdpProvider_Type: idpProviderTypeFromModel(provider.Type),
 	}
 }
 
@@ -84,5 +105,27 @@ func idpConfigTypeToModel(providerType iam_model.IdpConfigType) management.IdpTy
 		return management.IdpType_IDPTYPE_SAML
 	default:
 		return management.IdpType_IDPTYPE_UNSPECIFIED
+	}
+}
+
+func idpProviderTypeToModel(providerType management.IdpProviderType) iam_model.IdpProviderType {
+	switch providerType {
+	case management.IdpProviderType_IDPPROVIDERTYPE_SYSTEM:
+		return iam_model.IdpProviderTypeSystem
+	case management.IdpProviderType_IDPPROVIDERTYPE_ORG:
+		return iam_model.IdpProviderTypeOrg
+	default:
+		return iam_model.IdpProviderTypeSystem
+	}
+}
+
+func idpProviderTypeFromModel(providerType iam_model.IdpProviderType) management.IdpProviderType {
+	switch providerType {
+	case iam_model.IdpProviderTypeSystem:
+		return management.IdpProviderType_IDPPROVIDERTYPE_SYSTEM
+	case iam_model.IdpProviderTypeOrg:
+		return management.IdpProviderType_IDPPROVIDERTYPE_ORG
+	default:
+		return management.IdpProviderType_IDPPROVIDERTYPE_UNSPECIFIED
 	}
 }

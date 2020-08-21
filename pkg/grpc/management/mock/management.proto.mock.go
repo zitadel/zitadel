@@ -38,14 +38,14 @@ func (m *MockManagementServiceClient) EXPECT() *MockManagementServiceClientMockR
 }
 
 // AddIdpProviderToLoginPolicy mocks base method
-func (m *MockManagementServiceClient) AddIdpProviderToLoginPolicy(arg0 context.Context, arg1 *management.IdpProviderID, arg2 ...grpc.CallOption) (*management.IdpProviderID, error) {
+func (m *MockManagementServiceClient) AddIdpProviderToLoginPolicy(arg0 context.Context, arg1 *management.IdpProviderAdd, arg2 ...grpc.CallOption) (*management.IdpProvider, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "AddIdpProviderToLoginPolicy", varargs...)
-	ret0, _ := ret[0].(*management.IdpProviderID)
+	ret0, _ := ret[0].(*management.IdpProvider)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -355,6 +355,26 @@ func (mr *MockManagementServiceClientMockRecorder) ChangeUserPhone(arg0, arg1 in
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeUserPhone", reflect.TypeOf((*MockManagementServiceClient)(nil).ChangeUserPhone), varargs...)
+}
+
+// CreateLoginPolicy mocks base method
+func (m *MockManagementServiceClient) CreateLoginPolicy(arg0 context.Context, arg1 *management.LoginPolicyAdd, arg2 ...grpc.CallOption) (*management.LoginPolicy, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateLoginPolicy", varargs...)
+	ret0, _ := ret[0].(*management.LoginPolicy)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateLoginPolicy indicates an expected call of CreateLoginPolicy
+func (mr *MockManagementServiceClientMockRecorder) CreateLoginPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateLoginPolicy", reflect.TypeOf((*MockManagementServiceClient)(nil).CreateLoginPolicy), varargs...)
 }
 
 // CreateOIDCApplication mocks base method

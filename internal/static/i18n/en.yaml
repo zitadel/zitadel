@@ -72,6 +72,11 @@ Errors:
     IdpNotExisting: IDP configuration does not exist
     OIDCConfigInvalid: OIDC IDP configuration is invalid
     IdpIsNotOIDC: IDP configuration is not of type oidc
+    LoginPolicy:
+      NotExisting: Login Policy not existig
+      AlreadyExists: Login Policy already exists
+      IdpProviderAlreadyExisting: Idp Provider already existing
+      IdpProviderNotExisting: Idp Provider not existing
   Project:
     ProjectIDMissing: Project Id missing
     AlreadyExists: Project already exists on organisation

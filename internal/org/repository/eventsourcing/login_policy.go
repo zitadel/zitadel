@@ -67,7 +67,7 @@ func LoginPolicyIdpProviderAddedAggregate(aggCreator *es_models.AggregateCreator
 			return nil, err
 		}
 		validationQuery := es_models.NewSearchQuery().
-			AggregateTypeFilter(model.OrgAggregate).
+			AggregateTypeFilter(model.OrgAggregate, iam_es_model.IamAggregate).
 			AggregateIDFilter(existing.AggregateID)
 
 		validation := checkExistingLoginPolicyIdpProviderValidation(provider.IdpConfigID)
@@ -109,9 +109,24 @@ func checkExistingLoginPolicyValidation() func(...*es_models.Event) error {
 
 func checkExistingLoginPolicyIdpProviderValidation(idpConfigID string) func(...*es_models.Event) error {
 	return func(events ...*es_models.Event) error {
+		idpConfigs := make([]*iam_es_model.IdpConfig, 0)
 		idps := make([]*iam_es_model.IdpProvider, 0)
 		for _, event := range events {
 			switch event.Type {
+			case model.IdpConfigAdded, iam_es_model.IdpConfigAdded:
+				config := new(iam_es_model.IdpConfig)
+				config.SetData(event)
+				idpConfigs = append(idpConfigs, config)
+			case model.IdpConfigRemoved, iam_es_model.IdpConfigRemoved:
+				config := new(iam_es_model.IdpConfig)
+				config.SetData(event)
+				for i, p := range idpConfigs {
+					if p.IDPConfigID == config.IDPConfigID {
+						idpConfigs[i] = idpConfigs[len(idpConfigs)-1]
+						idpConfigs[len(idpConfigs)-1] = nil
+						idpConfigs = idpConfigs[:len(idpConfigs)-1]
+					}
+				}
 			case model.LoginPolicyIdpProviderAdded:
 				idp := new(iam_es_model.IdpProvider)
 				idp.SetData(event)
@@ -126,6 +141,15 @@ func checkExistingLoginPolicyIdpProviderValidation(idpConfigID string) func(...*
 					}
 				}
 			}
+		}
+		exists := false
+		for _, p := range idpConfigs {
+			if p.IDPConfigID == idpConfigID {
+				exists = true
+			}
+		}
+		if !exists {
+			return errors.ThrowPreconditionFailed(nil, "EVENT-Djlo9", "Errors.Iam.IdpNotExisting")
 		}
 		for _, p := range idps {
 			if p.IdpConfigID == idpConfigID {
