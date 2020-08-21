@@ -230,7 +230,7 @@
         },
         "MEMBERSHIPS": {
             "TITLE":"Mitgliedschaften",
-            "DESCRIPTION":"Dies sind alle Mitgliedschaften des Benutzers. Sie können die entsprechenden Rechte auch auf der Organisations-, Project-, or Iam detail seite aufrufen und modifizieren",
+            "DESCRIPTION":"Dies sind alle Mitgliedschaften des Benutzers. Sie können die entsprechenden Rechte auch auf der Organisations-, Projekt-, oder IAM Detailseite aufrufen und modifizieren",
             "CREATIONDATE":"Erstelldatum",
             "CHANGEDATE":"Letzte Änderung",
             "DISPLAYNAME":"Anzeigename",
