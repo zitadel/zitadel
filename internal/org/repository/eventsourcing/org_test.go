@@ -1087,7 +1087,7 @@ func TestIdpConfigurationRemovedAggregate(t *testing.T) {
 				aggCreator: es_models.NewAggregateCreator("Test"),
 			},
 			res: res{
-				eventLen:   1,
+				eventLen:   2,
 				eventTypes: []es_models.EventType{model.IdpConfigRemoved, model.LoginPolicyIdpProviderCascadeRemoved},
 			},
 		},

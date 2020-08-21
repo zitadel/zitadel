@@ -273,7 +273,7 @@ func (es *IamEventstore) ChangeIdpConfiguration(ctx context.Context, idp *iam_mo
 }
 
 func (es *IamEventstore) PrepareRemoveIdpConfiguration(ctx context.Context, idp *iam_model.IdpConfig) (*model.Iam, *models.Aggregate, error) {
-	if idp.IDPConfigID == "" {
+	if idp == nil || idp.IDPConfigID == "" {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Wz7sD", "Errors.Iam.IDMissing")
 	}
 	existing, err := es.IamByID(ctx, idp.AggregateID)
@@ -298,6 +298,9 @@ func (es *IamEventstore) PrepareRemoveIdpConfiguration(ctx context.Context, idp 
 
 func (es *IamEventstore) RemoveIdpConfiguration(ctx context.Context, idp *iam_model.IdpConfig) error {
 	repoIam, agg, err := es.PrepareRemoveIdpConfiguration(ctx, idp)
+	if err != nil {
+		return err
+	}
 	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoIam.AppendEvents, agg)
 	if err != nil {
 		return err

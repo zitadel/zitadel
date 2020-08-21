@@ -386,9 +386,12 @@ func IdpConfigurationRemovedAggregate(ctx context.Context, aggCreator *es_models
 	if err != nil {
 		return nil, err
 	}
-	agg.AppendEvent(model.IdpConfigRemoved, &iam_es_model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
+	agg, err = agg.AppendEvent(model.IdpConfigRemoved, &iam_es_model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
+	if err != nil {
+		return nil, err
+	}
 	if provider != nil {
-		agg.AppendEvent(model.LoginPolicyIdpProviderCascadeRemoved, &iam_es_model.IdpProviderID{IdpConfigID: provider.IdpConfigID})
+		return agg.AppendEvent(model.LoginPolicyIdpProviderCascadeRemoved, &iam_es_model.IdpProviderID{IdpConfigID: provider.IdpConfigID})
 	}
 	return agg, nil
 

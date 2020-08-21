@@ -692,7 +692,7 @@ func TestIdpConfigurationRemovedAggregate(t *testing.T) {
 		ctx        context.Context
 		existing   *model.Iam
 		new        *model.IdpConfig
-		provider *model.IdpProvider
+		provider   *model.IdpProvider
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -745,11 +745,11 @@ func TestIdpConfigurationRemovedAggregate(t *testing.T) {
 				},
 				provider: &model.IdpProvider{
 					IdpConfigID: "IdpConfigID",
-				}
+				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
-				eventLen:   1,
+				eventLen:   2,
 				eventTypes: []models.EventType{model.IdpConfigRemoved},
 			},
 		},
