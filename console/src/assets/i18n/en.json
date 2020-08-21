@@ -230,7 +230,7 @@
         },
         "MEMBERSHIPS": {
             "TITLE":"Memberships",
-            "DESCRIPTION":"These are all member grants of the user. You can modify them also on organisation-, project-, or iam detail pages.",
+            "DESCRIPTION":"These are all member grants of the user. You can modify them also on organisation-, project-, or iam detailpages.",
             "CREATIONDATE":"Creation Date",
             "CHANGEDATE":"Last Modified",
             "DISPLAYNAME":"Displayname",
