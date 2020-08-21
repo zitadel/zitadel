@@ -659,7 +659,7 @@
         "en": "Englisch"
     },
     "MEMBER":{
-        "ADD":"Manager hinzufügen",
+        "ADD":"Verwalter hinzufügen",
         "CREATIONTYPE":"Erstell Typ",
         "CREATIONTYPES":{
             "3":"IAM",
