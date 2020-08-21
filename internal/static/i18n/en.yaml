@@ -362,6 +362,7 @@ Application:
   OIDC:
     V1:
       NotCompliant: Your configuration is not compliant and differs from OIDC 1.0 standard.
+      NoRedirectUris: At least one redirect uri must be registered.
       NotAllCombinationsAreAllowed: Configuration is compliant, but not all possible combinations are allowed.
       Code:
         RedirectUris:
