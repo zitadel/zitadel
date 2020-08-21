@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api/authz"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -570,7 +571,7 @@ func checkExistsUser(events ...*es_models.Event) error {
 		switch event.AggregateType {
 		case usr_model.UserAggregate:
 			switch event.Type {
-			case usr_model.UserAdded, usr_model.UserRegistered:
+			case usr_model.UserAdded, usr_model.UserRegistered, usr_model.MachineAdded, usr_model.HumanAdded:
 				existsUser = true
 			case usr_model.UserRemoved:
 				existsUser = false

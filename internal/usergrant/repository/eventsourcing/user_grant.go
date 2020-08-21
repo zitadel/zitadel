@@ -188,7 +188,7 @@ func addUserGrantValidation(resourceOwner string, grant *model.UserGrant) func(.
 			switch event.AggregateType {
 			case usr_model.UserAggregate:
 				switch event.Type {
-				case usr_model.UserAdded, usr_model.UserRegistered:
+				case usr_model.UserAdded, usr_model.UserRegistered, usr_model.HumanAdded, usr_model.MachineAdded:
 					existsUser = true
 				case usr_model.UserRemoved:
 					existsUser = false

@@ -14,7 +14,7 @@ const (
 
 type User struct {
 	es_models.ObjectRoot
-	State int32
+	State int32 `json:"-"`
 
 	*Human
 	*Machine

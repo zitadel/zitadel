@@ -107,12 +107,16 @@ func (es *UserEventstore) UserEventsByID(ctx context.Context, id string, sequenc
 	return es.FilterEvents(ctx, query)
 }
 
-func (es *UserEventstore) prepareCreateMachine(ctx context.Context, user *usr_model.User, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
-	serviceAccount := model.UserFromModel(user)
+func (es *UserEventstore) prepareCreateMachine(ctx context.Context, user *usr_model.User, orgIamPolicy *org_model.OrgIamPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
+	machine := model.UserFromModel(user)
 
-	createAggregates, err := UserCreateAggregate(ctx, es.AggregateCreator(), serviceAccount, nil, nil, resourceOwner, false)
+	if !orgIamPolicy.UserLoginMustBeDomain {
+		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-cJlnI", "Errors.User.Invalid")
+	}
 
-	return serviceAccount, createAggregates, err
+	createAggregates, err := UserCreateAggregate(ctx, es.AggregateCreator(), machine, nil, nil, resourceOwner, true)
+
+	return machine, createAggregates, err
 }
 
 func (es *UserEventstore) prepareCreateHuman(ctx context.Context, user *usr_model.User, pwPolicy *policy_model.PasswordComplexityPolicy, orgIamPolicy *org_model.OrgIamPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
@@ -157,7 +161,7 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 	if user.Human != nil {
 		return es.prepareCreateHuman(ctx, user, pwPolicy, orgIamPolicy, resourceOwner)
 	} else if user.Machine != nil {
-		return es.prepareCreateMachine(ctx, user, resourceOwner)
+		return es.prepareCreateMachine(ctx, user, orgIamPolicy, resourceOwner)
 	}
 	return nil, nil, errors.ThrowInvalidArgument(nil, "EVENT-Q29tp", "Errors.User.TypeUndefined")
 }

@@ -2,9 +2,10 @@ package model
 
 import (
 	"encoding/json"
+	"time"
+
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/lib/pq"
-	"time"
 
 	"github.com/caos/logging"
 
@@ -170,7 +171,9 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	u.Sequence = event.Sequence
 	switch event.Type {
 	case es_model.UserAdded,
-		es_model.UserRegistered:
+		es_model.UserRegistered,
+		es_model.MachineAdded,
+		es_model.HumanAdded:
 		u.CreationDate = event.CreationDate
 		u.setRootData(event)
 		err = u.setData(event)
@@ -178,23 +181,31 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 			return err
 		}
 		err = u.setPasswordData(event)
-	case es_model.UserPasswordChanged:
+	case es_model.UserPasswordChanged,
+		es_model.HumanPasswordChanged:
 		err = u.setPasswordData(event)
 	case es_model.UserProfileChanged,
 		es_model.UserAddressChanged,
-		es_model.DomainClaimed:
+		es_model.DomainClaimed,
+		es_model.HumanProfileChanged,
+		es_model.HumanAddressChanged:
 		err = u.setData(event)
-	case es_model.UserEmailChanged:
+	case es_model.UserEmailChanged,
+		es_model.HumanEmailChanged:
 		u.IsEmailVerified = false
 		err = u.setData(event)
-	case es_model.UserEmailVerified:
+	case es_model.UserEmailVerified,
+		es_model.HumanEmailVerified:
 		u.IsEmailVerified = true
-	case es_model.UserPhoneChanged:
+	case es_model.UserPhoneChanged,
+		es_model.HumanPhoneChanged:
 		u.IsPhoneVerified = false
 		err = u.setData(event)
-	case es_model.UserPhoneVerified:
+	case es_model.UserPhoneVerified,
+		es_model.HumanPhoneVerified:
 		u.IsPhoneVerified = true
-	case es_model.UserPhoneRemoved:
+	case es_model.UserPhoneRemoved,
+		es_model.HumanPhoneRemoved:
 		u.Phone = ""
 		u.IsPhoneVerified = false
 	case es_model.UserDeactivated:
@@ -204,18 +215,24 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		u.State = int32(model.UserStateActive)
 	case es_model.UserLocked:
 		u.State = int32(model.UserStateLocked)
-	case es_model.MfaOtpAdded:
+	case es_model.MfaOtpAdded,
+		es_model.HumanMfaOtpAdded:
 		u.OTPState = int32(model.MfaStateNotReady)
-	case es_model.MfaOtpVerified:
+	case es_model.MfaOtpVerified,
+		es_model.HumanMfaOtpVerified:
 		u.OTPState = int32(model.MfaStateReady)
 		u.MfaInitSkipped = time.Time{}
-	case es_model.MfaOtpRemoved:
+	case es_model.MfaOtpRemoved,
+		es_model.HumanMfaOtpRemoved:
 		u.OTPState = int32(model.MfaStateUnspecified)
-	case es_model.MfaInitSkipped:
+	case es_model.MfaInitSkipped,
+		es_model.HumanMfaInitSkipped:
 		u.MfaInitSkipped = event.CreationDate
-	case es_model.InitializedUserCodeAdded:
+	case es_model.InitializedUserCodeAdded,
+		es_model.InitializedHumanCodeAdded:
 		u.InitRequired = true
-	case es_model.InitializedUserCheckSucceeded:
+	case es_model.InitializedUserCheckSucceeded,
+		es_model.InitializedHumanCheckSucceeded:
 		u.InitRequired = false
 	}
 	u.ComputeObject()
