@@ -172,6 +172,7 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	switch event.Type {
 	case es_model.UserAdded,
 		es_model.UserRegistered,
+		es_model.HumanRegistered,
 		es_model.MachineAdded,
 		es_model.HumanAdded:
 		u.CreationDate = event.CreationDate
@@ -188,7 +189,8 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		es_model.UserAddressChanged,
 		es_model.DomainClaimed,
 		es_model.HumanProfileChanged,
-		es_model.HumanAddressChanged:
+		es_model.HumanAddressChanged,
+		es_model.MachineChanged:
 		err = u.setData(event)
 	case es_model.UserEmailChanged,
 		es_model.HumanEmailChanged:

@@ -43,7 +43,7 @@ func (u *Token) EventQuery() (*models.SearchQuery, error) {
 
 func (u *Token) Reduce(event *models.Event) (err error) {
 	switch event.Type {
-	case user_es_model.SignedOut:
+	case user_es_model.SignedOut, user_es_model.HumanSignedOut:
 		id, err := agentIDFromSession(event)
 		if err != nil {
 			return err
@@ -74,7 +74,6 @@ func (u *Token) Reduce(event *models.Event) (err error) {
 	default:
 		return u.view.ProcessedTokenSequence(event.Sequence)
 	}
-	return nil
 }
 
 func (u *Token) OnError(event *models.Event, err error) error {

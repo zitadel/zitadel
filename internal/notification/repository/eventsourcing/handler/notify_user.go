@@ -70,7 +70,8 @@ func (u *NotifyUser) ProcessUser(event *models.Event) (err error) {
 		es_model.HumanEmailVerified,
 		es_model.HumanPhoneChanged,
 		es_model.HumanPhoneVerified,
-		es_model.HumanPhoneRemoved:
+		es_model.HumanPhoneRemoved,
+		es_model.MachineChanged:
 		user, err = u.view.NotifyUserByID(event.AggregateID)
 		if err != nil {
 			return err
@@ -100,10 +101,6 @@ func (u *NotifyUser) ProcessOrg(event *models.Event) (err error) {
 	default:
 		return u.view.ProcessedNotifyUserSequence(event.Sequence)
 	}
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (u *NotifyUser) fillLoginNamesOnOrgUsers(event *models.Event) error {

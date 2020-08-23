@@ -9,57 +9,52 @@ import (
 )
 
 func (s *Server) CreateServiceAccount(ctx context.Context, in *management.CreateServiceAccountRequest) (*management.ServiceAccountResponse, error) {
-	// serviceAccount, err := s.serviceAccount.CreateServiceAccount(ctx, createServiceAccountToModel(in))
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// return serviceAccountFromModel(serviceAccount), nil
-	return nil, errors.ThrowUnimplemented(nil, "MANAG-kzeI6", "unimplemented")
+	user, err := s.user.CreateUser(ctx, createServiceAccountToUserModel(in))
+	if err != nil {
+		return nil, err
+	}
+	return serviceAccountFromUserModel(user), nil
 }
 
 func (s *Server) UpdateServiceAccount(ctx context.Context, in *management.UpdateServiceAccountRequest) (*management.ServiceAccountResponse, error) {
-	// serviceAccount, err := s.serviceAccount.UpdateServiceAccount(ctx, updateServiceAccountToModel(in))
+	// serviceAccount, err := s.user.User UpdateUser(ctx, updateServiceAccountToUserModel(in))
 	// if err != nil {
 	// 	return nil, err
 	// }
-	// return serviceAccountFromModel(serviceAccount), nil
+	// return serviceAccountFromUserModel(serviceAccount), nil
 	return nil, errors.ThrowUnimplemented(nil, "MANAG-7HlGy", "unimplemented")
 }
 
 func (s *Server) DeactivateServiceAccount(ctx context.Context, in *management.ServiceAccountIDRequest) (*management.ServiceAccountResponse, error) {
-	// serviceAccount, err := s.serviceAccount.DeactivateServiceAccount(ctx, in.Id)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// return serviceAccountFromModel(serviceAccount), nil
-	return nil, errors.ThrowUnimplemented(nil, "MANAG-ByopO", "unimplemented")
+	serviceAccount, err := s.user.DeactivateUser(ctx, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return serviceAccountFromUserModel(serviceAccount), nil
 }
 
 func (s *Server) ReactivateServiceAccount(ctx context.Context, in *management.ServiceAccountIDRequest) (*management.ServiceAccountResponse, error) {
-	// serviceAccount, err := s.serviceAccount.ReactivateServiceAccount(ctx, in.Id)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// return serviceAccountFromModel(serviceAccount), nil
-	return nil, errors.ThrowUnimplemented(nil, "MANAG-L58LU", "unimplemented")
+	serviceAccount, err := s.user.ReactivateUser(ctx, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return serviceAccountFromUserModel(serviceAccount), nil
 }
 
 func (s *Server) LockServiceAccount(ctx context.Context, in *management.ServiceAccountIDRequest) (*management.ServiceAccountResponse, error) {
-	// serviceAccount, err := s.serviceAccount.LockServiceAccount(ctx, in.Id)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// return serviceAccountFromModel(serviceAccount), nil
-	return nil, errors.ThrowUnimplemented(nil, "MANAG-lZ21v", "unimplemented")
+	serviceAccount, err := s.user.LockUser(ctx, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return serviceAccountFromUserModel(serviceAccount), nil
 }
 
 func (s *Server) UnlockServiceAccount(ctx context.Context, in *management.ServiceAccountIDRequest) (*management.ServiceAccountResponse, error) {
-	// serviceAccount, err := s.serviceAccount.UnlockServiceAccount(ctx, in.Id)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// return serviceAccountFromModel(serviceAccount), nil
-	return nil, errors.ThrowUnimplemented(nil, "MANAG-4col1", "unimplemented")
+	serviceAccount, err := s.user.UnlockUser(ctx, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return serviceAccountFromUserModel(serviceAccount), nil
 }
 
 func (s *Server) DeleteServiceAccount(ctx context.Context, in *management.ServiceAccountIDRequest) (*empty.Empty, error) {

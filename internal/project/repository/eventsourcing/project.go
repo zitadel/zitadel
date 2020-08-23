@@ -571,7 +571,7 @@ func checkExistsUser(events ...*es_models.Event) error {
 		switch event.AggregateType {
 		case usr_model.UserAggregate:
 			switch event.Type {
-			case usr_model.UserAdded, usr_model.UserRegistered, usr_model.MachineAdded, usr_model.HumanAdded:
+			case usr_model.UserAdded, usr_model.UserRegistered, usr_model.HumanRegistered, usr_model.MachineAdded, usr_model.HumanAdded:
 				existsUser = true
 			case usr_model.UserRemoved:
 				existsUser = false

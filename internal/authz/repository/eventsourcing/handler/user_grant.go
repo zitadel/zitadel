@@ -76,7 +76,6 @@ func (u *UserGrant) processProject(event *models.Event) (err error) {
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
 	}
-	return nil
 }
 
 func (u *UserGrant) processOrg(event *models.Event) (err error) {
@@ -88,7 +87,6 @@ func (u *UserGrant) processOrg(event *models.Event) (err error) {
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
 	}
-	return nil
 }
 
 func (u *UserGrant) processIamMember(event *models.Event, rolePrefix string, suffix bool) error {

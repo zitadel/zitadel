@@ -110,7 +110,10 @@ func (u *UserGrant) processUserGrant(event *models.Event) (err error) {
 func (u *UserGrant) processUser(event *models.Event) (err error) {
 	switch event.Type {
 	case usr_es_model.UserProfileChanged,
-		usr_es_model.UserEmailChanged:
+		usr_es_model.UserEmailChanged,
+		usr_es_model.HumanProfileChanged,
+		usr_es_model.HumanEmailChanged,
+		usr_es_model.MachineChanged:
 		grants, err := u.view.UserGrantsByUserID(event.AggregateID)
 		if err != nil {
 			return err

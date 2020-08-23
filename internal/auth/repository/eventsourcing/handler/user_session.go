@@ -42,7 +42,12 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		es_model.UserPasswordCheckFailed,
 		es_model.MfaOtpCheckSucceeded,
 		es_model.MfaOtpCheckFailed,
-		es_model.SignedOut:
+		es_model.SignedOut,
+		es_model.HumanPasswordCheckSucceeded,
+		es_model.HumanPasswordCheckFailed,
+		es_model.HumanMfaOtpCheckSucceeded,
+		es_model.HumanMfaOtpCheckFailed,
+		es_model.HumanSignedOut:
 		eventData, err := view_model.UserSessionFromEvent(event)
 		if err != nil {
 			return err
@@ -65,7 +70,11 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		es_model.MfaOtpRemoved,
 		es_model.UserProfileChanged,
 		es_model.UserLocked,
-		es_model.UserDeactivated:
+		es_model.UserDeactivated,
+		es_model.HumanPasswordChanged,
+		es_model.HumanMfaOtpRemoved,
+		es_model.HumanProfileChanged,
+		es_model.MachineChanged:
 		sessions, err := u.view.UserSessionsByUserID(event.AggregateID)
 		if err != nil {
 			return err
