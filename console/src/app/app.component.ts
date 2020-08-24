@@ -12,8 +12,8 @@ import { map } from 'rxjs/operators';
 
 import { accountCard, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { Org, UserProfileView } from './proto/generated/auth_pb';
-import { AuthService } from './services/auth.service';
 import { AuthenticationService } from './services/authentication.service';
+import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';
 import { ThemeService } from './services/theme.service';
 import { ToastService } from './services/toast.service';
@@ -64,7 +64,7 @@ export class AppComponent implements OnDestroy {
         private breakpointObserver: BreakpointObserver,
         public overlayContainer: OverlayContainer,
         private themeService: ThemeService,
-        public userService: AuthService,
+        public userService: GrpcAuthService,
         private projectService: ManagementService,
         public matIconRegistry: MatIconRegistry,
         public domSanitizer: DomSanitizer,

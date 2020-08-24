@@ -4,7 +4,7 @@ import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
 import { catchError, filter, finalize, first, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
 
 import { Org, UserProfileView } from '../proto/generated/auth_pb';
-import { AuthService } from './auth.service';
+import { GrpcAuthService } from './grpc-auth.service';
 import { GrpcService } from './grpc.service';
 import { StatehandlerService } from './statehandler.service';
 import { StorageKey, StorageService } from './storage.service';
@@ -27,7 +27,7 @@ export class AuthenticationService {
         private grpcService: GrpcService,
         private config: AuthConfig,
         private oauthService: OAuthService,
-        private userService: AuthService,
+        private userService: GrpcAuthService,
         private storage: StorageService,
         private statehandler: StatehandlerService,
     ) {

@@ -6,7 +6,7 @@ import {
     PasswordLockoutPolicy,
     PolicyState,
 } from 'src/app/proto/generated/management_pb';
-import { AuthService } from 'src/app/services/auth.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 import { PolicyComponentType } from '../password-policy/password-policy.component';
@@ -27,7 +27,7 @@ export class PolicyGridComponent {
 
     constructor(
         private orgService: ManagementService,
-        public authUserService: AuthService,
+        public authUserService: GrpcAuthService,
     ) {
         this.getData();
     }

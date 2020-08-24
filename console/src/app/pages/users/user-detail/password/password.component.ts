@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/auth_pb';
-import { AuthService } from 'src/app/services/auth.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -39,7 +39,7 @@ export class PasswordComponent implements OnDestroy {
     constructor(
         activatedRoute: ActivatedRoute,
         private fb: FormBuilder,
-        private userService: AuthService,
+        private userService: GrpcAuthService,
         private mgmtUserService: ManagementService,
         private toast: ToastService,
     ) {

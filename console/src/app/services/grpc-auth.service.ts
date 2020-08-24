@@ -33,7 +33,7 @@ import { GrpcService } from './grpc.service';
 @Injectable({
     providedIn: 'root',
 })
-export class AuthService {
+export class GrpcAuthService {
     constructor(private readonly grpcService: GrpcService) { }
 
     public async GetMyUserProfile(): Promise<UserProfileView> {

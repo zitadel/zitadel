@@ -32,8 +32,8 @@ import { AvatarModule } from './modules/avatar/avatar.module';
 import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { HasRolePipeModule } from './pipes/has-role-pipe.module';
-import { AuthService } from './services/auth.service';
 import { AuthenticationService } from './services/authentication.service';
+import { GrpcAuthService } from './services/grpc-auth.service';
 import { GrpcService } from './services/grpc.service';
 import { StatehandlerProcessorService, StatehandlerProcessorServiceImpl } from './services/statehandler-processor.service';
 import { StatehandlerService, StatehandlerServiceImpl } from './services/statehandler.service';
@@ -154,7 +154,7 @@ const authConfig: AuthConfig = {
         // },
         GrpcService,
         AuthenticationService,
-        AuthService,
+        GrpcAuthService,
         { provide: 'windowObject', useValue: window },
     ],
     bootstrap: [AppComponent],

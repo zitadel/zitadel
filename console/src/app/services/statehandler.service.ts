@@ -1,6 +1,6 @@
 import { Injectable, Injector, OnDestroy, Type } from '@angular/core';
 import { GuardsCheckStart, Router, RouterEvent } from '@angular/router';
-import { OAuthenticationService } from 'angular-oauth2-oidc';
+import { OAuthService } from 'angular-oauth2-oidc';
 import { Observable, Subject, throwError } from 'rxjs';
 import { filter, map, shareReplay, switchMap, take, takeUntil } from 'rxjs/operators';
 
@@ -18,7 +18,7 @@ export class StatehandlerServiceImpl
     private unsubscribe$: Subject<void> = new Subject();
 
     constructor(
-        oauthService: OAuthenticationService,
+        oauthService: OAuthService,
         private injector: Injector,
         private processor: StatehandlerProcessorService,
     ) {
