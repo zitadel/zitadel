@@ -123,7 +123,7 @@ func (i *Iam) appendChangeLoginPolicyEvent(event *es_models.Event) error {
 }
 
 func (iam *Iam) appendAddIdpProviderToLoginPolicyEvent(event *es_models.Event) error {
-	provider := &IdpProvider{}
+	provider := new(IdpProvider)
 	err := provider.SetData(event)
 	if err != nil {
 		return err
