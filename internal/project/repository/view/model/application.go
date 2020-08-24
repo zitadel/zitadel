@@ -2,13 +2,16 @@ package model
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/caos/logging"
+	"github.com/lib/pq"
+
+	http_util "github.com/caos/zitadel/internal/api/http"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"github.com/lib/pq"
-	"time"
 )
 
 const (
@@ -39,6 +42,7 @@ type ApplicationView struct {
 	NoneCompliant              bool           `json:"-" gorm:"column:none_compliant"`
 	ComplianceProblems         pq.StringArray `json:"-" gorm:"column:compliance_problems"`
 	DevMode                    bool           `json:"devMode" gorm:"column:dev_mode"`
+	OriginAllowList            pq.StringArray `json:"-" gorm:"column:origin_allow_list"`
 
 	Sequence uint64 `json:"-" gorm:"sequence"`
 }
@@ -62,6 +66,7 @@ func ApplicationViewFromModel(app *model.ApplicationView) *ApplicationView {
 		OIDCAuthMethodType:         int32(app.OIDCAuthMethodType),
 		OIDCPostLogoutRedirectUris: app.OIDCPostLogoutRedirectUris,
 		DevMode:                    app.DevMode,
+		OriginAllowList:            app.OriginAllowList,
 	}
 }
 
@@ -103,6 +108,7 @@ func ApplicationViewToModel(app *ApplicationView) *model.ApplicationView {
 		NoneCompliant:              app.NoneCompliant,
 		ComplianceProblems:         app.ComplianceProblems,
 		DevMode:                    app.DevMode,
+		OriginAllowList:            app.OriginAllowList,
 	}
 }
 
@@ -171,6 +177,7 @@ func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 			return err
 		}
 		a.setCompliance()
+		return a.setOriginAllowList()
 	case es_model.OIDCConfigChanged,
 		es_model.ApplicationChanged:
 		err = a.SetData(event)
@@ -178,6 +185,7 @@ func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 			return err
 		}
 		a.setCompliance()
+		return a.setOriginAllowList()
 	case es_model.ApplicationDeactivated:
 		a.State = int32(model.AppStateInactive)
 	case es_model.ApplicationReactivated:
@@ -197,6 +205,21 @@ func (a *ApplicationView) SetData(event *models.Event) error {
 		logging.Log("EVEN-lo9ds").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-8suie", "Could not unmarshal data")
 	}
+	return nil
+}
+
+func (a *ApplicationView) setOriginAllowList() error {
+	allowList := make([]string, 0)
+	for _, redirect := range a.OIDCRedirectUris {
+		origin, err := http_util.GetOriginFromURLString(redirect)
+		if err != nil {
+			return err
+		}
+		if !http_util.IsOriginAllowed(allowList, origin) {
+			allowList = append(allowList, origin)
+		}
+	}
+	a.OriginAllowList = allowList
 	return nil
 }
 

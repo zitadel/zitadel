@@ -6,6 +6,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
+import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
+import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
 import { RefreshTableComponent } from './refresh-table.component';
 
@@ -21,6 +23,8 @@ import { RefreshTableComponent } from './refresh-table.component';
         FormsModule,
         MatTooltipModule,
         MatProgressSpinnerModule,
+        TimestampToDatePipeModule,
+        LocalizedDatePipeModule,
     ],
     exports: [
         RefreshTableComponent,

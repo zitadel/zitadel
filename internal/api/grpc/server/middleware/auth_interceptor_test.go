@@ -27,8 +27,8 @@ func (v *verifierMock) VerifyAccessToken(ctx context.Context, token, clientID st
 func (v *verifierMock) ResolveGrants(ctx context.Context) (*authz.Grant, error) {
 	return nil, nil
 }
-func (v *verifierMock) ProjectIDByClientID(ctx context.Context, clientID string) (string, error) {
-	return "", nil
+func (v *verifierMock) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (string, []string, error) {
+	return "", nil, nil
 }
 func (v *verifierMock) ExistsOrg(ctx context.Context, orgID string) error {
 	return nil

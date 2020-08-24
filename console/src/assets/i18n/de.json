@@ -227,6 +227,21 @@
             "DEACTIVATED":"User deaktiviert!",
             "SELECTEDREACTIVATED":"Selektierte User reaktiviert!",
             "SELECTEDDEACTIVATED":"Selektierte User deaktiviert!"
+        },
+        "MEMBERSHIPS": {
+            "TITLE":"Zitadel Manager Rollen",
+            "DESCRIPTION":"Dies sind alle Mitgliedschaften des Benutzers. Sie können die entsprechenden Rechte auch auf der Organisations-, Projekt-, oder IAM Detailseite aufrufen und modifizieren",
+            "CREATIONDATE":"Erstelldatum",
+            "CHANGEDATE":"Letzte Änderung",
+            "DISPLAYNAME":"Anzeigename",
+            "REMOVE":"Entfernen",
+            "TYPE":"Typ",
+            "TYPES":{
+                "0":"Unbekannt",
+                "1":"Organisation",
+                "2":"Projekt",
+                "3":"Berechtigtes Projekt"
+            }
         }
     },
     "IAM": {
@@ -408,13 +423,13 @@
             "TITLE": "Projekt",
             "DESCRIPTION": "Hier kannst du wichtige Einstellungen prüfen und die Daten einsehen, mit denen das Projekt konfiguriert worden ist",
             "LIST": "Projekte",
-            "LISTDESCRIPTION":"Hier findest du alle Projekte, für die du Aktionen anzeigen oder ausführen darfst. Wenn du dein Projekt nicht finden kannst, wenden dich an einen Projektbesitzer oder an jemanden mit den entsprechenden Rechten, um Projektzugriff zu erhalten.",
+            "LISTDESCRIPTION":"Hier findest du alle Projekte, für die du Aktionen anzeigen oder ausführen darfst. Wenn du dein Projekt nicht finden kannst, wende dich an einen Projektbesitzer oder an jemanden mit den entsprechenden Rechten, um Projektzugriff zu erhalten.",
             "DETAIL": "Detail",
             "CREATE": "Projekt erstellen",
             "CREATE_DESC": "Gib den Namen ein",
             "ROLE": "Rolle",
             "NOITEMS": "Keine Projekte",
-            "ZITADELPROJECT":"Diese Einstellungen gehören zum ZITADEL-Projekt. Wenn du etwas ändernst, verhält sich ZITADEL möglicherweise nicht wie beabsichtigt!",
+            "ZITADELPROJECT":"Diese Einstellungen gehören zum ZITADEL-Projekt. Wenn du etwas änderst, verhält sich ZITADEL möglicherweise nicht wie beabsichtigt!",
             "TYPE":{
                 "OWNED":"Eigene Projekte",
                 "GRANTED":"Berechtigte Projekte"
@@ -508,7 +523,8 @@
                 "PROJECTGRANTMEMBERADDED":"Berechtigungsmanager hinzugefügt!",
                 "PROJECTGRANTMEMBERCHANGED":"Berechtigungsmanager verändert!",
                 "PROJECTGRANTMEMBERREMOVED":"Berechtigungsmanager entfernt!"
-            }
+            },
+            "ROLES":"Projekt Rollen"
         },
         "APP": {
             "TITLE": "Applikationen",
@@ -643,50 +659,17 @@
         "en": "Englisch"
     },
     "MEMBER":{
-        "ADD":"Manager hinzufügen"
+        "ADD":"Verwalter hinzufügen",
+        "CREATIONTYPE":"Erstell Typ",
+        "CREATIONTYPES":{
+            "3":"IAM",
+            "2":"Organisation",
+            "0":"Eigenes Projekt",
+            "1":"Berechtigtes Projekt",
+            "4":"Projekt"
+        }
     },
-    "ROLES": {
-        "ORG_OWNER": "Org. Owner",
-        "ORG_MEMBER_VIEWER": "Org. Member Viewer",
-        "ORG_PROJECT_ROLE_VIEWER": "Org. Projekt Role Viewer",
-        "ORG_EDITOR":"Org. Editor",
-        "ORG_VIEWER":"Org. Viewer",
-        "ORG_MEMBER_EDITOR":"Org.. Member Editor",
-        "ORG_PROJECT_CREATOR":"Org.. Projekt Creator",
-        "ORG_PROJECT_EDITOR":"Org.. Projekt Editor",
-        "ORG_PROJECT_VIEWER":"Org.. Projekt Viewer",
-        "ORG_PROJECT_MEMBER_EDITOR":"Org.. Projekt Member Editor",
-        "ORG_PROJECT_MEMBER_VIEWER":"Org.. Projekt Member Viewer",
-        "ORG_PROJECT_ROLE_EDITOR":"Org.. Projekt Role Editor",
-        "ORG_PROJECT_APP_EDITOR":"Org. Projekt App Editor",
-        "ORG_PROJECT_APP_VIEWER":"Org. Projekt App Viewer",
-        "ORG_PROJECT_GRANT_EDITOR":"Org. Projekt Grant Editor" ,
-        "ORG_PROJECT_GRANT_VIEWER":"Org.Projekt Grant Viewer",
-        "ORG_PROJECT_GRANT_MEMBER_EDITOR":"Org.Projekt Grant Member Editor",
-        "ORG_PROJECT_GRANT_MEMBER_VIEWER":"Org.Projekt Grant Member Viewer",
-        "ORG_USER_EDITOR":"Org.User Editor",
-        "ORG_USER_VIEWER":"Org. User Viewer",
-        "ORG_USER_GRANT_EDITOR":"Org. User Grant Editor",
-        "ORG_USER_GRANT_VIEWER":"Org. User Grant Viewer",
-        "ORG_POLICY_EDITOR":"Org. Policy Editor",
-        "ORG_POLICY_VIEWER":"Org. Policy Viewer",
-        "PROJECT_OWNER":"Projekt Besitzer",
-        "PROJECT_OWNER_VIEWER":"Projekt Besitzer Viewer",
-        "PROJECT_MEMBER_EDITOR":"Projekt Manager Editor",
-        "PROJECT_APP_EDITOR":"Projekt App Editor",
-        "PROJECT_APP_VIEWER":"Projekt App Viewer",
-        "PROJECT_USER_GRANT_EDITOR":"Projekt User Grant Editor",
-        "PROJECT_USER_GRANT_VIEWER":"Projekt User Grant Viewer",
-        "PROJECT_ROLE_EDITOR": "Projekt Role Editor",
-        "PROJECT_MEMBER_VIEWER": "Projekt Member Viewer",
-        "PROJECT_GRANT_EDITOR":"Projekt Grant Editor",
-        "PROJECT_GRANT_VIEWER":"Projekt Grant Viewer",
-        "PROJECT_GRANT_MEMBER_EDITOR":"Projekt Grant Member Editor",
-        "PROJECT_GRANT_MEMBER_VIEWER":"Projekt Grant Member Viewer",
-        "PROJECT_GRANT_OWNER":"Projekt Grant Owner",
-        "PROJECT_GRANT_USER_GRANT_EDITOR":"Projekt Grant User Editor",
-        "PROJECT_GRANT_USER_GRANT_VIEWER":"Projekt Grant User Grant Viewer"
-    },
+    "ROLESLABEL":"Rollen",
     "GRANTS": {
         "DELETE":"Grant löschen",
         "ADD":"Grant erstellen",

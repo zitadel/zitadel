@@ -1,9 +1,11 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ProjectRole, User } from 'src/app/proto/generated/management_pb';
+import { ProjectGrantView, ProjectRole, ProjectView, User } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
+
+import { ProjectAutocompleteType } from '../search-project-autocomplete/search-project-autocomplete.component';
 
 export enum CreationType {
     PROJECT_OWNED = 0,
@@ -17,40 +19,78 @@ export enum CreationType {
     styleUrls: ['./member-create-dialog.component.scss'],
 })
 export class MemberCreateDialogComponent {
-    public projectId: string = '';
+    private projectId: string = '';
+    private grantId: string = '';
+    public preselectedUsers: Array<User.AsObject> = [];
+
+
     public creationType!: CreationType;
+    public creationTypes: CreationType[] = [
+        CreationType.IAM,
+        CreationType.ORG,
+        CreationType.PROJECT_OWNED,
+        CreationType.PROJECT_GRANTED,
+    ];
     public users: Array<User.AsObject> = [];
     public roles: Array<ProjectRole.AsObject> | string[] = [];
     public CreationType: any = CreationType;
+    public ProjectAutocompleteType: any = ProjectAutocompleteType;
     public memberRoleOptions: string[] = [];
+
+    public showCreationTypeSelector: boolean = false;
     constructor(
         private projectService: ProjectService,
         private adminService: AdminService,
         public dialogRef: MatDialogRef<MemberCreateDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
-        toastService: ToastService,
+        private toastService: ToastService,
     ) {
-        this.creationType = data.creationType;
-        this.projectId = data.projectId;
+        if (data?.projectId) {
+            this.projectId = data.projectId;
+        }
+        if (data?.user) {
+            this.preselectedUsers = [data.user];
+            this.users = [data.user];
+        }
 
-        if (this.creationType === CreationType.PROJECT_GRANTED) {
-            this.projectService.GetProjectGrantMemberRoles().then(resp => {
-                this.memberRoleOptions = resp.toObject().rolesList;
-            }).catch(error => {
-                toastService.showError(error);
-            });
-        } else if (this.creationType === CreationType.PROJECT_OWNED) {
-            this.projectService.GetProjectMemberRoles().then(resp => {
-                this.memberRoleOptions = resp.toObject().rolesList;
-            }).catch(error => {
-                toastService.showError(error);
-            });
-        } else if (this.creationType === CreationType.IAM) {
-            this.adminService.GetIamMemberRoles().then(resp => {
-                this.memberRoleOptions = resp.toObject().rolesList;
-            }).catch(error => {
-                toastService.showError(error);
-            });
+        if (data?.creationType !== undefined) {
+            this.creationType = data.creationType;
+            this.loadRoles();
+        } else {
+            this.showCreationTypeSelector = true;
+        }
+    }
+
+    public loadRoles(): void {
+        switch (this.creationType) {
+            case CreationType.PROJECT_GRANTED:
+                this.projectService.GetProjectGrantMemberRoles().then(resp => {
+                    this.memberRoleOptions = resp.toObject().rolesList;
+                }).catch(error => {
+                    this.toastService.showError(error);
+                });
+                break;
+            case CreationType.PROJECT_OWNED:
+                this.projectService.GetProjectMemberRoles().then(resp => {
+                    this.memberRoleOptions = resp.toObject().rolesList;
+                }).catch(error => {
+                    this.toastService.showError(error);
+                });
+                break;
+            case CreationType.IAM:
+                this.adminService.GetIamMemberRoles().then(resp => {
+                    this.memberRoleOptions = resp.toObject().rolesList;
+                }).catch(error => {
+                    this.toastService.showError(error);
+                });
+                break;
+        }
+    }
+
+    public selectProject(project: ProjectView.AsObject | ProjectGrantView.AsObject | any): void {
+        this.projectId = project.projectId;
+        if (project.id) {
+            this.grantId = project.id;
         }
     }
 
@@ -59,7 +99,13 @@ export class MemberCreateDialogComponent {
     }
 
     public closeDialogWithSuccess(): void {
-        this.dialogRef.close({ users: this.users, roles: this.roles });
+        this.dialogRef.close({
+            users: this.users,
+            roles: this.roles,
+            creationType: this.creationType,
+            projectId: this.projectId,
+            grantId: this.grantId,
+        });
     }
 
     public setOrgMemberRoles(roles: string[]): void {

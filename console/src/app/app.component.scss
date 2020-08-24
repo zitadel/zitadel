@@ -11,8 +11,8 @@
   right: 0;
 
   .logo {
-    height: 40px;
-    width: auto;
+    max-height: 50px;
+    width: 160px;
   }
 
   .title {
@@ -20,7 +20,6 @@
     color: white;
     font-size: 1.2rem;
     font-weight: 400;
-    margin-left: 1rem;
     line-height: 1.2rem;
     margin-right: 1rem;
   }

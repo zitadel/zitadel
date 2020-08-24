@@ -1,4 +1,5 @@
 import { DataSource } from '@angular/cdk/collections';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { ProjectRole } from 'src/app/proto/generated/management_pb';
@@ -11,6 +12,8 @@ import { ProjectService } from 'src/app/services/project.service';
  */
 export class ProjectRolesDataSource extends DataSource<ProjectRole.AsObject> {
     public totalResult: number = 0;
+    public viewTimestamp!: Timestamp.AsObject;
+
     public rolesSubject: BehaviorSubject<ProjectRole.AsObject[]> = new BehaviorSubject<ProjectRole.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
@@ -25,7 +28,11 @@ export class ProjectRolesDataSource extends DataSource<ProjectRole.AsObject> {
         this.loadingSubject.next(true);
         from(this.projectService.SearchProjectRoles(projectId, pageSize, offset)).pipe(
             map(resp => {
-                this.totalResult = resp.toObject().totalResult;
+                const response = resp.toObject();
+                this.totalResult = response.totalResult;
+                if (response.viewTimestamp) {
+                    this.viewTimestamp = response.viewTimestamp;
+                }
                 return resp.toObject().resultList;
             }),
             catchError(() => of([])),

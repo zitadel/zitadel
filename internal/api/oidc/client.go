@@ -7,6 +7,7 @@ import (
 	"github.com/caos/oidc/pkg/op"
 
 	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/errors"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	user_model "github.com/caos/zitadel/internal/user/model"
@@ -41,10 +42,17 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 	return o.repo.AuthorizeOIDCApplication(ctx, id, secret)
 }
 
-func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID string) (*oidc.Userinfo, error) {
+func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, origin string) (*oidc.Userinfo, error) {
 	token, err := o.repo.TokenByID(ctx, tokenID)
 	if err != nil {
 		return nil, err
+	}
+	app, err := o.repo.ApplicationByClientID(ctx, token.ApplicationID)
+	if err != nil {
+		return nil, err
+	}
+	if origin != "" && !http.IsOriginAllowed(app.OriginAllowList, origin) {
+		return nil, errors.ThrowPermissionDenied(nil, "OIDC-da1f3", "origin is not allowed")
 	}
 	return o.GetUserinfoFromScopes(ctx, token.UserID, token.Scopes)
 }

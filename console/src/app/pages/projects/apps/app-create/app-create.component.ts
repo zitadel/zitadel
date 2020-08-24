@@ -125,9 +125,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                         break;
                     case OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB:
                         this.oidcAuthMethodType[0].disabled = false;
-                        this.oidcAuthMethodType[1].disabled = true; // NONE DISABLED
-                        this.oidcAuthMethodType[2].disabled = false; // POST POSSIBLE
-                        this.authMethodType?.setValue(OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC);  // BASIC DEFAULT
+                        this.oidcAuthMethodType[1].disabled = false;
+                        this.oidcAuthMethodType[2].disabled = false;
+                        this.authMethodType?.setValue(OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC);
                         this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC;
 
                         this.oidcResponseTypes[0].checked = true;
@@ -190,7 +190,12 @@ export class AppCreateComponent implements OnInit, OnDestroy {
             .CreateOIDCApp(this.oidcApp)
             .then((data: Application) => {
                 this.loading = false;
-                this.showSavedDialog(data.toObject());
+                const response = data.toObject();
+                if (response.oidcConfig?.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE) {
+                    this.showSavedDialog(response);
+                } else {
+                    this.router.navigate(['projects', this.projectId, 'apps', response.id]);
+                }
             })
             .catch(error => {
                 this.loading = false;

@@ -9,7 +9,7 @@
 
 @mixin changes-theme($theme) {
   .scroll-container {
-    max-height: 60vh;
+    max-height: 50vh;
     overflow-y: scroll;
 
     .item {

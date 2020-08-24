@@ -7,6 +7,7 @@
 @import 'src/app/pages/projects/owned-projects/owned-project-detail/application-grid/application-grid.component';
 @import 'src/app/modules/meta-layout/meta';
 @import 'src/app/pages/users/user-detail/auth-user-detail/theme-setting/theme-card';
+@import 'src/app/pages/users/user-detail/memberships/memberships.component';
 
 @mixin component-themes($theme) {
   @include avatar-theme($theme);
@@ -15,6 +16,7 @@
   @include detail-layout-theme($theme);
   @include sidenav-list-theme($theme);
   @include application-grid-theme($theme);
+  @include membership-theme($theme);
   @include changes-theme($theme);
   @include meta-theme($theme);
   @include theme-card($theme);

@@ -1,5 +1,7 @@
 <div class="table-header-row">
     <div class="col">
+        <span class="desc"
+            *ngIf="timestamp">{{timestamp | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}</span>
         <ng-container *ngIf="!selection.hasValue()">
             <span class="desc">{{'ORG_DETAIL.TABLE.TOTAL' | translate}}</span>
             <span class="count">{{dataSize}}</span>
