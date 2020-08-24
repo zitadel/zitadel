@@ -217,10 +217,8 @@ func OIDCIdpConfigurationChangedAggregate(aggCreator *es_models.AggregateCreator
 		}
 		var changes map[string]interface{}
 		for _, idp := range existing.IDPs {
-			if idp.IDPConfigID == config.IdpConfigID {
-				if idp.OIDCIDPConfig != nil {
-					changes = idp.OIDCIDPConfig.Changes(config)
-				}
+			if idp.IDPConfigID == config.IdpConfigID && idp.OIDCIDPConfig != nil {
+				changes = idp.OIDCIDPConfig.Changes(config)
 			}
 		}
 		return agg.AppendEvent(model.OidcIdpConfigChanged, changes)
