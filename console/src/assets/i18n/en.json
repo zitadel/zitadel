@@ -229,7 +229,7 @@
             "SELECTEDDEACTIVATED":"Selected Users deactivated"
         },
         "MEMBERSHIPS": {
-            "TITLE":"Memberships",
+            "TITLE":"Zitadel Manager Roles",
             "DESCRIPTION":"These are all member grants of the user. You can modify them also on organisation-, project-, or iam detailpages.",
             "CREATIONDATE":"Creation Date",
             "CHANGEDATE":"Last Modified",
