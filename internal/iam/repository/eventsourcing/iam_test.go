@@ -598,7 +598,7 @@ func TestIdpConfigAddedAggregate(t *testing.T) {
 	}
 }
 
-func TestIdpConnfigurationChangedAggregate(t *testing.T) {
+func TestIdpConfigurationChangedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Iam
@@ -980,7 +980,7 @@ func TestIdpConfigurationReactivatedAggregate(t *testing.T) {
 	}
 }
 
-func TestOIDCConfigchangAggregate(t *testing.T) {
+func TestOIDCConfigChangedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Iam
