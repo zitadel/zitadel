@@ -45,13 +45,13 @@ export class ChangesComponent implements OnInit {
     private init(): void {
         let first: Promise<Changes>;
         switch (this.changeType) {
-            case ChangeType.MYUSER: first = this.authUserService.GetMyUserChanges(10, 0);
+            case ChangeType.MYUSER: first = this.authUserService.GetMyUserChanges(20, 0);
                 break;
-            case ChangeType.USER: first = this.mgmtUserService.UserChanges(this.id, 10, 0);
+            case ChangeType.USER: first = this.mgmtUserService.UserChanges(this.id, 20, 0);
                 break;
             case ChangeType.PROJECT: first = this.mgmtUserService.ProjectChanges(this.id, 20, 0);
                 break;
-            case ChangeType.ORG: first = this.mgmtUserService.OrgChanges(this.id, 10, 0);
+            case ChangeType.ORG: first = this.mgmtUserService.OrgChanges(this.id, 20, 0);
                 break;
         }
 
@@ -70,13 +70,13 @@ export class ChangesComponent implements OnInit {
         let more: Promise<Changes>;
 
         switch (this.changeType) {
-            case ChangeType.MYUSER: more = this.authUserService.GetMyUserChanges(10, cursor);
+            case ChangeType.MYUSER: more = this.authUserService.GetMyUserChanges(20, cursor);
                 break;
-            case ChangeType.USER: more = this.mgmtUserService.UserChanges(this.id, 10, cursor);
+            case ChangeType.USER: more = this.mgmtUserService.UserChanges(this.id, 20, cursor);
                 break;
-            case ChangeType.PROJECT: more = this.mgmtUserService.ProjectChanges(this.id, 10, cursor);
+            case ChangeType.PROJECT: more = this.mgmtUserService.ProjectChanges(this.id, 20, cursor);
                 break;
-            case ChangeType.ORG: more = this.mgmtUserService.OrgChanges(this.id, 10, cursor);
+            case ChangeType.ORG: more = this.mgmtUserService.OrgChanges(this.id, 20, cursor);
                 break;
         }
 

@@ -13,8 +13,8 @@ import {
     UserState,
     UserView,
 } from 'src/app/proto/generated/management_pb';
-import { AuthUserService } from 'src/app/services/auth-user.service';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
+import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -43,7 +43,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         private toast: ToastService,
         private mgmtUserService: MgmtUserService,
         private _location: Location,
-        public authUserService: AuthUserService,
+        public projectService: ProjectService,
     ) { }
 
     public ngOnInit(): void {

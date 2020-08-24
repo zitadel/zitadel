@@ -15,6 +15,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { QRCodeModule } from 'angularx-qrcode';
 import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/member-create-dialog.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
@@ -31,6 +32,7 @@ import { CodeDialogComponent } from './auth-user-detail/code-dialog/code-dialog.
 import { DialogOtpComponent } from './auth-user-detail/dialog-otp/dialog-otp.component';
 import { ThemeSettingComponent } from './auth-user-detail/theme-setting/theme-setting.component';
 import { DetailFormModule } from './detail-form/detail-form.module';
+import { MembershipsComponent } from './memberships/memberships.component';
 import { PasswordComponent } from './password/password.component';
 import { UserDetailRoutingModule } from './user-detail-routing.module';
 import { UserDetailComponent } from './user-detail/user-detail.component';
@@ -46,6 +48,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         ThemeSettingComponent,
         PasswordComponent,
         CodeDialogComponent,
+        MembershipsComponent,
     ],
     imports: [
         UserDetailRoutingModule,
@@ -76,6 +79,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         CopyToClipboardModule,
         DetailLayoutModule,
         PasswordComplexityViewModule,
+        MemberCreateDialogModule,
     ],
 })
 export class UserDetailModule { }

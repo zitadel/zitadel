@@ -1,10 +1,11 @@
 import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { PageEvent } from '@angular/material/paginator';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { ProjectGrantView } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
@@ -36,8 +37,11 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class GrantedProjectListComponent implements OnInit, OnDestroy {
     public totalResult: number = 0;
+    public viewTimestamp!: Timestamp.AsObject;
+
     public dataSource: MatTableDataSource<ProjectGrantView.AsObject> =
         new MatTableDataSource<ProjectGrantView.AsObject>();
+    @ViewChild(MatPaginator) public paginator!: MatPaginator;
 
     public grantedProjectList: ProjectGrantView.AsObject[] = [];
     public displayedColumns: string[] = ['select', 'name', 'resourceOwnerName', 'state', 'creationDate', 'changeDate'];
@@ -86,8 +90,12 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
     private async getData(limit: number, offset: number): Promise<void> {
         this.loadingSubject.next(true);
         this.projectService.SearchGrantedProjects(limit, offset).then(res => {
-            this.grantedProjectList = res.toObject().resultList;
-            this.totalResult = res.toObject().totalResult;
+            const response = res.toObject();
+            this.grantedProjectList = response.resultList;
+            this.totalResult = response.totalResult;
+            if (response.viewTimestamp) {
+                this.viewTimestamp = response.viewTimestamp;
+            }
             if (this.totalResult > 5) {
                 this.grid = false;
             }
@@ -100,28 +108,8 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
         });
     }
 
-    public reactivateSelectedProjects(): void {
-        const promises = this.selection.selected.map(project => {
-            this.projectService.ReactivateProject(project.id);
-        });
-
-        Promise.all(promises).then(() => {
-            this.toast.showInfo('PROJECT.TOAST.REACTIVATED', true);
-        }).catch(error => {
-            this.toast.showError(error);
-        });
-    }
-
-
-    public deactivateSelectedProjects(): void {
-        const promises = this.selection.selected.map(project => {
-            this.projectService.DeactivateProject(project.id);
-        });
-
-        Promise.all(promises).then(() => {
-            this.toast.showInfo('PROJECT.TOAST.DEACTIVATED', true);
-        }).catch(error => {
-            this.toast.showError(error);
-        });
+    public refreshPage(): void {
+        this.selection.clear();
+        this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
     }
 }

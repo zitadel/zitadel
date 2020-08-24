@@ -7,7 +7,7 @@
                 <mat-spinner diameter="30"></mat-spinner>
             </mat-option>
             <mat-option *ngFor="let role of allRoles" [value]="role">
-                {{'ROLES.'+role | translate}}
+                {{ role }}
             </mat-option>
         </mat-select>
     </mat-form-field>

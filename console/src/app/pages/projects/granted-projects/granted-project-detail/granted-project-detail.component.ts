@@ -132,7 +132,6 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
         const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
             data: {
                 creationType: CreationType.PROJECT_GRANTED,
-                projectId: this.project.projectId,
             },
             width: '400px',
         });

@@ -29,7 +29,7 @@ export class SearchUserAutocompleteComponent {
     public globalEmailControl: FormControl = new FormControl();
 
     public emails: string[] = [];
-    public users: Array<User.AsObject> = [];
+    @Input() public users: Array<User.AsObject> = [];
     public filteredUsers: Array<User.AsObject> = [];
     public isLoading: boolean = false;
     public target: UserTarget = UserTarget.SELF;
@@ -39,6 +39,7 @@ export class SearchUserAutocompleteComponent {
     @ViewChild('auto') public matAutocomplete!: MatAutocomplete;
     @Output() public selectionChanged: EventEmitter<User.AsObject | User.AsObject[]> = new EventEmitter();
     @Input() public singleOutput: boolean = false;
+
     private unsubscribed$: Subject<void> = new Subject();
     constructor(private userService: MgmtUserService, private toast: ToastService) {
         this.getFilteredResults();
@@ -102,6 +103,7 @@ export class SearchUserAutocompleteComponent {
 
         if (index >= 0) {
             this.users.splice(index, 1);
+            this.selectionChanged.emit(this.users);
         }
     }
 

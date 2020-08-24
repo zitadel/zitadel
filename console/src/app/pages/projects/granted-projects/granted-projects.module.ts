@@ -22,6 +22,7 @@ import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
+import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
@@ -73,6 +74,7 @@ import { GrantedProjectsComponent } from './granted-projects.component';
         SharedModule,
         LocalizedDatePipeModule,
         MemberCreateDialogModule,
+        RefreshTableModule,
     ],
 })
 export class GrantedProjectsModule { }

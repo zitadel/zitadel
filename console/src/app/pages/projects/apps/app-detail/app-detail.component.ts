@@ -78,6 +78,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public docs!: ZitadelDocs.AsObject;
 
     public OIDCApplicationType: any = OIDCApplicationType;
+    public OIDCAuthMethodType: any = OIDCAuthMethodType;
 
     public redirectControl: FormControl = new FormControl('');
     public postRedirectControl: FormControl = new FormControl('');

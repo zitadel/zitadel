@@ -122,7 +122,6 @@ export class ProjectMembersComponent {
         const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
             data: {
                 creationType: CreationType.PROJECT_OWNED,
-                projectId: this.project.projectId,
             },
             width: '400px',
         });

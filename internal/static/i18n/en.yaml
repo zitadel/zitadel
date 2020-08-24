@@ -1,6 +1,7 @@
 Errors:
   Internal: An internal error occured
-  NoChangesFound: No changes found
+  NoChangesFound: No changes
+  OriginNotAllowed: This "Origin" is not allowed
   User:
     NotFound: User could not be found
     UserIDMissing: User ID missing
