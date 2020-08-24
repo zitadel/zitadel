@@ -84,5 +84,5 @@ func checkOrigin(ctx context.Context, origins []string) error {
 	if http_util.IsOriginAllowed(origins, origin) {
 		return nil
 	}
-	return errors.ThrowPermissionDenied(nil, "AUTH-DZG21", "origin is not allowed")
+	return errors.ThrowPermissionDenied(nil, "AUTH-DZG21", "Errors.OriginNotAllowed")
 }
