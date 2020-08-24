@@ -23,8 +23,8 @@ func (v *testVerifier) ResolveGrants(ctx context.Context) (*Grant, error) {
 	return v.grant, nil
 }
 
-func (v *testVerifier) ProjectIDByClientID(ctx context.Context, clientID string) (string, error) {
-	return "", nil
+func (v *testVerifier) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (string, []string, error) {
+	return "", nil, nil
 }
 
 func (v *testVerifier) ExistsOrg(ctx context.Context, orgID string) error {

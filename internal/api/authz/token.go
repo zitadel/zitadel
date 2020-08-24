@@ -22,7 +22,7 @@ type authZRepo interface {
 	VerifyAccessToken(ctx context.Context, token, clientID string) (userID, agentID string, err error)
 	VerifierClientID(ctx context.Context, name string) (clientID string, err error)
 	ResolveGrants(ctx context.Context) (grant *Grant, err error)
-	ProjectIDByClientID(ctx context.Context, clientID string) (projectID string, err error)
+	ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error)
 	ExistsOrg(ctx context.Context, orgID string) error
 }
 
@@ -88,8 +88,8 @@ func (v *TokenVerifier) ResolveGrant(ctx context.Context) (*Grant, error) {
 	return v.authZRepo.ResolveGrants(ctx)
 }
 
-func (v *TokenVerifier) GetProjectIDByClientID(ctx context.Context, clientID string) (string, error) {
-	return v.authZRepo.ProjectIDByClientID(ctx, clientID)
+func (v *TokenVerifier) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (string, []string, error) {
+	return v.authZRepo.ProjectIDAndOriginsByClientID(ctx, clientID)
 }
 
 func (v *TokenVerifier) ExistsOrg(ctx context.Context, orgID string) error {

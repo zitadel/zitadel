@@ -408,13 +408,13 @@
             "TITLE": "Projekt",
             "DESCRIPTION": "Hier kannst du wichtige Einstellungen prüfen und die Daten einsehen, mit denen das Projekt konfiguriert worden ist",
             "LIST": "Projekte",
-            "LISTDESCRIPTION":"Hier findest du alle Projekte, für die du Aktionen anzeigen oder ausführen darfst. Wenn du dein Projekt nicht finden kannst, wenden dich an einen Projektbesitzer oder an jemanden mit den entsprechenden Rechten, um Projektzugriff zu erhalten.",
+            "LISTDESCRIPTION":"Hier findest du alle Projekte, für die du Aktionen anzeigen oder ausführen darfst. Wenn du dein Projekt nicht finden kannst, wende dich an einen Projektbesitzer oder an jemanden mit den entsprechenden Rechten, um Projektzugriff zu erhalten.",
             "DETAIL": "Detail",
             "CREATE": "Projekt erstellen",
             "CREATE_DESC": "Gib den Namen ein",
             "ROLE": "Rolle",
             "NOITEMS": "Keine Projekte",
-            "ZITADELPROJECT":"Diese Einstellungen gehören zum ZITADEL-Projekt. Wenn du etwas ändernst, verhält sich ZITADEL möglicherweise nicht wie beabsichtigt!",
+            "ZITADELPROJECT":"Diese Einstellungen gehören zum ZITADEL-Projekt. Wenn du etwas änderst, verhält sich ZITADEL möglicherweise nicht wie beabsichtigt!",
             "TYPE":{
                 "OWNED":"Eigene Projekte",
                 "GRANTED":"Berechtigte Projekte"
