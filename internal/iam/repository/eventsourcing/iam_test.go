@@ -750,7 +750,7 @@ func TestIdpConfigurationRemovedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{model.IdpConfigRemoved},
+				eventTypes: []models.EventType{model.IdpConfigRemoved, model.LoginPolicyIdpProviderCascadeRemoved},
 			},
 		},
 		{

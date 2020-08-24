@@ -85,7 +85,6 @@ func (o *Org) AppendEvents(events ...*es_models.Event) error {
 }
 
 func (o *Org) AppendEvent(event *es_models.Event) (err error) {
-	o.ObjectRoot.AppendEvent(event)
 	switch event.Type {
 	case OrgAdded:
 		*o = Org{}
@@ -166,7 +165,11 @@ func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 	case LoginPolicyIdpProviderRemoved:
 		err = o.appendRemoveIdpProviderFromLoginPolicyEvent(event)
 	}
-	return err
+	if err != nil {
+		return err
+	}
+	o.ObjectRoot.AppendEvent(event)
+	return nil
 }
 
 func (o *Org) setData(event *es_models.Event) error {
