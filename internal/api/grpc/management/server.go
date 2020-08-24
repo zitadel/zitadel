@@ -35,13 +35,12 @@ type Config struct {
 
 func CreateServer(repo repository.Repository, sd systemdefaults.SystemDefaults) *Server {
 	return &Server{
-		project:   repo,
-		policy:    repo,
-		org:       repo,
-		user:      repo,
-		usergrant: repo,
-		iam:       repo,
-		// serviceAccount: repo,
+		project:        repo,
+		policy:         repo,
+		org:            repo,
+		user:           repo,
+		usergrant:      repo,
+		iam:            repo,
 		systemDefaults: sd,
 	}
 }
