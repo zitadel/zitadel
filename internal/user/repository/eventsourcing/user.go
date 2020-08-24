@@ -429,6 +429,23 @@ func PasswordCodeSentAggregate(aggCreator *es_models.AggregateCreator, existing 
 	}
 }
 
+func MachineChangeAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, machine *model.Machine) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if machine == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "Errors.Internal")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		changes := existing.Machine.Changes(machine)
+		if len(changes) == 0 {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-0spow", "Errors.NoChangesFound")
+		}
+		return agg.AppendEvent(model.MachineChanged, changes)
+	}
+}
+
 func ProfileChangeAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, profile *model.Profile) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if profile == nil {

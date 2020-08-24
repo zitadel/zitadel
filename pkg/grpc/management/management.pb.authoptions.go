@@ -19,6 +19,11 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/IsUserUnique": authz.Option{
+		Permission: "user.read",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/GetUserByID": authz.Option{
 		Permission: "user.read",
 		CheckParam: "",
@@ -30,11 +35,6 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 	},
 
 	"/caos.zitadel.management.api.v1.ManagementService/SearchUsers": authz.Option{
-		Permission: "user.read",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/IsUserUnique": authz.Option{
 		Permission: "user.read",
 		CheckParam: "",
 	},

@@ -1,6 +1,10 @@
 package model
 
+import "github.com/caos/zitadel/internal/eventstore/models"
+
 type Machine struct {
+	models.ObjectRoot
+
 	Name        string
 	Description string
 }

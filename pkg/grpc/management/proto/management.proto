@@ -92,6 +92,16 @@ service ManagementService {
 //     };
 // }
 
+  rpc IsUserUnique(UniqueUserRequest) returns (UniqueUserResponse) {
+    option (google.api.http) = {
+      get: "/users/_isunique"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.read"
+    };
+  }
+
   rpc GetUserByID(UserID) returns (UserView) {
     option (google.api.http) = {
       get: "/users/{id}"
@@ -118,16 +128,6 @@ service ManagementService {
     option (google.api.http) = {
       post: "/users/_search"
       body: "*"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "user.read"
-    };
-  }
-
-  rpc IsUserUnique(UniqueUserRequest) returns (UniqueUserResponse) {
-    option (google.api.http) = {
-      get: "/users/_isunique"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
@@ -1509,7 +1509,6 @@ message MachineResponse {
 }
 
 message MachineView {
-  google.protobuf.Timestamp last_login = 1;
   google.protobuf.Timestamp last_key_added = 2;
 
   string name = 3;
@@ -1586,6 +1585,7 @@ enum UserSearchKey {
   USERSEARCHKEY_DISPLAY_NAME = 5;
   USERSEARCHKEY_EMAIL = 6;
   USERSEARCHKEY_STATE = 7;
+  USERSEARCHKEY_TYPE = 8;
 }
 
 message UserSearchResponse {

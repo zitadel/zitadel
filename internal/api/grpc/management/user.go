@@ -64,6 +64,14 @@ func (s *Server) CreateUser(ctx context.Context, in *management.CreateUserReques
 	return userFromModel(user), nil
 }
 
+func (s *Server) CreateHuman(ctx context.Context, in *management.CreateHumanRequest) (*management.UserResponse, error) {
+	return s.CreateUser(ctx, &management.CreateUserRequest{User: &management.CreateUserRequest_Human{in}})
+}
+
+func (s *Server) CreateMachine(ctx context.Context, in *management.CreateMachineRequest) (*management.UserResponse, error) {
+	return s.CreateUser(ctx, &management.CreateUserRequest{User: &management.CreateUserRequest_Machine{in}})
+}
+
 func (s *Server) DeactivateUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
 	user, err := s.user.DeactivateUser(ctx, in.Id)
 	if err != nil {
@@ -98,6 +106,14 @@ func (s *Server) UnlockUser(ctx context.Context, in *management.UserID) (*manage
 
 func (s *Server) DeleteUser(ctx context.Context, in *management.UserID) (*empty.Empty, error) {
 	return nil, errors.ThrowUnimplemented(nil, "GRPC-as4fg", "Not implemented")
+}
+
+func (s *Server) UpdateUserMachine(ctx context.Context, in *management.UpdateMachineRequest) (*management.MachineResponse, error) {
+	machine, err := s.user.ChangeMachine(ctx, updateMachineToModel(in))
+	if err != nil {
+		return nil, err
+	}
+	return machineFromModel(machine), nil
 }
 
 func (s *Server) GetUserProfile(ctx context.Context, in *management.UserID) (*management.UserProfileView, error) {

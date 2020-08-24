@@ -136,7 +136,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:      1,
-				eventTypes:    []models.EventType{model.UserAdded},
+				eventTypes:    []models.EventType{model.HumanAdded},
 				checkData:     []bool{true},
 				aggregatesLen: 3,
 			},
@@ -168,7 +168,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:      2,
-				eventTypes:    []models.EventType{model.UserAdded, model.InitializedUserCodeAdded},
+				eventTypes:    []models.EventType{model.HumanAdded, model.InitializedUserCodeAdded},
 				checkData:     []bool{true, true},
 				aggregatesLen: 3,
 			},
@@ -188,7 +188,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:      2,
-				eventTypes:    []models.EventType{model.UserAdded, model.UserPhoneCodeAdded},
+				eventTypes:    []models.EventType{model.HumanAdded, model.UserPhoneCodeAdded},
 				checkData:     []bool{true, true},
 				aggregatesLen: 3,
 			},
@@ -207,7 +207,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:      2,
-				eventTypes:    []models.EventType{model.UserAdded, model.UserEmailVerified},
+				eventTypes:    []models.EventType{model.HumanAdded, model.UserEmailVerified},
 				checkData:     []bool{true, false},
 				aggregatesLen: 3,
 			},
@@ -227,7 +227,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:      2,
-				eventTypes:    []models.EventType{model.UserAdded, model.UserPhoneVerified},
+				eventTypes:    []models.EventType{model.HumanAdded, model.UserPhoneVerified},
 				checkData:     []bool{true, false},
 				aggregatesLen: 3,
 			},
@@ -296,7 +296,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{model.UserRegistered, model.InitializedUserCodeAdded},
+				eventTypes: []models.EventType{model.HumanRegistered, model.InitializedHumanCodeAdded},
 			},
 		},
 		{
@@ -345,7 +345,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{model.UserRegistered, model.InitializedUserCodeAdded},
+				eventTypes: []models.EventType{model.HumanRegistered, model.InitializedHumanCodeAdded},
 			},
 		},
 		{
@@ -664,7 +664,7 @@ func TestUserInitCodeAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.InitializedUserCodeAdded,
+				eventType: model.InitializedHumanCodeAdded,
 			},
 		},
 		{
@@ -725,7 +725,7 @@ func TestInitCodeSentAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.InitializedUserCodeSent},
+				eventTypes: []models.EventType{model.InitializedHumanCodeSent},
 			},
 		},
 	}
@@ -779,7 +779,7 @@ func TestInitCodeVerifiedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{model.UserEmailVerified, model.InitializedUserCheckSucceeded},
+				eventTypes: []models.EventType{model.HumanEmailVerified, model.InitializedHumanCheckSucceeded},
 			},
 		},
 		{
@@ -796,7 +796,7 @@ func TestInitCodeVerifiedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.InitializedUserCheckSucceeded},
+				eventTypes: []models.EventType{model.InitializedHumanCheckSucceeded},
 			},
 		},
 		{
@@ -814,7 +814,7 @@ func TestInitCodeVerifiedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   3,
-				eventTypes: []models.EventType{model.UserEmailVerified, model.UserPasswordChanged, model.InitializedUserCheckSucceeded},
+				eventTypes: []models.EventType{model.HumanEmailVerified, model.HumanPasswordChanged, model.InitializedHumanCheckSucceeded},
 			},
 		},
 	}
@@ -866,7 +866,7 @@ func TestInitCodeCheckFailedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.MfaInitSkipped,
+				eventType: model.HumanMfaInitSkipped,
 			},
 		},
 	}
@@ -916,7 +916,7 @@ func TestSkipMfaAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.InitializedUserCheckFailed,
+				eventType: model.InitializedHumanCheckFailed,
 			},
 		},
 	}
@@ -968,7 +968,7 @@ func TestChangePasswordAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.UserPasswordChanged,
+				eventType: model.HumanPasswordChanged,
 			},
 		},
 		{
@@ -1035,7 +1035,7 @@ func TestRequestSetPasswordAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.UserPasswordCodeAdded,
+				eventType: model.HumanPasswordCodeAdded,
 			},
 		},
 		{
@@ -1096,7 +1096,7 @@ func TestPasswordCodeSentAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.UserPasswordCodeSent},
+				eventTypes: []models.EventType{model.HumanPasswordCodeSent},
 			},
 		},
 	}
@@ -1150,7 +1150,7 @@ func TestChangeProfileAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.UserProfileChanged,
+				eventType: model.HumanProfileChanged,
 			},
 		},
 		{
@@ -1218,7 +1218,7 @@ func TestChangeEmailAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{model.UserEmailChanged, model.UserEmailVerified},
+				eventTypes: []models.EventType{model.HumanEmailChanged, model.HumanEmailVerified},
 			},
 		},
 		{
@@ -1236,7 +1236,7 @@ func TestChangeEmailAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{model.UserEmailChanged, model.UserEmailCodeAdded},
+				eventTypes: []models.EventType{model.HumanEmailChanged, model.HumanEmailCodeAdded},
 			},
 		},
 		{
@@ -1333,7 +1333,7 @@ func TestVerifyEmailAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.UserEmailVerified},
+				eventTypes: []models.EventType{model.HumanEmailVerified},
 			},
 		},
 	}
@@ -1381,7 +1381,7 @@ func TestVerificationFailedEmailAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.UserEmailVerificationFailed},
+				eventTypes: []models.EventType{model.HumanEmailVerificationFailed},
 			},
 		},
 	}
@@ -1435,7 +1435,7 @@ func TestCreateEmailCodeAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.UserEmailCodeAdded},
+				eventTypes: []models.EventType{model.HumanEmailCodeAdded},
 			},
 		},
 		{
@@ -1501,7 +1501,7 @@ func TestEmailCodeSentAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.UserEmailCodeSent},
+				eventTypes: []models.EventType{model.HumanEmailCodeSent},
 			},
 		},
 	}
@@ -1556,7 +1556,7 @@ func TestChangePhoneAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{model.UserPhoneChanged, model.UserPhoneVerified},
+				eventTypes: []models.EventType{model.HumanPhoneChanged, model.HumanPhoneVerified},
 			},
 		},
 		{
@@ -1574,7 +1574,7 @@ func TestChangePhoneAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{model.UserPhoneChanged, model.UserPhoneCodeAdded},
+				eventTypes: []models.EventType{model.HumanPhoneChanged, model.HumanPhoneCodeAdded},
 			},
 		},
 		{
@@ -1677,7 +1677,7 @@ func TestVerifyPhoneAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.UserPhoneVerified},
+				eventTypes: []models.EventType{model.HumanPhoneVerified},
 			},
 		},
 	}
@@ -1729,7 +1729,7 @@ func TestRemovePhoneAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.UserPhoneRemoved},
+				eventTypes: []models.EventType{model.HumanPhoneRemoved},
 			},
 		},
 	}
@@ -1781,7 +1781,7 @@ func TestVerificationFailedPhoneAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.UserPhoneVerificationFailed},
+				eventTypes: []models.EventType{model.HumanPhoneVerificationFailed},
 			},
 		},
 	}
@@ -1835,7 +1835,7 @@ func TestCreatePhoneCodeAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.UserPhoneCodeAdded},
+				eventTypes: []models.EventType{model.HumanPhoneCodeAdded},
 			},
 		},
 		{
@@ -1901,7 +1901,7 @@ func TestPhoneCodeSentAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.UserPhoneCodeSent},
+				eventTypes: []models.EventType{model.HumanPhoneCodeSent},
 			},
 		},
 	}
@@ -1955,7 +1955,7 @@ func TestChangeAddressAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.UserAddressChanged},
+				eventTypes: []models.EventType{model.HumanAddressChanged},
 			},
 		},
 		{
@@ -2023,7 +2023,7 @@ func TestOtpAddAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.MfaOtpAdded},
+				eventTypes: []models.EventType{model.HumanMfaOtpAdded},
 			},
 		},
 		{
@@ -2085,7 +2085,7 @@ func TestOtpVerifyAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.MfaOtpVerified},
+				eventTypes: []models.EventType{model.HumanMfaOtpVerified},
 			},
 		},
 	}
@@ -2133,7 +2133,7 @@ func TestOtpRemoveAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.MfaOtpRemoved},
+				eventTypes: []models.EventType{model.HumanMfaOtpRemoved},
 			},
 		},
 	}

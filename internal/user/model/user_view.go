@@ -1,27 +1,34 @@
 package model
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"golang.org/x/text/language"
-	"time"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/model"
 )
 
 type UserView struct {
-	ID                     string
-	CreationDate           time.Time
-	ChangeDate             time.Time
-	State                  UserState
-	ResourceOwner          string
+	ID                 string
+	CreationDate       time.Time
+	ChangeDate         time.Time
+	State              UserState
+	Sequence           uint64
+	ResourceOwner      string
+	LastLogin          time.Time
+	PreferredLoginName string
+	LoginNames         []string
+	*MachineView
+	*HumanView
+}
+
+type HumanView struct {
 	PasswordSet            bool
 	PasswordChangeRequired bool
 	PasswordChanged        time.Time
-	LastLogin              time.Time
 	UserName               string
-	PreferredLoginName     string
-	LoginNames             []string
 	FirstName              string
 	LastName               string
 	NickName               string
@@ -41,8 +48,29 @@ type UserView struct {
 	MfaMaxSetUp            req_model.MfaLevel
 	MfaInitSkipped         time.Time
 	InitRequired           bool
-	Sequence               uint64
 }
+
+type MachineView struct {
+	LastKeyAdded time.Time
+	Name         string
+	Description  string
+	Keys         []*MachineKeyView
+}
+
+type MachineKeyView struct {
+	ID             string
+	Type           MachineKeyType
+	Sequence       uint64
+	CreationDate   time.Time
+	ExpirationDate time.Time
+}
+
+type MachineKeyType int32
+
+const (
+	MachineKeyTypeNONE = iota
+	MachineKeyTypeJSON
+)
 
 type UserSearchRequest struct {
 	Offset        uint64
@@ -66,6 +94,7 @@ const (
 	UserSearchKeyState
 	UserSearchKeyResourceOwner
 	UserSearchKeyLoginNames
+	UserSearchKeyType
 )
 
 type UserSearchQuery struct {
@@ -128,6 +157,9 @@ func (u *UserView) MfaTypesAllowed(level req_model.MfaLevel) []req_model.MfaType
 }
 
 func (u *UserView) GetProfile() *Profile {
+	if u.HumanView == nil {
+		return nil
+	}
 	return &Profile{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID:   u.ID,
@@ -149,6 +181,9 @@ func (u *UserView) GetProfile() *Profile {
 }
 
 func (u *UserView) GetPhone() *Phone {
+	if u.HumanView == nil {
+		return nil
+	}
 	return &Phone{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID:   u.ID,
@@ -163,6 +198,9 @@ func (u *UserView) GetPhone() *Phone {
 }
 
 func (u *UserView) GetEmail() *Email {
+	if u.HumanView == nil {
+		return nil
+	}
 	return &Email{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID:   u.ID,
@@ -177,6 +215,9 @@ func (u *UserView) GetEmail() *Email {
 }
 
 func (u *UserView) GetAddress() *Address {
+	if u.HumanView == nil {
+		return nil
+	}
 	return &Address{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID:   u.ID,

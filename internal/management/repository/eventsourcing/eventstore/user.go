@@ -3,6 +3,7 @@ package eventstore
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/view/repository"
@@ -164,7 +165,14 @@ func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_mode
 	if err != nil {
 		return nil, err
 	}
+	if user.HumanView == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-LQh4I", "Errors.User.NotHuman")
+	}
 	return user.GetProfile(), nil
+}
+
+func (repo *UserRepo) ChangeMachine(ctx context.Context, machine *usr_model.Machine) (*usr_model.Machine, error) {
+	return repo.UserEvents.ChangeMachine(ctx, machine)
 }
 
 func (repo *UserRepo) ChangeProfile(ctx context.Context, profile *usr_model.Profile) (*usr_model.Profile, error) {
@@ -175,6 +183,9 @@ func (repo *UserRepo) EmailByID(ctx context.Context, userID string) (*usr_model.
 	user, err := repo.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
+	}
+	if user.HumanView == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-LQh4I", "Errors.User.NotHuman")
 	}
 	return user.GetEmail(), nil
 }
@@ -191,6 +202,9 @@ func (repo *UserRepo) PhoneByID(ctx context.Context, userID string) (*usr_model.
 	user, err := repo.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
+	}
+	if user.HumanView == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-LQh4I", "Errors.User.NotHuman")
 	}
 	return user.GetPhone(), nil
 }
@@ -211,6 +225,9 @@ func (repo *UserRepo) AddressByID(ctx context.Context, userID string) (*usr_mode
 	user, err := repo.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
+	}
+	if user.HumanView == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-LQh4I", "Errors.User.NotHuman")
 	}
 	return user.GetAddress(), nil
 }

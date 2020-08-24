@@ -22,14 +22,22 @@ func userFromModel(user *usr_model.User) *management.UserResponse {
 	changeDate, err := ptypes.TimestampProto(user.ChangeDate)
 	logging.Log("GRPC-ckoe3d").OnError(err).Debug("unable to parse timestamp")
 
-	return &management.UserResponse{
+	userResp := &management.UserResponse{
 		Id:           user.AggregateID,
 		State:        userStateFromModel(user.State),
 		CreationDate: creationDate,
 		ChangeDate:   changeDate,
 		Sequence:     user.Sequence,
-		User:         &management.UserResponse_Human{humanFromModel(user)},
 	}
+
+	if user.Machine != nil {
+		userResp.User = &management.UserResponse_Machine{Machine: machineFromModel(user.Machine)}
+	}
+	if user.Human != nil {
+		userResp.User = &management.UserResponse_Human{Human: humanFromModel(user.Human)}
+	}
+
+	return userResp
 }
 
 func userCreateToModel(u *management.CreateUserRequest) *usr_model.User {
@@ -96,6 +104,8 @@ func userSearchKeyToModel(key management.UserSearchKey) usr_model.UserSearchKey 
 		return usr_model.UserSearchKeyEmail
 	case management.UserSearchKey_USERSEARCHKEY_STATE:
 		return usr_model.UserSearchKeyState
+	case management.UserSearchKey_USERSEARCHKEY_TYPE:
+		return usr_model.UserSearchKeyType
 	default:
 		return usr_model.UserSearchKeyUnspecified
 	}
@@ -361,37 +371,25 @@ func userViewFromModel(user *usr_model.UserView) *management.UserView {
 	lastLogin, err := ptypes.TimestampProto(user.LastLogin)
 	logging.Log("GRPC-dksi3").OnError(err).Debug("unable to parse timestamp")
 
-	passwordChanged, err := ptypes.TimestampProto(user.PasswordChanged)
-	logging.Log("GRPC-dl9ws").OnError(err).Debug("unable to parse timestamp")
-
-	return &management.UserView{
+	userView := &management.UserView{
 		Id:                 user.ID,
 		State:              userStateFromModel(user.State),
 		CreationDate:       creationDate,
 		ChangeDate:         changeDate,
 		LastLogin:          lastLogin,
-		PasswordChanged:    passwordChanged,
-		UserName:           user.UserName,
-		FirstName:          user.FirstName,
-		LastName:           user.LastName,
-		DisplayName:        user.DisplayName,
-		NickName:           user.NickName,
-		PreferredLanguage:  user.PreferredLanguage,
-		Gender:             genderFromModel(user.Gender),
-		Email:              user.Email,
-		IsEmailVerified:    user.IsEmailVerified,
-		Phone:              user.Phone,
-		IsPhoneVerified:    user.IsPhoneVerified,
-		Country:            user.Country,
-		Locality:           user.Locality,
-		PostalCode:         user.PostalCode,
-		Region:             user.Region,
-		StreetAddress:      user.StreetAddress,
 		Sequence:           user.Sequence,
 		ResourceOwner:      user.ResourceOwner,
 		LoginNames:         user.LoginNames,
 		PreferredLoginName: user.PreferredLoginName,
 	}
+	if user.HumanView != nil {
+		userView.User = &management.UserView_Human{humanViewFromModel(user.HumanView)}
+	}
+	if user.MachineView != nil {
+		userView.User = &management.UserView_Machine{machineViewFromModel(user.MachineView)}
+
+	}
+	return userView
 }
 
 func userMembershipSearchResponseFromModel(response *usr_model.UserMembershipSearchResponse) *management.UserMembershipSearchResponse {
