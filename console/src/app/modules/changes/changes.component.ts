@@ -2,8 +2,8 @@ import { Component, Input, OnInit } from '@angular/core';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, scan, take, tap } from 'rxjs/operators';
 import { Change, Changes } from 'src/app/proto/generated/management_pb';
-import { AuthUserService } from 'src/app/services/auth-user.service';
-import { MgmtUserService } from 'src/app/services/mgmt-user.service';
+import { AuthService } from 'src/app/services/auth.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 
 export enum ChangeType {
     MYUSER = 'myuser',
@@ -30,7 +30,7 @@ export class ChangesComponent implements OnInit {
     loading: Observable<boolean> = this._loading.asObservable();
     public data!: Observable<Change.AsObject[]>;
     public changes!: Changes.AsObject;
-    constructor(private mgmtUserService: MgmtUserService, private authUserService: AuthUserService) { }
+    constructor(private mgmtUserService: ManagementService, private authUserService: AuthService) { }
 
     ngOnInit(): void {
         this.init();

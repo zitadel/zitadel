@@ -14,7 +14,7 @@ import {
     ProjectView,
     SearchMethod,
 } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 
 
 export enum ProjectAutocompleteType {
@@ -47,7 +47,7 @@ export class SearchProjectAutocompleteComponent {
         | ProjectView.AsObject
         | ProjectView.AsObject[]
     > = new EventEmitter();
-    constructor(private projectService: ProjectService) {
+    constructor(private projectService: ManagementService) {
         this.myControl.valueChanges
             .pipe(
                 debounceTime(200),

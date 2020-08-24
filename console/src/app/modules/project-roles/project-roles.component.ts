@@ -5,7 +5,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
 import { ProjectRole } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { ProjectRoleDetailComponent } from './project-role-detail/project-role-detail.component';
@@ -30,7 +30,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'key', 'displayname', 'group', 'creationDate'];
 
-    constructor(private projectService: ProjectService, private toast: ToastService, private dialog: MatDialog) {
+    constructor(private projectService: ManagementService, private toast: ToastService, private dialog: MatDialog) {
         this.dataSource = new ProjectRolesDataSource(this.projectService);
     }
 

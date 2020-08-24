@@ -4,8 +4,8 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/auth_pb';
-import { AuthUserService } from 'src/app/services/auth-user.service';
-import { MgmtUserService } from 'src/app/services/mgmt-user.service';
+import { AuthService } from 'src/app/services/auth.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 function passwordConfirmValidator(c: AbstractControl): any {
@@ -39,8 +39,8 @@ export class PasswordComponent implements OnDestroy {
     constructor(
         activatedRoute: ActivatedRoute,
         private fb: FormBuilder,
-        private userService: AuthUserService,
-        private mgmtUserService: MgmtUserService,
+        private userService: AuthService,
+        private mgmtUserService: ManagementService,
         private toast: ToastService,
     ) {
 

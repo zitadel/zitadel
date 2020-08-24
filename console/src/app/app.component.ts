@@ -12,9 +12,9 @@ import { map } from 'rxjs/operators';
 
 import { accountCard, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { Org, UserProfileView } from './proto/generated/auth_pb';
-import { AuthUserService } from './services/auth-user.service';
 import { AuthService } from './services/auth.service';
-import { ProjectService } from './services/project.service';
+import { AuthenticationService } from './services/authentication.service';
+import { ManagementService } from './services/mgmt.service';
 import { ThemeService } from './services/theme.service';
 import { ToastService } from './services/toast.service';
 import { UpdateService } from './services/update.service';
@@ -60,12 +60,12 @@ export class AppComponent implements OnDestroy {
         public viewPortScroller: ViewportScroller,
         @Inject('windowObject') public window: Window,
         public translate: TranslateService,
-        public authService: AuthService,
+        public authService: AuthenticationService,
         private breakpointObserver: BreakpointObserver,
         public overlayContainer: OverlayContainer,
         private themeService: ThemeService,
-        public userService: AuthUserService,
-        private projectService: ProjectService,
+        public userService: AuthService,
+        private projectService: ManagementService,
         public matIconRegistry: MatIconRegistry,
         public domSanitizer: DomSanitizer,
         private toast: ToastService,

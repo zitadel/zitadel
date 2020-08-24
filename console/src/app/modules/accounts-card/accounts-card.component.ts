@@ -2,8 +2,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthConfig } from 'angular-oauth2-oidc';
 import { UserProfileView, UserSessionView } from 'src/app/proto/generated/auth_pb';
-import { AuthUserService } from 'src/app/services/auth-user.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 
 @Component({
     selector: 'app-accounts-card',
@@ -17,7 +17,7 @@ export class AccountsCardComponent implements OnInit {
     @Output() public close: EventEmitter<void> = new EventEmitter();
     public users: UserSessionView.AsObject[] = [];
     public loadingUsers: boolean = false;
-    constructor(public authService: AuthService, private router: Router, private userService: AuthUserService) {
+    constructor(public authService: AuthenticationService, private router: Router, private userService: AuthService) {
         this.userService.getMyUserSessions().then(sessions => {
             this.users = sessions.toObject().userSessionsList;
             const index = this.users.findIndex(user => user.loginName === this.profile.preferredLoginName);

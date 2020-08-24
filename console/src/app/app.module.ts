@@ -32,17 +32,16 @@ import { AvatarModule } from './modules/avatar/avatar.module';
 import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { HasRolePipeModule } from './pipes/has-role-pipe.module';
-import { AuthUserService } from './services/auth-user.service';
 import { AuthService } from './services/auth.service';
+import { AuthenticationService } from './services/authentication.service';
 import { GrpcService } from './services/grpc.service';
-import { GrpcAuthInterceptor } from './services/interceptors/grpc-auth.interceptor';
-import { GRPC_INTERCEPTORS } from './services/interceptors/grpc-interceptor';
-import { GrpcOrgInterceptor } from './services/interceptors/grpc-org.interceptor';
 import { StatehandlerProcessorService, StatehandlerProcessorServiceImpl } from './services/statehandler-processor.service';
 import { StatehandlerService, StatehandlerServiceImpl } from './services/statehandler.service';
 import { StorageService } from './services/storage.service';
 import { ThemeService } from './services/theme.service';
 
+// import { GrpcAuthInterceptor } from './services/interceptors/grpc-auth.interceptor';
+// import { GRPC_INTERCEPTORS } from './services/interceptors/grpc-interceptor';
 registerLocaleData(localeDe);
 
 // AoT requires an exported function for factories
@@ -80,7 +79,7 @@ const authConfig: AuthConfig = {
         OverlayModule,
         OAuthModule.forRoot({
             resourceServer: {
-                allowedUrls: ['https://test.api.zitadel.caos.ch/caos.zitadel.auth.api.v1.AuthService', 'https://test.api.zitadel.caos.ch/oauth/v2/userinfo', 'https://test.api.zitadel.caos.ch/caos.zitadel.management.api.v1.ManagementService/', 'https://preview.api.zitadel.caos.ch'],
+                allowedUrls: ['https://test.api.zitadel.caos.ch/caos.zitadel.auth.api.v1.AuthenticationService', 'https://test.api.zitadel.caos.ch/oauth/v2/userinfo', 'https://test.api.zitadel.caos.ch/caos.zitadel.management.api.v1.ManagementService/', 'https://preview.api.zitadel.caos.ch'],
                 sendAccessToken: true,
             },
         }),
@@ -143,19 +142,19 @@ const authConfig: AuthConfig = {
             provide: OAuthStorage,
             useClass: StorageService,
         },
-        {
-            provide: GRPC_INTERCEPTORS,
-            multi: true,
-            useClass: GrpcAuthInterceptor,
-        },
-        {
-            provide: GRPC_INTERCEPTORS,
-            multi: true,
-            useClass: GrpcOrgInterceptor,
-        },
+        // {
+        //     provide: GRPC_INTERCEPTORS,
+        //     multi: true,
+        //     useClass: GrpcAuthInterceptor,
+        // },
+        // {
+        //     provide: GRPC_INTERCEPTORS,
+        //     multi: true,
+        //     useClass: GrpcOrgInterceptor,
+        // },
         GrpcService,
+        AuthenticationService,
         AuthService,
-        AuthUserService,
         { provide: 'windowObject', useValue: window },
     ],
     bootstrap: [AppComponent],

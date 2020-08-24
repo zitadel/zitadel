@@ -9,8 +9,8 @@ import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidato
 import { CreateOrgRequest, CreateUserRequest, Gender, OrgSetUpResponse } from 'src/app/proto/generated/admin_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/auth_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { AuthService } from 'src/app/services/auth.service';
-import { OrgService } from 'src/app/services/org.service';
+import { AuthenticationService } from 'src/app/services/authentication.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 function passwordConfirmValidator(c: AbstractControl): any {
@@ -67,8 +67,8 @@ export class OrgCreateComponent {
         private adminService: AdminService,
         private _location: Location,
         private fb: FormBuilder,
-        private orgService: OrgService,
-        private authService: AuthService,
+        private orgService: ManagementService,
+        private authService: AuthenticationService,
     ) {
         this.authService.isAllowed(['iam.write']).pipe(take(1)).subscribe((allowed) => {
             if (allowed) {

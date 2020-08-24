@@ -4,7 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { Gender, UserAddress, UserEmail, UserPhone, UserProfile, UserView } from 'src/app/proto/generated/auth_pb';
-import { AuthUserService } from 'src/app/services/auth-user.service';
+import { AuthService } from 'src/app/services/auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { CodeDialogComponent } from './code-dialog/code-dialog.component';
@@ -35,7 +35,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     constructor(
         public translate: TranslateService,
         private toast: ToastService,
-        private userService: AuthUserService,
+        private userService: AuthService,
         private dialog: MatDialog,
     ) {
         this.loading = true;

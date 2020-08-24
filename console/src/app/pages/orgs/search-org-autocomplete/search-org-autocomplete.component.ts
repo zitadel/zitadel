@@ -5,7 +5,7 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import { MatChipInputEvent } from '@angular/material/chips';
 import { debounceTime, tap } from 'rxjs/operators';
 import { Org } from 'src/app/proto/generated/management_pb';
-import { OrgService } from 'src/app/services/org.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -27,7 +27,7 @@ export class SearchOrgAutocompleteComponent {
     @ViewChild('auto') public matAutocomplete!: MatAutocomplete;
     @Input() public singleOutput: boolean = false;
     @Output() public selectionChanged: EventEmitter<Org.AsObject | Org.AsObject[]> = new EventEmitter();
-    constructor(private orgService: OrgService, private toast: ToastService) {
+    constructor(private orgService: ManagementService, private toast: ToastService) {
         this.myControl.valueChanges.pipe(debounceTime(200), tap(() => this.isLoading = true)).subscribe(value => {
             return this.orgService.getOrgByDomainGlobal(value).then((org) => {
                 this.isLoading = false;

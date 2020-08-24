@@ -2,7 +2,7 @@ import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Project, ProjectCreateRequest } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -16,7 +16,7 @@ export class ProjectCreateComponent implements OnInit {
     constructor(
         private router: Router,
         private toast: ToastService,
-        private projectService: ProjectService,
+        private projectService: ManagementService,
         private _location: Location,
     ) { }
 

@@ -8,8 +8,7 @@ import {
     ProjectRoleView,
     ProjectType,
 } from 'src/app/proto/generated/management_pb';
-import { OrgService } from 'src/app/services/org.service';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -31,8 +30,8 @@ export class ProjectGrantDetailComponent {
     public memberRoleOptions: ProjectRoleView.AsObject[] = [];
 
     constructor(
-        private orgService: OrgService,
-        private projectService: ProjectService,
+        private orgService: ManagementService,
+        private projectService: ManagementService,
         private route: ActivatedRoute,
         private toast: ToastService,
     ) {

@@ -6,7 +6,7 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { from, of, Subject } from 'rxjs';
 import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { SearchMethod, User, UserSearchKey, UserSearchQuery } from 'src/app/proto/generated/management_pb';
-import { MgmtUserService } from 'src/app/services/mgmt-user.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 export enum UserTarget {
@@ -41,7 +41,7 @@ export class SearchUserAutocompleteComponent {
     @Input() public singleOutput: boolean = false;
 
     private unsubscribed$: Subject<void> = new Subject();
-    constructor(private userService: MgmtUserService, private toast: ToastService) {
+    constructor(private userService: ManagementService, private toast: ToastService) {
         this.getFilteredResults();
     }
 

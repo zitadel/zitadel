@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -13,7 +13,7 @@ export class ProjectRoleDetailComponent implements OnInit {
     public projectId: string = '';
 
     public formGroup!: FormGroup;
-    constructor(private projectService: ProjectService, private toast: ToastService,
+    constructor(private projectService: ManagementService, private toast: ToastService,
         public dialogRef: MatDialogRef<ProjectRoleDetailComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any) {
 

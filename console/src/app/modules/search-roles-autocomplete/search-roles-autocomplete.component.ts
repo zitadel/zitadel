@@ -11,7 +11,7 @@ import {
     ProjectRoleSearchQuery,
     SearchMethod,
 } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 
@@ -35,7 +35,7 @@ export class SearchRolesAutocompleteComponent {
     @Input() public projectId: string = '';
     @Input() public singleOutput: boolean = false;
     @Output() public selectionChanged: EventEmitter<ProjectRole.AsObject[] | ProjectRole.AsObject> = new EventEmitter();
-    constructor(private projectService: ProjectService, private toast: ToastService) {
+    constructor(private projectService: ManagementService, private toast: ToastService) {
         this.myControl.valueChanges
             .pipe(
                 debounceTime(200),

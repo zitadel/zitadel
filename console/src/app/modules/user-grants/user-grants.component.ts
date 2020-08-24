@@ -12,8 +12,7 @@ import {
     UserGrantSearchQuery,
     UserGrantView,
 } from 'src/app/proto/generated/management_pb';
-import { MgmtUserService } from 'src/app/services/mgmt-user.service';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource';
@@ -51,8 +50,8 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     public UserGrantContext: any = UserGrantContext;
 
     constructor(
-        private userService: MgmtUserService,
-        private projectService: ProjectService,
+        private userService: ManagementService,
+        private projectService: ManagementService,
         private toast: ToastService,
     ) { }
 

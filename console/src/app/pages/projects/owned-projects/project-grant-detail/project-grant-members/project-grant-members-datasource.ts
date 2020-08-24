@@ -3,7 +3,7 @@ import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { ProjectMember } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 
 /**
  * Data source for the ProjectMembers view. This class should
@@ -18,7 +18,7 @@ export class ProjectGrantMembersDataSource extends DataSource<ProjectMember.AsOb
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-    constructor(private projectService: ProjectService) {
+    constructor(private projectService: ManagementService) {
         super();
     }
 

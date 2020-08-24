@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { Application } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 
 @Component({
     selector: 'app-application-grid',
@@ -17,7 +17,7 @@ export class ApplicationGridComponent implements OnInit {
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-    constructor(private projectService: ProjectService) { }
+    constructor(private projectService: ManagementService) { }
 
     public ngOnInit(): void {
         this.loadApps();

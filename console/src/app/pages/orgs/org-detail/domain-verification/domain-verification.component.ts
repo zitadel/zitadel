@@ -2,7 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { saveAs } from 'file-saver';
 import { OrgDomainValidationResponse, OrgDomainValidationType, OrgDomainView } from 'src/app/proto/generated/management_pb';
-import { OrgService } from 'src/app/services/org.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -23,7 +23,7 @@ export class DomainVerificationComponent {
         private toast: ToastService,
         public dialogRef: MatDialogRef<DomainVerificationComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
-        private orgService: OrgService,
+        private orgService: ManagementService,
     ) {
         this.domain = data.domain;
     }

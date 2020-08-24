@@ -19,7 +19,7 @@ import {
     OrgState,
     User,
 } from 'src/app/proto/generated/management_pb';
-import { OrgService } from 'src/app/services/org.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AddDomainDialogComponent } from './add-domain-dialog/add-domain-dialog.component';
@@ -56,7 +56,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     constructor(
         private dialog: MatDialog,
         public translate: TranslateService,
-        private orgService: OrgService,
+        private orgService: ManagementService,
         private toast: ToastService,
         private router: Router,
     ) { }

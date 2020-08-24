@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 import { WarnDialogComponent } from '../modules/warn-dialog/warn-dialog.component';
-import { AuthService } from './auth.service';
+import { AuthenticationService } from './authentication.service';
 
 @Injectable({
     providedIn: 'root',
@@ -15,7 +15,7 @@ export class ToastService {
     constructor(private dialog: MatDialog,
         private snackBar: MatSnackBar,
         private translate: TranslateService,
-        private authService: AuthService,
+        private authService: AuthenticationService,
     ) { }
 
     public showInfo(message: string, i18nkey: boolean = false): void {

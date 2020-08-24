@@ -1,5 +1,5 @@
 import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
-import { AuthService } from 'src/app/services/auth.service';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 
 
 @Directive({
@@ -23,7 +23,7 @@ export class HasRoleDirective {
     }
 
     constructor(
-        private authService: AuthService,
+        private authService: AuthenticationService,
         protected templateRef: TemplateRef<any>,
         protected viewContainerRef: ViewContainerRef,
     ) { }

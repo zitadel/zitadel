@@ -1,20 +1,11 @@
 import { Injectable } from '@angular/core';
 
-import { StorageService } from '../storage.service';
-import { GrpcInterceptor } from './grpc-interceptor';
-
-const authorizationKey = 'Authorization';
-const bearerPrefix = 'Bearer ';
-const accessTokenStorageField = 'access_token';
-
 @Injectable({ providedIn: 'root' })
-export class GrpcAuthInterceptor implements GrpcInterceptor {
-    constructor(private readonly authStorage: StorageService) { }
+export class AuthInterceptor {
+    constructor() { }
 
-    public async intercept(
-        request: any,
-        invoker: any,
-    ): Promise<any> {
+    public intercept(request: any, invoker: any): any {
+        // Update the request message before the RPC.
         console.log(request);
         const reqMsg = request.getRequestMessage();
         reqMsg.setMessage('[Intercept request]' + reqMsg.getMessage());
@@ -26,15 +17,9 @@ export class GrpcAuthInterceptor implements GrpcInterceptor {
 
             // Update the response message.
             const responseMsg = response.getResponseMessage();
-
-            const accessToken = this.authStorage.getItem(accessTokenStorageField);
-            if (accessToken) {
-                responseMsg.setMetadata({ [authorizationKey]: bearerPrefix + accessToken });
-            }
-
             responseMsg.setMessage('[Intercept response]' + responseMsg.getMessage());
 
             return response;
         });
-    }
+    };
 }

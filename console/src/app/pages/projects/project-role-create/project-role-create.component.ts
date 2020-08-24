@@ -5,7 +5,7 @@ import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ProjectRoleAdd } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -45,7 +45,7 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
         private router: Router,
         private route: ActivatedRoute,
         private toast: ToastService,
-        private projectService: ProjectService,
+        private projectService: ManagementService,
         private _location: Location,
     ) {
         this.formGroup = new FormGroup({

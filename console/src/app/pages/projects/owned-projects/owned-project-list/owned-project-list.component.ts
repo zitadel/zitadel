@@ -8,7 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { ProjectView } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -56,7 +56,7 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
 
     constructor(private router: Router,
         public translate: TranslateService,
-        private projectService: ProjectService,
+        private projectService: ManagementService,
         private toast: ToastService,
     ) { }
 

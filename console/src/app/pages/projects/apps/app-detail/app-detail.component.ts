@@ -18,8 +18,7 @@ import {
     OIDCResponseType,
     ZitadelDocs,
 } from 'src/app/proto/generated/management_pb';
-import { OrgService } from 'src/app/services/org.service';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
@@ -88,11 +87,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         public translate: TranslateService,
         private route: ActivatedRoute,
         private toast: ToastService,
-        private projectService: ProjectService,
+        private projectService: ManagementService,
         private fb: FormBuilder,
         private _location: Location,
         private dialog: MatDialog,
-        private orgService: OrgService,
+        private orgService: ManagementService,
     ) {
         this.appNameForm = this.fb.group({
             state: ['', []],

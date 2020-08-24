@@ -3,7 +3,7 @@ import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { UserMembershipView } from 'src/app/proto/generated/management_pb';
-import { MgmtUserService } from 'src/app/services/mgmt-user.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 
 export class MembershipDetailDataSource extends DataSource<UserMembershipView.AsObject> {
     public totalResult: number = 0;
@@ -13,7 +13,7 @@ export class MembershipDetailDataSource extends DataSource<UserMembershipView.As
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-    constructor(private mgmtUserService: MgmtUserService) {
+    constructor(private mgmtUserService: ManagementService) {
         super();
     }
 

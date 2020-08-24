@@ -6,7 +6,7 @@ import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
 import { ProjectGrant, ProjectRoleView } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { ProjectGrantsDataSource } from './project-grants-datasource';
@@ -35,7 +35,7 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'grantedOrgName', 'creationDate', 'changeDate', 'roleNamesList'];
 
-    constructor(private projectService: ProjectService, private toast: ToastService) { }
+    constructor(private projectService: ManagementService, private toast: ToastService) { }
 
     public ngOnInit(): void {
         this.dataSource = new ProjectGrantsDataSource(this.projectService);

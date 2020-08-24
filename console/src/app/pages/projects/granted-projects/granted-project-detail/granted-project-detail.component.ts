@@ -25,8 +25,7 @@ import {
     User,
     UserGrantSearchKey,
 } from 'src/app/proto/generated/management_pb';
-import { OrgService } from 'src/app/services/org.service';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -79,9 +78,9 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
         public translate: TranslateService,
         private route: ActivatedRoute,
         private toast: ToastService,
-        private projectService: ProjectService,
+        private projectService: ManagementService,
         private _location: Location,
-        private orgService: OrgService,
+        private orgService: ManagementService,
         private router: Router,
         private dialog: MatDialog,
     ) {

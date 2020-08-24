@@ -6,7 +6,7 @@ import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
 import { ProjectMember, ProjectType } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import {
@@ -39,7 +39,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
     public memberRoleOptions: string[] = [];
 
     constructor(
-        private projectService: ProjectService,
+        private projectService: ManagementService,
         private dialog: MatDialog,
         private toast: ToastService,
     ) {

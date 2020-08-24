@@ -8,9 +8,7 @@ import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { User, UserMembershipSearchResponse, UserMembershipView, UserView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { MgmtUserService } from 'src/app/services/mgmt-user.service';
-import { OrgService } from 'src/app/services/org.service';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { MembershipDetailDataSource } from './membership-detail-datasource';
@@ -38,12 +36,12 @@ export class MembershipDetailComponent implements AfterViewInit {
     public memberships!: UserMembershipSearchResponse.AsObject;
 
     constructor(
-        private mgmtUserService: MgmtUserService,
+        private mgmtUserService: ManagementService,
         activatedRoute: ActivatedRoute,
         private dialog: MatDialog,
         private toast: ToastService,
-        private projectService: ProjectService,
-        private orgService: OrgService,
+        private projectService: ManagementService,
+        private orgService: ManagementService,
         private adminService: AdminService,
     ) {
         activatedRoute.params.subscribe(data => {

@@ -10,7 +10,7 @@ import {
     PasswordLockoutPolicy,
 } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { OrgService } from 'src/app/services/org.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -55,7 +55,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
     constructor(
         private route: ActivatedRoute,
         private adminService: AdminService,
-        private orgService: OrgService,
+        private orgService: ManagementService,
         private router: Router,
         private toast: ToastService,
         private sessionStorage: StorageService,

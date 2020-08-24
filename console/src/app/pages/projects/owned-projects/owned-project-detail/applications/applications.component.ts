@@ -6,7 +6,7 @@ import { MatTable } from '@angular/material/table';
 import { merge, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Application } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { ProjectApplicationsDataSource } from './applications-datasource';
@@ -28,7 +28,7 @@ export class ApplicationsComponent implements AfterViewInit, OnInit {
 
     public displayedColumns: string[] = ['select', 'name'];
 
-    constructor(private projectService: ProjectService, private toast: ToastService) { }
+    constructor(private projectService: ManagementService, private toast: ToastService) { }
 
     public ngOnInit(): void {
         this.dataSource = new ProjectApplicationsDataSource(this.projectService);

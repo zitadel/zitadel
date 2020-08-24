@@ -2,7 +2,7 @@ import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { ProjectMemberView } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 
 /**
  * Data source for the ProjectMembers view. This class should
@@ -16,7 +16,7 @@ export class ProjectGrantDetailDataSource extends DataSource<ProjectMemberView.A
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-    constructor(private projectService: ProjectService) {
+    constructor(private projectService: ManagementService) {
         super();
     }
 

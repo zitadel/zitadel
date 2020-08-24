@@ -7,7 +7,7 @@ import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { ProjectGrantView, ProjectMember, ProjectType, ProjectView, User } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { CreationType, MemberCreateDialogComponent } from '../add-member-dialog/member-create-dialog.component';
@@ -36,7 +36,7 @@ export class ProjectMembersComponent {
     public displayedColumns: string[] = ['select', 'userId', 'firstname', 'lastname', 'username', 'email', 'roles'];
 
     constructor(
-        private projectService: ProjectService,
+        private projectService: ManagementService,
         private dialog: MatDialog,
         private toast: ToastService,
         private route: ActivatedRoute) {

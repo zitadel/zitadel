@@ -3,9 +3,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Org, ProjectRole } from 'src/app/proto/generated/management_pb';
-import { AuthService } from 'src/app/services/auth.service';
-import { OrgService } from 'src/app/services/org.service';
-import { ProjectService } from 'src/app/services/project.service';
+import { AuthenticationService } from 'src/app/services/authentication.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -24,11 +23,11 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
 
     private routeSubscription: Subscription = new Subscription();
     constructor(
-        private orgService: OrgService,
+        private orgService: ManagementService,
         private route: ActivatedRoute,
         private toast: ToastService,
-        private projectService: ProjectService,
-        private authService: AuthService,
+        private projectService: ManagementService,
+        private authService: AuthenticationService,
         private _location: Location,
     ) { }
 

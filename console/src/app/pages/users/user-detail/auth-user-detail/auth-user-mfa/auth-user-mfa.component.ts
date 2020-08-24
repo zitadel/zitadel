@@ -4,7 +4,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { MfaOtpResponse, MFAState, MfaType, MultiFactor } from 'src/app/proto/generated/auth_pb';
-import { AuthUserService } from 'src/app/services/auth-user.service';
+import { AuthService } from 'src/app/services/auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { DialogOtpComponent } from '../dialog-otp/dialog-otp.component';
@@ -28,7 +28,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
     public error: string = '';
     public otpAvailable: boolean = false;
-    constructor(private service: AuthUserService, private toast: ToastService, private dialog: MatDialog) { }
+    constructor(private service: AuthService, private toast: ToastService, private dialog: MatDialog) { }
 
     public ngOnInit(): void {
         this.getOTP();
@@ -48,7 +48,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
             dialogRef.afterClosed().subscribe((code) => {
                 if (code) {
-                    (this.service as AuthUserService).VerifyMfaOTP(code).then(() => {
+                    (this.service as AuthService).VerifyMfaOTP(code).then(() => {
                         // TODO: show state
                     });
                 }

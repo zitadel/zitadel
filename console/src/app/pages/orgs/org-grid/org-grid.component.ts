@@ -4,8 +4,8 @@ import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 import { Org } from 'src/app/proto/generated/auth_pb';
-import { AuthUserService } from 'src/app/services/auth-user.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -24,8 +24,8 @@ export class OrgGridComponent {
     public notPinned: Array<Org.AsObject> = [];
 
     constructor(
-        public authService: AuthService,
-        private userService: AuthUserService,
+        public authService: AuthenticationService,
+        private userService: AuthService,
         private toast: ToastService,
         private router: Router,
     ) {
