@@ -67,7 +67,7 @@ func TestAppendAddLoginPolicyEvent(t *testing.T) {
 			args: args{
 				iam:    new(Iam),
 				policy: &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true},
-				event:  &es_models.Event{},
+				event:  new(es_models.Event),
 			},
 			result: &Iam{DefaultLoginPolicy: &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true}},
 		},
