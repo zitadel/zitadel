@@ -5,17 +5,17 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 )
 
-type IdpConfig struct {
+type IDPConfig struct {
 	es_models.ObjectRoot
 	IDPConfigID string
 	Type        IdpConfigType
 	Name        string
 	LogoSrc     []byte
-	State       IdpConfigState
-	OIDCConfig  *OidcIdpConfig
+	State       IDPConfigState
+	OIDCConfig  *OIDCIDPConfig
 }
 
-type OidcIdpConfig struct {
+type OIDCIDPConfig struct {
 	es_models.ObjectRoot
 	IDPConfigID        string
 	ClientID           string
@@ -32,19 +32,19 @@ const (
 	IDPConfigTypeSAML
 )
 
-type IdpConfigState int32
+type IDPConfigState int32
 
 const (
-	IdpConfigStateActive IdpConfigState = iota
-	IdpConfigStateInactive
-	IdpConfigStateRemoved
+	IDPConfigStateActive IDPConfigState = iota
+	IDPConfigStateInactive
+	IDPConfigStateRemoved
 )
 
-func NewIdpConfig(iamID, idpID string) *IdpConfig {
-	return &IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: iamID}, IDPConfigID: idpID}
+func NewIDPConfig(iamID, idpID string) *IDPConfig {
+	return &IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: iamID}, IDPConfigID: idpID}
 }
 
-func (idp *IdpConfig) IsValid(includeConfig bool) bool {
+func (idp *IDPConfig) IsValid(includeConfig bool) bool {
 	if idp.Name == "" || idp.AggregateID == "" {
 		return false
 	}
@@ -57,14 +57,14 @@ func (idp *IdpConfig) IsValid(includeConfig bool) bool {
 	return true
 }
 
-func (oi *OidcIdpConfig) IsValid(withSecret bool) bool {
+func (oi *OIDCIDPConfig) IsValid(withSecret bool) bool {
 	if withSecret {
 		return oi.ClientID != "" && oi.Issuer != "" && oi.ClientSecretString != ""
 	}
 	return oi.ClientID != "" && oi.Issuer != ""
 }
 
-func (oi *OidcIdpConfig) CryptSecret(crypt crypto.Crypto) error {
+func (oi *OIDCIDPConfig) CryptSecret(crypt crypto.Crypto) error {
 	cryptedSecret, err := crypto.Crypt([]byte(oi.ClientSecretString), crypt)
 	if err != nil {
 		return err

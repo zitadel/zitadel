@@ -256,7 +256,7 @@ func TestLoginPolicyIdpProviderAddedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Org
-		new        *iam_es_model.IdpProvider
+		new        *iam_es_model.IDPProvider
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -277,16 +277,16 @@ func TestLoginPolicyIdpProviderAddedAggregate(t *testing.T) {
 				existing: &model.Org{
 					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 				},
-				new: &iam_es_model.IdpProvider{
+				new: &iam_es_model.IDPProvider{
 					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
-					Type:        int32(iam_model.IdpProviderTypeSystem),
-					IdpConfigID: "IdpConfigID",
+					Type:        int32(iam_model.IDPProviderTypeSystem),
+					IDPConfigID: "IDPConfigID",
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.LoginPolicyIdpProviderAdded},
+				eventTypes: []models.EventType{model.LoginPolicyIDPProviderAdded},
 			},
 		},
 		{
@@ -317,7 +317,7 @@ func TestLoginPolicyIdpProviderAddedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LoginPolicyIdpProviderAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new, "IAMID")(tt.args.ctx)
+			agg, err := LoginPolicyIDPProviderAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new, "IAMID")(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -342,7 +342,7 @@ func TestLoginPolicyIdpProviderRemovedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Org
-		new        *iam_es_model.IdpProviderID
+		new        *iam_es_model.IDPProviderID
 		cascade    bool
 		aggCreator *models.AggregateCreator
 	}
@@ -365,18 +365,18 @@ func TestLoginPolicyIdpProviderRemovedAggregate(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					LoginPolicy: &iam_es_model.LoginPolicy{
 						AllowUsernamePassword: true,
-						IdpProviders: []*iam_es_model.IdpProvider{
-							{IdpConfigID: "IdpConfigID", Type: int32(iam_model.IdpProviderTypeSystem)},
+						IDPProviders: []*iam_es_model.IDPProvider{
+							{IDPConfigID: "IDPConfigID", Type: int32(iam_model.IDPProviderTypeSystem)},
 						},
 					}},
-				new: &iam_es_model.IdpProviderID{
-					IdpConfigID: "IdpConfigID",
+				new: &iam_es_model.IDPProviderID{
+					IDPConfigID: "IDPConfigID",
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.LoginPolicyIdpProviderRemoved},
+				eventTypes: []models.EventType{model.LoginPolicyIDPProviderRemoved},
 			},
 		},
 		{
@@ -387,19 +387,19 @@ func TestLoginPolicyIdpProviderRemovedAggregate(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					LoginPolicy: &iam_es_model.LoginPolicy{
 						AllowUsernamePassword: true,
-						IdpProviders: []*iam_es_model.IdpProvider{
-							{IdpConfigID: "IdpConfigID", Type: int32(iam_model.IdpProviderTypeSystem)},
+						IDPProviders: []*iam_es_model.IDPProvider{
+							{IDPConfigID: "IDPConfigID", Type: int32(iam_model.IDPProviderTypeSystem)},
 						},
 					}},
-				new: &iam_es_model.IdpProviderID{
-					IdpConfigID: "IdpConfigID",
+				new: &iam_es_model.IDPProviderID{
+					IDPConfigID: "IDPConfigID",
 				},
 				cascade:    true,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.LoginPolicyIdpProviderCascadeRemoved},
+				eventTypes: []models.EventType{model.LoginPolicyIDPProviderCascadeRemoved},
 			},
 		},
 		{
@@ -430,7 +430,7 @@ func TestLoginPolicyIdpProviderRemovedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LoginPolicyIdpProviderRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.new, tt.args.cascade)
+			agg, err := LoginPolicyIDPProviderRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.new, tt.args.cascade)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

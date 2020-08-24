@@ -6,59 +6,59 @@ import (
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
-type IdpConfigSearchRequest iam_model.IdpConfigSearchRequest
-type IdpConfigSearchQuery iam_model.IdpConfigSearchQuery
-type IdpConfigSearchKey iam_model.IdpConfigSearchKey
+type IDPConfigSearchRequest iam_model.IDPConfigSearchRequest
+type IDPConfigSearchQuery iam_model.IDPConfigSearchQuery
+type IDPConfigSearchKey iam_model.IDPConfigSearchKey
 
-func (req IdpConfigSearchRequest) GetLimit() uint64 {
+func (req IDPConfigSearchRequest) GetLimit() uint64 {
 	return req.Limit
 }
 
-func (req IdpConfigSearchRequest) GetOffset() uint64 {
+func (req IDPConfigSearchRequest) GetOffset() uint64 {
 	return req.Offset
 }
 
-func (req IdpConfigSearchRequest) GetSortingColumn() repository.ColumnKey {
-	if req.SortingColumn == iam_model.IdpConfigSearchKeyUnspecified {
+func (req IDPConfigSearchRequest) GetSortingColumn() repository.ColumnKey {
+	if req.SortingColumn == iam_model.IDPConfigSearchKeyUnspecified {
 		return nil
 	}
-	return IdpConfigSearchKey(req.SortingColumn)
+	return IDPConfigSearchKey(req.SortingColumn)
 }
 
-func (req IdpConfigSearchRequest) GetAsc() bool {
+func (req IDPConfigSearchRequest) GetAsc() bool {
 	return req.Asc
 }
 
-func (req IdpConfigSearchRequest) GetQueries() []repository.SearchQuery {
+func (req IDPConfigSearchRequest) GetQueries() []repository.SearchQuery {
 	result := make([]repository.SearchQuery, len(req.Queries))
 	for i, q := range req.Queries {
-		result[i] = IdpConfigSearchQuery{Key: q.Key, Value: q.Value, Method: q.Method}
+		result[i] = IDPConfigSearchQuery{Key: q.Key, Value: q.Value, Method: q.Method}
 	}
 	return result
 }
 
-func (req IdpConfigSearchQuery) GetKey() repository.ColumnKey {
-	return IdpConfigSearchKey(req.Key)
+func (req IDPConfigSearchQuery) GetKey() repository.ColumnKey {
+	return IDPConfigSearchKey(req.Key)
 }
 
-func (req IdpConfigSearchQuery) GetMethod() global_model.SearchMethod {
+func (req IDPConfigSearchQuery) GetMethod() global_model.SearchMethod {
 	return req.Method
 }
 
-func (req IdpConfigSearchQuery) GetValue() interface{} {
+func (req IDPConfigSearchQuery) GetValue() interface{} {
 	return req.Value
 }
 
-func (key IdpConfigSearchKey) ToColumnName() string {
-	switch iam_model.IdpConfigSearchKey(key) {
-	case iam_model.IdpConfigSearchKeyAggregateID:
-		return IdpConfigKeyAggregateID
-	case iam_model.IdpConfigSearchKeyIdpConfigID:
-		return IdpConfigKeyIdpConfigID
-	case iam_model.IdpConfigSearchKeyName:
-		return IdpConfigKeyName
-	case iam_model.IdpConfigSearchKeyIdpProviderType:
-		return IdpConfigKeyProviderType
+func (key IDPConfigSearchKey) ToColumnName() string {
+	switch iam_model.IDPConfigSearchKey(key) {
+	case iam_model.IDPConfigSearchKeyAggregateID:
+		return IDPConfigKeyAggregateID
+	case iam_model.IDPConfigSearchKeyIdpConfigID:
+		return IDPConfigKeyIdpConfigID
+	case iam_model.IDPConfigSearchKeyName:
+		return IDPConfigKeyName
+	case iam_model.IDPConfigSearchKeyIdpProviderType:
+		return IDPConfigKeyProviderType
 	default:
 		return ""
 	}

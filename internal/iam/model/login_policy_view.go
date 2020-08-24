@@ -9,7 +9,7 @@ type LoginPolicyView struct {
 	AggregateID           string
 	AllowUsernamePassword bool
 	AllowRegister         bool
-	AllowExternalIdp      bool
+	AllowExternalIDP      bool
 	Default               bool
 
 	CreationDate time.Time

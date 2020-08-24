@@ -36,7 +36,7 @@ func (s *Server) RemoveLoginPolicy(ctx context.Context, _ *empty.Empty) (*empty.
 }
 
 func (s *Server) GetLoginPolicyIdpProviders(ctx context.Context, request *management.IdpProviderSearchRequest) (*management.IdpProviderSearchResponse, error) {
-	result, err := s.org.SearchIdpProviders(ctx, idpProviderSearchRequestToModel(request))
+	result, err := s.org.SearchIDPProviders(ctx, idpProviderSearchRequestToModel(request))
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (s *Server) GetLoginPolicyIdpProviders(ctx context.Context, request *manage
 }
 
 func (s *Server) AddIdpProviderToLoginPolicy(ctx context.Context, provider *management.IdpProviderAdd) (*management.IdpProvider, error) {
-	result, err := s.org.AddIdpProviderToLoginPolicy(ctx, idpProviderAddToModel(provider))
+	result, err := s.org.AddIDPProviderToLoginPolicy(ctx, idpProviderAddToModel(provider))
 	if err != nil {
 		return nil, err
 	}
@@ -52,6 +52,6 @@ func (s *Server) AddIdpProviderToLoginPolicy(ctx context.Context, provider *mana
 }
 
 func (s *Server) RemoveIdpProviderFromLoginPolicy(ctx context.Context, provider *management.IdpProviderID) (*empty.Empty, error) {
-	err := s.org.RemoveIdpProviderFromLoginPolicy(ctx, idpProviderToModel(provider))
+	err := s.org.RemoveIDPProviderFromLoginPolicy(ctx, idpProviderToModel(provider))
 	return &empty.Empty{}, err
 }

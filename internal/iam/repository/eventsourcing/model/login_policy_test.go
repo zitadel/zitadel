@@ -144,7 +144,7 @@ func TestAppendChangeLoginPolicyEvent(t *testing.T) {
 func TestAppendAddIdpToPolicyEvent(t *testing.T) {
 	type args struct {
 		iam      *Iam
-		provider *IdpProvider
+		provider *IDPProvider
 		event    *es_models.Event
 	}
 	tests := []struct {
@@ -156,15 +156,15 @@ func TestAppendAddIdpToPolicyEvent(t *testing.T) {
 			name: "append add idp to login policy event",
 			args: args{
 				iam:      &Iam{DefaultLoginPolicy: &LoginPolicy{AllowExternalIdp: true, AllowRegister: true, AllowUsernamePassword: true}},
-				provider: &IdpProvider{Type: int32(model.IdpProviderTypeSystem), IdpConfigID: "IdpConfigID"},
+				provider: &IDPProvider{Type: int32(model.IDPProviderTypeSystem), IDPConfigID: "IDPConfigID"},
 				event:    &es_models.Event{},
 			},
 			result: &Iam{DefaultLoginPolicy: &LoginPolicy{
 				AllowExternalIdp:      true,
 				AllowRegister:         true,
 				AllowUsernamePassword: true,
-				IdpProviders: []*IdpProvider{
-					{IdpConfigID: "IdpConfigID", Type: int32(model.IdpProviderTypeSystem)},
+				IDPProviders: []*IDPProvider{
+					{IDPConfigID: "IDPConfigID", Type: int32(model.IDPProviderTypeSystem)},
 				}}},
 		},
 	}
@@ -174,7 +174,7 @@ func TestAppendAddIdpToPolicyEvent(t *testing.T) {
 				data, _ := json.Marshal(tt.args.provider)
 				tt.args.event.Data = data
 			}
-			tt.args.iam.appendAddIdpProviderToLoginPolicyEvent(tt.args.event)
+			tt.args.iam.appendAddIDPProviderToLoginPolicyEvent(tt.args.event)
 			if tt.result.DefaultLoginPolicy.AllowUsernamePassword != tt.args.iam.DefaultLoginPolicy.AllowUsernamePassword {
 				t.Errorf("got wrong result AllowUsernamePassword: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.AllowUsernamePassword, tt.args.iam.DefaultLoginPolicy.AllowUsernamePassword)
 			}
@@ -182,16 +182,16 @@ func TestAppendAddIdpToPolicyEvent(t *testing.T) {
 				t.Errorf("got wrong result AllowRegister: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.AllowRegister, tt.args.iam.DefaultLoginPolicy.AllowRegister)
 			}
 			if tt.result.DefaultLoginPolicy.AllowExternalIdp != tt.args.iam.DefaultLoginPolicy.AllowExternalIdp {
-				t.Errorf("got wrong result AllowExternalIdp: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.AllowExternalIdp, tt.args.iam.DefaultLoginPolicy.AllowExternalIdp)
+				t.Errorf("got wrong result AllowExternalIDP: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.AllowExternalIdp, tt.args.iam.DefaultLoginPolicy.AllowExternalIdp)
 			}
-			if len(tt.result.DefaultLoginPolicy.IdpProviders) != len(tt.args.iam.DefaultLoginPolicy.IdpProviders) {
-				t.Errorf("got wrong idp provider len: expected: %v, actual: %v ", len(tt.result.DefaultLoginPolicy.IdpProviders), len(tt.args.iam.DefaultLoginPolicy.IdpProviders))
+			if len(tt.result.DefaultLoginPolicy.IDPProviders) != len(tt.args.iam.DefaultLoginPolicy.IDPProviders) {
+				t.Errorf("got wrong idp provider len: expected: %v, actual: %v ", len(tt.result.DefaultLoginPolicy.IDPProviders), len(tt.args.iam.DefaultLoginPolicy.IDPProviders))
 			}
-			if tt.result.DefaultLoginPolicy.IdpProviders[0].Type != tt.args.provider.Type {
-				t.Errorf("got wrong idp provider type: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.IdpProviders[0].Type, tt.args.provider.Type)
+			if tt.result.DefaultLoginPolicy.IDPProviders[0].Type != tt.args.provider.Type {
+				t.Errorf("got wrong idp provider type: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.IDPProviders[0].Type, tt.args.provider.Type)
 			}
-			if tt.result.DefaultLoginPolicy.IdpProviders[0].IdpConfigID != tt.args.provider.IdpConfigID {
-				t.Errorf("got wrong idp provider idpconfigid: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.IdpProviders[0].IdpConfigID, tt.args.provider.IdpConfigID)
+			if tt.result.DefaultLoginPolicy.IDPProviders[0].IDPConfigID != tt.args.provider.IDPConfigID {
+				t.Errorf("got wrong idp provider idpconfigid: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.IDPProviders[0].IDPConfigID, tt.args.provider.IDPConfigID)
 			}
 		})
 	}
@@ -200,7 +200,7 @@ func TestAppendAddIdpToPolicyEvent(t *testing.T) {
 func TestRemoveAddIdpToPolicyEvent(t *testing.T) {
 	type args struct {
 		iam      *Iam
-		provider *IdpProvider
+		provider *IDPProvider
 		event    *es_models.Event
 	}
 	tests := []struct {
@@ -216,17 +216,17 @@ func TestRemoveAddIdpToPolicyEvent(t *testing.T) {
 						AllowExternalIdp:      true,
 						AllowRegister:         true,
 						AllowUsernamePassword: true,
-						IdpProviders: []*IdpProvider{
-							{IdpConfigID: "IdpConfigID", Type: int32(model.IdpProviderTypeSystem)},
+						IDPProviders: []*IDPProvider{
+							{IDPConfigID: "IDPConfigID", Type: int32(model.IDPProviderTypeSystem)},
 						}}},
-				provider: &IdpProvider{Type: int32(model.IdpProviderTypeSystem), IdpConfigID: "IdpConfigID"},
+				provider: &IDPProvider{Type: int32(model.IDPProviderTypeSystem), IDPConfigID: "IDPConfigID"},
 				event:    &es_models.Event{},
 			},
 			result: &Iam{DefaultLoginPolicy: &LoginPolicy{
 				AllowExternalIdp:      true,
 				AllowRegister:         true,
 				AllowUsernamePassword: true,
-				IdpProviders:          []*IdpProvider{}}},
+				IDPProviders:          []*IDPProvider{}}},
 		},
 	}
 	for _, tt := range tests {
@@ -235,7 +235,7 @@ func TestRemoveAddIdpToPolicyEvent(t *testing.T) {
 				data, _ := json.Marshal(tt.args.provider)
 				tt.args.event.Data = data
 			}
-			tt.args.iam.appendRemoveIdpProviderFromLoginPolicyEvent(tt.args.event)
+			tt.args.iam.appendRemoveIDPProviderFromLoginPolicyEvent(tt.args.event)
 			if tt.result.DefaultLoginPolicy.AllowUsernamePassword != tt.args.iam.DefaultLoginPolicy.AllowUsernamePassword {
 				t.Errorf("got wrong result AllowUsernamePassword: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.AllowUsernamePassword, tt.args.iam.DefaultLoginPolicy.AllowUsernamePassword)
 			}
@@ -243,10 +243,10 @@ func TestRemoveAddIdpToPolicyEvent(t *testing.T) {
 				t.Errorf("got wrong result AllowRegister: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.AllowRegister, tt.args.iam.DefaultLoginPolicy.AllowRegister)
 			}
 			if tt.result.DefaultLoginPolicy.AllowExternalIdp != tt.args.iam.DefaultLoginPolicy.AllowExternalIdp {
-				t.Errorf("got wrong result AllowExternalIdp: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.AllowExternalIdp, tt.args.iam.DefaultLoginPolicy.AllowExternalIdp)
+				t.Errorf("got wrong result AllowExternalIDP: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.AllowExternalIdp, tt.args.iam.DefaultLoginPolicy.AllowExternalIdp)
 			}
-			if len(tt.result.DefaultLoginPolicy.IdpProviders) != len(tt.args.iam.DefaultLoginPolicy.IdpProviders) {
-				t.Errorf("got wrong idp provider len: expected: %v, actual: %v ", len(tt.result.DefaultLoginPolicy.IdpProviders), len(tt.args.iam.DefaultLoginPolicy.IdpProviders))
+			if len(tt.result.DefaultLoginPolicy.IDPProviders) != len(tt.args.iam.DefaultLoginPolicy.IDPProviders) {
+				t.Errorf("got wrong idp provider len: expected: %v, actual: %v ", len(tt.result.DefaultLoginPolicy.IDPProviders), len(tt.args.iam.DefaultLoginPolicy.IDPProviders))
 			}
 		})
 	}

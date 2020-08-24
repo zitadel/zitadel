@@ -950,7 +950,7 @@ service ManagementService {
 
   rpc CreateOIDCApplication(OIDCApplicationCreate) returns (Application) {
     option (google.api.http) = {
-      post: "/projects/{project_id}/oidcapplications"
+      post: "/projects/{project_id}/applications/oidc"
       body: "*"
     };
 
@@ -1260,7 +1260,7 @@ service ManagementService {
 
     rpc CreateOidcIdp(OidcIdpConfigCreate) returns (Idp) {
         option (google.api.http) = {
-            post: "/orgs/me/oidcidps"
+            post: "/orgs/me/idps/oidc"
             body: "*"
         };
 

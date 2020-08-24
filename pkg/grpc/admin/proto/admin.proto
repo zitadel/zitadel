@@ -247,7 +247,7 @@ service AdminService {
 
     rpc CreateOidcIdp(OidcIdpConfigCreate) returns (Idp) {
         option (google.api.http) = {
-            post: "/oidcidps"
+            post: "/idps/oidc"
             body: "*"
         };
 

@@ -78,41 +78,41 @@ func (repo *IamRepository) GetIamMemberRoles() []string {
 	return roles
 }
 
-func (repo *IamRepository) IdpConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IdpConfigView, error) {
-	idp, err := repo.View.IdpConfigByID(idpConfigID)
+func (repo *IamRepository) IDPConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IDPConfigView, error) {
+	idp, err := repo.View.IDPConfigByID(idpConfigID)
 	if err != nil {
 		return nil, err
 	}
 	return iam_es_model.IdpConfigViewToModel(idp), nil
 }
-func (repo *IamRepository) AddOidcIdpConfig(ctx context.Context, idp *iam_model.IdpConfig) (*iam_model.IdpConfig, error) {
+func (repo *IamRepository) AddOIDCIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
 	idp.AggregateID = repo.SystemDefaults.IamID
-	return repo.IamEventstore.AddIdpConfiguration(ctx, idp)
+	return repo.IamEventstore.AddIDPConfig(ctx, idp)
 }
 
-func (repo *IamRepository) ChangeIdpConfig(ctx context.Context, idp *iam_model.IdpConfig) (*iam_model.IdpConfig, error) {
+func (repo *IamRepository) ChangeIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
 	idp.AggregateID = repo.SystemDefaults.IamID
-	return repo.IamEventstore.ChangeIdpConfiguration(ctx, idp)
+	return repo.IamEventstore.ChangeIDPConfig(ctx, idp)
 }
 
-func (repo *IamRepository) DeactivateIdpConfig(ctx context.Context, idpConfigID string) (*iam_model.IdpConfig, error) {
-	return repo.IamEventstore.DeactivateIdpConfiguration(ctx, repo.SystemDefaults.IamID, idpConfigID)
+func (repo *IamRepository) DeactivateIDPConfig(ctx context.Context, idpConfigID string) (*iam_model.IDPConfig, error) {
+	return repo.IamEventstore.DeactivateIDPConfig(ctx, repo.SystemDefaults.IamID, idpConfigID)
 }
 
-func (repo *IamRepository) ReactivateIdpConfig(ctx context.Context, idpConfigID string) (*iam_model.IdpConfig, error) {
-	return repo.IamEventstore.ReactivateIdpConfiguration(ctx, repo.SystemDefaults.IamID, idpConfigID)
+func (repo *IamRepository) ReactivateIDPConfig(ctx context.Context, idpConfigID string) (*iam_model.IDPConfig, error) {
+	return repo.IamEventstore.ReactivateIDPConfig(ctx, repo.SystemDefaults.IamID, idpConfigID)
 }
 
-func (repo *IamRepository) RemoveIdpConfig(ctx context.Context, idpConfigID string) error {
+func (repo *IamRepository) RemoveIDPConfig(ctx context.Context, idpConfigID string) error {
 	aggregates := make([]*es_models.Aggregate, 0)
-	idp := iam_model.NewIdpConfig(repo.SystemDefaults.IamID, idpConfigID)
-	_, agg, err := repo.IamEventstore.PrepareRemoveIdpConfiguration(ctx, idp)
+	idp := iam_model.NewIDPConfig(repo.SystemDefaults.IamID, idpConfigID)
+	_, agg, err := repo.IamEventstore.PrepareRemoveIDPConfig(ctx, idp)
 	if err != nil {
 		return err
 	}
 	aggregates = append(aggregates, agg)
 
-	providers, err := repo.View.IdpProvidersByIdpConfigID(idpConfigID)
+	providers, err := repo.View.IDPProvidersByIdpConfigID(idpConfigID)
 	if err != nil {
 		return err
 	}
@@ -120,9 +120,9 @@ func (repo *IamRepository) RemoveIdpConfig(ctx context.Context, idpConfigID stri
 		if p.AggregateID == repo.SystemDefaults.IamID {
 			continue
 		}
-		provider := &iam_model.IdpProvider{ObjectRoot: es_models.ObjectRoot{AggregateID: p.AggregateID}, IdpConfigID: p.IdpConfigID}
+		provider := &iam_model.IDPProvider{ObjectRoot: es_models.ObjectRoot{AggregateID: p.AggregateID}, IdpConfigID: p.IDPConfigID}
 		providerAgg := new(es_models.Aggregate)
-		_, providerAgg, err = repo.OrgEvents.PrepareRemoveIdpProviderFromLoginPolicy(ctx, provider, true)
+		_, providerAgg, err = repo.OrgEvents.PrepareRemoveIDPProviderFromLoginPolicy(ctx, provider, true)
 		if err != nil {
 			return err
 		}
@@ -132,20 +132,20 @@ func (repo *IamRepository) RemoveIdpConfig(ctx context.Context, idpConfigID stri
 	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
 }
 
-func (repo *IamRepository) ChangeOidcIdpConfig(ctx context.Context, oidcConfig *iam_model.OidcIdpConfig) (*iam_model.OidcIdpConfig, error) {
+func (repo *IamRepository) ChangeOidcIDPConfig(ctx context.Context, oidcConfig *iam_model.OIDCIDPConfig) (*iam_model.OIDCIDPConfig, error) {
 	oidcConfig.AggregateID = repo.SystemDefaults.IamID
-	return repo.IamEventstore.ChangeIdpOidcConfiguration(ctx, oidcConfig)
+	return repo.IamEventstore.ChangeIDPOIDCConfig(ctx, oidcConfig)
 }
 
-func (repo *IamRepository) SearchIdpConfigs(ctx context.Context, request *iam_model.IdpConfigSearchRequest) (*iam_model.IdpConfigSearchResponse, error) {
+func (repo *IamRepository) SearchIdpConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, err := repo.View.GetLatestIdpConfigSequence()
+	sequence, err := repo.View.GetLatestIDPConfigSequence()
 	logging.Log("EVENT-Dk8si").OnError(err).Warn("could not read latest idp config sequence")
-	idps, count, err := repo.View.SearchIdpConfigs(request)
+	idps, count, err := repo.View.SearchIDPConfigs(request)
 	if err != nil {
 		return nil, err
 	}
-	result := &iam_model.IdpConfigSearchResponse{
+	result := &iam_model.IDPConfigSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
@@ -176,20 +176,20 @@ func (repo *IamRepository) ChangeDefaultLoginPolicy(ctx context.Context, policy 
 	return repo.IamEventstore.ChangeLoginPolicy(ctx, policy)
 }
 
-func (repo *IamRepository) SearchDefaultIdpProviders(ctx context.Context, request *iam_model.IdpProviderSearchRequest) (*iam_model.IdpProviderSearchResponse, error) {
+func (repo *IamRepository) SearchDefaultIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	request.AppendAggregateIDQuery(repo.SystemDefaults.IamID)
-	sequence, err := repo.View.GetLatestIdpProviderSequence()
+	sequence, err := repo.View.GetLatestIDPProviderSequence()
 	logging.Log("EVENT-Tuiks").OnError(err).Warn("could not read latest iam sequence")
-	providers, count, err := repo.View.SearchIdpProviders(request)
+	providers, count, err := repo.View.SearchIDPProviders(request)
 	if err != nil {
 		return nil, err
 	}
-	result := &iam_model.IdpProviderSearchResponse{
+	result := &iam_model.IDPProviderSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
-		Result:      iam_es_model.IdpProviderViewsToModel(providers),
+		Result:      iam_es_model.IDPProviderViewsToModel(providers),
 	}
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
@@ -198,12 +198,12 @@ func (repo *IamRepository) SearchDefaultIdpProviders(ctx context.Context, reques
 	return result, nil
 }
 
-func (repo *IamRepository) AddIdpProviderToLoginPolicy(ctx context.Context, provider *iam_model.IdpProvider) (*iam_model.IdpProvider, error) {
+func (repo *IamRepository) AddIDPProviderToLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) (*iam_model.IDPProvider, error) {
 	provider.AggregateID = repo.SystemDefaults.IamID
-	return repo.IamEventstore.AddIdpProviderToLoginPolicy(ctx, provider)
+	return repo.IamEventstore.AddIDPProviderToLoginPolicy(ctx, provider)
 }
 
-func (repo *IamRepository) RemoveIdpProviderFromIdpProvider(ctx context.Context, provider *iam_model.IdpProvider) error {
+func (repo *IamRepository) RemoveIdpProviderFromIdpProvider(ctx context.Context, provider *iam_model.IDPProvider) error {
 	provider.AggregateID = repo.SystemDefaults.IamID
-	return repo.IamEventstore.RemoveIdpProviderFromLoginPolicy(ctx, provider)
+	return repo.IamEventstore.RemoveIDPProviderFromLoginPolicy(ctx, provider)
 }

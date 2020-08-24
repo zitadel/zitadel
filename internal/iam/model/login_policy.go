@@ -12,12 +12,12 @@ type LoginPolicy struct {
 	AllowUsernamePassword bool
 	AllowRegister         bool
 	AllowExternalIdp      bool
-	IdpProviders          []*IdpProvider
+	IDPProviders          []*IDPProvider
 }
 
-type IdpProvider struct {
+type IDPProvider struct {
 	models.ObjectRoot
-	Type        IdpProviderType
+	Type        IDPProviderType
 	IdpConfigID string
 }
 
@@ -28,23 +28,23 @@ const (
 	PolicyStateRemoved
 )
 
-type IdpProviderType int32
+type IDPProviderType int32
 
 const (
-	IdpProviderTypeSystem IdpProviderType = iota
-	IdpProviderTypeOrg
+	IDPProviderTypeSystem IDPProviderType = iota
+	IDPProviderTypeOrg
 )
 
 func (p *LoginPolicy) IsValid() bool {
 	return p.ObjectRoot.AggregateID != ""
 }
 
-func (p *IdpProvider) IsValid() bool {
+func (p *IDPProvider) IsValid() bool {
 	return p.ObjectRoot.AggregateID != "" && p.IdpConfigID != ""
 }
 
-func (p *LoginPolicy) GetIdpProvider(id string) (int, *IdpProvider) {
-	for i, m := range p.IdpProviders {
+func (p *LoginPolicy) GetIdpProvider(id string) (int, *IDPProvider) {
+	for i, m := range p.IDPProviders {
 		if m.IdpConfigID == id {
 			return i, m
 		}

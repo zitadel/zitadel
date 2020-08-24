@@ -115,6 +115,32 @@
         ]
       }
     },
+    "/idps/oidc": {
+      "post": {
+        "operationId": "CreateOidcIdp",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Idp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1OidcIdpConfigCreate"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/idps/{idp_id}/oidcconfig": {
       "put": {
         "operationId": "UpdateOidcIdpConfig",
@@ -401,32 +427,6 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/v1ChangeIamMemberRequest"
-            }
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
-    "/oidcidps": {
-      "post": {
-        "operationId": "CreateOidcIdp",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1Idp"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1OidcIdpConfigCreate"
             }
           }
         ],

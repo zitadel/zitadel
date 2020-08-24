@@ -24,19 +24,19 @@ func loginPolicyFromModel(policy *iam_model.LoginPolicy) *admin.DefaultLoginPoli
 func loginPolicyViewFromModel(policy *iam_model.LoginPolicyView) *admin.DefaultLoginPolicyView {
 	return &admin.DefaultLoginPolicyView{
 		AllowUsernamePassword: policy.AllowUsernamePassword,
-		AllowExternalIdp:      policy.AllowExternalIdp,
+		AllowExternalIdp:      policy.AllowExternalIDP,
 		AllowRegister:         policy.AllowRegister,
 	}
 }
 
-func idpProviderSearchRequestToModel(request *admin.IdpProviderSearchRequest) *iam_model.IdpProviderSearchRequest {
-	return &iam_model.IdpProviderSearchRequest{
+func idpProviderSearchRequestToModel(request *admin.IdpProviderSearchRequest) *iam_model.IDPProviderSearchRequest {
+	return &iam_model.IDPProviderSearchRequest{
 		Limit:  request.Limit,
 		Offset: request.Offset,
 	}
 }
 
-func idpProviderSearchResponseFromModel(response *iam_model.IdpProviderSearchResponse) *admin.IdpProviderSearchResponse {
+func idpProviderSearchResponseFromModel(response *iam_model.IDPProviderSearchResponse) *admin.IdpProviderSearchResponse {
 	return &admin.IdpProviderSearchResponse{
 		Limit:       response.Limit,
 		Offset:      response.Offset,
@@ -45,20 +45,20 @@ func idpProviderSearchResponseFromModel(response *iam_model.IdpProviderSearchRes
 	}
 }
 
-func idpProviderToModel(provider *admin.IdpProviderID) *iam_model.IdpProvider {
-	return &iam_model.IdpProvider{
+func idpProviderToModel(provider *admin.IdpProviderID) *iam_model.IDPProvider {
+	return &iam_model.IDPProvider{
 		IdpConfigID: provider.IdpConfigId,
-		Type:        iam_model.IdpProviderTypeSystem,
+		Type:        iam_model.IDPProviderTypeSystem,
 	}
 }
 
-func idpProviderFromModel(provider *iam_model.IdpProvider) *admin.IdpProviderID {
+func idpProviderFromModel(provider *iam_model.IDPProvider) *admin.IdpProviderID {
 	return &admin.IdpProviderID{
 		IdpConfigId: provider.IdpConfigID,
 	}
 }
 
-func idpProviderViewsFromModel(providers []*iam_model.IdpProviderView) []*admin.IdpProviderView {
+func idpProviderViewsFromModel(providers []*iam_model.IDPProviderView) []*admin.IdpProviderView {
 	converted := make([]*admin.IdpProviderView, len(providers))
 	for i, provider := range providers {
 		converted[i] = idpProviderViewFromModel(provider)
@@ -67,11 +67,11 @@ func idpProviderViewsFromModel(providers []*iam_model.IdpProviderView) []*admin.
 	return converted
 }
 
-func idpProviderViewFromModel(provider *iam_model.IdpProviderView) *admin.IdpProviderView {
+func idpProviderViewFromModel(provider *iam_model.IDPProviderView) *admin.IdpProviderView {
 	return &admin.IdpProviderView{
-		IdpConfigId: provider.IdpConfigID,
+		IdpConfigId: provider.IDPConfigID,
 		Name:        provider.Name,
-		Type:        idpConfigTypeToModel(provider.IdpConfigType),
+		Type:        idpConfigTypeToModel(provider.IDPConfigType),
 	}
 }
 

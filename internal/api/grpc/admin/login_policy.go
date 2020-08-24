@@ -23,7 +23,7 @@ func (s *Server) UpdateDefaultLoginPolicy(ctx context.Context, policy *admin.Def
 }
 
 func (s *Server) GetDefaultLoginPolicyIdpProviders(ctx context.Context, request *admin.IdpProviderSearchRequest) (*admin.IdpProviderSearchResponse, error) {
-	result, err := s.iam.SearchDefaultIdpProviders(ctx, idpProviderSearchRequestToModel(request))
+	result, err := s.iam.SearchDefaultIDPProviders(ctx, idpProviderSearchRequestToModel(request))
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func (s *Server) GetDefaultLoginPolicyIdpProviders(ctx context.Context, request 
 }
 
 func (s *Server) AddIdpProviderToDefaultLoginPolicy(ctx context.Context, provider *admin.IdpProviderID) (*admin.IdpProviderID, error) {
-	result, err := s.iam.AddIdpProviderToLoginPolicy(ctx, idpProviderToModel(provider))
+	result, err := s.iam.AddIDPProviderToLoginPolicy(ctx, idpProviderToModel(provider))
 	if err != nil {
 		return nil, err
 	}
@@ -39,6 +39,6 @@ func (s *Server) AddIdpProviderToDefaultLoginPolicy(ctx context.Context, provide
 }
 
 func (s *Server) RemoveIdpProviderFromDefaultLoginPolicy(ctx context.Context, provider *admin.IdpProviderID) (*empty.Empty, error) {
-	err := s.iam.RemoveIdpProviderFromLoginPolicy(ctx, idpProviderToModel(provider))
+	err := s.iam.RemoveIDPProviderFromLoginPolicy(ctx, idpProviderToModel(provider))
 	return &empty.Empty{}, err
 }

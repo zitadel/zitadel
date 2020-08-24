@@ -24,13 +24,13 @@ type Org struct {
 	Members      []*OrgMember              `json:"-"`
 	OrgIamPolicy *OrgIamPolicy             `json:"-"`
 	LoginPolicy  *iam_es_model.LoginPolicy `json:"-"`
-	IDPs         []*iam_es_model.IdpConfig `json:"-"`
+	IDPs         []*iam_es_model.IDPConfig `json:"-"`
 }
 
 func OrgFromModel(org *org_model.Org) *Org {
 	members := OrgMembersFromModel(org.Members)
 	domains := OrgDomainsFromModel(org.Domains)
-	idps := iam_es_model.IdpConfigsFromModel(org.IDPs)
+	idps := iam_es_model.IDPConfigsFromModel(org.IDPs)
 	converted := &Org{
 		ObjectRoot: org.ObjectRoot,
 		Name:       org.Name,
@@ -55,7 +55,7 @@ func OrgToModel(org *Org) *org_model.Org {
 		State:      org_model.OrgState(org.State),
 		Domains:    OrgDomainsToModel(org.Domains),
 		Members:    OrgMembersToModel(org.Members),
-		IDPs:       iam_es_model.IdpConfigsToModel(org.IDPs),
+		IDPs:       iam_es_model.IDPConfigsToModel(org.IDPs),
 	}
 	if org.OrgIamPolicy != nil {
 		converted.OrgIamPolicy = OrgIamPolicyToModel(org.OrgIamPolicy)
@@ -140,29 +140,29 @@ func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 		err = o.appendChangeOrgIamPolicyEvent(event)
 	case OrgIamPolicyRemoved:
 		o.appendRemoveOrgIamPolicyEvent()
-	case IdpConfigAdded:
-		err = o.appendAddIdpConfigEvent(event)
-	case IdpConfigChanged:
-		err = o.appendChangeIdpConfigEvent(event)
-	case IdpConfigRemoved:
-		err = o.appendRemoveIdpConfigEvent(event)
-	case IdpConfigDeactivated:
-		err = o.appendIdpConfigStateEvent(event, model.IdpConfigStateInactive)
-	case IdpConfigReactivated:
-		err = o.appendIdpConfigStateEvent(event, model.IdpConfigStateActive)
-	case OidcIdpConfigAdded:
-		err = o.appendAddOidcIdpConfigEvent(event)
-	case OidcIdpConfigChanged:
-		err = o.appendChangeOidcIdpConfigEvent(event)
+	case IDPConfigAdded:
+		err = o.appendAddIDPConfigEvent(event)
+	case IDPConfigChanged:
+		err = o.appendChangeIDPConfigEvent(event)
+	case IDPConfigRemoved:
+		err = o.appendRemoveIDPConfigEvent(event)
+	case IDPConfigDeactivated:
+		err = o.appendIDPConfigStateEvent(event, model.IDPConfigStateInactive)
+	case IDPConfigReactivated:
+		err = o.appendIDPConfigStateEvent(event, model.IDPConfigStateActive)
+	case OIDCIDPConfigAdded:
+		err = o.appendAddOIDCIDPConfigEvent(event)
+	case OIDCIDPConfigChanged:
+		err = o.appendChangeOIDCIDPConfigEvent(event)
 	case LoginPolicyAdded:
 		err = o.appendAddLoginPolicyEvent(event)
 	case LoginPolicyChanged:
 		err = o.appendChangeLoginPolicyEvent(event)
 	case LoginPolicyRemoved:
 		o.appendRemoveLoginPolicyEvent(event)
-	case LoginPolicyIdpProviderAdded:
+	case LoginPolicyIDPProviderAdded:
 		err = o.appendAddIdpProviderToLoginPolicyEvent(event)
-	case LoginPolicyIdpProviderRemoved:
+	case LoginPolicyIDPProviderRemoved:
 		err = o.appendRemoveIdpProviderFromLoginPolicyEvent(event)
 	}
 	if err != nil {

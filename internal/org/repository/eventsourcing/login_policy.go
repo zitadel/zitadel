@@ -58,7 +58,7 @@ func LoginPolicyRemovedAggregate(aggCreator *es_models.AggregateCreator, existin
 	}
 }
 
-func LoginPolicyIdpProviderAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, provider *iam_es_model.IdpProvider, iamID string) func(ctx context.Context) (*es_models.Aggregate, error) {
+func LoginPolicyIDPProviderAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, provider *iam_es_model.IDPProvider, iamID string) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if provider == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sml9d", "Errors.Internal")
@@ -71,13 +71,13 @@ func LoginPolicyIdpProviderAddedAggregate(aggCreator *es_models.AggregateCreator
 			AggregateTypeFilter(model.OrgAggregate, iam_es_model.IamAggregate).
 			AggregateIDsFilter(existing.AggregateID, iamID)
 
-		validation := checkExistingLoginPolicyIdpProviderValidation(provider)
+		validation := checkExistingLoginPolicyIDPProviderValidation(provider)
 		agg.SetPrecondition(validationQuery, validation)
-		return agg.AppendEvent(model.LoginPolicyIdpProviderAdded, provider)
+		return agg.AppendEvent(model.LoginPolicyIDPProviderAdded, provider)
 	}
 }
 
-func LoginPolicyIdpProviderRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Org, provider *iam_es_model.IdpProviderID, cascade bool) (*es_models.Aggregate, error) {
+func LoginPolicyIDPProviderRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Org, provider *iam_es_model.IDPProviderID, cascade bool) (*es_models.Aggregate, error) {
 	if provider == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sml9d", "Errors.Internal")
 	}
@@ -85,9 +85,9 @@ func LoginPolicyIdpProviderRemovedAggregate(ctx context.Context, aggCreator *es_
 	if err != nil {
 		return nil, err
 	}
-	eventType := model.LoginPolicyIdpProviderRemoved
+	eventType := model.LoginPolicyIDPProviderRemoved
 	if cascade {
-		eventType = model.LoginPolicyIdpProviderCascadeRemoved
+		eventType = model.LoginPolicyIDPProviderCascadeRemoved
 	}
 	return agg.AppendEvent(eventType, provider)
 }
@@ -110,23 +110,23 @@ func checkExistingLoginPolicyValidation() func(...*es_models.Event) error {
 	}
 }
 
-func checkExistingLoginPolicyIdpProviderValidation(idpProvider *iam_es_model.IdpProvider) func(...*es_models.Event) error {
+func checkExistingLoginPolicyIDPProviderValidation(idpProvider *iam_es_model.IDPProvider) func(...*es_models.Event) error {
 	return func(events ...*es_models.Event) error {
-		idpConfigs := make([]*iam_es_model.IdpConfig, 0)
-		idps := make([]*iam_es_model.IdpProvider, 0)
+		idpConfigs := make([]*iam_es_model.IDPConfig, 0)
+		idps := make([]*iam_es_model.IDPProvider, 0)
 		for _, event := range events {
 			switch event.Type {
-			case model.IdpConfigAdded, iam_es_model.IdpConfigAdded:
-				config := new(iam_es_model.IdpConfig)
+			case model.IDPConfigAdded, iam_es_model.IDPConfigAdded:
+				config := new(iam_es_model.IDPConfig)
 				config.SetData(event)
 				idpConfigs = append(idpConfigs, config)
 				if event.AggregateType == model.OrgAggregate {
-					config.Type = int32(iam_model.IdpProviderTypeOrg)
+					config.Type = int32(iam_model.IDPProviderTypeOrg)
 				} else {
-					config.Type = int32(iam_model.IdpProviderTypeSystem)
+					config.Type = int32(iam_model.IDPProviderTypeSystem)
 				}
-			case model.IdpConfigRemoved, iam_es_model.IdpConfigRemoved:
-				config := new(iam_es_model.IdpConfig)
+			case model.IDPConfigRemoved, iam_es_model.IDPConfigRemoved:
+				config := new(iam_es_model.IDPConfig)
 				config.SetData(event)
 				for i, p := range idpConfigs {
 					if p.IDPConfigID == config.IDPConfigID {
@@ -135,14 +135,14 @@ func checkExistingLoginPolicyIdpProviderValidation(idpProvider *iam_es_model.Idp
 						idpConfigs = idpConfigs[:len(idpConfigs)-1]
 					}
 				}
-			case model.LoginPolicyIdpProviderAdded:
-				idp := new(iam_es_model.IdpProvider)
+			case model.LoginPolicyIDPProviderAdded:
+				idp := new(iam_es_model.IDPProvider)
 				idp.SetData(event)
-			case model.LoginPolicyIdpProviderRemoved:
-				idp := new(iam_es_model.IdpProvider)
+			case model.LoginPolicyIDPProviderRemoved:
+				idp := new(iam_es_model.IDPProvider)
 				idp.SetData(event)
 				for i, p := range idps {
-					if p.IdpConfigID == idp.IdpConfigID {
+					if p.IDPConfigID == idp.IDPConfigID {
 						idps[i] = idps[len(idps)-1]
 						idps[len(idps)-1] = nil
 						idps = idps[:len(idps)-1]
@@ -152,7 +152,7 @@ func checkExistingLoginPolicyIdpProviderValidation(idpProvider *iam_es_model.Idp
 		}
 		exists := false
 		for _, p := range idpConfigs {
-			if p.IDPConfigID == idpProvider.IdpConfigID && p.Type == idpProvider.Type {
+			if p.IDPConfigID == idpProvider.IDPConfigID && p.Type == idpProvider.Type {
 				exists = true
 			}
 		}
@@ -160,7 +160,7 @@ func checkExistingLoginPolicyIdpProviderValidation(idpProvider *iam_es_model.Idp
 			return errors.ThrowPreconditionFailed(nil, "EVENT-Djlo9", "Errors.Iam.IdpNotExisting")
 		}
 		for _, p := range idps {
-			if p.IdpConfigID == idpProvider.IdpConfigID {
+			if p.IDPConfigID == idpProvider.IDPConfigID {
 				return errors.ThrowPreconditionFailed(nil, "EVENT-us5Zw", "Errors.Org.LoginPolicy.IdpProviderAlreadyExisting")
 			}
 		}

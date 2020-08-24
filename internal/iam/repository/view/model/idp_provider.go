@@ -14,61 +14,61 @@ import (
 )
 
 const (
-	IdpProviderKeyAggregateID = "aggregate_id"
-	IdpProviderKeyIdpConfigID = "idp_config_id"
+	IDPProviderKeyAggregateID = "aggregate_id"
+	IDPProviderKeyIdpConfigID = "idp_config_id"
 )
 
-type IdpProviderView struct {
+type IDPProviderView struct {
 	AggregateID string `json:"-" gorm:"column:aggregate_id;primary_key"`
-	IdpConfigID string `json:"idpConfigID" gorm:"column:idp_config_id;primary_key"`
+	IDPConfigID string `json:"idpConfigID" gorm:"column:idp_config_id;primary_key"`
 
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
 
 	Name            string `json:"-" gorm:"column:name"`
-	IdpConfigType   int32  `json:"-" gorm:"column:idp_config_type"`
-	IdpProviderType int32  `json:"idpProviderType" gorm:"column:idp_provider_type"`
+	IDPConfigType   int32  `json:"-" gorm:"column:idp_config_type"`
+	IDPProviderType int32  `json:"idpProviderType" gorm:"column:idp_provider_type"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }
 
-func IdpProviderViewFromModel(policy *model.IdpProviderView) *IdpProviderView {
-	return &IdpProviderView{
+func IDPProviderViewFromModel(policy *model.IDPProviderView) *IDPProviderView {
+	return &IDPProviderView{
 		AggregateID:     policy.AggregateID,
 		Sequence:        policy.Sequence,
 		CreationDate:    policy.CreationDate,
 		ChangeDate:      policy.ChangeDate,
 		Name:            policy.Name,
-		IdpConfigType:   int32(policy.IdpConfigType),
-		IdpProviderType: int32(policy.IdpProviderType),
+		IDPConfigType:   int32(policy.IDPConfigType),
+		IDPProviderType: int32(policy.IDPProviderType),
 	}
 }
 
-func IdpProviderViewToModel(policy *IdpProviderView) *model.IdpProviderView {
-	return &model.IdpProviderView{
+func IDPProviderViewToModel(policy *IDPProviderView) *model.IDPProviderView {
+	return &model.IDPProviderView{
 		AggregateID:     policy.AggregateID,
 		Sequence:        policy.Sequence,
 		CreationDate:    policy.CreationDate,
 		ChangeDate:      policy.ChangeDate,
 		Name:            policy.Name,
-		IdpConfigType:   model.IdpConfigType(policy.IdpConfigType),
-		IdpProviderType: model.IdpProviderType(policy.IdpProviderType),
+		IDPConfigType:   model.IdpConfigType(policy.IDPConfigType),
+		IDPProviderType: model.IDPProviderType(policy.IDPProviderType),
 	}
 }
 
-func IdpProviderViewsToModel(providers []*IdpProviderView) []*model.IdpProviderView {
-	result := make([]*model.IdpProviderView, len(providers))
+func IDPProviderViewsToModel(providers []*IDPProviderView) []*model.IDPProviderView {
+	result := make([]*model.IDPProviderView, len(providers))
 	for i, r := range providers {
-		result[i] = IdpProviderViewToModel(r)
+		result[i] = IDPProviderViewToModel(r)
 	}
 	return result
 }
 
-func (i *IdpProviderView) AppendEvent(event *models.Event) (err error) {
+func (i *IDPProviderView) AppendEvent(event *models.Event) (err error) {
 	i.Sequence = event.Sequence
 	i.ChangeDate = event.CreationDate
 	switch event.Type {
-	case es_model.LoginPolicyIdpProviderAdded, org_es_model.LoginPolicyIdpProviderAdded:
+	case es_model.LoginPolicyIDPProviderAdded, org_es_model.LoginPolicyIDPProviderAdded:
 		i.setRootData(event)
 		i.CreationDate = event.CreationDate
 		err = i.SetData(event)
@@ -76,11 +76,11 @@ func (i *IdpProviderView) AppendEvent(event *models.Event) (err error) {
 	return err
 }
 
-func (r *IdpProviderView) setRootData(event *models.Event) {
+func (r *IDPProviderView) setRootData(event *models.Event) {
 	r.AggregateID = event.AggregateID
 }
 
-func (r *IdpProviderView) SetData(event *models.Event) error {
+func (r *IDPProviderView) SetData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, r); err != nil {
 		logging.Log("EVEN-Lso0d").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-Hs8uf", "Could not unmarshal data")

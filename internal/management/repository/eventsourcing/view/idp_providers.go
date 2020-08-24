@@ -12,28 +12,28 @@ const (
 	idpProviderTable = "management.idp_providers"
 )
 
-func (v *View) IdpProviderByAggregateAndIdpConfigID(aggregateID, idpConfigID string) (*model.IdpProviderView, error) {
-	return view.GetIdpProviderByAggregateIDAndConfigID(v.Db, idpProviderTable, aggregateID, idpConfigID)
+func (v *View) IdpProviderByAggregateAndIdpConfigID(aggregateID, idpConfigID string) (*model.IDPProviderView, error) {
+	return view.GetIDPProviderByAggregateIDAndConfigID(v.Db, idpProviderTable, aggregateID, idpConfigID)
 }
 
-func (v *View) IdpProvidersByIdpConfigID(aggregateID, idpConfigID string) ([]*model.IdpProviderView, error) {
-	return view.IdpProvidersByIdpConfigID(v.Db, idpProviderTable, idpConfigID)
+func (v *View) IdpProvidersByIdpConfigID(aggregateID, idpConfigID string) ([]*model.IDPProviderView, error) {
+	return view.IDPProvidersByIdpConfigID(v.Db, idpProviderTable, idpConfigID)
 }
 
-func (v *View) SearchIdpProviders(request *iam_model.IdpProviderSearchRequest) ([]*model.IdpProviderView, uint64, error) {
-	return view.SearchIdpProviders(v.Db, idpProviderTable, request)
+func (v *View) SearchIdpProviders(request *iam_model.IDPProviderSearchRequest) ([]*model.IDPProviderView, uint64, error) {
+	return view.SearchIDPProviders(v.Db, idpProviderTable, request)
 }
 
-func (v *View) PutIdpProvider(provider *model.IdpProviderView, sequence uint64) error {
-	err := view.PutIdpProvider(v.Db, idpProviderTable, provider)
+func (v *View) PutIdpProvider(provider *model.IDPProviderView, sequence uint64) error {
+	err := view.PutIDPProvider(v.Db, idpProviderTable, provider)
 	if err != nil {
 		return err
 	}
 	return v.ProcessedIdpProviderSequence(sequence)
 }
 
-func (v *View) PutIdpProviders(sequence uint64, providers ...*model.IdpProviderView) error {
-	err := view.PutIdpProviders(v.Db, idpProviderTable, providers...)
+func (v *View) PutIdpProviders(sequence uint64, providers ...*model.IDPProviderView) error {
+	err := view.PutIDPProviders(v.Db, idpProviderTable, providers...)
 	if err != nil {
 		return err
 	}
@@ -41,7 +41,7 @@ func (v *View) PutIdpProviders(sequence uint64, providers ...*model.IdpProviderV
 }
 
 func (v *View) DeleteIdpProvider(aggregateID, idpConfigID string, eventSequence uint64) error {
-	err := view.DeleteIdpProvider(v.Db, idpProviderTable, aggregateID, idpConfigID)
+	err := view.DeleteIDPProvider(v.Db, idpProviderTable, aggregateID, idpConfigID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
@@ -49,7 +49,7 @@ func (v *View) DeleteIdpProvider(aggregateID, idpConfigID string, eventSequence 
 }
 
 func (v *View) DeleteIdpProvidersByAggregateID(aggregateID string, eventSequence uint64) error {
-	err := view.DeleteIdpProvidersByAggregateID(v.Db, idpProviderTable, aggregateID)
+	err := view.DeleteIDPProvidersByAggregateID(v.Db, idpProviderTable, aggregateID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}

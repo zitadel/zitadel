@@ -12,42 +12,42 @@ const (
 	idpConfigTable = "management.idp_configs"
 )
 
-func (v *View) IdpConfigByID(idpID string) (*iam_es_model.IdpConfigView, error) {
-	return view.IdpByID(v.Db, idpConfigTable, idpID)
+func (v *View) IDPConfigByID(idpID string) (*iam_es_model.IDPConfigView, error) {
+	return view.IDPByID(v.Db, idpConfigTable, idpID)
 }
 
-func (v *View) SearchIdpConfigs(request *iam_model.IdpConfigSearchRequest) ([]*iam_es_model.IdpConfigView, uint64, error) {
-	return view.SearchIdps(v.Db, idpConfigTable, request)
+func (v *View) SearchIDPConfigs(request *iam_model.IDPConfigSearchRequest) ([]*iam_es_model.IDPConfigView, uint64, error) {
+	return view.SearchIDPs(v.Db, idpConfigTable, request)
 }
 
-func (v *View) PutIdpConfig(idp *iam_es_model.IdpConfigView, sequence uint64) error {
-	err := view.PutIdp(v.Db, idpConfigTable, idp)
+func (v *View) PutIDPConfig(idp *iam_es_model.IDPConfigView, sequence uint64) error {
+	err := view.PutIDP(v.Db, idpConfigTable, idp)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedIdpConfigSequence(sequence)
+	return v.ProcessedIDPConfigSequence(sequence)
 }
 
-func (v *View) DeleteIdpConfig(idpID string, eventSequence uint64) error {
-	err := view.DeleteIdp(v.Db, idpConfigTable, idpID)
+func (v *View) DeleteIDPConfig(idpID string, eventSequence uint64) error {
+	err := view.DeleteIDP(v.Db, idpConfigTable, idpID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedIdpConfigSequence(eventSequence)
+	return v.ProcessedIDPConfigSequence(eventSequence)
 }
 
-func (v *View) GetLatestIdpConfigSequence() (*global_view.CurrentSequence, error) {
+func (v *View) GetLatestIDPConfigSequence() (*global_view.CurrentSequence, error) {
 	return v.latestSequence(idpConfigTable)
 }
 
-func (v *View) ProcessedIdpConfigSequence(eventSequence uint64) error {
+func (v *View) ProcessedIDPConfigSequence(eventSequence uint64) error {
 	return v.saveCurrentSequence(idpConfigTable, eventSequence)
 }
 
-func (v *View) GetLatestIdpConfigFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {
+func (v *View) GetLatestIDPConfigFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {
 	return v.latestFailedEvent(idpConfigTable, sequence)
 }
 
-func (v *View) ProcessedIdpConfigFailedEvent(failedEvent *global_view.FailedEvent) error {
+func (v *View) ProcessedIDPConfigFailedEvent(failedEvent *global_view.FailedEvent) error {
 	return v.saveFailedEvent(failedEvent)
 }

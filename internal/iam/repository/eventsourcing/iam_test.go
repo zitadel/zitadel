@@ -515,7 +515,7 @@ func TestIdpConfigAddedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Iam
-		new        *model.IdpConfig
+		new        *model.IDPConfig
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -534,17 +534,17 @@ func TestIdpConfigAddedAggregate(t *testing.T) {
 			args: args{
 				ctx:      authz.NewMockContext("orgID", "userID"),
 				existing: &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, IamProjectID: "IamProjectID"},
-				new: &model.IdpConfig{
+				new: &model.IDPConfig{
 					ObjectRoot:    models.ObjectRoot{AggregateID: "AggregateID"},
-					IDPConfigID:   "IdpConfigID",
+					IDPConfigID:   "IDPConfigID",
 					Name:          "Name",
-					OIDCIDPConfig: &model.OidcIdpConfig{IdpConfigID: "IdpConfigID", ClientID: "ClientID"},
+					OIDCIDPConfig: &model.OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID"},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{model.IdpConfigAdded, model.OidcIdpConfigAdded},
+				eventTypes: []models.EventType{model.IDPConfigAdded, model.OIDCIDPConfigAdded},
 			},
 		},
 		{
@@ -575,7 +575,7 @@ func TestIdpConfigAddedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := IdpConfigurationAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := IDPConfigAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -602,7 +602,7 @@ func TestIdpConnfigurationChangedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Iam
-		new        *model.IdpConfig
+		new        *model.IDPConfig
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -623,19 +623,19 @@ func TestIdpConnfigurationChangedAggregate(t *testing.T) {
 				existing: &model.Iam{
 					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
 					IamProjectID: "IamProjectID",
-					IDPs: []*model.IdpConfig{
-						{IDPConfigID: "IdpConfigID", Name: "IDPName"},
+					IDPs: []*model.IDPConfig{
+						{IDPConfigID: "IDPConfigID", Name: "IDPName"},
 					}},
-				new: &model.IdpConfig{
+				new: &model.IDPConfig{
 					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
-					IDPConfigID: "IdpConfigID",
+					IDPConfigID: "IDPConfigID",
 					Name:        "NameChanged",
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.IdpConfigChanged},
+				eventTypes: []models.EventType{model.IDPConfigChanged},
 			},
 		},
 		{
@@ -666,7 +666,7 @@ func TestIdpConnfigurationChangedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := IdpConfigurationChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := IDPConfigChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -691,8 +691,8 @@ func TestIdpConfigurationRemovedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Iam
-		new        *model.IdpConfig
-		provider   *model.IdpProvider
+		new        *model.IDPConfig
+		provider   *model.IDPProvider
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -713,19 +713,19 @@ func TestIdpConfigurationRemovedAggregate(t *testing.T) {
 				existing: &model.Iam{
 					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
 					IamProjectID: "IamProjectID",
-					IDPs: []*model.IdpConfig{
-						{IDPConfigID: "IdpConfigID", Name: "Name"},
+					IDPs: []*model.IDPConfig{
+						{IDPConfigID: "IDPConfigID", Name: "Name"},
 					}},
-				new: &model.IdpConfig{
+				new: &model.IDPConfig{
 					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
-					IDPConfigID: "IdpConfigID",
+					IDPConfigID: "IDPConfigID",
 					Name:        "Name",
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.IdpConfigRemoved},
+				eventTypes: []models.EventType{model.IDPConfigRemoved},
 			},
 		},
 		{
@@ -735,22 +735,22 @@ func TestIdpConfigurationRemovedAggregate(t *testing.T) {
 				existing: &model.Iam{
 					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
 					IamProjectID: "IamProjectID",
-					IDPs: []*model.IdpConfig{
-						{IDPConfigID: "IdpConfigID", Name: "Name"},
+					IDPs: []*model.IDPConfig{
+						{IDPConfigID: "IDPConfigID", Name: "Name"},
 					}},
-				new: &model.IdpConfig{
+				new: &model.IDPConfig{
 					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
-					IDPConfigID: "IdpConfigID",
+					IDPConfigID: "IDPConfigID",
 					Name:        "Name",
 				},
-				provider: &model.IdpProvider{
-					IdpConfigID: "IdpConfigID",
+				provider: &model.IDPProvider{
+					IDPConfigID: "IDPConfigID",
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{model.IdpConfigRemoved, model.LoginPolicyIdpProviderCascadeRemoved},
+				eventTypes: []models.EventType{model.IDPConfigRemoved, model.LoginPolicyIDPProviderCascadeRemoved},
 			},
 		},
 		{
@@ -781,7 +781,7 @@ func TestIdpConfigurationRemovedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := IdpConfigurationRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.new, tt.args.provider)
+			agg, err := IDPConfigRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.new, tt.args.provider)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -806,7 +806,7 @@ func TestIdpConfigurationDeactivatedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Iam
-		new        *model.IdpConfig
+		new        *model.IDPConfig
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -827,19 +827,19 @@ func TestIdpConfigurationDeactivatedAggregate(t *testing.T) {
 				existing: &model.Iam{
 					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
 					IamProjectID: "IamProjectID",
-					IDPs: []*model.IdpConfig{
-						{IDPConfigID: "IdpConfigID", Name: "Name"},
+					IDPs: []*model.IDPConfig{
+						{IDPConfigID: "IDPConfigID", Name: "Name"},
 					}},
-				new: &model.IdpConfig{
+				new: &model.IDPConfig{
 					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
-					IDPConfigID: "IdpConfigID",
+					IDPConfigID: "IDPConfigID",
 					Name:        "Name",
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.IdpConfigDeactivated},
+				eventTypes: []models.EventType{model.IDPConfigDeactivated},
 			},
 		},
 		{
@@ -870,7 +870,7 @@ func TestIdpConfigurationDeactivatedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := IdpConfigurationDeactivatedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := IDPConfigDeactivatedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -895,7 +895,7 @@ func TestIdpConfigurationReactivatedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Iam
-		new        *model.IdpConfig
+		new        *model.IDPConfig
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -916,19 +916,19 @@ func TestIdpConfigurationReactivatedAggregate(t *testing.T) {
 				existing: &model.Iam{
 					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
 					IamProjectID: "IamProjectID",
-					IDPs: []*model.IdpConfig{
-						{IDPConfigID: "IdpConfigID", Name: "Name"},
+					IDPs: []*model.IDPConfig{
+						{IDPConfigID: "IDPConfigID", Name: "Name"},
 					}},
-				new: &model.IdpConfig{
+				new: &model.IDPConfig{
 					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
-					IDPConfigID: "IdpConfigID",
+					IDPConfigID: "IDPConfigID",
 					Name:        "Name",
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.IdpConfigReactivated},
+				eventTypes: []models.EventType{model.IDPConfigReactivated},
 			},
 		},
 		{
@@ -959,7 +959,7 @@ func TestIdpConfigurationReactivatedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := IdpConfigurationReactivatedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := IDPConfigReactivatedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -984,7 +984,7 @@ func TestOIDCConfigchangAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Iam
-		new        *model.OidcIdpConfig
+		new        *model.OIDCIDPConfig
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -1005,19 +1005,19 @@ func TestOIDCConfigchangAggregate(t *testing.T) {
 				existing: &model.Iam{
 					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
 					IamProjectID: "IamProjectID",
-					IDPs: []*model.IdpConfig{
-						{IDPConfigID: "IdpConfigID", Name: "Name", OIDCIDPConfig: &model.OidcIdpConfig{IdpConfigID: "IdpConfigID", ClientID: "ClientID"}},
+					IDPs: []*model.IDPConfig{
+						{IDPConfigID: "IDPConfigID", Name: "Name", OIDCIDPConfig: &model.OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID"}},
 					}},
-				new: &model.OidcIdpConfig{
+				new: &model.OIDCIDPConfig{
 					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
-					IdpConfigID: "IdpConfigID",
+					IDPConfigID: "IDPConfigID",
 					ClientID:    "ClientIDChanged",
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.OidcIdpConfigChanged},
+				eventTypes: []models.EventType{model.OIDCIDPConfigChanged},
 			},
 		},
 		{
@@ -1048,7 +1048,7 @@ func TestOIDCConfigchangAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := OIDCIdpConfigurationChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := OIDCIDPConfigChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -1094,8 +1094,8 @@ func TestLoginPolicyAddedAggregate(t *testing.T) {
 				existing: &model.Iam{
 					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
 					IamProjectID: "IamProjectID",
-					IDPs: []*model.IdpConfig{
-						{IDPConfigID: "IdpConfigID", Name: "Name", OIDCIDPConfig: &model.OidcIdpConfig{IdpConfigID: "IdpConfigID", ClientID: "ClientID"}},
+					IDPs: []*model.IDPConfig{
+						{IDPConfigID: "IDPConfigID", Name: "Name", OIDCIDPConfig: &model.OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID"}},
 					}},
 				new: &model.LoginPolicy{
 					ObjectRoot:            models.ObjectRoot{AggregateID: "AggregateID"},
@@ -1198,6 +1198,27 @@ func TestLoginPolicyChangedAggregate(t *testing.T) {
 			},
 		},
 		{
+			name: "no changes",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existing: &model.Iam{
+					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
+					IamProjectID: "IamProjectID",
+					DefaultLoginPolicy: &model.LoginPolicy{
+						AllowUsernamePassword: true,
+					}},
+				new: &model.LoginPolicy{
+					ObjectRoot:            models.ObjectRoot{AggregateID: "AggregateID"},
+					AllowUsernamePassword: true,
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
 			name: "existing iam nil",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
@@ -1250,7 +1271,7 @@ func TestLoginPolicyIdpProviderAddedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Iam
-		new        *model.IdpProvider
+		new        *model.IDPProvider
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -1274,16 +1295,16 @@ func TestLoginPolicyIdpProviderAddedAggregate(t *testing.T) {
 					DefaultLoginPolicy: &model.LoginPolicy{
 						AllowUsernamePassword: true,
 					}},
-				new: &model.IdpProvider{
+				new: &model.IDPProvider{
 					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
-					Type:        int32(iam_model.IdpProviderTypeSystem),
-					IdpConfigID: "IdpConfigID",
+					Type:        int32(iam_model.IDPProviderTypeSystem),
+					IDPConfigID: "IDPConfigID",
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.LoginPolicyIdpProviderAdded},
+				eventTypes: []models.EventType{model.LoginPolicyIDPProviderAdded},
 			},
 		},
 		{
@@ -1314,7 +1335,7 @@ func TestLoginPolicyIdpProviderAddedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LoginPolicyIdpProviderAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := LoginPolicyIDPProviderAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -1339,7 +1360,7 @@ func TestLoginPolicyIdpProviderRemovedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Iam
-		new        *model.IdpProviderID
+		new        *model.IDPProviderID
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -1362,18 +1383,18 @@ func TestLoginPolicyIdpProviderRemovedAggregate(t *testing.T) {
 					IamProjectID: "IamProjectID",
 					DefaultLoginPolicy: &model.LoginPolicy{
 						AllowUsernamePassword: true,
-						IdpProviders: []*model.IdpProvider{
-							{IdpConfigID: "IdpConfigID", Type: int32(iam_model.IdpProviderTypeSystem)},
+						IDPProviders: []*model.IDPProvider{
+							{IDPConfigID: "IDPConfigID", Type: int32(iam_model.IDPProviderTypeSystem)},
 						},
 					}},
-				new: &model.IdpProviderID{
-					IdpConfigID: "IdpConfigID",
+				new: &model.IDPProviderID{
+					IDPConfigID: "IDPConfigID",
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.LoginPolicyIdpProviderRemoved},
+				eventTypes: []models.EventType{model.LoginPolicyIDPProviderRemoved},
 			},
 		},
 		{
@@ -1404,7 +1425,7 @@ func TestLoginPolicyIdpProviderRemovedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LoginPolicyIdpProviderRemovedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := LoginPolicyIDPProviderRemovedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

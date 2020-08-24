@@ -11,7 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
-type IdpConfig struct {
+type IDPConfig struct {
 	handler
 }
 
@@ -19,12 +19,12 @@ const (
 	idpConfigTable = "management.idp_configs"
 )
 
-func (m *IdpConfig) ViewModel() string {
+func (m *IDPConfig) ViewModel() string {
 	return idpConfigTable
 }
 
-func (m *IdpConfig) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestIdpConfigSequence()
+func (m *IDPConfig) EventQuery() (*models.SearchQuery, error) {
+	sequence, err := m.view.GetLatestIDPConfigSequence()
 	if err != nil {
 		return nil, err
 	}
@@ -33,50 +33,50 @@ func (m *IdpConfig) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (m *IdpConfig) Reduce(event *models.Event) (err error) {
+func (m *IDPConfig) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
 	case model.OrgAggregate:
-		err = m.processIdpConfig(iam_model.IdpProviderTypeOrg, event)
+		err = m.processIdpConfig(iam_model.IDPProviderTypeOrg, event)
 	case iam_es_model.IamAggregate:
-		err = m.processIdpConfig(iam_model.IdpProviderTypeSystem, event)
+		err = m.processIdpConfig(iam_model.IDPProviderTypeSystem, event)
 	}
 	return err
 }
 
-func (m *IdpConfig) processIdpConfig(providerType iam_model.IdpProviderType, event *models.Event) (err error) {
-	idp := new(iam_view_model.IdpConfigView)
+func (m *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, event *models.Event) (err error) {
+	idp := new(iam_view_model.IDPConfigView)
 	switch event.Type {
-	case model.IdpConfigAdded,
-		iam_es_model.IdpConfigAdded:
+	case model.IDPConfigAdded,
+		iam_es_model.IDPConfigAdded:
 		err = idp.AppendEvent(providerType, event)
-	case model.IdpConfigChanged, iam_es_model.IdpConfigChanged,
-		model.OidcIdpConfigAdded, iam_es_model.OidcIdpConfigAdded,
-		model.OidcIdpConfigChanged, iam_es_model.OidcIdpConfigChanged:
+	case model.IDPConfigChanged, iam_es_model.IDPConfigChanged,
+		model.OIDCIDPConfigAdded, iam_es_model.OIDCIDPConfigAdded,
+		model.OIDCIDPConfigChanged, iam_es_model.OIDCIDPConfigChanged:
 		err = idp.SetData(event)
 		if err != nil {
 			return err
 		}
-		idp, err = m.view.IdpConfigByID(idp.IdpConfigID)
+		idp, err = m.view.IDPConfigByID(idp.IDPConfigID)
 		if err != nil {
 			return err
 		}
 		err = idp.AppendEvent(providerType, event)
-	case model.IdpConfigRemoved, iam_es_model.IdpConfigRemoved:
+	case model.IDPConfigRemoved, iam_es_model.IDPConfigRemoved:
 		err = idp.SetData(event)
 		if err != nil {
 			return err
 		}
-		return m.view.DeleteIdpConfig(idp.IdpConfigID, event.Sequence)
+		return m.view.DeleteIDPConfig(idp.IDPConfigID, event.Sequence)
 	default:
-		return m.view.ProcessedIdpConfigSequence(event.Sequence)
+		return m.view.ProcessedIDPConfigSequence(event.Sequence)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutIdpConfig(idp, idp.Sequence)
+	return m.view.PutIDPConfig(idp, idp.Sequence)
 }
 
-func (m *IdpConfig) OnError(event *models.Event, err error) error {
+func (m *IDPConfig) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Nxu8s", "id", event.AggregateID).WithError(err).Warn("something went wrong in idp config handler")
-	return spooler.HandleError(event, err, m.view.GetLatestIdpConfigFailedEvent, m.view.ProcessedIdpConfigFailedEvent, m.view.ProcessedIdpConfigSequence, m.errorCountUntilSkip)
+	return spooler.HandleError(event, err, m.view.GetLatestIDPConfigFailedEvent, m.view.ProcessedIDPConfigFailedEvent, m.view.ProcessedIDPConfigSequence, m.errorCountUntilSkip)
 }

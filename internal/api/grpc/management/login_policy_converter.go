@@ -32,19 +32,19 @@ func loginPolicyViewFromModel(policy *iam_model.LoginPolicyView) *management.Log
 	return &management.LoginPolicyView{
 		Default:               policy.Default,
 		AllowUsernamePassword: policy.AllowUsernamePassword,
-		AllowExternalIdp:      policy.AllowExternalIdp,
+		AllowExternalIdp:      policy.AllowExternalIDP,
 		AllowRegister:         policy.AllowRegister,
 	}
 }
 
-func idpProviderSearchRequestToModel(request *management.IdpProviderSearchRequest) *iam_model.IdpProviderSearchRequest {
-	return &iam_model.IdpProviderSearchRequest{
+func idpProviderSearchRequestToModel(request *management.IdpProviderSearchRequest) *iam_model.IDPProviderSearchRequest {
+	return &iam_model.IDPProviderSearchRequest{
 		Limit:  request.Limit,
 		Offset: request.Offset,
 	}
 }
 
-func idpProviderSearchResponseFromModel(response *iam_model.IdpProviderSearchResponse) *management.IdpProviderSearchResponse {
+func idpProviderSearchResponseFromModel(response *iam_model.IDPProviderSearchResponse) *management.IdpProviderSearchResponse {
 	return &management.IdpProviderSearchResponse{
 		Limit:       response.Limit,
 		Offset:      response.Offset,
@@ -53,34 +53,34 @@ func idpProviderSearchResponseFromModel(response *iam_model.IdpProviderSearchRes
 	}
 }
 
-func idpProviderToModel(provider *management.IdpProviderID) *iam_model.IdpProvider {
-	return &iam_model.IdpProvider{
+func idpProviderToModel(provider *management.IdpProviderID) *iam_model.IDPProvider {
+	return &iam_model.IDPProvider{
 		IdpConfigID: provider.IdpConfigId,
-		Type:        iam_model.IdpProviderTypeSystem,
+		Type:        iam_model.IDPProviderTypeSystem,
 	}
 }
 
-func idpProviderAddToModel(provider *management.IdpProviderAdd) *iam_model.IdpProvider {
-	return &iam_model.IdpProvider{
+func idpProviderAddToModel(provider *management.IdpProviderAdd) *iam_model.IDPProvider {
+	return &iam_model.IDPProvider{
 		IdpConfigID: provider.IdpConfigId,
 		Type:        idpProviderTypeToModel(provider.IdpProviderType),
 	}
 }
 
-func idpProviderIDFromModel(provider *iam_model.IdpProvider) *management.IdpProviderID {
+func idpProviderIDFromModel(provider *iam_model.IDPProvider) *management.IdpProviderID {
 	return &management.IdpProviderID{
 		IdpConfigId: provider.IdpConfigID,
 	}
 }
 
-func idpProviderFromModel(provider *iam_model.IdpProvider) *management.IdpProvider {
+func idpProviderFromModel(provider *iam_model.IDPProvider) *management.IdpProvider {
 	return &management.IdpProvider{
 		IdpConfigId:      provider.IdpConfigID,
 		IdpProvider_Type: idpProviderTypeFromModel(provider.Type),
 	}
 }
 
-func idpProviderViewsFromModel(providers []*iam_model.IdpProviderView) []*management.IdpProviderView {
+func idpProviderViewsFromModel(providers []*iam_model.IDPProviderView) []*management.IdpProviderView {
 	converted := make([]*management.IdpProviderView, len(providers))
 	for i, provider := range providers {
 		converted[i] = idpProviderViewFromModel(provider)
@@ -89,11 +89,11 @@ func idpProviderViewsFromModel(providers []*iam_model.IdpProviderView) []*manage
 	return converted
 }
 
-func idpProviderViewFromModel(provider *iam_model.IdpProviderView) *management.IdpProviderView {
+func idpProviderViewFromModel(provider *iam_model.IDPProviderView) *management.IdpProviderView {
 	return &management.IdpProviderView{
-		IdpConfigId: provider.IdpConfigID,
+		IdpConfigId: provider.IDPConfigID,
 		Name:        provider.Name,
-		Type:        idpConfigTypeToModel(provider.IdpConfigType),
+		Type:        idpConfigTypeToModel(provider.IDPConfigType),
 	}
 }
 
@@ -108,22 +108,22 @@ func idpConfigTypeToModel(providerType iam_model.IdpConfigType) management.IdpTy
 	}
 }
 
-func idpProviderTypeToModel(providerType management.IdpProviderType) iam_model.IdpProviderType {
+func idpProviderTypeToModel(providerType management.IdpProviderType) iam_model.IDPProviderType {
 	switch providerType {
 	case management.IdpProviderType_IDPPROVIDERTYPE_SYSTEM:
-		return iam_model.IdpProviderTypeSystem
+		return iam_model.IDPProviderTypeSystem
 	case management.IdpProviderType_IDPPROVIDERTYPE_ORG:
-		return iam_model.IdpProviderTypeOrg
+		return iam_model.IDPProviderTypeOrg
 	default:
-		return iam_model.IdpProviderTypeSystem
+		return iam_model.IDPProviderTypeSystem
 	}
 }
 
-func idpProviderTypeFromModel(providerType iam_model.IdpProviderType) management.IdpProviderType {
+func idpProviderTypeFromModel(providerType iam_model.IDPProviderType) management.IdpProviderType {
 	switch providerType {
-	case iam_model.IdpProviderTypeSystem:
+	case iam_model.IDPProviderTypeSystem:
 		return management.IdpProviderType_IDPPROVIDERTYPE_SYSTEM
-	case iam_model.IdpProviderTypeOrg:
+	case iam_model.IDPProviderTypeOrg:
 		return management.IdpProviderType_IDPPROVIDERTYPE_ORG
 	default:
 		return management.IdpProviderType_IDPPROVIDERTYPE_UNSPECIFIED

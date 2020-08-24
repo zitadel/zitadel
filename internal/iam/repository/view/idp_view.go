@@ -9,9 +9,9 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func IdpByID(db *gorm.DB, table, idpID string) (*model.IdpConfigView, error) {
-	idp := new(model.IdpConfigView)
-	userIDQuery := &model.IdpConfigSearchQuery{Key: iam_model.IdpConfigSearchKeyIdpConfigID, Value: idpID, Method: global_model.SearchMethodEquals}
+func IDPByID(db *gorm.DB, table, idpID string) (*model.IDPConfigView, error) {
+	idp := new(model.IDPConfigView)
+	userIDQuery := &model.IDPConfigSearchQuery{Key: iam_model.IDPConfigSearchKeyIdpConfigID, Value: idpID, Method: global_model.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, userIDQuery)
 	err := query(db, idp)
 	if caos_errs.IsNotFound(err) {
@@ -20,9 +20,9 @@ func IdpByID(db *gorm.DB, table, idpID string) (*model.IdpConfigView, error) {
 	return idp, err
 }
 
-func SearchIdps(db *gorm.DB, table string, req *iam_model.IdpConfigSearchRequest) ([]*model.IdpConfigView, uint64, error) {
-	idps := make([]*model.IdpConfigView, 0)
-	query := repository.PrepareSearchQuery(table, model.IdpConfigSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
+func SearchIDPs(db *gorm.DB, table string, req *iam_model.IDPConfigSearchRequest) ([]*model.IDPConfigView, uint64, error) {
+	idps := make([]*model.IDPConfigView, 0)
+	query := repository.PrepareSearchQuery(table, model.IDPConfigSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &idps)
 	if err != nil {
 		return nil, 0, err
@@ -30,13 +30,13 @@ func SearchIdps(db *gorm.DB, table string, req *iam_model.IdpConfigSearchRequest
 	return idps, count, nil
 }
 
-func PutIdp(db *gorm.DB, table string, idp *model.IdpConfigView) error {
+func PutIDP(db *gorm.DB, table string, idp *model.IDPConfigView) error {
 	save := repository.PrepareSave(table)
 	return save(db, idp)
 }
 
-func DeleteIdp(db *gorm.DB, table, idpID string) error {
-	delete := repository.PrepareDeleteByKey(table, model.IdpConfigSearchKey(iam_model.IdpConfigSearchKeyIdpConfigID), idpID)
+func DeleteIDP(db *gorm.DB, table, idpID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.IDPConfigSearchKey(iam_model.IDPConfigSearchKeyIdpConfigID), idpID)
 
 	return delete(db)
 }

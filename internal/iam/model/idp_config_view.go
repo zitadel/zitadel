@@ -6,63 +6,63 @@ import (
 	"time"
 )
 
-type IdpConfigView struct {
+type IDPConfigView struct {
 	AggregateID     string
-	IdpConfigID     string
+	IDPConfigID     string
 	Name            string
 	LogoSrc         []byte
-	State           IdpConfigState
+	State           IDPConfigState
 	CreationDate    time.Time
 	ChangeDate      time.Time
 	Sequence        uint64
-	IdpProviderType IdpProviderType
+	IDPProviderType IDPProviderType
 
-	IsOidc           bool
-	OidcClientID     string
-	OidcClientSecret *crypto.CryptoValue
-	OidcIssuer       string
-	OidcScopes       []string
+	IsOIDC           bool
+	OIDCClientID     string
+	OIDCClientSecret *crypto.CryptoValue
+	OIDCIssuer       string
+	OIDCScopes       []string
 }
 
-type IdpConfigSearchRequest struct {
+type IDPConfigSearchRequest struct {
 	Offset        uint64
 	Limit         uint64
-	SortingColumn IdpConfigSearchKey
+	SortingColumn IDPConfigSearchKey
 	Asc           bool
-	Queries       []*IdpConfigSearchQuery
+	Queries       []*IDPConfigSearchQuery
 }
 
-type IdpConfigSearchKey int32
+type IDPConfigSearchKey int32
 
 const (
-	IdpConfigSearchKeyUnspecified IdpConfigSearchKey = iota
-	IdpConfigSearchKeyName
-	IdpConfigSearchKeyAggregateID
-	IdpConfigSearchKeyIdpConfigID
-	IdpConfigSearchKeyIdpProviderType
+	IDPConfigSearchKeyUnspecified IDPConfigSearchKey = iota
+	IDPConfigSearchKeyName
+	IDPConfigSearchKeyAggregateID
+	IDPConfigSearchKeyIdpConfigID
+	IDPConfigSearchKeyIdpProviderType
 )
 
-type IdpConfigSearchQuery struct {
-	Key    IdpConfigSearchKey
+type IDPConfigSearchQuery struct {
+	Key    IDPConfigSearchKey
 	Method model.SearchMethod
 	Value  interface{}
 }
 
-type IdpConfigSearchResponse struct {
+type IDPConfigSearchResponse struct {
 	Offset      uint64
 	Limit       uint64
 	TotalResult uint64
-	Result      []*IdpConfigView
+	Result      []*IDPConfigView
 	Sequence    uint64
 	Timestamp   time.Time
 }
 
-func (r *IdpConfigSearchRequest) EnsureLimit(limit uint64) {
+func (r *IDPConfigSearchRequest) EnsureLimit(limit uint64) {
 	if r.Limit == 0 || r.Limit > limit {
 		r.Limit = limit
 	}
 }
 
-func (r *IdpConfigSearchRequest) AppendMyOrgQuery(orgID, iamID string) {
-	r.Queries = append(r.Queries, &IdpConfigSearchQuery{Key: IdpConfigSearchKeyAggregateID, Method: model.SearchMethodIsOneOf, Value: []string{orgID, iamID}})
+func (r *IDPConfigSearchRequest) AppendMyOrgQuery(orgID, iamID string) {
+	r.Queries = append(r.Queries, &IDPConfigSearchQuery{Key: IDPConfigSearchKeyAggregateID, Method: model.SearchMethodIsOneOf, Value: []string{orgID, iamID}})
 }

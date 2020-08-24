@@ -19,13 +19,13 @@ type Iam struct {
 	GlobalOrgID        string       `json:"globalOrgId,omitempty"`
 	IamProjectID       string       `json:"iamProjectId,omitempty"`
 	Members            []*IamMember `json:"-"`
-	IDPs               []*IdpConfig `json:"-"`
+	IDPs               []*IDPConfig `json:"-"`
 	DefaultLoginPolicy *LoginPolicy `json:"-"`
 }
 
 func IamFromModel(iam *model.Iam) *Iam {
 	members := IamMembersFromModel(iam.Members)
-	idps := IdpConfigsFromModel(iam.IDPs)
+	idps := IDPConfigsFromModel(iam.IDPs)
 	converted := &Iam{
 		ObjectRoot:   iam.ObjectRoot,
 		SetUpStarted: iam.SetUpStarted,
@@ -43,7 +43,7 @@ func IamFromModel(iam *model.Iam) *Iam {
 
 func IamToModel(iam *Iam) *model.Iam {
 	members := IamMembersToModel(iam.Members)
-	idps := IdpConfigsToModel(iam.IDPs)
+	idps := IDPConfigsToModel(iam.IDPs)
 	converted := &model.Iam{
 		ObjectRoot:   iam.ObjectRoot,
 		SetUpStarted: iam.SetUpStarted,
@@ -84,28 +84,28 @@ func (i *Iam) AppendEvent(event *es_models.Event) (err error) {
 		err = i.appendChangeMemberEvent(event)
 	case IamMemberRemoved:
 		err = i.appendRemoveMemberEvent(event)
-	case IdpConfigAdded:
-		return i.appendAddIdpConfigEvent(event)
-	case IdpConfigChanged:
-		return i.appendChangeIdpConfigEvent(event)
-	case IdpConfigRemoved:
-		return i.appendRemoveIdpConfigEvent(event)
-	case IdpConfigDeactivated:
-		return i.appendIdpConfigStateEvent(event, model.IdpConfigStateInactive)
-	case IdpConfigReactivated:
-		return i.appendIdpConfigStateEvent(event, model.IdpConfigStateActive)
-	case OidcIdpConfigAdded:
-		return i.appendAddOidcIdpConfigEvent(event)
-	case OidcIdpConfigChanged:
-		return i.appendChangeOidcIdpConfigEvent(event)
+	case IDPConfigAdded:
+		return i.appendAddIDPConfigEvent(event)
+	case IDPConfigChanged:
+		return i.appendChangeIDPConfigEvent(event)
+	case IDPConfigRemoved:
+		return i.appendRemoveIDPConfigEvent(event)
+	case IDPConfigDeactivated:
+		return i.appendIDPConfigStateEvent(event, model.IDPConfigStateInactive)
+	case IDPConfigReactivated:
+		return i.appendIDPConfigStateEvent(event, model.IDPConfigStateActive)
+	case OIDCIDPConfigAdded:
+		return i.appendAddOIDCIDPConfigEvent(event)
+	case OIDCIDPConfigChanged:
+		return i.appendChangeOIDCIDPConfigEvent(event)
 	case LoginPolicyAdded:
 		return i.appendAddLoginPolicyEvent(event)
 	case LoginPolicyChanged:
 		return i.appendChangeLoginPolicyEvent(event)
-	case LoginPolicyIdpProviderAdded:
-		return i.appendAddIdpProviderToLoginPolicyEvent(event)
-	case LoginPolicyIdpProviderRemoved:
-		return i.appendRemoveIdpProviderFromLoginPolicyEvent(event)
+	case LoginPolicyIDPProviderAdded:
+		return i.appendAddIDPProviderToLoginPolicyEvent(event)
+	case LoginPolicyIDPProviderRemoved:
+		return i.appendRemoveIDPProviderFromLoginPolicyEvent(event)
 	}
 
 	return err

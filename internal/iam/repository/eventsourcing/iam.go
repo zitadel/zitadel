@@ -123,7 +123,7 @@ func IamMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, existing 
 	}
 }
 
-func IdpConfigurationAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, idp *model.IdpConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
+func IDPConfigAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, idp *model.IDPConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if idp == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-MSn7d", "Errors.Internal")
@@ -132,18 +132,18 @@ func IdpConfigurationAddedAggregate(aggCreator *es_models.AggregateCreator, exis
 		if err != nil {
 			return nil, err
 		}
-		agg, err = agg.AppendEvent(model.IdpConfigAdded, idp)
+		agg, err = agg.AppendEvent(model.IDPConfigAdded, idp)
 		if err != nil {
 			return nil, err
 		}
 		if idp.OIDCIDPConfig != nil {
-			return agg.AppendEvent(model.OidcIdpConfigAdded, idp.OIDCIDPConfig)
+			return agg.AppendEvent(model.OIDCIDPConfigAdded, idp.OIDCIDPConfig)
 		}
 		return agg, nil
 	}
 }
 
-func IdpConfigurationChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, idp *model.IdpConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
+func IDPConfigChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, idp *model.IDPConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if idp == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Amc7s", "Errors.Internal")
@@ -158,11 +158,11 @@ func IdpConfigurationChangedAggregate(aggCreator *es_models.AggregateCreator, ex
 				changes = i.Changes(idp)
 			}
 		}
-		return agg.AppendEvent(model.IdpConfigChanged, changes)
+		return agg.AppendEvent(model.IDPConfigChanged, changes)
 	}
 }
 
-func IdpConfigurationRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Iam, idp *model.IdpConfig, provider *model.IdpProvider) (*es_models.Aggregate, error) {
+func IDPConfigRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Iam, idp *model.IDPConfig, provider *model.IDPProvider) (*es_models.Aggregate, error) {
 	if idp == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-se23g", "Errors.Internal")
 	}
@@ -170,17 +170,17 @@ func IdpConfigurationRemovedAggregate(ctx context.Context, aggCreator *es_models
 	if err != nil {
 		return nil, err
 	}
-	agg, err = agg.AppendEvent(model.IdpConfigRemoved, &model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
+	agg, err = agg.AppendEvent(model.IDPConfigRemoved, &model.IDPConfigID{IDPConfigID: idp.IDPConfigID})
 	if err != nil {
 		return nil, err
 	}
 	if provider != nil {
-		return agg.AppendEvent(model.LoginPolicyIdpProviderCascadeRemoved, &model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
+		return agg.AppendEvent(model.LoginPolicyIDPProviderCascadeRemoved, &model.IDPConfigID{IDPConfigID: idp.IDPConfigID})
 	}
 	return agg, nil
 }
 
-func IdpConfigurationDeactivatedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, idp *model.IdpConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
+func IDPConfigDeactivatedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, idp *model.IDPConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if idp == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-slfi3", "Errors.Internal")
@@ -189,11 +189,11 @@ func IdpConfigurationDeactivatedAggregate(aggCreator *es_models.AggregateCreator
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.IdpConfigDeactivated, &model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
+		return agg.AppendEvent(model.IDPConfigDeactivated, &model.IDPConfigID{IDPConfigID: idp.IDPConfigID})
 	}
 }
 
-func IdpConfigurationReactivatedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, idp *model.IdpConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
+func IDPConfigReactivatedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, idp *model.IDPConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if idp == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-slf32", "Errors.Internal")
@@ -202,11 +202,11 @@ func IdpConfigurationReactivatedAggregate(aggCreator *es_models.AggregateCreator
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.IdpConfigReactivated, &model.IdpConfigID{IdpConfigID: idp.IDPConfigID})
+		return agg.AppendEvent(model.IDPConfigReactivated, &model.IDPConfigID{IDPConfigID: idp.IDPConfigID})
 	}
 }
 
-func OIDCIdpConfigurationChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, config *model.OidcIdpConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
+func OIDCIDPConfigChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, config *model.OIDCIDPConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if config == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-slf32", "Errors.Internal")
@@ -217,13 +217,13 @@ func OIDCIdpConfigurationChangedAggregate(aggCreator *es_models.AggregateCreator
 		}
 		var changes map[string]interface{}
 		for _, idp := range existing.IDPs {
-			if idp.IDPConfigID == config.IdpConfigID {
+			if idp.IDPConfigID == config.IDPConfigID {
 				if idp.OIDCIDPConfig != nil {
 					changes = idp.OIDCIDPConfig.Changes(config)
 				}
 			}
 		}
-		return agg.AppendEvent(model.OidcIdpConfigChanged, changes)
+		return agg.AppendEvent(model.OIDCIDPConfigChanged, changes)
 	}
 }
 
@@ -264,7 +264,7 @@ func LoginPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, existin
 	}
 }
 
-func LoginPolicyIdpProviderAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, provider *model.IdpProvider) func(ctx context.Context) (*es_models.Aggregate, error) {
+func LoginPolicyIDPProviderAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, provider *model.IDPProvider) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if provider == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sml9d", "Errors.Internal")
@@ -277,13 +277,13 @@ func LoginPolicyIdpProviderAddedAggregate(aggCreator *es_models.AggregateCreator
 			AggregateTypeFilter(model.IamAggregate).
 			AggregateIDFilter(existing.AggregateID)
 
-		validation := checkExistingLoginPolicyIdpProviderValidation(provider.IdpConfigID)
+		validation := checkExistingLoginPolicyIDPProviderValidation(provider.IDPConfigID)
 		agg.SetPrecondition(validationQuery, validation)
-		return agg.AppendEvent(model.LoginPolicyIdpProviderAdded, provider)
+		return agg.AppendEvent(model.LoginPolicyIDPProviderAdded, provider)
 	}
 }
 
-func LoginPolicyIdpProviderRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, provider *model.IdpProviderID) func(ctx context.Context) (*es_models.Aggregate, error) {
+func LoginPolicyIDPProviderRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, provider *model.IDPProviderID) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if provider == nil || existing == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sml9d", "Errors.Internal")
@@ -292,7 +292,7 @@ func LoginPolicyIdpProviderRemovedAggregate(aggCreator *es_models.AggregateCreat
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.LoginPolicyIdpProviderRemoved, provider)
+		return agg.AppendEvent(model.LoginPolicyIDPProviderRemoved, provider)
 	}
 }
 
@@ -308,18 +308,18 @@ func checkExistingLoginPolicyValidation() func(...*es_models.Event) error {
 	}
 }
 
-func checkExistingLoginPolicyIdpProviderValidation(idpConfigID string) func(...*es_models.Event) error {
+func checkExistingLoginPolicyIDPProviderValidation(idpConfigID string) func(...*es_models.Event) error {
 	return func(events ...*es_models.Event) error {
-		idpConfigs := make([]*model.IdpConfig, 0)
-		idps := make([]*model.IdpProvider, 0)
+		idpConfigs := make([]*model.IDPConfig, 0)
+		idps := make([]*model.IDPProvider, 0)
 		for _, event := range events {
 			switch event.Type {
-			case model.IdpConfigAdded:
-				config := new(model.IdpConfig)
+			case model.IDPConfigAdded:
+				config := new(model.IDPConfig)
 				config.SetData(event)
 				idpConfigs = append(idpConfigs, config)
-			case model.IdpConfigRemoved:
-				config := new(model.IdpConfig)
+			case model.IDPConfigRemoved:
+				config := new(model.IDPConfig)
 				config.SetData(event)
 				for i, p := range idpConfigs {
 					if p.IDPConfigID == config.IDPConfigID {
@@ -328,15 +328,15 @@ func checkExistingLoginPolicyIdpProviderValidation(idpConfigID string) func(...*
 						idpConfigs = idpConfigs[:len(idpConfigs)-1]
 					}
 				}
-			case model.LoginPolicyIdpProviderAdded:
-				idp := new(model.IdpProvider)
+			case model.LoginPolicyIDPProviderAdded:
+				idp := new(model.IDPProvider)
 				idp.SetData(event)
 				idps = append(idps, idp)
-			case model.LoginPolicyIdpProviderRemoved:
-				idp := new(model.IdpProvider)
+			case model.LoginPolicyIDPProviderRemoved:
+				idp := new(model.IDPProvider)
 				idp.SetData(event)
 				for i, p := range idps {
-					if p.IdpConfigID == idp.IdpConfigID {
+					if p.IDPConfigID == idp.IDPConfigID {
 						idps[i] = idps[len(idps)-1]
 						idps[len(idps)-1] = nil
 						idps = idps[:len(idps)-1]
@@ -354,7 +354,7 @@ func checkExistingLoginPolicyIdpProviderValidation(idpConfigID string) func(...*
 			return errors.ThrowPreconditionFailed(nil, "EVENT-Djlo9", "Errors.Iam.IdpNotExisting")
 		}
 		for _, p := range idps {
-			if p.IdpConfigID == idpConfigID {
+			if p.IDPConfigID == idpConfigID {
 				return errors.ThrowPreconditionFailed(nil, "EVENT-us5Zw", "Errors.Iam.LoginPolicy.IdpProviderAlreadyExisting")
 			}
 		}

@@ -8,22 +8,22 @@ import (
 	"github.com/caos/zitadel/internal/iam/model"
 )
 
-type IdpConfig struct {
+type IDPConfig struct {
 	es_models.ObjectRoot
 	IDPConfigID   string         `json:"idpConfigId"`
 	State         int32          `json:"-"`
 	Name          string         `json:"name,omitempty"`
 	Type          int32          `json:"idpType,omitempty"`
 	LogoSrc       []byte         `json:"logoSrc,omitempty"`
-	OIDCIDPConfig *OidcIdpConfig `json:"-"`
+	OIDCIDPConfig *OIDCIDPConfig `json:"-"`
 }
 
-type IdpConfigID struct {
+type IDPConfigID struct {
 	es_models.ObjectRoot
-	IdpConfigID string `json:"idpConfigId"`
+	IDPConfigID string `json:"idpConfigId"`
 }
 
-func GetIdpConfig(idps []*IdpConfig, id string) (int, *IdpConfig) {
+func GetIDPConfig(idps []*IDPConfig, id string) (int, *IDPConfig) {
 	for i, idp := range idps {
 		if idp.IDPConfigID == id {
 			return i, idp
@@ -32,7 +32,7 @@ func GetIdpConfig(idps []*IdpConfig, id string) (int, *IdpConfig) {
 	return -1, nil
 }
 
-func (c *IdpConfig) Changes(changed *IdpConfig) map[string]interface{} {
+func (c *IDPConfig) Changes(changed *IDPConfig) map[string]interface{} {
 	changes := make(map[string]interface{}, 1)
 	changes["idpConfigId"] = c.IDPConfigID
 	if changed.Name != "" && c.Name != changed.Name {
@@ -44,24 +44,24 @@ func (c *IdpConfig) Changes(changed *IdpConfig) map[string]interface{} {
 	return changes
 }
 
-func IdpConfigsToModel(idps []*IdpConfig) []*model.IdpConfig {
-	convertedIDPConfigs := make([]*model.IdpConfig, len(idps))
+func IDPConfigsToModel(idps []*IDPConfig) []*model.IDPConfig {
+	convertedIDPConfigs := make([]*model.IDPConfig, len(idps))
 	for i, idp := range idps {
-		convertedIDPConfigs[i] = IdpConfigToModel(idp)
+		convertedIDPConfigs[i] = IDPConfigToModel(idp)
 	}
 	return convertedIDPConfigs
 }
 
-func IdpConfigsFromModel(idps []*model.IdpConfig) []*IdpConfig {
-	convertedIDPConfigs := make([]*IdpConfig, len(idps))
+func IDPConfigsFromModel(idps []*model.IDPConfig) []*IDPConfig {
+	convertedIDPConfigs := make([]*IDPConfig, len(idps))
 	for i, idp := range idps {
-		convertedIDPConfigs[i] = IdpConfigFromModel(idp)
+		convertedIDPConfigs[i] = IDPConfigFromModel(idp)
 	}
 	return convertedIDPConfigs
 }
 
-func IdpConfigFromModel(idp *model.IdpConfig) *IdpConfig {
-	converted := &IdpConfig{
+func IDPConfigFromModel(idp *model.IDPConfig) *IDPConfig {
+	converted := &IDPConfig{
 		ObjectRoot:  idp.ObjectRoot,
 		IDPConfigID: idp.IDPConfigID,
 		Name:        idp.Name,
@@ -70,28 +70,28 @@ func IdpConfigFromModel(idp *model.IdpConfig) *IdpConfig {
 		LogoSrc:     idp.LogoSrc,
 	}
 	if idp.OIDCConfig != nil {
-		converted.OIDCIDPConfig = OidcIdpConfigFromModel(idp.OIDCConfig)
+		converted.OIDCIDPConfig = OIDCIDPConfigFromModel(idp.OIDCConfig)
 	}
 	return converted
 }
 
-func IdpConfigToModel(idp *IdpConfig) *model.IdpConfig {
-	converted := &model.IdpConfig{
+func IDPConfigToModel(idp *IDPConfig) *model.IDPConfig {
+	converted := &model.IDPConfig{
 		ObjectRoot:  idp.ObjectRoot,
 		IDPConfigID: idp.IDPConfigID,
 		Name:        idp.Name,
 		LogoSrc:     idp.LogoSrc,
-		State:       model.IdpConfigState(idp.State),
+		State:       model.IDPConfigState(idp.State),
 		Type:        model.IdpConfigType(idp.Type),
 	}
 	if idp.OIDCIDPConfig != nil {
-		converted.OIDCConfig = OidcIdpConfigToModel(idp.OIDCIDPConfig)
+		converted.OIDCConfig = OIDCIDPConfigToModel(idp.OIDCIDPConfig)
 	}
 	return converted
 }
 
-func (iam *Iam) appendAddIdpConfigEvent(event *es_models.Event) error {
-	idp := new(IdpConfig)
+func (iam *Iam) appendAddIDPConfigEvent(event *es_models.Event) error {
+	idp := new(IDPConfig)
 	err := idp.SetData(event)
 	if err != nil {
 		return err
@@ -101,25 +101,25 @@ func (iam *Iam) appendAddIdpConfigEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (iam *Iam) appendChangeIdpConfigEvent(event *es_models.Event) error {
-	idp := new(IdpConfig)
+func (iam *Iam) appendChangeIDPConfigEvent(event *es_models.Event) error {
+	idp := new(IDPConfig)
 	err := idp.SetData(event)
 	if err != nil {
 		return err
 	}
-	if i, a := GetIdpConfig(iam.IDPs, idp.IDPConfigID); a != nil {
+	if i, idpConfig := GetIDPConfig(iam.IDPs, idp.IDPConfigID); idpConfig != nil {
 		iam.IDPs[i].SetData(event)
 	}
 	return nil
 }
 
-func (iam *Iam) appendRemoveIdpConfigEvent(event *es_models.Event) error {
-	idp := new(IdpConfig)
+func (iam *Iam) appendRemoveIDPConfigEvent(event *es_models.Event) error {
+	idp := new(IDPConfig)
 	err := idp.SetData(event)
 	if err != nil {
 		return err
 	}
-	if i, a := GetIdpConfig(iam.IDPs, idp.IDPConfigID); a != nil {
+	if i, idpConfig := GetIDPConfig(iam.IDPs, idp.IDPConfigID); idpConfig != nil {
 		iam.IDPs[i] = iam.IDPs[len(iam.IDPs)-1]
 		iam.IDPs[len(iam.IDPs)-1] = nil
 		iam.IDPs = iam.IDPs[:len(iam.IDPs)-1]
@@ -127,21 +127,21 @@ func (iam *Iam) appendRemoveIdpConfigEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (iam *Iam) appendIdpConfigStateEvent(event *es_models.Event, state model.IdpConfigState) error {
-	idp := new(IdpConfig)
+func (iam *Iam) appendIDPConfigStateEvent(event *es_models.Event, state model.IDPConfigState) error {
+	idp := new(IDPConfig)
 	err := idp.SetData(event)
 	if err != nil {
 		return err
 	}
 
-	if i, a := GetIdpConfig(iam.IDPs, idp.IDPConfigID); a != nil {
-		a.State = int32(state)
-		iam.IDPs[i] = a
+	if i, idpConfig := GetIDPConfig(iam.IDPs, idp.IDPConfigID); idpConfig != nil {
+		idpConfig.State = int32(state)
+		iam.IDPs[i] = idpConfig
 	}
 	return nil
 }
 
-func (c *IdpConfig) SetData(event *es_models.Event) error {
+func (c *IDPConfig) SetData(event *es_models.Event) error {
 	c.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, c); err != nil {
 		logging.Log("EVEN-Msj9w").WithError(err).Error("could not unmarshal event data")

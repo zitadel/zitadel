@@ -92,8 +92,8 @@ func (repo *OrgRepository) GetMyOrgIamPolicy(ctx context.Context) (*org_model.Or
 func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_model.OrgDomainSearchRequest) (*org_model.OrgDomainSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	request.Queries = append(request.Queries, &org_model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyOrgID, Method: global_model.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID})
-	sequence, err := repo.View.GetLatestOrgDomainSequence()
-	logging.Log("EVENT-SLowp").OnError(err).Warn("could not read latest org domain sequence")
+	sequence, sequenceErr := repo.View.GetLatestOrgDomainSequence()
+	logging.Log("EVENT-SLowp").OnError(sequenceErr).Warn("could not read latest org domain sequence")
 	domains, count, err := repo.View.SearchOrgDomains(request)
 	if err != nil {
 		return nil, err
@@ -104,7 +104,7 @@ func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_
 		TotalResult: uint64(count),
 		Result:      model.OrgDomainsToModel(domains),
 	}
-	if err == nil {
+	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
 	}
@@ -184,8 +184,8 @@ func (repo *OrgRepository) RemoveMyOrgMember(ctx context.Context, userID string)
 func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	request.Queries[len(request.Queries)-1] = &org_model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyOrgID, Method: global_model.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID}
-	sequence, err := repo.View.GetLatestOrgMemberSequence()
-	logging.Log("EVENT-Smu3d").OnError(err).Warn("could not read latest org member sequence")
+	sequence, sequenceErr := repo.View.GetLatestOrgMemberSequence()
+	logging.Log("EVENT-Smu3d").OnError(sequenceErr).Warn("could not read latest org member sequence")
 	members, count, err := repo.View.SearchOrgMembers(request)
 	if err != nil {
 		return nil, err
@@ -196,7 +196,7 @@ func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_
 		TotalResult: count,
 		Result:      model.OrgMembersToModel(members),
 	}
-	if err == nil {
+	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
 	}
@@ -213,58 +213,58 @@ func (repo *OrgRepository) GetOrgMemberRoles() []string {
 	return roles
 }
 
-func (repo *OrgRepository) IdpConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IdpConfigView, error) {
-	idp, err := repo.View.IdpConfigByID(idpConfigID)
+func (repo *OrgRepository) IDPConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IDPConfigView, error) {
+	idp, err := repo.View.IDPConfigByID(idpConfigID)
 	if err != nil {
 		return nil, err
 	}
 	return iam_view_model.IdpConfigViewToModel(idp), nil
 }
-func (repo *OrgRepository) AddOidcIdpConfig(ctx context.Context, idp *iam_model.IdpConfig) (*iam_model.IdpConfig, error) {
+func (repo *OrgRepository) AddOIDCIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
 	idp.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.AddIdpConfiguration(ctx, idp)
+	return repo.OrgEventstore.AddIDPConfig(ctx, idp)
 }
 
-func (repo *OrgRepository) ChangeIdpConfig(ctx context.Context, idp *iam_model.IdpConfig) (*iam_model.IdpConfig, error) {
+func (repo *OrgRepository) ChangeIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
 	idp.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.ChangeIdpConfiguration(ctx, idp)
+	return repo.OrgEventstore.ChangeIDPConfig(ctx, idp)
 }
 
-func (repo *OrgRepository) DeactivateIdpConfig(ctx context.Context, idpConfigID string) (*iam_model.IdpConfig, error) {
-	return repo.OrgEventstore.DeactivateIdpConfiguration(ctx, authz.GetCtxData(ctx).OrgID, idpConfigID)
+func (repo *OrgRepository) DeactivateIDPConfig(ctx context.Context, idpConfigID string) (*iam_model.IDPConfig, error) {
+	return repo.OrgEventstore.DeactivateIDPConfig(ctx, authz.GetCtxData(ctx).OrgID, idpConfigID)
 }
 
-func (repo *OrgRepository) ReactivateIdpConfig(ctx context.Context, idpConfigID string) (*iam_model.IdpConfig, error) {
-	return repo.OrgEventstore.ReactivateIdpConfiguration(ctx, authz.GetCtxData(ctx).OrgID, idpConfigID)
+func (repo *OrgRepository) ReactivateIDPConfig(ctx context.Context, idpConfigID string) (*iam_model.IDPConfig, error) {
+	return repo.OrgEventstore.ReactivateIDPConfig(ctx, authz.GetCtxData(ctx).OrgID, idpConfigID)
 }
 
-func (repo *OrgRepository) RemoveIdpConfig(ctx context.Context, idpConfigID string) error {
-	idp := iam_model.NewIdpConfig(authz.GetCtxData(ctx).OrgID, idpConfigID)
-	return repo.OrgEventstore.RemoveIdpConfiguration(ctx, idp)
+func (repo *OrgRepository) RemoveIDPConfig(ctx context.Context, idpConfigID string) error {
+	idp := iam_model.NewIDPConfig(authz.GetCtxData(ctx).OrgID, idpConfigID)
+	return repo.OrgEventstore.RemoveIDPConfig(ctx, idp)
 }
 
-func (repo *OrgRepository) ChangeOidcIdpConfig(ctx context.Context, oidcConfig *iam_model.OidcIdpConfig) (*iam_model.OidcIdpConfig, error) {
+func (repo *OrgRepository) ChangeOIDCIDPConfig(ctx context.Context, oidcConfig *iam_model.OIDCIDPConfig) (*iam_model.OIDCIDPConfig, error) {
 	oidcConfig.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.ChangeIdpOidcConfiguration(ctx, oidcConfig)
+	return repo.OrgEventstore.ChangeIDPOIDCConfig(ctx, oidcConfig)
 }
 
-func (repo *OrgRepository) SearchIdpConfigs(ctx context.Context, request *iam_model.IdpConfigSearchRequest) (*iam_model.IdpConfigSearchResponse, error) {
+func (repo *OrgRepository) SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	request.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID, repo.SystemDefaults.IamID)
 
-	sequence, err := repo.View.GetLatestIdpConfigSequence()
-	logging.Log("EVENT-Dk8si").OnError(err).Warn("could not read latest idp config sequence")
-	idps, count, err := repo.View.SearchIdpConfigs(request)
+	sequence, sequenceErr := repo.View.GetLatestIDPConfigSequence()
+	logging.Log("EVENT-Dk8si").OnError(sequenceErr).Warn("could not read latest idp config sequence")
+	idps, count, err := repo.View.SearchIDPConfigs(request)
 	if err != nil {
 		return nil, err
 	}
-	result := &iam_model.IdpConfigSearchResponse{
+	result := &iam_model.IDPConfigSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
 		Result:      iam_view_model.IdpConfigViewsToModel(idps),
 	}
-	if err == nil {
+	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
 	}
@@ -303,7 +303,7 @@ func (repo *OrgRepository) RemoveLoginPolicy(ctx context.Context) error {
 	return repo.OrgEventstore.RemoveLoginPolicy(ctx, policy)
 }
 
-func (repo *OrgRepository) SearchIdpProviders(ctx context.Context, request *iam_model.IdpProviderSearchRequest) (*iam_model.IdpProviderSearchResponse, error) {
+func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error) {
 	_, err := repo.View.LoginPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -313,31 +313,31 @@ func (repo *OrgRepository) SearchIdpProviders(ctx context.Context, request *iam_
 		request.AppendAggregateIDQuery(authz.GetCtxData(ctx).OrgID)
 	}
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, err := repo.View.GetLatestIdpProviderSequence()
-	logging.Log("EVENT-Tuiks").OnError(err).Warn("could not read latest iam sequence")
+	sequence, sequenceErr := repo.View.GetLatestIdpProviderSequence()
+	logging.Log("EVENT-Tuiks").OnError(sequenceErr).Warn("could not read latest iam sequence")
 	providers, count, err := repo.View.SearchIdpProviders(request)
 	if err != nil {
 		return nil, err
 	}
-	result := &iam_model.IdpProviderSearchResponse{
+	result := &iam_model.IDPProviderSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
-		Result:      iam_es_model.IdpProviderViewsToModel(providers),
+		Result:      iam_es_model.IDPProviderViewsToModel(providers),
 	}
-	if err == nil {
+	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
 	}
 	return result, nil
 }
 
-func (repo *OrgRepository) AddIdpProviderToLoginPolicy(ctx context.Context, provider *iam_model.IdpProvider) (*iam_model.IdpProvider, error) {
+func (repo *OrgRepository) AddIDPProviderToLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) (*iam_model.IDPProvider, error) {
 	provider.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.AddIdpProviderToLoginPolicy(ctx, provider)
+	return repo.OrgEventstore.AddIDPProviderToLoginPolicy(ctx, provider)
 }
 
-func (repo *OrgRepository) RemoveIdpProviderFromIdpProvider(ctx context.Context, provider *iam_model.IdpProvider) error {
+func (repo *OrgRepository) RemoveIDPProviderFromIdpProvider(ctx context.Context, provider *iam_model.IDPProvider) error {
 	provider.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.RemoveIdpProviderFromLoginPolicy(ctx, provider)
+	return repo.OrgEventstore.RemoveIDPProviderFromLoginPolicy(ctx, provider)
 }

@@ -18,7 +18,7 @@ type Org struct {
 	OrgIamPolicy *OrgIamPolicy
 	LoginPolicy  *iam_model.LoginPolicy
 
-	IDPs []*iam_model.IdpConfig
+	IDPs []*iam_model.IDPConfig
 }
 type OrgChanges struct {
 	Changes      []*OrgChange
@@ -62,7 +62,7 @@ func (o *Org) GetDomain(domain *OrgDomain) (int, *OrgDomain) {
 	return -1, nil
 }
 
-func (o *Org) GetIDP(idpID string) (int, *iam_model.IdpConfig) {
+func (o *Org) GetIDP(idpID string) (int, *iam_model.IDPConfig) {
 	for i, idp := range o.IDPs {
 		if idp.IDPConfigID == idpID {
 			return i, idp

@@ -7,12 +7,12 @@ import (
 	"github.com/golang/protobuf/ptypes"
 )
 
-func createOidcIdpToModel(idp *management.OidcIdpConfigCreate) *iam_model.IdpConfig {
-	return &iam_model.IdpConfig{
+func createOidcIdpToModel(idp *management.OidcIdpConfigCreate) *iam_model.IDPConfig {
+	return &iam_model.IDPConfig{
 		Name:    idp.Name,
 		LogoSrc: idp.LogoSrc,
 		Type:    iam_model.IDPConfigTypeOIDC,
-		OIDCConfig: &iam_model.OidcIdpConfig{
+		OIDCConfig: &iam_model.OIDCIDPConfig{
 			ClientID:           idp.ClientId,
 			ClientSecretString: idp.ClientSecret,
 			Issuer:             idp.Issuer,
@@ -21,16 +21,16 @@ func createOidcIdpToModel(idp *management.OidcIdpConfigCreate) *iam_model.IdpCon
 	}
 }
 
-func updateIdpToModel(idp *management.IdpUpdate) *iam_model.IdpConfig {
-	return &iam_model.IdpConfig{
+func updateIdpToModel(idp *management.IdpUpdate) *iam_model.IDPConfig {
+	return &iam_model.IDPConfig{
 		IDPConfigID: idp.Id,
 		Name:        idp.Name,
 		LogoSrc:     idp.LogoSrc,
 	}
 }
 
-func updateOidcIdpToModel(idp *management.OidcIdpConfigUpdate) *iam_model.OidcIdpConfig {
-	return &iam_model.OidcIdpConfig{
+func updateOidcIdpToModel(idp *management.OidcIdpConfigUpdate) *iam_model.OIDCIDPConfig {
+	return &iam_model.OIDCIDPConfig{
 		IDPConfigID:        idp.IdpId,
 		ClientID:           idp.ClientId,
 		ClientSecretString: idp.ClientSecret,
@@ -39,7 +39,7 @@ func updateOidcIdpToModel(idp *management.OidcIdpConfigUpdate) *iam_model.OidcId
 	}
 }
 
-func idpFromModel(idp *iam_model.IdpConfig) *management.Idp {
+func idpFromModel(idp *iam_model.IDPConfig) *management.Idp {
 	creationDate, err := ptypes.TimestampProto(idp.CreationDate)
 	logging.Log("GRPC-8dju8").OnError(err).Debug("date parse failed")
 
@@ -58,7 +58,7 @@ func idpFromModel(idp *iam_model.IdpConfig) *management.Idp {
 	}
 }
 
-func idpViewFromModel(idp *iam_model.IdpConfigView) *management.IdpView {
+func idpViewFromModel(idp *iam_model.IDPConfigView) *management.IdpView {
 	creationDate, err := ptypes.TimestampProto(idp.CreationDate)
 	logging.Log("GRPC-8dju8").OnError(err).Debug("date parse failed")
 
@@ -66,11 +66,11 @@ func idpViewFromModel(idp *iam_model.IdpConfigView) *management.IdpView {
 	logging.Log("GRPC-Dsj8i").OnError(err).Debug("date parse failed")
 
 	return &management.IdpView{
-		Id:            idp.IdpConfigID,
+		Id:            idp.IDPConfigID,
 		CreationDate:  creationDate,
 		ChangeDate:    changeDate,
 		Sequence:      idp.Sequence,
-		ProviderType:  idpProviderTypeFromModel(idp.IdpProviderType),
+		ProviderType:  idpProviderTypeFromModel(idp.IDPProviderType),
 		Name:          idp.Name,
 		LogoSrc:       idp.LogoSrc,
 		State:         idpConfigStateFromModel(idp.State),
@@ -78,7 +78,7 @@ func idpViewFromModel(idp *iam_model.IdpConfigView) *management.IdpView {
 	}
 }
 
-func idpConfigFromModel(idp *iam_model.IdpConfig) *management.Idp_OidcConfig {
+func idpConfigFromModel(idp *iam_model.IDPConfig) *management.Idp_OidcConfig {
 	if idp.Type == iam_model.IDPConfigTypeOIDC {
 		return &management.Idp_OidcConfig{
 			OidcConfig: oidcIdpConfigFromModel(idp.OIDCConfig),
@@ -87,7 +87,7 @@ func idpConfigFromModel(idp *iam_model.IdpConfig) *management.Idp_OidcConfig {
 	return nil
 }
 
-func oidcIdpConfigFromModel(idp *iam_model.OidcIdpConfig) *management.OidcIdpConfig {
+func oidcIdpConfigFromModel(idp *iam_model.OIDCIDPConfig) *management.OidcIdpConfig {
 	return &management.OidcIdpConfig{
 		ClientId: idp.ClientID,
 		Issuer:   idp.Issuer,
@@ -95,8 +95,8 @@ func oidcIdpConfigFromModel(idp *iam_model.OidcIdpConfig) *management.OidcIdpCon
 	}
 }
 
-func idpConfigViewFromModel(idp *iam_model.IdpConfigView) *management.IdpView_OidcConfig {
-	if idp.IsOidc {
+func idpConfigViewFromModel(idp *iam_model.IDPConfigView) *management.IdpView_OidcConfig {
+	if idp.IsOIDC {
 		return &management.IdpView_OidcConfig{
 			OidcConfig: oidcIdpConfigViewFromModel(idp),
 		}
@@ -104,35 +104,35 @@ func idpConfigViewFromModel(idp *iam_model.IdpConfigView) *management.IdpView_Oi
 	return nil
 }
 
-func oidcIdpConfigViewFromModel(idp *iam_model.IdpConfigView) *management.OidcIdpConfigView {
+func oidcIdpConfigViewFromModel(idp *iam_model.IDPConfigView) *management.OidcIdpConfigView {
 	return &management.OidcIdpConfigView{
-		ClientId: idp.OidcClientID,
-		Issuer:   idp.OidcIssuer,
-		Scopes:   idp.OidcScopes,
+		ClientId: idp.OIDCClientID,
+		Issuer:   idp.OIDCIssuer,
+		Scopes:   idp.OIDCScopes,
 	}
 }
 
-func idpConfigStateFromModel(state iam_model.IdpConfigState) management.IdpState {
+func idpConfigStateFromModel(state iam_model.IDPConfigState) management.IdpState {
 	switch state {
-	case iam_model.IdpConfigStateActive:
+	case iam_model.IDPConfigStateActive:
 		return management.IdpState_IDPCONFIGSTATE_ACTIVE
-	case iam_model.IdpConfigStateInactive:
+	case iam_model.IDPConfigStateInactive:
 		return management.IdpState_IDPCONFIGSTATE_INACTIVE
 	default:
 		return management.IdpState_IDPCONFIGSTATE_UNSPECIFIED
 	}
 }
 
-func idpConfigSearchRequestToModel(request *management.IdpSearchRequest) *iam_model.IdpConfigSearchRequest {
-	return &iam_model.IdpConfigSearchRequest{
+func idpConfigSearchRequestToModel(request *management.IdpSearchRequest) *iam_model.IDPConfigSearchRequest {
+	return &iam_model.IDPConfigSearchRequest{
 		Limit:   request.Limit,
 		Offset:  request.Offset,
 		Queries: idpConfigSearchQueriesToModel(request.Queries),
 	}
 }
 
-func idpConfigSearchQueriesToModel(queries []*management.IdpSearchQuery) []*iam_model.IdpConfigSearchQuery {
-	modelQueries := make([]*iam_model.IdpConfigSearchQuery, len(queries))
+func idpConfigSearchQueriesToModel(queries []*management.IdpSearchQuery) []*iam_model.IDPConfigSearchQuery {
+	modelQueries := make([]*iam_model.IDPConfigSearchQuery, len(queries))
 	for i, query := range queries {
 		modelQueries[i] = idpConfigSearchQueryToModel(query)
 	}
@@ -140,28 +140,28 @@ func idpConfigSearchQueriesToModel(queries []*management.IdpSearchQuery) []*iam_
 	return modelQueries
 }
 
-func idpConfigSearchQueryToModel(query *management.IdpSearchQuery) *iam_model.IdpConfigSearchQuery {
-	return &iam_model.IdpConfigSearchQuery{
+func idpConfigSearchQueryToModel(query *management.IdpSearchQuery) *iam_model.IDPConfigSearchQuery {
+	return &iam_model.IDPConfigSearchQuery{
 		Key:    idpConfigSearchKeyToModel(query.Key),
 		Method: searchMethodToModel(query.Method),
 		Value:  query.Value,
 	}
 }
 
-func idpConfigSearchKeyToModel(key management.IdpSearchKey) iam_model.IdpConfigSearchKey {
+func idpConfigSearchKeyToModel(key management.IdpSearchKey) iam_model.IDPConfigSearchKey {
 	switch key {
 	case management.IdpSearchKey_IDPSEARCHKEY_IDP_CONFIG_ID:
-		return iam_model.IdpConfigSearchKeyIdpConfigID
+		return iam_model.IDPConfigSearchKeyIdpConfigID
 	case management.IdpSearchKey_IDPSEARCHKEY_NAME:
-		return iam_model.IdpConfigSearchKeyName
+		return iam_model.IDPConfigSearchKeyName
 	case management.IdpSearchKey_IDPSEARCHKEY_PROVIDER_TYPE:
-		return iam_model.IdpConfigSearchKeyIdpProviderType
+		return iam_model.IDPConfigSearchKeyIdpProviderType
 	default:
-		return iam_model.IdpConfigSearchKeyUnspecified
+		return iam_model.IDPConfigSearchKeyUnspecified
 	}
 }
 
-func idpConfigSearchResponseFromModel(resp *iam_model.IdpConfigSearchResponse) *management.IdpSearchResponse {
+func idpConfigSearchResponseFromModel(resp *iam_model.IDPConfigSearchResponse) *management.IdpSearchResponse {
 	timestamp, err := ptypes.TimestampProto(resp.Timestamp)
 	logging.Log("GRPC-KSi8c").OnError(err).Debug("date parse failed")
 	return &management.IdpSearchResponse{
@@ -174,7 +174,7 @@ func idpConfigSearchResponseFromModel(resp *iam_model.IdpConfigSearchResponse) *
 	}
 }
 
-func idpConfigsFromView(viewIdps []*iam_model.IdpConfigView) []*management.IdpView {
+func idpConfigsFromView(viewIdps []*iam_model.IDPConfigView) []*management.IdpView {
 	idps := make([]*management.IdpView, len(viewIdps))
 	for i, idp := range viewIdps {
 		idps[i] = idpViewFromModel(idp)

@@ -9,10 +9,10 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func GetIdpProviderByAggregateIDAndConfigID(db *gorm.DB, table, aggregateID, idpConfigID string) (*model.IdpProviderView, error) {
-	policy := new(model.IdpProviderView)
-	aggIDQuery := &model.IdpProviderSearchQuery{Key: iam_model.IdpProviderSearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
-	idpConfigIDQuery := &model.IdpProviderSearchQuery{Key: iam_model.IdpProviderSearchKeyIdpConfigID, Value: idpConfigID, Method: global_model.SearchMethodEquals}
+func GetIDPProviderByAggregateIDAndConfigID(db *gorm.DB, table, aggregateID, idpConfigID string) (*model.IDPProviderView, error) {
+	policy := new(model.IDPProviderView)
+	aggIDQuery := &model.IDPProviderSearchQuery{Key: iam_model.IDPProviderSearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
+	idpConfigIDQuery := &model.IDPProviderSearchQuery{Key: iam_model.IDPProviderSearchKeyIdpConfigID, Value: idpConfigID, Method: global_model.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, aggIDQuery, idpConfigIDQuery)
 	err := query(db, policy)
 	if caos_errs.IsNotFound(err) {
@@ -21,16 +21,16 @@ func GetIdpProviderByAggregateIDAndConfigID(db *gorm.DB, table, aggregateID, idp
 	return policy, err
 }
 
-func IdpProvidersByIdpConfigID(db *gorm.DB, table string, idpConfigID string) ([]*model.IdpProviderView, error) {
-	members := make([]*model.IdpProviderView, 0)
-	queries := []*iam_model.IdpProviderSearchQuery{
+func IDPProvidersByIdpConfigID(db *gorm.DB, table string, idpConfigID string) ([]*model.IDPProviderView, error) {
+	members := make([]*model.IDPProviderView, 0)
+	queries := []*iam_model.IDPProviderSearchQuery{
 		{
-			Key:    iam_model.IdpProviderSearchKeyIdpConfigID,
+			Key:    iam_model.IDPProviderSearchKeyIdpConfigID,
 			Value:  idpConfigID,
 			Method: global_model.SearchMethodEquals,
 		},
 	}
-	query := repository.PrepareSearchQuery(table, model.IdpProviderSearchRequest{Queries: queries})
+	query := repository.PrepareSearchQuery(table, model.IDPProviderSearchRequest{Queries: queries})
 	_, err := query(db, &members)
 	if err != nil {
 		return nil, err
@@ -38,9 +38,9 @@ func IdpProvidersByIdpConfigID(db *gorm.DB, table string, idpConfigID string) ([
 	return members, nil
 }
 
-func SearchIdpProviders(db *gorm.DB, table string, req *iam_model.IdpProviderSearchRequest) ([]*model.IdpProviderView, uint64, error) {
-	providers := make([]*model.IdpProviderView, 0)
-	query := repository.PrepareSearchQuery(table, model.IdpProviderSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
+func SearchIDPProviders(db *gorm.DB, table string, req *iam_model.IDPProviderSearchRequest) ([]*model.IDPProviderView, uint64, error) {
+	providers := make([]*model.IDPProviderView, 0)
+	query := repository.PrepareSearchQuery(table, model.IDPProviderSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &providers)
 	if err != nil {
 		return nil, 0, err
@@ -48,12 +48,12 @@ func SearchIdpProviders(db *gorm.DB, table string, req *iam_model.IdpProviderSea
 	return providers, count, nil
 }
 
-func PutIdpProvider(db *gorm.DB, table string, provider *model.IdpProviderView) error {
+func PutIDPProvider(db *gorm.DB, table string, provider *model.IDPProviderView) error {
 	save := repository.PrepareSave(table)
 	return save(db, provider)
 }
 
-func PutIdpProviders(db *gorm.DB, table string, providers ...*model.IdpProviderView) error {
+func PutIDPProviders(db *gorm.DB, table string, providers ...*model.IDPProviderView) error {
 	save := repository.PrepareBulkSave(table)
 	p := make([]interface{}, len(providers))
 	for i, provider := range providers {
@@ -62,17 +62,17 @@ func PutIdpProviders(db *gorm.DB, table string, providers ...*model.IdpProviderV
 	return save(db, p...)
 }
 
-func DeleteIdpProvider(db *gorm.DB, table, aggregateID, idpConfigID string) error {
+func DeleteIDPProvider(db *gorm.DB, table, aggregateID, idpConfigID string) error {
 	delete := repository.PrepareDeleteByKeys(table,
-		repository.Key{Key: model.IdpProviderSearchKey(iam_model.IdpProviderSearchKeyAggregateID), Value: aggregateID},
-		repository.Key{Key: model.IdpProviderSearchKey(iam_model.IdpProviderSearchKeyIdpConfigID), Value: idpConfigID},
+		repository.Key{Key: model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyAggregateID), Value: aggregateID},
+		repository.Key{Key: model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyIdpConfigID), Value: idpConfigID},
 	)
 	return delete(db)
 }
 
-func DeleteIdpProvidersByAggregateID(db *gorm.DB, table, aggregateID string) error {
+func DeleteIDPProvidersByAggregateID(db *gorm.DB, table, aggregateID string) error {
 	delete := repository.PrepareDeleteByKeys(table,
-		repository.Key{Key: model.IdpProviderSearchKey(iam_model.IdpProviderSearchKeyAggregateID), Value: aggregateID},
+		repository.Key{Key: model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyAggregateID), Value: aggregateID},
 	)
 	return delete(db)
 }

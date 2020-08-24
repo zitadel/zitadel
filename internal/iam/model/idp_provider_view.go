@@ -5,55 +5,55 @@ import (
 	"time"
 )
 
-type IdpProviderView struct {
+type IDPProviderView struct {
 	AggregateID     string
-	IdpConfigID     string
-	IdpProviderType IdpProviderType
+	IDPConfigID     string
+	IDPProviderType IDPProviderType
 	Name            string
-	IdpConfigType   IdpConfigType
+	IDPConfigType   IdpConfigType
 
 	CreationDate time.Time
 	ChangeDate   time.Time
 	Sequence     uint64
 }
 
-type IdpProviderSearchRequest struct {
+type IDPProviderSearchRequest struct {
 	Offset        uint64
 	Limit         uint64
-	SortingColumn IdpProviderSearchKey
+	SortingColumn IDPProviderSearchKey
 	Asc           bool
-	Queries       []*IdpProviderSearchQuery
+	Queries       []*IDPProviderSearchQuery
 }
 
-type IdpProviderSearchKey int32
+type IDPProviderSearchKey int32
 
 const (
-	IdpProviderSearchKeyUnspecified IdpProviderSearchKey = iota
-	IdpProviderSearchKeyAggregateID
-	IdpProviderSearchKeyIdpConfigID
+	IDPProviderSearchKeyUnspecified IDPProviderSearchKey = iota
+	IDPProviderSearchKeyAggregateID
+	IDPProviderSearchKeyIdpConfigID
 )
 
-type IdpProviderSearchQuery struct {
-	Key    IdpProviderSearchKey
+type IDPProviderSearchQuery struct {
+	Key    IDPProviderSearchKey
 	Method model.SearchMethod
 	Value  interface{}
 }
 
-type IdpProviderSearchResponse struct {
+type IDPProviderSearchResponse struct {
 	Offset      uint64
 	Limit       uint64
 	TotalResult uint64
-	Result      []*IdpProviderView
+	Result      []*IDPProviderView
 	Sequence    uint64
 	Timestamp   time.Time
 }
 
-func (r *IdpProviderSearchRequest) EnsureLimit(limit uint64) {
+func (r *IDPProviderSearchRequest) EnsureLimit(limit uint64) {
 	if r.Limit == 0 || r.Limit > limit {
 		r.Limit = limit
 	}
 }
 
-func (r *IdpProviderSearchRequest) AppendAggregateIDQuery(aggregateID string) {
-	r.Queries = append(r.Queries, &IdpProviderSearchQuery{Key: IdpProviderSearchKeyAggregateID, Method: model.SearchMethodEquals, Value: aggregateID})
+func (r *IDPProviderSearchRequest) AppendAggregateIDQuery(aggregateID string) {
+	r.Queries = append(r.Queries, &IDPProviderSearchQuery{Key: IDPProviderSearchKeyAggregateID, Method: model.SearchMethodEquals, Value: aggregateID})
 }

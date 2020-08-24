@@ -10,18 +10,18 @@ import (
 	"reflect"
 )
 
-type OidcIdpConfig struct {
+type OIDCIDPConfig struct {
 	es_models.ObjectRoot
-	IdpConfigID  string              `json:"idpConfigId"`
+	IDPConfigID  string              `json:"idpConfigId"`
 	ClientID     string              `json:"clientId"`
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
 	Issuer       string              `json:"issuer,omitempty"`
 	Scopes       pq.StringArray      `json:"scopes,omitempty"`
 }
 
-func (c *OidcIdpConfig) Changes(changed *OidcIdpConfig) map[string]interface{} {
+func (c *OIDCIDPConfig) Changes(changed *OIDCIDPConfig) map[string]interface{} {
 	changes := make(map[string]interface{}, 1)
-	changes["idpConfigId"] = c.IdpConfigID
+	changes["idpConfigId"] = c.IDPConfigID
 	if c.ClientID != changed.ClientID {
 		changes["clientId"] = changed.ClientID
 	}
@@ -37,10 +37,10 @@ func (c *OidcIdpConfig) Changes(changed *OidcIdpConfig) map[string]interface{} {
 	return changes
 }
 
-func OidcIdpConfigFromModel(config *model.OidcIdpConfig) *OidcIdpConfig {
-	return &OidcIdpConfig{
+func OIDCIDPConfigFromModel(config *model.OIDCIDPConfig) *OIDCIDPConfig {
+	return &OIDCIDPConfig{
 		ObjectRoot:   config.ObjectRoot,
-		IdpConfigID:  config.IDPConfigID,
+		IDPConfigID:  config.IDPConfigID,
 		ClientID:     config.ClientID,
 		ClientSecret: config.ClientSecret,
 		Issuer:       config.Issuer,
@@ -48,10 +48,10 @@ func OidcIdpConfigFromModel(config *model.OidcIdpConfig) *OidcIdpConfig {
 	}
 }
 
-func OidcIdpConfigToModel(config *OidcIdpConfig) *model.OidcIdpConfig {
-	return &model.OidcIdpConfig{
+func OIDCIDPConfigToModel(config *OIDCIDPConfig) *model.OIDCIDPConfig {
+	return &model.OIDCIDPConfig{
 		ObjectRoot:   config.ObjectRoot,
-		IDPConfigID:  config.IdpConfigID,
+		IDPConfigID:  config.IDPConfigID,
 		ClientID:     config.ClientID,
 		ClientSecret: config.ClientSecret,
 		Issuer:       config.Issuer,
@@ -59,34 +59,34 @@ func OidcIdpConfigToModel(config *OidcIdpConfig) *model.OidcIdpConfig {
 	}
 }
 
-func (iam *Iam) appendAddOidcIdpConfigEvent(event *es_models.Event) error {
-	config := new(OidcIdpConfig)
+func (iam *Iam) appendAddOIDCIDPConfigEvent(event *es_models.Event) error {
+	config := new(OIDCIDPConfig)
 	err := config.SetData(event)
 	if err != nil {
 		return err
 	}
 	config.ObjectRoot.CreationDate = event.CreationDate
-	if i, a := GetIdpConfig(iam.IDPs, config.IdpConfigID); a != nil {
+	if i, idpConfig := GetIDPConfig(iam.IDPs, config.IDPConfigID); idpConfig != nil {
 		iam.IDPs[i].Type = int32(model.IDPConfigTypeOIDC)
 		iam.IDPs[i].OIDCIDPConfig = config
 	}
 	return nil
 }
 
-func (iam *Iam) appendChangeOidcIdpConfigEvent(event *es_models.Event) error {
-	config := new(OidcIdpConfig)
+func (iam *Iam) appendChangeOIDCIDPConfigEvent(event *es_models.Event) error {
+	config := new(OIDCIDPConfig)
 	err := config.SetData(event)
 	if err != nil {
 		return err
 	}
 
-	if i, a := GetIdpConfig(iam.IDPs, config.IdpConfigID); a != nil {
+	if i, idpConfig := GetIDPConfig(iam.IDPs, config.IDPConfigID); idpConfig != nil {
 		iam.IDPs[i].OIDCIDPConfig.SetData(event)
 	}
 	return nil
 }
 
-func (o *OidcIdpConfig) SetData(event *es_models.Event) error {
+func (o *OIDCIDPConfig) SetData(event *es_models.Event) error {
 	o.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, o); err != nil {
 		logging.Log("EVEN-Msh8s").WithError(err).Error("could not unmarshal event data")

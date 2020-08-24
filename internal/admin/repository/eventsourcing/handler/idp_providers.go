@@ -16,7 +16,7 @@ import (
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 )
 
-type IdpProvider struct {
+type IDPProvider struct {
 	handler
 	systemDefaults systemdefaults.SystemDefaults
 	iamEvents      *eventsourcing.IamEventstore
@@ -27,12 +27,12 @@ const (
 	idpProviderTable = "adminapi.idp_providers"
 )
 
-func (m *IdpProvider) ViewModel() string {
+func (m *IDPProvider) ViewModel() string {
 	return idpProviderTable
 }
 
-func (m *IdpProvider) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestIdpProviderSequence()
+func (m *IDPProvider) EventQuery() (*models.SearchQuery, error) {
+	sequence, err := m.view.GetLatestIDPProviderSequence()
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (m *IdpProvider) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (m *IdpProvider) Reduce(event *models.Event) (err error) {
+func (m *IDPProvider) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
 	case model.IamAggregate, org_es_model.OrgAggregate:
 		err = m.processIdpProvider(event)
@@ -49,52 +49,52 @@ func (m *IdpProvider) Reduce(event *models.Event) (err error) {
 	return err
 }
 
-func (m *IdpProvider) processIdpProvider(event *models.Event) (err error) {
-	provider := new(iam_view_model.IdpProviderView)
+func (m *IDPProvider) processIdpProvider(event *models.Event) (err error) {
+	provider := new(iam_view_model.IDPProviderView)
 	switch event.Type {
-	case model.LoginPolicyIdpProviderAdded, org_es_model.LoginPolicyIdpProviderAdded:
+	case model.LoginPolicyIDPProviderAdded, org_es_model.LoginPolicyIDPProviderAdded:
 		err = provider.AppendEvent(event)
 		if err != nil {
 			return err
 		}
 		err = m.fillData(provider)
-	case model.LoginPolicyIdpProviderRemoved, model.LoginPolicyIdpProviderCascadeRemoved,
-		org_es_model.LoginPolicyIdpProviderRemoved, org_es_model.LoginPolicyIdpProviderCascadeRemoved:
+	case model.LoginPolicyIDPProviderRemoved, model.LoginPolicyIDPProviderCascadeRemoved,
+		org_es_model.LoginPolicyIDPProviderRemoved, org_es_model.LoginPolicyIDPProviderCascadeRemoved:
 		err = provider.SetData(event)
 		if err != nil {
 			return err
 		}
-		return m.view.DeleteIdpProvider(event.AggregateID, provider.IdpConfigID, event.Sequence)
-	case model.IdpConfigChanged, org_es_model.IdpConfigChanged:
-		config := new(iam_model.IdpConfig)
+		return m.view.DeleteIDPProvider(event.AggregateID, provider.IDPConfigID, event.Sequence)
+	case model.IDPConfigChanged, org_es_model.IDPConfigChanged:
+		config := new(iam_model.IDPConfig)
 		config.AppendEvent(event)
-		providers, err := m.view.IdpProvidersByIdpConfigID(config.IDPConfigID)
+		providers, err := m.view.IDPProvidersByIdpConfigID(config.IDPConfigID)
 		if err != nil {
 			return err
 		}
-		config, err = m.iamEvents.GetIdpConfiguration(context.Background(), provider.AggregateID, config.IDPConfigID)
+		config, err = m.iamEvents.GetIDPConfig(context.Background(), provider.AggregateID, config.IDPConfigID)
 		if err != nil {
 			return err
 		}
 		for _, provider := range providers {
 			m.fillConfigData(provider, config)
 		}
-		return m.view.PutIdpProviders(event.Sequence, providers...)
+		return m.view.PutIDPProviders(event.Sequence, providers...)
 	default:
-		return m.view.ProcessedIdpProviderSequence(event.Sequence)
+		return m.view.ProcessedIDPProviderSequence(event.Sequence)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutIdpProvider(provider, provider.Sequence)
+	return m.view.PutIDPProvider(provider, provider.Sequence)
 }
 
-func (m *IdpProvider) fillData(provider *iam_view_model.IdpProviderView) (err error) {
-	var config *iam_model.IdpConfig
-	if provider.IdpProviderType == int32(iam_model.IdpProviderTypeSystem) {
-		config, err = m.iamEvents.GetIdpConfiguration(context.Background(), m.systemDefaults.IamID, provider.IdpConfigID)
+func (m *IDPProvider) fillData(provider *iam_view_model.IDPProviderView) (err error) {
+	var config *iam_model.IDPConfig
+	if provider.IDPProviderType == int32(iam_model.IDPProviderTypeSystem) {
+		config, err = m.iamEvents.GetIDPConfig(context.Background(), m.systemDefaults.IamID, provider.IDPConfigID)
 	} else {
-		config, err = m.orgEvents.GetIdpConfiguration(context.Background(), provider.AggregateID, provider.IdpConfigID)
+		config, err = m.orgEvents.GetIDPConfig(context.Background(), provider.AggregateID, provider.IDPConfigID)
 	}
 	if err != nil {
 		return err
@@ -103,12 +103,12 @@ func (m *IdpProvider) fillData(provider *iam_view_model.IdpProviderView) (err er
 	return nil
 }
 
-func (m *IdpProvider) fillConfigData(provider *iam_view_model.IdpProviderView, config *iam_model.IdpConfig) {
+func (m *IDPProvider) fillConfigData(provider *iam_view_model.IDPProviderView, config *iam_model.IDPConfig) {
 	provider.Name = config.Name
-	provider.IdpConfigType = int32(config.Type)
+	provider.IDPConfigType = int32(config.Type)
 }
 
-func (m *IdpProvider) OnError(event *models.Event, err error) error {
+func (m *IDPProvider) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Msj8c", "id", event.AggregateID).WithError(err).Warn("something went wrong in idp provider handler")
-	return spooler.HandleError(event, err, m.view.GetLatestIdpProviderFailedEvent, m.view.ProcessedIdpProviderFailedEvent, m.view.ProcessedIdpProviderSequence, m.errorCountUntilSkip)
+	return spooler.HandleError(event, err, m.view.GetLatestIDPProviderFailedEvent, m.view.ProcessedIDPProviderFailedEvent, m.view.ProcessedIDPProviderSequence, m.errorCountUntilSkip)
 }

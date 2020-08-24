@@ -8,7 +8,7 @@ import (
 )
 
 func (s *Server) IdpByID(ctx context.Context, id *admin.IdpID) (*admin.IdpView, error) {
-	config, err := s.iam.IdpConfigByID(ctx, id.Id)
+	config, err := s.iam.IDPConfigByID(ctx, id.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -16,7 +16,7 @@ func (s *Server) IdpByID(ctx context.Context, id *admin.IdpID) (*admin.IdpView, 
 }
 
 func (s *Server) CreateOidcIdp(ctx context.Context, oidcIdpConfig *admin.OidcIdpConfigCreate) (*admin.Idp, error) {
-	config, err := s.iam.AddOidcIdpConfig(ctx, createOidcIdpToModel(oidcIdpConfig))
+	config, err := s.iam.AddOIDCIDPConfig(ctx, createOidcIdpToModel(oidcIdpConfig))
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,7 @@ func (s *Server) CreateOidcIdp(ctx context.Context, oidcIdpConfig *admin.OidcIdp
 }
 
 func (s *Server) UpdateIdpConfig(ctx context.Context, idpConfig *admin.IdpUpdate) (*admin.Idp, error) {
-	config, err := s.iam.ChangeIdpConfig(ctx, updateIdpToModel(idpConfig))
+	config, err := s.iam.ChangeIDPConfig(ctx, updateIdpToModel(idpConfig))
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (s *Server) UpdateIdpConfig(ctx context.Context, idpConfig *admin.IdpUpdate
 }
 
 func (s *Server) DeactivateIdpConfig(ctx context.Context, id *admin.IdpID) (*admin.Idp, error) {
-	config, err := s.iam.DeactivateIdpConfig(ctx, id.Id)
+	config, err := s.iam.DeactivateIDPConfig(ctx, id.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (s *Server) DeactivateIdpConfig(ctx context.Context, id *admin.IdpID) (*adm
 }
 
 func (s *Server) ReactivateIdpConfig(ctx context.Context, id *admin.IdpID) (*admin.Idp, error) {
-	config, err := s.iam.ReactivateIdpConfig(ctx, id.Id)
+	config, err := s.iam.ReactivateIDPConfig(ctx, id.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -48,12 +48,12 @@ func (s *Server) ReactivateIdpConfig(ctx context.Context, id *admin.IdpID) (*adm
 }
 
 func (s *Server) RemoveIdpConfig(ctx context.Context, id *admin.IdpID) (*empty.Empty, error) {
-	err := s.iam.RemoveIdpConfig(ctx, id.Id)
+	err := s.iam.RemoveIDPConfig(ctx, id.Id)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) UpdateOidcIdpConfig(ctx context.Context, request *admin.OidcIdpConfigUpdate) (*admin.OidcIdpConfig, error) {
-	config, err := s.iam.ChangeOidcIdpConfig(ctx, updateOidcIdpToModel(request))
+	config, err := s.iam.ChangeOidcIDPConfig(ctx, updateOidcIdpToModel(request))
 	if err != nil {
 		return nil, err
 	}
