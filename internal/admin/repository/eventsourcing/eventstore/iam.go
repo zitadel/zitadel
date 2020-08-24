@@ -117,7 +117,7 @@ func (repo *IamRepository) RemoveIdpConfig(ctx context.Context, idpConfigID stri
 		return err
 	}
 	for _, p := range providers {
-		if p.IdpProviderType == int32(iam_model.IdpProviderTypeSystem) {
+		if p.AggregateID == repo.SystemDefaults.IamID {
 			continue
 		}
 		provider := &iam_model.IdpProvider{ObjectRoot: es_models.ObjectRoot{AggregateID: p.AggregateID}, IdpConfigID: p.IdpConfigID}

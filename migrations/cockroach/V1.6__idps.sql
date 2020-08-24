@@ -7,7 +7,7 @@ CREATE TABLE adminapi.idp_configs (
     sequence BIGINT,
     aggregate_id TEXT,
     name TEXT,
-    logo_src TEXT,
+    logo_src BYTES,
     idp_state SMALLINT,
     idp_provider_type SMALLINT,
 
@@ -29,7 +29,7 @@ CREATE TABLE management.idp_configs (
     sequence BIGINT,
     aggregate_id TEXT,
     name TEXT,
-    logo_src TEXT,
+    logo_src BYTES,
     idp_state SMALLINT,
     idp_provider_type SMALLINT,
 

@@ -1265,7 +1265,8 @@
           "type": "string"
         },
         "logo_src": {
-          "type": "string"
+          "type": "string",
+          "format": "byte"
         },
         "oidc_config": {
           "$ref": "#/definitions/v1OidcIdpConfig"
@@ -1451,7 +1452,8 @@
           "type": "string"
         },
         "logo_src": {
-          "type": "string"
+          "type": "string",
+          "format": "byte"
         }
       }
     },
@@ -1476,7 +1478,8 @@
           "type": "string"
         },
         "logo_src": {
-          "type": "string"
+          "type": "string",
+          "format": "byte"
         },
         "oidc_config": {
           "$ref": "#/definitions/v1OidcIdpConfigView"
@@ -1514,7 +1517,8 @@
           "type": "string"
         },
         "logo_src": {
-          "type": "string"
+          "type": "string",
+          "format": "byte"
         },
         "client_id": {
           "type": "string"

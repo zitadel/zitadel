@@ -10,7 +10,7 @@ type IdpConfig struct {
 	IDPConfigID string
 	Type        IdpConfigType
 	Name        string
-	LogoSrc     string
+	LogoSrc     []byte
 	State       IdpConfigState
 	OIDCConfig  *OidcIdpConfig
 }

@@ -661,7 +661,7 @@ message Idp {
     google.protobuf.Timestamp creation_date = 3;
     google.protobuf.Timestamp change_date = 4;
     string name = 5;
-    string logo_src = 6;
+    bytes logo_src = 6;
     oneof idp_config {
         OidcIdpConfig oidc_config = 7;
     }
@@ -671,7 +671,7 @@ message Idp {
 message IdpUpdate {
     string id = 1;
     string name = 2;
-    string logo_src = 3;
+    bytes logo_src = 3;
 }
 
 message OidcIdpConfig {
@@ -688,7 +688,7 @@ enum IdpState {
 
 message OidcIdpConfigCreate {
     string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string logo_src = 2;
+    bytes logo_src = 2;
     string client_id = 3;
     string client_secret = 4;
     string issuer = 5;
@@ -718,7 +718,7 @@ message IdpView {
     google.protobuf.Timestamp creation_date = 3;
     google.protobuf.Timestamp change_date = 4;
     string name = 5;
-    string logo_src = 6;
+    bytes logo_src = 6;
     oneof idp_config_view {
         OidcIdpConfigView oidc_config = 7;
     }

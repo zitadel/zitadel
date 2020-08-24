@@ -1,6 +1,7 @@
 package model
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/caos/logging"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -13,7 +14,7 @@ type IdpConfig struct {
 	State         int32          `json:"-"`
 	Name          string         `json:"name,omitempty"`
 	Type          int32          `json:"idpType,omitempty"`
-	LogoSrc       string         `json:"logoSrc,omitempty"`
+	LogoSrc       []byte         `json:"logoSrc,omitempty"`
 	OIDCIDPConfig *OidcIdpConfig `json:"-"`
 }
 
@@ -37,7 +38,7 @@ func (c *IdpConfig) Changes(changed *IdpConfig) map[string]interface{} {
 	if changed.Name != "" && c.Name != changed.Name {
 		changes["name"] = changed.Name
 	}
-	if changed.LogoSrc != "" && c.LogoSrc != changed.LogoSrc {
+	if changed.LogoSrc != nil && bytes.Equal(c.LogoSrc, changed.LogoSrc) {
 		changes["logoSrc"] = changed.LogoSrc
 	}
 	return changes

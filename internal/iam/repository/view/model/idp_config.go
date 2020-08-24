@@ -26,7 +26,7 @@ type IdpConfigView struct {
 	IdpConfigID     string    `json:"idpConfigId" gorm:"column:idp_config_id;primary_key"`
 	AggregateID     string    `json:"-" gorm:"column:aggregate_id"`
 	Name            string    `json:"name" gorm:"column:name"`
-	LogoSrc         string    `json:"logoSrc" gorm:"column:logo_src"`
+	LogoSrc         []byte    `json:"logoSrc" gorm:"column:logo_src"`
 	CreationDate    time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate      time.Time `json:"-" gorm:"column:change_date"`
 	IdpState        int32     `json:"-" gorm:"column:idp_state"`

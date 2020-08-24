@@ -10,7 +10,7 @@ type IdpConfigView struct {
 	AggregateID     string
 	IdpConfigID     string
 	Name            string
-	LogoSrc         string
+	LogoSrc         []byte
 	State           IdpConfigState
 	CreationDate    time.Time
 	ChangeDate      time.Time
