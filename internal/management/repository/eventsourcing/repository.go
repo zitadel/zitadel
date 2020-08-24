@@ -35,7 +35,6 @@ type EsRepository struct {
 	eventstore.UserGrantRepo
 	eventstore.PolicyRepo
 	eventstore.IamRepository
-	// eventstore.ServiceAccountRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRepository, error) {
@@ -101,7 +100,6 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
 		PolicyRepo:    eventstore.PolicyRepo{policy},
 		IamRepository: eventstore.IamRepository{iam},
-		// ServiceAccountRepo: eventstore.ServiceAccountRepo{user},
 	}, nil
 }
 

@@ -18,11 +18,10 @@ const (
 var _ management.ManagementServiceServer = (*Server)(nil)
 
 type Server struct {
-	project repository.ProjectRepository
-	policy  repository.PolicyRepository
-	org     repository.OrgRepository
-	user    repository.UserRepository
-	// serviceAccount repository.ServiceAccountRepository
+	project        repository.ProjectRepository
+	policy         repository.PolicyRepository
+	org            repository.OrgRepository
+	user           repository.UserRepository
 	usergrant      repository.UserGrantRepository
 	iam            repository.IamRepository
 	authZ          authz.Config
