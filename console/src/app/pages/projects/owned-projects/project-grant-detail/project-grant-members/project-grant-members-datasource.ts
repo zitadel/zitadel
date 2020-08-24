@@ -18,7 +18,7 @@ export class ProjectGrantMembersDataSource extends DataSource<ProjectMember.AsOb
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-    constructor(private projectService: ManagementService) {
+    constructor(private mgmtService: ManagementService) {
         super();
     }
 
@@ -28,7 +28,7 @@ export class ProjectGrantMembersDataSource extends DataSource<ProjectMember.AsOb
 
         this.loadingSubject.next(true);
 
-        from(this.projectService.SearchProjectGrantMembers(projectId,
+        from(this.mgmtService.SearchProjectGrantMembers(projectId,
             grantId, pageSize, offset)).pipe(
                 map(resp => {
                     const response = resp.toObject();

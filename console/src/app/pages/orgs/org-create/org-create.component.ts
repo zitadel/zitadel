@@ -67,7 +67,7 @@ export class OrgCreateComponent {
         private adminService: AdminService,
         private _location: Location,
         private fb: FormBuilder,
-        private orgService: ManagementService,
+        private mgmtService: ManagementService,
         private authService: AuthenticationService,
     ) {
         this.authService.isAllowed(['iam.write']).pipe(take(1)).subscribe((allowed) => {
@@ -139,7 +139,7 @@ export class OrgCreateComponent {
         const validators: Validators[] = [Validators.required];
 
         if (this.usePassword) {
-            this.orgService.GetDefaultPasswordComplexityPolicy().then(data => {
+            this.mgmtService.GetDefaultPasswordComplexityPolicy().then(data => {
                 this.policy = data.toObject();
 
                 if (this.policy.minLength) {
@@ -194,7 +194,7 @@ export class OrgCreateComponent {
 
     public createOrgForSelf(): void {
         if (this.name && this.name.value) {
-            this.orgService.CreateOrg(this.name.value).then((org) => {
+            this.mgmtService.CreateOrg(this.name.value).then((org) => {
                 this.router.navigate(['orgs', org.toObject().id]);
             }).catch(error => {
                 this.toast.showError(error);

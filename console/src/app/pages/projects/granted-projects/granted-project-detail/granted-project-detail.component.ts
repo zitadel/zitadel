@@ -78,9 +78,8 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
         public translate: TranslateService,
         private route: ActivatedRoute,
         private toast: ToastService,
-        private projectService: ManagementService,
+        private mgmtService: ManagementService,
         private _location: Location,
-        private orgService: ManagementService,
         private router: Router,
         private dialog: MatDialog,
     ) {
@@ -98,18 +97,18 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
         this.projectId = id;
         this.grantId = grantId;
 
-        this.orgService.GetIam().then(iam => {
+        this.mgmtService.GetIam().then(iam => {
             this.isZitadel = iam.toObject().iamProjectId === this.projectId;
         });
 
         if (this.projectId && this.grantId) {
-            this.projectService.GetGrantedProjectByID(this.projectId, this.grantId).then(proj => {
+            this.mgmtService.GetGrantedProjectByID(this.projectId, this.grantId).then(proj => {
                 this.project = proj.toObject();
             }).catch(error => {
                 this.toast.showError(error);
             });
 
-            from(this.projectService.SearchProjectGrantMembers(this.projectId,
+            from(this.mgmtService.SearchProjectGrantMembers(this.projectId,
                 this.projectId, 100, 0)).pipe(
                     map(resp => {
                         this.totalMemberResult = resp.toObject().totalResult;
@@ -142,7 +141,7 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
 
                 if (users && users.length && roles && roles.length) {
                     users.forEach(user => {
-                        return this.projectService.AddProjectGrantMember(
+                        return this.mgmtService.AddProjectGrantMember(
                             this.projectId,
                             this.grantId,
                             user.id,

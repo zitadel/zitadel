@@ -1,8 +1,15 @@
 import { Injectable } from '@angular/core';
 
+import { StorageService } from '../storage.service';
+
+
+const authorizationKey = 'Authorization';
+const bearerPrefix = 'Bearer ';
+const accessTokenStorageField = 'access_token';
+
 @Injectable({ providedIn: 'root' })
 export class AuthInterceptor {
-    constructor() { }
+    constructor(private readonly authStorage: StorageService) { }
 
     public intercept(request: any, invoker: any): any {
         // Update the request message before the RPC.
@@ -17,6 +24,11 @@ export class AuthInterceptor {
 
             // Update the response message.
             const responseMsg = response.getResponseMessage();
+            const accessToken = this.authStorage.getItem(accessTokenStorageField);
+            if (accessToken) {
+                responseMsg.setMetadata({ [authorizationKey]: bearerPrefix + accessToken });
+            }
+
             responseMsg.setMessage('[Intercept response]' + responseMsg.getMessage());
 
             return response;

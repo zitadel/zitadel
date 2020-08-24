@@ -56,7 +56,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     constructor(
         private dialog: MatDialog,
         public translate: TranslateService,
-        private orgService: ManagementService,
+        private mgmtService: ManagementService,
         private toast: ToastService,
         private router: Router,
     ) { }
@@ -70,14 +70,14 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     }
 
     private async getData(): Promise<void> {
-        this.orgService.GetMyOrg().then((org: Org) => {
+        this.mgmtService.GetMyOrg().then((org: Org) => {
             this.org = org.toObject();
         }).catch(error => {
             this.toast.showError(error);
         });
 
         this.loadingSubject.next(true);
-        from(this.orgService.SearchMyOrgMembers(100, 0)).pipe(
+        from(this.mgmtService.SearchMyOrgMembers(100, 0)).pipe(
             map(resp => {
                 this.totalMemberResult = resp.toObject().totalResult;
                 return resp.toObject().resultList;
@@ -88,7 +88,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
             this.membersSubject.next(members);
         });
 
-        this.orgService.SearchMyOrgDomains(0, 100).then(result => {
+        this.mgmtService.SearchMyOrgDomains(0, 100).then(result => {
             this.domains = result.toObject().resultList;
             this.primaryDomain = this.domains.find(domain => domain.primary)?.domain ?? '';
         });
@@ -96,13 +96,13 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
 
     public changeState(event: MatButtonToggleChange | any): void {
         if (event.value === OrgState.ORGSTATE_ACTIVE) {
-            this.orgService.ReactivateMyOrg().then(() => {
+            this.mgmtService.ReactivateMyOrg().then(() => {
                 this.toast.showInfo('ORG.TOAST.REACTIVATED', true);
             }).catch((error) => {
                 this.toast.showError(error);
             });
         } else if (event.value === OrgState.ORGSTATE_INACTIVE) {
-            this.orgService.DeactivateMyOrg().then(() => {
+            this.mgmtService.DeactivateMyOrg().then(() => {
                 this.toast.showInfo('ORG.TOAST.DEACTIVATED', true);
             }).catch((error) => {
                 this.toast.showError(error);
@@ -118,7 +118,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                this.orgService.AddMyOrgDomain(resp).then(domain => {
+                this.mgmtService.AddMyOrgDomain(resp).then(domain => {
                     const newDomain = domain;
 
                     const newDomainView = new OrgDomainView();
@@ -150,7 +150,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                this.orgService.RemoveMyOrgDomain(domain).then(() => {
+                this.mgmtService.RemoveMyOrgDomain(domain).then(() => {
                     this.toast.showInfo('ORG.TOAST.DOMAINREMOVED', true);
                     const index = this.domains.findIndex(d => d.domain === domain);
                     if (index > -1) {
@@ -178,7 +178,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
 
                 if (users && users.length && roles && roles.length) {
                     Promise.all(users.map(user => {
-                        return this.orgService.AddMyOrgMember(user.id, roles);
+                        return this.mgmtService.AddMyOrgMember(user.id, roles);
                     })).then(() => {
                         this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
                     }).catch(error => {

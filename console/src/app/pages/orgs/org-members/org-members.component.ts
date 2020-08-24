@@ -30,13 +30,13 @@ export class OrgMembersComponent implements AfterViewInit {
     public displayedColumns: string[] = ['select', 'firstname', 'lastname', 'username', 'email', 'roles'];
 
     constructor(
-        private orgService: ManagementService,
+        private mgmtService: ManagementService,
         private dialog: MatDialog,
         private toast: ToastService,
     ) {
-        this.orgService.GetMyOrg().then(org => {
+        this.mgmtService.GetMyOrg().then(org => {
             this.org = org.toObject();
-            this.dataSource = new OrgMembersDataSource(this.orgService);
+            this.dataSource = new OrgMembersDataSource(this.mgmtService);
             this.dataSource.loadMembers(0, 25);
         });
 
@@ -52,7 +52,7 @@ export class OrgMembersComponent implements AfterViewInit {
     }
 
     public getRoleOptions(): void {
-        this.orgService.GetOrgMemberRoles().then(resp => {
+        this.mgmtService.GetOrgMemberRoles().then(resp => {
             this.memberRoleOptions = resp.toObject().rolesList;
         }).catch(error => {
             this.toast.showError(error);
@@ -60,7 +60,7 @@ export class OrgMembersComponent implements AfterViewInit {
     }
 
     updateRoles(member: OrgMemberView.AsObject, selectionChange: MatSelectChange): void {
-        this.orgService.ChangeMyOrgMember(member.userId, selectionChange.value)
+        this.mgmtService.ChangeMyOrgMember(member.userId, selectionChange.value)
             .then(() => {
                 this.toast.showInfo('ORG.TOAST.MEMBERCHANGED', true);
             }).catch(error => {
@@ -77,7 +77,7 @@ export class OrgMembersComponent implements AfterViewInit {
 
     public removeProjectMemberSelection(): void {
         Promise.all(this.selection.selected.map(member => {
-            return this.orgService.RemoveMyOrgMember(member.userId).then(() => {
+            return this.mgmtService.RemoveMyOrgMember(member.userId).then(() => {
                 this.toast.showInfo('ORG.TOAST.MEMBERREMOVED', true);
             }).catch(error => {
                 this.toast.showError(error);
@@ -112,7 +112,7 @@ export class OrgMembersComponent implements AfterViewInit {
 
                 if (users && users.length && roles && roles.length) {
                     Promise.all(users.map(user => {
-                        return this.orgService.AddMyOrgMember(user.id, roles);
+                        return this.mgmtService.AddMyOrgMember(user.id, roles);
                     })).then(() => {
                         this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
                     }).catch(error => {

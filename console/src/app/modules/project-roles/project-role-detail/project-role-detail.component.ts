@@ -13,7 +13,7 @@ export class ProjectRoleDetailComponent implements OnInit {
     public projectId: string = '';
 
     public formGroup!: FormGroup;
-    constructor(private projectService: ManagementService, private toast: ToastService,
+    constructor(private mgmtService: ManagementService, private toast: ToastService,
         public dialogRef: MatDialogRef<ProjectRoleDetailComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any) {
 
@@ -32,7 +32,7 @@ export class ProjectRoleDetailComponent implements OnInit {
 
     submitForm(): void {
         if (this.formGroup.valid && this.key?.value && this.group?.value && this.displayName?.value) {
-            this.projectService.ChangeProjectRole(this.projectId, this.key.value, this.key.value, this.group.value)
+            this.mgmtService.ChangeProjectRole(this.projectId, this.key.value, this.key.value, this.group.value)
                 .then(() => {
                     this.toast.showInfo('PROJECT.TOAST.ROLECHANGED', true);
                     this.dialogRef.close(true);

@@ -28,10 +28,10 @@ export class ApplicationsComponent implements AfterViewInit, OnInit {
 
     public displayedColumns: string[] = ['select', 'name'];
 
-    constructor(private projectService: ManagementService, private toast: ToastService) { }
+    constructor(private mgmtService: ManagementService, private toast: ToastService) { }
 
     public ngOnInit(): void {
-        this.dataSource = new ProjectApplicationsDataSource(this.projectService);
+        this.dataSource = new ProjectApplicationsDataSource(this.mgmtService);
         this.dataSource.loadApps(this.projectId, 0, 25);
     }
 

@@ -35,7 +35,7 @@ export class SearchRolesAutocompleteComponent {
     @Input() public projectId: string = '';
     @Input() public singleOutput: boolean = false;
     @Output() public selectionChanged: EventEmitter<ProjectRole.AsObject[] | ProjectRole.AsObject> = new EventEmitter();
-    constructor(private projectService: ManagementService, private toast: ToastService) {
+    constructor(private mgmtService: ManagementService, private toast: ToastService) {
         this.myControl.valueChanges
             .pipe(
                 debounceTime(200),
@@ -45,7 +45,7 @@ export class SearchRolesAutocompleteComponent {
                     query.setKey(ProjectRoleSearchKey.PROJECTROLESEARCHKEY_DISPLAY_NAME);
                     query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
                     query.setValue(value);
-                    return from(this.projectService.SearchProjectRoles(this.projectId, 10, 0, [query]));
+                    return from(this.mgmtService.SearchProjectRoles(this.projectId, 10, 0, [query]));
                 }),
             ).subscribe((roles) => {
                 this.isLoading = false;

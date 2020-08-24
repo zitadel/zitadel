@@ -12,7 +12,7 @@ export class OrgMembersDataSource extends DataSource<OrgMemberView.AsObject> {
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-    constructor(private orgService: ManagementService) {
+    constructor(private mgmtService: ManagementService) {
         super();
     }
 
@@ -20,7 +20,7 @@ export class OrgMembersDataSource extends DataSource<OrgMemberView.AsObject> {
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
-        from(this.orgService.SearchMyOrgMembers(pageSize, offset)).pipe(
+        from(this.mgmtService.SearchMyOrgMembers(pageSize, offset)).pipe(
             map(resp => {
                 const response = resp.toObject();
                 this.totalResult = response.totalResult;

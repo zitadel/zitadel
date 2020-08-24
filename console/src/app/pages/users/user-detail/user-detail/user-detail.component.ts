@@ -42,7 +42,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         private toast: ToastService,
         private mgmtUserService: ManagementService,
         private _location: Location,
-        public projectService: ManagementService,
+        public mgmtService: ManagementService,
     ) { }
 
     public ngOnInit(): void {

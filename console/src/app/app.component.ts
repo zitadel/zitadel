@@ -31,8 +31,7 @@ import { UpdateService } from './services/update.service';
     ],
 })
 export class AppComponent implements OnDestroy {
-    @ViewChild('drawer')
-    public drawer!: MatDrawer;
+    @ViewChild('drawer') public drawer!: MatDrawer;
     public isHandset$: Observable<boolean> = this.breakpointObserver
         .observe('(max-width: 599px)')
         .pipe(map(result => {
@@ -60,12 +59,12 @@ export class AppComponent implements OnDestroy {
         public viewPortScroller: ViewportScroller,
         @Inject('windowObject') public window: Window,
         public translate: TranslateService,
-        public authService: AuthenticationService,
+        public authenticationService: AuthenticationService,
         private breakpointObserver: BreakpointObserver,
         public overlayContainer: OverlayContainer,
         private themeService: ThemeService,
-        public userService: GrpcAuthService,
-        private projectService: ManagementService,
+        public authService: GrpcAuthService,
+        private mgmtService: ManagementService,
         public matIconRegistry: MatIconRegistry,
         public domSanitizer: DomSanitizer,
         private toast: ToastService,
@@ -139,15 +138,15 @@ export class AppComponent implements OnDestroy {
         );
         this.getProjectCount();
 
-        this.orgSub = this.authService.activeOrgChanged.subscribe(org => {
+        this.orgSub = this.authenticationService.activeOrgChanged.subscribe(org => {
             this.org = org;
 
             this.getProjectCount();
         });
 
-        this.authSub = this.authService.authenticationChanged.subscribe((authenticated) => {
+        this.authSub = this.authenticationService.authenticationChanged.subscribe((authenticated) => {
             if (authenticated) {
-                this.authService.GetActiveOrg().then(org => {
+                this.authenticationService.GetActiveOrg().then(org => {
                     this.org = org;
                 });
             }
@@ -170,7 +169,7 @@ export class AppComponent implements OnDestroy {
 
     public loadOrgs(): void {
         this.orgLoading = true;
-        this.userService.SearchMyProjectOrgs(10, 0).then(res => {
+        this.authService.SearchMyProjectOrgs(10, 0).then(res => {
             this.orgs = res.toObject().resultList;
             this.orgLoading = false;
         }).catch(error => {
@@ -199,7 +198,7 @@ export class AppComponent implements OnDestroy {
         this.translate.addLangs(['en', 'de']);
         this.translate.setDefaultLang('en');
 
-        this.authService.user.subscribe(userprofile => {
+        this.authenticationService.user.subscribe(userprofile => {
             this.profile = userprofile;
             const lang = userprofile.preferredLanguage.match(/en|de/) ? userprofile.preferredLanguage : 'en';
             this.translate.use(lang);
@@ -208,18 +207,18 @@ export class AppComponent implements OnDestroy {
 
     public setActiveOrg(org: Org.AsObject): void {
         this.org = org;
-        this.authService.setActiveOrg(org);
+        this.authenticationService.setActiveOrg(org);
         this.router.navigate(['/']);
     }
 
     private getProjectCount(): void {
-        this.authService.isAllowed(['project.read']).subscribe((allowed) => {
+        this.authenticationService.isAllowed(['project.read']).subscribe((allowed) => {
             if (allowed) {
-                this.projectService.SearchProjects(0, 0).then(res => {
+                this.mgmtService.SearchProjects(0, 0).then(res => {
                     this.ownedProjectsCount = res.toObject().totalResult;
                 });
 
-                this.projectService.SearchGrantedProjects(0, 0).then(res => {
+                this.mgmtService.SearchGrantedProjects(0, 0).then(res => {
                     this.grantedProjectsCount = res.toObject().totalResult;
                 });
             }

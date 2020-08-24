@@ -84,7 +84,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private toast: ToastService,
         private dialog: MatDialog,
-        private projectService: ManagementService,
+        private mgmtService: ManagementService,
         private fb: FormBuilder,
         private _location: Location,
     ) {
@@ -186,7 +186,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
     public saveOIDCApp(): void {
         this.loading = true;
-        this.projectService
+        this.mgmtService
             .CreateOIDCApp(this.oidcApp)
             .then((data: Application) => {
                 this.loading = false;

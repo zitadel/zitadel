@@ -18,8 +18,8 @@ export class OrgMemberRolesAutocompleteComponent {
     @ViewChild('nameInput') public nameInput!: ElementRef<HTMLInputElement>;
     @ViewChild('auto') public matAutocomplete!: MatAutocomplete;
     @Output() public selectionChanged: EventEmitter<string[]> = new EventEmitter();
-    constructor(private orgService: ManagementService, private toast: ToastService) {
-        this.orgService.GetOrgMemberRoles().then(resp => {
+    constructor(private mgmtService: ManagementService, private toast: ToastService) {
+        this.mgmtService.GetOrgMemberRoles().then(resp => {
             this.allRoles = resp.toObject().rolesList;
         }).catch(error => {
             this.toast.showError(error);

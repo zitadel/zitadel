@@ -47,7 +47,7 @@ export class SearchProjectAutocompleteComponent {
         | ProjectView.AsObject
         | ProjectView.AsObject[]
     > = new EventEmitter();
-    constructor(private projectService: ManagementService) {
+    constructor(private mgmtService: ManagementService) {
         this.myControl.valueChanges
             .pipe(
                 debounceTime(200),
@@ -60,13 +60,13 @@ export class SearchProjectAutocompleteComponent {
 
                     switch (this.autocompleteType) {
                         case ProjectAutocompleteType.PROJECT_GRANTED:
-                            return from(this.projectService.SearchGrantedProjects(10, 0, [query]));
+                            return from(this.mgmtService.SearchGrantedProjects(10, 0, [query]));
                         case ProjectAutocompleteType.PROJECT_OWNED:
-                            return from(this.projectService.SearchProjects(10, 0, [query]));
+                            return from(this.mgmtService.SearchProjects(10, 0, [query]));
                         default:
                             return forkJoin([
-                                from(this.projectService.SearchGrantedProjects(10, 0, [query])),
-                                from(this.projectService.SearchProjects(10, 0, [query])),
+                                from(this.mgmtService.SearchGrantedProjects(10, 0, [query])),
+                                from(this.mgmtService.SearchProjects(10, 0, [query])),
                             ]);
                     }
                 }),

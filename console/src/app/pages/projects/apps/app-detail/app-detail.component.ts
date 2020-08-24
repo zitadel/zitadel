@@ -87,11 +87,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         public translate: TranslateService,
         private route: ActivatedRoute,
         private toast: ToastService,
-        private projectService: ManagementService,
         private fb: FormBuilder,
         private _location: Location,
         private dialog: MatDialog,
-        private orgService: ManagementService,
+        private mgmtService: ManagementService,
     ) {
         this.appNameForm = this.fb.group({
             state: ['', []],
@@ -117,11 +116,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     private async getData({ projectid, id }: Params): Promise<void> {
         this.projectId = projectid;
-        this.orgService.GetIam().then(iam => {
+        this.mgmtService.GetIam().then(iam => {
             this.isZitadel = iam.toObject().iamProjectId === this.projectId;
         });
 
-        this.projectService.GetApplicationById(projectid, id).then(app => {
+        this.mgmtService.GetApplicationById(projectid, id).then(app => {
             this.app = app.toObject();
             this.appNameForm.patchValue(this.app);
 
@@ -150,18 +149,18 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.errorMessage = error.message;
         });
 
-        this.docs = (await this.projectService.GetZitadelDocs()).toObject();
+        this.docs = (await this.mgmtService.GetZitadelDocs()).toObject();
     }
 
     public changeState(event: MatButtonToggleChange): void {
         if (event.value === AppState.APPSTATE_ACTIVE) {
-            this.projectService.ReactivateApplication(this.projectId, this.app.id).then(() => {
+            this.mgmtService.ReactivateApplication(this.projectId, this.app.id).then(() => {
                 this.toast.showInfo('APP.TOAST.REACTIVATED', true);
             }).catch((error: any) => {
                 this.toast.showError(error);
             });
         } else if (event.value === AppState.APPSTATE_INACTIVE) {
-            this.projectService.DeactivateApplication(this.projectId, this.app.id).then(() => {
+            this.mgmtService.DeactivateApplication(this.projectId, this.app.id).then(() => {
                 this.toast.showInfo('APP.TOAST.REACTIVATED', true);
             }).catch((error: any) => {
                 this.toast.showError(error);
@@ -229,7 +228,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
                 this.app.oidcConfig.devMode = this.devMode?.value;
 
-                this.projectService
+                this.mgmtService
                     .UpdateOIDCAppConfig(this.projectId, this.app.id, this.app.oidcConfig)
                     .then(() => {
                         this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
@@ -242,7 +241,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
 
     public regenerateOIDCClientSecret(): void {
-        this.projectService.RegenerateOIDCClientSecret(this.app.id, this.projectId).then((data: OIDCConfig) => {
+        this.mgmtService.RegenerateOIDCClientSecret(this.app.id, this.projectId).then((data: OIDCConfig) => {
             this.toast.showInfo('APP.TOAST.OIDCCLIENTSECRETREGENERATED', true);
             this.dialog.open(AppSecretDialogComponent, {
                 data: {

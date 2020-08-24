@@ -39,11 +39,10 @@ export class PasswordComponent implements OnDestroy {
     constructor(
         activatedRoute: ActivatedRoute,
         private fb: FormBuilder,
-        private userService: GrpcAuthService,
+        private authService: GrpcAuthService,
         private mgmtUserService: ManagementService,
         private toast: ToastService,
     ) {
-
         activatedRoute.params.subscribe(data => {
             const { id } = data;
             if (id) {
@@ -51,7 +50,7 @@ export class PasswordComponent implements OnDestroy {
             }
 
             const validators: Validators[] = [Validators.required];
-            this.userService.GetMyPasswordComplexityPolicy().then(complexity => {
+            this.authService.GetMyPasswordComplexityPolicy().then(complexity => {
                 this.policy = complexity.toObject();
                 if (this.policy.minLength) {
                     validators.push(Validators.minLength(this.policy.minLength));
@@ -110,8 +109,8 @@ export class PasswordComponent implements OnDestroy {
         if (this.passwordForm.valid && this.currentPassword &&
             this.currentPassword.value &&
             this.newPassword && this.newPassword.value && this.newPassword.valid) {
-            this.userService
-                .ChangeMyPassword(this.currentPassword.value, this.newPassword.value).then((data: any) => {
+            this.authService.ChangeMyPassword(this.currentPassword.value, this.newPassword.value)
+                .then((data: any) => {
                     this.toast.showInfo('USER.TOAST.PASSWORDCHANGED', true);
                     window.history.back();
                 }).catch(error => {

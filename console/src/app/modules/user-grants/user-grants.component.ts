@@ -51,7 +51,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
     constructor(
         private userService: ManagementService,
-        private projectService: ManagementService,
+        private mgmtService: ManagementService,
         private toast: ToastService,
     ) { }
 
@@ -124,7 +124,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public getGrantRoleOptions(grantId: string, projectId: string): void {
-        this.projectService.GetGrantedProjectByID(projectId, grantId).then(resp => {
+        this.mgmtService.GetGrantedProjectByID(projectId, grantId).then(resp => {
             this.loadedGrantId = projectId;
             this.grantRoleOptions = resp.toObject().roleKeysList;
         }).catch(error => {
@@ -133,7 +133,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public getProjectRoleOptions(projectId: string): void {
-        this.projectService.SearchProjectRoles(projectId, 100, 0).then(resp => {
+        this.mgmtService.SearchProjectRoles(projectId, 100, 0).then(resp => {
             this.loadedProjectId = projectId;
             this.projectRoleOptions = resp.toObject().resultList;
         });

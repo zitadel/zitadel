@@ -16,7 +16,7 @@ export class ProjectCreateComponent implements OnInit {
     constructor(
         private router: Router,
         private toast: ToastService,
-        private projectService: ManagementService,
+        private mgmtService: ManagementService,
         private _location: Location,
     ) { }
 
@@ -25,7 +25,7 @@ export class ProjectCreateComponent implements OnInit {
     public ngOnInit(): void { }
 
     public saveProject(): void {
-        this.projectService
+        this.mgmtService
             .CreateProject(this.project)
             .then((data: Project) => {
                 this.router.navigate(['projects', data.getId()]);

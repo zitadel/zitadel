@@ -130,7 +130,6 @@ export class GrpcAuthService {
     }
 
     public async GetMyUserPhone(): Promise<UserPhone> {
-        // return this.grpcClient.auth.getMyUserPhone(new Empty());
         return this.grpcService.auth.getMyUserPhone(
             new Empty(),
         );

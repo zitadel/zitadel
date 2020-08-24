@@ -3,9 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { AdminServicePromiseClient } from '../proto/generated/admin_grpc_web_pb';
-import { AuthenticationServicePromiseClient } from '../proto/generated/auth_grpc_web_pb';
+import { AuthServicePromiseClient } from '../proto/generated/auth_grpc_web_pb';
 import { ManagementServicePromiseClient } from '../proto/generated/management_grpc_web_pb';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { OrgInterceptor } from './interceptors/org.interceptor';
 
 @Injectable({
     providedIn: 'root',
@@ -16,7 +17,7 @@ export class GrpcService {
     public redirectUri: string = '';
     public postLogoutRedirectUri: string = '';
 
-    public auth!: AuthenticationServicePromiseClient;
+    public auth!: AuthServicePromiseClient;
     public mgmt!: ManagementServicePromiseClient;
     public admin!: AdminServicePromiseClient;
 
@@ -29,14 +30,22 @@ export class GrpcService {
         return this.http.get('./assets/environment.json')
             .toPromise().then((data: any) => {
                 if (data && data.authServiceUrl && data.mgmtServiceUrl && data.issuer) {
-                    this.auth = new AuthenticationServicePromiseClient(data.authServiceUrl);
+                    this.auth = new AuthServicePromiseClient(
+                        data.authServiceUrl,
+                        null,
+                        { 'unaryInterceptors': [new AuthInterceptor(), new OrgInterceptor()] },
+                    );
                     this.mgmt = new ManagementServicePromiseClient(
                         data.mgmtServiceUrl,
                         null,
                         // @ts-ignore
-                        { 'unaryInterceptors': [new AuthInterceptor()] },
+                        { 'unaryInterceptors': [new AuthInterceptor(), new OrgInterceptor()] },
                     );
-                    this.admin = new AdminServicePromiseClient(data.adminServiceUrl);
+                    this.admin = new AdminServicePromiseClient(
+                        data.adminServiceUrl,
+                        null,
+                        { 'unaryInterceptors': [new AuthInterceptor(), new OrgInterceptor()] },
+                    );
 
                     this.issuer = data.issuer;
                     if (data.clientid) {

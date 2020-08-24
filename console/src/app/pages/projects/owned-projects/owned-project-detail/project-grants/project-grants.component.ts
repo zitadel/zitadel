@@ -35,10 +35,10 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'grantedOrgName', 'creationDate', 'changeDate', 'roleNamesList'];
 
-    constructor(private projectService: ManagementService, private toast: ToastService) { }
+    constructor(private mgmtService: ManagementService, private toast: ToastService) { }
 
     public ngOnInit(): void {
-        this.dataSource = new ProjectGrantsDataSource(this.projectService);
+        this.dataSource = new ProjectGrantsDataSource(this.mgmtService);
         this.dataSource.loadGrants(this.projectId, 0, 25, 'asc');
         this.getRoleOptions(this.projectId);
     }
@@ -73,13 +73,13 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public getRoleOptions(projectId: string): void {
-        this.projectService.SearchProjectRoles(projectId, 100, 0).then(resp => {
+        this.mgmtService.SearchProjectRoles(projectId, 100, 0).then(resp => {
             this.memberRoleOptions = resp.toObject().resultList;
         });
     }
 
     updateRoles(grant: ProjectGrant.AsObject, selectionChange: MatSelectChange): void {
-        this.projectService.UpdateProjectGrant(grant.id, grant.projectId, selectionChange.value)
+        this.mgmtService.UpdateProjectGrant(grant.id, grant.projectId, selectionChange.value)
             .then((newgrant: ProjectGrant) => {
                 this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTCHANGED', true);
             }).catch(error => {
@@ -89,7 +89,7 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
 
     deleteSelectedGrants(): void {
         const promises = this.selection.selected.map(grant => {
-            return this.projectService.RemoveProjectGrant(grant.id, grant.projectId);
+            return this.mgmtService.RemoveProjectGrant(grant.id, grant.projectId);
         });
 
         Promise.all(promises).then(() => {

@@ -27,7 +27,7 @@ export class AuthenticationService {
         private grpcService: GrpcService,
         private config: AuthConfig,
         private oauthService: OAuthService,
-        private userService: GrpcAuthService,
+        private authService: GrpcAuthService,
         private storage: StorageService,
         private statehandler: StatehandlerService,
     ) {
@@ -44,7 +44,7 @@ export class AuthenticationService {
         ).pipe(
             take(1),
             mergeMap(() => {
-                return from(this.userService.GetMyUserProfile().then(userprofile => userprofile.toObject()));
+                return from(this.authService.GetMyUserProfile().then(userprofile => userprofile.toObject()));
             }),
             finalize(() => {
                 this.loadPermissions();
@@ -62,7 +62,7 @@ export class AuthenticationService {
             this.activeOrgChanged.pipe(map(org => !!org)),
         ]).pipe(
             first(),
-            switchMap(() => from(this.userService.GetMyzitadelPermissions())),
+            switchMap(() => from(this.authService.GetMyzitadelPermissions())),
             map(rolesResp => rolesResp.toObject().permissionsList),
         ).subscribe(roles => {
             this.zitadelPermissions.next(roles);
@@ -145,7 +145,7 @@ export class AuthenticationService {
         } else {
             let orgs = this.cachedOrgs;
             if (orgs.length === 0) {
-                orgs = (await this.userService.SearchMyProjectOrgs(10, 0)).toObject().resultList;
+                orgs = (await this.authService.SearchMyProjectOrgs(10, 0)).toObject().resultList;
                 this.cachedOrgs = orgs;
             }
 

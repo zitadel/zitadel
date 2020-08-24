@@ -30,8 +30,8 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'key', 'displayname', 'group', 'creationDate'];
 
-    constructor(private projectService: ManagementService, private toast: ToastService, private dialog: MatDialog) {
-        this.dataSource = new ProjectRolesDataSource(this.projectService);
+    constructor(private mgmtService: ManagementService, private toast: ToastService, private dialog: MatDialog) {
+        this.dataSource = new ProjectRolesDataSource(this.mgmtService);
     }
 
     public ngOnInit(): void {
@@ -83,7 +83,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
         });
 
         return Promise.all(this.selection.selected.map(role => {
-            return this.projectService.RemoveProjectRole(role.projectId, role.key);
+            return this.mgmtService.RemoveProjectRole(role.projectId, role.key);
         })).then(() => {
             this.toast.showInfo('PROJECT.TOAST.ROLEREMOVED', true);
             indexes.forEach(index => {
@@ -99,7 +99,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
     }
 
     public removeRole(role: ProjectRole.AsObject, index: number): void {
-        this.projectService
+        this.mgmtService
             .RemoveProjectRole(role.projectId, role.key)
             .then(() => {
                 this.toast.showInfo('PROJECT.TOAST.ROLEREMOVED', true);

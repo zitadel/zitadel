@@ -45,7 +45,7 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
         private router: Router,
         private route: ActivatedRoute,
         private toast: ToastService,
-        private projectService: ManagementService,
+        private mgmtService: ManagementService,
         private _location: Location,
     ) {
         this.formGroup = new FormGroup({
@@ -92,7 +92,7 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
             return role;
         });
 
-        this.projectService.BulkAddProjectRole(this.projectId, rolesToAdd).then(() => {
+        this.mgmtService.BulkAddProjectRole(this.projectId, rolesToAdd).then(() => {
             this.router.navigate(['projects', this.projectId]);
         }).catch(error => {
             this.toast.showError(error);

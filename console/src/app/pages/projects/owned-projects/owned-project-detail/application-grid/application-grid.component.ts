@@ -17,14 +17,14 @@ export class ApplicationGridComponent implements OnInit {
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-    constructor(private projectService: ManagementService) { }
+    constructor(private mgmtService: ManagementService) { }
 
     public ngOnInit(): void {
         this.loadApps();
     }
 
     public loadApps(): void {
-        from(this.projectService.SearchApplications(this.projectId, 100, 0)).pipe(
+        from(this.mgmtService.SearchApplications(this.projectId, 100, 0)).pipe(
             map(resp => {
                 return resp.toObject().resultList;
             }),

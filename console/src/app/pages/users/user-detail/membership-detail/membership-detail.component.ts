@@ -36,20 +36,18 @@ export class MembershipDetailComponent implements AfterViewInit {
     public memberships!: UserMembershipSearchResponse.AsObject;
 
     constructor(
-        private mgmtUserService: ManagementService,
         activatedRoute: ActivatedRoute,
         private dialog: MatDialog,
         private toast: ToastService,
-        private projectService: ManagementService,
-        private orgService: ManagementService,
+        private mgmtService: ManagementService,
         private adminService: AdminService,
     ) {
         activatedRoute.params.subscribe(data => {
             const { id } = data;
             if (id) {
-                this.mgmtUserService.GetUserByID(id).then(user => {
+                this.mgmtService.GetUserByID(id).then(user => {
                     this.user = user.toObject();
-                    this.dataSource = new MembershipDetailDataSource(this.mgmtUserService);
+                    this.dataSource = new MembershipDetailDataSource(this.mgmtService);
                     this.dataSource.loadMemberships(
                         this.user.id,
                         0,
@@ -77,19 +75,6 @@ export class MembershipDetailComponent implements AfterViewInit {
             this.paginator.pageSize,
         );
     }
-
-    // public removeSelectedMemberships(): void {
-    //     Promise.all(this.selection.selected.map(membership => {
-    //         switch (membership.memberType) {
-    //             case MemberType.MEMBERTYPE_ORGANISATION:
-    //                 return this.orgService.RemoveMyOrgMember(membership.objectId);
-    //             case MemberType.MEMBERTYPE_PROJECT:
-    //                 return this.projectService.RemoveProjectMember(membership.objectId, this.user.id);
-    //             // case MemberType.MEMBERTYPE_PROJECT_GRANT:
-    //             //     return this.projectService.RemoveProjectGrantMember(membership.objectId, this.user.id);
-    //         }
-    //     }));
-    // }
 
     public isAllSelected(): boolean {
         const numSelected = this.selection.selected.length;
@@ -132,7 +117,7 @@ export class MembershipDetailComponent implements AfterViewInit {
     }
 
     public async loadManager(userId: string): Promise<void> {
-        this.mgmtUserService.SearchUserMemberships(userId, 100, 0, []).then(response => {
+        this.mgmtService.SearchUserMemberships(userId, 100, 0, []).then(response => {
             this.memberships = response.toObject();
             this.loading = false;
         });
@@ -159,7 +144,7 @@ export class MembershipDetailComponent implements AfterViewInit {
 
         if (users && users.length && roles && roles.length) {
             Promise.all(users.map(user => {
-                return this.orgService.AddMyOrgMember(user.id, roles);
+                return this.mgmtService.AddMyOrgMember(user.id, roles);
             })).then(() => {
                 this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
             }).catch(error => {
@@ -174,7 +159,7 @@ export class MembershipDetailComponent implements AfterViewInit {
 
         if (users && users.length && roles && roles.length) {
             users.forEach(user => {
-                return this.projectService.AddProjectGrantMember(
+                return this.mgmtService.AddProjectGrantMember(
                     response.projectId,
                     response.grantId,
                     user.id,
@@ -194,7 +179,7 @@ export class MembershipDetailComponent implements AfterViewInit {
 
         if (users && users.length && roles && roles.length) {
             users.forEach(user => {
-                return this.projectService.AddProjectMember(response.projectId, user.id, roles)
+                return this.mgmtService.AddProjectMember(response.projectId, user.id, roles)
                     .then(() => {
                         this.toast.showInfo('PROJECT.TOAST.MEMBERADDED', true);
                     }).catch(error => {

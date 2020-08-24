@@ -27,9 +27,9 @@ export class SearchOrgAutocompleteComponent {
     @ViewChild('auto') public matAutocomplete!: MatAutocomplete;
     @Input() public singleOutput: boolean = false;
     @Output() public selectionChanged: EventEmitter<Org.AsObject | Org.AsObject[]> = new EventEmitter();
-    constructor(private orgService: ManagementService, private toast: ToastService) {
+    constructor(private mgmtService: ManagementService, private toast: ToastService) {
         this.myControl.valueChanges.pipe(debounceTime(200), tap(() => this.isLoading = true)).subscribe(value => {
-            return this.orgService.getOrgByDomainGlobal(value).then((org) => {
+            return this.mgmtService.getOrgByDomainGlobal(value).then((org) => {
                 this.isLoading = false;
                 if (org) {
                     this.filteredOrgs = [org.toObject()];

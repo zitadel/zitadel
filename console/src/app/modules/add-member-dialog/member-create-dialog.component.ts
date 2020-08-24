@@ -39,7 +39,7 @@ export class MemberCreateDialogComponent {
 
     public showCreationTypeSelector: boolean = false;
     constructor(
-        private projectService: ManagementService,
+        private mgmtService: ManagementService,
         private adminService: AdminService,
         public dialogRef: MatDialogRef<MemberCreateDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
@@ -64,14 +64,14 @@ export class MemberCreateDialogComponent {
     public loadRoles(): void {
         switch (this.creationType) {
             case CreationType.PROJECT_GRANTED:
-                this.projectService.GetProjectGrantMemberRoles().then(resp => {
+                this.mgmtService.GetProjectGrantMemberRoles().then(resp => {
                     this.memberRoleOptions = resp.toObject().rolesList;
                 }).catch(error => {
                     this.toastService.showError(error);
                 });
                 break;
             case CreationType.PROJECT_OWNED:
-                this.projectService.GetProjectMemberRoles().then(resp => {
+                this.mgmtService.GetProjectMemberRoles().then(resp => {
                     this.memberRoleOptions = resp.toObject().rolesList;
                 }).catch(error => {
                     this.toastService.showError(error);

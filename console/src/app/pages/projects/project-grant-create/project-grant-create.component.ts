@@ -23,10 +23,9 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
 
     private routeSubscription: Subscription = new Subscription();
     constructor(
-        private orgService: ManagementService,
         private route: ActivatedRoute,
         private toast: ToastService,
-        private projectService: ManagementService,
+        private mgmtService: ManagementService,
         private authService: AuthenticationService,
         private _location: Location,
     ) { }
@@ -42,7 +41,7 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
     }
 
     public searchOrg(domain: string): void {
-        this.orgService.getOrgByDomainGlobal(domain).then((ret) => {
+        this.mgmtService.getOrgByDomainGlobal(domain).then((ret) => {
             const tmp = ret.toObject();
             this.authService.GetActiveOrg().then((org) => {
                 if (tmp !== org) {
@@ -60,7 +59,7 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
     }
 
     public addGrant(): void {
-        this.projectService
+        this.mgmtService
             .CreateProjectGrant(this.org.id, this.projectId, this.rolesKeyList)
             .then((data) => {
                 this.close();

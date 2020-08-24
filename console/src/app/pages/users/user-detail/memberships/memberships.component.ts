@@ -37,9 +37,7 @@ export class MembershipsComponent implements OnInit {
     public MemberType: any = MemberType;
 
     constructor(
-        private orgService: ManagementService,
-        private projectService: ManagementService,
-        private mgmtUserService: ManagementService,
+        private mgmtService: ManagementService,
         private adminService: AdminService,
         private dialog: MatDialog,
         private toast: ToastService,
@@ -51,7 +49,7 @@ export class MembershipsComponent implements OnInit {
     }
 
     public async loadManager(userId: string): Promise<void> {
-        this.mgmtUserService.SearchUserMemberships(userId, 100, 0, []).then(response => {
+        this.mgmtService.SearchUserMemberships(userId, 100, 0, []).then(response => {
             this.memberships = response.toObject();
             this.loading = false;
         });
@@ -110,7 +108,7 @@ export class MembershipsComponent implements OnInit {
 
         if (users && users.length && roles && roles.length) {
             Promise.all(users.map(user => {
-                return this.orgService.AddMyOrgMember(user.id, roles);
+                return this.mgmtService.AddMyOrgMember(user.id, roles);
             })).then(() => {
                 this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
             }).catch(error => {
@@ -125,7 +123,7 @@ export class MembershipsComponent implements OnInit {
 
         if (users && users.length && roles && roles.length) {
             users.forEach(user => {
-                return this.projectService.AddProjectGrantMember(
+                return this.mgmtService.AddProjectGrantMember(
                     response.projectId,
                     response.grantId,
                     user.id,
@@ -145,7 +143,7 @@ export class MembershipsComponent implements OnInit {
 
         if (users && users.length && roles && roles.length) {
             users.forEach(user => {
-                return this.projectService.AddProjectMember(response.projectId, user.id, roles)
+                return this.mgmtService.AddProjectMember(response.projectId, user.id, roles)
                     .then(() => {
                         this.toast.showInfo('PROJECT.TOAST.MEMBERADDED', true);
                     }).catch(error => {

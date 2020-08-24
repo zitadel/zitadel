@@ -26,14 +26,14 @@ export class PolicyGridComponent {
     public PolicyComponentType: any = PolicyComponentType;
 
     constructor(
-        private orgService: ManagementService,
+        private mgmtService: ManagementService,
         public authUserService: GrpcAuthService,
     ) {
         this.getData();
     }
 
     private getData(): void {
-        this.orgService.GetPasswordComplexityPolicy().then(data => this.complexityPolicy = data.toObject());
-        this.orgService.GetMyOrgIamPolicy().then(data => this.iamPolicy = data.toObject());
+        this.mgmtService.GetPasswordComplexityPolicy().then(data => this.complexityPolicy = data.toObject());
+        this.mgmtService.GetMyOrgIamPolicy().then(data => this.iamPolicy = data.toObject());
     }
 }

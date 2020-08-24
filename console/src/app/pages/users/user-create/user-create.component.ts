@@ -45,10 +45,10 @@ export class UserCreateComponent implements OnDestroy {
         private toast: ToastService,
         public userService: ManagementService,
         private fb: FormBuilder,
-        private orgService: ManagementService,
+        private mgmtService: ManagementService,
     ) {
         this.loading = true;
-        this.orgService.GetMyOrgIamPolicy().then((iampolicy) => {
+        this.mgmtService.GetMyOrgIamPolicy().then((iampolicy) => {
             this.userLoginMustBeDomain = iampolicy.toObject().userLoginMustBeDomain;
             this.initForm();
             this.loading = false;

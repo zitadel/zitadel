@@ -36,7 +36,7 @@ export class ProjectMembersComponent {
     public displayedColumns: string[] = ['select', 'userId', 'firstname', 'lastname', 'username', 'email', 'roles'];
 
     constructor(
-        private projectService: ManagementService,
+        private mgmtService: ManagementService,
         private dialog: MatDialog,
         private toast: ToastService,
         private route: ActivatedRoute) {
@@ -48,17 +48,17 @@ export class ProjectMembersComponent {
             this.route.params.subscribe(params => {
                 this.grantId = params.grantid;
                 if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
-                    this.projectService.GetProjectById(params.projectid).then(project => {
+                    this.mgmtService.GetProjectById(params.projectid).then(project => {
                         this.project = project.toObject();
                         this.projectName = this.project.name;
-                        this.dataSource = new ProjectMembersDataSource(this.projectService);
+                        this.dataSource = new ProjectMembersDataSource(this.mgmtService);
                         this.dataSource.loadMembers(this.project.projectId, this.projectType, 0, this.INITIALPAGESIZE);
                     });
                 } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
-                    this.projectService.GetGrantedProjectByID(params.projectid, params.grantid).then(project => {
+                    this.mgmtService.GetGrantedProjectByID(params.projectid, params.grantid).then(project => {
                         this.project = project.toObject();
                         this.projectName = this.project.projectName;
-                        this.dataSource = new ProjectMembersDataSource(this.projectService);
+                        this.dataSource = new ProjectMembersDataSource(this.mgmtService);
                         this.dataSource.loadMembers(this.project.projectId,
                             this.projectType,
                             0,
@@ -73,13 +73,13 @@ export class ProjectMembersComponent {
 
     public getRoleOptions(): void {
         if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
-            this.projectService.GetProjectGrantMemberRoles().then(resp => {
+            this.mgmtService.GetProjectGrantMemberRoles().then(resp => {
                 this.memberRoleOptions = resp.toObject().rolesList;
             }).catch(error => {
                 this.toast.showError(error);
             });
         } else if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
-            this.projectService.GetProjectMemberRoles().then(resp => {
+            this.mgmtService.GetProjectMemberRoles().then(resp => {
                 this.memberRoleOptions = resp.toObject().rolesList;
             }).catch(error => {
                 this.toast.showError(error);
@@ -90,13 +90,13 @@ export class ProjectMembersComponent {
     public removeProjectMemberSelection(): void {
         Promise.all(this.selection.selected.map(member => {
             if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
-                return this.projectService.RemoveProjectMember(this.project.projectId, member.userId).then(() => {
+                return this.mgmtService.RemoveProjectMember(this.project.projectId, member.userId).then(() => {
                     this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
                 }).catch(error => {
                     this.toast.showError(error);
                 });
             } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
-                return this.projectService.RemoveProjectGrantMember(this.project.projectId, this.grantId,
+                return this.mgmtService.RemoveProjectGrantMember(this.project.projectId, this.grantId,
                     member.userId).then(() => {
                         this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
                     }).catch(error => {
@@ -134,10 +134,10 @@ export class ProjectMembersComponent {
                 if (users && users.length && roles && roles.length) {
                     Promise.all(users.map(user => {
                         if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
-                            return this.projectService.AddProjectMember(this.project.projectId, user.id, roles);
+                            return this.mgmtService.AddProjectMember(this.project.projectId, user.id, roles);
 
                         } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
-                            return this.projectService.AddProjectGrantMember(this.project.projectId, this.grantId,
+                            return this.mgmtService.AddProjectGrantMember(this.project.projectId, this.grantId,
                                 user.id, roles);
                         }
                     })).then(() => {
@@ -152,14 +152,14 @@ export class ProjectMembersComponent {
 
     updateRoles(member: ProjectMember.AsObject, selectionChange: MatSelectChange): void {
         if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
-            this.projectService.ChangeProjectMember(this.project.projectId, member.userId, selectionChange.value)
+            this.mgmtService.ChangeProjectMember(this.project.projectId, member.userId, selectionChange.value)
                 .then((newmember: ProjectMember) => {
                     this.toast.showInfo('PROJECT.TOAST.MEMBERCHANGED', true);
                 }).catch(error => {
                     this.toast.showError(error);
                 });
         } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
-            this.projectService.ChangeProjectGrantMember(this.project.projectId,
+            this.mgmtService.ChangeProjectGrantMember(this.project.projectId,
                 this.grantId, member.userId, selectionChange.value)
                 .then((newmember: ProjectMember) => {
                     this.toast.showInfo('PROJECT.TOAST.MEMBERCHANGED', true);

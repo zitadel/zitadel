@@ -55,7 +55,7 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
 
     constructor(private router: Router,
         public translate: TranslateService,
-        private projectService: ManagementService,
+        private mgmtService: ManagementService,
         private toast: ToastService,
     ) { }
 
@@ -89,7 +89,7 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
 
     private async getData(limit: number, offset: number): Promise<void> {
         this.loadingSubject.next(true);
-        this.projectService.SearchGrantedProjects(limit, offset).then(res => {
+        this.mgmtService.SearchGrantedProjects(limit, offset).then(res => {
             const response = res.toObject();
             this.grantedProjectList = response.resultList;
             this.totalResult = response.totalResult;

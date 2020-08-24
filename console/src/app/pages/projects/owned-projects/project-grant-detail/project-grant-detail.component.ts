@@ -30,8 +30,7 @@ export class ProjectGrantDetailComponent {
     public memberRoleOptions: ProjectRoleView.AsObject[] = [];
 
     constructor(
-        private orgService: ManagementService,
-        private projectService: ManagementService,
+        private mgmtService: ManagementService,
         private route: ActivatedRoute,
         private toast: ToastService,
     ) {
@@ -39,13 +38,13 @@ export class ProjectGrantDetailComponent {
             this.projectid = params.projectid;
             this.grantid = params.grantid;
 
-            this.orgService.GetIam().then(iam => {
+            this.mgmtService.GetIam().then(iam => {
                 this.isZitadel = iam.toObject().iamProjectId === this.projectid;
             });
 
             this.getRoleOptions(params.projectid);
 
-            this.projectService.ProjectGrantByID(this.grantid, this.projectid).then((grant) => {
+            this.mgmtService.ProjectGrantByID(this.grantid, this.projectid).then((grant) => {
                 this.grant = grant.toObject();
             });
         });
@@ -53,14 +52,14 @@ export class ProjectGrantDetailComponent {
 
     public changeState(newState: ProjectGrantState): void {
         if (newState === ProjectGrantState.PROJECTGRANTSTATE_ACTIVE) {
-            this.projectService.ReactivateProjectGrant(this.grantid, this.projectid).then(() => {
+            this.mgmtService.ReactivateProjectGrant(this.grantid, this.projectid).then(() => {
                 this.toast.showInfo('PROJECT.TOAST.REACTIVATED', true);
                 this.grant.state = newState;
             }).catch(error => {
                 this.toast.showError(error);
             });
         } else if (newState === ProjectGrantState.PROJECTGRANTSTATE_INACTIVE) {
-            this.projectService.DeactivateProjectGrant(this.grantid, this.projectid).then(() => {
+            this.mgmtService.DeactivateProjectGrant(this.grantid, this.projectid).then(() => {
                 this.toast.showInfo('PROJECT.TOAST.DEACTIVATED', true);
                 this.grant.state = newState;
             }).catch(error => {
@@ -70,13 +69,13 @@ export class ProjectGrantDetailComponent {
     }
 
     public getRoleOptions(projectId: string): void {
-        this.projectService.SearchProjectRoles(projectId, 100, 0).then(resp => {
+        this.mgmtService.SearchProjectRoles(projectId, 100, 0).then(resp => {
             this.memberRoleOptions = resp.toObject().resultList;
         });
     }
 
     updateRoles(selectionChange: MatSelectChange): void {
-        this.projectService.UpdateProjectGrant(this.grant.id, this.grant.projectId, selectionChange.value)
+        this.mgmtService.UpdateProjectGrant(this.grant.id, this.grant.projectId, selectionChange.value)
             .then((newgrant: ProjectGrant) => {
                 this.toast.showInfo('PROJECT.TOAST.GRANTUPDATED');
             }).catch(error => {
