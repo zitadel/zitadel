@@ -56,7 +56,7 @@ func UserAggregateOverwriteContext(ctx context.Context, aggCreator *es_models.Ag
 	return aggCreator.NewAggregate(ctx, user.AggregateID, model.UserAggregate, model.UserVersion, user.Sequence, es_models.OverwriteResourceOwner(resourceOwnerID), es_models.OverwriteEditorUser(userID))
 }
 
-func UserCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, initCode *model.InitUserCode, phoneCode *model.PhoneCode, resourceOwner string, userLoginMustBeDomain bool) (_ []*es_models.Aggregate, err error) {
+func MachineCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, resourceOwner string, userLoginMustBeDomain bool) (_ []*es_models.Aggregate, err error) {
 	if user == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-duxk2", "Errors.Internal")
 	}
@@ -79,12 +79,45 @@ func UserCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCre
 		agg.SetPrecondition(validationQuery, validation)
 	}
 
-	eventType := model.HumanAdded
-	if user.Machine != nil {
-		eventType = model.MachineAdded
+	agg, err = agg.AppendEvent(model.MachineAdded, user)
+	if err != nil {
+		return nil, err
 	}
 
-	agg, err = agg.AppendEvent(eventType, user)
+	userNameAggregate, err := reservedUniqueUserNameAggregate(ctx, aggCreator, resourceOwner, user.Machine.Name, userLoginMustBeDomain)
+	if err != nil {
+		return nil, err
+	}
+	return []*es_models.Aggregate{
+		agg,
+		userNameAggregate,
+	}, nil
+}
+
+func HumanCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, initCode *model.InitUserCode, phoneCode *model.PhoneCode, resourceOwner string, userLoginMustBeDomain bool) (_ []*es_models.Aggregate, err error) {
+	if user == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-duxk2", "Errors.Internal")
+	}
+
+	var agg *es_models.Aggregate
+	if resourceOwner != "" {
+		agg, err = UserAggregateOverwriteContext(ctx, aggCreator, user, resourceOwner, user.AggregateID)
+	} else {
+		agg, err = UserAggregate(ctx, aggCreator, user)
+	}
+	if err != nil {
+		return nil, err
+	}
+	if !userLoginMustBeDomain {
+		validationQuery := es_models.NewSearchQuery().
+			AggregateTypeFilter(org_es_model.OrgAggregate).
+			AggregateIDsFilter()
+
+		validation := addUserNameValidation(user.UserName)
+		agg.SetPrecondition(validationQuery, validation)
+	}
+
+	agg, err = agg.AppendEvent(model.HumanAdded, user)
 	if err != nil {
 		return nil, err
 	}
@@ -112,6 +145,7 @@ func UserCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCre
 			return nil, err
 		}
 	}
+
 	uniqueAggregates, err := getUniqueUserAggregates(ctx, aggCreator, user.UserName, user.EmailAddress, resourceOwner, userLoginMustBeDomain)
 	if err != nil {
 		return nil, err

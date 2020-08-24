@@ -71,77 +71,6 @@ service ManagementService {
     };
   }
 
-  rpc CreateServiceAccount(CreateServiceAccountRequest) returns (ServiceAccountResponse){
-    option (google.api.http) = {
-        post: "/serviceaccounts"
-        body: "*"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-        permission: "serviceaccount.write"
-    };
-}
-
-rpc UpdateServiceAccount(UpdateServiceAccountRequest) returns (ServiceAccountResponse){
-    option (google.api.http) = {
-        put: "/serviceaccounts/{id}"
-        body: "*"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-        permission: "serviceaccount.write"
-    };
-}
-
-rpc DeactivateServiceAccount(ServiceAccountIDRequest) returns (ServiceAccountResponse) {
-    option (google.api.http) = {
-        put: "/serviceaccounts/{id}/_deactivate"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-        permission: "serviceaccount.write"
-    };
-}
-
-rpc ReactivateServiceAccount(ServiceAccountIDRequest) returns (ServiceAccountResponse) {
-    option (google.api.http) = {
-        put: "/serviceaccounts/{id}/_reactivate"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-        permission: "serviceaccount.write"
-    };
-}
-
-rpc LockServiceAccount(ServiceAccountIDRequest) returns (ServiceAccountResponse) {
-    option (google.api.http) = {
-        put: "/serviceaccounts/{id}/_lock"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-        permission: "serviceaccount.write"
-    };
-}
-
-rpc UnlockServiceAccount(ServiceAccountIDRequest) returns (ServiceAccountResponse) {
-    option (google.api.http) = {
-        put: "/serviceaccounts/{id}/_unlock"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-        permission: "serviceaccount.write"
-    };
-}
-
-rpc DeleteServiceAccount(ServiceAccountIDRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-        delete: "/serviceaccounts/{id}"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-        permission: "serviceaccount.write"
-    };
-}
 
 // rpc AddServiceAccountKey(ServiceAccountAddKeyRequest) returns (ServiceAccountKeyResponse) {
 //     option (google.api.http) = {
@@ -206,9 +135,15 @@ rpc DeleteServiceAccount(ServiceAccountIDRequest) returns (google.protobuf.Empty
     };
   }
 
-  rpc CreateUser(CreateUserRequest) returns (User) {
+  rpc CreateUser(CreateUserRequest) returns (UserResponse) {
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.write"
+    };
+  }
+
+  rpc CreateHuman(CreateHumanRequest) returns (UserResponse) {
     option (google.api.http) = {
-      post: "/users"
+      post: "/users/human"
       body: "*"
     };
 
@@ -217,7 +152,18 @@ rpc DeleteServiceAccount(ServiceAccountIDRequest) returns (google.protobuf.Empty
     };
   }
 
-  rpc DeactivateUser(UserID) returns (User) {
+  rpc CreateMachine(CreateMachineRequest) returns (UserResponse) {
+    option (google.api.http) = {
+      post: "/users/machine"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.write"
+    };
+  }
+
+  rpc DeactivateUser(UserID) returns (UserResponse) {
     option (google.api.http) = {
       put: "/users/{id}/_deactivate"
       body: "*"
@@ -228,7 +174,7 @@ rpc DeleteServiceAccount(ServiceAccountIDRequest) returns (google.protobuf.Empty
     };
   }
 
-  rpc ReactivateUser(UserID) returns (User) {
+  rpc ReactivateUser(UserID) returns (UserResponse) {
     option (google.api.http) = {
       put: "/users/{id}/_reactivate"
       body: "*"
@@ -239,7 +185,7 @@ rpc DeleteServiceAccount(ServiceAccountIDRequest) returns (google.protobuf.Empty
     };
   }
 
-  rpc LockUser(UserID) returns (User) {
+  rpc LockUser(UserID) returns (UserResponse) {
     option (google.api.http) = {
       put: "/users/{id}/_lock"
       body: "*"
@@ -250,7 +196,7 @@ rpc DeleteServiceAccount(ServiceAccountIDRequest) returns (google.protobuf.Empty
     };
   }
 
-  rpc UnlockUser(UserID) returns (User) {
+  rpc UnlockUser(UserID) returns (UserResponse) {
     option (google.api.http) = {
       put: "/users/{id}/_unlock"
       body: "*"
@@ -281,39 +227,28 @@ rpc DeleteServiceAccount(ServiceAccountIDRequest) returns (google.protobuf.Empty
       permission: "user.read"
     };
   }
+  
 
-  // ApplicationChanges returns the event stream of the application object
-  rpc ApplicationChanges(ChangeRequest) returns (Changes) {
-    option (google.api.http) = {
-      get: "/projects/{id}/applications/{sec_id}/changes"
-    };
 
-    option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "project.app.read"
-    };
-  }
 
-  // OrgChanges returns the event stream of the org object
-  rpc OrgChanges(ChangeRequest) returns (Changes) {
-    option (google.api.http) = {
-      get: "/orgs/{id}/changes"
-    };
 
-    option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "org.read"
-    };
-  }
 
-  // ProjectChanges returns the event stream of the project object
-  rpc ProjectChanges(ChangeRequest) returns (Changes) {
-    option (google.api.http) = {
-      get: "/projects/{id}/changes"
-    };
 
-    option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "project.read"
-    };
-  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   rpc GetUserProfile(UserID) returns (UserProfileView) {
     option (google.api.http) = {
@@ -423,6 +358,17 @@ rpc DeleteServiceAccount(ServiceAccountIDRequest) returns (google.protobuf.Empty
   rpc UpdateUserAddress(UpdateUserAddressRequest) returns (UserAddress) {
     option (google.api.http) = {
       put: "/users/{id}/address"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.write"
+    };
+  }
+
+  rpc UpdateUserMachine(UpdateMachineRequest) returns (MachineResponse) {
+    option (google.api.http) = {
+      put: "/users/{id}/machine"
       body: "*"
     };
 
@@ -626,6 +572,17 @@ rpc DeleteServiceAccount(ServiceAccountIDRequest) returns (google.protobuf.Empty
     };
   }
 
+  // OrgChanges returns the event stream of the org object
+  rpc OrgChanges(ChangeRequest) returns (Changes) {
+    option (google.api.http) = {
+      get: "/orgs/{id}/changes"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "org.read"
+    };
+  }
+
   rpc GetMyOrg(google.protobuf.Empty) returns (OrgView) {
     option (google.api.http) = {
       get: "/orgs/me"
@@ -793,6 +750,17 @@ rpc DeleteServiceAccount(ServiceAccountIDRequest) returns (google.protobuf.Empty
 
     option (caos.zitadel.utils.v1.auth_option) = {
       permission: "org.member.read"
+    };
+  }
+
+  // ProjectChanges returns the event stream of the project object
+  rpc ProjectChanges(ChangeRequest) returns (Changes) {
+    option (google.api.http) = {
+      get: "/projects/{id}/changes"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "project.read"
     };
   }
 
@@ -1037,6 +1005,17 @@ rpc DeleteServiceAccount(ServiceAccountIDRequest) returns (google.protobuf.Empty
     option (caos.zitadel.utils.v1.auth_option) = {
       permission: "project.app.read"
       check_field_name: "ProjectId"
+    };
+  }
+
+  // ApplicationChanges returns the event stream of the application object
+  rpc ApplicationChanges(ChangeRequest) returns (Changes) {
+    option (google.api.http) = {
+      get: "/projects/{id}/applications/{sec_id}/changes"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "project.app.read"
     };
   }
 
@@ -1403,6 +1382,15 @@ message UniqueUserResponse {
 }
 
 message CreateUserRequest {
+  oneof user {
+    option (validate.required) = true;
+
+    CreateHumanRequest human = 1;
+    CreateMachineRequest machine = 2;
+  }
+}
+
+message CreateHumanRequest {
   string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
   string first_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
   string last_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -1421,28 +1409,24 @@ message CreateUserRequest {
   string password = 16 [(validate.rules).string = {max_len: 72}];
 }
 
-message User {
+message CreateMachineRequest {
+  string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string description = 2 [(validate.rules).string = {min_len: 1, max_len: 500}];
+}
+
+message UserResponse {
   string id = 1;
   UserState state = 2;
   google.protobuf.Timestamp creation_date = 3;
   google.protobuf.Timestamp change_date = 4;
-  string user_name = 5;
-  string first_name = 6;
-  string last_name = 7;
-  string display_name = 8;
-  string nick_name = 9;
-  string preferred_language = 10;
-  Gender gender = 11;
-  string email = 12;
-  bool is_email_verified = 13;
-  string phone = 14;
-  bool is_phone_verified = 15;
-  string country = 16;
-  string locality = 17;
-  string postal_code = 18;
-  string region = 19;
-  string street_address = 20;
-  uint64 sequence = 21;
+  uint64 sequence = 5;
+
+  oneof user {
+    option (validate.required) = true;
+
+    HumanResponse human = 6;
+    MachineResponse machine = 7;
+  }
 }
 
 enum UserState {
@@ -1467,40 +1451,128 @@ message UserView {
   UserState state = 2;
   google.protobuf.Timestamp creation_date = 3;
   google.protobuf.Timestamp change_date = 4;
-  google.protobuf.Timestamp last_login = 5;
-  google.protobuf.Timestamp password_changed = 6;
-  string user_name = 7;
-  string first_name = 8;
-  string last_name = 9;
-  string display_name = 10;
-  string nick_name = 11;
-  string preferred_language = 12;
-  Gender gender = 13;
-  string email = 14;
-  bool is_email_verified = 15;
-  string phone = 16;
-  bool is_phone_verified = 17;
-  string country = 18;
-  string locality = 19;
-  string postal_code = 20;
-  string region = 21;
-  string street_address = 22;
-  uint64 sequence = 23;
-  string resource_owner = 24;
-  repeated string login_names = 25;
-  string preferred_login_name = 26;
+  uint64 sequence = 5;
+  repeated string login_names = 6;
+  string preferred_login_name = 7;
+  google.protobuf.Timestamp last_login = 8;
+  string resource_owner = 9;
+
+  oneof user {
+    HumanView human = 10;
+    MachineView machine = 11;
+  }
+}
+
+message HumanResponse {
+  string user_name = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string display_name = 4;
+  string nick_name = 5;
+  string preferred_language = 6;
+  Gender gender = 7;
+  string email = 8;
+  bool is_email_verified = 9;
+  string phone = 10;
+  bool is_phone_verified = 11;
+  string country = 12;
+  string locality = 13;
+  string postal_code = 14;
+  string region = 15;
+  string street_address = 16;
+}
+
+message HumanView {
+  google.protobuf.Timestamp password_changed = 2;
+  string user_name = 3;
+  string first_name = 4;
+  string last_name = 5;
+  string display_name = 6;
+  string nick_name = 7;
+  string preferred_language = 8;
+  Gender gender = 9;
+  string email = 10;
+  bool is_email_verified = 11;
+  string phone = 12;
+  bool is_phone_verified = 13;
+  string country = 14;
+  string locality = 15;
+  string postal_code = 16;
+  string region = 17;
+  string street_address = 18;
+}
+
+message MachineResponse {
+  string name = 1;
+  string description = 2;
+  repeated MachineKeyResponse keys = 3;
+}
+
+message MachineView {
+  google.protobuf.Timestamp last_login = 1;
+  google.protobuf.Timestamp last_key_added = 2;
+
+  string name = 3;
+  string description = 4;
+  repeated MachineKeyView keys = 5;
+}
+
+message UpdateMachineRequest {
+  string id = 1;
+  string description = 2 [(validate.rules).string.max_len = 500];
+}
+
+// full key
+message AddMachineKeyRequest {
+  string user_id = 1;
+  MachineKeyType type = 2 [(validate.rules).enum = {not_in: [0]}];
+  google.protobuf.Timestamp expiration_date = 3;
+}
+// full key
+message AddMachineKeyResponse {
+  string id = 1;
+  MachineKeyType type = 2;
+
+}
+
+message MachineKeyIDRequest {
+  string user_id = 1;
+  string key_id = 2;
+}
+
+message MachineKeyResponse {
+  string id = 1;
+  MachineKeyType type = 2;
+  uint64 sequence = 3;
+
+  google.protobuf.Timestamp creation_date = 4;
+  google.protobuf.Timestamp expiration_date = 5;
+}
+
+message MachineKeyView {
+  string id = 1;
+  MachineKeyType type = 2;
+  uint64 sequence = 3;
+
+  google.protobuf.Timestamp creation_date = 4;
+  google.protobuf.Timestamp expiration_date = 5;
+}
+
+enum MachineKeyType {
+  MACHINEKEY_UNSPECIFIED = 0;
+  MACHINEKEY_JSON = 1;
 }
 
 message UserSearchRequest {
   uint64 offset = 1;
   uint64 limit = 2;
-  UserSearchKey sorting_column = 3 [(validate.rules).enum = {not_in: [0]}];;
+  UserSearchKey sorting_column = 3 [(validate.rules).enum = {not_in: [0]}];
   bool asc = 4;
   repeated UserSearchQuery queries = 5;
 }
 
 message UserSearchQuery {
-  UserSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];;
+  UserSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
   SearchMethod method = 2;
   string value = 3;
 }
@@ -1565,8 +1637,8 @@ message UserProfileView {
   uint64 sequence = 9;
   google.protobuf.Timestamp creation_date = 10;
   google.protobuf.Timestamp change_date = 11;
-  repeated string login_names = 12;
-  string preferred_login_name = 27;
+  repeated string login_names = 12;//
+  string preferred_login_name = 27;//
 }
 
 message UpdateUserProfileRequest {
@@ -1587,7 +1659,7 @@ message UserEmail {
   google.protobuf.Timestamp change_date = 6;
 }
 
-message UserEmailView {
+message UserEmailView { //equal
   string id = 1;
   string email = 2;
   bool is_email_verified = 3;
@@ -1611,7 +1683,7 @@ message UserPhone {
   google.protobuf.Timestamp change_date = 7;
 }
 
-message UserPhoneView {
+message UserPhoneView { //equal
   string id = 1;
   string phone = 2;
   bool is_phone_verified = 3;
@@ -1638,7 +1710,7 @@ message UserAddress {
   google.protobuf.Timestamp change_date = 9;
 }
 
-message UserAddressView {
+message UserAddressView { //equal
   string id = 1;
   string country = 2;
   string locality = 3;
@@ -1658,6 +1730,35 @@ message UpdateUserAddressRequest {
   string region = 5 [(validate.rules).string = {max_len: 200}];
   string street_address = 6 [(validate.rules).string = {max_len: 200}];
 }
+
+
+
+// message ServiceAccountKeyResponse {
+//   string key_id = 1;
+//   string service_account_id = 2;
+//   google.protobuf.Timestamp expiration_date = 3;
+
+//   google.protobuf.Timestamp creation_date = 4;
+//   google.protobuf.Timestamp change_date = 5;
+//   uint64 sequence = 6;
+//   string resource_owner = 7;
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 message MultiFactors {
   repeated MultiFactor mfas = 1;
@@ -2322,6 +2423,7 @@ message ApplicationView {
   oneof app_config {
     OIDCConfig oidc_config = 8;
   }
+
   uint64 sequence = 9;
 }
 
@@ -2626,84 +2728,6 @@ message ProjectGrantUserGrantSearchRequest {
   uint64 offset = 2;
   uint64 limit = 3;
   repeated UserGrantSearchQuery queries = 4;
-}
-
-message ServiceAccountIDRequest {
-    string id = 1;
-}
-
-message CreateServiceAccountRequest {
-    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string description = 2 [(validate.rules).string = {min_len: 1, max_len: 500}];
-}
-
-message UpdateServiceAccountRequest {
-    string id = 1;
-    string description = 2 [(validate.rules).string.max_len = 500];
-}
-
-message ServiceAccountResponse {
-    string id = 1;
-    string name = 2;
-    string description = 3;
-    repeated ServiceAccountKeyResponse keys = 4;
-    google.protobuf.Timestamp creation_date = 5;
-    google.protobuf.Timestamp change_date = 6;
-    uint64 sequence = 7;
-    string resource_owner = 8;
-}
-
-message ServiceAccountAddKeyRequest {
-    ServiceAccountKeyType type = 1;
-    google.protobuf.Timestamp expiration_date = 2;
-    string service_account_id = 3;
-}
-
-message ServiceAccountAddKeyResponse {
-    string key_id = 1;
-    string service_account_id = 2;
-    string key = 3;
-    google.protobuf.Timestamp expiration_date = 4;
-    repeated ServiceAccountKeyResponse keys = 5;
-
-    google.protobuf.Timestamp creation_date = 6;
-    google.protobuf.Timestamp change_date = 7;
-    uint64 sequence = 8;
-    string resource_owner = 9;
-}
-
-message ServiceAccountKeyIDRequest {
-    string key_id = 1;
-    string service_account_id = 2;
-}
-
-message ServiceAccountKeyResponse {
-    string key_id = 1;
-    string service_account_id = 2;
-    google.protobuf.Timestamp expiration_date = 3;
-
-    google.protobuf.Timestamp creation_date = 4;
-    google.protobuf.Timestamp change_date = 5;
-    uint64 sequence = 6;
-    string resource_owner = 7;
-}
-
-message ServiceAccountDeleteKeyRequest {
-    string key_id = 1;
-    string service_account_id = 2;
-}
-
-enum ServiceAccountKeyType {
-    SERVICEACCOUNTKEY_UNSPECIFIED = 0;
-    SERVICEACCOUNTKEY_JSON = 1;
-}
-
-enum ServiceAccountState {
-    SERVICEACCOUNT_UNSPECIFIED = 0;
-    SERVICEACCOUNT_ACTIVE = 1;
-    SERVICEACCOUNT_INACTIVE = 2;
-    SERVICEACCOUNT_DELETED = 3;
-    SERVICEACCOUNT_LOCKED = 4;
 }
 
 message UserMembershipSearchResponse {

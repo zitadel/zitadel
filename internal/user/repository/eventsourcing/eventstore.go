@@ -114,7 +114,7 @@ func (es *UserEventstore) prepareCreateMachine(ctx context.Context, user *usr_mo
 		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-cJlnI", "Errors.User.Invalid")
 	}
 
-	createAggregates, err := UserCreateAggregate(ctx, es.AggregateCreator(), machine, nil, nil, resourceOwner, true)
+	createAggregates, err := MachineCreateAggregate(ctx, es.AggregateCreator(), machine, resourceOwner, true)
 
 	return machine, createAggregates, err
 }
@@ -146,7 +146,7 @@ func (es *UserEventstore) prepareCreateHuman(ctx context.Context, user *usr_mode
 	repoInitCode := model.InitCodeFromModel(user.InitCode)
 	repoPhoneCode := model.PhoneCodeFromModel(user.PhoneCode)
 
-	createAggregates, err := UserCreateAggregate(ctx, es.AggregateCreator(), repoUser, repoInitCode, repoPhoneCode, resourceOwner, orgIamPolicy.UserLoginMustBeDomain)
+	createAggregates, err := HumanCreateAggregate(ctx, es.AggregateCreator(), repoUser, repoInitCode, repoPhoneCode, resourceOwner, orgIamPolicy.UserLoginMustBeDomain)
 
 	return repoUser, createAggregates, err
 }

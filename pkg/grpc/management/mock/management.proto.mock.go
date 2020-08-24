@@ -337,6 +337,46 @@ func (mr *MockManagementServiceClientMockRecorder) ChangeUserPhone(arg0, arg1 in
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeUserPhone", reflect.TypeOf((*MockManagementServiceClient)(nil).ChangeUserPhone), varargs...)
 }
 
+// CreateHuman mocks base method
+func (m *MockManagementServiceClient) CreateHuman(arg0 context.Context, arg1 *management.CreateHumanRequest, arg2 ...grpc.CallOption) (*management.UserResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateHuman", varargs...)
+	ret0, _ := ret[0].(*management.UserResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateHuman indicates an expected call of CreateHuman
+func (mr *MockManagementServiceClientMockRecorder) CreateHuman(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateHuman", reflect.TypeOf((*MockManagementServiceClient)(nil).CreateHuman), varargs...)
+}
+
+// CreateMachine mocks base method
+func (m *MockManagementServiceClient) CreateMachine(arg0 context.Context, arg1 *management.CreateMachineRequest, arg2 ...grpc.CallOption) (*management.UserResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateMachine", varargs...)
+	ret0, _ := ret[0].(*management.UserResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateMachine indicates an expected call of CreateMachine
+func (mr *MockManagementServiceClientMockRecorder) CreateMachine(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMachine", reflect.TypeOf((*MockManagementServiceClient)(nil).CreateMachine), varargs...)
+}
+
 // CreateOIDCApplication mocks base method
 func (m *MockManagementServiceClient) CreateOIDCApplication(arg0 context.Context, arg1 *management.OIDCApplicationCreate, arg2 ...grpc.CallOption) (*management.Application, error) {
 	m.ctrl.T.Helper()
@@ -477,35 +517,15 @@ func (mr *MockManagementServiceClientMockRecorder) CreateProjectGrant(arg0, arg1
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateProjectGrant", reflect.TypeOf((*MockManagementServiceClient)(nil).CreateProjectGrant), varargs...)
 }
 
-// CreateServiceAccount mocks base method
-func (m *MockManagementServiceClient) CreateServiceAccount(arg0 context.Context, arg1 *management.CreateServiceAccountRequest, arg2 ...grpc.CallOption) (*management.ServiceAccountResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "CreateServiceAccount", varargs...)
-	ret0, _ := ret[0].(*management.ServiceAccountResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateServiceAccount indicates an expected call of CreateServiceAccount
-func (mr *MockManagementServiceClientMockRecorder) CreateServiceAccount(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateServiceAccount", reflect.TypeOf((*MockManagementServiceClient)(nil).CreateServiceAccount), varargs...)
-}
-
 // CreateUser mocks base method
-func (m *MockManagementServiceClient) CreateUser(arg0 context.Context, arg1 *management.CreateUserRequest, arg2 ...grpc.CallOption) (*management.User, error) {
+func (m *MockManagementServiceClient) CreateUser(arg0 context.Context, arg1 *management.CreateUserRequest, arg2 ...grpc.CallOption) (*management.UserResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "CreateUser", varargs...)
-	ret0, _ := ret[0].(*management.User)
+	ret0, _ := ret[0].(*management.UserResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -617,35 +637,15 @@ func (mr *MockManagementServiceClientMockRecorder) DeactivateProjectGrant(arg0, 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeactivateProjectGrant", reflect.TypeOf((*MockManagementServiceClient)(nil).DeactivateProjectGrant), varargs...)
 }
 
-// DeactivateServiceAccount mocks base method
-func (m *MockManagementServiceClient) DeactivateServiceAccount(arg0 context.Context, arg1 *management.ServiceAccountIDRequest, arg2 ...grpc.CallOption) (*management.ServiceAccountResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "DeactivateServiceAccount", varargs...)
-	ret0, _ := ret[0].(*management.ServiceAccountResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeactivateServiceAccount indicates an expected call of DeactivateServiceAccount
-func (mr *MockManagementServiceClientMockRecorder) DeactivateServiceAccount(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeactivateServiceAccount", reflect.TypeOf((*MockManagementServiceClient)(nil).DeactivateServiceAccount), varargs...)
-}
-
 // DeactivateUser mocks base method
-func (m *MockManagementServiceClient) DeactivateUser(arg0 context.Context, arg1 *management.UserID, arg2 ...grpc.CallOption) (*management.User, error) {
+func (m *MockManagementServiceClient) DeactivateUser(arg0 context.Context, arg1 *management.UserID, arg2 ...grpc.CallOption) (*management.UserResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "DeactivateUser", varargs...)
-	ret0, _ := ret[0].(*management.User)
+	ret0, _ := ret[0].(*management.UserResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -735,26 +735,6 @@ func (mr *MockManagementServiceClientMockRecorder) DeletePasswordLockoutPolicy(a
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePasswordLockoutPolicy", reflect.TypeOf((*MockManagementServiceClient)(nil).DeletePasswordLockoutPolicy), varargs...)
-}
-
-// DeleteServiceAccount mocks base method
-func (m *MockManagementServiceClient) DeleteServiceAccount(arg0 context.Context, arg1 *management.ServiceAccountIDRequest, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "DeleteServiceAccount", varargs...)
-	ret0, _ := ret[0].(*emptypb.Empty)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteServiceAccount indicates an expected call of DeleteServiceAccount
-func (mr *MockManagementServiceClientMockRecorder) DeleteServiceAccount(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteServiceAccount", reflect.TypeOf((*MockManagementServiceClient)(nil).DeleteServiceAccount), varargs...)
 }
 
 // DeleteUser mocks base method
@@ -1237,35 +1217,15 @@ func (mr *MockManagementServiceClientMockRecorder) IsUserUnique(arg0, arg1 inter
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsUserUnique", reflect.TypeOf((*MockManagementServiceClient)(nil).IsUserUnique), varargs...)
 }
 
-// LockServiceAccount mocks base method
-func (m *MockManagementServiceClient) LockServiceAccount(arg0 context.Context, arg1 *management.ServiceAccountIDRequest, arg2 ...grpc.CallOption) (*management.ServiceAccountResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "LockServiceAccount", varargs...)
-	ret0, _ := ret[0].(*management.ServiceAccountResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// LockServiceAccount indicates an expected call of LockServiceAccount
-func (mr *MockManagementServiceClientMockRecorder) LockServiceAccount(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LockServiceAccount", reflect.TypeOf((*MockManagementServiceClient)(nil).LockServiceAccount), varargs...)
-}
-
 // LockUser mocks base method
-func (m *MockManagementServiceClient) LockUser(arg0 context.Context, arg1 *management.UserID, arg2 ...grpc.CallOption) (*management.User, error) {
+func (m *MockManagementServiceClient) LockUser(arg0 context.Context, arg1 *management.UserID, arg2 ...grpc.CallOption) (*management.UserResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "LockUser", varargs...)
-	ret0, _ := ret[0].(*management.User)
+	ret0, _ := ret[0].(*management.UserResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1437,35 +1397,15 @@ func (mr *MockManagementServiceClientMockRecorder) ReactivateProjectGrant(arg0, 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReactivateProjectGrant", reflect.TypeOf((*MockManagementServiceClient)(nil).ReactivateProjectGrant), varargs...)
 }
 
-// ReactivateServiceAccount mocks base method
-func (m *MockManagementServiceClient) ReactivateServiceAccount(arg0 context.Context, arg1 *management.ServiceAccountIDRequest, arg2 ...grpc.CallOption) (*management.ServiceAccountResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "ReactivateServiceAccount", varargs...)
-	ret0, _ := ret[0].(*management.ServiceAccountResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ReactivateServiceAccount indicates an expected call of ReactivateServiceAccount
-func (mr *MockManagementServiceClientMockRecorder) ReactivateServiceAccount(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReactivateServiceAccount", reflect.TypeOf((*MockManagementServiceClient)(nil).ReactivateServiceAccount), varargs...)
-}
-
 // ReactivateUser mocks base method
-func (m *MockManagementServiceClient) ReactivateUser(arg0 context.Context, arg1 *management.UserID, arg2 ...grpc.CallOption) (*management.User, error) {
+func (m *MockManagementServiceClient) ReactivateUser(arg0 context.Context, arg1 *management.UserID, arg2 ...grpc.CallOption) (*management.UserResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ReactivateUser", varargs...)
-	ret0, _ := ret[0].(*management.User)
+	ret0, _ := ret[0].(*management.UserResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -2077,35 +2017,15 @@ func (mr *MockManagementServiceClientMockRecorder) SetMyPrimaryOrgDomain(arg0, a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetMyPrimaryOrgDomain", reflect.TypeOf((*MockManagementServiceClient)(nil).SetMyPrimaryOrgDomain), varargs...)
 }
 
-// UnlockServiceAccount mocks base method
-func (m *MockManagementServiceClient) UnlockServiceAccount(arg0 context.Context, arg1 *management.ServiceAccountIDRequest, arg2 ...grpc.CallOption) (*management.ServiceAccountResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "UnlockServiceAccount", varargs...)
-	ret0, _ := ret[0].(*management.ServiceAccountResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UnlockServiceAccount indicates an expected call of UnlockServiceAccount
-func (mr *MockManagementServiceClientMockRecorder) UnlockServiceAccount(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnlockServiceAccount", reflect.TypeOf((*MockManagementServiceClient)(nil).UnlockServiceAccount), varargs...)
-}
-
 // UnlockUser mocks base method
-func (m *MockManagementServiceClient) UnlockUser(arg0 context.Context, arg1 *management.UserID, arg2 ...grpc.CallOption) (*management.User, error) {
+func (m *MockManagementServiceClient) UnlockUser(arg0 context.Context, arg1 *management.UserID, arg2 ...grpc.CallOption) (*management.UserResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "UnlockUser", varargs...)
-	ret0, _ := ret[0].(*management.User)
+	ret0, _ := ret[0].(*management.UserResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -2257,26 +2177,6 @@ func (mr *MockManagementServiceClientMockRecorder) UpdateProjectGrant(arg0, arg1
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProjectGrant", reflect.TypeOf((*MockManagementServiceClient)(nil).UpdateProjectGrant), varargs...)
 }
 
-// UpdateServiceAccount mocks base method
-func (m *MockManagementServiceClient) UpdateServiceAccount(arg0 context.Context, arg1 *management.UpdateServiceAccountRequest, arg2 ...grpc.CallOption) (*management.ServiceAccountResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "UpdateServiceAccount", varargs...)
-	ret0, _ := ret[0].(*management.ServiceAccountResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateServiceAccount indicates an expected call of UpdateServiceAccount
-func (mr *MockManagementServiceClientMockRecorder) UpdateServiceAccount(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateServiceAccount", reflect.TypeOf((*MockManagementServiceClient)(nil).UpdateServiceAccount), varargs...)
-}
-
 // UpdateUserAddress mocks base method
 func (m *MockManagementServiceClient) UpdateUserAddress(arg0 context.Context, arg1 *management.UpdateUserAddressRequest, arg2 ...grpc.CallOption) (*management.UserAddress, error) {
 	m.ctrl.T.Helper()
@@ -2315,6 +2215,26 @@ func (mr *MockManagementServiceClientMockRecorder) UpdateUserGrant(arg0, arg1 in
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserGrant", reflect.TypeOf((*MockManagementServiceClient)(nil).UpdateUserGrant), varargs...)
+}
+
+// UpdateUserMachine mocks base method
+func (m *MockManagementServiceClient) UpdateUserMachine(arg0 context.Context, arg1 *management.UpdateMachineRequest, arg2 ...grpc.CallOption) (*management.MachineResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateUserMachine", varargs...)
+	ret0, _ := ret[0].(*management.MachineResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateUserMachine indicates an expected call of UpdateUserMachine
+func (mr *MockManagementServiceClientMockRecorder) UpdateUserMachine(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserMachine", reflect.TypeOf((*MockManagementServiceClient)(nil).UpdateUserMachine), varargs...)
 }
 
 // UpdateUserProfile mocks base method

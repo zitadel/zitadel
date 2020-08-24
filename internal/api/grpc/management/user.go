@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api/authz"
 
 	"github.com/golang/protobuf/ptypes/empty"
@@ -55,7 +56,7 @@ func (s *Server) IsUserUnique(ctx context.Context, request *management.UniqueUse
 	return &management.UniqueUserResponse{IsUnique: unique}, nil
 }
 
-func (s *Server) CreateUser(ctx context.Context, in *management.CreateUserRequest) (*management.User, error) {
+func (s *Server) CreateUser(ctx context.Context, in *management.CreateUserRequest) (*management.UserResponse, error) {
 	user, err := s.user.CreateUser(ctx, userCreateToModel(in))
 	if err != nil {
 		return nil, err
@@ -63,7 +64,7 @@ func (s *Server) CreateUser(ctx context.Context, in *management.CreateUserReques
 	return userFromModel(user), nil
 }
 
-func (s *Server) DeactivateUser(ctx context.Context, in *management.UserID) (*management.User, error) {
+func (s *Server) DeactivateUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
 	user, err := s.user.DeactivateUser(ctx, in.Id)
 	if err != nil {
 		return nil, err
@@ -71,7 +72,7 @@ func (s *Server) DeactivateUser(ctx context.Context, in *management.UserID) (*ma
 	return userFromModel(user), nil
 }
 
-func (s *Server) ReactivateUser(ctx context.Context, in *management.UserID) (*management.User, error) {
+func (s *Server) ReactivateUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
 	user, err := s.user.ReactivateUser(ctx, in.Id)
 	if err != nil {
 		return nil, err
@@ -79,7 +80,7 @@ func (s *Server) ReactivateUser(ctx context.Context, in *management.UserID) (*ma
 	return userFromModel(user), nil
 }
 
-func (s *Server) LockUser(ctx context.Context, in *management.UserID) (*management.User, error) {
+func (s *Server) LockUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
 	user, err := s.user.LockUser(ctx, in.Id)
 	if err != nil {
 		return nil, err
@@ -87,7 +88,7 @@ func (s *Server) LockUser(ctx context.Context, in *management.UserID) (*manageme
 	return userFromModel(user), nil
 }
 
-func (s *Server) UnlockUser(ctx context.Context, in *management.UserID) (*management.User, error) {
+func (s *Server) UnlockUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
 	user, err := s.user.UnlockUser(ctx, in.Id)
 	if err != nil {
 		return nil, err

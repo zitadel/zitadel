@@ -15,79 +15,38 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/message"
 )
 
-func userFromModel(user *usr_model.User) *management.User {
+func userFromModel(user *usr_model.User) *management.UserResponse {
 	creationDate, err := ptypes.TimestampProto(user.CreationDate)
 	logging.Log("GRPC-8duwe").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(user.ChangeDate)
 	logging.Log("GRPC-ckoe3d").OnError(err).Debug("unable to parse timestamp")
 
-	converted := &management.User{
-		Id:                user.AggregateID,
-		State:             userStateFromModel(user.State),
-		CreationDate:      creationDate,
-		ChangeDate:        changeDate,
-		Sequence:          user.Sequence,
-		UserName:          user.UserName,
-		FirstName:         user.FirstName,
-		LastName:          user.LastName,
-		DisplayName:       user.DisplayName,
-		NickName:          user.NickName,
-		PreferredLanguage: user.PreferredLanguage.String(),
-		Gender:            genderFromModel(user.Gender),
+	return &management.UserResponse{
+		Id:           user.AggregateID,
+		State:        userStateFromModel(user.State),
+		CreationDate: creationDate,
+		ChangeDate:   changeDate,
+		Sequence:     user.Sequence,
+		User:         &management.UserResponse_Human{humanFromModel(user)},
 	}
-	if user.Email != nil {
-		converted.Email = user.EmailAddress
-		converted.IsEmailVerified = user.IsEmailVerified
-	}
-	if user.Phone != nil {
-		converted.Phone = user.PhoneNumber
-		converted.IsPhoneVerified = user.IsPhoneVerified
-	}
-	if user.Address != nil {
-		converted.Country = user.Country
-		converted.Locality = user.Locality
-		converted.PostalCode = user.PostalCode
-		converted.Region = user.Region
-		converted.StreetAddress = user.StreetAddress
-	}
-	return converted
 }
 
 func userCreateToModel(u *management.CreateUserRequest) *usr_model.User {
-	preferredLanguage, err := language.Parse(u.PreferredLanguage)
-	logging.Log("GRPC-cK5k2").OnError(err).Debug("language malformed")
+	var human *usr_model.Human
+	var machine *usr_model.Machine
 
-	user := &usr_model.User{
-		Human: &usr_model.Human{
-			Profile: &usr_model.Profile{
-				UserName:          u.UserName,
-				FirstName:         u.FirstName,
-				LastName:          u.LastName,
-				NickName:          u.NickName,
-				PreferredLanguage: preferredLanguage,
-				Gender:            genderToModel(u.Gender),
-			},
-			Email: &usr_model.Email{
-				EmailAddress:    u.Email,
-				IsEmailVerified: u.IsEmailVerified,
-			},
-			Address: &usr_model.Address{
-				Country:       u.Country,
-				Locality:      u.Locality,
-				PostalCode:    u.PostalCode,
-				Region:        u.Region,
-				StreetAddress: u.StreetAddress,
-			},
-		},
+	if h := u.GetHuman(); h != nil {
+		human = humanCreateToModel(h)
 	}
-	if u.Password != "" {
-		user.Password = &usr_model.Password{SecretString: u.Password}
+	if m := u.GetMachine(); m != nil {
+		machine = machineCreateToModel(m)
 	}
-	if u.Phone != "" {
-		user.Phone = &usr_model.Phone{PhoneNumber: u.Phone, IsPhoneVerified: u.IsPhoneVerified}
+
+	return &usr_model.User{
+		Human:   human,
+		Machine: machine,
 	}
-	return user
 }
 
 func passwordRequestToModel(r *management.PasswordRequest) *usr_model.Password {

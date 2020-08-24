@@ -19,41 +19,6 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/CreateServiceAccount": authz.Option{
-		Permission: "serviceaccount.write",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/UpdateServiceAccount": authz.Option{
-		Permission: "serviceaccount.write",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/DeactivateServiceAccount": authz.Option{
-		Permission: "serviceaccount.write",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/ReactivateServiceAccount": authz.Option{
-		Permission: "serviceaccount.write",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/LockServiceAccount": authz.Option{
-		Permission: "serviceaccount.write",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/UnlockServiceAccount": authz.Option{
-		Permission: "serviceaccount.write",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/DeleteServiceAccount": authz.Option{
-		Permission: "serviceaccount.write",
-		CheckParam: "",
-	},
-
 	"/caos.zitadel.management.api.v1.ManagementService/GetUserByID": authz.Option{
 		Permission: "user.read",
 		CheckParam: "",
@@ -75,6 +40,16 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 	},
 
 	"/caos.zitadel.management.api.v1.ManagementService/CreateUser": authz.Option{
+		Permission: "user.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/CreateHuman": authz.Option{
+		Permission: "user.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/CreateMachine": authz.Option{
 		Permission: "user.write",
 		CheckParam: "",
 	},
@@ -106,21 +81,6 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 
 	"/caos.zitadel.management.api.v1.ManagementService/UserChanges": authz.Option{
 		Permission: "user.read",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/ApplicationChanges": authz.Option{
-		Permission: "project.app.read",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/OrgChanges": authz.Option{
-		Permission: "org.read",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/ProjectChanges": authz.Option{
-		Permission: "project.read",
 		CheckParam: "",
 	},
 
@@ -175,6 +135,11 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 	},
 
 	"/caos.zitadel.management.api.v1.ManagementService/UpdateUserAddress": authz.Option{
+		Permission: "user.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/UpdateUserMachine": authz.Option{
 		Permission: "user.write",
 		CheckParam: "",
 	},
@@ -269,6 +234,11 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/OrgChanges": authz.Option{
+		Permission: "org.read",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/GetMyOrg": authz.Option{
 		Permission: "org.read",
 		CheckParam: "",
@@ -346,6 +316,11 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 
 	"/caos.zitadel.management.api.v1.ManagementService/SearchMyOrgMembers": authz.Option{
 		Permission: "org.member.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/ProjectChanges": authz.Option{
+		Permission: "project.read",
 		CheckParam: "",
 	},
 
@@ -452,6 +427,11 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 	"/caos.zitadel.management.api.v1.ManagementService/ApplicationByID": authz.Option{
 		Permission: "project.app.read",
 		CheckParam: "ProjectId",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/ApplicationChanges": authz.Option{
+		Permission: "project.app.read",
+		CheckParam: "",
 	},
 
 	"/caos.zitadel.management.api.v1.ManagementService/CreateOIDCApplication": authz.Option{
