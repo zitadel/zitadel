@@ -134,7 +134,7 @@ func (iam *Iam) appendAddIdpProviderToLoginPolicyEvent(event *es_models.Event) e
 }
 
 func (iam *Iam) appendRemoveIdpProviderFromLoginPolicyEvent(event *es_models.Event) error {
-	provider := &IdpProvider{}
+	provider := new(IdpProvider)
 	err := provider.SetData(event)
 	if err != nil {
 		return err
