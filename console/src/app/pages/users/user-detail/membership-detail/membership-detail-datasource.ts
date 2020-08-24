@@ -2,25 +2,26 @@ import { DataSource } from '@angular/cdk/collections';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { OrgMemberView } from 'src/app/proto/generated/management_pb';
-import { OrgService } from 'src/app/services/org.service';
+import { UserMembershipView } from 'src/app/proto/generated/management_pb';
+import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 
-export class OrgMembersDataSource extends DataSource<OrgMemberView.AsObject> {
+export class MembershipDetailDataSource extends DataSource<UserMembershipView.AsObject> {
     public totalResult: number = 0;
     public viewTimestamp!: Timestamp.AsObject;
-    public membersSubject: BehaviorSubject<OrgMemberView.AsObject[]> = new BehaviorSubject<OrgMemberView.AsObject[]>([]);
+    public membersSubject: BehaviorSubject<UserMembershipView.AsObject[]>
+        = new BehaviorSubject<UserMembershipView.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-    constructor(private orgService: OrgService) {
+    constructor(private mgmtUserService: MgmtUserService) {
         super();
     }
 
-    public loadMembers(pageIndex: number, pageSize: number): void {
+    public loadMemberships(userId: string, pageIndex: number, pageSize: number): void {
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
-        from(this.orgService.SearchMyOrgMembers(pageSize, offset)).pipe(
+        from(this.mgmtUserService.SearchUserMemberships(userId, pageSize, offset)).pipe(
             map(resp => {
                 const response = resp.toObject();
                 this.totalResult = response.totalResult;
@@ -42,7 +43,7 @@ export class OrgMembersDataSource extends DataSource<OrgMemberView.AsObject> {
      * the returned stream emits new items.
      * @returns A stream of the items to be rendered.
      */
-    public connect(): Observable<OrgMemberView.AsObject[]> {
+    public connect(): Observable<UserMembershipView.AsObject[]> {
         return this.membersSubject.asObservable();
     }
 

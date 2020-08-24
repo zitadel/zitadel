@@ -1,6 +1,7 @@
 import { animate, animation, keyframes, style, transition, trigger, useAnimation } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 
 const rotate = animation([
     animate(
@@ -27,6 +28,7 @@ const rotate = animation([
 })
 export class RefreshTableComponent implements OnInit {
     @Input() public selection: SelectionModel<any> = new SelectionModel<any>(true, []);
+    @Input() public timestamp!: Timestamp.AsObject;
     @Input() public dataSize: number = 0;
     @Input() public emitRefreshAfterTimeoutInMs: number = 0;
     @Input() public loading: boolean = false;

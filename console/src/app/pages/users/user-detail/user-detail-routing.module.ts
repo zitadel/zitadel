@@ -48,6 +48,15 @@ const routes: Routes = [
             animation: 'AddPage',
         },
     },
+    {
+        path: ':id/memberships',
+        loadChildren: () => import('./membership-detail/membership-detail.module').then(m => m.MembershipDetailModule),
+        canActivate: [AuthGuard, RoleGuard],
+        data: {
+            roles: ['user.membership.read'],
+            animation: 'AddPage',
+        },
+    },
 ];
 
 @NgModule({

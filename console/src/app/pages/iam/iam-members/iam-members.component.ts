@@ -105,7 +105,7 @@ export class IamMembersComponent implements AfterViewInit {
     public openAddMember(): void {
         const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
             data: {
-                creationType: CreationType.ORG,
+                creationType: CreationType.IAM,
             },
             width: '400px',
         });
@@ -126,5 +126,10 @@ export class IamMembersComponent implements AfterViewInit {
                 }
             }
         });
+    }
+
+    public refreshPage(): void {
+        this.selection.clear();
+        this.dataSource.loadMembers(this.paginator.pageIndex, this.paginator.pageSize);
     }
 }

@@ -1,31 +1,26 @@
+.add-button {
+  border-radius: .5rem;
+}
 
-.view-toggle {
+.refresh-table {
   width: 100%;
-  display: flex;
-  justify-content: flex-end;
-
-  .icon-button {
-    display: block;
-    border-radius: .5rem;
-  }
 }
 
 .table-wrapper {
+  width: 100%;
   overflow: auto;
 
   .table,
   .paginator {
     width: 100%;
-    background-color: #2d2e30;
 
     td,
     th {
-      padding-left: .5rem;
-      padding-right: .5rem;
+      padding: .5rem;
 
       &:first-child {
         padding-left: 0;
-        padding-right: .5rem;
+        padding-right: 1rem;
       }
 
       &:last-child {
@@ -33,9 +28,11 @@
       }
     }
 
-    .data-row {
-      cursor: pointer;
+    .action {
+      width: 40px;
+    }
 
+    .data-row {
       &:hover {
         background-color: #ffffff05;
       }
@@ -48,6 +45,7 @@
   }
 }
 
-tr {
+.pointer {
   outline: none;
+  cursor: pointer;
 }

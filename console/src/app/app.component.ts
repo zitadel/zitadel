@@ -212,13 +212,17 @@ export class AppComponent implements OnDestroy {
         this.router.navigate(['/']);
     }
 
-    private async getProjectCount(): Promise<any> {
-        this.ownedProjectsCount = await this.projectService.SearchProjects(0, 0).then(res => {
-            return res.toObject().totalResult;
-        });
+    private getProjectCount(): void {
+        this.authService.isAllowed(['project.read']).subscribe((allowed) => {
+            if (allowed) {
+                this.projectService.SearchProjects(0, 0).then(res => {
+                    this.ownedProjectsCount = res.toObject().totalResult;
+                });
 
-        this.grantedProjectsCount = await this.projectService.SearchGrantedProjects(0, 0).then(res => {
-            return res.toObject().totalResult;
+                this.projectService.SearchGrantedProjects(0, 0).then(res => {
+                    this.grantedProjectsCount = res.toObject().totalResult;
+                });
+            }
         });
     }
 }

@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
@@ -11,7 +11,7 @@ import { AdminService } from 'src/app/services/admin.service';
     templateUrl: './iam-views.component.html',
     styleUrls: ['./iam-views.component.scss'],
 })
-export class IamViewsComponent {
+export class IamViewsComponent implements AfterViewInit {
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     public dataSource!: MatTableDataSource<View.AsObject>;
 
@@ -20,6 +20,10 @@ export class IamViewsComponent {
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     constructor(private adminService: AdminService) {
+        this.loadViews();
+    }
+
+    ngAfterViewInit(): void {
         this.loadViews();
     }
 

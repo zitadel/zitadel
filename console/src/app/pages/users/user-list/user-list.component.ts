@@ -77,7 +77,7 @@ export class UserListComponent implements OnDestroy {
         this.loadingSubject.next(true);
         this.userService.SearchUsers(limit, offset).then(resp => {
             this.userResult = resp.toObject();
-            this.dataSource.data = resp.toObject().resultList;
+            this.dataSource.data = this.userResult.resultList;
             this.loadingSubject.next(false);
         }).catch(error => {
             this.toast.showError(error);

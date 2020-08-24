@@ -1,5 +1,5 @@
 <app-refresh-table [loading]="dataSource.loading$ | async" [selection]="selection" (refreshed)="refreshPage()"
-    [dataSize]="dataSource.totalResult">
+    [dataSize]="dataSource.totalResult" [timestamp]="dataSource?.viewTimestamp">
     <ng-template appHasRole [appHasRole]="['project.app.write']" actions>
         <a [disabled]="disabled" class="add-button" [routerLink]="[ '/projects', projectId, 'apps', 'create']"
             color="primary" mat-raised-button>
