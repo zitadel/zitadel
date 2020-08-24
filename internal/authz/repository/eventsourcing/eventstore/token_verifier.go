@@ -2,12 +2,13 @@ package eventstore
 
 import (
 	"context"
+	"time"
+
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
-	"time"
 )
 
 type TokenVerifierRepo struct {
@@ -40,12 +41,12 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 	return "", "", caos_errs.ThrowUnauthenticated(nil, "APP-Zxfako", "invalid audience")
 }
 
-func (repo *TokenVerifierRepo) ProjectIDByClientID(ctx context.Context, clientID string) (projectID string, err error) {
+func (repo *TokenVerifierRepo) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error) {
 	app, err := repo.View.ApplicationByOIDCClientID(clientID)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
-	return app.ProjectID, nil
+	return app.ProjectID, app.OriginAllowList, nil
 }
 
 func (repo *TokenVerifierRepo) ExistsOrg(ctx context.Context, orgID string) error {
