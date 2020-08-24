@@ -7,6 +7,7 @@ import { AuthServicePromiseClient } from '../proto/generated/auth_grpc_web_pb';
 import { ManagementServicePromiseClient } from '../proto/generated/management_grpc_web_pb';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { OrgInterceptor } from './interceptors/org.interceptor';
+import { StorageService } from './storage.service';
 
 @Injectable({
     providedIn: 'root',
@@ -24,6 +25,7 @@ export class GrpcService {
     constructor(
         private http: HttpClient,
         private platformLocation: PlatformLocation,
+        private readonly authStorage: StorageService,
     ) { }
 
     public async loadAppEnvironment(): Promise<any> {
@@ -33,18 +35,35 @@ export class GrpcService {
                     this.auth = new AuthServicePromiseClient(
                         data.authServiceUrl,
                         null,
-                        { 'unaryInterceptors': [new AuthInterceptor(), new OrgInterceptor()] },
+                        {
+                            // @ts-ignore
+                            'unaryInterceptors': [
+                                new AuthInterceptor(this.authStorage),
+                                new OrgInterceptor(this.authStorage),
+                            ],
+                        },
                     );
                     this.mgmt = new ManagementServicePromiseClient(
                         data.mgmtServiceUrl,
                         null,
-                        // @ts-ignore
-                        { 'unaryInterceptors': [new AuthInterceptor(), new OrgInterceptor()] },
+                        {
+                            // @ts-ignore
+                            'unaryInterceptors': [
+                                new AuthInterceptor(this.authStorage),
+                                new OrgInterceptor(this.authStorage),
+                            ],
+                        },
                     );
                     this.admin = new AdminServicePromiseClient(
                         data.adminServiceUrl,
                         null,
-                        { 'unaryInterceptors': [new AuthInterceptor(), new OrgInterceptor()] },
+                        {
+                            // @ts-ignore
+                            'unaryInterceptors': [
+                                new AuthInterceptor(this.authStorage),
+                                new OrgInterceptor(this.authStorage),
+                            ],
+                        },
                     );
 
                     this.issuer = data.issuer;

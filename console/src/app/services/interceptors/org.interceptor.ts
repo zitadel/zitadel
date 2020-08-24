@@ -1,18 +1,23 @@
 import { Injectable } from '@angular/core';
+import { UnaryInterceptor } from 'grpc-web';
 import { Org } from 'src/app/proto/generated/auth_pb';
 
 import { StorageService } from '../storage.service';
 
 @Injectable({ providedIn: 'root' })
-export class OrgInterceptor {
+export class OrgInterceptor implements UnaryInterceptor<any, any> {
     constructor(private readonly storageService: StorageService) { }
 
     public intercept(request: any, invoker: any): any {
         console.log('orginterceptor');
-        // Update the request message before the RPC.
-        console.log(request);
         const reqMsg = request.getRequestMessage();
-        reqMsg.setMessage('[Intercept request]' + reqMsg.getMessage());
+
+        const org: Org.AsObject | null = (this.storageService.getItem('organization'));
+        console.log(org);
+
+        if (org) {
+            reqMsg.metadata = { 'x-zitadel-orgid': org.id };
+        }
 
         // After the RPC returns successfully, update the response.
         return invoker(request).then((response: any) => {
@@ -20,17 +25,7 @@ export class OrgInterceptor {
             console.log(response.getMetadata());
 
             // Update the response message.
-            const responseMsg = response.getResponseMessage();
-
-            const org: Org.AsObject | null = (this.storageService.getItem('organization'));
-            console.log(org);
-            // if (!response.setMetadata([orgKey] && org) {
-            //     metadata[orgKey] = org.id ?? '';
-            // }
-
-            responseMsg.setMessage('[Intercept response]' + responseMsg.getMessage());
-
             return response;
         });
-    };
+    }
 }
