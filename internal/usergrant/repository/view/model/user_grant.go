@@ -44,28 +44,6 @@ type UserGrantView struct {
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }
 
-func UserGrantFromModel(grant *model.UserGrantView) *UserGrantView {
-	return &UserGrantView{
-		ID:            grant.ID,
-		ResourceOwner: grant.ResourceOwner,
-		UserID:        grant.UserID,
-		ProjectID:     grant.ProjectID,
-		GrantID:       grant.GrantID,
-		ChangeDate:    grant.ChangeDate,
-		CreationDate:  grant.CreationDate,
-		State:         int32(grant.State),
-		UserName:      grant.UserName,
-		FirstName:     grant.FirstName,
-		LastName:      grant.LastName,
-		DisplayName:   grant.DisplayName,
-		Email:         grant.Email,
-		ProjectName:   grant.ProjectName,
-		OrgName:       grant.OrgName,
-		RoleKeys:      grant.RoleKeys,
-		Sequence:      grant.Sequence,
-	}
-}
-
 func UserGrantToModel(grant *UserGrantView) *model.UserGrantView {
 	return &model.UserGrantView{
 		ID:            grant.ID,
