@@ -1021,6 +1021,28 @@ func TestOIDCConfigChangedAggregate(t *testing.T) {
 			},
 		},
 		{
+			name: "no changes",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existing: &model.Iam{
+					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
+					IamProjectID: "IamProjectID",
+					IDPs: []*model.IDPConfig{
+						{IDPConfigID: "IDPConfigID", Name: "Name", OIDCIDPConfig: &model.OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID"}},
+					}},
+				new: &model.OIDCIDPConfig{
+					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
+					IDPConfigID: "IDPConfigID",
+					ClientID:    "ClientID",
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
 			name: "existing iam nil",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),

@@ -221,6 +221,9 @@ func OIDCIDPConfigChangedAggregate(aggCreator *es_models.AggregateCreator, exist
 				changes = idp.OIDCIDPConfig.Changes(config)
 			}
 		}
+		if len(changes) <= 1 {
+			return nil, errors.ThrowPreconditionFailedf(nil, "EVENT-Cml9s", "Errors.NoChangesFound")
+		}
 		return agg.AppendEvent(model.OIDCIDPConfigChanged, changes)
 	}
 }

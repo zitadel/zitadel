@@ -444,7 +444,7 @@ func OIDCIDPConfigChangedAggregate(aggCreator *es_models.AggregateCreator, exist
 				}
 			}
 		}
-		if len(changes) == 0 {
+		if len(changes) <= 1 {
 			return nil, errors.ThrowPreconditionFailedf(nil, "EVENT-Rks9u", "Errors.NoChangesFound")
 		}
 		agg.AppendEvent(model.OIDCIDPConfigChanged, changes)
