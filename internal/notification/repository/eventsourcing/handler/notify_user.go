@@ -56,6 +56,7 @@ func (u *NotifyUser) ProcessUser(event *models.Event) (err error) {
 	switch event.Type {
 	case es_model.UserAdded,
 		es_model.UserRegistered,
+		es_model.HumanRegistered,
 		es_model.HumanAdded:
 		user.AppendEvent(event)
 		u.fillLoginNames(user)

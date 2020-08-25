@@ -57,6 +57,7 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 	switch event.Type {
 	case es_model.UserAdded,
 		es_model.UserRegistered,
+		es_model.HumanRegistered,
 		es_model.MachineAdded,
 		es_model.HumanAdded:
 		err = user.AppendEvent(event)

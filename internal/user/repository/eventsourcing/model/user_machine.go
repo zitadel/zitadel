@@ -54,16 +54,16 @@ func (sa *Machine) Changes(updatedAccount *Machine) map[string]interface{} {
 	return changes
 }
 
-func MachineFromModel(serviceAccount *model.Machine) *Machine {
+func MachineFromModel(machine *model.Machine) *Machine {
 	return &Machine{
-		Description: serviceAccount.Description,
-		Name:        serviceAccount.Name,
+		Description: machine.Description,
+		Name:        machine.Name,
 	}
 }
 
-func MachineToModel(serviceAccount *Machine) *model.Machine {
+func MachineToModel(machine *Machine) *model.Machine {
 	return &model.Machine{
-		Description: serviceAccount.Description,
-		Name:        serviceAccount.Name,
+		Description: machine.Description,
+		Name:        machine.Name,
 	}
 }
