@@ -96,11 +96,8 @@ func (m *IamMember) processUser(event *models.Event) (err error) {
 		}
 		for _, member := range members {
 			m.fillUserData(member, user)
-			err = m.view.PutIamMember(member, event.Sequence)
-			if err != nil {
-				return err
-			}
 		}
+		return m.view.PutIamMembers(members, event.Sequence)
 	default:
 		return m.view.ProcessedIamMemberSequence(event.Sequence)
 	}

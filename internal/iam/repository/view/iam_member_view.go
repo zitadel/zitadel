@@ -53,6 +53,15 @@ func PutIamMember(db *gorm.DB, table string, role *model.IamMemberView) error {
 	return save(db, role)
 }
 
+func PutIamMembers(db *gorm.DB, table string, members ...*model.IamMemberView) error {
+	save := repository.PrepareBulkSave(table)
+	m := make([]interface{}, len(members))
+	for i, member := range members {
+		m[i] = member
+	}
+	return save(db, m...)
+}
+
 func DeleteIamMember(db *gorm.DB, table, orgID, userID string) error {
 	member, err := IamMemberByIDs(db, table, orgID, userID)
 	if err != nil {

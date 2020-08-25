@@ -24,8 +24,16 @@ func (v *View) IamMembersByUserID(userID string) ([]*model.IamMemberView, error)
 	return view.IamMembersByUserID(v.Db, iamMemberTable, userID)
 }
 
-func (v *View) PutIamMember(org *model.IamMemberView, sequence uint64) error {
-	err := view.PutIamMember(v.Db, iamMemberTable, org)
+func (v *View) PutIamMember(member *model.IamMemberView, sequence uint64) error {
+	err := view.PutIamMember(v.Db, iamMemberTable, member)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedIamMemberSequence(sequence)
+}
+
+func (v *View) PutIamMembers(members []*model.IamMemberView, sequence uint64) error {
+	err := view.PutIamMembers(v.Db, iamMemberTable, members...)
 	if err != nil {
 		return err
 	}
