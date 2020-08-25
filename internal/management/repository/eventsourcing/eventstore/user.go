@@ -166,7 +166,7 @@ func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_mode
 		return nil, err
 	}
 	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-LQh4I", "Errors.User.NotHuman")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-gDFC2", "Errors.User.NotHuman")
 	}
 	return user.GetProfile(), nil
 }
@@ -185,7 +185,7 @@ func (repo *UserRepo) EmailByID(ctx context.Context, userID string) (*usr_model.
 		return nil, err
 	}
 	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-LQh4I", "Errors.User.NotHuman")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-pt7HY", "Errors.User.NotHuman")
 	}
 	return user.GetEmail(), nil
 }
@@ -204,7 +204,7 @@ func (repo *UserRepo) PhoneByID(ctx context.Context, userID string) (*usr_model.
 		return nil, err
 	}
 	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-LQh4I", "Errors.User.NotHuman")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-hliQl", "Errors.User.NotHuman")
 	}
 	return user.GetPhone(), nil
 }

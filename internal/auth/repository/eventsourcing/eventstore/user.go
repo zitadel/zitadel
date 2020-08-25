@@ -75,7 +75,7 @@ func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {
 		return nil, err
 	}
 	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-LQh4I", "Errors.User.NotHuman")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-H2JIT", "Errors.User.NotHuman")
 	}
 	return user.GetProfile(), nil
 }
@@ -93,7 +93,7 @@ func (repo *UserRepo) MyEmail(ctx context.Context) (*model.Email, error) {
 		return nil, err
 	}
 	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-LQh4I", "Errors.User.NotHuman")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-oGRpc", "Errors.User.NotHuman")
 	}
 	return user.GetEmail(), nil
 }
@@ -127,7 +127,7 @@ func (repo *UserRepo) MyPhone(ctx context.Context) (*model.Phone, error) {
 		return nil, err
 	}
 	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-LQh4I", "Errors.User.NotHuman")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-DTWJb", "Errors.User.NotHuman")
 	}
 	return user.GetPhone(), nil
 }
@@ -157,7 +157,7 @@ func (repo *UserRepo) MyAddress(ctx context.Context) (*model.Address, error) {
 		return nil, err
 	}
 	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-LQh4I", "Errors.User.NotHuman")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Ok9nI", "Errors.User.NotHuman")
 	}
 	return user.GetAddress(), nil
 }
