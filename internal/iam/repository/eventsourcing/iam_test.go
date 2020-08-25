@@ -71,9 +71,9 @@ func TestSetUpStartedAggregate(t *testing.T) {
 
 func TestSetUpDoneAggregate(t *testing.T) {
 	type args struct {
-		ctx        context.Context
-		existing   *model.Iam
-		aggCreator *models.AggregateCreator
+		ctx         context.Context
+		existingIAM *model.Iam
+		aggCreator  *models.AggregateCreator
 	}
 	type res struct {
 		eventLen  int
@@ -88,9 +88,9 @@ func TestSetUpDoneAggregate(t *testing.T) {
 		{
 			name: "setup done aggregate ok",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
+				aggCreator:  models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
@@ -100,9 +100,9 @@ func TestSetUpDoneAggregate(t *testing.T) {
 		{
 			name: "existing iam nil",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   nil,
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
@@ -113,7 +113,7 @@ func TestSetUpDoneAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := IamSetupDoneAggregate(tt.args.aggCreator, tt.args.existing)(tt.args.ctx)
+			agg, err := IamSetupDoneAggregate(tt.args.aggCreator, tt.args.existingIAM)(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -130,10 +130,10 @@ func TestSetUpDoneAggregate(t *testing.T) {
 
 func TestGlobalOrgAggregate(t *testing.T) {
 	type args struct {
-		ctx        context.Context
-		existing   *model.Iam
-		orgID      string
-		aggCreator *models.AggregateCreator
+		ctx         context.Context
+		existingIAM *model.Iam
+		orgID       string
+		aggCreator  *models.AggregateCreator
 	}
 	type res struct {
 		eventLen  int
@@ -148,10 +148,10 @@ func TestGlobalOrgAggregate(t *testing.T) {
 		{
 			name: "global org set aggregate ok",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
-				orgID:      "orgID",
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
+				orgID:       "orgID",
+				aggCreator:  models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
@@ -161,10 +161,10 @@ func TestGlobalOrgAggregate(t *testing.T) {
 		{
 			name: "existing iam nil",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   nil,
-				orgID:      "orgID",
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: nil,
+				orgID:       "orgID",
+				aggCreator:  models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -173,9 +173,9 @@ func TestGlobalOrgAggregate(t *testing.T) {
 		{
 			name: "global org empty",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
+				aggCreator:  models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -184,7 +184,7 @@ func TestGlobalOrgAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := IamSetGlobalOrgAggregate(tt.args.aggCreator, tt.args.existing, tt.args.orgID)(tt.args.ctx)
+			agg, err := IamSetGlobalOrgAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.orgID)(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -201,10 +201,10 @@ func TestGlobalOrgAggregate(t *testing.T) {
 
 func TestIamProjectAggregate(t *testing.T) {
 	type args struct {
-		ctx        context.Context
-		existing   *model.Iam
-		projectID  string
-		aggCreator *models.AggregateCreator
+		ctx         context.Context
+		existingIAM *model.Iam
+		projectID   string
+		aggCreator  *models.AggregateCreator
 	}
 	type res struct {
 		eventLen  int
@@ -219,10 +219,10 @@ func TestIamProjectAggregate(t *testing.T) {
 		{
 			name: "iam project id set aggregate ok",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
-				projectID:  "projectID",
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
+				projectID:   "projectID",
+				aggCreator:  models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
@@ -232,10 +232,10 @@ func TestIamProjectAggregate(t *testing.T) {
 		{
 			name: "existing iam nil",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   nil,
-				projectID:  "projectID",
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: nil,
+				projectID:   "projectID",
+				aggCreator:  models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -244,9 +244,9 @@ func TestIamProjectAggregate(t *testing.T) {
 		{
 			name: "project id empty",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
+				aggCreator:  models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -255,7 +255,7 @@ func TestIamProjectAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := IamSetIamProjectAggregate(tt.args.aggCreator, tt.args.existing, tt.args.projectID)(tt.args.ctx)
+			agg, err := IamSetIamProjectAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.projectID)(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -272,10 +272,10 @@ func TestIamProjectAggregate(t *testing.T) {
 
 func TestIamMemberAddedAggregate(t *testing.T) {
 	type args struct {
-		ctx        context.Context
-		existing   *model.Iam
-		new        *model.IamMember
-		aggCreator *models.AggregateCreator
+		ctx         context.Context
+		existingIAM *model.Iam
+		new         *model.IamMember
+		aggCreator  *models.AggregateCreator
 	}
 	type res struct {
 		eventLen  int
@@ -290,10 +290,10 @@ func TestIamMemberAddedAggregate(t *testing.T) {
 		{
 			name: "iammember added ok",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
-				new:        &model.IamMember{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, UserID: "UserID", Roles: []string{"Roles"}},
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
+				new:         &model.IamMember{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, UserID: "UserID", Roles: []string{"Roles"}},
+				aggCreator:  models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
@@ -303,9 +303,9 @@ func TestIamMemberAddedAggregate(t *testing.T) {
 		{
 			name: "existing iam nil",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   nil,
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
@@ -316,10 +316,10 @@ func TestIamMemberAddedAggregate(t *testing.T) {
 		{
 			name: "member nil",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
-				new:        nil,
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
+				new:         nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
@@ -330,7 +330,7 @@ func TestIamMemberAddedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := IamMemberAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := IamMemberAddedAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.new)(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -350,10 +350,10 @@ func TestIamMemberAddedAggregate(t *testing.T) {
 
 func TestIamMemberChangedAggregate(t *testing.T) {
 	type args struct {
-		ctx        context.Context
-		existing   *model.Iam
-		new        *model.IamMember
-		aggCreator *models.AggregateCreator
+		ctx         context.Context
+		existingIAM *model.Iam
+		new         *model.IamMember
+		aggCreator  *models.AggregateCreator
 	}
 	type res struct {
 		eventLen  int
@@ -369,10 +369,10 @@ func TestIamMemberChangedAggregate(t *testing.T) {
 		{
 			name: "iammember changed ok",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
-				new:        &model.IamMember{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, UserID: "UserID", Roles: []string{"Roles"}},
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
+				new:         &model.IamMember{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, UserID: "UserID", Roles: []string{"Roles"}},
+				aggCreator:  models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
@@ -382,9 +382,9 @@ func TestIamMemberChangedAggregate(t *testing.T) {
 		{
 			name: "existing iam nil",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   nil,
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
@@ -396,10 +396,10 @@ func TestIamMemberChangedAggregate(t *testing.T) {
 		{
 			name: "member nil",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
-				new:        nil,
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
+				new:         nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
@@ -411,7 +411,7 @@ func TestIamMemberChangedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := IamMemberChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := IamMemberChangedAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.new)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -431,10 +431,10 @@ func TestIamMemberChangedAggregate(t *testing.T) {
 
 func TestIamMemberRemovedAggregate(t *testing.T) {
 	type args struct {
-		ctx        context.Context
-		existing   *model.Iam
-		new        *model.IamMember
-		aggCreator *models.AggregateCreator
+		ctx         context.Context
+		existingIAM *model.Iam
+		new         *model.IamMember
+		aggCreator  *models.AggregateCreator
 	}
 	type res struct {
 		eventLen  int
@@ -450,10 +450,10 @@ func TestIamMemberRemovedAggregate(t *testing.T) {
 		{
 			name: "iammember removed ok",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
-				new:        &model.IamMember{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, UserID: "UserID", Roles: []string{"Roles"}},
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
+				new:         &model.IamMember{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, UserID: "UserID", Roles: []string{"Roles"}},
+				aggCreator:  models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
@@ -463,9 +463,9 @@ func TestIamMemberRemovedAggregate(t *testing.T) {
 		{
 			name: "existing iam nil",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   nil,
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
@@ -477,10 +477,10 @@ func TestIamMemberRemovedAggregate(t *testing.T) {
 		{
 			name: "member nil",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
-				new:        nil,
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
+				new:         nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
@@ -492,7 +492,7 @@ func TestIamMemberRemovedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := IamMemberRemovedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := IamMemberRemovedAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.new)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

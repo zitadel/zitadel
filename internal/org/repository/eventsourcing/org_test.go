@@ -366,10 +366,10 @@ func TestOrgUpdateAggregates(t *testing.T) {
 		isErr          func(error) bool
 	}
 	type args struct {
-		ctx        context.Context
-		aggCreator *es_models.AggregateCreator
-		existing   *model.Org
-		updated    *model.Org
+		ctx         context.Context
+		aggCreator  *es_models.AggregateCreator
+		existingOrg *model.Org
+		updated     *model.Org
 	}
 	tests := []struct {
 		name string
@@ -379,10 +379,10 @@ func TestOrgUpdateAggregates(t *testing.T) {
 		{
 			name: "no existing org error",
 			args: args{
-				ctx:        authz.NewMockContext("org", "user"),
-				aggCreator: es_models.NewAggregateCreator("test"),
-				existing:   nil,
-				updated:    &model.Org{},
+				ctx:         authz.NewMockContext("org", "user"),
+				aggCreator:  es_models.NewAggregateCreator("test"),
+				existingOrg: nil,
+				updated:     &model.Org{},
 			},
 			res: res{
 				aggregateCount: 0,
@@ -392,10 +392,10 @@ func TestOrgUpdateAggregates(t *testing.T) {
 		{
 			name: "no updated org error",
 			args: args{
-				ctx:        authz.NewMockContext("org", "user"),
-				aggCreator: es_models.NewAggregateCreator("test"),
-				existing:   &model.Org{},
-				updated:    nil,
+				ctx:         authz.NewMockContext("org", "user"),
+				aggCreator:  es_models.NewAggregateCreator("test"),
+				existingOrg: &model.Org{},
+				updated:     nil,
 			},
 			res: res{
 				aggregateCount: 0,
@@ -405,10 +405,10 @@ func TestOrgUpdateAggregates(t *testing.T) {
 		{
 			name: "no changes",
 			args: args{
-				ctx:        authz.NewMockContext("org", "user"),
-				aggCreator: es_models.NewAggregateCreator("test"),
-				existing:   &model.Org{},
-				updated:    &model.Org{},
+				ctx:         authz.NewMockContext("org", "user"),
+				aggCreator:  es_models.NewAggregateCreator("test"),
+				existingOrg: &model.Org{},
+				updated:     &model.Org{},
 			},
 			res: res{
 				aggregateCount: 0,
@@ -420,7 +420,7 @@ func TestOrgUpdateAggregates(t *testing.T) {
 			args: args{
 				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
-				existing: &model.Org{
+				existingOrg: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
 						AggregateID: "sdaf",
 						Sequence:    5,
@@ -443,7 +443,7 @@ func TestOrgUpdateAggregates(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := OrgUpdateAggregates(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.updated)
+			got, err := OrgUpdateAggregates(tt.args.ctx, tt.args.aggCreator, tt.args.existingOrg, tt.args.updated)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got: %v", err)
 			}

@@ -72,11 +72,11 @@ func TestUserGrantAddedAggregate(t *testing.T) {
 
 func TestUserGrantChangedAggregate(t *testing.T) {
 	type args struct {
-		ctx        context.Context
-		existing   *model.UserGrant
-		new        *model.UserGrant
-		cascade    bool
-		aggCreator *models.AggregateCreator
+		ctx           context.Context
+		existingGrant *model.UserGrant
+		newGrant      *model.UserGrant
+		cascade       bool
+		aggCreator    *models.AggregateCreator
 	}
 	type res struct {
 		eventLen   int
@@ -92,12 +92,12 @@ func TestUserGrantChangedAggregate(t *testing.T) {
 			name: "change project grant",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.UserGrant{
+				existingGrant: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserID:     "UserID",
 					ProjectID:  "ProjectID",
 					RoleKeys:   []string{"Key"}},
-				new: &model.UserGrant{
+				newGrant: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserID:     "UserID",
 					ProjectID:  "ProjectID",
@@ -114,12 +114,12 @@ func TestUserGrantChangedAggregate(t *testing.T) {
 			name: "change project grant cascade",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.UserGrant{
+				existingGrant: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserID:     "UserID",
 					ProjectID:  "ProjectID",
 					RoleKeys:   []string{"Key"}},
-				new: &model.UserGrant{
+				newGrant: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserID:     "UserID",
 					ProjectID:  "ProjectID",
@@ -136,9 +136,9 @@ func TestUserGrantChangedAggregate(t *testing.T) {
 		{
 			name: "existing grant nil",
 			args: args{
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: nil,
-				new: &model.UserGrant{
+				ctx:           authz.NewMockContext("orgID", "userID"),
+				existingGrant: nil,
+				newGrant: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserID:     "UserID",
 					ProjectID:  "ProjectID",
@@ -153,12 +153,12 @@ func TestUserGrantChangedAggregate(t *testing.T) {
 			name: "grant nil",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.UserGrant{
+				existingGrant: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserID:     "UserID",
 					ProjectID:  "ProjectID",
 					RoleKeys:   []string{"Key"}},
-				new:        nil,
+				newGrant:   nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -168,7 +168,7 @@ func TestUserGrantChangedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := UserGrantChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new, tt.args.cascade)(tt.args.ctx)
+			agg, err := UserGrantChangedAggregate(tt.args.aggCreator, tt.args.existingGrant, tt.args.newGrant, tt.args.cascade)(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -191,11 +191,11 @@ func TestUserGrantChangedAggregate(t *testing.T) {
 
 func TestUserGrantRemovedAggregate(t *testing.T) {
 	type args struct {
-		ctx        context.Context
-		existing   *model.UserGrant
-		new        *model.UserGrant
-		cascade    bool
-		aggCreator *models.AggregateCreator
+		ctx           context.Context
+		existingGrant *model.UserGrant
+		newGrant      *model.UserGrant
+		cascade       bool
+		aggCreator    *models.AggregateCreator
 	}
 	type res struct {
 		eventLen   int
@@ -211,12 +211,12 @@ func TestUserGrantRemovedAggregate(t *testing.T) {
 			name: "remove app",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.UserGrant{
+				existingGrant: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserID:     "UserID",
 					ProjectID:  "ProjectID",
 					RoleKeys:   []string{"Key"}},
-				new: &model.UserGrant{
+				newGrant: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -230,12 +230,12 @@ func TestUserGrantRemovedAggregate(t *testing.T) {
 			name: "remove app cascade",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.UserGrant{
+				existingGrant: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserID:     "UserID",
 					ProjectID:  "ProjectID",
 					RoleKeys:   []string{"Key"}},
-				new: &model.UserGrant{
+				newGrant: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 				},
 				cascade:    true,
@@ -249,9 +249,9 @@ func TestUserGrantRemovedAggregate(t *testing.T) {
 		{
 			name: "existing project nil",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   nil,
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:           authz.NewMockContext("orgID", "userID"),
+				existingGrant: nil,
+				aggCreator:    models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -261,12 +261,12 @@ func TestUserGrantRemovedAggregate(t *testing.T) {
 			name: "grant nil",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.UserGrant{
+				existingGrant: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserID:     "UserID",
 					ProjectID:  "ProjectID",
 					RoleKeys:   []string{"Key"}},
-				new:        nil,
+				newGrant:   nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -276,7 +276,7 @@ func TestUserGrantRemovedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			aggregates, err := UserGrantRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.new, tt.args.cascade)
+			aggregates, err := UserGrantRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existingGrant, tt.args.newGrant, tt.args.cascade)
 
 			if tt.res.errFunc == nil && len(aggregates[0].Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(aggregates[0].Events))
@@ -296,10 +296,10 @@ func TestUserGrantRemovedAggregate(t *testing.T) {
 
 func TestUserGrantDeactivatedAggregate(t *testing.T) {
 	type args struct {
-		ctx        context.Context
-		existing   *model.UserGrant
-		new        *model.UserGrant
-		aggCreator *models.AggregateCreator
+		ctx           context.Context
+		existingGrant *model.UserGrant
+		newGrant      *model.UserGrant
+		aggCreator    *models.AggregateCreator
 	}
 	type res struct {
 		eventLen   int
@@ -315,10 +315,10 @@ func TestUserGrantDeactivatedAggregate(t *testing.T) {
 			name: "deactivate project grant",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.UserGrant{
+				existingGrant: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 				},
-				new: &model.UserGrant{
+				newGrant: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -331,9 +331,9 @@ func TestUserGrantDeactivatedAggregate(t *testing.T) {
 		{
 			name: "existing grant nil",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   nil,
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:           authz.NewMockContext("orgID", "userID"),
+				existingGrant: nil,
+				aggCreator:    models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -342,10 +342,10 @@ func TestUserGrantDeactivatedAggregate(t *testing.T) {
 		{
 			name: "grant nil",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.UserGrant{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
-				new:        nil,
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:           authz.NewMockContext("orgID", "userID"),
+				existingGrant: &model.UserGrant{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
+				newGrant:      nil,
+				aggCreator:    models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -354,7 +354,7 @@ func TestUserGrantDeactivatedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := UserGrantDeactivatedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := UserGrantDeactivatedAggregate(tt.args.aggCreator, tt.args.existingGrant, tt.args.newGrant)(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -374,10 +374,10 @@ func TestUserGrantDeactivatedAggregate(t *testing.T) {
 
 func TestUserGrantReactivatedAggregate(t *testing.T) {
 	type args struct {
-		ctx        context.Context
-		existing   *model.UserGrant
-		new        *model.UserGrant
-		aggCreator *models.AggregateCreator
+		ctx           context.Context
+		existingGrant *model.UserGrant
+		newGrant      *model.UserGrant
+		aggCreator    *models.AggregateCreator
 	}
 	type res struct {
 		eventLen   int
@@ -393,10 +393,10 @@ func TestUserGrantReactivatedAggregate(t *testing.T) {
 			name: "reactivate project grant",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.UserGrant{
+				existingGrant: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 				},
-				new: &model.UserGrant{
+				newGrant: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -409,9 +409,9 @@ func TestUserGrantReactivatedAggregate(t *testing.T) {
 		{
 			name: "existing grant nil",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   nil,
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:           authz.NewMockContext("orgID", "userID"),
+				existingGrant: nil,
+				aggCreator:    models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -420,10 +420,10 @@ func TestUserGrantReactivatedAggregate(t *testing.T) {
 		{
 			name: "grant nil",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &model.UserGrant{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
-				new:        nil,
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:           authz.NewMockContext("orgID", "userID"),
+				existingGrant: &model.UserGrant{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
+				newGrant:      nil,
+				aggCreator:    models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -432,7 +432,7 @@ func TestUserGrantReactivatedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := UserGrantReactivatedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := UserGrantReactivatedAggregate(tt.args.aggCreator, tt.args.existingGrant, tt.args.newGrant)(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

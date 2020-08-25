@@ -419,8 +419,8 @@ func Test_AddRoleContextIDToPerm(t *testing.T) {
 
 func Test_ExistisPerm(t *testing.T) {
 	type args struct {
-		existing []string
-		perm     string
+		existingPermissions []string
+		perm                string
 	}
 	tests := []struct {
 		name   string
@@ -430,23 +430,23 @@ func Test_ExistisPerm(t *testing.T) {
 		{
 			name: "not existing perm",
 			args: args{
-				existing: []string{"perm1", "perm2", "perm3"},
-				perm:     "perm4",
+				existingPermissions: []string{"perm1", "perm2", "perm3"},
+				perm:                "perm4",
 			},
 			result: false,
 		},
 		{
 			name: "existing perm",
 			args: args{
-				existing: []string{"perm1", "perm2", "perm3"},
-				perm:     "perm2",
+				existingPermissions: []string{"perm1", "perm2", "perm3"},
+				perm:                "perm2",
 			},
 			result: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := ExistsPerm(tt.args.existing, tt.args.perm)
+			result := ExistsPerm(tt.args.existingPermissions, tt.args.perm)
 			if result != tt.result {
 				t.Errorf("got wrong result, expecting: %v, actual: %v ", tt.result, result)
 			}

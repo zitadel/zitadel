@@ -9,8 +9,8 @@ import (
 
 func TestAddressChanges(t *testing.T) {
 	type args struct {
-		existing *Address
-		new      *Address
+		existingAddress *Address
+		newAddress      *Address
 	}
 	type res struct {
 		changesLen int
@@ -23,8 +23,8 @@ func TestAddressChanges(t *testing.T) {
 		{
 			name: "all fields changed",
 			args: args{
-				existing: &Address{Country: "Country", Locality: "Locality", PostalCode: "PostalCode", Region: "Region", StreetAddress: "StreetAddress"},
-				new:      &Address{Country: "CountryChanged", Locality: "LocalityChanged", PostalCode: "PostalCodeChanged", Region: "RegionChanged", StreetAddress: "StreetAddressChanged"},
+				existingAddress: &Address{Country: "Country", Locality: "Locality", PostalCode: "PostalCode", Region: "Region", StreetAddress: "StreetAddress"},
+				newAddress:      &Address{Country: "CountryChanged", Locality: "LocalityChanged", PostalCode: "PostalCodeChanged", Region: "RegionChanged", StreetAddress: "StreetAddressChanged"},
 			},
 			res: res{
 				changesLen: 5,
@@ -33,8 +33,8 @@ func TestAddressChanges(t *testing.T) {
 		{
 			name: "no fields changed",
 			args: args{
-				existing: &Address{Country: "Country", Locality: "Locality", PostalCode: "PostalCode", Region: "Region", StreetAddress: "StreetAddress"},
-				new:      &Address{Country: "Country", Locality: "Locality", PostalCode: "PostalCode", Region: "Region", StreetAddress: "StreetAddress"},
+				existingAddress: &Address{Country: "Country", Locality: "Locality", PostalCode: "PostalCode", Region: "Region", StreetAddress: "StreetAddress"},
+				newAddress:      &Address{Country: "Country", Locality: "Locality", PostalCode: "PostalCode", Region: "Region", StreetAddress: "StreetAddress"},
 			},
 			res: res{
 				changesLen: 0,
@@ -43,7 +43,7 @@ func TestAddressChanges(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			changes := tt.args.existing.Changes(tt.args.new)
+			changes := tt.args.existingAddress.Changes(tt.args.newAddress)
 			if len(changes) != tt.res.changesLen {
 				t.Errorf("got wrong changes len: expected: %v, actual: %v ", tt.res.changesLen, len(changes))
 			}

@@ -501,8 +501,8 @@ func (repo *ProjectRepo) ChangeProjectGrant(ctx context.Context, grant *proj_mod
 			ProjectID:  grant.ProjectID,
 			UserID:     grant.UserID,
 		}
-		existing := changed.RemoveRoleKeysIfExisting(removedRoles)
-		if existing {
+		roleDeleted := changed.RemoveRoleKeysIfExisting(removedRoles)
+		if roleDeleted {
 			_, agg, err := repo.UserGrantEvents.PrepareChangeUserGrant(ctx, changed, true)
 			if err != nil {
 				return nil, err

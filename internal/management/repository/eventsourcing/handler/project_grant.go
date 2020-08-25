@@ -111,11 +111,11 @@ func (p *ProjectGrant) updateExistingProjects(project *view_model.ProjectView) e
 	if err != nil {
 		logging.LogWithFields("SPOOL-los03", "id", project.ProjectID).WithError(err).Warn("could not update existing projects")
 	}
-	for _, existing := range projectGrants {
-		existing.Name = project.Name
-		err := p.view.PutProjectGrant(existing)
+	for _, existingGrant := range projectGrants {
+		existingGrant.Name = project.Name
+		err := p.view.PutProjectGrant(existingGrant)
 		if err != nil {
-			logging.LogWithFields("SPOOL-sjwi3", "id", existing.ProjectID).WithError(err).Warn("could not update existing project")
+			logging.LogWithFields("SPOOL-sjwi3", "id", existingGrant.ProjectID).WithError(err).Warn("could not update existing project")
 			return err
 		}
 	}

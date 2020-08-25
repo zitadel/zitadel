@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/cache/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -122,14 +123,14 @@ func (es *IamEventstore) AddIamMember(ctx context.Context, member *iam_model.Iam
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-89osr", "Errors.Iam.MemberInvalid")
 	}
-	existing, err := es.IamByID(ctx, member.AggregateID)
+	existingIAM, err := es.IamByID(ctx, member.AggregateID)
 	if err != nil {
 		return nil, err
 	}
-	if _, m := existing.GetMember(member.UserID); m != nil {
+	if _, m := existingIAM.GetMember(member.UserID); m != nil {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-idke6", "Errors.Iam.MemberAlreadyExisting")
 	}
-	repoIam := model.IamFromModel(existing)
+	repoIam := model.IamFromModel(existingIAM)
 	repoMember := model.IamMemberFromModel(member)
 
 	addAggregate := IamMemberAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoMember)
@@ -149,14 +150,14 @@ func (es *IamEventstore) ChangeIamMember(ctx context.Context, member *iam_model.
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-s9ipe", "Errors.Iam.MemberInvalid")
 	}
-	existing, err := es.IamByID(ctx, member.AggregateID)
+	existingIAM, err := es.IamByID(ctx, member.AggregateID)
 	if err != nil {
 		return nil, err
 	}
-	if _, m := existing.GetMember(member.UserID); m == nil {
+	if _, m := existingIAM.GetMember(member.UserID); m == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-s7ucs", "Errors.Iam.MemberNotExisting")
 	}
-	repoIam := model.IamFromModel(existing)
+	repoIam := model.IamFromModel(existingIAM)
 	repoMember := model.IamMemberFromModel(member)
 
 	projectAggregate := IamMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoMember)
@@ -173,14 +174,14 @@ func (es *IamEventstore) RemoveIamMember(ctx context.Context, member *iam_model.
 	if member.UserID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-0pors", "Errors.Iam.MemberInvalid")
 	}
-	existing, err := es.IamByID(ctx, member.AggregateID)
+	existingIAM, err := es.IamByID(ctx, member.AggregateID)
 	if err != nil {
 		return err
 	}
-	if _, m := existing.GetMember(member.UserID); m == nil {
+	if _, m := existingIAM.GetMember(member.UserID); m == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-29skr", "Errors.Iam.MemberNotExisting")
 	}
-	repoIam := model.IamFromModel(existing)
+	repoIam := model.IamFromModel(existingIAM)
 	repoMember := model.IamMemberFromModel(member)
 
 	projectAggregate := IamMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoMember)

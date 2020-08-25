@@ -2,15 +2,16 @@ package model
 
 import (
 	"encoding/json"
+	"testing"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
-	"testing"
 )
 
 func TestProjectChanges(t *testing.T) {
 	type args struct {
-		existing *Project
-		new      *Project
+		existingProject *Project
+		newProject      *Project
 	}
 	type res struct {
 		changesLen int
@@ -23,8 +24,8 @@ func TestProjectChanges(t *testing.T) {
 		{
 			name: "project name changes",
 			args: args{
-				existing: &Project{Name: "Name"},
-				new:      &Project{Name: "NameChanged"},
+				existingProject: &Project{Name: "Name"},
+				newProject:      &Project{Name: "NameChanged"},
 			},
 			res: res{
 				changesLen: 1,
@@ -33,8 +34,8 @@ func TestProjectChanges(t *testing.T) {
 		{
 			name: "no changes",
 			args: args{
-				existing: &Project{Name: "Name"},
-				new:      &Project{Name: "Name"},
+				existingProject: &Project{Name: "Name"},
+				newProject:      &Project{Name: "Name"},
 			},
 			res: res{
 				changesLen: 0,
@@ -43,7 +44,7 @@ func TestProjectChanges(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			changes := tt.args.existing.Changes(tt.args.new)
+			changes := tt.args.existingProject.Changes(tt.args.newProject)
 			if len(changes) != tt.res.changesLen {
 				t.Errorf("got wrong changes len: expected: %v, actual: %v ", tt.res.changesLen, len(changes))
 			}
@@ -65,7 +66,7 @@ func TestProjectFromEvents(t *testing.T) {
 			name: "project from events, ok",
 			args: args{
 				event: []*es_models.Event{
-					&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: ProjectAdded},
+					{AggregateID: "AggregateID", Sequence: 1, Type: ProjectAdded},
 				},
 				project: &Project{Name: "ProjectName"},
 			},
@@ -75,7 +76,7 @@ func TestProjectFromEvents(t *testing.T) {
 			name: "project from events, nil project",
 			args: args{
 				event: []*es_models.Event{
-					&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: ProjectAdded},
+					{AggregateID: "AggregateID", Sequence: 1, Type: ProjectAdded},
 				},
 				project: nil,
 			},

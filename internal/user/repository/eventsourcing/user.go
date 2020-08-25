@@ -309,12 +309,12 @@ func userStateAggregate(aggCreator *es_models.AggregateCreator, user *model.User
 	}
 }
 
-func UserInitCodeAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, code *model.InitUserCode) func(ctx context.Context) (*es_models.Aggregate, error) {
+func UserInitCodeAggregate(aggCreator *es_models.AggregateCreator, user *model.User, code *model.InitUserCode) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if code == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d8i23", "code should not be nil")
 		}
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -322,9 +322,9 @@ func UserInitCodeAggregate(aggCreator *es_models.AggregateCreator, existing *mod
 	}
 }
 
-func UserInitCodeSentAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+func UserInitCodeSentAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -332,13 +332,13 @@ func UserInitCodeSentAggregate(aggCreator *es_models.AggregateCreator, existing 
 	}
 }
 
-func InitCodeVerifiedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, password *model.Password) func(ctx context.Context) (*es_models.Aggregate, error) {
+func InitCodeVerifiedAggregate(aggCreator *es_models.AggregateCreator, user *model.User, password *model.Password) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
-		if existing.Email != nil && !existing.Email.IsEmailVerified {
+		if user.Email != nil && !user.Email.IsEmailVerified {
 			agg, err = agg.AppendEvent(model.HumanEmailVerified, nil)
 			if err != nil {
 				return nil, err
@@ -354,9 +354,9 @@ func InitCodeVerifiedAggregate(aggCreator *es_models.AggregateCreator, existing 
 	}
 }
 
-func InitCodeCheckFailedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+func InitCodeCheckFailedAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -364,9 +364,9 @@ func InitCodeCheckFailedAggregate(aggCreator *es_models.AggregateCreator, existi
 	}
 }
 
-func SkipMfaAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+func SkipMfaAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -374,12 +374,12 @@ func SkipMfaAggregate(aggCreator *es_models.AggregateCreator, existing *model.Us
 	}
 }
 
-func PasswordChangeAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, password *model.Password) func(ctx context.Context) (*es_models.Aggregate, error) {
+func PasswordChangeAggregate(aggCreator *es_models.AggregateCreator, user *model.User, password *model.Password) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if password == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d9832", "Errors.Internal")
 		}
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -387,18 +387,18 @@ func PasswordChangeAggregate(aggCreator *es_models.AggregateCreator, existing *m
 	}
 }
 
-func PasswordCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, check *model.AuthRequest) es_sdk.AggregateFunc {
+func PasswordCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, user *model.User, check *model.AuthRequest) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
 		return agg.AppendEvent(model.HumanPasswordCheckSucceeded, check)
 	}
 }
-func PasswordCheckFailedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, check *model.AuthRequest) es_sdk.AggregateFunc {
+func PasswordCheckFailedAggregate(aggCreator *es_models.AggregateCreator, user *model.User, check *model.AuthRequest) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -406,12 +406,12 @@ func PasswordCheckFailedAggregate(aggCreator *es_models.AggregateCreator, existi
 	}
 }
 
-func RequestSetPassword(aggCreator *es_models.AggregateCreator, existing *model.User, request *model.PasswordCode) func(ctx context.Context) (*es_models.Aggregate, error) {
+func RequestSetPassword(aggCreator *es_models.AggregateCreator, user *model.User, request *model.PasswordCode) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if request == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d8ei2", "Errors.Internal")
 		}
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -419,9 +419,9 @@ func RequestSetPassword(aggCreator *es_models.AggregateCreator, existing *model.
 	}
 }
 
-func PasswordCodeSentAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+func PasswordCodeSentAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -429,16 +429,16 @@ func PasswordCodeSentAggregate(aggCreator *es_models.AggregateCreator, existing 
 	}
 }
 
-func MachineChangeAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, machine *model.Machine) func(ctx context.Context) (*es_models.Aggregate, error) {
+func MachineChangeAggregate(aggCreator *es_models.AggregateCreator, user *model.User, machine *model.Machine) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if machine == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "Errors.Internal")
 		}
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
-		changes := existing.Machine.Changes(machine)
+		changes := user.Machine.Changes(machine)
 		if len(changes) == 0 {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-0spow", "Errors.NoChangesFound")
 		}
@@ -446,16 +446,16 @@ func MachineChangeAggregate(aggCreator *es_models.AggregateCreator, existing *mo
 	}
 }
 
-func ProfileChangeAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, profile *model.Profile) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ProfileChangeAggregate(aggCreator *es_models.AggregateCreator, user *model.User, profile *model.Profile) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if profile == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "Errors.Internal")
 		}
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
-		changes := existing.Profile.Changes(profile)
+		changes := user.Profile.Changes(profile)
 		if len(changes) == 0 {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-0spow", "Errors.NoChangesFound")
 		}
@@ -463,14 +463,14 @@ func ProfileChangeAggregate(aggCreator *es_models.AggregateCreator, existing *mo
 	}
 }
 
-func EmailChangeAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.User, email *model.Email, code *model.EmailCode) ([]*es_models.Aggregate, error) {
+func EmailChangeAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, email *model.Email, code *model.EmailCode) ([]*es_models.Aggregate, error) {
 	if email == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dki8s", "Errors.Internal")
 	}
 	if (!email.IsEmailVerified && code == nil) || (email.IsEmailVerified && code != nil) {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-id934", "Errors.Internal")
 	}
-	changes := existing.Email.Changes(email)
+	changes := user.Email.Changes(email)
 	if len(changes) == 0 {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-s90pw", "Errors.NoChangesFound")
 	}
@@ -480,12 +480,12 @@ func EmailChangeAggregate(ctx context.Context, aggCreator *es_models.AggregateCr
 		return nil, err
 	}
 	aggregates = append(aggregates, reserveEmailAggregate)
-	releaseEmailAggregate, err := releasedUniqueEmailAggregate(ctx, aggCreator, "", existing.EmailAddress)
+	releaseEmailAggregate, err := releasedUniqueEmailAggregate(ctx, aggCreator, "", user.EmailAddress)
 	if err != nil {
 		return nil, err
 	}
 	aggregates = append(aggregates, releaseEmailAggregate)
-	agg, err := UserAggregate(ctx, aggCreator, existing)
+	agg, err := UserAggregate(ctx, aggCreator, user)
 	if err != nil {
 		return nil, err
 	}
@@ -493,8 +493,8 @@ func EmailChangeAggregate(ctx context.Context, aggCreator *es_models.AggregateCr
 	if err != nil {
 		return nil, err
 	}
-	if existing.Email == nil {
-		existing.Email = new(model.Email)
+	if user.Email == nil {
+		user.Email = new(model.Email)
 	}
 	if email.IsEmailVerified {
 		agg, err = agg.AppendEvent(model.HumanEmailVerified, code)
@@ -511,9 +511,9 @@ func EmailChangeAggregate(ctx context.Context, aggCreator *es_models.AggregateCr
 	return append(aggregates, agg), nil
 }
 
-func EmailVerifiedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc {
+func EmailVerifiedAggregate(aggCreator *es_models.AggregateCreator, user *model.User) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -521,9 +521,9 @@ func EmailVerifiedAggregate(aggCreator *es_models.AggregateCreator, existing *mo
 	}
 }
 
-func EmailVerificationFailedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc {
+func EmailVerificationFailedAggregate(aggCreator *es_models.AggregateCreator, user *model.User) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -531,12 +531,12 @@ func EmailVerificationFailedAggregate(aggCreator *es_models.AggregateCreator, ex
 	}
 }
 
-func EmailVerificationCodeAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, code *model.EmailCode) func(ctx context.Context) (*es_models.Aggregate, error) {
+func EmailVerificationCodeAggregate(aggCreator *es_models.AggregateCreator, user *model.User, code *model.EmailCode) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if code == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dki8s", "Errors.Internal")
 		}
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -544,9 +544,9 @@ func EmailVerificationCodeAggregate(aggCreator *es_models.AggregateCreator, exis
 	}
 }
 
-func EmailCodeSentAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+func EmailCodeSentAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -554,7 +554,7 @@ func EmailCodeSentAggregate(aggCreator *es_models.AggregateCreator, existing *mo
 	}
 }
 
-func PhoneChangeAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, phone *model.Phone, code *model.PhoneCode) func(ctx context.Context) (*es_models.Aggregate, error) {
+func PhoneChangeAggregate(aggCreator *es_models.AggregateCreator, user *model.User, phone *model.Phone, code *model.PhoneCode) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if phone == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dkso3", "Errors.Internal")
@@ -562,14 +562,14 @@ func PhoneChangeAggregate(aggCreator *es_models.AggregateCreator, existing *mode
 		if (!phone.IsPhoneVerified && code == nil) || (phone.IsPhoneVerified && code != nil) {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dksi8", "Errors.Internal")
 		}
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
-		if existing.Phone == nil {
-			existing.Phone = new(model.Phone)
+		if user.Phone == nil {
+			user.Phone = new(model.Phone)
 		}
-		changes := existing.Phone.Changes(phone)
+		changes := user.Phone.Changes(phone)
 		if len(changes) == 0 {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-sp0oc", "Errors.NoChangesFound")
 		}
@@ -587,9 +587,9 @@ func PhoneChangeAggregate(aggCreator *es_models.AggregateCreator, existing *mode
 	}
 }
 
-func PhoneRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc {
+func PhoneRemovedAggregate(aggCreator *es_models.AggregateCreator, user *model.User) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -597,9 +597,9 @@ func PhoneRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *mod
 	}
 }
 
-func PhoneVerifiedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc {
+func PhoneVerifiedAggregate(aggCreator *es_models.AggregateCreator, user *model.User) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -607,9 +607,9 @@ func PhoneVerifiedAggregate(aggCreator *es_models.AggregateCreator, existing *mo
 	}
 }
 
-func PhoneVerificationFailedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc {
+func PhoneVerificationFailedAggregate(aggCreator *es_models.AggregateCreator, user *model.User) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -617,12 +617,12 @@ func PhoneVerificationFailedAggregate(aggCreator *es_models.AggregateCreator, ex
 	}
 }
 
-func PhoneVerificationCodeAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, code *model.PhoneCode) func(ctx context.Context) (*es_models.Aggregate, error) {
+func PhoneVerificationCodeAggregate(aggCreator *es_models.AggregateCreator, user *model.User, code *model.PhoneCode) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if code == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dsue2", "Errors.Internal")
 		}
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -630,9 +630,9 @@ func PhoneVerificationCodeAggregate(aggCreator *es_models.AggregateCreator, exis
 	}
 }
 
-func PhoneCodeSentAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+func PhoneCodeSentAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -640,19 +640,19 @@ func PhoneCodeSentAggregate(aggCreator *es_models.AggregateCreator, existing *mo
 	}
 }
 
-func AddressChangeAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, address *model.Address) func(ctx context.Context) (*es_models.Aggregate, error) {
+func AddressChangeAggregate(aggCreator *es_models.AggregateCreator, user *model.User, address *model.Address) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if address == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dkx9s", "Errors.Internal")
 		}
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
-		if existing.Address == nil {
-			existing.Address = new(model.Address)
+		if user.Address == nil {
+			user.Address = new(model.Address)
 		}
-		changes := existing.Address.Changes(address)
+		changes := user.Address.Changes(address)
 		if len(changes) == 0 {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-2tszw", "Errors.NoChangesFound")
 		}
@@ -660,12 +660,12 @@ func AddressChangeAggregate(aggCreator *es_models.AggregateCreator, existing *mo
 	}
 }
 
-func MfaOTPAddAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, otp *model.OTP) func(ctx context.Context) (*es_models.Aggregate, error) {
+func MfaOTPAddAggregate(aggCreator *es_models.AggregateCreator, user *model.User, otp *model.OTP) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if otp == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dkx9s", "Errors.Internal")
 		}
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -673,9 +673,9 @@ func MfaOTPAddAggregate(aggCreator *es_models.AggregateCreator, existing *model.
 	}
 }
 
-func MfaOTPVerifyAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+func MfaOTPVerifyAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -683,12 +683,12 @@ func MfaOTPVerifyAggregate(aggCreator *es_models.AggregateCreator, existing *mod
 	}
 }
 
-func MfaOTPCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, authReq *model.AuthRequest) es_sdk.AggregateFunc {
+func MfaOTPCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, user *model.User, authReq *model.AuthRequest) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if authReq == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-sd5DA", "Errors.Internal")
 		}
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -696,12 +696,12 @@ func MfaOTPCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, exist
 	}
 }
 
-func MfaOTPCheckFailedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, authReq *model.AuthRequest) es_sdk.AggregateFunc {
+func MfaOTPCheckFailedAggregate(aggCreator *es_models.AggregateCreator, user *model.User, authReq *model.AuthRequest) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if authReq == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-64sd6", "Errors.Internal")
 		}
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -709,9 +709,9 @@ func MfaOTPCheckFailedAggregate(aggCreator *es_models.AggregateCreator, existing
 	}
 }
 
-func MfaOTPRemoveAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+func MfaOTPRemoveAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
@@ -719,11 +719,11 @@ func MfaOTPRemoveAggregate(aggCreator *es_models.AggregateCreator, existing *mod
 	}
 }
 
-func SignOutAggregates(aggCreator *es_models.AggregateCreator, existingUsers []*model.User, agentID string) func(ctx context.Context) ([]*es_models.Aggregate, error) {
+func SignOutAggregates(aggCreator *es_models.AggregateCreator, users []*model.User, agentID string) func(ctx context.Context) ([]*es_models.Aggregate, error) {
 	return func(ctx context.Context) ([]*es_models.Aggregate, error) {
-		aggregates := make([]*es_models.Aggregate, len(existingUsers))
-		for i, existing := range existingUsers {
-			agg, err := UserAggregateOverwriteContext(ctx, aggCreator, existing, existing.ResourceOwner, existing.AggregateID)
+		aggregates := make([]*es_models.Aggregate, len(users))
+		for i, user := range users {
+			agg, err := UserAggregateOverwriteContext(ctx, aggCreator, user, user.ResourceOwner, user.AggregateID)
 			if err != nil {
 				return nil, err
 			}
@@ -734,9 +734,9 @@ func SignOutAggregates(aggCreator *es_models.AggregateCreator, existingUsers []*
 	}
 }
 
-func DomainClaimedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existingUser *model.User, tempName string) ([]*es_models.Aggregate, error) {
+func DomainClaimedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, tempName string) ([]*es_models.Aggregate, error) {
 	aggregates := make([]*es_models.Aggregate, 3)
-	userAggregate, err := UserAggregateOverwriteContext(ctx, aggCreator, existingUser, existingUser.ResourceOwner, existingUser.AggregateID)
+	userAggregate, err := UserAggregateOverwriteContext(ctx, aggCreator, user, user.ResourceOwner, user.AggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -745,12 +745,12 @@ func DomainClaimedAggregate(ctx context.Context, aggCreator *es_models.Aggregate
 		return nil, err
 	}
 	aggregates[0] = userAggregate
-	releasedUniqueAggregate, err := releasedUniqueUserNameAggregate(ctx, aggCreator, existingUser.ResourceOwner, existingUser.UserName)
+	releasedUniqueAggregate, err := releasedUniqueUserNameAggregate(ctx, aggCreator, user.ResourceOwner, user.UserName)
 	if err != nil {
 		return nil, err
 	}
 	aggregates[1] = releasedUniqueAggregate
-	reservedUniqueAggregate, err := reservedUniqueUserNameAggregate(ctx, aggCreator, existingUser.ResourceOwner, tempName, false)
+	reservedUniqueAggregate, err := reservedUniqueUserNameAggregate(ctx, aggCreator, user.ResourceOwner, tempName, false)
 	if err != nil {
 		return nil, err
 	}

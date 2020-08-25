@@ -1,15 +1,16 @@
 package model
 
 import (
+	"testing"
+
 	user_model "github.com/caos/zitadel/internal/user/model"
 	"golang.org/x/text/language"
-	"testing"
 )
 
 func TestProfileChanges(t *testing.T) {
 	type args struct {
-		existing *Profile
-		new      *Profile
+		existingProfile *Profile
+		newProfile      *Profile
 	}
 	type res struct {
 		changesLen int
@@ -22,8 +23,8 @@ func TestProfileChanges(t *testing.T) {
 		{
 			name: "all attributes changed",
 			args: args{
-				existing: &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
-				new:      &Profile{UserName: "UserNameChanged", FirstName: "FirstNameChanged", LastName: "LastNameChanged", NickName: "NickNameChanged", DisplayName: "DisplayNameChanged", PreferredLanguage: language.English, Gender: int32(user_model.GenderMale)},
+				existingProfile: &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
+				newProfile:      &Profile{UserName: "UserNameChanged", FirstName: "FirstNameChanged", LastName: "LastNameChanged", NickName: "NickNameChanged", DisplayName: "DisplayNameChanged", PreferredLanguage: language.English, Gender: int32(user_model.GenderMale)},
 			},
 			res: res{
 				changesLen: 6,
@@ -32,8 +33,8 @@ func TestProfileChanges(t *testing.T) {
 		{
 			name: "no changes",
 			args: args{
-				existing: &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
-				new:      &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
+				existingProfile: &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
+				newProfile:      &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
 			},
 			res: res{
 				changesLen: 0,
@@ -42,8 +43,8 @@ func TestProfileChanges(t *testing.T) {
 		{
 			name: "username changed",
 			args: args{
-				existing: &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
-				new:      &Profile{UserName: "UserNameChanged", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
+				existingProfile: &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
+				newProfile:      &Profile{UserName: "UserNameChanged", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
 			},
 			res: res{
 				changesLen: 0,
@@ -52,8 +53,8 @@ func TestProfileChanges(t *testing.T) {
 		{
 			name: "empty names",
 			args: args{
-				existing: &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
-				new:      &Profile{UserName: "UserName", FirstName: "", LastName: "", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
+				existingProfile: &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
+				newProfile:      &Profile{UserName: "UserName", FirstName: "", LastName: "", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
 			},
 			res: res{
 				changesLen: 0,
@@ -62,7 +63,7 @@ func TestProfileChanges(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			changes := tt.args.existing.Changes(tt.args.new)
+			changes := tt.args.existingProfile.Changes(tt.args.newProfile)
 			if len(changes) != tt.res.changesLen {
 				t.Errorf("got wrong changes len: expected: %v, actual: %v ", tt.res.changesLen, len(changes))
 			}

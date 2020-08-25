@@ -584,9 +584,9 @@ func TestRegisterUser(t *testing.T) {
 func TestDeactivateUser(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		existing *model.User
+		es   *UserEventstore
+		ctx  context.Context
+		user *model.User
 	}
 	type res struct {
 		user    *model.User
@@ -600,9 +600,9 @@ func TestDeactivateUser(t *testing.T) {
 		{
 			name: "deactivate user, ok",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.UserStateInactive},
@@ -611,9 +611,9 @@ func TestDeactivateUser(t *testing.T) {
 		{
 			name: "deactivate user with inactive state",
 			args: args{
-				es:       GetMockManipulateInactiveUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateInactiveUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -622,9 +622,9 @@ func TestDeactivateUser(t *testing.T) {
 		{
 			name: "existing not found",
 			args: args{
-				es:       GetMockManipulateUserNoEvents(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserNoEvents(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -633,7 +633,7 @@ func TestDeactivateUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.DeactivateUser(tt.args.ctx, tt.args.existing.AggregateID)
+			result, err := tt.args.es.DeactivateUser(tt.args.ctx, tt.args.user.AggregateID)
 
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
@@ -651,9 +651,9 @@ func TestDeactivateUser(t *testing.T) {
 func TestReactivateUser(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		existing *model.User
+		es   *UserEventstore
+		ctx  context.Context
+		user *model.User
 	}
 	type res struct {
 		user    *model.User
@@ -667,9 +667,9 @@ func TestReactivateUser(t *testing.T) {
 		{
 			name: "reactivate user, ok",
 			args: args{
-				es:       GetMockManipulateInactiveUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateInactiveUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.UserStateActive},
@@ -678,9 +678,9 @@ func TestReactivateUser(t *testing.T) {
 		{
 			name: "reactivate user with inital state",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -689,9 +689,9 @@ func TestReactivateUser(t *testing.T) {
 		{
 			name: "existing user not found",
 			args: args{
-				es:       GetMockManipulateUserNoEvents(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserNoEvents(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -700,7 +700,7 @@ func TestReactivateUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.ReactivateUser(tt.args.ctx, tt.args.existing.AggregateID)
+			result, err := tt.args.es.ReactivateUser(tt.args.ctx, tt.args.user.AggregateID)
 
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
@@ -718,9 +718,9 @@ func TestReactivateUser(t *testing.T) {
 func TestLockUser(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		existing *model.User
+		es   *UserEventstore
+		ctx  context.Context
+		user *model.User
 	}
 	type res struct {
 		user    *model.User
@@ -734,9 +734,9 @@ func TestLockUser(t *testing.T) {
 		{
 			name: "lock user, ok",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.UserStateLocked},
@@ -745,9 +745,9 @@ func TestLockUser(t *testing.T) {
 		{
 			name: "lock user with locked state",
 			args: args{
-				es:       GetMockManipulateLockedUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateLockedUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -756,9 +756,9 @@ func TestLockUser(t *testing.T) {
 		{
 			name: "existing user not found",
 			args: args{
-				es:       GetMockManipulateUserNoEvents(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserNoEvents(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -767,7 +767,7 @@ func TestLockUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.LockUser(tt.args.ctx, tt.args.existing.AggregateID)
+			result, err := tt.args.es.LockUser(tt.args.ctx, tt.args.user.AggregateID)
 
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
@@ -785,9 +785,9 @@ func TestLockUser(t *testing.T) {
 func TestUnlockUser(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		existing *model.User
+		es   *UserEventstore
+		ctx  context.Context
+		user *model.User
 	}
 	type res struct {
 		user    *model.User
@@ -801,9 +801,9 @@ func TestUnlockUser(t *testing.T) {
 		{
 			name: "unlock user, ok",
 			args: args{
-				es:       GetMockManipulateLockedUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateLockedUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.UserStateActive},
@@ -812,9 +812,9 @@ func TestUnlockUser(t *testing.T) {
 		{
 			name: "unlock user not locked state",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -823,9 +823,9 @@ func TestUnlockUser(t *testing.T) {
 		{
 			name: "existing user not found",
 			args: args{
-				es:       GetMockManipulateUserNoEvents(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserNoEvents(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -834,7 +834,7 @@ func TestUnlockUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.UnlockUser(tt.args.ctx, tt.args.existing.AggregateID)
+			result, err := tt.args.es.UnlockUser(tt.args.ctx, tt.args.user.AggregateID)
 
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
@@ -852,9 +852,9 @@ func TestUnlockUser(t *testing.T) {
 func TestGetInitCodeByID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		existing *model.User
+		es   *UserEventstore
+		ctx  context.Context
+		user *model.User
 	}
 	type res struct {
 		code    *model.InitUserCode
@@ -877,8 +877,8 @@ func TestGetInitCodeByID(t *testing.T) {
 							},
 						},
 					}),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				code: &model.InitUserCode{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Expiry: time.Hour * 30},
@@ -887,9 +887,9 @@ func TestGetInitCodeByID(t *testing.T) {
 		{
 			name: "empty userid",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -898,9 +898,9 @@ func TestGetInitCodeByID(t *testing.T) {
 		{
 			name: "existing user not found",
 			args: args{
-				es:       GetMockManipulateUserNoEvents(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserNoEvents(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -909,7 +909,7 @@ func TestGetInitCodeByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.InitializeUserCodeByID(tt.args.ctx, tt.args.existing.AggregateID)
+			result, err := tt.args.es.InitializeUserCodeByID(tt.args.ctx, tt.args.user.AggregateID)
 
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
@@ -927,9 +927,9 @@ func TestGetInitCodeByID(t *testing.T) {
 func TestCreateInitCode(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		existing *model.User
+		es   *UserEventstore
+		ctx  context.Context
+		user *model.User
 	}
 	type res struct {
 		code    *model.InitUserCode
@@ -943,9 +943,9 @@ func TestCreateInitCode(t *testing.T) {
 		{
 			name: "create init code",
 			args: args{
-				es:       GetMockManipulateUserWithPasswordInitCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}}),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Human: &model.Human{}},
+				es:   GetMockManipulateUserWithPasswordInitCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}}),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Human: &model.Human{}},
 			},
 			res: res{
 				code: &model.InitUserCode{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Expiry: time.Hour * 1},
@@ -954,9 +954,9 @@ func TestCreateInitCode(t *testing.T) {
 		{
 			name: "empty userid",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}, Human: &model.Human{}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}, Human: &model.Human{}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -965,9 +965,9 @@ func TestCreateInitCode(t *testing.T) {
 		{
 			name: "existing user not found",
 			args: args{
-				es:       GetMockManipulateUserNoEvents(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Human: &model.Human{}},
+				es:   GetMockManipulateUserNoEvents(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Human: &model.Human{}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -976,7 +976,7 @@ func TestCreateInitCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.CreateInitializeUserCodeByID(tt.args.ctx, tt.args.existing.AggregateID)
+			result, err := tt.args.es.CreateInitializeUserCodeByID(tt.args.ctx, tt.args.user.AggregateID)
 
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
@@ -994,9 +994,9 @@ func TestCreateInitCode(t *testing.T) {
 func TestInitCodeSent(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		existing *model.User
+		es   *UserEventstore
+		ctx  context.Context
+		user *model.User
 	}
 	type res struct {
 		errFunc func(err error) bool
@@ -1009,18 +1009,18 @@ func TestInitCodeSent(t *testing.T) {
 		{
 			name: "sent init",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{},
 		},
 		{
 			name: "empty userid",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -1029,9 +1029,9 @@ func TestInitCodeSent(t *testing.T) {
 		{
 			name: "existing user not found",
 			args: args{
-				es:       GetMockManipulateUserNoEvents(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserNoEvents(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -1040,7 +1040,7 @@ func TestInitCodeSent(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.es.InitCodeSent(tt.args.ctx, tt.args.existing.AggregateID)
+			err := tt.args.es.InitCodeSent(tt.args.ctx, tt.args.user.AggregateID)
 
 			if tt.res.errFunc == nil && err != nil {
 				t.Errorf("rshould not get err")
@@ -1190,9 +1190,9 @@ func TestInitCodeVerify(t *testing.T) {
 func TestSkipMfaInit(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		existing *model.User
+		es   *UserEventstore
+		ctx  context.Context
+		user *model.User
 	}
 	type res struct {
 		errFunc func(err error) bool
@@ -1205,18 +1205,18 @@ func TestSkipMfaInit(t *testing.T) {
 		{
 			name: "skip mfa init",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{},
 		},
 		{
 			name: "empty userid",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -1225,9 +1225,9 @@ func TestSkipMfaInit(t *testing.T) {
 		{
 			name: "existing user not found",
 			args: args{
-				es:       GetMockManipulateUserNoEvents(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserNoEvents(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -1236,7 +1236,7 @@ func TestSkipMfaInit(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.es.SkipMfaInit(tt.args.ctx, tt.args.existing.AggregateID)
+			err := tt.args.es.SkipMfaInit(tt.args.ctx, tt.args.user.AggregateID)
 
 			if tt.res.errFunc == nil && err != nil {
 				t.Errorf("rshould not get err")
@@ -1251,9 +1251,9 @@ func TestSkipMfaInit(t *testing.T) {
 func TestPasswordID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		existing *model.User
+		es   *UserEventstore
+		ctx  context.Context
+		user *model.User
 	}
 	type res struct {
 		password *model.Password
@@ -1267,9 +1267,9 @@ func TestPasswordID(t *testing.T) {
 		{
 			name: "get by id, ok",
 			args: args{
-				es:       GetMockManipulateUserFull(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserFull(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, ChangeRequired: true},
@@ -1278,9 +1278,9 @@ func TestPasswordID(t *testing.T) {
 		{
 			name: "empty userid",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -1289,9 +1289,9 @@ func TestPasswordID(t *testing.T) {
 		{
 			name: "existing user not found",
 			args: args{
-				es:       GetMockManipulateUserNoEvents(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserNoEvents(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -1300,9 +1300,9 @@ func TestPasswordID(t *testing.T) {
 		{
 			name: "existing pw not found",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -1311,7 +1311,7 @@ func TestPasswordID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.UserPasswordByID(tt.args.ctx, tt.args.existing.AggregateID)
+			result, err := tt.args.es.UserPasswordByID(tt.args.ctx, tt.args.user.AggregateID)
 
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
@@ -1888,9 +1888,9 @@ func TestRequestSetPassword(t *testing.T) {
 func TestPasswordCodeSent(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		existing *model.User
+		es   *UserEventstore
+		ctx  context.Context
+		user *model.User
 	}
 	type res struct {
 		errFunc func(err error) bool
@@ -1903,18 +1903,18 @@ func TestPasswordCodeSent(t *testing.T) {
 		{
 			name: "sent password code",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Human: &model.Human{}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Human: &model.Human{}},
 			},
 			res: res{},
 		},
 		{
 			name: "empty userid",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -1923,9 +1923,9 @@ func TestPasswordCodeSent(t *testing.T) {
 		{
 			name: "existing user not found",
 			args: args{
-				es:       GetMockManipulateUserNoEvents(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserNoEvents(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -1934,7 +1934,7 @@ func TestPasswordCodeSent(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.es.PasswordCodeSent(tt.args.ctx, tt.args.existing.AggregateID)
+			err := tt.args.es.PasswordCodeSent(tt.args.ctx, tt.args.user.AggregateID)
 
 			if tt.res.errFunc == nil && err != nil {
 				t.Errorf("rshould not get err")
@@ -1949,9 +1949,9 @@ func TestPasswordCodeSent(t *testing.T) {
 func TestProfileByID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		existing *model.User
+		es   *UserEventstore
+		ctx  context.Context
+		user *model.User
 	}
 	type res struct {
 		profile *model.Profile
@@ -1965,9 +1965,9 @@ func TestProfileByID(t *testing.T) {
 		{
 			name: "get by id, ok",
 			args: args{
-				es:       GetMockManipulateUserFull(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Human: &model.Human{}},
+				es:   GetMockManipulateUserFull(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Human: &model.Human{}},
 			},
 			res: res{
 				profile: &model.Profile{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserName: "UserName"},
@@ -1976,9 +1976,9 @@ func TestProfileByID(t *testing.T) {
 		{
 			name: "empty userid",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -1987,9 +1987,9 @@ func TestProfileByID(t *testing.T) {
 		{
 			name: "existing user not found",
 			args: args{
-				es:       GetMockManipulateUserNoEvents(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserNoEvents(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -1998,7 +1998,7 @@ func TestProfileByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.ProfileByID(tt.args.ctx, tt.args.existing.AggregateID)
+			result, err := tt.args.es.ProfileByID(tt.args.ctx, tt.args.user.AggregateID)
 
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
@@ -2083,9 +2083,9 @@ func TestChangeProfile(t *testing.T) {
 func TestEmailByID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		existing *model.User
+		es   *UserEventstore
+		ctx  context.Context
+		user *model.User
 	}
 	type res struct {
 		email   *model.Email
@@ -2099,9 +2099,9 @@ func TestEmailByID(t *testing.T) {
 		{
 			name: "get by id, ok",
 			args: args{
-				es:       GetMockManipulateUserFull(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserFull(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				email: &model.Email{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, EmailAddress: "EmailAddress"},
@@ -2110,9 +2110,9 @@ func TestEmailByID(t *testing.T) {
 		{
 			name: "empty userid",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -2121,9 +2121,9 @@ func TestEmailByID(t *testing.T) {
 		{
 			name: "existing user not found",
 			args: args{
-				es:       GetMockManipulateUserNoEvents(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserNoEvents(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -2132,7 +2132,7 @@ func TestEmailByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.EmailByID(tt.args.ctx, tt.args.existing.AggregateID)
+			result, err := tt.args.es.EmailByID(tt.args.ctx, tt.args.user.AggregateID)
 
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
@@ -2411,9 +2411,9 @@ func TestCreateEmailVerificationCode(t *testing.T) {
 func TestEmailVerificationCodeSent(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		existing *model.User
+		es   *UserEventstore
+		ctx  context.Context
+		user *model.User
 	}
 	type res struct {
 		errFunc func(err error) bool
@@ -2426,18 +2426,18 @@ func TestEmailVerificationCodeSent(t *testing.T) {
 		{
 			name: "sent email verify code",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{},
 		},
 		{
 			name: "empty userid",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -2446,9 +2446,9 @@ func TestEmailVerificationCodeSent(t *testing.T) {
 		{
 			name: "existing user not found",
 			args: args{
-				es:       GetMockManipulateUserNoEvents(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserNoEvents(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -2457,7 +2457,7 @@ func TestEmailVerificationCodeSent(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.es.EmailVerificationCodeSent(tt.args.ctx, tt.args.existing.AggregateID)
+			err := tt.args.es.EmailVerificationCodeSent(tt.args.ctx, tt.args.user.AggregateID)
 
 			if tt.res.errFunc == nil && err != nil {
 				t.Errorf("rshould not get err")
@@ -2472,9 +2472,9 @@ func TestEmailVerificationCodeSent(t *testing.T) {
 func TestPhoneByID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		existing *model.User
+		es   *UserEventstore
+		ctx  context.Context
+		user *model.User
 	}
 	type res struct {
 		phone   *model.Phone
@@ -2488,9 +2488,9 @@ func TestPhoneByID(t *testing.T) {
 		{
 			name: "get by id, ok",
 			args: args{
-				es:       GetMockManipulateUserFull(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserFull(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "PhoneNumber"},
@@ -2499,9 +2499,9 @@ func TestPhoneByID(t *testing.T) {
 		{
 			name: "empty userid",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -2510,9 +2510,9 @@ func TestPhoneByID(t *testing.T) {
 		{
 			name: "existing user not found",
 			args: args{
-				es:       GetMockManipulateUserNoEvents(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserNoEvents(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -2521,7 +2521,7 @@ func TestPhoneByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.PhoneByID(tt.args.ctx, tt.args.existing.AggregateID)
+			result, err := tt.args.es.PhoneByID(tt.args.ctx, tt.args.user.AggregateID)
 
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
@@ -2863,9 +2863,9 @@ func TestCreatePhoneVerificationCode(t *testing.T) {
 func TestPhoneVerificationCodeSent(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		existing *model.User
+		es   *UserEventstore
+		ctx  context.Context
+		user *model.User
 	}
 	type res struct {
 		errFunc func(err error) bool
@@ -2878,18 +2878,18 @@ func TestPhoneVerificationCodeSent(t *testing.T) {
 		{
 			name: "sent phone verification code",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{},
 		},
 		{
 			name: "empty userid",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -2898,9 +2898,9 @@ func TestPhoneVerificationCodeSent(t *testing.T) {
 		{
 			name: "existing user not found",
 			args: args{
-				es:       GetMockManipulateUserNoEvents(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserNoEvents(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -2909,7 +2909,7 @@ func TestPhoneVerificationCodeSent(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.es.PhoneVerificationCodeSent(tt.args.ctx, tt.args.existing.AggregateID)
+			err := tt.args.es.PhoneVerificationCodeSent(tt.args.ctx, tt.args.user.AggregateID)
 
 			if tt.res.errFunc == nil && err != nil {
 				t.Errorf("rshould not get err")
@@ -2924,9 +2924,9 @@ func TestPhoneVerificationCodeSent(t *testing.T) {
 func TestAddressByID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		existing *model.User
+		es   *UserEventstore
+		ctx  context.Context
+		user *model.User
 	}
 	type res struct {
 		address *model.Address
@@ -2940,9 +2940,9 @@ func TestAddressByID(t *testing.T) {
 		{
 			name: "get by id, ok",
 			args: args{
-				es:       GetMockManipulateUserFull(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserFull(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				address: &model.Address{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Country: "Country"},
@@ -2951,9 +2951,9 @@ func TestAddressByID(t *testing.T) {
 		{
 			name: "empty userid",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -2962,9 +2962,9 @@ func TestAddressByID(t *testing.T) {
 		{
 			name: "existing user not found",
 			args: args{
-				es:       GetMockManipulateUserNoEvents(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserNoEvents(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -2973,7 +2973,7 @@ func TestAddressByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.AddressByID(tt.args.ctx, tt.args.existing.AggregateID)
+			result, err := tt.args.es.AddressByID(tt.args.ctx, tt.args.user.AggregateID)
 
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
@@ -3368,9 +3368,9 @@ func TestCheckMfaOTP(t *testing.T) {
 func TestRemoveOTP(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		existing *model.User
+		es   *UserEventstore
+		ctx  context.Context
+		user *model.User
 	}
 	type res struct {
 		errFunc func(err error) bool
@@ -3383,17 +3383,17 @@ func TestRemoveOTP(t *testing.T) {
 		{
 			name: "remove ok",
 			args: args{
-				es:       GetMockManipulateUserWithOTP(ctrl, false, true),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserWithOTP(ctrl, false, true),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 		},
 		{
 			name: "empty userid",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -3402,9 +3402,9 @@ func TestRemoveOTP(t *testing.T) {
 		{
 			name: "existing user not found",
 			args: args{
-				es:       GetMockManipulateUserNoEvents(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUserNoEvents(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -3413,9 +3413,9 @@ func TestRemoveOTP(t *testing.T) {
 		{
 			name: "user has no otp",
 			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      authz.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -3424,7 +3424,7 @@ func TestRemoveOTP(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.es.RemoveOTP(tt.args.ctx, tt.args.existing.AggregateID)
+			err := tt.args.es.RemoveOTP(tt.args.ctx, tt.args.user.AggregateID)
 
 			if tt.res.errFunc == nil && err != nil {
 				t.Errorf("result should not get err")
@@ -3441,7 +3441,7 @@ func TestChangesUser(t *testing.T) {
 	type args struct {
 		es           *UserEventstore
 		id           string
-		secId        string
+		secID        string
 		lastSequence uint64
 		limit        uint64
 	}
