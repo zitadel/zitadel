@@ -50,7 +50,7 @@ func (repo *UserRepo) Register(ctx context.Context, registerUser *model.User, or
 		return nil, err
 	}
 	if orgMember != nil {
-		// orgMember.UserID = user.AggregateID
+		orgMember.UserID = user.AggregateID
 		_, memberAggregate, err := repo.OrgEvents.PrepareAddOrgMember(ctx, orgMember, policyResourceOwner)
 		if err != nil {
 			return nil, err
