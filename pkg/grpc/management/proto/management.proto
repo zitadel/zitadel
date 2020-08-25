@@ -1637,8 +1637,8 @@ message UserProfileView {
   uint64 sequence = 9;
   google.protobuf.Timestamp creation_date = 10;
   google.protobuf.Timestamp change_date = 11;
-  repeated string login_names = 12;//
-  string preferred_login_name = 27;//
+  repeated string login_names = 12;
+  string preferred_login_name = 27;
 }
 
 message UpdateUserProfileRequest {
