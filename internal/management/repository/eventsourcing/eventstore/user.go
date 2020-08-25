@@ -168,7 +168,7 @@ func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_mode
 	if user.HumanView == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-gDFC2", "Errors.User.NotHuman")
 	}
-	return user.GetProfile(), nil
+	return user.GetProfile()
 }
 
 func (repo *UserRepo) ChangeMachine(ctx context.Context, machine *usr_model.Machine) (*usr_model.Machine, error) {
@@ -187,7 +187,7 @@ func (repo *UserRepo) EmailByID(ctx context.Context, userID string) (*usr_model.
 	if user.HumanView == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-pt7HY", "Errors.User.NotHuman")
 	}
-	return user.GetEmail(), nil
+	return user.GetEmail()
 }
 
 func (repo *UserRepo) ChangeEmail(ctx context.Context, email *usr_model.Email) (*usr_model.Email, error) {
@@ -206,7 +206,7 @@ func (repo *UserRepo) PhoneByID(ctx context.Context, userID string) (*usr_model.
 	if user.HumanView == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-hliQl", "Errors.User.NotHuman")
 	}
-	return user.GetPhone(), nil
+	return user.GetPhone()
 }
 
 func (repo *UserRepo) ChangePhone(ctx context.Context, email *usr_model.Phone) (*usr_model.Phone, error) {
@@ -229,7 +229,7 @@ func (repo *UserRepo) AddressByID(ctx context.Context, userID string) (*usr_mode
 	if user.HumanView == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-LQh4I", "Errors.User.NotHuman")
 	}
-	return user.GetAddress(), nil
+	return user.GetAddress()
 }
 
 func (repo *UserRepo) ChangeAddress(ctx context.Context, address *usr_model.Address) (*usr_model.Address, error) {

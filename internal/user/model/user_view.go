@@ -3,6 +3,7 @@ package model
 import (
 	"time"
 
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"golang.org/x/text/language"
 
@@ -156,9 +157,9 @@ func (u *UserView) MfaTypesAllowed(level req_model.MfaLevel) []req_model.MfaType
 	return types
 }
 
-func (u *UserView) GetProfile() *Profile {
+func (u *UserView) GetProfile() (*Profile, error) {
 	if u.HumanView == nil {
-		return nil
+		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-WLTce", "Errors.User.NotHuman")
 	}
 	return &Profile{
 		ObjectRoot: models.ObjectRoot{
@@ -177,12 +178,12 @@ func (u *UserView) GetProfile() *Profile {
 		Gender:             u.Gender,
 		PreferredLoginName: u.PreferredLoginName,
 		LoginNames:         u.LoginNames,
-	}
+	}, nil
 }
 
-func (u *UserView) GetPhone() *Phone {
+func (u *UserView) GetPhone() (*Phone, error) {
 	if u.HumanView == nil {
-		return nil
+		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-him4a", "Errors.User.NotHuman")
 	}
 	return &Phone{
 		ObjectRoot: models.ObjectRoot{
@@ -194,12 +195,12 @@ func (u *UserView) GetPhone() *Phone {
 		},
 		PhoneNumber:     u.Phone,
 		IsPhoneVerified: u.IsPhoneVerified,
-	}
+	}, nil
 }
 
-func (u *UserView) GetEmail() *Email {
+func (u *UserView) GetEmail() (*Email, error) {
 	if u.HumanView == nil {
-		return nil
+		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-PWd6K", "Errors.User.NotHuman")
 	}
 	return &Email{
 		ObjectRoot: models.ObjectRoot{
@@ -211,12 +212,12 @@ func (u *UserView) GetEmail() *Email {
 		},
 		EmailAddress:    u.Email,
 		IsEmailVerified: u.IsEmailVerified,
-	}
+	}, nil
 }
 
-func (u *UserView) GetAddress() *Address {
+func (u *UserView) GetAddress() (*Address, error) {
 	if u.HumanView == nil {
-		return nil
+		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-DN61m", "Errors.User.NotHuman")
 	}
 	return &Address{
 		ObjectRoot: models.ObjectRoot{
@@ -231,5 +232,5 @@ func (u *UserView) GetAddress() *Address {
 		PostalCode:    u.PostalCode,
 		Region:        u.Region,
 		StreetAddress: u.StreetAddress,
-	}
+	}, nil
 }

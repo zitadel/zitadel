@@ -77,7 +77,7 @@ func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {
 	if user.HumanView == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-H2JIT", "Errors.User.NotHuman")
 	}
-	return user.GetProfile(), nil
+	return user.GetProfile()
 }
 
 func (repo *UserRepo) ChangeMyProfile(ctx context.Context, profile *model.Profile) (*model.Profile, error) {
@@ -95,7 +95,7 @@ func (repo *UserRepo) MyEmail(ctx context.Context) (*model.Email, error) {
 	if user.HumanView == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-oGRpc", "Errors.User.NotHuman")
 	}
-	return user.GetEmail(), nil
+	return user.GetEmail()
 }
 
 func (repo *UserRepo) ChangeMyEmail(ctx context.Context, email *model.Email) (*model.Email, error) {
@@ -129,7 +129,7 @@ func (repo *UserRepo) MyPhone(ctx context.Context) (*model.Phone, error) {
 	if user.HumanView == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-DTWJb", "Errors.User.NotHuman")
 	}
-	return user.GetPhone(), nil
+	return user.GetPhone()
 }
 
 func (repo *UserRepo) ChangeMyPhone(ctx context.Context, phone *model.Phone) (*model.Phone, error) {
@@ -159,7 +159,7 @@ func (repo *UserRepo) MyAddress(ctx context.Context) (*model.Address, error) {
 	if user.HumanView == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Ok9nI", "Errors.User.NotHuman")
 	}
-	return user.GetAddress(), nil
+	return user.GetAddress()
 }
 
 func (repo *UserRepo) ChangeMyAddress(ctx context.Context, address *model.Address) (*model.Address, error) {
