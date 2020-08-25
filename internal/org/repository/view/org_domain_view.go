@@ -60,9 +60,18 @@ func OrgDomainsByOrgID(db *gorm.DB, table string, orgID string) ([]*model.OrgDom
 	return domains, nil
 }
 
-func PutOrgDomain(db *gorm.DB, table string, role *model.OrgDomainView) error {
+func PutOrgDomain(db *gorm.DB, table string, domain *model.OrgDomainView) error {
 	save := repository.PrepareSave(table)
-	return save(db, role)
+	return save(db, domain)
+}
+
+func PutOrgDomains(db *gorm.DB, table string, domains ...*model.OrgDomainView) error {
+	save := repository.PrepareBulkSave(table)
+	d := make([]interface{}, len(domains))
+	for i, domain := range domains {
+		d[i] = domain
+	}
+	return save(db, d...)
 }
 
 func DeleteOrgDomain(db *gorm.DB, table, orgID, domain string) error {

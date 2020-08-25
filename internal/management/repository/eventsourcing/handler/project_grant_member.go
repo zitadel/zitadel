@@ -101,11 +101,8 @@ func (p *ProjectGrantMember) processUser(event *models.Event) (err error) {
 		}
 		for _, member := range members {
 			p.fillUserData(member, user)
-			err = p.view.PutProjectGrantMember(member, event.Sequence)
-			if err != nil {
-				return err
-			}
 		}
+		return p.view.PutProjectGrantMembers(members, event.Sequence)
 	default:
 		return p.view.ProcessedProjectGrantMemberSequence(event.Sequence)
 	}

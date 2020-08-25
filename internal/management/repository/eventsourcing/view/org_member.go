@@ -23,8 +23,16 @@ func (v *View) OrgMembersByUserID(userID string) ([]*model.OrgMemberView, error)
 	return view.OrgMembersByUserID(v.Db, orgMemberTable, userID)
 }
 
-func (v *View) PutOrgMember(org *model.OrgMemberView, sequence uint64) error {
-	err := view.PutOrgMember(v.Db, orgMemberTable, org)
+func (v *View) PutOrgMember(member *model.OrgMemberView, sequence uint64) error {
+	err := view.PutOrgMember(v.Db, orgMemberTable, member)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedOrgMemberSequence(sequence)
+}
+
+func (v *View) PutOrgMembers(members []*model.OrgMemberView, sequence uint64) error {
+	err := view.PutOrgMembers(v.Db, orgMemberTable, members...)
 	if err != nil {
 		return err
 	}
