@@ -136,25 +136,8 @@ service ManagementService {
   }
 
   rpc CreateUser(CreateUserRequest) returns (UserResponse) {
-    option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "user.write"
-    };
-  }
-
-  rpc CreateHuman(CreateHumanRequest) returns (UserResponse) {
     option (google.api.http) = {
-      post: "/users/human"
-      body: "*"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "user.write"
-    };
-  }
-
-  rpc CreateMachine(CreateMachineRequest) returns (UserResponse) {
-    option (google.api.http) = {
-      post: "/users/machine"
+      post: "/users"
       body: "*"
     };
 

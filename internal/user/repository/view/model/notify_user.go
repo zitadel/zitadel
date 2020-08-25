@@ -115,8 +115,7 @@ func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
 	case es_model.UserAdded,
 		es_model.UserRegistered,
 		es_model.HumanRegistered,
-		es_model.HumanAdded,
-		es_model.MachineAdded:
+		es_model.HumanAdded:
 		u.CreationDate = event.CreationDate
 		u.setRootData(event)
 		err = u.setData(event)

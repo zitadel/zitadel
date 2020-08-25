@@ -84,7 +84,7 @@ func MachineCreateAggregate(ctx context.Context, aggCreator *es_models.Aggregate
 		return nil, err
 	}
 
-	userNameAggregate, err := reservedUniqueUserNameAggregate(ctx, aggCreator, resourceOwner, user.Machine.Name, userLoginMustBeDomain)
+	userNameAggregate, err := reservedUniqueUserNameAggregate(ctx, aggCreator, resourceOwner, user.UserName, userLoginMustBeDomain)
 	if err != nil {
 		return nil, err
 	}

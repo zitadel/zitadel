@@ -44,16 +44,6 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/CreateHuman": authz.Option{
-		Permission: "user.write",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/CreateMachine": authz.Option{
-		Permission: "user.write",
-		CheckParam: "",
-	},
-
 	"/caos.zitadel.management.api.v1.ManagementService/DeactivateUser": authz.Option{
 		Permission: "user.write",
 		CheckParam: "",
