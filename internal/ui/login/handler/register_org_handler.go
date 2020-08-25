@@ -123,9 +123,9 @@ func (d registerOrgFormData) toUserModel() *usr_model.User {
 		d.Username = d.Email
 	}
 	return &usr_model.User{
+		UserName: d.Username,
 		Human: &usr_model.Human{
 			Profile: &usr_model.Profile{
-				UserName:  d.Username,
 				FirstName: d.Firstname,
 				LastName:  d.Lastname,
 			},

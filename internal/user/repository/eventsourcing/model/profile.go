@@ -10,7 +10,6 @@ import (
 type Profile struct {
 	es_models.ObjectRoot
 
-	UserName          string       `json:"userName,omitempty"`
 	FirstName         string       `json:"firstName,omitempty"`
 	LastName          string       `json:"lastName,omitempty"`
 	NickName          string       `json:"nickName,omitempty"`
@@ -18,7 +17,7 @@ type Profile struct {
 	PreferredLanguage language.Tag `json:"preferredLanguage,omitempty"`
 	Gender            int32        `json:"gender,omitempty"`
 
-	isUserNameUnique bool `json:"-"`
+	isUserNameUnique bool
 }
 
 func (p *Profile) Changes(changed *Profile) map[string]interface{} {
@@ -47,7 +46,6 @@ func (p *Profile) Changes(changed *Profile) map[string]interface{} {
 func ProfileFromModel(profile *model.Profile) *Profile {
 	return &Profile{
 		ObjectRoot:        profile.ObjectRoot,
-		UserName:          profile.UserName,
 		FirstName:         profile.FirstName,
 		LastName:          profile.LastName,
 		NickName:          profile.NickName,
@@ -60,7 +58,6 @@ func ProfileFromModel(profile *model.Profile) *Profile {
 func ProfileToModel(profile *Profile) *model.Profile {
 	return &model.Profile{
 		ObjectRoot:        profile.ObjectRoot,
-		UserName:          profile.UserName,
 		FirstName:         profile.FirstName,
 		LastName:          profile.LastName,
 		NickName:          profile.NickName,

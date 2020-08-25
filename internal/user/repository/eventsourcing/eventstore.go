@@ -126,7 +126,7 @@ func (es *UserEventstore) prepareCreateHuman(ctx context.Context, user *usr_mode
 	}
 	user.SetNamesAsDisplayname()
 	if !user.IsValid() {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Errors.User.Invalid")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-LoIxJ", "Errors.User.Invalid")
 	}
 
 	err = user.HashPasswordIfExisting(pwPolicy, es.PasswordAlg, true)
@@ -326,7 +326,7 @@ func (es *UserEventstore) UserChanges(ctx context.Context, id string, lastSequen
 		change := &usr_model.UserChange{
 			ChangeDate: creationDate,
 			EventType:  event.Type.String(),
-			ModifierId: event.EditorUser,
+			ModifierID: event.EditorUser,
 			Sequence:   event.Sequence,
 		}
 

@@ -57,6 +57,7 @@ func userViewFromModel(user *usr_model.UserView) *auth.UserView {
 		ResourceOwner:      user.ResourceOwner,
 		LoginNames:         user.LoginNames,
 		PreferredLoginName: user.PreferredLoginName,
+		// UserName: user.UserName TODO: remove comment
 	}
 }
 
@@ -72,7 +73,6 @@ func profileFromModel(profile *usr_model.Profile) *auth.UserProfile {
 		CreationDate:      creationDate,
 		ChangeDate:        changeDate,
 		Sequence:          profile.Sequence,
-		UserName:          profile.UserName,
 		FirstName:         profile.FirstName,
 		LastName:          profile.LastName,
 		DisplayName:       profile.DisplayName,
@@ -94,7 +94,6 @@ func profileViewFromModel(profile *usr_model.Profile) *auth.UserProfileView {
 		CreationDate:       creationDate,
 		ChangeDate:         changeDate,
 		Sequence:           profile.Sequence,
-		UserName:           profile.UserName,
 		FirstName:          profile.FirstName,
 		LastName:           profile.LastName,
 		DisplayName:        profile.DisplayName,
@@ -366,7 +365,7 @@ func userChangesToAPI(changes *usr_model.UserChanges) (_ []*auth.Change) {
 			EventType:  message.NewLocalizedEventType(change.EventType),
 			Sequence:   change.Sequence,
 			Data:       data,
-			EditorId:   change.ModifierId,
+			EditorId:   change.ModifierID,
 			Editor:     change.ModifierName,
 		}
 	}

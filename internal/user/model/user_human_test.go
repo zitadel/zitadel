@@ -19,7 +19,6 @@ func TestIsUserValid(t *testing.T) {
 			args: args{
 				user: &Human{
 					Profile: &Profile{
-						UserName:  "UserName",
 						FirstName: "FirstName",
 						LastName:  "LastName",
 					},
@@ -35,7 +34,6 @@ func TestIsUserValid(t *testing.T) {
 			args: args{
 				user: &Human{
 					Profile: &Profile{
-						UserName:  "UserName",
 						FirstName: "FirstName",
 						LastName:  "LastName",
 					},
@@ -54,7 +52,6 @@ func TestIsUserValid(t *testing.T) {
 			args: args{
 				user: &Human{
 					Profile: &Profile{
-						UserName:  "UserName",
 						FirstName: "FirstName",
 						LastName:  "LastName",
 					},
@@ -76,7 +73,6 @@ func TestIsUserValid(t *testing.T) {
 			args: args{
 				user: &Human{
 					Profile: &Profile{
-						UserName:  "UserName",
 						FirstName: "FirstName",
 						LastName:  "LastName",
 					},

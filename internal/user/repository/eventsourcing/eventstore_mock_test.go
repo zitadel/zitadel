@@ -84,9 +84,12 @@ func GetMockUserByIDNoEvents(ctrl *gomock.Controller) *UserEventstore {
 }
 
 func GetMockManipulateUser(ctrl *gomock.Controller) *UserEventstore {
-	user := model.Human{
-		Profile: &model.Profile{
-			UserName: "UserName",
+	user := model.User{
+		UserName: "UserName",
+		Human: &model.Human{
+			Profile: &model.Profile{
+				DisplayName: "DisplayName",
+			},
 		},
 	}
 	data, _ := json.Marshal(user)
@@ -103,7 +106,7 @@ func GetMockManipulateUser(ctrl *gomock.Controller) *UserEventstore {
 func GetMockManipulateUserWithPWGenerator(ctrl *gomock.Controller, init, email, phone, password bool) *UserEventstore {
 	user := model.Human{
 		Profile: &model.Profile{
-			UserName: "UserName",
+			DisplayName: "DisplayName",
 		},
 		Email: &model.Email{
 			EmailAddress: "EmailAddress",
@@ -198,9 +201,12 @@ func GetMockManipulateUserWithPasswordCodeGen(ctrl *gomock.Controller, user mode
 }
 
 func GetMockManipulateUserWithOTPGen(ctrl *gomock.Controller) *UserEventstore {
-	user := model.Human{
-		Profile: &model.Profile{
-			UserName: "UserName",
+	user := model.User{
+		UserName: "UserName",
+		Human: &model.Human{
+			Profile: &model.Profile{
+				DisplayName: "DisplayName",
+			},
 		},
 	}
 	data, _ := json.Marshal(user)
@@ -226,7 +232,7 @@ func GetMockManipulateUserWithOTPGen(ctrl *gomock.Controller) *UserEventstore {
 func GetMockManipulateInactiveUser(ctrl *gomock.Controller) *UserEventstore {
 	user := model.Human{
 		Profile: &model.Profile{
-			UserName: "UserName",
+			DisplayName: "DisplayName",
 		},
 	}
 	data, _ := json.Marshal(user)
@@ -244,7 +250,7 @@ func GetMockManipulateInactiveUser(ctrl *gomock.Controller) *UserEventstore {
 func GetMockManipulateLockedUser(ctrl *gomock.Controller) *UserEventstore {
 	user := model.Human{
 		Profile: &model.Profile{
-			UserName: "UserName",
+			DisplayName: "DisplayName",
 		},
 	}
 	data, _ := json.Marshal(user)
@@ -282,7 +288,7 @@ func GetMockManipulateUserWithInitCode(ctrl *gomock.Controller, user model.User)
 func GetMockManipulateUserWithEmailCode(ctrl *gomock.Controller) *UserEventstore {
 	user := model.Human{
 		Profile: &model.Profile{
-			UserName: "UserName",
+			DisplayName: "DisplayName",
 		},
 		Email: &model.Email{
 			EmailAddress: "EmailAddress",
@@ -309,7 +315,7 @@ func GetMockManipulateUserWithEmailCode(ctrl *gomock.Controller) *UserEventstore
 func GetMockManipulateUserVerifiedEmail(ctrl *gomock.Controller) *UserEventstore {
 	user := model.Human{
 		Profile: &model.Profile{
-			UserName: "UserName",
+			DisplayName: "DisplayName",
 		},
 		Email: &model.Email{
 			EmailAddress: "EmailAddress",
@@ -330,7 +336,7 @@ func GetMockManipulateUserVerifiedEmail(ctrl *gomock.Controller) *UserEventstore
 func GetMockManipulateUserWithPhoneCode(ctrl *gomock.Controller) *UserEventstore {
 	user := model.Human{
 		Profile: &model.Profile{
-			UserName: "UserName",
+			DisplayName: "DisplayName",
 		},
 		Phone: &model.Phone{
 			PhoneNumber: "PhoneNumber",
@@ -358,7 +364,7 @@ func GetMockManipulateUserWithPhoneCode(ctrl *gomock.Controller) *UserEventstore
 func GetMockManipulateUserVerifiedPhone(ctrl *gomock.Controller) *UserEventstore {
 	user := model.Human{
 		Profile: &model.Profile{
-			UserName: "UserName",
+			DisplayName: "DisplayName",
 		},
 		Phone: &model.Phone{
 			PhoneNumber: "PhoneNumber",
@@ -379,9 +385,9 @@ func GetMockManipulateUserVerifiedPhone(ctrl *gomock.Controller) *UserEventstore
 func GetMockManipulateUserFull(ctrl *gomock.Controller) *UserEventstore {
 	user := model.Human{
 		Profile: &model.Profile{
-			UserName:  "UserName",
-			FirstName: "FirstName",
-			LastName:  "LastName",
+			DisplayName: "DisplayName",
+			FirstName:   "FirstName",
+			LastName:    "LastName",
 		},
 		Password: &model.Password{
 			Secret:         &crypto.CryptoValue{Algorithm: "bcrypt", KeyID: "KeyID"},
@@ -411,7 +417,7 @@ func GetMockManipulateUserFull(ctrl *gomock.Controller) *UserEventstore {
 func GetMockManipulateUserWithOTP(ctrl *gomock.Controller, decrypt, verified bool) *UserEventstore {
 	user := model.Human{
 		Profile: &model.Profile{
-			UserName: "UserName",
+			DisplayName: "DisplayName",
 		},
 	}
 	otp := model.OTP{
@@ -478,9 +484,9 @@ func GetMockedEventstoreComplexity(ctrl *gomock.Controller, mockEs *mock.MockEve
 
 func GetMockChangesUserOK(ctrl *gomock.Controller) *UserEventstore {
 	user := model.Profile{
-		FirstName: "Hans",
-		LastName:  "Muster",
-		UserName:  "HansMuster",
+		FirstName:   "Hans",
+		LastName:    "Muster",
+		DisplayName: "DisplayName",
 	}
 	data, err := json.Marshal(user)
 	if err != nil {

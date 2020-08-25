@@ -1382,31 +1382,32 @@ message UniqueUserResponse {
 }
 
 message CreateUserRequest {
+  string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+
   oneof user {
     option (validate.required) = true;
 
-    CreateHumanRequest human = 1;
-    CreateMachineRequest machine = 2;
+    CreateHumanRequest human = 2;
+    CreateMachineRequest machine = 3;
   }
 }
 
 message CreateHumanRequest {
-  string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  string first_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  string last_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  string nick_name = 4 [(validate.rules).string = {max_len: 200}];
-  string preferred_language = 5[(validate.rules).string = {max_len: 200}];
-  Gender gender = 6;
-  string email = 7 [(validate.rules).string = {min_len: 1, max_len: 200, email: true}];
-  bool is_email_verified = 8;
-  string phone = 9 [(validate.rules).string = {max_len: 20}];
-  bool is_phone_verified = 10;
-  string country = 11 [(validate.rules).string = {max_len: 200}];
-  string locality = 12 [(validate.rules).string = {max_len: 200}];
-  string postal_code = 13 [(validate.rules).string = {max_len: 200}];
-  string region = 14 [(validate.rules).string = {max_len: 200}];
-  string street_address = 15 [(validate.rules).string = {max_len: 200}];
-  string password = 16 [(validate.rules).string = {max_len: 72}];
+  string first_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string last_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string nick_name = 3 [(validate.rules).string = {max_len: 200}];
+  string preferred_language = 4 [(validate.rules).string = {max_len: 200}];
+  Gender gender = 5;
+  string email = 6 [(validate.rules).string = {min_len: 1, max_len: 200, email: true}];
+  bool is_email_verified = 7;
+  string phone = 8 [(validate.rules).string = {max_len: 20}];
+  bool is_phone_verified = 9;
+  string country = 10 [(validate.rules).string = {max_len: 200}];
+  string locality = 11 [(validate.rules).string = {max_len: 200}];
+  string postal_code = 12 [(validate.rules).string = {max_len: 200}];
+  string region = 13 [(validate.rules).string = {max_len: 200}];
+  string street_address = 14 [(validate.rules).string = {max_len: 200}];
+  string password = 15 [(validate.rules).string = {max_len: 72}];
 }
 
 message CreateMachineRequest {
@@ -1420,12 +1421,13 @@ message UserResponse {
   google.protobuf.Timestamp creation_date = 3;
   google.protobuf.Timestamp change_date = 4;
   uint64 sequence = 5;
+  string user_name = 6;
 
   oneof user {
     option (validate.required) = true;
 
-    HumanResponse human = 6;
-    MachineResponse machine = 7;
+    HumanResponse human = 7;
+    MachineResponse machine = 8;
   }
 }
 
@@ -1456,30 +1458,32 @@ message UserView {
   string preferred_login_name = 7;
   google.protobuf.Timestamp last_login = 8;
   string resource_owner = 9;
+  string user_name = 10;
 
   oneof user {
-    HumanView human = 10;
-    MachineView machine = 11;
+    option (validate.required) = true;
+
+    HumanView human = 11;
+    MachineView machine = 12;
   }
 }
 
 message HumanResponse {
-  string user_name = 1;
-  string first_name = 2;
-  string last_name = 3;
-  string display_name = 4;
-  string nick_name = 5;
-  string preferred_language = 6;
-  Gender gender = 7;
-  string email = 8;
-  bool is_email_verified = 9;
-  string phone = 10;
-  bool is_phone_verified = 11;
-  string country = 12;
-  string locality = 13;
-  string postal_code = 14;
-  string region = 15;
-  string street_address = 16;
+  string first_name = 1;
+  string last_name = 2;
+  string display_name = 3;
+  string nick_name = 4;
+  string preferred_language = 5;
+  Gender gender = 6;
+  string email = 7;
+  bool is_email_verified = 8;
+  string phone = 9;
+  bool is_phone_verified = 10;
+  string country = 11;
+  string locality = 12;
+  string postal_code = 13;
+  string region = 14;
+  string street_address = 15;
 }
 
 message HumanView {
@@ -1619,10 +1623,9 @@ message UserProfile {
   string display_name = 5;
   string preferred_language = 6;
   Gender gender = 7;
-  string user_name = 8;
-  uint64 sequence = 9;
-  google.protobuf.Timestamp creation_date = 10;
-  google.protobuf.Timestamp change_date = 11;
+  uint64 sequence = 8;
+  google.protobuf.Timestamp creation_date = 9;
+  google.protobuf.Timestamp change_date = 10;
 }
 
 message UserProfileView {
@@ -1633,12 +1636,11 @@ message UserProfileView {
   string display_name = 5;
   string preferred_language = 6;
   Gender gender = 7;
-  string user_name = 8;
-  uint64 sequence = 9;
-  google.protobuf.Timestamp creation_date = 10;
-  google.protobuf.Timestamp change_date = 11;
-  repeated string login_names = 12;
-  string preferred_login_name = 27;
+  uint64 sequence = 8;
+  google.protobuf.Timestamp creation_date = 9;
+  google.protobuf.Timestamp change_date = 10;
+  repeated string login_names = 11;
+  string preferred_login_name = 12;
 }
 
 message UpdateUserProfileRequest {

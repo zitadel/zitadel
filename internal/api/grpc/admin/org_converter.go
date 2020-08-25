@@ -36,9 +36,9 @@ func userCreateRequestToModel(user *admin.CreateUserRequest) *usr_model.User {
 	preferredLanguage, err := language.Parse(user.PreferredLanguage)
 	logging.Log("GRPC-30hwz").OnError(err).Debug("unable to parse language")
 	result := &usr_model.User{
+		UserName: user.UserName,
 		Human: &usr_model.Human{
 			Profile: &usr_model.Profile{
-				UserName:          user.UserName,
 				FirstName:         user.FirstName,
 				LastName:          user.LastName,
 				NickName:          user.NickName,

@@ -80,7 +80,7 @@ func (es *ProjectEventstore) ProjectEventsByID(ctx context.Context, id string, s
 
 func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
 	if !project.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Errors.Project.Invalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-IOVCC", "Errors.Project.Invalid")
 	}
 	id, err := es.idGenerator.Next()
 	if err != nil {
@@ -106,7 +106,7 @@ func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_mo
 
 func (es *ProjectEventstore) UpdateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
 	if !project.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Errors.Project.Invalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-7eBD6", "Errors.Project.Invalid")
 	}
 	existingProject, err := es.ProjectByID(ctx, project.AggregateID)
 	if err != nil {
@@ -209,7 +209,7 @@ func (es *ProjectEventstore) ProjectMemberByIDs(ctx context.Context, member *pro
 
 func (es *ProjectEventstore) AddProjectMember(ctx context.Context, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
 	if !member.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Errors.Project.MemberInvalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-2OWkC", "Errors.Project.MemberInvalid")
 	}
 	existingProject, err := es.ProjectByID(ctx, member.AggregateID)
 	if err != nil {
@@ -236,7 +236,7 @@ func (es *ProjectEventstore) AddProjectMember(ctx context.Context, member *proj_
 
 func (es *ProjectEventstore) ChangeProjectMember(ctx context.Context, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
 	if !member.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Errors.Project.MemberInvalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Buh04", "Errors.Project.MemberInvalid")
 	}
 	existingProject, err := es.ProjectByID(ctx, member.AggregateID)
 	if err != nil {

@@ -38,14 +38,15 @@ func TestUserByID(t *testing.T) {
 		{
 			name: "user from events, ok",
 			args: args{
-				es:   GetMockUserByIDOK(ctrl, repo_model.User{Human: &repo_model.Human{Profile: &repo_model.Profile{UserName: "UserName"}}}),
+				es:   GetMockUserByIDOK(ctrl, repo_model.User{Human: &repo_model.Human{Profile: &repo_model.Profile{DisplayName: "DisplayName"}}, UserName: "UserName"}),
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				user: &model.User{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					UserName:   "UserName",
 					Human: &model.Human{
-						Profile: &model.Profile{UserName: "UserName"},
+						Profile: &model.Profile{DisplayName: "DisplayName"},
 					},
 				},
 			},
@@ -110,19 +111,21 @@ func TestCreateUser(t *testing.T) {
 			name: "init mail because no pw",
 			args: args{
 				es: GetMockManipulateUserWithInitCodeGen(ctrl, repo_model.User{
+					UserName: "",
 					Human: &repo_model.Human{
-						Profile: &repo_model.Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName"},
+						Profile: &repo_model.Profile{DisplayName: "DisplayName", FirstName: "FirstName", LastName: "LastName"},
 						Email:   &repo_model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true},
 					},
 				}),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				user: &model.User{
 					ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+					UserName:   "UserName",
 					Human: &model.Human{
 						Profile: &model.Profile{
-							UserName:  "UserName",
-							FirstName: "FirstName",
-							LastName:  "LastName",
+							FirstName:   "FirstName",
+							LastName:    "LastName",
+							DisplayName: "DisplayName",
 						},
 						Email: &model.Email{
 							EmailAddress:    "EmailAddress",
@@ -136,11 +139,12 @@ func TestCreateUser(t *testing.T) {
 			res: res{
 				user: &model.User{
 					ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+					UserName:   "UserName",
 					Human: &model.Human{
 						Profile: &model.Profile{
-							UserName:  "UserName",
-							FirstName: "FirstName",
-							LastName:  "LastName",
+							FirstName:   "FirstName",
+							LastName:    "LastName",
+							DisplayName: "DisplayName",
 						},
 						Email: &model.Email{
 							EmailAddress:    "EmailAddress",
@@ -155,7 +159,7 @@ func TestCreateUser(t *testing.T) {
 			args: args{
 				es: GetMockManipulateUserWithInitCodeGen(ctrl, repo_model.User{
 					Human: &repo_model.Human{
-						Profile: &repo_model.Profile{UserName: "EmailAddress", FirstName: "FirstName", LastName: "LastName"},
+						Profile: &repo_model.Profile{DisplayName: "DisplayName", FirstName: "FirstName", LastName: "LastName"},
 						Email:   &repo_model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true},
 					},
 				}),
@@ -177,11 +181,12 @@ func TestCreateUser(t *testing.T) {
 			},
 			res: res{
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+					UserName: "EmailAddress",
 					Human: &model.Human{
 						Profile: &model.Profile{
-							UserName:  "EmailAddress",
-							FirstName: "FirstName",
-							LastName:  "LastName",
+							FirstName:   "FirstName",
+							LastName:    "LastName",
+							DisplayName: "DisplayName",
 						},
 						Email: &model.Email{
 							EmailAddress:    "EmailAddress",
@@ -195,19 +200,21 @@ func TestCreateUser(t *testing.T) {
 			name: "with verified phone number",
 			args: args{
 				es: GetMockManipulateUserWithInitCodeGen(ctrl, repo_model.User{
+					UserName: "EmailAddress",
 					Human: &repo_model.Human{
-						Profile: &repo_model.Profile{UserName: "EmailAddress", FirstName: "FirstName", LastName: "LastName"},
+						Profile: &repo_model.Profile{DisplayName: "DisplayName", FirstName: "FirstName", LastName: "LastName"},
 						Email:   &repo_model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true},
 						Phone:   &repo_model.Phone{PhoneNumber: "+41711234567", IsPhoneVerified: true},
 					},
 				}),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+					UserName: "UserName",
 					Human: &model.Human{
 						Profile: &model.Profile{
-							FirstName: "FirstName",
-							LastName:  "LastName",
-							UserName:  "UserName",
+							FirstName:   "FirstName",
+							LastName:    "LastName",
+							DisplayName: "DisplayName",
 						},
 						Email: &model.Email{
 							EmailAddress:    "UserName",
@@ -224,11 +231,12 @@ func TestCreateUser(t *testing.T) {
 			},
 			res: res{
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+					UserName: "UserName",
 					Human: &model.Human{
 						Profile: &model.Profile{
-							UserName:  "UserName",
-							FirstName: "FirstName",
-							LastName:  "LastName",
+							FirstName:   "FirstName",
+							LastName:    "LastName",
+							DisplayName: "DisplayName",
 						},
 						Email: &model.Email{
 							EmailAddress:    "EmailAddress",
@@ -246,17 +254,19 @@ func TestCreateUser(t *testing.T) {
 			name: "with password",
 			args: args{
 				es: GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl, repo_model.User{
+					UserName: "UserName",
 					Human: &repo_model.Human{
-						Profile: &repo_model.Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName"},
+						Profile: &repo_model.Profile{DisplayName: "DisplayName", FirstName: "FirstName", LastName: "LastName"},
 						Email:   &repo_model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true}},
 				}),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+					UserName: "UserName",
 					Human: &model.Human{
 						Profile: &model.Profile{
-							FirstName: "FirstName",
-							LastName:  "LastName",
-							UserName:  "UserName",
+							FirstName:   "FirstName",
+							LastName:    "LastName",
+							DisplayName: "DisplayName",
 						},
 						Password: &model.Password{SecretString: "Password"},
 						Email: &model.Email{
@@ -270,11 +280,12 @@ func TestCreateUser(t *testing.T) {
 			},
 			res: res{
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+					UserName: "UserName",
 					Human: &model.Human{
 						Profile: &model.Profile{
-							UserName:  "UserName",
-							FirstName: "FirstName",
-							LastName:  "LastName",
+							FirstName:   "FirstName",
+							LastName:    "LastName",
+							DisplayName: "DisplayName",
 						},
 						Email: &model.Email{
 							EmailAddress:    "EmailAddress",
@@ -372,18 +383,20 @@ func TestRegisterUser(t *testing.T) {
 			name: "register user, ok",
 			args: args{
 				es: GetMockManipulateUserWithPasswordInitCodeGen(ctrl, repo_model.User{
+					UserName: "UserName",
 					Human: &repo_model.Human{
-						Profile: &repo_model.Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName"},
+						Profile: &repo_model.Profile{DisplayName: "DisplayName", FirstName: "FirstName", LastName: "LastName"},
 						Email:   &repo_model.Email{EmailAddress: "EmailAddress"}}},
 				),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				user: &model.User{
 					ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+					UserName:   "UserName",
 					Human: &model.Human{
 						Profile: &model.Profile{
-							UserName:  "UserName",
-							FirstName: "FirstName",
-							LastName:  "LastName",
+							FirstName:   "FirstName",
+							LastName:    "LastName",
+							DisplayName: "DisplayName",
 						},
 						Email: &model.Email{
 							EmailAddress: "EmailAddress",
@@ -399,11 +412,12 @@ func TestRegisterUser(t *testing.T) {
 			},
 			res: res{
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+					UserName: "UserName",
 					Human: &model.Human{
 						Profile: &model.Profile{
-							UserName:  "UserName",
-							FirstName: "FirstName",
-							LastName:  "LastName",
+							FirstName:   "FirstName",
+							LastName:    "LastName",
+							DisplayName: "DisplayName",
 						},
 						Email: &model.Email{
 							EmailAddress: "EmailAddress",
@@ -416,8 +430,9 @@ func TestRegisterUser(t *testing.T) {
 			name: "email as username",
 			args: args{
 				es: GetMockManipulateUserWithPasswordInitCodeGen(ctrl, repo_model.User{
+					UserName: "UserName",
 					Human: &repo_model.Human{
-						Profile: &repo_model.Profile{UserName: "EmailAddress", FirstName: "FirstName", LastName: "LastName"},
+						Profile: &repo_model.Profile{DisplayName: "DisplayName", FirstName: "FirstName", LastName: "LastName"},
 						Email:   &repo_model.Email{EmailAddress: "EmailAddress"}}},
 				),
 				ctx: authz.NewMockContext("orgID", "userID"),
@@ -441,11 +456,12 @@ func TestRegisterUser(t *testing.T) {
 			},
 			res: res{
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+					UserName: "EmailAddress",
 					Human: &model.Human{
 						Profile: &model.Profile{
-							UserName:  "EmailAddress",
-							FirstName: "FirstName",
-							LastName:  "LastName",
+							FirstName:   "FirstName",
+							LastName:    "LastName",
+							DisplayName: "DisplayName",
 						},
 						Email: &model.Email{
 							EmailAddress: "EmailAddress",
@@ -474,11 +490,12 @@ func TestRegisterUser(t *testing.T) {
 				es:  GetMockManipulateUser(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+					UserName: "EmailAddress",
 					Human: &model.Human{
 						Profile: &model.Profile{
-							UserName:  "EmailAddress",
-							FirstName: "FirstName",
-							LastName:  "LastName",
+							FirstName:   "FirstName",
+							LastName:    "LastName",
+							DisplayName: "DisplayName",
 						},
 						Email: &model.Email{
 							EmailAddress: "EmailAddress",
@@ -499,11 +516,12 @@ func TestRegisterUser(t *testing.T) {
 				es:  GetMockManipulateUser(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+					UserName: "EmailAddress",
 					Human: &model.Human{
 						Profile: &model.Profile{
-							UserName:  "EmailAddress",
-							FirstName: "FirstName",
-							LastName:  "LastName",
+							FirstName:   "FirstName",
+							LastName:    "LastName",
+							DisplayName: "DisplayName",
 						},
 						Email: &model.Email{
 							EmailAddress: "EmailAddress",
@@ -523,11 +541,12 @@ func TestRegisterUser(t *testing.T) {
 				es:  GetMockManipulateUser(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+					UserName: "EmailAddress",
 					Human: &model.Human{
 						Profile: &model.Profile{
-							UserName:  "EmailAddress",
-							FirstName: "FirstName",
-							LastName:  "LastName",
+							FirstName:   "FirstName",
+							LastName:    "LastName",
+							DisplayName: "DisplayName",
 						},
 						Email: &model.Email{
 							EmailAddress: "EmailAddress",
@@ -546,11 +565,12 @@ func TestRegisterUser(t *testing.T) {
 				es:  GetMockManipulateUser(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
+					UserName: "EmailAddress",
 					Human: &model.Human{
 						Profile: &model.Profile{
-							UserName:  "EmailAddress",
-							FirstName: "FirstName",
-							LastName:  "LastName",
+							FirstName:   "FirstName",
+							LastName:    "LastName",
+							DisplayName: "DisplayName",
 						},
 						Email: &model.Email{
 							EmailAddress: "EmailAddress",
@@ -871,9 +891,10 @@ func TestGetInitCodeByID(t *testing.T) {
 				es: GetMockManipulateUserWithInitCode(ctrl,
 					repo_model.User{
 						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+						UserName:   "UserName",
 						Human: &repo_model.Human{
 							Profile: &repo_model.Profile{
-								UserName: "UserName",
+								DisplayName: "DisplayName",
 							},
 						},
 					}),
@@ -1970,7 +1991,7 @@ func TestProfileByID(t *testing.T) {
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Human: &model.Human{}},
 			},
 			res: res{
-				profile: &model.Profile{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserName: "UserName"},
+				profile: &model.Profile{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, DisplayName: "DisplayName"},
 			},
 		},
 		{
@@ -1998,13 +2019,13 @@ func TestProfileByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.ProfileByID(tt.args.ctx, tt.args.user.AggregateID)
+			profile, err := tt.args.es.ProfileByID(tt.args.ctx, tt.args.user.AggregateID)
 
-			if tt.res.errFunc == nil && result.AggregateID == "" {
+			if tt.res.errFunc == nil && profile.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if tt.res.errFunc == nil && result.UserName != tt.res.profile.UserName {
-				t.Errorf("got wrong result change required: expected: %v, actual: %v ", tt.res.profile.UserName, result.UserName)
+			if tt.res.errFunc == nil && profile.DisplayName != tt.res.profile.DisplayName {
+				t.Errorf("got wrong result change required: expected: %v, actual: %v ", tt.res.profile.DisplayName, profile.DisplayName)
 			}
 			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
@@ -2179,8 +2200,9 @@ func TestChangeEmail(t *testing.T) {
 			args: args{
 				es: GetMockManipulateUserWithEmailCodeGen(ctrl, repo_model.User{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					UserName:   "UserName",
 					Human: &repo_model.Human{
-						Profile: &repo_model.Profile{UserName: "UserName"},
+						Profile: &repo_model.Profile{DisplayName: "DisplayName"},
 						Email:   &repo_model.Email{EmailAddress: "EmailAddress"},
 					},
 				}),
@@ -2341,8 +2363,9 @@ func TestCreateEmailVerificationCode(t *testing.T) {
 			args: args{
 				es: GetMockManipulateUserWithEmailCodeGen(ctrl, repo_model.User{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					UserName:   "UserName",
 					Human: &repo_model.Human{
-						Profile: &repo_model.Profile{UserName: "UserName"},
+						Profile: &repo_model.Profile{DisplayName: "DisplayName"},
 						Email:   &repo_model.Email{EmailAddress: "EmailAddress"},
 					}}),
 				ctx:    authz.NewMockContext("orgID", "userID"),
@@ -2568,8 +2591,9 @@ func TestChangePhone(t *testing.T) {
 			args: args{
 				es: GetMockManipulateUserWithPhoneCodeGen(ctrl, repo_model.User{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					UserName:   "UserName",
 					Human: &repo_model.Human{
-						Profile: &repo_model.Profile{UserName: "UserName"},
+						Profile: &repo_model.Profile{DisplayName: "DisplayName"},
 						Phone:   &repo_model.Phone{PhoneNumber: "PhoneNumber"}},
 				}),
 				ctx:   authz.NewMockContext("orgID", "userID"),
@@ -2793,8 +2817,9 @@ func TestCreatePhoneVerificationCode(t *testing.T) {
 			args: args{
 				es: GetMockManipulateUserWithPhoneCodeGen(ctrl, repo_model.User{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					UserName:   "UserName",
 					Human: &repo_model.Human{
-						Profile: &repo_model.Profile{UserName: "UserName"},
+						Profile: &repo_model.Profile{DisplayName: "DisplayName"},
 						Phone:   &repo_model.Phone{PhoneNumber: "PhoneNumber"},
 					}}),
 				ctx:    authz.NewMockContext("orgID", "userID"),
@@ -3447,7 +3472,7 @@ func TestChangesUser(t *testing.T) {
 	}
 	type res struct {
 		changes *model.UserChanges
-		user    *model.Profile
+		profile *model.Profile
 		wantErr bool
 		errFunc func(err error) bool
 	}
@@ -3465,8 +3490,8 @@ func TestChangesUser(t *testing.T) {
 				limit:        0,
 			},
 			res: res{
-				changes: &model.UserChanges{Changes: []*model.UserChange{{EventType: "", Sequence: 1, ModifierId: ""}}, LastSequence: 1},
-				user:    &model.Profile{FirstName: "Hans", LastName: "Muster", UserName: "HansMuster"},
+				changes: &model.UserChanges{Changes: []*model.UserChange{{EventType: "", Sequence: 1, ModifierID: ""}}, LastSequence: 1},
+				profile: &model.Profile{FirstName: "Hans", LastName: "Muster"},
 			},
 		},
 		{
@@ -3487,14 +3512,14 @@ func TestChangesUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.UserChanges(nil, tt.args.id, tt.args.lastSequence, tt.args.limit, false)
 
-			user := &model.Profile{}
+			profile := &model.Profile{}
 			if result != nil && len(result.Changes) > 0 {
 				b, err := json.Marshal(result.Changes[0].Data)
-				json.Unmarshal(b, user)
+				json.Unmarshal(b, profile)
 				if err != nil {
 				}
 			}
-			if !tt.res.wantErr && result.LastSequence != tt.res.changes.LastSequence && user.UserName != tt.res.user.UserName {
+			if !tt.res.wantErr && result.LastSequence != tt.res.changes.LastSequence && profile.DisplayName != tt.res.profile.DisplayName {
 				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.changes.LastSequence, result.LastSequence)
 			}
 			if tt.res.wantErr && !tt.res.errFunc(err) {

@@ -1,13 +1,18 @@
 package model
 
 import (
+	"strings"
+
+	caos_errors "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/golang/protobuf/ptypes/timestamp"
 )
 
 type User struct {
 	es_models.ObjectRoot
-	State UserState
+	State    UserState
+	UserName string
 
 	*Human
 	*Machine
@@ -34,7 +39,7 @@ type UserChange struct {
 	ChangeDate   *timestamp.Timestamp `json:"changeDate,omitempty"`
 	EventType    string               `json:"eventType,omitempty"`
 	Sequence     uint64               `json:"sequence,omitempty"`
-	ModifierId   string               `json:"modifierUser,omitempty"`
+	ModifierID   string               `json:"modifierUser,omitempty"`
 	ModifierName string               `json:"-"`
 	Data         interface{}          `json:"data,omitempty"`
 }
@@ -56,11 +61,24 @@ func (u *User) IsLocked() bool {
 }
 
 func (u *User) IsValid() bool {
-	if u.Human == nil && u.Machine == nil {
+	if u.Human == nil && u.Machine == nil || u.UserName == "" {
 		return false
 	}
 	if u.Human != nil {
 		return u.Human.IsValid()
 	}
 	return u.Machine.IsValid()
+}
+
+func (u *User) CheckOrgIamPolicy(policy *org_model.OrgIamPolicy) error {
+	if policy == nil {
+		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-zSH7j", "Errors.Users.OrgIamPolicyNil")
+	}
+	if policy.UserLoginMustBeDomain && strings.Contains(u.UserName, "@") {
+		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-se4sJ", "Errors.User.EmailAsUsernameNotAllowed")
+	}
+	if !policy.UserLoginMustBeDomain && u.Profile != nil && u.UserName == "" && u.Email != nil {
+		u.UserName = u.EmailAddress
+	}
+	return nil
 }

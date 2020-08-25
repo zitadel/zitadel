@@ -8,7 +8,6 @@ import (
 type Profile struct {
 	es_models.ObjectRoot
 
-	UserName           string
 	FirstName          string
 	LastName           string
 	NickName           string

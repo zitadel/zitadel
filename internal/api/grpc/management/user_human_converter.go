@@ -10,7 +10,6 @@ import (
 
 func humanFromModel(user *usr_model.Human) *management.HumanResponse {
 	human := &management.HumanResponse{
-		UserName:          user.UserName,
 		FirstName:         user.FirstName,
 		LastName:          user.LastName,
 		DisplayName:       user.DisplayName,
@@ -42,7 +41,6 @@ func humanViewFromModel(user *usr_model.HumanView) *management.HumanView {
 	logging.Log("MANAG-h4ByY").OnError(err).Debug("unable to parse date")
 
 	return &management.HumanView{
-		UserName:          user.UserName,
 		FirstName:         user.FirstName,
 		LastName:          user.LastName,
 		DisplayName:       user.DisplayName,
@@ -68,7 +66,6 @@ func humanCreateToModel(u *management.CreateHumanRequest) *usr_model.Human {
 
 	human := &usr_model.Human{
 		Profile: &usr_model.Profile{
-			UserName:          u.UserName,
 			FirstName:         u.FirstName,
 			LastName:          u.LastName,
 			NickName:          u.NickName,
