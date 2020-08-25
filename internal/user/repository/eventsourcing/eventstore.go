@@ -1142,10 +1142,10 @@ func (es *UserEventstore) CheckMfaOTPSetup(ctx context.Context, userID, code str
 		return errors.ThrowPreconditionFailed(nil, "EVENT-7zRQM", "Errors.User.NotHuman")
 	}
 	if user.OTP == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sd5NJ", "Errors.Users.Mfa.Otp.NotExisting")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-yERHV", "Errors.Users.Mfa.Otp.NotExisting")
 	}
 	if user.IsOTPReady() {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sd5NJ", "Errors.Users.Mfa.Otp.AlreadyReady")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-qx4ls", "Errors.Users.Mfa.Otp.AlreadyReady")
 	}
 	if err := es.verifyMfaOTP(user.OTP, code); err != nil {
 		return err

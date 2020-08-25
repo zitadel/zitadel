@@ -91,6 +91,7 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 		es_model.HumanMfaOtpAdded,
 		es_model.HumanMfaOtpVerified,
 		es_model.HumanMfaOtpRemoved,
+		es_model.HumanMfaInitSkipped,
 		es_model.MachineChanged,
 		es_model.HumanPasswordChanged:
 		user, err = u.view.UserByID(event.AggregateID)
