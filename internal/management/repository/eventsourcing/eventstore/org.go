@@ -85,8 +85,8 @@ func (repo *OrgRepository) ReactivateOrg(ctx context.Context, id string) (*org_m
 	return repo.OrgEventstore.ReactivateOrg(ctx, id)
 }
 
-func (repo *OrgRepository) GetMyOrgIamPolicy(ctx context.Context) (*org_model.OrgIamPolicy, error) {
-	return repo.OrgEventstore.GetOrgIamPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+func (repo *OrgRepository) GetMyOrgIamPolicy(ctx context.Context) (*org_model.OrgIAMPolicy, error) {
+	return repo.OrgEventstore.GetOrgIAMPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 }
 
 func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_model.OrgDomainSearchRequest) (*org_model.OrgDomainSearchResponse, error) {

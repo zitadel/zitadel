@@ -28,7 +28,7 @@ type handler struct {
 
 type EventstoreRepos struct {
 	UserEvents *usr_event.UserEventstore
-	IamEvents  *iam_event.IamEventstore
+	IamEvents  *iam_event.IAMEventstore
 	OrgEvents  *org_event.OrgEventstore
 }
 

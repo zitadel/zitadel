@@ -53,23 +53,23 @@ func TestLoginPolicyChanges(t *testing.T) {
 
 func TestAppendAddLoginPolicyEvent(t *testing.T) {
 	type args struct {
-		iam    *Iam
+		iam    *IAM
 		policy *LoginPolicy
 		event  *es_models.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *Iam
+		result *IAM
 	}{
 		{
 			name: "append add login policy event",
 			args: args{
-				iam:    new(Iam),
+				iam:    new(IAM),
 				policy: &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true},
 				event:  new(es_models.Event),
 			},
-			result: &Iam{DefaultLoginPolicy: &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true}},
+			result: &IAM{DefaultLoginPolicy: &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true}},
 		},
 	}
 	for _, tt := range tests {
@@ -94,19 +94,19 @@ func TestAppendAddLoginPolicyEvent(t *testing.T) {
 
 func TestAppendChangeLoginPolicyEvent(t *testing.T) {
 	type args struct {
-		iam    *Iam
+		iam    *IAM
 		policy *LoginPolicy
 		event  *es_models.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *Iam
+		result *IAM
 	}{
 		{
 			name: "append change login policy event",
 			args: args{
-				iam: &Iam{DefaultLoginPolicy: &LoginPolicy{
+				iam: &IAM{DefaultLoginPolicy: &LoginPolicy{
 					AllowExternalIdp:      false,
 					AllowRegister:         false,
 					AllowUsernamePassword: false,
@@ -114,7 +114,7 @@ func TestAppendChangeLoginPolicyEvent(t *testing.T) {
 				policy: &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true},
 				event:  &es_models.Event{},
 			},
-			result: &Iam{DefaultLoginPolicy: &LoginPolicy{
+			result: &IAM{DefaultLoginPolicy: &LoginPolicy{
 				AllowExternalIdp:      true,
 				AllowRegister:         true,
 				AllowUsernamePassword: true,
@@ -143,23 +143,23 @@ func TestAppendChangeLoginPolicyEvent(t *testing.T) {
 
 func TestAppendAddIdpToPolicyEvent(t *testing.T) {
 	type args struct {
-		iam      *Iam
+		iam      *IAM
 		provider *IDPProvider
 		event    *es_models.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *Iam
+		result *IAM
 	}{
 		{
 			name: "append add idp to login policy event",
 			args: args{
-				iam:      &Iam{DefaultLoginPolicy: &LoginPolicy{AllowExternalIdp: true, AllowRegister: true, AllowUsernamePassword: true}},
+				iam:      &IAM{DefaultLoginPolicy: &LoginPolicy{AllowExternalIdp: true, AllowRegister: true, AllowUsernamePassword: true}},
 				provider: &IDPProvider{Type: int32(model.IDPProviderTypeSystem), IDPConfigID: "IDPConfigID"},
 				event:    &es_models.Event{},
 			},
-			result: &Iam{DefaultLoginPolicy: &LoginPolicy{
+			result: &IAM{DefaultLoginPolicy: &LoginPolicy{
 				AllowExternalIdp:      true,
 				AllowRegister:         true,
 				AllowUsernamePassword: true,
@@ -199,19 +199,19 @@ func TestAppendAddIdpToPolicyEvent(t *testing.T) {
 
 func TestRemoveAddIdpToPolicyEvent(t *testing.T) {
 	type args struct {
-		iam      *Iam
+		iam      *IAM
 		provider *IDPProvider
 		event    *es_models.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *Iam
+		result *IAM
 	}{
 		{
 			name: "append add idp to login policy event",
 			args: args{
-				iam: &Iam{
+				iam: &IAM{
 					DefaultLoginPolicy: &LoginPolicy{
 						AllowExternalIdp:      true,
 						AllowRegister:         true,
@@ -222,7 +222,7 @@ func TestRemoveAddIdpToPolicyEvent(t *testing.T) {
 				provider: &IDPProvider{Type: int32(model.IDPProviderTypeSystem), IDPConfigID: "IDPConfigID"},
 				event:    &es_models.Event{},
 			},
-			result: &Iam{DefaultLoginPolicy: &LoginPolicy{
+			result: &IAM{DefaultLoginPolicy: &LoginPolicy{
 				AllowExternalIdp:      true,
 				AllowRegister:         true,
 				AllowUsernamePassword: true,

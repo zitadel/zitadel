@@ -29,7 +29,7 @@ func (m *IDPConfig) EventQuery() (*models.SearchQuery, error) {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate, iam_es_model.IamAggregate).
+		AggregateTypeFilter(model.OrgAggregate, iam_es_model.IAMAggregate).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
@@ -37,7 +37,7 @@ func (m *IDPConfig) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
 	case model.OrgAggregate:
 		err = m.processIdpConfig(iam_model.IDPProviderTypeOrg, event)
-	case iam_es_model.IamAggregate:
+	case iam_es_model.IAMAggregate:
 		err = m.processIdpConfig(iam_model.IDPProviderTypeSystem, event)
 	}
 	return err

@@ -59,7 +59,7 @@ func OIDCIDPConfigToModel(config *OIDCIDPConfig) *model.OIDCIDPConfig {
 	}
 }
 
-func (iam *Iam) appendAddOIDCIDPConfigEvent(event *es_models.Event) error {
+func (iam *IAM) appendAddOIDCIDPConfigEvent(event *es_models.Event) error {
 	config := new(OIDCIDPConfig)
 	err := config.SetData(event)
 	if err != nil {
@@ -73,7 +73,7 @@ func (iam *Iam) appendAddOIDCIDPConfigEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (iam *Iam) appendChangeOIDCIDPConfigEvent(event *es_models.Event) error {
+func (iam *IAM) appendChangeOIDCIDPConfigEvent(event *es_models.Event) error {
 	config := new(OIDCIDPConfig)
 	err := config.SetData(event)
 	if err != nil {

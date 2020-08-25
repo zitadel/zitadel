@@ -30,7 +30,7 @@ type OrgRepository interface {
 
 	GetOrgMemberRoles() []string
 
-	GetMyOrgIamPolicy(ctx context.Context) (*org_model.OrgIamPolicy, error)
+	GetMyOrgIamPolicy(ctx context.Context) (*org_model.OrgIAMPolicy, error)
 
 	SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error)
 	IDPConfigByID(ctx context.Context, id string) (*iam_model.IDPConfigView, error)

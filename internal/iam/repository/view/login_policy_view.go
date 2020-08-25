@@ -15,7 +15,7 @@ func GetLoginPolicyByAggregateID(db *gorm.DB, table, aggregateID string) (*model
 	query := repository.PrepareGetByQuery(table, userIDQuery)
 	err := query(db, policy)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Lso0cs", "Errors.Iam.LoginPolicy.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Lso0cs", "Errors.IAM.LoginPolicy.NotExisting")
 	}
 	return policy, err
 }

@@ -15,7 +15,7 @@ func IDPByID(db *gorm.DB, table, idpID string) (*model.IDPConfigView, error) {
 	query := repository.PrepareGetByQuery(table, userIDQuery)
 	err := query(db, idp)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Ahq2s", "Errors.Iam.IdpNotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Ahq2s", "Errors.IAM.IdpNotExisting")
 	}
 	return idp, err
 }

@@ -22,7 +22,7 @@ type Org struct {
 
 	Domains      []*OrgDomain              `json:"-"`
 	Members      []*OrgMember              `json:"-"`
-	OrgIamPolicy *OrgIamPolicy             `json:"-"`
+	OrgIamPolicy *OrgIAMPolicy             `json:"-"`
 	LoginPolicy  *iam_es_model.LoginPolicy `json:"-"`
 	IDPs         []*iam_es_model.IDPConfig `json:"-"`
 }
@@ -40,7 +40,7 @@ func OrgFromModel(org *org_model.Org) *Org {
 		IDPs:       idps,
 	}
 	if org.OrgIamPolicy != nil {
-		converted.OrgIamPolicy = OrgIamPolicyFromModel(org.OrgIamPolicy)
+		converted.OrgIamPolicy = OrgIAMPolicyFromModel(org.OrgIamPolicy)
 	}
 	if org.LoginPolicy != nil {
 		converted.LoginPolicy = iam_es_model.LoginPolicyFromModel(org.LoginPolicy)
@@ -58,7 +58,7 @@ func OrgToModel(org *Org) *org_model.Org {
 		IDPs:       iam_es_model.IDPConfigsToModel(org.IDPs),
 	}
 	if org.OrgIamPolicy != nil {
-		converted.OrgIamPolicy = OrgIamPolicyToModel(org.OrgIamPolicy)
+		converted.OrgIamPolicy = OrgIAMPolicyToModel(org.OrgIamPolicy)
 	}
 	if org.LoginPolicy != nil {
 		converted.LoginPolicy = iam_es_model.LoginPolicyToModel(org.LoginPolicy)
@@ -134,12 +134,12 @@ func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 		err = o.appendPrimaryDomainEvent(event)
 	case OrgDomainRemoved:
 		err = o.appendRemoveDomainEvent(event)
-	case OrgIamPolicyAdded:
-		err = o.appendAddOrgIamPolicyEvent(event)
-	case OrgIamPolicyChanged:
-		err = o.appendChangeOrgIamPolicyEvent(event)
-	case OrgIamPolicyRemoved:
-		o.appendRemoveOrgIamPolicyEvent()
+	case OrgIAMPolicyAdded:
+		err = o.appendAddOrgIAMPolicyEvent(event)
+	case OrgIAMPolicyChanged:
+		err = o.appendChangeOrgIAMPolicyEvent(event)
+	case OrgIAMPolicyRemoved:
+		o.appendRemoveOrgIAMPolicyEvent()
 	case IDPConfigAdded:
 		err = o.appendAddIDPConfigEvent(event)
 	case IDPConfigChanged:

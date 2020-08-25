@@ -39,7 +39,7 @@ func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) 
 	if err != nil {
 		return nil, err
 	}
-	orgPolicy, err := repo.OrgEventstore.GetOrgIamPolicy(ctx, policy_model.DefaultPolicy)
+	orgPolicy, err := repo.OrgEventstore.GetOrgIAMPolicy(ctx, policy_model.DefaultPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -106,18 +106,18 @@ func (repo *OrgRepo) IsOrgUnique(ctx context.Context, name, domain string) (isUn
 	return repo.OrgEventstore.IsOrgUnique(ctx, name, domain)
 }
 
-func (repo *OrgRepo) GetOrgIamPolicyByID(ctx context.Context, id string) (*org_model.OrgIamPolicy, error) {
-	return repo.OrgEventstore.GetOrgIamPolicy(ctx, id)
+func (repo *OrgRepo) GetOrgIamPolicyByID(ctx context.Context, id string) (*org_model.OrgIAMPolicy, error) {
+	return repo.OrgEventstore.GetOrgIAMPolicy(ctx, id)
 }
 
-func (repo *OrgRepo) CreateOrgIamPolicy(ctx context.Context, policy *org_model.OrgIamPolicy) (*org_model.OrgIamPolicy, error) {
-	return repo.OrgEventstore.AddOrgIamPolicy(ctx, policy)
+func (repo *OrgRepo) CreateOrgIamPolicy(ctx context.Context, policy *org_model.OrgIAMPolicy) (*org_model.OrgIAMPolicy, error) {
+	return repo.OrgEventstore.AddOrgIAMPolicy(ctx, policy)
 }
 
-func (repo *OrgRepo) ChangeOrgIamPolicy(ctx context.Context, policy *org_model.OrgIamPolicy) (*org_model.OrgIamPolicy, error) {
-	return repo.OrgEventstore.ChangeOrgIamPolicy(ctx, policy)
+func (repo *OrgRepo) ChangeOrgIamPolicy(ctx context.Context, policy *org_model.OrgIAMPolicy) (*org_model.OrgIAMPolicy, error) {
+	return repo.OrgEventstore.ChangeOrgIAMPolicy(ctx, policy)
 }
 
 func (repo *OrgRepo) RemoveOrgIamPolicy(ctx context.Context, id string) error {
-	return repo.OrgEventstore.RemoveOrgIamPolicy(ctx, id)
+	return repo.OrgEventstore.RemoveOrgIAMPolicy(ctx, id)
 }

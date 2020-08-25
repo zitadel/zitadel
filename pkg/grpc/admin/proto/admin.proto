@@ -689,17 +689,17 @@ enum IdpState {
 message OidcIdpConfigCreate {
     string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     bytes logo_src = 2;
-    string client_id = 3;
-    string client_secret = 4;
-    string issuer = 5;
+    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string issuer = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string scopes = 6;
 }
 
 message OidcIdpConfigUpdate {
     string idp_id = 1;
-    string client_id = 2;
+    string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_secret = 3;
-    string issuer = 4;
+    string issuer = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string scopes = 5;
 }
 

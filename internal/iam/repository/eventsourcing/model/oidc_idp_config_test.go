@@ -75,23 +75,23 @@ func TestOIDCIdpConfigChanges(t *testing.T) {
 
 func TestAppendAddOIDCIdpConfigEvent(t *testing.T) {
 	type args struct {
-		iam    *Iam
+		iam    *IAM
 		config *OIDCIDPConfig
 		event  *es_models.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *Iam
+		result *IAM
 	}{
 		{
 			name: "append add oidc idp config event",
 			args: args{
-				iam:    &Iam{IDPs: []*IDPConfig{&IDPConfig{IDPConfigID: "IDPConfigID"}}},
+				iam:    &IAM{IDPs: []*IDPConfig{&IDPConfig{IDPConfigID: "IDPConfigID"}}},
 				config: &OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID"},
 				event:  &es_models.Event{},
 			},
-			result: &Iam{IDPs: []*IDPConfig{&IDPConfig{IDPConfigID: "IDPConfigID", OIDCIDPConfig: &OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID"}}}},
+			result: &IAM{IDPs: []*IDPConfig{&IDPConfig{IDPConfigID: "IDPConfigID", OIDCIDPConfig: &OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID"}}}},
 		},
 	}
 	for _, tt := range tests {
@@ -116,23 +116,23 @@ func TestAppendAddOIDCIdpConfigEvent(t *testing.T) {
 
 func TestAppendChangeOIDCIdpConfigEvent(t *testing.T) {
 	type args struct {
-		iam    *Iam
+		iam    *IAM
 		config *OIDCIDPConfig
 		event  *es_models.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *Iam
+		result *IAM
 	}{
 		{
 			name: "append change oidc idp config event",
 			args: args{
-				iam:    &Iam{IDPs: []*IDPConfig{&IDPConfig{IDPConfigID: "IDPConfigID", OIDCIDPConfig: &OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID"}}}},
+				iam:    &IAM{IDPs: []*IDPConfig{&IDPConfig{IDPConfigID: "IDPConfigID", OIDCIDPConfig: &OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID"}}}},
 				config: &OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID Changed"},
 				event:  &es_models.Event{},
 			},
-			result: &Iam{IDPs: []*IDPConfig{&IDPConfig{IDPConfigID: "IDPConfigID", OIDCIDPConfig: &OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID Changed"}}}},
+			result: &IAM{IDPs: []*IDPConfig{&IDPConfig{IDPConfigID: "IDPConfigID", OIDCIDPConfig: &OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID Changed"}}}},
 		},
 	}
 	for _, tt := range tests {

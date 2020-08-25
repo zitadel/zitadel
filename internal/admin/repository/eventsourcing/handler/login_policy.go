@@ -28,13 +28,13 @@ func (m *LoginPolicy) EventQuery() (*models.SearchQuery, error) {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.IamAggregate).
+		AggregateTypeFilter(model.IAMAggregate).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (m *LoginPolicy) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
-	case model.IamAggregate:
+	case model.IAMAggregate:
 		err = m.processLoginPolicy(event)
 	}
 	return err

@@ -26,7 +26,7 @@ type handler struct {
 }
 
 type EventstoreRepos struct {
-	IamEvents *iam_events.IamEventstore
+	IamEvents *iam_events.IAMEventstore
 }
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults) []query.Handler {

@@ -16,7 +16,7 @@ type UserGrantRepo struct {
 	IamID        string
 	IamProjectID string
 	Auth         authz.Config
-	IamEvents    *iam_event.IamEventstore
+	IamEvents    *iam_event.IAMEventstore
 }
 
 func (repo *UserGrantRepo) Health() error {
@@ -67,14 +67,14 @@ func (repo *UserGrantRepo) FillIamProjectID(ctx context.Context) error {
 	if repo.IamProjectID != "" {
 		return nil
 	}
-	iam, err := repo.IamEvents.IamByID(ctx, repo.IamID)
+	iam, err := repo.IamEvents.IAMByID(ctx, repo.IamID)
 	if err != nil {
 		return err
 	}
 	if !iam.SetUpDone {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-skiwS", "Setup not done")
 	}
-	repo.IamProjectID = iam.IamProjectID
+	repo.IamProjectID = iam.IAMProjectID
 	return nil
 }
 

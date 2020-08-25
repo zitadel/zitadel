@@ -108,7 +108,7 @@ func (p *LoginPolicy) Changes(changed *LoginPolicy) map[string]interface{} {
 	return changes
 }
 
-func (i *Iam) appendAddLoginPolicyEvent(event *es_models.Event) error {
+func (i *IAM) appendAddLoginPolicyEvent(event *es_models.Event) error {
 	i.DefaultLoginPolicy = new(LoginPolicy)
 	err := i.DefaultLoginPolicy.SetData(event)
 	if err != nil {
@@ -118,11 +118,11 @@ func (i *Iam) appendAddLoginPolicyEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (i *Iam) appendChangeLoginPolicyEvent(event *es_models.Event) error {
+func (i *IAM) appendChangeLoginPolicyEvent(event *es_models.Event) error {
 	return i.DefaultLoginPolicy.SetData(event)
 }
 
-func (iam *Iam) appendAddIDPProviderToLoginPolicyEvent(event *es_models.Event) error {
+func (iam *IAM) appendAddIDPProviderToLoginPolicyEvent(event *es_models.Event) error {
 	provider := new(IDPProvider)
 	err := provider.SetData(event)
 	if err != nil {
@@ -133,7 +133,7 @@ func (iam *Iam) appendAddIDPProviderToLoginPolicyEvent(event *es_models.Event) e
 	return nil
 }
 
-func (iam *Iam) appendRemoveIDPProviderFromLoginPolicyEvent(event *es_models.Event) error {
+func (iam *IAM) appendRemoveIDPProviderFromLoginPolicyEvent(event *es_models.Event) error {
 	provider := new(IDPProvider)
 	err := provider.SetData(event)
 	if err != nil {

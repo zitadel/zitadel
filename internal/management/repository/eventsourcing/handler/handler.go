@@ -31,7 +31,7 @@ type EventstoreRepos struct {
 	ProjectEvents *proj_event.ProjectEventstore
 	UserEvents    *usr_event.UserEventstore
 	OrgEvents     *org_event.OrgEventstore
-	IamEvents     *iam_event.IamEventstore
+	IamEvents     *iam_event.IAMEventstore
 }
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos, defaults systemdefaults.SystemDefaults) []query.Handler {

@@ -90,7 +90,7 @@ func IDPConfigToModel(idp *IDPConfig) *model.IDPConfig {
 	return converted
 }
 
-func (iam *Iam) appendAddIDPConfigEvent(event *es_models.Event) error {
+func (iam *IAM) appendAddIDPConfigEvent(event *es_models.Event) error {
 	idp := new(IDPConfig)
 	err := idp.SetData(event)
 	if err != nil {
@@ -101,7 +101,7 @@ func (iam *Iam) appendAddIDPConfigEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (iam *Iam) appendChangeIDPConfigEvent(event *es_models.Event) error {
+func (iam *IAM) appendChangeIDPConfigEvent(event *es_models.Event) error {
 	idp := new(IDPConfig)
 	err := idp.SetData(event)
 	if err != nil {
@@ -113,7 +113,7 @@ func (iam *Iam) appendChangeIDPConfigEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (iam *Iam) appendRemoveIDPConfigEvent(event *es_models.Event) error {
+func (iam *IAM) appendRemoveIDPConfigEvent(event *es_models.Event) error {
 	idp := new(IDPConfig)
 	err := idp.SetData(event)
 	if err != nil {
@@ -127,7 +127,7 @@ func (iam *Iam) appendRemoveIDPConfigEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (iam *Iam) appendIDPConfigStateEvent(event *es_models.Event, state model.IDPConfigState) error {
+func (iam *IAM) appendIDPConfigStateEvent(event *es_models.Event, state model.IDPConfigState) error {
 	idp := new(IDPConfig)
 	err := idp.SetData(event)
 	if err != nil {

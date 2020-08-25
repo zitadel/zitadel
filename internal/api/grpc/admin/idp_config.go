@@ -61,7 +61,7 @@ func (s *Server) UpdateOidcIdpConfig(ctx context.Context, request *admin.OidcIdp
 }
 
 func (s *Server) SearchIdps(ctx context.Context, request *admin.IdpSearchRequest) (*admin.IdpSearchResponse, error) {
-	response, err := s.iam.SearchIdpConfigs(ctx, idpConfigSearchRequestToModel(request))
+	response, err := s.iam.SearchIDPConfigs(ctx, idpConfigSearchRequestToModel(request))
 	if err != nil {
 		return nil, err
 	}

@@ -9,29 +9,29 @@ import (
 )
 
 const (
-	IamVersion = "v1"
+	IAMVersion = "v1"
 )
 
-type Iam struct {
+type IAM struct {
 	es_models.ObjectRoot
 	SetUpStarted       bool         `json:"-"`
 	SetUpDone          bool         `json:"-"`
 	GlobalOrgID        string       `json:"globalOrgId,omitempty"`
-	IamProjectID       string       `json:"iamProjectId,omitempty"`
-	Members            []*IamMember `json:"-"`
+	IAMProjectID       string       `json:"iamProjectId,omitempty"`
+	Members            []*IAMMember `json:"-"`
 	IDPs               []*IDPConfig `json:"-"`
 	DefaultLoginPolicy *LoginPolicy `json:"-"`
 }
 
-func IamFromModel(iam *model.Iam) *Iam {
-	members := IamMembersFromModel(iam.Members)
+func IAMFromModel(iam *model.IAM) *IAM {
+	members := IAMMembersFromModel(iam.Members)
 	idps := IDPConfigsFromModel(iam.IDPs)
-	converted := &Iam{
+	converted := &IAM{
 		ObjectRoot:   iam.ObjectRoot,
 		SetUpStarted: iam.SetUpStarted,
 		SetUpDone:    iam.SetUpDone,
 		GlobalOrgID:  iam.GlobalOrgID,
-		IamProjectID: iam.IamProjectID,
+		IAMProjectID: iam.IAMProjectID,
 		Members:      members,
 		IDPs:         idps,
 	}
@@ -41,15 +41,15 @@ func IamFromModel(iam *model.Iam) *Iam {
 	return converted
 }
 
-func IamToModel(iam *Iam) *model.Iam {
-	members := IamMembersToModel(iam.Members)
+func IAMToModel(iam *IAM) *model.IAM {
+	members := IAMMembersToModel(iam.Members)
 	idps := IDPConfigsToModel(iam.IDPs)
-	converted := &model.Iam{
+	converted := &model.IAM{
 		ObjectRoot:   iam.ObjectRoot,
 		SetUpStarted: iam.SetUpStarted,
 		SetUpDone:    iam.SetUpDone,
 		GlobalOrgID:  iam.GlobalOrgID,
-		IamProjectID: iam.IamProjectID,
+		IAMProjectID: iam.IAMProjectID,
 		Members:      members,
 		IDPs:         idps,
 	}
@@ -59,7 +59,7 @@ func IamToModel(iam *Iam) *model.Iam {
 	return converted
 }
 
-func (i *Iam) AppendEvents(events ...*es_models.Event) error {
+func (i *IAM) AppendEvents(events ...*es_models.Event) error {
 	for _, event := range events {
 		if err := i.AppendEvent(event); err != nil {
 			return err
@@ -68,21 +68,21 @@ func (i *Iam) AppendEvents(events ...*es_models.Event) error {
 	return nil
 }
 
-func (i *Iam) AppendEvent(event *es_models.Event) (err error) {
+func (i *IAM) AppendEvent(event *es_models.Event) (err error) {
 	i.ObjectRoot.AppendEvent(event)
 	switch event.Type {
-	case IamSetupStarted:
+	case IAMSetupStarted:
 		i.SetUpStarted = true
-	case IamSetupDone:
+	case IAMSetupDone:
 		i.SetUpDone = true
-	case IamProjectSet,
+	case IAMProjectSet,
 		GlobalOrgSet:
 		err = i.SetData(event)
-	case IamMemberAdded:
+	case IAMMemberAdded:
 		err = i.appendAddMemberEvent(event)
-	case IamMemberChanged:
+	case IAMMemberChanged:
 		err = i.appendChangeMemberEvent(event)
-	case IamMemberRemoved:
+	case IAMMemberRemoved:
 		err = i.appendRemoveMemberEvent(event)
 	case IDPConfigAdded:
 		return i.appendAddIDPConfigEvent(event)
@@ -111,7 +111,7 @@ func (i *Iam) AppendEvent(event *es_models.Event) (err error) {
 	return err
 }
 
-func (i *Iam) SetData(event *es_models.Event) error {
+func (i *IAM) SetData(event *es_models.Event) error {
 	i.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, i); err != nil {
 		logging.Log("EVEN-9sie4").WithError(err).Error("could not unmarshal event data")

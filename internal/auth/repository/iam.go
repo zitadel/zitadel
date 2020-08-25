@@ -6,6 +6,6 @@ import (
 	"github.com/caos/zitadel/internal/iam/model"
 )
 
-type IamRepository interface {
-	GetIam(ctx context.Context) (*model.Iam, error)
+type IAMRepository interface {
+	GetIAM(ctx context.Context) (*model.IAM, error)
 }

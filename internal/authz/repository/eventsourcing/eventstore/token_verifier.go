@@ -13,8 +13,8 @@ import (
 
 type TokenVerifierRepo struct {
 	TokenVerificationKey [32]byte
-	IamID                string
-	IamEvents            *iam_event.IamEventstore
+	IAMID                string
+	IAMEvents            *iam_event.IAMEventstore
 	ProjectEvents        *proj_event.ProjectEventstore
 	View                 *view.View
 }
@@ -55,11 +55,11 @@ func (repo *TokenVerifierRepo) ExistsOrg(ctx context.Context, orgID string) erro
 }
 
 func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName string) (string, error) {
-	iam, err := repo.IamEvents.IamByID(ctx, repo.IamID)
+	iam, err := repo.IAMEvents.IAMByID(ctx, repo.IAMID)
 	if err != nil {
 		return "", err
 	}
-	app, err := repo.View.ApplicationByProjecIDAndAppName(iam.IamProjectID, appName)
+	app, err := repo.View.ApplicationByProjecIDAndAppName(iam.IAMProjectID, appName)
 	if err != nil {
 		return "", err
 	}

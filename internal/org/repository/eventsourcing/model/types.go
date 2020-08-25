@@ -29,9 +29,9 @@ const (
 	OrgMemberChanged models.EventType = "org.member.changed"
 	OrgMemberRemoved models.EventType = "org.member.removed"
 
-	OrgIamPolicyAdded   models.EventType = "org.iam.policy.added"
-	OrgIamPolicyChanged models.EventType = "org.iam.policy.changed"
-	OrgIamPolicyRemoved models.EventType = "org.iam.policy.removed"
+	OrgIAMPolicyAdded   models.EventType = "org.iam.policy.added"
+	OrgIAMPolicyChanged models.EventType = "org.iam.policy.changed"
+	OrgIAMPolicyRemoved models.EventType = "org.iam.policy.removed"
 
 	IDPConfigAdded       models.EventType = "org.idp.config.added"
 	IDPConfigChanged     models.EventType = "org.idp.config.changed"

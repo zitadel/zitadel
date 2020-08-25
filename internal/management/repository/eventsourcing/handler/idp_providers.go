@@ -19,7 +19,7 @@ import (
 type IDPProvider struct {
 	handler
 	systemDefaults systemdefaults.SystemDefaults
-	iamEvents      *eventsourcing.IamEventstore
+	iamEvents      *eventsourcing.IAMEventstore
 	orgEvents      *org_es.OrgEventstore
 }
 
@@ -37,13 +37,13 @@ func (m *IDPProvider) EventQuery() (*models.SearchQuery, error) {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.IamAggregate, org_es_model.OrgAggregate).
+		AggregateTypeFilter(model.IAMAggregate, org_es_model.OrgAggregate).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (m *IDPProvider) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
-	case model.IamAggregate, org_es_model.OrgAggregate:
+	case model.IAMAggregate, org_es_model.OrgAggregate:
 		err = m.processIdpProvider(event)
 	}
 	return err

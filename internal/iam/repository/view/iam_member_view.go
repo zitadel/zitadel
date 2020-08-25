@@ -9,38 +9,38 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func IamMemberByIDs(db *gorm.DB, table, orgID, userID string) (*model.IamMemberView, error) {
-	member := new(model.IamMemberView)
+func IAMMemberByIDs(db *gorm.DB, table, orgID, userID string) (*model.IAMMemberView, error) {
+	member := new(model.IAMMemberView)
 
-	iamIDQuery := &model.IamMemberSearchQuery{Key: iam_model.IamMemberSearchKeyIamID, Value: orgID, Method: global_model.SearchMethodEquals}
-	userIDQuery := &model.IamMemberSearchQuery{Key: iam_model.IamMemberSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals}
+	iamIDQuery := &model.IAMMemberSearchQuery{Key: iam_model.IAMMemberSearchKeyIamID, Value: orgID, Method: global_model.SearchMethodEquals}
+	userIDQuery := &model.IAMMemberSearchQuery{Key: iam_model.IAMMemberSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, iamIDQuery, userIDQuery)
 	err := query(db, member)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Ahq2s", "Errors.Iam.MemberNotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Ahq2s", "Errors.IAM.MemberNotExisting")
 	}
 	return member, err
 }
 
-func SearchIamMembers(db *gorm.DB, table string, req *iam_model.IamMemberSearchRequest) ([]*model.IamMemberView, uint64, error) {
-	members := make([]*model.IamMemberView, 0)
-	query := repository.PrepareSearchQuery(table, model.IamMemberSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
+func SearchIAMMembers(db *gorm.DB, table string, req *iam_model.IAMMemberSearchRequest) ([]*model.IAMMemberView, uint64, error) {
+	members := make([]*model.IAMMemberView, 0)
+	query := repository.PrepareSearchQuery(table, model.IAMMemberSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &members)
 	if err != nil {
 		return nil, 0, err
 	}
 	return members, count, nil
 }
-func IamMembersByUserID(db *gorm.DB, table string, userID string) ([]*model.IamMemberView, error) {
-	members := make([]*model.IamMemberView, 0)
-	queries := []*iam_model.IamMemberSearchQuery{
+func IAMMembersByUserID(db *gorm.DB, table string, userID string) ([]*model.IAMMemberView, error) {
+	members := make([]*model.IAMMemberView, 0)
+	queries := []*iam_model.IAMMemberSearchQuery{
 		{
-			Key:    iam_model.IamMemberSearchKeyUserID,
+			Key:    iam_model.IAMMemberSearchKeyUserID,
 			Value:  userID,
 			Method: global_model.SearchMethodEquals,
 		},
 	}
-	query := repository.PrepareSearchQuery(table, model.IamMemberSearchRequest{Queries: queries})
+	query := repository.PrepareSearchQuery(table, model.IAMMemberSearchRequest{Queries: queries})
 	_, err := query(db, &members)
 	if err != nil {
 		return nil, err
@@ -48,13 +48,13 @@ func IamMembersByUserID(db *gorm.DB, table string, userID string) ([]*model.IamM
 	return members, nil
 }
 
-func PutIamMember(db *gorm.DB, table string, role *model.IamMemberView) error {
+func PutIAMMember(db *gorm.DB, table string, role *model.IAMMemberView) error {
 	save := repository.PrepareSave(table)
 	return save(db, role)
 }
 
-func DeleteIamMember(db *gorm.DB, table, orgID, userID string) error {
-	member, err := IamMemberByIDs(db, table, orgID, userID)
+func DeleteIAMMember(db *gorm.DB, table, orgID, userID string) error {
+	member, err := IAMMemberByIDs(db, table, orgID, userID)
 	if err != nil {
 		return err
 	}

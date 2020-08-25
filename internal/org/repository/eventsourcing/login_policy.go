@@ -68,7 +68,7 @@ func LoginPolicyIDPProviderAddedAggregate(aggCreator *es_models.AggregateCreator
 			return nil, err
 		}
 		validationQuery := es_models.NewSearchQuery().
-			AggregateTypeFilter(model.OrgAggregate, iam_es_model.IamAggregate).
+			AggregateTypeFilter(model.OrgAggregate, iam_es_model.IAMAggregate).
 			AggregateIDsFilter(existing.AggregateID, iamID)
 
 		validation := checkExistingLoginPolicyIDPProviderValidation(provider)
@@ -157,7 +157,7 @@ func checkExistingLoginPolicyIDPProviderValidation(idpProvider *iam_es_model.IDP
 			}
 		}
 		if !exists {
-			return errors.ThrowPreconditionFailed(nil, "EVENT-Djlo9", "Errors.Iam.IdpNotExisting")
+			return errors.ThrowPreconditionFailed(nil, "EVENT-Djlo9", "Errors.IAM.IdpNotExisting")
 		}
 		for _, p := range idps {
 			if p.IDPConfigID == idpProvider.IDPConfigID {

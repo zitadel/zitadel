@@ -51,7 +51,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults) (*
 		return nil, err
 	}
 
-	iam, err := es_iam.StartIam(es_iam.IamConfig{
+	iam, err := es_iam.StartIAM(es_iam.IAMConfig{
 		Eventstore: es,
 		Cache:      conf.Eventstore.Cache,
 	}, systemDefaults)
@@ -77,13 +77,13 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults) (*
 			IamEvents: iam,
 		},
 		eventstore.IamRepo{
-			IamID:     systemDefaults.IamID,
-			IamEvents: iam,
+			IAMID:     systemDefaults.IamID,
+			IAMEvents: iam,
 		},
 		eventstore.TokenVerifierRepo{
 			//TODO: Add Token Verification Key
-			IamID:         systemDefaults.IamID,
-			IamEvents:     iam,
+			IAMID:         systemDefaults.IamID,
+			IAMEvents:     iam,
 			ProjectEvents: project,
 			View:          view,
 		},

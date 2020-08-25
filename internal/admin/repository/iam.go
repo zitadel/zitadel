@@ -5,15 +5,15 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
 
-type IamRepository interface {
-	SearchIamMembers(ctx context.Context, request *iam_model.IamMemberSearchRequest) (*iam_model.IamMemberSearchResponse, error)
-	AddIamMember(ctx context.Context, member *iam_model.IamMember) (*iam_model.IamMember, error)
-	ChangeIamMember(ctx context.Context, member *iam_model.IamMember) (*iam_model.IamMember, error)
-	RemoveIamMember(ctx context.Context, userID string) error
+type IAMRepository interface {
+	SearchIAMMembers(ctx context.Context, request *iam_model.IAMMemberSearchRequest) (*iam_model.IAMMemberSearchResponse, error)
+	AddIAMMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error)
+	ChangeIAMMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error)
+	RemoveIAMMember(ctx context.Context, userID string) error
 
-	GetIamMemberRoles() []string
+	GetIAMMemberRoles() []string
 
-	SearchIdpConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error)
+	SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error)
 	IDPConfigByID(ctx context.Context, id string) (*iam_model.IDPConfigView, error)
 	AddOIDCIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error)
 	ChangeIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error)

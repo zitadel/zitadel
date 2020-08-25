@@ -29,13 +29,13 @@ func (m *IDPConfig) EventQuery() (*models.SearchQuery, error) {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.IamAggregate).
+		AggregateTypeFilter(model.IAMAggregate).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (m *IDPConfig) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
-	case model.IamAggregate:
+	case model.IAMAggregate:
 		err = m.processIDPConfig(event)
 	}
 	return err

@@ -35,7 +35,7 @@ type EsRepository struct {
 	eventstore.UserRepo
 	eventstore.UserGrantRepo
 	eventstore.PolicyRepo
-	eventstore.IamRepository
+	eventstore.IAMRepository
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRepository, error) {
@@ -83,7 +83,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 	}
 	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain}, systemDefaults)
 
-	iam, err := es_iam.StartIam(es_iam.IamConfig{
+	iam, err := es_iam.StartIAM(es_iam.IAMConfig{
 		Eventstore: es,
 		Cache:      conf.Eventstore.Cache,
 	}, systemDefaults)
@@ -100,7 +100,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 		UserRepo:      eventstore.UserRepo{conf.SearchLimit, user, policy, org, view},
 		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
 		PolicyRepo:    eventstore.PolicyRepo{policy},
-		IamRepository: eventstore.IamRepository{iam},
+		IAMRepository: eventstore.IAMRepository{iam},
 	}, nil
 }
 

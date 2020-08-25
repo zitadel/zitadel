@@ -28,7 +28,7 @@ type OrgEventstore struct {
 	idGenerator           id.Generator
 	verificationAlgorithm crypto.EncryptionAlgorithm
 	verificationGenerator crypto.Generator
-	defaultOrgIamPolicy   *org_model.OrgIamPolicy
+	defaultOrgIamPolicy   *org_model.OrgIAMPolicy
 	verificationValidator func(domain string, token string, verifier string, checkType http_utils.CheckType) error
 	secretCrypto          crypto.Crypto
 }
@@ -465,7 +465,7 @@ func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.
 	return es_sdk.Push(ctx, es.PushAggregates, repoMember.AppendEvents, orgAggregate)
 }
 
-func (es *OrgEventstore) GetOrgIamPolicy(ctx context.Context, orgID string) (*org_model.OrgIamPolicy, error) {
+func (es *OrgEventstore) GetOrgIAMPolicy(ctx context.Context, orgID string) (*org_model.OrgIAMPolicy, error) {
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
@@ -476,7 +476,7 @@ func (es *OrgEventstore) GetOrgIamPolicy(ctx context.Context, orgID string) (*or
 	return es.defaultOrgIamPolicy, nil
 }
 
-func (es *OrgEventstore) AddOrgIamPolicy(ctx context.Context, policy *org_model.OrgIamPolicy) (*org_model.OrgIamPolicy, error) {
+func (es *OrgEventstore) AddOrgIAMPolicy(ctx context.Context, policy *org_model.OrgIAMPolicy) (*org_model.OrgIAMPolicy, error) {
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
 	if err != nil {
 		return nil, err
@@ -485,8 +485,8 @@ func (es *OrgEventstore) AddOrgIamPolicy(ctx context.Context, policy *org_model.
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-7Usj3", "Errors.Org.PolicyAlreadyExists")
 	}
 	repoOrg := model.OrgFromModel(existing)
-	repoPolicy := model.OrgIamPolicyFromModel(policy)
-	orgAggregate := OrgIamPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPolicy)
+	repoPolicy := model.OrgIAMPolicyFromModel(policy)
+	orgAggregate := OrgIAMPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -495,10 +495,10 @@ func (es *OrgEventstore) AddOrgIamPolicy(ctx context.Context, policy *org_model.
 		return nil, err
 	}
 
-	return model.OrgIamPolicyToModel(repoOrg.OrgIamPolicy), nil
+	return model.OrgIAMPolicyToModel(repoOrg.OrgIamPolicy), nil
 }
 
-func (es *OrgEventstore) ChangeOrgIamPolicy(ctx context.Context, policy *org_model.OrgIamPolicy) (*org_model.OrgIamPolicy, error) {
+func (es *OrgEventstore) ChangeOrgIAMPolicy(ctx context.Context, policy *org_model.OrgIAMPolicy) (*org_model.OrgIAMPolicy, error) {
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
 	if err != nil {
 		return nil, err
@@ -507,8 +507,8 @@ func (es *OrgEventstore) ChangeOrgIamPolicy(ctx context.Context, policy *org_mod
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-8juSd", "Errors.Org.PolicyNotExisting")
 	}
 	repoOrg := model.OrgFromModel(existing)
-	repoPolicy := model.OrgIamPolicyFromModel(policy)
-	orgAggregate := OrgIamPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPolicy)
+	repoPolicy := model.OrgIAMPolicyFromModel(policy)
+	orgAggregate := OrgIAMPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -517,10 +517,10 @@ func (es *OrgEventstore) ChangeOrgIamPolicy(ctx context.Context, policy *org_mod
 		return nil, err
 	}
 
-	return model.OrgIamPolicyToModel(repoOrg.OrgIamPolicy), nil
+	return model.OrgIAMPolicyToModel(repoOrg.OrgIamPolicy), nil
 }
 
-func (es *OrgEventstore) RemoveOrgIamPolicy(ctx context.Context, orgID string) error {
+func (es *OrgEventstore) RemoveOrgIAMPolicy(ctx context.Context, orgID string) error {
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
 	if err != nil {
 		return err
@@ -690,7 +690,7 @@ func (es *OrgEventstore) ChangeIDPOIDCConfig(ctx context.Context, config *iam_mo
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-pso0s", "Errors.Org.IdpNoExisting")
 	}
 	if idp.Type != iam_model.IDPConfigTypeOIDC {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Fms8w", "Errors.Iam.IdpIsNotOIDC")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Fms8w", "Errors.IAM.IdpIsNotOIDC")
 	}
 	if config.ClientSecretString != "" {
 		err = idp.OIDCConfig.CryptSecret(es.secretCrypto)
@@ -813,7 +813,7 @@ func (es *OrgEventstore) PrepareRemoveIDPProviderFromLoginPolicy(ctx context.Con
 		return nil, nil, err
 	}
 	if _, m := existing.LoginPolicy.GetIdpProvider(provider.IdpConfigID); m == nil {
-		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-29skr", "Errors.Iam.LoginPolicy.IdpProviderNotExisting")
+		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-29skr", "Errors.IAM.LoginPolicy.IdpProviderNotExisting")
 	}
 	repoOrg := model.OrgFromModel(existing)
 	providerID := &iam_es_model.IDPProviderID{provider.IdpConfigID}
