@@ -28,6 +28,7 @@ const (
 	MemberTypeOrganisation
 	MemberTypeProject
 	MemberTypeProjectGrant
+	MemberTypeIam
 )
 
 type UserMembershipSearchRequest struct {
@@ -79,8 +80,8 @@ func (r *UserMembershipSearchRequest) GetSearchQuery(key UserMembershipSearchKey
 	return -1, nil
 }
 
-func (r *UserMembershipSearchRequest) AppendResourceOwnerQuery(orgID string) {
-	r.Queries = append(r.Queries, &UserMembershipSearchQuery{Key: UserMembershipSearchKeyResourceOwner, Method: model.SearchMethodEquals, Value: orgID})
+func (r *UserMembershipSearchRequest) AppendResourceOwnerAndIamQuery(orgID, iamID string) {
+	r.Queries = append(r.Queries, &UserMembershipSearchQuery{Key: UserMembershipSearchKeyResourceOwner, Method: model.SearchMethodIsOneOf, Value: []string{orgID, iamID}})
 }
 
 func (r *UserMembershipSearchRequest) AppendUserIDQuery(userID string) {

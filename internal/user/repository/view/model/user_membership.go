@@ -5,6 +5,7 @@ import (
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/user/model"
@@ -77,6 +78,11 @@ func (u *UserMembershipView) AppendEvent(event *models.Event) (err error) {
 	u.Sequence = event.Sequence
 
 	switch event.Type {
+	case iam_es_model.IamMemberAdded:
+		u.setRootData(event, model.MemberTypeIam)
+		err = u.setIamMemberData(event)
+	case iam_es_model.IamMemberChanged:
+		err = u.setIamMemberData(event)
 	case org_es_model.OrgMemberAdded:
 		u.setRootData(event, model.MemberTypeOrganisation)
 		err = u.setOrgMemberData(event)
@@ -102,6 +108,17 @@ func (u *UserMembershipView) setRootData(event *models.Event, memberType model.M
 	u.ObjectID = event.AggregateID
 	u.ResourceOwner = event.ResourceOwner
 	u.MemberType = int32(memberType)
+}
+
+func (u *UserMembershipView) setIamMemberData(event *models.Event) error {
+	member := new(iam_es_model.IamMember)
+	if err := json.Unmarshal(event.Data, member); err != nil {
+		logging.Log("MODEL-Ec9sf").WithError(err).Error("could not unmarshal event data")
+		return caos_errs.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
+	}
+	u.UserID = member.UserID
+	u.Roles = member.Roles
+	return nil
 }
 
 func (u *UserMembershipView) setOrgMemberData(event *models.Event) error {
