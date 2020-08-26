@@ -2,6 +2,7 @@ function disableSubmit(checks, button) {
     let form = document.getElementsByTagName('form')[0];
     let inputs = form.getElementsByTagName('input');
     for (i = 0; i < inputs.length; i++) {
+        button.disabled = true;
         inputs[i].addEventListener('input', function () {
             if (checks != undefined) {
                 if (checks() === false) {

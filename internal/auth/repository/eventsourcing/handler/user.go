@@ -83,7 +83,8 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 			return err
 		}
 		err = user.AppendEvent(event)
-	case es_model.DomainClaimed:
+	case es_model.DomainClaimed,
+		es_model.UserUserNameChanged:
 		user, err = u.view.UserByID(event.AggregateID)
 		if err != nil {
 			return err

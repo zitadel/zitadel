@@ -164,6 +164,7 @@ Errors:
     NotMatchingUserID: User and user in authrequest don't match
     UserIDMissing: UserID is empty
     Invalid: Invalid userdata
+    DomainNotAllowedAsUsername: Domain is already reserved and cannot be used
     Password:
       ConfirmationWrong: Passwordconfirmation is wrong
       Empty: Password is empty
