@@ -78,10 +78,10 @@ func (u *UserMembershipView) AppendEvent(event *models.Event) (err error) {
 	u.Sequence = event.Sequence
 
 	switch event.Type {
-	case iam_es_model.IamMemberAdded:
+	case iam_es_model.IAMMemberAdded:
 		u.setRootData(event, model.MemberTypeIam)
 		err = u.setIamMemberData(event)
-	case iam_es_model.IamMemberChanged:
+	case iam_es_model.IAMMemberChanged:
 		err = u.setIamMemberData(event)
 	case org_es_model.OrgMemberAdded:
 		u.setRootData(event, model.MemberTypeOrganisation)
@@ -111,7 +111,7 @@ func (u *UserMembershipView) setRootData(event *models.Event, memberType model.M
 }
 
 func (u *UserMembershipView) setIamMemberData(event *models.Event) error {
-	member := new(iam_es_model.IamMember)
+	member := new(iam_es_model.IAMMember)
 	if err := json.Unmarshal(event.Data, member); err != nil {
 		logging.Log("MODEL-Ec9sf").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")

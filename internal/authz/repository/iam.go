@@ -5,7 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/iam/model"
 )
 
-type IamRepository interface {
+type IAMRepository interface {
 	Health(ctx context.Context) error
-	IamByID(ctx context.Context, id string) (*model.Iam, error)
+	IAMByID(ctx context.Context, id string) (*model.IAM, error)
 }

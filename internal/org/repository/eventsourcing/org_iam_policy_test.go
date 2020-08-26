@@ -20,7 +20,7 @@ func TestOrgIamPolicyAddedAggregates(t *testing.T) {
 		ctx        context.Context
 		aggCreator *es_models.AggregateCreator
 		org        *model.Org
-		policy     *model.OrgIamPolicy
+		policy     *model.OrgIAMPolicy
 	}
 	tests := []struct {
 		name string
@@ -48,21 +48,21 @@ func TestOrgIamPolicyAddedAggregates(t *testing.T) {
 						Sequence:    5,
 					},
 				},
-				policy: &model.OrgIamPolicy{
+				policy: &model.OrgIAMPolicy{
 					Description:           "description",
 					UserLoginMustBeDomain: true,
 				},
 			},
 			res: res{
 				eventsCount: 1,
-				eventType:   model.OrgIamPolicyAdded,
+				eventType:   model.OrgIAMPolicyAdded,
 				isErr:       nil,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg := OrgIamPolicyAddedAggregate(tt.args.aggCreator, tt.args.org, tt.args.policy)
+			agg := OrgIAMPolicyAddedAggregate(tt.args.aggCreator, tt.args.org, tt.args.policy)
 			got, err := agg(tt.args.ctx)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got %T: %v", err, err)
@@ -71,10 +71,10 @@ func TestOrgIamPolicyAddedAggregates(t *testing.T) {
 				t.Errorf("wrong error got %T: %v", err, err)
 			}
 			if tt.res.isErr == nil && got.Events[0].Type != tt.res.eventType {
-				t.Errorf("OrgIamPolicyAddedAggregate() event type = %v, wanted count %v", got.Events[0].Type, tt.res.eventType)
+				t.Errorf("OrgIAMPolicyAddedAggregate() event type = %v, wanted count %v", got.Events[0].Type, tt.res.eventType)
 			}
 			if tt.res.isErr == nil && len(got.Events) != tt.res.eventsCount {
-				t.Errorf("OrgIamPolicyAddedAggregate() event count = %d, wanted count %d", len(got.Events), tt.res.eventsCount)
+				t.Errorf("OrgIAMPolicyAddedAggregate() event count = %d, wanted count %d", len(got.Events), tt.res.eventsCount)
 			}
 		})
 	}
@@ -90,7 +90,7 @@ func TestOrgIamPolicyChangedAggregates(t *testing.T) {
 		ctx        context.Context
 		aggCreator *es_models.AggregateCreator
 		org        *model.Org
-		policy     *model.OrgIamPolicy
+		policy     *model.OrgIAMPolicy
 	}
 	tests := []struct {
 		name string
@@ -117,19 +117,19 @@ func TestOrgIamPolicyChangedAggregates(t *testing.T) {
 						AggregateID: "sdaf",
 						Sequence:    5,
 					},
-					OrgIamPolicy: &model.OrgIamPolicy{
+					OrgIamPolicy: &model.OrgIAMPolicy{
 						Description:           "description",
 						UserLoginMustBeDomain: true,
 					},
 				},
-				policy: &model.OrgIamPolicy{
+				policy: &model.OrgIAMPolicy{
 					Description:           "description",
 					UserLoginMustBeDomain: false,
 				},
 			},
 			res: res{
 				eventsCount: 1,
-				eventType:   model.OrgIamPolicyChanged,
+				eventType:   model.OrgIAMPolicyChanged,
 				isErr:       nil,
 			},
 		},
@@ -143,12 +143,12 @@ func TestOrgIamPolicyChangedAggregates(t *testing.T) {
 						AggregateID: "sdaf",
 						Sequence:    5,
 					},
-					OrgIamPolicy: &model.OrgIamPolicy{
+					OrgIamPolicy: &model.OrgIAMPolicy{
 						Description:           "description",
 						UserLoginMustBeDomain: true,
 					},
 				},
-				policy: &model.OrgIamPolicy{
+				policy: &model.OrgIAMPolicy{
 					Description:           "description",
 					UserLoginMustBeDomain: true,
 				},
@@ -160,7 +160,7 @@ func TestOrgIamPolicyChangedAggregates(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg := OrgIamPolicyChangedAggregate(tt.args.aggCreator, tt.args.org, tt.args.policy)
+			agg := OrgIAMPolicyChangedAggregate(tt.args.aggCreator, tt.args.org, tt.args.policy)
 			got, err := agg(tt.args.ctx)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got %T: %v", err, err)
@@ -169,10 +169,10 @@ func TestOrgIamPolicyChangedAggregates(t *testing.T) {
 				t.Errorf("wrong error got %T: %v", err, err)
 			}
 			if tt.res.isErr == nil && got.Events[0].Type != tt.res.eventType {
-				t.Errorf("OrgIamPolicyChangedAggregate() event type = %v, wanted count %v", got.Events[0].Type, tt.res.eventType)
+				t.Errorf("OrgIAMPolicyChangedAggregate() event type = %v, wanted count %v", got.Events[0].Type, tt.res.eventType)
 			}
 			if tt.res.isErr == nil && len(got.Events) != tt.res.eventsCount {
-				t.Errorf("OrgIamPolicyChangedAggregate() event count = %d, wanted count %d", len(got.Events), tt.res.eventsCount)
+				t.Errorf("OrgIAMPolicyChangedAggregate() event count = %d, wanted count %d", len(got.Events), tt.res.eventsCount)
 			}
 		})
 	}
@@ -204,7 +204,7 @@ func TestOrgIamPolicyRemovedAggregates(t *testing.T) {
 						AggregateID: "sdaf",
 						Sequence:    5,
 					},
-					OrgIamPolicy: &model.OrgIamPolicy{
+					OrgIamPolicy: &model.OrgIAMPolicy{
 						Description:           "description",
 						UserLoginMustBeDomain: true,
 					},
@@ -212,7 +212,7 @@ func TestOrgIamPolicyRemovedAggregates(t *testing.T) {
 			},
 			res: res{
 				eventsCount: 1,
-				eventType:   model.OrgIamPolicyRemoved,
+				eventType:   model.OrgIAMPolicyRemoved,
 				isErr:       nil,
 			},
 		},
@@ -228,10 +228,10 @@ func TestOrgIamPolicyRemovedAggregates(t *testing.T) {
 				t.Errorf("wrong error got %T: %v", err, err)
 			}
 			if tt.res.isErr == nil && got.Events[0].Type != tt.res.eventType {
-				t.Errorf("OrgIamPolicyChangedAggregate() event type = %v, wanted count %v", got.Events[0].Type, tt.res.eventType)
+				t.Errorf("OrgIAMPolicyChangedAggregate() event type = %v, wanted count %v", got.Events[0].Type, tt.res.eventType)
 			}
 			if tt.res.isErr == nil && len(got.Events) != tt.res.eventsCount {
-				t.Errorf("OrgIamPolicyChangedAggregate() event count = %d, wanted count %d", len(got.Events), tt.res.eventsCount)
+				t.Errorf("OrgIAMPolicyChangedAggregate() event count = %d, wanted count %d", len(got.Events), tt.res.eventsCount)
 			}
 		})
 	}

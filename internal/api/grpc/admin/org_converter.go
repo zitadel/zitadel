@@ -269,7 +269,7 @@ func orgQueryMethodToModel(method admin.OrgSearchMethod) model.SearchMethod {
 	}
 }
 
-func orgIamPolicyFromModel(policy *org_model.OrgIamPolicy) *admin.OrgIamPolicy {
+func orgIamPolicyFromModel(policy *org_model.OrgIAMPolicy) *admin.OrgIamPolicy {
 	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
 	logging.Log("GRPC-ush36").OnError(err).Debug("unable to get timestamp from time")
 
@@ -286,8 +286,8 @@ func orgIamPolicyFromModel(policy *org_model.OrgIamPolicy) *admin.OrgIamPolicy {
 	}
 }
 
-func orgIamPolicyRequestToModel(policy *admin.OrgIamPolicyRequest) *org_model.OrgIamPolicy {
-	return &org_model.OrgIamPolicy{
+func orgIamPolicyRequestToModel(policy *admin.OrgIamPolicyRequest) *org_model.OrgIAMPolicy {
+	return &org_model.OrgIAMPolicy{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: policy.OrgId,
 		},

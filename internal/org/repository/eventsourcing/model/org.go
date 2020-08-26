@@ -2,6 +2,8 @@ package model
 
 import (
 	"encoding/json"
+	"github.com/caos/zitadel/internal/iam/model"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -18,23 +20,30 @@ type Org struct {
 	Name  string `json:"name,omitempty"`
 	State int32  `json:"-"`
 
-	Domains      []*OrgDomain  `json:"-"`
-	Members      []*OrgMember  `json:"-"`
-	OrgIamPolicy *OrgIamPolicy `json:"-"`
+	Domains      []*OrgDomain              `json:"-"`
+	Members      []*OrgMember              `json:"-"`
+	OrgIamPolicy *OrgIAMPolicy             `json:"-"`
+	LoginPolicy  *iam_es_model.LoginPolicy `json:"-"`
+	IDPs         []*iam_es_model.IDPConfig `json:"-"`
 }
 
 func OrgFromModel(org *org_model.Org) *Org {
 	members := OrgMembersFromModel(org.Members)
 	domains := OrgDomainsFromModel(org.Domains)
+	idps := iam_es_model.IDPConfigsFromModel(org.IDPs)
 	converted := &Org{
 		ObjectRoot: org.ObjectRoot,
 		Name:       org.Name,
 		State:      int32(org.State),
 		Domains:    domains,
 		Members:    members,
+		IDPs:       idps,
 	}
 	if org.OrgIamPolicy != nil {
-		converted.OrgIamPolicy = OrgIamPolicyFromModel(org.OrgIamPolicy)
+		converted.OrgIamPolicy = OrgIAMPolicyFromModel(org.OrgIamPolicy)
+	}
+	if org.LoginPolicy != nil {
+		converted.LoginPolicy = iam_es_model.LoginPolicyFromModel(org.LoginPolicy)
 	}
 	return converted
 }
@@ -46,9 +55,13 @@ func OrgToModel(org *Org) *org_model.Org {
 		State:      org_model.OrgState(org.State),
 		Domains:    OrgDomainsToModel(org.Domains),
 		Members:    OrgMembersToModel(org.Members),
+		IDPs:       iam_es_model.IDPConfigsToModel(org.IDPs),
 	}
 	if org.OrgIamPolicy != nil {
-		converted.OrgIamPolicy = OrgIamPolicyToModel(org.OrgIamPolicy)
+		converted.OrgIamPolicy = OrgIAMPolicyToModel(org.OrgIamPolicy)
+	}
+	if org.LoginPolicy != nil {
+		converted.LoginPolicy = iam_es_model.LoginPolicyToModel(org.LoginPolicy)
 	}
 	return converted
 }
@@ -71,16 +84,16 @@ func (o *Org) AppendEvents(events ...*es_models.Event) error {
 	return nil
 }
 
-func (o *Org) AppendEvent(event *es_models.Event) error {
+func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 	switch event.Type {
 	case OrgAdded:
 		*o = Org{}
-		err := o.setData(event)
+		err = o.setData(event)
 		if err != nil {
 			return err
 		}
 	case OrgChanged:
-		err := o.setData(event)
+		err = o.setData(event)
 		if err != nil {
 			return err
 		}
@@ -112,25 +125,50 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 		}
 		o.removeMember(member.UserID)
 	case OrgDomainAdded:
-		o.appendAddDomainEvent(event)
+		err = o.appendAddDomainEvent(event)
 	case OrgDomainVerificationAdded:
-		o.appendVerificationDomainEvent(event)
+		err = o.appendVerificationDomainEvent(event)
 	case OrgDomainVerified:
-		o.appendVerifyDomainEvent(event)
+		err = o.appendVerifyDomainEvent(event)
 	case OrgDomainPrimarySet:
-		o.appendPrimaryDomainEvent(event)
+		err = o.appendPrimaryDomainEvent(event)
 	case OrgDomainRemoved:
-		o.appendRemoveDomainEvent(event)
-	case OrgIamPolicyAdded:
-		o.appendAddOrgIamPolicyEvent(event)
-	case OrgIamPolicyChanged:
-		o.appendChangeOrgIamPolicyEvent(event)
-	case OrgIamPolicyRemoved:
-		o.appendRemoveOrgIamPolicyEvent()
+		err = o.appendRemoveDomainEvent(event)
+	case OrgIAMPolicyAdded:
+		err = o.appendAddOrgIAMPolicyEvent(event)
+	case OrgIAMPolicyChanged:
+		err = o.appendChangeOrgIAMPolicyEvent(event)
+	case OrgIAMPolicyRemoved:
+		o.appendRemoveOrgIAMPolicyEvent()
+	case IDPConfigAdded:
+		err = o.appendAddIDPConfigEvent(event)
+	case IDPConfigChanged:
+		err = o.appendChangeIDPConfigEvent(event)
+	case IDPConfigRemoved:
+		err = o.appendRemoveIDPConfigEvent(event)
+	case IDPConfigDeactivated:
+		err = o.appendIDPConfigStateEvent(event, model.IDPConfigStateInactive)
+	case IDPConfigReactivated:
+		err = o.appendIDPConfigStateEvent(event, model.IDPConfigStateActive)
+	case OIDCIDPConfigAdded:
+		err = o.appendAddOIDCIDPConfigEvent(event)
+	case OIDCIDPConfigChanged:
+		err = o.appendChangeOIDCIDPConfigEvent(event)
+	case LoginPolicyAdded:
+		err = o.appendAddLoginPolicyEvent(event)
+	case LoginPolicyChanged:
+		err = o.appendChangeLoginPolicyEvent(event)
+	case LoginPolicyRemoved:
+		o.appendRemoveLoginPolicyEvent(event)
+	case LoginPolicyIDPProviderAdded:
+		err = o.appendAddIdpProviderToLoginPolicyEvent(event)
+	case LoginPolicyIDPProviderRemoved:
+		err = o.appendRemoveIdpProviderFromLoginPolicyEvent(event)
 	}
-
+	if err != nil {
+		return err
+	}
 	o.ObjectRoot.AppendEvent(event)
-
 	return nil
 }
 

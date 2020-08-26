@@ -69,6 +69,15 @@ Errors:
     UserIDMissing: User ID missing
     PolicyAlreadyExists: Policy alredy exists
     PolicyNotExisting: Policy doesn't exist
+    IdpInvalid: IDP configuration is invalid
+    IdpNotExisting: IDP configuration does not exist
+    OIDCConfigInvalid: OIDC IDP configuration is invalid
+    IdpIsNotOIDC: IDP configuration is not of type oidc
+    LoginPolicy:
+      NotExisting: Login Policy not existig
+      AlreadyExists: Login Policy already exists
+      IdpProviderAlreadyExisting: Idp Provider already existing
+      IdpProviderNotExisting: Idp Provider not existing
   Project:
     ProjectIDMissing: Project Id missing
     AlreadyExists: Project already exists on organisation
@@ -109,6 +118,17 @@ Errors:
     IDMissing: Id missing
     GlobalOrgMissing: Global organisation missing
     IamProjectIDMisisng: Iam project id missing
+    IdpInvalid: IDP configuration is invalid
+    IdpNotExisting: IDP configuration does not exist
+    OIDCConfigInvalid: OIDC IDP configuration is invalid
+    IdpIsNotOIDC: IDP configuration is not of type oidc
+    LoginPolicyInvalid: Login Policy is invalid
+    IdpProviderInvalid: Idp Provider is invalid
+    LoginPolicy:
+      NotExisting: Default Login Policy not existig
+      AlreadyExists: Default Login Policy already exists
+      IdpProviderAlreadyExisting: Idp Provider already existing
+      IdpProviderNotExisting: Idp Provider not existing
   Policy:
     AlreadyExists: Policy already exists
   UserGrant:
@@ -225,6 +245,28 @@ EventTypes:
         added: System policy added
         changed: System policy changed
         removed: System policy removed
+    idp:
+      config:
+        added: IDP configuration added
+        changed: IDP configuration changed
+        removed: IDP configuration removed
+        deactivated: IDP configuration deactivated
+        reactivated: IDP configuration reactivated
+      oidc:
+        config:
+          added: OIDC IDP configuration added
+          changed: OIDC IDP configuration changed
+      saml:
+        config:
+          added: SAML IDP configuration added
+          changed: SAML IDP configuration changed
+    policy:
+      login:
+        added: Login Policy added
+        changed: Login Policy changed
+        idpprovider:
+          added: Idp Provider added to Login Policy
+          removed: Idp Provider removed from Login Policy
   project:
     added: Project added
     changed: Project changed
@@ -293,6 +335,28 @@ EventTypes:
       added: ZITADEL member added
       changed: ZITADEL member changed
       removed: ZITADEL member removed
+    idp:
+      config:
+        added: IDP configuration added
+        changed: IDP configuration changed
+        removed: IDP configuration removed
+        deactivated: IDP configuration deactivated
+        reactivated: IDP configuration reactivated
+      oidc:
+        config:
+          added: OIDC IDP configuration added
+          changed: OIDC IDP configuration changed
+      saml:
+        config:
+          added: SAML IDP configuration added
+          changed: SAML IDP configuration changed
+    policy:
+      login:
+        added: Default Login Policy added
+        changed: Default Login Policy changed
+        idpprovider:
+          added: Idp Provider added to Default Login Policy
+          removed: Idp Provider removed from Default Login Policy
   key_pair:
     added: Key pair added
 Application:

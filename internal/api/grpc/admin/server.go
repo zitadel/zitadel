@@ -18,7 +18,7 @@ var _ admin.AdminServiceServer = (*Server)(nil)
 
 type Server struct {
 	org           repository.OrgRepository
-	iam           repository.IamRepository
+	iam           repository.IAMRepository
 	administrator repository.AdministratorRepository
 	repo          repository.Repository
 }

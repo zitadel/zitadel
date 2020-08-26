@@ -109,7 +109,7 @@ func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
 	if err != nil {
 		return err
 	}
-	policy, err := u.orgEvents.GetOrgIamPolicy(context.Background(), user.ResourceOwner)
+	policy, err := u.orgEvents.GetOrgIAMPolicy(context.Background(), user.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -122,9 +122,9 @@ func (u *User) ProcessOrg(event *models.Event) (err error) {
 	switch event.Type {
 	case org_es_model.OrgDomainVerified,
 		org_es_model.OrgDomainRemoved,
-		org_es_model.OrgIamPolicyAdded,
-		org_es_model.OrgIamPolicyChanged,
-		org_es_model.OrgIamPolicyRemoved:
+		org_es_model.OrgIAMPolicyAdded,
+		org_es_model.OrgIAMPolicyChanged,
+		org_es_model.OrgIAMPolicyRemoved:
 		return u.fillLoginNamesOnOrgUsers(event)
 	case org_es_model.OrgDomainPrimarySet:
 		return u.fillPreferredLoginNamesOnOrgUsers(event)
@@ -138,7 +138,7 @@ func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
 	if err != nil {
 		return err
 	}
-	policy, err := u.orgEvents.GetOrgIamPolicy(context.Background(), event.ResourceOwner)
+	policy, err := u.orgEvents.GetOrgIAMPolicy(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -157,7 +157,7 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
 	if err != nil {
 		return err
 	}
-	policy, err := u.orgEvents.GetOrgIamPolicy(context.Background(), event.ResourceOwner)
+	policy, err := u.orgEvents.GetOrgIAMPolicy(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
 	}

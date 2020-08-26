@@ -6,63 +6,63 @@ import (
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
-type IamMemberSearchRequest iam_model.IamMemberSearchRequest
-type IamMemberSearchQuery iam_model.IamMemberSearchQuery
-type IamMemberSearchKey iam_model.IamMemberSearchKey
+type IAMMemberSearchRequest iam_model.IAMMemberSearchRequest
+type IAMMemberSearchQuery iam_model.IAMMemberSearchQuery
+type IAMMemberSearchKey iam_model.IAMMemberSearchKey
 
-func (req IamMemberSearchRequest) GetLimit() uint64 {
+func (req IAMMemberSearchRequest) GetLimit() uint64 {
 	return req.Limit
 }
 
-func (req IamMemberSearchRequest) GetOffset() uint64 {
+func (req IAMMemberSearchRequest) GetOffset() uint64 {
 	return req.Offset
 }
 
-func (req IamMemberSearchRequest) GetSortingColumn() repository.ColumnKey {
-	if req.SortingColumn == iam_model.IamMemberSearchKeyUnspecified {
+func (req IAMMemberSearchRequest) GetSortingColumn() repository.ColumnKey {
+	if req.SortingColumn == iam_model.IAMMemberSearchKeyUnspecified {
 		return nil
 	}
-	return IamMemberSearchKey(req.SortingColumn)
+	return IAMMemberSearchKey(req.SortingColumn)
 }
 
-func (req IamMemberSearchRequest) GetAsc() bool {
+func (req IAMMemberSearchRequest) GetAsc() bool {
 	return req.Asc
 }
 
-func (req IamMemberSearchRequest) GetQueries() []repository.SearchQuery {
+func (req IAMMemberSearchRequest) GetQueries() []repository.SearchQuery {
 	result := make([]repository.SearchQuery, len(req.Queries))
 	for i, q := range req.Queries {
-		result[i] = IamMemberSearchQuery{Key: q.Key, Value: q.Value, Method: q.Method}
+		result[i] = IAMMemberSearchQuery{Key: q.Key, Value: q.Value, Method: q.Method}
 	}
 	return result
 }
 
-func (req IamMemberSearchQuery) GetKey() repository.ColumnKey {
-	return IamMemberSearchKey(req.Key)
+func (req IAMMemberSearchQuery) GetKey() repository.ColumnKey {
+	return IAMMemberSearchKey(req.Key)
 }
 
-func (req IamMemberSearchQuery) GetMethod() global_model.SearchMethod {
+func (req IAMMemberSearchQuery) GetMethod() global_model.SearchMethod {
 	return req.Method
 }
 
-func (req IamMemberSearchQuery) GetValue() interface{} {
+func (req IAMMemberSearchQuery) GetValue() interface{} {
 	return req.Value
 }
 
-func (key IamMemberSearchKey) ToColumnName() string {
-	switch iam_model.IamMemberSearchKey(key) {
-	case iam_model.IamMemberSearchKeyEmail:
-		return IamMemberKeyEmail
-	case iam_model.IamMemberSearchKeyFirstName:
-		return IamMemberKeyFirstName
-	case iam_model.IamMemberSearchKeyLastName:
-		return IamMemberKeyLastName
-	case iam_model.IamMemberSearchKeyUserName:
-		return IamMemberKeyUserName
-	case iam_model.IamMemberSearchKeyUserID:
-		return IamMemberKeyUserID
-	case iam_model.IamMemberSearchKeyIamID:
-		return IamMemberKeyIamID
+func (key IAMMemberSearchKey) ToColumnName() string {
+	switch iam_model.IAMMemberSearchKey(key) {
+	case iam_model.IAMMemberSearchKeyEmail:
+		return IAMMemberKeyEmail
+	case iam_model.IAMMemberSearchKeyFirstName:
+		return IAMMemberKeyFirstName
+	case iam_model.IAMMemberSearchKeyLastName:
+		return IAMMemberKeyLastName
+	case iam_model.IAMMemberSearchKeyUserName:
+		return IAMMemberKeyUserName
+	case iam_model.IAMMemberSearchKeyUserID:
+		return IAMMemberKeyUserID
+	case iam_model.IAMMemberSearchKeyIamID:
+		return IAMMemberKeyIamID
 	default:
 		return ""
 	}
