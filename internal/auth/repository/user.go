@@ -21,6 +21,9 @@ type UserRepository interface {
 	VerifyEmail(ctx context.Context, userID, code string) error
 	ResendEmailVerificationMail(ctx context.Context, userID string) error
 
+	VerifyInitCode(ctx context.Context, userID, code, password string) error
+	ResendInitVerificationMail(ctx context.Context, userID string) error
+
 	AddMfaOTP(ctx context.Context, userID string) (*model.OTP, error)
 	VerifyMfaOTPSetup(ctx context.Context, userID, code string) error
 
@@ -57,6 +60,8 @@ type myUserRepo interface {
 	AddMyMfaOTP(ctx context.Context) (*model.OTP, error)
 	VerifyMyMfaOTPSetup(ctx context.Context, code string) error
 	RemoveMyMfaOTP(ctx context.Context) error
+
+	ChangeMyUsername(ctx context.Context, username string) error
 
 	MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error)
 }

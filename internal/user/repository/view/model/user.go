@@ -189,6 +189,9 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	case es_model.DomainClaimed:
 		u.UsernameChangeRequired = true
 		err = u.setData(event)
+	case es_model.UserUserNameChanged:
+		u.UsernameChangeRequired = false
+		err = u.setData(event)
 	case es_model.UserEmailChanged:
 		u.IsEmailVerified = false
 		err = u.setData(event)

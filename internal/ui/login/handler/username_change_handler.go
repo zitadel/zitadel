@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	tmplChangeUsername = "changeusername"
+	tmplChangeUsername     = "changeusername"
+	tmplChangeUsernameDone = "changeusernamedone"
 )
 
 type changeUsernameData struct {
@@ -23,17 +24,23 @@ func (l *Login) renderChangeUsername(w http.ResponseWriter, r *http.Request, aut
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplChangeUsername], data, nil)
 }
 
-/*func (l *Login) handleChangeUsername(w http.ResponseWriter, r *http.Request) {
+func (l *Login) handleChangeUsername(w http.ResponseWriter, r *http.Request) {
 	data := new(changeUsernameData)
 	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	err = l.authRepo.ChangePassword(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.OldPassword, data.NewPassword)
+	err = l.authRepo.ChangeUsername(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.Username)
 	if err != nil {
-		l.renderChangePassword(w, r, authReq, err)
+		l.renderChangeUsername(w, r, authReq, err)
 		return
 	}
-	l.renderChangePasswordDone(w, r, authReq)
-}*/
+	l.renderChangeUsernameDone(w, r, authReq)
+}
+
+func (l *Login) renderChangeUsernameDone(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
+	var errType, errMessage string
+	data := l.getUserData(r, authReq, "Username Change Done", errType, errMessage)
+	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplChangeUsernameDone], data, nil)
+}

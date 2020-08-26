@@ -26,6 +26,10 @@ UsernameChange:
   Description: Set your new username
   Username: Username
 
+UsernameChangeDone:
+  Title: Username changed
+  Description: Your username was changed successfully.
+
 MfaVerify:
   Title: Verify Multificator
   Description: Verify your multifactor

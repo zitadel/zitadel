@@ -54,6 +54,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		tmplLogoutDone:         "logout_done.html",
 		tmplRegisterOrg:        "register_org.html",
 		tmplChangeUsername:     "change_username.html",
+		tmplChangeUsernameDone: "change_username_done.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {

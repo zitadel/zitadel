@@ -69,6 +69,10 @@ func (s *Server) UpdateMyUserProfile(ctx context.Context, request *auth.UpdateUs
 	return profileFromModel(profile), nil
 }
 
+func (s *Server) ChangeMyUserName(ctx context.Context, request *auth.ChangeUserNameRequest) (*empty.Empty, error) {
+	return &empty.Empty{}, s.repo.ChangeMyUsername(ctx, request.UserName)
+}
+
 func (s *Server) ChangeMyUserEmail(ctx context.Context, request *auth.UpdateUserEmailRequest) (*auth.UserEmail, error) {
 	email, err := s.repo.ChangeMyEmail(ctx, updateEmailToModel(ctx, request))
 	if err != nil {

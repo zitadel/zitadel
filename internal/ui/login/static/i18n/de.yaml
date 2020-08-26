@@ -26,6 +26,10 @@ UsernameChange:
   Description: Wähle deinen neuen Benutzernamen
   Username: Benutzernamen
 
+UsernameChangeDone:
+  Title: Username geändert
+  Description: Der Username wurde erfolgreich geändert.
+
 MfaVerify:
   Title: Multifaktor verifizieren
   Description: Verifiziere deinen Multifaktor

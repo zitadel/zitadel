@@ -41,6 +41,7 @@ func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.M
 	router.HandleFunc(EndpointLoginName, login.handleLoginName).Methods(http.MethodGet)
 	router.HandleFunc(EndpointLoginName, login.handleLoginNameCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointUserSelection, login.handleSelectUser).Methods(http.MethodPost)
+	router.HandleFunc(EndpointChangeUsername, login.handleChangeUsername).Methods(http.MethodPost)
 	router.HandleFunc(EndpointPassword, login.handlePasswordCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointInitPassword, login.handleInitPassword).Methods(http.MethodGet)
 	router.HandleFunc(EndpointInitPassword, login.handleInitPasswordCheck).Methods(http.MethodPost)

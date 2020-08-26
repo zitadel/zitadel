@@ -206,6 +206,20 @@ func releasedUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.
 	return aggregate.SetPrecondition(UserUserNameUniqueQuery(username), isEventValidation(aggregate, model.UserUserNameReleased)), nil
 }
 
+func changeUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, oldUsername, username string, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
+	aggregates := make([]*es_models.Aggregate, 2)
+	var err error
+	aggregates[0], err = releasedUniqueUserNameAggregate(ctx, aggCreator, resourceOwner, oldUsername)
+	if err != nil {
+		return nil, err
+	}
+	aggregates[1], err = reservedUniqueUserNameAggregate(ctx, aggCreator, resourceOwner, username, userLoginMustBeDomain)
+	if err != nil {
+		return nil, err
+	}
+	return aggregates, nil
+}
+
 func reservedUniqueEmailAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, email string) (aggregate *es_models.Aggregate, err error) {
 	aggregate, err = aggCreator.NewAggregate(ctx, email, model.UserEmailAggregate, model.UserVersion, 0)
 	if resourceOwner != "" {
@@ -673,7 +687,10 @@ func SignOutAggregates(aggCreator *es_models.AggregateCreator, existingUsers []*
 }
 
 func DomainClaimedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existingUser *model.User, tempName string) ([]*es_models.Aggregate, error) {
-	aggregates := make([]*es_models.Aggregate, 3)
+	aggregates, err := changeUniqueUserNameAggregate(ctx, aggCreator, existingUser.ResourceOwner, existingUser.UserName, tempName, false)
+	if err != nil {
+		return nil, err
+	}
 	userAggregate, err := UserAggregateOverwriteContext(ctx, aggCreator, existingUser, existingUser.ResourceOwner, existingUser.AggregateID)
 	if err != nil {
 		return nil, err
@@ -682,28 +699,41 @@ func DomainClaimedAggregate(ctx context.Context, aggCreator *es_models.Aggregate
 	if err != nil {
 		return nil, err
 	}
-	aggregates[0] = userAggregate
-	releasedUniqueAggregate, err := releasedUniqueUserNameAggregate(ctx, aggCreator, existingUser.ResourceOwner, existingUser.UserName)
-	if err != nil {
-		return nil, err
-	}
-	aggregates[1] = releasedUniqueAggregate
-	reservedUniqueAggregate, err := reservedUniqueUserNameAggregate(ctx, aggCreator, existingUser.ResourceOwner, tempName, false)
-	if err != nil {
-		return nil, err
-	}
-	aggregates[2] = reservedUniqueAggregate
-	return aggregates, nil
+	return append(aggregates, userAggregate), nil
 }
 
-func DomainClaimedSentAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+func DomainClaimedSentAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
 		return agg.AppendEvent(model.DomainClaimedSent, nil)
 	}
+}
+
+func UsernameChangedAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, oldUsername string, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
+	aggregates, err := changeUniqueUserNameAggregate(ctx, aggCreator, user.ResourceOwner, oldUsername, user.UserName, userLoginMustBeDomain)
+	if err != nil {
+		return nil, err
+	}
+	userAggregate, err := UserAggregate(ctx, aggCreator, user)
+	if err != nil {
+		return nil, err
+	}
+	userAggregate, err = userAggregate.AppendEvent(model.UserUserNameChanged, map[string]interface{}{"userName": user.UserName})
+	if err != nil {
+		return nil, err
+	}
+	if !userLoginMustBeDomain {
+		validationQuery := es_models.NewSearchQuery().
+			AggregateTypeFilter(org_es_model.OrgAggregate).
+			AggregateIDsFilter()
+
+		validation := addUserNameValidation(user.UserName)
+		userAggregate.SetPrecondition(validationQuery, validation)
+	}
+	return append(aggregates, userAggregate), nil
 }
 
 func isEventValidation(aggregate *es_models.Aggregate, eventType es_models.EventType) func(...*es_models.Event) error {

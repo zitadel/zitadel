@@ -44,8 +44,9 @@ const (
 	UserPhoneCodeAdded          models.EventType = "user.phone.code.added"
 	UserPhoneCodeSent           models.EventType = "user.phone.code.sent"
 
-	UserProfileChanged models.EventType = "user.profile.changed"
-	UserAddressChanged models.EventType = "user.address.changed"
+	UserProfileChanged  models.EventType = "user.profile.changed"
+	UserAddressChanged  models.EventType = "user.address.changed"
+	UserUserNameChanged models.EventType = "user.username.changed"
 
 	MfaOtpAdded          models.EventType = "user.mfa.otp.added"
 	MfaOtpVerified       models.EventType = "user.mfa.otp.verified"
