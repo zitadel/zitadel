@@ -1356,7 +1356,7 @@ message Email {
 }
 
 message UniqueUserRequest {
-  string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string user_name = 1 [(validate.rules).string.pattern = "^[[:graph:]]{1,200}$"];
   string email = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
@@ -1365,7 +1365,7 @@ message UniqueUserResponse {
 }
 
 message CreateUserRequest {
-  string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string user_name = 1 [(validate.rules).string.pattern = "^[[:graph:]]{1,200}$"];
 
   oneof user {
     option (validate.required) = true;
