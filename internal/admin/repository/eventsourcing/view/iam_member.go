@@ -32,9 +32,8 @@ func (v *View) PutIAMMember(org *model.IAMMemberView, sequence uint64) error {
 	return v.ProcessedIAMMemberSequence(sequence)
 }
 
-
-func (v *View) PutIAMMembers(members []*model.IamMemberView, sequence uint64) error {
-	err := view.PutIamMembers(v.Db, iamMemberTable, members...)
+func (v *View) PutIAMMembers(members []*model.IAMMemberView, sequence uint64) error {
+	err := view.PutIAMMembers(v.Db, iamMemberTable, members...)
 	if err != nil {
 		return err
 	}

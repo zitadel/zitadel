@@ -53,7 +53,7 @@ func PutIAMMember(db *gorm.DB, table string, role *model.IAMMemberView) error {
 	return save(db, role)
 }
 
-func PutIAMMembers(db *gorm.DB, table string, members ...*model.IamMemberView) error {
+func PutIAMMembers(db *gorm.DB, table string, members ...*model.IAMMemberView) error {
 	save := repository.PrepareBulkSave(table)
 	m := make([]interface{}, len(members))
 	for i, member := range members {
