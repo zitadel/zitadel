@@ -797,162 +797,48 @@ func (m *CreateUserRequest) Validate() error {
 		return nil
 	}
 
-	if l := utf8.RuneCountInString(m.GetUserName()); l < 1 || l > 200 {
+	if !_CreateUserRequest_UserName_Pattern.MatchString(m.GetUserName()) {
 		return CreateUserRequestValidationError{
 			field:  "UserName",
-			reason: "value length must be between 1 and 200 runes, inclusive",
+			reason: "value does not match regex pattern \"^[[:graph:]]{1,200}$\"",
 		}
 	}
 
-	if l := utf8.RuneCountInString(m.GetFirstName()); l < 1 || l > 200 {
-		return CreateUserRequestValidationError{
-			field:  "FirstName",
-			reason: "value length must be between 1 and 200 runes, inclusive",
-		}
-	}
+	switch m.User.(type) {
 
-	if l := utf8.RuneCountInString(m.GetLastName()); l < 1 || l > 200 {
-		return CreateUserRequestValidationError{
-			field:  "LastName",
-			reason: "value length must be between 1 and 200 runes, inclusive",
-		}
-	}
+	case *CreateUserRequest_Human:
 
-	if utf8.RuneCountInString(m.GetNickName()) > 200 {
-		return CreateUserRequestValidationError{
-			field:  "NickName",
-			reason: "value length must be at most 200 runes",
-		}
-	}
-
-	if utf8.RuneCountInString(m.GetPreferredLanguage()) > 200 {
-		return CreateUserRequestValidationError{
-			field:  "PreferredLanguage",
-			reason: "value length must be at most 200 runes",
-		}
-	}
-
-	// no validation rules for Gender
-
-	if l := utf8.RuneCountInString(m.GetEmail()); l < 1 || l > 200 {
-		return CreateUserRequestValidationError{
-			field:  "Email",
-			reason: "value length must be between 1 and 200 runes, inclusive",
-		}
-	}
-
-	if err := m._validateEmail(m.GetEmail()); err != nil {
-		return CreateUserRequestValidationError{
-			field:  "Email",
-			reason: "value must be a valid email address",
-			cause:  err,
-		}
-	}
-
-	// no validation rules for IsEmailVerified
-
-	if utf8.RuneCountInString(m.GetPhone()) > 20 {
-		return CreateUserRequestValidationError{
-			field:  "Phone",
-			reason: "value length must be at most 20 runes",
-		}
-	}
-
-	// no validation rules for IsPhoneVerified
-
-	if utf8.RuneCountInString(m.GetCountry()) > 200 {
-		return CreateUserRequestValidationError{
-			field:  "Country",
-			reason: "value length must be at most 200 runes",
-		}
-	}
-
-	if utf8.RuneCountInString(m.GetLocality()) > 200 {
-		return CreateUserRequestValidationError{
-			field:  "Locality",
-			reason: "value length must be at most 200 runes",
-		}
-	}
-
-	if utf8.RuneCountInString(m.GetPostalCode()) > 200 {
-		return CreateUserRequestValidationError{
-			field:  "PostalCode",
-			reason: "value length must be at most 200 runes",
-		}
-	}
-
-	if utf8.RuneCountInString(m.GetRegion()) > 200 {
-		return CreateUserRequestValidationError{
-			field:  "Region",
-			reason: "value length must be at most 200 runes",
-		}
-	}
-
-	if utf8.RuneCountInString(m.GetStreetAddress()) > 200 {
-		return CreateUserRequestValidationError{
-			field:  "StreetAddress",
-			reason: "value length must be at most 200 runes",
-		}
-	}
-
-	if utf8.RuneCountInString(m.GetPassword()) > 72 {
-		return CreateUserRequestValidationError{
-			field:  "Password",
-			reason: "value length must be at most 72 runes",
-		}
-	}
-
-	return nil
-}
-
-func (m *CreateUserRequest) _validateHostname(host string) error {
-	s := strings.ToLower(strings.TrimSuffix(host, "."))
-
-	if len(host) > 253 {
-		return errors.New("hostname cannot exceed 253 characters")
-	}
-
-	for _, part := range strings.Split(s, ".") {
-		if l := len(part); l == 0 || l > 63 {
-			return errors.New("hostname part must be non-empty and cannot exceed 63 characters")
-		}
-
-		if part[0] == '-' {
-			return errors.New("hostname parts cannot begin with hyphens")
-		}
-
-		if part[len(part)-1] == '-' {
-			return errors.New("hostname parts cannot end with hyphens")
-		}
-
-		for _, r := range part {
-			if (r < 'a' || r > 'z') && (r < '0' || r > '9') && r != '-' {
-				return fmt.Errorf("hostname parts can only contain alphanumeric characters or hyphens, got %q", string(r))
+		if v, ok := interface{}(m.GetHuman()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CreateUserRequestValidationError{
+					field:  "Human",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
+
+	case *CreateUserRequest_Machine:
+
+		if v, ok := interface{}(m.GetMachine()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CreateUserRequestValidationError{
+					field:  "Machine",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		return CreateUserRequestValidationError{
+			field:  "User",
+			reason: "value is required",
+		}
+
 	}
 
 	return nil
-}
-
-func (m *CreateUserRequest) _validateEmail(addr string) error {
-	a, err := mail.ParseAddress(addr)
-	if err != nil {
-		return err
-	}
-	addr = a.Address
-
-	if len(addr) > 254 {
-		return errors.New("email addresses cannot exceed 254 characters")
-	}
-
-	parts := strings.SplitN(addr, "@", 2)
-
-	if len(parts[0]) > 64 {
-		return errors.New("email address local phrase cannot exceed 64 characters")
-	}
-
-	return m._validateHostname(parts[1])
 }
 
 // CreateUserRequestValidationError is the validation error returned by
@@ -1011,9 +897,308 @@ var _ interface {
 	ErrorName() string
 } = CreateUserRequestValidationError{}
 
-// Validate checks the field values on User with the rules defined in the proto
-// definition for this message. If any rules are violated, an error is returned.
-func (m *User) Validate() error {
+var _CreateUserRequest_UserName_Pattern = regexp.MustCompile("^[[:graph:]]{1,200}$")
+
+// Validate checks the field values on CreateHumanRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CreateHumanRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if l := utf8.RuneCountInString(m.GetFirstName()); l < 1 || l > 200 {
+		return CreateHumanRequestValidationError{
+			field:  "FirstName",
+			reason: "value length must be between 1 and 200 runes, inclusive",
+		}
+	}
+
+	if l := utf8.RuneCountInString(m.GetLastName()); l < 1 || l > 200 {
+		return CreateHumanRequestValidationError{
+			field:  "LastName",
+			reason: "value length must be between 1 and 200 runes, inclusive",
+		}
+	}
+
+	if utf8.RuneCountInString(m.GetNickName()) > 200 {
+		return CreateHumanRequestValidationError{
+			field:  "NickName",
+			reason: "value length must be at most 200 runes",
+		}
+	}
+
+	if utf8.RuneCountInString(m.GetPreferredLanguage()) > 200 {
+		return CreateHumanRequestValidationError{
+			field:  "PreferredLanguage",
+			reason: "value length must be at most 200 runes",
+		}
+	}
+
+	// no validation rules for Gender
+
+	if l := utf8.RuneCountInString(m.GetEmail()); l < 1 || l > 200 {
+		return CreateHumanRequestValidationError{
+			field:  "Email",
+			reason: "value length must be between 1 and 200 runes, inclusive",
+		}
+	}
+
+	if err := m._validateEmail(m.GetEmail()); err != nil {
+		return CreateHumanRequestValidationError{
+			field:  "Email",
+			reason: "value must be a valid email address",
+			cause:  err,
+		}
+	}
+
+	// no validation rules for IsEmailVerified
+
+	if utf8.RuneCountInString(m.GetPhone()) > 20 {
+		return CreateHumanRequestValidationError{
+			field:  "Phone",
+			reason: "value length must be at most 20 runes",
+		}
+	}
+
+	// no validation rules for IsPhoneVerified
+
+	if utf8.RuneCountInString(m.GetCountry()) > 200 {
+		return CreateHumanRequestValidationError{
+			field:  "Country",
+			reason: "value length must be at most 200 runes",
+		}
+	}
+
+	if utf8.RuneCountInString(m.GetLocality()) > 200 {
+		return CreateHumanRequestValidationError{
+			field:  "Locality",
+			reason: "value length must be at most 200 runes",
+		}
+	}
+
+	if utf8.RuneCountInString(m.GetPostalCode()) > 200 {
+		return CreateHumanRequestValidationError{
+			field:  "PostalCode",
+			reason: "value length must be at most 200 runes",
+		}
+	}
+
+	if utf8.RuneCountInString(m.GetRegion()) > 200 {
+		return CreateHumanRequestValidationError{
+			field:  "Region",
+			reason: "value length must be at most 200 runes",
+		}
+	}
+
+	if utf8.RuneCountInString(m.GetStreetAddress()) > 200 {
+		return CreateHumanRequestValidationError{
+			field:  "StreetAddress",
+			reason: "value length must be at most 200 runes",
+		}
+	}
+
+	if utf8.RuneCountInString(m.GetPassword()) > 72 {
+		return CreateHumanRequestValidationError{
+			field:  "Password",
+			reason: "value length must be at most 72 runes",
+		}
+	}
+
+	return nil
+}
+
+func (m *CreateHumanRequest) _validateHostname(host string) error {
+	s := strings.ToLower(strings.TrimSuffix(host, "."))
+
+	if len(host) > 253 {
+		return errors.New("hostname cannot exceed 253 characters")
+	}
+
+	for _, part := range strings.Split(s, ".") {
+		if l := len(part); l == 0 || l > 63 {
+			return errors.New("hostname part must be non-empty and cannot exceed 63 characters")
+		}
+
+		if part[0] == '-' {
+			return errors.New("hostname parts cannot begin with hyphens")
+		}
+
+		if part[len(part)-1] == '-' {
+			return errors.New("hostname parts cannot end with hyphens")
+		}
+
+		for _, r := range part {
+			if (r < 'a' || r > 'z') && (r < '0' || r > '9') && r != '-' {
+				return fmt.Errorf("hostname parts can only contain alphanumeric characters or hyphens, got %q", string(r))
+			}
+		}
+	}
+
+	return nil
+}
+
+func (m *CreateHumanRequest) _validateEmail(addr string) error {
+	a, err := mail.ParseAddress(addr)
+	if err != nil {
+		return err
+	}
+	addr = a.Address
+
+	if len(addr) > 254 {
+		return errors.New("email addresses cannot exceed 254 characters")
+	}
+
+	parts := strings.SplitN(addr, "@", 2)
+
+	if len(parts[0]) > 64 {
+		return errors.New("email address local phrase cannot exceed 64 characters")
+	}
+
+	return m._validateHostname(parts[1])
+}
+
+// CreateHumanRequestValidationError is the validation error returned by
+// CreateHumanRequest.Validate if the designated constraints aren't met.
+type CreateHumanRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CreateHumanRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CreateHumanRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CreateHumanRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CreateHumanRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CreateHumanRequestValidationError) ErrorName() string {
+	return "CreateHumanRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CreateHumanRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCreateHumanRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CreateHumanRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CreateHumanRequestValidationError{}
+
+// Validate checks the field values on CreateMachineRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CreateMachineRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if l := utf8.RuneCountInString(m.GetName()); l < 1 || l > 200 {
+		return CreateMachineRequestValidationError{
+			field:  "Name",
+			reason: "value length must be between 1 and 200 runes, inclusive",
+		}
+	}
+
+	if l := utf8.RuneCountInString(m.GetDescription()); l < 1 || l > 500 {
+		return CreateMachineRequestValidationError{
+			field:  "Description",
+			reason: "value length must be between 1 and 500 runes, inclusive",
+		}
+	}
+
+	return nil
+}
+
+// CreateMachineRequestValidationError is the validation error returned by
+// CreateMachineRequest.Validate if the designated constraints aren't met.
+type CreateMachineRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CreateMachineRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CreateMachineRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CreateMachineRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CreateMachineRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CreateMachineRequestValidationError) ErrorName() string {
+	return "CreateMachineRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CreateMachineRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCreateMachineRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CreateMachineRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CreateMachineRequestValidationError{}
+
+// Validate checks the field values on UserResponse with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *UserResponse) Validate() error {
 	if m == nil {
 		return nil
 	}
@@ -1024,7 +1209,7 @@ func (m *User) Validate() error {
 
 	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return UserValidationError{
+			return UserResponseValidationError{
 				field:  "CreationDate",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -1034,7 +1219,7 @@ func (m *User) Validate() error {
 
 	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return UserValidationError{
+			return UserResponseValidationError{
 				field:  "ChangeDate",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -1042,15 +1227,116 @@ func (m *User) Validate() error {
 		}
 	}
 
+	// no validation rules for Sequence
+
 	// no validation rules for UserName
+
+	switch m.User.(type) {
+
+	case *UserResponse_Human:
+
+		if v, ok := interface{}(m.GetHuman()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UserResponseValidationError{
+					field:  "Human",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *UserResponse_Machine:
+
+		if v, ok := interface{}(m.GetMachine()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UserResponseValidationError{
+					field:  "Machine",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		return UserResponseValidationError{
+			field:  "User",
+			reason: "value is required",
+		}
+
+	}
+
+	return nil
+}
+
+// UserResponseValidationError is the validation error returned by
+// UserResponse.Validate if the designated constraints aren't met.
+type UserResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UserResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UserResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UserResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UserResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UserResponseValidationError) ErrorName() string { return "UserResponseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UserResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUserResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UserResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UserResponseValidationError{}
+
+// Validate checks the field values on HumanResponse with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *HumanResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
 
 	// no validation rules for FirstName
 
 	// no validation rules for LastName
 
-	// no validation rules for NickName
-
 	// no validation rules for DisplayName
+
+	// no validation rules for NickName
 
 	// no validation rules for PreferredLanguage
 
@@ -1074,14 +1360,12 @@ func (m *User) Validate() error {
 
 	// no validation rules for StreetAddress
 
-	// no validation rules for Sequence
-
 	return nil
 }
 
-// UserValidationError is the validation error returned by User.Validate if the
-// designated constraints aren't met.
-type UserValidationError struct {
+// HumanResponseValidationError is the validation error returned by
+// HumanResponse.Validate if the designated constraints aren't met.
+type HumanResponseValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1089,22 +1373,22 @@ type UserValidationError struct {
 }
 
 // Field function returns field value.
-func (e UserValidationError) Field() string { return e.field }
+func (e HumanResponseValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e UserValidationError) Reason() string { return e.reason }
+func (e HumanResponseValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e UserValidationError) Cause() error { return e.cause }
+func (e HumanResponseValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e UserValidationError) Key() bool { return e.key }
+func (e HumanResponseValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e UserValidationError) ErrorName() string { return "UserValidationError" }
+func (e HumanResponseValidationError) ErrorName() string { return "HumanResponseValidationError" }
 
 // Error satisfies the builtin error interface
-func (e UserValidationError) Error() string {
+func (e HumanResponseValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1116,14 +1400,14 @@ func (e UserValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sUser.%s: %s%s",
+		"invalid %sHumanResponse.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = UserValidationError{}
+var _ error = HumanResponseValidationError{}
 
 var _ interface {
 	Field() string
@@ -1131,7 +1415,184 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = UserValidationError{}
+} = HumanResponseValidationError{}
+
+// Validate checks the field values on MachineResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *MachineResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Name
+
+	// no validation rules for Description
+
+	for idx, item := range m.GetKeys() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MachineResponseValidationError{
+					field:  fmt.Sprintf("Keys[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// MachineResponseValidationError is the validation error returned by
+// MachineResponse.Validate if the designated constraints aren't met.
+type MachineResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MachineResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MachineResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MachineResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MachineResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MachineResponseValidationError) ErrorName() string { return "MachineResponseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MachineResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMachineResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MachineResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MachineResponseValidationError{}
+
+// Validate checks the field values on MachineKeyResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MachineKeyResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Id
+
+	// no validation rules for Type
+
+	// no validation rules for Sequence
+
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MachineKeyResponseValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetExpirationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MachineKeyResponseValidationError{
+				field:  "ExpirationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// MachineKeyResponseValidationError is the validation error returned by
+// MachineKeyResponse.Validate if the designated constraints aren't met.
+type MachineKeyResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MachineKeyResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MachineKeyResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MachineKeyResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MachineKeyResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MachineKeyResponseValidationError) ErrorName() string {
+	return "MachineKeyResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MachineKeyResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMachineKeyResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MachineKeyResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MachineKeyResponseValidationError{}
 
 // Validate checks the field values on CreateOrgRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, an

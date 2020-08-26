@@ -1470,23 +1470,22 @@ message HumanResponse {
 }
 
 message HumanView {
-  google.protobuf.Timestamp password_changed = 2;
-  string user_name = 3;
-  string first_name = 4;
-  string last_name = 5;
-  string display_name = 6;
-  string nick_name = 7;
-  string preferred_language = 8;
-  Gender gender = 9;
-  string email = 10;
-  bool is_email_verified = 11;
-  string phone = 12;
-  bool is_phone_verified = 13;
-  string country = 14;
-  string locality = 15;
-  string postal_code = 16;
-  string region = 17;
-  string street_address = 18;
+  google.protobuf.Timestamp password_changed = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string display_name = 4;
+  string nick_name = 5;
+  string preferred_language = 6;
+  Gender gender = 7;
+  string email = 8;
+  bool is_email_verified = 9;
+  string phone = 10;
+  bool is_phone_verified = 11;
+  string country = 12;
+  string locality = 13;
+  string postal_code = 14;
+  string region = 15;
+  string street_address = 16;
 }
 
 message MachineResponse {
@@ -1518,7 +1517,6 @@ message AddMachineKeyRequest {
 message AddMachineKeyResponse {
   string id = 1;
   MachineKeyType type = 2;
-
 }
 
 message MachineKeyIDRequest {

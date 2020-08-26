@@ -228,6 +228,10 @@ func (m *UserView) Validate() error {
 		}
 	}
 
+	// no validation rules for Sequence
+
+	// no validation rules for PreferredLoginName
+
 	if v, ok := interface{}(m.GetLastLogin()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return UserViewValidationError{
@@ -238,53 +242,43 @@ func (m *UserView) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetPasswordChanged()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return UserViewValidationError{
-				field:  "PasswordChanged",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for ResourceOwner
 
 	// no validation rules for UserName
 
-	// no validation rules for FirstName
+	switch m.User.(type) {
 
-	// no validation rules for LastName
+	case *UserView_Human:
 
-	// no validation rules for DisplayName
+		if v, ok := interface{}(m.GetHuman()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UserViewValidationError{
+					field:  "Human",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
 
-	// no validation rules for NickName
+	case *UserView_Machine:
 
-	// no validation rules for PreferredLanguage
+		if v, ok := interface{}(m.GetMachine()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UserViewValidationError{
+					field:  "Machine",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
 
-	// no validation rules for Gender
+	default:
+		return UserViewValidationError{
+			field:  "User",
+			reason: "value is required",
+		}
 
-	// no validation rules for Email
-
-	// no validation rules for IsEmailVerified
-
-	// no validation rules for Phone
-
-	// no validation rules for IsPhoneVerified
-
-	// no validation rules for Country
-
-	// no validation rules for Locality
-
-	// no validation rules for PostalCode
-
-	// no validation rules for Region
-
-	// no validation rules for StreetAddress
-
-	// no validation rules for Sequence
-
-	// no validation rules for ResourceOwner
-
-	// no validation rules for PreferredLoginName
+	}
 
 	return nil
 }
@@ -343,6 +337,295 @@ var _ interface {
 	ErrorName() string
 } = UserViewValidationError{}
 
+// Validate checks the field values on MachineView with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *MachineView) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetLastKeyAdded()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MachineViewValidationError{
+				field:  "LastKeyAdded",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Name
+
+	// no validation rules for Description
+
+	for idx, item := range m.GetKeys() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MachineViewValidationError{
+					field:  fmt.Sprintf("Keys[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// MachineViewValidationError is the validation error returned by
+// MachineView.Validate if the designated constraints aren't met.
+type MachineViewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MachineViewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MachineViewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MachineViewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MachineViewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MachineViewValidationError) ErrorName() string { return "MachineViewValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MachineViewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMachineView.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MachineViewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MachineViewValidationError{}
+
+// Validate checks the field values on MachineKeyView with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *MachineKeyView) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Id
+
+	// no validation rules for Type
+
+	// no validation rules for Sequence
+
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MachineKeyViewValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetExpirationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MachineKeyViewValidationError{
+				field:  "ExpirationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// MachineKeyViewValidationError is the validation error returned by
+// MachineKeyView.Validate if the designated constraints aren't met.
+type MachineKeyViewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MachineKeyViewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MachineKeyViewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MachineKeyViewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MachineKeyViewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MachineKeyViewValidationError) ErrorName() string { return "MachineKeyViewValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MachineKeyViewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMachineKeyView.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MachineKeyViewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MachineKeyViewValidationError{}
+
+// Validate checks the field values on HumanView with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *HumanView) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetPasswordChanged()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HumanViewValidationError{
+				field:  "PasswordChanged",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for FirstName
+
+	// no validation rules for LastName
+
+	// no validation rules for DisplayName
+
+	// no validation rules for NickName
+
+	// no validation rules for PreferredLanguage
+
+	// no validation rules for Gender
+
+	// no validation rules for Email
+
+	// no validation rules for IsEmailVerified
+
+	// no validation rules for Phone
+
+	// no validation rules for IsPhoneVerified
+
+	// no validation rules for Country
+
+	// no validation rules for Locality
+
+	// no validation rules for PostalCode
+
+	// no validation rules for Region
+
+	// no validation rules for StreetAddress
+
+	return nil
+}
+
+// HumanViewValidationError is the validation error returned by
+// HumanView.Validate if the designated constraints aren't met.
+type HumanViewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e HumanViewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e HumanViewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e HumanViewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e HumanViewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e HumanViewValidationError) ErrorName() string { return "HumanViewValidationError" }
+
+// Error satisfies the builtin error interface
+func (e HumanViewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHumanView.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = HumanViewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = HumanViewValidationError{}
+
 // Validate checks the field values on UserProfile with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.
@@ -352,8 +635,6 @@ func (m *UserProfile) Validate() error {
 	}
 
 	// no validation rules for Id
-
-	// no validation rules for UserName
 
 	// no validation rules for FirstName
 
@@ -455,8 +736,6 @@ func (m *UserProfileView) Validate() error {
 	}
 
 	// no validation rules for Id
-
-	// no validation rules for UserName
 
 	// no validation rules for FirstName
 

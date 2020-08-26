@@ -384,10 +384,10 @@ func userViewFromModel(user *usr_model.UserView) *management.UserView {
 		UserName:           user.UserName,
 	}
 	if user.HumanView != nil {
-		userView.User = &management.UserView_Human{humanViewFromModel(user.HumanView)}
+		userView.User = &management.UserView_Human{Human: humanViewFromModel(user.HumanView)}
 	}
 	if user.MachineView != nil {
-		userView.User = &management.UserView_Machine{machineViewFromModel(user.MachineView)}
+		userView.User = &management.UserView_Machine{Machine: machineViewFromModel(user.MachineView)}
 
 	}
 	return userView

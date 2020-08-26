@@ -9,7 +9,7 @@ import (
 
 type Setup struct {
 	*model.Org
-	*usr_es.Human
+	*usr_es.User
 }
 
 func (s *Setup) AppendEvents(events ...*es_models.Event) error {

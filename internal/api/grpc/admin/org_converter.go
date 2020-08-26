@@ -3,7 +3,6 @@ package admin
 import (
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
-	"golang.org/x/text/language"
 
 	admin_model "github.com/caos/zitadel/internal/admin/model"
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -30,41 +29,6 @@ func orgCreateRequestToModel(org *admin.CreateOrgRequest) *org_model.Org {
 	}
 
 	return o
-}
-
-func userCreateRequestToModel(user *admin.CreateUserRequest) *usr_model.User {
-	preferredLanguage, err := language.Parse(user.PreferredLanguage)
-	logging.Log("GRPC-30hwz").OnError(err).Debug("unable to parse language")
-	result := &usr_model.User{
-		UserName: user.UserName,
-		Human: &usr_model.Human{
-			Profile: &usr_model.Profile{
-				FirstName:         user.FirstName,
-				LastName:          user.LastName,
-				NickName:          user.NickName,
-				PreferredLanguage: preferredLanguage,
-				Gender:            genderToModel(user.Gender),
-			},
-			Password: &usr_model.Password{
-				SecretString: user.Password,
-			},
-			Email: &usr_model.Email{
-				EmailAddress:    user.Email,
-				IsEmailVerified: user.IsEmailVerified,
-			},
-			Address: &usr_model.Address{
-				Country:       user.Country,
-				Locality:      user.Locality,
-				PostalCode:    user.PostalCode,
-				Region:        user.Region,
-				StreetAddress: user.StreetAddress,
-			},
-		},
-	}
-	if user.Phone != "" {
-		result.Phone = &usr_model.Phone{PhoneNumber: user.Phone, IsPhoneVerified: user.IsPhoneVerified}
-	}
-	return result
 }
 
 func setUpOrgResponseFromModel(setUp *admin_model.SetupOrg) *admin.OrgSetUpResponse {
@@ -126,45 +90,6 @@ func orgViewFromModel(org *org_model.OrgView) *admin.Org {
 		Name:         org.Name,
 		State:        orgStateFromModel(org.State),
 	}
-}
-
-func userFromModel(user *usr_model.User) *admin.User {
-	creationDate, err := ptypes.TimestampProto(user.CreationDate)
-	logging.Log("GRPC-8duwe").OnError(err).Debug("unable to parse timestamp")
-
-	changeDate, err := ptypes.TimestampProto(user.ChangeDate)
-	logging.Log("GRPC-ckoe3d").OnError(err).Debug("unable to parse timestamp")
-
-	converted := &admin.User{
-		Id:                user.AggregateID,
-		State:             userStateFromModel(user.State),
-		CreationDate:      creationDate,
-		ChangeDate:        changeDate,
-		Sequence:          user.Sequence,
-		UserName:          user.UserName,
-		FirstName:         user.FirstName,
-		LastName:          user.LastName,
-		DisplayName:       user.DisplayName,
-		NickName:          user.NickName,
-		PreferredLanguage: user.PreferredLanguage.String(),
-		Gender:            genderFromModel(user.Gender),
-	}
-	if user.Email != nil {
-		converted.Email = user.EmailAddress
-		converted.IsEmailVerified = user.IsEmailVerified
-	}
-	if user.Phone != nil {
-		converted.Phone = user.PhoneNumber
-		converted.IsPhoneVerified = user.IsPhoneVerified
-	}
-	if user.Address != nil {
-		converted.Country = user.Country
-		converted.Locality = user.Locality
-		converted.PostalCode = user.PostalCode
-		converted.Region = user.Region
-		converted.StreetAddress = user.StreetAddress
-	}
-	return converted
 }
 
 func orgStateFromModel(state org_model.OrgState) admin.OrgState {
