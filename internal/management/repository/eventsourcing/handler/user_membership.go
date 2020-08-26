@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
@@ -37,18 +38,50 @@ func (m *UserMembership) EventQuery() (*models.SearchQuery, error) {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(org_es_model.OrgAggregate, proj_es_model.ProjectAggregate).
+		AggregateTypeFilter(iam_es_model.IamAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (m *UserMembership) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
+	case iam_es_model.IamAggregate:
+		err = m.processIam(event)
 	case org_es_model.OrgAggregate:
 		err = m.processOrg(event)
 	case proj_es_model.ProjectAggregate:
 		err = m.processProject(event)
 	}
 	return err
+}
+
+func (m *UserMembership) processIam(event *models.Event) (err error) {
+	member := new(usr_es_model.UserMembershipView)
+	err = member.AppendEvent(event)
+	if err != nil {
+		return err
+	}
+	switch event.Type {
+	case iam_es_model.IamMemberAdded:
+		m.fillIamDisplayName(member)
+	case iam_es_model.IamMemberChanged:
+		member, err = m.view.UserMembershipByIDs(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeIam)
+		if err != nil {
+			return err
+		}
+		err = member.AppendEvent(event)
+	case iam_es_model.IamMemberRemoved:
+		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeIam, event.Sequence)
+	default:
+		return m.view.ProcessedUserMembershipSequence(event.Sequence)
+	}
+	if err != nil {
+		return err
+	}
+	return m.view.PutUserMembership(member, event.Sequence)
+}
+
+func (m *UserMembership) fillIamDisplayName(member *usr_es_model.UserMembershipView) {
+	member.DisplayName = member.AggregateID
 }
 
 func (m *UserMembership) processOrg(event *models.Event) (err error) {

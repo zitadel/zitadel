@@ -2,6 +2,7 @@ package management
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/model"
 	"github.com/golang/protobuf/ptypes"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -47,12 +48,15 @@ func projectGrantMemberChangeToModel(member *management.ProjectGrantMemberChange
 	}
 }
 
-func projectGrantMemberSearchRequestsToModel(role *management.ProjectGrantMemberSearchRequest) *proj_model.ProjectGrantMemberSearchRequest {
-	return &proj_model.ProjectGrantMemberSearchRequest{
-		Offset:  role.Offset,
-		Limit:   role.Limit,
-		Queries: projectGrantMemberSearchQueriesToModel(role.Queries),
+func projectGrantMemberSearchRequestsToModel(memberSearch *management.ProjectGrantMemberSearchRequest) *proj_model.ProjectGrantMemberSearchRequest {
+	request := &proj_model.ProjectGrantMemberSearchRequest{
+		Offset:  memberSearch.Offset,
+		Limit:   memberSearch.Limit,
+		Queries: projectGrantMemberSearchQueriesToModel(memberSearch.Queries),
 	}
+	request.Queries = append(request.Queries, &proj_model.ProjectGrantMemberSearchQuery{Key: proj_model.ProjectGrantMemberSearchKeyProjectID, Method: model.SearchMethodEquals, Value: memberSearch.ProjectId})
+	request.Queries = append(request.Queries, &proj_model.ProjectGrantMemberSearchQuery{Key: proj_model.ProjectGrantMemberSearchKeyGrantID, Method: model.SearchMethodEquals, Value: memberSearch.GrantId})
+	return request
 }
 
 func projectGrantMemberSearchQueriesToModel(queries []*management.ProjectGrantMemberSearchQuery) []*proj_model.ProjectGrantMemberSearchQuery {
