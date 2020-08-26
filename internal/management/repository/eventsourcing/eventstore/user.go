@@ -145,7 +145,14 @@ func (repo *UserRepo) IsUserUnique(ctx context.Context, userName, email string) 
 }
 
 func (repo *UserRepo) UserMfas(ctx context.Context, userID string) ([]*usr_model.MultiFactor, error) {
-	return repo.View.UserMfas(userID)
+	user, err := repo.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if user.OTPState == usr_model.MfaStateUnspecified {
+		return []*usr_model.MultiFactor{}, nil
+	}
+	return []*usr_model.MultiFactor{{Type: usr_model.MfaTypeOTP, State: user.OTPState}}, nil
 }
 
 func (repo *UserRepo) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
