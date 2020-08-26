@@ -946,7 +946,7 @@ func (es *UserEventstore) ChangeAddress(ctx context.Context, address *usr_model.
 	return model.AddressToModel(repoExisting.Address), nil
 }
 
-func (es *UserEventstore) AddOTP(ctx context.Context, userID string) (*usr_model.OTP, error) {
+func (es *UserEventstore) AddOTP(ctx context.Context, userID, accountName string) (*usr_model.OTP, error) {
 	existing, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -954,9 +954,11 @@ func (es *UserEventstore) AddOTP(ctx context.Context, userID string) (*usr_model
 	if existing.IsOTPReady() {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-do9se", "Errors.User.Mfa.Otp.AlreadyReady")
 	}
-	accountName := existing.UserName
-	if existing.Email != nil {
-		accountName = existing.EmailAddress
+	if accountName == "" {
+		accountName = existing.UserName
+		if existing.Email != nil {
+			accountName = existing.EmailAddress
+		}
 	}
 	key, err := totp.Generate(totp.GenerateOpts{Issuer: es.Multifactors.OTP.Issuer, AccountName: accountName})
 	if err != nil {
