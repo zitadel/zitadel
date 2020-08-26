@@ -176,7 +176,14 @@ func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new strin
 }
 
 func (repo *UserRepo) MyUserMfas(ctx context.Context) ([]*model.MultiFactor, error) {
-	return repo.View.UserMfas(authz.GetCtxData(ctx).UserID)
+	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
+	if err != nil {
+		return nil, err
+	}
+	if user.OTPState == model.MfaStateUnspecified {
+		return []*model.MultiFactor{}, nil
+	}
+	return []*model.MultiFactor{{Type: model.MfaTypeOTP, State: user.OTPState}}, nil
 }
 
 func (repo *UserRepo) AddMfaOTP(ctx context.Context, userID string) (*model.OTP, error) {
