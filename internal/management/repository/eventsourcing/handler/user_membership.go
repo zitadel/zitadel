@@ -38,13 +38,13 @@ func (m *UserMembership) EventQuery() (*models.SearchQuery, error) {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(iam_es_model.IamAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate).
+		AggregateTypeFilter(iam_es_model.IAMAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (m *UserMembership) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
-	case iam_es_model.IamAggregate:
+	case iam_es_model.IAMAggregate:
 		err = m.processIam(event)
 	case org_es_model.OrgAggregate:
 		err = m.processOrg(event)
@@ -61,15 +61,15 @@ func (m *UserMembership) processIam(event *models.Event) (err error) {
 		return err
 	}
 	switch event.Type {
-	case iam_es_model.IamMemberAdded:
+	case iam_es_model.IAMMemberAdded:
 		m.fillIamDisplayName(member)
-	case iam_es_model.IamMemberChanged:
+	case iam_es_model.IAMMemberChanged:
 		member, err = m.view.UserMembershipByIDs(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeIam)
 		if err != nil {
 			return err
 		}
 		err = member.AppendEvent(event)
-	case iam_es_model.IamMemberRemoved:
+	case iam_es_model.IAMMemberRemoved:
 		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeIam, event.Sequence)
 	default:
 		return m.view.ProcessedUserMembershipSequence(event.Sequence)

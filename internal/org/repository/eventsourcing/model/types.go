@@ -29,7 +29,26 @@ const (
 	OrgMemberChanged models.EventType = "org.member.changed"
 	OrgMemberRemoved models.EventType = "org.member.removed"
 
-	OrgIamPolicyAdded   models.EventType = "org.iam.policy.added"
-	OrgIamPolicyChanged models.EventType = "org.iam.policy.changed"
-	OrgIamPolicyRemoved models.EventType = "org.iam.policy.removed"
+	OrgIAMPolicyAdded   models.EventType = "org.iam.policy.added"
+	OrgIAMPolicyChanged models.EventType = "org.iam.policy.changed"
+	OrgIAMPolicyRemoved models.EventType = "org.iam.policy.removed"
+
+	IDPConfigAdded       models.EventType = "org.idp.config.added"
+	IDPConfigChanged     models.EventType = "org.idp.config.changed"
+	IDPConfigRemoved     models.EventType = "org.idp.config.removed"
+	IDPConfigDeactivated models.EventType = "org.idp.config.deactivated"
+	IDPConfigReactivated models.EventType = "org.idp.config.reactivated"
+
+	OIDCIDPConfigAdded   models.EventType = "org.idp.oidc.config.added"
+	OIDCIDPConfigChanged models.EventType = "org.idp.oidc.config.changed"
+
+	SAMLIDPConfigAdded   models.EventType = "org.idp.saml.config.added"
+	SAMLIDPConfigChanged models.EventType = "org.idp.saml.config.changed"
+
+	LoginPolicyAdded                     models.EventType = "org.policy.login.added"
+	LoginPolicyChanged                   models.EventType = "org.policy.login.changed"
+	LoginPolicyRemoved                   models.EventType = "org.policy.login.removed"
+	LoginPolicyIDPProviderAdded          models.EventType = "org.policy.login.idpprovider.added"
+	LoginPolicyIDPProviderRemoved        models.EventType = "org.policy.login.idpprovider.removed"
+	LoginPolicyIDPProviderCascadeRemoved models.EventType = "org.policy.login.idpprovider.cascade.removed"
 )

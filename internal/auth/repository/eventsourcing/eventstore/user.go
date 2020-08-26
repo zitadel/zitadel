@@ -41,7 +41,7 @@ func (repo *UserRepo) Register(ctx context.Context, registerUser *model.User, or
 	if err != nil {
 		return nil, err
 	}
-	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, policyResourceOwner)
+	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, policyResourceOwner)
 	if err != nil {
 		return nil, err
 	}

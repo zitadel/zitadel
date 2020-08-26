@@ -9,8 +9,8 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/admin"
 )
 
-func addIamMemberToModel(member *admin.AddIamMemberRequest) *iam_model.IamMember {
-	memberModel := &iam_model.IamMember{
+func addIamMemberToModel(member *admin.AddIamMemberRequest) *iam_model.IAMMember {
+	memberModel := &iam_model.IAMMember{
 		UserID: member.UserId,
 	}
 	memberModel.Roles = member.Roles
@@ -18,8 +18,8 @@ func addIamMemberToModel(member *admin.AddIamMemberRequest) *iam_model.IamMember
 	return memberModel
 }
 
-func changeIamMemberToModel(member *admin.ChangeIamMemberRequest) *iam_model.IamMember {
-	memberModel := &iam_model.IamMember{
+func changeIamMemberToModel(member *admin.ChangeIamMemberRequest) *iam_model.IAMMember {
+	memberModel := &iam_model.IAMMember{
 		UserID: member.UserId,
 	}
 	memberModel.Roles = member.Roles
@@ -27,7 +27,7 @@ func changeIamMemberToModel(member *admin.ChangeIamMemberRequest) *iam_model.Iam
 	return memberModel
 }
 
-func iamMemberFromModel(member *iam_model.IamMember) *admin.IamMember {
+func iamMemberFromModel(member *iam_model.IAMMember) *admin.IamMember {
 	creationDate, err := ptypes.TimestampProto(member.CreationDate)
 	logging.Log("GRPC-Lsp76").OnError(err).Debug("date parse failed")
 
@@ -43,16 +43,16 @@ func iamMemberFromModel(member *iam_model.IamMember) *admin.IamMember {
 	}
 }
 
-func iamMemberSearchRequestToModel(request *admin.IamMemberSearchRequest) *iam_model.IamMemberSearchRequest {
-	return &iam_model.IamMemberSearchRequest{
+func iamMemberSearchRequestToModel(request *admin.IamMemberSearchRequest) *iam_model.IAMMemberSearchRequest {
+	return &iam_model.IAMMemberSearchRequest{
 		Limit:   request.Limit,
 		Offset:  request.Offset,
 		Queries: iamMemberSearchQueriesToModel(request.Queries),
 	}
 }
 
-func iamMemberSearchQueriesToModel(queries []*admin.IamMemberSearchQuery) []*iam_model.IamMemberSearchQuery {
-	modelQueries := make([]*iam_model.IamMemberSearchQuery, len(queries))
+func iamMemberSearchQueriesToModel(queries []*admin.IamMemberSearchQuery) []*iam_model.IAMMemberSearchQuery {
+	modelQueries := make([]*iam_model.IAMMemberSearchQuery, len(queries))
 	for i, query := range queries {
 		modelQueries[i] = iamMemberSearchQueryToModel(query)
 	}
@@ -60,30 +60,30 @@ func iamMemberSearchQueriesToModel(queries []*admin.IamMemberSearchQuery) []*iam
 	return modelQueries
 }
 
-func iamMemberSearchQueryToModel(query *admin.IamMemberSearchQuery) *iam_model.IamMemberSearchQuery {
-	return &iam_model.IamMemberSearchQuery{
+func iamMemberSearchQueryToModel(query *admin.IamMemberSearchQuery) *iam_model.IAMMemberSearchQuery {
+	return &iam_model.IAMMemberSearchQuery{
 		Key:    iamMemberSearchKeyToModel(query.Key),
-		Method: iamMemberSearchMethodToModel(query.Method),
+		Method: searchMethodToModel(query.Method),
 		Value:  query.Value,
 	}
 }
 
-func iamMemberSearchKeyToModel(key admin.IamMemberSearchKey) iam_model.IamMemberSearchKey {
+func iamMemberSearchKeyToModel(key admin.IamMemberSearchKey) iam_model.IAMMemberSearchKey {
 	switch key {
 	case admin.IamMemberSearchKey_IAMMEMBERSEARCHKEY_EMAIL:
-		return iam_model.IamMemberSearchKeyEmail
+		return iam_model.IAMMemberSearchKeyEmail
 	case admin.IamMemberSearchKey_IAMMEMBERSEARCHKEY_FIRST_NAME:
-		return iam_model.IamMemberSearchKeyFirstName
+		return iam_model.IAMMemberSearchKeyFirstName
 	case admin.IamMemberSearchKey_IAMMEMBERSEARCHKEY_LAST_NAME:
-		return iam_model.IamMemberSearchKeyLastName
+		return iam_model.IAMMemberSearchKeyLastName
 	case admin.IamMemberSearchKey_IAMMEMBERSEARCHKEY_USER_ID:
-		return iam_model.IamMemberSearchKeyUserID
+		return iam_model.IAMMemberSearchKeyUserID
 	default:
-		return iam_model.IamMemberSearchKeyUnspecified
+		return iam_model.IAMMemberSearchKeyUnspecified
 	}
 }
 
-func iamMemberSearchMethodToModel(key admin.SearchMethod) model.SearchMethod {
+func searchMethodToModel(key admin.SearchMethod) model.SearchMethod {
 	switch key {
 	case admin.SearchMethod_SEARCHMETHOD_CONTAINS:
 		return model.SearchMethodContains
@@ -102,7 +102,7 @@ func iamMemberSearchMethodToModel(key admin.SearchMethod) model.SearchMethod {
 	}
 }
 
-func iamMemberSearchResponseFromModel(resp *iam_model.IamMemberSearchResponse) *admin.IamMemberSearchResponse {
+func iamMemberSearchResponseFromModel(resp *iam_model.IAMMemberSearchResponse) *admin.IamMemberSearchResponse {
 	timestamp, err := ptypes.TimestampProto(resp.Timestamp)
 	logging.Log("GRPC-5shu8").OnError(err).Debug("date parse failed")
 	return &admin.IamMemberSearchResponse{
@@ -114,7 +114,7 @@ func iamMemberSearchResponseFromModel(resp *iam_model.IamMemberSearchResponse) *
 		ViewTimestamp:     timestamp,
 	}
 }
-func iamMembersFromView(viewMembers []*iam_model.IamMemberView) []*admin.IamMemberView {
+func iamMembersFromView(viewMembers []*iam_model.IAMMemberView) []*admin.IamMemberView {
 	members := make([]*admin.IamMemberView, len(viewMembers))
 
 	for i, member := range viewMembers {
@@ -124,7 +124,7 @@ func iamMembersFromView(viewMembers []*iam_model.IamMemberView) []*admin.IamMemb
 	return members
 }
 
-func iamMemberFromView(member *iam_model.IamMemberView) *admin.IamMemberView {
+func iamMemberFromView(member *iam_model.IAMMemberView) *admin.IamMemberView {
 	changeDate, err := ptypes.TimestampProto(member.ChangeDate)
 	logging.Log("GRPC-Lso9c").OnError(err).Debug("unable to parse changedate")
 	creationDate, err := ptypes.TimestampProto(member.CreationDate)
