@@ -38,19 +38,6 @@ const (
 	GenderDiverse
 )
 
-// func (u *Human) CheckOrgIamPolicy(policy *org_model.OrgIamPolicy) error {
-// 	if policy == nil {
-// 		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-zSH7j", "Errors.Users.OrgIamPolicyNil")
-// 	}
-// 	if policy.UserLoginMustBeDomain && strings.Contains(u.UserName, "@") {
-// 		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-se4sJ", "Errors.User.EmailAsUsernameNotAllowed")
-// 	}
-// 	if !policy.UserLoginMustBeDomain && u.Profile != nil && u.UserName == "" && u.Email != nil {
-// 		u.UserName = u.EmailAddress
-// 	}
-// 	return nil
-// }
-
 func (u *Human) SetNamesAsDisplayname() {
 	if u.Profile != nil && u.DisplayName == "" && u.FirstName != "" && u.LastName != "" {
 		u.DisplayName = u.FirstName + " " + u.LastName
