@@ -486,6 +486,7 @@ message IamMemberView {
     string first_name = 8;
     string last_name = 9;
     string display_name = 10;
+    string description = 11;
 }
 
 message IamMemberSearchRequest {

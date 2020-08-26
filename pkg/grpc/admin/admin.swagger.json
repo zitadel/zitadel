@@ -875,6 +875,9 @@
         },
         "display_name": {
           "type": "string"
+        },
+        "description": {
+          "type": "string"
         }
       }
     },

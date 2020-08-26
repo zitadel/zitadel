@@ -21,6 +21,7 @@ type UserGrantView struct {
 	OrgName       string
 	OrgDomain     string
 	RoleKeys      []string
+	Description   string
 
 	CreationDate time.Time
 	ChangeDate   time.Time

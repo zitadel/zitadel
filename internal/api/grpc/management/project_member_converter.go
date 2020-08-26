@@ -123,5 +123,6 @@ func projectMemberViewFromModel(member *proj_model.ProjectMemberView) *managemen
 		CreationDate: creationDate,
 		ChangeDate:   changeDate,
 		Sequence:     member.Sequence,
+		Description:  member.Description,
 	}
 }

@@ -141,5 +141,6 @@ func iamMemberFromView(member *iam_model.IamMemberView) *admin.IamMemberView {
 		FirstName:    member.FirstName,
 		LastName:     member.LastName,
 		DisplayName:  member.DisplayName,
+		Description:  member.Description,
 	}
 }

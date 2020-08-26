@@ -2064,6 +2064,7 @@ message OrgMemberView {
   string first_name = 8;
   string last_name = 9;
   string display_name = 10;
+  string description = 11;
 }
 
 message OrgMemberSearchRequest {
@@ -2113,7 +2114,6 @@ message ProjectView {
   string resource_owner = 6;
   uint64 sequence = 7;
 }
-
 
 message ProjectSearchRequest {
   uint64 offset = 1;
@@ -2268,6 +2268,7 @@ message ProjectMemberView {
   google.protobuf.Timestamp creation_date = 8;
   uint64 sequence = 10;
   string display_name = 11;
+  string description = 12;
 }
 
 message ProjectMemberSearchResponse {
@@ -2564,6 +2565,7 @@ message ProjectGrantMemberView {
   google.protobuf.Timestamp creation_date = 8;
   uint64 sequence = 9;
   string display_name = 10;
+  string description = 11;
 }
 
 message ProjectGrantMemberSearchResponse {
@@ -2667,6 +2669,7 @@ message UserGrantView {
   string resource_owner = 17;
   string display_name = 18;
   string grant_id = 19;
+  string user_description = 20;
 }
 
 

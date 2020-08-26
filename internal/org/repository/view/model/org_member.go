@@ -2,8 +2,9 @@ package model
 
 import (
 	"encoding/json"
-	es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"time"
+
+	es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -34,22 +35,8 @@ type OrgMemberView struct {
 
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
-}
 
-func OrgMemberViewFromModel(member *model.OrgMemberView) *OrgMemberView {
-	return &OrgMemberView{
-		UserID:       member.UserID,
-		OrgID:        member.OrgID,
-		UserName:     member.UserName,
-		Email:        member.Email,
-		FirstName:    member.FirstName,
-		LastName:     member.LastName,
-		DisplayName:  member.DisplayName,
-		Roles:        member.Roles,
-		Sequence:     member.Sequence,
-		CreationDate: member.CreationDate,
-		ChangeDate:   member.ChangeDate,
-	}
+	Description string `json:"-" gorm:"column:machine_description"`
 }
 
 func OrgMemberToModel(member *OrgMemberView) *model.OrgMemberView {
@@ -65,6 +52,7 @@ func OrgMemberToModel(member *OrgMemberView) *model.OrgMemberView {
 		Sequence:     member.Sequence,
 		CreationDate: member.CreationDate,
 		ChangeDate:   member.ChangeDate,
+		Description:  member.Description,
 	}
 }
 

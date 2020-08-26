@@ -35,22 +35,8 @@ type IamMemberView struct {
 
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
-}
 
-func IamMemberViewFromModel(member *model.IamMemberView) *IamMemberView {
-	return &IamMemberView{
-		UserID:       member.UserID,
-		IamID:        member.IamID,
-		UserName:     member.UserName,
-		Email:        member.Email,
-		FirstName:    member.FirstName,
-		LastName:     member.LastName,
-		DisplayName:  member.DisplayName,
-		Roles:        member.Roles,
-		Sequence:     member.Sequence,
-		CreationDate: member.CreationDate,
-		ChangeDate:   member.ChangeDate,
-	}
+	Description string `json:"-" gorm:"column:machine_description"`
 }
 
 func IamMemberToModel(member *IamMemberView) *model.IamMemberView {
@@ -66,6 +52,7 @@ func IamMemberToModel(member *IamMemberView) *model.IamMemberView {
 		Sequence:     member.Sequence,
 		CreationDate: member.CreationDate,
 		ChangeDate:   member.ChangeDate,
+		Description:  member.Description,
 	}
 }
 

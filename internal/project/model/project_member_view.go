@@ -1,8 +1,9 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/model"
 	"time"
+
+	"github.com/caos/zitadel/internal/model"
 )
 
 type ProjectMemberView struct {
@@ -17,6 +18,7 @@ type ProjectMemberView struct {
 	CreationDate time.Time
 	ChangeDate   time.Time
 	Sequence     uint64
+	Description  string
 }
 
 type ProjectMemberSearchRequest struct {

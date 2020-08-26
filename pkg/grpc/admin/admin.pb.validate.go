@@ -2405,6 +2405,8 @@ func (m *IamMemberView) Validate() error {
 
 	// no validation rules for DisplayName
 
+	// no validation rules for Description
+
 	return nil
 }
 

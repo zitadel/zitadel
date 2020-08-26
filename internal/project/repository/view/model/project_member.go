@@ -2,13 +2,14 @@ package model
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	"github.com/lib/pq"
-	"time"
 )
 
 const (
@@ -33,22 +34,8 @@ type ProjectMemberView struct {
 
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
-}
 
-func ProjectMemberViewFromModel(member *model.ProjectMemberView) *ProjectMemberView {
-	return &ProjectMemberView{
-		UserID:       member.UserID,
-		ProjectID:    member.ProjectID,
-		UserName:     member.UserName,
-		Email:        member.Email,
-		FirstName:    member.FirstName,
-		LastName:     member.LastName,
-		DisplayName:  member.DisplayName,
-		Roles:        member.Roles,
-		Sequence:     member.Sequence,
-		CreationDate: member.CreationDate,
-		ChangeDate:   member.ChangeDate,
-	}
+	Description string `json:"-" gorm:"column:machine_description"`
 }
 
 func ProjectMemberToModel(member *ProjectMemberView) *model.ProjectMemberView {
@@ -64,6 +51,7 @@ func ProjectMemberToModel(member *ProjectMemberView) *model.ProjectMemberView {
 		Sequence:     member.Sequence,
 		CreationDate: member.CreationDate,
 		ChangeDate:   member.ChangeDate,
+		Description:  member.Description,
 	}
 }
 

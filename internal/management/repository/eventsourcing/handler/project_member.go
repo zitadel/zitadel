@@ -127,10 +127,16 @@ func (p *ProjectMember) fillData(member *view_model.ProjectMemberView) (err erro
 //TODO: secific for user data
 func (p *ProjectMember) fillUserData(member *view_model.ProjectMemberView, user *usr_model.User) {
 	member.UserName = user.UserName
-	member.FirstName = user.FirstName
-	member.LastName = user.LastName
-	member.Email = user.EmailAddress
-	member.DisplayName = user.DisplayName
+	if user.Human != nil {
+		member.FirstName = user.FirstName
+		member.LastName = user.LastName
+		member.Email = user.EmailAddress
+		member.DisplayName = user.FirstName + " " + user.LastName
+	}
+	if user.Machine != nil {
+		member.Description = user.Machine.Description
+		member.DisplayName = user.Machine.Name
+	}
 }
 func (p *ProjectMember) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-u73es", "id", event.AggregateID).WithError(err).Warn("something went wrong in projectmember handler")

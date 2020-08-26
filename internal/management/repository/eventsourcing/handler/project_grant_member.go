@@ -127,10 +127,16 @@ func (p *ProjectGrantMember) fillData(member *view_model.ProjectGrantMemberView)
 //TODO: specific for user data
 func (p *ProjectGrantMember) fillUserData(member *view_model.ProjectGrantMemberView, user *usr_model.User) {
 	member.UserName = user.UserName
-	member.FirstName = user.FirstName
-	member.LastName = user.LastName
-	member.Email = user.EmailAddress
-	member.DisplayName = user.DisplayName
+	if user.Human != nil {
+		member.FirstName = user.FirstName
+		member.LastName = user.LastName
+		member.DisplayName = user.FirstName + " " + user.LastName
+		member.Email = user.EmailAddress
+	}
+	if user.Machine != nil {
+		member.Description = user.Machine.Description
+		member.DisplayName = user.Machine.Name
+	}
 }
 
 func (p *ProjectGrantMember) OnError(event *models.Event, err error) error {

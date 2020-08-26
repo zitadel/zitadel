@@ -1639,8 +1639,6 @@ func (m *HumanView) Validate() error {
 		}
 	}
 
-	// no validation rules for UserName
-
 	// no validation rules for FirstName
 
 	// no validation rules for LastName
@@ -7193,6 +7191,8 @@ func (m *OrgMemberView) Validate() error {
 
 	// no validation rules for DisplayName
 
+	// no validation rules for Description
+
 	return nil
 }
 
@@ -9263,6 +9263,8 @@ func (m *ProjectMemberView) Validate() error {
 	// no validation rules for Sequence
 
 	// no validation rules for DisplayName
+
+	// no validation rules for Description
 
 	return nil
 }
@@ -11664,6 +11666,8 @@ func (m *ProjectGrantMemberView) Validate() error {
 
 	// no validation rules for DisplayName
 
+	// no validation rules for Description
+
 	return nil
 }
 
@@ -12595,6 +12599,8 @@ func (m *UserGrantView) Validate() error {
 	// no validation rules for DisplayName
 
 	// no validation rules for GrantId
+
+	// no validation rules for UserDescription
 
 	return nil
 }
