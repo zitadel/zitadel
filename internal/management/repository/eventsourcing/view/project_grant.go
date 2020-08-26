@@ -31,12 +31,20 @@ func (v *View) SearchProjectGrants(request *proj_model.ProjectGrantViewSearchReq
 	return view.SearchProjectGrants(v.Db, grantedProjectTable, request)
 }
 
-func (v *View) PutProjectGrant(project *model.ProjectGrantView) error {
-	err := view.PutProjectGrant(v.Db, grantedProjectTable, project)
+func (v *View) PutProjectGrant(grant *model.ProjectGrantView) error {
+	err := view.PutProjectGrant(v.Db, grantedProjectTable, grant)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedProjectGrantSequence(project.Sequence)
+	return v.ProcessedProjectGrantSequence(grant.Sequence)
+}
+
+func (v *View) PutProjectGrants(grants []*model.ProjectGrantView, sequence uint64) error {
+	err := view.PutProjectGrants(v.Db, grantedProjectTable, grants...)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedProjectGrantSequence(sequence)
 }
 
 func (v *View) DeleteProjectGrant(grantID string, eventSequence uint64) error {

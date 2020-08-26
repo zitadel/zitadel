@@ -63,6 +63,15 @@ func PutProjectGrantMember(db *gorm.DB, table string, role *model.ProjectGrantMe
 	return save(db, role)
 }
 
+func PutProjectGrantMembers(db *gorm.DB, table string, members ...*model.ProjectGrantMemberView) error {
+	save := repository.PrepareBulkSave(table)
+	m := make([]interface{}, len(members))
+	for i, member := range members {
+		m[i] = member
+	}
+	return save(db, m...)
+}
+
 func DeleteProjectGrantMember(db *gorm.DB, table, grantID, userID string) error {
 	grant, err := ProjectGrantMemberByIDs(db, table, grantID, userID)
 	if err != nil {

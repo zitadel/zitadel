@@ -74,11 +74,12 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 			return u.view.ProcessedUserSessionSequence(event.Sequence)
 		}
 		for _, session := range sessions {
-			if err := u.updateSession(session, event); err != nil {
+			session.AppendEvent(event)
+			if err := u.fillUserInfo(session, event.AggregateID); err != nil {
 				return err
 			}
 		}
-		return nil
+		return u.view.PutUserSessions(sessions, event.Sequence)
 	case es_model.UserRemoved:
 		return u.view.DeleteUserSessions(event.AggregateID, event.Sequence)
 	default:
