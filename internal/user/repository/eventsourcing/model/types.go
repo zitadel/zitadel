@@ -5,7 +5,6 @@ import "github.com/caos/zitadel/internal/eventstore/models"
 const (
 	UserAggregate         models.AggregateType = "user"
 	UserUserNameAggregate models.AggregateType = "user.username"
-	UserEmailAggregate    models.AggregateType = "user.email"
 
 	UserAdded                     models.EventType = "user.added"
 	UserRegistered                models.EventType = "user.selfregistered"
@@ -16,8 +15,6 @@ const (
 
 	UserUserNameReserved models.EventType = "user.username.reserved"
 	UserUserNameReleased models.EventType = "user.username.released"
-	UserEmailReserved    models.EventType = "user.email.reserved"
-	UserEmailReleased    models.EventType = "user.email.released"
 
 	UserLocked      models.EventType = "user.locked"
 	UserUnlocked    models.EventType = "user.unlocked"

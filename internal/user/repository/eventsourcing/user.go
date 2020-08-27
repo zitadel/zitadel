@@ -33,14 +33,6 @@ func UserUserNameUniqueQuery(userName string) *es_models.SearchQuery {
 		SetLimit(1)
 }
 
-func UserEmailUniqueQuery(email string) *es_models.SearchQuery {
-	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.UserEmailAggregate).
-		AggregateIDFilter(email).
-		OrderDesc().
-		SetLimit(1)
-}
-
 func UserAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User) (*es_models.Aggregate, error) {
 	if user == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dis83", "Errors.Internal")
@@ -111,11 +103,7 @@ func UserCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCre
 	if err != nil {
 		return nil, err
 	}
-	return []*es_models.Aggregate{
-		agg,
-		uniqueAggregates[0],
-		uniqueAggregates[1],
-	}, nil
+	return append(uniqueAggregates, agg), nil
 }
 
 func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, resourceOwner string, initCode *model.InitUserCode, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
@@ -148,11 +136,7 @@ func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateC
 	if err != nil {
 		return nil, err
 	}
-	return []*es_models.Aggregate{
-		agg,
-		uniqueAggregates[0],
-		uniqueAggregates[1],
-	}, nil
+	return append(uniqueAggregates, agg), nil
 }
 
 func getUniqueUserAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, resourceOwner string, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
@@ -161,13 +145,8 @@ func getUniqueUserAggregates(ctx context.Context, aggCreator *es_models.Aggregat
 		return nil, err
 	}
 
-	emailAggregate, err := reservedUniqueEmailAggregate(ctx, aggCreator, resourceOwner, user.EmailAddress)
-	if err != nil {
-		return nil, err
-	}
 	return []*es_models.Aggregate{
 		userNameAggregate,
-		emailAggregate,
 	}, nil
 }
 func reservedUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, userName string, userLoginMustBeDomain bool) (*es_models.Aggregate, error) {
@@ -218,38 +197,6 @@ func changeUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.Ag
 		return nil, err
 	}
 	return aggregates, nil
-}
-
-func reservedUniqueEmailAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, email string) (aggregate *es_models.Aggregate, err error) {
-	aggregate, err = aggCreator.NewAggregate(ctx, email, model.UserEmailAggregate, model.UserVersion, 0)
-	if resourceOwner != "" {
-		aggregate, err = aggCreator.NewAggregate(ctx, email, model.UserEmailAggregate, model.UserVersion, 0, es_models.OverwriteResourceOwner(resourceOwner))
-	}
-	if err != nil {
-		return nil, err
-	}
-	aggregate, err = aggregate.AppendEvent(model.UserEmailReserved, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return aggregate.SetPrecondition(UserEmailUniqueQuery(email), isEventValidation(aggregate, model.UserEmailReserved)), nil
-}
-
-func releasedUniqueEmailAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, email string) (aggregate *es_models.Aggregate, err error) {
-	aggregate, err = aggCreator.NewAggregate(ctx, email, model.UserEmailAggregate, model.UserVersion, 0)
-	if resourceOwner != "" {
-		aggregate, err = aggCreator.NewAggregate(ctx, email, model.UserEmailAggregate, model.UserVersion, 0, es_models.OverwriteResourceOwner(resourceOwner))
-	}
-	if err != nil {
-		return nil, err
-	}
-	aggregate, err = aggregate.AppendEvent(model.UserEmailReleased, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return aggregate.SetPrecondition(UserEmailUniqueQuery(email), isEventValidation(aggregate, model.UserEmailReleased)), nil
 }
 
 func UserDeactivateAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
@@ -415,7 +362,7 @@ func ProfileChangeAggregate(aggCreator *es_models.AggregateCreator, existing *mo
 	}
 }
 
-func EmailChangeAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.User, email *model.Email, code *model.EmailCode) ([]*es_models.Aggregate, error) {
+func EmailChangeAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.User, email *model.Email, code *model.EmailCode) (*es_models.Aggregate, error) {
 	if email == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dki8s", "Errors.Internal")
 	}
@@ -426,17 +373,6 @@ func EmailChangeAggregate(ctx context.Context, aggCreator *es_models.AggregateCr
 	if len(changes) == 0 {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-s90pw", "Errors.NoChangesFound")
 	}
-	aggregates := make([]*es_models.Aggregate, 0, 4)
-	reserveEmailAggregate, err := reservedUniqueEmailAggregate(ctx, aggCreator, "", email.EmailAddress)
-	if err != nil {
-		return nil, err
-	}
-	aggregates = append(aggregates, reserveEmailAggregate)
-	releaseEmailAggregate, err := releasedUniqueEmailAggregate(ctx, aggCreator, "", existing.EmailAddress)
-	if err != nil {
-		return nil, err
-	}
-	aggregates = append(aggregates, releaseEmailAggregate)
 	agg, err := UserAggregate(ctx, aggCreator, existing)
 	if err != nil {
 		return nil, err
@@ -460,7 +396,7 @@ func EmailChangeAggregate(ctx context.Context, aggCreator *es_models.AggregateCr
 			return nil, err
 		}
 	}
-	return append(aggregates, agg), nil
+	return agg, nil
 }
 
 func EmailVerifiedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc {
