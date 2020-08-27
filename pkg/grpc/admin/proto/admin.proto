@@ -311,7 +311,7 @@ message OrgSetUpResponse {
 }
 
 message CreateUserRequest {
-    string user_name = 1 [(validate.rules).string.pattern = "^[[:graph:]]{1,200}$"];
+    string user_name = 1 [(validate.rules).string.pattern = "^[^[:space:]]{1,200}$"];
 
     oneof user {
       option (validate.required) = true;
