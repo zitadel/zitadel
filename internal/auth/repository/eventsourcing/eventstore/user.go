@@ -222,7 +222,7 @@ func (repo *UserRepo) RemoveMyMfaOTP(ctx context.Context) error {
 
 func (repo *UserRepo) ChangeMyUsername(ctx context.Context, username string) error {
 	ctxData := authz.GetCtxData(ctx)
-	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, ctxData.OrgID)
+	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, ctxData.OrgID)
 	if err != nil {
 		return err
 	}
@@ -309,7 +309,7 @@ func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, li
 
 func (repo *UserRepo) ChangeUsername(ctx context.Context, userID, username string) error {
 	policyResourceOwner := authz.GetCtxData(ctx).OrgID
-	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, policyResourceOwner)
+	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, policyResourceOwner)
 	if err != nil {
 		return err
 	}

@@ -1131,14 +1131,14 @@ func (es *UserEventstore) DomainClaimedSent(ctx context.Context, userID string) 
 	return nil
 }
 
-func (es *UserEventstore) ChangeUsername(ctx context.Context, userID, username string, orgIamPolicy *org_model.OrgIamPolicy) error {
+func (es *UserEventstore) ChangeUsername(ctx context.Context, userID, username string, orgIamPolicy *org_model.OrgIAMPolicy) error {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
 	}
 	oldUsername := user.UserName
 	user.UserName = username
-	if err := user.CheckOrgIamPolicy(orgIamPolicy); err != nil {
+	if err := user.CheckOrgIAMPolicy(orgIamPolicy); err != nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-D23s2", "Errors.Users.Mfa.Otp.NotExisting")
 	}
 	repoUser := model.UserFromModel(user)

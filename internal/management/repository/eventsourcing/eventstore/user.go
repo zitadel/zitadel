@@ -180,7 +180,7 @@ func (repo *UserRepo) ChangeProfile(ctx context.Context, profile *usr_model.Prof
 }
 
 func (repo *UserRepo) ChangeUsername(ctx context.Context, userID, userName string) error {
-	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return err
 	}

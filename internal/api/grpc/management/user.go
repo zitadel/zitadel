@@ -6,8 +6,6 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	grpc_util "github.com/caos/zitadel/internal/api/grpc"
-	"github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
@@ -30,8 +28,7 @@ func (s *Server) GetUserByLoginNameGlobal(ctx context.Context, loginName *manage
 
 func (s *Server) SearchUsers(ctx context.Context, in *management.UserSearchRequest) (*management.UserSearchResponse, error) {
 	request := userSearchRequestsToModel(in)
-	orgID := grpc_util.GetHeader(ctx, http.ZitadelOrgID)
-	request.AppendMyOrgQuery(orgID)
+	request.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID)
 	response, err := s.user.SearchUsers(ctx, request)
 	if err != nil {
 		return nil, err
