@@ -170,6 +170,14 @@ func (repo *UserRepo) ChangeProfile(ctx context.Context, profile *usr_model.Prof
 	return repo.UserEvents.ChangeProfile(ctx, profile)
 }
 
+func (repo *UserRepo) ChangeUsername(ctx context.Context, userID, userName string) error {
+	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return err
+	}
+	return repo.UserEvents.ChangeUsername(ctx, userID, userName, orgPolicy)
+}
+
 func (repo *UserRepo) EmailByID(ctx context.Context, userID string) (*usr_model.Email, error) {
 	user, err := repo.UserByID(ctx, userID)
 	if err != nil {

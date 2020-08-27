@@ -26,6 +26,8 @@ type UserRepository interface {
 	ProfileByID(ctx context.Context, userID string) (*model.Profile, error)
 	ChangeProfile(ctx context.Context, profile *model.Profile) (*model.Profile, error)
 
+	ChangeUsername(ctx context.Context, id, username string) error
+
 	EmailByID(ctx context.Context, userID string) (*model.Email, error)
 	ChangeEmail(ctx context.Context, email *model.Email) (*model.Email, error)
 	CreateEmailVerificationCode(ctx context.Context, userID string) error

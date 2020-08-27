@@ -107,6 +107,10 @@ func (s *Server) GetUserProfile(ctx context.Context, in *management.UserID) (*ma
 	return profileViewFromModel(profile), nil
 }
 
+func (s *Server) ChangeUserUserName(ctx context.Context, request *management.UpdateUserUserNameRequest) (*empty.Empty, error) {
+	return &empty.Empty{}, s.user.ChangeUsername(ctx, request.Id, request.UserName)
+}
+
 func (s *Server) UpdateUserProfile(ctx context.Context, request *management.UpdateUserProfileRequest) (*management.UserProfile, error) {
 	profile, err := s.user.ChangeProfile(ctx, updateProfileToModel(request))
 	if err != nil {

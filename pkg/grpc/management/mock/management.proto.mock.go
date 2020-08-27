@@ -337,6 +337,26 @@ func (mr *MockManagementServiceClientMockRecorder) ChangeUserPhone(arg0, arg1 in
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeUserPhone", reflect.TypeOf((*MockManagementServiceClient)(nil).ChangeUserPhone), varargs...)
 }
 
+// ChangeUserUserName mocks base method
+func (m *MockManagementServiceClient) ChangeUserUserName(arg0 context.Context, arg1 *management.UpdateUserUserNameRequest, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ChangeUserUserName", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ChangeUserUserName indicates an expected call of ChangeUserUserName
+func (mr *MockManagementServiceClientMockRecorder) ChangeUserUserName(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeUserUserName", reflect.TypeOf((*MockManagementServiceClient)(nil).ChangeUserUserName), varargs...)
+}
+
 // CreateOIDCApplication mocks base method
 func (m *MockManagementServiceClient) CreateOIDCApplication(arg0 context.Context, arg1 *management.OIDCApplicationCreate, arg2 ...grpc.CallOption) (*management.Application, error) {
 	m.ctrl.T.Helper()

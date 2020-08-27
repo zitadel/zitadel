@@ -104,6 +104,11 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/ChangeUserUserName": authz.Option{
+		Permission: "user.write",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/ChangeUserEmail": authz.Option{
 		Permission: "user.write",
 		CheckParam: "",

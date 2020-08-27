@@ -254,6 +254,16 @@ service ManagementService {
     };
   }
 
+  rpc ChangeUserUserName(UpdateUserUserNameRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      get: "/users/{id}/username"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.write"
+    };
+  }
+
   rpc ChangeUserEmail(UpdateUserEmailRequest) returns (UserEmail) {
     option (google.api.http) = {
       put: "/users/{id}/email"
@@ -1484,6 +1494,11 @@ message UpdateUserProfileRequest {
   string nick_name = 4 [(validate.rules).string = {max_len: 200}];
   string preferred_language = 5 [(validate.rules).string = {max_len: 200}];
   Gender gender = 6;
+}
+
+message UpdateUserUserNameRequest {
+  string id = 1;
+  string user_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message UserEmail {
