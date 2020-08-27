@@ -713,7 +713,7 @@ func (m *UniqueUserRequest) Validate() error {
 	if !_UniqueUserRequest_UserName_Pattern.MatchString(m.GetUserName()) {
 		return UniqueUserRequestValidationError{
 			field:  "UserName",
-			reason: "value does not match regex pattern \"^[[:graph:]]{1,200}$\"",
+			reason: "value does not match regex pattern \"^[^[:space:]]{1,200}$\"",
 		}
 	}
 
@@ -783,7 +783,7 @@ var _ interface {
 	ErrorName() string
 } = UniqueUserRequestValidationError{}
 
-var _UniqueUserRequest_UserName_Pattern = regexp.MustCompile("^[[:graph:]]{1,200}$")
+var _UniqueUserRequest_UserName_Pattern = regexp.MustCompile("^[^[:space:]]{1,200}$")
 
 // Validate checks the field values on UniqueUserResponse with the rules
 // defined in the proto definition for this message. If any rules are
@@ -865,7 +865,7 @@ func (m *CreateUserRequest) Validate() error {
 	if !_CreateUserRequest_UserName_Pattern.MatchString(m.GetUserName()) {
 		return CreateUserRequestValidationError{
 			field:  "UserName",
-			reason: "value does not match regex pattern \"^[[:graph:]]{1,200}$\"",
+			reason: "value does not match regex pattern \"^[^[:space:]]{1,200}$\"",
 		}
 	}
 
@@ -962,7 +962,7 @@ var _ interface {
 	ErrorName() string
 } = CreateUserRequestValidationError{}
 
-var _CreateUserRequest_UserName_Pattern = regexp.MustCompile("^[[:graph:]]{1,200}$")
+var _CreateUserRequest_UserName_Pattern = regexp.MustCompile("^[^[:space:]]{1,200}$")
 
 // Validate checks the field values on CreateHumanRequest with the rules
 // defined in the proto definition for this message. If any rules are
