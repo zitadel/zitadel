@@ -232,11 +232,11 @@ func TestUserCreateAggregate(t *testing.T) {
 			}
 
 			if !tt.res.wantErr && len(aggregates[1].Events) != tt.res.eventLen {
-				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(aggregates[0].Events))
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(aggregates[1].Events))
 			}
 			for i := 0; i < tt.res.eventLen; i++ {
 				if !tt.res.wantErr && aggregates[1].Events[i].Type != tt.res.eventTypes[i] {
-					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], aggregates[0].Events[i].Type.String())
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], aggregates[1].Events[i].Type.String())
 				}
 				if !tt.res.wantErr && tt.res.checkData[i] && aggregates[1].Events[i].Data == nil {
 					t.Errorf("should have data in event")
@@ -352,14 +352,14 @@ func TestUserRegisterAggregate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			aggregates, err := UserRegisterAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.new, tt.args.resourceOwner, tt.args.initCode, false)
 
-			if tt.res.errFunc == nil && len(aggregates[0].Events) != tt.res.eventLen {
-				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(aggregates[0].Events))
+			if tt.res.errFunc == nil && len(aggregates[1].Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(aggregates[1].Events))
 			}
 			for i := 0; i < tt.res.eventLen; i++ {
-				if tt.res.errFunc == nil && aggregates[0].Events[i].Type != tt.res.eventTypes[i] {
-					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], aggregates[0].Events[i].Type.String())
+				if tt.res.errFunc == nil && aggregates[1].Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], aggregates[1].Events[i].Type.String())
 				}
-				if tt.res.errFunc == nil && aggregates[0].Events[i].Data == nil {
+				if tt.res.errFunc == nil && aggregates[1].Events[i].Data == nil {
 					t.Errorf("should have data in event")
 				}
 			}
