@@ -234,8 +234,6 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     }
 
     public showDetail(): void {
-        if (this.project?.state === ProjectState.PROJECTSTATE_ACTIVE) {
-            this.router.navigate(['projects', this.project.projectId, 'members']);
-        }
+        this.router.navigate(['projects', this.project.projectId, 'members']);
     }
 }

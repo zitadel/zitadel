@@ -1,14 +1,14 @@
 <app-detail-layout [backRouterLink]="[ '/org']" title="{{org?.name}} {{ 'ORG.MEMBER.TITLE' | translate }}"
     description="{{ 'ORG.MEMBER.DESCRIPTION' | translate }}">
-    <app-refresh-table (refreshed)="refreshPage()" [dataSize]="dataSource.totalResult"
-        [timestamp]="dataSource?.viewTimestamp" [selection]="selection" [loading]="dataSource.loading$ | async">
-        <ng-template appHasRole actions [appHasRole]="['org.member.delete:'+org.id,'org.member.delete']">
+    <app-refresh-table (refreshed)="refreshPage()" [dataSize]="dataSource?.totalResult"
+        [timestamp]="dataSource?.viewTimestamp" [selection]="selection" [loading]="dataSource?.loading$ | async">
+        <ng-template appHasRole actions [appHasRole]="['org.member.delete:'+org?.id,'org.member.delete']">
             <button (click)="removeProjectMemberSelection()" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}"
                 class="icon-button" mat-icon-button *ngIf="selection.hasValue()" color="warn">
                 <i class="las la-trash"></i>
             </button>
         </ng-template>
-        <ng-template appHasRole actions [appHasRole]="['org.member.write:'+org.id,'org.member.write']">
+        <ng-template appHasRole actions [appHasRole]="['org.member.write:'+org?.id,'org.member.write']">
             <a color="primary" [disabled]="disabled" class="add-button" (click)="openAddMember()" color="primary"
                 mat-raised-button>
                 <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
