@@ -81,7 +81,7 @@ service ManagementService {
     };
   }
 
-  // GetUserByEmailGlobal returns User, global search is overall organisations
+  // GetUserByLoginNameGlobal returns User, global search is overall organisations
   rpc GetUserByLoginNameGlobal(LoginName) returns (UserView) {
     option (google.api.http) = {
       get: "/global/users/_byloginname"
