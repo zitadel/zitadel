@@ -63,6 +63,15 @@ func PutUserSession(db *gorm.DB, table string, session *model.UserSessionView) e
 	return save(db, session)
 }
 
+func PutUserSessions(db *gorm.DB, table string, sessions ...*model.UserSessionView) error {
+	save := repository.PrepareBulkSave(table)
+	s := make([]interface{}, len(sessions))
+	for i, session := range sessions {
+		s[i] = session
+	}
+	return save(db, s...)
+}
+
 func DeleteUserSessions(db *gorm.DB, table, userID string) error {
 	delete := repository.PrepareDeleteByKey(table, model.UserSessionSearchKey(usr_model.UserSessionSearchKeyUserID), userID)
 	return delete(db)

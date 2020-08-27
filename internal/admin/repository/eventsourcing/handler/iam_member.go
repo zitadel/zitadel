@@ -29,18 +29,18 @@ func (m *IamMember) ViewModel() string {
 }
 
 func (m *IamMember) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestIamMemberSequence()
+	sequence, err := m.view.GetLatestIAMMemberSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.IamAggregate, usr_es_model.UserAggregate).
+		AggregateTypeFilter(model.IAMAggregate, usr_es_model.UserAggregate).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (m *IamMember) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
-	case model.IamAggregate:
+	case model.IAMAggregate:
 		err = m.processIamMember(event)
 	case usr_es_model.UserAggregate:
 		err = m.processUser(event)
@@ -49,46 +49,46 @@ func (m *IamMember) Reduce(event *models.Event) (err error) {
 }
 
 func (m *IamMember) processIamMember(event *models.Event) (err error) {
-	member := new(iam_model.IamMemberView)
+	member := new(iam_model.IAMMemberView)
 	switch event.Type {
-	case model.IamMemberAdded:
+	case model.IAMMemberAdded:
 		member.AppendEvent(event)
 		m.fillData(member)
-	case model.IamMemberChanged:
+	case model.IAMMemberChanged:
 		err := member.SetData(event)
 		if err != nil {
 			return err
 		}
-		member, err = m.view.IamMemberByIDs(event.AggregateID, member.UserID)
+		member, err = m.view.IAMMemberByIDs(event.AggregateID, member.UserID)
 		if err != nil {
 			return err
 		}
 		member.AppendEvent(event)
-	case model.IamMemberRemoved:
+	case model.IAMMemberRemoved:
 		err := member.SetData(event)
 		if err != nil {
 			return err
 		}
-		return m.view.DeleteIamMember(event.AggregateID, member.UserID, event.Sequence)
+		return m.view.DeleteIAMMember(event.AggregateID, member.UserID, event.Sequence)
 	default:
-		return m.view.ProcessedIamMemberSequence(event.Sequence)
+		return m.view.ProcessedIAMMemberSequence(event.Sequence)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutIamMember(member, member.Sequence)
+	return m.view.PutIAMMember(member, member.Sequence)
 }
 
 func (m *IamMember) processUser(event *models.Event) (err error) {
 	switch event.Type {
 	case usr_es_model.UserProfileChanged,
 		usr_es_model.UserEmailChanged:
-		members, err := m.view.IamMembersByUserID(event.AggregateID)
+		members, err := m.view.IAMMembersByUserID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		if len(members) == 0 {
-			return m.view.ProcessedIamMemberSequence(event.Sequence)
+			return m.view.ProcessedIAMMemberSequence(event.Sequence)
 		}
 		user, err := m.userEvents.UserByID(context.Background(), event.AggregateID)
 		if err != nil {
@@ -96,18 +96,15 @@ func (m *IamMember) processUser(event *models.Event) (err error) {
 		}
 		for _, member := range members {
 			m.fillUserData(member, user)
-			err = m.view.PutIamMember(member, event.Sequence)
-			if err != nil {
-				return err
-			}
 		}
+		return m.view.PutIAMMembers(members, event.Sequence)
 	default:
-		return m.view.ProcessedIamMemberSequence(event.Sequence)
+		return m.view.ProcessedIAMMemberSequence(event.Sequence)
 	}
 	return nil
 }
 
-func (m *IamMember) fillData(member *iam_model.IamMemberView) (err error) {
+func (m *IamMember) fillData(member *iam_model.IAMMemberView) (err error) {
 	user, err := m.userEvents.UserByID(context.Background(), member.UserID)
 	if err != nil {
 		return err
@@ -116,7 +113,7 @@ func (m *IamMember) fillData(member *iam_model.IamMemberView) (err error) {
 	return nil
 }
 
-func (m *IamMember) fillUserData(member *iam_model.IamMemberView, user *usr_model.User) {
+func (m *IamMember) fillUserData(member *iam_model.IAMMemberView, user *usr_model.User) {
 	member.UserName = user.UserName
 	member.FirstName = user.FirstName
 	member.LastName = user.LastName
@@ -125,5 +122,5 @@ func (m *IamMember) fillUserData(member *iam_model.IamMemberView, user *usr_mode
 }
 func (m *IamMember) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Ld9ow", "id", event.AggregateID).WithError(err).Warn("something went wrong in iammember handler")
-	return spooler.HandleError(event, err, m.view.GetLatestIamMemberFailedEvent, m.view.ProcessedIamMemberFailedEvent, m.view.ProcessedIamMemberSequence, m.errorCountUntilSkip)
+	return spooler.HandleError(event, err, m.view.GetLatestIAMMemberFailedEvent, m.view.ProcessedIAMMemberFailedEvent, m.view.ProcessedIAMMemberSequence, m.errorCountUntilSkip)
 }

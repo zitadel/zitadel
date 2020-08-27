@@ -4,7 +4,7 @@
             <a (click)="navigateBack()" mat-icon-button>
                 <mat-icon class="icon">arrow_back</mat-icon>
             </a>
-            <h1>{{ 'USER.PROFILE.TITLE' | translate }} {{user?.displayName}}</h1>
+            <h1>{{user?.displayName}}</h1>
 
             <span class="fill-space"></span>
 
@@ -157,6 +157,8 @@
                 <span class="second"><span style="display: block;">{{user.preferredLoginName}}</span></span>
             </div>
         </div>
+
+        <app-memberships [user]="user"></app-memberships>
 
         <app-changes class="changes" [changeType]="ChangeType.USER" [id]="user.id"></app-changes>
     </div>

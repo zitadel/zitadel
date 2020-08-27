@@ -16,6 +16,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
+import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 
 import { IamMembersRoutingModule } from './iam-members-routing.module';
@@ -45,6 +46,7 @@ import { IamMembersComponent } from './iam-members.component';
         MatFormFieldModule,
         MatSelectModule,
         HasRolePipeModule,
+        RefreshTableModule,
     ],
 })
 export class IamMembersModule { }

@@ -94,14 +94,6 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
         }));
     }
 
-    public removeMember(member: ProjectMember.AsObject): void {
-        this.projectService.RemoveProjectGrantMember(this.projectId, this.grantId, member.userId).then(() => {
-            this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERREMOVED', true);
-        }).catch(error => {
-            this.toast.showError(error);
-        });
-    }
-
     public isAllSelected(): boolean {
         const numSelected = this.selection.selected.length;
         const numRows = this.dataSource.membersSubject.value.length;
@@ -149,5 +141,10 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
             }).catch(error => {
                 this.toast.showError(error);
             });
+    }
+
+    public refreshPage(): void {
+        this.selection.clear();
+        this.dataSource.loadGrantMembers(this.projectId, this.grantId, this.paginator.pageIndex, this.paginator.pageSize);
     }
 }

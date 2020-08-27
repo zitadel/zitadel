@@ -558,4 +558,79 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		Permission: "user.grant.delete",
 		CheckParam: "",
 	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/IdpByID": authz.Option{
+		Permission: "org.idp.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/CreateOidcIdp": authz.Option{
+		Permission: "org.idp.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/UpdateIdpConfig": authz.Option{
+		Permission: "org.idp.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/DeactivateIdpConfig": authz.Option{
+		Permission: "org.idp.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/ReactivateIdpConfig": authz.Option{
+		Permission: "org.idp.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveIdpConfig": authz.Option{
+		Permission: "org.idp.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/UpdateOidcIdpConfig": authz.Option{
+		Permission: "org.idp.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/SearchIdps": authz.Option{
+		Permission: "org.idp.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GetLoginPolicy": authz.Option{
+		Permission: "policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/CreateLoginPolicy": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/UpdateLoginPolicy": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveLoginPolicy": authz.Option{
+		Permission: "policy.delete",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GetLoginPolicyIdpProviders": authz.Option{
+		Permission: "policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/AddIdpProviderToLoginPolicy": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveIdpProviderFromLoginPolicy": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
 }

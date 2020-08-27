@@ -5,9 +5,9 @@ import (
 	"time"
 )
 
-type IamMemberView struct {
+type IAMMemberView struct {
 	UserID       string
-	IamID        string
+	IAMID        string
 	UserName     string
 	Email        string
 	FirstName    string
@@ -19,42 +19,42 @@ type IamMemberView struct {
 	Sequence     uint64
 }
 
-type IamMemberSearchRequest struct {
+type IAMMemberSearchRequest struct {
 	Offset        uint64
 	Limit         uint64
-	SortingColumn IamMemberSearchKey
+	SortingColumn IAMMemberSearchKey
 	Asc           bool
-	Queries       []*IamMemberSearchQuery
+	Queries       []*IAMMemberSearchQuery
 }
 
-type IamMemberSearchKey int32
+type IAMMemberSearchKey int32
 
 const (
-	IamMemberSearchKeyUnspecified IamMemberSearchKey = iota
-	IamMemberSearchKeyUserName
-	IamMemberSearchKeyEmail
-	IamMemberSearchKeyFirstName
-	IamMemberSearchKeyLastName
-	IamMemberSearchKeyIamID
-	IamMemberSearchKeyUserID
+	IAMMemberSearchKeyUnspecified IAMMemberSearchKey = iota
+	IAMMemberSearchKeyUserName
+	IAMMemberSearchKeyEmail
+	IAMMemberSearchKeyFirstName
+	IAMMemberSearchKeyLastName
+	IAMMemberSearchKeyIamID
+	IAMMemberSearchKeyUserID
 )
 
-type IamMemberSearchQuery struct {
-	Key    IamMemberSearchKey
+type IAMMemberSearchQuery struct {
+	Key    IAMMemberSearchKey
 	Method model.SearchMethod
 	Value  interface{}
 }
 
-type IamMemberSearchResponse struct {
+type IAMMemberSearchResponse struct {
 	Offset      uint64
 	Limit       uint64
 	TotalResult uint64
-	Result      []*IamMemberView
+	Result      []*IAMMemberView
 	Sequence    uint64
 	Timestamp   time.Time
 }
 
-func (r *IamMemberSearchRequest) EnsureLimit(limit uint64) {
+func (r *IAMMemberSearchRequest) EnsureLimit(limit uint64) {
 	if r.Limit == 0 || r.Limit > limit {
 		r.Limit = limit
 	}

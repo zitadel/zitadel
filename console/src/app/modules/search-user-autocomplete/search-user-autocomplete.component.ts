@@ -29,7 +29,7 @@ export class SearchUserAutocompleteComponent {
     public globalLoginNameControl: FormControl = new FormControl();
 
     public loginNames: string[] = [];
-    public users: Array<UserView.AsObject> = [];
+    @Input() public users: Array<UserView.AsObject> = [];
     public filteredUsers: Array<UserView.AsObject> = [];
     public isLoading: boolean = false;
     public target: UserTarget = UserTarget.SELF;
@@ -39,6 +39,7 @@ export class SearchUserAutocompleteComponent {
     @ViewChild('auto') public matAutocomplete!: MatAutocomplete;
     @Output() public selectionChanged: EventEmitter<UserView.AsObject | UserView.AsObject[]> = new EventEmitter();
     @Input() public singleOutput: boolean = false;
+
     private unsubscribed$: Subject<void> = new Subject();
     constructor(private userService: MgmtUserService, private toast: ToastService) {
         this.getFilteredResults();
@@ -102,6 +103,7 @@ export class SearchUserAutocompleteComponent {
 
         if (index >= 0) {
             this.users.splice(index, 1);
+            this.selectionChanged.emit(this.users);
         }
     }
 

@@ -17,6 +17,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 import { CardModule } from 'src/app/modules/card/card.module';
+import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
@@ -61,6 +62,7 @@ import { OwnedProjectsComponent } from './owned-projects.component';
         TimestampToDatePipeModule,
         LocalizedDatePipeModule,
         SharedModule,
+        RefreshTableModule,
     ],
 })
 export class OwnedProjectsModule { }

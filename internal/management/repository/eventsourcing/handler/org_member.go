@@ -99,11 +99,8 @@ func (m *OrgMember) processUser(event *models.Event) (err error) {
 		}
 		for _, member := range members {
 			m.fillUserData(member, user)
-			err = m.view.PutOrgMember(member, event.Sequence)
-			if err != nil {
-				return err
-			}
 		}
+		return m.view.PutOrgMembers(members, event.Sequence)
 	default:
 		return m.view.ProcessedOrgMemberSequence(event.Sequence)
 	}

@@ -93,13 +93,6 @@ func TestAppendEvent(t *testing.T) {
 			},
 			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.OrgStateActive)},
 		},
-		{
-			name: "append added domain event",
-			args: args{
-				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgDomainAdded},
-			},
-			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.OrgStateActive)},
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

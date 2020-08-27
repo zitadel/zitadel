@@ -9,11 +9,11 @@ import (
 )
 
 func (s *Server) GetIamMemberRoles(ctx context.Context, _ *empty.Empty) (*admin.IamMemberRoles, error) {
-	return &admin.IamMemberRoles{Roles: s.iam.GetIamMemberRoles()}, nil
+	return &admin.IamMemberRoles{Roles: s.iam.GetIAMMemberRoles()}, nil
 }
 
 func (s *Server) SearchIamMembers(ctx context.Context, in *admin.IamMemberSearchRequest) (*admin.IamMemberSearchResponse, error) {
-	members, err := s.iam.SearchIamMembers(ctx, iamMemberSearchRequestToModel(in))
+	members, err := s.iam.SearchIAMMembers(ctx, iamMemberSearchRequestToModel(in))
 	if err != nil {
 		return nil, err
 	}
@@ -21,7 +21,7 @@ func (s *Server) SearchIamMembers(ctx context.Context, in *admin.IamMemberSearch
 }
 
 func (s *Server) AddIamMember(ctx context.Context, member *admin.AddIamMemberRequest) (*admin.IamMember, error) {
-	addedMember, err := s.iam.AddIamMember(ctx, addIamMemberToModel(member))
+	addedMember, err := s.iam.AddIAMMember(ctx, addIamMemberToModel(member))
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func (s *Server) AddIamMember(ctx context.Context, member *admin.AddIamMemberReq
 }
 
 func (s *Server) ChangeIamMember(ctx context.Context, member *admin.ChangeIamMemberRequest) (*admin.IamMember, error) {
-	changedMember, err := s.iam.ChangeIamMember(ctx, changeIamMemberToModel(member))
+	changedMember, err := s.iam.ChangeIAMMember(ctx, changeIamMemberToModel(member))
 	if err != nil {
 		return nil, err
 	}
@@ -38,6 +38,6 @@ func (s *Server) ChangeIamMember(ctx context.Context, member *admin.ChangeIamMem
 }
 
 func (s *Server) RemoveIamMember(ctx context.Context, member *admin.RemoveIamMemberRequest) (*empty.Empty, error) {
-	err := s.iam.RemoveIamMember(ctx, member.UserId)
+	err := s.iam.RemoveIAMMember(ctx, member.UserId)
 	return &empty.Empty{}, err
 }

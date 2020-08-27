@@ -202,7 +202,6 @@ func (s *Server) GetUserMfas(ctx context.Context, userID *management.UserID) (*m
 
 func (s *Server) SearchUserMemberships(ctx context.Context, in *management.UserMembershipSearchRequest) (*management.UserMembershipSearchResponse, error) {
 	request := userMembershipSearchRequestsToModel(in)
-	request.AppendResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
 	request.AppendUserIDQuery(in.UserId)
 	response, err := s.user.SearchUserMemberships(ctx, request)
 	if err != nil {

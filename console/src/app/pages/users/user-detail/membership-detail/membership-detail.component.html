@@ -1,0 +1,74 @@
+<app-detail-layout [backRouterLink]="[ '/users', user?.id]"
+    title="{{user?.displayName}} {{ 'USER.MEMBERSHIPS.TITLE' | translate }}"
+    description="{{ 'USER.MEMBERSHIPS.DESCRIPTION' | translate }}">
+    <app-refresh-table class="refresh-table" (refreshed)="refreshPage()" [dataSize]="dataSource?.totalResult"
+        [timestamp]="dataSource?.viewTimestamp" [selection]="selection" [loading]="dataSource?.loading$ | async">
+
+        <!-- <button actions (click)="removeSelectedMemberships()" matTooltip="{{'USER.MEMBERSHIPS.REMOVE' | translate}}"
+            class="icon-button" mat-icon-button *ngIf="selection.hasValue()" color="warn">
+            <i class="las la-trash"></i>
+        </button> -->
+
+        <a actions color="primary" class="add-button" (click)="addMember()" color="primary" mat-raised-button>
+            <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
+        </a>
+
+        <div class="table-wrapper">
+            <table mat-table class="background-style table" aria-label="Elements" [dataSource]="dataSource">
+                <ng-container matColumnDef="select">
+                    <th class="selection" mat-header-cell *matHeaderCellDef>
+                        <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
+                            [checked]="selection.hasValue() && isAllSelected()"
+                            [indeterminate]="selection.hasValue() && !isAllSelected()">
+                        </mat-checkbox>
+                    </th>
+                    <td class="selection" mat-cell *matCellDef="let row">
+                        <mat-checkbox color="primary" (click)="$event.stopPropagation()"
+                            (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
+                        </mat-checkbox>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="memberType">
+                    <th mat-header-cell *matHeaderCellDef> {{ 'USER.MEMBERSHIPS.TYPE' | translate }} </th>
+                    <td class="pointer" mat-cell *matCellDef="let member">
+                        {{'USER.MEMBERSHIPS.TYPES.' + member.memberType | translate }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="displayName">
+                    <th mat-header-cell *matHeaderCellDef> {{ 'USER.MEMBERSHIPS.DISPLAYNAME' | translate }} </th>
+                    <td class="pointer" mat-cell *matCellDef="let member">
+                        {{member.displayName}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="creationDate">
+                    <th mat-header-cell *matHeaderCellDef> {{ 'USER.MEMBERSHIPS.CREATIONDATE' | translate }} </th>
+                    <td class="pointer" mat-cell *matCellDef="let member">
+                        {{member.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="changeDate">
+                    <th mat-header-cell *matHeaderCellDef> {{ 'USER.MEMBERSHIPS.CHANGEDATE' | translate }} </th>
+                    <td class="pointer" mat-cell *matCellDef="let member">
+                        {{member.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="roles">
+                    <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.ROLES' | translate }} </th>
+                    <td class="pointer" mat-cell *matCellDef="let member">
+                        {{member.rolesList.join(', ')}}
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr class="data-row" mat-row *matRowDef="let row; columns: displayedColumns;">
+                </tr>
+            </table>
+
+            <mat-paginator class="paginator background-style" #paginator [pageSize]="50"
+                [pageSizeOptions]="[25, 50, 100, 250]">
+            </mat-paginator>
+        </div>
+    </app-refresh-table>
+</app-detail-layout>

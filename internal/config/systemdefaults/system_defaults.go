@@ -14,17 +14,18 @@ import (
 )
 
 type SystemDefaults struct {
-	DefaultLanguage       language.Tag
-	Domain                string
-	ZitadelDocs           ZitadelDocs
-	SecretGenerators      SecretGenerators
-	UserVerificationKey   *crypto.KeyConfig
-	Multifactors          MultifactorConfig
-	VerificationLifetimes VerificationLifetimes
-	DefaultPolicies       DefaultPolicies
-	DomainVerification    DomainVerification
-	IamID                 string
-	Notifications         Notifications
+	DefaultLanguage          language.Tag
+	Domain                   string
+	ZitadelDocs              ZitadelDocs
+	SecretGenerators         SecretGenerators
+	UserVerificationKey      *crypto.KeyConfig
+	IDPConfigVerificationKey *crypto.KeyConfig
+	Multifactors             MultifactorConfig
+	VerificationLifetimes    VerificationLifetimes
+	DefaultPolicies          DefaultPolicies
+	DomainVerification       DomainVerification
+	IamID                    string
+	Notifications            Notifications
 }
 
 type ZitadelDocs struct {
@@ -61,7 +62,7 @@ type DefaultPolicies struct {
 	Age        pol.PasswordAgePolicyDefault
 	Complexity pol.PasswordComplexityPolicyDefault
 	Lockout    pol.PasswordLockoutPolicyDefault
-	OrgIam     org_model.OrgIamPolicy
+	OrgIam     org_model.OrgIAMPolicy
 }
 
 type DomainVerification struct {

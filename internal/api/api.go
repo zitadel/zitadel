@@ -32,7 +32,7 @@ type API struct {
 }
 type health interface {
 	Health(ctx context.Context) error
-	IamByID(ctx context.Context) (*iam_model.Iam, error)
+	IamByID(ctx context.Context) (*iam_model.IAM, error)
 	VerifierClientID(ctx context.Context, appName string) (string, error)
 }
 

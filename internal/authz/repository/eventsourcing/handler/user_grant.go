@@ -22,7 +22,7 @@ import (
 type UserGrant struct {
 	handler
 	eventstore   eventstore.Eventstore
-	iamEvents    *iam_events.IamEventstore
+	iamEvents    *iam_events.IAMEventstore
 	iamID        string
 	iamProjectID string
 }
@@ -47,7 +47,7 @@ func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(iam_es_model.IamAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate).
+		AggregateTypeFilter(iam_es_model.IAMAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
@@ -55,7 +55,7 @@ func (u *UserGrant) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
 	case proj_es_model.ProjectAggregate:
 		err = u.processProject(event)
-	case iam_es_model.IamAggregate:
+	case iam_es_model.IAMAggregate:
 		err = u.processIamMember(event, "IAM", false)
 	case org_es_model.OrgAggregate:
 		return u.processOrg(event)
@@ -92,10 +92,10 @@ func (u *UserGrant) processOrg(event *models.Event) (err error) {
 }
 
 func (u *UserGrant) processIamMember(event *models.Event, rolePrefix string, suffix bool) error {
-	member := new(iam_es_model.IamMember)
+	member := new(iam_es_model.IAMMember)
 
 	switch event.Type {
-	case iam_es_model.IamMemberAdded, iam_es_model.IamMemberChanged:
+	case iam_es_model.IAMMemberAdded, iam_es_model.IAMMemberChanged:
 		member.SetData(event)
 
 		grant, err := u.view.UserGrantByIDs(u.iamID, u.iamProjectID, member.UserID)
@@ -126,7 +126,7 @@ func (u *UserGrant) processIamMember(event *models.Event, rolePrefix string, suf
 		grant.Sequence = event.Sequence
 		grant.ChangeDate = event.CreationDate
 		return u.view.PutUserGrant(grant, grant.Sequence)
-	case iam_es_model.IamMemberRemoved:
+	case iam_es_model.IAMMemberRemoved:
 		member.SetData(event)
 		grant, err := u.view.UserGrantByIDs(u.iamID, u.iamProjectID, member.UserID)
 		if err != nil {
@@ -210,14 +210,14 @@ func (u *UserGrant) setIamProjectID() error {
 	if u.iamProjectID != "" {
 		return nil
 	}
-	iam, err := u.iamEvents.IamByID(context.Background(), u.iamID)
+	iam, err := u.iamEvents.IAMByID(context.Background(), u.iamID)
 	if err != nil {
 		return err
 	}
 	if !iam.SetUpDone {
 		return caos_errs.ThrowPreconditionFailed(nil, "HANDL-s5DTs", "Setup not done")
 	}
-	u.iamProjectID = iam.IamProjectID
+	u.iamProjectID = iam.IAMProjectID
 	return nil
 }
 
