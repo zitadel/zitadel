@@ -16,25 +16,30 @@ func (v *View) TokenByID(tokenID string) (*model.Token, error) {
 	return view.TokenByID(v.Db, tokenTable, tokenID)
 }
 
+func (v *View) TokensByUserID(userID string) ([]*model.Token, error) {
+	return view.TokensByUserID(v.Db, tokenTable, userID)
+}
+
 func (v *View) IsTokenValid(tokenID string) (bool, error) {
 	return view.IsTokenValid(v.Db, tokenTable, tokenID)
 }
 
-func (v *View) CreateToken(agentID, applicationID, userID string, audience, scopes []string, lifetime time.Duration) (*model.Token, error) {
+func (v *View) CreateToken(agentID, applicationID, userID, preferredLanguage string, audience, scopes []string, lifetime time.Duration) (*model.Token, error) {
 	id, err := v.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
 	now := time.Now().UTC()
 	token := &model.Token{
-		ID:            id,
-		CreationDate:  now,
-		UserID:        userID,
-		ApplicationID: applicationID,
-		UserAgentID:   agentID,
-		Scopes:        scopes,
-		Audience:      audience,
-		Expiration:    now.Add(lifetime),
+		ID:                id,
+		CreationDate:      now,
+		UserID:            userID,
+		ApplicationID:     applicationID,
+		UserAgentID:       agentID,
+		Scopes:            scopes,
+		Audience:          audience,
+		Expiration:        now.Add(lifetime),
+		PreferredLanguage: preferredLanguage,
 	}
 	if err := view.PutToken(v.Db, tokenTable, token); err != nil {
 		return nil, err
@@ -48,6 +53,14 @@ func (v *View) PutToken(token *model.Token) error {
 		return err
 	}
 	return v.ProcessedTokenSequence(token.Sequence)
+}
+
+func (v *View) PutTokens(token []*model.Token, sequence uint64) error {
+	err := view.PutTokens(v.Db, tokenTable, token...)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedTokenSequence(sequence)
 }
 
 func (v *View) DeleteToken(tokenID string, eventSequence uint64) error {

@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"golang.org/x/text/language"
 
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
@@ -78,6 +79,7 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, sc
 			userInfo.PreferredUsername = user.PreferredLoginName
 			userInfo.UpdatedAt = user.ChangeDate
 			userInfo.Gender = oidc.Gender(getGender(user.Gender))
+			userInfo.Locale, _ = language.Parse(user.PreferredLanguage)
 		case scopePhone:
 			userInfo.PhoneNumber = user.Phone
 			userInfo.PhoneNumberVerified = user.IsPhoneVerified

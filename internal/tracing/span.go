@@ -2,11 +2,11 @@ package tracing
 
 import (
 	"fmt"
+	errors2 "github.com/caos/zitadel/internal/api/grpc/errors"
 	"strconv"
 
 	"go.opencensus.io/trace"
 
-	"github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/errors"
 )
 
@@ -40,7 +40,7 @@ func (s *Span) SetStatusByError(err error) {
 }
 
 func statusFromError(err error) trace.Status {
-	code, msg, _, _ := grpc.ExtractCaosError(err)
+	code, msg, _, _ := errors2.ExtractCaosError(err)
 	return trace.Status{Code: int32(code), Message: msg}
 }
 

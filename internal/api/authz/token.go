@@ -19,7 +19,7 @@ type TokenVerifier struct {
 }
 
 type authZRepo interface {
-	VerifyAccessToken(ctx context.Context, token, clientID string) (userID, agentID string, err error)
+	VerifyAccessToken(ctx context.Context, token, clientID string) (userID, agentID, prefLang string, err error)
 	VerifierClientID(ctx context.Context, name string) (clientID string, err error)
 	ResolveGrants(ctx context.Context) (grant *Grant, err error)
 	ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error)
@@ -30,13 +30,13 @@ func Start(authZRepo authZRepo) (v *TokenVerifier) {
 	return &TokenVerifier{authZRepo: authZRepo}
 }
 
-func (v *TokenVerifier) VerifyAccessToken(ctx context.Context, token string, method string) (userID, clientID, agentID string, err error) {
+func (v *TokenVerifier) VerifyAccessToken(ctx context.Context, token string, method string) (userID, clientID, agentID, prefLang string, err error) {
 	clientID, err = v.clientIDFromMethod(ctx, method)
 	if err != nil {
-		return "", "", "", err
+		return "", "", "", "", err
 	}
-	userID, agentID, err = v.authZRepo.VerifyAccessToken(ctx, token, clientID)
-	return userID, clientID, agentID, err
+	userID, agentID, prefLang, err = v.authZRepo.VerifyAccessToken(ctx, token, clientID)
+	return userID, clientID, agentID, prefLang, err
 }
 
 type client struct {
@@ -101,10 +101,10 @@ func (v *TokenVerifier) CheckAuthMethod(method string) (Option, bool) {
 	return authOpt, ok
 }
 
-func verifyAccessToken(ctx context.Context, token string, t *TokenVerifier, method string) (userID, clientID, agentID string, err error) {
+func verifyAccessToken(ctx context.Context, token string, t *TokenVerifier, method string) (userID, clientID, agentID, prefLang string, err error) {
 	parts := strings.Split(token, BearerPrefix)
 	if len(parts) != 2 {
-		return "", "", "", caos_errs.ThrowUnauthenticated(nil, "AUTH-7fs1e", "invalid auth header")
+		return "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "AUTH-7fs1e", "invalid auth header")
 	}
 	return t.VerifyAccessToken(ctx, parts[1], method)
 }

@@ -31,13 +31,12 @@ func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, lang l
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
 				middleware.ErrorHandler(lang),
+				middleware.AuthorizationInterceptor(verifier, authConfig),
 				middleware.TranslationHandler(lang),
-				grpc_middleware.ChainUnaryServer(
-					middleware.AuthorizationInterceptor(verifier, authConfig),
-				),
 			),
 		),
 	)
+
 }
 
 func Serve(ctx context.Context, server *grpc.Server, port string) {
