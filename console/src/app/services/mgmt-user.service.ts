@@ -7,7 +7,7 @@ import {
     ChangeRequest,
     Changes,
     CreateUserRequest,
-    Email,
+    LoginName,
     Gender,
     MultiFactors,
     NotificationType,
@@ -354,11 +354,11 @@ export class MgmtUserService {
         );
     }
 
-    public async GetUserByEmailGlobal(email: string): Promise<User> {
-        const req = new Email();
-        req.setEmail(email);
+    public async GetUserByLoginNameGlobal(loginName: string): Promise<UserView> {
+        const req = new LoginName();
+        req.setLoginName(loginName);
         return await this.request(
-            c => c.getUserByEmailGlobal,
+            c => c.getUserByLoginNameGlobal,
             req,
             f => f,
         );
