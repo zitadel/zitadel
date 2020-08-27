@@ -1,35 +1,38 @@
-import { Injectable } from '@angular/core';
-import { UnaryInterceptor } from 'grpc-web';
+import { Injectable, InjectionToken, Injector } from '@angular/core';
+import { Request, UnaryInterceptor, UnaryResponse } from 'grpc-web';
+import { filter, first } from 'rxjs/operators';
 
-import { StorageService } from '../storage.service';
+import { AuthenticationService } from '../authentication.service';
 
 
 const authorizationKey = 'Authorization';
-const bearerPrefix = 'Bearer ';
+const bearerPrefix = 'Bearer';
 const accessTokenStorageField = 'access_token';
 
+export const GRPC_INTERCEPTORS = new InjectionToken<Array<UnaryInterceptor<any, any>>>(
+    'GRPC_INTERCEPTORS',
+);
+
 @Injectable({ providedIn: 'root' })
-export class AuthInterceptor implements UnaryInterceptor<any, any> {
-    constructor(private readonly authStorage: StorageService) { }
+export class AuthInterceptor<TReq = unknown, TResp = unknown> implements UnaryInterceptor<TReq, TResp> {
+    constructor(private injector: Injector) { }
 
-    public intercept(request: any, invoker: any): any {
-        console.log('authinterceptor');
-        // Update the request message before the RPC.
-        const reqMsg = request.getRequestMessage();
-        console.log(request.getMetadata());
+    public async intercept(request: Request<TReq, TResp>, invoker: any): Promise<UnaryResponse<TReq, TResp>> {
 
-        const accessToken = this.authStorage.getItem(accessTokenStorageField);
+        const auth = this.injector.get(AuthenticationService);
 
-        if (accessToken) {
-            const metadata = { 'Authorization': bearerPrefix + accessToken };
-            console.log(metadata);
-            reqMsg.metadata = metadata;
-        }
+        const accessToken = await auth.authenticationChanged.pipe(
+            filter((authed) => !!authed),
+            first(),
+        ).toPromise();
 
-        console.log(request.getMetadata());
+        const metadata = request.getMetadata();
+        metadata[authorizationKey] = `${bearerPrefix} ${accessToken}`;
 
-        // After the RPC returns successfully, update the response.
         return invoker(request).then((response: any) => {
+            // const message = response.getResponseMessage();
+            const respMetadata = response.getMetadata();
+            console.log(respMetadata['grpc-status]']);
             return response;
         });
     }

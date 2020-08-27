@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
 import { catchError, filter, finalize, first, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
@@ -24,12 +24,13 @@ export class AuthenticationService {
     private zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject(['user.resourceowner']);
 
     constructor(
-        private grpcService: GrpcService,
+        // private grpcService: GrpcService,
         private config: AuthConfig,
         private oauthService: OAuthService,
         private authService: GrpcAuthService,
         private storage: StorageService,
         private statehandler: StatehandlerService,
+        private injector: Injector,
     ) {
         this.user = merge(
             of(this.oauthService.getAccessToken()).pipe(
@@ -104,10 +105,12 @@ export class AuthenticationService {
         setState: boolean = true,
         force: boolean = false,
     ): Promise<boolean> {
-        this.config.issuer = config?.issuer || this.grpcService.issuer;
-        this.config.clientId = config?.clientId || this.grpcService.clientid;
-        this.config.redirectUri = config?.redirectUri || this.grpcService.redirectUri;
-        this.config.postLogoutRedirectUri = config?.postLogoutRedirectUri || this.grpcService.postLogoutRedirectUri;
+        const grpcService = this.injector.get(GrpcService);
+
+        this.config.issuer = config?.issuer || grpcService.issuer;
+        this.config.clientId = config?.clientId || grpcService.clientid;
+        this.config.redirectUri = config?.redirectUri || grpcService.redirectUri;
+        this.config.postLogoutRedirectUri = config?.postLogoutRedirectUri || grpcService.postLogoutRedirectUri;
         this.config.customQueryParams = config?.customQueryParams;
         this.oauthService.configure(this.config);
         // this.oauthService.setupAutomaticSilentRefresh();

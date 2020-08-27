@@ -35,6 +35,8 @@ import { HasRolePipeModule } from './pipes/has-role-pipe.module';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { GrpcService } from './services/grpc.service';
+import { AuthInterceptor, GRPC_INTERCEPTORS } from './services/interceptors/auth.interceptor';
+import { OrgInterceptor } from './services/interceptors/org.interceptor';
 import { StatehandlerProcessorService, StatehandlerProcessorServiceImpl } from './services/statehandler-processor.service';
 import { StatehandlerService, StatehandlerServiceImpl } from './services/statehandler.service';
 import { StorageService } from './services/storage.service';
@@ -142,16 +144,16 @@ const authConfig: AuthConfig = {
             provide: OAuthStorage,
             useClass: StorageService,
         },
-        // {
-        //     provide: GRPC_INTERCEPTORS,
-        //     multi: true,
-        //     useClass: GrpcAuthInterceptor,
-        // },
-        // {
-        //     provide: GRPC_INTERCEPTORS,
-        //     multi: true,
-        //     useClass: GrpcOrgInterceptor,
-        // },
+        {
+            provide: GRPC_INTERCEPTORS,
+            multi: true,
+            useClass: AuthInterceptor,
+        },
+        {
+            provide: GRPC_INTERCEPTORS,
+            multi: true,
+            useClass: OrgInterceptor,
+        },
         GrpcService,
         AuthenticationService,
         GrpcAuthService,
