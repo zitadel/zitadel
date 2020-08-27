@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go v0.61.0 // indirect
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.3
 	github.com/BurntSushi/toml v0.3.1
-	github.com/DATA-DOG/go-sqlmock v1.4.1
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/Masterminds/goutils v1.1.0 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
@@ -16,7 +16,7 @@ require (
 	github.com/aws/aws-sdk-go v1.33.13 // indirect
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.7.1
+	github.com/caos/oidc v0.7.3
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/cockroachdb/cockroach-go/v2 v2.0.5
 	github.com/envoyproxy/protoc-gen-validate v0.4.0
@@ -26,8 +26,8 @@ require (
 	github.com/golang/protobuf v1.4.2
 	github.com/google/go-cmp v0.5.1 // indirect
 	github.com/gorilla/csrf v1.7.0
-	github.com/gorilla/mux v1.7.4
-	github.com/gorilla/schema v1.1.0
+	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/schema v1.2.0
 	github.com/gorilla/securecookie v1.1.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway v1.14.6

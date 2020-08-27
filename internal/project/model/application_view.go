@@ -1,8 +1,9 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/model"
 	"time"
+
+	"github.com/caos/zitadel/internal/model"
 )
 
 type ApplicationView struct {
@@ -25,6 +26,7 @@ type ApplicationView struct {
 	NoneCompliant              bool
 	ComplianceProblems         []string
 	DevMode                    bool
+	OriginAllowList            []string
 
 	Sequence uint64
 }

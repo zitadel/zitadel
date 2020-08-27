@@ -27,8 +27,16 @@ func (v *View) ProjectGrantMembersByUserID(userID string) ([]*model.ProjectGrant
 	return view.ProjectGrantMembersByUserID(v.Db, projectGrantMemberTable, userID)
 }
 
-func (v *View) PutProjectGrantMember(project *model.ProjectGrantMemberView, sequence uint64) error {
-	err := view.PutProjectGrantMember(v.Db, projectGrantMemberTable, project)
+func (v *View) PutProjectGrantMember(member *model.ProjectGrantMemberView, sequence uint64) error {
+	err := view.PutProjectGrantMember(v.Db, projectGrantMemberTable, member)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedProjectGrantMemberSequence(sequence)
+}
+
+func (v *View) PutProjectGrantMembers(members []*model.ProjectGrantMemberView, sequence uint64) error {
+	err := view.PutProjectGrantMembers(v.Db, projectGrantMemberTable, members...)
 	if err != nil {
 		return err
 	}

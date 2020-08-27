@@ -6,10 +6,10 @@ import (
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 )
 
-type IamRepository struct {
-	IamEvents *eventsourcing.IamEventstore
+type IAMRepository struct {
+	IAMEvents *eventsourcing.IAMEventstore
 }
 
-func (repo *IamRepository) IamByID(ctx context.Context, id string) (*iam_model.Iam, error) {
-	return repo.IamEvents.IamByID(ctx, id)
+func (repo *IAMRepository) IAMByID(ctx context.Context, id string) (*iam_model.IAM, error) {
+	return repo.IAMEvents.IAMByID(ctx, id)
 }

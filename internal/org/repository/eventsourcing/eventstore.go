@@ -3,6 +3,8 @@ package eventsourcing
 import (
 	"context"
 	"encoding/json"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
@@ -22,11 +24,13 @@ import (
 type OrgEventstore struct {
 	eventstore.Eventstore
 	IAMDomain             string
+	IamID                 string
 	idGenerator           id.Generator
 	verificationAlgorithm crypto.EncryptionAlgorithm
 	verificationGenerator crypto.Generator
-	defaultOrgIamPolicy   *org_model.OrgIamPolicy
+	defaultOrgIamPolicy   *org_model.OrgIAMPolicy
 	verificationValidator func(domain string, token string, verifier string, checkType http_utils.CheckType) error
+	secretCrypto          crypto.Crypto
 }
 
 type OrgConfig struct {
@@ -42,6 +46,10 @@ func StartOrg(conf OrgConfig, defaults systemdefaults.SystemDefaults) *OrgEvents
 	verificationAlg, err := crypto.NewAESCrypto(defaults.DomainVerification.VerificationKey)
 	logging.Log("EVENT-aZ22d").OnError(err).Panic("cannot create verificationAlgorithm for domain verification")
 	verificationGen := crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, verificationAlg)
+
+	aesCrypto, err := crypto.NewAESCrypto(defaults.IDPConfigVerificationKey)
+	logging.Log("EVENT-Sn8du").OnError(err).Panic("cannot create verificationAlgorithm for idp config verification")
+
 	return &OrgEventstore{
 		Eventstore:            conf.Eventstore,
 		idGenerator:           id.SonyFlakeGenerator,
@@ -49,7 +57,9 @@ func StartOrg(conf OrgConfig, defaults systemdefaults.SystemDefaults) *OrgEvents
 		verificationGenerator: verificationGen,
 		verificationValidator: http_utils.ValidateDomain,
 		IAMDomain:             conf.IAMDomain,
+		IamID:                 defaults.IamID,
 		defaultOrgIamPolicy:   &policy,
+		secretCrypto:          aesCrypto,
 	}
 }
 
@@ -455,7 +465,7 @@ func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.
 	return es_sdk.Push(ctx, es.PushAggregates, repoMember.AppendEvents, orgAggregate)
 }
 
-func (es *OrgEventstore) GetOrgIamPolicy(ctx context.Context, orgID string) (*org_model.OrgIamPolicy, error) {
+func (es *OrgEventstore) GetOrgIAMPolicy(ctx context.Context, orgID string) (*org_model.OrgIAMPolicy, error) {
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
@@ -466,7 +476,7 @@ func (es *OrgEventstore) GetOrgIamPolicy(ctx context.Context, orgID string) (*or
 	return es.defaultOrgIamPolicy, nil
 }
 
-func (es *OrgEventstore) AddOrgIamPolicy(ctx context.Context, policy *org_model.OrgIamPolicy) (*org_model.OrgIamPolicy, error) {
+func (es *OrgEventstore) AddOrgIAMPolicy(ctx context.Context, policy *org_model.OrgIAMPolicy) (*org_model.OrgIAMPolicy, error) {
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
 	if err != nil {
 		return nil, err
@@ -475,8 +485,8 @@ func (es *OrgEventstore) AddOrgIamPolicy(ctx context.Context, policy *org_model.
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-7Usj3", "Errors.Org.PolicyAlreadyExists")
 	}
 	repoOrg := model.OrgFromModel(existing)
-	repoPolicy := model.OrgIamPolicyFromModel(policy)
-	orgAggregate := OrgIamPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPolicy)
+	repoPolicy := model.OrgIAMPolicyFromModel(policy)
+	orgAggregate := OrgIAMPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -485,10 +495,10 @@ func (es *OrgEventstore) AddOrgIamPolicy(ctx context.Context, policy *org_model.
 		return nil, err
 	}
 
-	return model.OrgIamPolicyToModel(repoOrg.OrgIamPolicy), nil
+	return model.OrgIAMPolicyToModel(repoOrg.OrgIamPolicy), nil
 }
 
-func (es *OrgEventstore) ChangeOrgIamPolicy(ctx context.Context, policy *org_model.OrgIamPolicy) (*org_model.OrgIamPolicy, error) {
+func (es *OrgEventstore) ChangeOrgIAMPolicy(ctx context.Context, policy *org_model.OrgIAMPolicy) (*org_model.OrgIAMPolicy, error) {
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
 	if err != nil {
 		return nil, err
@@ -497,8 +507,8 @@ func (es *OrgEventstore) ChangeOrgIamPolicy(ctx context.Context, policy *org_mod
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-8juSd", "Errors.Org.PolicyNotExisting")
 	}
 	repoOrg := model.OrgFromModel(existing)
-	repoPolicy := model.OrgIamPolicyFromModel(policy)
-	orgAggregate := OrgIamPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPolicy)
+	repoPolicy := model.OrgIAMPolicyFromModel(policy)
+	orgAggregate := OrgIAMPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -507,10 +517,10 @@ func (es *OrgEventstore) ChangeOrgIamPolicy(ctx context.Context, policy *org_mod
 		return nil, err
 	}
 
-	return model.OrgIamPolicyToModel(repoOrg.OrgIamPolicy), nil
+	return model.OrgIAMPolicyToModel(repoOrg.OrgIamPolicy), nil
 }
 
-func (es *OrgEventstore) RemoveOrgIamPolicy(ctx context.Context, orgID string) error {
+func (es *OrgEventstore) RemoveOrgIAMPolicy(ctx context.Context, orgID string) error {
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
 	if err != nil {
 		return err
@@ -524,4 +534,300 @@ func (es *OrgEventstore) RemoveOrgIamPolicy(ctx context.Context, orgID string) e
 		return err
 	}
 	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, orgAggregate)
+}
+
+func (es *OrgEventstore) AddIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
+	if idp == nil || !idp.IsValid(true) {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Ms89d", "Errors.Org.IdpInvalid")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(idp.AggregateID))
+	if err != nil {
+		return nil, err
+	}
+	id, err := es.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+	idp.IDPConfigID = id
+
+	if idp.OIDCConfig != nil {
+		idp.OIDCConfig.IDPConfigID = id
+		err = idp.OIDCConfig.CryptSecret(es.secretCrypto)
+	}
+	repoOrg := model.OrgFromModel(existing)
+	repoIdp := iam_es_model.IDPConfigFromModel(idp)
+
+	addAggregate := IDPConfigAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoIdp)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	if _, idpConfig := iam_es_model.GetIDPConfig(repoOrg.IDPs, idp.IDPConfigID); idpConfig != nil {
+		return iam_es_model.IDPConfigToModel(idpConfig), nil
+	}
+	return nil, errors.ThrowInternal(nil, "EVENT-Cmsj8d", "Errors.Internal")
+}
+
+func (es *OrgEventstore) ChangeIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
+	if idp == nil || !idp.IsValid(false) {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Mslo9", "Errors.Org.IdpInvalid")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(idp.AggregateID))
+	if err != nil {
+		return nil, err
+	}
+	if _, i := existing.GetIDP(idp.IDPConfigID); i == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Aji8e", "Errors.Org.IdpNotExisting")
+	}
+	repoOrg := model.OrgFromModel(existing)
+	repoIdp := iam_es_model.IDPConfigFromModel(idp)
+
+	iamAggregate := IDPConfigChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoIdp)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, iamAggregate)
+	if err != nil {
+		return nil, err
+	}
+	if _, idpConfig := iam_es_model.GetIDPConfig(repoOrg.IDPs, idp.IDPConfigID); idpConfig != nil {
+		return iam_es_model.IDPConfigToModel(idpConfig), nil
+	}
+	return nil, errors.ThrowInternal(nil, "EVENT-Ml9xs", "Errors.Internal")
+}
+
+func (es *OrgEventstore) PrepareRemoveIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*model.Org, *es_models.Aggregate, error) {
+	if idp.IDPConfigID == "" {
+		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-Wz7sD", "Errors.Org.IDMissing")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(idp.AggregateID))
+	if err != nil {
+		return nil, nil, err
+	}
+	if _, i := existing.GetIDP(idp.IDPConfigID); i == nil {
+		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-Smiu8", "Errors.Org.IdpNotExisting")
+	}
+	repoOrg := model.OrgFromModel(existing)
+	repoIdp := iam_es_model.IDPConfigFromModel(idp)
+	provider := new(iam_es_model.IDPProvider)
+	if repoOrg.LoginPolicy != nil {
+		_, provider = iam_es_model.GetIDPProvider(repoOrg.LoginPolicy.IDPProviders, idp.IDPConfigID)
+	}
+	agg, err := IDPConfigRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoOrg, repoIdp, provider)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoOrg, agg, nil
+}
+
+func (es *OrgEventstore) RemoveIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) error {
+	repoOrg, agg, err := es.PrepareRemoveIDPConfig(ctx, idp)
+	if err != nil {
+		return err
+	}
+	return es_sdk.PushAggregates(ctx, es.PushAggregates, repoOrg.AppendEvents, agg)
+}
+
+func (es *OrgEventstore) DeactivateIDPConfig(ctx context.Context, orgID, idpID string) (*iam_model.IDPConfig, error) {
+	if idpID == "" {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Smk8d", "Errors.Org.IDMissing")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
+	if err != nil {
+		return nil, err
+	}
+	idp := &iam_model.IDPConfig{IDPConfigID: idpID}
+	if _, app := existing.GetIDP(idp.IDPConfigID); app == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Amk8d", "Errors.Org.IdpNotExisting")
+	}
+	repoOrg := model.OrgFromModel(existing)
+	repoIdp := iam_es_model.IDPConfigFromModel(idp)
+
+	iamAggregate := IDPConfigDeactivatedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoIdp)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, iamAggregate)
+	if err != nil {
+		return nil, err
+	}
+	if _, idpConfig := iam_es_model.GetIDPConfig(repoOrg.IDPs, idp.IDPConfigID); idpConfig != nil {
+		return iam_es_model.IDPConfigToModel(idpConfig), nil
+	}
+	return nil, errors.ThrowInternal(nil, "EVENT-Amk9c", "Errors.Internal")
+}
+
+func (es *OrgEventstore) ReactivateIDPConfig(ctx context.Context, orgID, idpID string) (*iam_model.IDPConfig, error) {
+	if idpID == "" {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Xm8df", "Errors.Org.IDMissing")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
+	if err != nil {
+		return nil, err
+	}
+	idp := &iam_model.IDPConfig{IDPConfigID: idpID}
+	if _, i := existing.GetIDP(idp.IDPConfigID); i == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Qls0f", "Errors.Org.IdpNotExisting")
+	}
+	repoOrg := model.OrgFromModel(existing)
+	repoIdp := iam_es_model.IDPConfigFromModel(idp)
+
+	iamAggregate := IDPConfigReactivatedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoIdp)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, iamAggregate)
+	if err != nil {
+		return nil, err
+	}
+	if _, idpConfig := iam_es_model.GetIDPConfig(repoOrg.IDPs, idp.IDPConfigID); idpConfig != nil {
+		return iam_es_model.IDPConfigToModel(idpConfig), nil
+	}
+	return nil, errors.ThrowInternal(nil, "EVENT-Al90s", "Errors.Internal")
+}
+
+func (es *OrgEventstore) ChangeIDPOIDCConfig(ctx context.Context, config *iam_model.OIDCIDPConfig) (*iam_model.OIDCIDPConfig, error) {
+	if config == nil || !config.IsValid(false) {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Qs789", "Errors.Org.OIDCConfigInvalid")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(config.AggregateID))
+	if err != nil {
+		return nil, err
+	}
+	var idp *iam_model.IDPConfig
+	if _, idp = existing.GetIDP(config.IDPConfigID); idp == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-pso0s", "Errors.Org.IdpNoExisting")
+	}
+	if idp.Type != iam_model.IDPConfigTypeOIDC {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Fms8w", "Errors.IAM.IdpIsNotOIDC")
+	}
+	if config.ClientSecretString != "" {
+		err = idp.OIDCConfig.CryptSecret(es.secretCrypto)
+	} else {
+		config.ClientSecret = nil
+	}
+	repoOrg := model.OrgFromModel(existing)
+	repoConfig := iam_es_model.OIDCIDPConfigFromModel(config)
+
+	iamAggregate := OIDCIDPConfigChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoConfig)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, iamAggregate)
+	if err != nil {
+		return nil, err
+	}
+	if _, idpConfig := iam_es_model.GetIDPConfig(repoOrg.IDPs, idp.IDPConfigID); idpConfig != nil {
+		return iam_es_model.OIDCIDPConfigToModel(idpConfig.OIDCIDPConfig), nil
+	}
+	return nil, errors.ThrowInternal(nil, "EVENT-Sldk8", "Errors.Internal")
+}
+
+func (es *OrgEventstore) AddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
+	if policy == nil || !policy.IsValid() {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sjkl9", "Errors.Org.LoginPolicyInvalid")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	if err != nil {
+		return nil, err
+	}
+
+	repoOrg := model.OrgFromModel(existing)
+	repoLoginPolicy := iam_es_model.LoginPolicyFromModel(policy)
+
+	addAggregate := LoginPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoLoginPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.LoginPolicyToModel(repoOrg.LoginPolicy), nil
+}
+
+func (es *OrgEventstore) ChangeLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
+	if policy == nil || !policy.IsValid() {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.Org.LoginPolicyInvalid")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	if err != nil {
+		return nil, err
+	}
+
+	repoOrg := model.OrgFromModel(existing)
+	repoLoginPolicy := iam_es_model.LoginPolicyFromModel(policy)
+
+	addAggregate := LoginPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoLoginPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.LoginPolicyToModel(repoOrg.LoginPolicy), nil
+}
+
+func (es *OrgEventstore) RemoveLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) error {
+	if policy == nil || !policy.IsValid() {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-O0s9e", "Errors.Org.LoginPolicyInvalid")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	if err != nil {
+		return err
+	}
+	repoOrg := model.OrgFromModel(existing)
+
+	addAggregate := LoginPolicyRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg)
+	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+}
+
+func (es *OrgEventstore) GetIDPConfig(ctx context.Context, aggregateID, idpConfigID string) (*iam_model.IDPConfig, error) {
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(aggregateID))
+	if err != nil {
+		return nil, err
+	}
+	if _, i := existing.GetIDP(idpConfigID); i != nil {
+		return i, nil
+	}
+	return nil, errors.ThrowNotFound(nil, "EVENT-Qlo0d", "Errors.Org.IdpNotExisting")
+}
+
+func (es *OrgEventstore) AddIDPProviderToLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) (*iam_model.IDPProvider, error) {
+	if provider == nil || !provider.IsValid() {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sjd8e", "Errors.Org.IdpProviderInvalid")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(provider.AggregateID))
+	if err != nil {
+		return nil, err
+	}
+	if existing.LoginPolicy == nil {
+		return nil, errors.ThrowAlreadyExists(nil, "EVENT-sk9fW", "Errors.Org.LoginPolicy.NotExisting")
+	}
+	if _, m := existing.LoginPolicy.GetIdpProvider(provider.IdpConfigID); m != nil {
+		return nil, errors.ThrowAlreadyExists(nil, "EVENT-Lso9f", "Errors.Org.LoginPolicy.IdpProviderAlreadyExisting")
+	}
+	repoOrg := model.OrgFromModel(existing)
+	repoProvider := iam_es_model.IDPProviderFromModel(provider)
+
+	addAggregate := LoginPolicyIDPProviderAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoProvider, es.IamID)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	if _, m := iam_es_model.GetIDPProvider(repoOrg.LoginPolicy.IDPProviders, provider.IdpConfigID); m != nil {
+		return iam_es_model.IDPProviderToModel(m), nil
+	}
+	return nil, errors.ThrowInternal(nil, "EVENT-Slf9s", "Errors.Internal")
+}
+
+func (es *OrgEventstore) PrepareRemoveIDPProviderFromLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider, cascade bool) (*model.Org, *es_models.Aggregate, error) {
+	if provider == nil || !provider.IsValid() {
+		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-Esi8c", "Errors.IdpProviderInvalid")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(provider.AggregateID))
+	if err != nil {
+		return nil, nil, err
+	}
+	if _, m := existing.LoginPolicy.GetIdpProvider(provider.IdpConfigID); m == nil {
+		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-29skr", "Errors.IAM.LoginPolicy.IdpProviderNotExisting")
+	}
+	repoOrg := model.OrgFromModel(existing)
+	providerID := &iam_es_model.IDPProviderID{provider.IdpConfigID}
+	providerAggregates, err := LoginPolicyIDPProviderRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoOrg, providerID, cascade)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoOrg, providerAggregates, nil
+}
+
+func (es *OrgEventstore) RemoveIDPProviderFromLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) error {
+	repoOrg, agg, err := es.PrepareRemoveIDPProviderFromLoginPolicy(ctx, provider, false)
+	if err != nil {
+		return err
+	}
+	return es_sdk.PushAggregates(ctx, es.PushAggregates, repoOrg.AppendEvents, agg)
 }

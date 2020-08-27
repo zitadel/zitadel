@@ -43,6 +43,14 @@ func (v *View) PutUserGrant(grant *model.UserGrantView, sequence uint64) error {
 	return v.ProcessedUserGrantSequence(sequence)
 }
 
+func (v *View) PutUserGrants(grants []*model.UserGrantView, sequence uint64) error {
+	err := view.PutUserGrants(v.Db, userGrantTable, grants...)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedUserGrantSequence(sequence)
+}
+
 func (v *View) DeleteUserGrant(grantID string, eventSequence uint64) error {
 	err := view.DeleteUserGrant(v.Db, userGrantTable, grantID)
 	if err != nil {

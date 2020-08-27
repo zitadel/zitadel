@@ -106,11 +106,8 @@ func (u *UserGrant) processUser(event *models.Event) (err error) {
 		}
 		for _, grant := range grants {
 			u.fillUserData(grant, user)
-			err = u.view.PutUserGrant(grant, event.Sequence)
-			if err != nil {
-				return err
-			}
 		}
+		return u.view.PutUserGrants(grants, event.Sequence)
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
 	}
@@ -133,8 +130,8 @@ func (u *UserGrant) processProject(event *models.Event) (err error) {
 		}
 		for _, grant := range grants {
 			u.fillProjectData(grant, project)
-			return u.view.PutUserGrant(grant, event.Sequence)
 		}
+		return u.view.PutUserGrants(grants, event.Sequence)
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
 	}

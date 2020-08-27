@@ -8,5 +8,5 @@ import (
 
 type OrgRepository interface {
 	RegisterOrg(context.Context, *auth_model.RegisterOrg) (*auth_model.RegisterOrg, error)
-	GetOrgIamPolicy(ctx context.Context, orgID string) (*org_model.OrgIamPolicy, error)
+	GetOrgIamPolicy(ctx context.Context, orgID string) (*org_model.OrgIAMPolicy, error)
 }

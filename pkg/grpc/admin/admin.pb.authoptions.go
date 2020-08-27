@@ -98,4 +98,69 @@ var AdminService_AuthMethods = authz.MethodMapping{
 		Permission: "iam.write",
 		CheckParam: "",
 	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/IdpByID": authz.Option{
+		Permission: "iam.idp.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/CreateOidcIdp": authz.Option{
+		Permission: "iam.idp.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/UpdateIdpConfig": authz.Option{
+		Permission: "iam.idp.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/DeactivateIdpConfig": authz.Option{
+		Permission: "iam.idp.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/ReactivateIdpConfig": authz.Option{
+		Permission: "iam.idp.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/RemoveIdpConfig": authz.Option{
+		Permission: "iam.idp.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/UpdateOidcIdpConfig": authz.Option{
+		Permission: "iam.idp.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/SearchIdps": authz.Option{
+		Permission: "iam.idp.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultLoginPolicy": authz.Option{
+		Permission: "iam.policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/UpdateDefaultLoginPolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultLoginPolicyIdpProviders": authz.Option{
+		Permission: "iam.policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/AddIdpProviderToDefaultLoginPolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/RemoveIdpProviderFromDefaultLoginPolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
 }

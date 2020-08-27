@@ -28,7 +28,7 @@ type Config struct {
 type EsRepository struct {
 	spooler *es_spol.Spooler
 	eventstore.OrgRepo
-	eventstore.IamRepository
+	eventstore.IAMRepository
 	eventstore.AdministratorRepo
 }
 
@@ -38,7 +38,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 		return nil, err
 	}
 
-	iam, err := es_iam.StartIam(es_iam.IamConfig{
+	iam, err := es_iam.StartIAM(es_iam.IAMConfig{
 		Eventstore: es,
 		Cache:      conf.Eventstore.Cache,
 	}, systemDefaults)
@@ -71,7 +71,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 		return nil, err
 	}
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, handler.EventstoreRepos{UserEvents: user, OrgEvents: org})
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, handler.EventstoreRepos{UserEvents: user, OrgEvents: org, IamEvents: iam}, systemDefaults)
 
 	return &EsRepository{
 		spooler: spool,
@@ -82,9 +82,11 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 			PolicyEventstore: policy,
 			View:             view,
 			SearchLimit:      conf.SearchLimit,
+			SystemDefaults:   systemDefaults,
 		},
-		IamRepository: eventstore.IamRepository{
-			IamEventstore:  iam,
+		IAMRepository: eventstore.IAMRepository{
+			IAMEventstore:  iam,
+			OrgEvents:      org,
 			View:           view,
 			SystemDefaults: systemDefaults,
 			SearchLimit:    conf.SearchLimit,

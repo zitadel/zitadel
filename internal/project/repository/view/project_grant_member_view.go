@@ -10,22 +10,22 @@ import (
 )
 
 func ProjectGrantMemberByIDs(db *gorm.DB, table, grantID, userID string) (*model.ProjectGrantMemberView, error) {
-	role := new(model.ProjectGrantMemberView)
+	grant := new(model.ProjectGrantMemberView)
 
 	grantIDQuery := model.ProjectGrantMemberSearchQuery{Key: proj_model.ProjectGrantMemberSearchKeyGrantID, Value: grantID, Method: global_model.SearchMethodEquals}
 	userIDQuery := model.ProjectGrantMemberSearchQuery{Key: proj_model.ProjectGrantMemberSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, grantIDQuery, userIDQuery)
-	err := query(db, role)
+	err := query(db, grant)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Sgr32", "Errors.Project.MemberNotExisting")
 	}
-	return role, err
+	return grant, err
 }
 
 func ProjectGrantMembersByProjectID(db *gorm.DB, table, projectID string) ([]*model.ProjectGrantMemberView, error) {
 	members := make([]*model.ProjectGrantMemberView, 0)
 	queries := []*proj_model.ProjectGrantMemberSearchQuery{
-		&proj_model.ProjectGrantMemberSearchQuery{Key: proj_model.ProjectGrantMemberSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
+		{Key: proj_model.ProjectGrantMemberSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
 	}
 	query := repository.PrepareSearchQuery(table, model.ProjectGrantMemberSearchRequest{Queries: queries})
 	_, err := query(db, &members)
@@ -48,7 +48,7 @@ func SearchProjectGrantMembers(db *gorm.DB, table string, req *proj_model.Projec
 func ProjectGrantMembersByUserID(db *gorm.DB, table, userID string) ([]*model.ProjectGrantMemberView, error) {
 	members := make([]*model.ProjectGrantMemberView, 0)
 	queries := []*proj_model.ProjectGrantMemberSearchQuery{
-		&proj_model.ProjectGrantMemberSearchQuery{Key: proj_model.ProjectGrantMemberSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals},
+		{Key: proj_model.ProjectGrantMemberSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals},
 	}
 	query := repository.PrepareSearchQuery(table, model.ProjectGrantMemberSearchRequest{Queries: queries})
 	_, err := query(db, &members)
@@ -63,12 +63,21 @@ func PutProjectGrantMember(db *gorm.DB, table string, role *model.ProjectGrantMe
 	return save(db, role)
 }
 
+func PutProjectGrantMembers(db *gorm.DB, table string, members ...*model.ProjectGrantMemberView) error {
+	save := repository.PrepareBulkSave(table)
+	m := make([]interface{}, len(members))
+	for i, member := range members {
+		m[i] = member
+	}
+	return save(db, m...)
+}
+
 func DeleteProjectGrantMember(db *gorm.DB, table, grantID, userID string) error {
-	role, err := ProjectGrantMemberByIDs(db, table, grantID, userID)
+	grant, err := ProjectGrantMemberByIDs(db, table, grantID, userID)
 	if err != nil {
 		return err
 	}
-	delete := repository.PrepareDeleteByObject(table, role)
+	delete := repository.PrepareDeleteByObject(table, grant)
 	return delete(db)
 }
 

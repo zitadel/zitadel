@@ -56,7 +56,7 @@ func (repo *OrgRepository) RegisterOrg(ctx context.Context, register *auth_model
 	if err != nil {
 		return nil, err
 	}
-	orgPolicy, err := repo.OrgEventstore.GetOrgIamPolicy(ctx, policy_model.DefaultPolicy)
+	orgPolicy, err := repo.OrgEventstore.GetOrgIAMPolicy(ctx, policy_model.DefaultPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -94,6 +94,6 @@ func (repo *OrgRepository) RegisterOrg(ctx context.Context, register *auth_model
 	return RegisterToModel(registerModel), nil
 }
 
-func (repo *OrgRepository) GetOrgIamPolicy(ctx context.Context, orgID string) (*org_model.OrgIamPolicy, error) {
-	return repo.OrgEventstore.GetOrgIamPolicy(ctx, policy_model.DefaultPolicy)
+func (repo *OrgRepository) GetOrgIamPolicy(ctx context.Context, orgID string) (*org_model.OrgIAMPolicy, error) {
+	return repo.OrgEventstore.GetOrgIAMPolicy(ctx, policy_model.DefaultPolicy)
 }

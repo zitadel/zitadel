@@ -1,6 +1,7 @@
 Errors:
   Internal: Es ist ein interner Fehler aufgetreten
   NoChangesFound: Keine Änderungen gefunden
+  OriginNotAllowed: Dieser "Origin" ist nicht freigeschaltet
   User:
     NotFound: Benutzer konnte nicht gefunden werden
     UserIDMissing: User ID fehlt
@@ -68,6 +69,15 @@ Errors:
     UserIDMissing: User ID fehlt
     PolicyAlreadyExists: Policy existiert bereits
     PolicyNotExisting: Policy existiert nicht
+    IdpInvalid: IDP Konfiguration ist ungültig
+    IdpNotExisting: IDP Konfiguration existiert nicht
+    OIDCConfigInvalid: OIDC IDP Konfiguration ist ungültig
+    IdpIsNotOIDC: IDP Konfiguration ist nicht vom Typ OIDC
+    LoginPolicy:
+      NotExisting: Login Policy existiert nicht auf dieser Organisation
+      AlreadyExists: Login Policy existiert bereits
+      IdpProviderAlreadyExisting: Idp Provider existiert bereits
+      IdpProviderNotExisting: Idp Provider existiert nicht
   Project:
     ProjectIDMissing: Project Id fehlt
     AlreadyExists: Project existiert bereits auf der Organisation
@@ -108,6 +118,17 @@ Errors:
     IDMissing: Id fehlt
     GlobalOrgMissing: Globale Organisation fehlt
     IamProjectIDMisisng: Iam Project ID fehlt
+    IdpInvalid: IDP Konfiguration ist ungültig
+    IdpNotExisting: IDP Konfiguration existiert nicht
+    OIDCConfigInvalid: OIDC IDP Konfiguration ist ungültig
+    IdpIsNotOIDC: IDP Konfiguration ist nicht vom Typ OIDC
+    LoginPolicyInvalid: Login Policy ist ungültig
+    IdpProviderInvalid: Idp Provider ist ungültig
+    LoginPolicy:
+      NotExisting: Default Login Policy existiert nicht
+      AlreadyExists: Default Login Policy existiert bereits
+      IdpProviderAlreadyExisting: Idp Provider existiert bereits
+      IdpProviderNotExisting: Idp Provider existiert nicht
   Policy:
     AlreadyExists: Policy existiert bereits
   UserGrant:
@@ -224,6 +245,28 @@ EventTypes:
         added: System Richtlinie der Organisation hinzugefügt
         changed: System Richtlinie der Organisation geändert
         removed: System Richtlinie der Organisation entfernt
+    idp:
+      config:
+        added: IDP Konfiguration hinzugefügt
+        changed: IDP Konfiguration geändert
+        removed: IDP Konfiguration gelöscht
+        deactivated: IDP Konfiguration deaktiviert
+        reactivated: IDP Konfiguration reaktiviert
+      oidc:
+        config:
+          added: OIDC IDP Konfiguration hinzugefügt
+          changed: OIDC IDP Konfiguration geändert
+      saml:
+        config:
+          added: SAML IDP Konfiguration hinzugefügt
+          changed: SAML IDP Konfiguration geändert
+    policy:
+      login:
+        added: Login Policy hinzugefügt
+        changed: Login Policy geändert
+        idpprovider:
+          added: Idp Provider zu Login Policy hinzugefügt
+          removed: Idp Provider aus Login Policy gelöscht
   project:
     added: Projekt hinzugefügt
     changed: Project geändert
@@ -292,6 +335,28 @@ EventTypes:
       added: ZITADEL Mitglied hinzugefügt
       changed: ZITADEL Mitglied geändert
       removed: ZITADEL Mitglied entfernt
+    idp:
+      config:
+        added: IDP Konfiguration hinzugefügt
+        changed: IDP Konfiguration geändert
+        removed: IDP Konfiguration gelöscht
+        deactivated: IDP Konfiguration deaktiviert
+        reactivated: IDP Konfiguration reaktiviert
+      oidc:
+        config:
+          added: OIDC IDP Konfiguration hinzugefügt
+          changed: OIDC IDP Konfiguration geändert
+      saml:
+        config:
+          added: SAML IDP Konfiguration hinzugefügt
+          changed: SAML IDP Konfiguration geändert
+    policy:
+      login:
+        added: Default Login Policy hinzugefügt
+        changed: Default Login Policy geändert
+        idpprovider:
+          added: Idp Provider zu Default Login Policy hinzugefügt
+          removed: Idp Provider aus Default Login Policy gelöscht
   key_pair:
     added: Schlüsselpaar hinzugefügt
 Application:

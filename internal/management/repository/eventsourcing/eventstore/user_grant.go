@@ -115,8 +115,8 @@ func (repo *UserGrantRepo) BulkRemoveUserGrant(ctx context.Context, grantIDs ...
 
 func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, err := repo.View.GetLatestUserGrantSequence()
-	logging.Log("EVENT-5Viwf").OnError(err).Warn("could not read latest user grant sequence")
+	sequence, sequenceErr := repo.View.GetLatestUserGrantSequence()
+	logging.Log("EVENT-5Viwf").OnError(sequenceErr).Warn("could not read latest user grant sequence")
 
 	result := handleSearchUserGrantPermissions(ctx, request, sequence)
 	if result != nil {
@@ -134,7 +134,7 @@ func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_
 		TotalResult: uint64(count),
 		Result:      model.UserGrantsToModel(grants),
 	}
-	if err == nil {
+	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
 	}

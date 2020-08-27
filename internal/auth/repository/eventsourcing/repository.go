@@ -44,7 +44,7 @@ type EsRepository struct {
 	eventstore.UserSessionRepo
 	eventstore.UserGrantRepo
 	eventstore.OrgRepository
-	eventstore.IamRepository
+	eventstore.IAMRepository
 	eventstore.PolicyRepo
 }
 
@@ -109,8 +109,8 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 	if err != nil {
 		return nil, err
 	}
-	iam, err := es_iam.StartIam(
-		es_iam.IamConfig{
+	iam, err := es_iam.StartIAM(
+		es_iam.IAMConfig{
 			Eventstore: es,
 			Cache:      conf.Eventstore.Cache,
 		},
@@ -174,9 +174,9 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 			PolicyEventstore: policy,
 			UserEventstore:   user,
 		},
-		eventstore.IamRepository{
-			IamEvents: iam,
-			IamID:     systemDefaults.IamID,
+		eventstore.IAMRepository{
+			IAMEvents: iam,
+			IAMID:     systemDefaults.IamID,
 		},
 		eventstore.PolicyRepo{
 			PolicyEvents: policy,

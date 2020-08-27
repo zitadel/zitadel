@@ -55,6 +55,14 @@ func (v *View) PutUser(user *model.UserView, sequence uint64) error {
 	return v.ProcessedUserSequence(sequence)
 }
 
+func (v *View) PutUsers(users []*model.UserView, sequence uint64) error {
+	err := view.PutUsers(v.Db, userTable, users...)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedUserSequence(sequence)
+}
+
 func (v *View) DeleteUser(userID string, eventSequence uint64) error {
 	err := view.DeleteUser(v.Db, userTable, userID)
 	if err != nil {
