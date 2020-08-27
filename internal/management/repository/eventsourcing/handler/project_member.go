@@ -134,7 +134,6 @@ func (p *ProjectMember) fillUserData(member *view_model.ProjectMemberView, user 
 		member.DisplayName = user.FirstName + " " + user.LastName
 	}
 	if user.Machine != nil {
-		member.Description = user.Machine.Description
 		member.DisplayName = user.Machine.Name
 	}
 }

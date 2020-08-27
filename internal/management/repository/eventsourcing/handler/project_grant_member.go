@@ -134,7 +134,6 @@ func (p *ProjectGrantMember) fillUserData(member *view_model.ProjectGrantMemberV
 		member.Email = user.EmailAddress
 	}
 	if user.Machine != nil {
-		member.Description = user.Machine.Description
 		member.DisplayName = user.Machine.Name
 	}
 }

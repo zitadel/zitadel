@@ -19,7 +19,6 @@ type ProjectGrantMemberView struct {
 	CreationDate time.Time
 	ChangeDate   time.Time
 	Sequence     uint64
-	Description  string
 }
 
 type ProjectGrantMemberSearchRequest struct {

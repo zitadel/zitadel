@@ -339,7 +339,6 @@ func (u *UserGrant) fillUserData(grant *view_model.UserGrantView, user *usr_mode
 		grant.Email = user.EmailAddress
 	}
 	if user.Machine != nil {
-		grant.Description = user.Machine.Description
 		grant.DisplayName = user.Machine.Name
 	}
 }

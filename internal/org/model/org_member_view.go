@@ -18,7 +18,6 @@ type OrgMemberView struct {
 	CreationDate time.Time
 	ChangeDate   time.Time
 	Sequence     uint64
-	Description  string
 }
 
 type OrgMemberSearchRequest struct {

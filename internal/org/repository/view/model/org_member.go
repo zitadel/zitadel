@@ -35,8 +35,6 @@ type OrgMemberView struct {
 
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
-
-	Description string `json:"-" gorm:"column:machine_description"`
 }
 
 func OrgMemberToModel(member *OrgMemberView) *model.OrgMemberView {
@@ -52,7 +50,6 @@ func OrgMemberToModel(member *OrgMemberView) *model.OrgMemberView {
 		Sequence:     member.Sequence,
 		CreationDate: member.CreationDate,
 		ChangeDate:   member.ChangeDate,
-		Description:  member.Description,
 	}
 }
 

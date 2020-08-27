@@ -125,6 +125,5 @@ func projectGrantMemberViewFromModel(member *proj_model.ProjectGrantMemberView) 
 		CreationDate: creationDate,
 		ChangeDate:   changeDate,
 		Sequence:     member.Sequence,
-		Description:  member.Description,
 	}
 }

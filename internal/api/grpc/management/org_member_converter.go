@@ -142,6 +142,5 @@ func orgMemberFromView(member *org_model.OrgMemberView) *management.OrgMemberVie
 		FirstName:    member.FirstName,
 		LastName:     member.LastName,
 		DisplayName:  member.DisplayName,
-		Description:  member.Description,
 	}
 }

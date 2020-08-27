@@ -129,7 +129,6 @@ func (m *IamMember) fillUserData(member *iam_model.IamMemberView, user *usr_mode
 		member.Email = user.EmailAddress
 	}
 	if user.Machine != nil {
-		member.Description = user.Machine.Description
 		member.DisplayName = user.Machine.Name
 	}
 }

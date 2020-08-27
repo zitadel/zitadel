@@ -42,8 +42,6 @@ type UserGrantView struct {
 	State        int32     `json:"-" gorm:"column:grant_state"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
-
-	Description string `json:"-" gorm:"column:machine_description"`
 }
 
 func UserGrantToModel(grant *UserGrantView) *model.UserGrantView {
@@ -64,7 +62,6 @@ func UserGrantToModel(grant *UserGrantView) *model.UserGrantView {
 		OrgName:       grant.OrgName,
 		RoleKeys:      grant.RoleKeys,
 		Sequence:      grant.Sequence,
-		Description:   grant.Description,
 	}
 }
 
