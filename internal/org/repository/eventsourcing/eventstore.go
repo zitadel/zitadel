@@ -390,7 +390,7 @@ func (es *OrgEventstore) OrgMemberByIDs(ctx context.Context, member *org_model.O
 
 func (es *OrgEventstore) PrepareAddOrgMember(ctx context.Context, member *org_model.OrgMember, resourceOwner string) (*model.OrgMember, *es_models.Aggregate, error) {
 	if member == nil || !member.IsValid() {
-		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Errors.Org.InvalidMember")
+		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-jRFLz", "Errors.Org.InvalidMember")
 	}
 
 	repoMember := model.OrgMemberFromModel(member)
@@ -414,7 +414,7 @@ func (es *OrgEventstore) AddOrgMember(ctx context.Context, member *org_model.Org
 
 func (es *OrgEventstore) ChangeOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
 	if member == nil || !member.IsValid() {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Errors.Org.InvalidMember")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ara6l", "Errors.Org.InvalidMember")
 	}
 
 	existingMember, err := es.OrgMemberByIDs(ctx, member)

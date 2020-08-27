@@ -28,6 +28,7 @@ func userFromModel(user *usr_model.User) *management.UserResponse {
 		CreationDate: creationDate,
 		ChangeDate:   changeDate,
 		Sequence:     user.Sequence,
+		UserName:     user.UserName,
 	}
 
 	if user.Machine != nil {
@@ -40,20 +41,21 @@ func userFromModel(user *usr_model.User) *management.UserResponse {
 	return userResp
 }
 
-func userCreateToModel(u *management.CreateUserRequest) *usr_model.User {
+func userCreateToModel(user *management.CreateUserRequest) *usr_model.User {
 	var human *usr_model.Human
 	var machine *usr_model.Machine
 
-	if h := u.GetHuman(); h != nil {
+	if h := user.GetHuman(); h != nil {
 		human = humanCreateToModel(h)
 	}
-	if m := u.GetMachine(); m != nil {
+	if m := user.GetMachine(); m != nil {
 		machine = machineCreateToModel(m)
 	}
 
 	return &usr_model.User{
-		Human:   human,
-		Machine: machine,
+		UserName: user.UserName,
+		Human:    human,
+		Machine:  machine,
 	}
 }
 
@@ -158,7 +160,6 @@ func profileFromModel(profile *usr_model.Profile) *management.UserProfile {
 		CreationDate:      creationDate,
 		ChangeDate:        changeDate,
 		Sequence:          profile.Sequence,
-		UserName:          profile.UserName,
 		FirstName:         profile.FirstName,
 		LastName:          profile.LastName,
 		DisplayName:       profile.DisplayName,
@@ -180,7 +181,6 @@ func profileViewFromModel(profile *usr_model.Profile) *management.UserProfileVie
 		CreationDate:       creationDate,
 		ChangeDate:         changeDate,
 		Sequence:           profile.Sequence,
-		UserName:           profile.UserName,
 		FirstName:          profile.FirstName,
 		LastName:           profile.LastName,
 		DisplayName:        profile.DisplayName,
@@ -381,12 +381,13 @@ func userViewFromModel(user *usr_model.UserView) *management.UserView {
 		ResourceOwner:      user.ResourceOwner,
 		LoginNames:         user.LoginNames,
 		PreferredLoginName: user.PreferredLoginName,
+		UserName:           user.UserName,
 	}
 	if user.HumanView != nil {
-		userView.User = &management.UserView_Human{humanViewFromModel(user.HumanView)}
+		userView.User = &management.UserView_Human{Human: humanViewFromModel(user.HumanView)}
 	}
 	if user.MachineView != nil {
-		userView.User = &management.UserView_Machine{machineViewFromModel(user.MachineView)}
+		userView.User = &management.UserView_Machine{Machine: machineViewFromModel(user.MachineView)}
 
 	}
 	return userView
@@ -562,7 +563,7 @@ func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*management.Change
 			EventType:  message.NewLocalizedEventType(change.EventType),
 			Sequence:   change.Sequence,
 			Data:       data,
-			EditorId:   change.ModifierId,
+			EditorId:   change.ModifierID,
 			Editor:     change.ModifierName,
 		}
 	}

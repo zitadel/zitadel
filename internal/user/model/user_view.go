@@ -13,6 +13,7 @@ import (
 
 type UserView struct {
 	ID                 string
+	UserName           string
 	CreationDate       time.Time
 	ChangeDate         time.Time
 	State              UserState
@@ -29,7 +30,6 @@ type HumanView struct {
 	PasswordSet            bool
 	PasswordChangeRequired bool
 	PasswordChanged        time.Time
-	UserName               string
 	FirstName              string
 	LastName               string
 	NickName               string
@@ -169,7 +169,6 @@ func (u *UserView) GetProfile() (*Profile, error) {
 			CreationDate:  u.CreationDate,
 			ChangeDate:    u.ChangeDate,
 		},
-		UserName:           u.UserName,
 		FirstName:          u.FirstName,
 		LastName:           u.LastName,
 		NickName:           u.NickName,

@@ -119,13 +119,17 @@ func (m *IamMember) fillData(member *iam_model.IamMemberView) (err error) {
 	return nil
 }
 
-//TODO: specific for user data
 func (m *IamMember) fillUserData(member *iam_model.IamMemberView, user *usr_model.User) {
 	member.UserName = user.UserName
-	member.FirstName = user.FirstName
-	member.LastName = user.LastName
-	member.Email = user.EmailAddress
-	member.DisplayName = user.DisplayName
+	if user.Human != nil {
+		member.FirstName = user.FirstName
+		member.LastName = user.LastName
+		member.DisplayName = user.FirstName + " " + user.LastName
+		member.Email = user.EmailAddress
+	}
+	if user.Machine != nil {
+		member.DisplayName = user.Machine.Name
+	}
 }
 func (m *IamMember) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Ld9ow", "id", event.AggregateID).WithError(err).Warn("something went wrong in iammember handler")

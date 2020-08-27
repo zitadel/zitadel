@@ -330,6 +330,7 @@ service AuthService {
 message UserSessionViews {
   repeated UserSessionView user_sessions = 1;
 }
+
 message UserSessionView {
   string id = 1;
   string agent_id = 2;
@@ -358,28 +359,60 @@ message UserView {
   UserState state = 2;
   google.protobuf.Timestamp creation_date = 3;
   google.protobuf.Timestamp change_date = 4;
-  google.protobuf.Timestamp last_login = 5;
-  google.protobuf.Timestamp password_changed = 6;
-  string user_name = 7;
-  string first_name = 8;
-  string last_name = 9;
-  string display_name = 10;
-  string nick_name = 11;
-  string preferred_language = 12;
-  Gender gender = 13;
-  string email = 14;
-  bool is_email_verified = 15;
-  string phone = 16;
-  bool is_phone_verified = 17;
-  string country = 18;
-  string locality = 19;
-  string postal_code = 20;
-  string region = 21;
-  string street_address = 22;
-  uint64 sequence = 23;
-  string resource_owner = 24;
-  repeated string login_names = 25;
-  string preferred_login_name = 26;
+  uint64 sequence = 5;
+  repeated string login_names = 6;
+  string preferred_login_name = 7;
+  google.protobuf.Timestamp last_login = 8;
+  string resource_owner = 9;
+  string user_name = 10;
+
+  oneof user {
+    option (validate.required) = true;
+
+    HumanView human = 11;
+    MachineView machine = 12;
+  }
+}
+
+message MachineView {
+  google.protobuf.Timestamp last_key_added = 2;
+
+  string name = 3;
+  string description = 4;
+  repeated MachineKeyView keys = 5;
+}
+
+message MachineKeyView {
+  string id = 1;
+  MachineKeyType type = 2;
+  uint64 sequence = 3;
+
+  google.protobuf.Timestamp creation_date = 4;
+  google.protobuf.Timestamp expiration_date = 5;
+}
+
+enum MachineKeyType {
+  MACHINEKEY_UNSPECIFIED = 0;
+  MACHINEKEY_JSON = 1;
+}
+
+message HumanView {
+  google.protobuf.Timestamp password_changed = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string display_name = 4;
+  string nick_name = 5;
+  string preferred_language = 6;
+  Gender gender = 7;
+  string email = 8;
+  bool is_email_verified = 9;
+  string phone = 10;
+  bool is_phone_verified = 11;
+  string country = 12;
+  string locality = 13;
+  string postal_code = 14;
+  string region = 15;
+  string street_address = 16;
 }
 
 enum UserState {
@@ -401,32 +434,30 @@ enum Gender {
 
 message UserProfile {
   string id = 1;
-  string user_name = 2;
-  string first_name = 3;
-  string last_name = 4;
-  string nick_name = 5;
-  string display_name = 6;
-  string preferred_language = 7;
-  Gender gender = 8;
-  uint64 sequence = 9;
-  google.protobuf.Timestamp creation_date = 10;
-  google.protobuf.Timestamp change_date = 11;
+  string first_name = 2;
+  string last_name = 3;
+  string nick_name = 4;
+  string display_name = 5;
+  string preferred_language = 6;
+  Gender gender = 7;
+  uint64 sequence = 8;
+  google.protobuf.Timestamp creation_date = 9;
+  google.protobuf.Timestamp change_date = 10;
 }
 
 message UserProfileView {
   string id = 1;
-  string user_name = 2;
-  string first_name = 3;
-  string last_name = 4;
-  string nick_name = 5;
-  string display_name = 6;
-  string preferred_language = 7;
-  Gender gender = 8;
-  uint64 sequence = 9;
-  google.protobuf.Timestamp creation_date = 10;
-  google.protobuf.Timestamp change_date = 11;
-  repeated string login_names = 12;
-  string preferred_login_name = 13;
+  string first_name = 2;
+  string last_name = 3;
+  string nick_name = 4;
+  string display_name = 5;
+  string preferred_language = 6;
+  Gender gender = 7;
+  uint64 sequence = 8;
+  google.protobuf.Timestamp creation_date = 9;
+  google.protobuf.Timestamp change_date = 10;
+  repeated string login_names = 11;
+  string preferred_login_name = 12;
 }
 
 message UpdateUserProfileRequest {

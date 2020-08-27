@@ -15,7 +15,6 @@ import (
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	policy_model "github.com/caos/zitadel/internal/policy/model"
 	policy_es "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
@@ -54,13 +53,13 @@ func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) 
 	if err != nil {
 		return nil, err
 	}
-	user, userAggregates, err := repo.UserEventstore.PrepareCreateUser(ctx, &usr_model.User{Human: setUp.Human}, pwPolicy, orgPolicy, org.AggregateID)
+	user, userAggregates, err := repo.UserEventstore.PrepareCreateUser(ctx, setUp.User, pwPolicy, orgPolicy, org.AggregateID)
 	if err != nil {
 		return nil, err
 	}
 
 	aggregates = append(aggregates, userAggregates...)
-	setupModel := &Setup{Org: org, Human: user.Human}
+	setupModel := &Setup{Org: org, User: user}
 
 	member := org_model.NewOrgMemberWithRoles(org.AggregateID, user.AggregateID, orgOwnerRole)
 	_, memberAggregate, err := repo.OrgEventstore.PrepareAddOrgMember(ctx, member, org.AggregateID)

@@ -1,8 +1,9 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/model"
 	"time"
+
+	"github.com/caos/zitadel/internal/model"
 )
 
 type IamMemberView struct {

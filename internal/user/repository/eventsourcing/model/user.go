@@ -1,9 +1,12 @@
 package model
 
 import (
+	"encoding/json"
 	"strings"
 
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
 )
@@ -14,20 +17,11 @@ const (
 
 type User struct {
 	es_models.ObjectRoot
-	State int32 `json:"-"`
+	State    int32  `json:"-"`
+	UserName string `json:"userName"`
 
 	*Human
 	*Machine
-}
-
-func (u *User) AppendEvents(events ...*es_models.Event) error {
-	for _, event := range events {
-		if err := u.AppendEvent(event); err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 func UserFromModel(user *model.User) *User {
@@ -42,6 +36,7 @@ func UserFromModel(user *model.User) *User {
 	return &User{
 		ObjectRoot: user.ObjectRoot,
 		State:      int32(user.State),
+		UserName:   user.UserName,
 		Human:      human,
 		Machine:    machine,
 	}
@@ -59,15 +54,31 @@ func UserToModel(user *User) *model.User {
 	return &model.User{
 		ObjectRoot: user.ObjectRoot,
 		State:      model.UserState(user.State),
+		UserName:   user.UserName,
 		Human:      human,
 		Machine:    machine,
 	}
+}
+
+func (u *User) AppendEvents(events ...*es_models.Event) error {
+	for _, event := range events {
+		if err := u.AppendEvent(event); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (u *User) AppendEvent(event *es_models.Event) error {
 	u.ObjectRoot.AppendEvent(event)
 
 	switch event.Type {
+	case UserAdded, HumanAdded, MachineAdded, UserRegistered, HumanRegistered:
+		err := u.setData(event)
+		if err != nil {
+			return err
+		}
 	case UserDeactivated:
 		u.appendDeactivatedEvent()
 	case UserReactivated:
@@ -95,6 +106,14 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 	}
 
 	return errors.ThrowNotFound(nil, "MODEL-x9TaX", "Errors.UserType.Undefined")
+}
+
+func (u *User) setData(event *es_models.Event) error {
+	if err := json.Unmarshal(event.Data, u); err != nil {
+		logging.Log("EVEN-ZDzQy").WithError(err).Error("could not unmarshal event data")
+		return caos_errs.ThrowInternal(err, "MODEL-yGmhh", "could not unmarshal event")
+	}
+	return nil
 }
 
 func (u *User) appendDeactivatedEvent() {

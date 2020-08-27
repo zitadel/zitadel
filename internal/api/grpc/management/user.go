@@ -64,14 +64,6 @@ func (s *Server) CreateUser(ctx context.Context, in *management.CreateUserReques
 	return userFromModel(user), nil
 }
 
-func (s *Server) CreateHuman(ctx context.Context, in *management.CreateHumanRequest) (*management.UserResponse, error) {
-	return s.CreateUser(ctx, &management.CreateUserRequest{User: &management.CreateUserRequest_Human{in}})
-}
-
-func (s *Server) CreateMachine(ctx context.Context, in *management.CreateMachineRequest) (*management.UserResponse, error) {
-	return s.CreateUser(ctx, &management.CreateUserRequest{User: &management.CreateUserRequest_Machine{in}})
-}
-
 func (s *Server) DeactivateUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
 	user, err := s.user.DeactivateUser(ctx, in.Id)
 	if err != nil {

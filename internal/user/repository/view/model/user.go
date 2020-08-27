@@ -48,38 +48,39 @@ type UserView struct {
 	PreferredLoginName string         `json:"-" gorm:"column:preferred_login_name"`
 	Sequence           uint64         `json:"-" gorm:"column:sequence"`
 	Type               userType       `json:"-" gorm:"column:user_type"`
+	UserName           string         `json:"userName" gorm:"column:user_name"`
 	*MachineView
 	*HumanView
 }
 
 type HumanView struct {
-	FirstName              string    `json:"firstName" gorm:"column:first_name"`
-	LastName               string    `json:"lastName" gorm:"column:last_name"`
-	NickName               string    `json:"nickName" gorm:"column:nick_name"`
-	DisplayName            string    `json:"displayName" gorm:"column:display_name"`
-	PreferredLanguage      string    `json:"preferredLanguage" gorm:"column:preferred_language"`
-	Gender                 int32     `json:"gender" gorm:"column:gender"`
-	Email                  string    `json:"email" gorm:"column:email"`
-	IsEmailVerified        bool      `json:"-" gorm:"column:is_email_verified"`
-	Phone                  string    `json:"phone" gorm:"column:phone"`
-	IsPhoneVerified        bool      `json:"-" gorm:"column:is_phone_verified"`
-	Country                string    `json:"country" gorm:"column:country"`
-	Locality               string    `json:"locality" gorm:"column:locality"`
-	PostalCode             string    `json:"postalCode" gorm:"column:postal_code"`
-	Region                 string    `json:"region" gorm:"column:region"`
-	StreetAddress          string    `json:"streetAddress" gorm:"column:street_address"`
-	OTPState               int32     `json:"-" gorm:"column:otp_state"`
-	MfaMaxSetUp            int32     `json:"-" gorm:"column:mfa_max_set_up"`
-	MfaInitSkipped         time.Time `json:"-" gorm:"column:mfa_init_skipped"`
-	InitRequired           bool      `json:"-" gorm:"column:init_required"`
-	UserName               string    `json:"userName" gorm:"column:user_name"`
+	FirstName         string    `json:"firstName" gorm:"column:first_name"`
+	LastName          string    `json:"lastName" gorm:"column:last_name"`
+	NickName          string    `json:"nickName" gorm:"column:nick_name"`
+	DisplayName       string    `json:"displayName" gorm:"column:display_name"`
+	PreferredLanguage string    `json:"preferredLanguage" gorm:"column:preferred_language"`
+	Gender            int32     `json:"gender" gorm:"column:gender"`
+	Email             string    `json:"email" gorm:"column:email"`
+	IsEmailVerified   bool      `json:"-" gorm:"column:is_email_verified"`
+	Phone             string    `json:"phone" gorm:"column:phone"`
+	IsPhoneVerified   bool      `json:"-" gorm:"column:is_phone_verified"`
+	Country           string    `json:"country" gorm:"column:country"`
+	Locality          string    `json:"locality" gorm:"column:locality"`
+	PostalCode        string    `json:"postalCode" gorm:"column:postal_code"`
+	Region            string    `json:"region" gorm:"column:region"`
+	StreetAddress     string    `json:"streetAddress" gorm:"column:street_address"`
+	OTPState          int32     `json:"-" gorm:"column:otp_state"`
+	MfaMaxSetUp       int32     `json:"-" gorm:"column:mfa_max_set_up"`
+	MfaInitSkipped    time.Time `json:"-" gorm:"column:mfa_init_skipped"`
+	InitRequired      bool      `json:"-" gorm:"column:init_required"`
+
 	PasswordSet            bool      `json:"-" gorm:"column:password_set"`
 	PasswordChangeRequired bool      `json:"-" gorm:"column:password_change_required"`
 	PasswordChanged        time.Time `json:"-" gorm:"column:password_change"`
 }
 
 func (h *HumanView) IsZero() bool {
-	return h == nil || h.UserName == ""
+	return h == nil || h.FirstName == ""
 }
 
 type MachineView struct {
@@ -94,6 +95,7 @@ func (m *MachineView) IsZero() bool {
 func UserToModel(user *UserView) *model.UserView {
 	userView := &model.UserView{
 		ID:                 user.ID,
+		UserName:           user.UserName,
 		ChangeDate:         user.ChangeDate,
 		CreationDate:       user.CreationDate,
 		ResourceOwner:      user.ResourceOwner,
@@ -108,7 +110,6 @@ func UserToModel(user *UserView) *model.UserView {
 			PasswordSet:            user.PasswordSet,
 			PasswordChangeRequired: user.PasswordChangeRequired,
 			PasswordChanged:        user.PasswordChanged,
-			UserName:               user.UserName,
 			FirstName:              user.FirstName,
 			LastName:               user.LastName,
 			NickName:               user.NickName,

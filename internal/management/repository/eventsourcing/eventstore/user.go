@@ -123,8 +123,8 @@ func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence u
 		return nil, err
 	}
 	for _, change := range changes.Changes {
-		change.ModifierName = change.ModifierId
-		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		change.ModifierName = change.ModifierID
+		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierID)
 		if user != nil {
 			change.ModifierName = user.DisplayName
 		}

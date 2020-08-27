@@ -337,46 +337,6 @@ func (mr *MockManagementServiceClientMockRecorder) ChangeUserPhone(arg0, arg1 in
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeUserPhone", reflect.TypeOf((*MockManagementServiceClient)(nil).ChangeUserPhone), varargs...)
 }
 
-// CreateHuman mocks base method
-func (m *MockManagementServiceClient) CreateHuman(arg0 context.Context, arg1 *management.CreateHumanRequest, arg2 ...grpc.CallOption) (*management.UserResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "CreateHuman", varargs...)
-	ret0, _ := ret[0].(*management.UserResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateHuman indicates an expected call of CreateHuman
-func (mr *MockManagementServiceClientMockRecorder) CreateHuman(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateHuman", reflect.TypeOf((*MockManagementServiceClient)(nil).CreateHuman), varargs...)
-}
-
-// CreateMachine mocks base method
-func (m *MockManagementServiceClient) CreateMachine(arg0 context.Context, arg1 *management.CreateMachineRequest, arg2 ...grpc.CallOption) (*management.UserResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "CreateMachine", varargs...)
-	ret0, _ := ret[0].(*management.UserResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateMachine indicates an expected call of CreateMachine
-func (mr *MockManagementServiceClientMockRecorder) CreateMachine(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMachine", reflect.TypeOf((*MockManagementServiceClient)(nil).CreateMachine), varargs...)
-}
-
 // CreateOIDCApplication mocks base method
 func (m *MockManagementServiceClient) CreateOIDCApplication(arg0 context.Context, arg1 *management.OIDCApplicationCreate, arg2 ...grpc.CallOption) (*management.Application, error) {
 	m.ctrl.T.Helper()
