@@ -119,7 +119,6 @@ func (m *IamMember) fillData(member *iam_model.IamMemberView) (err error) {
 	return nil
 }
 
-//TODO: specific for user data
 func (m *IamMember) fillUserData(member *iam_model.IamMemberView, user *usr_model.User) {
 	member.UserName = user.UserName
 	if user.Human != nil {

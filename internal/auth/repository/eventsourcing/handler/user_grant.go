@@ -329,7 +329,6 @@ func (u *UserGrant) fillData(grant *view_model.UserGrantView, resourceOwner stri
 	return nil
 }
 
-//TODO: specific for user data
 func (u *UserGrant) fillUserData(grant *view_model.UserGrantView, user *usr_model.User) {
 	grant.UserName = user.UserName
 	if user.Human != nil {

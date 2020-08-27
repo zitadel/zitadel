@@ -122,7 +122,6 @@ func (m *OrgMember) fillData(member *org_model.OrgMemberView) (err error) {
 	return nil
 }
 
-//TODO: specific for user data
 func (m *OrgMember) fillUserData(member *org_model.OrgMemberView, user *usr_model.User) {
 	member.UserName = user.UserName
 	if user.Human != nil {

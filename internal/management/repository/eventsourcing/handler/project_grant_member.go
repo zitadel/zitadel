@@ -124,7 +124,6 @@ func (p *ProjectGrantMember) fillData(member *view_model.ProjectGrantMemberView)
 	return nil
 }
 
-//TODO: specific for user data
 func (p *ProjectGrantMember) fillUserData(member *view_model.ProjectGrantMemberView, user *usr_model.User) {
 	member.UserName = user.UserName
 	if user.Human != nil {
