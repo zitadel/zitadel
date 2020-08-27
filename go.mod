@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go v0.61.0 // indirect
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.3
 	github.com/BurntSushi/toml v0.3.1
-	github.com/DATA-DOG/go-sqlmock v1.4.1
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/Masterminds/goutils v1.1.0 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
