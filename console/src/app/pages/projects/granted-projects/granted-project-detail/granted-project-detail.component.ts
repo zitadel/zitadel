@@ -13,7 +13,6 @@ import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-dataso
 import {
     Application,
     ApplicationSearchResponse,
-    ProjectGrantState,
     ProjectGrantView,
     ProjectMember,
     ProjectMemberSearchResponse,
@@ -162,8 +161,6 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
     }
 
     public showDetail(): void {
-        if (this.project.state === ProjectGrantState.PROJECTGRANTSTATE_ACTIVE) {
-            this.router.navigate(['granted-projects', this.project.projectId, 'grant', this.grantId, 'members']);
-        }
+        this.router.navigate(['granted-projects', this.project.projectId, 'grant', this.grantId, 'members']);
     }
 }
