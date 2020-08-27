@@ -30,7 +30,7 @@ func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, lang l
 		middleware.TracingStatsServer(http.Healthz, http.Readiness, http.Validation),
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
-				middleware.ErrorHandler(lang),
+				middleware.ErrorHandler(),
 				middleware.AuthorizationInterceptor(verifier, authConfig),
 				middleware.TranslationHandler(lang),
 			),

@@ -9,6 +9,7 @@ import (
 type Error interface {
 	GetParent() error
 	GetMessage() string
+	SetMessage(string)
 	GetID() string
 }
 
