@@ -2114,7 +2114,6 @@ message ProjectView {
   uint64 sequence = 7;
 }
 
-
 message ProjectSearchRequest {
   uint64 offset = 1;
   uint64 limit = 2;

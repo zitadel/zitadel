@@ -329,12 +329,17 @@ func (u *UserGrant) fillData(grant *view_model.UserGrantView, resourceOwner stri
 	return nil
 }
 
-//TODO: specific for user data
 func (u *UserGrant) fillUserData(grant *view_model.UserGrantView, user *usr_model.User) {
 	grant.UserName = user.UserName
-	grant.FirstName = user.FirstName
-	grant.LastName = user.LastName
-	grant.Email = user.EmailAddress
+	if user.Human != nil {
+		grant.FirstName = user.FirstName
+		grant.LastName = user.LastName
+		grant.DisplayName = user.FirstName + " " + user.LastName
+		grant.Email = user.EmailAddress
+	}
+	if user.Machine != nil {
+		grant.DisplayName = user.Machine.Name
+	}
 }
 
 func (u *UserGrant) fillProjectData(grant *view_model.UserGrantView, project *proj_model.Project) {
