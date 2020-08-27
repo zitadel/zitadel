@@ -1139,7 +1139,7 @@ func (es *UserEventstore) ChangeUsername(ctx context.Context, userID, username s
 	oldUsername := user.UserName
 	user.UserName = username
 	if err := user.CheckOrgIAMPolicy(orgIamPolicy); err != nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-D23s2", "Errors.Users.Mfa.Otp.NotExisting")
+		return err
 	}
 	repoUser := model.UserFromModel(user)
 	aggregates, err := UsernameChangedAggregates(ctx, es.AggregateCreator(), repoUser, oldUsername, orgIamPolicy.UserLoginMustBeDomain)

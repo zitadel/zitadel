@@ -88,7 +88,7 @@ service ManagementService {
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "user.read"
+      permission: "user.global.read"
     };
   }
 

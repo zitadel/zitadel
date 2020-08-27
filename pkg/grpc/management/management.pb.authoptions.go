@@ -25,7 +25,7 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 	},
 
 	"/caos.zitadel.management.api.v1.ManagementService/GetUserByLoginNameGlobal": authz.Option{
-		Permission: "user.read",
+		Permission: "user.global.read",
 		CheckParam: "",
 	},
 
