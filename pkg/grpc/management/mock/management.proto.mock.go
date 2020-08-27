@@ -1017,26 +1017,6 @@ func (mr *MockManagementServiceClientMockRecorder) GetUserAddress(arg0, arg1 int
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserAddress", reflect.TypeOf((*MockManagementServiceClient)(nil).GetUserAddress), varargs...)
 }
 
-// GetUserByEmailGlobal mocks base method
-func (m *MockManagementServiceClient) GetUserByEmailGlobal(arg0 context.Context, arg1 *management.Email, arg2 ...grpc.CallOption) (*management.UserView, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetUserByEmailGlobal", varargs...)
-	ret0, _ := ret[0].(*management.UserView)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetUserByEmailGlobal indicates an expected call of GetUserByEmailGlobal
-func (mr *MockManagementServiceClientMockRecorder) GetUserByEmailGlobal(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByEmailGlobal", reflect.TypeOf((*MockManagementServiceClient)(nil).GetUserByEmailGlobal), varargs...)
-}
-
 // GetUserByID mocks base method
 func (m *MockManagementServiceClient) GetUserByID(arg0 context.Context, arg1 *management.UserID, arg2 ...grpc.CallOption) (*management.UserView, error) {
 	m.ctrl.T.Helper()
@@ -1055,6 +1035,26 @@ func (mr *MockManagementServiceClientMockRecorder) GetUserByID(arg0, arg1 interf
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByID", reflect.TypeOf((*MockManagementServiceClient)(nil).GetUserByID), varargs...)
+}
+
+// GetUserByLoginNameGlobal mocks base method
+func (m *MockManagementServiceClient) GetUserByLoginNameGlobal(arg0 context.Context, arg1 *management.LoginName, arg2 ...grpc.CallOption) (*management.UserView, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetUserByLoginNameGlobal", varargs...)
+	ret0, _ := ret[0].(*management.UserView)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserByLoginNameGlobal indicates an expected call of GetUserByLoginNameGlobal
+func (mr *MockManagementServiceClientMockRecorder) GetUserByLoginNameGlobal(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByLoginNameGlobal", reflect.TypeOf((*MockManagementServiceClient)(nil).GetUserByLoginNameGlobal), varargs...)
 }
 
 // GetUserEmail mocks base method

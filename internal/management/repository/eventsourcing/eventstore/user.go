@@ -130,8 +130,8 @@ func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence u
 	return changes, nil
 }
 
-func (repo *UserRepo) GetGlobalUserByEmail(ctx context.Context, email string) (*usr_model.UserView, error) {
-	user, err := repo.View.GetGlobalUserByEmail(email)
+func (repo *UserRepo) GetUserByLoginNameGlobal(ctx context.Context, loginName string) (*usr_model.UserView, error) {
+	user, err := repo.View.GetGlobalUserByLoginName(loginName)
 	if err != nil {
 		return nil, err
 	}

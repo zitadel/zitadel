@@ -82,9 +82,9 @@ service ManagementService {
   }
 
   // GetUserByEmailGlobal returns User, global search is overall organisations
-  rpc GetUserByEmailGlobal(Email) returns (UserView) {
+  rpc GetUserByLoginNameGlobal(LoginName) returns (UserView) {
     option (google.api.http) = {
-      get: "/global/users/_byemail"
+      get: "/global/users/_byloginname"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
@@ -1307,8 +1307,8 @@ message UserID {
   string id = 1;
 }
 
-message Email {
-  string email = 1;
+message LoginName {
+  string login_name = 1;
 }
 
 message UniqueUserRequest {

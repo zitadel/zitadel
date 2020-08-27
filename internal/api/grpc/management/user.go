@@ -2,10 +2,10 @@ package management
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/authz"
 
 	"github.com/golang/protobuf/ptypes/empty"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/errors"
@@ -20,8 +20,8 @@ func (s *Server) GetUserByID(ctx context.Context, id *management.UserID) (*manag
 	return userViewFromModel(user), nil
 }
 
-func (s *Server) GetUserByEmailGlobal(ctx context.Context, email *management.Email) (*management.UserView, error) {
-	user, err := s.user.GetGlobalUserByEmail(ctx, email.Email)
+func (s *Server) GetUserByLoginNameGlobal(ctx context.Context, loginName *management.LoginName) (*management.UserView, error) {
+	user, err := s.user.GetUserByLoginNameGlobal(ctx, loginName.LoginName)
 	if err != nil {
 		return nil, err
 	}
