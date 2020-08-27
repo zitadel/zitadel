@@ -18,6 +18,7 @@ const (
 	NextStepMfaPrompt
 	NextStepMfaVerify
 	NextStepRedirectToCallback
+	NextStepChangeUsername
 )
 
 type UserSessionState int32
@@ -72,6 +73,12 @@ type InitPasswordStep struct{}
 
 func (s *InitPasswordStep) Type() NextStepType {
 	return NextStepInitPassword
+}
+
+type ChangeUsernameStep struct{}
+
+func (s *ChangeUsernameStep) Type() NextStepType {
+	return NextStepChangeUsername
 }
 
 type VerifyEMailStep struct{}

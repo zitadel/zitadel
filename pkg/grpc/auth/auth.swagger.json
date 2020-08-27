@@ -614,6 +614,32 @@
         ]
       }
     },
+    "/users/me/username": {
+      "put": {
+        "operationId": "ChangeMyUserName",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ChangeUserNameRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
     "/validate": {
       "get": {
         "operationId": "Validate",
@@ -662,6 +688,14 @@
         },
         "data": {
           "type": "object"
+        }
+      }
+    },
+    "v1ChangeUserNameRequest": {
+      "type": "object",
+      "properties": {
+        "user_name": {
+          "type": "string"
         }
       }
     },

@@ -132,8 +132,8 @@ func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence u
 	return changes, nil
 }
 
-func (repo *UserRepo) GetGlobalUserByEmail(ctx context.Context, email string) (*usr_model.UserView, error) {
-	user, err := repo.View.GetGlobalUserByEmail(email)
+func (repo *UserRepo) GetUserByLoginNameGlobal(ctx context.Context, loginName string) (*usr_model.UserView, error) {
+	user, err := repo.View.GetGlobalUserByLoginName(loginName)
 	if err != nil {
 		return nil, err
 	}
@@ -177,6 +177,14 @@ func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_mode
 
 func (repo *UserRepo) ChangeProfile(ctx context.Context, profile *usr_model.Profile) (*usr_model.Profile, error) {
 	return repo.UserEvents.ChangeProfile(ctx, profile)
+}
+
+func (repo *UserRepo) ChangeUsername(ctx context.Context, userID, userName string) error {
+	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return err
+	}
+	return repo.UserEvents.ChangeUsername(ctx, userID, userName, orgPolicy)
 }
 
 func (repo *UserRepo) EmailByID(ctx context.Context, userID string) (*usr_model.Email, error) {

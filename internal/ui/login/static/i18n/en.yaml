@@ -21,6 +21,15 @@ Password:
   HasNumber: Number
   HasSymbol: Symbol
 
+UsernameChange:
+  Title: Change Username
+  Description: Set your new username
+  Username: Username
+
+UsernameChangeDone:
+  Title: Username changed
+  Description: Your username was changed successfully.
+
 MfaVerify:
   Title: Verify Multificator
   Description: Verify your multifactor
@@ -155,6 +164,7 @@ Errors:
     NotMatchingUserID: User and user in authrequest don't match
     UserIDMissing: UserID is empty
     Invalid: Invalid userdata
+    DomainNotAllowedAsUsername: Domain is already reserved and cannot be used
     Password:
       ConfirmationWrong: Passwordconfirmation is wrong
       Empty: Password is empty

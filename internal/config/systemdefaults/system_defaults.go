@@ -81,6 +81,7 @@ type Endpoints struct {
 	InitCode      string
 	PasswordReset string
 	VerifyEmail   string
+	DomainClaimed string
 }
 
 type Providers struct {
@@ -94,4 +95,5 @@ type TemplateData struct {
 	PasswordReset templates.TemplateData
 	VerifyEmail   templates.TemplateData
 	VerifyPhone   templates.TemplateData
+	DomainClaimed templates.TemplateData
 }

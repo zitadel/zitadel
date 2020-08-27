@@ -8,7 +8,7 @@ Errors:
     OrgIamPolicyNil: Organisation Policy is empty
     EmailAsUsernameNotAllowed: Email is not allowed as username
     Invalid: Userdata is invalid
-    DomainNotAllowedAsUsername: Domain is already reserved
+    DomainNotAllowedAsUsername: Domain is already reserved and cannot be used
     AlreadyInactive: User already inactive
     NotInactive: User is not inactive
     ShouldBeActiveOrInitial: User is not active or inital

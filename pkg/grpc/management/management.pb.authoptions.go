@@ -24,8 +24,8 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetUserByEmailGlobal": authz.Option{
-		Permission: "user.read",
+	"/caos.zitadel.management.api.v1.ManagementService/GetUserByLoginNameGlobal": authz.Option{
+		Permission: "user.global.read",
 		CheckParam: "",
 	},
 
@@ -101,6 +101,11 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 
 	"/caos.zitadel.management.api.v1.ManagementService/GetUserEmail": authz.Option{
 		Permission: "user.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/ChangeUserUserName": authz.Option{
+		Permission: "user.write",
 		CheckParam: "",
 	},
 

@@ -6,7 +6,7 @@ import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs/operators';
-import { ProjectGrantView, ProjectMember, ProjectType, ProjectView, User } from 'src/app/proto/generated/management_pb';
+import { ProjectGrantView, ProjectMember, ProjectType, ProjectView, UserView } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -128,7 +128,7 @@ export class ProjectMembersComponent {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                const users: User.AsObject[] = resp.users;
+                const users: UserView.AsObject[] = resp.users;
                 const roles: string[] = resp.roles;
 
                 if (users && users.length && roles && roles.length) {

@@ -81,14 +81,14 @@ service ManagementService {
     };
   }
 
-  // GetUserByEmailGlobal returns User, global search is overall organisations
-  rpc GetUserByEmailGlobal(Email) returns (UserView) {
+  // GetUserByLoginNameGlobal returns User, global search is overall organisations
+  rpc GetUserByLoginNameGlobal(LoginName) returns (UserView) {
     option (google.api.http) = {
-      get: "/global/users/_byemail"
+      get: "/global/users/_byloginname"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "user.read"
+      permission: "user.global.read"
     };
   }
 
@@ -251,6 +251,16 @@ service ManagementService {
 
     option (caos.zitadel.utils.v1.auth_option) = {
       permission: "user.read"
+    };
+  }
+
+  rpc ChangeUserUserName(UpdateUserUserNameRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      get: "/users/{id}/username"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.write"
     };
   }
 
@@ -1459,8 +1469,8 @@ message UserID {
   string id = 1;
 }
 
-message Email {
-  string email = 1;
+message LoginName {
+  string login_name = 1;
 }
 
 message UniqueUserRequest {
@@ -1646,6 +1656,11 @@ message UpdateUserProfileRequest {
   string nick_name = 4 [(validate.rules).string = {max_len: 200}];
   string preferred_language = 5 [(validate.rules).string = {max_len: 200}];
   Gender gender = 6;
+}
+
+message UpdateUserUserNameRequest {
+  string id = 1;
+  string user_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message UserEmail {

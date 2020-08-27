@@ -21,6 +21,15 @@ UserSelection:
   SessionState0: aktiv
   SessionState1: inaktiv
 
+UsernameChange:
+  Title: Usernamen ändern
+  Description: Wähle deinen neuen Benutzernamen
+  Username: Benutzernamen
+
+UsernameChangeDone:
+  Title: Username geändert
+  Description: Der Username wurde erfolgreich geändert.
+
 MfaVerify:
   Title: Multifaktor verifizieren
   Description: Verifiziere deinen Multifaktor
@@ -153,6 +162,7 @@ Errors:
     NotMatchingUserID: User stimm nicht mit User in Auth Request überein
     UserIDMissing: UserID ist leer
     Invalid: Userdaten sind ungültig
+    DomainNotAllowedAsUsername: Domäne ist bereits reserviert und kann nicht verwendet werden
     Password:
       ConfirmationWrong: Passwort Bestätigung stimmt nicht überein
       Empty: Passwort ist leer

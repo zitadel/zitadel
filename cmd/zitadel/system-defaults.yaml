@@ -89,6 +89,7 @@ SystemDefaults:
       InitCode: '$ZITADEL_ACCOUNTS/user/init?userID={{.UserID}}&code={{.Code}}&passwordset={{.PasswordSet}}'
       PasswordReset: '$ZITADEL_ACCOUNTS/password/init?userID={{.UserID}}&code={{.Code}}'
       VerifyEmail: '$ZITADEL_ACCOUNTS/mail/verification?userID={{.UserID}}&code={{.Code}}'
+      DomainClaimed: '$ZITADEL_ACCOUNTS/login'
     Providers:
       Chat:
         Url: $CHAT_URL
@@ -134,3 +135,10 @@ SystemDefaults:
         Greeting: 'VerifyPhone.Greeting'
         Text: 'VerifyPhone.Text'
         ButtonText: 'VerifyPhone.ButtonText'
+      DomainClaimed:
+        Title: 'DomainClaimed.Title'
+        PreHeader: 'DomainClaimed.PreHeader'
+        Subject: 'DomainClaimed.Subject'
+        Greeting: 'DomainClaimed.Greeting'
+        Text: 'DomainClaimed.Text'
+        ButtonText: 'DomainClaimed.ButtonText'

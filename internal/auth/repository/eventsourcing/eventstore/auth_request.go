@@ -239,8 +239,11 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 	if !user.IsEmailVerified {
 		steps = append(steps, &model.VerifyEMailStep{})
 	}
+	if user.UsernameChangeRequired {
+		steps = append(steps, &model.ChangeUsernameStep{})
+	}
 
-	if user.PasswordChangeRequired || !user.IsEmailVerified {
+	if user.PasswordChangeRequired || !user.IsEmailVerified || user.UsernameChangeRequired {
 		return steps, nil
 	}
 
