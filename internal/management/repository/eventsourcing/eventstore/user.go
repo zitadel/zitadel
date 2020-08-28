@@ -175,6 +175,35 @@ func (repo *UserRepo) ChangeMachine(ctx context.Context, machine *usr_model.Mach
 	return repo.UserEvents.ChangeMachine(ctx, machine)
 }
 
+func (repo *UserRepo) MachineKeyByID(ctx context.Context, id string) (*usr_model.MachineKeyView, error) {
+	key, err := repo.View.MachineKeyByID(id)
+	if err != nil {
+		return nil, err
+	}
+	return model.MachineKeyToModel(key), nil
+}
+
+func (repo *UserRepo) SearchMachineKeys(ctx context.Context, request *usr_model.MachineKeySearchRequest) (*usr_model.MachineKeySearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	sequence, seqErr := repo.View.GetLatestMachineKeySequence()
+	logging.Log("EVENT-Sk8fs").OnError(seqErr).Warn("could not read latest user sequence")
+	keys, count, err := repo.View.SearchMachineKeys(request)
+	if err != nil {
+		return nil, err
+	}
+	result := &usr_model.MachineKeySearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: count,
+		Result:      model.MachineKeysToModel(keys),
+	}
+	if seqErr == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
+	}
+	return result, nil
+}
+
 func (repo *UserRepo) AddMachineKey(ctx context.Context, key *usr_model.MachineKey) (*usr_model.MachineKey, error) {
 	return repo.UserEvents.AddMachineKey(ctx, key)
 }

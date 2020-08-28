@@ -58,14 +58,6 @@ type MachineView struct {
 	Keys         []*MachineKeyView
 }
 
-type MachineKeyView struct {
-	ID             string
-	Type           MachineKeyType
-	Sequence       uint64
-	CreationDate   time.Time
-	ExpirationDate time.Time
-}
-
 type UserSearchRequest struct {
 	Offset        uint64
 	Limit         uint64
