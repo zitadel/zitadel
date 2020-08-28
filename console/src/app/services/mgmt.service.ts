@@ -16,10 +16,10 @@ import {
     Changes,
     CreateUserRequest,
     Domain,
-    Email,
     Gender,
     GrantedProjectSearchRequest,
     Iam,
+    LoginName,
     MultiFactors,
     NotificationType,
     OIDCApplicationCreate,
@@ -615,10 +615,10 @@ export class ManagementService {
         return this.grpcService.mgmt.searchUsers(req);
     }
 
-    public async GetUserByEmailGlobal(email: string): Promise<User> {
-        const req = new Email();
-        req.setEmail(email);
-        return this.grpcService.mgmt.getUserByEmailGlobal(req);
+    public async GetUserByLoginNameGlobal(loginname: string): Promise<UserView> {
+        const req = new LoginName();
+        req.set(loginname);
+        return this.grpcService.mgmt.getUserByLoginNameGlobal(req);
     }
 
     // USER GRANTS
