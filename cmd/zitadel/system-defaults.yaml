@@ -42,6 +42,8 @@ SystemDefaults:
       IncludeUpperLetters: true
       IncludeDigits: true
       IncludeSymbols: false
+    MachineKey:
+      Length: 2048
   Multifactors:
     OTP:
       Issuer: 'Zitadel'

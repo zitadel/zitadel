@@ -192,7 +192,8 @@ service ManagementService {
 
   rpc AddMachineKey(AddMachineKeyRequest) returns (AddMachineKeyResponse) {
       option (google.api.http) = {
-          post: "/user/{user_id}/keys"
+          post: "/users/{user_id}/keys"
+          body: "*"
       };
 
       option (caos.zitadel.utils.v1.auth_option) = {
@@ -202,7 +203,7 @@ service ManagementService {
 
   rpc DeleteServiceAccountKey(MachineKeyIDRequest) returns (google.protobuf.Empty) {
       option (google.api.http) = {
-          post: "/users/{user_id}/keys/{key_id}"
+          delete: "/users/{user_id}/keys/{key_id}"
       };
 
       option (caos.zitadel.utils.v1.auth_option) = {
@@ -1694,35 +1695,6 @@ message UpdateUserAddressRequest {
   string region = 5 [(validate.rules).string = {max_len: 200}];
   string street_address = 6 [(validate.rules).string = {max_len: 200}];
 }
-
-
-
-// message ServiceAccountKeyResponse {
-//   string key_id = 1;
-//   string service_account_id = 2;
-//   google.protobuf.Timestamp expiration_date = 3;
-
-//   google.protobuf.Timestamp creation_date = 4;
-//   google.protobuf.Timestamp change_date = 5;
-//   uint64 sequence = 6;
-//   string resource_owner = 7;
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 message MultiFactors {
   repeated MultiFactor mfas = 1;

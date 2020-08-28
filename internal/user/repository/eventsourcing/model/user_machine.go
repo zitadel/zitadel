@@ -72,12 +72,12 @@ func MachineToModel(machine *Machine) *model.Machine {
 }
 
 type MachineKey struct {
-	es_models.ObjectRoot
-	KeyID          string
-	Type           int32
-	ExpirationDate time.Time
-	PublicKey      *crypto.CryptoValue
-	privateKey     []byte
+	es_models.ObjectRoot `json:"-"`
+	KeyID                string              `json:"keyId,omitempty"`
+	Type                 int32               `json:"type,omitempty"`
+	ExpirationDate       time.Time           `json:"expirationDate,omitempty"`
+	PublicKey            *crypto.CryptoValue `json:"publicKey,omitempty"`
+	privateKey           []byte
 }
 
 func (key *MachineKey) AppendEvents(events ...*es_models.Event) error {
