@@ -71,6 +71,7 @@ func addMachineKeyToModel(key *management.AddMachineKeyRequest) *usr_model.Machi
 	return &usr_model.MachineKey{
 		ExpirationDate: expirationDate,
 		Type:           machineKeyTypeToModel(key.Type),
+		ObjectRoot:     models.ObjectRoot{AggregateID: key.UserId},
 	}
 }
 

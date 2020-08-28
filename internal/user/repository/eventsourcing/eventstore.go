@@ -81,8 +81,10 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 				Issuer:    systemDefaults.Multifactors.OTP.Issuer,
 			},
 		},
-		PasswordAlg:  passwordAlg,
-		validateTOTP: totp.Validate,
+		PasswordAlg:    passwordAlg,
+		validateTOTP:   totp.Validate,
+		MachineKeyAlg:  aesCrypto,
+		MachineKeySize: int(systemDefaults.SecretGenerators.MachineKey.Length),
 	}, nil
 }
 
@@ -1305,6 +1307,20 @@ func (es *UserEventstore) RemoveMachineKey(ctx context.Context, userID, keyID st
 	if user.Machine == nil {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-h5Qtd", "Errors.User.NotMachine")
 	}
-	// user.Machine.
-	return nil
+
+	repoUser := model.UserFromModel(user)
+	userAggregate, err := UserAggregate(ctx, es.AggregateCreator(), repoUser)
+	if err != nil {
+		return err
+	}
+
+	keyIDPayload := struct {
+		KeyID string `json:"keyId"`
+	}{KeyID: keyID}
+
+	keyAggregate, err := userAggregate.AppendEvent(model.MachineKeyRemoved, &keyIDPayload)
+	if err != nil {
+		return err
+	}
+	return es.PushAggregates(ctx, keyAggregate)
 }
