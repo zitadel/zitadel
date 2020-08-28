@@ -19,3 +19,19 @@ func (s *Server) DeleteServiceAccountKey(ctx context.Context, req *management.Ma
 	err := s.user.RemoveMachineKey(ctx, req.UserId, req.KeyId)
 	return &empty.Empty{}, err
 }
+
+func (s *Server) GetMachineKey(ctx context.Context, req *management.MachineKeyIDRequest) (*management.MachineKeyView, error) {
+	key, err := s.user.GetMachineKey(ctx, req.KeyId)
+	if err != nil {
+		return nil, err
+	}
+	return machineKeyViewFromModel(key), nil
+}
+
+func (s *Server) SearchMachineKeys(ctx context.Context, req *management.MachineKeySearchRequest) (*management.MachineKeySearchResponse, error) {
+	result, err := s.user.SearchMachineKeys(ctx, machineKeySearchRequestToModel(req))
+	if err != nil {
+		return nil, err
+	}
+	return machineKeySearchResponseFromModel(result), nil
+}

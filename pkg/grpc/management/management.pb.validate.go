@@ -2297,6 +2297,181 @@ var _ interface {
 	ErrorName() string
 } = MachineKeyViewValidationError{}
 
+// Validate checks the field values on MachineKeySearchRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MachineKeySearchRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Offset
+
+	// no validation rules for Limit
+
+	// no validation rules for Asc
+
+	// no validation rules for UserId
+
+	return nil
+}
+
+// MachineKeySearchRequestValidationError is the validation error returned by
+// MachineKeySearchRequest.Validate if the designated constraints aren't met.
+type MachineKeySearchRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MachineKeySearchRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MachineKeySearchRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MachineKeySearchRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MachineKeySearchRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MachineKeySearchRequestValidationError) ErrorName() string {
+	return "MachineKeySearchRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MachineKeySearchRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMachineKeySearchRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MachineKeySearchRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MachineKeySearchRequestValidationError{}
+
+// Validate checks the field values on MachineKeySearchResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MachineKeySearchResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Offset
+
+	// no validation rules for Limit
+
+	// no validation rules for TotalResult
+
+	for idx, item := range m.GetResult() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MachineKeySearchResponseValidationError{
+					field:  fmt.Sprintf("Result[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for ProcessedSequence
+
+	if v, ok := interface{}(m.GetViewTimestamp()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MachineKeySearchResponseValidationError{
+				field:  "ViewTimestamp",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// MachineKeySearchResponseValidationError is the validation error returned by
+// MachineKeySearchResponse.Validate if the designated constraints aren't met.
+type MachineKeySearchResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MachineKeySearchResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MachineKeySearchResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MachineKeySearchResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MachineKeySearchResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MachineKeySearchResponseValidationError) ErrorName() string {
+	return "MachineKeySearchResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MachineKeySearchResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMachineKeySearchResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MachineKeySearchResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MachineKeySearchResponseValidationError{}
+
 // Validate checks the field values on UserSearchRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.

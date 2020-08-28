@@ -3,6 +3,7 @@ package management
 import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/golang/protobuf/ptypes"
@@ -108,5 +109,34 @@ func machineKeyTypeFromModel(typ usr_model.MachineKeyType) management.MachineKey
 		return management.MachineKeyType_MACHINEKEY_JSON
 	default:
 		return management.MachineKeyType_MACHINEKEY_UNSPECIFIED
+	}
+}
+
+func machineKeySearchRequestToModel(req *management.MachineKeySearchRequest) *usr_model.MachineKeySearchRequest {
+	return &usr_model.MachineKeySearchRequest{
+		Offset: req.Offset,
+		Limit:  req.Limit,
+		Asc:    req.Asc,
+		Queries: []*usr_model.MachineKeySearchQuery{
+			{
+				Key:    usr_model.MachineKeyKeyUserID,
+				Method: model.SearchMethodEquals,
+				Value:  req.UserId,
+			},
+		},
+	}
+}
+
+func machineKeySearchResponseFromModel(req *usr_model.MachineKeySearchResponse) *management.MachineKeySearchResponse {
+	viewTimestamp, err := ptypes.TimestampProto(req.Timestamp)
+	logging.Log("MANAG-Sk9ds").OnError(err).Debug("unable to parse cretaion date")
+
+	return &management.MachineKeySearchResponse{
+		Offset:            req.Offset,
+		Limit:             req.Limit,
+		TotalResult:       req.TotalResult,
+		ProcessedSequence: req.Sequence,
+		ViewTimestamp:     viewTimestamp,
+		Result:            machineKeyViewsFromModel(req.Result),
 	}
 }

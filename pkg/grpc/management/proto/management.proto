@@ -210,7 +210,28 @@ service ManagementService {
           permission: "user.write"
       };
   }
-  
+
+  rpc SearchMachineKeys(MachineKeySearchRequest) returns (MachineKeySearchResponse) {
+    option (google.api.http) = {
+      post: "/users/{user_id}/keys/_search"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.read"
+    };
+  }
+
+  rpc GetMachineKey(MachineKeyIDRequest) returns (MachineKeyView) {
+    option (google.api.http) = {
+      get: "/users/{user_id}/keys/{key_id}"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.read"
+    };
+  }
+
   rpc GetUserProfile(UserID) returns (UserProfileView) {
     option (google.api.http) = {
       get: "/users/{id}/profile"
@@ -1516,6 +1537,22 @@ message MachineKeyView {
 enum MachineKeyType {
   MACHINEKEY_UNSPECIFIED = 0;
   MACHINEKEY_JSON = 1;
+}
+
+message MachineKeySearchRequest {
+  uint64 offset = 1;
+  uint64 limit = 2;
+  bool asc = 3;
+  string user_id = 4;
+}
+
+message MachineKeySearchResponse {
+  uint64 offset = 1;
+  uint64 limit = 2;
+  uint64 total_result = 3;
+  repeated MachineKeyView result = 4;
+  uint64 processed_sequence = 5;
+  google.protobuf.Timestamp view_timestamp = 6;
 }
 
 message UserSearchRequest {

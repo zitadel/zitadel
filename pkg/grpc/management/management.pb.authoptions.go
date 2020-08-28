@@ -84,6 +84,16 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/SearchMachineKeys": authz.Option{
+		Permission: "user.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GetMachineKey": authz.Option{
+		Permission: "user.read",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/GetUserProfile": authz.Option{
 		Permission: "user.read",
 		CheckParam: "",
