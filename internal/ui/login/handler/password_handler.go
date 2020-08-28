@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
@@ -30,7 +31,8 @@ func (l *Login) handlePasswordCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	err = l.authRepo.VerifyPassword(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, data.Password, model.BrowserInfoFromRequest(r))
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	err = l.authRepo.VerifyPassword(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, data.Password, userAgentID, model.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderPassword(w, r, authReq, err)
 		return

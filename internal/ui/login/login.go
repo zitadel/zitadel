@@ -9,6 +9,6 @@ type Config struct {
 	Handler handler.Config
 }
 
-func Start(config Config, authRepo *eventsourcing.EsRepository, pathPrefix string) *handler.Login {
-	return handler.CreateLogin(config.Handler, authRepo, pathPrefix)
+func Start(config Config, authRepo *eventsourcing.EsRepository, localDevMode bool) (*handler.Login, string) {
+	return handler.CreateLogin(config.Handler, authRepo, localDevMode)
 }

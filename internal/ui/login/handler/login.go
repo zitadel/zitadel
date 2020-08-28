@@ -17,6 +17,9 @@ import (
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/form"
+	"github.com/caos/zitadel/internal/id"
+
+	//"github.com/caos/zitadel/internal/id"
 	_ "github.com/caos/zitadel/internal/ui/login/statik"
 )
 
@@ -31,12 +34,13 @@ type Login struct {
 }
 
 type Config struct {
-	OidcAuthCallbackURL string
-	ZitadelURL          string
-	LanguageCookieName  string
-	DefaultLanguage     language.Tag
-	CSRF                CSRF
-	Cache               middleware.CacheConfig
+	OidcAuthCallbackURL   string
+	ZitadelURL            string
+	LanguageCookieName    string
+	DefaultLanguage       language.Tag
+	CSRF                  CSRF
+	UserAgentCookieConfig *middleware.UserAgentCookieConfig
+	Cache                 middleware.CacheConfig
 }
 
 type CSRF struct {
@@ -46,14 +50,19 @@ type CSRF struct {
 }
 
 const (
-	login = "LOGIN"
+	login         = "LOGIN"
+	handlerPrefix = "/login"
 )
 
-func CreateLogin(config Config, authRepo *eventsourcing.EsRepository, prefix string) *Login {
+func CreateLogin(config Config, authRepo *eventsourcing.EsRepository, localDevMode bool) (*Login, string) {
 	login := &Login{
 		oidcAuthCallbackURL: config.OidcAuthCallbackURL,
 		zitadelURL:          config.ZitadelURL,
 		authRepo:            authRepo,
+	}
+	prefix := ""
+	if localDevMode {
+		prefix = handlerPrefix
 	}
 	statikFS, err := fs.NewWithNamespace("login")
 	logging.Log("CONFI-Ga21f").OnError(err).Panic("unable to create filesystem")
@@ -63,10 +72,12 @@ func CreateLogin(config Config, authRepo *eventsourcing.EsRepository, prefix str
 	cache, err := middleware.DefaultCacheInterceptor(EndpointResources, config.Cache.MaxAge.Duration, config.Cache.SharedMaxAge.Duration)
 	logging.Log("CONFI-BHq2a").OnError(err).Panic("unable to create cacheInterceptor")
 	security := middleware.SecurityHeaders(csp(), login.cspErrorHandler)
-	login.router = CreateRouter(login, statikFS, csrf, cache, security)
+	userAgentCookie, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator, localDevMode)
+	logging.Log("CONFI-Dvwf2").OnError(err).Panic("unable to create userAgentInterceptor")
+	login.router = CreateRouter(login, statikFS, csrf, cache, security, userAgentCookie)
 	login.renderer = CreateRenderer(prefix, statikFS, config.LanguageCookieName, config.DefaultLanguage)
 	login.parser = form.NewParser()
-	return login
+	return login, prefix
 }
 
 func csp() *middleware.CSP {

@@ -7,16 +7,15 @@ import (
 	"net/http"
 	"path"
 
+	"github.com/caos/logging"
 	"github.com/gorilla/csrf"
+	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/api/http/middleware"
+	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/renderer"
-
-	"github.com/caos/logging"
-	"golang.org/x/text/language"
 )
 
 const (
@@ -135,7 +134,8 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 }
 
 func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
-	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID)
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID, userAgentID)
 	if err != nil {
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-sio0W", "could not get authreq"))
 	}
@@ -219,7 +219,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 		ThemeMode: l.getThemeMode(r),
 		AuthReqID: getRequestID(authReq, r),
 		CSRF:      csrf.TemplateField(r),
-		Nonce:     middleware.GetNonce(r),
+		Nonce:     http_mw.GetNonce(r),
 	}
 }
 

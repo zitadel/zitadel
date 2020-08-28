@@ -231,6 +231,12 @@ UI:
         Key:
           EncryptionKeyID: $ZITADEL_CSRF_KEY
         Development: $ZITADEL_CSRF_DEV
+      UserAgentCookieConfig:
+        Name: caos.zitadel.useragent
+        Domain: $ZITADEL_COOKIE_DOMAIN
+        MaxAge: 8760h #365*24h (1 year)
+        Key:
+          EncryptionKeyID: $ZITADEL_COOKIE_KEY
       Cache:
         MaxAge: $ZITADEL_CACHE_MAXAGE
         SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
