@@ -50,7 +50,7 @@ func Test_toGRPCError(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := toGRPCError(tt.args.ctx, tt.args.req, tt.args.handler, nil)
+			got, err := toGRPCError(tt.args.ctx, tt.args.req, tt.args.handler)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("toGRPCError() error = %v, wantErr %v", err, tt.res.wantErr)
 				return

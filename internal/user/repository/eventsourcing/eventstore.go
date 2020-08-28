@@ -107,8 +107,8 @@ func (es *UserEventstore) UserEventsByID(ctx context.Context, id string, sequenc
 	return es.FilterEvents(ctx, query)
 }
 
-func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, pwPolicy *policy_model.PasswordComplexityPolicy, orgIamPolicy *org_model.OrgIamPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
-	err := user.CheckOrgIamPolicy(orgIamPolicy)
+func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, pwPolicy *policy_model.PasswordComplexityPolicy, orgIAMPolicy *org_model.OrgIAMPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
+	err := user.CheckOrgIAMPolicy(orgIAMPolicy)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -140,13 +140,13 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 	repoInitCode := model.InitCodeFromModel(user.InitCode)
 	repoPhoneCode := model.PhoneCodeFromModel(user.PhoneCode)
 
-	createAggregates, err := UserCreateAggregate(ctx, es.AggregateCreator(), repoUser, repoInitCode, repoPhoneCode, resourceOwner, orgIamPolicy.UserLoginMustBeDomain)
+	createAggregates, err := UserCreateAggregate(ctx, es.AggregateCreator(), repoUser, repoInitCode, repoPhoneCode, resourceOwner, orgIAMPolicy.UserLoginMustBeDomain)
 
 	return repoUser, createAggregates, err
 }
 
-func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, pwPolicy *policy_model.PasswordComplexityPolicy, orgIamPolicy *org_model.OrgIamPolicy) (*usr_model.User, error) {
-	repoUser, aggregates, err := es.PrepareCreateUser(ctx, user, pwPolicy, orgIamPolicy, "")
+func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, pwPolicy *policy_model.PasswordComplexityPolicy, orgIAMPolicy *org_model.OrgIAMPolicy) (*usr_model.User, error) {
+	repoUser, aggregates, err := es.PrepareCreateUser(ctx, user, pwPolicy, orgIAMPolicy, "")
 	if err != nil {
 		return nil, err
 	}
@@ -160,8 +160,8 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, 
 	return model.UserToModel(repoUser), nil
 }
 
-func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, orgIamPolicy *org_model.OrgIamPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
-	err := user.CheckOrgIamPolicy(orgIamPolicy)
+func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, orgIAMPolicy *org_model.OrgIAMPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
+	err := user.CheckOrgIAMPolicy(orgIAMPolicy)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -187,12 +187,12 @@ func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_mod
 	repoUser := model.UserFromModel(user)
 	repoInitCode := model.InitCodeFromModel(user.InitCode)
 
-	aggregates, err := UserRegisterAggregate(ctx, es.AggregateCreator(), repoUser, resourceOwner, repoInitCode, orgIamPolicy.UserLoginMustBeDomain)
+	aggregates, err := UserRegisterAggregate(ctx, es.AggregateCreator(), repoUser, resourceOwner, repoInitCode, orgIAMPolicy.UserLoginMustBeDomain)
 	return repoUser, aggregates, err
 }
 
-func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User, pwPolicy *policy_model.PasswordComplexityPolicy, orgIamPolicy *org_model.OrgIamPolicy, resourceOwner string) (*usr_model.User, error) {
-	repoUser, createAggregates, err := es.PrepareRegisterUser(ctx, user, pwPolicy, orgIamPolicy, resourceOwner)
+func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User, pwPolicy *policy_model.PasswordComplexityPolicy, orgIAMPolicy *org_model.OrgIAMPolicy, resourceOwner string) (*usr_model.User, error) {
+	repoUser, createAggregates, err := es.PrepareRegisterUser(ctx, user, pwPolicy, orgIAMPolicy, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -670,11 +670,11 @@ func (es *UserEventstore) ChangeEmail(ctx context.Context, email *usr_model.Emai
 	repoNew := model.EmailFromModel(email)
 	repoEmailCode := model.EmailCodeFromModel(emailCode)
 
-	updateAggregates, err := EmailChangeAggregate(ctx, es.AggregateCreator(), repoExisting, repoNew, repoEmailCode)
+	updateAggregate, err := EmailChangeAggregate(ctx, es.AggregateCreator(), repoExisting, repoNew, repoEmailCode)
 	if err != nil {
 		return nil, err
 	}
-	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregates...)
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
 	if err != nil {
 		return nil, err
 	}
@@ -946,7 +946,7 @@ func (es *UserEventstore) ChangeAddress(ctx context.Context, address *usr_model.
 	return model.AddressToModel(repoExisting.Address), nil
 }
 
-func (es *UserEventstore) AddOTP(ctx context.Context, userID string) (*usr_model.OTP, error) {
+func (es *UserEventstore) AddOTP(ctx context.Context, userID, accountName string) (*usr_model.OTP, error) {
 	existing, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -954,9 +954,11 @@ func (es *UserEventstore) AddOTP(ctx context.Context, userID string) (*usr_model
 	if existing.IsOTPReady() {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-do9se", "Errors.User.Mfa.Otp.AlreadyReady")
 	}
-	accountName := existing.UserName
-	if existing.Email != nil {
-		accountName = existing.EmailAddress
+	if accountName == "" {
+		accountName = existing.UserName
+		if existing.Email != nil {
+			accountName = existing.EmailAddress
+		}
 	}
 	key, err := totp.Generate(totp.GenerateOpts{Issuer: es.Multifactors.OTP.Issuer, AccountName: accountName})
 	if err != nil {
@@ -1108,6 +1110,48 @@ func (es *UserEventstore) PrepareDomainClaimed(ctx context.Context, userIDs []st
 		aggregates = append(aggregates, userAgg...)
 	}
 	return aggregates, nil
+}
+
+func (es *UserEventstore) DomainClaimedSent(ctx context.Context, userID string) error {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-0posw", "Errors.User.UserIDMissing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	repoUser := model.UserFromModel(user)
+	agg := DomainClaimedSentAggregate(es.AggregateCreator(), repoUser)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
+func (es *UserEventstore) ChangeUsername(ctx context.Context, userID, username string, orgIamPolicy *org_model.OrgIAMPolicy) error {
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	oldUsername := user.UserName
+	user.UserName = username
+	if err := user.CheckOrgIAMPolicy(orgIamPolicy); err != nil {
+		return err
+	}
+	repoUser := model.UserFromModel(user)
+	aggregates, err := UsernameChangedAggregates(ctx, es.AggregateCreator(), repoUser, oldUsername, orgIamPolicy.UserLoginMustBeDomain)
+	if err != nil {
+		return err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, aggregates...)
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
 }
 
 func (es *UserEventstore) generateTemporaryLoginName() (string, error) {

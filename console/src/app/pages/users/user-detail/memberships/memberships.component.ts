@@ -3,7 +3,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { MemberType, User, UserMembershipSearchResponse } from 'src/app/proto/generated/management_pb';
+import { MemberType, UserView, UserMembershipSearchResponse } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -33,7 +33,7 @@ export class MembershipsComponent implements OnInit {
     public loading: boolean = false;
     public memberships!: UserMembershipSearchResponse.AsObject;
 
-    @Input() public user!: User.AsObject;
+    @Input() public user!: UserView.AsObject;
     public MemberType: any = MemberType;
 
     constructor(
@@ -88,7 +88,7 @@ export class MembershipsComponent implements OnInit {
     }
 
     public createIamMember(response: any): void {
-        const users: User.AsObject[] = response.users;
+        const users: UserView.AsObject[] = response.users;
         const roles: string[] = response.roles;
 
         if (users && users.length && roles && roles.length) {
@@ -103,7 +103,7 @@ export class MembershipsComponent implements OnInit {
     }
 
     private createOrgMember(response: any): void {
-        const users: User.AsObject[] = response.users;
+        const users: UserView.AsObject[] = response.users;
         const roles: string[] = response.roles;
 
         if (users && users.length && roles && roles.length) {
@@ -118,7 +118,7 @@ export class MembershipsComponent implements OnInit {
     }
 
     private createGrantedProjectMember(response: any): void {
-        const users: User.AsObject[] = response.users;
+        const users: UserView.AsObject[] = response.users;
         const roles: string[] = response.roles;
 
         if (users && users.length && roles && roles.length) {
@@ -138,7 +138,7 @@ export class MembershipsComponent implements OnInit {
     }
 
     private createOwnedProjectMember(response: any): void {
-        const users: User.AsObject[] = response.users;
+        const users: UserView.AsObject[] = response.users;
         const roles: string[] = response.roles;
 
         if (users && users.length && roles && roles.length) {

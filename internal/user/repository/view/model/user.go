@@ -36,6 +36,7 @@ type UserView struct {
 	State                  int32          `json:"-" gorm:"column:user_state"`
 	PasswordSet            bool           `json:"-" gorm:"column:password_set"`
 	PasswordChangeRequired bool           `json:"-" gorm:"column:password_change_required"`
+	UsernameChangeRequired bool           `json:"-" gorm:"column:username_change_required"`
 	PasswordChanged        time.Time      `json:"-" gorm:"column:password_change"`
 	LastLogin              time.Time      `json:"-" gorm:"column:last_login"`
 	UserName               string         `json:"userName" gorm:"column:user_name"`
@@ -72,6 +73,7 @@ func UserFromModel(user *model.UserView) *UserView {
 		State:                  int32(user.State),
 		PasswordSet:            user.PasswordSet,
 		PasswordChangeRequired: user.PasswordChangeRequired,
+		UsernameChangeRequired: user.UsernameChangeRequired,
 		PasswordChanged:        user.PasswordChanged,
 		LastLogin:              user.LastLogin,
 		UserName:               user.UserName,
@@ -109,6 +111,7 @@ func UserToModel(user *UserView) *model.UserView {
 		State:                  model.UserState(user.State),
 		PasswordSet:            user.PasswordSet,
 		PasswordChangeRequired: user.PasswordChangeRequired,
+		UsernameChangeRequired: user.UsernameChangeRequired,
 		PasswordChanged:        user.PasswordChanged,
 		LastLogin:              user.LastLogin,
 		PreferredLoginName:     user.PreferredLoginName,
@@ -152,7 +155,7 @@ func (u *UserView) GenerateLoginName(domain string, appendDomain bool) string {
 	return u.UserName + "@" + domain
 }
 
-func (u *UserView) SetLoginNames(policy *org_model.OrgIamPolicy, domains []*org_model.OrgDomain) {
+func (u *UserView) SetLoginNames(policy *org_model.OrgIAMPolicy, domains []*org_model.OrgDomain) {
 	loginNames := make([]string, 0)
 	for _, d := range domains {
 		if d.Verified {
@@ -181,8 +184,13 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	case es_model.UserPasswordChanged:
 		err = u.setPasswordData(event)
 	case es_model.UserProfileChanged,
-		es_model.UserAddressChanged,
-		es_model.DomainClaimed:
+		es_model.UserAddressChanged:
+		err = u.setData(event)
+	case es_model.DomainClaimed:
+		u.UsernameChangeRequired = true
+		err = u.setData(event)
+	case es_model.UserUserNameChanged:
+		u.UsernameChangeRequired = false
 		err = u.setData(event)
 	case es_model.UserEmailChanged:
 		u.IsEmailVerified = false

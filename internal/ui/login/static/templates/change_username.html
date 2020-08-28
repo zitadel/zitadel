@@ -1,0 +1,35 @@
+{{template "main-top" .}}
+
+{{ template "user-profile" . }}
+
+<p>{{t "UsernameChange.Description"}}</p>
+
+<form action="{{ changeUsernameUrl }}" method="POST">
+
+    {{ .CSRF }}
+
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+
+    <div class="fields">
+        <div class="field">
+            <label class="label" for="username">{{t "UsernameChange.Username"}}</label>
+            <input class="input" type="text" id="username" name="username" autocomplete="username" autofocus required>
+        </div>
+    </div>
+
+    {{ template "error-message" .}}
+
+    <div class="actions">
+        <button type="submit" id="submit-button" value="false" class="primary right">{{t "Actions.Next"}}</button>
+        <a href="{{ loginUrl }}">
+            <button class="secondary" type="button">{{t "Actions.Cancel"}}</button>
+        </a>
+    </div>
+</form>
+
+<script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
+<script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
+
+
+{{template "main-bottom" .}}
+ 

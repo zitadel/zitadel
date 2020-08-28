@@ -63,9 +63,18 @@ func SearchProjectGrants(db *gorm.DB, table string, req *proj_model.ProjectGrant
 	return projectGrants, count, err
 }
 
-func PutProjectGrant(db *gorm.DB, table string, project *model.ProjectGrantView) error {
+func PutProjectGrant(db *gorm.DB, table string, grant *model.ProjectGrantView) error {
 	save := repository.PrepareSave(table)
-	return save(db, project)
+	return save(db, grant)
+}
+
+func PutProjectGrants(db *gorm.DB, table string, grants ...*model.ProjectGrantView) error {
+	save := repository.PrepareBulkSave(table)
+	g := make([]interface{}, len(grants))
+	for i, grant := range grants {
+		g[i] = grant
+	}
+	return save(db, g...)
 }
 
 func DeleteProjectGrant(db *gorm.DB, table, grantID string) error {

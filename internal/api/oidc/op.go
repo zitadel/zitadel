@@ -59,6 +59,7 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, repo repository.Re
 			middleware.NoCacheInterceptor(http_utils.CopyHeadersToContext(handlerFunc))
 		}
 	}
+	config.OPConfig.CodeMethodS256 = true
 	provider, err := op.NewDefaultOP(
 		ctx,
 		config.OPConfig,

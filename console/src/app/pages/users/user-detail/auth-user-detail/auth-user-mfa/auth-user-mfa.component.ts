@@ -48,8 +48,8 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
             dialogRef.afterClosed().subscribe((code) => {
                 if (code) {
-                    (this.service as GrpcAuthService).VerifyMfaOTP(code).then(() => {
-                        // TODO: show state
+                    (this.service as AuthUserService).VerifyMfaOTP(code).then(() => {
+                        this.getOTP();
                     });
                 }
             });

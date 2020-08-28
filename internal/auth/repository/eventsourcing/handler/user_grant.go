@@ -33,7 +33,7 @@ type UserGrant struct {
 	projectEvents *proj_event.ProjectEventstore
 	userEvents    *usr_events.UserEventstore
 	orgEvents     *org_events.OrgEventstore
-	iamEvents     *iam_events.IamEventstore
+	iamEvents     *iam_events.IAMEventstore
 	iamID         string
 	iamProjectID  string
 }
@@ -58,7 +58,7 @@ func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(grant_es_model.UserGrantAggregate, iam_es_model.IamAggregate, org_es_model.OrgAggregate, usr_es_model.UserAggregate, proj_es_model.ProjectAggregate).
+		AggregateTypeFilter(grant_es_model.UserGrantAggregate, iam_es_model.IAMAggregate, org_es_model.OrgAggregate, usr_es_model.UserAggregate, proj_es_model.ProjectAggregate).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
@@ -70,7 +70,7 @@ func (u *UserGrant) Reduce(event *models.Event) (err error) {
 		err = u.processUser(event)
 	case proj_es_model.ProjectAggregate:
 		err = u.processProject(event)
-	case iam_es_model.IamAggregate:
+	case iam_es_model.IAMAggregate:
 		err = u.processIamMember(event, "IAM", false)
 	case org_es_model.OrgAggregate:
 		return u.processOrg(event)
@@ -124,11 +124,8 @@ func (u *UserGrant) processUser(event *models.Event) (err error) {
 		}
 		for _, grant := range grants {
 			u.fillUserData(grant, user)
-			err = u.view.PutUserGrant(grant, event.Sequence)
-			if err != nil {
-				return err
-			}
 		}
+		return u.view.PutUserGrants(grants, event.Sequence)
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
 	}
@@ -148,8 +145,8 @@ func (u *UserGrant) processProject(event *models.Event) (err error) {
 		}
 		for _, grant := range grants {
 			u.fillProjectData(grant, project)
-			return u.view.PutUserGrant(grant, event.Sequence)
 		}
+		return u.view.PutUserGrants(grants, event.Sequence)
 	case proj_es_model.ProjectMemberAdded, proj_es_model.ProjectMemberChanged, proj_es_model.ProjectMemberRemoved:
 		member := new(proj_es_model.ProjectMember)
 		member.SetData(event)
@@ -176,10 +173,10 @@ func (u *UserGrant) processOrg(event *models.Event) (err error) {
 }
 
 func (u *UserGrant) processIamMember(event *models.Event, rolePrefix string, suffix bool) error {
-	member := new(iam_es_model.IamMember)
+	member := new(iam_es_model.IAMMember)
 
 	switch event.Type {
-	case iam_es_model.IamMemberAdded, iam_es_model.IamMemberChanged:
+	case iam_es_model.IAMMemberAdded, iam_es_model.IAMMemberChanged:
 		member.SetData(event)
 
 		grant, err := u.view.UserGrantByIDs(u.iamID, u.iamProjectID, member.UserID)
@@ -210,7 +207,7 @@ func (u *UserGrant) processIamMember(event *models.Event, rolePrefix string, suf
 		grant.Sequence = event.Sequence
 		grant.ChangeDate = event.CreationDate
 		return u.view.PutUserGrant(grant, grant.Sequence)
-	case iam_es_model.IamMemberRemoved:
+	case iam_es_model.IAMMemberRemoved:
 		member.SetData(event)
 		grant, err := u.view.UserGrantByIDs(u.iamID, u.iamProjectID, member.UserID)
 		if err != nil {
@@ -295,14 +292,14 @@ func (u *UserGrant) setIamProjectID() error {
 	if u.iamProjectID != "" {
 		return nil
 	}
-	iam, err := u.iamEvents.IamByID(context.Background(), u.iamID)
+	iam, err := u.iamEvents.IAMByID(context.Background(), u.iamID)
 	if err != nil {
 		return err
 	}
 	if !iam.SetUpDone {
 		return caos_errs.ThrowPreconditionFailed(nil, "HANDL-s5DTs", "Setup not done")
 	}
-	u.iamProjectID = iam.IamProjectID
+	u.iamProjectID = iam.IAMProjectID
 	return nil
 }
 

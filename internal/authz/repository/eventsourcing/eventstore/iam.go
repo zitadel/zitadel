@@ -7,14 +7,14 @@ import (
 )
 
 type IamRepo struct {
-	IamID     string
-	IamEvents *iam_event.IamEventstore
+	IAMID     string
+	IAMEvents *iam_event.IAMEventstore
 }
 
 func (repo *IamRepo) Health(ctx context.Context) error {
-	return repo.IamEvents.Health(ctx)
+	return repo.IAMEvents.Health(ctx)
 }
 
-func (repo *IamRepo) IamByID(ctx context.Context) (*model.Iam, error) {
-	return repo.IamEvents.IamByID(ctx, repo.IamID)
+func (repo *IamRepo) IamByID(ctx context.Context) (*model.IAM, error) {
+	return repo.IAMEvents.IAMByID(ctx, repo.IAMID)
 }

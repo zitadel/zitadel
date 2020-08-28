@@ -13,7 +13,6 @@ import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-dataso
 import {
     Application,
     ApplicationSearchResponse,
-    ProjectGrantState,
     ProjectGrantView,
     ProjectMember,
     ProjectMemberSearchResponse,
@@ -108,8 +107,8 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
                 this.toast.showError(error);
             });
 
-            from(this.mgmtService.SearchProjectGrantMembers(this.projectId,
-                this.projectId, 100, 0)).pipe(
+            from(this.projectService.SearchProjectGrantMembers(this.projectId,
+                this.grantId, 100, 0)).pipe(
                     map(resp => {
                         this.totalMemberResult = resp.toObject().totalResult;
                         return resp.toObject().resultList;
@@ -158,8 +157,6 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
     }
 
     public showDetail(): void {
-        if (this.project.state === ProjectGrantState.PROJECTGRANTSTATE_ACTIVE) {
-            this.router.navigate(['granted-projects', this.project.projectId, 'grant', this.grantId, 'members']);
-        }
+        this.router.navigate(['granted-projects', this.project.projectId, 'grant', this.grantId, 'members']);
     }
 }

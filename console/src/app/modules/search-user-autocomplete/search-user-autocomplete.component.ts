@@ -5,7 +5,7 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import { MatChipInputEvent } from '@angular/material/chips';
 import { from, of, Subject } from 'rxjs';
 import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { SearchMethod, User, UserSearchKey, UserSearchQuery } from 'src/app/proto/generated/management_pb';
+import { SearchMethod, UserSearchKey, UserSearchQuery, UserView } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -26,18 +26,18 @@ export class SearchUserAutocompleteComponent {
     public separatorKeysCodes: number[] = [ENTER, COMMA];
 
     public myControl: FormControl = new FormControl();
-    public globalEmailControl: FormControl = new FormControl();
+    public globalLoginNameControl: FormControl = new FormControl();
 
-    public emails: string[] = [];
-    @Input() public users: Array<User.AsObject> = [];
-    public filteredUsers: Array<User.AsObject> = [];
+    public loginNames: string[] = [];
+    @Input() public users: Array<UserView.AsObject> = [];
+    public filteredUsers: Array<UserView.AsObject> = [];
     public isLoading: boolean = false;
     public target: UserTarget = UserTarget.SELF;
     public hint: string = '';
     public UserTarget: any = UserTarget;
     @ViewChild('usernameInput') public usernameInput!: ElementRef<HTMLInputElement>;
     @ViewChild('auto') public matAutocomplete!: MatAutocomplete;
-    @Output() public selectionChanged: EventEmitter<User.AsObject | User.AsObject[]> = new EventEmitter();
+    @Output() public selectionChanged: EventEmitter<UserView.AsObject | UserView.AsObject[]> = new EventEmitter();
     @Input() public singleOutput: boolean = false;
 
     private unsubscribed$: Subject<void> = new Subject();
@@ -51,7 +51,7 @@ export class SearchUserAutocompleteComponent {
             tap(() => this.isLoading = true),
             switchMap(value => {
                 const query = new UserSearchQuery();
-                query.setKey(UserSearchKey.USERSEARCHKEY_EMAIL);
+                query.setKey(UserSearchKey.USERSEARCHKEY_USER_NAME);
                 query.setValue(value);
                 query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
                 if (this.target === UserTarget.SELF) {
@@ -68,8 +68,8 @@ export class SearchUserAutocompleteComponent {
         });
     }
 
-    public displayFn(user?: User.AsObject): string | undefined {
-        return user ? `${user.email}` : undefined;
+    public displayFn(user?: UserView.AsObject): string | undefined {
+        return user ? `${user.preferredLoginName}` : undefined;
     }
 
     public add(event: MatChipInputEvent): void {
@@ -79,8 +79,8 @@ export class SearchUserAutocompleteComponent {
 
             if ((value || '').trim()) {
                 const index = this.filteredUsers.findIndex((user) => {
-                    if (user.email) {
-                        return user.email === value;
+                    if (user.preferredLoginName) {
+                        return user.preferredLoginName === value;
                     }
                 });
                 if (index > -1) {
@@ -98,7 +98,7 @@ export class SearchUserAutocompleteComponent {
         }
     }
 
-    public remove(user: User.AsObject): void {
+    public remove(user: UserView.AsObject): void {
         const index = this.users.indexOf(user);
 
         if (index >= 0) {
@@ -138,7 +138,7 @@ export class SearchUserAutocompleteComponent {
     }
 
     public getGlobalUser(): void {
-        this.userService.GetUserByEmailGlobal(this.globalEmailControl.value).then(user => {
+        this.userService.GetUserByLoginNameGlobal(this.globalLoginNameControl.value).then(user => {
             this.users = [user.toObject()];
             this.selectionChanged.emit(this.users);
         }).catch(error => {

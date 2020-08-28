@@ -53,6 +53,15 @@ func PutOrgMember(db *gorm.DB, table string, role *model.OrgMemberView) error {
 	return save(db, role)
 }
 
+func PutOrgMembers(db *gorm.DB, table string, members ...*model.OrgMemberView) error {
+	save := repository.PrepareBulkSave(table)
+	m := make([]interface{}, len(members))
+	for i, member := range members {
+		m[i] = member
+	}
+	return save(db, m...)
+}
+
 func DeleteOrgMember(db *gorm.DB, table, orgID, userID string) error {
 	member, err := OrgMemberByIDs(db, table, orgID, userID)
 	if err != nil {

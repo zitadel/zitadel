@@ -190,9 +190,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     }
 
     public showDetail(): void {
-        if (this.org?.state === OrgState.ORGSTATE_ACTIVE) {
-            this.router.navigate(['org/members']);
-        }
+        this.router.navigate(['org/members']);
     }
 
     public verifyDomain(domain: OrgDomainView.AsObject): void {

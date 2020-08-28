@@ -1,16 +1,15 @@
-package grpc
+package errors
 
 import (
 	"context"
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/pkg/grpc/message"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-func CaosToGRPCError(ctx context.Context, err error, translator *i18n.Translator) error {
+func CaosToGRPCError(ctx context.Context, err error) error {
 	if err == nil {
 		return nil
 	}
@@ -19,10 +18,8 @@ func CaosToGRPCError(ctx context.Context, err error, translator *i18n.Translator
 		return status.Convert(err).Err()
 	}
 	msg := key
-	if translator != nil {
-		msg = translator.LocalizeFromCtx(ctx, key, nil)
-		msg += " (" + id + ")"
-	}
+	msg += " (" + id + ")"
+
 	s, err := status.New(code, msg).WithDetails(&message.ErrorDetail{Id: id, Message: key})
 	if err != nil {
 		logging.Log("GRPC-gIeRw").WithError(err).Debug("unable to add detail")

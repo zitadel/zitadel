@@ -30,6 +30,14 @@ func (v *View) PutUserSession(userSession *model.UserSessionView) error {
 	return v.ProcessedUserSessionSequence(userSession.Sequence)
 }
 
+func (v *View) PutUserSessions(userSession []*model.UserSessionView, sequence uint64) error {
+	err := view.PutUserSessions(v.Db, userSessionTable, userSession...)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedUserSessionSequence(sequence)
+}
+
 func (v *View) DeleteUserSessions(userID string, eventSequence uint64) error {
 	err := view.DeleteUserSessions(v.Db, userSessionTable, userID)
 	if err != nil {

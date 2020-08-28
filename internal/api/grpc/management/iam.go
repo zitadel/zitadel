@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) GetIam(ctx context.Context, _ *empty.Empty) (*management.Iam, error) {
-	iam, err := s.iam.IamByID(ctx, s.systemDefaults.IamID)
+	iam, err := s.iam.IAMByID(ctx, s.systemDefaults.IamID)
 	if err != nil {
 		return nil, err
 	}

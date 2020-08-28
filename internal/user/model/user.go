@@ -69,7 +69,7 @@ const (
 	GenderDiverse
 )
 
-func (u *User) CheckOrgIamPolicy(policy *org_model.OrgIamPolicy) error {
+func (u *User) CheckOrgIAMPolicy(policy *org_model.OrgIAMPolicy) error {
 	if policy == nil {
 		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-zSH7j", "Errors.Users.OrgIamPolicyNil")
 	}

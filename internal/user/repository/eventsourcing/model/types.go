@@ -5,7 +5,6 @@ import "github.com/caos/zitadel/internal/eventstore/models"
 const (
 	UserAggregate         models.AggregateType = "user"
 	UserUserNameAggregate models.AggregateType = "user.username"
-	UserEmailAggregate    models.AggregateType = "user.email"
 
 	UserAdded                     models.EventType = "user.added"
 	UserRegistered                models.EventType = "user.selfregistered"
@@ -16,8 +15,6 @@ const (
 
 	UserUserNameReserved models.EventType = "user.username.reserved"
 	UserUserNameReleased models.EventType = "user.username.released"
-	UserEmailReserved    models.EventType = "user.email.reserved"
-	UserEmailReleased    models.EventType = "user.email.released"
 
 	UserLocked      models.EventType = "user.locked"
 	UserUnlocked    models.EventType = "user.unlocked"
@@ -44,8 +41,9 @@ const (
 	UserPhoneCodeAdded          models.EventType = "user.phone.code.added"
 	UserPhoneCodeSent           models.EventType = "user.phone.code.sent"
 
-	UserProfileChanged models.EventType = "user.profile.changed"
-	UserAddressChanged models.EventType = "user.address.changed"
+	UserProfileChanged  models.EventType = "user.profile.changed"
+	UserAddressChanged  models.EventType = "user.address.changed"
+	UserUserNameChanged models.EventType = "user.username.changed"
 
 	MfaOtpAdded          models.EventType = "user.mfa.otp.added"
 	MfaOtpVerified       models.EventType = "user.mfa.otp.verified"
@@ -56,5 +54,6 @@ const (
 
 	SignedOut models.EventType = "user.signed.out"
 
-	DomainClaimed models.EventType = "user.domain.claimed"
+	DomainClaimed     models.EventType = "user.domain.claimed"
+	DomainClaimedSent models.EventType = "user.domain.claimed.sent"
 )

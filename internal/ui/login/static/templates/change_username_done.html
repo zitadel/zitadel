@@ -1,0 +1,21 @@
+{{template "main-top" .}}
+
+{{ template "user-profile" . }}
+
+<p>{{t "UsernameChangeDone.Description"}}</p>
+
+<form action="{{ loginUrl }}" method="POST">
+
+    {{ .CSRF }}
+
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+
+
+    <div class="actions">
+        <button class="primary right" type="submit">{{t "Actions.Next"}}</button>
+    </div>
+</form>
+
+
+{{template "main-bottom" .}}
+ 

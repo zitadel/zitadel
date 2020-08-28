@@ -1,9 +1,11 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/eventstore/models"
-	"golang.org/x/text/language"
 	"time"
+
+	"golang.org/x/text/language"
+
+	"github.com/caos/zitadel/internal/eventstore/models"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/model"
@@ -17,6 +19,7 @@ type UserView struct {
 	ResourceOwner          string
 	PasswordSet            bool
 	PasswordChangeRequired bool
+	UsernameChangeRequired bool
 	PasswordChanged        time.Time
 	LastLogin              time.Time
 	UserName               string

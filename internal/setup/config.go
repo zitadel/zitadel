@@ -1,10 +1,17 @@
 package setup
 
 type IAMSetUp struct {
-	GlobalOrg  string
-	IAMProject string
-	Orgs       []Org
-	Owners     []string
+	GlobalOrg          string
+	IAMProject         string
+	DefaultLoginPolicy LoginPolicy
+	Orgs               []Org
+	Owners             []string
+}
+
+type LoginPolicy struct {
+	AllowRegister         bool
+	AllowUsernamePassword bool
+	AllowExternalIdp      bool
 }
 
 type User struct {

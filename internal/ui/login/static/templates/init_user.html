@@ -47,8 +47,7 @@
                 id="init-button"
                 name="resend"
                 value="false"
-                class="primary right"
-                {{ if not .PasswordSet }} disabled {{ end }}>{{t "Actions.Next"}}</button>
+                class="primary right">{{t "Actions.Next"}}</button>
         <button type="submit" name="resend" value="true" class="secondary right" formnovalidate>{{t "Actions.Resend" }}</button>
         <a href="{{ loginUrl }}">
             <button class="secondary" type="button">{{t "Actions.Cancel"}}</button>

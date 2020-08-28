@@ -53,6 +53,8 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		tmplRegister:           "register.html",
 		tmplLogoutDone:         "logout_done.html",
 		tmplRegisterOrg:        "register_org.html",
+		tmplChangeUsername:     "change_username.html",
+		tmplChangeUsernameDone: "change_username_done.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -111,6 +113,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		},
 		"orgRegistrationUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointRegisterOrg)
+		},
+		"changeUsernameUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointChangeUsername)
 		},
 		"selectedLanguage": func(l string) bool {
 			return false
@@ -179,6 +184,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderMfaPrompt(w, r, authReq, step, err)
 	case *model.InitUserStep:
 		l.renderInitUser(w, r, authReq, "", "", step.PasswordSet, nil)
+	case *model.ChangeUsernameStep:
+		l.renderChangeUsername(w, r, authReq, nil)
 	default:
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}

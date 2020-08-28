@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func mockIamData(iam *Iam) []byte {
+func mockIamData(iam *IAM) []byte {
 	data, _ := json.Marshal(iam)
 	return data
 }
@@ -14,44 +14,44 @@ func mockIamData(iam *Iam) []byte {
 func TestProjectRoleAppendEvent(t *testing.T) {
 	type args struct {
 		event *es_models.Event
-		iam   *Iam
+		iam   *IAM
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *Iam
+		result *IAM
 	}{
 		{
 			name: "append set up start event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: IamSetupStarted, ResourceOwner: "OrgID"},
-				iam:   &Iam{},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: IAMSetupStarted, ResourceOwner: "OrgID"},
+				iam:   &IAM{},
 			},
-			result: &Iam{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true},
+			result: &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true},
 		},
 		{
 			name: "append set up done event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: IamSetupDone, ResourceOwner: "OrgID"},
-				iam:   &Iam{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: IAMSetupDone, ResourceOwner: "OrgID"},
+				iam:   &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true},
 			},
-			result: &Iam{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true, SetUpDone: true},
+			result: &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true, SetUpDone: true},
 		},
 		{
 			name: "append globalorg event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: GlobalOrgSet, ResourceOwner: "OrgID", Data: mockIamData(&Iam{GlobalOrgID: "GlobalOrg"})},
-				iam:   &Iam{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: GlobalOrgSet, ResourceOwner: "OrgID", Data: mockIamData(&IAM{GlobalOrgID: "GlobalOrg"})},
+				iam:   &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true},
 			},
-			result: &Iam{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true, GlobalOrgID: "GlobalOrg"},
+			result: &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true, GlobalOrgID: "GlobalOrg"},
 		},
 		{
 			name: "append iamproject event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: IamProjectSet, ResourceOwner: "OrgID", Data: mockIamData(&Iam{IamProjectID: "IamProject"})},
-				iam:   &Iam{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: IAMProjectSet, ResourceOwner: "OrgID", Data: mockIamData(&IAM{IAMProjectID: "IamProject"})},
+				iam:   &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true},
 			},
-			result: &Iam{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true, IamProjectID: "IamProject"},
+			result: &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true, IAMProjectID: "IamProject"},
 		},
 	}
 	for _, tt := range tests {
@@ -66,8 +66,8 @@ func TestProjectRoleAppendEvent(t *testing.T) {
 			if tt.args.iam.GlobalOrgID != tt.result.GlobalOrgID {
 				t.Errorf("got wrong result GlobalOrgID: expected: %v, actual: %v ", tt.result.GlobalOrgID, tt.args.iam.GlobalOrgID)
 			}
-			if tt.args.iam.IamProjectID != tt.result.IamProjectID {
-				t.Errorf("got wrong result IamProjectID: expected: %v, actual: %v ", tt.result.IamProjectID, tt.args.iam.IamProjectID)
+			if tt.args.iam.IAMProjectID != tt.result.IAMProjectID {
+				t.Errorf("got wrong result IAMProjectID: expected: %v, actual: %v ", tt.result.IAMProjectID, tt.args.iam.IAMProjectID)
 			}
 		})
 	}

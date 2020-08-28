@@ -2,9 +2,10 @@ package authz
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/errors"
 
-	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/grpc"
+	http_util "github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/errors"
 )
 
 type key int
@@ -42,13 +43,18 @@ func VerifyTokenAndWriteCtxData(ctx context.Context, token, orgID string, t *Tok
 		}
 	}
 
-	userID, clientID, agentID, err := verifyAccessToken(ctx, token, t, method)
+	userID, clientID, agentID, prefLang, err := verifyAccessToken(ctx, token, t, method)
 	if err != nil {
 		return nil, err
 	}
-	projectID, err := t.GetProjectIDByClientID(ctx, clientID)
-	logging.LogWithFields("AUTH-GfAoV", "clientID", clientID).OnError(err).Warn("could not read projectid by clientid")
-	return context.WithValue(ctx, dataKey, CtxData{UserID: userID, OrgID: orgID, ProjectID: projectID, AgentID: agentID}), nil
+	projectID, origins, err := t.ProjectIDAndOriginsByClientID(ctx, clientID)
+	if err != nil {
+		return nil, errors.ThrowPermissionDenied(err, "AUTH-GHpw2", "could not read projectid by clientid")
+	}
+	if err := checkOrigin(ctx, origins); err != nil {
+		return nil, err
+	}
+	return context.WithValue(ctx, dataKey, CtxData{UserID: userID, OrgID: orgID, ProjectID: projectID, AgentID: agentID, PreferredLanguage: prefLang}), nil
 }
 
 func SetCtxData(ctx context.Context, ctxData CtxData) context.Context {
@@ -68,4 +74,15 @@ func GetRequestPermissionsFromCtx(ctx context.Context) []string {
 func GetAllPermissionsFromCtx(ctx context.Context) []string {
 	ctxPermission, _ := ctx.Value(allPermissionsKey).([]string)
 	return ctxPermission
+}
+
+func checkOrigin(ctx context.Context, origins []string) error {
+	origin := grpc.GetGatewayHeader(ctx, http_util.Origin)
+	if origin == "" {
+		return nil
+	}
+	if http_util.IsOriginAllowed(origins, origin) {
+		return nil
+	}
+	return errors.ThrowPermissionDenied(nil, "AUTH-DZG21", "Errors.OriginNotAllowed")
 }

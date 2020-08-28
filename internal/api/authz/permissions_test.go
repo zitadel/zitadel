@@ -15,16 +15,16 @@ type testVerifier struct {
 	grant *Grant
 }
 
-func (v *testVerifier) VerifyAccessToken(ctx context.Context, token, clientID string) (string, string, error) {
-	return "userID", "agentID", nil
+func (v *testVerifier) VerifyAccessToken(ctx context.Context, token, clientID string) (string, string, string, error) {
+	return "userID", "agentID", "de", nil
 }
 
 func (v *testVerifier) ResolveGrants(ctx context.Context) (*Grant, error) {
 	return v.grant, nil
 }
 
-func (v *testVerifier) ProjectIDByClientID(ctx context.Context, clientID string) (string, error) {
-	return "", nil
+func (v *testVerifier) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (string, []string, error) {
+	return "", nil, nil
 }
 
 func (v *testVerifier) ExistsOrg(ctx context.Context, orgID string) error {
