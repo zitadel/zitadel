@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
+import { OAuthService } from 'angular-oauth2-oidc';
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
+import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
+import { catchError, filter, finalize, first, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
 
 import {
     Changes,
@@ -11,6 +14,7 @@ import {
     MyProjectOrgSearchQuery,
     MyProjectOrgSearchRequest,
     MyProjectOrgSearchResponse,
+    Org,
     PasswordChange,
     PasswordComplexityPolicy,
     UpdateUserAddressRequest,
@@ -28,13 +32,119 @@ import {
     VerifyUserPhoneRequest,
 } from '../proto/generated/auth_pb';
 import { GrpcService } from './grpc.service';
+import { StorageKey, StorageService } from './storage.service';
 
 
 @Injectable({
     providedIn: 'root',
 })
 export class GrpcAuthService {
-    constructor(private readonly grpcService: GrpcService) { }
+    private _activeOrgChanged: Subject<Org.AsObject> = new Subject();
+    public user!: Observable<UserProfileView.AsObject>;
+    private zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject(['user.resourceowner']);
+    private cachedOrgs: Org.AsObject[] = [];
+
+    constructor(
+        private readonly grpcService: GrpcService,
+        private oauthService: OAuthService,
+        private storage: StorageService,
+    ) {
+        this.user = merge(
+            of(this.oauthService.getAccessToken()).pipe(
+                filter(token => token ? true : false),
+            ),
+            this.oauthService.events.pipe(
+                filter(e => e.type === 'token_received'),
+                timeout(this.oauthService.waitForTokenInMsec || 0),
+                catchError(_ => of(null)), // timeout is not an error
+                map(_ => this.oauthService.getAccessToken()),
+            ),
+        ).pipe(
+            take(1),
+            mergeMap(() => {
+                return from(this.GetMyUserProfile().then(userprofile => userprofile.toObject()));
+            }),
+            finalize(() => {
+                this.loadPermissions();
+            }),
+        );
+
+        this.activeOrgChanged.subscribe(() => {
+            this.loadPermissions();
+        });
+    }
+
+    public async GetActiveOrg(id?: string): Promise<Org.AsObject> {
+        if (id) {
+            const org = this.storage.getItem<Org.AsObject>(StorageKey.organization);
+            if (org && this.cachedOrgs.find(tmp => tmp.id === org.id)) {
+                return org;
+            }
+            return Promise.reject(new Error('no cached org'));
+        } else {
+            let orgs = this.cachedOrgs;
+            if (orgs.length === 0) {
+                orgs = (await this.SearchMyProjectOrgs(10, 0)).toObject().resultList;
+                this.cachedOrgs = orgs;
+            }
+
+            const org = this.storage.getItem<Org.AsObject>(StorageKey.organization);
+            if (org && orgs.find(tmp => tmp.id === org.id)) {
+                return org;
+            }
+
+            if (orgs.length === 0) {
+                return Promise.reject(new Error('No organizations found!'));
+            }
+            const orgToSet = orgs.find(element => element.id !== '0' && element.name !== '');
+
+            if (orgToSet) {
+                this.setActiveOrg(orgToSet);
+                return Promise.resolve(orgToSet);
+            }
+            return Promise.resolve(orgs[0]);
+        }
+    }
+
+    public get activeOrgChanged(): Observable<Org.AsObject> {
+        return this._activeOrgChanged;
+    }
+
+    public setActiveOrg(org: Org.AsObject): void {
+        this.storage.setItem(StorageKey.organization, org);
+        this._activeOrgChanged.next(org);
+    }
+
+    private loadPermissions(): void {
+        merge([
+            // this.authenticationChanged,
+            this.activeOrgChanged.pipe(map(org => !!org)),
+        ]).pipe(
+            first(),
+            switchMap(() => from(this.GetMyzitadelPermissions())),
+            map(rolesResp => rolesResp.toObject().permissionsList),
+        ).subscribe(roles => {
+            this.zitadelPermissions.next(roles);
+        });
+    }
+
+    public isAllowed(roles: string[] | RegExp[]): Observable<boolean> {
+        if (roles && roles.length > 0) {
+            return this.zitadelPermissions.pipe(switchMap(zroles => {
+                return of(this.hasRoles(zroles, roles));
+            }));
+        } else {
+            return of(false);
+        }
+    }
+
+    public hasRoles(userRoles: string[], requestedRoles: string[] | RegExp[]): boolean {
+        return requestedRoles.findIndex((regexp: any) => {
+            return userRoles.findIndex(role => {
+                return (new RegExp(regexp)).test(role);
+            }) > -1;
+        }) > -1;
+    }
 
     public async GetMyUserProfile(): Promise<UserProfileView> {
         return this.grpcService.auth.getMyUserProfile(new Empty());

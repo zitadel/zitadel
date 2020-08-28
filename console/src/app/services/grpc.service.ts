@@ -23,15 +23,16 @@ export class GrpcService {
     ) { }
 
     public grpcInit = (
-        envDeps: /*() => */ Promise<EnvironmentDep>,
-    ): () => Promise<any> => {
+        envDeps: Promise<EnvironmentDep>,
+    ): () => any => {
+
         return (): Promise<any> => {
             return envDeps.then(data => {
                 console.log(data);
 
                 const interceptors = {
                     'unaryInterceptors': [
-                        new AuthInterceptor(this.authenticationService),
+                        new AuthInterceptor(this.authenticationService, this.storageService),
                         new OrgInterceptor(this.storageService),
                     ],
                 };

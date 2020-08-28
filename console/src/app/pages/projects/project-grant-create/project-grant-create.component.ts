@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Org, ProjectRole } from 'src/app/proto/generated/management_pb';
-import { AuthenticationService } from 'src/app/services/authentication.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -26,7 +26,7 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private toast: ToastService,
         private mgmtService: ManagementService,
-        private authService: AuthenticationService,
+        private authService: GrpcAuthService,
         private _location: Location,
     ) { }
 

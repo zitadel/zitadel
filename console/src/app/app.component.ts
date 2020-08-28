@@ -138,7 +138,7 @@ export class AppComponent implements OnDestroy {
         );
         this.getProjectCount();
 
-        this.orgSub = this.authenticationService.activeOrgChanged.subscribe(org => {
+        this.orgSub = this.authService.activeOrgChanged.subscribe(org => {
             this.org = org;
 
             this.getProjectCount();
@@ -146,7 +146,7 @@ export class AppComponent implements OnDestroy {
 
         this.authSub = this.authenticationService.authenticationChanged.subscribe((authenticated) => {
             if (authenticated) {
-                this.authenticationService.GetActiveOrg().then(org => {
+                this.authService.GetActiveOrg().then(org => {
                     this.org = org;
                 });
             }
@@ -198,7 +198,7 @@ export class AppComponent implements OnDestroy {
         this.translate.addLangs(['en', 'de']);
         this.translate.setDefaultLang('en');
 
-        this.authenticationService.user.subscribe(userprofile => {
+        this.authService.user.subscribe(userprofile => {
             this.profile = userprofile;
             const lang = userprofile.preferredLanguage.match(/en|de/) ? userprofile.preferredLanguage : 'en';
             this.translate.use(lang);
@@ -207,12 +207,12 @@ export class AppComponent implements OnDestroy {
 
     public setActiveOrg(org: Org.AsObject): void {
         this.org = org;
-        this.authenticationService.setActiveOrg(org);
+        this.authService.setActiveOrg(org);
         this.router.navigate(['/']);
     }
 
     private getProjectCount(): void {
-        this.authenticationService.isAllowed(['project.read']).subscribe((allowed) => {
+        this.authService.isAllowed(['project.read']).subscribe((allowed) => {
             if (allowed) {
                 this.mgmtService.SearchProjects(0, 0).then(res => {
                     this.ownedProjectsCount = res.toObject().totalResult;

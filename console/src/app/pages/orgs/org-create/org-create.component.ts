@@ -9,7 +9,7 @@ import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidato
 import { CreateOrgRequest, CreateUserRequest, Gender, OrgSetUpResponse } from 'src/app/proto/generated/admin_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/auth_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { AuthenticationService } from 'src/app/services/authentication.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -68,7 +68,7 @@ export class OrgCreateComponent {
         private _location: Location,
         private fb: FormBuilder,
         private mgmtService: ManagementService,
-        private authService: AuthenticationService,
+        private authService: GrpcAuthService,
     ) {
         this.authService.isAllowed(['iam.write']).pipe(take(1)).subscribe((allowed) => {
             if (allowed) {

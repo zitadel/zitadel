@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 import { Org } from 'src/app/proto/generated/auth_pb';
-import { AuthenticationService } from 'src/app/services/authentication.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -24,7 +23,6 @@ export class OrgGridComponent {
     public notPinned: Array<Org.AsObject> = [];
 
     constructor(
-        public authService: AuthenticationService,
         private userService: GrpcAuthService,
         private toast: ToastService,
         private router: Router,
@@ -32,7 +30,7 @@ export class OrgGridComponent {
         this.loading = true;
         this.getData(10, 0);
 
-        this.authService.GetActiveOrg().then(org => this.activeOrg = org);
+        this.userService.GetActiveOrg().then(org => this.activeOrg = org);
 
         this.selection.changed.subscribe(selection => {
             this.setPrefixedItem('pinned-orgs', JSON.stringify(
@@ -71,7 +69,7 @@ export class OrgGridComponent {
     }
 
     private getPrefixedItem(key: string): Observable<string | null> {
-        return this.authService.user.pipe(
+        return this.userService.user.pipe(
             take(1),
             switchMap(user => {
                 return of(localStorage.getItem(`${user.id}:${key}`));
@@ -80,7 +78,7 @@ export class OrgGridComponent {
     }
 
     private setPrefixedItem(key: string, value: any): Observable<void> {
-        return this.authService.user.pipe(
+        return this.userService.user.pipe(
             take(1),
             switchMap(user => {
                 return of(localStorage.setItem(`${user.id}:${key}`, value));
@@ -103,7 +101,7 @@ export class OrgGridComponent {
 
     public selectOrg(item: Org.AsObject, event?: any): void {
         if (event && !event.target.classList.contains('mat-icon')) {
-            this.authService.setActiveOrg(item);
+            this.userService.setActiveOrg(item);
             this.routeToOrg(item);
         }
     }
