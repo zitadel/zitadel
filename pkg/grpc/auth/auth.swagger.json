@@ -771,37 +771,6 @@
       ],
       "default": "MFASTATE_UNSPECIFIED"
     },
-    "v1MachineKeyType": {
-      "type": "string",
-      "enum": [
-        "MACHINEKEY_UNSPECIFIED",
-        "MACHINEKEY_JSON"
-      ],
-      "default": "MACHINEKEY_UNSPECIFIED"
-    },
-    "v1MachineKeyView": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "type": {
-          "$ref": "#/definitions/v1MachineKeyType"
-        },
-        "sequence": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "creation_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "expiration_date": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
     "v1MachineView": {
       "type": "object",
       "properties": {
@@ -814,12 +783,6 @@
         },
         "description": {
           "type": "string"
-        },
-        "keys": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1MachineKeyView"
-          }
         }
       }
     },

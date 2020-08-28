@@ -55,7 +55,6 @@ type MachineView struct {
 	LastKeyAdded time.Time
 	Name         string
 	Description  string
-	Keys         []*MachineKeyView
 }
 
 type UserSearchRequest struct {

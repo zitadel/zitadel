@@ -359,21 +359,6 @@ func (m *MachineView) Validate() error {
 
 	// no validation rules for Description
 
-	for idx, item := range m.GetKeys() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return MachineViewValidationError{
-					field:  fmt.Sprintf("Keys[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
-
 	return nil
 }
 

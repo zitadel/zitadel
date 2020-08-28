@@ -136,7 +136,6 @@ func UserToModel(user *UserView) *model.UserView {
 		userView.MachineView = &model.MachineView{
 			Description: user.MachineView.Description,
 			Name:        user.MachineView.Name,
-			//TODO: keys
 		}
 	}
 	return userView

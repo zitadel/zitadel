@@ -1469,7 +1469,6 @@ message HumanView {
 message MachineResponse {
   string name = 1;
   string description = 2;
-  repeated MachineKeyResponse keys = 3;
 }
 
 message MachineView {
@@ -1477,7 +1476,6 @@ message MachineView {
 
   string name = 3;
   string description = 4;
-  repeated MachineKeyView keys = 5;
 }
 
 message UpdateMachineRequest {
@@ -1504,15 +1502,6 @@ message AddMachineKeyResponse {
 message MachineKeyIDRequest {
   string user_id = 1;
   string key_id = 2;
-}
-
-message MachineKeyResponse {
-  string id = 1;
-  MachineKeyType type = 2;
-  uint64 sequence = 3;
-
-  google.protobuf.Timestamp creation_date = 4;
-  google.protobuf.Timestamp expiration_date = 5;
 }
 
 message MachineKeyView {

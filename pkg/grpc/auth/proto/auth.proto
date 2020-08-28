@@ -375,11 +375,10 @@ message UserView {
 }
 
 message MachineView {
-  google.protobuf.Timestamp last_key_added = 2;
+  google.protobuf.Timestamp last_key_added = 1;
 
-  string name = 3;
-  string description = 4;
-  repeated MachineKeyView keys = 5;
+  string name = 2;
+  string description = 3;
 }
 
 message MachineKeyView {

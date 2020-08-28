@@ -1738,21 +1738,6 @@ func (m *MachineResponse) Validate() error {
 
 	// no validation rules for Description
 
-	for idx, item := range m.GetKeys() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return MachineResponseValidationError{
-					field:  fmt.Sprintf("Keys[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
-
 	return nil
 }
 
@@ -1831,21 +1816,6 @@ func (m *MachineView) Validate() error {
 	// no validation rules for Name
 
 	// no validation rules for Description
-
-	for idx, item := range m.GetKeys() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return MachineViewValidationError{
-					field:  fmt.Sprintf("Keys[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
 
 	return nil
 }
@@ -2235,99 +2205,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = MachineKeyIDRequestValidationError{}
-
-// Validate checks the field values on MachineKeyResponse with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *MachineKeyResponse) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	// no validation rules for Id
-
-	// no validation rules for Type
-
-	// no validation rules for Sequence
-
-	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return MachineKeyResponseValidationError{
-				field:  "CreationDate",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if v, ok := interface{}(m.GetExpirationDate()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return MachineKeyResponseValidationError{
-				field:  "ExpirationDate",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	return nil
-}
-
-// MachineKeyResponseValidationError is the validation error returned by
-// MachineKeyResponse.Validate if the designated constraints aren't met.
-type MachineKeyResponseValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e MachineKeyResponseValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e MachineKeyResponseValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e MachineKeyResponseValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e MachineKeyResponseValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e MachineKeyResponseValidationError) ErrorName() string {
-	return "MachineKeyResponseValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e MachineKeyResponseValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sMachineKeyResponse.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = MachineKeyResponseValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = MachineKeyResponseValidationError{}
 
 // Validate checks the field values on MachineKeyView with the rules defined in
 // the proto definition for this message. If any rules are violated, an error

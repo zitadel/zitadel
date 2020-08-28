@@ -14,7 +14,6 @@ func machineViewFromModel(machine *usr_model.MachineView) *auth.MachineView {
 		Description:  machine.Description,
 		Name:         machine.Name,
 		LastKeyAdded: lastKeyAdded,
-		Keys:         machineKeyViewsFromModel(machine.Keys...),
 	}
 }
 

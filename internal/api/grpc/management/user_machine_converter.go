@@ -36,7 +36,6 @@ func machineViewFromModel(machine *usr_model.MachineView) *management.MachineVie
 		Description:  machine.Description,
 		Name:         machine.Name,
 		LastKeyAdded: lastKeyAdded,
-		Keys:         machineKeyViewsFromModel(machine.Keys...),
 	}
 }
 
