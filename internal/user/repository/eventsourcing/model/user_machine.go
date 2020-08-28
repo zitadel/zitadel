@@ -35,7 +35,7 @@ func (sa *Machine) AppendEvent(event *models.Event) (err error) {
 	case MachineKeyAdded:
 		fallthrough
 	case MachineKeyRemoved:
-		logging.Log("MODEL-iBgOc").Panic("key unimplemented")
+		logging.Log("MODEL-iBgOc").Warn("key unimplemented")
 	}
 
 	return err

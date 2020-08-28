@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"time"
+
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -45,6 +47,9 @@ func (d *MachineKeys) processMachineKeys(event *models.Event) (err error) {
 	switch event.Type {
 	case model.MachineKeyAdded:
 		err = key.AppendEvent(event)
+		if key.ExpirationDate.Before(time.Now()) {
+			return d.view.ProcessedMachineKeySequence(event.Sequence)
+		}
 	case model.MachineKeyRemoved:
 		err = key.SetData(event)
 		if err != nil {
