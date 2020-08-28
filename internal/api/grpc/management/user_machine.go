@@ -21,7 +21,7 @@ func (s *Server) DeleteServiceAccountKey(ctx context.Context, req *management.Ma
 }
 
 func (s *Server) GetMachineKey(ctx context.Context, req *management.MachineKeyIDRequest) (*management.MachineKeyView, error) {
-	key, err := s.user.GetMachineKey(ctx, req.KeyId)
+	key, err := s.user.GetMachineKey(ctx, req.UserId, req.KeyId)
 	if err != nil {
 		return nil, err
 	}

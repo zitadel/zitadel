@@ -143,6 +143,6 @@ func machineKeySearchResponseFromModel(req *usr_model.MachineKeySearchResponse) 
 		TotalResult:       req.TotalResult,
 		ProcessedSequence: req.Sequence,
 		ViewTimestamp:     viewTimestamp,
-		Result:            machineKeyViewsFromModel(req.Result),
+		Result:            machineKeyViewsFromModel(req.Result...),
 	}
 }
