@@ -245,7 +245,7 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 	},
 
 	"/caos.zitadel.management.api.v1.ManagementService/GetOrgByDomainGlobal": authz.Option{
-		Permission: "org.read",
+		Permission: "org.global.read",
 		CheckParam: "",
 	},
 

@@ -561,7 +561,7 @@ service ManagementService {
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "org.read"
+      permission: "org.global.read"
     };
   }
 
