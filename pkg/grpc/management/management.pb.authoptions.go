@@ -74,6 +74,16 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/AddMachineKey": authz.Option{
+		Permission: "user.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/DeleteServiceAccountKey": authz.Option{
+		Permission: "user.write",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/GetUserProfile": authz.Option{
 		Permission: "user.read",
 		CheckParam: "",

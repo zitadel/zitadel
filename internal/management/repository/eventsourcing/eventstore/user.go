@@ -175,6 +175,14 @@ func (repo *UserRepo) ChangeMachine(ctx context.Context, machine *usr_model.Mach
 	return repo.UserEvents.ChangeMachine(ctx, machine)
 }
 
+func (repo *UserRepo) AddMachineKey(ctx context.Context, key *usr_model.MachineKey) (*usr_model.MachineKey, error) {
+	return repo.UserEvents.AddMachineKey(ctx, key)
+}
+
+func (repo *UserRepo) RemoveMachineKey(ctx context.Context, userID, keyID string) error {
+	return repo.UserEvents.RemoveMachineKey(ctx, userID, keyID)
+}
+
 func (repo *UserRepo) ChangeProfile(ctx context.Context, profile *usr_model.Profile) (*usr_model.Profile, error) {
 	return repo.UserEvents.ChangeProfile(ctx, profile)
 }

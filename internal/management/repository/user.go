@@ -27,6 +27,8 @@ type UserRepository interface {
 	ChangeProfile(ctx context.Context, profile *model.Profile) (*model.Profile, error)
 
 	ChangeMachine(ctx context.Context, machine *model.Machine) (*model.Machine, error)
+	AddMachineKey(ctx context.Context, key *model.MachineKey) (*model.MachineKey, error)
+	RemoveMachineKey(ctx context.Context, userID, keyID string) error
 
 	EmailByID(ctx context.Context, userID string) (*model.Email, error)
 	ChangeEmail(ctx context.Context, email *model.Email) (*model.Email, error)

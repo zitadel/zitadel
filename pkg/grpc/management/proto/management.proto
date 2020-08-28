@@ -71,27 +71,6 @@ service ManagementService {
     };
   }
 
-
-// rpc AddServiceAccountKey(ServiceAccountAddKeyRequest) returns (ServiceAccountKeyResponse) {
-//     option (google.api.http) = {
-//         post: "/serviceaccounts/{service_account_id}/keys"
-//     };
-
-//     option (caos.zitadel.utils.v1.auth_option) = {
-//         permission: "serviceaccount.write"
-//     };
-// }
-
-// rpc DeleteServiceAccountKey(ServiceAccountKeyIDRequest) returns (ServiceAccountKeyResponse) {
-//     option (google.api.http) = {
-//         post: "/serviceaccounts/{service_account_id}/keys/{key_id}"
-//     };
-
-//     option (caos.zitadel.utils.v1.auth_option) = {
-//         permission: "serviceaccount.write"
-//     };
-// }
-
   rpc IsUserUnique(UniqueUserRequest) returns (UniqueUserResponse) {
     option (google.api.http) = {
       get: "/users/_isunique"
@@ -210,29 +189,27 @@ service ManagementService {
       permission: "user.read"
     };
   }
+
+  rpc AddMachineKey(AddMachineKeyRequest) returns (AddMachineKeyResponse) {
+      option (google.api.http) = {
+          post: "/user/{user_id}/keys"
+      };
+
+      option (caos.zitadel.utils.v1.auth_option) = {
+          permission: "user.write"
+      };
+  }
+
+  rpc DeleteServiceAccountKey(MachineKeyIDRequest) returns (google.protobuf.Empty) {
+      option (google.api.http) = {
+          post: "/users/{user_id}/keys/{key_id}"
+      };
+
+      option (caos.zitadel.utils.v1.auth_option) = {
+          permission: "user.write"
+      };
+  }
   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   rpc GetUserProfile(UserID) returns (UserProfileView) {
     option (google.api.http) = {
       get: "/users/{id}/profile"
@@ -1507,16 +1484,20 @@ message UpdateMachineRequest {
   string description = 2 [(validate.rules).string.max_len = 500];
 }
 
-// full key
 message AddMachineKeyRequest {
   string user_id = 1;
   MachineKeyType type = 2 [(validate.rules).enum = {not_in: [0]}];
   google.protobuf.Timestamp expiration_date = 3;
 }
-// full key
+
 message AddMachineKeyResponse {
   string id = 1;
-  MachineKeyType type = 2;
+  google.protobuf.Timestamp creation_date = 2;
+  uint64 sequence = 3;
+
+  MachineKeyType type = 4;
+  google.protobuf.Timestamp expiration_date = 5;
+  bytes key_details = 6;
 }
 
 message MachineKeyIDRequest {

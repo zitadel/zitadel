@@ -38,6 +38,8 @@ type UserEventstore struct {
 	EmailVerificationCode    crypto.Generator
 	PhoneVerificationCode    crypto.Generator
 	PasswordVerificationCode crypto.Generator
+	MachineKeyAlg            crypto.EncryptionAlgorithm
+	MachineKeySize           int
 	Multifactors             global_model.Multifactors
 	validateTOTP             func(string, string) bool
 }
@@ -1255,4 +1257,54 @@ func (es *UserEventstore) generateTemporaryLoginName() (string, error) {
 		return "", err
 	}
 	return fmt.Sprintf("%s@temporary.%s", id, es.domain), nil
+}
+
+func (es *UserEventstore) AddMachineKey(ctx context.Context, key *usr_model.MachineKey) (*usr_model.MachineKey, error) {
+	user, err := es.UserByID(ctx, key.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	if user.Machine == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5ROh4", "Errors.User.NotMachine")
+	}
+
+	id, err := es.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+	key.KeyID = id
+
+	repoUser := model.UserFromModel(user)
+	repoKey := model.MachineKeyFromModel(key)
+	err = repoKey.GenerateMachineKeyPair(es.MachineKeySize, es.MachineKeyAlg)
+	if err != nil {
+		return nil, err
+	}
+
+	userAggregate, err := UserAggregate(ctx, es.AggregateCreator(), repoUser)
+	if err != nil {
+		return nil, err
+	}
+	keyAggregate, err := userAggregate.AppendEvent(model.MachineKeyAdded, repoKey)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoKey.AppendEvents, keyAggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	return model.MachineKeyToModel(repoKey), nil
+}
+
+func (es *UserEventstore) RemoveMachineKey(ctx context.Context, userID, keyID string) error {
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if user.Machine == nil {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-h5Qtd", "Errors.User.NotMachine")
+	}
+	// user.Machine.
+	return nil
 }

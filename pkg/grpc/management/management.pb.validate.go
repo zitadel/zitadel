@@ -2080,7 +2080,31 @@ func (m *AddMachineKeyResponse) Validate() error {
 
 	// no validation rules for Id
 
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddMachineKeyResponseValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Sequence
+
 	// no validation rules for Type
+
+	if v, ok := interface{}(m.GetExpirationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddMachineKeyResponseValidationError{
+				field:  "ExpirationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for KeyDetails
 
 	return nil
 }

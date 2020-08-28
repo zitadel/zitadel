@@ -117,6 +117,6 @@ const (
 	MachineAdded   models.EventType = "user.machine.added"
 	MachineChanged models.EventType = "user.machine.changed"
 
-	KeyAdded   models.EventType = "user.machine.key.added"
-	KeyRemoved models.EventType = "user.machine.key.removed"
+	MachineKeyAdded   models.EventType = "user.machine.key.added"
+	MachineKeyRemoved models.EventType = "user.machine.key.removed"
 )

@@ -66,13 +66,6 @@ type MachineKeyView struct {
 	ExpirationDate time.Time
 }
 
-type MachineKeyType int32
-
-const (
-	MachineKeyTypeNONE = iota
-	MachineKeyTypeJSON
-)
-
 type UserSearchRequest struct {
 	Offset        uint64
 	Limit         uint64

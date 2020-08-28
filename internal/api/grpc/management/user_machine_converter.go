@@ -60,6 +60,53 @@ func machineKeyViewFromModel(key *usr_model.MachineKeyView) *management.MachineK
 		CreationDate:   creationDate,
 		ExpirationDate: expirationDate,
 		Sequence:       key.Sequence,
-		Type:           management.MachineKeyType_MACHINEKEY_UNSPECIFIED, //TODO: type mapping
+		Type:           machineKeyTypeFromModel(key.Type),
+	}
+}
+
+func addMachineKeyToModel(key *management.AddMachineKeyRequest) *usr_model.MachineKey {
+	expirationDate, err := ptypes.Timestamp(key.ExpirationDate)
+	logging.Log("MANAG-iNshR").OnError(err).Debug("unable to parse expiration date")
+
+	return &usr_model.MachineKey{
+		ExpirationDate: expirationDate,
+		Type:           machineKeyTypeToModel(key.Type),
+	}
+}
+
+func addMachineKeyFromModel(key *usr_model.MachineKey) *management.AddMachineKeyResponse {
+	creationDate, err := ptypes.TimestampProto(key.CreationDate)
+	logging.Log("MANAG-dlb8m").OnError(err).Debug("unable to parse cretaion date")
+
+	expirationDate, err := ptypes.TimestampProto(key.ExpirationDate)
+	logging.Log("MANAG-dlb8m").OnError(err).Debug("unable to parse cretaion date")
+
+	details := []byte(`{"type": "serviceaccount, "privateKeyId":}`)
+
+	return &management.AddMachineKeyResponse{
+		Id:             key.KeyID,
+		CreationDate:   creationDate,
+		ExpirationDate: expirationDate,
+		Sequence:       key.Sequence,
+		KeyDetails:     details,
+		Type:           machineKeyTypeFromModel(key.Type),
+	}
+}
+
+func machineKeyTypeToModel(typ management.MachineKeyType) usr_model.MachineKeyType {
+	switch typ {
+	case management.MachineKeyType_MACHINEKEY_JSON:
+		return usr_model.MachineKeyTypeJSON
+	default:
+		return usr_model.MachineKeyTypeNONE
+	}
+}
+
+func machineKeyTypeFromModel(typ usr_model.MachineKeyType) management.MachineKeyType {
+	switch typ {
+	case usr_model.MachineKeyTypeJSON:
+		return management.MachineKeyType_MACHINEKEY_JSON
+	default:
+		return management.MachineKeyType_MACHINEKEY_UNSPECIFIED
 	}
 }
