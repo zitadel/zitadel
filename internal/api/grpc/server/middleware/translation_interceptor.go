@@ -18,6 +18,9 @@ func TranslationHandler(defaultLanguage language.Tag) func(ctx context.Context, 
 		if loc, ok := resp.(localizers); ok && resp != nil {
 			translateFields(ctx, loc, translator)
 		}
+		if err != nil {
+			err = translateError(ctx, err, translator)
+		}
 		return resp, err
 	}
 }
