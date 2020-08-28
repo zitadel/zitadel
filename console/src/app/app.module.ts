@@ -2,7 +2,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { APP_INITIALIZER, InjectionToken, NgModule } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -35,25 +35,64 @@ import { HasRolePipeModule } from './pipes/has-role-pipe.module';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { GrpcService } from './services/grpc.service';
-import { AuthInterceptor, GRPC_INTERCEPTORS } from './services/interceptors/auth.interceptor';
+import { AuthInterceptor } from './services/interceptors/auth.interceptor';
+import { GRPC_INTERCEPTORS } from './services/interceptors/grpc-interceptor';
 import { OrgInterceptor } from './services/interceptors/org.interceptor';
 import { StatehandlerProcessorService, StatehandlerProcessorServiceImpl } from './services/statehandler-processor.service';
 import { StatehandlerService, StatehandlerServiceImpl } from './services/statehandler.service';
 import { StorageService } from './services/storage.service';
 import { ThemeService } from './services/theme.service';
 
-// import { GrpcAuthInterceptor } from './services/interceptors/grpc-auth.interceptor';
-// import { GRPC_INTERCEPTORS } from './services/interceptors/grpc-interceptor';
 registerLocaleData(localeDe);
-
-// AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     return new TranslateHttpLoader(http, './assets/i18n/');
 }
 
-const appInitializerFn = (grpcServ: GrpcService) => {
+export interface EnvironmentDep {
+    authServiceUrl: string;
+    mgmtServiceUrl: string;
+    adminServiceUrl: string;
+    issuer: string;
+    clientid: string;
+}
+
+const ENVIRONMENTDEPS = new InjectionToken<(Promise<EnvironmentDep>)>('ENVIRONMENTDEPS');
+
+async function loadAppEnvironment(http: HttpClient): Promise<any> {
+    return http.get('./assets/environment.json')
+        .toPromise();
+}
+
+const loadAppEnvironmentFactory = (
+    httpClient: HttpClient,
+): Promise<EnvironmentDep> => {
+    // return () => {
+    console.log('loadEnvironmentFactory');
+    return loadAppEnvironment(httpClient);
+    // };
+};
+
+const authEnvironmentFactory = (
+    authenticationService: AuthenticationService,
+    envDeps: Promise<any>,
+) => {
     return () => {
-        return grpcServ.loadAppEnvironment();
+        return (): Promise<any> => {
+            return envDeps.then(data => {
+                authenticationService.authInit(data);
+            });
+        };
+    };
+};
+
+const grpcEnvironmentFactory = (
+    grpcService: GrpcService,
+    envDeps: Promise<any>,
+): () => Promise<any> => {
+    return (): Promise<any> => {
+        return envDeps.then(data => {
+            return grpcService.grpcInit(data);
+        });
     };
 };
 
@@ -117,10 +156,25 @@ const authConfig: AuthConfig = {
     providers: [
         ThemeService,
         {
+            provide: ENVIRONMENTDEPS,
+            useFactory: (
+                http: HttpClient,
+            ) => {
+                return loadAppEnvironmentFactory(http);
+            },
+            deps: [HttpClient],
+        },
+        {
             provide: APP_INITIALIZER,
-            useFactory: appInitializerFn,
+            useFactory: authEnvironmentFactory,
             multi: true,
-            deps: [GrpcService],
+            deps: [ENVIRONMENTDEPS, AuthenticationService],
+        },
+        {
+            provide: APP_INITIALIZER,
+            useFactory: grpcEnvironmentFactory,
+            multi: true,
+            deps: [ENVIRONMENTDEPS, GrpcService],
         },
         {
             provide: APP_INITIALIZER,
@@ -154,8 +208,11 @@ const authConfig: AuthConfig = {
             multi: true,
             useClass: OrgInterceptor,
         },
-        GrpcService,
-        AuthenticationService,
+        // {
+        //     provide: AuthenticationService,
+        //     useClass: AuthenticationService,
+        //     deps: [GrpcAuthService],
+        // },
         GrpcAuthService,
         { provide: 'windowObject', useValue: window },
     ],
@@ -163,5 +220,5 @@ const authConfig: AuthConfig = {
 })
 export class AppModule {
 
-    constructor() { }
+    constructor(private http: HttpClient) { }
 }

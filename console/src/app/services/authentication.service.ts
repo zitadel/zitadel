@@ -1,11 +1,11 @@
-import { Injectable, Injector } from '@angular/core';
+import { PlatformLocation } from '@angular/common';
+import { Injectable } from '@angular/core';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
 import { catchError, filter, finalize, first, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
 
 import { Org, UserProfileView } from '../proto/generated/auth_pb';
 import { GrpcAuthService } from './grpc-auth.service';
-import { GrpcService } from './grpc.service';
 import { StatehandlerService } from './statehandler.service';
 import { StorageKey, StorageService } from './storage.service';
 
@@ -13,6 +13,8 @@ import { StorageKey, StorageService } from './storage.service';
     providedIn: 'root',
 })
 export class AuthenticationService {
+    private authConfig!: AuthConfig;
+
     private cachedOrgs: Org.AsObject[] = [];
     private _activeOrgChanged: Subject<Org.AsObject> = new Subject();
     public user!: Observable<UserProfileView.AsObject>;
@@ -24,13 +26,11 @@ export class AuthenticationService {
     private zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject(['user.resourceowner']);
 
     constructor(
-        // private grpcService: GrpcService,
-        private config: AuthConfig,
+        private platformLocation: PlatformLocation,
         private oauthService: OAuthService,
         private authService: GrpcAuthService,
         private storage: StorageService,
         private statehandler: StatehandlerService,
-        private injector: Injector,
     ) {
         this.user = merge(
             of(this.oauthService.getAccessToken()).pipe(
@@ -56,6 +56,23 @@ export class AuthenticationService {
             this.loadPermissions();
         });
     }
+
+    public authInit = (
+        envDeps: Promise<any>, // (() => Function),
+    ): () => Promise<any> => {
+        return (): Promise<any> => {
+            return envDeps.then(data => {
+                this.authConfig = {
+                    scope: 'openid profile email', // offline_access
+                    responseType: 'code',
+                    oidc: true,
+                    clientId: data.clientid,
+                    redirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'auth/callback',
+                    postLogoutRedirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'signedout',
+                };
+            });
+        };
+    };
 
     private loadPermissions(): void {
         merge([
@@ -105,15 +122,11 @@ export class AuthenticationService {
         setState: boolean = true,
         force: boolean = false,
     ): Promise<boolean> {
-        const grpcService = this.injector.get(GrpcService);
+        if (config) {
+            this.authConfig = config;
+        }
+        this.oauthService.configure(this.authConfig);
 
-        this.config.issuer = config?.issuer || grpcService.issuer;
-        this.config.clientId = config?.clientId || grpcService.clientid;
-        this.config.redirectUri = config?.redirectUri || grpcService.redirectUri;
-        this.config.postLogoutRedirectUri = config?.postLogoutRedirectUri || grpcService.postLogoutRedirectUri;
-        this.config.customQueryParams = config?.customQueryParams;
-        this.oauthService.configure(this.config);
-        // this.oauthService.setupAutomaticSilentRefresh();
         this.oauthService.strictDiscoveryDocumentValidation = false;
         await this.oauthService.loadDiscoveryDocumentAndTryLogin();
 
