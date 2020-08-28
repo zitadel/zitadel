@@ -35,6 +35,14 @@ func (v *View) PutProjectMember(project *model.ProjectMemberView, sequence uint6
 	return v.ProcessedProjectMemberSequence(sequence)
 }
 
+func (v *View) PutProjectMembers(project []*model.ProjectMemberView, sequence uint64) error {
+	err := view.PutProjectMembers(v.Db, projectMemberTable, project...)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedProjectMemberSequence(sequence)
+}
+
 func (v *View) DeleteProjectMember(projectID, userID string, eventSequence uint64) error {
 	err := view.DeleteProjectMember(v.Db, projectMemberTable, projectID, userID)
 	if err != nil {

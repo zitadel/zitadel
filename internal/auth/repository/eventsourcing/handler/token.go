@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 
+	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+
 	"github.com/caos/logging"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -43,6 +45,17 @@ func (u *Token) EventQuery() (*models.SearchQuery, error) {
 
 func (u *Token) Reduce(event *models.Event) (err error) {
 	switch event.Type {
+	case user_es_model.UserProfileChanged:
+		user := new(view_model.UserView)
+		user.AppendEvent(event)
+		tokens, err := u.view.TokensByUserID(event.AggregateID)
+		if err != nil {
+			return err
+		}
+		for _, token := range tokens {
+			token.PreferredLanguage = user.PreferredLanguage
+		}
+		return u.view.PutTokens(tokens, event.Sequence)
 	case user_es_model.SignedOut, user_es_model.HumanSignedOut:
 		id, err := agentIDFromSession(event)
 		if err != nil {

@@ -8,23 +8,23 @@ import (
 
 func TestAppendAddMemberEvent(t *testing.T) {
 	type args struct {
-		iam    *Iam
-		member *IamMember
+		iam    *IAM
+		member *IAMMember
 		event  *es_models.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *Iam
+		result *IAM
 	}{
 		{
 			name: "append add member event",
 			args: args{
-				iam:    &Iam{},
-				member: &IamMember{UserID: "UserID", Roles: []string{"Role"}},
+				iam:    &IAM{},
+				member: &IAMMember{UserID: "UserID", Roles: []string{"Role"}},
 				event:  &es_models.Event{},
 			},
-			result: &Iam{Members: []*IamMember{&IamMember{UserID: "UserID", Roles: []string{"Role"}}}},
+			result: &IAM{Members: []*IAMMember{&IAMMember{UserID: "UserID", Roles: []string{"Role"}}}},
 		},
 	}
 	for _, tt := range tests {
@@ -46,23 +46,23 @@ func TestAppendAddMemberEvent(t *testing.T) {
 
 func TestAppendChangeMemberEvent(t *testing.T) {
 	type args struct {
-		iam    *Iam
-		member *IamMember
+		iam    *IAM
+		member *IAMMember
 		event  *es_models.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *Iam
+		result *IAM
 	}{
 		{
 			name: "append change member event",
 			args: args{
-				iam:    &Iam{Members: []*IamMember{&IamMember{UserID: "UserID", Roles: []string{"Role"}}}},
-				member: &IamMember{UserID: "UserID", Roles: []string{"ChangedRole"}},
+				iam:    &IAM{Members: []*IAMMember{&IAMMember{UserID: "UserID", Roles: []string{"Role"}}}},
+				member: &IAMMember{UserID: "UserID", Roles: []string{"ChangedRole"}},
 				event:  &es_models.Event{},
 			},
-			result: &Iam{Members: []*IamMember{&IamMember{UserID: "UserID", Roles: []string{"ChangedRole"}}}},
+			result: &IAM{Members: []*IAMMember{&IAMMember{UserID: "UserID", Roles: []string{"ChangedRole"}}}},
 		},
 	}
 	for _, tt := range tests {
@@ -84,23 +84,23 @@ func TestAppendChangeMemberEvent(t *testing.T) {
 
 func TestAppendRemoveMemberEvent(t *testing.T) {
 	type args struct {
-		iam    *Iam
-		member *IamMember
+		iam    *IAM
+		member *IAMMember
 		event  *es_models.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *Iam
+		result *IAM
 	}{
 		{
 			name: "append remove member event",
 			args: args{
-				iam:    &Iam{Members: []*IamMember{&IamMember{UserID: "UserID", Roles: []string{"Role"}}}},
-				member: &IamMember{UserID: "UserID"},
+				iam:    &IAM{Members: []*IAMMember{&IAMMember{UserID: "UserID", Roles: []string{"Role"}}}},
+				member: &IAMMember{UserID: "UserID"},
 				event:  &es_models.Event{},
 			},
-			result: &Iam{Members: []*IamMember{}},
+			result: &IAM{Members: []*IAMMember{}},
 		},
 	}
 	for _, tt := range tests {

@@ -38,6 +38,14 @@ func (v *View) PutOrgDomain(org *model.OrgDomainView, sequence uint64) error {
 	return nil
 }
 
+func (v *View) PutOrgDomains(domains []*model.OrgDomainView, sequence uint64) error {
+	err := view.PutOrgDomains(v.Db, orgDomainTable, domains...)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedUserSequence(sequence)
+}
+
 func (v *View) DeleteOrgDomain(orgID, domain string, eventSequence uint64) error {
 	err := view.DeleteOrgDomain(v.Db, orgDomainTable, orgID, domain)
 	if err != nil {

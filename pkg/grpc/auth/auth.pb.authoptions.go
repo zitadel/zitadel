@@ -34,6 +34,11 @@ var AuthService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.auth.api.v1.AuthService/ChangeMyUserName": authz.Option{
+		Permission: "authenticated",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.auth.api.v1.AuthService/GetMyUserEmail": authz.Option{
 		Permission: "authenticated",
 		CheckParam: "",

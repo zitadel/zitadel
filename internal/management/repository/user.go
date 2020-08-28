@@ -16,7 +16,7 @@ type UserRepository interface {
 	UnlockUser(ctx context.Context, id string) (*model.User, error)
 	SearchUsers(ctx context.Context, request *model.UserSearchRequest) (*model.UserSearchResponse, error)
 	UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error)
-	GetGlobalUserByEmail(ctx context.Context, email string) (*model.UserView, error)
+	GetUserByLoginNameGlobal(ctx context.Context, email string) (*model.UserView, error)
 	IsUserUnique(ctx context.Context, userName, email string) (bool, error)
 	UserMfas(ctx context.Context, userID string) ([]*model.MultiFactor, error)
 
@@ -31,6 +31,8 @@ type UserRepository interface {
 	ChangeMachine(ctx context.Context, machine *model.Machine) (*model.Machine, error)
 	AddMachineKey(ctx context.Context, key *model.MachineKey) (*model.MachineKey, error)
 	RemoveMachineKey(ctx context.Context, userID, keyID string) error
+
+	ChangeUsername(ctx context.Context, id, username string) error
 
 	EmailByID(ctx context.Context, userID string) (*model.Email, error)
 	ChangeEmail(ctx context.Context, email *model.Email) (*model.Email, error)

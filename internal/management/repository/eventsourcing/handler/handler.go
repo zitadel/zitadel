@@ -3,6 +3,9 @@ package handler
 import (
 	"time"
 
+	"github.com/caos/zitadel/internal/config/systemdefaults"
+	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
+
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/query"
@@ -29,9 +32,10 @@ type EventstoreRepos struct {
 	ProjectEvents *proj_event.ProjectEventstore
 	UserEvents    *usr_event.UserEventstore
 	OrgEvents     *org_event.OrgEventstore
+	IamEvents     *iam_event.IAMEventstore
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos, defaults systemdefaults.SystemDefaults) []query.Handler {
 	return []query.Handler{
 		&Project{handler: handler{view, bulkLimit, configs.cycleDuration("Project"), errorCount}, eventstore: eventstore},
 		&ProjectGrant{handler: handler{view, bulkLimit, configs.cycleDuration("ProjectGrant"), errorCount}, eventstore: eventstore, projectEvents: repos.ProjectEvents, orgEvents: repos.OrgEvents},
@@ -46,6 +50,9 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 		&OrgDomain{handler: handler{view, bulkLimit, configs.cycleDuration("OrgDomain"), errorCount}},
 		&UserMembership{handler: handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount}, orgEvents: repos.OrgEvents, projectEvents: repos.ProjectEvents},
 		&MachineKeys{handler: handler{view, bulkLimit, configs.cycleDuration("MachineKeys"), errorCount}},
+		&IDPConfig{handler: handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount}},
+		&LoginPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount}},
+		&IDPProvider{handler: handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount}, systemDefaults: defaults, iamEvents: repos.IamEvents, orgEvents: repos.OrgEvents},
 	}
 }
 

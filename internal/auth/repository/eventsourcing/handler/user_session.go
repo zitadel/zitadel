@@ -74,7 +74,9 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		es_model.HumanPasswordChanged,
 		es_model.HumanMfaOtpRemoved,
 		es_model.HumanProfileChanged,
-		es_model.MachineChanged:
+		es_model.MachineChanged,
+		es_model.DomainClaimed,
+		es_model.UserUserNameChanged:
 		sessions, err := u.view.UserSessionsByUserID(event.AggregateID)
 		if err != nil {
 			return err
@@ -83,11 +85,12 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 			return u.view.ProcessedUserSessionSequence(event.Sequence)
 		}
 		for _, session := range sessions {
-			if err := u.updateSession(session, event); err != nil {
+			session.AppendEvent(event)
+			if err := u.fillUserInfo(session, event.AggregateID); err != nil {
 				return err
 			}
 		}
-		return nil
+		return u.view.PutUserSessions(sessions, event.Sequence)
 	case es_model.UserRemoved:
 		return u.view.DeleteUserSessions(event.AggregateID, event.Sequence)
 	default:

@@ -1,17 +1,17 @@
 <form>
     <mat-form-field *ngIf="target == UserTarget.SELF" appearance="outline" class="full-width">
-        <mat-label>Organizations User Email</mat-label>
+        <mat-label>Organizations User Loginname</mat-label>
 
-        <input matInput *ngIf="singleOutput" type="text" placeholder="Search for the user email" #usernameInput
+        <input matInput *ngIf="singleOutput" type="text" placeholder="Search for the user loginname" #usernameInput
             [formControl]="myControl" [matAutocomplete]="auto" />
 
-        <mat-chip-list *ngIf="!singleOutput" #chipList aria-label="useremail selection">
+        <mat-chip-list *ngIf="!singleOutput" #chipList aria-label="loginname selection">
             <mat-chip class="chip" *ngFor="let selecteduser of users" [selectable]="selectable" [removable]="removable"
                 (removed)="remove(selecteduser)">
-                {{ selecteduser?.firstName }} {{selecteduser.lastName}} | <small> {{selecteduser.email}}</small>
+                {{ selecteduser?.firstName }} {{selecteduser.lastName}} | <small> {{selecteduser.preferredLoginName}}</small>
                 <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
             </mat-chip>
-            <input placeholder="{{'ORG_DETAIL.MEMBER.EMAIL' | translate}}" #usernameInput [formControl]="myControl"
+            <input placeholder="{{'ORG_DETAIL.MEMBER.LOGINNAME' | translate}}" #usernameInput [formControl]="myControl"
                 [matAutocomplete]="auto" [matChipInputFor]="chipList"
                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
                 (matChipInputTokenEnd)="add($event)" />
@@ -23,15 +23,15 @@
             </mat-option>
             <mat-option *ngFor="let user of filteredUsers" [value]="user">
                 {{user.firstName}} {{user.lastName}}
-                <small>{{user.email}}</small>
+                <small>{{user.preferredLoginName}}</small>
             </mat-option>
         </mat-autocomplete>
     </mat-form-field>
 
     <div *ngIf="target == UserTarget.EXTERNAL" class="line">
         <mat-form-field class="form-field" appearance="outline">
-            <mat-label>Global User Email</mat-label>
-            <input matInput type="text" [formControl]="globalEmailControl" />
+            <mat-label>Global User Loginname</mat-label>
+            <input matInput type="text" [formControl]="globalLoginNameControl" />
         </mat-form-field>
 
         <button color="primary" mat-icon-button (click)="getGlobalUser()">
@@ -42,7 +42,7 @@
     <div *ngIf="target == UserTarget.EXTERNAL && users.length > 0">
         <span class="found-label">{{'USER.SEARCH.FOUND' | translate}}:</span>
         <div class="found-user-row" *ngFor="let user of users; index as i">
-            <span>{{user.email}}</span>
+            <span>{{user.preferredLoginName}}</span>
             <button mat-icon-button>
                 <i class="las la-minus-circle" (click)="users.splice(i, 1)"></i>
             </button>

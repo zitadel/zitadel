@@ -3,6 +3,7 @@ package eventstore
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
@@ -20,11 +21,12 @@ import (
 )
 
 type UserRepo struct {
-	SearchLimit  uint64
-	UserEvents   *usr_event.UserEventstore
-	PolicyEvents *policy_event.PolicyEventstore
-	OrgEvents    *org_event.OrgEventstore
-	View         *view.View
+	SearchLimit    uint64
+	UserEvents     *usr_event.UserEventstore
+	PolicyEvents   *policy_event.PolicyEventstore
+	OrgEvents      *org_event.OrgEventstore
+	View           *view.View
+	SystemDefaults systemdefaults.SystemDefaults
 }
 
 func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserView, error) {
@@ -57,7 +59,7 @@ func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*us
 	if err != nil {
 		return nil, err
 	}
-	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +75,7 @@ func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, re
 	if err != nil {
 		return nil, err
 	}
-	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -98,8 +100,8 @@ func (repo *UserRepo) UnlockUser(ctx context.Context, id string) (*usr_model.Use
 
 func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSearchRequest) (*usr_model.UserSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, err := repo.View.GetLatestUserSequence()
-	logging.Log("EVENT-Lcn7d").OnError(err).Warn("could not read latest user sequence")
+	sequence, sequenceErr := repo.View.GetLatestUserSequence()
+	logging.Log("EVENT-Lcn7d").OnError(sequenceErr).Warn("could not read latest user sequence")
 	users, count, err := repo.View.SearchUsers(request)
 	if err != nil {
 		return nil, err
@@ -110,7 +112,7 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 		TotalResult: uint64(count),
 		Result:      model.UsersToModel(users),
 	}
-	if err == nil {
+	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
 	}
@@ -132,8 +134,8 @@ func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence u
 	return changes, nil
 }
 
-func (repo *UserRepo) GetGlobalUserByEmail(ctx context.Context, email string) (*usr_model.UserView, error) {
-	user, err := repo.View.GetGlobalUserByEmail(email)
+func (repo *UserRepo) GetUserByLoginNameGlobal(ctx context.Context, loginName string) (*usr_model.UserView, error) {
+	user, err := repo.View.GetGlobalUserByLoginName(loginName)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +147,14 @@ func (repo *UserRepo) IsUserUnique(ctx context.Context, userName, email string) 
 }
 
 func (repo *UserRepo) UserMfas(ctx context.Context, userID string) ([]*usr_model.MultiFactor, error) {
-	return repo.View.UserMfas(userID)
+	user, err := repo.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if user.OTPState == usr_model.MfaStateUnspecified {
+		return []*usr_model.MultiFactor{}, nil
+	}
+	return []*usr_model.MultiFactor{{Type: usr_model.MfaTypeOTP, State: user.OTPState}}, nil
 }
 
 func (repo *UserRepo) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
@@ -216,6 +225,14 @@ func (repo *UserRepo) ChangeProfile(ctx context.Context, profile *usr_model.Prof
 	return repo.UserEvents.ChangeProfile(ctx, profile)
 }
 
+func (repo *UserRepo) ChangeUsername(ctx context.Context, userID, userName string) error {
+	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return err
+	}
+	return repo.UserEvents.ChangeUsername(ctx, userID, userName, orgPolicy)
+}
+
 func (repo *UserRepo) EmailByID(ctx context.Context, userID string) (*usr_model.Email, error) {
 	user, err := repo.UserByID(ctx, userID)
 	if err != nil {
@@ -275,8 +292,8 @@ func (repo *UserRepo) ChangeAddress(ctx context.Context, address *usr_model.Addr
 
 func (repo *UserRepo) SearchUserMemberships(ctx context.Context, request *usr_model.UserMembershipSearchRequest) (*usr_model.UserMembershipSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, err := repo.View.GetLatestUserMembershipSequence()
-	logging.Log("EVENT-Dn7sf").OnError(err).Warn("could not read latest user sequence")
+	sequence, sequenceErr := repo.View.GetLatestUserMembershipSequence()
+	logging.Log("EVENT-Dn7sf").OnError(sequenceErr).Warn("could not read latest user sequence")
 
 	result := handleSearchUserMembershipsPermissions(ctx, request, sequence)
 	if result != nil {
@@ -290,10 +307,10 @@ func (repo *UserRepo) SearchUserMemberships(ctx context.Context, request *usr_mo
 	result = &usr_model.UserMembershipSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
-		TotalResult: uint64(count),
+		TotalResult: count,
 		Result:      model.UserMembershipsToModel(memberships),
 	}
-	if err == nil {
+	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
 	}
@@ -302,13 +319,16 @@ func (repo *UserRepo) SearchUserMemberships(ctx context.Context, request *usr_mo
 
 func handleSearchUserMembershipsPermissions(ctx context.Context, request *usr_model.UserMembershipSearchRequest, sequence *repository.CurrentSequence) *usr_model.UserMembershipSearchResponse {
 	permissions := authz.GetAllPermissionsFromCtx(ctx)
+	iamPerm := authz.HasGlobalExplicitPermission(permissions, iamMemberReadPerm)
 	orgPerm := authz.HasGlobalExplicitPermission(permissions, orgMemberReadPerm)
 	projectPerm := authz.HasGlobalExplicitPermission(permissions, projectMemberReadPerm)
 	projectGrantPerm := authz.HasGlobalExplicitPermission(permissions, projectGrantMemberReadPerm)
-	if orgPerm && projectPerm && projectGrantPerm {
+	if iamPerm && orgPerm && projectPerm && projectGrantPerm {
 		return nil
 	}
-
+	if !iamPerm {
+		request.Queries = append(request.Queries, &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyMemberType, Method: global_model.SearchMethodNotEquals, Value: usr_model.MemberTypeIam})
+	}
 	if !orgPerm {
 		request.Queries = append(request.Queries, &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyMemberType, Method: global_model.SearchMethodNotEquals, Value: usr_model.MemberTypeOrganisation})
 	}

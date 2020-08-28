@@ -94,9 +94,9 @@ func SearchUsers(db *gorm.DB, table string, req *usr_model.UserSearchRequest) ([
 	return users, count, nil
 }
 
-func GetGlobalUserByEmail(db *gorm.DB, table, email string) (*model.UserView, error) {
+func GetGlobalUserByLoginName(db *gorm.DB, table, loginName string) (*model.UserView, error) {
 	user := new(model.UserView)
-	query := repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyEmail), email)
+	query := repository.PrepareGetByQuery(table, &model.UserSearchQuery{Key: usr_model.UserSearchKeyLoginNames, Value: loginName, Method: global_model.SearchMethodListContains})
 	err := query(db, user)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-8uWer", "Errors.User.NotFound")

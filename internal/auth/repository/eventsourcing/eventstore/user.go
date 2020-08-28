@@ -41,7 +41,7 @@ func (repo *UserRepo) Register(ctx context.Context, registerUser *model.User, or
 	if err != nil {
 		return nil, err
 	}
-	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, policyResourceOwner)
+	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, policyResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -188,7 +188,14 @@ func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new strin
 }
 
 func (repo *UserRepo) MyUserMfas(ctx context.Context) ([]*model.MultiFactor, error) {
-	return repo.View.UserMfas(authz.GetCtxData(ctx).UserID)
+	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
+	if err != nil {
+		return nil, err
+	}
+	if user.OTPState == model.MfaStateUnspecified {
+		return []*model.MultiFactor{}, nil
+	}
+	return []*model.MultiFactor{{Type: model.MfaTypeOTP, State: user.OTPState}}, nil
 }
 
 func (repo *UserRepo) AddMfaOTP(ctx context.Context, userID string) (*model.OTP, error) {
@@ -211,6 +218,14 @@ func (repo *UserRepo) RemoveMyMfaOTP(ctx context.Context) error {
 	return repo.UserEvents.RemoveOTP(ctx, authz.GetCtxData(ctx).UserID)
 }
 
+func (repo *UserRepo) ChangeMyUsername(ctx context.Context, username string) error {
+	ctxData := authz.GetCtxData(ctx)
+	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, ctxData.OrgID)
+	if err != nil {
+		return err
+	}
+	return repo.UserEvents.ChangeUsername(ctx, ctxData.UserID, username, orgPolicy)
+}
 func (repo *UserRepo) ResendInitVerificationMail(ctx context.Context, userID string) error {
 	_, err := repo.UserEvents.CreateInitializeUserCodeByID(ctx, userID)
 	return err
@@ -288,6 +303,15 @@ func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, li
 		}
 	}
 	return changes, nil
+}
+
+func (repo *UserRepo) ChangeUsername(ctx context.Context, userID, username string) error {
+	policyResourceOwner := authz.GetCtxData(ctx).OrgID
+	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, policyResourceOwner)
+	if err != nil {
+		return err
+	}
+	return repo.UserEvents.ChangeUsername(ctx, userID, username, orgPolicy)
 }
 
 func checkIDs(ctx context.Context, obj es_models.ObjectRoot) error {

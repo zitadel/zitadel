@@ -6,5 +6,5 @@ import (
 )
 
 type IamRepository interface {
-	IamByID(ctx context.Context, id string) (*iam_model.Iam, error)
+	IAMByID(ctx context.Context, id string) (*iam_model.IAM, error)
 }

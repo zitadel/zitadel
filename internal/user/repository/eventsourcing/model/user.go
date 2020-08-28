@@ -74,7 +74,14 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 	u.ObjectRoot.AppendEvent(event)
 
 	switch event.Type {
-	case UserAdded, HumanAdded, MachineAdded, UserRegistered, HumanRegistered:
+	case UserAdded,
+		HumanAdded,
+		MachineAdded,
+		UserRegistered,
+		HumanRegistered,
+		UserProfileChanged,
+		DomainClaimed,
+		UserUserNameChanged:
 		err := u.setData(event)
 		if err != nil {
 			return err

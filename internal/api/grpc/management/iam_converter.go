@@ -5,9 +5,9 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func iamFromModel(iam *iam_model.Iam) *management.Iam {
+func iamFromModel(iam *iam_model.IAM) *management.Iam {
 	return &management.Iam{
-		IamProjectId: iam.IamProjectID,
+		IamProjectId: iam.IAMProjectID,
 		GlobalOrgId:  iam.GlobalOrgID,
 		SetUpDone:    iam.SetUpDone,
 		SetUpStarted: iam.SetUpStarted,

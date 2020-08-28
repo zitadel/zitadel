@@ -34,7 +34,7 @@ type EsRepository struct {
 	eventstore.UserRepo
 	eventstore.UserGrantRepo
 	eventstore.PolicyRepo
-	eventstore.IamRepository
+	eventstore.IAMRepository
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRepository, error) {
@@ -82,24 +82,24 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 	}
 	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain}, systemDefaults)
 
-	iam, err := es_iam.StartIam(es_iam.IamConfig{
+	iam, err := es_iam.StartIAM(es_iam.IAMConfig{
 		Eventstore: es,
 		Cache:      conf.Eventstore.Cache,
 	}, systemDefaults)
 	if err != nil {
 		return nil, err
 	}
-	eventstoreRepos := handler.EventstoreRepos{ProjectEvents: project, UserEvents: user, OrgEvents: org}
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos)
+	eventstoreRepos := handler.EventstoreRepos{ProjectEvents: project, UserEvents: user, OrgEvents: org, IamEvents: iam}
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos, systemDefaults)
 
 	return &EsRepository{
 		spooler:       spool,
-		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, org, user, view, roles},
+		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, org, user, view, roles, systemDefaults},
 		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, project, usergrant, user, view, roles},
-		UserRepo:      eventstore.UserRepo{conf.SearchLimit, user, policy, org, view},
+		UserRepo:      eventstore.UserRepo{conf.SearchLimit, user, policy, org, view, systemDefaults},
 		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
 		PolicyRepo:    eventstore.PolicyRepo{policy},
-		IamRepository: eventstore.IamRepository{iam},
+		IAMRepository: eventstore.IAMRepository{iam},
 	}, nil
 }
 

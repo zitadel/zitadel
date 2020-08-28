@@ -3,12 +3,11 @@ package model
 import (
 	"time"
 
+	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
-	"golang.org/x/text/language"
-
-	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/model"
+	"golang.org/x/text/language"
 )
 
 type UserView struct {
@@ -29,6 +28,7 @@ type UserView struct {
 type HumanView struct {
 	PasswordSet            bool
 	PasswordChangeRequired bool
+	UsernameChangeRequired bool
 	PasswordChanged        time.Time
 	FirstName              string
 	LastName               string

@@ -43,7 +43,7 @@ func VerifyTokenAndWriteCtxData(ctx context.Context, token, orgID string, t *Tok
 		}
 	}
 
-	userID, clientID, agentID, err := verifyAccessToken(ctx, token, t, method)
+	userID, clientID, agentID, prefLang, err := verifyAccessToken(ctx, token, t, method)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func VerifyTokenAndWriteCtxData(ctx context.Context, token, orgID string, t *Tok
 	if err := checkOrigin(ctx, origins); err != nil {
 		return nil, err
 	}
-	return context.WithValue(ctx, dataKey, CtxData{UserID: userID, OrgID: orgID, ProjectID: projectID, AgentID: agentID}), nil
+	return context.WithValue(ctx, dataKey, CtxData{UserID: userID, OrgID: orgID, ProjectID: projectID, AgentID: agentID, PreferredLanguage: prefLang}), nil
 }
 
 func SetCtxData(ctx context.Context, ctxData CtxData) context.Context {

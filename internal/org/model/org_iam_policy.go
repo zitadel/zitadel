@@ -4,7 +4,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 )
 
-type OrgIamPolicy struct {
+type OrgIAMPolicy struct {
 	models.ObjectRoot
 
 	Description           string

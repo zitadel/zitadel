@@ -60,7 +60,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-	iam, err := l.authRepo.GetIam(r.Context())
+	iam, err := l.authRepo.GetIAM(r.Context())
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
@@ -99,7 +99,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 		baseData:         l.getBaseData(r, authRequest, "Register", errType, errMessage),
 		registerFormData: *formData,
 	}
-	iam, _ := l.authRepo.GetIam(r.Context())
+	iam, _ := l.authRepo.GetIAM(r.Context())
 	if iam != nil {
 		policy, description, _ := l.getPasswordComplexityPolicy(r, iam.GlobalOrgID)
 		if policy != nil {

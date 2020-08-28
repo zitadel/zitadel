@@ -227,7 +227,7 @@ func orgChangesToMgtAPI(changes *org_model.OrgChanges) (_ []*management.Change) 
 	return result
 }
 
-func orgIamPolicyFromModel(policy *org_model.OrgIamPolicy) *management.OrgIamPolicy {
+func orgIamPolicyFromModel(policy *org_model.OrgIAMPolicy) *management.OrgIamPolicy {
 	return &management.OrgIamPolicy{
 		OrgId:                 policy.AggregateID,
 		Description:           policy.Description,

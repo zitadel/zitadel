@@ -129,6 +129,15 @@ func PutUserGrant(db *gorm.DB, table string, grant *model.UserGrantView) error {
 	return save(db, grant)
 }
 
+func PutUserGrants(db *gorm.DB, table string, grants ...*model.UserGrantView) error {
+	save := repository.PrepareBulkSave(table)
+	g := make([]interface{}, len(grants))
+	for i, grant := range grants {
+		g[i] = grant
+	}
+	return save(db, g...)
+}
+
 func DeleteUserGrant(db *gorm.DB, table, grantID string) error {
 	delete := repository.PrepareDeleteByKey(table, model.UserGrantSearchKey(grant_model.UserGrantSearchKeyGrantID), grantID)
 	return delete(db)

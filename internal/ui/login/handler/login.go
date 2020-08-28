@@ -12,6 +12,7 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/http/middleware"
+	auth_repository "github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/form"
@@ -23,7 +24,7 @@ type Login struct {
 	router              http.Handler
 	renderer            *Renderer
 	parser              *form.Parser
-	authRepo            *eventsourcing.EsRepository
+	authRepo            auth_repository.Repository
 	zitadelURL          string
 	oidcAuthCallbackURL string
 }

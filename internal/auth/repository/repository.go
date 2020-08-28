@@ -15,4 +15,5 @@ type Repository interface {
 	UserGrantRepository
 	PolicyRepository
 	OrgRepository
+	IAMRepository
 }

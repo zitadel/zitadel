@@ -94,6 +94,17 @@ service AuthService {
     };
   }
 
+  rpc ChangeMyUserName(ChangeUserNameRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/users/me/username"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
   rpc GetMyUserEmail(google.protobuf.Empty) returns (UserEmailView) {
     option (google.api.http) = {
       get: "/users/me/email"
@@ -465,6 +476,10 @@ message UpdateUserProfileRequest {
   string nick_name = 3 [(validate.rules).string.max_len = 200];
   string preferred_language = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
   Gender gender = 5;
+}
+
+message ChangeUserNameRequest {
+  string user_name = 1 [(validate.rules).string.pattern = "^[^[:space:]]{1,200}$"];
 }
 
 message UserEmail {

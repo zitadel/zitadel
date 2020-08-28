@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/caos/logging"
@@ -9,6 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
@@ -60,6 +62,8 @@ func (n *Notification) Reduce(event *models.Event) (err error) {
 	case es_model.UserPasswordCodeAdded,
 		es_model.HumanPasswordCodeAdded:
 		err = n.handlePasswordCode(event)
+	case es_model.DomainClaimed:
+		err = n.handleDomainClaimed(event)
 	default:
 		return n.view.ProcessedNotificationSequence(event.Sequence)
 	}
@@ -139,6 +143,27 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 		return err
 	}
 	return n.userEvents.PhoneVerificationCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+}
+
+func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
+	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.DomainClaimed, es_model.DomainClaimedSent)
+	if err != nil || alreadyHandled {
+		return nil
+	}
+	data := make(map[string]string)
+	if err := json.Unmarshal(event.Data, &data); err != nil {
+		logging.Log("HANDLE-Gghq2").WithError(err).Error("could not unmarshal event data")
+		return caos_errs.ThrowInternal(err, "HANDLE-7hgj3", "could not unmarshal event")
+	}
+	user, err := n.view.NotifyUserByID(event.AggregateID)
+	if err != nil {
+		return err
+	}
+	err = types.SendDomainClaimed(n.statikDir, n.i18n, user, data["userName"], n.systemDefaults)
+	if err != nil {
+		return err
+	}
+	return n.userEvents.DomainClaimedSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
 }
 
 func (n *Notification) checkIfCodeAlreadyHandled(userID string, sequence uint64, addedType, sentType models.EventType) (bool, error) {
