@@ -617,7 +617,7 @@ export class ManagementService {
 
     public async GetUserByLoginNameGlobal(loginname: string): Promise<UserView> {
         const req = new LoginName();
-        req.set(loginname);
+        req.setLoginName(loginname);
         return this.grpcService.mgmt.getUserByLoginNameGlobal(req);
     }
 

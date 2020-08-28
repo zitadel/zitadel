@@ -107,7 +107,7 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
                 this.toast.showError(error);
             });
 
-            from(this.projectService.SearchProjectGrantMembers(this.projectId,
+            from(this.mgmtService.SearchProjectGrantMembers(this.projectId,
                 this.grantId, 100, 0)).pipe(
                     map(resp => {
                         this.totalMemberResult = resp.toObject().totalResult;
