@@ -3,6 +3,7 @@ package http
 import (
 	"net/http"
 
+	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/id"
@@ -22,19 +23,24 @@ type UserAgentCookieConfig struct {
 	Name   string
 	Domain string
 	Key    *crypto.KeyConfig
+	MaxAge types.Duration
 }
 
-func NewUserAgentHandler(config *UserAgentCookieConfig, idGenerator id.Generator) (*UserAgentHandler, error) {
+func NewUserAgentHandler(config *UserAgentCookieConfig, idGenerator id.Generator, localDevMode bool) (*UserAgentHandler, error) {
 	key, err := crypto.LoadKey(config.Key, config.Key.EncryptionKeyID)
 	if err != nil {
 		return nil, err
 	}
 	cookieKey := []byte(key)
-	handler := NewCookieHandler(
+	opts := []CookieHandlerOpt{
 		WithEncryption(cookieKey, cookieKey),
 		WithDomain(config.Domain),
-		WithUnsecure(),
-	)
+		WithMaxAge(int(config.MaxAge.Seconds())),
+	}
+	if localDevMode {
+		opts = append(opts, WithUnsecure())
+	}
+	handler := NewCookieHandler(opts...)
 	return &UserAgentHandler{
 		cookieName:  config.Name,
 		handler:     handler,

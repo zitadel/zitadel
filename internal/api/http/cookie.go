@@ -8,9 +8,15 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 )
 
+const (
+	prefixSecure = "__Secure-"
+	prefixHost   = "__Host-"
+)
+
 type CookieHandler struct {
 	securecookie *securecookie.SecureCookie
 	secureOnly   bool
+	httpOnly     bool
 	sameSite     http.SameSite
 	path         string
 	maxAge       int
@@ -20,6 +26,7 @@ type CookieHandler struct {
 func NewCookieHandler(opts ...CookieHandlerOpt) *CookieHandler {
 	c := &CookieHandler{
 		secureOnly: true,
+		httpOnly:   true,
 		sameSite:   http.SameSiteLaxMode,
 		path:       "/",
 	}
@@ -41,6 +48,12 @@ func WithEncryption(hashKey, encryptKey []byte) CookieHandlerOpt {
 func WithUnsecure() CookieHandlerOpt {
 	return func(c *CookieHandler) {
 		c.secureOnly = false
+	}
+}
+
+func WithNonHttpOnly() CookieHandlerOpt {
+	return func(c *CookieHandler) {
+		c.httpOnly = false
 	}
 }
 
@@ -78,7 +91,7 @@ func (c *CookieHandler) GetCookieValue(r *http.Request, name string) (string, er
 }
 
 func (c *CookieHandler) GetEncryptedCookieValue(r *http.Request, name string, value interface{}) error {
-	cookie, err := r.Cookie(name)
+	cookie, err := r.Cookie(c.setPrefix(name))
 	if err != nil {
 		return err
 	}
@@ -110,13 +123,23 @@ func (c *CookieHandler) DeleteCookie(w http.ResponseWriter, name string) {
 
 func (c *CookieHandler) httpSet(w http.ResponseWriter, name, value string, maxage int) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     name,
+		Name:     c.setPrefix(name),
 		Value:    value,
 		Domain:   c.domain,
 		Path:     c.path,
 		MaxAge:   maxage,
-		HttpOnly: true,
+		HttpOnly: c.httpOnly,
 		Secure:   c.secureOnly,
 		SameSite: c.sameSite,
 	})
+}
+
+func (c *CookieHandler) setPrefix(name string) string {
+	if !c.secureOnly {
+		return name
+	}
+	if c.domain != "" || c.path != "/" {
+		return prefixSecure + name
+	}
+	return prefixHost + name
 }

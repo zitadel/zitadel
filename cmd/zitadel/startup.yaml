@@ -195,6 +195,7 @@ API:
     UserAgentCookieConfig:
       Name: caos.zitadel.useragent
       Domain: $ZITADEL_COOKIE_DOMAIN
+      MaxAge: 8760h #365*24h (1 year)
       Key:
         EncryptionKeyID: $ZITADEL_COOKIE_KEY
     Cache:

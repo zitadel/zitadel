@@ -148,7 +148,7 @@ func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsReposit
 		apis.RegisterServer(ctx, auth.CreateServer(authRepo))
 	}
 	if *oidcEnabled {
-		op := oidc.NewProvider(ctx, conf.API.OIDC, authRepo)
+		op := oidc.NewProvider(ctx, conf.API.OIDC, authRepo, *localDevMode)
 		apis.RegisterHandler("/oauth/v2", op.HttpHandler())
 	}
 	apis.Start(ctx)

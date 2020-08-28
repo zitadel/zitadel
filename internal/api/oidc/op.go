@@ -51,8 +51,8 @@ type OPStorage struct {
 	signingKeyAlgorithm        string
 }
 
-func NewProvider(ctx context.Context, config OPHandlerConfig, repo repository.Repository) op.OpenIDProvider {
-	cookieHandler, err := http_utils.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator)
+func NewProvider(ctx context.Context, config OPHandlerConfig, repo repository.Repository, localDevMode bool) op.OpenIDProvider {
+	cookieHandler, err := http_utils.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator, localDevMode)
 	logging.Log("OIDC-sd4fd").OnError(err).Panic("cannot user agent handler")
 	nextHandler := func(handlerFunc http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
