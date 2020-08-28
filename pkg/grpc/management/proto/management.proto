@@ -1558,7 +1558,7 @@ message MachineKeySearchResponse {
 message UserSearchRequest {
   uint64 offset = 1;
   uint64 limit = 2;
-  UserSearchKey sorting_column = 3 [(validate.rules).enum = {not_in: [0]}];
+  UserSearchKey sorting_column = 3;
   bool asc = 4;
   repeated UserSearchQuery queries = 5;
 }
