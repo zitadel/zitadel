@@ -175,8 +175,8 @@ func (repo *UserRepo) ChangeMachine(ctx context.Context, machine *usr_model.Mach
 	return repo.UserEvents.ChangeMachine(ctx, machine)
 }
 
-func (repo *UserRepo) MachineKeyByID(ctx context.Context, id string) (*usr_model.MachineKeyView, error) {
-	key, err := repo.View.MachineKeyByID(id)
+func (repo *UserRepo) GetMachineKey(ctx context.Context, keyID string) (*usr_model.MachineKeyView, error) {
+	key, err := repo.View.MachineKeyByID(keyID)
 	if err != nil {
 		return nil, err
 	}

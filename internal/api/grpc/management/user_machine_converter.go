@@ -1,6 +1,8 @@
 package management
 
 import (
+	"time"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
@@ -64,8 +66,12 @@ func machineKeyViewFromModel(key *usr_model.MachineKeyView) *management.MachineK
 }
 
 func addMachineKeyToModel(key *management.AddMachineKeyRequest) *usr_model.MachineKey {
-	expirationDate, err := ptypes.Timestamp(key.ExpirationDate)
-	logging.Log("MANAG-iNshR").OnError(err).Debug("unable to parse expiration date")
+	expirationDate := time.Time{}
+	if key.ExpirationDate != nil {
+		var err error
+		expirationDate, err = ptypes.Timestamp(key.ExpirationDate)
+		logging.Log("MANAG-iNshR").OnError(err).Debug("unable to parse expiration date")
+	}
 
 	return &usr_model.MachineKey{
 		ExpirationDate: expirationDate,
