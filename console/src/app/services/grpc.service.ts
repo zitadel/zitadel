@@ -1,6 +1,7 @@
 import { PlatformLocation } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AuthConfig } from 'angular-oauth2-oidc';
 
 import { AdminServicePromiseClient } from '../proto/generated/admin_grpc_web_pb';
 import { AuthServicePromiseClient } from '../proto/generated/auth_grpc_web_pb';
@@ -14,11 +15,6 @@ import { StorageService } from './storage.service';
     providedIn: 'root',
 })
 export class GrpcService {
-    public issuer: string = '';
-    public clientid: string = '';
-    public redirectUri: string = '';
-    public postLogoutRedirectUri: string = '';
-
     public auth!: AuthServicePromiseClient;
     public mgmt!: ManagementServicePromiseClient;
     public admin!: AdminServicePromiseClient;
@@ -60,12 +56,17 @@ export class GrpcService {
                         interceptors,
                     );
 
-                    this.issuer = data.issuer;
-                    if (data.clientid) {
-                        this.clientid = data.clientid;
-                        this.redirectUri = window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'auth/callback';
-                        this.postLogoutRedirectUri = window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'signedout';
-                    }
+                    const authConfig: AuthConfig = {
+                        scope: 'openid profile email',
+                        responseType: 'code',
+                        oidc: true,
+                        clientId: data.clientid,
+                        issuer: data.issuer,
+                        redirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'auth/callback',
+                        postLogoutRedirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'signedout',
+                    };
+
+                    this.authenticationService.initConfig(authConfig);
                 }
                 return Promise.resolve(data);
             }).catch(() => {

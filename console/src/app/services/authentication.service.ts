@@ -2,24 +2,27 @@ import { Injectable } from '@angular/core';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, from, Observable } from 'rxjs';
 
-import { GrpcService } from './grpc.service';
 import { StatehandlerService } from './statehandler.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AuthenticationService {
+    private authConfig!: AuthConfig;
     private _authenticated: boolean = false;
     private readonly _authenticationChanged: BehaviorSubject<
         boolean
     > = new BehaviorSubject(this.authenticated);
 
     constructor(
-        private grpcService: GrpcService,
         private config: AuthConfig,
         private oauthService: OAuthService,
         private statehandler: StatehandlerService,
     ) { }
+
+    public initConfig(data: AuthConfig): void {
+        this.authConfig = data;
+    }
 
     public get authenticated(): boolean {
         return this._authenticated;
@@ -38,12 +41,11 @@ export class AuthenticationService {
         setState: boolean = true,
         force: boolean = false,
     ): Promise<boolean> {
-        this.config.issuer = config?.issuer || this.grpcService.issuer;
-        this.config.clientId = config?.clientId || this.grpcService.clientid;
-        this.config.redirectUri = config?.redirectUri || this.grpcService.redirectUri;
-        this.config.postLogoutRedirectUri = config?.postLogoutRedirectUri || this.grpcService.postLogoutRedirectUri;
-        this.config.customQueryParams = config?.customQueryParams;
-        this.oauthService.configure(this.config);
+        if (config) {
+            this.authConfig = config;
+        }
+        console.log(this.authConfig);
+        this.oauthService.configure(this.authConfig);
 
         this.oauthService.strictDiscoveryDocumentValidation = false;
         await this.oauthService.loadDiscoveryDocumentAndTryLogin();
