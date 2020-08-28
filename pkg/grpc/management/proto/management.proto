@@ -201,7 +201,7 @@ service ManagementService {
       };
   }
 
-  rpc DeleteServiceAccountKey(MachineKeyIDRequest) returns (google.protobuf.Empty) {
+  rpc DeleteMachineKey(MachineKeyIDRequest) returns (google.protobuf.Empty) {
       option (google.api.http) = {
           delete: "/users/{user_id}/keys/{key_id}"
       };

@@ -657,6 +657,26 @@ func (mr *MockManagementServiceClientMockRecorder) DeactivateUserGrant(arg0, arg
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeactivateUserGrant", reflect.TypeOf((*MockManagementServiceClient)(nil).DeactivateUserGrant), varargs...)
 }
 
+// DeleteMachineKey mocks base method
+func (m *MockManagementServiceClient) DeleteMachineKey(arg0 context.Context, arg1 *management.MachineKeyIDRequest, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteMachineKey", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteMachineKey indicates an expected call of DeleteMachineKey
+func (mr *MockManagementServiceClientMockRecorder) DeleteMachineKey(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMachineKey", reflect.TypeOf((*MockManagementServiceClient)(nil).DeleteMachineKey), varargs...)
+}
+
 // DeletePasswordAgePolicy mocks base method
 func (m *MockManagementServiceClient) DeletePasswordAgePolicy(arg0 context.Context, arg1 *management.PasswordAgePolicyID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
@@ -715,26 +735,6 @@ func (mr *MockManagementServiceClientMockRecorder) DeletePasswordLockoutPolicy(a
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePasswordLockoutPolicy", reflect.TypeOf((*MockManagementServiceClient)(nil).DeletePasswordLockoutPolicy), varargs...)
-}
-
-// DeleteServiceAccountKey mocks base method
-func (m *MockManagementServiceClient) DeleteServiceAccountKey(arg0 context.Context, arg1 *management.MachineKeyIDRequest, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "DeleteServiceAccountKey", varargs...)
-	ret0, _ := ret[0].(*emptypb.Empty)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteServiceAccountKey indicates an expected call of DeleteServiceAccountKey
-func (mr *MockManagementServiceClientMockRecorder) DeleteServiceAccountKey(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteServiceAccountKey", reflect.TypeOf((*MockManagementServiceClient)(nil).DeleteServiceAccountKey), varargs...)
 }
 
 // DeleteUser mocks base method
