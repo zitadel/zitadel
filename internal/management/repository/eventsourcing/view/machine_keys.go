@@ -11,8 +11,8 @@ const (
 	machineKeyTable = "management.machine_keys"
 )
 
-func (v *View) MachineKeyByID(keyID string) (*model.MachineKeyView, error) {
-	return view.MachineKeyByID(v.Db, machineKeyTable, keyID)
+func (v *View) MachineKeyByIDs(userID, keyID string) (*model.MachineKeyView, error) {
+	return view.MachineKeyByIDs(v.Db, machineKeyTable, userID, keyID)
 }
 
 func (v *View) MachineKeysByUserID(userID string) ([]*model.MachineKeyView, error) {

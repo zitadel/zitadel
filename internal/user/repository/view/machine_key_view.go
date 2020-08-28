@@ -9,25 +9,17 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func MachineKeyByID(db *gorm.DB, table, keyID string) (*model.MachineKeyView, error) {
+func MachineKeyByIDs(db *gorm.DB, table, userID, keyID string) (*model.MachineKeyView, error) {
 	key := new(model.MachineKeyView)
-	query := repository.PrepareGetByKey(table, model.MachineKeySearchKey(usr_model.MachineKeyKeyUserID), keyID)
+	query := repository.PrepareGetByQuery(table,
+		model.MachineKeySearchQuery{Key: usr_model.MachineKeyKeyUserID, Method: global_model.SearchMethodEquals, Value: userID},
+		model.MachineKeySearchQuery{Key: usr_model.MachineKeyKeyID, Method: global_model.SearchMethodEquals, Value: keyID},
+	)
 	err := query(db, key)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-3Dk9s", "Errors.User.KeyNotFound")
 	}
 	return key, err
-}
-
-func MachineKeyByKeyID(db *gorm.DB, table, keyID string) (*model.MachineKeyView, error) {
-	keyView := new(model.MachineKeyView)
-	keyIDQuery := &model.MachineKeySearchQuery{Key: usr_model.MachineKeyKeyUserID, Value: keyID, Method: global_model.SearchMethodEquals}
-	query := repository.PrepareGetByQuery(table, keyIDQuery)
-	err := query(db, keyView)
-	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-3Dk9s", "Errors.User.KeyNotFound")
-	}
-	return keyView, err
 }
 
 func SearchMachineKeys(db *gorm.DB, table string, req *usr_model.MachineKeySearchRequest) ([]*model.MachineKeyView, uint64, error) {
