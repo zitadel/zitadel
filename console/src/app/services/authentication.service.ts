@@ -1,42 +1,25 @@
-import { PlatformLocation } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, from, Observable } from 'rxjs';
 
+import { GrpcService } from './grpc.service';
 import { StatehandlerService } from './statehandler.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AuthenticationService {
-    private authConfig!: AuthConfig;
     private _authenticated: boolean = false;
     private readonly _authenticationChanged: BehaviorSubject<
         boolean
     > = new BehaviorSubject(this.authenticated);
 
     constructor(
-        private platformLocation: PlatformLocation,
+        private grpcService: GrpcService,
+        private config: AuthConfig,
         private oauthService: OAuthService,
         private statehandler: StatehandlerService,
     ) { }
-
-    public authInit = (
-        envDeps: Promise<any>, // (() => Function),
-    ): () => Promise<any> => {
-        return (): Promise<any> => {
-            return envDeps.then(data => {
-                this.authConfig = {
-                    scope: 'openid profile email', // offline_access
-                    responseType: 'code',
-                    oidc: true,
-                    clientId: data.clientid,
-                    redirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'auth/callback',
-                    postLogoutRedirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'signedout',
-                };
-            });
-        };
-    };
 
     public get authenticated(): boolean {
         return this._authenticated;
@@ -55,10 +38,12 @@ export class AuthenticationService {
         setState: boolean = true,
         force: boolean = false,
     ): Promise<boolean> {
-        if (config) {
-            this.authConfig = config;
-        }
-        this.oauthService.configure(this.authConfig);
+        this.config.issuer = config?.issuer || this.grpcService.issuer;
+        this.config.clientId = config?.clientId || this.grpcService.clientid;
+        this.config.redirectUri = config?.redirectUri || this.grpcService.redirectUri;
+        this.config.postLogoutRedirectUri = config?.postLogoutRedirectUri || this.grpcService.postLogoutRedirectUri;
+        this.config.customQueryParams = config?.customQueryParams;
+        this.oauthService.configure(this.config);
 
         this.oauthService.strictDiscoveryDocumentValidation = false;
         await this.oauthService.loadDiscoveryDocumentAndTryLogin();

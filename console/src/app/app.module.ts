@@ -2,7 +2,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
-import { APP_INITIALIZER, InjectionToken, NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -32,7 +32,6 @@ import { AvatarModule } from './modules/avatar/avatar.module';
 import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { HasRolePipeModule } from './pipes/has-role-pipe.module';
-import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { GrpcService } from './services/grpc.service';
 import { AuthInterceptor } from './services/interceptors/auth.interceptor';
@@ -44,55 +43,15 @@ import { StorageService } from './services/storage.service';
 import { ThemeService } from './services/theme.service';
 
 registerLocaleData(localeDe);
+
+// AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     return new TranslateHttpLoader(http, './assets/i18n/');
 }
 
-export interface EnvironmentDep {
-    authServiceUrl: string;
-    mgmtServiceUrl: string;
-    adminServiceUrl: string;
-    issuer: string;
-    clientid: string;
-}
-
-const ENVIRONMENTDEPS = new InjectionToken<(Promise<EnvironmentDep>)>('ENVIRONMENTDEPS');
-
-async function loadAppEnvironment(http: HttpClient): Promise<any> {
-    return http.get('./assets/environment.json')
-        .toPromise();
-}
-
-const loadAppEnvironmentFactory = (
-    httpClient: HttpClient,
-): Promise<EnvironmentDep> => {
-    // return () => {
-    console.log('loadEnvironmentFactory');
-    return loadAppEnvironment(httpClient);
-    // };
-};
-
-const authEnvironmentFactory = (
-    authenticationService: AuthenticationService,
-    envDeps: Promise<any>,
-) => {
+const appInitializerFn = (grpcServ: GrpcService) => {
     return () => {
-        return (): Promise<any> => {
-            return envDeps.then(data => {
-                authenticationService.authInit(data);
-            });
-        };
-    };
-};
-
-const grpcEnvironmentFactory = (
-    grpcService: GrpcService,
-    envDeps: Promise<any>,
-): () => Promise<any> => {
-    return (): Promise<any> => {
-        return envDeps.then(data => {
-            return grpcService.grpcInit(data);
-        });
+        return grpcServ.loadAppEnvironment();
     };
 };
 
@@ -120,7 +79,7 @@ const authConfig: AuthConfig = {
         OverlayModule,
         OAuthModule.forRoot({
             resourceServer: {
-                allowedUrls: ['https://test.api.zitadel.caos.ch/caos.zitadel.auth.api.v1.AuthenticationService', 'https://test.api.zitadel.caos.ch/oauth/v2/userinfo', 'https://test.api.zitadel.caos.ch/caos.zitadel.management.api.v1.ManagementService/', 'https://preview.api.zitadel.caos.ch'],
+                allowedUrls: ['https://test.api.zitadel.caos.ch/caos.zitadel.auth.api.v1.AuthService', 'https://test.api.zitadel.caos.ch/oauth/v2/userinfo', 'https://test.api.zitadel.caos.ch/caos.zitadel.management.api.v1.ManagementService/', 'https://preview.api.zitadel.caos.ch'],
                 sendAccessToken: true,
             },
         }),
@@ -156,25 +115,10 @@ const authConfig: AuthConfig = {
     providers: [
         ThemeService,
         {
-            provide: ENVIRONMENTDEPS,
-            useFactory: (
-                http: HttpClient,
-            ) => {
-                return loadAppEnvironmentFactory(http);
-            },
-            deps: [HttpClient],
-        },
-        {
             provide: APP_INITIALIZER,
-            useFactory: authEnvironmentFactory,
+            useFactory: appInitializerFn,
             multi: true,
-            deps: [ENVIRONMENTDEPS, AuthenticationService],
-        },
-        {
-            provide: APP_INITIALIZER,
-            useFactory: grpcEnvironmentFactory,
-            multi: true,
-            deps: [ENVIRONMENTDEPS, GrpcService],
+            deps: [GrpcService],
         },
         {
             provide: APP_INITIALIZER,
@@ -208,17 +152,13 @@ const authConfig: AuthConfig = {
             multi: true,
             useClass: OrgInterceptor,
         },
-        // {
-        //     provide: AuthenticationService,
-        //     useClass: AuthenticationService,
-        //     deps: [GrpcAuthService],
-        // },
+        GrpcService,
         GrpcAuthService,
         { provide: 'windowObject', useValue: window },
     ],
     bootstrap: [AppComponent],
 })
-export class AppModule {
 
-    constructor(private http: HttpClient) { }
+export class AppModule {
+    constructor() { }
 }
