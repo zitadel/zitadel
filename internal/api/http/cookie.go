@@ -82,6 +82,16 @@ func WithDomain(domain string) CookieHandlerOpt {
 	}
 }
 
+func SetCookiePrefix(name, domain, path string, secureOnly bool) string {
+	if !secureOnly {
+		return name
+	}
+	if domain != "" || path != "/" {
+		return prefixSecure + name
+	}
+	return prefixHost + name
+}
+
 func (c *CookieHandler) GetCookieValue(r *http.Request, name string) (string, error) {
 	cookie, err := r.Cookie(name)
 	if err != nil {
@@ -91,7 +101,7 @@ func (c *CookieHandler) GetCookieValue(r *http.Request, name string) (string, er
 }
 
 func (c *CookieHandler) GetEncryptedCookieValue(r *http.Request, name string, value interface{}) error {
-	cookie, err := r.Cookie(c.setPrefix(name))
+	cookie, err := r.Cookie(SetCookiePrefix(name, c.domain, c.path, c.secureOnly))
 	if err != nil {
 		return err
 	}
@@ -123,7 +133,7 @@ func (c *CookieHandler) DeleteCookie(w http.ResponseWriter, name string) {
 
 func (c *CookieHandler) httpSet(w http.ResponseWriter, name, value string, maxage int) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     c.setPrefix(name),
+		Name:     SetCookiePrefix(name, c.domain, c.path, c.secureOnly),
 		Value:    value,
 		Domain:   c.domain,
 		Path:     c.path,
@@ -132,14 +142,4 @@ func (c *CookieHandler) httpSet(w http.ResponseWriter, name, value string, maxag
 		Secure:   c.secureOnly,
 		SameSite: c.sameSite,
 	})
-}
-
-func (c *CookieHandler) setPrefix(name string) string {
-	if !c.secureOnly {
-		return name
-	}
-	if c.domain != "" || c.path != "/" {
-		return prefixSecure + name
-	}
-	return prefixHost + name
 }

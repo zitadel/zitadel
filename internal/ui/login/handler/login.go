@@ -11,6 +11,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/api/authz"
+	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	auth_repository "github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
@@ -81,10 +82,11 @@ func csrfInterceptor(config CSRF, errorHandler http.Handler) (func(http.Handler)
 	if err != nil {
 		return nil, err
 	}
+	path := "/"
 	return csrf.Protect([]byte(csrfKey),
 		csrf.Secure(!config.Development),
-		csrf.CookieName(config.CookieName),
-		csrf.Path("/"),
+		csrf.CookieName(http_utils.SetCookiePrefix(config.CookieName, "", path, !config.Development)),
+		csrf.Path(path),
 		csrf.ErrorHandler(errorHandler),
 	), nil
 }
