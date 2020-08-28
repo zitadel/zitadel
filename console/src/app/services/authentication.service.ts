@@ -15,7 +15,6 @@ export class AuthenticationService {
     > = new BehaviorSubject(this.authenticated);
 
     constructor(
-        private config: AuthConfig,
         private oauthService: OAuthService,
         private statehandler: StatehandlerService,
     ) { }
