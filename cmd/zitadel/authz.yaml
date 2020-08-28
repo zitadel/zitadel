@@ -14,6 +14,7 @@ InternalAuthZ:
         - "iam.idp.write"
         - "iam.idp.delete"
         - "org.read"
+        - "org.global.read"
         - "org.create"
         - "org.write"
         - "org.member.read"
@@ -82,6 +83,7 @@ InternalAuthZ:
     - Role: 'ORG_OWNER'
       Permissions:
         - "org.read"
+        - "org.global.read"
         - "org.create"
         - "org.write"
         - "org.member.read"
@@ -183,6 +185,7 @@ InternalAuthZ:
         - "project.write"
     - Role: 'PROJECT_OWNER'
       Permissions:
+        - "org.global.read"
         - "project.read"
         - "project.write"
         - "project.delete"
@@ -221,6 +224,7 @@ InternalAuthZ:
         - "user.membership.read"
     - Role: 'PROJECT_GRANT_OWNER'
       Permissions:
+        - "org.global.read"
         - "project.read"
         - "project.grant.read"
         - "project.grant.member.read"
@@ -232,7 +236,7 @@ InternalAuthZ:
         - "user.grant.write"
         - "user.grant.delete"
         - "user.membership.read"
-    - Role: 'PROJECT_GRANT_OWNER'
+    - Role: 'PROJECT_GRANT_OWNER_VIEWER'
       Permissions:
         - "project.read"
         - "project.grant.read"
