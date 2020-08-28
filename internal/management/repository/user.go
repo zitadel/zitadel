@@ -27,7 +27,7 @@ type UserRepository interface {
 	ChangeProfile(ctx context.Context, profile *model.Profile) (*model.Profile, error)
 
 	SearchMachineKeys(ctx context.Context, request *model.MachineKeySearchRequest) (*model.MachineKeySearchResponse, error)
-	GetMachineKey(ctx context.Context, keyID string) (*model.MachineKeyView, error)
+	GetMachineKey(ctx context.Context, userID, keyID string) (*model.MachineKeyView, error)
 	ChangeMachine(ctx context.Context, machine *model.Machine) (*model.Machine, error)
 	AddMachineKey(ctx context.Context, key *model.MachineKey) (*model.MachineKey, error)
 	RemoveMachineKey(ctx context.Context, userID, keyID string) error

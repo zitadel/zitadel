@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
@@ -26,6 +27,11 @@ import (
 	global_model "github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+)
+
+const (
+	yearLayout            = "2006-01-02"
+	defaultExpirationDate = "9999-01-01"
 )
 
 type UserEventstore struct {
@@ -1275,6 +1281,17 @@ func (es *UserEventstore) AddMachineKey(ctx context.Context, key *usr_model.Mach
 		return nil, err
 	}
 	key.KeyID = id
+
+	if key.ExpirationDate.IsZero() {
+		key.ExpirationDate, err = time.Parse(yearLayout, defaultExpirationDate)
+		if err != nil {
+			logging.Log("EVENT-vzibi").WithError(err).Warn("unable to set default date")
+			return nil, errors.ThrowInternal(err, "EVENT-j68fg", "Errors.Internal")
+		}
+	}
+	if key.ExpirationDate.Before(time.Now()) {
+		return nil, errors.ThrowInvalidArgument(nil, "EVENT-C6YV5", "Errors.Key.ExpireBeforeNow")
+	}
 
 	repoUser := model.UserFromModel(user)
 	repoKey := model.MachineKeyFromModel(key)
