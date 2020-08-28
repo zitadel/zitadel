@@ -2484,12 +2484,7 @@ func (m *UserSearchRequest) Validate() error {
 
 	// no validation rules for Limit
 
-	if _, ok := _UserSearchRequest_SortingColumn_NotInLookup[m.GetSortingColumn()]; ok {
-		return UserSearchRequestValidationError{
-			field:  "SortingColumn",
-			reason: "value must not be in list [0]",
-		}
-	}
+	// no validation rules for SortingColumn
 
 	// no validation rules for Asc
 
@@ -2566,10 +2561,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UserSearchRequestValidationError{}
-
-var _UserSearchRequest_SortingColumn_NotInLookup = map[UserSearchKey]struct{}{
-	0: {},
-}
 
 // Validate checks the field values on UserSearchQuery with the rules defined
 // in the proto definition for this message. If any rules are violated, an
