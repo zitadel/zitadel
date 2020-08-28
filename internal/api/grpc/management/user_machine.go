@@ -15,7 +15,7 @@ func (s *Server) AddMachineKey(ctx context.Context, req *management.AddMachineKe
 	return addMachineKeyFromModel(key), nil
 }
 
-func (s *Server) DeleteServiceAccountKey(ctx context.Context, req *management.MachineKeyIDRequest) (*empty.Empty, error) {
+func (s *Server) DeleteMachineKey(ctx context.Context, req *management.MachineKeyIDRequest) (*empty.Empty, error) {
 	err := s.user.RemoveMachineKey(ctx, req.UserId, req.KeyId)
 	return &empty.Empty{}, err
 }
