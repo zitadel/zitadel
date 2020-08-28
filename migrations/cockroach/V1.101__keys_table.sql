@@ -5,5 +5,7 @@ CREATE TABLE management.machine_keys (
     machine_type SMALLINT,
     expiration_date TIMESTAMPTZ,
     sequence BIGINT,
-    creation_date TIMESTAMPTZ
+    creation_date TIMESTAMPTZ,
+
+    PRIMARY KEY (id, user_id)
 )
