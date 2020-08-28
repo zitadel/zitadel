@@ -19,7 +19,6 @@ import (
 	"github.com/caos/zitadel/internal/form"
 	"github.com/caos/zitadel/internal/id"
 
-	//"github.com/caos/zitadel/internal/id"
 	_ "github.com/caos/zitadel/internal/ui/login/statik"
 )
 

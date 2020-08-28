@@ -52,7 +52,6 @@ type OPStorage struct {
 
 func NewProvider(ctx context.Context, config OPHandlerConfig, repo repository.Repository, localDevMode bool) op.OpenIDProvider {
 	cookieHandler, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator, localDevMode)
-	//cookieHandler, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator, localDevMode)
 	logging.Log("OIDC-sd4fd").OnError(err).Panic("cannot user agent handler")
 	config.OPConfig.CodeMethodS256 = true
 	provider, err := op.NewDefaultOP(
