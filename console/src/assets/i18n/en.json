@@ -73,6 +73,8 @@
             "LIST": "Users",
             "TITLE": "User",
             "DESCRIPTION": "Create new user in your organisation and manage existing ones.",
+            "LISTMACHINE": "Service Accounts",
+            "DESCRIPTIONMACHINE": "Create and manage Service Accounts of your organisation",
             "DETAIL": "Detail",
             "CREATE": "Create",
             "MY": "My Informations",
@@ -142,6 +144,11 @@
             "PREFERRED_LANGUAGE": "Language",
             "GENDER": "Gender",
             "PASSWORD":"Password"
+        },
+        "MACHINE": {
+            "USERNAME":"Username",
+            "NAME":"Name",
+            "DESCRIPTION":"Description"
         },
         "PASSWORD": {
             "TITLE": "Password",

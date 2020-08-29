@@ -1,0 +1,37 @@
+<app-detail-layout [backRouterLink]="[ '/users/all']" title="{{ 'USER.CREATE.TITLE' | translate }}"
+    description="{{ 'USER.CREATE.DESCRIPTION' | translate }}">
+    <mat-progress-bar *ngIf="loading" color="accent" mode="indeterminate"></mat-progress-bar>
+
+    <form *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="createUser()" class="form">
+        <div class="content">
+            <mat-form-field class="formfield">
+                <mat-label>{{ 'USER.MACHINE.USERNAME' | translate }}</mat-label>
+                <input matInput formControlName="userName" required />
+                <mat-error *ngIf="userName?.invalid && userName?.errors?.required">
+                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                </mat-error>
+                <mat-error *ngIf="userName?.invalid && userName?.errors?.noEmailValidator">
+                    {{ 'USER.VALIDATION.NOEMAIL' | translate }}
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field class="formfield">
+                <mat-label>{{ 'USER.MACHINE.NAME' | translate }}</mat-label>
+                <input matInput formControlName="name" required />
+                <mat-error *ngIf="name?.invalid && name?.errors?.required">
+                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field class="formfield">
+                <mat-label>{{ 'USER.MACHINE.DESCRIPTION' | translate }}</mat-label>
+                <input matInput formControlName="description" required />
+                <mat-error *ngIf="name?.invalid && name?.errors?.required">
+                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <div class="btn-container">
+            <button color="primary" [disabled]="userForm.invalid" type="submit"
+                mat-raised-button>{{ 'ACTIONS.CREATE' | translate }}</button>
+        </div>
+    </form>
+</app-detail-layout>

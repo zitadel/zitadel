@@ -73,6 +73,8 @@
             "LIST": "Benutzer",
             "TITLE": "Benutzer",
             "DESCRIPTION": "Erfasse und verwalte die Benutzer in deiner Organisation",
+            "LISTMACHINE": "Service Accounts",
+            "DESCRIPTIONMACHINE": "Erfassen und verwalten Sie die Service Accounts Ihrer Organisation",
             "DETAIL": "Detail",
             "CREATE": "Erstellen",
             "MY": "Meine Informationen",
@@ -142,6 +144,11 @@
             "PREFERRED_LANGUAGE": "Sprache",
             "GENDER": "Geschlecht",
             "PASSWORD":"Passwort"
+        },
+        "MACHINE": {
+            "USERNAME":"Benutzername",
+            "NAME":"Name",
+            "DESCRIPTION":"Beschreibung"
         },
         "PASSWORD": {
             "TITLE": "Passwort",
