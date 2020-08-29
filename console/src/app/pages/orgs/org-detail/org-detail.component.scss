@@ -17,10 +17,11 @@
     font-size: 16px;
     margin-right: 1rem;
     cursor: pointer;
+
     &:not(.disabled) {
-        &:hover {
+      &:hover {
         text-decoration: underline;
-        }
+      }
     }
   }
 
