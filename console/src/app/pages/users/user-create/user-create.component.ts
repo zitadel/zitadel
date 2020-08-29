@@ -75,7 +75,7 @@ export class UserCreateComponent implements OnDestroy {
             nickName: [''],
             gender: [Gender.GENDER_UNSPECIFIED],
             preferredLanguage: [''],
-            phone: ['']
+            phone: [''],
         });
     }
 
