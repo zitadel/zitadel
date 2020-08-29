@@ -145,6 +145,11 @@
             "GENDER": "Geschlecht",
             "PASSWORD":"Passwort"
         },
+        "MACHINE": {
+            "USERNAME":"Benutzername",
+            "NAME":"Name",
+            "DESCRIPTION":"Beschreibung"
+        },
         "PASSWORD": {
             "TITLE": "Passwort",
             "DESCRIPTION": "Gib das neue Password unter Einhaltung der Richtlinie für die Komplexität ein.",

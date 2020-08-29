@@ -145,6 +145,11 @@
             "GENDER": "Gender",
             "PASSWORD":"Password"
         },
+        "MACHINE": {
+            "USERNAME":"Username",
+            "NAME":"Name",
+            "DESCRIPTION":"Description"
+        },
         "PASSWORD": {
             "TITLE": "Password",
             "DESCRIPTION": "Enter the new password according to the policy below.",

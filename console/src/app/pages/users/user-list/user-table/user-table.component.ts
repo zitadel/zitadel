@@ -17,7 +17,8 @@ import { UserType } from '../user-list.component';
     styleUrls: ['./user-table.component.scss'],
 })
 export class UserTableComponent implements OnInit {
-    @Input() userType!: UserType;
+    public UserType: any = UserType;
+    @Input() userType: UserType = UserType.HUMAN;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     public dataSource: MatTableDataSource<UserView.AsObject> = new MatTableDataSource<UserView.AsObject>();
     public selection: SelectionModel<UserView.AsObject> = new SelectionModel<UserView.AsObject>(true, []);
