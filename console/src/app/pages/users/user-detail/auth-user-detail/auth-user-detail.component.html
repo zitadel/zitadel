@@ -138,8 +138,9 @@
                 <span class="second"><span style="display: block;">{{user.preferredLoginName}}</span></span>
             </div>
         </div>
-
-        <app-memberships [user]="user"></app-memberships>
+        <ng-template appHasRole [appHasRole]="['user.membership.read']">
+            <app-memberships [user]="user"></app-memberships>
+        </ng-template>
 
         <app-changes class="changes" [changeType]="ChangeType.MYUSER" [id]="user.id"></app-changes>
     </div>
