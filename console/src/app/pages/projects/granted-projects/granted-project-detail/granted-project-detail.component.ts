@@ -21,8 +21,8 @@ import {
     ProjectRoleSearchResponse,
     ProjectState,
     ProjectType,
-    User,
     UserGrantSearchKey,
+    UserView,
 } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 import { ProjectService } from 'src/app/services/project.service';
@@ -139,7 +139,7 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                const users: User.AsObject[] = resp.users;
+                const users: UserView.AsObject[] = resp.users;
                 const roles: string[] = resp.roles;
 
                 if (users && users.length && roles && roles.length) {

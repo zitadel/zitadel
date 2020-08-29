@@ -2,7 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { CreateUserRequest, Gender, User } from 'src/app/proto/generated/management_pb';
+import { CreateHumanRequest, CreateUserRequest, Gender, UserResponse } from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -75,12 +75,7 @@ export class UserCreateComponent implements OnDestroy {
             nickName: [''],
             gender: [Gender.GENDER_UNSPECIFIED],
             preferredLanguage: [''],
-            phone: [''],
-            streetAddress: [''],
-            postalCode: [''],
-            locality: [''],
-            region: [''],
-            country: [''],
+            phone: ['']
         });
     }
 
@@ -88,9 +83,20 @@ export class UserCreateComponent implements OnDestroy {
         this.user = this.userForm.value;
 
         this.loading = true;
+
+        const humanReq = new CreateHumanRequest();
+        humanReq.setFirstName(this.firstName?.value);
+        humanReq.setLastName(this.lastName?.value);
+        humanReq.setNickName(this.nickName?.value);
+        humanReq.setPreferredLanguage(this.preferredLanguage?.value);
+        humanReq.setEmail(this.email?.value);
+        humanReq.setPhone(this.phone?.value);
+        humanReq.setGender(this.gender?.value);
+        humanReq.setCountry(this.country?.value);
+
         this.userService
-            .CreateUser(this.user)
-            .then((data: User) => {
+            .CreateUserHuman(this.userName?.value, humanReq)
+            .then((data: UserResponse) => {
                 this.loading = false;
                 this.toast.showInfo('USER.TOAST.CREATED', true);
                 this.router.navigate(['users', data.getId()]);

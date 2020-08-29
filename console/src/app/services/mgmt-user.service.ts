@@ -6,9 +6,11 @@ import { ManagementServicePromiseClient } from '../proto/generated/management_gr
 import {
     ChangeRequest,
     Changes,
+    CreateHumanRequest,
+    CreateMachineRequest,
     CreateUserRequest,
-    LoginName,
     Gender,
+    LoginName,
     MultiFactors,
     NotificationType,
     PasswordRequest,
@@ -24,7 +26,6 @@ import {
     UpdateUserEmailRequest,
     UpdateUserPhoneRequest,
     UpdateUserProfileRequest,
-    User,
     UserAddress,
     UserEmail,
     UserGrant,
@@ -42,6 +43,7 @@ import {
     UserMembershipSearchResponse,
     UserPhone,
     UserProfile,
+    UserResponse,
     UserSearchQuery,
     UserSearchRequest,
     UserSearchResponse,
@@ -71,22 +73,26 @@ export class MgmtUserService {
         return responseMapper(response);
     }
 
-    public async CreateUser(user: CreateUserRequest.AsObject): Promise<User> {
+    public async CreateUserHuman(username: string, user: CreateHumanRequest): Promise<UserResponse> {
         const req = new CreateUserRequest();
-        req.setEmail(user.email);
-        req.setUserName(user.userName);
-        req.setFirstName(user.firstName);
-        req.setLastName(user.lastName);
-        req.setNickName(user.nickName);
-        req.setPassword(user.password);
-        req.setPreferredLanguage(user.preferredLanguage);
-        req.setGender(user.gender);
-        req.setPhone(user.phone);
-        req.setStreetAddress(user.streetAddress);
-        req.setPostalCode(user.postalCode);
-        req.setLocality(user.locality);
-        req.setRegion(user.region);
-        req.setCountry(user.country);
+        const human = new CreateHumanRequest();
+
+        req.setUserName(username);
+        req.setHuman(user);
+
+        return await this.request(
+            c => c.createUser,
+            req,
+            f => f,
+        );
+    }
+
+    public async CreateUserMachine(username: string, user: CreateMachineRequest): Promise<UserResponse> {
+        const req = new CreateUserRequest();
+
+        req.setUserName(username);
+        req.setMachine(user);
+
         return await this.request(
             c => c.createUser,
             req,
@@ -239,7 +245,7 @@ export class MgmtUserService {
         );
     }
 
-    public async DeactivateUser(id: string): Promise<UserPhone> {
+    public async DeactivateUser(id: string): Promise<UserResponse> {
         const req = new UserID();
         req.setId(id);
         return await this.request(
@@ -267,7 +273,7 @@ export class MgmtUserService {
             f => f,
         );
     }
-    public async ReactivateUser(id: string): Promise<UserPhone> {
+    public async ReactivateUser(id: string): Promise<UserResponse> {
         const req = new UserID();
         req.setId(id);
         return await this.request(

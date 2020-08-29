@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { OrgMemberView, User } from 'src/app/proto/generated/management_pb';
+import { OrgMemberView, UserView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -45,7 +45,7 @@ export class IamComponent {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                const users: User.AsObject[] = resp.users;
+                const users: UserView.AsObject[] = resp.users;
                 const roles: string[] = resp.roles;
 
                 if (users && users.length && roles && roles.length) {

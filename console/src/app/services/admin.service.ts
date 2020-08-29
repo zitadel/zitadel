@@ -6,6 +6,7 @@ import { AdminServicePromiseClient } from '../proto/generated/admin_grpc_web_pb'
 import {
     AddIamMemberRequest,
     ChangeIamMemberRequest,
+    CreateHumanRequest,
     CreateOrgRequest,
     CreateUserRequest,
     FailedEventID,
@@ -50,12 +51,15 @@ export class AdminService {
 
     public async SetUpOrg(
         createOrgRequest: CreateOrgRequest,
-        registerUserRequest: CreateUserRequest,
+        humanRequest: CreateHumanRequest,
     ): Promise<OrgSetUpResponse> {
         const req: OrgSetUpRequest = new OrgSetUpRequest();
+        const userReq: CreateUserRequest = new CreateUserRequest();
+
+        userReq.setHuman(humanRequest);
 
         req.setOrg(createOrgRequest);
-        req.setUser(registerUserRequest);
+        req.setUser(userReq);
 
         return await this.request(
             c => c.setUpOrg,

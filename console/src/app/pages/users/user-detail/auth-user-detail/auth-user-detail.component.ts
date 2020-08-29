@@ -53,60 +53,69 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
 
     public saveProfile(profileData: UserProfile.AsObject): void {
-        this.user.firstName = profileData.firstName;
-        this.user.lastName = profileData.lastName;
-        this.user.nickName = profileData.nickName;
-        this.user.displayName = profileData.displayName;
-        this.user.gender = profileData.gender;
-        this.user.preferredLanguage = profileData.preferredLanguage;
-        this.userService
-            .SaveMyUserProfile(
-                this.user.firstName,
-                this.user.lastName,
-                this.user.nickName,
-                this.user.preferredLanguage,
-                this.user.gender,
-            )
-            .then((data: UserProfile) => {
-                this.toast.showInfo('USER.TOAST.SAVED', true);
-                this.user = Object.assign(this.user, data.toObject());
-            })
-            .catch(error => {
-                this.toast.showError(error);
-            });
+        if (this.user.human) {
+            this.user.human.firstName = profileData.firstName;
+            this.user.human.lastName = profileData.lastName;
+            this.user.human.nickName = profileData.nickName;
+            this.user.human.displayName = profileData.displayName;
+            this.user.human.gender = profileData.gender;
+            this.user.human.preferredLanguage = profileData.preferredLanguage;
+
+            this.userService
+                .SaveMyUserProfile(
+                    this.user.human.firstName,
+                    this.user.human.lastName,
+                    this.user.human.nickName,
+                    this.user.human.preferredLanguage,
+                    this.user.human.gender,
+                )
+                .then((data: UserProfile) => {
+                    this.toast.showInfo('USER.TOAST.SAVED', true);
+                    this.user = Object.assign(this.user, data.toObject());
+                })
+                .catch(error => {
+                    this.toast.showError(error);
+                });
+        }
     }
 
     public saveEmail(): void {
         this.emailEditState = false;
 
-        this.userService
-            .SaveMyUserEmail(this.user.email).then((data: UserEmail) => {
-                this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
-                this.user.email = data.toObject().email;
-                this.emailEditState = false;
-            }).catch(error => {
-                this.toast.showError(error);
-                this.emailEditState = false;
-            });
+        if (this.user.human) {
+            this.userService
+                .SaveMyUserEmail(this.user.human.email).then((data: UserEmail) => {
+                    this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
+                    if (this.user.human) {
+                        this.user.human.email = data.toObject().email;
+                    }
+                    this.emailEditState = false;
+                }).catch(error => {
+                    this.toast.showError(error);
+                    this.emailEditState = false;
+                });
+        }
     }
 
     public enterCode(): void {
-        const dialogRef = this.dialog.open(CodeDialogComponent, {
-            data: {
-                number: this.user.phone,
-            },
-            width: '400px',
-        });
+        if (this.user.human) {
+            const dialogRef = this.dialog.open(CodeDialogComponent, {
+                data: {
+                    number: this.user.human.phone,
+                },
+                width: '400px',
+            });
 
-        dialogRef.afterClosed().subscribe(code => {
-            if (code) {
-                this.userService.VerifyMyUserPhone(code).then(() => {
-                    this.toast.showInfo('USER.TOAST.PHONESAVED', true);
-                }).catch(error => {
-                    this.toast.showError(error);
-                });
-            }
-        });
+            dialogRef.afterClosed().subscribe(code => {
+                if (code) {
+                    this.userService.VerifyMyUserPhone(code).then(() => {
+                        this.toast.showInfo('USER.TOAST.PHONESAVED', true);
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
+                }
+            });
+        }
     }
 
     public changedLanguage(language: string): void {
@@ -130,25 +139,33 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
 
     public deletePhone(): void {
-        this.userService.RemoveMyUserPhone().then(() => {
-            this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
-            this.user.phone = '';
-            this.phoneEditState = false;
-        }).catch(error => {
-            this.toast.showError(error);
-        });
+        if (this.user.human) {
+            this.userService.RemoveMyUserPhone().then(() => {
+                this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
+                if (this.user.human) {
+                    this.user.human.phone = '';
+                }
+                this.phoneEditState = false;
+            }).catch(error => {
+                this.toast.showError(error);
+            });
+        }
     }
 
     public savePhone(): void {
         this.phoneEditState = false;
-        this.userService
-            .SaveMyUserPhone(this.user.phone).then((data: UserPhone) => {
-                this.toast.showInfo('USER.TOAST.PHONESAVED', true);
-                this.user.phone = data.toObject().phone;
-                this.phoneEditState = false;
-            }).catch(error => {
-                this.toast.showError(error);
-                this.phoneEditState = false;
-            });
+        if (this.user.human) {
+            this.userService
+                .SaveMyUserPhone(this.user.human.phone).then((data: UserPhone) => {
+                    this.toast.showInfo('USER.TOAST.PHONESAVED', true);
+                    if (this.user.human) {
+                        this.user.human.phone = data.toObject().phone;
+                    }
+                    this.phoneEditState = false;
+                }).catch(error => {
+                    this.toast.showError(error);
+                    this.phoneEditState = false;
+                });
+        }
     }
 }
