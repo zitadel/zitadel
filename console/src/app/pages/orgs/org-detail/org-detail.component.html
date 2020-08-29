@@ -15,8 +15,8 @@
             </div>
 
             <p class="new-desc">{{'ORG.PAGES.ORGDOMAIN_VERIFICATION' | translate}}</p>
-            <button class="add-button" matTooltip="Add domain" mat-raised-button color="primary"
-                (click)="addNewDomain()">{{'ORG.DOMAINS.NEW' | translate}} </button>
+            <button [disabled]="(['org.create'] | hasRole | async) == false" class="add-button" matTooltip="Add domain"
+                mat-raised-button color="primary" (click)="addNewDomain()">{{'ORG.DOMAINS.NEW' | translate}} </button>
         </app-card>
 
         <ng-template appHasRole [appHasRole]="['policy.read']">
