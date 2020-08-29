@@ -8,7 +8,8 @@
         <mat-chip-list *ngIf="!singleOutput" #chipList aria-label="loginname selection">
             <mat-chip class="chip" *ngFor="let selecteduser of users" [selectable]="selectable" [removable]="removable"
                 (removed)="remove(selecteduser)">
-                {{ selecteduser?.firstName }} {{selecteduser.lastName}} | <small> {{selecteduser.preferredLoginName}}</small>
+                {{ selecteduser?.human?.firstName }} {{selecteduser.human.lastName}} | <small>
+                    {{selecteduser.preferredLoginName}}</small>
                 <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
             </mat-chip>
             <input placeholder="{{'ORG_DETAIL.MEMBER.LOGINNAME' | translate}}" #usernameInput [formControl]="myControl"
@@ -22,7 +23,7 @@
                 <mat-spinner diameter="30"></mat-spinner>
             </mat-option>
             <mat-option *ngFor="let user of filteredUsers" [value]="user">
-                {{user.firstName}} {{user.lastName}}
+                {{user.human.firstName}} {{user.human.lastName}}
                 <small>{{user.preferredLoginName}}</small>
             </mat-option>
         </mat-autocomplete>
