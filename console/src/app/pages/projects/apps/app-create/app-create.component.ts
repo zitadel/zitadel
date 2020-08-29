@@ -15,7 +15,7 @@ import {
     OIDCGrantType,
     OIDCResponseType,
 } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
@@ -84,7 +84,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private toast: ToastService,
         private dialog: MatDialog,
-        private projectService: ProjectService,
+        private mgmtService: ManagementService,
         private fb: FormBuilder,
         private _location: Location,
     ) {
@@ -186,7 +186,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
     public saveOIDCApp(): void {
         this.loading = true;
-        this.projectService
+        this.mgmtService
             .CreateOIDCApp(this.oidcApp)
             .then((data: Application) => {
                 this.loading = false;

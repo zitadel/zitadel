@@ -2,7 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { saveAs } from 'file-saver';
 import { OrgDomainValidationResponse, OrgDomainValidationType, OrgDomainView } from 'src/app/proto/generated/management_pb';
-import { OrgService } from 'src/app/services/org.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -23,19 +23,19 @@ export class DomainVerificationComponent {
         private toast: ToastService,
         public dialogRef: MatDialogRef<DomainVerificationComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
-        private orgService: OrgService,
+        private mgmtService: ManagementService,
     ) {
         this.domain = data.domain;
     }
 
     async loadHttpToken(): Promise<void> {
-        this.http = (await this.orgService.GenerateMyOrgDomainValidation(
+        this.http = (await this.mgmtService.GenerateMyOrgDomainValidation(
             this.domain.domain,
             OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_HTTP)).toObject();
     }
 
     async loadDnsToken(): Promise<void> {
-        this.dns = (await this.orgService.GenerateMyOrgDomainValidation(
+        this.dns = (await this.mgmtService.GenerateMyOrgDomainValidation(
             this.domain.domain,
             OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_DNS)).toObject();
     }
@@ -45,7 +45,7 @@ export class DomainVerificationComponent {
     }
 
     public validate(): void {
-        this.orgService.ValidateMyOrgDomain(this.domain.domain).then(() => {
+        this.mgmtService.ValidateMyOrgDomain(this.domain.domain).then(() => {
             this.dialogRef.close(false);
         }).catch((error) => {
             this.toast.showError(error);

@@ -5,9 +5,8 @@ import { Subscription } from 'rxjs';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { Org } from 'src/app/proto/generated/auth_pb';
 import { ProjectGrantView, ProjectRole, ProjectView, User, UserGrant } from 'src/app/proto/generated/management_pb';
-import { AuthService } from 'src/app/services/auth.service';
-import { MgmtUserService } from 'src/app/services/mgmt-user.service';
-import { ProjectService } from 'src/app/services/project.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -35,12 +34,12 @@ export class UserGrantCreateComponent implements OnDestroy {
 
     public grantRolesKeyList: string[] = [];
     constructor(
-        private authService: AuthService,
-        private userService: MgmtUserService,
+        private userService: ManagementService,
         private toast: ToastService,
         private _location: Location,
         private route: ActivatedRoute,
-        private projectService: ProjectService,
+        private authService: GrpcAuthService,
+        private mgmtService: ManagementService,
     ) {
         this.subscription = this.route.params.subscribe((params: Params) => {
             const { context, projectid, grantid, userid } = params;
@@ -54,7 +53,7 @@ export class UserGrantCreateComponent implements OnDestroy {
                 this.context = UserGrantContext.OWNED_PROJECT;
             } else if (this.projectId && this.grantId) {
                 this.context = UserGrantContext.GRANTED_PROJECT;
-                this.projectService.GetGrantedProjectByID(this.projectId, this.grantId).then(resp => {
+                this.mgmtService.GetGrantedProjectByID(this.projectId, this.grantId).then(resp => {
                     this.grantRolesKeyList = resp.toObject().roleKeysList;
                 }).catch(error => {
                     this.toast.showError(error);

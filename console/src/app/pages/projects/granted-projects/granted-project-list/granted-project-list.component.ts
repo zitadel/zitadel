@@ -8,7 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { ProjectGrantView } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -55,7 +55,7 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
 
     constructor(private router: Router,
         public translate: TranslateService,
-        private projectService: ProjectService,
+        private mgmtService: ManagementService,
         private toast: ToastService,
     ) { }
 
@@ -89,7 +89,7 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
 
     private async getData(limit: number, offset: number): Promise<void> {
         this.loadingSubject.next(true);
-        this.projectService.SearchGrantedProjects(limit, offset).then(res => {
+        this.mgmtService.SearchGrantedProjects(limit, offset).then(res => {
             const response = res.toObject();
             this.grantedProjectList = response.resultList;
             this.totalResult = response.totalResult;

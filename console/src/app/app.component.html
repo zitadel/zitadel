@@ -52,7 +52,7 @@
                 [opened]="!(isHandset$ | async)">
                 <div class="side-column">
                     <div class="list">
-                        <ng-container *ngIf="authService.authenticationChanged | async">
+                        <ng-container *ngIf="authenticationService.authenticationChanged | async">
                             <a @navitem class="nav-item" [routerLinkActive]="['active']"
                                 [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/users/me']">
                                 <i class="icon las la-user-circle"></i>

@@ -12,9 +12,9 @@ import { map } from 'rxjs/operators';
 
 import { accountCard, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { Org, UserProfileView } from './proto/generated/auth_pb';
-import { AuthUserService } from './services/auth-user.service';
-import { AuthService } from './services/auth.service';
-import { ProjectService } from './services/project.service';
+import { AuthenticationService } from './services/authentication.service';
+import { GrpcAuthService } from './services/grpc-auth.service';
+import { ManagementService } from './services/mgmt.service';
 import { ThemeService } from './services/theme.service';
 import { ToastService } from './services/toast.service';
 import { UpdateService } from './services/update.service';
@@ -31,8 +31,7 @@ import { UpdateService } from './services/update.service';
     ],
 })
 export class AppComponent implements OnDestroy {
-    @ViewChild('drawer')
-    public drawer!: MatDrawer;
+    @ViewChild('drawer') public drawer!: MatDrawer;
     public isHandset$: Observable<boolean> = this.breakpointObserver
         .observe('(max-width: 599px)')
         .pipe(map(result => {
@@ -60,12 +59,12 @@ export class AppComponent implements OnDestroy {
         public viewPortScroller: ViewportScroller,
         @Inject('windowObject') public window: Window,
         public translate: TranslateService,
-        public authService: AuthService,
+        public authenticationService: AuthenticationService,
+        public authService: GrpcAuthService,
         private breakpointObserver: BreakpointObserver,
         public overlayContainer: OverlayContainer,
         private themeService: ThemeService,
-        public userService: AuthUserService,
-        private projectService: ProjectService,
+        private mgmtService: ManagementService,
         public matIconRegistry: MatIconRegistry,
         public domSanitizer: DomSanitizer,
         private toast: ToastService,
@@ -145,7 +144,7 @@ export class AppComponent implements OnDestroy {
             this.getProjectCount();
         });
 
-        this.authSub = this.authService.authenticationChanged.subscribe((authenticated) => {
+        this.authSub = this.authenticationService.authenticationChanged.subscribe((authenticated) => {
             if (authenticated) {
                 this.authService.GetActiveOrg().then(org => {
                     this.org = org;
@@ -170,7 +169,7 @@ export class AppComponent implements OnDestroy {
 
     public loadOrgs(): void {
         this.orgLoading = true;
-        this.userService.SearchMyProjectOrgs(10, 0).then(res => {
+        this.authService.SearchMyProjectOrgs(10, 0).then(res => {
             this.orgs = res.toObject().resultList;
             this.orgLoading = false;
         }).catch(error => {
@@ -215,11 +214,11 @@ export class AppComponent implements OnDestroy {
     private getProjectCount(): void {
         this.authService.isAllowed(['project.read']).subscribe((allowed) => {
             if (allowed) {
-                this.projectService.SearchProjects(0, 0).then(res => {
+                this.mgmtService.SearchProjects(0, 0).then(res => {
                     this.ownedProjectsCount = res.toObject().totalResult;
                 });
 
-                this.projectService.SearchGrantedProjects(0, 0).then(res => {
+                this.mgmtService.SearchGrantedProjects(0, 0).then(res => {
                     this.grantedProjectsCount = res.toObject().totalResult;
                 });
             }

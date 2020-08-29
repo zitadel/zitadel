@@ -5,9 +5,7 @@ import { Router } from '@angular/router';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { MemberType, UserView, UserMembershipSearchResponse } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { MgmtUserService } from 'src/app/services/mgmt-user.service';
-import { OrgService } from 'src/app/services/org.service';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -39,9 +37,7 @@ export class MembershipsComponent implements OnInit {
     public MemberType: any = MemberType;
 
     constructor(
-        private orgService: OrgService,
-        private projectService: ProjectService,
-        private mgmtUserService: MgmtUserService,
+        private mgmtService: ManagementService,
         private adminService: AdminService,
         private dialog: MatDialog,
         private toast: ToastService,
@@ -53,7 +49,7 @@ export class MembershipsComponent implements OnInit {
     }
 
     public async loadManager(userId: string): Promise<void> {
-        this.mgmtUserService.SearchUserMemberships(userId, 100, 0, []).then(response => {
+        this.mgmtService.SearchUserMemberships(userId, 100, 0, []).then(response => {
             this.memberships = response.toObject();
             this.loading = false;
         });
@@ -112,7 +108,7 @@ export class MembershipsComponent implements OnInit {
 
         if (users && users.length && roles && roles.length) {
             Promise.all(users.map(user => {
-                return this.orgService.AddMyOrgMember(user.id, roles);
+                return this.mgmtService.AddMyOrgMember(user.id, roles);
             })).then(() => {
                 this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
             }).catch(error => {
@@ -127,7 +123,7 @@ export class MembershipsComponent implements OnInit {
 
         if (users && users.length && roles && roles.length) {
             users.forEach(user => {
-                return this.projectService.AddProjectGrantMember(
+                return this.mgmtService.AddProjectGrantMember(
                     response.projectId,
                     response.grantId,
                     user.id,
@@ -147,7 +143,7 @@ export class MembershipsComponent implements OnInit {
 
         if (users && users.length && roles && roles.length) {
             users.forEach(user => {
-                return this.projectService.AddProjectMember(response.projectId, user.id, roles)
+                return this.mgmtService.AddProjectMember(response.projectId, user.id, roles)
                     .then(() => {
                         this.toast.showInfo('PROJECT.TOAST.MEMBERADDED', true);
                     }).catch(error => {

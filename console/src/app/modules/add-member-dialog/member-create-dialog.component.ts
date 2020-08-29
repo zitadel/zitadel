@@ -2,7 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProjectGrantView, ProjectRole, ProjectView, UserView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { ProjectAutocompleteType } from '../search-project-autocomplete/search-project-autocomplete.component';
@@ -39,7 +39,7 @@ export class MemberCreateDialogComponent {
 
     public showCreationTypeSelector: boolean = false;
     constructor(
-        private projectService: ProjectService,
+        private mgmtService: ManagementService,
         private adminService: AdminService,
         public dialogRef: MatDialogRef<MemberCreateDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
@@ -64,14 +64,14 @@ export class MemberCreateDialogComponent {
     public loadRoles(): void {
         switch (this.creationType) {
             case CreationType.PROJECT_GRANTED:
-                this.projectService.GetProjectGrantMemberRoles().then(resp => {
+                this.mgmtService.GetProjectGrantMemberRoles().then(resp => {
                     this.memberRoleOptions = resp.toObject().rolesList;
                 }).catch(error => {
                     this.toastService.showError(error);
                 });
                 break;
             case CreationType.PROJECT_OWNED:
-                this.projectService.GetProjectMemberRoles().then(resp => {
+                this.mgmtService.GetProjectMemberRoles().then(resp => {
                     this.memberRoleOptions = resp.toObject().rolesList;
                 }).catch(error => {
                     this.toastService.showError(error);

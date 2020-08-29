@@ -3,7 +3,7 @@ import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { ProjectMember, ProjectMemberSearchResponse, ProjectType } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 
 /**
  * Data source for the ProjectMembers view. This class should
@@ -18,7 +18,7 @@ export class ProjectMembersDataSource extends DataSource<ProjectMember.AsObject>
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-    constructor(private projectService: ProjectService) {
+    constructor(private mgmtService: ManagementService) {
         super();
     }
 
@@ -31,9 +31,9 @@ export class ProjectMembersDataSource extends DataSource<ProjectMember.AsObject>
 
         const promise: Promise<ProjectMemberSearchResponse> | undefined =
             projectType === ProjectType.PROJECTTYPE_OWNED ?
-                this.projectService.SearchProjectMembers(projectId, pageSize, offset) :
+                this.mgmtService.SearchProjectMembers(projectId, pageSize, offset) :
                 projectType === ProjectType.PROJECTTYPE_GRANTED && grantId ?
-                    this.projectService.SearchProjectGrantMembers(projectId,
+                    this.mgmtService.SearchProjectGrantMembers(projectId,
                         grantId, pageSize, offset) : undefined;
         if (promise) {
             from(promise).pipe(

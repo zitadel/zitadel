@@ -10,7 +10,7 @@ import {
     UserGrantSearchResponse,
     UserGrantView,
 } from 'src/app/proto/generated/management_pb';
-import { MgmtUserService } from 'src/app/services/mgmt-user.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 
 export enum UserGrantContext {
     // AUTHUSER = 'authuser',
@@ -27,7 +27,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-    constructor(private userService: MgmtUserService) {
+    constructor(private userService: ManagementService) {
         super();
     }
 
