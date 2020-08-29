@@ -30,8 +30,8 @@
                     <td mat-cell *matCellDef="let user">
                         <mat-checkbox color="primary" (click)="$event.stopPropagation()"
                             (change)="$event ? selection.toggle(user) : null" [checked]="selection.isSelected(user)">
-                            <app-avatar *ngIf="user && user.displayName" class="avatar" [name]="user.displayName"
-                                [size]="32">
+                            <app-avatar *ngIf="user.human && user.human.displayName" class="avatar"
+                                [name]="user.human.displayName" [size]="32">
                             </app-avatar>
                         </mat-checkbox>
                     </td>
@@ -39,12 +39,12 @@
 
                 <ng-container matColumnDef="firstname">
                     <th mat-header-cell *matHeaderCellDef> {{ 'USER.PROFILE.FIRSTNAME' | translate }} </th>
-                    <td mat-cell *matCellDef="let user"> {{user.firstName}} </td>
+                    <td mat-cell *matCellDef="let user"> {{user.human.firstName}} </td>
                 </ng-container>
 
                 <ng-container matColumnDef="lastname">
                     <th mat-header-cell *matHeaderCellDef> {{ 'USER.PROFILE.LASTNAME' | translate }} </th>
-                    <td mat-cell *matCellDef="let user"> {{user.lastName}} </td>
+                    <td mat-cell *matCellDef="let user"> {{user.human.lastName}} </td>
                 </ng-container>
 
                 <ng-container matColumnDef="username">
@@ -54,7 +54,7 @@
 
                 <ng-container matColumnDef="email">
                     <th mat-header-cell *matHeaderCellDef> {{ 'USER.EMAIL' | translate }} </th>
-                    <td mat-cell *matCellDef="let user"> {{user.email}} </td>
+                    <td mat-cell *matCellDef="let user"> {{user.human.email}} </td>
                 </ng-container>
                 <ng-container matColumnDef="state">
                     <th mat-header-cell *matHeaderCellDef> {{ 'USER.DATA.STATE' | translate }} </th>
