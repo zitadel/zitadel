@@ -87,13 +87,14 @@
                     <ng-template #emailEdit>
                         <mat-form-field class="name">
                             <mat-label>{{ 'USER.EMAIL' | translate }}</mat-label>
-                            <input matInput [(ngModel)]="user.human.email" />
+                            <input matInput *ngIf="user.human && user.human.email" [(ngModel)]="user.human.email" />
                         </mat-form-field>
                         <button (click)="emailEditState = false" mat-icon-button>
                             <mat-icon class="icon">close</mat-icon>
                         </button>
-                        <button [disabled]="!user.human.email" class="submit-button" type="button" color="primary"
-                            (click)="saveEmail()" mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+                        <button *ngIf="user.human" [disabled]="!user.human.email" class="submit-button" type="button"
+                            color="primary" (click)="saveEmail()"
+                            mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
                     </ng-template>
                 </div>
 
@@ -125,16 +126,16 @@
                     <ng-template #phoneEdit>
                         <mat-form-field class="name">
                             <mat-label>{{ 'USER.PHONE' | translate }}</mat-label>
-                            <input matInput [(ngModel)]="user.human.phone" />
+                            <input *ngIf="user.human && user.human.phone" matInput [(ngModel)]="user.human.phone" />
                         </mat-form-field>
                         <button (click)="phoneEditState = false" mat-icon-button>
                             <mat-icon class="icon">close</mat-icon>
                         </button>
-                        <button *ngIf="user.human.phone" color="warn" (click)="deletePhone()" mat-icon-button>
+                        <button *ngIf="user.human?.phone" color="warn" (click)="deletePhone()" mat-icon-button>
                             <i class="las la-trash"></i>
                         </button>
-                        <button [disabled]="!user.human.phone" type="button" color="primary" (click)="savePhone()"
-                            mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+                        <button *ngIf="user.human" [disabled]="!user.human.phone" type="button" color="primary"
+                            (click)="savePhone()" mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
                     </ng-template>
                 </div>
             </div>

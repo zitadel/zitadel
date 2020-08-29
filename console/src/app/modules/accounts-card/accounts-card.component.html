@@ -3,7 +3,7 @@
         [name]="profile.displayName ? profile.displayName : (profile.firstName + ' '+ profile.lastName)" [size]="80">
     </app-avatar>
 
-    <span class="u-name">{{profile.displayName ? profile.displayName : profile.userName}}</span>
+    <span class="u-name">{{profile.displayName ? profile.displayName : profile.preferredLoginName}}</span>
     <span class="u-email">{{profile?.preferredLoginName}}</span>
     <span class="iamuser" *ngIf="iamuser">IAM USER</span>
 
