@@ -4,7 +4,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { Org } from 'src/app/proto/generated/auth_pb';
-import { ProjectGrantView, ProjectRole, ProjectView, User, UserGrant } from 'src/app/proto/generated/management_pb';
+import { ProjectGrantView, ProjectRole, ProjectView, UserGrant, UserView } from 'src/app/proto/generated/management_pb';
 import { AuthService } from 'src/app/services/auth.service';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { ProjectService } from 'src/app/services/project.service';
@@ -106,7 +106,7 @@ export class UserGrantCreateComponent implements OnDestroy {
         this.projectId = project.projectId;
     }
 
-    public selectUser(user: User.AsObject): void {
+    public selectUser(user: UserView.AsObject): void {
         this.userId = user.id;
     }
 

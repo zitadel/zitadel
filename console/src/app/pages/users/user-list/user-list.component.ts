@@ -5,7 +5,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { User, UserSearchResponse } from 'src/app/proto/generated/management_pb';
+import { UserSearchResponse, UserView } from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -16,13 +16,13 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class UserListComponent implements OnDestroy {
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    public dataSource: MatTableDataSource<User.AsObject> = new MatTableDataSource<User.AsObject>();
+    public dataSource: MatTableDataSource<UserView.AsObject> = new MatTableDataSource<UserView.AsObject>();
     public userResult!: UserSearchResponse.AsObject;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     public displayedColumns: string[] = ['select', 'firstname', 'lastname', 'username', 'email', 'state'];
-    public selection: SelectionModel<User.AsObject> = new SelectionModel<User.AsObject>(true, []);
-    @Output() public changedSelection: EventEmitter<Array<User.AsObject>> = new EventEmitter();
+    public selection: SelectionModel<UserView.AsObject> = new SelectionModel<UserView.AsObject>(true, []);
+    @Output() public changedSelection: EventEmitter<Array<UserView.AsObject>> = new EventEmitter();
 
     private subscription?: Subscription;
 
