@@ -37,7 +37,6 @@ export class DetailFormComponent implements OnInit, OnDestroy {
     }
 
     public ngOnInit(): void {
-        console.log(this.user);
         this.profileForm.patchValue({ userName: this.username, ...this.user });
 
         if (this.preferredLanguage) {
@@ -54,9 +53,11 @@ export class DetailFormComponent implements OnInit, OnDestroy {
     public submitForm(): void {
         this.submitData.emit(this.profileForm.value);
     }
+
     public get userName(): AbstractControl | null {
         return this.profileForm.get('userName');
     }
+
     public get firstName(): AbstractControl | null {
         return this.profileForm.get('firstName');
     }
