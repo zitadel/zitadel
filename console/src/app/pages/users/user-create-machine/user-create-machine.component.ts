@@ -1,6 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CreateMachineRequest } from 'src/app/proto/generated/admin_pb';
 import { UserResponse } from 'src/app/proto/generated/management_pb';
@@ -38,7 +37,7 @@ export class UserCreateMachineComponent implements OnDestroy {
     public loading: boolean = false;
 
     constructor(
-        private router: Router,
+        // private router: Router,
         private toast: ToastService,
         public userService: MgmtUserService,
         private fb: FormBuilder,
@@ -52,11 +51,10 @@ export class UserCreateMachineComponent implements OnDestroy {
                 [
                     Validators.required,
                     Validators.minLength(2),
-                    // this.userLoginMustBeDomain ? noEmailValidator : Validators.email,
                 ],
             ],
             name: ['', [Validators.required]],
-            description: ['', [Validators.required]],
+            description: ['', []],
         });
     }
 
