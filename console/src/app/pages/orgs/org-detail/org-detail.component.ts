@@ -76,17 +76,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
             this.toast.showError(error);
         });
 
-        this.loadingSubject.next(true);
-        from(this.mgmtService.SearchMyOrgMembers(100, 0)).pipe(
-            map(resp => {
-                this.totalMemberResult = resp.toObject().totalResult;
-                return resp.toObject().resultList;
-            }),
-            catchError(() => of([])),
-            finalize(() => this.loadingSubject.next(false)),
-        ).subscribe(members => {
-            this.membersSubject.next(members);
-        });
+        this.loadMembers();
 
         this.mgmtService.SearchMyOrgDomains(0, 100).then(result => {
             this.domains = result.toObject().resultList;
@@ -198,6 +188,20 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
             data: {
                 domain: domain,
             },
+        });
+    }
+
+    public loadMembers(): void {
+        this.loadingSubject.next(true);
+        from(this.mgmtService.SearchMyOrgMembers(100, 0)).pipe(
+            map(resp => {
+                this.totalMemberResult = resp.toObject().totalResult;
+                return resp.toObject().resultList;
+            }),
+            catchError(() => of([])),
+            finalize(() => this.loadingSubject.next(false)),
+        ).subscribe(members => {
+            this.membersSubject.next(members);
         });
     }
 }

@@ -22,8 +22,8 @@ import {
     ProjectState,
     ProjectType,
     ProjectView,
-    UserView,
     UserGrantSearchKey,
+    UserView,
 } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -82,8 +82,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
         private _location: Location,
         private dialog: MatDialog,
         private router: Router,
-    ) {
-    }
+    ) { }
 
     public ngOnInit(): void {
         this.subscription = this.route.params.subscribe(params => this.getData(params));
@@ -107,6 +106,11 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
             this.toast.showError(error);
         });
 
+        this.loadMembers();
+    }
+
+    public loadMembers(): void {
+        this.loadingSubject.next(true);
         from(this.mgmtService.SearchProjectMembers(this.projectId, 100, 0)).pipe(
             map(resp => {
                 this.totalMemberResult = resp.toObject().totalResult;

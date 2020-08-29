@@ -110,7 +110,7 @@
                 <app-contributors [loading]="loading$ | async" [totalResult]="totalMemberResult"
                     [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
                     description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
-                    (showDetailClicked)="showDetail()" [disabled]="false">
+                    (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()" [disabled]="false">
                 </app-contributors>
             </mat-tab>
             <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="flex-col">

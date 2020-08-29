@@ -43,7 +43,6 @@ export class AuthenticationService {
         if (partialConfig) {
             Object.assign(this.authConfig, partialConfig);
         }
-        console.log(this.authConfig);
         this.oauthService.configure(this.authConfig);
 
         this.oauthService.strictDiscoveryDocumentValidation = false;
