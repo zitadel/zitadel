@@ -26,7 +26,14 @@ export class AuthInterceptor<TReq = unknown, TResp = unknown> implements UnaryIn
         return invoker(request).then((response: any) => {
             // const message = response.getResponseMessage();
             const respMetadata = response.getMetadata();
-            console.log(respMetadata['grpc-status]']);
+
+            // TODO: intercept unauthenticated an authenticate
+
+            // const status = respMetadata['grpc-status'];
+            // console.log(respMetadata, status);
+            // if (status?.code === 16) {
+            //     this.authenticationService.authenticate();
+            // }
             return response;
         });
     }
