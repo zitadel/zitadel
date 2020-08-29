@@ -36,14 +36,13 @@ export class AuthenticationService {
     }
 
     public async authenticate(
-        config?: Partial<AuthConfig>,
+        partialConfig?: Partial<AuthConfig>,
         setState: boolean = true,
         force: boolean = false,
     ): Promise<boolean> {
-        if (config) {
-            this.authConfig = config;
+        if (partialConfig) {
+            Object.assign(this.authConfig, partialConfig);
         }
-        console.log(this.authConfig);
         this.oauthService.configure(this.authConfig);
 
         this.oauthService.strictDiscoveryDocumentValidation = false;
@@ -51,7 +50,7 @@ export class AuthenticationService {
 
         this._authenticated = this.oauthService.hasValidAccessToken();
 
-        if (!this.oauthService.hasValidIdToken() || !this.authenticated || config || force) {
+        if (!this.oauthService.hasValidIdToken() || !this.authenticated || partialConfig || force) {
             const newState = setState ? await this.statehandler.createState().toPromise() : undefined;
             this.oauthService.initCodeFlow(newState);
         }

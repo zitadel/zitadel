@@ -158,7 +158,9 @@
             </div>
         </div>
 
-        <app-memberships [user]="user"></app-memberships>
+        <ng-template appHasRole [appHasRole]="['user.membership.read']">
+            <app-memberships [user]="user"></app-memberships>
+        </ng-template>
 
         <app-changes class="changes" [changeType]="ChangeType.USER" [id]="user.id"></app-changes>
     </div>

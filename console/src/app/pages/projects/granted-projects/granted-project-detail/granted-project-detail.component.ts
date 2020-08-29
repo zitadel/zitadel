@@ -107,18 +107,23 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
                 this.toast.showError(error);
             });
 
-            from(this.mgmtService.SearchProjectGrantMembers(this.projectId,
-                this.grantId, 100, 0)).pipe(
-                    map(resp => {
-                        this.totalMemberResult = resp.toObject().totalResult;
-                        return resp.toObject().resultList;
-                    }),
-                    catchError(() => of([])),
-                    finalize(() => this.loadingSubject.next(false)),
-                ).subscribe(members => {
-                    this.membersSubject.next(members);
-                });
+            this.loadMembers();
         }
+    }
+
+    public loadMembers(): void {
+        this.loadingSubject.next(true);
+        from(this.mgmtService.SearchProjectGrantMembers(this.projectId,
+            this.grantId, 100, 0)).pipe(
+                map(resp => {
+                    this.totalMemberResult = resp.toObject().totalResult;
+                    return resp.toObject().resultList;
+                }),
+                catchError(() => of([])),
+                finalize(() => this.loadingSubject.next(false)),
+            ).subscribe(members => {
+                this.membersSubject.next(members);
+            });
     }
 
     public navigateBack(): void {
