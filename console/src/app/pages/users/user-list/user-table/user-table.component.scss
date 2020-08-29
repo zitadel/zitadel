@@ -8,24 +8,24 @@
 
     td,
     th {
-    padding: 0 1rem;
+      padding: 0 1rem;
 
-    &:first-child {
+      &:first-child {
         padding-left: 0;
         padding-right: 1rem;
-    }
+      }
 
-    &:last-child {
+      &:last-child {
         padding-right: 0;
-    }
+      }
     }
 
     .data-row {
-    cursor: pointer;
+      cursor: pointer;
 
-    &:hover {
+      &:hover {
         background-color: #ffffff05;
-    }
+      }
     }
   }
 }
@@ -37,5 +37,4 @@ tr {
 .add-button {
   border-radius: .5rem;
 }
-  
-  
+
