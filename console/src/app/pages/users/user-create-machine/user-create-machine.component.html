@@ -1,4 +1,4 @@
-<app-detail-layout [backRouterLink]="[ '/users/all']" title="{{ 'USER.CREATE.TITLE' | translate }}"
+<app-detail-layout [backRouterLink]="[ '/users/list/machines']" title="{{ 'USER.CREATE.TITLE' | translate }}"
     description="{{ 'USER.CREATE.DESCRIPTION' | translate }}">
     <mat-progress-bar *ngIf="loading" color="accent" mode="indeterminate"></mat-progress-bar>
 
@@ -23,10 +23,7 @@
             </mat-form-field>
             <mat-form-field class="formfield">
                 <mat-label>{{ 'USER.MACHINE.DESCRIPTION' | translate }}</mat-label>
-                <input matInput formControlName="description" required />
-                <mat-error *ngIf="name?.invalid && name?.errors?.required">
-                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                </mat-error>
+                <input matInput formControlName="description" />
             </mat-form-field>
         </div>
         <div class="btn-container">

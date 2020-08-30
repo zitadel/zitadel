@@ -5,6 +5,7 @@ import localeDe from '@angular/common/locales/de';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -91,6 +92,7 @@ const authConfig: AuthConfig = {
                 deps: [HttpClient],
             },
         }),
+        MatNativeDateModule,
         QuicklinkModule,
         AccountsCardModule,
         HasRoleModule,

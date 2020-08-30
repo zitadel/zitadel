@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { Metadata } from 'grpc-web';
 
 import { ManagementServicePromiseClient } from '../proto/generated/management_grpc_web_pb';
 import {
+    AddMachineKeyRequest,
+    AddMachineKeyResponse,
     ChangeRequest,
     Changes,
     CreateHumanRequest,
@@ -11,6 +14,11 @@ import {
     CreateUserRequest,
     Gender,
     LoginName,
+    MachineKeyIDRequest,
+    MachineKeySearchRequest,
+    MachineKeySearchResponse,
+    MachineKeyType,
+    MachineResponse,
     MultiFactors,
     NotificationType,
     PasswordRequest,
@@ -22,6 +30,7 @@ import {
     ProjectMemberSearchResponse,
     ProjectRoleAdd,
     SetPasswordNotificationRequest,
+    UpdateMachineRequest,
     UpdateUserAddressRequest,
     UpdateUserEmailRequest,
     UpdateUserPhoneRequest,
@@ -188,6 +197,75 @@ export class MgmtUserService {
         }
         return await this.request(
             c => c.updateUserProfile,
+            req,
+            f => f,
+        );
+    }
+
+    public async UpdateUserMachine(
+        id: string,
+        description?: string,
+    ): Promise<MachineResponse> {
+        const req = new UpdateMachineRequest();
+        req.setId(id);
+        if (description) {
+            req.setDescription(description);
+        }
+        return await this.request(
+            c => c.updateUserMachine,
+            req,
+            f => f,
+        );
+    }
+
+    public async AddMachineKey(
+        userId: string,
+        type: MachineKeyType,
+        date?: Timestamp,
+    ): Promise<AddMachineKeyResponse> {
+        const req = new AddMachineKeyRequest();
+        req.setType(type);
+        req.setUserId(userId);
+        if (date) {
+            req.setExpirationDate(date);
+        }
+        return await this.request(
+            c => c.addMachineKey,
+            req,
+            f => f,
+        );
+    }
+
+    public async DeleteMachineKey(
+        keyId: string,
+        userId: string,
+    ): Promise<Empty> {
+        const req = new MachineKeyIDRequest();
+        req.setKeyId(keyId);
+        req.setUserId(userId);
+
+        return await this.request(
+            c => c.deleteMachineKey,
+            req,
+            f => f,
+        );
+    }
+
+    public async SearchMachineKeys(
+        userId: string,
+        limit: number,
+        offset: number,
+        asc?: boolean,
+    ): Promise<MachineKeySearchResponse> {
+        const req = new MachineKeySearchRequest();
+        req.setUserId(userId);
+        req.setLimit(limit);
+        req.setOffset(offset);
+        if (asc) {
+            req.setAsc(asc);
+        }
+        return await this.request(
+            c => c.searchMachineKeys,
             req,
             f => f,
         );

@@ -4,7 +4,7 @@
             <a (click)="navigateBack()" mat-icon-button>
                 <mat-icon class="icon">arrow_back</mat-icon>
             </a>
-            <h1>{{user?.human?.displayName}}</h1>
+            <h1>{{user.human ? user.human?.displayName : user.machine?.name}}</h1>
 
             <span class="fill-space"></span>
 
@@ -37,15 +37,27 @@
         </app-card>
 
         <ng-template appHasRole [appHasRole]="['user.read', 'user.read:'+user?.id]">
-            <app-card title="{{ 'USER.PROFILE.TITLE' | translate }}">
+            <app-card *ngIf="user.human" title="{{ 'USER.PROFILE.TITLE' | translate }}">
                 <app-detail-form [disabled]="(['user.write:' + user?.id, 'user.write'] | hasRole | async) == false"
                     [genders]="genders" [languages]="languages" [username]="user.userName" [user]="user.human"
                     (submitData)="saveProfile($event)">
                 </app-detail-form>
             </app-card>
+
+            <app-card *ngIf="user.machine" title="{{ 'USER.MACHINE.TITLE' | translate }}">
+                <app-detail-form-machine
+                    [disabled]="(['user.write:' + user?.id, 'user.write'] | hasRole | async) == false"
+                    [username]="user.userName" [user]="user.machine" (submitData)="saveMachine($event)">
+                </app-detail-form-machine>
+            </app-card>
+
+            <app-card *ngIf="user.id" title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}"
+                description="{{ 'USER.MACHINE.KEYSDESC' | translate }}">
+                <app-machine-keys [userId]="user.id"></app-machine-keys>
+            </app-card>
         </ng-template>
 
-        <app-card title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
+        <app-card *ngIf="user.human" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
             description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
             <div class="method-col">
                 <div class="method-row">
@@ -142,7 +154,7 @@
             </div>
         </app-card>
 
-        <app-user-mfa *ngIf="user" [user]="user"></app-user-mfa>
+        <app-user-mfa *ngIf="user && user.human" [user]="user"></app-user-mfa>
 
         <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
             description="{{'GRANTS.USER.DESCRIPTION' | translate }}">

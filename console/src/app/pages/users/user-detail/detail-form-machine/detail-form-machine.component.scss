@@ -1,0 +1,21 @@
+
+.content {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 0 -.5rem;
+
+  .formfield {
+    flex: 1 1 33%;
+    margin: 0 .5rem;
+  }
+}
+
+.btn-container {
+  display: flex;
+  justify-content: flex-end;
+
+  .submit-button {
+    border-radius: .5rem;
+  }
+}

@@ -6,6 +6,8 @@ import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import {
     Gender,
+    MachineResponse,
+    MachineView,
     NotificationType,
     UserEmail,
     UserPhone,
@@ -96,6 +98,25 @@ export class UserDetailComponent implements OnInit, OnDestroy {
                     this.user.human.preferredLanguage,
                     this.user.human.gender)
                 .then((data: UserProfile) => {
+                    this.toast.showInfo('USER.TOAST.SAVED', true);
+                    this.user = Object.assign(this.user, data.toObject());
+                })
+                .catch(error => {
+                    this.toast.showError(error);
+                });
+        }
+    }
+
+    public saveMachine(machineData: MachineView.AsObject): void {
+        if (this.user.machine) {
+            this.user.machine.name = machineData.name;
+            this.user.machine.description = machineData.description;
+
+            this.mgmtUserService
+                .UpdateUserMachine(
+                    this.user.id,
+                    this.user.machine.description)
+                .then((data: MachineResponse) => {
                     this.toast.showInfo('USER.TOAST.SAVED', true);
                     this.user = Object.assign(this.user, data.toObject());
                 })
