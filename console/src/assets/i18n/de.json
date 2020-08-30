@@ -31,7 +31,7 @@
         "GRANTEDPROJECT":"Berechtigte Projekte",
         "USERSECTION":"Benutzersektion",
         "HUMANUSERS": "Benutzer",
-        "MACHINEUSERS":"Service User",
+        "MACHINEUSERS":"Service Benutzer",
         "LOGOUT": "Alle Benutzer abmelden",
         "NEWORG":"Neue Organisation",
         "IAMADMIN":"Du bist ein IAM Administrator. Achtung du hast erhöhte Rechte!",
