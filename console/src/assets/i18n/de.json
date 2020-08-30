@@ -156,6 +156,7 @@
             "ID":"Schlüssel Id",
             "TYPE":"Typ",
             "EXPIRYDATE":"Ablaufdatum",
+            "CHOOSEEXPIRY":"Wähle ein Ablaufdatum",
             "CREATIONDATE":"Erstelldatum",
             "ADD": {
                 "TITLE":"Key hinzufügen",
@@ -248,7 +249,8 @@
             "REACTIVATED":"User reaktiviert!",
             "DEACTIVATED":"User deaktiviert!",
             "SELECTEDREACTIVATED":"Selektierte User reaktiviert!",
-            "SELECTEDDEACTIVATED":"Selektierte User deaktiviert!"
+            "SELECTEDDEACTIVATED":"Selektierte User deaktiviert!",
+            "SELECTEDKEYSDELETED":"Selektierte Schlüssel gelöscht!"
         },
         "MEMBERSHIPS": {
             "TITLE":"Zitadel Manager Rollen",

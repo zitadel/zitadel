@@ -58,24 +58,15 @@ export class MachineKeysComponent implements OnInit {
         this.getData(event.pageSize, event.pageIndex * event.pageSize);
     }
 
-    public deactivateSelectedUsers(): void {
+    public deleteSelectedKeys(): void {
         Promise.all(this.selection.selected.map(value => {
-            return this.userService.DeactivateUser(value.id);
+            return this.userService.DeleteMachineKey(value.id, this.userId);
         })).then(() => {
-            this.toast.showInfo('USER.TOAST.SELECTEDDEACTIVATED', true);
+            this.selection.clear();
+            this.toast.showInfo('USER.TOAST.SELECTEDKEYSDELETED', true);
             this.getData(10, 0);
         });
     }
-
-    public reactivateSelectedUsers(): void {
-        Promise.all(this.selection.selected.map(value => {
-            return this.userService.ReactivateUser(value.id);
-        })).then(() => {
-            this.toast.showInfo('USER.TOAST.SELECTEDREACTIVATED', true);
-            this.getData(10, 0);
-        });
-    }
-
 
     public openAddKey(): void {
         const dialogRef = this.dialog.open(AddKeyDialogComponent, {
@@ -91,13 +82,17 @@ export class MachineKeysComponent implements OnInit {
 
                 if (resp.date as Date) {
                     const ts = new Timestamp();
-                    ts.setSeconds(resp.date.getTime() / 1000);
 
+                    const milliseconds = resp.date.getTime();
+                    const seconds = Math.abs(milliseconds / 1000);
+                    const nanos = (milliseconds - seconds * 1000) * 1000 * 1000;
+                    ts.setSeconds(seconds);
+                    ts.setNanos(nanos);
                     date = ts;
                     console.log(date.toObject());
                 }
 
-                if (type && date) {
+                if (type) {
                     console.log(this.userId, type, date);
                     return this.userService.AddMachineKey(this.userId, type, date).then(() => {
                         this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
