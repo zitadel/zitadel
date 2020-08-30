@@ -160,7 +160,7 @@
             "CREATIONDATE":"Creation Date",
             "ADD": {
                 "TITLE":"Add Key",
-                "DESCRIPTION":"Select your key type and choose an optinal expiry date."
+                "DESCRIPTION":"Select your key type and choose an optional expiry date."
             },
             "KEYTYPES": {
                 "1":"JSON"

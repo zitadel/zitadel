@@ -74,8 +74,8 @@
             "LIST": "Benutzer",
             "TITLE": "Benutzer",
             "DESCRIPTION": "Erfasse und verwalte die Benutzer in deiner Organisation",
-            "LISTMACHINE": "Service User",
-            "DESCRIPTIONMACHINE": "Erfassen und verwalten Sie die Service User Ihrer Organisation",
+            "LISTMACHINE": "Service Benutzer",
+            "DESCRIPTIONMACHINE": "Erfassen und verwalten Sie die Service Benutzer Ihrer Organisation",
             "DETAIL": "Detail",
             "CREATE": "Erstellen",
             "MY": "Meine Informationen",
@@ -147,19 +147,19 @@
             "PASSWORD":"Passwort"
         },
         "MACHINE": {
-            "TITLE":"Service User Details",
+            "TITLE":"Service Benutzer Details",
             "USERNAME":"Benutzername",
             "NAME":"Name",
             "DESCRIPTION":"Beschreibung",
             "KEYSTITLE":"Schlüssel",
-            "KEYSDESC":"Definieren Sie ihre Schlüssel mit einem optionalen Ablaufdatum",
+            "KEYSDESC":"Definieren Sie Ihre Schlüssel mit einem optionalen Ablaufdatum",
             "ID":"Schlüssel Id",
             "TYPE":"Typ",
             "EXPIRYDATE":"Ablaufdatum",
-            "CHOOSEEXPIRY":"Wähle ein Ablaufdatum",
+            "CHOOSEEXPIRY":"Definieren Sie ein Ablaufdatum",
             "CREATIONDATE":"Erstelldatum",
             "ADD": {
-                "TITLE":"Key hinzufügen",
+                "TITLE":"Schlüssel hinzufügen",
                 "DESCRIPTION":"Wählen Sie den Typ und selektieren Sie ein optionales Ablaufdatum."
             },
             "KEYTYPES": {
@@ -249,7 +249,7 @@
             "REACTIVATED":"User reaktiviert!",
             "DEACTIVATED":"User deaktiviert!",
             "SELECTEDREACTIVATED":"Selektierte User reaktiviert!",
-            "SELECTEDDEACTIVATED":"Selektierte User deaktiviert!",
+            "SELECTEDDEACTIVATED":"Selektierte Benutzer deaktiviert!",
             "SELECTEDKEYSDELETED":"Selektierte Schlüssel gelöscht!"
         },
         "MEMBERSHIPS": {
