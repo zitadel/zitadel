@@ -31,6 +31,7 @@ import { AuthUserMfaComponent } from './auth-user-detail/auth-user-mfa/auth-user
 import { CodeDialogComponent } from './auth-user-detail/code-dialog/code-dialog.component';
 import { DialogOtpComponent } from './auth-user-detail/dialog-otp/dialog-otp.component';
 import { ThemeSettingComponent } from './auth-user-detail/theme-setting/theme-setting.component';
+import { DetailFormMachineModule } from './detail-form-machine/detail-form-machine.module';
 import { DetailFormModule } from './detail-form/detail-form.module';
 import { MembershipsComponent } from './memberships/memberships.component';
 import { PasswordComponent } from './password/password.component';
@@ -57,6 +58,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         FormsModule,
         ReactiveFormsModule,
         DetailFormModule,
+        DetailFormMachineModule,
         MatDialogModule,
         QRCodeModule,
         MetaLayoutModule,
