@@ -34,7 +34,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         children: [
             {
-                path: 'all',
+                path: 'list',
                 loadChildren: () => import('src/app/pages/users/user-list/user-list.module')
                     .then(m => m.UserListModule),
                 canActivate: [RoleGuard],

@@ -84,7 +84,6 @@ export class UserTableComponent implements OnInit {
         this.userService.SearchUsers(limit, offset).then(resp => {
             this.userResult = resp.toObject();
             this.dataSource.data = this.userResult.resultList;
-            console.log(this.userResult.resultList);
             this.loadingSubject.next(false);
         }).catch(error => {
             this.toast.showError(error);

@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { take } from 'rxjs/operators';
 
 export enum UserType {
     HUMAN = 'human',
@@ -12,6 +14,11 @@ export enum UserType {
 })
 export class UserListComponent {
     public UserType: any = UserType;
-
-    constructor(public translate: TranslateService) { }
+    public type: UserType = UserType.HUMAN;
+    constructor(public translate: TranslateService, activatedRoute: ActivatedRoute) {
+        activatedRoute.data.pipe(take(1)).subscribe(params => {
+            const { type } = params;
+            this.type = type;
+        });
+    }
 }
