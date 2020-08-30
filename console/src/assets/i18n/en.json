@@ -152,7 +152,18 @@
             "NAME":"Name",
             "DESCRIPTION":"Description",
             "KEYSTITLE":"Key",
-            "KEYSDESC":"Define your keys with an optional expiry date."
+            "KEYSDESC":"Define your keys with an optional expiry date.",
+            "ID":"Key Id",
+            "TYPE":"Type",
+            "EXPIRYDATE":"Expiry date",
+            "CREATIONDATE":"Creation Date",
+            "ADD": {
+                "TITLE":"Add Key",
+                "DESCRIPTION":"Select your key type and choose an optinal expiry date."
+            },
+            "KEYTYPES": {
+                "1":"JSON"
+            }
         },
         "PASSWORD": {
             "TITLE": "Password",

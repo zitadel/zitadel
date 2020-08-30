@@ -51,9 +51,9 @@
                 </app-detail-form-machine>
             </app-card>
 
-            <app-card title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}"
+            <app-card *ngIf="user.id" title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}"
                 description="{{ 'USER.MACHINE.KEYSDESC' | translate }}">
-                <app-machine-keys></app-machine-keys>
+                <app-machine-keys [userId]="user.id"></app-machine-keys>
             </app-card>
         </ng-template>
 

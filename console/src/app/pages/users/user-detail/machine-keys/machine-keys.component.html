@@ -9,7 +9,7 @@
             class="icon-button" mat-icon-button *ngIf="selection.hasValue()">
             <mat-icon svgIcon="mdi_account_check_outline"></mat-icon>
         </button>
-        <a class="add-button" color="primary" mat-raised-button>
+        <a class="add-button" color="primary" mat-raised-button (click)="openAddKey()">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
     </ng-template>
@@ -30,19 +30,28 @@
                 </td>
             </ng-container>
 
-            <ng-container matColumnDef="userId">
-                <th mat-header-cell *matHeaderCellDef> {{ 'KEYS.FIRSTNAME' | translate }} </th>
-                <td mat-cell *matCellDef="let key"> {{key?.userId}} </td>
+            <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.ID' | translate }} </th>
+                <td mat-cell *matCellDef="let key"> {{key?.id}} </td>
             </ng-container>
 
             <ng-container matColumnDef="type">
-                <th mat-header-cell *matHeaderCellDef> {{ 'KEYS.TYPE' | translate }} </th>
-                <td mat-cell *matCellDef="let key"> {{key?.type}} </td>
+                <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.TYPE' | translate }} </th>
+                <td mat-cell *matCellDef="let key"> {{'USER.MACHINE.KEYTYPES.'+key?.type | translate}} </td>
             </ng-container>
 
-            <ng-container matColumnDef="expiry">
-                <th mat-header-cell *matHeaderCellDef> {{ 'KEYS.EXPIRY' | translate }} </th>
-                <td mat-cell *matCellDef="let key"> </td>
+            <ng-container matColumnDef="creationDate">
+                <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.CREATIONDATE' | translate }} </th>
+                <td mat-cell *matCellDef="let key">
+                    {{key.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="expirationDate">
+                <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.EXPIRYDATE' | translate }} </th>
+                <td mat-cell *matCellDef="let key">
+                    {{key.expirationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}
+                </td>
             </ng-container>
 
 

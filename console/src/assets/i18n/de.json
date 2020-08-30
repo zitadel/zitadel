@@ -152,7 +152,18 @@
             "NAME":"Name",
             "DESCRIPTION":"Beschreibung",
             "KEYSTITLE":"Schlüssel",
-            "KEYSDESC":"Definieren Sie ihre Schlüssel mit einem optionalen Ablaufdatum"
+            "KEYSDESC":"Definieren Sie ihre Schlüssel mit einem optionalen Ablaufdatum",
+            "ID":"Schlüssel Id",
+            "TYPE":"Typ",
+            "EXPIRYDATE":"Ablaufdatum",
+            "CREATIONDATE":"Erstelldatum",
+            "ADD": {
+                "TITLE":"Key hinzufügen",
+                "DESCRIPTION":"Wählen Sie den Typ und selektieren Sie ein optionales Ablaufdatum."
+            },
+            "KEYTYPES": {
+                "1":"JSON"
+            }
         },
         "PASSWORD": {
             "TITLE": "Passwort",

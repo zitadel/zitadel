@@ -126,10 +126,6 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         }
     }
 
-    public addMachineKey(): void {
-        this.mgmtUserService.AddMachineKey;
-    }
-
     public resendVerification(): void {
         this.mgmtUserService.ResendEmailVerification(this.user.id).then(() => {
             this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);

@@ -1,12 +1,16 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { TranslateService } from '@ngx-translate/core';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { MachineKeySearchResponse, MachineKeyView } from 'src/app/proto/generated/management_pb';
+import { MachineKeySearchResponse, MachineKeyType, MachineKeyView } from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { ToastService } from 'src/app/services/toast.service';
+
+import { AddKeyDialogComponent } from './add-key-dialog/add-key-dialog.component';
 
 @Component({
     selector: 'app-machine-keys',
@@ -21,11 +25,11 @@ export class MachineKeysComponent implements OnInit {
     public keyResult!: MachineKeySearchResponse.AsObject;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-    @Input() public displayedColumns: string[] = ['select', 'userId', 'type', 'expiry'];
+    @Input() public displayedColumns: string[] = ['select', 'id', 'type', 'creationDate', 'expirationDate'];
 
     @Output() public changedSelection: EventEmitter<Array<MachineKeyView.AsObject>> = new EventEmitter();
 
-    constructor(public translate: TranslateService, private userService: MgmtUserService,
+    constructor(public translate: TranslateService, private userService: MgmtUserService, private dialog: MatDialog,
         private toast: ToastService) {
         this.selection.changed.subscribe(() => {
             this.changedSelection.emit(this.selection.selected);
@@ -69,6 +73,39 @@ export class MachineKeysComponent implements OnInit {
         })).then(() => {
             this.toast.showInfo('USER.TOAST.SELECTEDREACTIVATED', true);
             this.getData(10, 0);
+        });
+    }
+
+
+    public openAddKey(): void {
+        const dialogRef = this.dialog.open(AddKeyDialogComponent, {
+            data: {},
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                const type: MachineKeyType = resp.type;
+
+                let date: Timestamp | undefined;
+
+                if (resp.date as Date) {
+                    const ts = new Timestamp();
+                    ts.setSeconds(resp.date.getTime() / 1000);
+
+                    date = ts;
+                    console.log(date.toObject());
+                }
+
+                if (type && date) {
+                    console.log(this.userId, type, date);
+                    return this.userService.AddMachineKey(this.userId, type, date).then(() => {
+                        this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
+                }
+            }
         });
     }
 
