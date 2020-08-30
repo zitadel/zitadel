@@ -70,7 +70,7 @@
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr class="data-row" mat-row *matRowDef="let row; columns: displayedColumns;"
-                [routerLink]="['/users', userType == UserType.HUMAN ? row.id : 'all']">
+                [routerLink]="userType == UserType.HUMAN ? ['/users', row.id ]: null">
             </tr>
 
         </table>
