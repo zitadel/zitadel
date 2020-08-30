@@ -1,40 +1,39 @@
 
 .table-wrapper {
-    overflow: auto;
-  
-    .table,
-    .paginator {
-      width: 100%;
-  
-      td,
-      th {
-        padding: 0 1rem;
-  
-        &:first-child {
-          padding-left: 0;
-          padding-right: 1rem;
-        }
-  
-        &:last-child {
-          padding-right: 0;
-        }
+  overflow: auto;
+
+  .table,
+  .paginator {
+    width: 100%;
+
+    td,
+    th {
+      padding: 0 1rem;
+
+      &:first-child {
+        padding-left: 0;
+        padding-right: 1rem;
       }
-  
-      .data-row {
-        cursor: pointer;
-  
-        &:hover {
-          background-color: #ffffff05;
-        }
+
+      &:last-child {
+        padding-right: 0;
+      }
+    }
+
+    .data-row {
+      cursor: pointer;
+
+      &:hover {
+        background-color: #ffffff05;
       }
     }
   }
-  
-  tr {
-    outline: none;
-  }
-  
-  .add-button {
-    border-radius: .5rem;
-  }
-  
+}
+
+tr {
+  outline: none;
+}
+
+.add-button {
+  border-radius: .5rem;
+}
