@@ -147,7 +147,7 @@
             "PASSWORD":"Passwort"
         },
         "MACHINE": {
-            "TITLE":"Service User",
+            "TITLE":"Service User Details",
             "USERNAME":"Benutzername",
             "NAME":"Name",
             "DESCRIPTION":"Beschreibung"

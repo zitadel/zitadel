@@ -11,6 +11,7 @@ import {
     CreateUserRequest,
     Gender,
     LoginName,
+    MachineResponse,
     MultiFactors,
     NotificationType,
     PasswordRequest,
@@ -22,6 +23,7 @@ import {
     ProjectMemberSearchResponse,
     ProjectRoleAdd,
     SetPasswordNotificationRequest,
+    UpdateMachineRequest,
     UpdateUserAddressRequest,
     UpdateUserEmailRequest,
     UpdateUserPhoneRequest,
@@ -188,6 +190,22 @@ export class MgmtUserService {
         }
         return await this.request(
             c => c.updateUserProfile,
+            req,
+            f => f,
+        );
+    }
+
+    public async UpdateUserMachine(
+        id: string,
+        description?: string,
+    ): Promise<MachineResponse> {
+        const req = new UpdateMachineRequest();
+        req.setId(id);
+        if (description) {
+            req.setDescription(description);
+        }
+        return await this.request(
+            c => c.updateUserMachine,
             req,
             f => f,
         );

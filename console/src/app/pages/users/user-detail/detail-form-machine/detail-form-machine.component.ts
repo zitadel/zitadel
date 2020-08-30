@@ -15,25 +15,22 @@ export class DetailFormMachineComponent implements OnInit, OnDestroy {
     @Input() public disabled: boolean = false;
     @Output() public submitData: EventEmitter<any> = new EventEmitter<any>();
 
-    public profileForm!: FormGroup;
+    public machineForm!: FormGroup;
 
     private sub: Subscription = new Subscription();
 
     constructor(private fb: FormBuilder) {
-        this.profileForm = this.fb.group({
+        this.machineForm = this.fb.group({
             userName: [{ value: '', disabled: true }, [
                 Validators.required,
             ]],
-            firstName: [{ value: '', disabled: this.disabled }, Validators.required],
-            lastName: [{ value: '', disabled: this.disabled }, Validators.required],
-            nickName: [{ value: '', disabled: this.disabled }],
-            gender: [{ value: 0 }, { disabled: this.disabled }],
-            preferredLanguage: [{ value: '', disabled: this.disabled }],
+            name: [{ value: '', disabled: true }, Validators.required],
+            description: [{ value: '', disabled: this.disabled }],
         });
     }
 
     public ngOnInit(): void {
-        this.profileForm.patchValue({ userName: this.username, ...this.user });
+        this.machineForm.patchValue({ userName: this.username, ...this.user });
     }
 
     public ngOnDestroy(): void {
@@ -41,27 +38,18 @@ export class DetailFormMachineComponent implements OnInit, OnDestroy {
     }
 
     public submitForm(): void {
-        this.submitData.emit(this.profileForm.value);
+        this.submitData.emit(this.machineForm.value);
+    }
+
+    public get name(): AbstractControl | null {
+        return this.machineForm.get('name');
+    }
+
+    public get description(): AbstractControl | null {
+        return this.machineForm.get('description');
     }
 
     public get userName(): AbstractControl | null {
-        return this.profileForm.get('userName');
+        return this.machineForm.get('userName');
     }
-
-    public get firstName(): AbstractControl | null {
-        return this.profileForm.get('firstName');
-    }
-    public get lastName(): AbstractControl | null {
-        return this.profileForm.get('lastName');
-    }
-    public get nickName(): AbstractControl | null {
-        return this.profileForm.get('nickName');
-    }
-    public get gender(): AbstractControl | null {
-        return this.profileForm.get('gender');
-    }
-    public get preferredLanguage(): AbstractControl | null {
-        return this.profileForm.get('preferredLanguage');
-    }
-
 }

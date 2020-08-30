@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { Gender as authGender, UserView as authUV } from 'src/app/proto/generated/auth_pb';
-import { Gender as mgmtGender, UserView as mgmtUV } from 'src/app/proto/generated/management_pb';
+import { Gender as authGender, UserProfile as authUP, UserView as authUV } from 'src/app/proto/generated/auth_pb';
+import { Gender as mgmtGender, UserProfile as mgmtUP, UserView as mgmtUV } from 'src/app/proto/generated/management_pb';
 
 
 @Component({
@@ -16,7 +16,7 @@ export class DetailFormComponent implements OnInit, OnDestroy {
     @Input() public disabled: boolean = false;
     @Input() public genders: mgmtGender[] | authGender[] = [];
     @Input() public languages: string[] = ['de', 'en'];
-    @Output() public submitData: EventEmitter<any> = new EventEmitter<any>();
+    @Output() public submitData: EventEmitter<mgmtUP | authUP> = new EventEmitter<mgmtUP | authUP>();
     @Output() public changedLanguage: EventEmitter<string> = new EventEmitter<string>();
 
     public profileForm!: FormGroup;
