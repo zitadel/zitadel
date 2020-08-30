@@ -150,7 +150,9 @@
             "TITLE":"Service User Details",
             "USERNAME":"Benutzername",
             "NAME":"Name",
-            "DESCRIPTION":"Beschreibung"
+            "DESCRIPTION":"Beschreibung",
+            "KEYSTITLE":"Schlüssel",
+            "KEYSDESC":"Definieren Sie ihre Schlüssel mit einem optionalen Ablaufdatum"
         },
         "PASSWORD": {
             "TITLE": "Passwort",

@@ -150,7 +150,9 @@
             "TITLE":"Service User Details",
             "USERNAME":"Username",
             "NAME":"Name",
-            "DESCRIPTION":"Description"
+            "DESCRIPTION":"Description",
+            "KEYSTITLE":"Key",
+            "KEYSDESC":"Define your keys with an optional expiry date."
         },
         "PASSWORD": {
             "TITLE": "Password",

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -33,6 +34,7 @@ import { DialogOtpComponent } from './auth-user-detail/dialog-otp/dialog-otp.com
 import { ThemeSettingComponent } from './auth-user-detail/theme-setting/theme-setting.component';
 import { DetailFormMachineModule } from './detail-form-machine/detail-form-machine.module';
 import { DetailFormModule } from './detail-form/detail-form.module';
+import { MachineKeysComponent } from './machine-keys/machine-keys.component';
 import { MembershipsComponent } from './memberships/memberships.component';
 import { PasswordComponent } from './password/password.component';
 import { UserDetailRoutingModule } from './user-detail-routing.module';
@@ -50,6 +52,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         PasswordComponent,
         CodeDialogComponent,
         MembershipsComponent,
+        MachineKeysComponent,
     ],
     imports: [
         UserDetailRoutingModule,
@@ -62,6 +65,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         MatDialogModule,
         QRCodeModule,
         MetaLayoutModule,
+        MatCheckboxModule,
         HasRolePipeModule,
         MatFormFieldModule,
         UserGrantsModule,

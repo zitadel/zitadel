@@ -50,6 +50,11 @@
                     [username]="user.userName" [user]="user.machine" (submitData)="saveMachine($event)">
                 </app-detail-form-machine>
             </app-card>
+
+            <app-card title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}"
+                description="{{ 'USER.MACHINE.KEYSDESC' | translate }}">
+                <app-machine-keys></app-machine-keys>
+            </app-card>
         </ng-template>
 
         <app-card *ngIf="user.human" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
