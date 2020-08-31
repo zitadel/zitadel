@@ -1,0 +1,30 @@
+<span class="title" mat-dialog-title>{{'USER.MACHINE.ADD.TITLE' | translate}}</span>
+<div mat-dialog-content>
+    <p class="desc"> {{'USER.MACHINE.ADD.DESCRIPTION' | translate}}</p>
+
+    <mat-form-field class="form-field" appearance="outline">
+        <mat-label>{{'USER.MACHINE.TYPE' | translate}}</mat-label>
+        <mat-select [(ngModel)]="type">
+            <mat-option *ngFor="let t of types" [value]="t">
+                {{'USER.MACHINE.KEYTYPES.'+t | translate}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="form-field" appearance="outline">
+        <mat-label>{{'USER.MACHINE.CHOOSEEXPIRY' | translate}}</mat-label>
+        <input matInput [matDatepicker]="picker" [(ngModel)]="date">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+</div>
+<div mat-dialog-actions class="action">
+    <button mat-button (click)="closeDialog()">
+        {{'ACTIONS.CANCEL' | translate}}
+    </button>
+
+    <button color="primary" mat-raised-button class="ok-button" [disabled]="type == undefined"
+        (click)="closeDialogWithSuccess()">
+        {{'ACTIONS.ADD' | translate}}
+    </button>
+</div>

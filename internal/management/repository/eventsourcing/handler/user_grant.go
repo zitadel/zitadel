@@ -92,7 +92,10 @@ func (u *UserGrant) processUserGrant(event *models.Event) (err error) {
 func (u *UserGrant) processUser(event *models.Event) (err error) {
 	switch event.Type {
 	case usr_es_model.UserProfileChanged,
-		usr_es_model.UserEmailChanged:
+		usr_es_model.UserEmailChanged,
+		usr_es_model.HumanProfileChanged,
+		usr_es_model.HumanEmailChanged,
+		usr_es_model.MachineChanged:
 		grants, err := u.view.UserGrantsByUserID(event.AggregateID)
 		if err != nil {
 			return err
@@ -160,10 +163,15 @@ func (u *UserGrant) fillData(grant *view_model.UserGrantView, resourceOwner stri
 
 func (u *UserGrant) fillUserData(grant *view_model.UserGrantView, user *usr_model.User) {
 	grant.UserName = user.UserName
-	grant.FirstName = user.FirstName
-	grant.LastName = user.LastName
-	grant.DisplayName = user.DisplayName
-	grant.Email = user.EmailAddress
+	if user.Human != nil {
+		grant.FirstName = user.FirstName
+		grant.LastName = user.LastName
+		grant.DisplayName = user.FirstName + " " + user.LastName
+		grant.Email = user.EmailAddress
+	}
+	if user.Machine != nil {
+		grant.DisplayName = user.Machine.Name
+	}
 }
 
 func (u *UserGrant) fillProjectData(grant *view_model.UserGrantView, project *proj_model.Project) {

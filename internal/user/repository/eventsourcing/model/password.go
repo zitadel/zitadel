@@ -2,12 +2,13 @@ package model
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
-	"time"
 )
 
 type Password struct {
@@ -50,7 +51,7 @@ func PasswordCodeToModel(code *PasswordCode) *model.PasswordCode {
 	}
 }
 
-func (u *User) appendUserPasswordChangedEvent(event *es_models.Event) error {
+func (u *Human) appendUserPasswordChangedEvent(event *es_models.Event) error {
 	u.Password = new(Password)
 	err := u.Password.setData(event)
 	if err != nil {
@@ -60,7 +61,7 @@ func (u *User) appendUserPasswordChangedEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (u *User) appendPasswordSetRequestedEvent(event *es_models.Event) error {
+func (u *Human) appendPasswordSetRequestedEvent(event *es_models.Event) error {
 	u.PasswordCode = new(PasswordCode)
 	return u.PasswordCode.SetData(event)
 }

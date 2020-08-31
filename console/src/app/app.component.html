@@ -117,9 +117,16 @@
                                 </div>
 
                                 <a @navitem class="nav-item" [routerLinkActive]="['active']"
-                                    [routerLink]="[ '/users/all']" [routerLinkActiveOptions]="{ exact: true }">
-                                    <i class="icon las la-users"></i>
-                                    <span class="label">{{ 'MENU.USER' | translate }}</span>
+                                    [routerLink]="[ '/users/list/humans']" [routerLinkActiveOptions]="{ exact: true }">
+                                    <i class="icon las la-user-friends"></i>
+                                    <span class="label">{{ 'MENU.HUMANUSERS' | translate }}</span>
+                                </a>
+
+                                <a @navitem class="nav-item" [routerLinkActive]="['active']"
+                                    [routerLink]="[ '/users/list/machines']"
+                                    [routerLinkActiveOptions]="{ exact: true }">
+                                    <i class="icon las la-users-cog"></i>
+                                    <span class="label">{{ 'MENU.MACHINEUSERS' | translate }}</span>
                                 </a>
                             </ng-template>
                         </div>

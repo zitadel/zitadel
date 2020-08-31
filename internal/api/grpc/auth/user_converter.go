@@ -27,37 +27,28 @@ func userViewFromModel(user *usr_model.UserView) *auth.UserView {
 	lastLogin, err := ptypes.TimestampProto(user.LastLogin)
 	logging.Log("GRPC-Gteh2").OnError(err).Debug("unable to parse timestamp")
 
-	passwordChanged, err := ptypes.TimestampProto(user.PasswordChanged)
-	logging.Log("GRPC-fgQFT").OnError(err).Debug("unable to parse timestamp")
-
-	return &auth.UserView{
+	userView := &auth.UserView{
 		Id:                 user.ID,
 		State:              userStateFromModel(user.State),
 		CreationDate:       creationDate,
 		ChangeDate:         changeDate,
 		LastLogin:          lastLogin,
-		PasswordChanged:    passwordChanged,
 		UserName:           user.UserName,
-		FirstName:          user.FirstName,
-		LastName:           user.LastName,
-		DisplayName:        user.DisplayName,
-		NickName:           user.NickName,
-		PreferredLanguage:  user.PreferredLanguage,
-		Gender:             genderFromModel(user.Gender),
-		Email:              user.Email,
-		IsEmailVerified:    user.IsEmailVerified,
-		Phone:              user.Phone,
-		IsPhoneVerified:    user.IsPhoneVerified,
-		Country:            user.Country,
-		Locality:           user.Locality,
-		PostalCode:         user.PostalCode,
-		Region:             user.Region,
-		StreetAddress:      user.StreetAddress,
 		Sequence:           user.Sequence,
 		ResourceOwner:      user.ResourceOwner,
 		LoginNames:         user.LoginNames,
 		PreferredLoginName: user.PreferredLoginName,
 	}
+
+	if user.HumanView != nil {
+		userView.User = &auth.UserView_Human{Human: humanViewFromModel(user.HumanView)}
+	}
+	if user.MachineView != nil {
+		userView.User = &auth.UserView_Machine{Machine: machineViewFromModel(user.MachineView)}
+
+	}
+
+	return userView
 }
 
 func profileFromModel(profile *usr_model.Profile) *auth.UserProfile {
@@ -72,7 +63,6 @@ func profileFromModel(profile *usr_model.Profile) *auth.UserProfile {
 		CreationDate:      creationDate,
 		ChangeDate:        changeDate,
 		Sequence:          profile.Sequence,
-		UserName:          profile.UserName,
 		FirstName:         profile.FirstName,
 		LastName:          profile.LastName,
 		DisplayName:       profile.DisplayName,
@@ -94,7 +84,6 @@ func profileViewFromModel(profile *usr_model.Profile) *auth.UserProfileView {
 		CreationDate:       creationDate,
 		ChangeDate:         changeDate,
 		Sequence:           profile.Sequence,
-		UserName:           profile.UserName,
 		FirstName:          profile.FirstName,
 		LastName:           profile.LastName,
 		DisplayName:        profile.DisplayName,
@@ -366,7 +355,7 @@ func userChangesToAPI(changes *usr_model.UserChanges) (_ []*auth.Change) {
 			EventType:  message.NewLocalizedEventType(change.EventType),
 			Sequence:   change.Sequence,
 			Data:       data,
-			EditorId:   change.ModifierId,
+			EditorId:   change.ModifierID,
 			Editor:     change.ModifierName,
 		}
 	}

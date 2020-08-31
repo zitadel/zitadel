@@ -3,10 +3,8 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 
 	"github.com/caos/logging"
-
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -14,6 +12,7 @@ import (
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	project_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	user_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 type Token struct {
@@ -44,7 +43,8 @@ func (u *Token) EventQuery() (*models.SearchQuery, error) {
 
 func (u *Token) Reduce(event *models.Event) (err error) {
 	switch event.Type {
-	case user_es_model.UserProfileChanged:
+	case user_es_model.UserProfileChanged,
+		user_es_model.HumanProfileChanged:
 		user := new(view_model.UserView)
 		user.AppendEvent(event)
 		tokens, err := u.view.TokensByUserID(event.AggregateID)
@@ -55,7 +55,8 @@ func (u *Token) Reduce(event *models.Event) (err error) {
 			token.PreferredLanguage = user.PreferredLanguage
 		}
 		return u.view.PutTokens(tokens, event.Sequence)
-	case user_es_model.SignedOut:
+	case user_es_model.SignedOut,
+		user_es_model.HumanSignedOut:
 		id, err := agentIDFromSession(event)
 		if err != nil {
 			return err
@@ -86,7 +87,6 @@ func (u *Token) Reduce(event *models.Event) (err error) {
 	default:
 		return u.view.ProcessedTokenSequence(event.Sequence)
 	}
-	return nil
 }
 
 func (u *Token) OnError(event *models.Event, err error) error {

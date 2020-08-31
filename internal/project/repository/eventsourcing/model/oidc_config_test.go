@@ -2,14 +2,15 @@ package model
 
 import (
 	"encoding/json"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"testing"
+
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 )
 
 func TestOIDCConfigChanges(t *testing.T) {
 	type args struct {
-		existing *OIDCConfig
-		new      *OIDCConfig
+		existingConfig *OIDCConfig
+		newConfig      *OIDCConfig
 	}
 	type res struct {
 		changesLen int
@@ -22,7 +23,7 @@ func TestOIDCConfigChanges(t *testing.T) {
 		{
 			name: "all possible values change",
 			args: args{
-				existing: &OIDCConfig{
+				existingConfig: &OIDCConfig{
 					AppID:                  "AppID",
 					RedirectUris:           []string{"RedirectUris"},
 					ResponseTypes:          []int32{1},
@@ -31,7 +32,7 @@ func TestOIDCConfigChanges(t *testing.T) {
 					AuthMethodType:         1,
 					PostLogoutRedirectUris: []string{"PostLogoutRedirectUris"},
 				},
-				new: &OIDCConfig{
+				newConfig: &OIDCConfig{
 					AppID:                  "AppID",
 					RedirectUris:           []string{"RedirectUrisChanged"},
 					ResponseTypes:          []int32{2},
@@ -48,7 +49,7 @@ func TestOIDCConfigChanges(t *testing.T) {
 		{
 			name: "no changes",
 			args: args{
-				existing: &OIDCConfig{
+				existingConfig: &OIDCConfig{
 					AppID:                  "AppID",
 					RedirectUris:           []string{"RedirectUris"},
 					ResponseTypes:          []int32{1},
@@ -57,7 +58,7 @@ func TestOIDCConfigChanges(t *testing.T) {
 					AuthMethodType:         1,
 					PostLogoutRedirectUris: []string{"PostLogoutRedirectUris"},
 				},
-				new: &OIDCConfig{
+				newConfig: &OIDCConfig{
 					AppID:                  "AppID",
 					RedirectUris:           []string{"RedirectUris"},
 					ResponseTypes:          []int32{1},
@@ -74,11 +75,11 @@ func TestOIDCConfigChanges(t *testing.T) {
 		{
 			name: "change not changeable attributes",
 			args: args{
-				existing: &OIDCConfig{
+				existingConfig: &OIDCConfig{
 					AppID:    "AppID",
 					ClientID: "ClientID",
 				},
-				new: &OIDCConfig{
+				newConfig: &OIDCConfig{
 					AppID:    "AppIDChange",
 					ClientID: "ClientIDChange",
 				},
@@ -90,7 +91,7 @@ func TestOIDCConfigChanges(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			changes := tt.args.existing.Changes(tt.args.new)
+			changes := tt.args.existingConfig.Changes(tt.args.newConfig)
 			if len(changes) != tt.res.changesLen {
 				t.Errorf("got wrong changes len: expected: %v, actual: %v ", tt.res.changesLen, len(changes))
 			}
@@ -112,11 +113,19 @@ func TestAppendAddOIDCConfigEvent(t *testing.T) {
 		{
 			name: "append add application event",
 			args: args{
-				project: &Project{Applications: []*Application{&Application{AppID: "AppID"}}},
-				config:  &OIDCConfig{AppID: "AppID", ClientID: "ClientID"},
-				event:   &es_models.Event{},
+				project: &Project{
+					Applications: []*Application{
+						{AppID: "AppID"},
+					},
+				},
+				config: &OIDCConfig{AppID: "AppID", ClientID: "ClientID"},
+				event:  &es_models.Event{},
 			},
-			result: &Project{Applications: []*Application{&Application{AppID: "AppID", OIDCConfig: &OIDCConfig{AppID: "AppID", ClientID: "ClientID"}}}},
+			result: &Project{
+				Applications: []*Application{
+					{AppID: "AppID", OIDCConfig: &OIDCConfig{AppID: "AppID", ClientID: "ClientID"}},
+				},
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -153,11 +162,19 @@ func TestAppendChangeOIDCConfigEvent(t *testing.T) {
 		{
 			name: "append change application event",
 			args: args{
-				project: &Project{Applications: []*Application{&Application{AppID: "AppID", OIDCConfig: &OIDCConfig{AppID: "AppID", ClientID: "ClientID"}}}},
-				config:  &OIDCConfig{AppID: "AppID", ClientID: "ClientID Changed"},
-				event:   &es_models.Event{},
+				project: &Project{
+					Applications: []*Application{
+						{AppID: "AppID", OIDCConfig: &OIDCConfig{AppID: "AppID", ClientID: "ClientID"}},
+					},
+				},
+				config: &OIDCConfig{AppID: "AppID", ClientID: "ClientID Changed"},
+				event:  &es_models.Event{},
 			},
-			result: &Project{Applications: []*Application{&Application{AppID: "AppID", OIDCConfig: &OIDCConfig{AppID: "AppID", ClientID: "ClientID Changed"}}}},
+			result: &Project{
+				Applications: []*Application{
+					{AppID: "AppID", OIDCConfig: &OIDCConfig{AppID: "AppID", ClientID: "ClientID Changed"}},
+				},
+			},
 		},
 	}
 	for _, tt := range tests {

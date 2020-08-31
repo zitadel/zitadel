@@ -7,7 +7,7 @@ import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { IamMember, IamMemberView } from 'src/app/proto/generated/admin_pb';
-import { ProjectMember, ProjectType, User } from 'src/app/proto/generated/management_pb';
+import { ProjectMember, ProjectType, UserView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -112,7 +112,7 @@ export class IamMembersComponent implements AfterViewInit {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                const users: User.AsObject[] = resp.users;
+                const users: UserView.AsObject[] = resp.users;
                 const roles: string[] = resp.roles;
 
                 if (users && users.length && roles && roles.length) {

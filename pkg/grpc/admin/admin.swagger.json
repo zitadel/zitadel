@@ -797,7 +797,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protobufStruct"
+              "type": "object"
             }
           }
         },
@@ -854,19 +854,6 @@
     }
   },
   "definitions": {
-    "protobufListValue": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protobufValue"
-          },
-          "description": "Repeated field of dynamically typed values."
-        }
-      },
-      "description": "`ListValue` is a wrapper around a repeated field of values.\n\nThe JSON representation for `ListValue` is JSON array."
-    },
     "protobufNullValue": {
       "type": "string",
       "enum": [
@@ -874,51 +861,6 @@
       ],
       "default": "NULL_VALUE",
       "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
-    },
-    "protobufStruct": {
-      "type": "object",
-      "properties": {
-        "fields": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/protobufValue"
-          },
-          "description": "Unordered map of dynamically typed values."
-        }
-      },
-      "description": "`Struct` represents a structured data value, consisting of fields\nwhich map to dynamically typed values. In some languages, `Struct`\nmight be supported by a native representation. For example, in\nscripting languages like JS a struct is represented as an\nobject. The details of that representation are described together\nwith the proto support for the language.\n\nThe JSON representation for `Struct` is JSON object."
-    },
-    "protobufValue": {
-      "type": "object",
-      "properties": {
-        "null_value": {
-          "$ref": "#/definitions/protobufNullValue",
-          "description": "Represents a null value."
-        },
-        "number_value": {
-          "type": "number",
-          "format": "double",
-          "description": "Represents a double value."
-        },
-        "string_value": {
-          "type": "string",
-          "description": "Represents a string value."
-        },
-        "bool_value": {
-          "type": "boolean",
-          "format": "boolean",
-          "description": "Represents a boolean value."
-        },
-        "struct_value": {
-          "$ref": "#/definitions/protobufStruct",
-          "description": "Represents a structured value."
-        },
-        "list_value": {
-          "$ref": "#/definitions/protobufListValue",
-          "description": "Represents a repeated `Value`."
-        }
-      },
-      "description": "`Value` represents a dynamically typed value which can be either\nnull, a number, a string, a boolean, a recursive struct value, or a\nlist of values. A producer of value is expected to set one of that\nvariants, absence of any variant indicates an error.\n\nThe JSON representation for `Value` is JSON value."
     },
     "v1AddIamMemberRequest": {
       "type": "object",
@@ -948,23 +890,9 @@
         }
       }
     },
-    "v1CreateOrgRequest": {
+    "v1CreateHumanRequest": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string"
-        },
-        "domain": {
-          "type": "string"
-        }
-      }
-    },
-    "v1CreateUserRequest": {
-      "type": "object",
-      "properties": {
-        "user_name": {
-          "type": "string"
-        },
         "first_name": {
           "type": "string"
         },
@@ -1011,6 +939,42 @@
         },
         "password": {
           "type": "string"
+        }
+      }
+    },
+    "v1CreateMachineRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateOrgRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateUserRequest": {
+      "type": "object",
+      "properties": {
+        "user_name": {
+          "type": "string"
+        },
+        "human": {
+          "$ref": "#/definitions/v1CreateHumanRequest"
+        },
+        "machine": {
+          "$ref": "#/definitions/v1CreateMachineRequest"
         }
       }
     },
@@ -1090,6 +1054,58 @@
         "GENDER_DIVERSE"
       ],
       "default": "GENDER_UNSPECIFIED"
+    },
+    "v1HumanResponse": {
+      "type": "object",
+      "properties": {
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "nick_name": {
+          "type": "string"
+        },
+        "preferred_language": {
+          "type": "string"
+        },
+        "gender": {
+          "$ref": "#/definitions/v1Gender"
+        },
+        "email": {
+          "type": "string"
+        },
+        "is_email_verified": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "is_phone_verified": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "country": {
+          "type": "string"
+        },
+        "locality": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "street_address": {
+          "type": "string"
+        }
+      }
     },
     "v1IamMember": {
       "type": "object",
@@ -1490,6 +1506,54 @@
         }
       }
     },
+    "v1MachineKeyResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1MachineKeyType"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiration_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1MachineKeyType": {
+      "type": "string",
+      "enum": [
+        "MACHINEKEY_UNSPECIFIED",
+        "MACHINEKEY_JSON"
+      ],
+      "default": "MACHINEKEY_UNSPECIFIED"
+    },
+    "v1MachineResponse": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "keys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1MachineKeyResponse"
+          }
+        }
+      }
+    },
     "v1OidcIdpConfig": {
       "type": "object",
       "properties": {
@@ -1652,7 +1716,7 @@
       "type": "string",
       "enum": [
         "ORGSEARCHKEY_UNSPECIFIED",
-        "ORGSEARCHKEY_ORG_NAME",
+        "ORGSEARCHKEY_NAME",
         "ORGSEARCHKEY_DOMAIN",
         "ORGSEARCHKEY_STATE"
       ],
@@ -1756,7 +1820,7 @@
           "$ref": "#/definitions/v1Org"
         },
         "user": {
-          "$ref": "#/definitions/v1User"
+          "$ref": "#/definitions/v1UserResponse"
         }
       }
     },
@@ -1795,7 +1859,7 @@
         }
       }
     },
-    "v1User": {
+    "v1UserResponse": {
       "type": "object",
       "properties": {
         "id": {
@@ -1812,59 +1876,18 @@
           "type": "string",
           "format": "date-time"
         },
-        "user_name": {
-          "type": "string"
-        },
-        "first_name": {
-          "type": "string"
-        },
-        "last_name": {
-          "type": "string"
-        },
-        "nick_name": {
-          "type": "string"
-        },
-        "display_name": {
-          "type": "string"
-        },
-        "preferred_language": {
-          "type": "string"
-        },
-        "gender": {
-          "$ref": "#/definitions/v1Gender"
-        },
-        "email": {
-          "type": "string"
-        },
-        "isEmailVerified": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "phone": {
-          "type": "string"
-        },
-        "isPhoneVerified": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "country": {
-          "type": "string"
-        },
-        "locality": {
-          "type": "string"
-        },
-        "postal_code": {
-          "type": "string"
-        },
-        "region": {
-          "type": "string"
-        },
-        "street_address": {
-          "type": "string"
-        },
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "human": {
+          "$ref": "#/definitions/v1HumanResponse"
+        },
+        "machine": {
+          "$ref": "#/definitions/v1MachineResponse"
         }
       }
     },

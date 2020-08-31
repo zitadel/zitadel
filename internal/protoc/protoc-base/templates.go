@@ -26,7 +26,7 @@ var templateFuncs = map[string]interface{}{
 }
 
 func RegisterTmplFunc(name string, f interface{}) {
-	if _, existing := templateFuncs[name]; existing {
+	if _, found := templateFuncs[name]; found {
 		panic(fmt.Sprintf("func with name %v is already registered", name))
 	}
 

@@ -106,14 +106,18 @@ type mockViewUser struct {
 
 func (m *mockViewUser) UserByID(string) (*user_view_model.UserView, error) {
 	return &user_view_model.UserView{
-		InitRequired:           m.InitRequired,
-		PasswordSet:            m.PasswordSet,
-		PasswordChangeRequired: m.PasswordChangeRequired,
-		IsEmailVerified:        m.IsEmailVerified,
-		OTPState:               m.OTPState,
-		MfaMaxSetUp:            m.MfaMaxSetUp,
-		MfaInitSkipped:         m.MfaInitSkipped,
-		State:                  int32(user_model.UserStateActive),
+		State:    int32(user_model.UserStateActive),
+		UserName: "schofseckel",
+		HumanView: &user_view_model.HumanView{
+			FirstName:              "schof",
+			InitRequired:           m.InitRequired,
+			PasswordSet:            m.PasswordSet,
+			PasswordChangeRequired: m.PasswordChangeRequired,
+			IsEmailVerified:        m.IsEmailVerified,
+			OTPState:               m.OTPState,
+			MfaMaxSetUp:            m.MfaMaxSetUp,
+			MfaInitSkipped:         m.MfaInitSkipped,
+		},
 	}, nil
 }
 
@@ -564,7 +568,9 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			args{
 				request: &model.AuthRequest{},
 				user: &user_model.UserView{
-					MfaMaxSetUp: model.MfaLevelNotSetUp,
+					HumanView: &user_model.HumanView{
+						MfaMaxSetUp: model.MfaLevelNotSetUp,
+					},
 				},
 			},
 			&model.MfaPromptStep{
@@ -582,8 +588,10 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			args{
 				request: &model.AuthRequest{},
 				user: &user_model.UserView{
-					MfaMaxSetUp:    model.MfaLevelNotSetUp,
-					MfaInitSkipped: time.Now().UTC(),
+					HumanView: &user_model.HumanView{
+						MfaMaxSetUp:    model.MfaLevelNotSetUp,
+						MfaInitSkipped: time.Now().UTC(),
+					},
 				},
 			},
 			nil,
@@ -597,8 +605,10 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			args{
 				request: &model.AuthRequest{},
 				user: &user_model.UserView{
-					MfaMaxSetUp: model.MfaLevelSoftware,
-					OTPState:    user_model.MfaStateReady,
+					HumanView: &user_model.HumanView{
+						MfaMaxSetUp: model.MfaLevelSoftware,
+						OTPState:    user_model.MfaStateReady,
+					},
 				},
 				userSession: &user_model.UserSessionView{MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Hour)},
 			},
@@ -613,8 +623,10 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			args{
 				request: &model.AuthRequest{},
 				user: &user_model.UserView{
-					MfaMaxSetUp: model.MfaLevelSoftware,
-					OTPState:    user_model.MfaStateReady,
+					HumanView: &user_model.HumanView{
+						MfaMaxSetUp: model.MfaLevelSoftware,
+						OTPState:    user_model.MfaStateReady,
+					},
 				},
 				userSession: &user_model.UserSessionView{},
 			},
@@ -658,7 +670,9 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 			"mfa set up, true",
 			fields{},
 			args{&user_model.UserView{
-				MfaMaxSetUp: model.MfaLevelSoftware,
+				HumanView: &user_model.HumanView{
+					MfaMaxSetUp: model.MfaLevelSoftware,
+				},
 			}},
 			true,
 		},
@@ -668,8 +682,10 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 				MfaInitSkippedLifeTime: 30 * 24 * time.Hour,
 			},
 			args{&user_model.UserView{
-				MfaMaxSetUp:    -1,
-				MfaInitSkipped: time.Now().UTC().Add(-10 * time.Hour),
+				HumanView: &user_model.HumanView{
+					MfaMaxSetUp:    -1,
+					MfaInitSkipped: time.Now().UTC().Add(-10 * time.Hour),
+				},
 			}},
 			true,
 		},
@@ -679,8 +695,10 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 				MfaInitSkippedLifeTime: 30 * 24 * time.Hour,
 			},
 			args{&user_model.UserView{
-				MfaMaxSetUp:    -1,
-				MfaInitSkipped: time.Now().UTC().Add(-40 * 24 * time.Hour),
+				HumanView: &user_model.HumanView{
+					MfaMaxSetUp:    -1,
+					MfaInitSkipped: time.Now().UTC().Add(-40 * 24 * time.Hour),
+				},
 			}},
 			false,
 		},
@@ -735,7 +753,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				userProvider: &mockViewUserSession{
 					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
 				},
-				user:          &user_model.UserView{ID: "id"},
+				user:          &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "schof"}},
 				eventProvider: &mockEventErrUser{},
 			},
 			&user_model.UserSessionView{
@@ -752,7 +770,7 @@ func Test_userSessionByIDs(t *testing.T) {
 					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
 				},
 				agentID: "agentID",
-				user:    &user_model.UserView{ID: "id"},
+				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "schof"}},
 				eventProvider: &mockEventUser{
 					&es_models.Event{
 						AggregateType: user_es_model.UserAggregate,
@@ -802,7 +820,7 @@ func Test_userSessionByIDs(t *testing.T) {
 					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
 				},
 				agentID: "agentID",
-				user:    &user_model.UserView{ID: "id"},
+				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "schof"}},
 				eventProvider: &mockEventUser{
 					&es_models.Event{
 						AggregateType: user_es_model.UserAggregate,
@@ -884,8 +902,12 @@ func Test_userByID(t *testing.T) {
 				eventProvider: &mockEventErrUser{},
 			},
 			&user_model.UserView{
-				PasswordChangeRequired: true,
-				State:                  user_model.UserStateActive,
+				State:    user_model.UserStateActive,
+				UserName: "schofseckel",
+				HumanView: &user_model.HumanView{
+					PasswordChangeRequired: true,
+					FirstName:              "schof",
+				},
 			},
 			nil,
 		},
@@ -905,8 +927,12 @@ func Test_userByID(t *testing.T) {
 				},
 			},
 			&user_model.UserView{
-				PasswordChangeRequired: true,
-				State:                  user_model.UserStateActive,
+				State:    user_model.UserStateActive,
+				UserName: "schofseckel",
+				HumanView: &user_model.HumanView{
+					PasswordChangeRequired: true,
+					FirstName:              "schof",
+				},
 			},
 			nil,
 		},
@@ -929,10 +955,14 @@ func Test_userByID(t *testing.T) {
 				},
 			},
 			&user_model.UserView{
-				PasswordChangeRequired: false,
-				ChangeDate:             time.Now().UTC().Round(1 * time.Second),
-				State:                  user_model.UserStateActive,
-				PasswordChanged:        time.Now().UTC().Round(1 * time.Second),
+				ChangeDate: time.Now().UTC().Round(1 * time.Second),
+				State:      user_model.UserStateActive,
+				UserName:   "schofseckel",
+				HumanView: &user_model.HumanView{
+					PasswordChangeRequired: false,
+					PasswordChanged:        time.Now().UTC().Round(1 * time.Second),
+					FirstName:              "schof",
+				},
 			},
 			nil,
 		},

@@ -2,20 +2,20 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	global_model "github.com/caos/zitadel/internal/model"
-	"github.com/caos/zitadel/internal/view/repository"
 
 	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
+	global_model "github.com/caos/zitadel/internal/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 type UserRepo struct {
@@ -123,8 +123,8 @@ func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence u
 		return nil, err
 	}
 	for _, change := range changes.Changes {
-		change.ModifierName = change.ModifierId
-		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		change.ModifierName = change.ModifierID
+		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierID)
 		if user != nil {
 			change.ModifierName = user.DisplayName
 		}
@@ -149,6 +149,9 @@ func (repo *UserRepo) UserMfas(ctx context.Context, userID string) ([]*usr_model
 	if err != nil {
 		return nil, err
 	}
+	if user.HumanView == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-xx0hV", "Errors.User.NotHuman")
+	}
 	if user.OTPState == usr_model.MfaStateUnspecified {
 		return []*usr_model.MultiFactor{}, nil
 	}
@@ -172,7 +175,51 @@ func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_mode
 	if err != nil {
 		return nil, err
 	}
-	return user.GetProfile(), nil
+	if user.HumanView == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-gDFC2", "Errors.User.NotHuman")
+	}
+	return user.GetProfile()
+}
+
+func (repo *UserRepo) ChangeMachine(ctx context.Context, machine *usr_model.Machine) (*usr_model.Machine, error) {
+	return repo.UserEvents.ChangeMachine(ctx, machine)
+}
+
+func (repo *UserRepo) GetMachineKey(ctx context.Context, userID, keyID string) (*usr_model.MachineKeyView, error) {
+	key, err := repo.View.MachineKeyByIDs(userID, keyID)
+	if err != nil {
+		return nil, err
+	}
+	return model.MachineKeyToModel(key), nil
+}
+
+func (repo *UserRepo) SearchMachineKeys(ctx context.Context, request *usr_model.MachineKeySearchRequest) (*usr_model.MachineKeySearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	sequence, seqErr := repo.View.GetLatestMachineKeySequence()
+	logging.Log("EVENT-Sk8fs").OnError(seqErr).Warn("could not read latest user sequence")
+	keys, count, err := repo.View.SearchMachineKeys(request)
+	if err != nil {
+		return nil, err
+	}
+	result := &usr_model.MachineKeySearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: count,
+		Result:      model.MachineKeysToModel(keys),
+	}
+	if seqErr == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
+	}
+	return result, nil
+}
+
+func (repo *UserRepo) AddMachineKey(ctx context.Context, key *usr_model.MachineKey) (*usr_model.MachineKey, error) {
+	return repo.UserEvents.AddMachineKey(ctx, key)
+}
+
+func (repo *UserRepo) RemoveMachineKey(ctx context.Context, userID, keyID string) error {
+	return repo.UserEvents.RemoveMachineKey(ctx, userID, keyID)
 }
 
 func (repo *UserRepo) ChangeProfile(ctx context.Context, profile *usr_model.Profile) (*usr_model.Profile, error) {
@@ -192,7 +239,10 @@ func (repo *UserRepo) EmailByID(ctx context.Context, userID string) (*usr_model.
 	if err != nil {
 		return nil, err
 	}
-	return user.GetEmail(), nil
+	if user.HumanView == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-pt7HY", "Errors.User.NotHuman")
+	}
+	return user.GetEmail()
 }
 
 func (repo *UserRepo) ChangeEmail(ctx context.Context, email *usr_model.Email) (*usr_model.Email, error) {
@@ -208,7 +258,10 @@ func (repo *UserRepo) PhoneByID(ctx context.Context, userID string) (*usr_model.
 	if err != nil {
 		return nil, err
 	}
-	return user.GetPhone(), nil
+	if user.HumanView == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-hliQl", "Errors.User.NotHuman")
+	}
+	return user.GetPhone()
 }
 
 func (repo *UserRepo) ChangePhone(ctx context.Context, email *usr_model.Phone) (*usr_model.Phone, error) {
@@ -228,7 +281,10 @@ func (repo *UserRepo) AddressByID(ctx context.Context, userID string) (*usr_mode
 	if err != nil {
 		return nil, err
 	}
-	return user.GetAddress(), nil
+	if user.HumanView == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-LQh4I", "Errors.User.NotHuman")
+	}
+	return user.GetAddress()
 }
 
 func (repo *UserRepo) ChangeAddress(ctx context.Context, address *usr_model.Address) (*usr_model.Address, error) {

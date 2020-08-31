@@ -110,7 +110,10 @@ func (u *UserGrant) processUserGrant(event *models.Event) (err error) {
 func (u *UserGrant) processUser(event *models.Event) (err error) {
 	switch event.Type {
 	case usr_es_model.UserProfileChanged,
-		usr_es_model.UserEmailChanged:
+		usr_es_model.UserEmailChanged,
+		usr_es_model.HumanProfileChanged,
+		usr_es_model.HumanEmailChanged,
+		usr_es_model.MachineChanged:
 		grants, err := u.view.UserGrantsByUserID(event.AggregateID)
 		if err != nil {
 			return err
@@ -276,13 +279,13 @@ func suffixRoles(suffix string, roles []string) []string {
 
 func mergeExistingRoles(rolePrefix, suffix string, existingRoles, newRoles []string) []string {
 	mergedRoles := make([]string, 0)
-	for _, existing := range existingRoles {
-		if !strings.HasPrefix(existing, rolePrefix) {
-			mergedRoles = append(mergedRoles, existing)
+	for _, existingRole := range existingRoles {
+		if !strings.HasPrefix(existingRole, rolePrefix) {
+			mergedRoles = append(mergedRoles, existingRole)
 			continue
 		}
-		if suffix != "" && !strings.HasSuffix(existing, suffix) {
-			mergedRoles = append(mergedRoles, existing)
+		if suffix != "" && !strings.HasSuffix(existingRole, suffix) {
+			mergedRoles = append(mergedRoles, existingRole)
 		}
 	}
 	return append(mergedRoles, newRoles...)
@@ -325,9 +328,15 @@ func (u *UserGrant) fillData(grant *view_model.UserGrantView, resourceOwner stri
 
 func (u *UserGrant) fillUserData(grant *view_model.UserGrantView, user *usr_model.User) {
 	grant.UserName = user.UserName
-	grant.FirstName = user.FirstName
-	grant.LastName = user.LastName
-	grant.Email = user.EmailAddress
+	if user.Human != nil {
+		grant.FirstName = user.FirstName
+		grant.LastName = user.LastName
+		grant.DisplayName = user.FirstName + " " + user.LastName
+		grant.Email = user.EmailAddress
+	}
+	if user.Machine != nil {
+		grant.DisplayName = user.Machine.Name
+	}
 }
 
 func (u *UserGrant) fillProjectData(grant *view_model.UserGrantView, project *proj_model.Project) {

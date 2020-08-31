@@ -18,11 +18,13 @@ import { SharedModule } from 'src/app/modules/shared/shared.module';
 
 import { UserListRoutingModule } from './user-list-routing.module';
 import { UserListComponent } from './user-list.component';
+import { UserTableComponent } from './user-table/user-table.component';
 
 
 @NgModule({
     declarations: [
         UserListComponent,
+        UserTableComponent,
     ],
     imports: [
         AvatarModule,

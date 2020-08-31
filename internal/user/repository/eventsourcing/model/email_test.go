@@ -2,15 +2,16 @@ package model
 
 import (
 	"encoding/json"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"testing"
 	"time"
+
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 )
 
 func TestEmailChanges(t *testing.T) {
 	type args struct {
-		existing *Email
-		new      *Email
+		existingEmail *Email
+		new           *Email
 	}
 	type res struct {
 		changesLen int
@@ -23,8 +24,8 @@ func TestEmailChanges(t *testing.T) {
 		{
 			name: "all fields changed",
 			args: args{
-				existing: &Email{EmailAddress: "Email", IsEmailVerified: true},
-				new:      &Email{EmailAddress: "EmailChanged", IsEmailVerified: false},
+				existingEmail: &Email{EmailAddress: "Email", IsEmailVerified: true},
+				new:           &Email{EmailAddress: "EmailChanged", IsEmailVerified: false},
 			},
 			res: res{
 				changesLen: 1,
@@ -33,8 +34,8 @@ func TestEmailChanges(t *testing.T) {
 		{
 			name: "no fields changed",
 			args: args{
-				existing: &Email{EmailAddress: "Email", IsEmailVerified: true},
-				new:      &Email{EmailAddress: "Email", IsEmailVerified: false},
+				existingEmail: &Email{EmailAddress: "Email", IsEmailVerified: true},
+				new:           &Email{EmailAddress: "Email", IsEmailVerified: false},
 			},
 			res: res{
 				changesLen: 0,
@@ -43,7 +44,7 @@ func TestEmailChanges(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			changes := tt.args.existing.Changes(tt.args.new)
+			changes := tt.args.existingEmail.Changes(tt.args.new)
 			if len(changes) != tt.res.changesLen {
 				t.Errorf("got wrong changes len: expected: %v, actual: %v ", tt.res.changesLen, len(changes))
 			}
@@ -53,23 +54,23 @@ func TestEmailChanges(t *testing.T) {
 
 func TestAppendUserEmailChangedEvent(t *testing.T) {
 	type args struct {
-		user  *User
+		user  *Human
 		email *Email
 		event *es_models.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *User
+		result *Human
 	}{
 		{
 			name: "append user email event",
 			args: args{
-				user:  &User{Email: &Email{EmailAddress: "EmailAddress"}},
+				user:  &Human{Email: &Email{EmailAddress: "EmailAddress"}},
 				email: &Email{EmailAddress: "EmailAddressChanged"},
 				event: &es_models.Event{},
 			},
-			result: &User{Email: &Email{EmailAddress: "EmailAddressChanged"}},
+			result: &Human{Email: &Email{EmailAddress: "EmailAddressChanged"}},
 		},
 	}
 	for _, tt := range tests {
@@ -88,23 +89,23 @@ func TestAppendUserEmailChangedEvent(t *testing.T) {
 
 func TestAppendUserEmailCodeAddedEvent(t *testing.T) {
 	type args struct {
-		user  *User
+		user  *Human
 		code  *EmailCode
 		event *es_models.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *User
+		result *Human
 	}{
 		{
 			name: "append user email code added event",
 			args: args{
-				user:  &User{Email: &Email{EmailAddress: "EmailAddress"}},
+				user:  &Human{Email: &Email{EmailAddress: "EmailAddress"}},
 				code:  &EmailCode{Expiry: time.Hour * 1},
 				event: &es_models.Event{},
 			},
-			result: &User{EmailCode: &EmailCode{Expiry: time.Hour * 1}},
+			result: &Human{EmailCode: &EmailCode{Expiry: time.Hour * 1}},
 		},
 	}
 	for _, tt := range tests {
@@ -123,21 +124,21 @@ func TestAppendUserEmailCodeAddedEvent(t *testing.T) {
 
 func TestAppendUserEmailVerifiedEvent(t *testing.T) {
 	type args struct {
-		user  *User
+		user  *Human
 		event *es_models.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *User
+		result *Human
 	}{
 		{
 			name: "append user email event",
 			args: args{
-				user:  &User{Email: &Email{EmailAddress: "EmailAddress"}},
+				user:  &Human{Email: &Email{EmailAddress: "EmailAddress"}},
 				event: &es_models.Event{},
 			},
-			result: &User{Email: &Email{EmailAddress: "EmailAddress", IsEmailVerified: true}},
+			result: &Human{Email: &Email{EmailAddress: "EmailAddress", IsEmailVerified: true}},
 		},
 	}
 	for _, tt := range tests {

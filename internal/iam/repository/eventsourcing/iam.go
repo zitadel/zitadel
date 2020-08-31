@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
@@ -83,12 +84,12 @@ func IAMSetIamProjectAggregate(aggCreator *es_models.AggregateCreator, iam *mode
 	}
 }
 
-func IAMMemberAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, member *model.IAMMember) func(ctx context.Context) (*es_models.Aggregate, error) {
+func IAMMemberAddedAggregate(aggCreator *es_models.AggregateCreator, existingIAM *model.IAM, member *model.IAMMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9sope", "Errors.Internal")
 		}
-		agg, err := IAMAggregate(ctx, aggCreator, existing)
+		agg, err := IAMAggregate(ctx, aggCreator, existingIAM)
 		if err != nil {
 			return nil, err
 		}
@@ -96,13 +97,13 @@ func IAMMemberAddedAggregate(aggCreator *es_models.AggregateCreator, existing *m
 	}
 }
 
-func IAMMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, member *model.IAMMember) func(ctx context.Context) (*es_models.Aggregate, error) {
+func IAMMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existingIAM *model.IAM, member *model.IAMMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-38skf", "Errors.Internal")
 		}
 
-		agg, err := IAMAggregate(ctx, aggCreator, existing)
+		agg, err := IAMAggregate(ctx, aggCreator, existingIAM)
 		if err != nil {
 			return nil, err
 		}
@@ -110,12 +111,12 @@ func IAMMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existing 
 	}
 }
 
-func IAMMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, member *model.IAMMember) func(ctx context.Context) (*es_models.Aggregate, error) {
+func IAMMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, existingIAM *model.IAM, member *model.IAMMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-90lsw", "Errors.Internal")
 		}
-		agg, err := IAMAggregate(ctx, aggCreator, existing)
+		agg, err := IAMAggregate(ctx, aggCreator, existingIAM)
 		if err != nil {
 			return nil, err
 		}

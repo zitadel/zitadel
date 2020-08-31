@@ -19,9 +19,9 @@ func StartCache(conf *config.CacheConfig) (*UserCache, error) {
 	return &UserCache{userCache: userCache}, nil
 }
 
-func (c *UserCache) getUser(ID string) *model.User {
-	user := &model.User{ObjectRoot: models.ObjectRoot{AggregateID: ID}}
-	if err := c.userCache.Get(ID, user); err != nil {
+func (c *UserCache) getUser(id string) *model.User {
+	user := &model.User{ObjectRoot: models.ObjectRoot{AggregateID: id}}
+	if err := c.userCache.Get(id, user); err != nil {
 		logging.Log("EVENT-AtS0S").WithError(err).Debug("error in getting cache")
 	}
 	return user
