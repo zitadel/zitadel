@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
-func OrgIamPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org, policy *model.OrgIamPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+func OrgIAMPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org, policy *model.OrgIAMPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if policy == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-i9sJS", "Errors.Internal")
@@ -17,11 +17,11 @@ func OrgIamPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, org *mod
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.OrgIamPolicyAdded, policy)
+		return agg.AppendEvent(model.OrgIAMPolicyAdded, policy)
 	}
 }
 
-func OrgIamPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org, policy *model.OrgIamPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+func OrgIAMPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org, policy *model.OrgIAMPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if policy == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9Ksie", "Errors.Internal")
@@ -34,7 +34,7 @@ func OrgIamPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, org *m
 		if len(changes) == 0 {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Js6Vs", "Errors.NoChangesFound")
 		}
-		return agg.AppendEvent(model.OrgIamPolicyChanged, changes)
+		return agg.AppendEvent(model.OrgIAMPolicyChanged, changes)
 	}
 }
 
@@ -44,6 +44,6 @@ func OrgIamPolicyRemovedAggregate(aggCreator *es_models.AggregateCreator, org *m
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.OrgIamPolicyRemoved, nil)
+		return agg.AppendEvent(model.OrgIAMPolicyRemoved, nil)
 	}
 }

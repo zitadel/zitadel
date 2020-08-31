@@ -16,6 +16,7 @@ const (
 	UserGrantKeyID            = "id"
 	UserGrantKeyUserID        = "user_id"
 	UserGrantKeyProjectID     = "project_id"
+	UserGrantKeyGrantID       = "grant_id"
 	UserGrantKeyResourceOwner = "resource_owner"
 	UserGrantKeyState         = "state"
 	UserGrantKeyOrgName       = "org_name"

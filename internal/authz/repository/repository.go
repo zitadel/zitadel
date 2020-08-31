@@ -7,5 +7,5 @@ import (
 type Repository interface {
 	Health(context.Context) error
 	UserGrantRepository
-	IamRepository
+	IAMRepository
 }

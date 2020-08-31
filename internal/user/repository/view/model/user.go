@@ -38,17 +38,18 @@ const (
 )
 
 type UserView struct {
-	ID                 string         `json:"-" gorm:"column:id;primary_key"`
-	CreationDate       time.Time      `json:"-" gorm:"column:creation_date"`
-	ChangeDate         time.Time      `json:"-" gorm:"column:change_date"`
-	ResourceOwner      string         `json:"-" gorm:"column:resource_owner"`
-	State              int32          `json:"-" gorm:"column:user_state"`
-	LastLogin          time.Time      `json:"-" gorm:"column:last_login"`
-	LoginNames         pq.StringArray `json:"-" gorm:"column:login_names"`
-	PreferredLoginName string         `json:"-" gorm:"column:preferred_login_name"`
-	Sequence           uint64         `json:"-" gorm:"column:sequence"`
-	Type               userType       `json:"-" gorm:"column:user_type"`
-	UserName           string         `json:"userName" gorm:"column:user_name"`
+	ID                     string         `json:"-" gorm:"column:id;primary_key"`
+	CreationDate           time.Time      `json:"-" gorm:"column:creation_date"`
+	ChangeDate             time.Time      `json:"-" gorm:"column:change_date"`
+	ResourceOwner          string         `json:"-" gorm:"column:resource_owner"`
+	State                  int32          `json:"-" gorm:"column:user_state"`
+	LastLogin              time.Time      `json:"-" gorm:"column:last_login"`
+	LoginNames             pq.StringArray `json:"-" gorm:"column:login_names"`
+	PreferredLoginName     string         `json:"-" gorm:"column:preferred_login_name"`
+	Sequence               uint64         `json:"-" gorm:"column:sequence"`
+	Type                   userType       `json:"-" gorm:"column:user_type"`
+	UserName               string         `json:"userName" gorm:"column:user_name"`
+	UsernameChangeRequired bool           `json:"-" gorm:"column:username_change_required"`
 	*MachineView
 	*HumanView
 }
@@ -136,7 +137,6 @@ func UserToModel(user *UserView) *model.UserView {
 		userView.MachineView = &model.MachineView{
 			Description: user.MachineView.Description,
 			Name:        user.MachineView.Name,
-			//TODO: keys
 		}
 	}
 	return userView
@@ -151,19 +151,13 @@ func UsersToModel(users []*UserView) []*model.UserView {
 }
 
 func (u *UserView) GenerateLoginName(domain string, appendDomain bool) string {
-	var name string
-	if u.MachineView != nil {
-		name = u.MachineView.Name
-	} else {
-		name = u.UserName
-	}
 	if !appendDomain {
-		return name
+		return u.UserName
 	}
-	return name + "@" + domain
+	return u.UserName + "@" + domain
 }
 
-func (u *UserView) SetLoginNames(policy *org_model.OrgIamPolicy, domains []*org_model.OrgDomain) {
+func (u *UserView) SetLoginNames(policy *org_model.OrgIAMPolicy, domains []*org_model.OrgDomain) {
 	loginNames := make([]string, 0)
 	for _, d := range domains {
 		if d.Verified {
@@ -210,10 +204,15 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		err = u.setPasswordData(event)
 	case es_model.UserProfileChanged,
 		es_model.UserAddressChanged,
-		es_model.DomainClaimed,
 		es_model.HumanProfileChanged,
 		es_model.HumanAddressChanged,
 		es_model.MachineChanged:
+		err = u.setData(event)
+	case es_model.DomainClaimed:
+		u.UsernameChangeRequired = true
+		err = u.setData(event)
+	case es_model.UserUserNameChanged:
+		u.UsernameChangeRequired = false
 		err = u.setData(event)
 	case es_model.UserEmailChanged,
 		es_model.HumanEmailChanged:

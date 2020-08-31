@@ -14,17 +14,17 @@ import (
 )
 
 const (
-	IamMemberKeyUserID    = "user_id"
-	IamMemberKeyIamID     = "iam_id"
-	IamMemberKeyUserName  = "user_name"
-	IamMemberKeyEmail     = "email"
-	IamMemberKeyFirstName = "first_name"
-	IamMemberKeyLastName  = "last_name"
+	IAMMemberKeyUserID    = "user_id"
+	IAMMemberKeyIamID     = "iam_id"
+	IAMMemberKeyUserName  = "user_name"
+	IAMMemberKeyEmail     = "email"
+	IAMMemberKeyFirstName = "first_name"
+	IAMMemberKeyLastName  = "last_name"
 )
 
-type IamMemberView struct {
+type IAMMemberView struct {
 	UserID      string         `json:"userId" gorm:"column:user_id;primary_key"`
-	IamID       string         `json:"-" gorm:"column:iam_id"`
+	IAMID       string         `json:"-" gorm:"column:iam_id"`
 	UserName    string         `json:"-" gorm:"column:user_name"`
 	Email       string         `json:"-" gorm:"column:email_address"`
 	FirstName   string         `json:"-" gorm:"column:first_name"`
@@ -37,10 +37,10 @@ type IamMemberView struct {
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
 }
 
-func IamMemberToModel(member *IamMemberView) *model.IamMemberView {
-	return &model.IamMemberView{
+func IAMMemberViewFromModel(member *model.IAMMemberView) *IAMMemberView {
+	return &IAMMemberView{
 		UserID:       member.UserID,
-		IamID:        member.IamID,
+		IAMID:        member.IAMID,
 		UserName:     member.UserName,
 		Email:        member.Email,
 		FirstName:    member.FirstName,
@@ -53,33 +53,49 @@ func IamMemberToModel(member *IamMemberView) *model.IamMemberView {
 	}
 }
 
-func IamMembersToModel(roles []*IamMemberView) []*model.IamMemberView {
-	result := make([]*model.IamMemberView, len(roles))
+func IAMMemberToModel(member *IAMMemberView) *model.IAMMemberView {
+	return &model.IAMMemberView{
+		UserID:       member.UserID,
+		IAMID:        member.IAMID,
+		UserName:     member.UserName,
+		Email:        member.Email,
+		FirstName:    member.FirstName,
+		LastName:     member.LastName,
+		DisplayName:  member.DisplayName,
+		Roles:        member.Roles,
+		Sequence:     member.Sequence,
+		CreationDate: member.CreationDate,
+		ChangeDate:   member.ChangeDate,
+	}
+}
+
+func IAMMembersToModel(roles []*IAMMemberView) []*model.IAMMemberView {
+	result := make([]*model.IAMMemberView, len(roles))
 	for i, r := range roles {
-		result[i] = IamMemberToModel(r)
+		result[i] = IAMMemberToModel(r)
 	}
 	return result
 }
 
-func (r *IamMemberView) AppendEvent(event *models.Event) (err error) {
+func (r *IAMMemberView) AppendEvent(event *models.Event) (err error) {
 	r.Sequence = event.Sequence
 	r.ChangeDate = event.CreationDate
 	switch event.Type {
-	case es_model.IamMemberAdded:
+	case es_model.IAMMemberAdded:
 		r.setRootData(event)
 		r.CreationDate = event.CreationDate
 		err = r.SetData(event)
-	case es_model.IamMemberChanged:
+	case es_model.IAMMemberChanged:
 		err = r.SetData(event)
 	}
 	return err
 }
 
-func (r *IamMemberView) setRootData(event *models.Event) {
-	r.IamID = event.AggregateID
+func (r *IAMMemberView) setRootData(event *models.Event) {
+	r.IAMID = event.AggregateID
 }
 
-func (r *IamMemberView) SetData(event *models.Event) error {
+func (r *IAMMemberView) SetData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, r); err != nil {
 		logging.Log("EVEN-Psl89").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-lub6s", "Could not unmarshal data")

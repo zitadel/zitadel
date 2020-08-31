@@ -8,7 +8,7 @@ import (
 	org_model "github.com/caos/zitadel/internal/org/model"
 )
 
-type OrgIamPolicy struct {
+type OrgIAMPolicy struct {
 	models.ObjectRoot
 
 	Description           string `json:"description,omitempty"`
@@ -16,24 +16,24 @@ type OrgIamPolicy struct {
 	UserLoginMustBeDomain bool   `json:"userLoginMustBeDomain"`
 }
 
-func OrgIamPolicyToModel(policy *OrgIamPolicy) *org_model.OrgIamPolicy {
-	return &org_model.OrgIamPolicy{
+func OrgIAMPolicyToModel(policy *OrgIAMPolicy) *org_model.OrgIAMPolicy {
+	return &org_model.OrgIAMPolicy{
 		ObjectRoot:            policy.ObjectRoot,
 		State:                 org_model.PolicyState(policy.State),
 		UserLoginMustBeDomain: policy.UserLoginMustBeDomain,
 	}
 }
 
-func OrgIamPolicyFromModel(policy *org_model.OrgIamPolicy) *OrgIamPolicy {
-	return &OrgIamPolicy{
+func OrgIAMPolicyFromModel(policy *org_model.OrgIAMPolicy) *OrgIAMPolicy {
+	return &OrgIAMPolicy{
 		ObjectRoot:            policy.ObjectRoot,
 		State:                 int32(policy.State),
 		UserLoginMustBeDomain: policy.UserLoginMustBeDomain,
 	}
 }
 
-func (o *Org) appendAddOrgIamPolicyEvent(event *es_models.Event) error {
-	o.OrgIamPolicy = new(OrgIamPolicy)
+func (o *Org) appendAddOrgIAMPolicyEvent(event *es_models.Event) error {
+	o.OrgIamPolicy = new(OrgIAMPolicy)
 	err := o.OrgIamPolicy.SetData(event)
 	if err != nil {
 		return err
@@ -42,15 +42,15 @@ func (o *Org) appendAddOrgIamPolicyEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (o *Org) appendChangeOrgIamPolicyEvent(event *es_models.Event) error {
+func (o *Org) appendChangeOrgIAMPolicyEvent(event *es_models.Event) error {
 	return o.OrgIamPolicy.SetData(event)
 }
 
-func (o *Org) appendRemoveOrgIamPolicyEvent() {
+func (o *Org) appendRemoveOrgIAMPolicyEvent() {
 	o.OrgIamPolicy = nil
 }
 
-func (p *OrgIamPolicy) Changes(changed *OrgIamPolicy) map[string]interface{} {
+func (p *OrgIAMPolicy) Changes(changed *OrgIAMPolicy) map[string]interface{} {
 	changes := make(map[string]interface{}, 2)
 
 	if changed.Description != p.Description {
@@ -63,7 +63,7 @@ func (p *OrgIamPolicy) Changes(changed *OrgIamPolicy) map[string]interface{} {
 	return changes
 }
 
-func (p *OrgIamPolicy) SetData(event *es_models.Event) error {
+func (p *OrgIAMPolicy) SetData(event *es_models.Event) error {
 	err := json.Unmarshal(event.Data, p)
 	if err != nil {
 		return errors.ThrowInternal(err, "EVENT-7JS9d", "unable to unmarshal data")

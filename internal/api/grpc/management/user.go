@@ -4,13 +4,9 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
-
-	"github.com/golang/protobuf/ptypes/empty"
-
-	grpc_util "github.com/caos/zitadel/internal/api/grpc"
-	"github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/golang/protobuf/ptypes/empty"
 )
 
 func (s *Server) GetUserByID(ctx context.Context, id *management.UserID) (*management.UserView, error) {
@@ -21,8 +17,8 @@ func (s *Server) GetUserByID(ctx context.Context, id *management.UserID) (*manag
 	return userViewFromModel(user), nil
 }
 
-func (s *Server) GetUserByEmailGlobal(ctx context.Context, email *management.Email) (*management.UserView, error) {
-	user, err := s.user.GetGlobalUserByEmail(ctx, email.Email)
+func (s *Server) GetUserByLoginNameGlobal(ctx context.Context, loginName *management.LoginName) (*management.UserView, error) {
+	user, err := s.user.GetUserByLoginNameGlobal(ctx, loginName.LoginName)
 	if err != nil {
 		return nil, err
 	}
@@ -31,8 +27,7 @@ func (s *Server) GetUserByEmailGlobal(ctx context.Context, email *management.Ema
 
 func (s *Server) SearchUsers(ctx context.Context, in *management.UserSearchRequest) (*management.UserSearchResponse, error) {
 	request := userSearchRequestsToModel(in)
-	orgID := grpc_util.GetHeader(ctx, http.ZitadelOrgID)
-	request.AppendMyOrgQuery(orgID)
+	request.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID)
 	response, err := s.user.SearchUsers(ctx, request)
 	if err != nil {
 		return nil, err
@@ -114,6 +109,10 @@ func (s *Server) GetUserProfile(ctx context.Context, in *management.UserID) (*ma
 		return nil, err
 	}
 	return profileViewFromModel(profile), nil
+}
+
+func (s *Server) ChangeUserUserName(ctx context.Context, request *management.UpdateUserUserNameRequest) (*empty.Empty, error) {
+	return &empty.Empty{}, s.user.ChangeUsername(ctx, request.Id, request.UserName)
 }
 
 func (s *Server) UpdateUserProfile(ctx context.Context, request *management.UpdateUserProfileRequest) (*management.UserProfile, error) {
@@ -207,7 +206,6 @@ func (s *Server) GetUserMfas(ctx context.Context, userID *management.UserID) (*m
 
 func (s *Server) SearchUserMemberships(ctx context.Context, in *management.UserMembershipSearchRequest) (*management.UserMembershipSearchResponse, error) {
 	request := userMembershipSearchRequestsToModel(in)
-	request.AppendResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
 	request.AppendUserIDQuery(in.UserId)
 	response, err := s.user.SearchUserMemberships(ctx, request)
 	if err != nil {

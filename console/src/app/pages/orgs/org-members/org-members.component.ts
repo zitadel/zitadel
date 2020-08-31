@@ -5,7 +5,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { Org, OrgMemberView, ProjectType, User } from 'src/app/proto/generated/management_pb';
+import { Org, OrgMemberView, ProjectType, UserView } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -107,7 +107,7 @@ export class OrgMembersComponent implements AfterViewInit {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                const users: User.AsObject[] = resp.users;
+                const users: UserView.AsObject[] = resp.users;
                 const roles: string[] = resp.roles;
 
                 if (users && users.length && roles && roles.length) {

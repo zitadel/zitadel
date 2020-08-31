@@ -614,6 +614,32 @@
         ]
       }
     },
+    "/users/me/username": {
+      "put": {
+        "operationId": "ChangeMyUserName",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ChangeUserNameRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
     "/validate": {
       "get": {
         "operationId": "Validate",
@@ -662,6 +688,14 @@
         },
         "data": {
           "type": "object"
+        }
+      }
+    },
+    "v1ChangeUserNameRequest": {
+      "type": "object",
+      "properties": {
+        "user_name": {
+          "type": "string"
         }
       }
     },
@@ -771,37 +805,6 @@
       ],
       "default": "MFASTATE_UNSPECIFIED"
     },
-    "v1MachineKeyType": {
-      "type": "string",
-      "enum": [
-        "MACHINEKEY_UNSPECIFIED",
-        "MACHINEKEY_JSON"
-      ],
-      "default": "MACHINEKEY_UNSPECIFIED"
-    },
-    "v1MachineKeyView": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "type": {
-          "$ref": "#/definitions/v1MachineKeyType"
-        },
-        "sequence": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "creation_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "expiration_date": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
     "v1MachineView": {
       "type": "object",
       "properties": {
@@ -814,12 +817,6 @@
         },
         "description": {
           "type": "string"
-        },
-        "keys": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1MachineKeyView"
-          }
         }
       }
     },

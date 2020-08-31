@@ -1,13 +1,8 @@
 <app-detail-layout [backRouterLink]="[ '/users', user?.id]"
-    title="{{user?.displayName}} {{ 'USER.MEMBERSHIPS.TITLE' | translate }}"
+    title="{{user?.human?.displayName}} {{ 'USER.MEMBERSHIPS.TITLE' | translate }}"
     description="{{ 'USER.MEMBERSHIPS.DESCRIPTION' | translate }}">
     <app-refresh-table class="refresh-table" (refreshed)="refreshPage()" [dataSize]="dataSource?.totalResult"
         [timestamp]="dataSource?.viewTimestamp" [selection]="selection" [loading]="dataSource?.loading$ | async">
-
-        <!-- <button actions (click)="removeSelectedMemberships()" matTooltip="{{'USER.MEMBERSHIPS.REMOVE' | translate}}"
-            class="icon-button" mat-icon-button *ngIf="selection.hasValue()" color="warn">
-            <i class="las la-trash"></i>
-        </button> -->
 
         <a actions color="primary" class="add-button" (click)="addMember()" color="primary" mat-raised-button>
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}

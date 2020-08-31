@@ -30,7 +30,8 @@
         "PROJECT": "Projects",
         "GRANTEDPROJECT":"Granted Projects",
         "USERSECTION":"user section",
-        "USER": "Users",
+        "HUMANUSERS": "Users",
+        "MACHINEUSERS":"Service Users",
         "LOGOUT": "Logout all users",
         "NEWORG":"New Organisation",
         "IAMADMIN":"You are an IAM Administrator. Note that you have extended permissions!",
@@ -73,6 +74,8 @@
             "LIST": "Users",
             "TITLE": "User",
             "DESCRIPTION": "Create new user in your organisation and manage existing ones.",
+            "LISTMACHINE": "Service Users",
+            "DESCRIPTIONMACHINE": "Create and manage Service Users of your organisation",
             "DETAIL": "Detail",
             "CREATE": "Create",
             "MY": "My Informations",
@@ -142,6 +145,26 @@
             "PREFERRED_LANGUAGE": "Language",
             "GENDER": "Gender",
             "PASSWORD":"Password"
+        },
+        "MACHINE": {
+            "TITLE":"Service User Details",
+            "USERNAME":"Username",
+            "NAME":"Name",
+            "DESCRIPTION":"Description",
+            "KEYSTITLE":"Keys",
+            "KEYSDESC":"Define your keys and add an optional expiration date.",
+            "ID":"Key Id",
+            "TYPE":"Type",
+            "EXPIRYDATE":"Expiration date",
+            "CHOOSEEXPIRY":"Select an expiration Date",
+            "CREATIONDATE":"Creation Date",
+            "ADD": {
+                "TITLE":"Add Key",
+                "DESCRIPTION":"Select your key type and choose an optional expiry date."
+            },
+            "KEYTYPES": {
+                "1":"JSON"
+            }
         },
         "PASSWORD": {
             "TITLE": "Password",
@@ -226,7 +249,8 @@
             "REACTIVATED":"User reactivated",
             "DEACTIVATED":"User deactivated",
             "SELECTEDREACTIVATED":"Selected Users reactivated",
-            "SELECTEDDEACTIVATED":"Selected Users deactivated"
+            "SELECTEDDEACTIVATED":"Selected Users deactivated",
+            "SELECTEDKEYSDELETED":"Selected Keys deleted!"
         },
         "MEMBERSHIPS": {
             "TITLE":"Zitadel Manager Roles",

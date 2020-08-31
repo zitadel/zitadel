@@ -29,7 +29,7 @@ import (
 
 type Setup struct {
 	iamID         string
-	IamEvents     *iam_event.IamEventstore
+	IamEvents     *iam_event.IAMEventstore
 	OrgEvents     *org_event.OrgEventstore
 	UserEvents    *usr_event.UserEventstore
 	ProjectEvents *proj_event.ProjectEventstore
@@ -70,7 +70,7 @@ func StartSetup(esConfig es_int.Config, sd systemdefaults.SystemDefaults) (*Setu
 		return nil, err
 	}
 
-	setup.IamEvents, err = es_iam.StartIam(es_iam.IamConfig{
+	setup.IamEvents, err = es_iam.StartIAM(es_iam.IAMConfig{
 		Eventstore: es,
 		Cache:      esConfig.Cache,
 	}, sd)
@@ -107,7 +107,7 @@ func StartSetup(esConfig es_int.Config, sd systemdefaults.SystemDefaults) (*Setu
 }
 
 func (s *Setup) Execute(ctx context.Context, setUpConfig IAMSetUp) error {
-	iam, err := s.IamEvents.IamByID(ctx, s.iamID)
+	iam, err := s.IamEvents.IAMByID(ctx, s.iamID)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
 	}
@@ -127,6 +127,12 @@ func (s *Setup) Execute(ctx context.Context, setUpConfig IAMSetUp) error {
 		createdUsers:    make(map[string]*usr_model.User),
 		createdOrgs:     make(map[string]*org_model.Org),
 		createdProjects: make(map[string]*proj_model.Project),
+	}
+
+	err = setUp.loginPolicy(ctx, setUpConfig.DefaultLoginPolicy)
+	if err != nil {
+		logging.Log("SETUP-Hdu8S").WithError(err).Error("unable to create login policy")
+		return err
 	}
 
 	pwComplexityPolicy, err := s.PolicyEvents.GetPasswordComplexityPolicy(ctx, policy_model.DefaultPolicy)
@@ -170,6 +176,20 @@ func (s *Setup) Execute(ctx context.Context, setUpConfig IAMSetUp) error {
 	return nil
 }
 
+func (setUp *initializer) loginPolicy(ctx context.Context, policy LoginPolicy) error {
+	logging.Log("SETUP-4djul").Info("setting up login policy")
+	loginPolicy := &iam_model.LoginPolicy{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: setUp.iamID,
+		},
+		AllowRegister:         policy.AllowRegister,
+		AllowUsernamePassword: policy.AllowUsernamePassword,
+		AllowExternalIdp:      policy.AllowExternalIdp,
+	}
+	_, err := setUp.IamEvents.AddLoginPolicy(ctx, loginPolicy)
+	return err
+}
+
 func (setUp *initializer) orgs(ctx context.Context, orgs []Org) error {
 	logging.Log("SETUP-dsTh3").Info("setting up orgs")
 	for _, iamOrg := range orgs {
@@ -180,17 +200,17 @@ func (setUp *initializer) orgs(ctx context.Context, orgs []Org) error {
 		}
 		setUp.createdOrgs[iamOrg.Name] = org
 
-		var policy *org_model.OrgIamPolicy
+		var policy *org_model.OrgIAMPolicy
 		if iamOrg.OrgIamPolicy {
 			policy, err = setUp.iamorgpolicy(ctx, org)
 			if err != nil {
-				logging.LogWithFields("SETUP-IlLif", "Org Iam Policy", iamOrg.Name).WithError(err).Error("unable to create iam org policy")
+				logging.LogWithFields("SETUP-IlLif", "Org IAM Policy", iamOrg.Name).WithError(err).Error("unable to create iam org policy")
 				return err
 			}
 		} else {
-			policy, err = setUp.OrgEvents.GetOrgIamPolicy(ctx, policy_model.DefaultPolicy)
+			policy, err = setUp.OrgEvents.GetOrgIAMPolicy(ctx, policy_model.DefaultPolicy)
 			if err != nil {
-				logging.LogWithFields("SETUP-IS8wS", "Org Iam Policy", iamOrg.Name).WithError(err).Error("unable to get default iam org policy")
+				logging.LogWithFields("SETUP-IS8wS", "Org IAM Policy", iamOrg.Name).WithError(err).Error("unable to get default iam org policy")
 				return err
 			}
 		}
@@ -227,13 +247,13 @@ func (setUp *initializer) org(ctx context.Context, org Org) (*org_model.Org, err
 	return setUp.OrgEvents.CreateOrg(ctx, createOrg, nil)
 }
 
-func (setUp *initializer) iamorgpolicy(ctx context.Context, org *org_model.Org) (*org_model.OrgIamPolicy, error) {
+func (setUp *initializer) iamorgpolicy(ctx context.Context, org *org_model.Org) (*org_model.OrgIAMPolicy, error) {
 	ctx = setSetUpContextData(ctx, org.AggregateID)
-	policy := &org_model.OrgIamPolicy{
+	policy := &org_model.OrgIAMPolicy{
 		ObjectRoot:            models.ObjectRoot{AggregateID: org.AggregateID},
 		UserLoginMustBeDomain: false,
 	}
-	return setUp.OrgEvents.AddOrgIamPolicy(ctx, policy)
+	return setUp.OrgEvents.AddOrgIAMPolicy(ctx, policy)
 }
 
 func (setUp *initializer) iamOwners(ctx context.Context, owners []string) error {
@@ -244,7 +264,7 @@ func (setUp *initializer) iamOwners(ctx context.Context, owners []string) error 
 			logging.LogWithFields("SETUP-8siew", "Owner", iamOwner).Error("unable to add user to iam members")
 			return caos_errs.ThrowPreconditionFailedf(nil, "SETUP-su6L3", "unable to add user to iam members")
 		}
-		_, err := setUp.IamEvents.AddIamMember(ctx, &iam_model.IamMember{ObjectRoot: models.ObjectRoot{AggregateID: setUp.iamID}, UserID: user.AggregateID, Roles: []string{"IAM_OWNER"}})
+		_, err := setUp.IamEvents.AddIAMMember(ctx, &iam_model.IAMMember{ObjectRoot: models.ObjectRoot{AggregateID: setUp.iamID}, UserID: user.AggregateID, Roles: []string{"IAM_OWNER"}})
 		if err != nil {
 			logging.Log("SETUP-LM7rI").WithError(err).Error("unable to add iam administrator to iam members as owner")
 			return err
@@ -274,11 +294,11 @@ func (setUp *initializer) setIamProject(ctx context.Context, iamProjectName stri
 	logging.Log("SETUP-HE3qa").Info("setting iam project")
 	iamProject, ok := setUp.createdProjects[iamProjectName]
 	if !ok {
-		logging.LogWithFields("SETUP-SJFWP", "Iam Project", iamProjectName).Error("iam project created")
+		logging.LogWithFields("SETUP-SJFWP", "IAM Project", iamProjectName).Error("iam project created")
 		return caos_errs.ThrowPreconditionFailedf(nil, "SETUP-sGmQt", "iam project not created: %v", iamProjectName)
 	}
 
-	if _, err := setUp.IamEvents.SetIamProject(ctx, setUp.iamID, iamProject.AggregateID); err != nil {
+	if _, err := setUp.IamEvents.SetIAMProject(ctx, setUp.iamID, iamProject.AggregateID); err != nil {
 		logging.Log("SETUP-i1pNh").WithError(err).Error("unable to set iam project on iam")
 		return err
 	}
@@ -286,7 +306,7 @@ func (setUp *initializer) setIamProject(ctx context.Context, iamProjectName stri
 	return nil
 }
 
-func (setUp *initializer) users(ctx context.Context, users []User, orgPolicy *org_model.OrgIamPolicy) error {
+func (setUp *initializer) users(ctx context.Context, users []User, orgPolicy *org_model.OrgIAMPolicy) error {
 	for _, user := range users {
 		created, err := setUp.user(ctx, user, orgPolicy)
 		if err != nil {
@@ -298,7 +318,7 @@ func (setUp *initializer) users(ctx context.Context, users []User, orgPolicy *or
 	return nil
 }
 
-func (setUp *initializer) user(ctx context.Context, user User, orgPolicy *org_model.OrgIamPolicy) (*usr_model.User, error) {
+func (setUp *initializer) user(ctx context.Context, user User, orgPolicy *org_model.OrgIAMPolicy) (*usr_model.User, error) {
 	createUser := &usr_model.User{
 		UserName: user.UserName,
 		Human: &usr_model.Human{

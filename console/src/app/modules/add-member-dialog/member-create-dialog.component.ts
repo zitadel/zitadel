@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ProjectGrantView, ProjectRole, ProjectView, User } from 'src/app/proto/generated/management_pb';
+import { ProjectGrantView, ProjectRole, ProjectView, UserView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -21,7 +21,7 @@ export enum CreationType {
 export class MemberCreateDialogComponent {
     private projectId: string = '';
     private grantId: string = '';
-    public preselectedUsers: Array<User.AsObject> = [];
+    public preselectedUsers: Array<UserView.AsObject> = [];
 
 
     public creationType!: CreationType;
@@ -31,7 +31,7 @@ export class MemberCreateDialogComponent {
         CreationType.PROJECT_OWNED,
         CreationType.PROJECT_GRANTED,
     ];
-    public users: Array<User.AsObject> = [];
+    public users: Array<UserView.AsObject> = [];
     public roles: Array<ProjectRole.AsObject> | string[] = [];
     public CreationType: any = CreationType;
     public ProjectAutocompleteType: any = ProjectAutocompleteType;

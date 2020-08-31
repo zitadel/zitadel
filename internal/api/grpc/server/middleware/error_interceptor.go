@@ -2,24 +2,20 @@ package middleware
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/grpc/errors"
 
-	"golang.org/x/text/language"
 	"google.golang.org/grpc"
 
-	grpc_util "github.com/caos/zitadel/internal/api/grpc"
-	"github.com/caos/zitadel/internal/i18n"
 	_ "github.com/caos/zitadel/internal/statik"
 )
 
-func ErrorHandler(defaultLanguage language.Tag) grpc.UnaryServerInterceptor {
-	translator := newZitadelTranslator(defaultLanguage)
-
+func ErrorHandler() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		return toGRPCError(ctx, req, handler, translator)
+		return toGRPCError(ctx, req, handler)
 	}
 }
 
-func toGRPCError(ctx context.Context, req interface{}, handler grpc.UnaryHandler, translator *i18n.Translator) (interface{}, error) {
+func toGRPCError(ctx context.Context, req interface{}, handler grpc.UnaryHandler) (interface{}, error) {
 	resp, err := handler(ctx, req)
-	return resp, grpc_util.CaosToGRPCError(ctx, err, translator)
+	return resp, errors.CaosToGRPCError(ctx, err)
 }

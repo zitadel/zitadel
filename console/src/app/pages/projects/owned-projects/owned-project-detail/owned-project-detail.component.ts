@@ -22,7 +22,7 @@ import {
     ProjectState,
     ProjectType,
     ProjectView,
-    User,
+    UserView,
     UserGrantSearchKey,
 } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
@@ -216,7 +216,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                const users: User.AsObject[] = resp.users;
+                const users: UserView.AsObject[] = resp.users;
                 const roles: string[] = resp.roles;
 
                 if (users && users.length && roles && roles.length) {
@@ -234,8 +234,6 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     }
 
     public showDetail(): void {
-        if (this.project?.state === ProjectState.PROJECTSTATE_ACTIVE) {
-            this.router.navigate(['projects', this.project.projectId, 'members']);
-        }
+        this.router.navigate(['projects', this.project.projectId, 'members']);
     }
 }

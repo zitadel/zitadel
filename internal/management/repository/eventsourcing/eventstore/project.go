@@ -109,8 +109,8 @@ func (repo *ProjectRepo) RemoveProject(ctx context.Context, projectID string) er
 
 func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model.ProjectViewSearchRequest) (*proj_model.ProjectViewSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, err := repo.View.GetLatestProjectSequence()
-	logging.Log("EVENT-Edc56").OnError(err).Warn("could not read latest project sequence")
+	sequence, sequenceErr := repo.View.GetLatestProjectSequence()
+	logging.Log("EVENT-Edc56").OnError(sequenceErr).Warn("could not read latest project sequence")
 
 	permissions := authz.GetRequestPermissionsFromCtx(ctx)
 	if !authz.HasGlobalPermission(permissions) {
@@ -130,7 +130,7 @@ func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model
 					TotalResult: uint64(0),
 					Result:      []*proj_model.ProjectView{},
 				}
-				if err == nil {
+				if sequenceErr == nil {
 					result.Sequence = sequence.CurrentSequence
 					result.Timestamp = sequence.CurrentTimestamp
 				}
@@ -151,7 +151,7 @@ func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model
 		TotalResult: uint64(count),
 		Result:      model.ProjectsToModel(projects),
 	}
-	if err == nil {
+	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
 	}
@@ -189,8 +189,8 @@ func (repo *ProjectRepo) RemoveProjectMember(ctx context.Context, projectID, use
 
 func (repo *ProjectRepo) SearchProjectMembers(ctx context.Context, request *proj_model.ProjectMemberSearchRequest) (*proj_model.ProjectMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, err := repo.View.GetLatestProjectMemberSequence()
-	logging.Log("EVENT-3dgt6").OnError(err).Warn("could not read latest project member sequence")
+	sequence, sequenceErr := repo.View.GetLatestProjectMemberSequence()
+	logging.Log("EVENT-3dgt6").OnError(sequenceErr).Warn("could not read latest project member sequence")
 	members, count, err := repo.View.SearchProjectMembers(request)
 	if err != nil {
 		return nil, err
@@ -201,7 +201,7 @@ func (repo *ProjectRepo) SearchProjectMembers(ctx context.Context, request *proj
 		TotalResult: uint64(count),
 		Result:      model.ProjectMembersToModel(members),
 	}
-	if err == nil {
+	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
 	}
@@ -261,8 +261,8 @@ func (repo *ProjectRepo) RemoveProjectRole(ctx context.Context, projectID, key s
 func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, projectID string, request *proj_model.ProjectRoleSearchRequest) (*proj_model.ProjectRoleSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	request.AppendProjectQuery(projectID)
-	sequence, err := repo.View.GetLatestProjectRoleSequence()
-	logging.Log("LSp0d-47suf").OnError(err).Warn("could not read latest project role sequence")
+	sequence, sequenceErr := repo.View.GetLatestProjectRoleSequence()
+	logging.Log("LSp0d-47suf").OnError(sequenceErr).Warn("could not read latest project role sequence")
 	roles, count, err := repo.View.SearchProjectRoles(request)
 	if err != nil {
 		return nil, err
@@ -271,10 +271,10 @@ func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, projectID strin
 	result := &proj_model.ProjectRoleSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
-		TotalResult: uint64(count),
+		TotalResult: count,
 		Result:      model.ProjectRolesToModel(roles),
 	}
-	if err == nil {
+	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
 	}
@@ -352,8 +352,8 @@ func (repo *ProjectRepo) RemoveApplication(ctx context.Context, projectID, appID
 
 func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_model.ApplicationSearchRequest) (*proj_model.ApplicationSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, err := repo.View.GetLatestApplicationSequence()
-	logging.Log("EVENT-SKe8s").OnError(err).Warn("could not read latest application sequence")
+	sequence, sequenceErr := repo.View.GetLatestApplicationSequence()
+	logging.Log("EVENT-SKe8s").OnError(sequenceErr).Warn("could not read latest application sequence")
 	apps, count, err := repo.View.SearchApplications(request)
 	if err != nil {
 		return nil, err
@@ -361,10 +361,10 @@ func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_m
 	result := &proj_model.ApplicationSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
-		TotalResult: uint64(count),
+		TotalResult: count,
 		Result:      model.ApplicationViewsToModel(apps),
 	}
-	if err == nil {
+	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
 	}
@@ -404,8 +404,8 @@ func (repo *ProjectRepo) ProjectGrantByID(ctx context.Context, grantID string) (
 
 func (repo *ProjectRepo) SearchProjectGrants(ctx context.Context, request *proj_model.ProjectGrantViewSearchRequest) (*proj_model.ProjectGrantViewSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, err := repo.View.GetLatestProjectGrantSequence()
-	logging.Log("EVENT-Skw9f").OnError(err).Warn("could not read latest project grant sequence")
+	sequence, sequenceErr := repo.View.GetLatestProjectGrantSequence()
+	logging.Log("EVENT-Skw9f").OnError(sequenceErr).Warn("could not read latest project grant sequence")
 	projects, count, err := repo.View.SearchProjectGrants(request)
 	if err != nil {
 		return nil, err
@@ -413,10 +413,10 @@ func (repo *ProjectRepo) SearchProjectGrants(ctx context.Context, request *proj_
 	result := &proj_model.ProjectGrantViewSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
-		TotalResult: uint64(count),
+		TotalResult: count,
 		Result:      model.ProjectGrantsToModel(projects),
 	}
-	if err == nil {
+	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
 	}
@@ -425,8 +425,8 @@ func (repo *ProjectRepo) SearchProjectGrants(ctx context.Context, request *proj_
 
 func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *proj_model.ProjectGrantViewSearchRequest) (*proj_model.ProjectGrantViewSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, err := repo.View.GetLatestProjectGrantSequence()
-	logging.Log("EVENT-Skw9f").OnError(err).Warn("could not read latest project grant sequence")
+	sequence, sequenceErr := repo.View.GetLatestProjectGrantSequence()
+	logging.Log("EVENT-Skw9f").OnError(sequenceErr).Warn("could not read latest project grant sequence")
 
 	permissions := authz.GetRequestPermissionsFromCtx(ctx)
 	if !authz.HasGlobalPermission(permissions) {
@@ -446,7 +446,7 @@ func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *pro
 					TotalResult: uint64(0),
 					Result:      []*proj_model.ProjectGrantView{},
 				}
-				if err == nil {
+				if sequenceErr == nil {
 					result.Sequence = sequence.CurrentSequence
 					result.Timestamp = sequence.CurrentTimestamp
 				}
@@ -464,10 +464,10 @@ func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *pro
 	result := &proj_model.ProjectGrantViewSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
-		TotalResult: uint64(count),
+		TotalResult: count,
 		Result:      model.ProjectGrantsToModel(projects),
 	}
-	if err == nil {
+	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
 	}
@@ -593,8 +593,8 @@ func (repo *ProjectRepo) RemoveProjectGrantMember(ctx context.Context, projectID
 
 func (repo *ProjectRepo) SearchProjectGrantMembers(ctx context.Context, request *proj_model.ProjectGrantMemberSearchRequest) (*proj_model.ProjectGrantMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, err := repo.View.GetLatestProjectGrantMemberSequence()
-	logging.Log("EVENT-Du8sk").OnError(err).Warn("could not read latest project grant sequence")
+	sequence, sequenceErr := repo.View.GetLatestProjectGrantMemberSequence()
+	logging.Log("EVENT-Du8sk").OnError(sequenceErr).Warn("could not read latest project grant sequence")
 	members, count, err := repo.View.SearchProjectGrantMembers(request)
 	if err != nil {
 		return nil, err
@@ -605,7 +605,7 @@ func (repo *ProjectRepo) SearchProjectGrantMembers(ctx context.Context, request 
 		TotalResult: uint64(count),
 		Result:      model.ProjectGrantMembersToModel(members),
 	}
-	if err == nil {
+	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
 	}

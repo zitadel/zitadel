@@ -359,21 +359,6 @@ func (m *MachineView) Validate() error {
 
 	// no validation rules for Description
 
-	for idx, item := range m.GetKeys() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return MachineViewValidationError{
-					field:  fmt.Sprintf("Keys[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
-
 	return nil
 }
 
@@ -927,6 +912,82 @@ var _ interface {
 	ErrorName() string
 } = UpdateUserProfileRequestValidationError{}
 
+// Validate checks the field values on ChangeUserNameRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ChangeUserNameRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if !_ChangeUserNameRequest_UserName_Pattern.MatchString(m.GetUserName()) {
+		return ChangeUserNameRequestValidationError{
+			field:  "UserName",
+			reason: "value does not match regex pattern \"^[^[:space:]]{1,200}$\"",
+		}
+	}
+
+	return nil
+}
+
+// ChangeUserNameRequestValidationError is the validation error returned by
+// ChangeUserNameRequest.Validate if the designated constraints aren't met.
+type ChangeUserNameRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ChangeUserNameRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ChangeUserNameRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ChangeUserNameRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ChangeUserNameRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ChangeUserNameRequestValidationError) ErrorName() string {
+	return "ChangeUserNameRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ChangeUserNameRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sChangeUserNameRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ChangeUserNameRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ChangeUserNameRequestValidationError{}
+
+var _ChangeUserNameRequest_UserName_Pattern = regexp.MustCompile("^[^[:space:]]{1,200}$")
+
 // Validate checks the field values on UserEmail with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
 func (m *UserEmail) Validate() error {
@@ -1185,82 +1246,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = VerifyMyUserEmailRequestValidationError{}
-
-// Validate checks the field values on VerifyUserEmailRequest with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *VerifyUserEmailRequest) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	// no validation rules for Id
-
-	if l := utf8.RuneCountInString(m.GetCode()); l < 1 || l > 200 {
-		return VerifyUserEmailRequestValidationError{
-			field:  "Code",
-			reason: "value length must be between 1 and 200 runes, inclusive",
-		}
-	}
-
-	return nil
-}
-
-// VerifyUserEmailRequestValidationError is the validation error returned by
-// VerifyUserEmailRequest.Validate if the designated constraints aren't met.
-type VerifyUserEmailRequestValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e VerifyUserEmailRequestValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e VerifyUserEmailRequestValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e VerifyUserEmailRequestValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e VerifyUserEmailRequestValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e VerifyUserEmailRequestValidationError) ErrorName() string {
-	return "VerifyUserEmailRequestValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e VerifyUserEmailRequestValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sVerifyUserEmailRequest.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = VerifyUserEmailRequestValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = VerifyUserEmailRequestValidationError{}
 
 // Validate checks the field values on UpdateUserEmailRequest with the rules
 // defined in the proto definition for this message. If any rules are
@@ -1969,144 +1954,6 @@ var _ interface {
 	ErrorName() string
 } = UpdateUserAddressRequestValidationError{}
 
-// Validate checks the field values on PasswordID with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *PasswordID) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	// no validation rules for Id
-
-	return nil
-}
-
-// PasswordIDValidationError is the validation error returned by
-// PasswordID.Validate if the designated constraints aren't met.
-type PasswordIDValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e PasswordIDValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e PasswordIDValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e PasswordIDValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e PasswordIDValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e PasswordIDValidationError) ErrorName() string { return "PasswordIDValidationError" }
-
-// Error satisfies the builtin error interface
-func (e PasswordIDValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sPasswordID.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = PasswordIDValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = PasswordIDValidationError{}
-
-// Validate checks the field values on PasswordRequest with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
-func (m *PasswordRequest) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	if l := utf8.RuneCountInString(m.GetPassword()); l < 1 || l > 72 {
-		return PasswordRequestValidationError{
-			field:  "Password",
-			reason: "value length must be between 1 and 72 runes, inclusive",
-		}
-	}
-
-	return nil
-}
-
-// PasswordRequestValidationError is the validation error returned by
-// PasswordRequest.Validate if the designated constraints aren't met.
-type PasswordRequestValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e PasswordRequestValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e PasswordRequestValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e PasswordRequestValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e PasswordRequestValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e PasswordRequestValidationError) ErrorName() string { return "PasswordRequestValidationError" }
-
-// Error satisfies the builtin error interface
-func (e PasswordRequestValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sPasswordRequest.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = PasswordRequestValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = PasswordRequestValidationError{}
-
 // Validate checks the field values on PasswordChange with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.
@@ -2194,7 +2041,12 @@ func (m *VerifyMfaOtp) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Code
+	if utf8.RuneCountInString(m.GetCode()) < 1 {
+		return VerifyMfaOtpValidationError{
+			field:  "Code",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -2474,75 +2326,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = MfaOtpResponseValidationError{}
-
-// Validate checks the field values on OIDCClientAuth with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *OIDCClientAuth) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	// no validation rules for ClientId
-
-	// no validation rules for ClientSecret
-
-	return nil
-}
-
-// OIDCClientAuthValidationError is the validation error returned by
-// OIDCClientAuth.Validate if the designated constraints aren't met.
-type OIDCClientAuthValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e OIDCClientAuthValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e OIDCClientAuthValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e OIDCClientAuthValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e OIDCClientAuthValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e OIDCClientAuthValidationError) ErrorName() string { return "OIDCClientAuthValidationError" }
-
-// Error satisfies the builtin error interface
-func (e OIDCClientAuthValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sOIDCClientAuth.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = OIDCClientAuthValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = OIDCClientAuthValidationError{}
 
 // Validate checks the field values on UserGrantSearchRequest with the rules
 // defined in the proto definition for this message. If any rules are

@@ -95,7 +95,7 @@ func (u *NotifyUser) GenerateLoginName(domain string, appendDomain bool) string 
 	return u.UserName + "@" + domain
 }
 
-func (u *NotifyUser) SetLoginNames(policy *org_model.OrgIamPolicy, domains []*org_model.OrgDomain) {
+func (u *NotifyUser) SetLoginNames(policy *org_model.OrgIAMPolicy, domains []*org_model.OrgDomain) {
 	loginNames := make([]string, 0)
 	for _, d := range domains {
 		if d.Verified {

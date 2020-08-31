@@ -104,11 +104,8 @@ func (p *ProjectMember) processUser(event *models.Event) (err error) {
 		}
 		for _, member := range members {
 			p.fillUserData(member, user)
-			err = p.view.PutProjectMember(member, event.Sequence)
-			if err != nil {
-				return err
-			}
 		}
+		return p.view.PutProjectMembers(members, event.Sequence)
 	default:
 		return p.view.ProcessedProjectMemberSequence(event.Sequence)
 	}

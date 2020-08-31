@@ -94,6 +94,17 @@ service AuthService {
     };
   }
 
+  rpc ChangeMyUserName(ChangeUserNameRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/users/me/username"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
   rpc GetMyUserEmail(google.protobuf.Empty) returns (UserEmailView) {
     option (google.api.http) = {
       get: "/users/me/email"
@@ -230,6 +241,7 @@ service AuthService {
       permission: "authenticated"
     };
   }
+
   //Password
   rpc ChangeMyPassword(PasswordChange) returns (google.protobuf.Empty) {
     option (google.api.http) = {
@@ -348,12 +360,6 @@ enum UserSessionState {
   USERSESSIONSTATE_TERMINATED = 2;
 }
 
-enum OIDCResponseType {
-  OIDCRESPONSETYPE_CODE = 0;
-  OIDCRESPONSETYPE_ID_TOKEN = 1;
-  OIDCRESPONSETYPE_ID_TOKEN_TOKEN = 2;
-}
-
 message UserView {
   string id = 1;
   UserState state = 2;
@@ -375,11 +381,10 @@ message UserView {
 }
 
 message MachineView {
-  google.protobuf.Timestamp last_key_added = 2;
+  google.protobuf.Timestamp last_key_added = 1;
 
-  string name = 3;
-  string description = 4;
-  repeated MachineKeyView keys = 5;
+  string name = 2;
+  string description = 3;
 }
 
 message MachineKeyView {
@@ -468,6 +473,10 @@ message UpdateUserProfileRequest {
   Gender gender = 5;
 }
 
+message ChangeUserNameRequest {
+  string user_name = 1 [(validate.rules).string.pattern = "^[^[:space:]]{1,200}$"];
+}
+
 message UserEmail {
   string id = 1;
   string email = 2;
@@ -488,11 +497,6 @@ message UserEmailView {
 
 message VerifyMyUserEmailRequest {
   string code = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-}
-
-message VerifyUserEmailRequest {
-  string id = 1;
-  string code = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message UpdateUserEmailRequest {
@@ -557,14 +561,6 @@ message UpdateUserAddressRequest {
   string street_address = 5 [(validate.rules).string = {max_len: 200}];
 }
 
-message PasswordID {
-  string id = 1;
-}
-
-message PasswordRequest {
-  string password = 1 [(validate.rules).string = {min_len: 1, max_len: 72}];
-}
-
 message PasswordChange {
   string old_password = 1 [(validate.rules).string = {min_len: 1, max_len: 72}];
   string new_password = 2 [(validate.rules).string = {min_len: 1, max_len: 72}];
@@ -577,7 +573,7 @@ enum MfaType {
 }
 
 message VerifyMfaOtp {
-  string code = 1;
+  string code = 1 [(validate.rules).string = {min_len: 1}];
 }
 
 message MultiFactors {
@@ -601,11 +597,6 @@ enum MFAState {
   MFASTATE_NOT_READY = 1;
   MFASTATE_READY = 2;
   MFASTATE_REMOVED = 3;
-}
-
-message OIDCClientAuth {
-  string client_id = 1;
-  string client_secret = 2;
 }
 
 message UserGrantSearchRequest {

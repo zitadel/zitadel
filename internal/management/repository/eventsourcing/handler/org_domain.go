@@ -71,10 +71,10 @@ func (d *OrgDomain) processOrgDomain(event *models.Event) (err error) {
 		}
 		for _, existingDomain := range existingDomains {
 			existingDomain.Primary = false
-			err := d.view.PutOrgDomain(existingDomain, 0)
-			if err != nil {
-				return err
-			}
+		}
+		err = d.view.PutOrgDomains(existingDomains, 0)
+		if err != nil {
+			return err
 		}
 		err = domain.AppendEvent(event)
 	case model.OrgDomainRemoved:

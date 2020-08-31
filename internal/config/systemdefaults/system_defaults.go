@@ -14,17 +14,18 @@ import (
 )
 
 type SystemDefaults struct {
-	DefaultLanguage       language.Tag
-	Domain                string
-	ZitadelDocs           ZitadelDocs
-	SecretGenerators      SecretGenerators
-	UserVerificationKey   *crypto.KeyConfig
-	Multifactors          MultifactorConfig
-	VerificationLifetimes VerificationLifetimes
-	DefaultPolicies       DefaultPolicies
-	DomainVerification    DomainVerification
-	IamID                 string
-	Notifications         Notifications
+	DefaultLanguage          language.Tag
+	Domain                   string
+	ZitadelDocs              ZitadelDocs
+	SecretGenerators         SecretGenerators
+	UserVerificationKey      *crypto.KeyConfig
+	IDPConfigVerificationKey *crypto.KeyConfig
+	Multifactors             MultifactorConfig
+	VerificationLifetimes    VerificationLifetimes
+	DefaultPolicies          DefaultPolicies
+	DomainVerification       DomainVerification
+	IamID                    string
+	Notifications            Notifications
 }
 
 type ZitadelDocs struct {
@@ -39,6 +40,7 @@ type SecretGenerators struct {
 	EmailVerificationCode    crypto.GeneratorConfig
 	PhoneVerificationCode    crypto.GeneratorConfig
 	PasswordVerificationCode crypto.GeneratorConfig
+	MachineKey               crypto.GeneratorConfig
 }
 
 type MultifactorConfig struct {
@@ -61,7 +63,7 @@ type DefaultPolicies struct {
 	Age        pol.PasswordAgePolicyDefault
 	Complexity pol.PasswordComplexityPolicyDefault
 	Lockout    pol.PasswordLockoutPolicyDefault
-	OrgIam     org_model.OrgIamPolicy
+	OrgIam     org_model.OrgIAMPolicy
 }
 
 type DomainVerification struct {
@@ -80,6 +82,7 @@ type Endpoints struct {
 	InitCode      string
 	PasswordReset string
 	VerifyEmail   string
+	DomainClaimed string
 }
 
 type Providers struct {
@@ -93,4 +96,5 @@ type TemplateData struct {
 	PasswordReset templates.TemplateData
 	VerifyEmail   templates.TemplateData
 	VerifyPhone   templates.TemplateData
+	DomainClaimed templates.TemplateData
 }

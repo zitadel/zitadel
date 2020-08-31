@@ -6,7 +6,7 @@ import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { Router } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
-import { CreateOrgRequest, CreateUserRequest, Gender, OrgSetUpResponse } from 'src/app/proto/generated/admin_pb';
+import { CreateHumanRequest, CreateOrgRequest, Gender, OrgSetUpResponse } from 'src/app/proto/generated/admin_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/auth_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { AuthService } from 'src/app/services/auth.service';
@@ -92,21 +92,20 @@ export class OrgCreateComponent {
         createOrgRequest.setName(this.name?.value);
         createOrgRequest.setDomain(this.domain?.value);
 
-        const registerUserRequest: CreateUserRequest = new CreateUserRequest();
-        registerUserRequest.setUserName(this.userName?.value);
-        registerUserRequest.setEmail(this.email?.value);
-        registerUserRequest.setFirstName(this.firstName?.value);
-        registerUserRequest.setLastName(this.lastName?.value);
-        registerUserRequest.setNickName(this.nickName?.value);
-        registerUserRequest.setGender(this.gender?.value);
-        registerUserRequest.setPreferredLanguage(this.preferredLanguage?.value);
+        const humanRequest: CreateHumanRequest = new CreateHumanRequest();
+        humanRequest.setEmail(this.email?.value);
+        humanRequest.setFirstName(this.firstName?.value);
+        humanRequest.setLastName(this.lastName?.value);
+        humanRequest.setNickName(this.nickName?.value);
+        humanRequest.setGender(this.gender?.value);
+        humanRequest.setPreferredLanguage(this.preferredLanguage?.value);
 
         if (this.usePassword && this.password) {
-            registerUserRequest.setPassword(this.password?.value);
+            humanRequest.setPassword(this.password?.value);
         }
 
         this.adminService
-            .SetUpOrg(createOrgRequest, registerUserRequest)
+            .SetUpOrg(createOrgRequest, humanRequest)
             .then((data: OrgSetUpResponse) => {
                 this.router.navigate(['orgs', data.toObject().org?.id]);
             })

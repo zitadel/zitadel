@@ -7,13 +7,13 @@ import (
 	"github.com/caos/zitadel/internal/iam/model"
 )
 
-type IamMember struct {
+type IAMMember struct {
 	es_models.ObjectRoot
 	UserID string   `json:"userId,omitempty"`
 	Roles  []string `json:"roles,omitempty"`
 }
 
-func GetIamMember(members []*IamMember, id string) (int, *IamMember) {
+func GetIAMMember(members []*IAMMember, id string) (int, *IAMMember) {
 	for i, m := range members {
 		if m.UserID == id {
 			return i, m
@@ -22,40 +22,40 @@ func GetIamMember(members []*IamMember, id string) (int, *IamMember) {
 	return -1, nil
 }
 
-func IamMembersToModel(members []*IamMember) []*model.IamMember {
-	convertedMembers := make([]*model.IamMember, len(members))
+func IAMMembersToModel(members []*IAMMember) []*model.IAMMember {
+	convertedMembers := make([]*model.IAMMember, len(members))
 	for i, m := range members {
-		convertedMembers[i] = IamMemberToModel(m)
+		convertedMembers[i] = IAMMemberToModel(m)
 	}
 	return convertedMembers
 }
 
-func IamMembersFromModel(members []*model.IamMember) []*IamMember {
-	convertedMembers := make([]*IamMember, len(members))
+func IAMMembersFromModel(members []*model.IAMMember) []*IAMMember {
+	convertedMembers := make([]*IAMMember, len(members))
 	for i, m := range members {
-		convertedMembers[i] = IamMemberFromModel(m)
+		convertedMembers[i] = IAMMemberFromModel(m)
 	}
 	return convertedMembers
 }
 
-func IamMemberFromModel(member *model.IamMember) *IamMember {
-	return &IamMember{
+func IAMMemberFromModel(member *model.IAMMember) *IAMMember {
+	return &IAMMember{
 		ObjectRoot: member.ObjectRoot,
 		UserID:     member.UserID,
 		Roles:      member.Roles,
 	}
 }
 
-func IamMemberToModel(member *IamMember) *model.IamMember {
-	return &model.IamMember{
+func IAMMemberToModel(member *IAMMember) *model.IAMMember {
+	return &model.IAMMember{
 		ObjectRoot: member.ObjectRoot,
 		UserID:     member.UserID,
 		Roles:      member.Roles,
 	}
 }
 
-func (iam *Iam) appendAddMemberEvent(event *es_models.Event) error {
-	member := &IamMember{}
+func (iam *IAM) appendAddMemberEvent(event *es_models.Event) error {
+	member := &IAMMember{}
 	err := member.SetData(event)
 	if err != nil {
 		return err
@@ -65,25 +65,25 @@ func (iam *Iam) appendAddMemberEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (iam *Iam) appendChangeMemberEvent(event *es_models.Event) error {
-	member := &IamMember{}
+func (iam *IAM) appendChangeMemberEvent(event *es_models.Event) error {
+	member := &IAMMember{}
 	err := member.SetData(event)
 	if err != nil {
 		return err
 	}
-	if i, m := GetIamMember(iam.Members, member.UserID); m != nil {
+	if i, m := GetIAMMember(iam.Members, member.UserID); m != nil {
 		iam.Members[i] = member
 	}
 	return nil
 }
 
-func (iam *Iam) appendRemoveMemberEvent(event *es_models.Event) error {
-	member := &IamMember{}
+func (iam *IAM) appendRemoveMemberEvent(event *es_models.Event) error {
+	member := &IAMMember{}
 	err := member.SetData(event)
 	if err != nil {
 		return err
 	}
-	if i, m := GetIamMember(iam.Members, member.UserID); m != nil {
+	if i, m := GetIAMMember(iam.Members, member.UserID); m != nil {
 		iam.Members[i] = iam.Members[len(iam.Members)-1]
 		iam.Members[len(iam.Members)-1] = nil
 		iam.Members = iam.Members[:len(iam.Members)-1]
@@ -91,7 +91,7 @@ func (iam *Iam) appendRemoveMemberEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (m *IamMember) SetData(event *es_models.Event) error {
+func (m *IAMMember) SetData(event *es_models.Event) error {
 	m.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, m); err != nil {
 		logging.Log("EVEN-e4dkp").WithError(err).Error("could not unmarshal event data")

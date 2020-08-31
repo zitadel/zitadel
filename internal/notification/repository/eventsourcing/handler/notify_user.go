@@ -78,6 +78,17 @@ func (u *NotifyUser) ProcessUser(event *models.Event) (err error) {
 			return err
 		}
 		err = user.AppendEvent(event)
+	case es_model.DomainClaimed,
+		es_model.UserUserNameChanged:
+		user, err = u.view.NotifyUserByID(event.AggregateID)
+		if err != nil {
+			return err
+		}
+		err = user.AppendEvent(event)
+		if err != nil {
+			return err
+		}
+		u.fillLoginNames(user)
 	case es_model.UserRemoved:
 		err = u.view.DeleteNotifyUser(event.AggregateID, event.Sequence)
 	default:
@@ -93,9 +104,9 @@ func (u *NotifyUser) ProcessOrg(event *models.Event) (err error) {
 	switch event.Type {
 	case org_es_model.OrgDomainVerified,
 		org_es_model.OrgDomainRemoved,
-		org_es_model.OrgIamPolicyAdded,
-		org_es_model.OrgIamPolicyChanged,
-		org_es_model.OrgIamPolicyRemoved:
+		org_es_model.OrgIAMPolicyAdded,
+		org_es_model.OrgIAMPolicyChanged,
+		org_es_model.OrgIAMPolicyRemoved:
 		return u.fillLoginNamesOnOrgUsers(event)
 	case org_es_model.OrgDomainPrimarySet:
 		return u.fillPreferredLoginNamesOnOrgUsers(event)
@@ -109,7 +120,7 @@ func (u *NotifyUser) fillLoginNamesOnOrgUsers(event *models.Event) error {
 	if err != nil {
 		return err
 	}
-	policy, err := u.orgEvents.GetOrgIamPolicy(context.Background(), event.ResourceOwner)
+	policy, err := u.orgEvents.GetOrgIAMPolicy(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -132,7 +143,7 @@ func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *models.Event) erro
 	if err != nil {
 		return err
 	}
-	policy, err := u.orgEvents.GetOrgIamPolicy(context.Background(), event.ResourceOwner)
+	policy, err := u.orgEvents.GetOrgIAMPolicy(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -158,7 +169,7 @@ func (u *NotifyUser) fillLoginNames(user *view_model.NotifyUser) (err error) {
 	if err != nil {
 		return err
 	}
-	policy, err := u.orgEvents.GetOrgIamPolicy(context.Background(), user.ResourceOwner)
+	policy, err := u.orgEvents.GetOrgIAMPolicy(context.Background(), user.ResourceOwner)
 	if err != nil {
 		return err
 	}

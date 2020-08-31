@@ -443,9 +443,19 @@ func (m *ApplicationID) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return ApplicationIDValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for ProjectId
+	if utf8.RuneCountInString(m.GetProjectId()) < 1 {
+		return ApplicationIDValidationError{
+			field:  "ProjectId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -511,7 +521,12 @@ func (m *ProjectID) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return ProjectIDValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -577,7 +592,12 @@ func (m *UserID) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return UserIDValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -636,21 +656,26 @@ var _ interface {
 	ErrorName() string
 } = UserIDValidationError{}
 
-// Validate checks the field values on Email with the rules defined in the
+// Validate checks the field values on LoginName with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
-func (m *Email) Validate() error {
+func (m *LoginName) Validate() error {
 	if m == nil {
 		return nil
 	}
 
-	// no validation rules for Email
+	if utf8.RuneCountInString(m.GetLoginName()) < 1 {
+		return LoginNameValidationError{
+			field:  "LoginName",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
 
-// EmailValidationError is the validation error returned by Email.Validate if
-// the designated constraints aren't met.
-type EmailValidationError struct {
+// LoginNameValidationError is the validation error returned by
+// LoginName.Validate if the designated constraints aren't met.
+type LoginNameValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -658,22 +683,22 @@ type EmailValidationError struct {
 }
 
 // Field function returns field value.
-func (e EmailValidationError) Field() string { return e.field }
+func (e LoginNameValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e EmailValidationError) Reason() string { return e.reason }
+func (e LoginNameValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e EmailValidationError) Cause() error { return e.cause }
+func (e LoginNameValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e EmailValidationError) Key() bool { return e.key }
+func (e LoginNameValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e EmailValidationError) ErrorName() string { return "EmailValidationError" }
+func (e LoginNameValidationError) ErrorName() string { return "LoginNameValidationError" }
 
 // Error satisfies the builtin error interface
-func (e EmailValidationError) Error() string {
+func (e LoginNameValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -685,14 +710,14 @@ func (e EmailValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sEmail.%s: %s%s",
+		"invalid %sLoginName.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = EmailValidationError{}
+var _ error = LoginNameValidationError{}
 
 var _ interface {
 	Field() string
@@ -700,7 +725,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = EmailValidationError{}
+} = LoginNameValidationError{}
 
 // Validate checks the field values on UniqueUserRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, an
@@ -1194,10 +1219,10 @@ func (m *CreateMachineRequest) Validate() error {
 		}
 	}
 
-	if l := utf8.RuneCountInString(m.GetDescription()); l < 1 || l > 500 {
+	if utf8.RuneCountInString(m.GetDescription()) > 500 {
 		return CreateMachineRequestValidationError{
 			field:  "Description",
-			reason: "value length must be between 1 and 500 runes, inclusive",
+			reason: "value length must be at most 500 runes",
 		}
 	}
 
@@ -1738,21 +1763,6 @@ func (m *MachineResponse) Validate() error {
 
 	// no validation rules for Description
 
-	for idx, item := range m.GetKeys() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return MachineResponseValidationError{
-					field:  fmt.Sprintf("Keys[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
-
 	return nil
 }
 
@@ -1832,21 +1842,6 @@ func (m *MachineView) Validate() error {
 
 	// no validation rules for Description
 
-	for idx, item := range m.GetKeys() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return MachineViewValidationError{
-					field:  fmt.Sprintf("Keys[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
-
 	return nil
 }
 
@@ -1912,7 +1907,12 @@ func (m *UpdateMachineRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return UpdateMachineRequestValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	if utf8.RuneCountInString(m.GetDescription()) > 500 {
 		return UpdateMachineRequestValidationError{
@@ -1988,7 +1988,12 @@ func (m *AddMachineKeyRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for UserId
+	if utf8.RuneCountInString(m.GetUserId()) < 1 {
+		return AddMachineKeyRequestValidationError{
+			field:  "UserId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	if _, ok := _AddMachineKeyRequest_Type_NotInLookup[m.GetType()]; ok {
 		return AddMachineKeyRequestValidationError{
@@ -2080,7 +2085,31 @@ func (m *AddMachineKeyResponse) Validate() error {
 
 	// no validation rules for Id
 
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddMachineKeyResponseValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Sequence
+
 	// no validation rules for Type
+
+	if v, ok := interface{}(m.GetExpirationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddMachineKeyResponseValidationError{
+				field:  "ExpirationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for KeyDetails
 
 	return nil
 }
@@ -2149,9 +2178,19 @@ func (m *MachineKeyIDRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for UserId
+	if utf8.RuneCountInString(m.GetUserId()) < 1 {
+		return MachineKeyIDRequestValidationError{
+			field:  "UserId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for KeyId
+	if utf8.RuneCountInString(m.GetKeyId()) < 1 {
+		return MachineKeyIDRequestValidationError{
+			field:  "KeyId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -2211,99 +2250,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = MachineKeyIDRequestValidationError{}
-
-// Validate checks the field values on MachineKeyResponse with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *MachineKeyResponse) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	// no validation rules for Id
-
-	// no validation rules for Type
-
-	// no validation rules for Sequence
-
-	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return MachineKeyResponseValidationError{
-				field:  "CreationDate",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if v, ok := interface{}(m.GetExpirationDate()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return MachineKeyResponseValidationError{
-				field:  "ExpirationDate",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	return nil
-}
-
-// MachineKeyResponseValidationError is the validation error returned by
-// MachineKeyResponse.Validate if the designated constraints aren't met.
-type MachineKeyResponseValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e MachineKeyResponseValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e MachineKeyResponseValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e MachineKeyResponseValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e MachineKeyResponseValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e MachineKeyResponseValidationError) ErrorName() string {
-	return "MachineKeyResponseValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e MachineKeyResponseValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sMachineKeyResponse.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = MachineKeyResponseValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = MachineKeyResponseValidationError{}
 
 // Validate checks the field values on MachineKeyView with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
@@ -2396,6 +2342,186 @@ var _ interface {
 	ErrorName() string
 } = MachineKeyViewValidationError{}
 
+// Validate checks the field values on MachineKeySearchRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MachineKeySearchRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Offset
+
+	// no validation rules for Limit
+
+	// no validation rules for Asc
+
+	if utf8.RuneCountInString(m.GetUserId()) < 1 {
+		return MachineKeySearchRequestValidationError{
+			field:  "UserId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	return nil
+}
+
+// MachineKeySearchRequestValidationError is the validation error returned by
+// MachineKeySearchRequest.Validate if the designated constraints aren't met.
+type MachineKeySearchRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MachineKeySearchRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MachineKeySearchRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MachineKeySearchRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MachineKeySearchRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MachineKeySearchRequestValidationError) ErrorName() string {
+	return "MachineKeySearchRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MachineKeySearchRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMachineKeySearchRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MachineKeySearchRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MachineKeySearchRequestValidationError{}
+
+// Validate checks the field values on MachineKeySearchResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MachineKeySearchResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Offset
+
+	// no validation rules for Limit
+
+	// no validation rules for TotalResult
+
+	for idx, item := range m.GetResult() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MachineKeySearchResponseValidationError{
+					field:  fmt.Sprintf("Result[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for ProcessedSequence
+
+	if v, ok := interface{}(m.GetViewTimestamp()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MachineKeySearchResponseValidationError{
+				field:  "ViewTimestamp",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// MachineKeySearchResponseValidationError is the validation error returned by
+// MachineKeySearchResponse.Validate if the designated constraints aren't met.
+type MachineKeySearchResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MachineKeySearchResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MachineKeySearchResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MachineKeySearchResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MachineKeySearchResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MachineKeySearchResponseValidationError) ErrorName() string {
+	return "MachineKeySearchResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MachineKeySearchResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMachineKeySearchResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MachineKeySearchResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MachineKeySearchResponseValidationError{}
+
 // Validate checks the field values on UserSearchRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.
@@ -2408,12 +2534,7 @@ func (m *UserSearchRequest) Validate() error {
 
 	// no validation rules for Limit
 
-	if _, ok := _UserSearchRequest_SortingColumn_NotInLookup[m.GetSortingColumn()]; ok {
-		return UserSearchRequestValidationError{
-			field:  "SortingColumn",
-			reason: "value must not be in list [0]",
-		}
-	}
+	// no validation rules for SortingColumn
 
 	// no validation rules for Asc
 
@@ -2490,10 +2611,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UserSearchRequestValidationError{}
-
-var _UserSearchRequest_SortingColumn_NotInLookup = map[UserSearchKey]struct{}{
-	0: {},
-}
 
 // Validate checks the field values on UserSearchQuery with the rules defined
 // in the proto definition for this message. If any rules are violated, an
@@ -2978,6 +3095,84 @@ var _ interface {
 	ErrorName() string
 } = UpdateUserProfileRequestValidationError{}
 
+// Validate checks the field values on UpdateUserUserNameRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UpdateUserUserNameRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Id
+
+	if !_UpdateUserUserNameRequest_UserName_Pattern.MatchString(m.GetUserName()) {
+		return UpdateUserUserNameRequestValidationError{
+			field:  "UserName",
+			reason: "value does not match regex pattern \"^[^[:space:]]{1,200}$\"",
+		}
+	}
+
+	return nil
+}
+
+// UpdateUserUserNameRequestValidationError is the validation error returned by
+// UpdateUserUserNameRequest.Validate if the designated constraints aren't met.
+type UpdateUserUserNameRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateUserUserNameRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateUserUserNameRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateUserUserNameRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateUserUserNameRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateUserUserNameRequestValidationError) ErrorName() string {
+	return "UpdateUserUserNameRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateUserUserNameRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateUserUserNameRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateUserUserNameRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateUserUserNameRequestValidationError{}
+
+var _UpdateUserUserNameRequest_UserName_Pattern = regexp.MustCompile("^[^[:space:]]{1,200}$")
+
 // Validate checks the field values on UserEmail with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
 func (m *UserEmail) Validate() error {
@@ -3434,7 +3629,12 @@ func (m *UpdateUserPhoneRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return UpdateUserPhoneRequestValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	if l := utf8.RuneCountInString(m.GetPhone()); l < 1 || l > 20 {
 		return UpdateUserPhoneRequestValidationError{
@@ -3710,7 +3910,12 @@ func (m *UpdateUserAddressRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return UpdateUserAddressRequestValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	if utf8.RuneCountInString(m.GetCountry()) > 200 {
 		return UpdateUserAddressRequestValidationError{
@@ -3955,72 +4160,6 @@ var _ interface {
 	ErrorName() string
 } = MultiFactorValidationError{}
 
-// Validate checks the field values on PasswordID with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *PasswordID) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	// no validation rules for Id
-
-	return nil
-}
-
-// PasswordIDValidationError is the validation error returned by
-// PasswordID.Validate if the designated constraints aren't met.
-type PasswordIDValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e PasswordIDValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e PasswordIDValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e PasswordIDValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e PasswordIDValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e PasswordIDValidationError) ErrorName() string { return "PasswordIDValidationError" }
-
-// Error satisfies the builtin error interface
-func (e PasswordIDValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sPasswordID.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = PasswordIDValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = PasswordIDValidationError{}
-
 // Validate checks the field values on PasswordRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.
@@ -4029,7 +4168,12 @@ func (m *PasswordRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return PasswordRequestValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	if l := utf8.RuneCountInString(m.GetPassword()); l < 1 || l > 72 {
 		return PasswordRequestValidationError{
@@ -4095,75 +4239,6 @@ var _ interface {
 	ErrorName() string
 } = PasswordRequestValidationError{}
 
-// Validate checks the field values on ResetPasswordRequest with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *ResetPasswordRequest) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	// no validation rules for Id
-
-	return nil
-}
-
-// ResetPasswordRequestValidationError is the validation error returned by
-// ResetPasswordRequest.Validate if the designated constraints aren't met.
-type ResetPasswordRequestValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e ResetPasswordRequestValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e ResetPasswordRequestValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e ResetPasswordRequestValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e ResetPasswordRequestValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e ResetPasswordRequestValidationError) ErrorName() string {
-	return "ResetPasswordRequestValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e ResetPasswordRequestValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sResetPasswordRequest.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = ResetPasswordRequestValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = ResetPasswordRequestValidationError{}
-
 // Validate checks the field values on SetPasswordNotificationRequest with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -4172,7 +4247,12 @@ func (m *SetPasswordNotificationRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return SetPasswordNotificationRequestValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	// no validation rules for Type
 
@@ -5315,72 +5395,6 @@ var _ interface {
 	ErrorName() string
 } = OrgIamPolicyValidationError{}
 
-// Validate checks the field values on OrgID with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *OrgID) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	// no validation rules for Id
-
-	return nil
-}
-
-// OrgIDValidationError is the validation error returned by OrgID.Validate if
-// the designated constraints aren't met.
-type OrgIDValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e OrgIDValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e OrgIDValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e OrgIDValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e OrgIDValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e OrgIDValidationError) ErrorName() string { return "OrgIDValidationError" }
-
-// Error satisfies the builtin error interface
-func (e OrgIDValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sOrgID.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = OrgIDValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = OrgIDValidationError{}
-
 // Validate checks the field values on OrgCreateRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.
@@ -5389,7 +5403,12 @@ func (m *OrgCreateRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if l := utf8.RuneCountInString(m.GetName()); l < 1 || l > 200 {
+		return OrgCreateRequestValidationError{
+			field:  "Name",
+			reason: "value length must be between 1 and 200 runes, inclusive",
+		}
+	}
 
 	return nil
 }
@@ -5639,7 +5658,12 @@ func (m *Domain) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Domain
+	if utf8.RuneCountInString(m.GetDomain()) < 1 {
+		return DomainValidationError{
+			field:  "Domain",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -5697,85 +5721,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DomainValidationError{}
-
-// Validate checks the field values on OrgDomains with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *OrgDomains) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	for idx, item := range m.GetDomains() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return OrgDomainsValidationError{
-					field:  fmt.Sprintf("Domains[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
-
-	return nil
-}
-
-// OrgDomainsValidationError is the validation error returned by
-// OrgDomains.Validate if the designated constraints aren't met.
-type OrgDomainsValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e OrgDomainsValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e OrgDomainsValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e OrgDomainsValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e OrgDomainsValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e OrgDomainsValidationError) ErrorName() string { return "OrgDomainsValidationError" }
-
-// Error satisfies the builtin error interface
-func (e OrgDomainsValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sOrgDomains.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = OrgDomainsValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = OrgDomainsValidationError{}
 
 // Validate checks the field values on OrgDomain with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
@@ -6281,10 +6226,10 @@ func (m *PrimaryOrgDomainRequest) Validate() error {
 		return nil
 	}
 
-	if l := utf8.RuneCountInString(m.GetDomain()); l < 1 || l > 200 {
+	if utf8.RuneCountInString(m.GetDomain()) < 1 {
 		return PrimaryOrgDomainRequestValidationError{
 			field:  "Domain",
-			reason: "value length must be between 1 and 200 runes, inclusive",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -6355,10 +6300,10 @@ func (m *RemoveOrgDomainRequest) Validate() error {
 		return nil
 	}
 
-	if l := utf8.RuneCountInString(m.GetDomain()); l < 1 || l > 200 {
+	if utf8.RuneCountInString(m.GetDomain()) < 1 {
 		return RemoveOrgDomainRequestValidationError{
 			field:  "Domain",
-			reason: "value length must be between 1 and 200 runes, inclusive",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -6850,7 +6795,12 @@ func (m *AddOrgMemberRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for UserId
+	if utf8.RuneCountInString(m.GetUserId()) < 1 {
+		return AddOrgMemberRequestValidationError{
+			field:  "UserId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -6919,7 +6869,12 @@ func (m *ChangeOrgMemberRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for UserId
+	if utf8.RuneCountInString(m.GetUserId()) < 1 {
+		return ChangeOrgMemberRequestValidationError{
+			field:  "UserId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -6988,7 +6943,12 @@ func (m *RemoveOrgMemberRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for UserId
+	if utf8.RuneCountInString(m.GetUserId()) < 1 {
+		return RemoveOrgMemberRequestValidationError{
+			field:  "UserId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -7498,7 +7458,12 @@ func (m *ProjectUpdateRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return ProjectUpdateRequestValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	if l := utf8.RuneCountInString(m.GetName()); l < 1 || l > 200 {
 		return ProjectUpdateRequestValidationError{
@@ -8264,9 +8229,19 @@ func (m *ProjectMemberAdd) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return ProjectMemberAddValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for UserId
+	if utf8.RuneCountInString(m.GetUserId()) < 1 {
+		return ProjectMemberAddValidationError{
+			field:  "UserId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -8333,9 +8308,19 @@ func (m *ProjectMemberChange) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return ProjectMemberChangeValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for UserId
+	if utf8.RuneCountInString(m.GetUserId()) < 1 {
+		return ProjectMemberChangeValidationError{
+			field:  "UserId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -8404,9 +8389,19 @@ func (m *ProjectMemberRemove) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return ProjectMemberRemoveValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for UserId
+	if utf8.RuneCountInString(m.GetUserId()) < 1 {
+		return ProjectMemberRemoveValidationError{
+			field:  "UserId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -8475,7 +8470,12 @@ func (m *ProjectRoleAdd) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return ProjectRoleAddValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	// no validation rules for Key
 
@@ -8548,7 +8548,12 @@ func (m *ProjectRoleAddBulk) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return ProjectRoleAddBulkValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	for idx, item := range m.GetProjectRoles() {
 		_, _ = idx, item
@@ -8632,9 +8637,19 @@ func (m *ProjectRoleChange) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return ProjectRoleChangeValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for Key
+	if utf8.RuneCountInString(m.GetKey()) < 1 {
+		return ProjectRoleChangeValidationError{
+			field:  "Key",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	// no validation rules for DisplayName
 
@@ -8887,9 +8902,19 @@ func (m *ProjectRoleRemove) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return ProjectRoleRemoveValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for Key
+	if utf8.RuneCountInString(m.GetKey()) < 1 {
+		return ProjectRoleRemoveValidationError{
+			field:  "Key",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -9058,7 +9083,12 @@ func (m *ProjectRoleSearchRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ProjectId
+	if utf8.RuneCountInString(m.GetProjectId()) < 1 {
+		return ProjectRoleSearchRequestValidationError{
+			field:  "ProjectId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	// no validation rules for Offset
 
@@ -9430,7 +9460,12 @@ func (m *ProjectMemberSearchRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ProjectId
+	if utf8.RuneCountInString(m.GetProjectId()) < 1 {
+		return ProjectMemberSearchRequestValidationError{
+			field:  "ProjectId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	// no validation rules for Offset
 
@@ -9709,9 +9744,19 @@ func (m *ApplicationUpdate) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ProjectId
+	if utf8.RuneCountInString(m.GetProjectId()) < 1 {
+		return ApplicationUpdateValidationError{
+			field:  "ProjectId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return ApplicationUpdateValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	if l := utf8.RuneCountInString(m.GetName()); l < 1 || l > 200 {
 		return ApplicationUpdateValidationError{
@@ -9880,7 +9925,12 @@ func (m *OIDCApplicationCreate) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ProjectId
+	if utf8.RuneCountInString(m.GetProjectId()) < 1 {
+		return OIDCApplicationCreateValidationError{
+			field:  "ProjectId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	if l := utf8.RuneCountInString(m.GetName()); l < 1 || l > 200 {
 		return OIDCApplicationCreateValidationError{
@@ -9964,9 +10014,19 @@ func (m *OIDCConfigUpdate) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ProjectId
+	if utf8.RuneCountInString(m.GetProjectId()) < 1 {
+		return OIDCConfigUpdateValidationError{
+			field:  "ProjectId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for ApplicationId
+	if utf8.RuneCountInString(m.GetApplicationId()) < 1 {
+		return OIDCConfigUpdateValidationError{
+			field:  "ApplicationId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	// no validation rules for ApplicationType
 
@@ -10315,7 +10375,12 @@ func (m *ApplicationSearchRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ProjectId
+	if utf8.RuneCountInString(m.GetProjectId()) < 1 {
+		return ApplicationSearchRequestValidationError{
+			field:  "ProjectId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	// no validation rules for Offset
 
@@ -10580,9 +10645,19 @@ func (m *ProjectGrantCreate) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ProjectId
+	if utf8.RuneCountInString(m.GetProjectId()) < 1 {
+		return ProjectGrantCreateValidationError{
+			field:  "ProjectId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for GrantedOrgId
+	if utf8.RuneCountInString(m.GetGrantedOrgId()) < 1 {
+		return ProjectGrantCreateValidationError{
+			field:  "GrantedOrgId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -10651,9 +10726,19 @@ func (m *ProjectGrantUpdate) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ProjectId
+	if utf8.RuneCountInString(m.GetProjectId()) < 1 {
+		return ProjectGrantUpdateValidationError{
+			field:  "ProjectId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return ProjectGrantUpdateValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -10722,9 +10807,19 @@ func (m *ProjectGrantID) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ProjectId
+	if utf8.RuneCountInString(m.GetProjectId()) < 1 {
+		return ProjectGrantIDValidationError{
+			field:  "ProjectId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return ProjectGrantIDValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -11081,7 +11176,12 @@ func (m *ProjectGrantSearchRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ProjectId
+	if utf8.RuneCountInString(m.GetProjectId()) < 1 {
+		return ProjectGrantSearchRequestValidationError{
+			field:  "ProjectId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	// no validation rules for Offset
 
@@ -11409,11 +11509,26 @@ func (m *ProjectGrantMemberAdd) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ProjectId
+	if utf8.RuneCountInString(m.GetProjectId()) < 1 {
+		return ProjectGrantMemberAddValidationError{
+			field:  "ProjectId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for GrantId
+	if utf8.RuneCountInString(m.GetGrantId()) < 1 {
+		return ProjectGrantMemberAddValidationError{
+			field:  "GrantId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for UserId
+	if utf8.RuneCountInString(m.GetUserId()) < 1 {
+		return ProjectGrantMemberAddValidationError{
+			field:  "UserId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -11482,11 +11597,26 @@ func (m *ProjectGrantMemberChange) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ProjectId
+	if utf8.RuneCountInString(m.GetProjectId()) < 1 {
+		return ProjectGrantMemberChangeValidationError{
+			field:  "ProjectId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for GrantId
+	if utf8.RuneCountInString(m.GetGrantId()) < 1 {
+		return ProjectGrantMemberChangeValidationError{
+			field:  "GrantId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for UserId
+	if utf8.RuneCountInString(m.GetUserId()) < 1 {
+		return ProjectGrantMemberChangeValidationError{
+			field:  "UserId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -11555,11 +11685,26 @@ func (m *ProjectGrantMemberRemove) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ProjectId
+	if utf8.RuneCountInString(m.GetProjectId()) < 1 {
+		return ProjectGrantMemberRemoveValidationError{
+			field:  "ProjectId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for GrantId
+	if utf8.RuneCountInString(m.GetGrantId()) < 1 {
+		return ProjectGrantMemberRemoveValidationError{
+			field:  "GrantId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for UserId
+	if utf8.RuneCountInString(m.GetUserId()) < 1 {
+		return ProjectGrantMemberRemoveValidationError{
+			field:  "UserId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -11830,9 +11975,19 @@ func (m *ProjectGrantMemberSearchRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ProjectId
+	if utf8.RuneCountInString(m.GetProjectId()) < 1 {
+		return ProjectGrantMemberSearchRequestValidationError{
+			field:  "ProjectId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for GrantId
+	if utf8.RuneCountInString(m.GetGrantId()) < 1 {
+		return ProjectGrantMemberSearchRequestValidationError{
+			field:  "GrantId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	// no validation rules for Offset
 
@@ -12094,88 +12249,6 @@ var _ interface {
 	ErrorName() string
 } = UserGrantValidationError{}
 
-// Validate checks the field values on UserGrantCreateBulk with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *UserGrantCreateBulk) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	for idx, item := range m.GetUserGrants() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return UserGrantCreateBulkValidationError{
-					field:  fmt.Sprintf("UserGrants[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
-
-	return nil
-}
-
-// UserGrantCreateBulkValidationError is the validation error returned by
-// UserGrantCreateBulk.Validate if the designated constraints aren't met.
-type UserGrantCreateBulkValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e UserGrantCreateBulkValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e UserGrantCreateBulkValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e UserGrantCreateBulkValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e UserGrantCreateBulkValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e UserGrantCreateBulkValidationError) ErrorName() string {
-	return "UserGrantCreateBulkValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e UserGrantCreateBulkValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sUserGrantCreateBulk.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = UserGrantCreateBulkValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = UserGrantCreateBulkValidationError{}
-
 // Validate checks the field values on UserGrantCreate with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.
@@ -12184,9 +12257,19 @@ func (m *UserGrantCreate) Validate() error {
 		return nil
 	}
 
-	// no validation rules for UserId
+	if utf8.RuneCountInString(m.GetUserId()) < 1 {
+		return UserGrantCreateValidationError{
+			field:  "UserId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for ProjectId
+	if utf8.RuneCountInString(m.GetProjectId()) < 1 {
+		return UserGrantCreateValidationError{
+			field:  "ProjectId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	// no validation rules for GrantId
 
@@ -12247,88 +12330,6 @@ var _ interface {
 	ErrorName() string
 } = UserGrantCreateValidationError{}
 
-// Validate checks the field values on UserGrantUpdateBulk with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *UserGrantUpdateBulk) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	for idx, item := range m.GetUserGrants() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return UserGrantUpdateBulkValidationError{
-					field:  fmt.Sprintf("UserGrants[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
-
-	return nil
-}
-
-// UserGrantUpdateBulkValidationError is the validation error returned by
-// UserGrantUpdateBulk.Validate if the designated constraints aren't met.
-type UserGrantUpdateBulkValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e UserGrantUpdateBulkValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e UserGrantUpdateBulkValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e UserGrantUpdateBulkValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e UserGrantUpdateBulkValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e UserGrantUpdateBulkValidationError) ErrorName() string {
-	return "UserGrantUpdateBulkValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e UserGrantUpdateBulkValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sUserGrantUpdateBulk.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = UserGrantUpdateBulkValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = UserGrantUpdateBulkValidationError{}
-
 // Validate checks the field values on UserGrantUpdate with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.
@@ -12337,9 +12338,19 @@ func (m *UserGrantUpdate) Validate() error {
 		return nil
 	}
 
-	// no validation rules for UserId
+	if utf8.RuneCountInString(m.GetUserId()) < 1 {
+		return UserGrantUpdateValidationError{
+			field:  "UserId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return UserGrantUpdateValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -12404,6 +12415,13 @@ var _ interface {
 func (m *UserGrantRemoveBulk) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	if len(m.GetIds()) < 1 {
+		return UserGrantRemoveBulkValidationError{
+			field:  "Ids",
+			reason: "value must contain at least 1 item(s)",
+		}
 	}
 
 	return nil
@@ -12473,9 +12491,19 @@ func (m *UserGrantID) Validate() error {
 		return nil
 	}
 
-	// no validation rules for UserId
+	if utf8.RuneCountInString(m.GetUserId()) < 1 {
+		return UserGrantIDValidationError{
+			field:  "UserId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
-	// no validation rules for Id
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return UserGrantIDValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	return nil
 }
@@ -12928,184 +12956,6 @@ var _UserGrantSearchQuery_Method_InLookup = map[SearchMethod]struct{}{
 	0: {},
 }
 
-// Validate checks the field values on ProjectUserGrantSearchRequest with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *ProjectUserGrantSearchRequest) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	// no validation rules for ProjectId
-
-	// no validation rules for Offset
-
-	// no validation rules for Limit
-
-	for idx, item := range m.GetQueries() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return ProjectUserGrantSearchRequestValidationError{
-					field:  fmt.Sprintf("Queries[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
-
-	return nil
-}
-
-// ProjectUserGrantSearchRequestValidationError is the validation error
-// returned by ProjectUserGrantSearchRequest.Validate if the designated
-// constraints aren't met.
-type ProjectUserGrantSearchRequestValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e ProjectUserGrantSearchRequestValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e ProjectUserGrantSearchRequestValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e ProjectUserGrantSearchRequestValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e ProjectUserGrantSearchRequestValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e ProjectUserGrantSearchRequestValidationError) ErrorName() string {
-	return "ProjectUserGrantSearchRequestValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e ProjectUserGrantSearchRequestValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sProjectUserGrantSearchRequest.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = ProjectUserGrantSearchRequestValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = ProjectUserGrantSearchRequestValidationError{}
-
-// Validate checks the field values on ProjectGrantUserGrantSearchRequest with
-// the rules defined in the proto definition for this message. If any rules
-// are violated, an error is returned.
-func (m *ProjectGrantUserGrantSearchRequest) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	// no validation rules for ProjectGrantId
-
-	// no validation rules for Offset
-
-	// no validation rules for Limit
-
-	for idx, item := range m.GetQueries() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return ProjectGrantUserGrantSearchRequestValidationError{
-					field:  fmt.Sprintf("Queries[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
-
-	return nil
-}
-
-// ProjectGrantUserGrantSearchRequestValidationError is the validation error
-// returned by ProjectGrantUserGrantSearchRequest.Validate if the designated
-// constraints aren't met.
-type ProjectGrantUserGrantSearchRequestValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e ProjectGrantUserGrantSearchRequestValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e ProjectGrantUserGrantSearchRequestValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e ProjectGrantUserGrantSearchRequestValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e ProjectGrantUserGrantSearchRequestValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e ProjectGrantUserGrantSearchRequestValidationError) ErrorName() string {
-	return "ProjectGrantUserGrantSearchRequestValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e ProjectGrantUserGrantSearchRequestValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sProjectGrantUserGrantSearchRequest.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = ProjectGrantUserGrantSearchRequestValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = ProjectGrantUserGrantSearchRequestValidationError{}
-
 // Validate checks the field values on UserMembershipSearchResponse with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -13215,7 +13065,12 @@ func (m *UserMembershipSearchRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for UserId
+	if utf8.RuneCountInString(m.GetUserId()) < 1 {
+		return UserMembershipSearchRequestValidationError{
+			field:  "UserId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	// no validation rules for Offset
 
@@ -13487,3 +13342,1650 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UserMembershipViewValidationError{}
+
+// Validate checks the field values on IdpID with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *IdpID) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return IdpIDValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	return nil
+}
+
+// IdpIDValidationError is the validation error returned by IdpID.Validate if
+// the designated constraints aren't met.
+type IdpIDValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IdpIDValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IdpIDValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IdpIDValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IdpIDValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IdpIDValidationError) ErrorName() string { return "IdpIDValidationError" }
+
+// Error satisfies the builtin error interface
+func (e IdpIDValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIdpID.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IdpIDValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IdpIDValidationError{}
+
+// Validate checks the field values on Idp with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *Idp) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Id
+
+	// no validation rules for State
+
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return IdpValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return IdpValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Name
+
+	// no validation rules for LogoSrc
+
+	// no validation rules for Sequence
+
+	switch m.IdpConfig.(type) {
+
+	case *Idp_OidcConfig:
+
+		if v, ok := interface{}(m.GetOidcConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return IdpValidationError{
+					field:  "OidcConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// IdpValidationError is the validation error returned by Idp.Validate if the
+// designated constraints aren't met.
+type IdpValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IdpValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IdpValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IdpValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IdpValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IdpValidationError) ErrorName() string { return "IdpValidationError" }
+
+// Error satisfies the builtin error interface
+func (e IdpValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIdp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IdpValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IdpValidationError{}
+
+// Validate checks the field values on IdpUpdate with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *IdpUpdate) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return IdpUpdateValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	if l := utf8.RuneCountInString(m.GetName()); l < 1 || l > 200 {
+		return IdpUpdateValidationError{
+			field:  "Name",
+			reason: "value length must be between 1 and 200 runes, inclusive",
+		}
+	}
+
+	// no validation rules for LogoSrc
+
+	return nil
+}
+
+// IdpUpdateValidationError is the validation error returned by
+// IdpUpdate.Validate if the designated constraints aren't met.
+type IdpUpdateValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IdpUpdateValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IdpUpdateValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IdpUpdateValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IdpUpdateValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IdpUpdateValidationError) ErrorName() string { return "IdpUpdateValidationError" }
+
+// Error satisfies the builtin error interface
+func (e IdpUpdateValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIdpUpdate.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IdpUpdateValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IdpUpdateValidationError{}
+
+// Validate checks the field values on OidcIdpConfig with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *OidcIdpConfig) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for ClientId
+
+	// no validation rules for ClientSecret
+
+	// no validation rules for Issuer
+
+	return nil
+}
+
+// OidcIdpConfigValidationError is the validation error returned by
+// OidcIdpConfig.Validate if the designated constraints aren't met.
+type OidcIdpConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e OidcIdpConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e OidcIdpConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e OidcIdpConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e OidcIdpConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e OidcIdpConfigValidationError) ErrorName() string { return "OidcIdpConfigValidationError" }
+
+// Error satisfies the builtin error interface
+func (e OidcIdpConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sOidcIdpConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = OidcIdpConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = OidcIdpConfigValidationError{}
+
+// Validate checks the field values on OidcIdpConfigCreate with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *OidcIdpConfigCreate) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if l := utf8.RuneCountInString(m.GetName()); l < 1 || l > 200 {
+		return OidcIdpConfigCreateValidationError{
+			field:  "Name",
+			reason: "value length must be between 1 and 200 runes, inclusive",
+		}
+	}
+
+	// no validation rules for LogoSrc
+
+	if l := utf8.RuneCountInString(m.GetClientId()); l < 1 || l > 200 {
+		return OidcIdpConfigCreateValidationError{
+			field:  "ClientId",
+			reason: "value length must be between 1 and 200 runes, inclusive",
+		}
+	}
+
+	if l := utf8.RuneCountInString(m.GetClientSecret()); l < 1 || l > 200 {
+		return OidcIdpConfigCreateValidationError{
+			field:  "ClientSecret",
+			reason: "value length must be between 1 and 200 runes, inclusive",
+		}
+	}
+
+	if l := utf8.RuneCountInString(m.GetIssuer()); l < 1 || l > 200 {
+		return OidcIdpConfigCreateValidationError{
+			field:  "Issuer",
+			reason: "value length must be between 1 and 200 runes, inclusive",
+		}
+	}
+
+	return nil
+}
+
+// OidcIdpConfigCreateValidationError is the validation error returned by
+// OidcIdpConfigCreate.Validate if the designated constraints aren't met.
+type OidcIdpConfigCreateValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e OidcIdpConfigCreateValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e OidcIdpConfigCreateValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e OidcIdpConfigCreateValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e OidcIdpConfigCreateValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e OidcIdpConfigCreateValidationError) ErrorName() string {
+	return "OidcIdpConfigCreateValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e OidcIdpConfigCreateValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sOidcIdpConfigCreate.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = OidcIdpConfigCreateValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = OidcIdpConfigCreateValidationError{}
+
+// Validate checks the field values on OidcIdpConfigUpdate with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *OidcIdpConfigUpdate) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if utf8.RuneCountInString(m.GetIdpId()) < 1 {
+		return OidcIdpConfigUpdateValidationError{
+			field:  "IdpId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	if l := utf8.RuneCountInString(m.GetClientId()); l < 1 || l > 200 {
+		return OidcIdpConfigUpdateValidationError{
+			field:  "ClientId",
+			reason: "value length must be between 1 and 200 runes, inclusive",
+		}
+	}
+
+	// no validation rules for ClientSecret
+
+	if l := utf8.RuneCountInString(m.GetIssuer()); l < 1 || l > 200 {
+		return OidcIdpConfigUpdateValidationError{
+			field:  "Issuer",
+			reason: "value length must be between 1 and 200 runes, inclusive",
+		}
+	}
+
+	return nil
+}
+
+// OidcIdpConfigUpdateValidationError is the validation error returned by
+// OidcIdpConfigUpdate.Validate if the designated constraints aren't met.
+type OidcIdpConfigUpdateValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e OidcIdpConfigUpdateValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e OidcIdpConfigUpdateValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e OidcIdpConfigUpdateValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e OidcIdpConfigUpdateValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e OidcIdpConfigUpdateValidationError) ErrorName() string {
+	return "OidcIdpConfigUpdateValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e OidcIdpConfigUpdateValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sOidcIdpConfigUpdate.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = OidcIdpConfigUpdateValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = OidcIdpConfigUpdateValidationError{}
+
+// Validate checks the field values on IdpSearchResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *IdpSearchResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Offset
+
+	// no validation rules for Limit
+
+	// no validation rules for TotalResult
+
+	for idx, item := range m.GetResult() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return IdpSearchResponseValidationError{
+					field:  fmt.Sprintf("Result[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for ProcessedSequence
+
+	if v, ok := interface{}(m.GetViewTimestamp()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return IdpSearchResponseValidationError{
+				field:  "ViewTimestamp",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// IdpSearchResponseValidationError is the validation error returned by
+// IdpSearchResponse.Validate if the designated constraints aren't met.
+type IdpSearchResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IdpSearchResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IdpSearchResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IdpSearchResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IdpSearchResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IdpSearchResponseValidationError) ErrorName() string {
+	return "IdpSearchResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e IdpSearchResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIdpSearchResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IdpSearchResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IdpSearchResponseValidationError{}
+
+// Validate checks the field values on IdpView with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *IdpView) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Id
+
+	// no validation rules for State
+
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return IdpViewValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return IdpViewValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Name
+
+	// no validation rules for LogoSrc
+
+	// no validation rules for ProviderType
+
+	// no validation rules for Sequence
+
+	switch m.IdpConfigView.(type) {
+
+	case *IdpView_OidcConfig:
+
+		if v, ok := interface{}(m.GetOidcConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return IdpViewValidationError{
+					field:  "OidcConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// IdpViewValidationError is the validation error returned by IdpView.Validate
+// if the designated constraints aren't met.
+type IdpViewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IdpViewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IdpViewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IdpViewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IdpViewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IdpViewValidationError) ErrorName() string { return "IdpViewValidationError" }
+
+// Error satisfies the builtin error interface
+func (e IdpViewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIdpView.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IdpViewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IdpViewValidationError{}
+
+// Validate checks the field values on OidcIdpConfigView with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *OidcIdpConfigView) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for ClientId
+
+	// no validation rules for Issuer
+
+	return nil
+}
+
+// OidcIdpConfigViewValidationError is the validation error returned by
+// OidcIdpConfigView.Validate if the designated constraints aren't met.
+type OidcIdpConfigViewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e OidcIdpConfigViewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e OidcIdpConfigViewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e OidcIdpConfigViewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e OidcIdpConfigViewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e OidcIdpConfigViewValidationError) ErrorName() string {
+	return "OidcIdpConfigViewValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e OidcIdpConfigViewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sOidcIdpConfigView.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = OidcIdpConfigViewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = OidcIdpConfigViewValidationError{}
+
+// Validate checks the field values on IdpSearchRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *IdpSearchRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Offset
+
+	// no validation rules for Limit
+
+	for idx, item := range m.GetQueries() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return IdpSearchRequestValidationError{
+					field:  fmt.Sprintf("Queries[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// IdpSearchRequestValidationError is the validation error returned by
+// IdpSearchRequest.Validate if the designated constraints aren't met.
+type IdpSearchRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IdpSearchRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IdpSearchRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IdpSearchRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IdpSearchRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IdpSearchRequestValidationError) ErrorName() string { return "IdpSearchRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e IdpSearchRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIdpSearchRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IdpSearchRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IdpSearchRequestValidationError{}
+
+// Validate checks the field values on IdpSearchQuery with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *IdpSearchQuery) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if _, ok := _IdpSearchQuery_Key_NotInLookup[m.GetKey()]; ok {
+		return IdpSearchQueryValidationError{
+			field:  "Key",
+			reason: "value must not be in list [0]",
+		}
+	}
+
+	// no validation rules for Method
+
+	// no validation rules for Value
+
+	return nil
+}
+
+// IdpSearchQueryValidationError is the validation error returned by
+// IdpSearchQuery.Validate if the designated constraints aren't met.
+type IdpSearchQueryValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IdpSearchQueryValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IdpSearchQueryValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IdpSearchQueryValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IdpSearchQueryValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IdpSearchQueryValidationError) ErrorName() string { return "IdpSearchQueryValidationError" }
+
+// Error satisfies the builtin error interface
+func (e IdpSearchQueryValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIdpSearchQuery.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IdpSearchQueryValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IdpSearchQueryValidationError{}
+
+var _IdpSearchQuery_Key_NotInLookup = map[IdpSearchKey]struct{}{
+	0: {},
+}
+
+// Validate checks the field values on LoginPolicy with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *LoginPolicy) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for AllowUsernamePassword
+
+	// no validation rules for AllowRegister
+
+	// no validation rules for AllowExternalIdp
+
+	return nil
+}
+
+// LoginPolicyValidationError is the validation error returned by
+// LoginPolicy.Validate if the designated constraints aren't met.
+type LoginPolicyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoginPolicyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoginPolicyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoginPolicyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoginPolicyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoginPolicyValidationError) ErrorName() string { return "LoginPolicyValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LoginPolicyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoginPolicy.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoginPolicyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoginPolicyValidationError{}
+
+// Validate checks the field values on LoginPolicyAdd with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *LoginPolicyAdd) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for AllowUsernamePassword
+
+	// no validation rules for AllowRegister
+
+	// no validation rules for AllowExternalIdp
+
+	return nil
+}
+
+// LoginPolicyAddValidationError is the validation error returned by
+// LoginPolicyAdd.Validate if the designated constraints aren't met.
+type LoginPolicyAddValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoginPolicyAddValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoginPolicyAddValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoginPolicyAddValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoginPolicyAddValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoginPolicyAddValidationError) ErrorName() string { return "LoginPolicyAddValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LoginPolicyAddValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoginPolicyAdd.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoginPolicyAddValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoginPolicyAddValidationError{}
+
+// Validate checks the field values on IdpProviderID with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *IdpProviderID) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if utf8.RuneCountInString(m.GetIdpConfigId()) < 1 {
+		return IdpProviderIDValidationError{
+			field:  "IdpConfigId",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	return nil
+}
+
+// IdpProviderIDValidationError is the validation error returned by
+// IdpProviderID.Validate if the designated constraints aren't met.
+type IdpProviderIDValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IdpProviderIDValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IdpProviderIDValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IdpProviderIDValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IdpProviderIDValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IdpProviderIDValidationError) ErrorName() string { return "IdpProviderIDValidationError" }
+
+// Error satisfies the builtin error interface
+func (e IdpProviderIDValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIdpProviderID.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IdpProviderIDValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IdpProviderIDValidationError{}
+
+// Validate checks the field values on IdpProviderAdd with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *IdpProviderAdd) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if l := utf8.RuneCountInString(m.GetIdpConfigId()); l < 1 || l > 200 {
+		return IdpProviderAddValidationError{
+			field:  "IdpConfigId",
+			reason: "value length must be between 1 and 200 runes, inclusive",
+		}
+	}
+
+	if _, ok := _IdpProviderAdd_IdpProviderType_NotInLookup[m.GetIdpProviderType()]; ok {
+		return IdpProviderAddValidationError{
+			field:  "IdpProviderType",
+			reason: "value must not be in list [0]",
+		}
+	}
+
+	return nil
+}
+
+// IdpProviderAddValidationError is the validation error returned by
+// IdpProviderAdd.Validate if the designated constraints aren't met.
+type IdpProviderAddValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IdpProviderAddValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IdpProviderAddValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IdpProviderAddValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IdpProviderAddValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IdpProviderAddValidationError) ErrorName() string { return "IdpProviderAddValidationError" }
+
+// Error satisfies the builtin error interface
+func (e IdpProviderAddValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIdpProviderAdd.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IdpProviderAddValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IdpProviderAddValidationError{}
+
+var _IdpProviderAdd_IdpProviderType_NotInLookup = map[IdpProviderType]struct{}{
+	0: {},
+}
+
+// Validate checks the field values on IdpProvider with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *IdpProvider) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for IdpConfigId
+
+	// no validation rules for IdpProvider_Type
+
+	return nil
+}
+
+// IdpProviderValidationError is the validation error returned by
+// IdpProvider.Validate if the designated constraints aren't met.
+type IdpProviderValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IdpProviderValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IdpProviderValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IdpProviderValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IdpProviderValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IdpProviderValidationError) ErrorName() string { return "IdpProviderValidationError" }
+
+// Error satisfies the builtin error interface
+func (e IdpProviderValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIdpProvider.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IdpProviderValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IdpProviderValidationError{}
+
+// Validate checks the field values on LoginPolicyView with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *LoginPolicyView) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Default
+
+	// no validation rules for AllowUsernamePassword
+
+	// no validation rules for AllowRegister
+
+	// no validation rules for AllowExternalIdp
+
+	return nil
+}
+
+// LoginPolicyViewValidationError is the validation error returned by
+// LoginPolicyView.Validate if the designated constraints aren't met.
+type LoginPolicyViewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoginPolicyViewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoginPolicyViewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoginPolicyViewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoginPolicyViewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoginPolicyViewValidationError) ErrorName() string { return "LoginPolicyViewValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LoginPolicyViewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoginPolicyView.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoginPolicyViewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoginPolicyViewValidationError{}
+
+// Validate checks the field values on IdpProviderView with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *IdpProviderView) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for IdpConfigId
+
+	// no validation rules for Name
+
+	// no validation rules for Type
+
+	return nil
+}
+
+// IdpProviderViewValidationError is the validation error returned by
+// IdpProviderView.Validate if the designated constraints aren't met.
+type IdpProviderViewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IdpProviderViewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IdpProviderViewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IdpProviderViewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IdpProviderViewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IdpProviderViewValidationError) ErrorName() string { return "IdpProviderViewValidationError" }
+
+// Error satisfies the builtin error interface
+func (e IdpProviderViewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIdpProviderView.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IdpProviderViewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IdpProviderViewValidationError{}
+
+// Validate checks the field values on IdpProviderSearchResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *IdpProviderSearchResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Offset
+
+	// no validation rules for Limit
+
+	// no validation rules for TotalResult
+
+	for idx, item := range m.GetResult() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return IdpProviderSearchResponseValidationError{
+					field:  fmt.Sprintf("Result[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for ProcessedSequence
+
+	if v, ok := interface{}(m.GetViewTimestamp()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return IdpProviderSearchResponseValidationError{
+				field:  "ViewTimestamp",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// IdpProviderSearchResponseValidationError is the validation error returned by
+// IdpProviderSearchResponse.Validate if the designated constraints aren't met.
+type IdpProviderSearchResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IdpProviderSearchResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IdpProviderSearchResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IdpProviderSearchResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IdpProviderSearchResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IdpProviderSearchResponseValidationError) ErrorName() string {
+	return "IdpProviderSearchResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e IdpProviderSearchResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIdpProviderSearchResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IdpProviderSearchResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IdpProviderSearchResponseValidationError{}
+
+// Validate checks the field values on IdpProviderSearchRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *IdpProviderSearchRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Offset
+
+	// no validation rules for Limit
+
+	return nil
+}
+
+// IdpProviderSearchRequestValidationError is the validation error returned by
+// IdpProviderSearchRequest.Validate if the designated constraints aren't met.
+type IdpProviderSearchRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IdpProviderSearchRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IdpProviderSearchRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IdpProviderSearchRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IdpProviderSearchRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IdpProviderSearchRequestValidationError) ErrorName() string {
+	return "IdpProviderSearchRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e IdpProviderSearchRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIdpProviderSearchRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IdpProviderSearchRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IdpProviderSearchRequestValidationError{}

@@ -2,6 +2,8 @@ package oidc
 
 import (
 	"context"
+	"github.com/caos/logging"
+	"golang.org/x/text/language"
 
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
@@ -78,6 +80,8 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, sc
 			userInfo.PreferredUsername = user.PreferredLoginName
 			userInfo.UpdatedAt = user.ChangeDate
 			userInfo.Gender = oidc.Gender(getGender(user.Gender))
+			userInfo.Locale, err = language.Parse(user.PreferredLanguage)
+			logging.Log("OIDC-4ks9F").OnError(err).Debug("unable to parse locale")
 		case scopePhone:
 			userInfo.PhoneNumber = user.Phone
 			userInfo.PhoneNumberVerified = user.IsPhoneVerified

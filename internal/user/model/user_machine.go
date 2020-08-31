@@ -1,6 +1,10 @@
 package model
 
-import "github.com/caos/zitadel/internal/eventstore/models"
+import (
+	"time"
+
+	"github.com/caos/zitadel/internal/eventstore/models"
+)
 
 type Machine struct {
 	models.ObjectRoot
@@ -12,3 +16,19 @@ type Machine struct {
 func (sa *Machine) IsValid() bool {
 	return sa.Name != ""
 }
+
+type MachineKey struct {
+	models.ObjectRoot
+
+	KeyID          string
+	Type           MachineKeyType
+	ExpirationDate time.Time
+	PrivateKey     []byte
+}
+
+type MachineKeyType int32
+
+const (
+	MachineKeyTypeNONE = iota
+	MachineKeyTypeJSON
+)

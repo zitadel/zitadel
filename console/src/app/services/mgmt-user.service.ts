@@ -1,14 +1,24 @@
 import { Injectable } from '@angular/core';
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { Metadata } from 'grpc-web';
 
 import { ManagementServicePromiseClient } from '../proto/generated/management_grpc_web_pb';
 import {
+    AddMachineKeyRequest,
+    AddMachineKeyResponse,
     ChangeRequest,
     Changes,
+    CreateHumanRequest,
+    CreateMachineRequest,
     CreateUserRequest,
-    Email,
     Gender,
+    LoginName,
+    MachineKeyIDRequest,
+    MachineKeySearchRequest,
+    MachineKeySearchResponse,
+    MachineKeyType,
+    MachineResponse,
     MultiFactors,
     NotificationType,
     PasswordRequest,
@@ -20,11 +30,11 @@ import {
     ProjectMemberSearchResponse,
     ProjectRoleAdd,
     SetPasswordNotificationRequest,
+    UpdateMachineRequest,
     UpdateUserAddressRequest,
     UpdateUserEmailRequest,
     UpdateUserPhoneRequest,
     UpdateUserProfileRequest,
-    User,
     UserAddress,
     UserEmail,
     UserGrant,
@@ -42,6 +52,7 @@ import {
     UserMembershipSearchResponse,
     UserPhone,
     UserProfile,
+    UserResponse,
     UserSearchQuery,
     UserSearchRequest,
     UserSearchResponse,
@@ -71,22 +82,26 @@ export class MgmtUserService {
         return responseMapper(response);
     }
 
-    public async CreateUser(user: CreateUserRequest.AsObject): Promise<User> {
+    public async CreateUserHuman(username: string, user: CreateHumanRequest): Promise<UserResponse> {
         const req = new CreateUserRequest();
-        req.setEmail(user.email);
-        req.setUserName(user.userName);
-        req.setFirstName(user.firstName);
-        req.setLastName(user.lastName);
-        req.setNickName(user.nickName);
-        req.setPassword(user.password);
-        req.setPreferredLanguage(user.preferredLanguage);
-        req.setGender(user.gender);
-        req.setPhone(user.phone);
-        req.setStreetAddress(user.streetAddress);
-        req.setPostalCode(user.postalCode);
-        req.setLocality(user.locality);
-        req.setRegion(user.region);
-        req.setCountry(user.country);
+        const human = new CreateHumanRequest();
+
+        req.setUserName(username);
+        req.setHuman(user);
+
+        return await this.request(
+            c => c.createUser,
+            req,
+            f => f,
+        );
+    }
+
+    public async CreateUserMachine(username: string, user: CreateMachineRequest): Promise<UserResponse> {
+        const req = new CreateUserRequest();
+
+        req.setUserName(username);
+        req.setMachine(user);
+
         return await this.request(
             c => c.createUser,
             req,
@@ -187,6 +202,75 @@ export class MgmtUserService {
         );
     }
 
+    public async UpdateUserMachine(
+        id: string,
+        description?: string,
+    ): Promise<MachineResponse> {
+        const req = new UpdateMachineRequest();
+        req.setId(id);
+        if (description) {
+            req.setDescription(description);
+        }
+        return await this.request(
+            c => c.updateUserMachine,
+            req,
+            f => f,
+        );
+    }
+
+    public async AddMachineKey(
+        userId: string,
+        type: MachineKeyType,
+        date?: Timestamp,
+    ): Promise<AddMachineKeyResponse> {
+        const req = new AddMachineKeyRequest();
+        req.setType(type);
+        req.setUserId(userId);
+        if (date) {
+            req.setExpirationDate(date);
+        }
+        return await this.request(
+            c => c.addMachineKey,
+            req,
+            f => f,
+        );
+    }
+
+    public async DeleteMachineKey(
+        keyId: string,
+        userId: string,
+    ): Promise<Empty> {
+        const req = new MachineKeyIDRequest();
+        req.setKeyId(keyId);
+        req.setUserId(userId);
+
+        return await this.request(
+            c => c.deleteMachineKey,
+            req,
+            f => f,
+        );
+    }
+
+    public async SearchMachineKeys(
+        userId: string,
+        limit: number,
+        offset: number,
+        asc?: boolean,
+    ): Promise<MachineKeySearchResponse> {
+        const req = new MachineKeySearchRequest();
+        req.setUserId(userId);
+        req.setLimit(limit);
+        req.setOffset(offset);
+        if (asc) {
+            req.setAsc(asc);
+        }
+        return await this.request(
+            c => c.searchMachineKeys,
+            req,
+            f => f,
+        );
+    }
+
     public async GetUserEmail(id: string): Promise<UserEmail> {
         const req = new UserID();
         req.setId(id);
@@ -239,7 +323,7 @@ export class MgmtUserService {
         );
     }
 
-    public async DeactivateUser(id: string): Promise<UserPhone> {
+    public async DeactivateUser(id: string): Promise<UserResponse> {
         const req = new UserID();
         req.setId(id);
         return await this.request(
@@ -267,7 +351,7 @@ export class MgmtUserService {
             f => f,
         );
     }
-    public async ReactivateUser(id: string): Promise<UserPhone> {
+    public async ReactivateUser(id: string): Promise<UserResponse> {
         const req = new UserID();
         req.setId(id);
         return await this.request(
@@ -391,11 +475,11 @@ export class MgmtUserService {
         );
     }
 
-    public async GetUserByEmailGlobal(email: string): Promise<User> {
-        const req = new Email();
-        req.setEmail(email);
+    public async GetUserByLoginNameGlobal(loginName: string): Promise<UserView> {
+        const req = new LoginName();
+        req.setLoginName(loginName);
         return await this.request(
-            c => c.getUserByEmailGlobal,
+            c => c.getUserByLoginNameGlobal,
             req,
             f => f,
         );

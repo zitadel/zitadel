@@ -19,8 +19,8 @@ func (v *View) SearchUsers(request *usr_model.UserSearchRequest) ([]*model.UserV
 	return view.SearchUsers(v.Db, userTable, request)
 }
 
-func (v *View) GetGlobalUserByEmail(email string) (*model.UserView, error) {
-	return view.GetGlobalUserByEmail(v.Db, userTable, email)
+func (v *View) GetGlobalUserByLoginName(loginName string) (*model.UserView, error) {
+	return view.GetGlobalUserByLoginName(v.Db, userTable, loginName)
 }
 
 func (v *View) UsersByOrgID(orgID string) ([]*model.UserView, error) {

@@ -62,6 +62,15 @@ func PutProjectMember(db *gorm.DB, table string, role *model.ProjectMemberView) 
 	return save(db, role)
 }
 
+func PutProjectMembers(db *gorm.DB, table string, members ...*model.ProjectMemberView) error {
+	save := repository.PrepareBulkSave(table)
+	m := make([]interface{}, len(members))
+	for i, member := range members {
+		m[i] = member
+	}
+	return save(db, m...)
+}
+
 func DeleteProjectMember(db *gorm.DB, table, projectID, userID string) error {
 	role, err := ProjectMemberByIDs(db, table, projectID, userID)
 	if err != nil {

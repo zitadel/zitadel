@@ -99,7 +99,8 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 			return err
 		}
 		err = user.AppendEvent(event)
-	case es_model.DomainClaimed:
+	case es_model.DomainClaimed,
+		es_model.UserUserNameChanged:
 		user, err = u.view.UserByID(event.AggregateID)
 		if err != nil {
 			return err
@@ -125,7 +126,7 @@ func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
 	if err != nil {
 		return err
 	}
-	policy, err := u.orgEvents.GetOrgIamPolicy(context.Background(), user.ResourceOwner)
+	policy, err := u.orgEvents.GetOrgIAMPolicy(context.Background(), user.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -138,9 +139,9 @@ func (u *User) ProcessOrg(event *models.Event) (err error) {
 	switch event.Type {
 	case org_es_model.OrgDomainVerified,
 		org_es_model.OrgDomainRemoved,
-		org_es_model.OrgIamPolicyAdded,
-		org_es_model.OrgIamPolicyChanged,
-		org_es_model.OrgIamPolicyRemoved:
+		org_es_model.OrgIAMPolicyAdded,
+		org_es_model.OrgIAMPolicyChanged,
+		org_es_model.OrgIAMPolicyRemoved:
 		return u.fillLoginNamesOnOrgUsers(event)
 	case org_es_model.OrgDomainPrimarySet:
 		return u.fillPreferredLoginNamesOnOrgUsers(event)
@@ -154,7 +155,7 @@ func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
 	if err != nil {
 		return err
 	}
-	policy, err := u.orgEvents.GetOrgIamPolicy(context.Background(), event.ResourceOwner)
+	policy, err := u.orgEvents.GetOrgIAMPolicy(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -164,12 +165,8 @@ func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
 	}
 	for _, user := range users {
 		user.SetLoginNames(policy, org.Domains)
-		err := u.view.PutUser(user, event.Sequence)
-		if err != nil {
-			return err
-		}
 	}
-	return nil
+	return u.view.PutUsers(users, event.Sequence)
 }
 
 func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
@@ -177,7 +174,7 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
 	if err != nil {
 		return err
 	}
-	policy, err := u.orgEvents.GetOrgIamPolicy(context.Background(), event.ResourceOwner)
+	policy, err := u.orgEvents.GetOrgIAMPolicy(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -190,15 +187,11 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
 	}
 	for _, user := range users {
 		user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
-		err := u.view.PutUser(user, 0)
-		if err != nil {
-			return err
-		}
 	}
-	return nil
+	return u.view.PutUsers(users, 0)
 }
 
 func (u *User) OnError(event *models.Event, err error) error {
-	logging.LogWithFields("SPOOL-is8wa", "id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
+	logging.LogWithFields("SPOOL-is8aAWima", "id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
 	return spooler.HandleError(event, err, u.view.GetLatestUserFailedEvent, u.view.ProcessedUserFailedEvent, u.view.ProcessedUserSequence, u.errorCountUntilSkip)
 }

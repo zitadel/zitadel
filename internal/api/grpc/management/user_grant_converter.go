@@ -28,13 +28,13 @@ func usergrantFromModel(grant *grant_model.UserGrant) *management.UserGrant {
 	}
 }
 
-func userGrantCreateBulkToModel(u *management.UserGrantCreateBulk) []*grant_model.UserGrant {
-	grants := make([]*grant_model.UserGrant, len(u.UserGrants))
-	for i, grant := range u.UserGrants {
-		grants[i] = userGrantCreateToModel(grant)
-	}
-	return grants
-}
+// func userGrantCreateBulkToModel(u *management.UserGrantCreateBulk) []*grant_model.UserGrant {
+// 	grants := make([]*grant_model.UserGrant, len(u.UserGrants))
+// 	for i, grant := range u.UserGrants {
+// 		grants[i] = userGrantCreateToModel(grant)
+// 	}
+// 	return grants
+// }
 
 func userGrantCreateToModel(u *management.UserGrantCreate) *grant_model.UserGrant {
 	return &grant_model.UserGrant{
@@ -46,13 +46,13 @@ func userGrantCreateToModel(u *management.UserGrantCreate) *grant_model.UserGran
 	}
 }
 
-func userGrantUpdateBulkToModel(u *management.UserGrantUpdateBulk) []*grant_model.UserGrant {
-	grants := make([]*grant_model.UserGrant, len(u.UserGrants))
-	for i, grant := range u.UserGrants {
-		grants[i] = userGrantUpdateToModel(grant)
-	}
-	return grants
-}
+// func userGrantUpdateBulkToModel(u *management.UserGrantUpdateBulk) []*grant_model.UserGrant {
+// 	grants := make([]*grant_model.UserGrant, len(u.UserGrants))
+// 	for i, grant := range u.UserGrants {
+// 		grants[i] = userGrantUpdateToModel(grant)
+// 	}
+// 	return grants
+// }
 
 func userGrantUpdateToModel(u *management.UserGrantUpdate) *grant_model.UserGrant {
 	return &grant_model.UserGrant{
@@ -172,18 +172,18 @@ func usergrantStateFromModel(state grant_model.UserGrantState) management.UserGr
 	}
 }
 
-func projectUserGrantSearchRequestsToModel(project *management.ProjectUserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
-	return &grant_model.UserGrantSearchRequest{
-		Offset:  project.Offset,
-		Limit:   project.Limit,
-		Queries: userGrantSearchQueriesToModel(project.Queries),
-	}
-}
+// func projectUserGrantSearchRequestsToModel(project *management.ProjectUserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
+// 	return &grant_model.UserGrantSearchRequest{
+// 		Offset:  project.Offset,
+// 		Limit:   project.Limit,
+// 		Queries: userGrantSearchQueriesToModel(project.Queries),
+// 	}
+// }
 
-func projectGrantUserGrantSearchRequestsToModel(project *management.ProjectGrantUserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
-	return &grant_model.UserGrantSearchRequest{
-		Offset:  project.Offset,
-		Limit:   project.Limit,
-		Queries: userGrantSearchQueriesToModel(project.Queries),
-	}
-}
+// func projectGrantUserGrantSearchRequestsToModel(project *management.ProjectGrantUserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
+// 	return &grant_model.UserGrantSearchRequest{
+// 		Offset:  project.Offset,
+// 		Limit:   project.Limit,
+// 		Queries: userGrantSearchQueriesToModel(project.Queries),
+// 	}
+// }
