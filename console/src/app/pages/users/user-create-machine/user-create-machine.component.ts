@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CreateMachineRequest } from 'src/app/proto/generated/admin_pb';
 import { UserResponse } from 'src/app/proto/generated/management_pb';
-import { MgmtUserService } from 'src/app/services/mgmt-user.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 function noEmailValidator(c: AbstractControl): any {
@@ -40,7 +40,7 @@ export class UserCreateMachineComponent implements OnDestroy {
     constructor(
         private router: Router,
         private toast: ToastService,
-        public userService: MgmtUserService,
+        public userService: ManagementService,
         private fb: FormBuilder,
     ) {
         this.initForm();
@@ -78,7 +78,7 @@ export class UserCreateMachineComponent implements OnDestroy {
                     this.router.navigate(['users', id]);
                 }
             })
-            .catch(error => {
+            .catch((error: any) => {
                 this.loading = false;
                 this.toast.showError(error);
             });

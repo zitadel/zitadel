@@ -7,7 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { MachineKeySearchResponse, MachineKeyType, MachineKeyView } from 'src/app/proto/generated/management_pb';
-import { MgmtUserService } from 'src/app/services/mgmt-user.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AddKeyDialogComponent } from './add-key-dialog/add-key-dialog.component';
@@ -29,7 +29,7 @@ export class MachineKeysComponent implements OnInit {
 
     @Output() public changedSelection: EventEmitter<Array<MachineKeyView.AsObject>> = new EventEmitter();
 
-    constructor(public translate: TranslateService, private userService: MgmtUserService, private dialog: MatDialog,
+    constructor(public translate: TranslateService, private userService: ManagementService, private dialog: MatDialog,
         private toast: ToastService) {
         this.selection.changed.subscribe(() => {
             this.changedSelection.emit(this.selection.selected);
@@ -96,7 +96,7 @@ export class MachineKeysComponent implements OnInit {
                     console.log(this.userId, type, date);
                     return this.userService.AddMachineKey(this.userId, type, date).then(() => {
                         this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
-                    }).catch(error => {
+                    }).catch((error: any) => {
                         this.toast.showError(error);
                     });
                 }
@@ -112,7 +112,7 @@ export class MachineKeysComponent implements OnInit {
             this.dataSource.data = this.keyResult.resultList;
             console.log(this.keyResult.resultList);
             this.loadingSubject.next(false);
-        }).catch(error => {
+        }).catch((error: any) => {
             this.toast.showError(error);
             this.loadingSubject.next(false);
         });
