@@ -58,10 +58,8 @@ const (
 
 //the following consts are for user(v2)
 const (
-	UserNameReserved   models.EventType = "user.username.reserved"
-	UserNameReleased   models.EventType = "user.username.released"
-	HumanEmailReserved models.EventType = "user.email.reserved"
-	HumanEmailReleased models.EventType = "user.email.released"
+	UserNameReserved models.EventType = "user.username.reserved"
+	UserNameReleased models.EventType = "user.username.released"
 
 	UserLocked      models.EventType = "user.locked"
 	UserUnlocked    models.EventType = "user.unlocked"
