@@ -174,8 +174,8 @@ EventTypes:
         sent: Email address verification code sent
     machine:
       machine:
-        added: Service added
-        changed: Service changed
+        added: Technical user added
+        changed: Technical user changed
         key:
           added: Key added
           removed: Key removed
