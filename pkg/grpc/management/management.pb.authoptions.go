@@ -330,7 +330,7 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 	},
 
 	"/caos.zitadel.management.api.v1.ManagementService/CreateProject": authz.Option{
-		Permission: "project.write",
+		Permission: "project.create",
 		CheckParam: "",
 	},
 
