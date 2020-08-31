@@ -45,7 +45,6 @@ import {
     OrgDomainValidationResponse,
     OrgDomainValidationType,
     OrgIamPolicy,
-    OrgID,
     OrgMember,
     OrgMemberRoles,
     OrgMemberSearchRequest,
@@ -320,7 +319,7 @@ export class ManagementService {
     }
 
     public async ReactivateMyOrg(): Promise<Org> {
-        const req = new OrgID();
+        const req = new Empty();
         return this.grpcService.mgmt.reactivateMyOrg(req);
     }
 
