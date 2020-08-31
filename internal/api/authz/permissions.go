@@ -60,8 +60,8 @@ func addRoleContextIDToPerm(perm, roleContextID string) string {
 }
 
 func ExistsPerm(existingPermissions []string, perm string) bool {
-	for _, e := range existingPermissions {
-		if e == perm {
+	for _, existingPermission := range existingPermissions {
+		if existingPermission == perm {
 			return true
 		}
 	}
