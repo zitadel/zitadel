@@ -76,7 +76,7 @@ func CreateLogin(config Config, authRepo *eventsourcing.EsRepository, localDevMo
 	login.router = CreateRouter(login, statikFS, csrf, cache, security, userAgentCookie)
 	login.renderer = CreateRenderer(prefix, statikFS, config.LanguageCookieName, config.DefaultLanguage)
 	login.parser = form.NewParser()
-	return login, prefix
+	return login, handlerPrefix
 }
 
 func csp() *middleware.CSP {
