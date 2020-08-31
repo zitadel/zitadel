@@ -151,6 +151,9 @@ func (repo *UserRepo) UserMfas(ctx context.Context, userID string) ([]*usr_model
 	if err != nil {
 		return nil, err
 	}
+	if user.HumanView == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-xx0hV", "Errors.User.NotHuman")
+	}
 	if user.OTPState == usr_model.MfaStateUnspecified {
 		return []*usr_model.MultiFactor{}, nil
 	}
