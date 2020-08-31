@@ -89,7 +89,7 @@
                     <app-card *ngIf="project?.projectId" title="{{ 'GRANTS.PROJECT.TITLE' | translate }}"
                         description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
                         <app-user-grants [context]="userGrantContext" [projectId]="projectId"
-                            [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"
+                            [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE || (['project.write', 'project.write'+ project.projectId]| hasRole | async) == false"
                             [allowCreate]="(['user.grant.write'] | hasRole) | async"
                             [allowDelete]="(['user.grant.delete'] | hasRole) | async">
                         </app-user-grants>
