@@ -199,25 +199,11 @@ func (repo *UserRepo) MyUserMfas(ctx context.Context) ([]*model.MultiFactor, err
 }
 
 func (repo *UserRepo) AddMfaOTP(ctx context.Context, userID string) (*model.OTP, error) {
-	accountName := ""
-	user, err := repo.UserByID(ctx, userID)
-	if err != nil {
-		logging.Log("EVENT-Fk93s").OnError(err).Debug("unable to get user for loginname")
-	} else {
-		accountName = user.PreferredLoginName
-	}
-	return repo.UserEvents.AddOTP(ctx, userID, accountName)
+	return repo.UserEvents.AddOTP(ctx, userID)
 }
 
 func (repo *UserRepo) AddMyMfaOTP(ctx context.Context) (*model.OTP, error) {
-	accountName := ""
-	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
-	if err != nil {
-		logging.Log("EVENT-Ml0sd").OnError(err).Debug("unable to get user for loginname")
-	} else {
-		accountName = user.PreferredLoginName
-	}
-	return repo.UserEvents.AddOTP(ctx, authz.GetCtxData(ctx).UserID, accountName)
+	return repo.UserEvents.AddOTP(ctx, authz.GetCtxData(ctx).UserID)
 }
 
 func (repo *UserRepo) VerifyMfaOTPSetup(ctx context.Context, userID, code string) error {

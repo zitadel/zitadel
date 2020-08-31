@@ -105,8 +105,9 @@
                         <button (click)="emailEditState = false" mat-icon-button>
                             <mat-icon class="icon">close</mat-icon>
                         </button>
-                        <button *ngIf="user.human" [disabled]="!user.human.email" class="submit-button" type="button"
-                            color="primary" (click)="saveEmail()"
+                        <button *ngIf="user.human"
+                            [disabled]="!user.human.email || (['user.write','user.write' + user.id] | hasRole | async) == false"
+                            class="submit-button" type="button" color="primary" (click)="saveEmail()"
                             mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
                     </ng-template>
                 </div>
@@ -147,8 +148,10 @@
                         <button *ngIf="user.human?.phone" color="warn" (click)="deletePhone()" mat-icon-button>
                             <i class="las la-trash"></i>
                         </button>
-                        <button *ngIf="user.human" [disabled]="!user.human.phone" type="button" color="primary"
-                            (click)="savePhone()" mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+                        <button *ngIf="user.human"
+                            [disabled]="!user.human.phone || (['user.write', 'user.write'+ user.id]| hasRole | async) == false"
+                            type="button" color="primary" (click)="savePhone()" mat-raised-button>
+                            {{ 'ACTIONS.SAVE' | translate }}</button>
                     </ng-template>
                 </div>
             </div>

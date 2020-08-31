@@ -1666,7 +1666,6 @@ message MachineResponse {
 
 message MachineView {
   google.protobuf.Timestamp last_key_added = 1;
-
   string name = 2;
   string description = 3;
 }

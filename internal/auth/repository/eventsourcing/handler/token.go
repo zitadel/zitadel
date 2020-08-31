@@ -4,12 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
-
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
-
 	"github.com/caos/logging"
-
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -17,6 +12,7 @@ import (
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	project_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	user_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 type Token struct {

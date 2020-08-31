@@ -4,13 +4,10 @@ import (
 	"context"
 	"testing"
 
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-
 	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 )
 

@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 
 import {
+    AddMachineKeyRequest,
+    AddMachineKeyResponse,
     AddOrgDomainRequest,
     AddOrgMemberRequest,
     Application,
@@ -14,12 +17,19 @@ import {
     ChangeOrgMemberRequest,
     ChangeRequest,
     Changes,
+    CreateHumanRequest,
+    CreateMachineRequest,
     CreateUserRequest,
     Domain,
     Gender,
     GrantedProjectSearchRequest,
     Iam,
     LoginName,
+    MachineKeyIDRequest,
+    MachineKeySearchRequest,
+    MachineKeySearchResponse,
+    MachineKeyType,
+    MachineResponse,
     MultiFactors,
     NotificationType,
     OIDCApplicationCreate,
@@ -95,11 +105,11 @@ import {
     RemoveOrgDomainRequest,
     RemoveOrgMemberRequest,
     SetPasswordNotificationRequest,
+    UpdateMachineRequest,
     UpdateUserAddressRequest,
     UpdateUserEmailRequest,
     UpdateUserPhoneRequest,
     UpdateUserProfileRequest,
-    User,
     UserAddress,
     UserEmail,
     UserGrant,
@@ -117,6 +127,7 @@ import {
     UserMembershipSearchResponse,
     UserPhone,
     UserProfile,
+    UserResponse,
     UserSearchQuery,
     UserSearchRequest,
     UserSearchResponse,
@@ -133,6 +144,77 @@ export type ResponseMapper<TResp, TMappedResp> = (resp: TResp) => TMappedResp;
 })
 export class ManagementService {
     constructor(private readonly grpcService: GrpcService) { }
+
+    public async CreateUserHuman(username: string, user: CreateHumanRequest): Promise<UserResponse> {
+        const req = new CreateUserRequest();
+
+        req.setUserName(username);
+        req.setHuman(user);
+
+        return this.grpcService.mgmt.createUser(req);
+    }
+
+    public async CreateUserMachine(username: string, user: CreateMachineRequest): Promise<UserResponse> {
+        const req = new CreateUserRequest();
+
+        req.setUserName(username);
+        req.setMachine(user);
+
+        return this.grpcService.mgmt.createUser(req);
+    }
+
+    public async UpdateUserMachine(
+        id: string,
+        description?: string,
+    ): Promise<MachineResponse> {
+        const req = new UpdateMachineRequest();
+        req.setId(id);
+        if (description) {
+            req.setDescription(description);
+        }
+        return this.grpcService.mgmt.updateUserMachine(req);
+    }
+
+    public async AddMachineKey(
+        userId: string,
+        type: MachineKeyType,
+        date?: Timestamp,
+    ): Promise<AddMachineKeyResponse> {
+        const req = new AddMachineKeyRequest();
+        req.setType(type);
+        req.setUserId(userId);
+        if (date) {
+            req.setExpirationDate(date);
+        }
+        return this.grpcService.mgmt.addMachineKey(req);
+    }
+
+    public async DeleteMachineKey(
+        keyId: string,
+        userId: string,
+    ): Promise<Empty> {
+        const req = new MachineKeyIDRequest();
+        req.setKeyId(keyId);
+        req.setUserId(userId);
+
+        return this.grpcService.mgmt.deleteMachineKey(req);
+    }
+
+    public async SearchMachineKeys(
+        userId: string,
+        limit: number,
+        offset: number,
+        asc?: boolean,
+    ): Promise<MachineKeySearchResponse> {
+        const req = new MachineKeySearchRequest();
+        req.setUserId(userId);
+        req.setLimit(limit);
+        req.setOffset(offset);
+        if (asc) {
+            req.setAsc(asc);
+        }
+        return this.grpcService.mgmt.searchMachineKeys(req);
+    }
 
     public async GetIam(): Promise<Iam> {
         const req = new Empty();
@@ -400,25 +482,6 @@ export class ManagementService {
         }
     }
 
-    public async CreateUser(user: CreateUserRequest.AsObject): Promise<User> {
-        const req = new CreateUserRequest();
-        req.setEmail(user.email);
-        req.setUserName(user.userName);
-        req.setFirstName(user.firstName);
-        req.setLastName(user.lastName);
-        req.setNickName(user.nickName);
-        req.setPassword(user.password);
-        req.setPreferredLanguage(user.preferredLanguage);
-        req.setGender(user.gender);
-        req.setPhone(user.phone);
-        req.setStreetAddress(user.streetAddress);
-        req.setPostalCode(user.postalCode);
-        req.setLocality(user.locality);
-        req.setRegion(user.region);
-        req.setCountry(user.country);
-        return this.grpcService.mgmt.createUser(req);
-    }
-
     public async GetUserByID(id: string): Promise<UserView> {
         const req = new UserID();
         req.setId(id);
@@ -525,7 +588,7 @@ export class ManagementService {
         return this.grpcService.mgmt.removeUserPhone(req);
     }
 
-    public async DeactivateUser(id: string): Promise<UserPhone> {
+    public async DeactivateUser(id: string): Promise<UserResponse> {
         const req = new UserID();
         req.setId(id);
         return this.grpcService.mgmt.deactivateUser(req);
@@ -545,7 +608,8 @@ export class ManagementService {
 
         return this.grpcService.mgmt.createUserGrant(req);
     }
-    public async ReactivateUser(id: string): Promise<UserPhone> {
+
+    public async ReactivateUser(id: string): Promise<UserResponse> {
         const req = new UserID();
         req.setId(id);
         return this.grpcService.mgmt.reactivateUser(req);

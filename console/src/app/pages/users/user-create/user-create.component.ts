@@ -2,7 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { CreateUserRequest, Gender, User } from 'src/app/proto/generated/management_pb';
+import { CreateHumanRequest, CreateUserRequest, Gender, UserResponse } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 

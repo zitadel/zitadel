@@ -6,7 +6,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { UserView } from 'src/app/proto/generated/auth_pb';
 import { UserSearchKey, UserSearchQuery, UserSearchResponse } from 'src/app/proto/generated/management_pb';
-import { MgmtUserService } from 'src/app/services/mgmt-user.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { UserType } from '../user-list.component';
@@ -29,7 +29,7 @@ export class UserTableComponent implements OnInit {
 
     @Output() public changedSelection: EventEmitter<Array<UserView.AsObject>> = new EventEmitter();
 
-    constructor(public translate: TranslateService, private userService: MgmtUserService,
+    constructor(public translate: TranslateService, private userService: ManagementService,
         private toast: ToastService) {
         this.selection.changed.subscribe(() => {
             this.changedSelection.emit(this.selection.selected);

@@ -3,10 +3,6 @@ package model
 import (
 	"time"
 
-	"golang.org/x/text/language"
-
-	"github.com/caos/zitadel/internal/eventstore/models"
-
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
