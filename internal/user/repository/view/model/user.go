@@ -151,16 +151,10 @@ func UsersToModel(users []*UserView) []*model.UserView {
 }
 
 func (u *UserView) GenerateLoginName(domain string, appendDomain bool) string {
-	var name string
-	if u.MachineView != nil {
-		name = u.MachineView.Name
-	} else {
-		name = u.UserName
-	}
 	if !appendDomain {
-		return name
+		return u.UserName
 	}
-	return name + "@" + domain
+	return u.UserName + "@" + domain
 }
 
 func (u *UserView) SetLoginNames(policy *org_model.OrgIAMPolicy, domains []*org_model.OrgDomain) {
