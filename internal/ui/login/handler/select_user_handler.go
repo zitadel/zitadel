@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
@@ -33,7 +34,8 @@ func (l *Login) handleSelectUser(w http.ResponseWriter, r *http.Request) {
 		l.renderLogin(w, r, authSession, nil)
 		return
 	}
-	err = l.authRepo.SelectUser(r.Context(), authSession.ID, data.UserID)
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	err = l.authRepo.SelectUser(r.Context(), authSession.ID, data.UserID, userAgentID)
 	if err != nil {
 		l.renderError(w, r, authSession, err)
 		return

@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
@@ -15,7 +16,8 @@ func (l *Login) getAuthRequest(r *http.Request) (*model.AuthRequest, error) {
 	if authRequestID == "" {
 		return nil, nil
 	}
-	return l.authRepo.AuthRequestByID(r.Context(), authRequestID)
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	return l.authRepo.AuthRequestByID(r.Context(), authRequestID, userAgentID)
 }
 
 func (l *Login) getAuthRequestAndParseData(r *http.Request, data interface{}) (*model.AuthRequest, error) {

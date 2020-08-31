@@ -159,6 +159,7 @@ Errors:
   Internal: An internal error occured
   AuthRequest:
     NotFound: Could not find authrequest
+    UserAgentNotCorresponding: User Agent does not correspond
   User:
     NotFound: User could not be found
     NotMatchingUserID: User and user in authrequest don't match

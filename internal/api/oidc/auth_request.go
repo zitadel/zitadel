@@ -9,13 +9,13 @@ import (
 	"github.com/caos/oidc/pkg/op"
 	"gopkg.in/square/go-jose.v2"
 
-	"github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/errors"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 )
 
 func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (op.AuthRequest, error) {
-	userAgentID, ok := UserAgentIDFromCtx(ctx)
+	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
 	}
@@ -28,7 +28,11 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 }
 
 func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (op.AuthRequest, error) {
-	resp, err := o.repo.AuthRequestByIDCheckLoggedIn(ctx, id)
+	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
+	if !ok {
+		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-D3g21", "no user agent id")
+	}
+	resp, err := o.repo.AuthRequestByIDCheckLoggedIn(ctx, id, userAgentID)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +48,11 @@ func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (op.Auth
 }
 
 func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) error {
-	return o.repo.SaveAuthCode(ctx, id, code)
+	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
+	if !ok {
+		return errors.ThrowPreconditionFailed(nil, "OIDC-Dgus2", "no user agent id")
+	}
+	return o.repo.SaveAuthCode(ctx, id, code, userAgentID)
 }
 
 func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) error {
@@ -52,16 +60,13 @@ func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) error {
 }
 
 func (o *OPStorage) CreateToken(ctx context.Context, authReq op.AuthRequest) (string, time.Time, error) {
-	req, err := o.repo.AuthRequestByID(ctx, authReq.GetID())
+	app, err := o.repo.ApplicationByClientID(ctx, authReq.GetClientID())
 	if err != nil {
 		return "", time.Time{}, err
 	}
-	app, err := o.repo.ApplicationByClientID(ctx, req.ApplicationID)
-	if err != nil {
-		return "", time.Time{}, err
-	}
-	grants, err := o.repo.UserGrantsByProjectAndUserID(app.ProjectID, req.UserID)
-	scopes := append(req.Request.(*model.AuthRequestOIDC).Scopes, grantsToScopes(grants)...)
+	grants, err := o.repo.UserGrantsByProjectAndUserID(app.ProjectID, authReq.GetSubject())
+	scopes := append(authReq.GetScopes(), grantsToScopes(grants)...)
+	req, _ := authReq.(*AuthRequest)
 	resp, err := o.repo.CreateToken(ctx, req.AgentID, req.ApplicationID, req.UserID, req.Audience, scopes, o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
 	if err != nil {
 		return "", time.Time{}, err
@@ -80,7 +85,7 @@ func grantsToScopes(grants []*grant_model.UserGrantView) []string {
 }
 
 func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID string) error {
-	userAgentID, ok := UserAgentIDFromCtx(ctx)
+	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		return errors.ThrowPreconditionFailed(nil, "OIDC-fso7F", "no user agent id")
 	}

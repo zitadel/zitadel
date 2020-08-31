@@ -114,16 +114,13 @@ func startZitadel(configPaths []string) {
 func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository) {
 	uis := ui.Create(conf.UI)
 	if *loginEnabled {
-		prefix := ""
-		if *localDevMode {
-			prefix = ui.LoginHandler
-		}
-		uis.RegisterHandler(ui.LoginHandler, login.Start(conf.UI.Login, authRepo, prefix).Handler())
+		login, prefix := login.Start(conf.UI.Login, authRepo, *localDevMode)
+		uis.RegisterHandler(prefix, login.Handler())
 	}
 	if *consoleEnabled {
-		consoleHandler, err := console.Start(conf.UI.Console)
+		consoleHandler, prefix, err := console.Start(conf.UI.Console)
 		logging.Log("API-AGD1f").OnError(err).Fatal("error starting console")
-		uis.RegisterHandler(ui.ConsoleHandler, consoleHandler)
+		uis.RegisterHandler(prefix, consoleHandler)
 	}
 	uis.Start(ctx)
 }
@@ -148,7 +145,7 @@ func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsReposit
 		apis.RegisterServer(ctx, auth.CreateServer(authRepo))
 	}
 	if *oidcEnabled {
-		op := oidc.NewProvider(ctx, conf.API.OIDC, authRepo)
+		op := oidc.NewProvider(ctx, conf.API.OIDC, authRepo, *localDevMode)
 		apis.RegisterHandler("/oauth/v2", op.HttpHandler())
 	}
 	apis.Start(ctx)
