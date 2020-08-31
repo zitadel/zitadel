@@ -1,6 +1,7 @@
 package management
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/caos/logging"
@@ -88,14 +89,25 @@ func addMachineKeyFromModel(key *usr_model.MachineKey) *management.AddMachineKey
 	expirationDate, err := ptypes.TimestampProto(key.ExpirationDate)
 	logging.Log("MANAG-dlb8m").OnError(err).Debug("unable to parse cretaion date")
 
-	details := []byte(`{"type": "serviceaccount, "privateKeyId":}`)
+	detail, err := json.Marshal(struct {
+		Type   string `json:"type"`
+		KeyID  string `json:"keyId"`
+		Key    []byte `json:"key"`
+		UserID string `json:"userId"`
+	}{
+		Type:   "serviceaccount",
+		KeyID:  key.KeyID,
+		Key:    key.PrivateKey,
+		UserID: key.AggregateID,
+	})
+	logging.Log("MANAG-lFQ2g").OnError(err).Warn("unable to marshall key")
 
 	return &management.AddMachineKeyResponse{
 		Id:             key.KeyID,
 		CreationDate:   creationDate,
 		ExpirationDate: expirationDate,
 		Sequence:       key.Sequence,
-		KeyDetails:     details,
+		KeyDetails:     detail,
 		Type:           machineKeyTypeFromModel(key.Type),
 	}
 }
