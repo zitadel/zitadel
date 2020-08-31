@@ -241,6 +241,7 @@ service AuthService {
       permission: "authenticated"
     };
   }
+
   //Password
   rpc ChangeMyPassword(PasswordChange) returns (google.protobuf.Empty) {
     option (google.api.http) = {
@@ -357,12 +358,6 @@ enum UserSessionState {
   USERSESSIONSTATE_UNSPECIFIED = 0;
   USERSESSIONSTATE_ACTIVE = 1;
   USERSESSIONSTATE_TERMINATED = 2;
-}
-
-enum OIDCResponseType {
-  OIDCRESPONSETYPE_CODE = 0;
-  OIDCRESPONSETYPE_ID_TOKEN = 1;
-  OIDCRESPONSETYPE_ID_TOKEN_TOKEN = 2;
 }
 
 message UserView {
@@ -504,11 +499,6 @@ message VerifyMyUserEmailRequest {
   string code = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message VerifyUserEmailRequest {
-  string id = 1;
-  string code = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-}
-
 message UpdateUserEmailRequest {
   string email = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -571,14 +561,6 @@ message UpdateUserAddressRequest {
   string street_address = 5 [(validate.rules).string = {max_len: 200}];
 }
 
-message PasswordID {
-  string id = 1;
-}
-
-message PasswordRequest {
-  string password = 1 [(validate.rules).string = {min_len: 1, max_len: 72}];
-}
-
 message PasswordChange {
   string old_password = 1 [(validate.rules).string = {min_len: 1, max_len: 72}];
   string new_password = 2 [(validate.rules).string = {min_len: 1, max_len: 72}];
@@ -591,7 +573,7 @@ enum MfaType {
 }
 
 message VerifyMfaOtp {
-  string code = 1;
+  string code = 1 [(validate.rules).string = {min_len: 1}];
 }
 
 message MultiFactors {
@@ -615,11 +597,6 @@ enum MFAState {
   MFASTATE_NOT_READY = 1;
   MFASTATE_READY = 2;
   MFASTATE_REMOVED = 3;
-}
-
-message OIDCClientAuth {
-  string client_id = 1;
-  string client_secret = 2;
 }
 
 message UserGrantSearchRequest {
