@@ -24,6 +24,8 @@ Errors:
     PhoneInvalid: Telefonnummer ist ungültig
     PhoneAlreadyVerified: Telefonnummer bereits verifiziert
     AddressNotFound: Addresse nicht gefunden
+    NotHuman: Der Benutzer muss eine Person sein
+    NotMachine: Der Benutzer muss technisch sein
     Code:
       Empty: Code ist leer
       NotFound: Code konnte nicht gefunden werden
@@ -144,6 +146,8 @@ Errors:
     NotFound: Token konnte nicht gefunden werden
   UserSession:
     NotFound: Benutzer Sitzung konnte nicht gefunden werden
+  Key:
+    ExpireBeforeNow: Das Ablaufdatum liegt in der Vergangenheit
 EventTypes:
   user:
     added: Benutzer hinzugefügt

@@ -24,6 +24,8 @@ Errors:
     PhoneInvalid: Phone is invalid
     PhoneAlreadyVerified: Phone already verified
     AddressNotFound: Address not found
+    NotHuman: The User must be personal
+    NotMachine: The User must be technical
     Code:
       Empty: Code is empty
       NotFound: Code not found
@@ -144,6 +146,8 @@ Errors:
     NotFound: Token not found
   UserSession:
     NotFound: UserSession not found
+  Key:
+    ExpireBeforeNow: The expiration date is in the past
 EventTypes:
   user:
     added: User added
