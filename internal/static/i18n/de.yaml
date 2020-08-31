@@ -172,6 +172,66 @@ EventTypes:
       code:
         added: E-Mail Code generiert
         sent: E-Mail Code gesendet
+    machine:
+      machine:
+        added: Technischer Benutzer hinzugefügt
+        changed: Technischer Benutzer geändert
+        key:
+          added: Key added
+          removed: Key removed
+    human:
+      added: Benutzer hinzugefügt
+      selfregistered: Benutzer hat sich selbst registriert
+      initialization: 
+        code:
+          added: Initialisierungscode generiert
+          sent: Initialiseriungscode versendet
+        check:
+          succeeded: Benutzerinitialisierung erfolgreich
+          failed: Benutzerinitialisierung fehlgeschlagen
+      username:
+        reserved: Benutzername reserviert
+        released: Benutzername freigegeben
+      email:
+        changed: E-Mail-Adresse geändert
+        verified: E-Mail-Adresse verifiziert
+        verification:
+          failed: Verifikation der E-Mail-Adresse fehlgeschlagen
+        code:
+          added: E-Mail Code generiert
+          sent: E-Mail Code gesendet
+      password:
+        changed: Passwort geändert
+        code:
+          added: Passwort Code generiert
+          sent: Passwort Code versendet
+        check:
+          succeeded: Passwortvalidierung erfolgreich
+          failed: Passwortvalidierung fehlgeschlagen
+      phone:
+        changed: Telefonnummer geändert
+        verified: Telefonnummer verifiziert
+        verification:
+          failed: Verifikation der Telefonnummer fehlgeschlagen
+        code:
+          added: Telefon Code hinzugefügt
+          sent: Telefon Code versendet
+      profile:
+        changed: Benutzerprofil geändert
+      address:
+        changed: Adresse des Benutzers geändert
+      mfa:
+        otp:
+          added: Multifaktor OTP hinzugefügt
+          verified: Multifaktor OTP verifiziert
+          removed: Multifaktor OTP entfernt
+          check:
+            succeeded: Multifaktor OTP Verifikation erfolgreich
+            failed: Multifaktor OTP Verifikation fehlgeschlagen
+        init:
+          skipped: Multifaktor Initialisierung übersprungen
+      signed:
+        out: Benutzer erfolgreich abgemeldet
     locked: Benutzer gesperrt
     unlocked: Benutzer entsperrt
     deactivated: Benutzer deaktiviert
