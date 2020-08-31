@@ -2,7 +2,6 @@ package eventsourcing
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -340,12 +339,13 @@ func (es *UserEventstore) UserChanges(ctx context.Context, id string, lastSequen
 			Sequence:   event.Sequence,
 		}
 
-		if len(event.Data) != 0 {
-			user := new(model.User) //TODO: discuss change view. profile is not enough and everything of the user is too much
-			err := json.Unmarshal(event.Data, user)
-			logging.Log("EVENT-Rkg7X").OnError(err).Debug("unable to unmarshal data")
-			change.Data = user
-		}
+		//TODO: now all types should be unmarshalled, e.g. password
+		// if len(event.Data) != 0 {
+		// 	user := new(model.User)
+		// 	err := json.Unmarshal(event.Data, user)
+		// 	logging.Log("EVENT-Rkg7X").OnError(err).Debug("unable to unmarshal data")
+		// 	change.Data = user
+		// }
 
 		result[i] = change
 		if lastSequence < event.Sequence {
