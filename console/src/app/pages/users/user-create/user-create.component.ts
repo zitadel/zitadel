@@ -3,8 +3,7 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CreateHumanRequest, CreateUserRequest, Gender, UserResponse } from 'src/app/proto/generated/management_pb';
-import { MgmtUserService } from 'src/app/services/mgmt-user.service';
-import { OrgService } from 'src/app/services/org.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 function noEmailValidator(c: AbstractControl): any {
@@ -44,12 +43,12 @@ export class UserCreateComponent implements OnDestroy {
     constructor(
         private router: Router,
         private toast: ToastService,
-        public userService: MgmtUserService,
+        public userService: ManagementService,
         private fb: FormBuilder,
-        private orgService: OrgService,
+        private mgmtService: ManagementService,
     ) {
         this.loading = true;
-        this.orgService.GetMyOrgIamPolicy().then((iampolicy) => {
+        this.mgmtService.GetMyOrgIamPolicy().then((iampolicy) => {
             this.userLoginMustBeDomain = iampolicy.toObject().userLoginMustBeDomain;
             this.initForm();
             this.loading = false;

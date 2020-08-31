@@ -10,7 +10,7 @@ import {
     PasswordLockoutPolicy,
 } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { OrgService } from 'src/app/services/org.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -55,7 +55,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
     constructor(
         private route: ActivatedRoute,
         private adminService: AdminService,
-        private orgService: OrgService,
+        private mgmtService: ManagementService,
         private router: Router,
         private toast: ToastService,
         private sessionStorage: StorageService,
@@ -121,40 +121,40 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
             case PolicyComponentType.LOCKOUT:
                 this.title = 'ORG.POLICY.PWD_LOCKOUT.TITLE';
                 this.desc = 'ORG.POLICY.PWD_LOCKOUT.DESCRIPTION';
-                return this.orgService.GetPasswordLockoutPolicy();
+                return this.mgmtService.GetPasswordLockoutPolicy();
             case PolicyComponentType.AGE:
                 this.title = 'ORG.POLICY.PWD_AGE.TITLE';
                 this.desc = 'ORG.POLICY.PWD_AGE.DESCRIPTION';
-                return this.orgService.GetPasswordAgePolicy();
+                return this.mgmtService.GetPasswordAgePolicy();
             case PolicyComponentType.COMPLEXITY:
                 this.title = 'ORG.POLICY.PWD_COMPLEXITY.TITLE';
                 this.desc = 'ORG.POLICY.PWD_COMPLEXITY.DESCRIPTION';
-                return this.orgService.GetPasswordComplexityPolicy();
+                return this.mgmtService.GetPasswordComplexityPolicy();
             case PolicyComponentType.IAM_POLICY:
                 this.title = 'ORG.POLICY.IAM_POLICY.TITLECREATE';
                 this.desc = 'ORG.POLICY.IAM_POLICY.DESCRIPTIONCREATE';
-                return this.orgService.GetMyOrgIamPolicy();
+                return this.mgmtService.GetMyOrgIamPolicy();
         }
     }
 
     public deletePolicy(): void {
         switch (this.policyType) {
             case PolicyComponentType.LOCKOUT:
-                this.orgService.DeletePasswordLockoutPolicy(this.lockoutData.id).then(() => {
+                this.mgmtService.DeletePasswordLockoutPolicy(this.lockoutData.id).then(() => {
                     this.toast.showInfo('Successfully deleted');
                 }).catch(error => {
                     this.toast.showError(error);
                 });
                 break;
             case PolicyComponentType.AGE:
-                this.orgService.DeletePasswordAgePolicy(this.ageData.id).then(() => {
+                this.mgmtService.DeletePasswordAgePolicy(this.ageData.id).then(() => {
                     this.toast.showInfo('Successfully deleted');
                 }).catch(error => {
                     this.toast.showError(error);
                 });
                 break;
             case PolicyComponentType.COMPLEXITY:
-                this.orgService.DeletePasswordComplexityPolicy(this.complexityData.id).then(() => {
+                this.mgmtService.DeletePasswordComplexityPolicy(this.complexityData.id).then(() => {
                     this.toast.showInfo('Successfully deleted');
                 }).catch(error => {
                     this.toast.showError(error);
@@ -215,7 +215,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
         if (this.componentAction === PolicyComponentAction.CREATE) {
             switch (this.policyType) {
                 case PolicyComponentType.LOCKOUT:
-                    this.orgService.CreatePasswordLockoutPolicy(
+                    this.mgmtService.CreatePasswordLockoutPolicy(
                         this.lockoutData.description,
                         this.lockoutData.maxAttempts,
                         this.lockoutData.showLockOutFailures,
@@ -227,7 +227,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
 
                     break;
                 case PolicyComponentType.AGE:
-                    this.orgService.CreatePasswordAgePolicy(
+                    this.mgmtService.CreatePasswordAgePolicy(
                         this.ageData.description,
                         this.ageData.maxAgeDays,
                         this.ageData.expireWarnDays,
@@ -239,7 +239,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
 
                     break;
                 case PolicyComponentType.COMPLEXITY:
-                    this.orgService.CreatePasswordComplexityPolicy(
+                    this.mgmtService.CreatePasswordComplexityPolicy(
                         this.complexityData.description,
                         this.complexityData.hasLowercase,
                         this.complexityData.hasUppercase,
@@ -271,7 +271,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
         } else if (this.componentAction === PolicyComponentAction.MODIFY) {
             switch (this.policyType) {
                 case PolicyComponentType.LOCKOUT:
-                    this.orgService.UpdatePasswordLockoutPolicy(
+                    this.mgmtService.UpdatePasswordLockoutPolicy(
                         this.lockoutData.description,
                         this.lockoutData.maxAttempts,
                         this.lockoutData.showLockOutFailures,
@@ -283,7 +283,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
 
                     break;
                 case PolicyComponentType.AGE:
-                    this.orgService.UpdatePasswordAgePolicy(
+                    this.mgmtService.UpdatePasswordAgePolicy(
                         this.ageData.description,
                         this.ageData.maxAgeDays,
                         this.ageData.expireWarnDays,
@@ -295,7 +295,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
 
                     break;
                 case PolicyComponentType.COMPLEXITY:
-                    this.orgService.UpdatePasswordComplexityPolicy(
+                    this.mgmtService.UpdatePasswordComplexityPolicy(
                         this.complexityData.description,
                         this.complexityData.hasLowercase,
                         this.complexityData.hasUppercase,

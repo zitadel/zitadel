@@ -4,8 +4,8 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/auth_pb';
-import { AuthUserService } from 'src/app/services/auth-user.service';
-import { MgmtUserService } from 'src/app/services/mgmt-user.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 function passwordConfirmValidator(c: AbstractControl): any {
@@ -39,11 +39,10 @@ export class PasswordComponent implements OnDestroy {
     constructor(
         activatedRoute: ActivatedRoute,
         private fb: FormBuilder,
-        private userService: AuthUserService,
-        private mgmtUserService: MgmtUserService,
+        private authService: GrpcAuthService,
+        private mgmtUserService: ManagementService,
         private toast: ToastService,
     ) {
-
         activatedRoute.params.subscribe(data => {
             const { id } = data;
             if (id) {
@@ -51,7 +50,7 @@ export class PasswordComponent implements OnDestroy {
             }
 
             const validators: Validators[] = [Validators.required];
-            this.userService.GetMyPasswordComplexityPolicy().then(complexity => {
+            this.authService.GetMyPasswordComplexityPolicy().then(complexity => {
                 this.policy = complexity.toObject();
                 if (this.policy.minLength) {
                     validators.push(Validators.minLength(this.policy.minLength));
@@ -110,8 +109,8 @@ export class PasswordComponent implements OnDestroy {
         if (this.passwordForm.valid && this.currentPassword &&
             this.currentPassword.value &&
             this.newPassword && this.newPassword.value && this.newPassword.valid) {
-            this.userService
-                .ChangeMyPassword(this.currentPassword.value, this.newPassword.value).then((data: any) => {
+            this.authService.ChangeMyPassword(this.currentPassword.value, this.newPassword.value)
+                .then((data: any) => {
                     this.toast.showInfo('USER.TOAST.PASSWORDCHANGED', true);
                     window.history.back();
                 }).catch(error => {

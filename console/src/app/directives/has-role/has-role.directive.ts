@@ -1,5 +1,5 @@
 import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
-import { AuthService } from 'src/app/services/auth.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 
 @Directive({
@@ -23,7 +23,7 @@ export class HasRoleDirective {
     }
 
     constructor(
-        private authService: AuthService,
+        private authService: GrpcAuthService,
         protected templateRef: TemplateRef<any>,
         protected viewContainerRef: ViewContainerRef,
     ) { }

@@ -9,8 +9,8 @@ import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidato
 import { CreateHumanRequest, CreateOrgRequest, Gender, OrgSetUpResponse } from 'src/app/proto/generated/admin_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/auth_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { AuthService } from 'src/app/services/auth.service';
-import { OrgService } from 'src/app/services/org.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 function passwordConfirmValidator(c: AbstractControl): any {
@@ -67,8 +67,8 @@ export class OrgCreateComponent {
         private adminService: AdminService,
         private _location: Location,
         private fb: FormBuilder,
-        private orgService: OrgService,
-        private authService: AuthService,
+        private mgmtService: ManagementService,
+        private authService: GrpcAuthService,
     ) {
         this.authService.isAllowed(['iam.write']).pipe(take(1)).subscribe((allowed) => {
             if (allowed) {
@@ -138,7 +138,7 @@ export class OrgCreateComponent {
         const validators: Validators[] = [Validators.required];
 
         if (this.usePassword) {
-            this.orgService.GetDefaultPasswordComplexityPolicy().then(data => {
+            this.mgmtService.GetDefaultPasswordComplexityPolicy().then(data => {
                 this.policy = data.toObject();
 
                 if (this.policy.minLength) {
@@ -193,7 +193,7 @@ export class OrgCreateComponent {
 
     public createOrgForSelf(): void {
         if (this.name && this.name.value) {
-            this.orgService.CreateOrg(this.name.value).then((org) => {
+            this.mgmtService.CreateOrg(this.name.value).then((org) => {
                 this.router.navigate(['orgs', org.toObject().id]);
             }).catch(error => {
                 this.toast.showError(error);

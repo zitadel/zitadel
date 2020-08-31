@@ -12,8 +12,7 @@ import {
     UserGrantSearchQuery,
     UserGrantView,
 } from 'src/app/proto/generated/management_pb';
-import { MgmtUserService } from 'src/app/services/mgmt-user.service';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource';
@@ -51,8 +50,8 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     public UserGrantContext: any = UserGrantContext;
 
     constructor(
-        private userService: MgmtUserService,
-        private projectService: ProjectService,
+        private userService: ManagementService,
+        private mgmtService: ManagementService,
         private toast: ToastService,
     ) { }
 
@@ -85,6 +84,9 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
             default:
                 this.routerLink = ['/grant-create'];
         }
+
+        console.log(this.routerLink);
+
         this.dataSource.loadGrants(this.context, 0, 25, {
             projectId: this.projectId,
             grantId: this.grantId,
@@ -125,7 +127,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public getGrantRoleOptions(grantId: string, projectId: string): void {
-        this.projectService.GetGrantedProjectByID(projectId, grantId).then(resp => {
+        this.mgmtService.GetGrantedProjectByID(projectId, grantId).then(resp => {
             this.loadedGrantId = projectId;
             this.grantRoleOptions = resp.toObject().roleKeysList;
         }).catch(error => {
@@ -134,7 +136,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public getProjectRoleOptions(projectId: string): void {
-        this.projectService.SearchProjectRoles(projectId, 100, 0).then(resp => {
+        this.mgmtService.SearchProjectRoles(projectId, 100, 0).then(resp => {
             this.loadedProjectId = projectId;
             this.projectRoleOptions = resp.toObject().resultList;
         });

@@ -8,7 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { ProjectView } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -56,7 +56,7 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
 
     constructor(private router: Router,
         public translate: TranslateService,
-        private projectService: ProjectService,
+        private mgmtService: ManagementService,
         private toast: ToastService,
     ) { }
 
@@ -90,7 +90,7 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
 
     private async getData(limit: number, offset: number): Promise<void> {
         this.loadingSubject.next(true);
-        this.projectService.SearchProjects(limit, offset).then(res => {
+        this.mgmtService.SearchProjects(limit, offset).then(res => {
             const response = res.toObject();
             this.ownedProjectList = response.resultList;
             this.totalResult = response.totalResult;
@@ -113,7 +113,7 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
 
     public reactivateSelectedProjects(): void {
         const promises = this.selection.selected.map(project => {
-            this.projectService.ReactivateProject(project.projectId);
+            this.mgmtService.ReactivateProject(project.projectId);
         });
 
         Promise.all(promises).then(() => {
@@ -126,7 +126,7 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
 
     public deactivateSelectedProjects(): void {
         const promises = this.selection.selected.map(project => {
-            this.projectService.DeactivateProject(project.projectId);
+            this.mgmtService.DeactivateProject(project.projectId);
         });
 
         Promise.all(promises).then(() => {

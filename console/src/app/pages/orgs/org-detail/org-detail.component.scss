@@ -18,8 +18,10 @@
     margin-right: 1rem;
     cursor: pointer;
 
-    &:hover {
-      text-decoration: underline;
+    &:not(.disabled) {
+      &:hover {
+        text-decoration: underline;
+      }
     }
   }
 

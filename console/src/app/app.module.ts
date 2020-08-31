@@ -33,12 +33,11 @@ import { AvatarModule } from './modules/avatar/avatar.module';
 import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { HasRolePipeModule } from './pipes/has-role-pipe.module';
-import { AuthUserService } from './services/auth-user.service';
-import { AuthService } from './services/auth.service';
+import { GrpcAuthService } from './services/grpc-auth.service';
 import { GrpcService } from './services/grpc.service';
-import { GrpcAuthInterceptor } from './services/interceptors/grpc-auth.interceptor';
+import { AuthInterceptor } from './services/interceptors/auth.interceptor';
 import { GRPC_INTERCEPTORS } from './services/interceptors/grpc-interceptor';
-import { GrpcOrgInterceptor } from './services/interceptors/grpc-org.interceptor';
+import { OrgInterceptor } from './services/interceptors/org.interceptor';
 import { StatehandlerProcessorService, StatehandlerProcessorServiceImpl } from './services/statehandler-processor.service';
 import { StatehandlerService, StatehandlerServiceImpl } from './services/statehandler.service';
 import { StorageService } from './services/storage.service';
@@ -148,21 +147,20 @@ const authConfig: AuthConfig = {
         {
             provide: GRPC_INTERCEPTORS,
             multi: true,
-            useClass: GrpcAuthInterceptor,
+            useClass: AuthInterceptor,
         },
         {
             provide: GRPC_INTERCEPTORS,
             multi: true,
-            useClass: GrpcOrgInterceptor,
+            useClass: OrgInterceptor,
         },
         GrpcService,
-        AuthService,
-        AuthUserService,
+        GrpcAuthService,
         { provide: 'windowObject', useValue: window },
     ],
     bootstrap: [AppComponent],
 })
-export class AppModule {
 
+export class AppModule {
     constructor() { }
 }
