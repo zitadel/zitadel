@@ -32,6 +32,7 @@ export class ContributorsComponent {
     @Input() membersSubject!: BehaviorSubject<any[]>;
     @Output() addClicked: EventEmitter<void> = new EventEmitter();
     @Output() showDetailClicked: EventEmitter<void> = new EventEmitter();
+    @Output() refreshClicked: EventEmitter<void> = new EventEmitter();
 
     public emitAddMember(): void {
         this.addClicked.emit();
@@ -39,5 +40,9 @@ export class ContributorsComponent {
 
     public emitShowDetail(): void {
         this.showDetailClicked.emit();
+    }
+
+    public emitRefresh(): void {
+        this.refreshClicked.emit();
     }
 }

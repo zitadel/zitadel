@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/BurntSushi/toml"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"io/ioutil"
 	"net/http"
@@ -130,6 +131,10 @@ func (t *Translator) langsFromRequest(r *http.Request) []string {
 func (t *Translator) langsFromCtx(ctx context.Context) []string {
 	langs := make([]string, 0)
 	if ctx != nil {
+		ctxData := authz.GetCtxData(ctx)
+		if ctxData.PreferredLanguage != "" {
+			langs = append(langs, authz.GetCtxData(ctx).PreferredLanguage)
+		}
 		langs = append(langs, getAcceptLanguageHeader(ctx))
 	}
 	return langs

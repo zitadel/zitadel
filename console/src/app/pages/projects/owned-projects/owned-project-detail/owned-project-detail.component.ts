@@ -22,11 +22,10 @@ import {
     ProjectState,
     ProjectType,
     ProjectView,
-    UserView,
     UserGrantSearchKey,
+    UserView,
 } from 'src/app/proto/generated/management_pb';
-import { OrgService } from 'src/app/services/org.service';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -79,13 +78,11 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
         public translate: TranslateService,
         private route: ActivatedRoute,
         private toast: ToastService,
-        private projectService: ProjectService,
+        private mgmtService: ManagementService,
         private _location: Location,
-        private orgService: OrgService,
         private dialog: MatDialog,
         private router: Router,
-    ) {
-    }
+    ) { }
 
     public ngOnInit(): void {
         this.subscription = this.route.params.subscribe(params => this.getData(params));
@@ -98,18 +95,23 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     private async getData({ id }: Params): Promise<void> {
         this.projectId = id;
 
-        this.orgService.GetIam().then(iam => {
+        this.mgmtService.GetIam().then(iam => {
             this.isZitadel = iam.toObject().iamProjectId === this.projectId;
         });
 
-        this.projectService.GetProjectById(id).then(proj => {
+        this.mgmtService.GetProjectById(id).then(proj => {
             this.project = proj.toObject();
         }).catch(error => {
             console.error(error);
             this.toast.showError(error);
         });
 
-        from(this.projectService.SearchProjectMembers(this.projectId, 100, 0)).pipe(
+        this.loadMembers();
+    }
+
+    public loadMembers(): void {
+        this.loadingSubject.next(true);
+        from(this.mgmtService.SearchProjectMembers(this.projectId, 100, 0)).pipe(
             map(resp => {
                 this.totalMemberResult = resp.toObject().totalResult;
                 return resp.toObject().resultList;
@@ -134,7 +136,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
             });
             dialogRef.afterClosed().subscribe(resp => {
                 if (resp) {
-                    this.projectService.ReactivateProject(this.projectId).then(() => {
+                    this.mgmtService.ReactivateProject(this.projectId).then(() => {
                         this.toast.showInfo('PROJECT.TOAST.REACTIVATED', true);
                         this.project.state = ProjectState.PROJECTSTATE_ACTIVE;
                     }).catch(error => {
@@ -155,7 +157,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
             });
             dialogRef.afterClosed().subscribe(resp => {
                 if (resp) {
-                    this.projectService.DeactivateProject(this.projectId).then(() => {
+                    this.mgmtService.DeactivateProject(this.projectId).then(() => {
                         this.toast.showInfo('PROJECT.TOAST.DEACTIVATED', true);
                         this.project.state = ProjectState.PROJECTSTATE_INACTIVE;
                     }).catch(error => {
@@ -178,7 +180,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
         });
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                this.projectService.RemoveProject(this.projectId).then(() => {
+                this.mgmtService.RemoveProject(this.projectId).then(() => {
                     this.toast.showInfo('PROJECT.TOAST.DELETED', true);
                     this.router.navigate(['/projects']);
                 }).catch(error => {
@@ -189,7 +191,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     }
 
     public saveProject(): void {
-        this.projectService.UpdateProject(this.project.projectId, this.project.name).then(() => {
+        this.mgmtService.UpdateProject(this.project.projectId, this.project.name).then(() => {
             this.toast.showInfo('PROJECT.TOAST.UPDATED', true);
         }).catch(error => {
             this.toast.showError(error);
@@ -221,7 +223,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
 
                 if (users && users.length && roles && roles.length) {
                     users.forEach(user => {
-                        return this.projectService.AddProjectMember(this.projectId, user.id, roles)
+                        return this.mgmtService.AddProjectMember(this.projectId, user.id, roles)
                             .then(() => {
                                 this.toast.showInfo('PROJECT.TOAST.MEMBERADDED', true);
                             }).catch(error => {

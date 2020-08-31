@@ -4,7 +4,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
 import { Router } from '@angular/router';
 import { Org } from 'src/app/proto/generated/auth_pb';
 import { ProjectState, ProjectType, ProjectView } from 'src/app/proto/generated/management_pb';
-import { AuthService } from 'src/app/services/auth.service';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 import { StorageKey, StorageService } from 'src/app/services/storage.service';
 
 @Component({
@@ -49,7 +49,7 @@ export class OwnedProjectGridComponent implements OnChanges {
     public ProjectState: any = ProjectState;
     public ProjectType: any = ProjectType;
 
-    constructor(private router: Router, private authService: AuthService, private storage: StorageService) {
+    constructor(private router: Router, private authService: AuthenticationService, private storage: StorageService) {
         this.selection.changed.subscribe(selection => {
             this.setPrefixedItem('pinned-projects', JSON.stringify(
                 this.selection.selected.map(item => item.projectId),

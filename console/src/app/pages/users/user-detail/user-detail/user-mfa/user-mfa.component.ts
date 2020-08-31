@@ -3,7 +3,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { MFAState, MfaType, MultiFactor, UserView } from 'src/app/proto/generated/management_pb';
-import { MgmtUserService } from 'src/app/services/mgmt-user.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 
 
 export interface MFAItem {
@@ -31,7 +31,7 @@ export class UserMfaComponent implements OnInit, OnDestroy {
     public MFAState: any = MFAState;
 
     public error: string = '';
-    constructor(private mgmtUserService: MgmtUserService) { }
+    constructor(private mgmtUserService: ManagementService) { }
 
     public ngOnInit(): void {
         this.getOTP();

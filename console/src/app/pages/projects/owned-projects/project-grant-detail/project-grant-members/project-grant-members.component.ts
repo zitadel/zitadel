@@ -6,7 +6,7 @@ import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
 import { ProjectMember, ProjectType } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import {
@@ -39,11 +39,11 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
     public memberRoleOptions: string[] = [];
 
     constructor(
-        private projectService: ProjectService,
+        private mgmtService: ManagementService,
         private dialog: MatDialog,
         private toast: ToastService,
     ) {
-        this.dataSource = new ProjectGrantMembersDataSource(this.projectService);
+        this.dataSource = new ProjectGrantMembersDataSource(this.mgmtService);
         this.getRoleOptions();
     }
 
@@ -61,13 +61,13 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
 
     public getRoleOptions(): void {
         if (this.type === ProjectType.PROJECTTYPE_GRANTED) {
-            this.projectService.GetProjectGrantMemberRoles().then(resp => {
+            this.mgmtService.GetProjectGrantMemberRoles().then(resp => {
                 this.memberRoleOptions = resp.toObject().rolesList;
             }).catch(error => {
                 this.toast.showError(error);
             });
         } else if (this.type === ProjectType.PROJECTTYPE_OWNED) {
-            this.projectService.GetProjectMemberRoles().then(resp => {
+            this.mgmtService.GetProjectMemberRoles().then(resp => {
                 this.memberRoleOptions = resp.toObject().rolesList;
             }).catch(error => {
                 this.toast.showError(error);
@@ -86,7 +86,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
 
     public removeProjectMemberSelection(): void {
         Promise.all(this.selection.selected.map(member => {
-            return this.projectService.RemoveProjectGrantMember(this.projectId, this.grantId, member.userId).then(() => {
+            return this.mgmtService.RemoveProjectGrantMember(this.projectId, this.grantId, member.userId).then(() => {
                 this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERREMOVED', true);
             }).catch(error => {
                 this.toast.showError(error);
@@ -107,7 +107,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
     }
 
     public async openAddMember(): Promise<any> {
-        const keysList = (await this.projectService.GetProjectGrantMemberRoles()).toObject();
+        const keysList = (await this.mgmtService.GetProjectGrantMemberRoles()).toObject();
 
         const dialogRef = this.dialog.open(ProjectGrantMembersCreateDialogComponent, {
             data: {
@@ -119,7 +119,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
         dialogRef.afterClosed().subscribe((dataToAdd: ProjectGrantMembersCreateDialogExportType) => {
             if (dataToAdd) {
                 Promise.all(dataToAdd.userIds.map((userid: string) => {
-                    return this.projectService.AddProjectGrantMember(
+                    return this.mgmtService.AddProjectGrantMember(
                         this.projectId,
                         this.grantId,
                         userid,
@@ -135,7 +135,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
     }
 
     updateRoles(member: ProjectMember.AsObject, selectionChange: MatSelectChange): void {
-        this.projectService.ChangeProjectGrantMember(this.projectId, this.grantId, member.userId, selectionChange.value)
+        this.mgmtService.ChangeProjectGrantMember(this.projectId, this.grantId, member.userId, selectionChange.value)
             .then((newmember: ProjectMember) => {
                 this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERCHANGED', true);
             }).catch(error => {

@@ -24,8 +24,7 @@ import {
     User,
     UserGrantSearchKey,
 } from 'src/app/proto/generated/management_pb';
-import { OrgService } from 'src/app/services/org.service';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -78,9 +77,8 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
         public translate: TranslateService,
         private route: ActivatedRoute,
         private toast: ToastService,
-        private projectService: ProjectService,
+        private mgmtService: ManagementService,
         private _location: Location,
-        private orgService: OrgService,
         private router: Router,
         private dialog: MatDialog,
     ) {
@@ -98,31 +96,34 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
         this.projectId = id;
         this.grantId = grantId;
 
-        console.log(id, grantId);
-
-        this.orgService.GetIam().then(iam => {
+        this.mgmtService.GetIam().then(iam => {
             this.isZitadel = iam.toObject().iamProjectId === this.projectId;
         });
 
         if (this.projectId && this.grantId) {
-            this.projectService.GetGrantedProjectByID(this.projectId, this.grantId).then(proj => {
+            this.mgmtService.GetGrantedProjectByID(this.projectId, this.grantId).then(proj => {
                 this.project = proj.toObject();
             }).catch(error => {
                 this.toast.showError(error);
             });
 
-            from(this.projectService.SearchProjectGrantMembers(this.projectId,
-                this.grantId, 100, 0)).pipe(
-                    map(resp => {
-                        this.totalMemberResult = resp.toObject().totalResult;
-                        return resp.toObject().resultList;
-                    }),
-                    catchError(() => of([])),
-                    finalize(() => this.loadingSubject.next(false)),
-                ).subscribe(members => {
-                    this.membersSubject.next(members);
-                });
+            this.loadMembers();
         }
+    }
+
+    public loadMembers(): void {
+        this.loadingSubject.next(true);
+        from(this.mgmtService.SearchProjectGrantMembers(this.projectId,
+            this.grantId, 100, 0)).pipe(
+                map(resp => {
+                    this.totalMemberResult = resp.toObject().totalResult;
+                    return resp.toObject().resultList;
+                }),
+                catchError(() => of([])),
+                finalize(() => this.loadingSubject.next(false)),
+            ).subscribe(members => {
+                this.membersSubject.next(members);
+            });
     }
 
     public navigateBack(): void {
@@ -144,7 +145,7 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
 
                 if (users && users.length && roles && roles.length) {
                     users.forEach(user => {
-                        return this.projectService.AddProjectGrantMember(
+                        return this.mgmtService.AddProjectGrantMember(
                             this.projectId,
                             this.grantId,
                             user.id,

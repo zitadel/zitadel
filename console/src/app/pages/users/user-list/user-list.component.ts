@@ -6,7 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { User, UserSearchResponse } from 'src/app/proto/generated/management_pb';
-import { MgmtUserService } from 'src/app/services/mgmt-user.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -26,7 +26,7 @@ export class UserListComponent implements OnDestroy {
 
     private subscription?: Subscription;
 
-    constructor(public translate: TranslateService, private route: ActivatedRoute, private userService: MgmtUserService,
+    constructor(public translate: TranslateService, private route: ActivatedRoute, private userService: ManagementService,
         private toast: ToastService) {
         this.subscription = this.route.params.subscribe(() => this.getData(10, 0));
 

@@ -7,17 +7,18 @@ import (
 )
 
 type Token struct {
-	ID            string
-	CreationDate  time.Time
-	ChangeDate    time.Time
-	ResourceOwner string
-	UserID        string
-	ApplicationID string
-	UserAgentID   string
-	Audience      []string
-	Expiration    time.Time
-	Scopes        []string
-	Sequence      uint64
+	ID                string
+	CreationDate      time.Time
+	ChangeDate        time.Time
+	ResourceOwner     string
+	UserID            string
+	ApplicationID     string
+	UserAgentID       string
+	Audience          []string
+	Expiration        time.Time
+	Scopes            []string
+	Sequence          uint64
+	PreferredLanguage string
 }
 
 type TokenSearchRequest struct {

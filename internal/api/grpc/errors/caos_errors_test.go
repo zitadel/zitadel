@@ -1,4 +1,4 @@
-package grpc
+package errors
 
 import (
 	"context"
@@ -8,13 +8,11 @@ import (
 	"google.golang.org/grpc/codes"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/i18n"
 )
 
 func TestCaosToGRPCError(t *testing.T) {
 	type args struct {
-		err        error
-		translator *i18n.Translator
+		err error
 	}
 	tests := []struct {
 		name    string
@@ -28,18 +26,18 @@ func TestCaosToGRPCError(t *testing.T) {
 		},
 		{
 			"unknown error",
-			args{errors.New("unknown"), nil},
+			args{errors.New("unknown")},
 			true,
 		},
 		{
 			"caos error",
-			args{caos_errs.ThrowInternal(nil, "", "message"), nil},
+			args{caos_errs.ThrowInternal(nil, "", "message")},
 			true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := CaosToGRPCError(context.Background(), tt.args.err, tt.args.translator); (err != nil) != tt.wantErr {
+			if err := CaosToGRPCError(context.Background(), tt.args.err); (err != nil) != tt.wantErr {
 				t.Errorf("CaosToGRPCError() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

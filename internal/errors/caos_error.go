@@ -44,6 +44,10 @@ func (err *CaosError) GetMessage() string {
 	return err.Message
 }
 
+func (err *CaosError) SetMessage(msg string) {
+	err.Message = msg
+}
+
 func (err *CaosError) GetID() string {
 	return err.ID
 }

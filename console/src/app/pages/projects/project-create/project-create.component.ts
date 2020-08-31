@@ -2,7 +2,7 @@ import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Project, ProjectCreateRequest } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -16,7 +16,7 @@ export class ProjectCreateComponent implements OnInit {
     constructor(
         private router: Router,
         private toast: ToastService,
-        private projectService: ProjectService,
+        private mgmtService: ManagementService,
         private _location: Location,
     ) { }
 
@@ -25,7 +25,7 @@ export class ProjectCreateComponent implements OnInit {
     public ngOnInit(): void { }
 
     public saveProject(): void {
-        this.projectService
+        this.mgmtService
             .CreateProject(this.project)
             .then((data: Project) => {
                 this.router.navigate(['projects', data.getId()]);
