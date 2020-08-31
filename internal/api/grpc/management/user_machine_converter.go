@@ -54,7 +54,7 @@ func machineKeyViewFromModel(key *usr_model.MachineKeyView) *management.MachineK
 	creationDate, err := ptypes.TimestampProto(key.CreationDate)
 	logging.Log("MANAG-gluk7").OnError(err).Debug("unable to parse timestamp")
 
-	expirationDate, err := ptypes.TimestampProto(key.CreationDate)
+	expirationDate, err := ptypes.TimestampProto(key.ExpirationDate)
 	logging.Log("MANAG-gluk7").OnError(err).Debug("unable to parse timestamp")
 
 	return &management.MachineKeyView{
