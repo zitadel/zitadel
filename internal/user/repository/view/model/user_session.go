@@ -94,9 +94,9 @@ func (v *UserSessionView) AppendEvent(event *models.Event) {
 		v.MfaSoftwareVerificationType = int32(req_model.MfaTypeOTP)
 		v.State = int32(req_model.UserSessionStateActive)
 	case es_model.MfaOtpCheckFailed,
-		es_model.MfaOtpRemoved,
+		es_model.MFAOTPRemoved,
 		es_model.HumanMfaOtpCheckFailed,
-		es_model.HumanMfaOtpRemoved:
+		es_model.HumanMFAOTPRemoved:
 		v.MfaSoftwareVerification = time.Time{}
 	case es_model.SignedOut,
 		es_model.HumanSignedOut,

@@ -121,7 +121,6 @@ func (p *ProjectMember) fillData(member *view_model.ProjectMemberView) (err erro
 	return nil
 }
 
-//TODO: secific for user data
 func (p *ProjectMember) fillUserData(member *view_model.ProjectMemberView, user *usr_model.User) {
 	member.UserName = user.UserName
 	if user.Human != nil {

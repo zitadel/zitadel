@@ -75,9 +75,9 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 		es_model.UserReactivated,
 		es_model.UserLocked,
 		es_model.UserUnlocked,
-		es_model.MfaOtpAdded,
-		es_model.MfaOtpVerified,
-		es_model.MfaOtpRemoved,
+		es_model.MFAOTPAdded,
+		es_model.MFAOTPVerified,
+		es_model.MFAOTPRemoved,
 		es_model.HumanProfileChanged,
 		es_model.HumanEmailChanged,
 		es_model.HumanEmailVerified,
@@ -85,9 +85,9 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 		es_model.HumanPhoneVerified,
 		es_model.HumanPhoneRemoved,
 		es_model.HumanAddressChanged,
-		es_model.HumanMfaOtpAdded,
-		es_model.HumanMfaOtpVerified,
-		es_model.HumanMfaOtpRemoved,
+		es_model.HumanMFAOTPAdded,
+		es_model.HumanMFAOTPVerified,
+		es_model.HumanMFAOTPRemoved,
 		es_model.MachineChanged:
 		user, err = u.view.UserByID(event.AggregateID)
 		if err != nil {

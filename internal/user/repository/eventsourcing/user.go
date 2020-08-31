@@ -49,7 +49,7 @@ func UserAggregateOverwriteContext(ctx context.Context, aggCreator *es_models.Ag
 }
 
 func MachineCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, resourceOwner string, userLoginMustBeDomain bool) (_ []*es_models.Aggregate, err error) {
-	if user == nil {
+	if user == nil || user.Machine == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-duxk2", "Errors.Internal")
 	}
 
@@ -87,7 +87,7 @@ func MachineCreateAggregate(ctx context.Context, aggCreator *es_models.Aggregate
 }
 
 func HumanCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, initCode *model.InitUserCode, phoneCode *model.PhoneCode, resourceOwner string, userLoginMustBeDomain bool) (_ []*es_models.Aggregate, err error) {
-	if user == nil {
+	if user == nil || user.Human == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-duxk2", "Errors.Internal")
 	}
 
@@ -610,7 +610,7 @@ func AddressChangeAggregate(aggCreator *es_models.AggregateCreator, user *model.
 	}
 }
 
-func MfaOTPAddAggregate(aggCreator *es_models.AggregateCreator, user *model.User, otp *model.OTP) func(ctx context.Context) (*es_models.Aggregate, error) {
+func MFAOTPAddAggregate(aggCreator *es_models.AggregateCreator, user *model.User, otp *model.OTP) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if otp == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dkx9s", "Errors.Internal")
@@ -619,21 +619,21 @@ func MfaOTPAddAggregate(aggCreator *es_models.AggregateCreator, user *model.User
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.HumanMfaOtpAdded, otp)
+		return agg.AppendEvent(model.HumanMFAOTPAdded, otp)
 	}
 }
 
-func MfaOTPVerifyAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+func MFAOTPVerifyAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.HumanMfaOtpVerified, nil)
+		return agg.AppendEvent(model.HumanMFAOTPVerified, nil)
 	}
 }
 
-func MfaOTPCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, user *model.User, authReq *model.AuthRequest) es_sdk.AggregateFunc {
+func MFAOTPCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, user *model.User, authReq *model.AuthRequest) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if authReq == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-sd5DA", "Errors.Internal")
@@ -646,7 +646,7 @@ func MfaOTPCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, user 
 	}
 }
 
-func MfaOTPCheckFailedAggregate(aggCreator *es_models.AggregateCreator, user *model.User, authReq *model.AuthRequest) es_sdk.AggregateFunc {
+func MFAOTPCheckFailedAggregate(aggCreator *es_models.AggregateCreator, user *model.User, authReq *model.AuthRequest) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if authReq == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-64sd6", "Errors.Internal")
@@ -659,13 +659,13 @@ func MfaOTPCheckFailedAggregate(aggCreator *es_models.AggregateCreator, user *mo
 	}
 }
 
-func MfaOTPRemoveAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+func MFAOTPRemoveAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.HumanMfaOtpRemoved, nil)
+		return agg.AppendEvent(model.HumanMFAOTPRemoved, nil)
 	}
 }
 

@@ -54,6 +54,18 @@ type UserView struct {
 	*HumanView
 }
 
+type UserState int32
+
+const (
+	UserStateUnspecified UserState = iota
+	UserStateActive
+	UserStateInactive
+	UserStateDeleted
+	UserStateLocked
+	UserStateSuspend
+	UserStateInitial
+)
+
 type HumanView struct {
 	FirstName         string    `json:"firstName" gorm:"column:first_name"`
 	LastName          string    `json:"lastName" gorm:"column:last_name"`
@@ -131,10 +143,6 @@ func UserToModel(user *UserView) *model.UserView {
 			MfaMaxSetUp:            req_model.MfaLevel(user.MfaMaxSetUp),
 			MfaInitSkipped:         user.MfaInitSkipped,
 			InitRequired:           user.InitRequired,
-			PasswordSet:            user.PasswordSet,
-			PasswordChangeRequired: user.PasswordChangeRequired,
-			UsernameChangeRequired: user.UsernameChangeRequired,
-			PasswordChanged:        user.PasswordChanged,
 		}
 	}
 
@@ -170,11 +178,6 @@ func (u *UserView) SetLoginNames(policy *org_model.OrgIAMPolicy, domains []*org_
 		}
 	}
 	if !policy.UserLoginMustBeDomain {
-		if u.MachineView != nil {
-			loginNames = append(loginNames, u.MachineView.Name)
-		} else {
-			loginNames = append(loginNames, u.UserName)
-		}
 		loginNames = append(loginNames, u.UserName)
 	}
 	u.LoginNames = loginNames
@@ -219,9 +222,6 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	case es_model.UserUserNameChanged:
 		u.UsernameChangeRequired = false
 		err = u.setData(event)
-	case es_model.UserUserNameChanged:
-		u.UsernameChangeRequired = false
-		err = u.setData(event)
 	case es_model.UserEmailChanged,
 		es_model.HumanEmailChanged:
 		u.IsEmailVerified = false
@@ -247,15 +247,15 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		u.State = int32(model.UserStateActive)
 	case es_model.UserLocked:
 		u.State = int32(model.UserStateLocked)
-	case es_model.MfaOtpAdded,
-		es_model.HumanMfaOtpAdded:
+	case es_model.MFAOTPAdded,
+		es_model.HumanMFAOTPAdded:
 		u.OTPState = int32(model.MfaStateNotReady)
-	case es_model.MfaOtpVerified,
-		es_model.HumanMfaOtpVerified:
+	case es_model.MFAOTPVerified,
+		es_model.HumanMFAOTPVerified:
 		u.OTPState = int32(model.MfaStateReady)
 		u.MfaInitSkipped = time.Time{}
-	case es_model.MfaOtpRemoved,
-		es_model.HumanMfaOtpRemoved:
+	case es_model.MFAOTPRemoved,
+		es_model.HumanMFAOTPRemoved:
 		u.OTPState = int32(model.MfaStateUnspecified)
 	case es_model.MfaInitSkipped,
 		es_model.HumanMfaInitSkipped:

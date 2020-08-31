@@ -160,15 +160,15 @@ func (h *Human) AppendEvent(event *es_models.Event) (err error) {
 	case UserAddressChanged,
 		HumanAddressChanged:
 		err = h.appendUserAddressChangedEvent(event)
-	case MfaOtpAdded,
-		HumanMfaOtpAdded:
-		err = h.appendOtpAddedEvent(event)
-	case MfaOtpVerified,
-		HumanMfaOtpVerified:
-		h.appendOtpVerifiedEvent()
-	case MfaOtpRemoved,
-		HumanMfaOtpRemoved:
-		h.appendOtpRemovedEvent()
+	case MFAOTPAdded,
+		HumanMFAOTPAdded:
+		err = h.appendOTPAddedEvent(event)
+	case MFAOTPVerified,
+		HumanMFAOTPVerified:
+		h.appendOTPVerifiedEvent()
+	case MFAOTPRemoved,
+		HumanMFAOTPRemoved:
+		h.appendOTPRemovedEvent()
 	}
 	if err != nil {
 		return err

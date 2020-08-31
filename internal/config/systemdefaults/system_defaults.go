@@ -40,7 +40,7 @@ type SecretGenerators struct {
 	EmailVerificationCode    crypto.GeneratorConfig
 	PhoneVerificationCode    crypto.GeneratorConfig
 	PasswordVerificationCode crypto.GeneratorConfig
-	MachineKey               crypto.GeneratorConfig
+	MachineKeySize           uint32
 }
 
 type MultifactorConfig struct {

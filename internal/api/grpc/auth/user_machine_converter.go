@@ -37,6 +37,15 @@ func machineKeyViewFromModel(key *usr_model.MachineKeyView) *auth.MachineKeyView
 		CreationDate:   creationDate,
 		ExpirationDate: expirationDate,
 		Sequence:       key.Sequence,
-		Type:           auth.MachineKeyType_MACHINEKEY_UNSPECIFIED, //TODO: type mapping
+		Type:           machineKeyTypeFromModel(key.Type),
+	}
+}
+
+func machineKeyTypeFromModel(typ usr_model.MachineKeyType) auth.MachineKeyType {
+	switch typ {
+	case usr_model.MachineKeyTypeJSON:
+		return auth.MachineKeyType_MACHINEKEY_JSON
+	default:
+		return auth.MachineKeyType_MACHINEKEY_UNSPECIFIED
 	}
 }

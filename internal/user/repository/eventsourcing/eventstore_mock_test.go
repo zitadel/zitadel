@@ -432,10 +432,10 @@ func GetMockManipulateUserWithOTP(ctrl *gomock.Controller, decrypt, verified boo
 	dataOtp, _ := json.Marshal(otp)
 	events := []*es_models.Event{
 		{AggregateID: "AggregateID", AggregateVersion: "v1", Sequence: 1, Type: model.UserAdded, Data: dataUser},
-		{AggregateID: "AggregateID", AggregateVersion: "v1", Sequence: 1, Type: model.MfaOtpAdded, Data: dataOtp},
+		{AggregateID: "AggregateID", AggregateVersion: "v1", Sequence: 1, Type: model.MFAOTPAdded, Data: dataOtp},
 	}
 	if verified {
-		events = append(events, &es_models.Event{AggregateID: "AggregateID", AggregateVersion: "v1", Sequence: 1, Type: model.MfaOtpVerified})
+		events = append(events, &es_models.Event{AggregateID: "AggregateID", AggregateVersion: "v1", Sequence: 1, Type: model.MFAOTPVerified})
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)

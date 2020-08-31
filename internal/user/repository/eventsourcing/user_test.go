@@ -2072,7 +2072,7 @@ func TestOtpAddAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.HumanMfaOtpAdded},
+				eventTypes: []models.EventType{model.HumanMFAOTPAdded},
 			},
 		},
 		{
@@ -2089,7 +2089,7 @@ func TestOtpAddAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := MfaOTPAddAggregate(tt.args.aggCreator, tt.args.user, tt.args.otp)(tt.args.ctx)
+			agg, err := MFAOTPAddAggregate(tt.args.aggCreator, tt.args.user, tt.args.otp)(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -2134,13 +2134,13 @@ func TestOtpVerifyAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.HumanMfaOtpVerified},
+				eventTypes: []models.EventType{model.HumanMFAOTPVerified},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := MfaOTPVerifyAggregate(tt.args.aggCreator, tt.args.user)(tt.args.ctx)
+			agg, err := MFAOTPVerifyAggregate(tt.args.aggCreator, tt.args.user)(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -2182,13 +2182,13 @@ func TestOtpRemoveAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.HumanMfaOtpRemoved},
+				eventTypes: []models.EventType{model.HumanMFAOTPRemoved},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := MfaOTPRemoveAggregate(tt.args.aggCreator, tt.args.user)(tt.args.ctx)
+			agg, err := MFAOTPRemoveAggregate(tt.args.aggCreator, tt.args.user)(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

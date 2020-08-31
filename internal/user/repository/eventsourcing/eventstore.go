@@ -90,7 +90,7 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 		PasswordAlg:    passwordAlg,
 		validateTOTP:   totp.Validate,
 		MachineKeyAlg:  aesCrypto,
-		MachineKeySize: int(systemDefaults.SecretGenerators.MachineKey.Length),
+		MachineKeySize: systemDefaults.SecretGenerators.MachineKey,
 	}, nil
 }
 
@@ -1110,7 +1110,7 @@ func (es *UserEventstore) AddOTP(ctx context.Context, userID, accountName string
 	}
 	repoOTP := &model.OTP{Secret: encryptedSecret}
 	repoUser := model.UserFromModel(user)
-	updateAggregate := MfaOTPAddAggregate(es.AggregateCreator(), repoUser, repoOTP)
+	updateAggregate := MFAOTPAddAggregate(es.AggregateCreator(), repoUser, repoOTP)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, updateAggregate)
 	if err != nil {
 		return nil, err
@@ -1135,7 +1135,7 @@ func (es *UserEventstore) RemoveOTP(ctx context.Context, userID string) error {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp0de", "Errors.User.Mfa.Otp.NotExisting")
 	}
 	repoUser := model.UserFromModel(user)
-	updateAggregate := MfaOTPRemoveAggregate(es.AggregateCreator(), repoUser)
+	updateAggregate := MFAOTPRemoveAggregate(es.AggregateCreator(), repoUser)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, updateAggregate)
 	if err != nil {
 		return err
@@ -1163,7 +1163,7 @@ func (es *UserEventstore) CheckMfaOTPSetup(ctx context.Context, userID, code str
 		return err
 	}
 	repoUser := model.UserFromModel(user)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MfaOTPVerifyAggregate(es.AggregateCreator(), repoUser))
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAOTPVerifyAggregate(es.AggregateCreator(), repoUser))
 	if err != nil {
 		return err
 	}
@@ -1189,9 +1189,9 @@ func (es *UserEventstore) CheckMfaOTP(ctx context.Context, userID, code string, 
 	var aggregate func(*es_models.AggregateCreator, *model.User, *model.AuthRequest) es_sdk.AggregateFunc
 	var checkErr error
 	if checkErr = es.verifyMfaOTP(user.OTP, code); checkErr != nil {
-		aggregate = MfaOTPCheckFailedAggregate
+		aggregate = MFAOTPCheckFailedAggregate
 	} else {
-		aggregate = MfaOTPCheckSucceededAggregate
+		aggregate = MFAOTPCheckSucceededAggregate
 	}
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, aggregate(es.AggregateCreator(), repoUser, repoAuthReq))
 	if checkErr != nil {
@@ -1334,7 +1334,7 @@ func (es *UserEventstore) AddMachineKey(ctx context.Context, key *usr_model.Mach
 		}
 	}
 	if key.ExpirationDate.Before(time.Now()) {
-		return nil, errors.ThrowInvalidArgument(nil, "EVENT-C6YV5", "Errors.Key.ExpireBeforeNow")
+		return nil, errors.ThrowInvalidArgument(nil, "EVENT-C6YV5", "Errors.MachineKey.ExpireBeforeNow")
 	}
 
 	repoUser := model.UserFromModel(user)

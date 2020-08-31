@@ -67,12 +67,12 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		}
 		return u.updateSession(session, event)
 	case es_model.UserPasswordChanged,
-		es_model.MfaOtpRemoved,
+		es_model.MFAOTPRemoved,
 		es_model.UserProfileChanged,
 		es_model.UserLocked,
 		es_model.UserDeactivated,
 		es_model.HumanPasswordChanged,
-		es_model.HumanMfaOtpRemoved,
+		es_model.HumanMFAOTPRemoved,
 		es_model.HumanProfileChanged,
 		es_model.DomainClaimed,
 		es_model.UserUserNameChanged:

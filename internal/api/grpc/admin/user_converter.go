@@ -28,7 +28,7 @@ func userCreateRequestToModel(user *admin.CreateUserRequest) *usr_model.User {
 
 func humanCreateToModel(u *admin.CreateHumanRequest) *usr_model.Human {
 	preferredLanguage, err := language.Parse(u.PreferredLanguage)
-	logging.Log("GRPC-cK5k2").OnError(err).Debug("language malformed")
+	logging.Log("GRPC-1ouQc").OnError(err).Debug("language malformed")
 
 	human := &usr_model.Human{
 		Profile: &usr_model.Profile{
@@ -68,10 +68,10 @@ func machineCreateToModel(machine *admin.CreateMachineRequest) *usr_model.Machin
 
 func userFromModel(user *usr_model.User) *admin.UserResponse {
 	creationDate, err := ptypes.TimestampProto(user.CreationDate)
-	logging.Log("GRPC-8duwe").OnError(err).Debug("unable to parse timestamp")
+	logging.Log("GRPC-yo0FW").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(user.ChangeDate)
-	logging.Log("GRPC-ckoe3d").OnError(err).Debug("unable to parse timestamp")
+	logging.Log("GRPC-jxoQr").OnError(err).Debug("unable to parse timestamp")
 
 	userResp := &admin.UserResponse{
 		Id:           user.AggregateID,

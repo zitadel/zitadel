@@ -58,7 +58,6 @@ func (a *Aggregate) AppendEvent(typ EventType, payload interface{}) (*Aggregate,
 }
 
 func (a *Aggregate) SetPrecondition(query *SearchQuery, validateFunc func(...*Event) error) *Aggregate {
-
 	a.Precondition = &precondition{Query: query, Validation: validateFunc}
 	return a
 }

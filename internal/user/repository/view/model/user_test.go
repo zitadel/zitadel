@@ -193,7 +193,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append user add otp event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.MfaOtpAdded, ResourceOwner: "OrgID"},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.MFAOTPAdded, ResourceOwner: "OrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateNotReady)}, State: int32(model.UserStateActive)},
@@ -201,7 +201,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append user verify otp event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.MfaOtpVerified, ResourceOwner: "OrgID"},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.MFAOTPVerified, ResourceOwner: "OrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateNotReady)}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateReady)}, State: int32(model.UserStateActive)},
@@ -209,7 +209,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append user remove otp event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.MfaOtpRemoved, ResourceOwner: "OrgID"},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.MFAOTPRemoved, ResourceOwner: "OrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateReady)}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateUnspecified)}, State: int32(model.UserStateActive)},

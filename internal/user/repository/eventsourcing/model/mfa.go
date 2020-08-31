@@ -33,18 +33,18 @@ func OTPToModel(otp *OTP) *model.OTP {
 	}
 }
 
-func (u *Human) appendOtpAddedEvent(event *es_models.Event) error {
+func (u *Human) appendOTPAddedEvent(event *es_models.Event) error {
 	u.OTP = &OTP{
 		State: int32(model.MfaStateNotReady),
 	}
 	return u.OTP.setData(event)
 }
 
-func (u *Human) appendOtpVerifiedEvent() {
+func (u *Human) appendOTPVerifiedEvent() {
 	u.OTP.State = int32(model.MfaStateReady)
 }
 
-func (u *Human) appendOtpRemovedEvent() {
+func (u *Human) appendOTPRemovedEvent() {
 	u.OTP = nil
 }
 
