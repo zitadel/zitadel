@@ -188,10 +188,10 @@ func TestPasswordAgePolicyCreateAggregate(t *testing.T) {
 
 func TestPasswordAgePolicyUpdateAggregate(t *testing.T) {
 	type args struct {
-		ctx        context.Context
-		existing   *PasswordAgePolicy
-		new        *PasswordAgePolicy
-		aggCreator *models.AggregateCreator
+		ctx            context.Context
+		existingPolicy *PasswordAgePolicy
+		newPolicy      *PasswordAgePolicy
+		aggCreator     *models.AggregateCreator
 	}
 	type res struct {
 		eventLen  int
@@ -207,10 +207,10 @@ func TestPasswordAgePolicyUpdateAggregate(t *testing.T) {
 		{
 			name: "policy update aggregate ok",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &PasswordAgePolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "PolicyName", State: int32(policy_model.PolicyStateActive)},
-				new:        &PasswordAgePolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "PolicyName_Changed", State: int32(policy_model.PolicyStateActive)},
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:            authz.NewMockContext("orgID", "userID"),
+				existingPolicy: &PasswordAgePolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "PolicyName", State: int32(policy_model.PolicyStateActive)},
+				newPolicy:      &PasswordAgePolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "PolicyName_Changed", State: int32(policy_model.PolicyStateActive)},
+				aggCreator:     models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
@@ -220,9 +220,9 @@ func TestPasswordAgePolicyUpdateAggregate(t *testing.T) {
 		{
 			name: "existing policy nil",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   nil,
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:            authz.NewMockContext("orgID", "userID"),
+				existingPolicy: nil,
+				aggCreator:     models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
@@ -234,10 +234,10 @@ func TestPasswordAgePolicyUpdateAggregate(t *testing.T) {
 		{
 			name: "new policy nil",
 			args: args{
-				ctx:        authz.NewMockContext("orgID", "userID"),
-				existing:   &PasswordAgePolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "ProjectName", State: int32(policy_model.PolicyStateActive)},
-				new:        nil,
-				aggCreator: models.NewAggregateCreator("Test"),
+				ctx:            authz.NewMockContext("orgID", "userID"),
+				existingPolicy: &PasswordAgePolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "ProjectName", State: int32(policy_model.PolicyStateActive)},
+				newPolicy:      nil,
+				aggCreator:     models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
@@ -249,7 +249,7 @@ func TestPasswordAgePolicyUpdateAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := PasswordAgePolicyUpdateAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := PasswordAgePolicyUpdateAggregate(tt.args.aggCreator, tt.args.existingPolicy, tt.args.newPolicy)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

@@ -38,23 +38,6 @@ type ProjectGrantMemberView struct {
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
 }
 
-func ProjectGrantMemberViewFromModel(member *model.ProjectGrantMemberView) *ProjectGrantMemberView {
-	return &ProjectGrantMemberView{
-		UserID:       member.UserID,
-		GrantID:      member.GrantID,
-		ProjectID:    member.ProjectID,
-		UserName:     member.UserName,
-		Email:        member.Email,
-		FirstName:    member.FirstName,
-		LastName:     member.LastName,
-		DisplayName:  member.DisplayName,
-		Roles:        member.Roles,
-		Sequence:     member.Sequence,
-		CreationDate: member.CreationDate,
-		ChangeDate:   member.ChangeDate,
-	}
-}
-
 func ProjectGrantMemberToModel(member *ProjectGrantMemberView) *model.ProjectGrantMemberView {
 	return &model.ProjectGrantMemberView{
 		UserID:       member.UserID,

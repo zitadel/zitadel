@@ -2,12 +2,13 @@ package model
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
-	"time"
 )
 
 type Phone struct {
@@ -67,21 +68,21 @@ func PhoneCodeToModel(code *PhoneCode) *model.PhoneCode {
 	}
 }
 
-func (u *User) appendUserPhoneChangedEvent(event *es_models.Event) error {
+func (u *Human) appendUserPhoneChangedEvent(event *es_models.Event) error {
 	u.Phone = new(Phone)
 	return u.Phone.setData(event)
 }
 
-func (u *User) appendUserPhoneCodeAddedEvent(event *es_models.Event) error {
+func (u *Human) appendUserPhoneCodeAddedEvent(event *es_models.Event) error {
 	u.PhoneCode = new(PhoneCode)
 	return u.PhoneCode.SetData(event)
 }
 
-func (u *User) appendUserPhoneVerifiedEvent() {
+func (u *Human) appendUserPhoneVerifiedEvent() {
 	u.IsPhoneVerified = true
 }
 
-func (u *User) appendUserPhoneRemovedEvent() {
+func (u *Human) appendUserPhoneRemovedEvent() {
 	u.Phone = nil
 	u.PhoneCode = nil
 }

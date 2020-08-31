@@ -1,8 +1,9 @@
 package handler
 
 import (
-	auth_model "github.com/caos/zitadel/internal/auth/model"
 	"net/http"
+
+	auth_model "github.com/caos/zitadel/internal/auth/model"
 
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -122,22 +123,24 @@ func (d registerOrgFormData) toUserModel() *usr_model.User {
 		d.Username = d.Email
 	}
 	return &usr_model.User{
-		Profile: &usr_model.Profile{
-			UserName:  d.Username,
-			FirstName: d.Firstname,
-			LastName:  d.Lastname,
-		},
-		Password: &usr_model.Password{
-			SecretString: d.Password,
-		},
-		Email: &usr_model.Email{
-			EmailAddress: d.Email,
+		UserName: d.Username,
+		Human: &usr_model.Human{
+			Profile: &usr_model.Profile{
+				FirstName: d.Firstname,
+				LastName:  d.Lastname,
+			},
+			Password: &usr_model.Password{
+				SecretString: d.Password,
+			},
+			Email: &usr_model.Email{
+				EmailAddress: d.Email,
+			},
 		},
 	}
 }
 
 func (d registerOrgFormData) toOrgModel() *org_model.Org {
 	return &org_model.Org{
-		Name:    d.OrgName,
+		Name: d.OrgName,
 	}
 }

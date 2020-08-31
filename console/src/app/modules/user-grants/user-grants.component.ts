@@ -84,6 +84,9 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
             default:
                 this.routerLink = ['/grant-create'];
         }
+
+        console.log(this.routerLink);
+
         this.dataSource.loadGrants(this.context, 0, 25, {
             projectId: this.projectId,
             grantId: this.grantId,

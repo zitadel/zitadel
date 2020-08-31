@@ -11,7 +11,7 @@ import (
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
-func mockUserData(user *es_model.User) []byte {
+func mockUserData(user *es_model.Human) []byte {
 	data, _ := json.Marshal(user)
 	return data
 }
@@ -41,10 +41,9 @@ func mockAddressData(address *es_model.Address) []byte {
 	return data
 }
 
-func getFullUser(password *es_model.Password) *es_model.User {
-	return &es_model.User{
+func getFullUser(password *es_model.Password) *es_model.Human {
+	return &es_model.Human{
 		Profile: &es_model.Profile{
-			UserName:  "UserName",
 			FirstName: "FirstName",
 			LastName:  "LastName",
 		},
@@ -77,7 +76,7 @@ func TestUserAppendEvent(t *testing.T) {
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullUser(nil))},
 				user:  &UserView{},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateInitial)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInitial)},
 		},
 		{
 			name: "append added user with password event",
@@ -85,7 +84,7 @@ func TestUserAppendEvent(t *testing.T) {
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullUser(&es_model.Password{Secret: &crypto.CryptoValue{}}))},
 				user:  &UserView{},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateInitial), PasswordSet: true},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", PasswordSet: true}, State: int32(model.UserStateInitial)},
 		},
 		{
 			name: "append added user with password but change required event",
@@ -93,135 +92,135 @@ func TestUserAppendEvent(t *testing.T) {
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullUser(&es_model.Password{ChangeRequired: true, Secret: &crypto.CryptoValue{}}))},
 				user:  &UserView{},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateInitial), PasswordSet: true, PasswordChangeRequired: true},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", PasswordSet: true, PasswordChangeRequired: true}, State: int32(model.UserStateInitial)},
 		},
 		{
 			name: "append password change event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserPasswordChanged, ResourceOwner: "OrgID", Data: mockPasswordData(&es_model.Password{Secret: &crypto.CryptoValue{}})},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", State: int32(model.UserStateActive)},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", State: int32(model.UserStateActive), PasswordSet: true},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", PasswordSet: true}, State: int32(model.UserStateActive)},
 		},
 		{
 			name: "append password change with change required event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserPasswordChanged, ResourceOwner: "OrgID", Data: mockPasswordData(&es_model.Password{ChangeRequired: true, Secret: &crypto.CryptoValue{}})},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", State: int32(model.UserStateActive)},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", State: int32(model.UserStateActive), PasswordSet: true, PasswordChangeRequired: true},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", PasswordSet: true, PasswordChangeRequired: true}, State: int32(model.UserStateActive)},
 		},
 		{
 			name: "append change user profile event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserProfileChanged, ResourceOwner: "OrgID", Data: mockProfileData(&es_model.Profile{FirstName: "FirstNameChanged"})},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateInitial)},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInitial)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstNameChanged", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateInitial)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstNameChanged", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInitial)},
 		},
 		{
 			name: "append change user email event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserEmailChanged, ResourceOwner: "OrgID", Data: mockEmailData(&es_model.Email{EmailAddress: "EmailChanged"})},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", State: int32(model.UserStateActive)},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "EmailChanged", Phone: "Phone", Country: "Country", State: int32(model.UserStateActive)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "EmailChanged", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 		},
 		{
 			name: "append verify user email event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserEmailVerified, ResourceOwner: "OrgID"},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateInitial)},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInitial)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", State: int32(model.UserStateActive)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 		},
 		{
 			name: "append change user phone event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserPhoneChanged, ResourceOwner: "OrgID", Data: mockPhoneData(&es_model.Phone{PhoneNumber: "PhoneChanged"})},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", State: int32(model.UserStateActive)},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "PhoneChanged", Country: "Country", State: int32(model.UserStateActive)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "PhoneChanged", Country: "Country"}, State: int32(model.UserStateActive)},
 		},
 		{
 			name: "append verify user phone event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserPhoneVerified, ResourceOwner: "OrgID"},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateActive)},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", IsPhoneVerified: true, Country: "Country", State: int32(model.UserStateActive)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", IsPhoneVerified: true, Country: "Country"}, State: int32(model.UserStateActive)},
 		},
 		{
 			name: "append change user address event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserAddressChanged, ResourceOwner: "OrgID", Data: mockAddressData(&es_model.Address{Country: "CountryChanged"})},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", State: int32(model.UserStateActive)},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "CountryChanged", State: int32(model.UserStateActive)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "CountryChanged"}, State: int32(model.UserStateActive)},
 		},
 		{
 			name: "append user deactivate event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserDeactivated, ResourceOwner: "OrgID"},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateActive)},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateInactive)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInactive)},
 		},
 		{
 			name: "append user reactivate event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserReactivated, ResourceOwner: "OrgID"},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateInactive)},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInactive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateActive)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 		},
 		{
 			name: "append user lock event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserLocked, ResourceOwner: "OrgID"},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateActive)},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateLocked)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateLocked)},
 		},
 		{
 			name: "append user unlock event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserUnlocked, ResourceOwner: "OrgID"},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateLocked)},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateLocked)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateActive)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 		},
 		{
 			name: "append user add otp event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.MfaOtpAdded, ResourceOwner: "OrgID"},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateActive)},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.MFAOTPAdded, ResourceOwner: "OrgID"},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateActive), OTPState: int32(model.MfaStateNotReady)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateNotReady)}, State: int32(model.UserStateActive)},
 		},
 		{
 			name: "append user verify otp event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.MfaOtpVerified, ResourceOwner: "OrgID"},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateActive), OTPState: int32(model.MfaStateNotReady)},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.MFAOTPVerified, ResourceOwner: "OrgID"},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateNotReady)}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateActive), OTPState: int32(model.MfaStateReady)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateReady)}, State: int32(model.UserStateActive)},
 		},
 		{
 			name: "append user remove otp event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.MfaOtpRemoved, ResourceOwner: "OrgID"},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateActive), OTPState: int32(model.MfaStateReady)},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.MFAOTPRemoved, ResourceOwner: "OrgID"},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateReady)}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateActive), OTPState: int32(model.MfaStateUnspecified)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateUnspecified)}, State: int32(model.UserStateActive)},
 		},
 		{
 			name: "append mfa init skipped event",
 			args: args{
-				event: &es_models.Event{Sequence: 1, CreationDate: time.Now().UTC(), Type: es_model.MfaInitSkipped, AggregateID: "AggregateID", ResourceOwner: "OrgID"},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateActive)},
+				event: &es_models.Event{Sequence: 1, CreationDate: time.Now().UTC(), Type: es_model.MFAInitSkipped, AggregateID: "AggregateID", ResourceOwner: "OrgID"},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.UserStateActive), MfaInitSkipped: time.Now().UTC()},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", MfaInitSkipped: time.Now().UTC()}, State: int32(model.UserStateActive)},
 		},
 	}
 	for _, tt := range tests {

@@ -15,77 +15,48 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/message"
 )
 
-func userFromModel(user *usr_model.User) *management.User {
+func userFromModel(user *usr_model.User) *management.UserResponse {
 	creationDate, err := ptypes.TimestampProto(user.CreationDate)
 	logging.Log("GRPC-8duwe").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(user.ChangeDate)
 	logging.Log("GRPC-ckoe3d").OnError(err).Debug("unable to parse timestamp")
 
-	converted := &management.User{
-		Id:                user.AggregateID,
-		State:             userStateFromModel(user.State),
-		CreationDate:      creationDate,
-		ChangeDate:        changeDate,
-		Sequence:          user.Sequence,
-		UserName:          user.UserName,
-		FirstName:         user.FirstName,
-		LastName:          user.LastName,
-		DisplayName:       user.DisplayName,
-		NickName:          user.NickName,
-		PreferredLanguage: user.PreferredLanguage.String(),
-		Gender:            genderFromModel(user.Gender),
+	userResp := &management.UserResponse{
+		Id:           user.AggregateID,
+		State:        userStateFromModel(user.State),
+		CreationDate: creationDate,
+		ChangeDate:   changeDate,
+		Sequence:     user.Sequence,
+		UserName:     user.UserName,
 	}
-	if user.Email != nil {
-		converted.Email = user.EmailAddress
-		converted.IsEmailVerified = user.IsEmailVerified
+
+	if user.Machine != nil {
+		userResp.User = &management.UserResponse_Machine{Machine: machineFromModel(user.Machine)}
 	}
-	if user.Phone != nil {
-		converted.Phone = user.PhoneNumber
-		converted.IsPhoneVerified = user.IsPhoneVerified
+	if user.Human != nil {
+		userResp.User = &management.UserResponse_Human{Human: humanFromModel(user.Human)}
 	}
-	if user.Address != nil {
-		converted.Country = user.Country
-		converted.Locality = user.Locality
-		converted.PostalCode = user.PostalCode
-		converted.Region = user.Region
-		converted.StreetAddress = user.StreetAddress
-	}
-	return converted
+
+	return userResp
 }
 
-func userCreateToModel(u *management.CreateUserRequest) *usr_model.User {
-	preferredLanguage, err := language.Parse(u.PreferredLanguage)
-	logging.Log("GRPC-cK5k2").OnError(err).Debug("language malformed")
+func userCreateToModel(user *management.CreateUserRequest) *usr_model.User {
+	var human *usr_model.Human
+	var machine *usr_model.Machine
 
-	user := &usr_model.User{
-		Profile: &usr_model.Profile{
-			UserName:          u.UserName,
-			FirstName:         u.FirstName,
-			LastName:          u.LastName,
-			NickName:          u.NickName,
-			PreferredLanguage: preferredLanguage,
-			Gender:            genderToModel(u.Gender),
-		},
-		Email: &usr_model.Email{
-			EmailAddress:    u.Email,
-			IsEmailVerified: u.IsEmailVerified,
-		},
-		Address: &usr_model.Address{
-			Country:       u.Country,
-			Locality:      u.Locality,
-			PostalCode:    u.PostalCode,
-			Region:        u.Region,
-			StreetAddress: u.StreetAddress,
-		},
+	if h := user.GetHuman(); h != nil {
+		human = humanCreateToModel(h)
 	}
-	if u.Password != "" {
-		user.Password = &usr_model.Password{SecretString: u.Password}
+	if m := user.GetMachine(); m != nil {
+		machine = machineCreateToModel(m)
 	}
-	if u.Phone != "" {
-		user.Phone = &usr_model.Phone{PhoneNumber: u.Phone, IsPhoneVerified: u.IsPhoneVerified}
+
+	return &usr_model.User{
+		UserName: user.UserName,
+		Human:    human,
+		Machine:  machine,
 	}
-	return user
 }
 
 func passwordRequestToModel(r *management.PasswordRequest) *usr_model.Password {
@@ -135,6 +106,8 @@ func userSearchKeyToModel(key management.UserSearchKey) usr_model.UserSearchKey 
 		return usr_model.UserSearchKeyEmail
 	case management.UserSearchKey_USERSEARCHKEY_STATE:
 		return usr_model.UserSearchKeyState
+	case management.UserSearchKey_USERSEARCHKEY_TYPE:
+		return usr_model.UserSearchKeyType
 	default:
 		return usr_model.UserSearchKeyUnspecified
 	}
@@ -187,7 +160,6 @@ func profileFromModel(profile *usr_model.Profile) *management.UserProfile {
 		CreationDate:      creationDate,
 		ChangeDate:        changeDate,
 		Sequence:          profile.Sequence,
-		UserName:          profile.UserName,
 		FirstName:         profile.FirstName,
 		LastName:          profile.LastName,
 		DisplayName:       profile.DisplayName,
@@ -209,7 +181,6 @@ func profileViewFromModel(profile *usr_model.Profile) *management.UserProfileVie
 		CreationDate:       creationDate,
 		ChangeDate:         changeDate,
 		Sequence:           profile.Sequence,
-		UserName:           profile.UserName,
 		FirstName:          profile.FirstName,
 		LastName:           profile.LastName,
 		DisplayName:        profile.DisplayName,
@@ -400,37 +371,26 @@ func userViewFromModel(user *usr_model.UserView) *management.UserView {
 	lastLogin, err := ptypes.TimestampProto(user.LastLogin)
 	logging.Log("GRPC-dksi3").OnError(err).Debug("unable to parse timestamp")
 
-	passwordChanged, err := ptypes.TimestampProto(user.PasswordChanged)
-	logging.Log("GRPC-dl9ws").OnError(err).Debug("unable to parse timestamp")
-
-	return &management.UserView{
+	userView := &management.UserView{
 		Id:                 user.ID,
 		State:              userStateFromModel(user.State),
 		CreationDate:       creationDate,
 		ChangeDate:         changeDate,
 		LastLogin:          lastLogin,
-		PasswordChanged:    passwordChanged,
-		UserName:           user.UserName,
-		FirstName:          user.FirstName,
-		LastName:           user.LastName,
-		DisplayName:        user.DisplayName,
-		NickName:           user.NickName,
-		PreferredLanguage:  user.PreferredLanguage,
-		Gender:             genderFromModel(user.Gender),
-		Email:              user.Email,
-		IsEmailVerified:    user.IsEmailVerified,
-		Phone:              user.Phone,
-		IsPhoneVerified:    user.IsPhoneVerified,
-		Country:            user.Country,
-		Locality:           user.Locality,
-		PostalCode:         user.PostalCode,
-		Region:             user.Region,
-		StreetAddress:      user.StreetAddress,
 		Sequence:           user.Sequence,
 		ResourceOwner:      user.ResourceOwner,
 		LoginNames:         user.LoginNames,
 		PreferredLoginName: user.PreferredLoginName,
+		UserName:           user.UserName,
 	}
+	if user.HumanView != nil {
+		userView.User = &management.UserView_Human{Human: humanViewFromModel(user.HumanView)}
+	}
+	if user.MachineView != nil {
+		userView.User = &management.UserView_Machine{Machine: machineViewFromModel(user.MachineView)}
+
+	}
+	return userView
 }
 
 func userMembershipSearchResponseFromModel(response *usr_model.UserMembershipSearchResponse) *management.UserMembershipSearchResponse {
@@ -603,7 +563,7 @@ func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*management.Change
 			EventType:  message.NewLocalizedEventType(change.EventType),
 			Sequence:   change.Sequence,
 			Data:       data,
-			EditorId:   change.ModifierId,
+			EditorId:   change.ModifierID,
 			Editor:     change.ModifierName,
 		}
 	}

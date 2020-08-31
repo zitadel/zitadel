@@ -24,6 +24,8 @@ Errors:
     PhoneInvalid: Phone is invalid
     PhoneAlreadyVerified: Phone already verified
     AddressNotFound: Address not found
+    NotHuman: The User must be personal
+    NotMachine: The User must be technical
     Code:
       Empty: Code is empty
       NotFound: Code not found
@@ -144,6 +146,8 @@ Errors:
     NotFound: Token not found
   UserSession:
     NotFound: UserSession not found
+  Key:
+    ExpireBeforeNow: The expiration date is in the past
 EventTypes:
   user:
     added: User added
@@ -168,6 +172,66 @@ EventTypes:
       code:
         added: Email address verification code generated
         sent: Email address verification code sent
+    machine:
+      machine:
+        added: Technical user added
+        changed: Technical user changed
+        key:
+          added: Key added
+          removed: Key removed
+    human:
+      added: Person added
+      selfregistered: Person registered himself
+      initialization:
+        code:
+          added: Initialisation code generated
+          sent: Initialisation code sent
+        check:
+          succeeded: Initialisation check succeded
+          failed: Initialisation check failed
+      username:
+        reserved: Username reserved
+        released: Username released
+      email:
+        changed:  Email address changed
+        verified: Email address verified
+        verification:
+          failed: Email address verification failed
+        code:
+          added: Email address verification code generated
+          sent: Email address verification code sent
+      password:
+        changed: Password changed
+        code:
+          added: Password code generated
+          sent: Password code sent
+        check:
+          succeeded: Password check succeeded
+          failed: Password check failed
+      phone:
+        changed: Phone number changed
+        verified: Phone number verified
+        verification:
+          failed: Phone number verification failed
+        code:
+          added: Phone number code generated
+          sent: Phone number code sent
+      profile:
+        changed: User profile changed
+      address:
+        changed: User address changed
+      mfa:
+        otp:
+          added: Multifactor OTP added
+          verified: Multifactor OTP verified
+          removed: Multifactor OTP removed
+          check:
+            succeeded: Multifactor OTP check succeeded
+            failed: Multifactor OTP check failed
+        init:
+          skipped: Multifactor initialisation skipped
+      signed:
+        out: User signed out
     locked: User locked
     unlocked: User unlocked
     deactivated: User deactivated

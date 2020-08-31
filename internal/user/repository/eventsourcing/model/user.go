@@ -2,141 +2,90 @@ package model
 
 import (
 	"encoding/json"
-	"time"
+	"strings"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
 )
 
 const (
-	UserVersion = "v1"
+	UserVersion = "v2"
 )
 
 type User struct {
 	es_models.ObjectRoot
-	State int32 `json:"-"`
-	*Password
-	*Profile
-	*Email
-	*Phone
-	*Address
-	InitCode     *InitUserCode `json:"-"`
-	EmailCode    *EmailCode    `json:"-"`
-	PhoneCode    *PhoneCode    `json:"-"`
-	PasswordCode *PasswordCode `json:"-"`
-	OTP          *OTP          `json:"-"`
-}
+	State    int32  `json:"-"`
+	UserName string `json:"userName"`
 
-type InitUserCode struct {
-	es_models.ObjectRoot
-	Code   *crypto.CryptoValue `json:"code,omitempty"`
-	Expiry time.Duration       `json:"expiry,omitempty"`
+	*Human
+	*Machine
 }
 
 func UserFromModel(user *model.User) *User {
-	converted := &User{
+	var human *Human
+	if user.Human != nil {
+		human = HumanFromModel(user.Human)
+	}
+	var machine *Machine
+	if user.Machine != nil {
+		machine = MachineFromModel(user.Machine)
+	}
+	return &User{
 		ObjectRoot: user.ObjectRoot,
 		State:      int32(user.State),
+		UserName:   user.UserName,
+		Human:      human,
+		Machine:    machine,
 	}
-	if user.Password != nil {
-		converted.Password = PasswordFromModel(user.Password)
-	}
-	if user.Profile != nil {
-		converted.Profile = ProfileFromModel(user.Profile)
-	}
-	if user.Email != nil {
-		converted.Email = EmailFromModel(user.Email)
-	}
-	if user.Phone != nil {
-		converted.Phone = PhoneFromModel(user.Phone)
-	}
-	if user.Address != nil {
-		converted.Address = AddressFromModel(user.Address)
-	}
-	if user.OTP != nil {
-		converted.OTP = OTPFromModel(user.OTP)
-	}
-	return converted
 }
 
 func UserToModel(user *User) *model.User {
-	converted := &model.User{
+	var human *model.Human
+	if user.Human != nil {
+		human = HumanToModel(user.Human)
+	}
+	var machine *model.Machine
+	if user.Machine != nil {
+		machine = MachineToModel(user.Machine)
+	}
+	return &model.User{
 		ObjectRoot: user.ObjectRoot,
 		State:      model.UserState(user.State),
-	}
-	if user.Password != nil {
-		converted.Password = PasswordToModel(user.Password)
-	}
-	if user.Profile != nil {
-		converted.Profile = ProfileToModel(user.Profile)
-	}
-	if user.Email != nil {
-		converted.Email = EmailToModel(user.Email)
-	}
-	if user.Phone != nil {
-		converted.Phone = PhoneToModel(user.Phone)
-	}
-	if user.Address != nil {
-		converted.Address = AddressToModel(user.Address)
-	}
-	if user.InitCode != nil {
-		converted.InitCode = InitCodeToModel(user.InitCode)
-	}
-	if user.EmailCode != nil {
-		converted.EmailCode = EmailCodeToModel(user.EmailCode)
-	}
-	if user.PhoneCode != nil {
-		converted.PhoneCode = PhoneCodeToModel(user.PhoneCode)
-	}
-	if user.PasswordCode != nil {
-		converted.PasswordCode = PasswordCodeToModel(user.PasswordCode)
-	}
-	if user.OTP != nil {
-		converted.OTP = OTPToModel(user.OTP)
-	}
-	return converted
-}
-
-func InitCodeFromModel(code *model.InitUserCode) *InitUserCode {
-	if code == nil {
-		return nil
-	}
-	return &InitUserCode{
-		ObjectRoot: code.ObjectRoot,
-		Expiry:     code.Expiry,
-		Code:       code.Code,
+		UserName:   user.UserName,
+		Human:      human,
+		Machine:    machine,
 	}
 }
 
-func InitCodeToModel(code *InitUserCode) *model.InitUserCode {
-	return &model.InitUserCode{
-		ObjectRoot: code.ObjectRoot,
-		Expiry:     code.Expiry,
-		Code:       code.Code,
-	}
-}
-
-func (p *User) AppendEvents(events ...*es_models.Event) error {
+func (u *User) AppendEvents(events ...*es_models.Event) error {
 	for _, event := range events {
-		if err := p.AppendEvent(event); err != nil {
+		if err := u.AppendEvent(event); err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
 
-func (u *User) AppendEvent(event *es_models.Event) (err error) {
+func (u *User) AppendEvent(event *es_models.Event) error {
 	u.ObjectRoot.AppendEvent(event)
+
 	switch event.Type {
 	case UserAdded,
+		HumanAdded,
+		MachineAdded,
 		UserRegistered,
+		HumanRegistered,
 		UserProfileChanged,
 		DomainClaimed,
 		UserUserNameChanged:
-		u.setData(event)
+		err := u.setData(event)
+		if err != nil {
+			return err
+		}
 	case UserDeactivated:
 		u.appendDeactivatedEvent()
 	case UserReactivated:
@@ -145,71 +94,31 @@ func (u *User) AppendEvent(event *es_models.Event) (err error) {
 		u.appendLockedEvent()
 	case UserUnlocked:
 		u.appendUnlockedEvent()
-	case InitializedUserCodeAdded:
-		u.appendInitUsercodeCreatedEvent(event)
-	case UserPasswordChanged:
-		err = u.appendUserPasswordChangedEvent(event)
-	case UserPasswordCodeAdded:
-		err = u.appendPasswordSetRequestedEvent(event)
-	case UserEmailChanged:
-		err = u.appendUserEmailChangedEvent(event)
-	case UserEmailCodeAdded:
-		err = u.appendUserEmailCodeAddedEvent(event)
-	case UserEmailVerified:
-		u.appendUserEmailVerifiedEvent()
-	case UserPhoneChanged:
-		err = u.appendUserPhoneChangedEvent(event)
-	case UserPhoneCodeAdded:
-		err = u.appendUserPhoneCodeAddedEvent(event)
-	case UserPhoneVerified:
-		u.appendUserPhoneVerifiedEvent()
-	case UserPhoneRemoved:
-		u.appendUserPhoneRemovedEvent()
-	case UserAddressChanged:
-		err = u.appendUserAddressChangedEvent(event)
-	case MfaOtpAdded:
-		err = u.appendOtpAddedEvent(event)
-	case MfaOtpVerified:
-		u.appendOtpVerifiedEvent()
-	case MfaOtpRemoved:
-		u.appendOtpRemovedEvent()
 	}
-	if err != nil {
-		return err
-	}
-	u.ComputeObject()
-	return nil
-}
 
-func (u *User) ComputeObject() {
-	if u.State == 0 {
-		if u.Email != nil && u.IsEmailVerified {
-			u.State = int32(model.UserStateActive)
-		} else {
-			u.State = int32(model.UserStateInitial)
-		}
+	if u.Human != nil {
+		u.Human.User = u
+		return u.Human.AppendEvent(event)
+	} else if u.Machine != nil {
+		u.Machine.User = u
+		return u.Machine.AppendEvent(event)
 	}
-	if u.Password != nil && u.Password.ObjectRoot.IsZero() {
-		u.Password.ObjectRoot = u.ObjectRoot
+	if strings.HasPrefix(string(event.Type), "user.human") || event.AggregateVersion == "v1" {
+		u.Human = &Human{User: u}
+		return u.Human.AppendEvent(event)
 	}
-	if u.Profile != nil && u.Profile.ObjectRoot.IsZero() {
-		u.Profile.ObjectRoot = u.ObjectRoot
+	if strings.HasPrefix(string(event.Type), "user.machine") {
+		u.Machine = &Machine{User: u}
+		return u.Machine.AppendEvent(event)
 	}
-	if u.Email != nil && u.Email.ObjectRoot.IsZero() {
-		u.Email.ObjectRoot = u.ObjectRoot
-	}
-	if u.Phone != nil && u.Phone.ObjectRoot.IsZero() {
-		u.Phone.ObjectRoot = u.ObjectRoot
-	}
-	if u.Address != nil && u.Address.ObjectRoot.IsZero() {
-		u.Address.ObjectRoot = u.ObjectRoot
-	}
+
+	return errors.ThrowNotFound(nil, "MODEL-x9TaX", "Errors.UserType.Undefined")
 }
 
 func (u *User) setData(event *es_models.Event) error {
 	if err := json.Unmarshal(event.Data, u); err != nil {
-		logging.Log("EVEN-8ujgd").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-sj4jd", "could not unmarshal event")
+		logging.Log("EVEN-ZDzQy").WithError(err).Error("could not unmarshal event data")
+		return caos_errs.ThrowInternal(err, "MODEL-yGmhh", "could not unmarshal event")
 	}
 	return nil
 }
@@ -228,24 +137,4 @@ func (u *User) appendLockedEvent() {
 
 func (u *User) appendUnlockedEvent() {
 	u.State = int32(model.UserStateActive)
-}
-
-func (u *User) appendInitUsercodeCreatedEvent(event *es_models.Event) error {
-	initCode := new(InitUserCode)
-	err := initCode.SetData(event)
-	if err != nil {
-		return err
-	}
-	initCode.ObjectRoot.CreationDate = event.CreationDate
-	u.InitCode = initCode
-	return nil
-}
-
-func (c *InitUserCode) SetData(event *es_models.Event) error {
-	c.ObjectRoot.AppendEvent(event)
-	if err := json.Unmarshal(event.Data, c); err != nil {
-		logging.Log("EVEN-7duwe").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-lo34s", "could not unmarshal event")
-	}
-	return nil
 }

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -25,13 +26,18 @@ import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
+import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
+import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
 import { AuthUserDetailComponent } from './auth-user-detail/auth-user-detail.component';
 import { AuthUserMfaComponent } from './auth-user-detail/auth-user-mfa/auth-user-mfa.component';
 import { CodeDialogComponent } from './auth-user-detail/code-dialog/code-dialog.component';
 import { DialogOtpComponent } from './auth-user-detail/dialog-otp/dialog-otp.component';
 import { ThemeSettingComponent } from './auth-user-detail/theme-setting/theme-setting.component';
+import { DetailFormMachineModule } from './detail-form-machine/detail-form-machine.module';
 import { DetailFormModule } from './detail-form/detail-form.module';
+import { AddKeyDialogModule } from './machine-keys/add-key-dialog/add-key-dialog.module';
+import { MachineKeysComponent } from './machine-keys/machine-keys.component';
 import { MembershipsComponent } from './memberships/memberships.component';
 import { PasswordComponent } from './password/password.component';
 import { UserDetailRoutingModule } from './user-detail-routing.module';
@@ -49,6 +55,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         PasswordComponent,
         CodeDialogComponent,
         MembershipsComponent,
+        MachineKeysComponent,
     ],
     imports: [
         UserDetailRoutingModule,
@@ -57,9 +64,12 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         FormsModule,
         ReactiveFormsModule,
         DetailFormModule,
+        DetailFormMachineModule,
         MatDialogModule,
         QRCodeModule,
         MetaLayoutModule,
+        AddKeyDialogModule,
+        MatCheckboxModule,
         HasRolePipeModule,
         MatFormFieldModule,
         UserGrantsModule,
@@ -80,6 +90,8 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         DetailLayoutModule,
         PasswordComplexityViewModule,
         MemberCreateDialogModule,
+        TimestampToDatePipeModule,
+        LocalizedDatePipeModule,
     ],
 })
 export class UserDetailModule { }

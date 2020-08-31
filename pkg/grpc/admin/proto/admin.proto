@@ -377,7 +377,7 @@ service AdminService {
 }
 
 message OrgID {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1}];
 }
 
 message UniqueOrgRequest {
@@ -420,7 +420,7 @@ message OrgSearchQuery {
 
 enum OrgSearchKey {
     ORGSEARCHKEY_UNSPECIFIED = 0;
-    ORGSEARCHKEY_ORG_NAME = 1;
+    ORGSEARCHKEY_NAME = 1;
     ORGSEARCHKEY_DOMAIN = 2;
     ORGSEARCHKEY_STATE = 3;
 }
@@ -441,56 +441,63 @@ enum OrgSearchMethod {
 }
 
 message OrgSetUpRequest {
-    CreateOrgRequest org = 1;
-    CreateUserRequest user = 2;
+    CreateOrgRequest org = 1 [(validate.rules).message.required = true];
+    CreateUserRequest user = 2 [(validate.rules).message.required = true];
 }
 
 message OrgSetUpResponse {
     Org org = 1;
-    User user = 2;
+    UserResponse user = 2;
 }
 
 message CreateUserRequest {
-    string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string first_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string last_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string nick_name = 4 [(validate.rules).string = {max_len: 200}];
-    string preferred_language = 5 [(validate.rules).string = {max_len: 200}];
-    Gender gender = 6;
-    string email = 7 [(validate.rules).string = {min_len: 1, max_len: 200, email: true}];
-    bool is_email_verified = 8;
-    string phone = 9 [(validate.rules).string = {max_len: 20}];
-    bool is_phone_verified = 10;
-    string country = 11 [(validate.rules).string = {max_len: 200}];
-    string locality = 12 [(validate.rules).string = {max_len: 200}];
-    string postal_code = 13 [(validate.rules).string = {max_len: 200}];
-    string region = 14 [(validate.rules).string = {max_len: 200}];
-    string street_address = 15 [(validate.rules).string = {max_len: 200}];
-    string password = 16 [(validate.rules).string = {max_len: 72}];
+    string user_name = 1 [(validate.rules).string.pattern = "^[^[:space:]]{1,200}$"];
+
+    oneof user {
+      option (validate.required) = true;
+  
+      CreateHumanRequest human = 2;
+      CreateMachineRequest machine = 3;
+    }
 }
 
-message User {
+message CreateHumanRequest {
+    string first_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string last_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string nick_name = 3 [(validate.rules).string = {max_len: 200}];
+    string preferred_language = 4 [(validate.rules).string = {max_len: 200}];
+    Gender gender = 5;
+    string email = 6 [(validate.rules).string = {min_len: 1, max_len: 200, email: true}];
+    bool is_email_verified = 7;
+    string phone = 8 [(validate.rules).string = {max_len: 20}];
+    bool is_phone_verified = 9;
+    string country = 10 [(validate.rules).string = {max_len: 200}];
+    string locality = 11 [(validate.rules).string = {max_len: 200}];
+    string postal_code = 12 [(validate.rules).string = {max_len: 200}];
+    string region = 13 [(validate.rules).string = {max_len: 200}];
+    string street_address = 14 [(validate.rules).string = {max_len: 200}];
+    string password = 15 [(validate.rules).string = {max_len: 72}];
+}
+
+message CreateMachineRequest {
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string description = 2 [(validate.rules).string = {min_len: 1, max_len: 500}];
+  }
+
+message UserResponse {
     string id = 1;
     UserState state = 2;
     google.protobuf.Timestamp creation_date = 3;
     google.protobuf.Timestamp change_date = 4;
-    string user_name = 5;
-    string first_name = 6;
-    string last_name = 7;
-    string nick_name = 8;
-    string display_name = 9;
-    string preferred_language = 10;
-    Gender gender = 11;
-    string email = 12;
-    bool isEmailVerified = 13;
-    string phone = 14;
-    bool isPhoneVerified = 15;
-    string country = 16;
-    string locality = 17;
-    string postal_code = 18;
-    string region = 19;
-    string street_address = 20;
-    uint64 sequence = 21;
+    uint64 sequence = 5;
+    string user_name = 6;
+  
+    oneof user {
+      option (validate.required) = true;
+  
+      HumanResponse human = 7;
+      MachineResponse machine = 8;
+    }
 }
 
 enum UserState {
@@ -510,6 +517,44 @@ enum Gender {
     GENDER_DIVERSE = 3;
 }
 
+message HumanResponse {
+    string first_name = 1;
+    string last_name = 2;
+    string display_name = 3;
+    string nick_name = 4;
+    string preferred_language = 5;
+    Gender gender = 6;
+    string email = 7;
+    bool is_email_verified = 8;
+    string phone = 9;
+    bool is_phone_verified = 10;
+    string country = 11;
+    string locality = 12;
+    string postal_code = 13;
+    string region = 14;
+    string street_address = 15;
+  }
+
+  message MachineResponse {
+    string name = 1;
+    string description = 2;
+    repeated MachineKeyResponse keys = 3;
+  }
+
+  message MachineKeyResponse {
+    string id = 1;
+    MachineKeyType type = 2;
+    uint64 sequence = 3;
+  
+    google.protobuf.Timestamp creation_date = 4;
+    google.protobuf.Timestamp expiration_date = 5;
+  }
+
+  enum MachineKeyType {
+    MACHINEKEY_UNSPECIFIED = 0;
+    MACHINEKEY_JSON = 1;
+  }
+
 message CreateOrgRequest {
     string name = 1 [(validate.rules).string.min_len = 1];
     string domain = 2;
@@ -526,13 +571,13 @@ message OrgIamPolicy {
 }
 
 message OrgIamPolicyRequest {
-    string org_id = 1;
+    string org_id = 1 [(validate.rules).string = {min_len: 1}];
     string description = 2;
     bool user_login_must_be_domain = 3;
 }
 
 message OrgIamPolicyID {
-    string org_id = 1;
+    string org_id = 1 [(validate.rules).string = {min_len: 1}];
 }
 
 message IamMemberRoles {
@@ -548,17 +593,17 @@ message IamMember {
 }
 
 message AddIamMemberRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1}];
     repeated string roles = 2;
 }
 
 message ChangeIamMemberRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1}];
     repeated string roles = 2;
 }
 
 message RemoveIamMemberRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1}];
 }
 
 message IamMemberSearchResponse {
@@ -618,8 +663,8 @@ enum SearchMethod {
 }
 
 message FailedEventID {
-    string database = 1;
-    string view_name = 2;
+    string database = 1 [(validate.rules).string = {min_len: 1}];
+    string view_name = 2 [(validate.rules).string = {min_len: 1}];
     uint64 failed_sequence = 3;
 }
 
@@ -636,8 +681,8 @@ message FailedEvent {
 }
 
 message ViewID {
-    string database = 1;
-    string view_name = 2;
+    string database = 1 [(validate.rules).string = {min_len: 1}];
+    string view_name = 2 [(validate.rules).string = {min_len: 1}];
 }
 
 message Views {
@@ -652,7 +697,7 @@ message View {
 }
 
 message IdpID {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1}];
 }
 
 message Idp {
@@ -669,7 +714,7 @@ message Idp {
 }
 
 message IdpUpdate {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1}];
     string name = 2;
     bytes logo_src = 3;
 }
@@ -680,6 +725,7 @@ message OidcIdpConfig {
     string issuer = 3;
     repeated string scopes = 4;
 }
+
 enum IdpState {
     IDPCONFIGSTATE_UNSPECIFIED = 0;
     IDPCONFIGSTATE_ACTIVE = 1;
@@ -696,7 +742,7 @@ message OidcIdpConfigCreate {
 }
 
 message OidcIdpConfigUpdate {
-    string idp_id = 1;
+    string idp_id = 1 [(validate.rules).string = {min_len: 1}];
     string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_secret = 3;
     string issuer = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -756,17 +802,13 @@ message DefaultLoginPolicy {
 }
 
 message IdpProviderID {
-    string idp_config_id = 1;
+    string idp_config_id = 1 [(validate.rules).string = {min_len: 1}];
 }
 
 message DefaultLoginPolicyView {
     bool allow_username_password = 1;
     bool allow_register = 2;
     bool allow_external_idp = 3;
-}
-
-message IdpProviderViews {
-    repeated IdpProviderView providers = 1;
 }
 
 message IdpProviderView {

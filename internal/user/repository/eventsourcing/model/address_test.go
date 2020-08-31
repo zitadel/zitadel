@@ -2,14 +2,15 @@ package model
 
 import (
 	"encoding/json"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"testing"
+
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 )
 
 func TestAddressChanges(t *testing.T) {
 	type args struct {
-		existing *Address
-		new      *Address
+		existingAddress *Address
+		newAddress      *Address
 	}
 	type res struct {
 		changesLen int
@@ -22,8 +23,8 @@ func TestAddressChanges(t *testing.T) {
 		{
 			name: "all fields changed",
 			args: args{
-				existing: &Address{Country: "Country", Locality: "Locality", PostalCode: "PostalCode", Region: "Region", StreetAddress: "StreetAddress"},
-				new:      &Address{Country: "CountryChanged", Locality: "LocalityChanged", PostalCode: "PostalCodeChanged", Region: "RegionChanged", StreetAddress: "StreetAddressChanged"},
+				existingAddress: &Address{Country: "Country", Locality: "Locality", PostalCode: "PostalCode", Region: "Region", StreetAddress: "StreetAddress"},
+				newAddress:      &Address{Country: "CountryChanged", Locality: "LocalityChanged", PostalCode: "PostalCodeChanged", Region: "RegionChanged", StreetAddress: "StreetAddressChanged"},
 			},
 			res: res{
 				changesLen: 5,
@@ -32,8 +33,8 @@ func TestAddressChanges(t *testing.T) {
 		{
 			name: "no fields changed",
 			args: args{
-				existing: &Address{Country: "Country", Locality: "Locality", PostalCode: "PostalCode", Region: "Region", StreetAddress: "StreetAddress"},
-				new:      &Address{Country: "Country", Locality: "Locality", PostalCode: "PostalCode", Region: "Region", StreetAddress: "StreetAddress"},
+				existingAddress: &Address{Country: "Country", Locality: "Locality", PostalCode: "PostalCode", Region: "Region", StreetAddress: "StreetAddress"},
+				newAddress:      &Address{Country: "Country", Locality: "Locality", PostalCode: "PostalCode", Region: "Region", StreetAddress: "StreetAddress"},
 			},
 			res: res{
 				changesLen: 0,
@@ -42,7 +43,7 @@ func TestAddressChanges(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			changes := tt.args.existing.Changes(tt.args.new)
+			changes := tt.args.existingAddress.Changes(tt.args.newAddress)
 			if len(changes) != tt.res.changesLen {
 				t.Errorf("got wrong changes len: expected: %v, actual: %v ", tt.res.changesLen, len(changes))
 			}
@@ -52,23 +53,23 @@ func TestAddressChanges(t *testing.T) {
 
 func TestAppendUserAddressChangedEvent(t *testing.T) {
 	type args struct {
-		user    *User
+		user    *Human
 		address *Address
 		event   *es_models.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *User
+		result *Human
 	}{
 		{
 			name: "append user address event",
 			args: args{
-				user:    &User{Address: &Address{Locality: "Locality", Country: "Country"}},
+				user:    &Human{Address: &Address{Locality: "Locality", Country: "Country"}},
 				address: &Address{Locality: "LocalityChanged", PostalCode: "PostalCode"},
 				event:   &es_models.Event{},
 			},
-			result: &User{Address: &Address{Locality: "LocalityChanged", Country: "Country", PostalCode: "PostalCode"}},
+			result: &Human{Address: &Address{Locality: "LocalityChanged", Country: "Country", PostalCode: "PostalCode"}},
 		},
 	}
 	for _, tt := range tests {

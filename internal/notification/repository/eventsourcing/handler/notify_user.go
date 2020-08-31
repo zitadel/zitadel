@@ -55,7 +55,9 @@ func (u *NotifyUser) ProcessUser(event *models.Event) (err error) {
 	user := new(view_model.NotifyUser)
 	switch event.Type {
 	case es_model.UserAdded,
-		es_model.UserRegistered:
+		es_model.UserRegistered,
+		es_model.HumanRegistered,
+		es_model.HumanAdded:
 		user.AppendEvent(event)
 		u.fillLoginNames(user)
 	case es_model.UserProfileChanged,
@@ -63,7 +65,14 @@ func (u *NotifyUser) ProcessUser(event *models.Event) (err error) {
 		es_model.UserEmailVerified,
 		es_model.UserPhoneChanged,
 		es_model.UserPhoneVerified,
-		es_model.UserPhoneRemoved:
+		es_model.UserPhoneRemoved,
+		es_model.HumanProfileChanged,
+		es_model.HumanEmailChanged,
+		es_model.HumanEmailVerified,
+		es_model.HumanPhoneChanged,
+		es_model.HumanPhoneVerified,
+		es_model.HumanPhoneRemoved,
+		es_model.MachineChanged:
 		user, err = u.view.NotifyUserByID(event.AggregateID)
 		if err != nil {
 			return err
@@ -104,10 +113,6 @@ func (u *NotifyUser) ProcessOrg(event *models.Event) (err error) {
 	default:
 		return u.view.ProcessedNotifyUserSequence(event.Sequence)
 	}
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (u *NotifyUser) fillLoginNamesOnOrgUsers(event *models.Event) error {

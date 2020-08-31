@@ -33,6 +33,7 @@ func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, lang l
 				middleware.ErrorHandler(),
 				middleware.AuthorizationInterceptor(verifier, authConfig),
 				middleware.TranslationHandler(lang),
+				middleware.ValidationHandler(),
 			),
 		),
 	)

@@ -3,12 +3,8 @@ package eventsourcing
 import (
 	"context"
 	"encoding/json"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
 	"github.com/caos/logging"
-	"github.com/golang/protobuf/ptypes"
-
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -16,9 +12,12 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/id"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	"github.com/golang/protobuf/ptypes"
 )
 
 type OrgEventstore struct {
@@ -174,11 +173,11 @@ func (es *OrgEventstore) AddOrgDomain(ctx context.Context, domain *org_model.Org
 	if domain == nil || !domain.IsValid() {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-8sFJW", "Errors.Org.InvalidDomain")
 	}
-	existing, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
+	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
 	if err != nil {
 		return nil, err
 	}
-	repoOrg := model.OrgFromModel(existing)
+	repoOrg := model.OrgFromModel(existingOrg)
 	repoDomain := model.OrgDomainFromModel(domain)
 	aggregate := OrgDomainAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoDomain)
 
@@ -201,11 +200,11 @@ func (es *OrgEventstore) GenerateOrgDomainValidation(ctx context.Context, domain
 	if !ok {
 		return "", "", errors.ThrowPreconditionFailed(nil, "EVENT-Gsw31", "Errors.Org.DomainVerificationTypeInvalid")
 	}
-	existing, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
+	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
 	if err != nil {
 		return "", "", err
 	}
-	_, d := existing.GetDomain(domain)
+	_, d := existingOrg.GetDomain(domain)
 	if d == nil {
 		return "", "", errors.ThrowPreconditionFailed(nil, "EVENT-AGD31", "Errors.Org.DomainNotOnOrg")
 	}
@@ -221,7 +220,7 @@ func (es *OrgEventstore) GenerateOrgDomainValidation(ctx context.Context, domain
 		return "", "", errors.ThrowPreconditionFailed(err, "EVENT-Bae21", "Errors.Org.DomainVerificationTypeInvalid")
 	}
 
-	repoOrg := model.OrgFromModel(existing)
+	repoOrg := model.OrgFromModel(existingOrg)
 	repoDomain := model.OrgDomainFromModel(domain)
 	aggregate := OrgDomainValidationGeneratedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoDomain)
 
@@ -236,28 +235,28 @@ func (es *OrgEventstore) ValidateOrgDomain(ctx context.Context, domain *org_mode
 	if domain == nil || !domain.IsValid() {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-R24hb", "Errors.Org.InvalidDomain")
 	}
-	existing, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
+	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
 	if err != nil {
 		return err
 	}
-	_, d := existing.GetDomain(domain)
-	if d == nil {
+	_, existingDomain := existingOrg.GetDomain(domain)
+	if existingDomain == nil {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-Sjdi3", "Errors.Org.DomainNotOnOrg")
 	}
-	if d.Verified {
+	if existingDomain.Verified {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-4gT342", "Errors.Org.DomainAlreadyVerified")
 	}
-	if d.ValidationCode == nil || d.ValidationType == org_model.OrgDomainValidationTypeUnspecified {
+	if existingDomain.ValidationCode == nil || existingDomain.ValidationType == org_model.OrgDomainValidationTypeUnspecified {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-SFBB3", "Errors.Org.DomainVerificationMissing")
 	}
-	validationCode, err := crypto.DecryptString(d.ValidationCode, es.verificationAlgorithm)
+	validationCode, err := crypto.DecryptString(existingDomain.ValidationCode, es.verificationAlgorithm)
 	if err != nil {
 		return err
 	}
-	repoOrg := model.OrgFromModel(existing)
+	repoOrg := model.OrgFromModel(existingOrg)
 	repoDomain := model.OrgDomainFromModel(domain)
-	checkType, _ := d.ValidationType.CheckType()
-	err = es.verificationValidator(d.Domain, validationCode, validationCode, checkType)
+	checkType, _ := existingDomain.ValidationType.CheckType()
+	err = es.verificationValidator(existingDomain.Domain, validationCode, validationCode, checkType)
 	if err == nil {
 		orgAggregates, err := OrgDomainVerifiedAggregate(ctx, es.Eventstore.AggregateCreator(), repoOrg, repoDomain, users)
 		if err != nil {
@@ -275,18 +274,18 @@ func (es *OrgEventstore) SetPrimaryOrgDomain(ctx context.Context, domain *org_mo
 	if domain == nil || !domain.IsValid() {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-SsDG2", "Errors.Org.InvalidDomain")
 	}
-	existing, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
+	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
 	if err != nil {
 		return err
 	}
-	_, d := existing.GetDomain(domain)
-	if d == nil {
+	_, existingDomain := existingOrg.GetDomain(domain)
+	if existingDomain == nil {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-GDfA3", "Errors.Org.DomainNotOnOrg")
 	}
-	if !d.Verified {
+	if !existingDomain.Verified {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-Ggd32", "Errors.Org.DomainNotVerified")
 	}
-	repoOrg := model.OrgFromModel(existing)
+	repoOrg := model.OrgFromModel(existingOrg)
 	repoDomain := model.OrgDomainFromModel(domain)
 	if err := es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, OrgDomainSetPrimaryAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoDomain)); err != nil {
 		return err
@@ -298,18 +297,18 @@ func (es *OrgEventstore) RemoveOrgDomain(ctx context.Context, domain *org_model.
 	if domain.Domain == "" {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-SJsK3", "Errors.Org.DomainMissing")
 	}
-	existing, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
+	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
 	if err != nil {
 		return err
 	}
-	_, d := existing.GetDomain(domain)
-	if d == nil {
+	_, existingDomain := existingOrg.GetDomain(domain)
+	if existingDomain == nil {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-Sjdi3", "Errors.Org.DomainNotOnOrg")
 	}
-	if d.Primary {
+	if existingDomain.Primary {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-Sjdi3", "Errors.Org.PrimaryDomainNotDeletable")
 	}
-	repoOrg := model.OrgFromModel(existing)
+	repoOrg := model.OrgFromModel(existingOrg)
 	repoDomain := model.OrgDomainFromModel(domain)
 	orgAggregates, err := OrgDomainRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoOrg, repoDomain)
 	if err != nil {
@@ -400,7 +399,7 @@ func (es *OrgEventstore) OrgMemberByIDs(ctx context.Context, member *org_model.O
 
 func (es *OrgEventstore) PrepareAddOrgMember(ctx context.Context, member *org_model.OrgMember, resourceOwner string) (*model.OrgMember, *es_models.Aggregate, error) {
 	if member == nil || !member.IsValid() {
-		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Errors.Org.InvalidMember")
+		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-jRFLz", "Errors.Org.InvalidMember")
 	}
 
 	repoMember := model.OrgMemberFromModel(member)
@@ -424,7 +423,7 @@ func (es *OrgEventstore) AddOrgMember(ctx context.Context, member *org_model.Org
 
 func (es *OrgEventstore) ChangeOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
 	if member == nil || !member.IsValid() {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Errors.Org.InvalidMember")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ara6l", "Errors.Org.InvalidMember")
 	}
 
 	existingMember, err := es.OrgMemberByIDs(ctx, member)
@@ -466,25 +465,25 @@ func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.
 }
 
 func (es *OrgEventstore) GetOrgIAMPolicy(ctx context.Context, orgID string) (*org_model.OrgIAMPolicy, error) {
-	existing, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
+	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
 	}
-	if existing != nil && existing.OrgIamPolicy != nil {
-		return existing.OrgIamPolicy, nil
+	if existingOrg != nil && existingOrg.OrgIamPolicy != nil {
+		return existingOrg.OrgIamPolicy, nil
 	}
 	return es.defaultOrgIamPolicy, nil
 }
 
 func (es *OrgEventstore) AddOrgIAMPolicy(ctx context.Context, policy *org_model.OrgIAMPolicy) (*org_model.OrgIAMPolicy, error) {
-	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
 	if err != nil {
 		return nil, err
 	}
-	if existing.OrgIamPolicy != nil {
+	if existingOrg.OrgIamPolicy != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-7Usj3", "Errors.Org.PolicyAlreadyExists")
 	}
-	repoOrg := model.OrgFromModel(existing)
+	repoOrg := model.OrgFromModel(existingOrg)
 	repoPolicy := model.OrgIAMPolicyFromModel(policy)
 	orgAggregate := OrgIAMPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPolicy)
 	if err != nil {
@@ -499,14 +498,14 @@ func (es *OrgEventstore) AddOrgIAMPolicy(ctx context.Context, policy *org_model.
 }
 
 func (es *OrgEventstore) ChangeOrgIAMPolicy(ctx context.Context, policy *org_model.OrgIAMPolicy) (*org_model.OrgIAMPolicy, error) {
-	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
 	if err != nil {
 		return nil, err
 	}
-	if existing.OrgIamPolicy == nil {
+	if existingOrg.OrgIamPolicy == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-8juSd", "Errors.Org.PolicyNotExisting")
 	}
-	repoOrg := model.OrgFromModel(existing)
+	repoOrg := model.OrgFromModel(existingOrg)
 	repoPolicy := model.OrgIAMPolicyFromModel(policy)
 	orgAggregate := OrgIAMPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPolicy)
 	if err != nil {
@@ -521,14 +520,14 @@ func (es *OrgEventstore) ChangeOrgIAMPolicy(ctx context.Context, policy *org_mod
 }
 
 func (es *OrgEventstore) RemoveOrgIAMPolicy(ctx context.Context, orgID string) error {
-	existing, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
+	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
 	if err != nil {
 		return err
 	}
-	if existing.OrgIamPolicy == nil {
+	if existingOrg.OrgIamPolicy == nil {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-z6Dse", "Errors.Org.PolicyNotExisting")
 	}
-	repoOrg := model.OrgFromModel(existing)
+	repoOrg := model.OrgFromModel(existingOrg)
 	orgAggregate := OrgIamPolicyRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg)
 	if err != nil {
 		return err

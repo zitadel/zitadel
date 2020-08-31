@@ -17,6 +17,14 @@ const routes: Routes = [
         },
     },
     {
+        path: 'create-machine',
+        loadChildren: () => import('../user-create-machine/user-create-machine.module').then(m => m.UserCreateMachineModule),
+        canActivate: [AuthGuard, RoleGuard],
+        data: {
+            roles: ['user.write'],
+        },
+    },
+    {
         path: 'me',
         component: AuthUserDetailComponent,
         canActivate: [AuthGuard],

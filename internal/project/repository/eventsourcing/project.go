@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api/authz"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -59,25 +60,25 @@ func ProjectCreateAggregate(aggCreator *es_models.AggregateCreator, project *mod
 	}
 }
 
-func ProjectUpdateAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, new *model.Project) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ProjectUpdateAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, newProject *model.Project) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if new == nil {
+		if newProject == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "Errors.Internal")
 		}
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
-		changes := existing.Changes(new)
+		changes := existingProject.Changes(newProject)
 		if len(changes) == 0 {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9soPE", "Errors.NoChangesFound")
 		}
-		if existing.Name != new.Name {
+		if existingProject.Name != newProject.Name {
 			validationQuery := es_models.NewSearchQuery().
 				AggregateTypeFilter(model.ProjectAggregate).
 				EventTypesFilter(model.ProjectAdded, model.ProjectChanged, model.ProjectRemoved)
 
-			validation := addProjectValidation(new.Name)
+			validation := addProjectValidation(newProject.Name)
 			agg.SetPrecondition(validationQuery, validation)
 		}
 		return agg.AppendEvent(model.ProjectChanged, changes)
@@ -102,23 +103,23 @@ func projectStateAggregate(aggCreator *es_models.AggregateCreator, project *mode
 	}
 }
 
-func ProjectRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Project) (*es_models.Aggregate, error) {
-	if existing == nil {
+func ProjectRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existingProject *model.Project) (*es_models.Aggregate, error) {
+	if existingProject == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Cj7lb", "Errors.Internal")
 	}
-	agg, err := ProjectAggregate(ctx, aggCreator, existing)
+	agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 	if err != nil {
 		return nil, err
 	}
-	return agg.AppendEvent(model.ProjectRemoved, existing)
+	return agg.AppendEvent(model.ProjectRemoved, existingProject)
 }
 
-func ProjectMemberAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, member *model.ProjectMember) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ProjectMemberAddedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, member *model.ProjectMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ie34f", "Errors.Internal")
 		}
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
@@ -131,13 +132,13 @@ func ProjectMemberAddedAggregate(aggCreator *es_models.AggregateCreator, existin
 	}
 }
 
-func ProjectMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, member *model.ProjectMember) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ProjectMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, member *model.ProjectMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d34fs", "Errors.Internal")
 		}
 
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
@@ -145,12 +146,12 @@ func ProjectMemberChangedAggregate(aggCreator *es_models.AggregateCreator, exist
 	}
 }
 
-func ProjectMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, member *model.ProjectMember) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ProjectMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, member *model.ProjectMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dieu7", "Errors.Internal")
 		}
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
@@ -158,12 +159,12 @@ func ProjectMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, exist
 	}
 }
 
-func ProjectRoleAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, roles ...*model.ProjectRole) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ProjectRoleAddedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, roles ...*model.ProjectRole) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if roles == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-sleo9", "Errors.Internal")
 		}
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
@@ -177,12 +178,12 @@ func ProjectRoleAddedAggregate(aggCreator *es_models.AggregateCreator, existing 
 	}
 }
 
-func ProjectRoleChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, role *model.ProjectRole) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ProjectRoleChangedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, role *model.ProjectRole) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if role == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-oe8sf", "Errors.Internal")
 		}
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
@@ -190,11 +191,11 @@ func ProjectRoleChangedAggregate(aggCreator *es_models.AggregateCreator, existin
 	}
 }
 
-func ProjectRoleRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Project, role *model.ProjectRole, grants []*model.ProjectGrant) (*es_models.Aggregate, error) {
+func ProjectRoleRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existingProject *model.Project, role *model.ProjectRole, grants []*model.ProjectGrant) (*es_models.Aggregate, error) {
 	if role == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d8eis", "Errors.Internal")
 	}
-	agg, err := ProjectAggregate(ctx, aggCreator, existing)
+	agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 	if err != nil {
 		return nil, err
 	}
@@ -204,7 +205,7 @@ func ProjectRoleRemovedAggregate(ctx context.Context, aggCreator *es_models.Aggr
 	}
 	for _, grant := range grants {
 		var changes map[string]interface{}
-		if _, g := model.GetProjectGrant(existing.Grants, grant.GrantID); grant != nil {
+		if _, g := model.GetProjectGrant(existingProject.Grants, grant.GrantID); grant != nil {
 			changes = g.Changes(grant)
 			agg, err = agg.AppendEvent(model.ProjectGrantCascadeChanged, changes)
 			if err != nil {
@@ -215,12 +216,12 @@ func ProjectRoleRemovedAggregate(ctx context.Context, aggCreator *es_models.Aggr
 	return agg, nil
 }
 
-func ApplicationAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, app *model.Application) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ApplicationAddedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, app *model.Application) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if app == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-09du7", "Errors.Internal")
 		}
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
@@ -232,17 +233,17 @@ func ApplicationAddedAggregate(aggCreator *es_models.AggregateCreator, existing 
 	}
 }
 
-func ApplicationChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, app *model.Application) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ApplicationChangedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, app *model.Application) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if app == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-sleo9", "Errors.Internal")
 		}
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
 		var changes map[string]interface{}
-		for _, a := range existing.Applications {
+		for _, a := range existingProject.Applications {
 			if a.AppID == app.AppID {
 				changes = a.Changes(app)
 			}
@@ -253,12 +254,12 @@ func ApplicationChangedAggregate(aggCreator *es_models.AggregateCreator, existin
 	}
 }
 
-func ApplicationRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, app *model.Application) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ApplicationRemovedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, app *model.Application) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if app == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-se23g", "Errors.Internal")
 		}
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
@@ -268,12 +269,12 @@ func ApplicationRemovedAggregate(aggCreator *es_models.AggregateCreator, existin
 	}
 }
 
-func ApplicationDeactivatedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, app *model.Application) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ApplicationDeactivatedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, app *model.Application) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if app == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-slfi3", "Errors.Internal")
 		}
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
@@ -283,12 +284,12 @@ func ApplicationDeactivatedAggregate(aggCreator *es_models.AggregateCreator, exi
 	}
 }
 
-func ApplicationReactivatedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, app *model.Application) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ApplicationReactivatedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, app *model.Application) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if app == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-slf32", "Errors.Internal")
 		}
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
@@ -298,17 +299,17 @@ func ApplicationReactivatedAggregate(aggCreator *es_models.AggregateCreator, exi
 	}
 }
 
-func OIDCConfigChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, config *model.OIDCConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
+func OIDCConfigChangedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, config *model.OIDCConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if config == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-slf32", "Errors.Internal")
 		}
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
 		var changes map[string]interface{}
-		for _, a := range existing.Applications {
+		for _, a := range existingProject.Applications {
 			if a.AppID == config.AppID {
 				if a.OIDCConfig != nil {
 					changes = a.OIDCConfig.Changes(config)
@@ -321,9 +322,9 @@ func OIDCConfigChangedAggregate(aggCreator *es_models.AggregateCreator, existing
 	}
 }
 
-func OIDCConfigSecretChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, appID string, secret *crypto.CryptoValue) func(ctx context.Context) (*es_models.Aggregate, error) {
+func OIDCConfigSecretChangedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, appID string, secret *crypto.CryptoValue) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
@@ -337,9 +338,9 @@ func OIDCConfigSecretChangedAggregate(aggCreator *es_models.AggregateCreator, ex
 	}
 }
 
-func OIDCClientSecretCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, appID string) es_sdk.AggregateFunc {
+func OIDCClientSecretCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, appID string) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
@@ -352,9 +353,9 @@ func OIDCClientSecretCheckSucceededAggregate(aggCreator *es_models.AggregateCrea
 	}
 }
 
-func OIDCClientSecretCheckFailedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, appID string) es_sdk.AggregateFunc {
+func OIDCClientSecretCheckFailedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, appID string) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
@@ -367,12 +368,12 @@ func OIDCClientSecretCheckFailedAggregate(aggCreator *es_models.AggregateCreator
 	}
 }
 
-func ProjectGrantAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, grant *model.ProjectGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ProjectGrantAddedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, grant *model.ProjectGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if grant == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kd89w", "Errors.Internal")
 		}
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
@@ -386,17 +387,17 @@ func ProjectGrantAddedAggregate(aggCreator *es_models.AggregateCreator, existing
 	}
 }
 
-func ProjectGrantChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, grant *model.ProjectGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ProjectGrantChangedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, grant *model.ProjectGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if grant == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d9ie2", "Errors.Internal")
 		}
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
 		var changes map[string]interface{}
-		for _, g := range existing.Grants {
+		for _, g := range existingProject.Grants {
 			if g.GrantID == grant.GrantID {
 				changes = g.Changes(grant)
 			}
@@ -407,12 +408,12 @@ func ProjectGrantChangedAggregate(aggCreator *es_models.AggregateCreator, existi
 	}
 }
 
-func ProjectGrantRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, grant *model.ProjectGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ProjectGrantRemovedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, grant *model.ProjectGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if grant == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kci8d", "Errors.Internal")
 		}
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
@@ -422,12 +423,12 @@ func ProjectGrantRemovedAggregate(aggCreator *es_models.AggregateCreator, existi
 	}
 }
 
-func ProjectGrantDeactivatedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, grant *model.ProjectGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ProjectGrantDeactivatedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, grant *model.ProjectGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if grant == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-id832", "Errors.Internal")
 		}
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
@@ -437,12 +438,12 @@ func ProjectGrantDeactivatedAggregate(aggCreator *es_models.AggregateCreator, ex
 	}
 }
 
-func ProjectGrantReactivatedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, grant *model.ProjectGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ProjectGrantReactivatedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, grant *model.ProjectGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if grant == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-8diw2", "Errors.Internal")
 		}
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
@@ -450,12 +451,12 @@ func ProjectGrantReactivatedAggregate(aggCreator *es_models.AggregateCreator, ex
 	}
 }
 
-func ProjectGrantMemberAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, member *model.ProjectGrantMember) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ProjectGrantMemberAddedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, member *model.ProjectGrantMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-4ufh6", "Errors.Internal")
 		}
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
@@ -468,13 +469,13 @@ func ProjectGrantMemberAddedAggregate(aggCreator *es_models.AggregateCreator, ex
 	}
 }
 
-func ProjectGrantMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, member *model.ProjectGrantMember) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ProjectGrantMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, member *model.ProjectGrantMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d8i4h", "Errors.Internal")
 		}
 
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
@@ -487,12 +488,12 @@ func ProjectGrantMemberChangedAggregate(aggCreator *es_models.AggregateCreator, 
 	}
 }
 
-func ProjectGrantMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, member *model.ProjectGrantMember) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ProjectGrantMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, member *model.ProjectGrantMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-slp0r", "Errors.Internal")
 		}
-		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
 		if err != nil {
 			return nil, err
 		}
@@ -570,7 +571,7 @@ func checkExistsUser(events ...*es_models.Event) error {
 		switch event.AggregateType {
 		case usr_model.UserAggregate:
 			switch event.Type {
-			case usr_model.UserAdded, usr_model.UserRegistered:
+			case usr_model.UserAdded, usr_model.UserRegistered, usr_model.HumanRegistered, usr_model.MachineAdded, usr_model.HumanAdded:
 				existsUser = true
 			case usr_model.UserRemoved:
 				existsUser = false

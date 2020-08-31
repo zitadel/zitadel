@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/cache/config"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
@@ -103,33 +104,33 @@ func (es *UserGrantEventStore) PrepareChangeUserGrant(ctx context.Context, grant
 	if grant == nil {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo0s9", "Errors.UserGrant.Invalid")
 	}
-	existing, err := es.UserGrantByID(ctx, grant.AggregateID)
+	existingGrant, err := es.UserGrantByID(ctx, grant.AggregateID)
 	if err != nil {
 		return nil, nil, err
 	}
-	repoExisting := model.UserGrantFromModel(existing)
+	repoExistingGrant := model.UserGrantFromModel(existingGrant)
 	repoGrant := model.UserGrantFromModel(grant)
 
-	aggFunc := UserGrantChangedAggregate(es.Eventstore.AggregateCreator(), repoExisting, repoGrant, cascade)
+	aggFunc := UserGrantChangedAggregate(es.Eventstore.AggregateCreator(), repoExistingGrant, repoGrant, cascade)
 	projectAggregate, err := aggFunc(ctx)
 	if err != nil {
 		return nil, nil, err
 	}
-	return repoExisting, projectAggregate, err
+	return repoExistingGrant, projectAggregate, err
 }
 
 func (es *UserGrantEventStore) ChangeUserGrant(ctx context.Context, grant *grant_model.UserGrant) (*grant_model.UserGrant, error) {
-	repoExisting, agg, err := es.PrepareChangeUserGrant(ctx, grant, false)
+	repoGrant, agg, err := es.PrepareChangeUserGrant(ctx, grant, false)
 	if err != nil {
 		return nil, err
 	}
 
-	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoExisting.AppendEvents, agg)
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoGrant.AppendEvents, agg)
 	if err != nil {
 		return nil, err
 	}
-	es.userGrantCache.cacheUserGrant(repoExisting)
-	return model.UserGrantToModel(repoExisting), nil
+	es.userGrantCache.cacheUserGrant(repoGrant)
+	return model.UserGrantToModel(repoGrant), nil
 }
 
 func (es *UserGrantEventStore) ChangeUserGrants(ctx context.Context, grants ...*grant_model.UserGrant) error {
@@ -145,15 +146,15 @@ func (es *UserGrantEventStore) ChangeUserGrants(ctx context.Context, grants ...*
 }
 
 func (es *UserGrantEventStore) RemoveUserGrant(ctx context.Context, grantID string) error {
-	existing, projectAggregates, err := es.PrepareRemoveUserGrant(ctx, grantID, false)
+	grant, projectAggregates, err := es.PrepareRemoveUserGrant(ctx, grantID, false)
 	if err != nil {
 		return err
 	}
-	err = es_sdk.PushAggregates(ctx, es.PushAggregates, existing.AppendEvents, projectAggregates...)
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, grant.AppendEvents, projectAggregates...)
 	if err != nil {
 		return err
 	}
-	es.userGrantCache.cacheUserGrant(existing)
+	es.userGrantCache.cacheUserGrant(grant)
 	return nil
 }
 
@@ -172,11 +173,11 @@ func (es *UserGrantEventStore) RemoveUserGrants(ctx context.Context, grantIDs ..
 }
 
 func (es *UserGrantEventStore) PrepareRemoveUserGrant(ctx context.Context, grantID string, cascade bool) (*model.UserGrant, []*es_models.Aggregate, error) {
-	existing, err := es.UserGrantByID(ctx, grantID)
+	grant, err := es.UserGrantByID(ctx, grantID)
 	if err != nil {
 		return nil, nil, err
 	}
-	repoExisting := model.UserGrantFromModel(existing)
+	repoExisting := model.UserGrantFromModel(grant)
 	repoGrant := &model.UserGrant{ObjectRoot: models.ObjectRoot{AggregateID: grantID}}
 	projectAggregates, err := UserGrantRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoExisting, repoGrant, cascade)
 	if err != nil {
@@ -189,44 +190,44 @@ func (es *UserGrantEventStore) DeactivateUserGrant(ctx context.Context, grantID 
 	if grantID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-8si34", "Errors.UserGrant.IDMissing")
 	}
-	existing, err := es.UserGrantByID(ctx, grantID)
+	grant, err := es.UserGrantByID(ctx, grantID)
 	if err != nil {
 		return nil, err
 	}
-	if !existing.IsActive() {
+	if !grant.IsActive() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9sw", "Errors.UserGrant.NotActive")
 	}
-	repoExisting := model.UserGrantFromModel(existing)
+	repoExistingGrant := model.UserGrantFromModel(grant)
 	repoGrant := &model.UserGrant{ObjectRoot: models.ObjectRoot{AggregateID: grantID}}
 
-	projectAggregate := UserGrantDeactivatedAggregate(es.Eventstore.AggregateCreator(), repoExisting, repoGrant)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, projectAggregate)
+	projectAggregate := UserGrantDeactivatedAggregate(es.Eventstore.AggregateCreator(), repoExistingGrant, repoGrant)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExistingGrant.AppendEvents, projectAggregate)
 	if err != nil {
 		return nil, err
 	}
 	es.userGrantCache.cacheUserGrant(repoGrant)
-	return model.UserGrantToModel(repoExisting), nil
+	return model.UserGrantToModel(repoExistingGrant), nil
 }
 
 func (es *UserGrantEventStore) ReactivateUserGrant(ctx context.Context, grantID string) (*grant_model.UserGrant, error) {
 	if grantID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-sksiw", "Errors.UserGrant.IDMissing")
 	}
-	existing, err := es.UserGrantByID(ctx, grantID)
+	grant, err := es.UserGrantByID(ctx, grantID)
 	if err != nil {
 		return nil, err
 	}
-	if !existing.IsInactive() {
+	if !grant.IsInactive() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9sw", "Errors.UserGrant.NotInactive")
 	}
-	repoExisting := model.UserGrantFromModel(existing)
+	repoExistingGrant := model.UserGrantFromModel(grant)
 	repoGrant := &model.UserGrant{ObjectRoot: models.ObjectRoot{AggregateID: grantID}}
 
-	projectAggregate := UserGrantReactivatedAggregate(es.Eventstore.AggregateCreator(), repoExisting, repoGrant)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, projectAggregate)
+	projectAggregate := UserGrantReactivatedAggregate(es.Eventstore.AggregateCreator(), repoExistingGrant, repoGrant)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExistingGrant.AppendEvents, projectAggregate)
 	if err != nil {
 		return nil, err
 	}
-	es.userGrantCache.cacheUserGrant(repoExisting)
-	return model.UserGrantToModel(repoExisting), nil
+	es.userGrantCache.cacheUserGrant(repoExistingGrant)
+	return model.UserGrantToModel(repoExistingGrant), nil
 }

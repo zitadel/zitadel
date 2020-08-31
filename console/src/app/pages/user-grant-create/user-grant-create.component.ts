@@ -4,7 +4,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { Org } from 'src/app/proto/generated/auth_pb';
-import { ProjectGrantView, ProjectRole, ProjectView, User, UserGrant } from 'src/app/proto/generated/management_pb';
+import { ProjectGrantView, ProjectRole, ProjectView, UserGrant, UserView } from 'src/app/proto/generated/management_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -55,7 +55,7 @@ export class UserGrantCreateComponent implements OnDestroy {
                 this.context = UserGrantContext.GRANTED_PROJECT;
                 this.mgmtService.GetGrantedProjectByID(this.projectId, this.grantId).then(resp => {
                     this.grantRolesKeyList = resp.toObject().roleKeysList;
-                }).catch(error => {
+                }).catch((error: any) => {
                     this.toast.showError(error);
                 });
             }
@@ -80,7 +80,7 @@ export class UserGrantCreateComponent implements OnDestroy {
                 ).then((data: UserGrant) => {
                     this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTADDED', true);
                     this.close();
-                }).catch(error => {
+                }).catch((error: any) => {
                     this.toast.showError(error);
                 });
                 break;
@@ -93,7 +93,7 @@ export class UserGrantCreateComponent implements OnDestroy {
                 ).then((data: UserGrant) => {
                     this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
                     this.close();
-                }).catch(error => {
+                }).catch((error: any) => {
                     this.toast.showError(error);
                 });
                 break;
@@ -105,7 +105,7 @@ export class UserGrantCreateComponent implements OnDestroy {
         this.projectId = project.projectId;
     }
 
-    public selectUser(user: User.AsObject): void {
+    public selectUser(user: UserView.AsObject): void {
         this.userId = user.id;
     }
 

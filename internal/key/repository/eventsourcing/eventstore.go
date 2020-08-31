@@ -64,6 +64,7 @@ func (es *KeyEventstore) GenerateKeyPair(ctx context.Context, usage key_model.Ke
 		},
 	})
 }
+
 func (es *KeyEventstore) CreateKeyPair(ctx context.Context, pair *key_model.KeyPair) (*key_model.KeyPair, error) {
 	if !pair.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-G34ga", "Name is required")

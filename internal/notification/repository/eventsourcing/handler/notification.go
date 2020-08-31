@@ -50,13 +50,17 @@ func (n *Notification) EventQuery() (*models.SearchQuery, error) {
 
 func (n *Notification) Reduce(event *models.Event) (err error) {
 	switch event.Type {
-	case es_model.InitializedUserCodeAdded:
+	case es_model.InitializedUserCodeAdded,
+		es_model.InitializedHumanCodeAdded:
 		err = n.handleInitUserCode(event)
-	case es_model.UserEmailCodeAdded:
+	case es_model.UserEmailCodeAdded,
+		es_model.HumanEmailCodeAdded:
 		err = n.handleEmailVerificationCode(event)
-	case es_model.UserPhoneCodeAdded:
+	case es_model.UserPhoneCodeAdded,
+		es_model.HumanPhoneCodeAdded:
 		err = n.handlePhoneVerificationCode(event)
-	case es_model.UserPasswordCodeAdded:
+	case es_model.UserPasswordCodeAdded,
+		es_model.HumanPasswordCodeAdded:
 		err = n.handlePasswordCode(event)
 	case es_model.DomainClaimed:
 		err = n.handleDomainClaimed(event)

@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { Gender as authGender, UserProfile as authUP } from 'src/app/proto/generated/auth_pb';
-import { Gender as mgmtGender, UserProfile as mgmtUP } from 'src/app/proto/generated/management_pb';
+import { Gender as authGender, UserProfile as authUP, UserView as authUV } from 'src/app/proto/generated/auth_pb';
+import { Gender as mgmtGender, UserProfile as mgmtUP, UserView as mgmtUV } from 'src/app/proto/generated/management_pb';
 
 
 @Component({
@@ -11,11 +11,12 @@ import { Gender as mgmtGender, UserProfile as mgmtUP } from 'src/app/proto/gener
     styleUrls: ['./detail-form.component.scss'],
 })
 export class DetailFormComponent implements OnInit, OnDestroy {
-    @Input() public profile!: mgmtUP | authUP;
+    @Input() public username!: string;
+    @Input() public user!: mgmtUV | authUV;
     @Input() public disabled: boolean = false;
     @Input() public genders: mgmtGender[] | authGender[] = [];
     @Input() public languages: string[] = ['de', 'en'];
-    @Output() public submitData: EventEmitter<any> = new EventEmitter<any>();
+    @Output() public submitData: EventEmitter<mgmtUP | authUP> = new EventEmitter<mgmtUP | authUP>();
     @Output() public changedLanguage: EventEmitter<string> = new EventEmitter<string>();
 
     public profileForm!: FormGroup;
@@ -36,7 +37,7 @@ export class DetailFormComponent implements OnInit, OnDestroy {
     }
 
     public ngOnInit(): void {
-        this.profileForm.patchValue(this.profile);
+        this.profileForm.patchValue({ userName: this.username, ...this.user });
 
         if (this.preferredLanguage) {
             this.sub = this.preferredLanguage.valueChanges.subscribe(value => {
@@ -52,9 +53,11 @@ export class DetailFormComponent implements OnInit, OnDestroy {
     public submitForm(): void {
         this.submitData.emit(this.profileForm.value);
     }
+
     public get userName(): AbstractControl | null {
         return this.profileForm.get('userName');
     }
+
     public get firstName(): AbstractControl | null {
         return this.profileForm.get('firstName');
     }

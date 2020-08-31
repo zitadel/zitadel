@@ -62,23 +62,6 @@
         ]
       }
     },
-    "/me/usersessions": {
-      "get": {
-        "summary": "Authorization",
-        "operationId": "GetMyUserSessions",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1UserSessionViews"
-            }
-          }
-        },
-        "tags": [
-          "AuthService"
-        ]
-      }
-    },
     "/permissions/me": {
       "get": {
         "operationId": "GetMyProjectPermissions",
@@ -358,7 +341,23 @@
         ]
       }
     },
-    "/users/me/mfa/otp": {
+    "/users/me/mfas": {
+      "get": {
+        "operationId": "GetMyMfas",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MultiFactors"
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/mfas/otp": {
       "delete": {
         "operationId": "RemoveMfaOTP",
         "responses": {
@@ -399,7 +398,7 @@
         ]
       }
     },
-    "/users/me/mfa/otp/_verify": {
+    "/users/me/mfas/otp/_verify": {
       "put": {
         "operationId": "VerifyMfaOTP",
         "responses": {
@@ -420,22 +419,6 @@
             }
           }
         ],
-        "tags": [
-          "AuthService"
-        ]
-      }
-    },
-    "/users/me/mfas": {
-      "get": {
-        "operationId": "GetMyMfas",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1MultiFactors"
-            }
-          }
-        },
         "tags": [
           "AuthService"
         ]
@@ -614,6 +597,23 @@
         ]
       }
     },
+    "/users/me/sessions": {
+      "get": {
+        "summary": "Authorization",
+        "operationId": "GetMyUserSessions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserSessionViews"
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
     "/users/me/username": {
       "put": {
         "operationId": "ChangeMyUserName",
@@ -728,6 +728,62 @@
       ],
       "default": "GENDER_UNSPECIFIED"
     },
+    "v1HumanView": {
+      "type": "object",
+      "properties": {
+        "password_changed": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "nick_name": {
+          "type": "string"
+        },
+        "preferred_language": {
+          "type": "string"
+        },
+        "gender": {
+          "$ref": "#/definitions/v1Gender"
+        },
+        "email": {
+          "type": "string"
+        },
+        "is_email_verified": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "is_phone_verified": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "country": {
+          "type": "string"
+        },
+        "locality": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "street_address": {
+          "type": "string"
+        }
+      }
+    },
     "v1LocalizedMessage": {
       "type": "object",
       "properties": {
@@ -748,6 +804,21 @@
         "MFASTATE_REMOVED"
       ],
       "default": "MFASTATE_UNSPECIFIED"
+    },
+    "v1MachineView": {
+      "type": "object",
+      "properties": {
+        "last_key_added": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
     },
     "v1MfaOtpResponse": {
       "type": "object",
@@ -1303,9 +1374,6 @@
         "id": {
           "type": "string"
         },
-        "user_name": {
-          "type": "string"
-        },
         "first_name": {
           "type": "string"
         },
@@ -1342,9 +1410,6 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
-        },
-        "user_name": {
           "type": "string"
         },
         "first_name": {
@@ -1468,70 +1533,9 @@
           "type": "string",
           "format": "date-time"
         },
-        "last_login": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "password_changed": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "user_name": {
-          "type": "string"
-        },
-        "first_name": {
-          "type": "string"
-        },
-        "last_name": {
-          "type": "string"
-        },
-        "display_name": {
-          "type": "string"
-        },
-        "nick_name": {
-          "type": "string"
-        },
-        "preferred_language": {
-          "type": "string"
-        },
-        "gender": {
-          "$ref": "#/definitions/v1Gender"
-        },
-        "email": {
-          "type": "string"
-        },
-        "is_email_verified": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "phone": {
-          "type": "string"
-        },
-        "is_phone_verified": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "country": {
-          "type": "string"
-        },
-        "locality": {
-          "type": "string"
-        },
-        "postal_code": {
-          "type": "string"
-        },
-        "region": {
-          "type": "string"
-        },
-        "street_address": {
-          "type": "string"
-        },
         "sequence": {
           "type": "string",
           "format": "uint64"
-        },
-        "resource_owner": {
-          "type": "string"
         },
         "login_names": {
           "type": "array",
@@ -1541,6 +1545,22 @@
         },
         "preferred_login_name": {
           "type": "string"
+        },
+        "last_login": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "resource_owner": {
+          "type": "string"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "human": {
+          "$ref": "#/definitions/v1HumanView"
+        },
+        "machine": {
+          "$ref": "#/definitions/v1MachineView"
         }
       }
     },

@@ -117,8 +117,8 @@ func TestAppendEvent(t *testing.T) {
 
 func TestChanges(t *testing.T) {
 	type args struct {
-		existing *Org
-		new      *Org
+		existingOrg *Org
+		newOrg      *Org
 	}
 	type res struct {
 		changesLen int
@@ -131,8 +131,8 @@ func TestChanges(t *testing.T) {
 		{
 			name: "org name changes",
 			args: args{
-				existing: &Org{Name: "Name"},
-				new:      &Org{Name: "NameChanged"},
+				existingOrg: &Org{Name: "Name"},
+				newOrg:      &Org{Name: "NameChanged"},
 			},
 			res: res{
 				changesLen: 1,
@@ -141,8 +141,8 @@ func TestChanges(t *testing.T) {
 		{
 			name: "no changes",
 			args: args{
-				existing: &Org{Name: "Name"},
-				new:      &Org{Name: "Name"},
+				existingOrg: &Org{Name: "Name"},
+				newOrg:      &Org{Name: "Name"},
 			},
 			res: res{
 				changesLen: 0,
@@ -151,7 +151,7 @@ func TestChanges(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			changes := tt.args.existing.Changes(tt.args.new)
+			changes := tt.args.existingOrg.Changes(tt.args.newOrg)
 			if len(changes) != tt.res.changesLen {
 				t.Errorf("got wrong changes len: expected: %v, actual: %v ", tt.res.changesLen, len(changes))
 			}

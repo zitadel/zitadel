@@ -320,17 +320,19 @@ func (setUp *initializer) users(ctx context.Context, users []User, orgPolicy *or
 
 func (setUp *initializer) user(ctx context.Context, user User, orgPolicy *org_model.OrgIAMPolicy) (*usr_model.User, error) {
 	createUser := &usr_model.User{
-		Profile: &usr_model.Profile{
-			UserName:  user.UserName,
-			FirstName: user.FirstName,
-			LastName:  user.LastName,
-		},
-		Email: &usr_model.Email{
-			EmailAddress:    user.Email,
-			IsEmailVerified: true,
-		},
-		Password: &usr_model.Password{
-			SecretString: user.Password,
+		UserName: user.UserName,
+		Human: &usr_model.Human{
+			Profile: &usr_model.Profile{
+				FirstName: user.FirstName,
+				LastName:  user.LastName,
+			},
+			Email: &usr_model.Email{
+				EmailAddress:    user.Email,
+				IsEmailVerified: true,
+			},
+			Password: &usr_model.Password{
+				SecretString: user.Password,
+			},
 		},
 	}
 	return setUp.UserEvents.CreateUser(ctx, createUser, setUp.pwComplexityPolicy, orgPolicy)

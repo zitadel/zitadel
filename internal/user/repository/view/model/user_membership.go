@@ -2,6 +2,8 @@ package model
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -10,7 +12,6 @@ import (
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/user/model"
 	"github.com/lib/pq"
-	"time"
 )
 
 const (

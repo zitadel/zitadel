@@ -85,7 +85,10 @@ func (m *OrgMember) processOrgMember(event *models.Event) (err error) {
 func (m *OrgMember) processUser(event *models.Event) (err error) {
 	switch event.Type {
 	case usr_es_model.UserProfileChanged,
-		usr_es_model.UserEmailChanged:
+		usr_es_model.UserEmailChanged,
+		usr_es_model.HumanProfileChanged,
+		usr_es_model.HumanEmailChanged,
+		usr_es_model.MachineChanged:
 		members, err := m.view.OrgMembersByUserID(event.AggregateID)
 		if err != nil {
 			return err
@@ -118,10 +121,15 @@ func (m *OrgMember) fillData(member *org_model.OrgMemberView) (err error) {
 
 func (m *OrgMember) fillUserData(member *org_model.OrgMemberView, user *usr_model.User) {
 	member.UserName = user.UserName
-	member.FirstName = user.FirstName
-	member.LastName = user.LastName
-	member.Email = user.EmailAddress
-	member.DisplayName = user.DisplayName
+	if user.Human != nil {
+		member.FirstName = user.FirstName
+		member.LastName = user.LastName
+		member.DisplayName = user.FirstName + " " + user.LastName
+		member.Email = user.EmailAddress
+	}
+	if user.Machine != nil {
+		member.DisplayName = user.Machine.Name
+	}
 }
 func (m *OrgMember) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-u73es", "id", event.AggregateID).WithError(err).Warn("something went wrong in orgmember handler")
