@@ -90,7 +90,7 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 		PasswordAlg:    passwordAlg,
 		validateTOTP:   totp.Validate,
 		MachineKeyAlg:  aesCrypto,
-		MachineKeySize: systemDefaults.SecretGenerators.MachineKey,
+		MachineKeySize: int(systemDefaults.SecretGenerators.MachineKeySize),
 	}, nil
 }
 
