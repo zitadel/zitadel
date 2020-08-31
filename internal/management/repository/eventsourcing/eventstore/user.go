@@ -3,21 +3,19 @@ package eventstore
 import (
 	"context"
 
+	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	global_model "github.com/caos/zitadel/internal/model"
-	"github.com/caos/zitadel/internal/view/repository"
-
-	"github.com/caos/logging"
-
-	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
+	global_model "github.com/caos/zitadel/internal/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 type UserRepo struct {

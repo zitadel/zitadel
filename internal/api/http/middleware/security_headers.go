@@ -9,10 +9,10 @@ import (
 	http_utils "github.com/caos/zitadel/internal/api/http"
 )
 
-type key int
+type securityKey int
 
 const (
-	nonceKey key = 0
+	nonceKey securityKey = 0
 
 	DefaultNonceLength = uint(32)
 )

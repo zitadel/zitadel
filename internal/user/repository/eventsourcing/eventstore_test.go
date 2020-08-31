@@ -3083,9 +3083,10 @@ func TestChangeAddress(t *testing.T) {
 func TestAddOTP(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es     *UserEventstore
-		ctx    context.Context
-		userID string
+		es          *UserEventstore
+		ctx         context.Context
+		userID      string
+		accountName string
 	}
 	type res struct {
 		errFunc func(err error) bool
@@ -3098,9 +3099,10 @@ func TestAddOTP(t *testing.T) {
 		{
 			name: "add ok",
 			args: args{
-				es:     GetMockManipulateUserWithOTPGen(ctrl),
-				ctx:    authz.NewMockContext("orgID", "userID"),
-				userID: "AggregateID",
+				es:          GetMockManipulateUserWithOTPGen(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				userID:      "AggregateID",
+				accountName: "AccountName",
 			},
 		},
 		{
@@ -3128,7 +3130,7 @@ func TestAddOTP(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.AddOTP(tt.args.ctx, tt.args.userID)
+			result, err := tt.args.es.AddOTP(tt.args.ctx, tt.args.userID, tt.args.accountName)
 
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")

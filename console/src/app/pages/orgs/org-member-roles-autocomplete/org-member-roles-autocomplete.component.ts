@@ -1,7 +1,7 @@
 import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatAutocomplete } from '@angular/material/autocomplete';
-import { OrgService } from 'src/app/services/org.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -18,8 +18,8 @@ export class OrgMemberRolesAutocompleteComponent {
     @ViewChild('nameInput') public nameInput!: ElementRef<HTMLInputElement>;
     @ViewChild('auto') public matAutocomplete!: MatAutocomplete;
     @Output() public selectionChanged: EventEmitter<string[]> = new EventEmitter();
-    constructor(private orgService: OrgService, private toast: ToastService) {
-        this.orgService.GetOrgMemberRoles().then(resp => {
+    constructor(private mgmtService: ManagementService, private toast: ToastService) {
+        this.mgmtService.GetOrgMemberRoles().then(resp => {
             this.allRoles = resp.toObject().rolesList;
         }).catch(error => {
             this.toast.showError(error);

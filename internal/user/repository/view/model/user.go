@@ -77,6 +77,7 @@ type HumanView struct {
 
 	PasswordSet            bool      `json:"-" gorm:"column:password_set"`
 	PasswordChangeRequired bool      `json:"-" gorm:"column:password_change_required"`
+	UsernameChangeRequired bool      `json:"-" gorm:"column:username_change_required"`
 	PasswordChanged        time.Time `json:"-" gorm:"column:password_change"`
 }
 
@@ -130,6 +131,10 @@ func UserToModel(user *UserView) *model.UserView {
 			MfaMaxSetUp:            req_model.MfaLevel(user.MfaMaxSetUp),
 			MfaInitSkipped:         user.MfaInitSkipped,
 			InitRequired:           user.InitRequired,
+			PasswordSet:            user.PasswordSet,
+			PasswordChangeRequired: user.PasswordChangeRequired,
+			UsernameChangeRequired: user.UsernameChangeRequired,
+			PasswordChanged:        user.PasswordChanged,
 		}
 	}
 
@@ -204,12 +209,15 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		err = u.setPasswordData(event)
 	case es_model.UserProfileChanged,
 		es_model.UserAddressChanged,
-		es_model.HumanProfileChanged,
 		es_model.HumanAddressChanged,
+		es_model.HumanProfileChanged,
 		es_model.MachineChanged:
 		err = u.setData(event)
 	case es_model.DomainClaimed:
 		u.UsernameChangeRequired = true
+		err = u.setData(event)
+	case es_model.UserUserNameChanged:
+		u.UsernameChangeRequired = false
 		err = u.setData(event)
 	case es_model.UserUserNameChanged:
 		u.UsernameChangeRequired = false

@@ -1,7 +1,10 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { take } from 'rxjs/operators';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { User, UserSearchResponse } from 'src/app/proto/generated/management_pb';
+import { ManagementService } from 'src/app/services/mgmt.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 export enum UserType {
     HUMAN = 'human',
@@ -12,13 +15,24 @@ export enum UserType {
     templateUrl: './user-list.component.html',
     styleUrls: ['./user-list.component.scss'],
 })
-export class UserListComponent {
-    public UserType: any = UserType;
-    public type: UserType = UserType.HUMAN;
-    constructor(public translate: TranslateService, activatedRoute: ActivatedRoute) {
-        activatedRoute.data.pipe(take(1)).subscribe(params => {
-            const { type } = params;
-            this.type = type;
+export class UserListComponent implements OnDestroy {
+    @ViewChild(MatPaginator) public paginator!: MatPaginator;
+    public dataSource: MatTableDataSource<User.AsObject> = new MatTableDataSource<User.AsObject>();
+    public userResult!: UserSearchResponse.AsObject;
+    private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    public loading$: Observable<boolean> = this.loadingSubject.asObservable();
+    public displayedColumns: string[] = ['select', 'firstname', 'lastname', 'username', 'email', 'state'];
+    public selection: SelectionModel<User.AsObject> = new SelectionModel<User.AsObject>(true, []);
+    @Output() public changedSelection: EventEmitter<Array<User.AsObject>> = new EventEmitter();
+
+    private subscription?: Subscription;
+
+    constructor(public translate: TranslateService, private route: ActivatedRoute, private userService: ManagementService,
+        private toast: ToastService) {
+        this.subscription = this.route.params.subscribe(() => this.getData(10, 0));
+
+        this.selection.changed.subscribe(() => {
+            this.changedSelection.emit(this.selection.selected);
         });
     }
 }

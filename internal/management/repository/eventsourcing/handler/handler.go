@@ -6,6 +6,9 @@ import (
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 
+	"github.com/caos/zitadel/internal/config/systemdefaults"
+	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
+
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/query"

@@ -22,6 +22,10 @@ export class IamComponent {
 
     constructor(private adminService: AdminService, private dialog: MatDialog, private toast: ToastService,
         private router: Router) {
+        this.loadMembers();
+    }
+
+    public loadMembers(): void {
         this.loadingSubject.next(true);
         from(this.adminService.SearchIamMembers(100, 0)).pipe(
             map(resp => {

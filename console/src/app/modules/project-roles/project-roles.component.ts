@@ -5,7 +5,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
 import { ProjectRole } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { ProjectRoleDetailComponent } from './project-role-detail/project-role-detail.component';
@@ -30,8 +30,8 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'key', 'displayname', 'group', 'creationDate'];
 
-    constructor(private projectService: ProjectService, private toast: ToastService, private dialog: MatDialog) {
-        this.dataSource = new ProjectRolesDataSource(this.projectService);
+    constructor(private mgmtService: ManagementService, private toast: ToastService, private dialog: MatDialog) {
+        this.dataSource = new ProjectRolesDataSource(this.mgmtService);
     }
 
     public ngOnInit(): void {
@@ -83,7 +83,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
         });
 
         return Promise.all(this.selection.selected.map(role => {
-            return this.projectService.RemoveProjectRole(role.projectId, role.key);
+            return this.mgmtService.RemoveProjectRole(role.projectId, role.key);
         })).then(() => {
             this.toast.showInfo('PROJECT.TOAST.ROLEREMOVED', true);
             indexes.forEach(index => {
@@ -99,7 +99,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
     }
 
     public removeRole(role: ProjectRole.AsObject, index: number): void {
-        this.projectService
+        this.mgmtService
             .RemoveProjectRole(role.projectId, role.key)
             .then(() => {
                 this.toast.showInfo('PROJECT.TOAST.ROLEREMOVED', true);

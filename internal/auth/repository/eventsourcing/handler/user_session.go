@@ -74,7 +74,6 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		es_model.HumanPasswordChanged,
 		es_model.HumanMfaOtpRemoved,
 		es_model.HumanProfileChanged,
-		es_model.MachineChanged,
 		es_model.DomainClaimed,
 		es_model.UserUserNameChanged:
 		sessions, err := u.view.UserSessionsByUserID(event.AggregateID)

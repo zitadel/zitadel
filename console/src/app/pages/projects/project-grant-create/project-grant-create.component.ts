@@ -3,9 +3,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Org, ProjectRole } from 'src/app/proto/generated/management_pb';
-import { AuthService } from 'src/app/services/auth.service';
-import { OrgService } from 'src/app/services/org.service';
-import { ProjectService } from 'src/app/services/project.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -24,11 +23,10 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
 
     private routeSubscription: Subscription = new Subscription();
     constructor(
-        private orgService: OrgService,
         private route: ActivatedRoute,
         private toast: ToastService,
-        private projectService: ProjectService,
-        private authService: AuthService,
+        private mgmtService: ManagementService,
+        private authService: GrpcAuthService,
         private _location: Location,
     ) { }
 
@@ -43,7 +41,7 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
     }
 
     public searchOrg(domain: string): void {
-        this.orgService.getOrgByDomainGlobal(domain).then((ret) => {
+        this.mgmtService.getOrgByDomainGlobal(domain).then((ret) => {
             const tmp = ret.toObject();
             this.authService.GetActiveOrg().then((org) => {
                 if (tmp !== org) {
@@ -61,7 +59,7 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
     }
 
     public addGrant(): void {
-        this.projectService
+        this.mgmtService
             .CreateProjectGrant(this.org.id, this.projectId, this.rolesKeyList)
             .then((data) => {
                 this.close();

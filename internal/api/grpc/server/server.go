@@ -34,9 +34,6 @@ func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, lang l
 				middleware.AuthorizationInterceptor(verifier, authConfig),
 				middleware.TranslationHandler(lang),
 				middleware.ValidationHandler(),
-				grpc_middleware.ChainUnaryServer(
-					middleware.AuthorizationInterceptor(verifier, authConfig),
-				),
 			),
 		),
 	)

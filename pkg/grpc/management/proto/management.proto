@@ -81,7 +81,7 @@ service ManagementService {
     };
   }
 
-  rpc GetUserByID(UserID) returns (UserView) {
+rpc GetUserByID(UserID) returns (UserView) {
     option (google.api.http) = {
       get: "/users/{id}"
     };

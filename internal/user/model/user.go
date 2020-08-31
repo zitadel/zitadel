@@ -18,18 +18,6 @@ type User struct {
 	*Machine
 }
 
-type UserState int32
-
-const (
-	UserStateUnspecified UserState = iota
-	UserStateActive
-	UserStateInactive
-	UserStateDeleted
-	UserStateLocked
-	UserStateSuspend
-	UserStateInitial
-)
-
 func (u *User) CheckOrgIAMPolicy(policy *org_model.OrgIAMPolicy) error {
 	if policy == nil {
 		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-zSH7j", "Errors.Users.OrgIamPolicyNil")
