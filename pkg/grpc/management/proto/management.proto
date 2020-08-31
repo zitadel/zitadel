@@ -3035,3 +3035,10 @@ message IdpProviderSearchRequest {
     uint64 offset = 1;
     uint64 limit = 2;
 }
+
+//ProjectType is deprecated, remove as soon as console is ready 
+enum ProjectType {
+  PROJECTTYPE_UNSPECIFIED = 0;
+  PROJECTTYPE_OWNED = 1;
+  PROJECTTYPE_GRANTED = 2;
+}
