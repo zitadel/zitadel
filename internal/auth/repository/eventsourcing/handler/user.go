@@ -79,7 +79,7 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 		es_model.MFAOTPAdded,
 		es_model.MFAOTPVerified,
 		es_model.MFAOTPRemoved,
-		es_model.MfaInitSkipped,
+		es_model.MFAInitSkipped,
 		es_model.UserPasswordChanged,
 		es_model.HumanProfileChanged,
 		es_model.HumanEmailChanged,

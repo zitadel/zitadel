@@ -48,7 +48,7 @@ const (
 	MFAOTPRemoved        models.EventType = "user.mfa.otp.removed"
 	MfaOtpCheckSucceeded models.EventType = "user.mfa.otp.check.succeeded"
 	MfaOtpCheckFailed    models.EventType = "user.mfa.otp.check.failed"
-	MfaInitSkipped       models.EventType = "user.mfa.init.skipped"
+	MFAInitSkipped       models.EventType = "user.mfa.init.skipped"
 
 	SignedOut models.EventType = "user.signed.out"
 

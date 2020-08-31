@@ -256,7 +256,7 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	case es_model.MFAOTPRemoved,
 		es_model.HumanMFAOTPRemoved:
 		u.OTPState = int32(model.MfaStateUnspecified)
-	case es_model.MfaInitSkipped,
+	case es_model.MFAInitSkipped,
 		es_model.HumanMfaInitSkipped:
 		u.MfaInitSkipped = event.CreationDate
 	case es_model.InitializedUserCodeAdded,

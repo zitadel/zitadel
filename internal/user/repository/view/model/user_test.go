@@ -217,7 +217,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append mfa init skipped event",
 			args: args{
-				event: &es_models.Event{Sequence: 1, CreationDate: time.Now().UTC(), Type: es_model.MfaInitSkipped, AggregateID: "AggregateID", ResourceOwner: "OrgID"},
+				event: &es_models.Event{Sequence: 1, CreationDate: time.Now().UTC(), Type: es_model.MFAInitSkipped, AggregateID: "AggregateID", ResourceOwner: "OrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", MfaInitSkipped: time.Now().UTC()}, State: int32(model.UserStateActive)},
