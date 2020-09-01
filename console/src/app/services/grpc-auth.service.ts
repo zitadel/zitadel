@@ -124,7 +124,6 @@ export class GrpcAuthService {
             switchMap(() => from(this.GetMyzitadelPermissions())),
             map(rolesResp => rolesResp.toObject().permissionsList),
         ).subscribe(roles => {
-            console.log(roles);
             this.zitadelPermissions.next(roles);
         });
     }
