@@ -98,6 +98,16 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 	if err != nil {
 		return nil, err
 	}
+	iam, err := es_iam.StartIAM(
+		es_iam.IAMConfig{
+			Eventstore: es,
+			Cache:      conf.Eventstore.Cache,
+		},
+		systemDefaults,
+	)
+	if err != nil {
+		return nil, err
+	}
 
 	project, err := es_proj.StartProject(
 		es_proj.ProjectConfig{
@@ -109,16 +119,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 	if err != nil {
 		return nil, err
 	}
-	iam, err := es_iam.StartIAM(
-		es_iam.IAMConfig{
-			Eventstore: es,
-			Cache:      conf.Eventstore.Cache,
-		},
-		systemDefaults,
-	)
-	if err != nil {
-		return nil, err
-	}
+
 	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain}, systemDefaults)
 
 	repos := handler.EventstoreRepos{UserEvents: user, ProjectEvents: project, OrgEvents: org, IamEvents: iam}

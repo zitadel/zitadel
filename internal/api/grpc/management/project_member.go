@@ -9,7 +9,11 @@ import (
 )
 
 func (s *Server) GetProjectMemberRoles(ctx context.Context, _ *empty.Empty) (*management.ProjectMemberRoles, error) {
-	return &management.ProjectMemberRoles{Roles: s.project.GetProjectMemberRoles()}, nil
+	roles, err := s.project.GetProjectMemberRoles(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &management.ProjectMemberRoles{Roles: roles}, nil
 }
 
 func (s *Server) SearchProjectMembers(ctx context.Context, in *management.ProjectMemberSearchRequest) (*management.ProjectMemberSearchResponse, error) {
