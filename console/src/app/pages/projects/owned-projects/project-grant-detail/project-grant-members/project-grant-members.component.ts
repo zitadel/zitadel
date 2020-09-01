@@ -26,7 +26,6 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
 
     @Input() public type: ProjectType = ProjectType.PROJECTTYPE_GRANTED;
 
-    @Input() public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatTable) public table!: MatTable<ProjectMember.AsObject>;
     public dataSource!: ProjectGrantMembersDataSource;
