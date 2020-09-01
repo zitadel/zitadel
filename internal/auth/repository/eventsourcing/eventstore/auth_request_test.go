@@ -774,7 +774,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				eventProvider: &mockEventUser{
 					&es_models.Event{
 						AggregateType: user_es_model.UserAggregate,
-						Type:          user_es_model.MfaOtpCheckSucceeded,
+						Type:          user_es_model.MFAOTPCheckSucceeded,
 						CreationDate:  time.Now().UTC().Round(1 * time.Second),
 					},
 				},
@@ -797,7 +797,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				eventProvider: &mockEventUser{
 					&es_models.Event{
 						AggregateType: user_es_model.UserAggregate,
-						Type:          user_es_model.MfaOtpCheckSucceeded,
+						Type:          user_es_model.MFAOTPCheckSucceeded,
 						CreationDate:  time.Now().UTC().Round(1 * time.Second),
 						Data: func() []byte {
 							data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "otherID"})
@@ -824,7 +824,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				eventProvider: &mockEventUser{
 					&es_models.Event{
 						AggregateType: user_es_model.UserAggregate,
-						Type:          user_es_model.MfaOtpCheckSucceeded,
+						Type:          user_es_model.MFAOTPCheckSucceeded,
 						CreationDate:  time.Now().UTC().Round(1 * time.Second),
 						Data: func() []byte {
 							data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})

@@ -88,14 +88,14 @@ func (v *UserSessionView) AppendEvent(event *models.Event) {
 		es_model.HumanPasswordCheckFailed,
 		es_model.HumanPasswordChanged:
 		v.PasswordVerification = time.Time{}
-	case es_model.MfaOtpCheckSucceeded,
-		es_model.HumanMfaOtpCheckSucceeded:
+	case es_model.MFAOTPCheckSucceeded,
+		es_model.HumanMFAOTPCheckSucceeded:
 		v.MfaSoftwareVerification = event.CreationDate
 		v.MfaSoftwareVerificationType = int32(req_model.MfaTypeOTP)
 		v.State = int32(req_model.UserSessionStateActive)
-	case es_model.MfaOtpCheckFailed,
+	case es_model.MFAOTPCheckFailed,
 		es_model.MFAOTPRemoved,
-		es_model.HumanMfaOtpCheckFailed,
+		es_model.HumanMFAOTPCheckFailed,
 		es_model.HumanMFAOTPRemoved:
 		v.MfaSoftwareVerification = time.Time{}
 	case es_model.SignedOut,

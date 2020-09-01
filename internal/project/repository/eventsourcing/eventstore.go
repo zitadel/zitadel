@@ -834,14 +834,14 @@ func (es *ProjectEventstore) AddProjectGrant(ctx context.Context, grant *proj_mo
 	if grant == nil || !grant.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-37dhs", "Errors.Project.GrantInvalid")
 	}
-	existingProject, err := es.ProjectByID(ctx, grant.AggregateID)
+	project, err := es.ProjectByID(ctx, grant.AggregateID)
 	if err != nil {
 		return nil, err
 	}
-	if existingProject.ContainsGrantForOrg(grant.GrantedOrgID) {
+	if project.ContainsGrantForOrg(grant.GrantedOrgID) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-7ug4g", "Errors.Project.GrantAlreadyExists")
 	}
-	if !existingProject.ContainsRoles(grant.RoleKeys) {
+	if !project.ContainsRoles(grant.RoleKeys) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83d", "Errors.Project.GrantHasNotExistingRole")
 	}
 	id, err := es.idGenerator.Next()
@@ -850,7 +850,7 @@ func (es *ProjectEventstore) AddProjectGrant(ctx context.Context, grant *proj_mo
 	}
 	grant.GrantID = id
 
-	repoProject := model.ProjectFromModel(existingProject)
+	repoProject := model.ProjectFromModel(project)
 	repoGrant := model.GrantFromModel(grant)
 
 	addAggregate := ProjectGrantAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoGrant)
