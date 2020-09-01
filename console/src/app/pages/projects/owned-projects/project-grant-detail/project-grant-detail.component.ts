@@ -38,10 +38,6 @@ export class ProjectGrantDetailComponent {
             this.projectid = params.projectid;
             this.grantid = params.grantid;
 
-            this.mgmtService.GetIam().then(iam => {
-                this.isZitadel = iam.toObject().iamProjectId === this.projectid;
-            });
-
             this.getRoleOptions(params.projectid);
 
             this.mgmtService.ProjectGrantByID(this.grantid, this.projectid).then((grant) => {

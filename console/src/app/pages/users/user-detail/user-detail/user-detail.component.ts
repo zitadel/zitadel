@@ -155,7 +155,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
     public saveEmail(): void {
         this.emailEditState = false;
-        if (this.user && this.user.human?.phone) {
+        if (this.user && this.user.human?.email) {
             this.mgmtUserService
                 .SaveUserEmail(this.user.id, this.user.human.email).then((data: UserEmail) => {
                     this.toast.showInfo('USER.TOAST.EMAILSENT', true);

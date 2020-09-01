@@ -324,8 +324,8 @@ export class ManagementService {
     }
 
     public async CreateProjectGrant(
-        projectId: string,
         orgId: string,
+        projectId: string,
         roleKeysList: string[],
     ): Promise<ProjectGrant> {
         const req = new ProjectGrantCreate();

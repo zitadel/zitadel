@@ -33,8 +33,6 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
     @Input() allowCreate: boolean = false;
     @Input() allowDelete: boolean = false;
-    @Input() public disabled: boolean = false;
-
 
     @Input() userId: string = '';
     @Input() projectId: string = '';
@@ -84,8 +82,6 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
             default:
                 this.routerLink = ['/grant-create'];
         }
-
-        console.log(this.routerLink);
 
         this.dataSource.loadGrants(this.context, 0, 25, {
             projectId: this.projectId,

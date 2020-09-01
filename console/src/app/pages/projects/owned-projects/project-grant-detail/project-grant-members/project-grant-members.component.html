@@ -1,11 +1,14 @@
 <app-refresh-table (refreshed)="refreshPage()" [dataSize]="dataSource.totalResult"
     [timestamp]="dataSource?.viewTimestamp" [selection]="selection" [loading]="dataSource.loading$ | async">
-    <button (click)="removeProjectMemberSelection()" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}"
-        class="icon-button" color="warn" mat-icon-button *ngIf="selection.hasValue()">
+    <button (click)="removeProjectMemberSelection()"
+        [disabled]="(['project.grant.member.delete','project.grant.member.delete:' + grantId] | hasRole | async) == false"
+        matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="icon-button" color="warn" mat-icon-button
+        *ngIf="selection.hasValue()">
         <i class="las la-trash"></i>
     </button>
-    <a color="primary" [disabled]="disabled" class="add-button" (click)="openAddMember()" color="primary"
-        mat-raised-button>
+    <a color="primary"
+        [disabled]="(['project.grant.member.write','project.grant.member.write:' + grantId] | hasRole | async) == false"
+        class="add-button" (click)="openAddMember()" color="primary" mat-raised-button>
         <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
     </a>
 
@@ -59,7 +62,8 @@
                 <td class="pointer" mat-cell *matCellDef="let member">
                     <mat-form-field class="form-field" appearance="outline" *ngIf="projectId">
                         <mat-label>{{ 'PROJECT.MEMBER.ROLES' | translate }}</mat-label>
-                        <mat-select [(ngModel)]="member.rolesList" multiple [disabled]="disabled"
+                        <mat-select [(ngModel)]="member.rolesList" multiple
+                            [disabled]="(['project.grant.member.write','project.grant.member.write:' + grantId] | hasRole | async) == false"
                             (selectionChange)="updateRoles(member, $event)">
                             <mat-option *ngFor="let role of memberRoleOptions" [value]="role">
                                 {{ role }}
