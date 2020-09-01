@@ -74,7 +74,10 @@ func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {
 	if err != nil {
 		return nil, err
 	}
-	return user.GetProfile(), nil
+	if user.HumanView == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-H2JIT", "Errors.User.NotHuman")
+	}
+	return user.GetProfile()
 }
 
 func (repo *UserRepo) ChangeMyProfile(ctx context.Context, profile *model.Profile) (*model.Profile, error) {
@@ -89,7 +92,10 @@ func (repo *UserRepo) MyEmail(ctx context.Context) (*model.Email, error) {
 	if err != nil {
 		return nil, err
 	}
-	return user.GetEmail(), nil
+	if user.HumanView == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-oGRpc", "Errors.User.NotHuman")
+	}
+	return user.GetEmail()
 }
 
 func (repo *UserRepo) ChangeMyEmail(ctx context.Context, email *model.Email) (*model.Email, error) {
@@ -120,7 +126,10 @@ func (repo *UserRepo) MyPhone(ctx context.Context) (*model.Phone, error) {
 	if err != nil {
 		return nil, err
 	}
-	return user.GetPhone(), nil
+	if user.HumanView == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-DTWJb", "Errors.User.NotHuman")
+	}
+	return user.GetPhone()
 }
 
 func (repo *UserRepo) ChangeMyPhone(ctx context.Context, phone *model.Phone) (*model.Phone, error) {
@@ -147,7 +156,10 @@ func (repo *UserRepo) MyAddress(ctx context.Context) (*model.Address, error) {
 	if err != nil {
 		return nil, err
 	}
-	return user.GetAddress(), nil
+	if user.HumanView == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Ok9nI", "Errors.User.NotHuman")
+	}
+	return user.GetAddress()
 }
 
 func (repo *UserRepo) ChangeMyAddress(ctx context.Context, address *model.Address) (*model.Address, error) {
@@ -190,7 +202,7 @@ func (repo *UserRepo) AddMfaOTP(ctx context.Context, userID string) (*model.OTP,
 	accountName := ""
 	user, err := repo.UserByID(ctx, userID)
 	if err != nil {
-		logging.Log("EVENT-Fk93s").OnError(err).Debug("unable to get user for loginname")
+		logging.Log("EVENT-Fk93s").WithError(err).Debug("unable to get user for loginname")
 	} else {
 		accountName = user.PreferredLoginName
 	}
@@ -201,7 +213,7 @@ func (repo *UserRepo) AddMyMfaOTP(ctx context.Context) (*model.OTP, error) {
 	accountName := ""
 	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
-		logging.Log("EVENT-Ml0sd").OnError(err).Debug("unable to get user for loginname")
+		logging.Log("EVENT-Ml0sd").WithError(err).Debug("unable to get user for loginname")
 	} else {
 		accountName = user.PreferredLoginName
 	}
@@ -298,8 +310,8 @@ func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, li
 		return nil, err
 	}
 	for _, change := range changes.Changes {
-		change.ModifierName = change.ModifierId
-		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		change.ModifierName = change.ModifierID
+		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierID)
 		if user != nil {
 			change.ModifierName = user.DisplayName
 		}

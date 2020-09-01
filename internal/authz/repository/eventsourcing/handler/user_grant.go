@@ -76,7 +76,6 @@ func (u *UserGrant) processProject(event *models.Event) (err error) {
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
 	}
-	return nil
 }
 
 func (u *UserGrant) processOrg(event *models.Event) (err error) {
@@ -88,7 +87,6 @@ func (u *UserGrant) processOrg(event *models.Event) (err error) {
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
 	}
-	return nil
 }
 
 func (u *UserGrant) processIamMember(event *models.Event, rolePrefix string, suffix bool) error {
@@ -194,13 +192,13 @@ func suffixRoles(suffix string, roles []string) []string {
 
 func mergeExistingRoles(rolePrefix, suffix string, existingRoles, newRoles []string) []string {
 	mergedRoles := make([]string, 0)
-	for _, existing := range existingRoles {
-		if !strings.HasPrefix(existing, rolePrefix) {
-			mergedRoles = append(mergedRoles, existing)
+	for _, existingRole := range existingRoles {
+		if !strings.HasPrefix(existingRole, rolePrefix) {
+			mergedRoles = append(mergedRoles, existingRole)
 			continue
 		}
-		if suffix != "" && !strings.HasSuffix(existing, suffix) {
-			mergedRoles = append(mergedRoles, existing)
+		if suffix != "" && !strings.HasSuffix(existingRole, suffix) {
+			mergedRoles = append(mergedRoles, existingRole)
 		}
 	}
 	return append(mergedRoles, newRoles...)

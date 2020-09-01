@@ -10,9 +10,7 @@ import (
 )
 
 const (
-	LoginHandler   = "/login"
-	ConsoleHandler = "/console"
-	uiname         = "ui"
+	uiname = "ui"
 )
 
 type Config struct {

@@ -55,7 +55,10 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 	user := new(view_model.UserView)
 	switch event.Type {
 	case es_model.UserAdded,
-		es_model.UserRegistered:
+		es_model.UserRegistered,
+		es_model.HumanRegistered,
+		es_model.MachineAdded,
+		es_model.HumanAdded:
 		err = user.AppendEvent(event)
 		if err != nil {
 			return err
@@ -72,9 +75,20 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 		es_model.UserReactivated,
 		es_model.UserLocked,
 		es_model.UserUnlocked,
-		es_model.MfaOtpAdded,
-		es_model.MfaOtpVerified,
-		es_model.MfaOtpRemoved:
+		es_model.MFAOTPAdded,
+		es_model.MFAOTPVerified,
+		es_model.MFAOTPRemoved,
+		es_model.HumanProfileChanged,
+		es_model.HumanEmailChanged,
+		es_model.HumanEmailVerified,
+		es_model.HumanPhoneChanged,
+		es_model.HumanPhoneVerified,
+		es_model.HumanPhoneRemoved,
+		es_model.HumanAddressChanged,
+		es_model.HumanMFAOTPAdded,
+		es_model.HumanMFAOTPVerified,
+		es_model.HumanMFAOTPRemoved,
+		es_model.MachineChanged:
 		user, err = u.view.UserByID(event.AggregateID)
 		if err != nil {
 			return err

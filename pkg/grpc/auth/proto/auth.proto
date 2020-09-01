@@ -54,7 +54,7 @@ service AuthService {
   // Authorization
   rpc GetMyUserSessions(google.protobuf.Empty) returns (UserSessionViews) {
     option (google.api.http) = {
-      get: "/me/usersessions"
+      get: "/users/me/sessions"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
@@ -241,6 +241,7 @@ service AuthService {
       permission: "authenticated"
     };
   }
+
   //Password
   rpc ChangeMyPassword(PasswordChange) returns (google.protobuf.Empty) {
     option (google.api.http) = {
@@ -266,7 +267,7 @@ service AuthService {
   // MFA
   rpc AddMfaOTP(google.protobuf.Empty) returns (MfaOtpResponse) {
     option (google.api.http) = {
-      post: "/users/me/mfa/otp"
+      post: "/users/me/mfas/otp"
       body: "*"
     };
     option (caos.zitadel.utils.v1.auth_option) = {
@@ -276,7 +277,7 @@ service AuthService {
 
   rpc VerifyMfaOTP(VerifyMfaOtp) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      put: "/users/me/mfa/otp/_verify"
+      put: "/users/me/mfas/otp/_verify"
       body: "*"
     };
 
@@ -287,7 +288,7 @@ service AuthService {
 
   rpc RemoveMfaOTP(google.protobuf.Empty) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/users/me/mfa/otp"
+      delete: "/users/me/mfas/otp"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
@@ -341,6 +342,7 @@ service AuthService {
 message UserSessionViews {
   repeated UserSessionView user_sessions = 1;
 }
+
 message UserSessionView {
   string id = 1;
   string agent_id = 2;
@@ -358,39 +360,64 @@ enum UserSessionState {
   USERSESSIONSTATE_TERMINATED = 2;
 }
 
-enum OIDCResponseType {
-  OIDCRESPONSETYPE_CODE = 0;
-  OIDCRESPONSETYPE_ID_TOKEN = 1;
-  OIDCRESPONSETYPE_ID_TOKEN_TOKEN = 2;
-}
-
 message UserView {
   string id = 1;
   UserState state = 2;
   google.protobuf.Timestamp creation_date = 3;
   google.protobuf.Timestamp change_date = 4;
-  google.protobuf.Timestamp last_login = 5;
-  google.protobuf.Timestamp password_changed = 6;
-  string user_name = 7;
-  string first_name = 8;
-  string last_name = 9;
-  string display_name = 10;
-  string nick_name = 11;
-  string preferred_language = 12;
-  Gender gender = 13;
-  string email = 14;
-  bool is_email_verified = 15;
-  string phone = 16;
-  bool is_phone_verified = 17;
-  string country = 18;
-  string locality = 19;
-  string postal_code = 20;
-  string region = 21;
-  string street_address = 22;
-  uint64 sequence = 23;
-  string resource_owner = 24;
-  repeated string login_names = 25;
-  string preferred_login_name = 26;
+  uint64 sequence = 5;
+  repeated string login_names = 6;
+  string preferred_login_name = 7;
+  google.protobuf.Timestamp last_login = 8;
+  string resource_owner = 9;
+  string user_name = 10;
+
+  oneof user {
+    option (validate.required) = true;
+
+    HumanView human = 11;
+    MachineView machine = 12;
+  }
+}
+
+message MachineView {
+  google.protobuf.Timestamp last_key_added = 1;
+
+  string name = 2;
+  string description = 3;
+}
+
+message MachineKeyView {
+  string id = 1;
+  MachineKeyType type = 2;
+  uint64 sequence = 3;
+
+  google.protobuf.Timestamp creation_date = 4;
+  google.protobuf.Timestamp expiration_date = 5;
+}
+
+enum MachineKeyType {
+  MACHINEKEY_UNSPECIFIED = 0;
+  MACHINEKEY_JSON = 1;
+}
+
+message HumanView {
+  google.protobuf.Timestamp password_changed = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string display_name = 4;
+  string nick_name = 5;
+  string preferred_language = 6;
+  Gender gender = 7;
+  string email = 8;
+  bool is_email_verified = 9;
+  string phone = 10;
+  bool is_phone_verified = 11;
+  string country = 12;
+  string locality = 13;
+  string postal_code = 14;
+  string region = 15;
+  string street_address = 16;
 }
 
 enum UserState {
@@ -412,44 +439,42 @@ enum Gender {
 
 message UserProfile {
   string id = 1;
-  string user_name = 2;
-  string first_name = 3;
-  string last_name = 4;
-  string nick_name = 5;
-  string display_name = 6;
-  string preferred_language = 7;
-  Gender gender = 8;
-  uint64 sequence = 9;
-  google.protobuf.Timestamp creation_date = 10;
-  google.protobuf.Timestamp change_date = 11;
+  string first_name = 2;
+  string last_name = 3;
+  string nick_name = 4;
+  string display_name = 5;
+  string preferred_language = 6;
+  Gender gender = 7;
+  uint64 sequence = 8;
+  google.protobuf.Timestamp creation_date = 9;
+  google.protobuf.Timestamp change_date = 10;
 }
 
 message UserProfileView {
   string id = 1;
-  string user_name = 2;
-  string first_name = 3;
-  string last_name = 4;
-  string nick_name = 5;
-  string display_name = 6;
-  string preferred_language = 7;
-  Gender gender = 8;
-  uint64 sequence = 9;
-  google.protobuf.Timestamp creation_date = 10;
-  google.protobuf.Timestamp change_date = 11;
-  repeated string login_names = 12;
-  string preferred_login_name = 13;
+  string first_name = 2;
+  string last_name = 3;
+  string nick_name = 4;
+  string display_name = 5;
+  string preferred_language = 6;
+  Gender gender = 7;
+  uint64 sequence = 8;
+  google.protobuf.Timestamp creation_date = 9;
+  google.protobuf.Timestamp change_date = 10;
+  repeated string login_names = 11;
+  string preferred_login_name = 12;
 }
 
 message UpdateUserProfileRequest {
   string first_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
   string last_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  string nick_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string nick_name = 3 [(validate.rules).string.max_len = 200];
   string preferred_language = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
   Gender gender = 5;
 }
 
 message ChangeUserNameRequest {
-  string user_name = 1 [(validate.rules).string = {max_len: 200}];
+  string user_name = 1 [(validate.rules).string.pattern = "^[^[:space:]]{1,200}$"];
 }
 
 message UserEmail {
@@ -472,11 +497,6 @@ message UserEmailView {
 
 message VerifyMyUserEmailRequest {
   string code = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-}
-
-message VerifyUserEmailRequest {
-  string id = 1;
-  string code = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message UpdateUserEmailRequest {
@@ -541,14 +561,6 @@ message UpdateUserAddressRequest {
   string street_address = 5 [(validate.rules).string = {max_len: 200}];
 }
 
-message PasswordID {
-  string id = 1;
-}
-
-message PasswordRequest {
-  string password = 1 [(validate.rules).string = {min_len: 1, max_len: 72}];
-}
-
 message PasswordChange {
   string old_password = 1 [(validate.rules).string = {min_len: 1, max_len: 72}];
   string new_password = 2 [(validate.rules).string = {min_len: 1, max_len: 72}];
@@ -561,7 +573,7 @@ enum MfaType {
 }
 
 message VerifyMfaOtp {
-  string code = 1;
+  string code = 1 [(validate.rules).string = {min_len: 1}];
 }
 
 message MultiFactors {
@@ -585,11 +597,6 @@ enum MFAState {
   MFASTATE_NOT_READY = 1;
   MFASTATE_READY = 2;
   MFASTATE_REMOVED = 3;
-}
-
-message OIDCClientAuth {
-  string client_id = 1;
-  string client_secret = 2;
 }
 
 message UserGrantSearchRequest {

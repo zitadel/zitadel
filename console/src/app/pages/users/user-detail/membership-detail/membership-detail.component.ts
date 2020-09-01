@@ -6,7 +6,7 @@ import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { User, UserMembershipSearchResponse, UserMembershipView, UserView } from 'src/app/proto/generated/management_pb';
+import { UserMembershipSearchResponse, UserMembershipView, UserView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -124,7 +124,7 @@ export class MembershipDetailComponent implements AfterViewInit {
     }
 
     public createIamMember(response: any): void {
-        const users: User.AsObject[] = response.users;
+        const users: UserView.AsObject[] = response.users;
         const roles: string[] = response.roles;
 
         if (users && users.length && roles && roles.length) {
@@ -139,7 +139,7 @@ export class MembershipDetailComponent implements AfterViewInit {
     }
 
     private createOrgMember(response: any): void {
-        const users: User.AsObject[] = response.users;
+        const users: UserView.AsObject[] = response.users;
         const roles: string[] = response.roles;
 
         if (users && users.length && roles && roles.length) {
@@ -154,7 +154,7 @@ export class MembershipDetailComponent implements AfterViewInit {
     }
 
     private createGrantedProjectMember(response: any): void {
-        const users: User.AsObject[] = response.users;
+        const users: UserView.AsObject[] = response.users;
         const roles: string[] = response.roles;
 
         if (users && users.length && roles && roles.length) {
@@ -174,7 +174,7 @@ export class MembershipDetailComponent implements AfterViewInit {
     }
 
     private createOwnedProjectMember(response: any): void {
-        const users: User.AsObject[] = response.users;
+        const users: UserView.AsObject[] = response.users;
         const roles: string[] = response.roles;
 
         if (users && users.length && roles && roles.length) {

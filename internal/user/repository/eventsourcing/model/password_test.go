@@ -2,30 +2,31 @@ package model
 
 import (
 	"encoding/json"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"testing"
 	"time"
+
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 )
 
 func TestAppendUserPasswordChangedEvent(t *testing.T) {
 	type args struct {
-		user  *User
+		user  *Human
 		pw    *Password
 		event *es_models.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *User
+		result *Human
 	}{
 		{
 			name: "append init user code event",
 			args: args{
-				user:  &User{},
+				user:  &Human{},
 				pw:    &Password{ChangeRequired: true},
 				event: &es_models.Event{},
 			},
-			result: &User{Password: &Password{ChangeRequired: true}},
+			result: &Human{Password: &Password{ChangeRequired: true}},
 		},
 	}
 	for _, tt := range tests {
@@ -44,23 +45,23 @@ func TestAppendUserPasswordChangedEvent(t *testing.T) {
 
 func TestAppendPasswordSetRequestedEvent(t *testing.T) {
 	type args struct {
-		user  *User
+		user  *Human
 		code  *PasswordCode
 		event *es_models.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *User
+		result *Human
 	}{
 		{
 			name: "append user phone code added event",
 			args: args{
-				user:  &User{Phone: &Phone{PhoneNumber: "PhoneNumber"}},
+				user:  &Human{Phone: &Phone{PhoneNumber: "PhoneNumber"}},
 				code:  &PasswordCode{Expiry: time.Hour * 1},
 				event: &es_models.Event{},
 			},
-			result: &User{PasswordCode: &PasswordCode{Expiry: time.Hour * 1}},
+			result: &Human{PasswordCode: &PasswordCode{Expiry: time.Hour * 1}},
 		},
 	}
 	for _, tt := range tests {

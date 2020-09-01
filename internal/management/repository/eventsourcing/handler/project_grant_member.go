@@ -87,7 +87,10 @@ func (p *ProjectGrantMember) processProjectGrantMember(event *models.Event) (err
 func (p *ProjectGrantMember) processUser(event *models.Event) (err error) {
 	switch event.Type {
 	case usr_es_model.UserProfileChanged,
-		usr_es_model.UserEmailChanged:
+		usr_es_model.UserEmailChanged,
+		usr_es_model.HumanProfileChanged,
+		usr_es_model.HumanEmailChanged,
+		usr_es_model.MachineChanged:
 		members, err := p.view.ProjectGrantMembersByUserID(event.AggregateID)
 		if err != nil {
 			return err
@@ -120,10 +123,15 @@ func (p *ProjectGrantMember) fillData(member *view_model.ProjectGrantMemberView)
 
 func (p *ProjectGrantMember) fillUserData(member *view_model.ProjectGrantMemberView, user *usr_model.User) {
 	member.UserName = user.UserName
-	member.FirstName = user.FirstName
-	member.LastName = user.LastName
-	member.Email = user.EmailAddress
-	member.DisplayName = user.DisplayName
+	if user.Human != nil {
+		member.FirstName = user.FirstName
+		member.LastName = user.LastName
+		member.DisplayName = user.FirstName + " " + user.LastName
+		member.Email = user.EmailAddress
+	}
+	if user.Machine != nil {
+		member.DisplayName = user.Machine.Name
+	}
 }
 
 func (p *ProjectGrantMember) OnError(event *models.Event, err error) error {

@@ -2,6 +2,8 @@ package model
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -9,7 +11,6 @@ import (
 	"github.com/caos/zitadel/internal/user/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	"github.com/lib/pq"
-	"time"
 )
 
 const (
@@ -112,7 +113,9 @@ func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
 	u.Sequence = event.Sequence
 	switch event.Type {
 	case es_model.UserAdded,
-		es_model.UserRegistered:
+		es_model.UserRegistered,
+		es_model.HumanRegistered,
+		es_model.HumanAdded:
 		u.CreationDate = event.CreationDate
 		u.setRootData(event)
 		err = u.setData(event)
@@ -120,20 +123,25 @@ func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
 			return err
 		}
 		err = u.setPasswordData(event)
-	case es_model.UserProfileChanged:
+	case es_model.UserProfileChanged,
+		es_model.UserEmailChanged,
+		es_model.UserPhoneChanged,
+		es_model.HumanProfileChanged,
+		es_model.HumanEmailChanged,
+		es_model.HumanPhoneChanged:
 		err = u.setData(event)
-	case es_model.UserEmailChanged:
-		err = u.setData(event)
-	case es_model.UserEmailVerified:
+	case es_model.UserEmailVerified,
+		es_model.HumanEmailVerified:
 		u.VerifiedEmail = u.LastEmail
-	case es_model.UserPhoneChanged:
-		err = u.setData(event)
-	case es_model.UserPhoneRemoved:
+	case es_model.UserPhoneRemoved,
+		es_model.HumanPhoneRemoved:
 		u.VerifiedPhone = ""
 		u.LastPhone = ""
-	case es_model.UserPhoneVerified:
+	case es_model.UserPhoneVerified,
+		es_model.HumanPhoneVerified:
 		u.VerifiedPhone = u.LastPhone
-	case es_model.UserPasswordChanged:
+	case es_model.UserPasswordChanged,
+		es_model.HumanPasswordChanged:
 		err = u.setPasswordData(event)
 	}
 	return err

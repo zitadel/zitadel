@@ -71,7 +71,17 @@ service ManagementService {
     };
   }
 
-  rpc GetUserByID(UserID) returns (UserView) {
+  rpc IsUserUnique(UniqueUserRequest) returns (UniqueUserResponse) {
+    option (google.api.http) = {
+      get: "/users/_isunique"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.read"
+    };
+  }
+
+rpc GetUserByID(UserID) returns (UserView) {
     option (google.api.http) = {
       get: "/users/{id}"
     };
@@ -104,17 +114,7 @@ service ManagementService {
     };
   }
 
-  rpc IsUserUnique(UniqueUserRequest) returns (UniqueUserResponse) {
-    option (google.api.http) = {
-      get: "/users/_isunique"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "user.read"
-    };
-  }
-
-  rpc CreateUser(CreateUserRequest) returns (User) {
+  rpc CreateUser(CreateUserRequest) returns (UserResponse) {
     option (google.api.http) = {
       post: "/users"
       body: "*"
@@ -125,7 +125,7 @@ service ManagementService {
     };
   }
 
-  rpc DeactivateUser(UserID) returns (User) {
+  rpc DeactivateUser(UserID) returns (UserResponse) {
     option (google.api.http) = {
       put: "/users/{id}/_deactivate"
       body: "*"
@@ -136,7 +136,7 @@ service ManagementService {
     };
   }
 
-  rpc ReactivateUser(UserID) returns (User) {
+  rpc ReactivateUser(UserID) returns (UserResponse) {
     option (google.api.http) = {
       put: "/users/{id}/_reactivate"
       body: "*"
@@ -147,7 +147,7 @@ service ManagementService {
     };
   }
 
-  rpc LockUser(UserID) returns (User) {
+  rpc LockUser(UserID) returns (UserResponse) {
     option (google.api.http) = {
       put: "/users/{id}/_lock"
       body: "*"
@@ -158,7 +158,7 @@ service ManagementService {
     };
   }
 
-  rpc UnlockUser(UserID) returns (User) {
+  rpc UnlockUser(UserID) returns (UserResponse) {
     option (google.api.http) = {
       put: "/users/{id}/_unlock"
       body: "*"
@@ -190,36 +190,45 @@ service ManagementService {
     };
   }
 
-  // ApplicationChanges returns the event stream of the application object
-  rpc ApplicationChanges(ChangeRequest) returns (Changes) {
+  rpc AddMachineKey(AddMachineKeyRequest) returns (AddMachineKeyResponse) {
     option (google.api.http) = {
-      get: "/projects/{id}/applications/{sec_id}/changes"
+      post: "/users/{user_id}/keys"
+      body: "*"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "project.app.read"
+      permission: "user.write"
     };
   }
 
-  // OrgChanges returns the event stream of the org object
-  rpc OrgChanges(ChangeRequest) returns (Changes) {
+  rpc DeleteMachineKey(MachineKeyIDRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      get: "/orgs/{id}/changes"
+      delete: "/users/{user_id}/keys/{key_id}"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "org.read"
+      permission: "user.write"
     };
   }
 
-  // ProjectChanges returns the event stream of the project object
-  rpc ProjectChanges(ChangeRequest) returns (Changes) {
+  rpc SearchMachineKeys(MachineKeySearchRequest) returns (MachineKeySearchResponse) {
     option (google.api.http) = {
-      get: "/projects/{id}/changes"
+      post: "/users/{user_id}/keys/_search"
+      body: "*"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "project.read"
+      permission: "user.read"
+    };
+  }
+
+  rpc GetMachineKey(MachineKeyIDRequest) returns (MachineKeyView) {
+    option (google.api.http) = {
+      get: "/users/{user_id}/keys/{key_id}"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.read"
     };
   }
 
@@ -341,6 +350,17 @@ service ManagementService {
   rpc UpdateUserAddress(UpdateUserAddressRequest) returns (UserAddress) {
     option (google.api.http) = {
       put: "/users/{id}/address"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.write"
+    };
+  }
+
+  rpc UpdateUserMachine(UpdateMachineRequest) returns (MachineResponse) {
+    option (google.api.http) = {
+      put: "/users/{id}/machine"
       body: "*"
     };
 
@@ -544,6 +564,17 @@ service ManagementService {
     };
   }
 
+  // OrgChanges returns the event stream of the org object
+  rpc OrgChanges(ChangeRequest) returns (Changes) {
+    option (google.api.http) = {
+      get: "/orgs/{id}/changes"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "org.read"
+    };
+  }
+
   rpc GetMyOrg(google.protobuf.Empty) returns (OrgView) {
     option (google.api.http) = {
       get: "/orgs/me"
@@ -714,6 +745,17 @@ service ManagementService {
     };
   }
 
+  // ProjectChanges returns the event stream of the project object
+  rpc ProjectChanges(ChangeRequest) returns (Changes) {
+    option (google.api.http) = {
+      get: "/projects/{id}/changes"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "project.read"
+    };
+  }
+
   rpc SearchProjects(ProjectSearchRequest) returns (ProjectSearchResponse) {
     option (google.api.http) = {
       post: "/projects/_search"
@@ -743,7 +785,7 @@ service ManagementService {
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "project.write"
+      permission: "project.create"
     };
   }
 
@@ -955,6 +997,17 @@ service ManagementService {
     option (caos.zitadel.utils.v1.auth_option) = {
       permission: "project.app.read"
       check_field_name: "ProjectId"
+    };
+  }
+
+  // ApplicationChanges returns the event stream of the application object
+  rpc ApplicationChanges(ChangeRequest) returns (Changes) {
+    option (google.api.http) = {
+      get: "/projects/{id}/applications/{sec_id}/changes"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "project.app.read"
     };
   }
 
@@ -1253,172 +1306,172 @@ service ManagementService {
       body: "*"
     };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.grant.delete"
-        };
-    }
+    option (caos.zitadel.utils.v1.auth_option) = {
+        permission: "user.grant.delete"
+    };
+  }
 
-    rpc IdpByID(IdpID) returns (IdpView) {
-        option (google.api.http) = {
-            get: "/orgs/me/idps/{id}"
-        };
+  rpc IdpByID(IdpID) returns (IdpView) {
+    option (google.api.http) = {
+        get: "/orgs/me/idps/{id}"
+    };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.idp.read"
-        };
-    }
+    option (caos.zitadel.utils.v1.auth_option) = {
+        permission: "org.idp.read"
+    };
+  }
 
-    rpc CreateOidcIdp(OidcIdpConfigCreate) returns (Idp) {
-        option (google.api.http) = {
-            post: "/orgs/me/idps/oidc"
-            body: "*"
-        };
+  rpc CreateOidcIdp(OidcIdpConfigCreate) returns (Idp) {
+    option (google.api.http) = {
+        post: "/orgs/me/idps/oidc"
+        body: "*"
+    };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.idp.write"
-        };
-    }
+    option (caos.zitadel.utils.v1.auth_option) = {
+        permission: "org.idp.write"
+    };
+  }
 
-    rpc UpdateIdpConfig(IdpUpdate) returns (Idp) {
-        option (google.api.http) = {
-            put: "/orgs/me/idps/{id}"
-            body: "*"
-        };
+  rpc UpdateIdpConfig(IdpUpdate) returns (Idp) {
+    option (google.api.http) = {
+        put: "/orgs/me/idps/{id}"
+        body: "*"
+    };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.idp.write"
-        };
-    }
+    option (caos.zitadel.utils.v1.auth_option) = {
+        permission: "org.idp.write"
+    };
+  }
 
-    rpc DeactivateIdpConfig(IdpID) returns (Idp) {
-        option (google.api.http) = {
-            put: "/orgs/me/idps/{id}/_deactivate"
-            body: "*"
-        };
+  rpc DeactivateIdpConfig(IdpID) returns (Idp) {
+    option (google.api.http) = {
+        put: "/orgs/me/idps/{id}/_deactivate"
+        body: "*"
+    };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.idp.write"
-        };
-    }
+    option (caos.zitadel.utils.v1.auth_option) = {
+        permission: "org.idp.write"
+    };
+  }
 
-    rpc ReactivateIdpConfig(IdpID) returns (Idp) {
-        option (google.api.http) = {
-            put: "/orgs/me/idps/{id}/_reactivate"
-            body: "*"
-        };
+  rpc ReactivateIdpConfig(IdpID) returns (Idp) {
+    option (google.api.http) = {
+        put: "/orgs/me/idps/{id}/_reactivate"
+        body: "*"
+    };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.idp.write"
-        };
-    }
+    option (caos.zitadel.utils.v1.auth_option) = {
+        permission: "org.idp.write"
+    };
+  }
 
-    rpc RemoveIdpConfig(IdpID) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-            delete: "/orgs/me/idps/{id}"
-        };
+  rpc RemoveIdpConfig(IdpID) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+        delete: "/orgs/me/idps/{id}"
+    };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.idp.write"
-        };
-    }
+    option (caos.zitadel.utils.v1.auth_option) = {
+        permission: "org.idp.write"
+    };
+  }
 
-    rpc UpdateOidcIdpConfig(OidcIdpConfigUpdate) returns (OidcIdpConfig) {
-        option (google.api.http) = {
-            put: "/orgs/me/idps/{idp_id}/oidcconfig"
-            body: "*"
-        };
+  rpc UpdateOidcIdpConfig(OidcIdpConfigUpdate) returns (OidcIdpConfig) {
+    option (google.api.http) = {
+        put: "/orgs/me/idps/{idp_id}/oidcconfig"
+        body: "*"
+    };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.idp.write"
-        };
-    }
+    option (caos.zitadel.utils.v1.auth_option) = {
+        permission: "org.idp.write"
+    };
+  }
 
-    rpc SearchIdps(IdpSearchRequest) returns (IdpSearchResponse) {
-        option (google.api.http) = {
-            post: "/orgs/me/idps/_search"
-            body: "*"
-        };
+  rpc SearchIdps(IdpSearchRequest) returns (IdpSearchResponse) {
+    option (google.api.http) = {
+        post: "/orgs/me/idps/_search"
+        body: "*"
+    };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.idp.read"
-        };
-    }
+    option (caos.zitadel.utils.v1.auth_option) = {
+        permission: "org.idp.read"
+    };
+  }
 
 
-    rpc GetLoginPolicy(google.protobuf.Empty) returns (LoginPolicyView) {
-        option (google.api.http) = {
-            get: "/orgs/me/policies/login"
-        };
+  rpc GetLoginPolicy(google.protobuf.Empty) returns (LoginPolicyView) {
+    option (google.api.http) = {
+      get: "/orgs/me/policies/login"
+    };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "policy.read"
-        };
-    }
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "policy.read"
+    };
+  }
 
-    rpc CreateLoginPolicy(LoginPolicyAdd) returns (LoginPolicy) {
-      option (google.api.http) = {
-              post: "/orgs/me/policies/login"
-              body: "*"
-          };
+  rpc CreateLoginPolicy(LoginPolicyAdd) returns (LoginPolicy) {
+    option (google.api.http) = {
+      post: "/orgs/me/policies/login"
+      body: "*"
+    };
 
-      option (caos.zitadel.utils.v1.auth_option) = {
-              permission: "policy.write"
-          };
-    }
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "policy.write"
+    };
+  }
 
-    rpc UpdateLoginPolicy(LoginPolicy) returns (LoginPolicy) {
-        option (google.api.http) = {
-            put: "/orgs/me/policies/login"
-            body: "*"
-        };
+  rpc UpdateLoginPolicy(LoginPolicy) returns (LoginPolicy) {
+    option (google.api.http) = {
+      put: "/orgs/me/policies/login"
+      body: "*"
+    };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "policy.write"
-        };
-    }
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "policy.write"
+    };
+  }
 
-    rpc RemoveLoginPolicy(google.protobuf.Empty) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-            delete: "/orgs/me/policies/login"
-        };
+  rpc RemoveLoginPolicy(google.protobuf.Empty) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/orgs/me/policies/login"
+    };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "policy.delete"
-        };
-    }
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "policy.delete"
+    };
+  }
 
-    rpc GetLoginPolicyIdpProviders(IdpProviderSearchRequest) returns (IdpProviderSearchResponse) {
-        option (google.api.http) = {
-            post: "/orgs/me/policies/login/idpproviders/_search"
-            body: "*"
-        };
+  rpc GetLoginPolicyIdpProviders(IdpProviderSearchRequest) returns (IdpProviderSearchResponse) {
+    option (google.api.http) = {
+      post: "/orgs/me/policies/login/idpproviders/_search"
+      body: "*"
+    };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "policy.read"
-        };
-    }
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "policy.read"
+    };
+  }
 
-    rpc AddIdpProviderToLoginPolicy(IdpProviderAdd) returns (IdpProvider) {
-        option (google.api.http) = {
-            post: "/orgs/me/policies/login/idpproviders"
-            body: "*"
-        };
+  rpc AddIdpProviderToLoginPolicy(IdpProviderAdd) returns (IdpProvider) {
+    option (google.api.http) = {
+      post: "/orgs/me/policies/login/idpproviders"
+      body: "*"
+    };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "policy.write"
-        };
-    }
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "policy.write"
+    };
+  }
 
-    rpc RemoveIdpProviderFromLoginPolicy(IdpProviderID) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-            post: "/orgs/me/policies/login/idpproviders/{idp_config_id}"
-            body: "*"
-        };
+  rpc RemoveIdpProviderFromLoginPolicy(IdpProviderID) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/orgs/me/policies/login/idpproviders/{idp_config_id}"
+      body: "*"
+    };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "policy.write"
-        };
-    }
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "policy.write"
+    };
+  }
 }
 
 message ZitadelDocs {
@@ -1457,24 +1510,24 @@ message Change {
 }
 
 message ApplicationID {
-  string id = 1;
-  string project_id = 2;
+  string id = 1 [(validate.rules).string.min_len = 1];
+  string project_id = 2 [(validate.rules).string.min_len = 1];
 }
 
 message ProjectID {
-  string id = 1;
+  string id = 1 [(validate.rules).string.min_len = 1];
 }
 
 message UserID {
-  string id = 1;
+  string id = 1 [(validate.rules).string.min_len = 1];
 }
 
 message LoginName {
-  string login_name = 1;
+  string login_name = 1 [(validate.rules).string.min_len = 1];
 }
 
 message UniqueUserRequest {
-  string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string user_name = 1 [(validate.rules).string.pattern = "^[^[:space:]]{1,200}$"];
   string email = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
@@ -1483,46 +1536,53 @@ message UniqueUserResponse {
 }
 
 message CreateUserRequest {
-  string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  string first_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  string last_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  string nick_name = 4 [(validate.rules).string = {max_len: 200}];
-  string preferred_language = 5[(validate.rules).string = {max_len: 200}];
-  Gender gender = 6;
-  string email = 7 [(validate.rules).string = {min_len: 1, max_len: 200, email: true}];
-  bool is_email_verified = 8;
-  string phone = 9 [(validate.rules).string = {max_len: 20}];
-  bool is_phone_verified = 10;
-  string country = 11 [(validate.rules).string = {max_len: 200}];
-  string locality = 12 [(validate.rules).string = {max_len: 200}];
-  string postal_code = 13 [(validate.rules).string = {max_len: 200}];
-  string region = 14 [(validate.rules).string = {max_len: 200}];
-  string street_address = 15 [(validate.rules).string = {max_len: 200}];
-  string password = 16 [(validate.rules).string = {max_len: 72}];
+  string user_name = 1 [(validate.rules).string.pattern = "^[^[:space:]]{1,200}$"];
+
+  oneof user {
+    option (validate.required) = true;
+
+    CreateHumanRequest human = 2;
+    CreateMachineRequest machine = 3;
+  }
 }
 
-message User {
+message CreateHumanRequest {
+  string first_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string last_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string nick_name = 3 [(validate.rules).string = {max_len: 200}];
+  string preferred_language = 4 [(validate.rules).string = {max_len: 200}];
+  Gender gender = 5;
+  string email = 6 [(validate.rules).string = {min_len: 1, max_len: 200, email: true}];
+  bool is_email_verified = 7;
+  string phone = 8 [(validate.rules).string = {max_len: 20}];
+  bool is_phone_verified = 9;
+  string country = 10 [(validate.rules).string = {max_len: 200}];
+  string locality = 11 [(validate.rules).string = {max_len: 200}];
+  string postal_code = 12 [(validate.rules).string = {max_len: 200}];
+  string region = 13 [(validate.rules).string = {max_len: 200}];
+  string street_address = 14 [(validate.rules).string = {max_len: 200}];
+  string password = 15 [(validate.rules).string = {max_len: 72}];
+}
+
+message CreateMachineRequest {
+  string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string description = 2 [(validate.rules).string.max_len = 500];
+}
+
+message UserResponse {
   string id = 1;
   UserState state = 2;
   google.protobuf.Timestamp creation_date = 3;
   google.protobuf.Timestamp change_date = 4;
-  string user_name = 5;
-  string first_name = 6;
-  string last_name = 7;
-  string display_name = 8;
-  string nick_name = 9;
-  string preferred_language = 10;
-  Gender gender = 11;
-  string email = 12;
-  bool is_email_verified = 13;
-  string phone = 14;
-  bool is_phone_verified = 15;
-  string country = 16;
-  string locality = 17;
-  string postal_code = 18;
-  string region = 19;
-  string street_address = 20;
-  uint64 sequence = 21;
+  uint64 sequence = 5;
+  string user_name = 6;
+
+  oneof user {
+    option (validate.required) = true;
+
+    HumanResponse human = 7;
+    MachineResponse machine = 8;
+  }
 }
 
 enum UserState {
@@ -1547,40 +1607,135 @@ message UserView {
   UserState state = 2;
   google.protobuf.Timestamp creation_date = 3;
   google.protobuf.Timestamp change_date = 4;
-  google.protobuf.Timestamp last_login = 5;
-  google.protobuf.Timestamp password_changed = 6;
-  string user_name = 7;
-  string first_name = 8;
-  string last_name = 9;
-  string display_name = 10;
-  string nick_name = 11;
-  string preferred_language = 12;
-  Gender gender = 13;
-  string email = 14;
-  bool is_email_verified = 15;
-  string phone = 16;
-  bool is_phone_verified = 17;
-  string country = 18;
-  string locality = 19;
-  string postal_code = 20;
-  string region = 21;
-  string street_address = 22;
-  uint64 sequence = 23;
-  string resource_owner = 24;
-  repeated string login_names = 25;
-  string preferred_login_name = 26;
+  uint64 sequence = 5;
+  repeated string login_names = 6;
+  string preferred_login_name = 7;
+  google.protobuf.Timestamp last_login = 8;
+  string resource_owner = 9;
+  string user_name = 10;
+
+  oneof user {
+    option (validate.required) = true;
+
+    HumanView human = 11;
+    MachineView machine = 12;
+  }
+}
+
+message HumanResponse {
+  string first_name = 1;
+  string last_name = 2;
+  string display_name = 3;
+  string nick_name = 4;
+  string preferred_language = 5;
+  Gender gender = 6;
+  string email = 7;
+  bool is_email_verified = 8;
+  string phone = 9;
+  bool is_phone_verified = 10;
+  string country = 11;
+  string locality = 12;
+  string postal_code = 13;
+  string region = 14;
+  string street_address = 15;
+}
+
+message HumanView {
+  google.protobuf.Timestamp password_changed = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string display_name = 4;
+  string nick_name = 5;
+  string preferred_language = 6;
+  Gender gender = 7;
+  string email = 8;
+  bool is_email_verified = 9;
+  string phone = 10;
+  bool is_phone_verified = 11;
+  string country = 12;
+  string locality = 13;
+  string postal_code = 14;
+  string region = 15;
+  string street_address = 16;
+}
+
+message MachineResponse {
+  string name = 1;
+  string description = 2;
+}
+
+message MachineView {
+  google.protobuf.Timestamp last_key_added = 1;
+  string name = 2;
+  string description = 3;
+}
+
+message UpdateMachineRequest {
+  string id = 1 [(validate.rules).string.min_len = 1];
+  string description = 2 [(validate.rules).string.max_len = 500];
+}
+
+message AddMachineKeyRequest {
+  string user_id = 1 [(validate.rules).string.min_len = 1];
+  MachineKeyType type = 2 [(validate.rules).enum = {not_in: [0]}];
+  google.protobuf.Timestamp expiration_date = 3;
+}
+
+message AddMachineKeyResponse {
+  string id = 1;
+  google.protobuf.Timestamp creation_date = 2;
+  uint64 sequence = 3;
+
+  MachineKeyType type = 4;
+  google.protobuf.Timestamp expiration_date = 5;
+  bytes key_details = 6;
+}
+
+message MachineKeyIDRequest {
+  string user_id = 1 [(validate.rules).string.min_len = 1];
+  string key_id = 2 [(validate.rules).string.min_len = 1];
+}
+
+message MachineKeyView {
+  string id = 1;
+  MachineKeyType type = 2;
+  uint64 sequence = 3;
+
+  google.protobuf.Timestamp creation_date = 4;
+  google.protobuf.Timestamp expiration_date = 5;
+}
+
+enum MachineKeyType {
+  MACHINEKEY_UNSPECIFIED = 0;
+  MACHINEKEY_JSON = 1;
+}
+
+message MachineKeySearchRequest {
+  uint64 offset = 1;
+  uint64 limit = 2;
+  bool asc = 3;
+  string user_id = 4 [(validate.rules).string.min_len = 1];
+}
+
+message MachineKeySearchResponse {
+  uint64 offset = 1;
+  uint64 limit = 2;
+  uint64 total_result = 3;
+  repeated MachineKeyView result = 4;
+  uint64 processed_sequence = 5;
+  google.protobuf.Timestamp view_timestamp = 6;
 }
 
 message UserSearchRequest {
   uint64 offset = 1;
   uint64 limit = 2;
-  UserSearchKey sorting_column = 3 [(validate.rules).enum = {not_in: [0]}];;
+  UserSearchKey sorting_column = 3;
   bool asc = 4;
   repeated UserSearchQuery queries = 5;
 }
 
 message UserSearchQuery {
-  UserSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];;
+  UserSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
   SearchMethod method = 2;
   string value = 3;
 }
@@ -1594,6 +1749,7 @@ enum UserSearchKey {
   USERSEARCHKEY_DISPLAY_NAME = 5;
   USERSEARCHKEY_EMAIL = 6;
   USERSEARCHKEY_STATE = 7;
+  USERSEARCHKEY_TYPE = 8;
 }
 
 message UserSearchResponse {
@@ -1627,10 +1783,9 @@ message UserProfile {
   string display_name = 5;
   string preferred_language = 6;
   Gender gender = 7;
-  string user_name = 8;
-  uint64 sequence = 9;
-  google.protobuf.Timestamp creation_date = 10;
-  google.protobuf.Timestamp change_date = 11;
+  uint64 sequence = 8;
+  google.protobuf.Timestamp creation_date = 9;
+  google.protobuf.Timestamp change_date = 10;
 }
 
 message UserProfileView {
@@ -1641,12 +1796,11 @@ message UserProfileView {
   string display_name = 5;
   string preferred_language = 6;
   Gender gender = 7;
-  string user_name = 8;
-  uint64 sequence = 9;
-  google.protobuf.Timestamp creation_date = 10;
-  google.protobuf.Timestamp change_date = 11;
-  repeated string login_names = 12;
-  string preferred_login_name = 27;
+  uint64 sequence = 8;
+  google.protobuf.Timestamp creation_date = 9;
+  google.protobuf.Timestamp change_date = 10;
+  repeated string login_names = 11;
+  string preferred_login_name = 12;
 }
 
 message UpdateUserProfileRequest {
@@ -1660,7 +1814,7 @@ message UpdateUserProfileRequest {
 
 message UpdateUserUserNameRequest {
   string id = 1;
-  string user_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string user_name = 2 [(validate.rules).string.pattern = "^[^[:space:]]{1,200}$"];
 }
 
 message UserEmail {
@@ -1706,7 +1860,7 @@ message UserPhoneView {
 }
 
 message UpdateUserPhoneRequest {
-  string id = 1;
+  string id = 1 [(validate.rules).string.min_len = 1];
   string phone = 2 [(validate.rules).string = {min_len: 1, max_len: 20}];
   bool is_phone_verified = 3;
 }
@@ -1723,7 +1877,7 @@ message UserAddress {
   google.protobuf.Timestamp change_date = 9;
 }
 
-message UserAddressView {
+message UserAddressView { 
   string id = 1;
   string country = 2;
   string locality = 3;
@@ -1736,7 +1890,7 @@ message UserAddressView {
 }
 
 message UpdateUserAddressRequest {
-  string id = 1;
+  string id = 1 [(validate.rules).string.min_len = 1];
   string country = 2 [(validate.rules).string = {max_len: 200}];
   string locality = 3 [(validate.rules).string = {max_len: 200}];
   string postal_code = 4 [(validate.rules).string = {max_len: 200}];
@@ -1766,21 +1920,13 @@ enum MFAState {
   MFASTATE_REMOVED = 3;
 }
 
-message PasswordID{
-  string id = 1;
-}
-
 message PasswordRequest {
-  string id = 1;
+  string id = 1 [(validate.rules).string.min_len = 1];
   string password = 2 [(validate.rules).string = {min_len: 1, max_len: 72}];
 }
 
-message ResetPasswordRequest {
-  string id = 1;
-}
-
 message SetPasswordNotificationRequest {
-  string id = 1;
+  string id = 1 [(validate.rules).string.min_len = 1];
   NotificationType type = 2;
 }
 
@@ -1789,7 +1935,7 @@ enum NotificationType {
   NOTIFICATIONTYPE_SMS = 1;
 }
 
-message PasswordComplexityPolicyID {
+message PasswordComplexityPolicyID { //TODO: why do we need this?
   string id = 1;
 }
 
@@ -1818,7 +1964,7 @@ message PasswordComplexityPolicyCreate {
 }
 
 message PasswordComplexityPolicyUpdate {
-  string id = 1;
+  string id = 1; //TODO: do we need id?
   string description = 2 [(validate.rules).string = {max_len: 500}];
   uint64 min_length = 3;
   bool has_lowercase = 4;
@@ -1827,12 +1973,12 @@ message PasswordComplexityPolicyUpdate {
   bool has_symbol = 7;
 }
 
-message PasswordAgePolicyID {
+message PasswordAgePolicyID { //TODO: why do we need this?
   string id = 1;
 }
 
 message PasswordAgePolicy {
-  string id = 1;
+  string id = 1; //TODO: do we need id?
   string description = 2;
   PolicyState state = 3;
   google.protobuf.Timestamp creation_date = 4;
@@ -1850,18 +1996,18 @@ message PasswordAgePolicyCreate {
 }
 
 message PasswordAgePolicyUpdate {
-  string id = 1;
+  string id = 1; //TODO: do we need id?
   string description = 2 [(validate.rules).string = {max_len: 500}];
   uint64 max_age_days = 3;
   uint64 expire_warn_days = 4;
 }
 
 message PasswordLockoutPolicyID {
-  string id = 1;
+  string id = 1; //TODO: why do we need this?
 }
 
 message PasswordLockoutPolicy {
-  string id = 1;
+  string id = 1; //TODO: why do we need this?
   string description = 2;
   PolicyState state = 3;
   google.protobuf.Timestamp creation_date = 4;
@@ -1869,8 +2015,7 @@ message PasswordLockoutPolicy {
   uint64 max_attempts = 6;
   bool show_lock_out_failures = 7;
   uint64 sequence = 8;
-  bool is_default = 9
-  ;
+  bool is_default = 9;
 }
 
 message PasswordLockoutPolicyCreate {
@@ -1880,7 +2025,7 @@ message PasswordLockoutPolicyCreate {
 }
 
 message PasswordLockoutPolicyUpdate {
-  string id = 1;
+  string id = 1; //TODO: do we need id?
   string description = 2 [(validate.rules).string = {max_len: 500}];
   uint64 max_attempts = 3;
   bool show_lock_out_failures = 4;
@@ -1894,18 +2039,14 @@ enum PolicyState {
 }
 
 message OrgIamPolicy {
-  string org_id = 1;
+  string org_id = 1; //TODO: do we need id?
   string description = 2;
   bool user_login_must_be_domain = 3;
   bool default = 4;
 }
 
-message OrgID {
-  string id = 1;
-}
-
 message OrgCreateRequest {
-  string name = 1;
+  string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message Org {
@@ -1933,11 +2074,7 @@ enum OrgState {
 }
 
 message Domain {
-  string domain = 1;
-}
-
-message OrgDomains {
-  repeated OrgDomain domains = 1;
+  string domain = 1 [(validate.rules).string = {min_len: 1}];
 }
 
 message OrgDomain {
@@ -1986,11 +2123,11 @@ message ValidateOrgDomainRequest {
 }
 
 message PrimaryOrgDomainRequest {
-  string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string domain = 1 [(validate.rules).string = {min_len: 1}];
 }
 
 message RemoveOrgDomainRequest {
-  string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string domain = 1 [(validate.rules).string = {min_len: 1}];
 }
 
 message OrgDomainSearchResponse {
@@ -2032,17 +2169,17 @@ message OrgMember {
 }
 
 message AddOrgMemberRequest {
-  string user_id = 1;
+  string user_id = 1 [(validate.rules).string = {min_len: 1}];
   repeated string roles = 2;
 }
 
 message ChangeOrgMemberRequest {
-  string user_id = 1;
+  string user_id = 1 [(validate.rules).string = {min_len: 1}];
   repeated string roles = 2;
 }
 
 message RemoveOrgMemberRequest {
-  string user_id = 1;
+  string user_id = 1 [(validate.rules).string = {min_len: 1}];
 }
 
 message OrgMemberSearchResponse {
@@ -2092,7 +2229,7 @@ message ProjectCreateRequest {
 }
 
 message ProjectUpdateRequest {
-  string id = 1;
+  string id = 1 [(validate.rules).string = {min_len: 1}];
   string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
@@ -2114,7 +2251,6 @@ message ProjectView {
   string resource_owner = 6;
   uint64 sequence = 7;
 }
-
 
 message ProjectSearchRequest {
   uint64 offset = 1;
@@ -2152,12 +2288,6 @@ enum ProjectState {
   PROJECTSTATE_INACTIVE = 2;
 }
 
-enum ProjectType {
-  PROJECTTYPE_UNSPECIFIED = 0;
-  PROJECTTYPE_OWNED = 1;
-  PROJECTTYPE_GRANTED = 2;
-}
-
 message ProjectMemberRoles {
   repeated string roles = 1;
 }
@@ -2171,37 +2301,37 @@ message ProjectMember {
 }
 
 message ProjectMemberAdd {
-  string id = 1;
-  string user_id = 2;
+  string id = 1 [(validate.rules).string = {min_len: 1}];
+  string user_id = 2 [(validate.rules).string = {min_len: 1}];
   repeated string roles = 3;
 }
 
 message ProjectMemberChange {
-  string id = 1;
-  string user_id = 2;
+  string id = 1 [(validate.rules).string = {min_len: 1}];
+  string user_id = 2 [(validate.rules).string = {min_len: 1}];
   repeated string roles = 3;
 }
 
 message ProjectMemberRemove {
-  string id = 1;
-  string user_id = 2;
+  string id = 1 [(validate.rules).string = {min_len: 1}];
+  string user_id = 2 [(validate.rules).string = {min_len: 1}];
 }
 
 message ProjectRoleAdd {
-  string id = 1;
+  string id = 1 [(validate.rules).string = {min_len: 1}];
   string key = 2;
   string display_name = 3;
   string group = 4;
 }
 
 message ProjectRoleAddBulk {
-  string id = 1;
+  string id = 1 [(validate.rules).string = {min_len: 1}];
   repeated ProjectRoleAdd project_roles = 2;
 }
 
 message ProjectRoleChange {
-  string id = 1;
-  string key = 2;
+  string id = 1 [(validate.rules).string = {min_len: 1}];
+  string key = 2 [(validate.rules).string = {min_len: 1}];
   string display_name = 3;
   string group = 4;
 }
@@ -2226,8 +2356,8 @@ message ProjectRoleView {
 }
 
 message ProjectRoleRemove {
-  string id = 1;
-  string key = 2;
+  string id = 1 [(validate.rules).string = {min_len: 1}];
+  string key = 2 [(validate.rules).string = {min_len: 1}];
 }
 
 message ProjectRoleSearchResponse {
@@ -2240,7 +2370,7 @@ message ProjectRoleSearchResponse {
 }
 
 message ProjectRoleSearchRequest {
-  string project_id = 1;
+  string project_id = 1 [(validate.rules).string = {min_len: 1}];
   uint64 offset = 2;
   uint64 limit = 3;
   repeated ProjectRoleSearchQuery queries = 4;
@@ -2281,7 +2411,7 @@ message ProjectMemberSearchResponse {
 }
 
 message ProjectMemberSearchRequest {
-  string project_id = 1;
+  string project_id = 1 [(validate.rules).string = {min_len: 1}];
   uint64 offset = 2;
   uint64 limit = 3;
   repeated ProjectMemberSearchQuery queries = 4;
@@ -2321,8 +2451,8 @@ message Application {
 }
 
 message ApplicationUpdate {
-  string project_id = 1;
-  string id = 2;
+  string project_id = 1 [(validate.rules).string = {min_len: 1}];
+  string id = 2 [(validate.rules).string = {min_len: 1}];
   string name = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
@@ -2342,7 +2472,7 @@ message OIDCConfig {
 }
 
 message OIDCApplicationCreate {
-  string project_id = 1;
+  string project_id = 1 [(validate.rules).string = {min_len: 1}];
   string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
   repeated string redirect_uris = 3;
   repeated OIDCResponseType response_types = 4;
@@ -2359,8 +2489,8 @@ enum OIDCVersion {
 }
 
 message OIDCConfigUpdate {
-  string project_id = 1;
-  string application_id = 2;
+  string project_id = 1 [(validate.rules).string = {min_len: 1}];
+  string application_id = 2 [(validate.rules).string = {min_len: 1}];
   repeated string redirect_uris = 3;
   repeated OIDCResponseType response_types = 4;
   repeated OIDCGrantType grant_types = 5;
@@ -2407,6 +2537,7 @@ message ApplicationView {
   oneof app_config {
     OIDCConfig oidc_config = 8;
   }
+
   uint64 sequence = 9;
 }
 
@@ -2420,7 +2551,7 @@ message ApplicationSearchResponse {
 }
 
 message ApplicationSearchRequest {
-  string project_id = 1;
+  string project_id = 1 [(validate.rules).string = {min_len: 1}];
   uint64 offset = 2;
   uint64 limit = 3;
   repeated ApplicationSearchQuery queries = 4;
@@ -2449,20 +2580,20 @@ message ProjectGrant {
 }
 
 message ProjectGrantCreate {
-  string project_id = 1;
-  string granted_org_id = 2;
+  string project_id = 1 [(validate.rules).string = {min_len: 1}];
+  string granted_org_id = 2 [(validate.rules).string = {min_len: 1}];
   repeated string role_keys = 3;
 }
 
 message ProjectGrantUpdate {
-  string project_id = 1;
-  string id = 2;
+  string project_id = 1 [(validate.rules).string = {min_len: 1}];
+  string id = 2 [(validate.rules).string = {min_len: 1}];
   repeated string role_keys = 3;
 }
 
 message ProjectGrantID {
-  string project_id = 1;
-  string id = 2;
+  string project_id = 1 [(validate.rules).string = {min_len: 1}];
+  string id = 2 [(validate.rules).string = {min_len: 1}];
 }
 
 enum ProjectGrantState {
@@ -2502,7 +2633,7 @@ message GrantedProjectSearchRequest {
 }
 
 message ProjectGrantSearchRequest {
-  string project_id = 1;
+  string project_id = 1 [(validate.rules).string = {min_len: 1}];
   uint64 offset = 2;
   uint64 limit = 3;
   repeated ProjectGrantSearchQuery queries = 4;
@@ -2520,7 +2651,6 @@ enum ProjectGrantSearchKey {
   PROJECTGRANTSEARCHKEY_ROLE_KEY = 2;
 }
 
-
 message ProjectGrantMemberRoles {
   repeated string roles = 1;
 }
@@ -2534,23 +2664,23 @@ message ProjectGrantMember {
 }
 
 message ProjectGrantMemberAdd {
-  string project_id = 1;
-  string grant_id = 2;
-  string user_id = 3;
+  string project_id = 1 [(validate.rules).string = {min_len: 1}];
+  string grant_id = 2 [(validate.rules).string = {min_len: 1}];
+  string user_id = 3 [(validate.rules).string = {min_len: 1}];
   repeated string roles = 4;
 }
 
 message ProjectGrantMemberChange {
-  string project_id = 1;
-  string grant_id = 2;
-  string user_id = 3;
+  string project_id = 1 [(validate.rules).string = {min_len: 1}];
+  string grant_id = 2 [(validate.rules).string = {min_len: 1}];
+  string user_id = 3 [(validate.rules).string = {min_len: 1}];
   repeated string roles = 4;
 }
 
 message ProjectGrantMemberRemove {
-  string project_id = 1;
-  string grant_id = 2;
-  string user_id = 3;
+  string project_id = 1 [(validate.rules).string = {min_len: 1}];
+  string grant_id = 2 [(validate.rules).string = {min_len: 1}];
+  string user_id = 3 [(validate.rules).string = {min_len: 1}];
 }
 
 message ProjectGrantMemberView {
@@ -2576,8 +2706,8 @@ message ProjectGrantMemberSearchResponse {
 }
 
 message ProjectGrantMemberSearchRequest {
-  string project_id = 1;
-  string grant_id = 2;
+  string project_id = 1 [(validate.rules).string = {min_len: 1}];
+  string grant_id = 2 [(validate.rules).string = {min_len: 1}];
   uint64 offset = 3;
   uint64 limit = 4;
   repeated ProjectGrantMemberSearchQuery queries = 5;
@@ -2611,34 +2741,26 @@ message UserGrant {
   string grant_id = 10;
 }
 
-message UserGrantCreateBulk {
-  repeated UserGrantCreate user_grants = 1;
-}
-
 message UserGrantCreate {
-  string user_id = 1;
-  string project_id = 2;
+  string user_id = 1 [(validate.rules).string = {min_len: 1}];
+  string project_id = 2 [(validate.rules).string = {min_len: 1}];
   repeated string role_keys = 3;
   string grant_id = 4;
 }
 
-message UserGrantUpdateBulk {
-  repeated UserGrantUpdate user_grants = 1;
-}
-
 message UserGrantUpdate {
-  string user_id = 1;
-  string id = 2;
+  string user_id = 1 [(validate.rules).string = {min_len: 1}];
+  string id = 2 [(validate.rules).string = {min_len: 1}];
   repeated string role_keys = 3;
 }
 
 message UserGrantRemoveBulk {
-  repeated string ids = 1;
+  repeated string ids = 1 [(validate.rules).repeated.min_items = 1];
 }
 
 message UserGrantID {
-  string user_id = 1;
-  string id = 2;
+  string user_id = 1 [(validate.rules).string = {min_len: 1}];
+  string id = 2 [(validate.rules).string = {min_len: 1}];
 }
 
 enum UserGrantState {
@@ -2684,6 +2806,7 @@ message UserGrantSearchRequest {
   uint64 limit = 2;
   repeated UserGrantSearchQuery queries = 3;
 }
+
 message UserGrantSearchQuery {
   UserGrantSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
   SearchMethod method = 2 [(validate.rules).enum = {in: [0]}];
@@ -2699,20 +2822,6 @@ enum UserGrantSearchKey {
   USERGRANTSEARCHKEY_GRANT_ID = 5;
 }
 
-message ProjectUserGrantSearchRequest {
-  string project_id = 1;
-  uint64 offset = 2;
-  uint64 limit = 3;
-  repeated UserGrantSearchQuery queries = 4;
-}
-
-message ProjectGrantUserGrantSearchRequest {
-  string project_grant_id = 1;
-  uint64 offset = 2;
-  uint64 limit = 3;
-  repeated UserGrantSearchQuery queries = 4;
-}
-
 message UserMembershipSearchResponse {
   uint64 offset = 1;
   uint64 limit = 2;
@@ -2723,7 +2832,7 @@ message UserMembershipSearchResponse {
 }
 
 message UserMembershipSearchRequest {
-  string user_id = 1;
+  string user_id = 1 [(validate.rules).string = {min_len: 1}];
   uint64 offset = 2;
   uint64 limit = 3;
   repeated UserMembershipSearchQuery queries = 4;
@@ -2761,9 +2870,8 @@ enum MemberType {
   MEMBERTYPE_PROJECT_GRANT = 3;
 }
 
-
 message IdpID {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1}];
 }
 
 message Idp {
@@ -2780,8 +2888,8 @@ message Idp {
 }
 
 message IdpUpdate {
-    string id = 1;
-    string name = 2;
+    string id = 1 [(validate.rules).string = {min_len: 1}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     bytes logo_src = 3;
 }
 
@@ -2791,6 +2899,7 @@ message OidcIdpConfig {
     string issuer = 3;
     repeated string scopes = 4;
 }
+
 enum IdpState {
     IDPCONFIGSTATE_UNSPECIFIED = 0;
     IDPCONFIGSTATE_ACTIVE = 1;
@@ -2807,7 +2916,7 @@ message OidcIdpConfigCreate {
 }
 
 message OidcIdpConfigUpdate {
-    string idp_id = 1;
+    string idp_id = 1 [(validate.rules).string = {min_len: 1}];
     string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_secret = 3;
     string issuer = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -2875,12 +2984,12 @@ message LoginPolicyAdd {
 }
 
 message IdpProviderID {
-    string idp_config_id = 1;
+    string idp_config_id = 1 [(validate.rules).string = {min_len: 1}];
 }
 
 message IdpProviderAdd {
   string idp_config_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  IdpProviderType idp_provider_type = 2;
+  IdpProviderType idp_provider_type = 2 [(validate.rules).enum = {not_in: [0]}];
 }
 
 message IdpProvider {
@@ -2893,10 +3002,6 @@ message LoginPolicyView {
     bool allow_username_password = 2;
     bool allow_register = 3;
     bool allow_external_idp = 4;
-}
-
-message IdpProviderViews {
-    repeated IdpProviderView providers = 1;
 }
 
 message IdpProviderView {
@@ -2929,4 +3034,11 @@ message IdpProviderSearchResponse {
 message IdpProviderSearchRequest {
     uint64 offset = 1;
     uint64 limit = 2;
+}
+
+//ProjectType is deprecated, remove as soon as console is ready 
+enum ProjectType {
+  PROJECTTYPE_UNSPECIFIED = 0;
+  PROJECTTYPE_OWNED = 1;
+  PROJECTTYPE_GRANTED = 2;
 }

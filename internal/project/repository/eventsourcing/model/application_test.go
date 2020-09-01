@@ -2,15 +2,16 @@ package model
 
 import (
 	"encoding/json"
+	"testing"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
-	"testing"
 )
 
 func TestApplicationChanges(t *testing.T) {
 	type args struct {
-		existing *Application
-		new      *Application
+		existingProject *Application
+		newProject      *Application
 	}
 	type res struct {
 		changesLen int
@@ -23,8 +24,8 @@ func TestApplicationChanges(t *testing.T) {
 		{
 			name: "application name changes",
 			args: args{
-				existing: &Application{AppID: "AppID", Name: "Name"},
-				new:      &Application{AppID: "AppID", Name: "NameChanged"},
+				existingProject: &Application{AppID: "AppID", Name: "Name"},
+				newProject:      &Application{AppID: "AppID", Name: "NameChanged"},
 			},
 			res: res{
 				changesLen: 2,
@@ -33,8 +34,8 @@ func TestApplicationChanges(t *testing.T) {
 		{
 			name: "no changes",
 			args: args{
-				existing: &Application{AppID: "AppID", Name: "Name"},
-				new:      &Application{AppID: "AppID", Name: "Name"},
+				existingProject: &Application{AppID: "AppID", Name: "Name"},
+				newProject:      &Application{AppID: "AppID", Name: "Name"},
 			},
 			res: res{
 				changesLen: 1,
@@ -43,7 +44,7 @@ func TestApplicationChanges(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			changes := tt.args.existing.Changes(tt.args.new)
+			changes := tt.args.existingProject.Changes(tt.args.newProject)
 			if len(changes) != tt.res.changesLen {
 				t.Errorf("got wrong changes len: expected: %v, actual: %v ", tt.res.changesLen, len(changes))
 			}
@@ -69,7 +70,11 @@ func TestAppendAddAppEvent(t *testing.T) {
 				app:     &Application{Name: "Application"},
 				event:   &es_models.Event{},
 			},
-			result: &Project{Applications: []*Application{&Application{Name: "Application"}}},
+			result: &Project{
+				Applications: []*Application{
+					{Name: "Application"},
+				},
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -103,11 +108,19 @@ func TestAppendChangeAppEvent(t *testing.T) {
 		{
 			name: "append change application event",
 			args: args{
-				project: &Project{Applications: []*Application{&Application{Name: "Application"}}},
-				app:     &Application{Name: "Application Change"},
-				event:   &es_models.Event{},
+				project: &Project{
+					Applications: []*Application{
+						{Name: "Application"},
+					},
+				},
+				app:   &Application{Name: "Application Change"},
+				event: &es_models.Event{},
 			},
-			result: &Project{Applications: []*Application{&Application{Name: "Application Change"}}},
+			result: &Project{
+				Applications: []*Application{
+					{Name: "Application Change"},
+				},
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -141,9 +154,13 @@ func TestAppendRemoveAppEvent(t *testing.T) {
 		{
 			name: "append remove application event",
 			args: args{
-				project: &Project{Applications: []*Application{&Application{AppID: "AppID", Name: "Application"}}},
-				app:     &Application{AppID: "AppID", Name: "Application"},
-				event:   &es_models.Event{},
+				project: &Project{
+					Applications: []*Application{
+						{AppID: "AppID", Name: "Application"},
+					},
+				},
+				app:   &Application{AppID: "AppID", Name: "Application"},
+				event: &es_models.Event{},
 			},
 			result: &Project{Applications: []*Application{}},
 		},
@@ -177,22 +194,38 @@ func TestAppendAppStateEvent(t *testing.T) {
 		{
 			name: "append deactivate application event",
 			args: args{
-				project: &Project{Applications: []*Application{&Application{AppID: "AppID", Name: "Application", State: int32(model.AppStateActive)}}},
-				app:     &ApplicationID{AppID: "AppID"},
-				event:   &es_models.Event{},
-				state:   model.AppStateInactive,
+				project: &Project{
+					Applications: []*Application{
+						{AppID: "AppID", Name: "Application", State: int32(model.AppStateActive)},
+					},
+				},
+				app:   &ApplicationID{AppID: "AppID"},
+				event: &es_models.Event{},
+				state: model.AppStateInactive,
 			},
-			result: &Project{Applications: []*Application{&Application{AppID: "AppID", Name: "Application", State: int32(model.AppStateInactive)}}},
+			result: &Project{
+				Applications: []*Application{
+					{AppID: "AppID", Name: "Application", State: int32(model.AppStateInactive)},
+				},
+			},
 		},
 		{
 			name: "append reactivate application event",
 			args: args{
-				project: &Project{Applications: []*Application{&Application{AppID: "AppID", Name: "Application", State: int32(model.AppStateInactive)}}},
-				app:     &ApplicationID{AppID: "AppID"},
-				event:   &es_models.Event{},
-				state:   model.AppStateActive,
+				project: &Project{
+					Applications: []*Application{
+						{AppID: "AppID", Name: "Application", State: int32(model.AppStateInactive)},
+					},
+				},
+				app:   &ApplicationID{AppID: "AppID"},
+				event: &es_models.Event{},
+				state: model.AppStateActive,
 			},
-			result: &Project{Applications: []*Application{&Application{AppID: "AppID", Name: "Application", State: int32(model.AppStateActive)}}},
+			result: &Project{
+				Applications: []*Application{
+					{AppID: "AppID", Name: "Application", State: int32(model.AppStateActive)},
+				},
+			},
 		},
 	}
 	for _, tt := range tests {

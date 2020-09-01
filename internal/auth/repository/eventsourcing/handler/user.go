@@ -56,7 +56,10 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 	user := new(view_model.UserView)
 	switch event.Type {
 	case es_model.UserAdded,
-		es_model.UserRegistered:
+		es_model.MachineAdded,
+		es_model.HumanAdded,
+		es_model.UserRegistered,
+		es_model.HumanRegistered:
 		err = user.AppendEvent(event)
 		if err != nil {
 			return err
@@ -73,11 +76,24 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 		es_model.UserReactivated,
 		es_model.UserLocked,
 		es_model.UserUnlocked,
-		es_model.MfaOtpAdded,
-		es_model.MfaOtpVerified,
-		es_model.MfaOtpRemoved,
-		es_model.MfaInitSkipped,
-		es_model.UserPasswordChanged:
+		es_model.MFAOTPAdded,
+		es_model.MFAOTPVerified,
+		es_model.MFAOTPRemoved,
+		es_model.MFAInitSkipped,
+		es_model.UserPasswordChanged,
+		es_model.HumanProfileChanged,
+		es_model.HumanEmailChanged,
+		es_model.HumanEmailVerified,
+		es_model.HumanPhoneChanged,
+		es_model.HumanPhoneVerified,
+		es_model.HumanPhoneRemoved,
+		es_model.HumanAddressChanged,
+		es_model.HumanMFAOTPAdded,
+		es_model.HumanMFAOTPVerified,
+		es_model.HumanMFAOTPRemoved,
+		es_model.HumanMfaInitSkipped,
+		es_model.MachineChanged,
+		es_model.HumanPasswordChanged:
 		user, err = u.view.UserByID(event.AggregateID)
 		if err != nil {
 			return err
@@ -176,6 +192,6 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
 }
 
 func (u *User) OnError(event *models.Event, err error) error {
-	logging.LogWithFields("SPOOL-is8wa", "id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
+	logging.LogWithFields("SPOOL-is8aAWima", "id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
 	return spooler.HandleError(event, err, u.view.GetLatestUserFailedEvent, u.view.ProcessedUserFailedEvent, u.view.ProcessedUserSequence, u.errorCountUntilSkip)
 }

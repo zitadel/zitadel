@@ -111,15 +111,15 @@ func IsUserUnique(db *gorm.DB, table, userName, email string) (bool, error) {
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return false, err
 	}
-	if user != nil {
+	if user.UserName != "" {
 		return false, nil
 	}
-	query = repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyUserName), email)
+	query = repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyUserName), userName)
 	err = query(db, user)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return false, err
 	}
-	return user == nil, nil
+	return user.UserName == "", nil
 }
 
 func UserMfas(db *gorm.DB, table, userID string) ([]*usr_model.MultiFactor, error) {

@@ -2,10 +2,11 @@ package model
 
 import (
 	"encoding/json"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/user/model"
 	"testing"
 	"time"
+
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/user/model"
 )
 
 func TestAppendDeactivatedEvent(t *testing.T) {
@@ -118,23 +119,23 @@ func TestAppendUnlockEvent(t *testing.T) {
 
 func TestAppendInitUserCodeEvent(t *testing.T) {
 	type args struct {
-		user  *User
+		user  *Human
 		code  *InitUserCode
 		event *es_models.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		result *User
+		result *Human
 	}{
 		{
 			name: "append init user code event",
 			args: args{
-				user:  &User{},
+				user:  &Human{},
 				code:  &InitUserCode{Expiry: time.Hour * 30},
 				event: &es_models.Event{},
 			},
-			result: &User{InitCode: &InitUserCode{Expiry: time.Hour * 30}},
+			result: &Human{InitCode: &InitUserCode{Expiry: time.Hour * 30}},
 		},
 	}
 	for _, tt := range tests {

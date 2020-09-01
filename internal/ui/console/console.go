@@ -28,6 +28,7 @@ type spaHandler struct {
 const (
 	envRequestPath = "/assets/environment.json"
 	envDefaultDir  = "/console/"
+	handlerPrefix  = "/console"
 )
 
 var (
@@ -50,10 +51,10 @@ func (i *spaHandler) Open(name string) (http.File, error) {
 	return i.fileSystem.Open("/index.html")
 }
 
-func Start(config Config) (http.Handler, error) {
+func Start(config Config) (http.Handler, string, error) {
 	statikFS, err := fs.NewWithNamespace("console")
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	envDir := envDefaultDir
 	if config.EnvOverwriteDir != "" {
@@ -69,7 +70,7 @@ func Start(config Config) (http.Handler, error) {
 	handler := &http.ServeMux{}
 	handler.Handle("/", cache(security(http.FileServer(&spaHandler{statikFS}))))
 	handler.Handle(envRequestPath, cache(security(http.StripPrefix("/assets", http.FileServer(http.Dir(envDir))))))
-	return handler, nil
+	return handler, handlerPrefix, nil
 }
 
 func csp(zitadelDomain string) *middleware.CSP {

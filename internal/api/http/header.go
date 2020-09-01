@@ -41,13 +41,13 @@ var (
 	remoteAddr  key
 )
 
-func CopyHeadersToContext(h http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func CopyHeadersToContext(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), httpHeaders, r.Header)
 		ctx = context.WithValue(ctx, remoteAddr, r.RemoteAddr)
 		r = r.WithContext(ctx)
-		h(w, r)
-	}
+		h.ServeHTTP(w, r)
+	})
 }
 
 func HeadersFromCtx(ctx context.Context) (http.Header, bool) {

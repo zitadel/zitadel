@@ -28,14 +28,6 @@ func usergrantFromModel(grant *grant_model.UserGrant) *management.UserGrant {
 	}
 }
 
-func userGrantCreateBulkToModel(u *management.UserGrantCreateBulk) []*grant_model.UserGrant {
-	grants := make([]*grant_model.UserGrant, len(u.UserGrants))
-	for i, grant := range u.UserGrants {
-		grants[i] = userGrantCreateToModel(grant)
-	}
-	return grants
-}
-
 func userGrantCreateToModel(u *management.UserGrantCreate) *grant_model.UserGrant {
 	return &grant_model.UserGrant{
 		ObjectRoot: models.ObjectRoot{AggregateID: u.UserId},
@@ -44,14 +36,6 @@ func userGrantCreateToModel(u *management.UserGrantCreate) *grant_model.UserGran
 		RoleKeys:   u.RoleKeys,
 		GrantID:    u.GrantId,
 	}
-}
-
-func userGrantUpdateBulkToModel(u *management.UserGrantUpdateBulk) []*grant_model.UserGrant {
-	grants := make([]*grant_model.UserGrant, len(u.UserGrants))
-	for i, grant := range u.UserGrants {
-		grants[i] = userGrantUpdateToModel(grant)
-	}
-	return grants
 }
 
 func userGrantUpdateToModel(u *management.UserGrantUpdate) *grant_model.UserGrant {
@@ -169,21 +153,5 @@ func usergrantStateFromModel(state grant_model.UserGrantState) management.UserGr
 		return management.UserGrantState_USERGRANTSTATE_INACTIVE
 	default:
 		return management.UserGrantState_USERGRANTSTATE_UNSPECIFIED
-	}
-}
-
-func projectUserGrantSearchRequestsToModel(project *management.ProjectUserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
-	return &grant_model.UserGrantSearchRequest{
-		Offset:  project.Offset,
-		Limit:   project.Limit,
-		Queries: userGrantSearchQueriesToModel(project.Queries),
-	}
-}
-
-func projectGrantUserGrantSearchRequestsToModel(project *management.ProjectGrantUserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
-	return &grant_model.UserGrantSearchRequest{
-		Offset:  project.Offset,
-		Limit:   project.Limit,
-		Queries: userGrantSearchQueriesToModel(project.Queries),
 	}
 }

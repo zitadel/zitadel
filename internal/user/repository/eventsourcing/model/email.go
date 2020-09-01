@@ -2,12 +2,13 @@ package model
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
-	"time"
 )
 
 type Email struct {
@@ -69,17 +70,17 @@ func EmailCodeToModel(code *EmailCode) *model.EmailCode {
 	}
 }
 
-func (u *User) appendUserEmailChangedEvent(event *es_models.Event) error {
+func (u *Human) appendUserEmailChangedEvent(event *es_models.Event) error {
 	u.Email = new(Email)
 	return u.Email.setData(event)
 }
 
-func (u *User) appendUserEmailCodeAddedEvent(event *es_models.Event) error {
+func (u *Human) appendUserEmailCodeAddedEvent(event *es_models.Event) error {
 	u.EmailCode = new(EmailCode)
 	return u.EmailCode.SetData(event)
 }
 
-func (u *User) appendUserEmailVerifiedEvent() {
+func (u *Human) appendUserEmailVerifiedEvent() {
 	u.IsEmailVerified = true
 }
 

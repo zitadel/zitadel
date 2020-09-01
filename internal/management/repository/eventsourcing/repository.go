@@ -3,12 +3,11 @@ package eventsourcing
 import (
 	"context"
 
-	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
+	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/handler"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/spooler"

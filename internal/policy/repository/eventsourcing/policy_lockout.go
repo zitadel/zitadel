@@ -38,16 +38,16 @@ func PasswordLockoutPolicyCreateAggregate(aggCreator *es_models.AggregateCreator
 	}
 }
 
-func PasswordLockoutPolicyUpdateAggregate(aggCreator *es_models.AggregateCreator, existing *PasswordLockoutPolicy, new *PasswordLockoutPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+func PasswordLockoutPolicyUpdateAggregate(aggCreator *es_models.AggregateCreator, existingPolicy *PasswordLockoutPolicy, newPolicy *PasswordLockoutPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if new == nil {
+		if newPolicy == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "Errors.Internal")
 		}
-		agg, err := PasswordLockoutPolicyAggregate(ctx, aggCreator, existing)
+		agg, err := PasswordLockoutPolicyAggregate(ctx, aggCreator, existingPolicy)
 		if err != nil {
 			return nil, err
 		}
-		changes := existing.LockoutChanges(new)
+		changes := existingPolicy.LockoutChanges(newPolicy)
 		return agg.AppendEvent(model.PasswordLockoutPolicyChanged, changes)
 	}
 }

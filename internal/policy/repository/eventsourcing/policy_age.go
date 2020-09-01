@@ -36,16 +36,16 @@ func PasswordAgePolicyCreateAggregate(aggCreator *es_models.AggregateCreator, po
 	}
 }
 
-func PasswordAgePolicyUpdateAggregate(aggCreator *es_models.AggregateCreator, existing *PasswordAgePolicy, new *PasswordAgePolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+func PasswordAgePolicyUpdateAggregate(aggCreator *es_models.AggregateCreator, existingPolicy *PasswordAgePolicy, newPolicy *PasswordAgePolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if new == nil {
+		if newPolicy == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "Errors.Internal")
 		}
-		agg, err := PasswordAgePolicyAggregate(ctx, aggCreator, existing)
+		agg, err := PasswordAgePolicyAggregate(ctx, aggCreator, existingPolicy)
 		if err != nil {
 			return nil, err
 		}
-		changes := existing.AgeChanges(new)
+		changes := existingPolicy.AgeChanges(newPolicy)
 		return agg.AppendEvent(model.PasswordAgePolicyChanged, changes)
 	}
 }

@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/cache/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -190,12 +191,12 @@ func (es *IAMEventstore) RemoveIAMMember(ctx context.Context, member *iam_model.
 	if _, m := existing.GetMember(member.UserID); m == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-29skr", "Errors.IAM.MemberNotExisting")
 	}
-	repoIam := model.IAMFromModel(existing)
+	repoIAM := model.IAMFromModel(existing)
 	repoMember := model.IAMMemberFromModel(member)
 
-	projectAggregate := IAMMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoMember)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, projectAggregate)
-	es.iamCache.cacheIAM(repoIam)
+	projectAggregate := IAMMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoIAM, repoMember)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIAM.AppendEvents, projectAggregate)
+	es.iamCache.cacheIAM(repoIAM)
 	return err
 }
 

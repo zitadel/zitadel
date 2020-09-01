@@ -83,16 +83,16 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 	return request, nil
 }
 
-func (repo *AuthRequestRepo) AuthRequestByID(ctx context.Context, id string) (*model.AuthRequest, error) {
-	return repo.getAuthRequest(ctx, id, false)
+func (repo *AuthRequestRepo) AuthRequestByID(ctx context.Context, id, userAgentID string) (*model.AuthRequest, error) {
+	return repo.getAuthRequestNextSteps(ctx, id, userAgentID, false)
 }
 
-func (repo *AuthRequestRepo) AuthRequestByIDCheckLoggedIn(ctx context.Context, id string) (*model.AuthRequest, error) {
-	return repo.getAuthRequest(ctx, id, true)
+func (repo *AuthRequestRepo) AuthRequestByIDCheckLoggedIn(ctx context.Context, id, userAgentID string) (*model.AuthRequest, error) {
+	return repo.getAuthRequestNextSteps(ctx, id, userAgentID, true)
 }
 
-func (repo *AuthRequestRepo) SaveAuthCode(ctx context.Context, id, code string) error {
-	request, err := repo.AuthRequests.GetAuthRequestByID(ctx, id)
+func (repo *AuthRequestRepo) SaveAuthCode(ctx context.Context, id, code, userAgentID string) error {
+	request, err := repo.getAuthRequest(ctx, id, userAgentID)
 	if err != nil {
 		return err
 	}
@@ -117,8 +117,8 @@ func (repo *AuthRequestRepo) DeleteAuthRequest(ctx context.Context, id string) e
 	return repo.AuthRequests.DeleteAuthRequest(ctx, id)
 }
 
-func (repo *AuthRequestRepo) CheckLoginName(ctx context.Context, id, loginName string) error {
-	request, err := repo.AuthRequests.GetAuthRequestByID(ctx, id)
+func (repo *AuthRequestRepo) CheckLoginName(ctx context.Context, id, loginName, userAgentID string) error {
+	request, err := repo.getAuthRequest(ctx, id, userAgentID)
 	if err != nil {
 		return err
 	}
@@ -129,8 +129,8 @@ func (repo *AuthRequestRepo) CheckLoginName(ctx context.Context, id, loginName s
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID string) error {
-	request, err := repo.AuthRequests.GetAuthRequestByID(ctx, id)
+func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAgentID string) error {
+	request, err := repo.getAuthRequest(ctx, id, userAgentID)
 	if err != nil {
 		return err
 	}
@@ -142,8 +142,8 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID string) 
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, password string, info *model.BrowserInfo) error {
-	request, err := repo.AuthRequests.GetAuthRequestByID(ctx, id)
+func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, password, userAgentID string, info *model.BrowserInfo) error {
+	request, err := repo.getAuthRequest(ctx, id, userAgentID)
 	if err != nil {
 		return err
 	}
@@ -153,8 +153,8 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, pas
 	return repo.UserEvents.CheckPassword(ctx, userID, password, request.WithCurrentInfo(info))
 }
 
-func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, userID string, code string, info *model.BrowserInfo) error {
-	request, err := repo.AuthRequests.GetAuthRequestByID(ctx, authRequestID)
+func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, userID, code, userAgentID string, info *model.BrowserInfo) error {
+	request, err := repo.getAuthRequest(ctx, authRequestID, userAgentID)
 	if err != nil {
 		return err
 	}
@@ -164,8 +164,8 @@ func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, us
 	return repo.UserEvents.CheckMfaOTP(ctx, userID, code, request.WithCurrentInfo(info))
 }
 
-func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id string, checkLoggedIn bool) (*model.AuthRequest, error) {
-	request, err := repo.AuthRequests.GetAuthRequestByID(ctx, id)
+func (repo *AuthRequestRepo) getAuthRequestNextSteps(ctx context.Context, id, userAgentID string, checkLoggedIn bool) (*model.AuthRequest, error) {
+	request, err := repo.getAuthRequest(ctx, id, userAgentID)
 	if err != nil {
 		return nil, err
 	}
@@ -174,6 +174,17 @@ func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id string, chec
 		return nil, err
 	}
 	request.PossibleSteps = steps
+	return request, nil
+}
+
+func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID string) (*model.AuthRequest, error) {
+	request, err := repo.AuthRequests.GetAuthRequestByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if request.AgentID != userAgentID {
+		return nil, errors.ThrowPermissionDenied(nil, "EVENT-adk13", "Errors.AuthRequest.UserAgentNotCorresponding")
+	}
 	return request, nil
 }
 
@@ -345,7 +356,12 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			es_model.MfaOtpCheckFailed,
 			es_model.SignedOut,
 			es_model.UserLocked,
-			es_model.UserDeactivated:
+			es_model.UserDeactivated,
+			es_model.HumanPasswordCheckSucceeded,
+			es_model.HumanPasswordCheckFailed,
+			es_model.HumanMfaOtpCheckSucceeded,
+			es_model.HumanMfaOtpCheckFailed,
+			es_model.HumanSignedOut:
 			eventData, err := user_view_model.UserSessionFromEvent(event)
 			if err != nil {
 				logging.Log("EVENT-sdgT3").WithError(err).Debug("error getting event data")
@@ -367,6 +383,11 @@ func activeUserByID(ctx context.Context, userViewProvider userViewProvider, user
 	if err != nil {
 		return nil, err
 	}
+
+	if user.HumanView == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Lm69x", "Errors.User.NotHuman")
+	}
+
 	if user.State == user_model.UserStateLocked || user.State == user_model.UserStateSuspend {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.Locked")
 	}

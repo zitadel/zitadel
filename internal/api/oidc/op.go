@@ -2,7 +2,6 @@ package oidc
 
 import (
 	"context"
-	"net/http"
 	"time"
 
 	"github.com/caos/logging"
@@ -18,7 +17,7 @@ import (
 type OPHandlerConfig struct {
 	OPConfig              *op.Config
 	StorageConfig         StorageConfig
-	UserAgentCookieConfig *http_utils.UserAgentCookieConfig
+	UserAgentCookieConfig *middleware.UserAgentCookieConfig
 	Cache                 *middleware.CacheConfig
 	Endpoints             *EndpointConfig
 }
@@ -51,24 +50,18 @@ type OPStorage struct {
 	signingKeyAlgorithm        string
 }
 
-func NewProvider(ctx context.Context, config OPHandlerConfig, repo repository.Repository) op.OpenIDProvider {
-	cookieHandler, err := http_utils.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator)
+func NewProvider(ctx context.Context, config OPHandlerConfig, repo repository.Repository, localDevMode bool) op.OpenIDProvider {
+	cookieHandler, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator, localDevMode)
 	logging.Log("OIDC-sd4fd").OnError(err).Panic("cannot user agent handler")
-	nextHandler := func(handlerFunc http.HandlerFunc) http.HandlerFunc {
-		return func(w http.ResponseWriter, r *http.Request) {
-			middleware.NoCacheInterceptor(http_utils.CopyHeadersToContext(handlerFunc))
-		}
-	}
 	config.OPConfig.CodeMethodS256 = true
 	provider, err := op.NewDefaultOP(
 		ctx,
 		config.OPConfig,
 		newStorage(config.StorageConfig, repo),
-		op.WithHttpInterceptor(
-			UserAgentCookieHandler(
-				cookieHandler,
-				nextHandler,
-			),
+		op.WithHttpInterceptors(
+			middleware.NoCacheInterceptor,
+			cookieHandler,
+			http_utils.CopyHeadersToContext,
 		),
 		op.WithCustomAuthEndpoint(op.NewEndpointWithURL(config.Endpoints.Auth.Path, config.Endpoints.Auth.URL)),
 		op.WithCustomTokenEndpoint(op.NewEndpointWithURL(config.Endpoints.Token.Path, config.Endpoints.Token.URL)),

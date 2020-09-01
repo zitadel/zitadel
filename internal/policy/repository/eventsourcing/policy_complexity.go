@@ -37,16 +37,16 @@ func PasswordComplexityPolicyCreateAggregate(aggCreator *es_models.AggregateCrea
 	}
 }
 
-func PasswordComplexityPolicyUpdateAggregate(aggCreator *es_models.AggregateCreator, existing *PasswordComplexityPolicy, new *PasswordComplexityPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+func PasswordComplexityPolicyUpdateAggregate(aggCreator *es_models.AggregateCreator, existingPolicy *PasswordComplexityPolicy, newPolicy *PasswordComplexityPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if new == nil {
+		if newPolicy == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "Errors.Internal")
 		}
-		agg, err := PasswordComplexityPolicyAggregate(ctx, aggCreator, existing)
+		agg, err := PasswordComplexityPolicyAggregate(ctx, aggCreator, existingPolicy)
 		if err != nil {
 			return nil, err
 		}
-		changes := existing.ComplexityChanges(new)
+		changes := existingPolicy.ComplexityChanges(newPolicy)
 		return agg.AppendEvent(model.PasswordComplexityPolicyChanged, changes)
 	}
 }

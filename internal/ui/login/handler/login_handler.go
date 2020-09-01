@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
@@ -48,7 +49,8 @@ func (l *Login) handleLoginNameCheck(w http.ResponseWriter, r *http.Request) {
 		l.handleRegister(w, r)
 		return
 	}
-	err = l.authRepo.CheckLoginName(r.Context(), authReq.ID, data.LoginName)
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	err = l.authRepo.CheckLoginName(r.Context(), authReq.ID, data.LoginName, userAgentID)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
 		return

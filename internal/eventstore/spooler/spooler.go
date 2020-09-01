@@ -90,7 +90,7 @@ func (s *spooledHandler) awaitError(cancel func(), errs chan error, workerID str
 	select {
 	case err := <-errs:
 		cancel()
-		logging.Log("SPOOL-K2lst").OnError(err).WithField("view", s.ViewModel()).WithField("worker", workerID).Debug("load canceled")
+		logging.Log("SPOOL-OT8di").OnError(err).WithField("view", s.ViewModel()).WithField("worker", workerID).Debug("load canceled")
 	}
 }
 
@@ -164,7 +164,7 @@ func (s *spooledHandler) lock(ctx context.Context, errs chan<- error, workerID s
 			case <-renewTimer:
 				logging.Log("SPOOL-K2lst").WithField("view", s.ViewModel()).WithField("worker", workerID).Debug("renew")
 				err := s.locker.Renew(workerID, s.ViewModel(), s.MinimumCycleDuration()*2)
-				logging.Log("SPOOL-K2lst").WithField("view", s.ViewModel()).WithField("worker", workerID).WithError(err).Debug("renew done")
+				logging.Log("SPOOL-u4j6k").WithField("view", s.ViewModel()).WithField("worker", workerID).WithError(err).Debug("renew done")
 				if err == nil {
 					locked <- true
 					renewTimer = time.After(renewDuration)

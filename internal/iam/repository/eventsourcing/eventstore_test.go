@@ -554,10 +554,10 @@ func TestChangeIamMember(t *testing.T) {
 func TestRemoveIamMember(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *IAMEventstore
-		ctx      context.Context
-		existing *model.IAM
-		member   *iam_model.IAMMember
+		es          *IAMEventstore
+		ctx         context.Context
+		existingIAM *model.IAM
+		member      *iam_model.IAMMember
 	}
 	type res struct {
 		result  *iam_model.IAMMember
@@ -573,7 +573,7 @@ func TestRemoveIamMember(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIamWithMember(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.IAM{
+				existingIAM: &model.IAM{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					Members:    []*model.IAMMember{{UserID: "UserID", Roles: []string{"Roles"}}},
 				},
@@ -588,7 +588,7 @@ func TestRemoveIamMember(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIam(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.IAM{
+				existingIAM: &model.IAM{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					Members:    []*model.IAMMember{{UserID: "UserID", Roles: []string{"Roles"}}},
 				},
@@ -603,7 +603,7 @@ func TestRemoveIamMember(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIam(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				existing: &model.IAM{
+				existingIAM: &model.IAM{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 				},
 				member: &iam_model.IAMMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
