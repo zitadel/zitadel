@@ -3,7 +3,8 @@
         <h1>{{ 'USER.PAGES.LIST' | translate }}</h1>
         <p class="sub">{{ 'USER.PAGES.DESCRIPTION' | translate }}</p>
 
-        <app-user-table [userType]="UserType.HUMAN"></app-user-table>
+        <app-user-table [userType]="UserType.HUMAN" [disabled]="(['user.write'] | hasRole | async) == false">
+        </app-user-table>
     </ng-container>
 
     <ng-container *ngSwitchCase="UserType.MACHINE">
@@ -11,7 +12,8 @@
         <p class="sub">{{ 'USER.PAGES.DESCRIPTIONMACHINE' | translate }}</p>
 
         <app-user-table [userType]="UserType.MACHINE"
-            [displayedColumns]="['select','name', 'username', 'description','state']">
+            [displayedColumns]="['select','name', 'username', 'description','state']"
+            [disabled]="(['user.write'] | hasRole | async) == false">
         </app-user-table>
     </ng-container>
 </div>

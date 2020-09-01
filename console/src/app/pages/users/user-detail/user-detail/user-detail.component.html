@@ -51,7 +51,7 @@
                 </app-detail-form-machine>
             </app-card>
 
-            <app-card *ngIf="user.id" title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}"
+            <app-card *ngIf="user.machine && user.id" title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}"
                 description="{{ 'USER.MACHINE.KEYSDESC' | translate }}">
                 <app-machine-keys [userId]="user.id"></app-machine-keys>
             </app-card>
@@ -106,7 +106,7 @@
                             <mat-icon class="icon">close</mat-icon>
                         </button>
                         <button *ngIf="user.human"
-                            [disabled]="!user.human.email || (['user.write','user.write' + user.id] | hasRole | async) == false"
+                            [disabled]="!user.human.email || (['user.write','user.write:' + user.id] | hasRole | async) == false"
                             class="submit-button" type="button" color="primary" (click)="saveEmail()"
                             mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
                     </ng-template>

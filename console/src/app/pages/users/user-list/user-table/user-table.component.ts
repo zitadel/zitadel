@@ -5,7 +5,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { UserView } from 'src/app/proto/generated/auth_pb';
-import { UserSearchKey, UserSearchQuery, UserSearchResponse } from 'src/app/proto/generated/management_pb';
+import { SearchMethod, UserSearchKey, UserSearchQuery, UserSearchResponse } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -19,6 +19,7 @@ import { UserType } from '../user-list.component';
 export class UserTableComponent implements OnInit {
     public UserType: any = UserType;
     @Input() userType: UserType = UserType.HUMAN;
+    @Input() disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     public dataSource: MatTableDataSource<UserView.AsObject> = new MatTableDataSource<UserView.AsObject>();
     public selection: SelectionModel<UserView.AsObject> = new SelectionModel<UserView.AsObject>(true, []);
@@ -79,9 +80,11 @@ export class UserTableComponent implements OnInit {
         this.loadingSubject.next(true);
         const query = new UserSearchQuery();
         query.setKey(UserSearchKey.USERSEARCHKEY_TYPE);
+        query.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
         query.setValue(filterTypeValue);
+        console.log(filterTypeValue);
 
-        this.userService.SearchUsers(limit, offset).then(resp => {
+        this.userService.SearchUsers(limit, offset, [query]).then(resp => {
             this.userResult = resp.toObject();
             this.dataSource.data = this.userResult.resultList;
             console.log(this.userResult.resultList);
