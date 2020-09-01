@@ -60,6 +60,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
     public ngOnInit(): void {
         this.dataSource = new UserGrantsDataSource(this.userService);
+        console.log(this.context);
 
         switch (this.context) {
             case UserGrantContext.OWNED_PROJECT:

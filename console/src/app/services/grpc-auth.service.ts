@@ -124,6 +124,7 @@ export class GrpcAuthService {
             switchMap(() => from(this.GetMyzitadelPermissions())),
             map(rolesResp => rolesResp.toObject().permissionsList),
         ).subscribe(roles => {
+            console.log(roles);
             this.zitadelPermissions.next(roles);
         });
     }
@@ -141,7 +142,7 @@ export class GrpcAuthService {
     public hasRoles(userRoles: string[], requestedRoles: string[] | RegExp[]): boolean {
         return requestedRoles.findIndex((regexp: any) => {
             return userRoles.findIndex(role => {
-                return (new RegExp(regexp)).test(role);
+                return new RegExp(regexp).test(role);
             }) > -1;
         }) > -1;
     }
