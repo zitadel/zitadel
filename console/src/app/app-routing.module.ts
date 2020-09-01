@@ -75,7 +75,7 @@ const routes: Routes = [
                     .then(m => m.UserGrantCreateModule),
                 canActivate: [RoleGuard],
                 data: {
-                    roles: ['project.grant.user.grant.write'],
+                    roles: ['user.grant.write'],
                 },
             },
             {
