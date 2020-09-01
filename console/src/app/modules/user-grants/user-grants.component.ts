@@ -33,8 +33,6 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
     @Input() allowCreate: boolean = false;
     @Input() allowDelete: boolean = false;
-    @Input() public disabled: boolean = false;
-
 
     @Input() userId: string = '';
     @Input() projectId: string = '';

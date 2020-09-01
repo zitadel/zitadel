@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { Gender as authGender, UserProfile as authUP, UserView as authUV } from 'src/app/proto/generated/auth_pb';
@@ -34,6 +34,26 @@ export class DetailFormComponent implements OnInit, OnDestroy {
             gender: [{ value: 0 }, { disabled: this.disabled }],
             preferredLanguage: [{ value: '', disabled: this.disabled }],
         });
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        //Called before any other lifecycle hook. Use it to inject dependencies, but avoid any serious work here.
+        //Add '${implements OnChanges}' to the class.
+        if (changes.disabled) {
+            console.log('disabled');
+            this.profileForm = this.fb.group({
+                userName: [{ value: '', disabled: true }, [
+                    Validators.required,
+                ]],
+                firstName: [{ value: '', disabled: this.disabled }, Validators.required],
+                lastName: [{ value: '', disabled: this.disabled }, Validators.required],
+                nickName: [{ value: '', disabled: this.disabled }],
+                gender: [{ value: 0 }, { disabled: this.disabled }],
+                preferredLanguage: [{ value: '', disabled: this.disabled }],
+            });
+
+            this.profileForm.patchValue({ userName: this.username, ...this.user });
+        }
     }
 
     public ngOnInit(): void {
