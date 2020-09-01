@@ -40,7 +40,7 @@
     <h1 class="h1">{{ 'PROJECT.GRANT.DETAIL.MEMBERTITLE' | translate }}</h1>
     <p class="desc">{{ 'PROJECT.GRANT.DETAIL.MEMBERDESC' | translate }}</p>
 
-    <app-project-grant-members *ngIf="this.projectid && this.grantid" [disabled]="isZitadel" [projectId]="projectid"
-        [grantId]="grantid" [type]="projectType">
+    <app-project-grant-members *ngIf="this.projectid && this.grantid" [projectId]="projectid" [grantId]="grantid"
+        [type]="projectType">
     </app-project-grant-members>
 </app-detail-layout>

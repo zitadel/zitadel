@@ -1,5 +1,5 @@
-<app-meta-layout>
-    <div *ngIf="user" class="max-width-container">
+<app-meta-layout *ngIf="user && (['user.write','user.write:' + user.id] | hasRole) as canWrite$">
+    <div class="max-width-container">
         <div class="head">
             <a (click)="navigateBack()" mat-icon-button>
                 <mat-icon class="icon">arrow_back</mat-icon>
@@ -38,9 +38,8 @@
 
         <ng-template appHasRole [appHasRole]="['user.read', 'user.read:'+user?.id]">
             <app-card *ngIf="user.human" title="{{ 'USER.PROFILE.TITLE' | translate }}">
-                <app-detail-form [disabled]="(['user.write:' + user?.id, 'user.write'] | hasRole | async) == false"
-                    [genders]="genders" [languages]="languages" [username]="user.userName" [user]="user.human"
-                    (submitData)="saveProfile($event)">
+                <app-detail-form [disabled]="(canWrite$ | async) == false" [genders]="genders" [languages]="languages"
+                    [username]="user.userName" [user]="user.human" (submitData)="saveProfile($event)">
                 </app-detail-form>
             </app-card>
 
@@ -51,7 +50,7 @@
                 </app-detail-form-machine>
             </app-card>
 
-            <app-card *ngIf="user.id" title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}"
+            <app-card *ngIf="user.machine && user.id" title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}"
                 description="{{ 'USER.MACHINE.KEYSDESC' | translate }}">
                 <app-machine-keys [userId]="user.id"></app-machine-keys>
             </app-card>
@@ -62,13 +61,12 @@
             <div class="method-col">
                 <div class="method-row">
                     <span class="label">{{ 'USER.PROFILE.PASSWORD' | translate }}</span>
-
-                    <span>*********</span>
+                    <span>******</span>
                     <div class="actions">
-                        <button class="notify-change-pwd" (click)="sendSetPasswordNotification()" mat-stroked-button
-                            color="primary"
+                        <button [disabled]="(canWrite$ | async) == false" class="notify-change-pwd"
+                            (click)="sendSetPasswordNotification()" mat-stroked-button color="primary"
                             *ngIf="user.state === UserState.USERSTATE_INITIAL">{{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
-                        <a [routerLink]="['password']" mat-icon-button>
+                        <a [disabled]="(canWrite$ | async) == false" [routerLink]="['password']" mat-icon-button>
                             <mat-icon class="icon">chevron_right</mat-icon>
                         </a>
                     </div>
@@ -86,13 +84,16 @@
                                 <mat-icon class="icon" color="warn" aria-hidden="false" aria-label="not verified icon">
                                     highlight_off
                                 </mat-icon>
-                                <a class="verify" matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
-                                    (click)="resendVerification()">{{'USER.LOGINMETHODS.RESENDCODE' | translate}}</a>
+                                <ng-container *ngIf="(canWrite$ | async)">
+                                    <a class="verify" matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
+                                        (click)="resendVerification()">{{'USER.LOGINMETHODS.RESENDCODE' | translate}}</a>
+                                </ng-container>
                             </ng-container>
                         </div>
 
                         <div class="actions">
-                            <button (click)="emailEditState = true" mat-icon-button>
+                            <button [disabled]="(canWrite$ | async) == false" (click)="emailEditState = true"
+                                mat-icon-button>
                                 <mat-icon class="icon">edit</mat-icon>
                             </button>
                         </div>
@@ -105,8 +106,7 @@
                         <button (click)="emailEditState = false" mat-icon-button>
                             <mat-icon class="icon">close</mat-icon>
                         </button>
-                        <button *ngIf="user.human"
-                            [disabled]="!user.human.email || (['user.write','user.write' + user.id] | hasRole | async) == false"
+                        <button *ngIf="user.human" [disabled]="!user.human.email || (canWrite$ | async) == false"
                             class="submit-button" type="button" color="primary" (click)="saveEmail()"
                             mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
                     </ng-template>
@@ -125,13 +125,16 @@
                                 <mat-icon class="icon" color="warn" aria-hidden="false" aria-label="not verified icon">
                                     highlight_off
                                 </mat-icon>
-                                <a class="verify" matTooltip="{{'USER.LOGINMETHODS.PHONE.RESEND' | translate}}"
-                                    (click)="resendPhoneVerification()">{{'USER.LOGINMETHODS.RESENDCODE' | translate}}</a>
+                                <ng-container *ngIf="(canWrite$ | async)">
+                                    <a class="verify" matTooltip="{{'USER.LOGINMETHODS.PHONE.RESEND' | translate}}"
+                                        (click)="resendPhoneVerification()">{{'USER.LOGINMETHODS.RESENDCODE' | translate}}</a>
+                                </ng-container>
                             </ng-container>
                         </div>
 
                         <div class="actions">
-                            <button (click)="phoneEditState = true" mat-icon-button>
+                            <button [disabled]="(canWrite$ | async) == false" (click)="phoneEditState = true"
+                                mat-icon-button>
                                 <mat-icon class="icon">edit</mat-icon>
                             </button>
                         </div>
@@ -140,16 +143,19 @@
                     <ng-template #phoneEdit>
                         <mat-form-field class="name">
                             <mat-label>{{ 'USER.PHONE' | translate }}</mat-label>
-                            <input *ngIf="user.human && user.human.phone" matInput [(ngModel)]="user.human.phone" />
+                            <input *ngIf="user.human && user.human.phone" matInput
+                                [disabled]="(canWrite$ | async) == false" [(ngModel)]="user.human.phone" />
                         </mat-form-field>
-                        <button (click)="phoneEditState = false" mat-icon-button>
+                        <button (click)="phoneEditState = false" mat-icon-button
+                            [disabled]="(canWrite$ | async) == false">
                             <mat-icon class="icon">close</mat-icon>
                         </button>
-                        <button *ngIf="user.human?.phone" color="warn" (click)="deletePhone()" mat-icon-button>
+                        <button *ngIf="user.human?.phone" color="warn" (click)="deletePhone()"
+                            [disabled]="(canWrite$ | async) == false" mat-icon-button>
                             <i class="las la-trash"></i>
                         </button>
-                        <button *ngIf="user.human"
-                            [disabled]="!user.human.phone || (['user.write', 'user.write'+ user.id]| hasRole | async) == false"
+
+                        <button *ngIf="user.human" [disabled]="!user.human.phone || (canWrite$ | async) == false"
                             type="button" color="primary" (click)="savePhone()" mat-raised-button>
                             {{ 'ACTIONS.SAVE' | translate }}</button>
                     </ng-template>
@@ -176,7 +182,7 @@
         </div>
 
         <ng-template appHasRole [appHasRole]="['user.membership.read']">
-            <app-memberships [user]="user"></app-memberships>
+            <app-memberships [user]="user" [disabled]="(canWrite$ | async) == false"></app-memberships>
         </ng-template>
 
         <app-changes class="changes" [changeType]="ChangeType.USER" [id]="user.id"></app-changes>

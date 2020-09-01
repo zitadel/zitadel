@@ -11,7 +11,7 @@
     <app-refresh-table (refreshed)="refreshPage()" [dataSize]="totalResult" [timestamp]="viewTimestamp"
         [selection]="selection" [loading]="loading$ | async">
 
-        <ng-template actions appHasRole [appHasRole]="['project.write']">
+        <ng-template actions appHasRole [appHasRole]="['project.create']">
             <a class="add-button" [routerLink]="[ '/projects', 'create']" color="primary" mat-raised-button>
                 <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
             </a>

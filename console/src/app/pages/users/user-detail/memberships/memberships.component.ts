@@ -3,7 +3,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { MemberType, UserView, UserMembershipSearchResponse } from 'src/app/proto/generated/management_pb';
+import { MemberType, UserMembershipSearchResponse, UserView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -34,6 +34,8 @@ export class MembershipsComponent implements OnInit {
     public memberships!: UserMembershipSearchResponse.AsObject;
 
     @Input() public user!: UserView.AsObject;
+    @Input() public disabled: boolean = false;
+
     public MemberType: any = MemberType;
 
     constructor(
@@ -46,6 +48,7 @@ export class MembershipsComponent implements OnInit {
 
     ngOnInit(): void {
         this.loadManager(this.user.id);
+        console.log(this.disabled);
     }
 
     public async loadManager(userId: string): Promise<void> {
@@ -56,7 +59,9 @@ export class MembershipsComponent implements OnInit {
     }
 
     public navigateToObject(): void {
-        this.router.navigate(['/users', this.user.id, 'memberships']);
+        if (!this.disabled) {
+            this.router.navigate(['/users', this.user.id, 'memberships']);
+        }
     }
 
     public addMember(): void {

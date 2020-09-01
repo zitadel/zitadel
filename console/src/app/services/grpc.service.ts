@@ -50,7 +50,8 @@ export class GrpcService {
                         interceptors,
                     );
                     this.admin = new AdminServicePromiseClient(
-                        data.adminServiceUrl,
+                        // TODO: replace with service url
+                        data.mgmtServiceUrl,
                         null,
                         // @ts-ignore
                         interceptors,

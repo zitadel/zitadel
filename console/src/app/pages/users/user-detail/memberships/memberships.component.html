@@ -28,7 +28,8 @@
                     <span>{{memberships.totalResult}}</span>
                 </div>
             </ng-template>
-            <button class="add-img" (click)="addMember()" mat-icon-button aria-label="add membership">
+            <button [disabled]="disabled" class="add-img" (click)="addMember()" mat-icon-button
+                aria-label="add membership">
                 <mat-icon>add</mat-icon>
             </button>
         </div>

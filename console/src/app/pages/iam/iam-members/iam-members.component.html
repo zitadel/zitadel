@@ -65,7 +65,7 @@
                         <mat-form-field class="form-field" appearance="outline">
                             <mat-label>{{ 'ROLESLABEL' | translate }}</mat-label>
                             <mat-select [(ngModel)]="member.rolesList" multiple
-                                [disabled]="(['org.member.write'] | hasRole | async) == false"
+                                [disabled]="(['iam.member.write'] | hasRole | async) == false"
                                 (selectionChange)="updateRoles(member, $event)">
                                 <mat-option *ngFor="let role of memberRoleOptions" [value]="role">
                                     {{ role }}
