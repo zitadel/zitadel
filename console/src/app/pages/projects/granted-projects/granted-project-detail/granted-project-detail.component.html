@@ -38,7 +38,8 @@
                 <app-contributors [totalResult]="totalMemberResult" [loading]="loading$ | async"
                     [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
                     description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
-                    (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()" [disabled]="false">
+                    (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()"
+                    [disabled]="(['project.grant.member.write', 'project.grant.member.write:'+ project.projectId]| hasRole | async) == false">
                 </app-contributors>
             </mat-tab>
             <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="flex-col">
