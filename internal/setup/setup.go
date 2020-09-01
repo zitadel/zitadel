@@ -386,7 +386,7 @@ func (setUp *initializer) project(ctx context.Context, project Project) (*proj_m
 	addProject := &proj_model.Project{
 		Name: project.Name,
 	}
-	return setUp.ProjectEvents.CreateProject(ctx, addProject)
+	return setUp.ProjectEvents.CreateProject(ctx, addProject, false)
 }
 
 func (setUp *initializer) oidcApp(ctx context.Context, project *proj_model.Project, oidc OIDCApp) (*proj_model.Application, error) {
