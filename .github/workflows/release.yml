@@ -6,7 +6,7 @@ env:
   REGISTRY: docker.pkg.github.com
   IMAGE: zitadel
   NODE_VERSION: '12'
-  GO_VERSION: '1.14'
+  GO_VERSION: '1.15'
 
 jobs:
 
