@@ -785,7 +785,7 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "project.write"
+      permission: "project.create"
     };
   }
 
