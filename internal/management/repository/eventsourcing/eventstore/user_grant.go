@@ -148,29 +148,43 @@ func handleSearchUserGrantPermissions(ctx context.Context, request *grant_model.
 	}
 
 	ids := authz.GetExplicitPermissionCtxIDs(permissions, projectReadPerm)
-	if _, q := request.GetSearchQuery(grant_model.UserGrantSearchKeyProjectID); q != nil {
-		containsID := false
-		for _, id := range ids {
-			if id == q.Value {
-				containsID = true
-				break
-			}
+	if _, query := request.GetSearchQuery(grant_model.UserGrantSearchKeyGrantID); query != nil {
+		result := checkContainsPermID(ids, query, request, sequence)
+		if result != nil {
+			return result
 		}
-		if !containsID {
-			result := &grant_model.UserGrantSearchResponse{
-				Offset:      request.Offset,
-				Limit:       request.Limit,
-				TotalResult: uint64(0),
-				Result:      []*grant_model.UserGrantView{},
-			}
-			if sequence != nil {
-				result.Sequence = sequence.CurrentSequence
-				result.Timestamp = sequence.CurrentTimestamp
-			}
+	}
+	if _, query := request.GetSearchQuery(grant_model.UserGrantSearchKeyProjectID); query != nil {
+		result := checkContainsPermID(ids, query, request, sequence)
+		if result != nil {
 			return result
 		}
 	}
 	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyProjectID, Method: global_model.SearchMethodIsOneOf, Value: ids})
+	return nil
+}
+
+func checkContainsPermID(ids []string, query *grant_model.UserGrantSearchQuery, request *grant_model.UserGrantSearchRequest, sequence *repository.CurrentSequence) *grant_model.UserGrantSearchResponse {
+	containsID := false
+	for _, id := range ids {
+		if id == query.Value {
+			containsID = true
+			break
+		}
+	}
+	if !containsID {
+		result := &grant_model.UserGrantSearchResponse{
+			Offset:      request.Offset,
+			Limit:       request.Limit,
+			TotalResult: uint64(0),
+			Result:      []*grant_model.UserGrantView{},
+		}
+		if sequence != nil {
+			result.Sequence = sequence.CurrentSequence
+			result.Timestamp = sequence.CurrentTimestamp
+		}
+		return result
+	}
 	return nil
 }
 
