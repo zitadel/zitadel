@@ -26,12 +26,12 @@
   }
 
   .primaryset {
-      font-size: 13px;
-      cursor: pointer;
-    
-      &:hover {
-          text-decoration: underline;
-      }
+    font-size: 13px;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 
   .verified,
