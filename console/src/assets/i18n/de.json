@@ -335,6 +335,7 @@
             "NEW":"Domain hinzufügen",
             "TITLE":"Domains",
             "DESCRIPTION":"Konfiguriere die Domains mit denen sich deine Benutzer einloggen können.",
+            "SETPRIMARY":"Primäre Domain setzen",
             "DELETE": {
                 "TITLE":"Domain löschen?",
                 "DESCRIPTION":"Du bist im Begriff eine Domain aus deiner Organisation zu löschen. Deine Benutzer können diese nach dem Löschen nicht mehr für den Login nutzen."
@@ -408,7 +409,8 @@
             "DOMAINREMOVED":"Domain entfernt!",
             "MEMBERADDED":"Manager hinzugefügt!",
             "MEMBERREMOVED":"Manager entfernt!",
-            "MEMBERCHANGED":"Manager verändert!"
+            "MEMBERCHANGED":"Manager verändert!",
+            "SETPRIMARY":"Primäre Domain gesetzt"
         }
     },
     "ORG_DETAIL": {

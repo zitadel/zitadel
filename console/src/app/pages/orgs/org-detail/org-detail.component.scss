@@ -25,6 +25,15 @@
     }
   }
 
+  .primaryset {
+    font-size: 13px;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
   .verified,
   .primary {
     color: #5282c1;

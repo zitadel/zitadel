@@ -13,6 +13,8 @@
 
                     <i matTooltip="verified" *ngIf="domain.verified" class="verified las la-check-circle"></i>
                     <i matTooltip="primary" *ngIf="domain.primary" class="primary las la-star"></i>
+                    <a *ngIf="!domain.primary" class="primaryset"
+                        (click)="setPrimary(domain)">{{'ORG.DOMAINS.SETPRIMARY' | translate}}</a>
 
                     <span class="fill-space"></span>
                     <button [disabled]="(canwrite$ | async) == false" matTooltip="Remove domain" color="warn"

@@ -128,6 +128,10 @@ export class GrpcAuthService {
         });
     }
 
+    /**
+     * returns true if user has one of the provided roles
+     * @param roles roles of the user
+     */
     public isAllowed(roles: string[] | RegExp[]): Observable<boolean> {
         if (roles && roles.length > 0) {
             return this.zitadelPermissions.pipe(switchMap(zroles => {
@@ -138,6 +142,11 @@ export class GrpcAuthService {
         }
     }
 
+    /**
+     * returns true if user has one of the provided roles
+     * @param userRoles roles of the user
+     * @param requestedRoles required roles for accessing the respective component
+     */
     public hasRoles(userRoles: string[], requestedRoles: string[] | RegExp[]): boolean {
         return requestedRoles.findIndex((regexp: any) => {
             return userRoles.findIndex(role => {
