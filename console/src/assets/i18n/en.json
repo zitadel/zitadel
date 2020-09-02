@@ -335,6 +335,7 @@
             "NEW":"Add Domain",
             "TITLE":"Domains",
             "DESCRIPTION":"Configure your domains. This domain can be used to login with your users.",
+            "SETPRIMARY":"Set as primary",
             "DELETE": {
                 "TITLE":"Delete domain?",
                 "DESCRIPTION":"You are about to delete one of your domains. Note that your users can no longer use this domain for their logins."
@@ -408,7 +409,8 @@
             "DOMAINREMOVED":"Removed domain!",
             "MEMBERADDED":"Manager added!",
             "MEMBERREMOVED":"Manager removed!",
-            "MEMBERCHANGED":"Manager changed!"
+            "MEMBERCHANGED":"Manager changed!",
+            "SETPRIMARY":"Primary Domain set"
         }
     },
     "ORG_DETAIL": {
