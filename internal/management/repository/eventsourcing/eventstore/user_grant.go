@@ -131,7 +131,7 @@ func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_
 	result = &grant_model.UserGrantSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
-		TotalResult: uint64(count),
+		TotalResult: count,
 		Result:      model.UserGrantsToModel(grants),
 	}
 	if sequenceErr == nil {
@@ -153,6 +153,7 @@ func handleSearchUserGrantPermissions(ctx context.Context, request *grant_model.
 		if result != nil {
 			return result
 		}
+		return nil
 	}
 	if _, query := request.GetSearchQuery(grant_model.UserGrantSearchKeyProjectID); query != nil {
 		result := checkContainsPermID(ids, query, request, sequence)
