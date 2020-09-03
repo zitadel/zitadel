@@ -15,6 +15,7 @@ type Human struct {
 	*Email
 	*Phone
 	*Address
+	ExternalIDPs []*ExternalIDP
 	InitCode     *InitUserCode
 	EmailCode    *EmailCode
 	PhoneCode    *PhoneCode
@@ -95,4 +96,13 @@ func (init *InitUserCode) GenerateInitUserCode(generator crypto.Generator) error
 	init.Code = initCodeCrypto
 	init.Expiry = generator.Expiry()
 	return nil
+}
+
+func (u *Human) GetExternalIDP(externalIDP *ExternalIDP) (int, *ExternalIDP) {
+	for i, idp := range u.ExternalIDPs {
+		if idp.UserID == externalIDP.UserID {
+			return i, idp
+		}
+	}
+	return -1, nil
 }

@@ -43,6 +43,8 @@ Errors:
       HasUpper: Passwort beinhaltet keinen Grossbuchstaben
       HasNumber: Passwort beinhaltet keine Nummer
       HasSymbol: Passwort beinhaltet kein Symbol
+    ExternalIDP:
+      Invalid: Externer IDP ungültig
     Mfa:
       Otp:
         AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet

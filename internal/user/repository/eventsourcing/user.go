@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/authz"
 	"strings"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -29,6 +30,14 @@ func UserUserNameUniqueQuery(userName string) *es_models.SearchQuery {
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(model.UserUserNameAggregate).
 		AggregateIDFilter(userName).
+		OrderDesc().
+		SetLimit(1)
+}
+
+func UserExternalIDPUniqueQuery(externalIDPUserID string) *es_models.SearchQuery {
+	return es_models.NewSearchQuery().
+		AggregateTypeFilter(model.UserExternalIDPAggregate).
+		AggregateIDFilter(externalIDPUserID).
 		OrderDesc().
 		SetLimit(1)
 }
@@ -708,6 +717,75 @@ func DomainClaimedSentAggregate(aggCreator *es_models.AggregateCreator, user *mo
 		}
 		return agg.AppendEvent(model.DomainClaimedSent, nil)
 	}
+}
+
+func ExternalIDPAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, externalIDP *model.ExternalIDP) ([]*es_models.Aggregate, error) {
+	if externalIDP == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Di9os", "Errors.Internal")
+	}
+	aggregates := make([]*es_models.Aggregate, 0)
+	agg, err := UserAggregate(ctx, aggCreator, user)
+	if err != nil {
+		return nil, err
+	}
+	agg, err = agg.AppendEvent(model.HumanExternalIDPAdded, externalIDP)
+	uniqueAggregate, err := reservedUniqueExternalIDPAggregate(ctx, aggCreator, authz.GetCtxData(ctx).OrgID, externalIDP)
+	if err != nil {
+		return nil, err
+	}
+	//TODO: Add Validation of idpconfigid is in loginpolicy of org
+	aggregates = append(aggregates, uniqueAggregate)
+	return append(aggregates, agg), nil
+}
+
+func ExternalIDPRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, externalIDP *model.ExternalIDP) ([]*es_models.Aggregate, error) {
+	if externalIDP == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Mlo0s", "Errors.Internal")
+	}
+
+	aggregates := make([]*es_models.Aggregate, 0)
+	agg, err := UserAggregate(ctx, aggCreator, user)
+	if err != nil {
+		return nil, err
+	}
+	agg, err = agg.AppendEvent(model.HumanExternalIDPRemoved, externalIDP)
+	uniqueReleasedAggregate, err := releasedUniqueExternalIDPAggregate(ctx, aggCreator, externalIDP)
+	if err != nil {
+		return nil, err
+	}
+	aggregates = append(aggregates, uniqueReleasedAggregate)
+	return append(aggregates, agg), nil
+}
+
+func reservedUniqueExternalIDPAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner string, externalIDP *model.ExternalIDP) (*es_models.Aggregate, error) {
+	uniqueExternlIDP := externalIDP.IDPConfigID + externalIDP.UserID
+	aggregate, err := aggCreator.NewAggregate(ctx, uniqueExternlIDP, model.UserExternalIDPAggregate, model.UserVersion, 0)
+	if resourceOwner != "" {
+		aggregate, err = aggCreator.NewAggregate(ctx, uniqueExternlIDP, model.UserExternalIDPAggregate, model.UserVersion, 0, es_models.OverwriteResourceOwner(resourceOwner))
+	}
+	if err != nil {
+		return nil, err
+	}
+	aggregate, err = aggregate.AppendEvent(model.HumanExternalIDPReserved, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return aggregate.SetPrecondition(UserExternalIDPUniqueQuery(uniqueExternlIDP), isEventValidation(aggregate, model.HumanExternalIDPReserved)), nil
+}
+
+func releasedUniqueExternalIDPAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, externalIDP *model.ExternalIDP) (aggregate *es_models.Aggregate, err error) {
+	uniqueExternlIDP := externalIDP.IDPConfigID + externalIDP.UserID
+	aggregate, err = aggCreator.NewAggregate(ctx, uniqueExternlIDP, model.UserExternalIDPAggregate, model.UserVersion, 0)
+	if err != nil {
+		return nil, err
+	}
+	aggregate, err = aggregate.AppendEvent(model.HumanExternalIDPReleased, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return aggregate.SetPrecondition(UserExternalIDPUniqueQuery(uniqueExternlIDP), isEventValidation(aggregate, model.HumanExternalIDPReleased)), nil
 }
 
 func UsernameChangedAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, oldUsername string, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {

@@ -19,11 +19,12 @@ type Human struct {
 	*Email
 	*Phone
 	*Address
-	InitCode     *InitUserCode `json:"-"`
-	EmailCode    *EmailCode    `json:"-"`
-	PhoneCode    *PhoneCode    `json:"-"`
-	PasswordCode *PasswordCode `json:"-"`
-	OTP          *OTP          `json:"-"`
+	ExternalIDPs []*ExternalIDP `json:"-"`
+	InitCode     *InitUserCode  `json:"-"`
+	EmailCode    *EmailCode     `json:"-"`
+	PhoneCode    *PhoneCode     `json:"-"`
+	PasswordCode *PasswordCode  `json:"-"`
+	OTP          *OTP           `json:"-"`
 }
 
 type InitUserCode struct {
@@ -52,6 +53,9 @@ func HumanFromModel(user *model.Human) *Human {
 	if user.OTP != nil {
 		human.OTP = OTPFromModel(user.OTP)
 	}
+	if user.ExternalIDPs != nil {
+		human.ExternalIDPs = ExternalIDPsFromModel(user.ExternalIDPs)
+	}
 	return human
 }
 
@@ -71,6 +75,9 @@ func HumanToModel(user *Human) *model.Human {
 	}
 	if user.Address != nil {
 		human.Address = AddressToModel(user.Address)
+	}
+	if user.ExternalIDPs != nil {
+		human.ExternalIDPs = ExternalIDPsToModel(user.ExternalIDPs)
 	}
 	if user.InitCode != nil {
 		human.InitCode = InitCodeToModel(user.InitCode)
@@ -169,6 +176,10 @@ func (h *Human) AppendEvent(event *es_models.Event) (err error) {
 	case MFAOTPRemoved,
 		HumanMFAOTPRemoved:
 		h.appendOTPRemovedEvent()
+	case HumanExternalIDPAdded:
+		err = h.appendExternalIDPAddedEvent(event)
+	case HumanExternalIDPRemoved:
+		err = h.appendExternalIDPRemovedEvent(event)
 	}
 	if err != nil {
 		return err

@@ -10,11 +10,13 @@ import (
 
 type IDPConfig struct {
 	es_models.ObjectRoot
-	IDPConfigID   string         `json:"idpConfigId"`
-	State         int32          `json:"-"`
-	Name          string         `json:"name,omitempty"`
-	Type          int32          `json:"idpType,omitempty"`
-	LogoSrc       []byte         `json:"logoSrc,omitempty"`
+	IDPConfigID        string `json:"idpConfigId"`
+	State              int32  `json:"-"`
+	Name               string `json:"name,omitempty"`
+	Type               int32  `json:"idpType,omitempty"`
+	LogoSrc            []byte `json:"logoSrc,omitempty"`
+	DisplayNameMapping string `json:"displayNameMapping,omitempty"`
+
 	OIDCIDPConfig *OIDCIDPConfig `json:"-"`
 }
 
@@ -41,6 +43,9 @@ func (c *IDPConfig) Changes(changed *IDPConfig) map[string]interface{} {
 	if changed.LogoSrc != nil && bytes.Equal(c.LogoSrc, changed.LogoSrc) {
 		changes["logoSrc"] = changed.LogoSrc
 	}
+	if changed.DisplayNameMapping != "" && c.DisplayNameMapping != changed.DisplayNameMapping {
+		changes["displayNameMapping"] = changed.DisplayNameMapping
+	}
 	return changes
 }
 
@@ -62,12 +67,13 @@ func IDPConfigsFromModel(idps []*model.IDPConfig) []*IDPConfig {
 
 func IDPConfigFromModel(idp *model.IDPConfig) *IDPConfig {
 	converted := &IDPConfig{
-		ObjectRoot:  idp.ObjectRoot,
-		IDPConfigID: idp.IDPConfigID,
-		Name:        idp.Name,
-		State:       int32(idp.State),
-		Type:        int32(idp.Type),
-		LogoSrc:     idp.LogoSrc,
+		ObjectRoot:         idp.ObjectRoot,
+		IDPConfigID:        idp.IDPConfigID,
+		Name:               idp.Name,
+		State:              int32(idp.State),
+		Type:               int32(idp.Type),
+		LogoSrc:            idp.LogoSrc,
+		DisplayNameMapping: idp.DisplayNameMapping,
 	}
 	if idp.OIDCConfig != nil {
 		converted.OIDCIDPConfig = OIDCIDPConfigFromModel(idp.OIDCConfig)
@@ -77,12 +83,13 @@ func IDPConfigFromModel(idp *model.IDPConfig) *IDPConfig {
 
 func IDPConfigToModel(idp *IDPConfig) *model.IDPConfig {
 	converted := &model.IDPConfig{
-		ObjectRoot:  idp.ObjectRoot,
-		IDPConfigID: idp.IDPConfigID,
-		Name:        idp.Name,
-		LogoSrc:     idp.LogoSrc,
-		State:       model.IDPConfigState(idp.State),
-		Type:        model.IdpConfigType(idp.Type),
+		ObjectRoot:         idp.ObjectRoot,
+		IDPConfigID:        idp.IDPConfigID,
+		Name:               idp.Name,
+		LogoSrc:            idp.LogoSrc,
+		State:              model.IDPConfigState(idp.State),
+		Type:               model.IdpConfigType(idp.Type),
+		DisplayNameMapping: idp.DisplayNameMapping,
 	}
 	if idp.OIDCIDPConfig != nil {
 		converted.OIDCConfig = OIDCIDPConfigToModel(idp.OIDCIDPConfig)

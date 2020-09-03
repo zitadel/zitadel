@@ -7,12 +7,13 @@ import (
 
 type IDPConfig struct {
 	es_models.ObjectRoot
-	IDPConfigID string
-	Type        IdpConfigType
-	Name        string
-	LogoSrc     []byte
-	State       IDPConfigState
-	OIDCConfig  *OIDCIDPConfig
+	IDPConfigID        string
+	Type               IdpConfigType
+	Name               string
+	LogoSrc            []byte
+	State              IDPConfigState
+	OIDCConfig         *OIDCIDPConfig
+	DisplayNameMapping string
 }
 
 type OIDCIDPConfig struct {

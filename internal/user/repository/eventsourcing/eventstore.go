@@ -691,6 +691,58 @@ func (es *UserEventstore) PasswordCodeSent(ctx context.Context, userID string) e
 	return nil
 }
 
+func (es *UserEventstore) AddExternalIDP(ctx context.Context, externalIDP *usr_model.ExternalIDP) (*usr_model.ExternalIDP, error) {
+	if externalIDP == nil || !externalIDP.IsValid() {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Ek9s", "Errors.User.ExternalIDP.Invalid")
+	}
+	existingUser, err := es.UserByID(ctx, externalIDP.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	repoUser := model.UserFromModel(existingUser)
+	repoExternalIDP := model.ExternalIDPFromModel(externalIDP)
+	aggregates, err := ExternalIDPAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoUser, repoExternalIDP)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, aggregates...)
+	if err != nil {
+		return nil, err
+	}
+
+	es.userCache.cacheUser(repoUser)
+	if _, idp := model.GetExternalIDP(repoUser.ExternalIDPs, externalIDP.UserID); idp != nil {
+		return model.ExternalIDPToModel(idp), nil
+	}
+	return nil, errors.ThrowInternal(nil, "EVENT-Msi9d", "Errors.Internal")
+}
+
+func (es *UserEventstore) RemoveExternalIDP(ctx context.Context, externalIDP *usr_model.ExternalIDP) error {
+	if externalIDP == nil || !externalIDP.IsValid() {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Cm8sj", "Errors.User.ExternalIDP.Invalid")
+	}
+	existingUser, err := es.UserByID(ctx, externalIDP.AggregateID)
+	if err != nil {
+		return err
+	}
+	_, existingIDP := existingUser.GetExternalIDP(externalIDP)
+	if existingIDP == nil {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-3Dh7s", "Errors.User.ExternalIDP.NotOnUser")
+	}
+	repoUser := model.UserFromModel(existingUser)
+	repoExternalIDP := model.ExternalIDPFromModel(externalIDP)
+	aggregates, err := ExternalIDPRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoUser, repoExternalIDP)
+	if err != nil {
+		return err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, aggregates...)
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
 func (es *UserEventstore) ProfileByID(ctx context.Context, userID string) (*usr_model.Profile, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di834", "Errors.User.UserIDMissing")
