@@ -3,6 +3,7 @@ package eventsourcing
 import (
 	"context"
 	"github.com/caos/zitadel/internal/api/authz"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	"strings"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -728,12 +729,18 @@ func ExternalIDPAddedAggregate(ctx context.Context, aggCreator *es_models.Aggreg
 	if err != nil {
 		return nil, err
 	}
+	validationQuery := es_models.NewSearchQuery().
+		AggregateTypeFilter(org_es_model.OrgAggregate, iam_es_model.IAMAggregate).
+		AggregateIDsFilter()
+
+	validation := addIDPConfigExistingValidation(externalIDP.IDPConfigID)
+	agg.SetPrecondition(validationQuery, validation)
 	agg, err = agg.AppendEvent(model.HumanExternalIDPAdded, externalIDP)
+
 	uniqueAggregate, err := reservedUniqueExternalIDPAggregate(ctx, aggCreator, authz.GetCtxData(ctx).OrgID, externalIDP)
 	if err != nil {
 		return nil, err
 	}
-	//TODO: Add Validation of idpconfigid is in loginpolicy of org
 	aggregates = append(aggregates, uniqueAggregate)
 	return append(aggregates, agg), nil
 }
@@ -866,5 +873,90 @@ func addUserNameValidation(userName string) func(...*es_models.Event) error {
 			}
 		}
 		return nil
+	}
+}
+
+func addIDPConfigExistingValidation(idpConfigID string) func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		iamLoginPolicy := new(iam_es_model.LoginPolicy)
+		orgPolicyExisting := false
+		orgLoginPolicy := new(iam_es_model.LoginPolicy)
+		for _, event := range events {
+			switch event.AggregateType {
+			case org_es_model.OrgAggregate:
+				orgPolicyExisting = handleOrgLoginPolicy(event, orgPolicyExisting, orgLoginPolicy)
+			case iam_es_model.IAMAggregate:
+				handleIAMLoginPolicy(event, iamLoginPolicy)
+			}
+		}
+		if orgPolicyExisting {
+			if !orgLoginPolicy.AllowExternalIdp {
+				return errors.ThrowPreconditionFailed(nil, "EVENT-Wmi9s", "Errors.User.ExternalIDP.NotAllowed")
+			}
+			for _, provider := range orgLoginPolicy.IDPProviders {
+				if provider.IDPConfigID == idpConfigID {
+					return nil
+				}
+			}
+		}
+		if !iamLoginPolicy.AllowExternalIdp {
+			return errors.ThrowPreconditionFailed(nil, "EVENT-Ns7uf", "Errors.User.ExternalIDP.NotAllowed")
+		}
+		for _, provider := range iamLoginPolicy.IDPProviders {
+			if provider.IDPConfigID == idpConfigID {
+				return nil
+			}
+		}
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Wmi9s", "Errors.User.ExternalIDP.IDPConfigNotExisting")
+	}
+}
+
+func handleOrgLoginPolicy(event *es_models.Event, orgPolicyExisting bool, orgLoginPolicy *iam_es_model.LoginPolicy) bool {
+	switch event.Type {
+	case org_es_model.LoginPolicyAdded:
+		orgPolicyExisting = true
+		orgLoginPolicy.SetData(event)
+	case org_es_model.LoginPolicyChanged:
+		orgLoginPolicy.SetData(event)
+	case org_es_model.LoginPolicyRemoved:
+		orgPolicyExisting = false
+	case org_es_model.LoginPolicyIDPProviderAdded:
+		idp := new(iam_es_model.IDPProvider)
+		idp.SetData(event)
+		orgLoginPolicy.IDPProviders = append(orgLoginPolicy.IDPProviders, idp)
+	case org_es_model.LoginPolicyIDPProviderRemoved, org_es_model.LoginPolicyIDPProviderCascadeRemoved:
+		idp := new(iam_es_model.IDPProvider)
+		idp.SetData(event)
+		for i, provider := range orgLoginPolicy.IDPProviders {
+			if provider.IDPConfigID == idp.IDPConfigID {
+				orgLoginPolicy.IDPProviders[i] = orgLoginPolicy.IDPProviders[len(orgLoginPolicy.IDPProviders)-1]
+				orgLoginPolicy.IDPProviders[len(orgLoginPolicy.IDPProviders)-1] = nil
+				orgLoginPolicy.IDPProviders = orgLoginPolicy.IDPProviders[:len(orgLoginPolicy.IDPProviders)-1]
+				break
+			}
+		}
+	}
+	return orgPolicyExisting
+}
+
+func handleIAMLoginPolicy(event *es_models.Event, iamLoginPolicy *iam_es_model.LoginPolicy) {
+	switch event.Type {
+	case iam_es_model.LoginPolicyAdded, iam_es_model.LoginPolicyChanged:
+		iamLoginPolicy.SetData(event)
+	case iam_es_model.LoginPolicyIDPProviderAdded:
+		idp := new(iam_es_model.IDPProvider)
+		idp.SetData(event)
+		iamLoginPolicy.IDPProviders = append(iamLoginPolicy.IDPProviders, idp)
+	case iam_es_model.LoginPolicyIDPProviderRemoved, iam_es_model.LoginPolicyIDPProviderCascadeRemoved:
+		idp := new(iam_es_model.IDPProvider)
+		idp.SetData(event)
+		for i, provider := range iamLoginPolicy.IDPProviders {
+			if provider.IDPConfigID == idp.IDPConfigID {
+				iamLoginPolicy.IDPProviders[i] = iamLoginPolicy.IDPProviders[len(iamLoginPolicy.IDPProviders)-1]
+				iamLoginPolicy.IDPProviders[len(iamLoginPolicy.IDPProviders)-1] = nil
+				iamLoginPolicy.IDPProviders = iamLoginPolicy.IDPProviders[:len(iamLoginPolicy.IDPProviders)-1]
+				break
+			}
+		}
 	}
 }

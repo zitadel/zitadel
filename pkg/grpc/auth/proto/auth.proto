@@ -264,6 +264,28 @@ service AuthService {
         };
   }
 
+  //ExternalIDP
+  rpc AddExternalIDP(ExternalIDPAddRequest) returns (ExternalIDPResponse) {
+    option (google.api.http) = {
+      post: "/users/me/externalidps"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
+  rpc RemoveExternalIDP(ExternalIDPRemoveRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/users/me/externalidps/{idp_config_id}/{user_id}"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
   // MFA
   rpc AddMfaOTP(google.protobuf.Empty) returns (MfaOtpResponse) {
     option (google.api.http) = {
@@ -713,4 +735,21 @@ message PasswordComplexityPolicy {
   bool has_symbol = 9;
   uint64 sequence = 10;
   bool is_default = 11;
+}
+
+message ExternalIDPAddRequest {
+  string idp_config_id = 1;
+  string user_id = 2;
+  string display_name = 3;
+}
+
+message ExternalIDPResponse {
+  string idp_config_id = 1;
+  string user_id = 2;
+  string display_name = 3;
+}
+
+message ExternalIDPRemoveRequest {
+  string idp_config_id = 1;
+  string user_id = 2;
 }

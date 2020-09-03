@@ -44,7 +44,9 @@ Errors:
       HasNumber: Password must contain number
       HasSymbol: Password must contain symbol
     ExternalIDP:
-      Invalid: Externer IDP ungültig
+      Invalid: Externer IDP invalid
+      IDPConfigNotExisting: IDP provider invalid for this organisation
+      NotAllowed: External IDP not allowed on this organisation
     Mfa:
       Otp:
         AlreadyReady: Multifactor OTP (OneTimePassword) is already set up

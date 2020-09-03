@@ -699,6 +699,9 @@ func (es *UserEventstore) AddExternalIDP(ctx context.Context, externalIDP *usr_m
 	if err != nil {
 		return nil, err
 	}
+	if existingUser.Human == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Cnk8s", "Errors.User.NotHuman")
+	}
 	repoUser := model.UserFromModel(existingUser)
 	repoExternalIDP := model.ExternalIDPFromModel(externalIDP)
 	aggregates, err := ExternalIDPAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoUser, repoExternalIDP)
@@ -724,6 +727,9 @@ func (es *UserEventstore) RemoveExternalIDP(ctx context.Context, externalIDP *us
 	existingUser, err := es.UserByID(ctx, externalIDP.AggregateID)
 	if err != nil {
 		return err
+	}
+	if existingUser.Human == nil {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-E8iod", "Errors.User.NotHuman")
 	}
 	_, existingIDP := existingUser.GetExternalIDP(externalIDP)
 	if existingIDP == nil {

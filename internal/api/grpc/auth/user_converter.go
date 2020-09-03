@@ -242,6 +242,31 @@ func updateAddressToModel(ctx context.Context, address *auth.UpdateUserAddressRe
 	}
 }
 
+func externalIDPAddToModel(ctx context.Context, idp *auth.ExternalIDPAddRequest) *usr_model.ExternalIDP {
+	return &usr_model.ExternalIDP{
+		ObjectRoot:  models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
+		IDPConfigID: idp.IdpConfigId,
+		UserID:      idp.UserId,
+		DisplayName: idp.DisplayName,
+	}
+}
+
+func externalIDPRemoveToModel(ctx context.Context, idp *auth.ExternalIDPRemoveRequest) *usr_model.ExternalIDP {
+	return &usr_model.ExternalIDP{
+		ObjectRoot:  models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
+		IDPConfigID: idp.IdpConfigId,
+		UserID:      idp.UserId,
+	}
+}
+
+func externalIDPResponseFromModel(idp *usr_model.ExternalIDP) *auth.ExternalIDPResponse {
+	return &auth.ExternalIDPResponse{
+		IdpConfigId: idp.IDPConfigID,
+		UserId:      idp.UserID,
+		DisplayName: idp.DisplayName,
+	}
+}
+
 func otpFromModel(otp *usr_model.OTP) *auth.MfaOtpResponse {
 	return &auth.MfaOtpResponse{
 		UserId: otp.AggregateID,

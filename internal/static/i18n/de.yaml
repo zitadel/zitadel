@@ -45,6 +45,8 @@ Errors:
       HasSymbol: Passwort beinhaltet kein Symbol
     ExternalIDP:
       Invalid: Externer IDP ungültig
+      IDPConfigNotExisting: IDP Provider ungültig für diese Organisation
+      NotAllowed: Externer IDP ist auf dieser Organisation nicht erlaubt.
     Mfa:
       Otp:
         AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet

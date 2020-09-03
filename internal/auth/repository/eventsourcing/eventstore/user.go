@@ -87,6 +87,20 @@ func (repo *UserRepo) ChangeMyProfile(ctx context.Context, profile *model.Profil
 	return repo.UserEvents.ChangeProfile(ctx, profile)
 }
 
+func (repo *UserRepo) AddMyExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) (*model.ExternalIDP, error) {
+	if err := checkIDs(ctx, externalIDP.ObjectRoot); err != nil {
+		return nil, err
+	}
+	return repo.UserEvents.AddExternalIDP(ctx, externalIDP)
+}
+
+func (repo *UserRepo) RemoveMyExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) error {
+	if err := checkIDs(ctx, externalIDP.ObjectRoot); err != nil {
+		return err
+	}
+	return repo.UserEvents.RemoveExternalIDP(ctx, externalIDP)
+}
+
 func (repo *UserRepo) MyEmail(ctx context.Context) (*model.Email, error) {
 	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {

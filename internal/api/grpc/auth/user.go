@@ -122,6 +122,19 @@ func (s *Server) ChangeMyPassword(ctx context.Context, request *auth.PasswordCha
 	return &empty.Empty{}, err
 }
 
+func (s *Server) AddMyExternalIDP(ctx context.Context, request *auth.ExternalIDPAddRequest) (*auth.ExternalIDPResponse, error) {
+	externalIDP, err := s.repo.AddMyExternalIDP(ctx, externalIDPAddToModel(ctx, request))
+	if err != nil {
+		return nil, err
+	}
+	return externalIDPResponseFromModel(externalIDP), nil
+}
+
+func (s *Server) RemoveMyExternalIDP(ctx context.Context, request *auth.ExternalIDPRemoveRequest) (*empty.Empty, error) {
+	err := s.repo.RemoveMyExternalIDP(ctx, externalIDPRemoveToModel(ctx, request))
+	return &empty.Empty{}, err
+}
+
 func (s *Server) GetMyPasswordComplexityPolicy(ctx context.Context, _ *empty.Empty) (*auth.PasswordComplexityPolicy, error) {
 	policy, err := s.repo.GetMyPasswordComplexityPolicy(ctx)
 	if err != nil {
