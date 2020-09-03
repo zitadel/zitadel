@@ -140,7 +140,7 @@ jobs:
       run: echo ${{ steps.vars.outputs.sha_short }}
     - name: Docker Login
       run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
-    - uses: anchore/scan-action@master
+    - uses: anchore/scan-action@v1
       with:
         image-reference: "${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.vars.outputs.sha_short }}"
         dockerfile-path: "./build/docker/Dockerfile"
