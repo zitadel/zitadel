@@ -245,7 +245,11 @@ func (l *Login) getErrorMessage(r *http.Request, err error) (errMsg string) {
 	return err.Error()
 }
 
-func (l *Login) getTheme(r *http.Request) string {
+func (l *Login) getTheme(authReq *model.AuthRequest) string {
+	//switch authReq.Request.Type() {
+	//case model.AuthRequestTypeOIDC:
+	//
+	//}
 	return "zitadel" //TODO: impl
 }
 
