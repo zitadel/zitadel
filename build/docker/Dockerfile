@@ -2,7 +2,7 @@
 FROM alpine:latest as prepare
 RUN adduser -D zitadel
 COPY .artifacts/zitadel-linux-amd64 /app/zitadel
-COPY cmd/zitadel/*.yaml /app
+COPY cmd/zitadel/*.yaml /app/
 RUN chmod a+x /app/zitadel
 
 # This Stage is intended as production image
