@@ -2,9 +2,8 @@ name: Release
 on: push
 
 env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  REGISTRY: docker.pkg.github.com
-  IMAGE: zitadel
+  GITHUB_TOKEN: ${{ secrets.CR_PAT }}
+  REGISTRY: ghcr.io
   NODE_VERSION: '12'
   GO_VERSION: '1.14'
 
@@ -122,9 +121,9 @@ jobs:
       with:
         dockerfile: build/docker/Dockerfile
         username: ${{ github.actor }}
-        password: ${{ github.token }}
+        password: ${{ secrets.CR_PAT }}
         registry: ${{ env.REGISTRY }}
-        repository: ${{ github.repository }}/${{ env.IMAGE }}
+        repository: ${{ github.repository }}
         tag_with_ref: true
         tag_with_sha: true
   
@@ -143,7 +142,7 @@ jobs:
       run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
     - uses: anchore/scan-action@master
       with:
-        image-reference: "${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE }}:${{ steps.vars.outputs.sha_short }}"
+        image-reference: "${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.vars.outputs.sha_short }}"
         dockerfile-path: "./build/docker/Dockerfile"
         fail-build: false
         acs-report-enable: true
@@ -157,7 +156,7 @@ jobs:
     needs: [container-prod]
     env:
       DOCKER_USERNAME: ${{ github.actor }}
-      DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      DOCKER_PASSWORD: ${{ secrets.CR_PAT }}
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
@@ -173,7 +172,7 @@ jobs:
     - name: Docker Login
       run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
     - name: Docker Pull short-sha
-      run: docker pull $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:${{ steps.vars.outputs.sha_short }}
+      run: docker pull $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }}
     - name: Semantic Release
       uses: cycjimmy/semantic-release-action@v2
       with:
@@ -182,25 +181,14 @@ jobs:
         extra_plugins: |
           @semantic-release/exec@5.0.0
     - name: Docker Tag Version
-      run: docker tag $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:$CAOS_NEXT_VERSION
+      run: docker tag $REGISTRY/$GITHUB_REPOSITORY${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:$CAOS_NEXT_VERSION
       if: env.CAOS_NEXT_VERSION !=  ''
     - name: Docker Tag Latest
-      run: docker tag $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:latest
+      run: docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:latest
       if: env.CAOS_NEXT_VERSION !=  ''
     - name: Docker Push Version
-      run: docker push $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:$CAOS_NEXT_VERSION
+      run: docker push $REGISTRY/$GITHUB_REPOSITORY:$CAOS_NEXT_VERSION
       if: env.CAOS_NEXT_VERSION !=  ''
     - name: Docker Push Latest
-      run: docker push $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:latest
-      if: env.CAOS_NEXT_VERSION !=  ''
-    - name: Deploy DEV environment
-      env:
-        TARGET_ENVIRONMENT: "dev"
-        GIT_OPSREPO_DEPLOYTOKEN: ${{secrets.GIT_OPSREPO_DEPLOYTOKEN}}
-      run: |
-        source ./.github/scripts/githelper.sh
-        setup_git
-        checkout_project
-        change_image_version
-        upload_files
+      run: docker push $REGISTRY/$GITHUB_REPOSITORY:latest
       if: env.CAOS_NEXT_VERSION !=  ''
