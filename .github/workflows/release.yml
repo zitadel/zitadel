@@ -121,7 +121,7 @@ jobs:
       with:
         dockerfile: build/docker/Dockerfile
         username: ${{ github.actor }}
-        password: ${{ github.token }}
+        password: ${{ secrets.CR_PAT }}
         registry: ${{ env.REGISTRY }}
         repository: ${{ github.repository }}
         tag_with_ref: true
@@ -156,7 +156,7 @@ jobs:
     needs: [container-prod]
     env:
       DOCKER_USERNAME: ${{ github.actor }}
-      DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      DOCKER_PASSWORD: ${{ secrets.CR_PAT }}
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
@@ -191,15 +191,4 @@ jobs:
       if: env.CAOS_NEXT_VERSION !=  ''
     - name: Docker Push Latest
       run: docker push $REGISTRY/$GITHUB_REPOSITORY:latest
-      if: env.CAOS_NEXT_VERSION !=  ''
-    - name: Deploy DEV environment
-      env:
-        TARGET_ENVIRONMENT: "dev"
-        GIT_OPSREPO_DEPLOYTOKEN: ${{secrets.GIT_OPSREPO_DEPLOYTOKEN}}
-      run: |
-        source ./.github/scripts/githelper.sh
-        setup_git
-        checkout_project
-        change_image_version
-        upload_files
       if: env.CAOS_NEXT_VERSION !=  ''
