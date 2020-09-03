@@ -2,7 +2,7 @@ name: Release
 on: push
 
 env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.CR_PAT }}
   REGISTRY: ghcr.io
   NODE_VERSION: '12'
   GO_VERSION: '1.14'
