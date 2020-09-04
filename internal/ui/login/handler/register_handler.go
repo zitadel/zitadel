@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strings"
 
 	"golang.org/x/text/language"
 
@@ -15,16 +16,19 @@ import (
 const (
 	tmplRegister          = "register"
 	orgProjectCreatorRole = "ORG_PROJECT_CREATOR"
+	TermsLinkEN           = "https://zitadel.ch/pdf/tos.pdf"
+	TermsLinkDE           = "https://zitadel.ch/pdf/agb.pdf"
 )
 
 type registerFormData struct {
-	Email     string `schema:"email"`
-	Firstname string `schema:"firstname"`
-	Lastname  string `schema:"lastname"`
-	Language  string `schema:"language"`
-	Gender    int32  `schema:"gender"`
-	Password  string `schema:"register-password"`
-	Password2 string `schema:"register-password-confirmation"`
+	Email        string `schema:"email"`
+	Firstname    string `schema:"firstname"`
+	Lastname     string `schema:"lastname"`
+	Language     string `schema:"language"`
+	Gender       int32  `schema:"gender"`
+	Password     string `schema:"register-password"`
+	Password2    string `schema:"register-password-confirmation"`
+	TermsConfirm bool   `schema:"terms-confirm"`
 }
 
 type registerData struct {
@@ -36,6 +40,7 @@ type registerData struct {
 	HasLowercase              string
 	HasNumber                 string
 	HasSymbol                 string
+	TermsLink                 string
 }
 
 func (l *Login) handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -94,10 +99,13 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	if formData.Language == "" {
 		formData.Language = l.renderer.Lang(r).String()
 	}
-
 	data := registerData{
 		baseData:         l.getBaseData(r, authRequest, "Register", errType, errMessage),
 		registerFormData: *formData,
+		TermsLink:        TermsLinkDE,
+	}
+	if strings.HasPrefix(data.Lang, "en") {
+		data.TermsLink = TermsLinkEN
 	}
 	iam, _ := l.authRepo.GetIAM(r.Context())
 	if iam != nil {

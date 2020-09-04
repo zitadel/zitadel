@@ -180,6 +180,23 @@ form {
         }
     }
 
+    .field.check-box {
+        display: flex;
+
+        input[type='checkbox'] {
+            height: 20px;
+            vertical-align: middle;
+        }
+
+        & label {
+            height: 20px;
+            text-transform: inherit;
+            display: inline-block;
+            padding: 2px 0 0 15px;
+            width: 100%;
+        }
+    }
+
     label {
         color: $labelColor;
         text-transform: uppercase;

@@ -118,6 +118,9 @@ Registration:
   Diverse: diverse / X
   Password: Password
   Password2: Password confirmation
+  Tos: Terms and conditions
+  TosConfirm: I agree the
+  TosLink: TOS
 
 RegistrationOrg:
   Title: Organisation Registration
@@ -137,6 +140,9 @@ RegistrationOrg:
   Diverse: diverse / X
   Password: Password
   Password2: Password confirmation
+  Tos: Terms and conditions
+  TosConfirm: I agree the
+  TosLink: TOS
 
 
 LogoutDone:

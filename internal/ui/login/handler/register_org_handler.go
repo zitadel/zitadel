@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strings"
 
 	auth_model "github.com/caos/zitadel/internal/auth/model"
 
@@ -16,13 +17,14 @@ const (
 )
 
 type registerOrgFormData struct {
-	OrgName   string `schema:"orgname"`
-	Email     string `schema:"email"`
-	Username  string `schema:"username"`
-	Firstname string `schema:"firstname"`
-	Lastname  string `schema:"lastname"`
-	Password  string `schema:"register-password"`
-	Password2 string `schema:"register-password-confirmation"`
+	OrgName      string `schema:"orgname"`
+	Email        string `schema:"email"`
+	Username     string `schema:"username"`
+	Firstname    string `schema:"firstname"`
+	Lastname     string `schema:"lastname"`
+	Password     string `schema:"register-password"`
+	Password2    string `schema:"register-password-confirmation"`
+	TermsConfirm bool   `schema:"terms-confirm"`
 }
 
 type registerOrgData struct {
@@ -36,6 +38,7 @@ type registerOrgData struct {
 	HasSymbol                 string
 	UserLoginMustBeDomain     bool
 	IamDomain                 string
+	TermsLink                 string
 }
 
 func (l *Login) handleRegisterOrg(w http.ResponseWriter, r *http.Request) {
@@ -90,8 +93,11 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 	data := registerOrgData{
 		baseData:            l.getBaseData(r, authRequest, "Register", errType, errMessage),
 		registerOrgFormData: *formData,
+		TermsLink:           TermsLinkDE,
 	}
-
+	if strings.HasPrefix(data.Lang, "en") {
+		data.TermsLink = TermsLinkEN
+	}
 	pwPolicy, description, _ := l.getPasswordComplexityPolicy(r, "0")
 	if pwPolicy != nil {
 		data.PasswordPolicyDescription = description

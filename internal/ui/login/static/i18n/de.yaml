@@ -118,6 +118,9 @@ Registration:
   Diverse: diverse
   Password: Passwort
   Password2: Passwort wiederholen
+  Tos: Allgemeine Geschäftsbedingungen
+  TosConfirm: Ich akzeptiere die
+  TosLink: AGBs
 
 RegistrationOrg:
   Title: Organisations Registration
@@ -137,6 +140,9 @@ RegistrationOrg:
   Diverse: diverse
   Password: Passwort
   Password2: Passwort wiederholen
+  Tos: Allgemeine Geschäftsbedingungen
+  TosConfirm: Ich akzeptiere die
+  TosLink: AGBs
 
 LogoutDone:
   Title: Ausgeloggt
