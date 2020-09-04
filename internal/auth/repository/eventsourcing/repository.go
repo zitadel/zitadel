@@ -147,6 +147,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 			MfaInitSkippedLifeTime:   systemDefaults.VerificationLifetimes.MfaInitSkip.Duration,
 			MfaSoftwareCheckLifeTime: systemDefaults.VerificationLifetimes.MfaSoftwareCheck.Duration,
 			MfaHardwareCheckLifeTime: systemDefaults.VerificationLifetimes.MfaHardwareCheck.Duration,
+			SystemDefaults:           systemDefaults,
 		},
 		eventstore.TokenRepo{View: view},
 		eventstore.KeyRepository{
@@ -174,6 +175,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 			OrgEventstore:    org,
 			PolicyEventstore: policy,
 			UserEventstore:   user,
+			SystemDefaults:   systemDefaults,
 		},
 		eventstore.IAMRepository{
 			IAMEvents: iam,

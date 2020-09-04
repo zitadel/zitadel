@@ -1,5 +1,7 @@
 package model
 
+import "github.com/caos/zitadel/internal/iam/model"
+
 type NextStep interface {
 	Type() NextStepType
 }
@@ -28,7 +30,10 @@ const (
 	UserSessionStateTerminated
 )
 
-type LoginStep struct{}
+type LoginStep struct {
+	LoginPolicy *model.LoginPolicyView
+	AllowedIDPs []*model.IDPConfigView
+}
 
 func (s *LoginStep) Type() NextStepType {
 	return NextStepLogin

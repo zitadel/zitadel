@@ -2,6 +2,9 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"time"
 
 	"github.com/caos/logging"
@@ -36,6 +39,8 @@ type AuthRequestRepo struct {
 	MfaInitSkippedLifeTime   time.Duration
 	MfaSoftwareCheckLifeTime time.Duration
 	MfaHardwareCheckLifeTime time.Duration
+
+	SystemDefaults systemdefaults.SystemDefaults
 }
 
 type userSessionViewProvider interface {
@@ -188,8 +193,14 @@ func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID
 	return request, nil
 }
 
-func (repo *AuthRequestRepo) checkLoginName(request *model.AuthRequest, loginName string) error {
-	user, err := repo.View.UserByLoginName(loginName)
+func (repo *AuthRequestRepo) checkLoginName(request *model.AuthRequest, loginName string) (err error) {
+	orgID := request.GetScopeOrgID()
+	user := new(user_view_model.UserView)
+	if orgID != "" {
+		user, err = repo.View.UserByLoginNameAndResourceOwner(loginName, orgID)
+	} else {
+		user, err = repo.View.UserByLoginName(loginName)
+	}
 	if err != nil {
 		return err
 	}
@@ -206,7 +217,11 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 		return append(steps, &model.RedirectToCallbackStep{}), nil
 	}
 	if request.UserID == "" {
-		steps = append(steps, &model.LoginStep{})
+		loginStep, err := repo.getLoginStep(ctx, request)
+		if err != nil {
+			return nil, err
+		}
+		steps = append(steps, loginStep)
 		if request.Prompt == model.PromptSelectAccount || request.Prompt == model.PromptUnspecified {
 			users, err := repo.usersForUserSelection(request)
 			if err != nil {
@@ -260,6 +275,29 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 
 	//PLANNED: consent step
 	return append(steps, &model.RedirectToCallbackStep{}), nil
+}
+
+func (repo *AuthRequestRepo) getLoginStep(ctx context.Context, request *model.AuthRequest) (*model.LoginStep, error) {
+	loginStep := new(model.LoginStep)
+	orgID := request.GetScopeOrgID()
+	if orgID == "" {
+		orgID = repo.SystemDefaults.IamID
+	}
+
+	policy, err := repo.getLoginPolicy(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	loginStep.LoginPolicy = policy
+	if !policy.AllowExternalIDP {
+		return loginStep, nil
+	}
+	idpProviders, err := repo.getLoginPolicyIDPConfigs(ctx, orgID, policy.Default)
+	if err != nil {
+		return nil, err
+	}
+	loginStep.AllowedIDPs = idpProviders
+	return loginStep, nil
 }
 
 func (repo *AuthRequestRepo) usersForUserSelection(request *model.AuthRequest) ([]model.UserSelection, error) {
@@ -320,6 +358,36 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
 		return true
 	}
 	return checkVerificationTime(user.MfaInitSkipped, repo.MfaInitSkippedLifeTime)
+}
+
+func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (*iam_model.LoginPolicyView, error) {
+	policy, err := repo.View.LoginPolicyByAggregateID(orgID)
+	if errors.IsNotFound(err) {
+		policy, err = repo.View.LoginPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
+		policy.Default = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.LoginPolicyViewToModel(policy), err
+}
+
+func (repo *AuthRequestRepo) getLoginPolicyIDPConfigs(ctx context.Context, orgID string, defaultPolicy bool) ([]*iam_model.IDPConfigView, error) {
+	if defaultPolicy {
+		idpConfigs, err := repo.View.GetIDPConfigsByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
+		return iam_es_model.IdpConfigViewsToModel(idpConfigs), nil
+	}
+	idpConfigs, err := repo.View.GetIDPConfigsByAggregateID(orgID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.IdpConfigViewsToModel(idpConfigs), nil
 }
 
 func checkVerificationTime(verificationTime time.Time, lifetime time.Duration) bool {

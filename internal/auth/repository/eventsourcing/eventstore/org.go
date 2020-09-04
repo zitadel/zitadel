@@ -2,8 +2,8 @@ package eventstore
 
 import (
 	"context"
-
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 
 	auth_model "github.com/caos/zitadel/internal/auth/model"
 	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
@@ -26,6 +26,7 @@ type OrgRepository struct {
 	OrgEventstore    *org_es.OrgEventstore
 	UserEventstore   *usr_es.UserEventstore
 	PolicyEventstore *policy_es.PolicyEventstore
+	SystemDefaults   systemdefaults.SystemDefaults
 
 	View *auth_view.View
 }

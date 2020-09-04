@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"net/http"
 	"path"
+	"strings"
 
 	"github.com/caos/logging"
 	"github.com/gorilla/csrf"
@@ -161,7 +162,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 			l.chooseNextStep(w, r, authReq, 1, err)
 			return
 		}
-		l.renderLogin(w, r, authReq, err)
+		l.renderLogin(w, r, authReq, step, err)
 	case *model.SelectUserStep:
 		l.renderUserSelection(w, r, authReq, step)
 	case *model.InitPasswordStep:
@@ -215,8 +216,9 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 		},
 		Lang:      l.renderer.Lang(r).String(),
 		Title:     title,
-		Theme:     l.getTheme(r),
+		Theme:     l.getTheme(authReq),
 		ThemeMode: l.getThemeMode(r),
+		OrgID:     l.getOrgID(authReq),
 		AuthReqID: getRequestID(authReq, r),
 		CSRF:      csrf.TemplateField(r),
 		Nonce:     http_mw.GetNonce(r),
@@ -246,15 +248,25 @@ func (l *Login) getErrorMessage(r *http.Request, err error) (errMsg string) {
 }
 
 func (l *Login) getTheme(authReq *model.AuthRequest) string {
-	//switch authReq.Request.Type() {
-	//case model.AuthRequestTypeOIDC:
-	//
-	//}
 	return "zitadel" //TODO: impl
 }
 
 func (l *Login) getThemeMode(r *http.Request) string {
 	return "" //TODO: impl
+}
+
+func (l *Login) getOrgID(authReq *model.AuthRequest) string {
+	switch request := authReq.Request.(type) {
+	case *model.AuthRequestOIDC:
+		fmt.Printf("SCOPES: %v", request.Scopes)
+		for _, scope := range request.Scopes {
+			if strings.HasPrefix(scope, model.OrgIDScope) {
+				scopeParts := strings.Split(scope, ":")
+				return scopeParts[len(scopeParts)-1]
+			}
+		}
+	}
+	return ""
 }
 
 func getRequestID(authReq *model.AuthRequest, r *http.Request) string {
@@ -283,6 +295,7 @@ type baseData struct {
 	Title     string
 	Theme     string
 	ThemeMode string
+	OrgID     string
 	AuthReqID string
 	CSRF      template.HTML
 	Nonce     string

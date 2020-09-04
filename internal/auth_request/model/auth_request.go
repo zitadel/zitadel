@@ -1,6 +1,7 @@
 package model
 
 import (
+	"strings"
 	"time"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -102,4 +103,17 @@ func (a *AuthRequest) SetUserInfo(userID, loginName, displayName, userOrgID stri
 	a.LoginName = loginName
 	a.DisplayName = displayName
 	a.UserOrgID = userOrgID
+}
+
+func (a *AuthRequest) GetScopeOrgID() string {
+	switch request := a.Request.(type) {
+	case *AuthRequestOIDC:
+		for _, scope := range request.Scopes {
+			if strings.HasPrefix(scope, OrgIDScope) {
+				scopeParts := strings.Split(scope, ":")
+				return scopeParts[len(scopeParts)-1]
+			}
+		}
+	}
+	return ""
 }

@@ -51,6 +51,8 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 			projectEvents: repos.ProjectEvents,
 			iamEvents:     repos.IamEvents,
 			iamID:         systemDefaults.IamID},
+		&LoginPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount}},
+		&IDPConfig{handler: handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount}},
 	}
 }
 
