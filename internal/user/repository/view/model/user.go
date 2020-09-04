@@ -296,7 +296,7 @@ func (u *UserView) setPasswordData(event *models.Event) error {
 }
 
 func (u *UserView) ComputeObject() {
-	if u.MachineView != nil {
+	if !u.MachineView.IsZero() {
 		if u.State == int32(model.UserStateUnspecified) {
 			u.State = int32(model.UserStateActive)
 		}
