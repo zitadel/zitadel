@@ -1,10 +1,8 @@
 package handler
 
 import (
-	"net/http"
-	"strings"
-
 	auth_model "github.com/caos/zitadel/internal/auth/model"
+	"net/http"
 
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -38,7 +36,6 @@ type registerOrgData struct {
 	HasSymbol                 string
 	UserLoginMustBeDomain     bool
 	IamDomain                 string
-	TermsLink                 string
 }
 
 func (l *Login) handleRegisterOrg(w http.ResponseWriter, r *http.Request) {
@@ -93,10 +90,6 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 	data := registerOrgData{
 		baseData:            l.getBaseData(r, authRequest, "Register", errType, errMessage),
 		registerOrgFormData: *formData,
-		TermsLink:           TermsLinkDE,
-	}
-	if strings.HasPrefix(data.Lang, "en") {
-		data.TermsLink = TermsLinkEN
 	}
 	pwPolicy, description, _ := l.getPasswordComplexityPolicy(r, "0")
 	if pwPolicy != nil {

@@ -1,10 +1,8 @@
 package handler
 
 import (
-	"net/http"
-	"strings"
-
 	"golang.org/x/text/language"
+	"net/http"
 
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -16,8 +14,6 @@ import (
 const (
 	tmplRegister          = "register"
 	orgProjectCreatorRole = "ORG_PROJECT_CREATOR"
-	TermsLinkEN           = "https://zitadel.ch/pdf/tos.pdf"
-	TermsLinkDE           = "https://zitadel.ch/pdf/agb.pdf"
 )
 
 type registerFormData struct {
@@ -40,7 +36,6 @@ type registerData struct {
 	HasLowercase              string
 	HasNumber                 string
 	HasSymbol                 string
-	TermsLink                 string
 }
 
 func (l *Login) handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -102,10 +97,6 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	data := registerData{
 		baseData:         l.getBaseData(r, authRequest, "Register", errType, errMessage),
 		registerFormData: *formData,
-		TermsLink:        TermsLinkDE,
-	}
-	if strings.HasPrefix(data.Lang, "en") {
-		data.TermsLink = TermsLinkEN
 	}
 	iam, _ := l.authRepo.GetIAM(r.Context())
 	if iam != nil {
