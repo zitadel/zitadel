@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -11,6 +12,7 @@ import (
 	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
+	user_model "github.com/caos/zitadel/internal/user/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
 )
@@ -88,19 +90,35 @@ func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *gra
 }
 
 func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]string, error) {
-	grant, err := repo.AuthZRepo.ResolveGrants(ctx)
+	ctxData := authz.GetCtxData(ctx)
+	memberships, count, err := repo.View.SearchUserMemberships(&user_model.UserMembershipSearchRequest{
+		Queries: []*user_model.UserMembershipSearchQuery{
+			{
+				Key:    user_model.UserMembershipSearchKeyUserID,
+				Method: global_model.SearchMethodEquals,
+				Value:  ctxData.UserID,
+			},
+			{
+				Key:    user_model.UserMembershipSearchKeyResourceOwner,
+				Method: global_model.SearchMethodEquals,
+				Value:  ctxData.OrgID,
+			},
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
-	if grant == nil {
+	if count == 0 {
 		return []string{}, nil
 	}
 	permissions := &grant_model.Permissions{Permissions: []string{}}
-	for _, role := range grant.Roles {
-		roleName, ctxID := authz.SplitPermission(role)
-		for _, mapping := range repo.Auth.RolePermissionMappings {
-			if mapping.Role == roleName {
-				permissions.AppendPermissions(ctxID, mapping.Permissions...)
+	for _, membership := range memberships {
+		for _, role := range membership.Roles {
+			roleName, ctxID := authz.SplitPermission(role)
+			for _, mapping := range repo.Auth.RolePermissionMappings {
+				if mapping.Role == roleName {
+					permissions.AppendPermissions(ctxID, mapping.Permissions...)
+				}
 			}
 		}
 	}

@@ -39,6 +39,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 	return []query.Handler{
 		&User{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount}, orgEvents: repos.OrgEvents},
 		&UserSession{handler: handler{view, bulkLimit, configs.cycleDuration("UserSession"), errorCount}, userEvents: repos.UserEvents},
+		&UserMembership{handler: handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount}, orgEvents: repos.OrgEvents, projectEvents: repos.ProjectEvents},
 		&Token{handler: handler{view, bulkLimit, configs.cycleDuration("Token"), errorCount}, ProjectEvents: repos.ProjectEvents},
 		&Key{handler: handler{view, bulkLimit, configs.cycleDuration("Key"), errorCount}},
 		&Application{handler: handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount}},

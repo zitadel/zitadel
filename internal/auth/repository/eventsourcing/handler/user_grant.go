@@ -260,10 +260,20 @@ func (u *UserGrant) processMember(event *models.Event, rolePrefix, roleSuffix st
 		proj_es_model.ProjectGrantMemberRemoved:
 
 		grant, err := u.view.UserGrantByIDs(event.ResourceOwner, u.iamProjectID, userID)
-		if err != nil {
+		if err != nil && !errors.IsNotFound(err) {
 			return err
 		}
-		return u.view.DeleteUserGrant(grant.ID, event.Sequence)
+		if errors.IsNotFound(err) {
+			return u.view.ProcessedUserGrantSequence(event.Sequence)
+		}
+		if roleSuffix != "" {
+			roleKeys = suffixRoles(roleSuffix, roleKeys)
+		}
+		if grant.RoleKeys == nil {
+			return u.view.ProcessedUserGrantSequence(event.Sequence)
+		}
+		grant.RoleKeys = mergeExistingRoles(rolePrefix, roleSuffix, grant.RoleKeys, nil)
+		return u.view.PutUserGrant(grant, event.Sequence)
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
 	}
