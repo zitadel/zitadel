@@ -35,6 +35,16 @@ func UserMembershipsByAggregateID(db *gorm.DB, table, aggregateID string) ([]*mo
 	return memberships, err
 }
 
+func UserMembershipsByResourceOwner(db *gorm.DB, table, resourceOwner string) ([]*model.UserMembershipView, error) {
+	memberships := make([]*model.UserMembershipView, 0)
+	aggregateIDQuery := &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyResourceOwner, Value: resourceOwner, Method: global_model.SearchMethodEquals}
+	query := repository.PrepareSearchQuery(table, model.UserMembershipSearchRequest{
+		Queries: []*usr_model.UserMembershipSearchQuery{aggregateIDQuery},
+	})
+	_, err := query(db, &memberships)
+	return memberships, err
+}
+
 func SearchUserMemberships(db *gorm.DB, table string, req *usr_model.UserMembershipSearchRequest) ([]*model.UserMembershipView, uint64, error) {
 	users := make([]*model.UserMembershipView, 0)
 	query := repository.PrepareSearchQuery(table, model.UserMembershipSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
