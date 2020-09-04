@@ -134,6 +134,12 @@ func (s *Setup) Execute(ctx context.Context, setUpConfig IAMSetUp) error {
 		logging.Log("SETUP-Hdu8S").WithError(err).Error("unable to create login policy")
 		return err
 	}
+	// ToDo Michi
+	err = setUp.labelPolicy(ctx, setUpConfig.DefaultLabelPolicy)
+	if err != nil {
+		logging.Log("SETUP-esSOn").WithError(err).Error("unable to create label policy")
+		return err
+	}
 
 	pwComplexityPolicy, err := s.PolicyEvents.GetPasswordComplexityPolicy(ctx, policy_model.DefaultPolicy)
 	if err != nil {
@@ -187,6 +193,20 @@ func (setUp *initializer) loginPolicy(ctx context.Context, policy LoginPolicy) e
 		AllowExternalIdp:      policy.AllowExternalIdp,
 	}
 	_, err := setUp.IamEvents.AddLoginPolicy(ctx, loginPolicy)
+	return err
+}
+
+// ToDo Michi
+func (setUp *initializer) labelPolicy(ctx context.Context, policy LabelPolicy) error {
+	logging.Log("SETUP-4djul").Info("setting up login policy")
+	labelPolicy := &iam_model.LabelPolicy{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: setUp.iamID,
+		},
+		PrimaryColor:   policy.PrimaryColor,
+		SecundaryColor: policy.SecundaryColor,
+	}
+	_, err := setUp.IamEvents.AddLabelPolicy(ctx, labelPolicy)
 	return err
 }
 

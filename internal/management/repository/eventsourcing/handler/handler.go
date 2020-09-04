@@ -34,6 +34,7 @@ type EventstoreRepos struct {
 	IamEvents     *iam_event.IAMEventstore
 }
 
+// ToDo Michi
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos, defaults systemdefaults.SystemDefaults) []query.Handler {
 	return []query.Handler{
 		&Project{handler: handler{view, bulkLimit, configs.cycleDuration("Project"), errorCount}, eventstore: eventstore},
@@ -51,6 +52,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 		&MachineKeys{handler: handler{view, bulkLimit, configs.cycleDuration("MachineKeys"), errorCount}},
 		&IDPConfig{handler: handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount}},
 		&LoginPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount}},
+		&LabelPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount}},
 		&IDPProvider{handler: handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount}, systemDefaults: defaults, iamEvents: repos.IamEvents, orgEvents: repos.OrgEvents},
 	}
 }

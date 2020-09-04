@@ -29,6 +29,9 @@ SetUp:
     AllowUsernamePassword: true
     AllowRegister: true
     AllowExternalIdp: true
+  DefaultLabelPolicy:
+    PrimaryColor: '#222324'
+    SecundaryColor: '#ffffff'  
   Orgs:
     - Name: 'Global'
       Domain: 'global.caos.ch'

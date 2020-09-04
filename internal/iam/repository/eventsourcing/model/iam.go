@@ -2,12 +2,14 @@ package model
 
 import (
 	"encoding/json"
+
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/iam/model"
 )
 
+// ToDo Michi
 const (
 	IAMVersion = "v1"
 )
@@ -21,6 +23,7 @@ type IAM struct {
 	Members            []*IAMMember `json:"-"`
 	IDPs               []*IDPConfig `json:"-"`
 	DefaultLoginPolicy *LoginPolicy `json:"-"`
+	DefaultLabelPolicy *LabelPolicy `json:"-"`
 }
 
 func IAMFromModel(iam *model.IAM) *IAM {
@@ -106,6 +109,14 @@ func (i *IAM) AppendEvent(event *es_models.Event) (err error) {
 		return i.appendAddIDPProviderToLoginPolicyEvent(event)
 	case LoginPolicyIDPProviderRemoved:
 		return i.appendRemoveIDPProviderFromLoginPolicyEvent(event)
+	case LabelPolicyAdded:
+		return i.appendAddLabelPolicyEvent(event)
+	case LabelPolicyChanged:
+		return i.appendChangeLabelPolicyEvent(event)
+		// case LabelPolicyIDPProviderAdded:
+		// 	return i.appendAddIDPProviderToLabelPolicyEvent(event)
+		// case LabelPolicyIDPProviderRemoved:
+		// 	return i.appendRemoveIDPProviderFromLabelPolicyEvent(event)
 	}
 
 	return err

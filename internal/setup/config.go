@@ -1,9 +1,11 @@
 package setup
 
+// ToDo Michi
 type IAMSetUp struct {
 	GlobalOrg          string
 	IAMProject         string
 	DefaultLoginPolicy LoginPolicy
+	DefaultLabelPolicy LabelPolicy
 	Orgs               []Org
 	Owners             []string
 }
@@ -13,7 +15,10 @@ type LoginPolicy struct {
 	AllowUsernamePassword bool
 	AllowExternalIdp      bool
 }
-
+type LabelPolicy struct {
+	PrimaryColor   string
+	SecundaryColor string
+}
 type User struct {
 	FirstName string
 	LastName  string

@@ -229,6 +229,56 @@ func OIDCIDPConfigChangedAggregate(aggCreator *es_models.AggregateCreator, exist
 	}
 }
 
+// ToDo Michi
+func LabelPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.LabelPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if policy == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-e248Y", "Errors.Internal")
+		}
+		agg, err := IAMAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		validationQuery := es_models.NewSearchQuery().
+			AggregateTypeFilter(model.IAMAggregate).
+			EventTypesFilter(model.LabelPolicyAdded).
+			AggregateIDFilter(existing.AggregateID)
+
+		validation := checkExistingLabelPolicyValidation()
+		agg.SetPrecondition(validationQuery, validation)
+		return agg.AppendEvent(model.LabelPolicyAdded, policy)
+	}
+}
+
+func checkExistingLabelPolicyValidation() func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		for _, event := range events {
+			switch event.Type {
+			case model.LabelPolicyAdded:
+				return errors.ThrowPreconditionFailed(nil, "EVENT-KyLIK", "Errors.IAM.LabelPolicy.AlreadyExists")
+			}
+		}
+		return nil
+	}
+}
+
+func LabelPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.LabelPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if policy == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-uP6HQ", "Errors.Internal")
+		}
+		agg, err := IAMAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		changes := existing.DefaultLabelPolicy.Changes(policy)
+		if len(changes) == 0 {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-hZE24", "Errors.NoChangesFound")
+		}
+		return agg.AppendEvent(model.LoginPolicyChanged, changes)
+	}
+}
+
 func LoginPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.LoginPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if policy == nil {

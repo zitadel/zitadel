@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
@@ -10,6 +11,7 @@ import (
 	org_model "github.com/caos/zitadel/internal/org/model"
 )
 
+// ToDo Michi
 const (
 	OrgVersion = "v1"
 )
@@ -24,6 +26,7 @@ type Org struct {
 	Members      []*OrgMember              `json:"-"`
 	OrgIamPolicy *OrgIAMPolicy             `json:"-"`
 	LoginPolicy  *iam_es_model.LoginPolicy `json:"-"`
+	LabelPolicy  *iam_es_model.LabelPolicy `json:"-"`
 	IDPs         []*iam_es_model.IDPConfig `json:"-"`
 }
 
@@ -154,6 +157,8 @@ func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 		err = o.appendAddOIDCIDPConfigEvent(event)
 	case OIDCIDPConfigChanged:
 		err = o.appendChangeOIDCIDPConfigEvent(event)
+	case LabelPolicyAdded:
+		err = o.appendAddLabelPolicyEvent(event)
 	case LoginPolicyAdded:
 		err = o.appendAddLoginPolicyEvent(event)
 	case LoginPolicyChanged:

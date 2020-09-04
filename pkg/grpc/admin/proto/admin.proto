@@ -320,6 +320,27 @@ service AdminService {
             permission: "iam.idp.read"
         };
     }
+// ToDo Michi
+    rpc GetDefaultLabelPolicy(google.protobuf.Empty) returns (DefaultLabelPolicyView) {
+        option (google.api.http) = {
+            get: "/policies/label"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc UpdateDefaultLabelPolicy(DefaultLabelPolicy) returns (DefaultLabelPolicy) {
+        option (google.api.http) = {
+            put: "/policies/label"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
 
     rpc GetDefaultLoginPolicy(google.protobuf.Empty) returns (DefaultLoginPolicyView) {
         option (google.api.http) = {
@@ -793,6 +814,16 @@ enum IdpSearchKey {
     IDPSEARCHKEY_UNSPECIFIED = 0;
     IDPSEARCHKEY_IDP_CONFIG_ID = 1;
     IDPSEARCHKEY_NAME = 2;
+}
+
+message DefaultLabelPolicy {
+    string primary_color = 1;
+    string secundary_color = 2;
+}
+
+message DefaultLabelPolicyView {
+    string primary_color = 1;
+    string secundary_color = 2;
 }
 
 message DefaultLoginPolicy {

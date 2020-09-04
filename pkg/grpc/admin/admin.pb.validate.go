@@ -4106,6 +4106,148 @@ var _IdpSearchQuery_Key_NotInLookup = map[IdpSearchKey]struct{}{
 	0: {},
 }
 
+// Validate checks the field values on DefaultLabelPolicy with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DefaultLabelPolicy) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for PrimaryColor
+
+	// no validation rules for SecundaryColor
+
+	return nil
+}
+
+// DefaultLabelPolicyValidationError is the validation error returned by
+// DefaultLabelPolicy.Validate if the designated constraints aren't met.
+type DefaultLabelPolicyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultLabelPolicyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultLabelPolicyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultLabelPolicyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultLabelPolicyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultLabelPolicyValidationError) ErrorName() string {
+	return "DefaultLabelPolicyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DefaultLabelPolicyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultLabelPolicy.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultLabelPolicyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultLabelPolicyValidationError{}
+
+// Validate checks the field values on DefaultLabelPolicyView with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DefaultLabelPolicyView) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for PrimaryColor
+
+	// no validation rules for SecundaryColor
+
+	return nil
+}
+
+// DefaultLabelPolicyViewValidationError is the validation error returned by
+// DefaultLabelPolicyView.Validate if the designated constraints aren't met.
+type DefaultLabelPolicyViewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultLabelPolicyViewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultLabelPolicyViewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultLabelPolicyViewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultLabelPolicyViewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultLabelPolicyViewValidationError) ErrorName() string {
+	return "DefaultLabelPolicyViewValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DefaultLabelPolicyViewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultLabelPolicyView.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultLabelPolicyViewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultLabelPolicyViewValidationError{}
+
 // Validate checks the field values on DefaultLoginPolicy with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

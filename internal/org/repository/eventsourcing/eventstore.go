@@ -710,6 +710,28 @@ func (es *OrgEventstore) ChangeIDPOIDCConfig(ctx context.Context, config *iam_mo
 	return nil, errors.ThrowInternal(nil, "EVENT-Sldk8", "Errors.Internal")
 }
 
+// ToDo Michi
+func (es *OrgEventstore) AddLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
+	if policy == nil || !policy.IsValid() {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-37rSC", "Errors.Org.LabelPolicyInvalid")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	if err != nil {
+		return nil, err
+	}
+
+	repoOrg := model.OrgFromModel(existing)
+	repoLabelPolicy := iam_es_model.LabelPolicyFromModel(policy)
+
+	addAggregate := LabelPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoLabelPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.LabelPolicyToModel(repoOrg.LabelPolicy), nil
+	//return nil, nil
+}
+
 func (es *OrgEventstore) AddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
 	if policy == nil || !policy.IsValid() {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sjkl9", "Errors.Org.LoginPolicyInvalid")

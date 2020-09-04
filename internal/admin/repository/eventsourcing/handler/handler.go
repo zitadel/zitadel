@@ -1,9 +1,10 @@
 package handler
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-	"time"
 
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/types"
@@ -32,11 +33,13 @@ type EventstoreRepos struct {
 	OrgEvents  *org_event.OrgEventstore
 }
 
+// ToDo Michi
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos, defaults systemdefaults.SystemDefaults) []query.Handler {
 	return []query.Handler{
 		&Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount}},
 		&IamMember{handler: handler{view, bulkLimit, configs.cycleDuration("IamMember"), errorCount}, userEvents: repos.UserEvents},
 		&IDPConfig{handler: handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount}},
+		&LabelPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount}},
 		&LoginPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount}},
 		&IDPProvider{handler: handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount}, systemDefaults: defaults, iamEvents: repos.IamEvents, orgEvents: repos.OrgEvents},
 		&User{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount}, eventstore: eventstore, orgEvents: repos.OrgEvents},

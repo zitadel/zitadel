@@ -197,6 +197,26 @@ func (mr *MockAdminServiceClientMockRecorder) DeleteOrgIamPolicy(arg0, arg1 inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteOrgIamPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).DeleteOrgIamPolicy), varargs...)
 }
 
+// GetDefaultLabelPolicy mocks base method
+func (m *MockAdminServiceClient) GetDefaultLabelPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.DefaultLabelPolicyView, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetDefaultLabelPolicy", varargs...)
+	ret0, _ := ret[0].(*admin.DefaultLabelPolicyView)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDefaultLabelPolicy indicates an expected call of GetDefaultLabelPolicy
+func (mr *MockAdminServiceClientMockRecorder) GetDefaultLabelPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultLabelPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultLabelPolicy), varargs...)
+}
+
 // GetDefaultLoginPolicy mocks base method
 func (m *MockAdminServiceClient) GetDefaultLoginPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.DefaultLoginPolicyView, error) {
 	m.ctrl.T.Helper()
@@ -595,6 +615,26 @@ func (mr *MockAdminServiceClientMockRecorder) SetUpOrg(arg0, arg1 interface{}, a
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetUpOrg", reflect.TypeOf((*MockAdminServiceClient)(nil).SetUpOrg), varargs...)
+}
+
+// UpdateDefaultLabelPolicy mocks base method
+func (m *MockAdminServiceClient) UpdateDefaultLabelPolicy(arg0 context.Context, arg1 *admin.DefaultLabelPolicy, arg2 ...grpc.CallOption) (*admin.DefaultLabelPolicy, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateDefaultLabelPolicy", varargs...)
+	ret0, _ := ret[0].(*admin.DefaultLabelPolicy)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateDefaultLabelPolicy indicates an expected call of UpdateDefaultLabelPolicy
+func (mr *MockAdminServiceClientMockRecorder) UpdateDefaultLabelPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDefaultLabelPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).UpdateDefaultLabelPolicy), varargs...)
 }
 
 // UpdateDefaultLoginPolicy mocks base method

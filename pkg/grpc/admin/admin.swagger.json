@@ -649,6 +649,46 @@
         ]
       }
     },
+    "/policies/label": {
+      "get": {
+        "operationId": "GetDefaultLabelPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultLabelPolicyView"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "operationId": "UpdateDefaultLabelPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultLabelPolicy"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DefaultLabelPolicy"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/policies/login": {
       "get": {
         "operationId": "GetDefaultLoginPolicy",
@@ -975,6 +1015,28 @@
         },
         "machine": {
           "$ref": "#/definitions/v1CreateMachineRequest"
+        }
+      }
+    },
+    "v1DefaultLabelPolicy": {
+      "type": "object",
+      "properties": {
+        "primary_color": {
+          "type": "string"
+        },
+        "secundary_color": {
+          "type": "string"
+        }
+      }
+    },
+    "v1DefaultLabelPolicyView": {
+      "type": "object",
+      "properties": {
+        "primary_color": {
+          "type": "string"
+        },
+        "secundary_color": {
+          "type": "string"
         }
       }
     },

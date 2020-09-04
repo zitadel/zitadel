@@ -399,6 +399,49 @@ func (es *IAMEventstore) ChangeIDPOIDCConfig(ctx context.Context, config *iam_mo
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-Sldk8", "Errors.Internal")
 }
 
+// ToDo Michi
+func (es *IAMEventstore) AddLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
+	if policy == nil || !policy.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-aAPWI", "Errors.IAM.LabelPolicyInvalid")
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoLabelPolicy := model.LabelPolicyFromModel(policy)
+
+	addAggregate := LabelPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoLabelPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.LabelPolicyToModel(repoIam.DefaultLabelPolicy), nil
+}
+
+func (es *IAMEventstore) ChangeLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
+	if policy == nil || !policy.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-vRqjg", "Errors.IAM.LabelPolicyInvalid")
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoLabelPolicy := model.LabelPolicyFromModel(policy)
+
+	addAggregate := LabelPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoLabelPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.LabelPolicyToModel(repoIam.DefaultLabelPolicy), nil
+}
+
 func (es *IAMEventstore) AddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
 	if policy == nil || !policy.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.IAM.LoginPolicyInvalid")
