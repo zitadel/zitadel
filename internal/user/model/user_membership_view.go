@@ -13,12 +13,13 @@ type UserMembershipView struct {
 	//ObjectID differs from aggregate id if obejct is sub of an aggregate
 	ObjectID string
 
-	Roles         []string
-	DisplayName   string
-	CreationDate  time.Time
-	ChangeDate    time.Time
-	ResourceOwner string
-	Sequence      uint64
+	Roles             []string
+	DisplayName       string
+	CreationDate      time.Time
+	ChangeDate        time.Time
+	ResourceOwner     string
+	ResourceOwnerName string
+	Sequence          uint64
 }
 
 type MemberType int32

@@ -19,6 +19,10 @@ func (v *View) UserMembershipsByAggregateID(aggregateID string) ([]*model.UserMe
 	return view.UserMembershipsByAggregateID(v.Db, userMembershipTable, aggregateID)
 }
 
+func (v *View) UserMembershipsByResourceOwner(resourceOwner string) ([]*model.UserMembershipView, error) {
+	return view.UserMembershipsByResourceOwner(v.Db, userMembershipTable, resourceOwner)
+}
+
 func (v *View) SearchUserMemberships(request *usr_model.UserMembershipSearchRequest) ([]*model.UserMembershipView, uint64, error) {
 	return view.SearchUserMemberships(v.Db, userMembershipTable, request)
 }

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
@@ -82,6 +83,7 @@ func (m *UserMembership) processIam(event *models.Event) (err error) {
 
 func (m *UserMembership) fillIamDisplayName(member *usr_es_model.UserMembershipView) {
 	member.DisplayName = member.AggregateID
+	member.ResourceOwnerName = member.ResourceOwner
 }
 
 func (m *UserMembership) processOrg(event *models.Event) (err error) {
@@ -92,7 +94,7 @@ func (m *UserMembership) processOrg(event *models.Event) (err error) {
 	}
 	switch event.Type {
 	case org_es_model.OrgMemberAdded:
-		err = m.fillOrgDisplayName(member)
+		err = m.fillOrgName(member)
 	case org_es_model.OrgMemberChanged:
 		member, err = m.view.UserMembershipByIDs(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeOrganisation)
 		if err != nil {
@@ -102,7 +104,7 @@ func (m *UserMembership) processOrg(event *models.Event) (err error) {
 	case org_es_model.OrgMemberRemoved:
 		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeOrganisation, event.Sequence)
 	case org_es_model.OrgChanged:
-		err = m.updateOrgDisplayName(event)
+		err = m.updateOrgName(event)
 	default:
 		return m.view.ProcessedUserMembershipSequence(event.Sequence)
 	}
@@ -112,27 +114,33 @@ func (m *UserMembership) processOrg(event *models.Event) (err error) {
 	return m.view.PutUserMembership(member, event.Sequence)
 }
 
-func (m *UserMembership) fillOrgDisplayName(member *usr_es_model.UserMembershipView) (err error) {
-	org, err := m.orgEvents.OrgByID(context.Background(), org_model.NewOrg(member.AggregateID))
+func (m *UserMembership) fillOrgName(member *usr_es_model.UserMembershipView) (err error) {
+	org, err := m.orgEvents.OrgByID(context.Background(), org_model.NewOrg(member.ResourceOwner))
 	if err != nil {
 		return err
 	}
-	member.DisplayName = org.Name
+	member.ResourceOwnerName = org.Name
+	if member.AggregateID == org.AggregateID {
+		member.DisplayName = org.Name
+	}
 	return nil
 }
 
-func (m *UserMembership) updateOrgDisplayName(event *models.Event) error {
+func (m *UserMembership) updateOrgName(event *models.Event) error {
 	org, err := m.orgEvents.OrgByID(context.Background(), org_model.NewOrg(event.AggregateID))
 	if err != nil {
 		return err
 	}
 
-	memberships, err := m.view.UserMembershipsByAggregateID(event.AggregateID)
+	memberships, err := m.view.UserMembershipsByResourceOwner(event.ResourceOwner)
 	if err != nil {
 		return err
 	}
 	for _, membership := range memberships {
-		membership.DisplayName = org.Name
+		membership.ResourceOwnerName = org.Name
+		if membership.AggregateID == event.AggregateID {
+			membership.DisplayName = org.Name
+		}
 	}
 	return m.view.BulkPutUserMemberships(memberships, event.Sequence)
 }
@@ -146,6 +154,10 @@ func (m *UserMembership) processProject(event *models.Event) (err error) {
 	switch event.Type {
 	case proj_es_model.ProjectMemberAdded, proj_es_model.ProjectGrantMemberAdded:
 		err = m.fillProjectDisplayName(member)
+		if err != nil {
+			return err
+		}
+		err = m.fillOrgName(member)
 	case proj_es_model.ProjectMemberChanged:
 		member, err = m.view.UserMembershipByIDs(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeProject)
 		if err != nil {
