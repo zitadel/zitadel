@@ -162,7 +162,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 			l.chooseNextStep(w, r, authReq, 1, err)
 			return
 		}
-		l.renderLogin(w, r, authReq, step, err)
+		l.renderLogin(w, r, authReq, err)
 	case *model.SelectUserStep:
 		l.renderUserSelection(w, r, authReq, step)
 	case *model.InitPasswordStep:

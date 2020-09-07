@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/iam/model"
 	"strings"
 	"time"
 
@@ -23,17 +24,19 @@ type AuthRequest struct {
 	MaxAuthAge    uint32
 	Request       Request
 
-	levelOfAssurance LevelOfAssurance
-	UserID           string
-	LoginName        string
-	DisplayName      string
-	UserOrgID        string
-	PossibleSteps    []NextStep
-	PasswordVerified bool
-	MfasVerified     []MfaType
-	Audience         []string
-	AuthTime         time.Time
-	Code             string
+	levelOfAssurance    LevelOfAssurance
+	UserID              string
+	LoginName           string
+	DisplayName         string
+	UserOrgID           string
+	PossibleSteps       []NextStep
+	PasswordVerified    bool
+	MfasVerified        []MfaType
+	Audience            []string
+	AuthTime            time.Time
+	Code                string
+	LoginPolicy         *model.LoginPolicyView
+	AllowedExternalIDPs []*model.IDPConfigView
 }
 
 type Prompt int32

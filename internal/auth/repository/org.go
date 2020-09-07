@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	auth_model "github.com/caos/zitadel/internal/auth/model"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 )
 

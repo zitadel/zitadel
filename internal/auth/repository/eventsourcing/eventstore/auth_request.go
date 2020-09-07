@@ -193,6 +193,28 @@ func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID
 	return request, nil
 }
 
+func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *model.AuthRequest) error {
+	orgID := request.GetScopeOrgID()
+	if orgID == "" {
+		orgID = repo.SystemDefaults.IamID
+	}
+
+	policy, err := repo.getLoginPolicy(ctx, orgID)
+	if err != nil {
+		return err
+	}
+	request.LoginPolicy = policy
+	if !policy.AllowExternalIDP {
+		return nil
+	}
+	idpProviders, err := repo.getLoginPolicyIDPConfigs(ctx, orgID, policy.Default)
+	if err != nil {
+		return err
+	}
+	request.AllowedExternalIDPs = idpProviders
+	return nil
+}
+
 func (repo *AuthRequestRepo) checkLoginName(request *model.AuthRequest, loginName string) (err error) {
 	orgID := request.GetScopeOrgID()
 	user := new(user_view_model.UserView)
@@ -217,11 +239,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 		return append(steps, &model.RedirectToCallbackStep{}), nil
 	}
 	if request.UserID == "" {
-		loginStep, err := repo.getLoginStep(ctx, request)
-		if err != nil {
-			return nil, err
-		}
-		steps = append(steps, loginStep)
+		steps = append(steps, new(model.LoginStep))
 		if request.Prompt == model.PromptSelectAccount || request.Prompt == model.PromptUnspecified {
 			users, err := repo.usersForUserSelection(request)
 			if err != nil {
@@ -275,29 +293,6 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 
 	//PLANNED: consent step
 	return append(steps, &model.RedirectToCallbackStep{}), nil
-}
-
-func (repo *AuthRequestRepo) getLoginStep(ctx context.Context, request *model.AuthRequest) (*model.LoginStep, error) {
-	loginStep := new(model.LoginStep)
-	orgID := request.GetScopeOrgID()
-	if orgID == "" {
-		orgID = repo.SystemDefaults.IamID
-	}
-
-	policy, err := repo.getLoginPolicy(ctx, orgID)
-	if err != nil {
-		return nil, err
-	}
-	loginStep.LoginPolicy = policy
-	if !policy.AllowExternalIDP {
-		return loginStep, nil
-	}
-	idpProviders, err := repo.getLoginPolicyIDPConfigs(ctx, orgID, policy.Default)
-	if err != nil {
-		return nil, err
-	}
-	loginStep.AllowedIDPs = idpProviders
-	return loginStep, nil
 }
 
 func (repo *AuthRequestRepo) usersForUserSelection(request *model.AuthRequest) ([]model.UserSelection, error) {

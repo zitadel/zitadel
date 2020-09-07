@@ -265,7 +265,7 @@ service AuthService {
   }
 
   //ExternalIDP
-  rpc AddExternalIDP(ExternalIDPAddRequest) returns (ExternalIDPResponse) {
+  rpc AddMyExternalIDP(ExternalIDPAddRequest) returns (ExternalIDPResponse) {
     option (google.api.http) = {
       post: "/users/me/externalidps"
       body: "*"
@@ -276,7 +276,7 @@ service AuthService {
     };
   }
 
-  rpc RemoveExternalIDP(ExternalIDPRemoveRequest) returns (google.protobuf.Empty) {
+  rpc RemoveMyExternalIDP(ExternalIDPRemoveRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/users/me/externalidps/{idp_config_id}/{user_id}"
     };

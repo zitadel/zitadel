@@ -344,7 +344,7 @@
     "/users/me/externalidps": {
       "post": {
         "summary": "ExternalIDP",
-        "operationId": "AddExternalIDP",
+        "operationId": "AddMyExternalIDP",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -370,7 +370,7 @@
     },
     "/users/me/externalidps/{idp_config_id}/{user_id}": {
       "delete": {
-        "operationId": "RemoveExternalIDP",
+        "operationId": "RemoveMyExternalIDP",
         "responses": {
           "200": {
             "description": "A successful response.",
