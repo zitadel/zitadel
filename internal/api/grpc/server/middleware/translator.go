@@ -35,6 +35,8 @@ func translateError(ctx context.Context, err error, translator *i18n.Translator)
 	caosErr := new(caos_errs.CaosError)
 	if errors.As(err, &caosErr) {
 		caosErr.SetMessage(translator.LocalizeFromCtx(ctx, caosErr.GetMessage(), nil))
+	} else {
+		return err
 	}
 	return caosErr
 }

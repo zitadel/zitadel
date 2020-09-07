@@ -65,7 +65,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     public isZitadel: boolean = false;
 
     public userGrantSearchKey: UserGrantSearchKey = UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID;
-    public userGrantContext: UserGrantContext = UserGrantContext.OWNED_PROJECT;
+    public UserGrantContext: any = UserGrantContext;
 
     // members
     public totalMemberResult: number = 0;

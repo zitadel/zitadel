@@ -63,7 +63,7 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
 
     public isZitadel: boolean = false;
 
-    public userGrantContext: UserGrantContext = UserGrantContext.GRANTED_PROJECT;
+    UserGrantContext: any = UserGrantContext;
     public userGrantSearchKey: UserGrantSearchKey = UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID;
 
     // members

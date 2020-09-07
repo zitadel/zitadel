@@ -75,7 +75,7 @@ export class OrgMembersComponent implements AfterViewInit {
         );
     }
 
-    public removeProjectMemberSelection(): void {
+    public removeOrgMemberSelection(): void {
         Promise.all(this.selection.selected.map(member => {
             return this.mgmtService.RemoveMyOrgMember(member.userId).then(() => {
                 this.toast.showInfo('ORG.TOAST.MEMBERREMOVED', true);

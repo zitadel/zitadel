@@ -3,7 +3,7 @@
     <app-refresh-table (refreshed)="refreshPage()" [dataSize]="dataSource?.totalResult"
         [timestamp]="dataSource?.viewTimestamp" [selection]="selection" [loading]="dataSource?.loading$ | async">
         <ng-template appHasRole actions [appHasRole]="['org.member.delete:'+org?.id,'org.member.delete']">
-            <button (click)="removeProjectMemberSelection()" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}"
+            <button (click)="removeOrgMemberSelection()" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}"
                 class="icon-button" mat-icon-button *ngIf="selection.hasValue()" color="warn">
                 <i class="las la-trash"></i>
             </button>

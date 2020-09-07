@@ -23,7 +23,8 @@ import (
 )
 
 const (
-	projectOwnerRole = "PROJECT_OWNER"
+	projectOwnerRole       = "PROJECT_OWNER"
+	projectOwnerGlobalRole = "PROJECT_OWNER_GLOBAL"
 )
 
 type ProjectEventstore struct {
@@ -78,7 +79,7 @@ func (es *ProjectEventstore) ProjectEventsByID(ctx context.Context, id string, s
 	return es.FilterEvents(ctx, query)
 }
 
-func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
+func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_model.Project, global bool) (*proj_model.Project, error) {
 	if !project.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-IOVCC", "Errors.Project.Invalid")
 	}
@@ -89,9 +90,13 @@ func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_mo
 	project.AggregateID = id
 	project.State = proj_model.ProjectStateActive
 	repoProject := model.ProjectFromModel(project)
+	projectRole := projectOwnerRole
+	if global {
+		projectRole = projectOwnerGlobalRole
+	}
 	member := &model.ProjectMember{
 		UserID: authz.GetCtxData(ctx).UserID,
-		Roles:  []string{projectOwnerRole},
+		Roles:  []string{projectRole},
 	}
 
 	createAggregate := ProjectCreateAggregate(es.AggregateCreator(), repoProject, member)

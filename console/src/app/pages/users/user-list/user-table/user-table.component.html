@@ -2,15 +2,15 @@
     [timestamp]="userResult?.viewTimestamp" [selection]="selection">
     <ng-template appHasRole [appHasRole]="['user.write']" actions>
         <button (click)="deactivateSelectedUsers()" matTooltip="{{'ORG_DETAIL.TABLE.DEACTIVATE' | translate}}"
-            class="icon-button" mat-icon-button *ngIf="selection.hasValue()">
+            class="icon-button" mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
             <mat-icon svgIcon="mdi_account_cancel"></mat-icon>
         </button>
         <button (click)="reactivateSelectedUsers()" matTooltip="{{'ORG_DETAIL.TABLE.ACTIVATE' | translate}}"
-            class="icon-button" mat-icon-button *ngIf="selection.hasValue()">
+            class="icon-button" mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
             <mat-icon svgIcon="mdi_account_check_outline"></mat-icon>
         </button>
         <a class="add-button" [routerLink]="[ '/users',userType == UserType.HUMAN ? 'create' : 'create-machine']"
-            color="primary" mat-raised-button>
+            color="primary" mat-raised-button [disabled]="disabled">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
     </ng-template>

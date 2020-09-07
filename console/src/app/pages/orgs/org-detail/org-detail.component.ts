@@ -84,6 +84,15 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         });
     }
 
+    public setPrimary(domain: OrgDomainView.AsObject): void {
+        this.mgmtService.setMyPrimaryOrgDomain(domain.domain).then(() => {
+            this.toast.showInfo('ORG.TOAST.SETPRIMARY', true);
+            this.getData();
+        }).catch((error) => {
+            this.toast.showError(error);
+        });
+    }
+
     public changeState(event: MatButtonToggleChange | any): void {
         if (event.value === OrgState.ORGSTATE_ACTIVE) {
             this.mgmtService.ReactivateMyOrg().then(() => {

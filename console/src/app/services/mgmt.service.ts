@@ -63,6 +63,7 @@ import {
     PasswordLockoutPolicyID,
     PasswordLockoutPolicyUpdate,
     PasswordRequest,
+    PrimaryOrgDomainRequest,
     Project,
     ProjectCreateRequest,
     ProjectGrant,
@@ -254,6 +255,12 @@ export class ManagementService {
         return this.grpcService.mgmt.searchMyOrgDomains(req);
     }
 
+    public async setMyPrimaryOrgDomain(domain: string): Promise<Empty> {
+        const req: PrimaryOrgDomainRequest = new PrimaryOrgDomainRequest();
+        req.setDomain(domain);
+        return this.grpcService.mgmt.setMyPrimaryOrgDomain(req);
+    }
+
     public async GenerateMyOrgDomainValidation(domain: string, type: OrgDomainValidationType):
         Promise<OrgDomainValidationResponse> {
         const req: OrgDomainValidationRequest = new OrgDomainValidationRequest();
@@ -324,8 +331,8 @@ export class ManagementService {
     }
 
     public async CreateProjectGrant(
-        projectId: string,
         orgId: string,
+        projectId: string,
         roleKeysList: string[],
     ): Promise<ProjectGrant> {
         const req = new ProjectGrantCreate();

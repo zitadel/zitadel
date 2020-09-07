@@ -28,7 +28,7 @@
                     {{temporg?.name ? temporg.name : 'NO NAME'}}
                 </button>
 
-                <ng-template appHasRole [appHasRole]="['(org.create)?(iam.write)?']">
+                <ng-template appHasRole [appHasRole]="['org.create','iam.write']">
                     <button mat-menu-item [routerLink]="[ '/org/create' ]">
                         <mat-icon class="avatar">add</mat-icon>
                         {{'MENU.NEWORG' | translate}}

@@ -82,9 +82,11 @@ func TestCreateProject(t *testing.T) {
 		es      *ProjectEventstore
 		ctx     context.Context
 		project *model.Project
+		global  bool
 	}
 	type res struct {
 		project *model.Project
+		role    string
 		wantErr bool
 		errFunc func(err error) bool
 	}
@@ -102,6 +104,20 @@ func TestCreateProject(t *testing.T) {
 			},
 			res: res{
 				project: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name"},
+				role:    projectOwnerRole,
+			},
+		},
+		{
+			name: "create global project, ok",
+			args: args{
+				es:      GetMockManipulateProject(ctrl),
+				ctx:     authz.NewMockContext("orgID", "userID"),
+				project: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name"},
+				global:  true,
+			},
+			res: res{
+				project: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name"},
+				role:    projectOwnerGlobalRole,
 			},
 		},
 		{
@@ -119,13 +135,16 @@ func TestCreateProject(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.CreateProject(tt.args.ctx, tt.args.project)
+			result, err := tt.args.es.CreateProject(tt.args.ctx, tt.args.project, tt.args.global)
 
 			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
 			if !tt.res.wantErr && result.Name != tt.res.project.Name {
 				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.project.Name, result.Name)
+			}
+			if !tt.res.wantErr && result.Members[0].Roles[0] != tt.res.role {
+				t.Errorf("got wrong result role: expected: %v, actual: %v ", tt.res.role, result.Members[0].Roles[0])
 			}
 			if tt.res.wantErr && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)

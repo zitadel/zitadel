@@ -12,6 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
@@ -29,8 +30,10 @@ type ProjectRepo struct {
 	ProjectEvents   *proj_event.ProjectEventstore
 	UserGrantEvents *usr_grant_event.UserGrantEventStore
 	UserEvents      *usr_event.UserEventstore
+	IAMEvents       *iam_event.IAMEventstore
 	View            *view.View
 	Roles           []string
+	IAMID           string
 }
 
 func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_model.ProjectView, error) {
@@ -64,8 +67,13 @@ func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_mode
 }
 
 func (repo *ProjectRepo) CreateProject(ctx context.Context, name string) (*proj_model.Project, error) {
+	ctxData := authz.GetCtxData(ctx)
+	iam, err := repo.IAMEvents.IAMByID(ctx, repo.IAMID)
+	if err != nil {
+		return nil, err
+	}
 	project := &proj_model.Project{Name: name}
-	return repo.ProjectEvents.CreateProject(ctx, project)
+	return repo.ProjectEvents.CreateProject(ctx, project, iam.GlobalOrgID == ctxData.OrgID)
 }
 
 func (repo *ProjectRepo) UpdateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
@@ -612,14 +620,22 @@ func (repo *ProjectRepo) SearchProjectGrantMembers(ctx context.Context, request 
 	return result, nil
 }
 
-func (repo *ProjectRepo) GetProjectMemberRoles() []string {
+func (repo *ProjectRepo) GetProjectMemberRoles(ctx context.Context) ([]string, error) {
+	iam, err := repo.IAMEvents.IAMByID(ctx, repo.IAMID)
+	if err != nil {
+		return nil, err
+	}
 	roles := make([]string, 0)
+	global := authz.GetCtxData(ctx).OrgID == iam.GlobalOrgID
 	for _, roleMap := range repo.Roles {
 		if strings.HasPrefix(roleMap, "PROJECT") && !strings.HasPrefix(roleMap, "PROJECT_GRANT") {
+			if global && !strings.HasSuffix(roleMap, "GLOBAL") {
+				continue
+			}
 			roles = append(roles, roleMap)
 		}
 	}
-	return roles
+	return roles, nil
 }
 
 func (repo *ProjectRepo) GetProjectGrantMemberRoles() []string {
