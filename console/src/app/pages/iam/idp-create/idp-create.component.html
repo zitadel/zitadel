@@ -1,0 +1,47 @@
+<div class="container">
+    <div class="abort-container">
+        <button (click)="close()" mat-icon-button>
+            <mat-icon>close</mat-icon>
+        </button>
+        <span class="abort">{{ 'PROJECT.ROLE.ADDTITLE' | translate }}</span><span class="abort-2">Step
+            {{ currentCreateStep }} of
+            {{ createSteps }}</span>
+    </div>
+
+    <h1>{{'PROJECT.ROLE.ADDDESCRIPTION' | translate}}</h1>
+    <form (ngSubmit)="addIdp()">
+        <div class="content">
+            <ng-container [formGroup]="formGroup">
+                <mat-form-field appearance="outline" class="formfield">
+                    <mat-label>{{ 'IAM.IDP.NAME' | translate }}</mat-label>
+                    <input matInput formControlName="name" />
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="formfield">
+                    <mat-label>{{ 'IAM.IDP.LOGOSRC' | translate }}</mat-label>
+                    <input matInput formControlName="logoSrc" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="formfield">
+                    <mat-label>{{ 'IAM.IDP.CLIENTID' | translate }}</mat-label>
+                    <input matInput formControlName="clientId" />
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="formfield">
+                    <mat-label>{{ 'IAM.IDP.CLIENTSECRET' | translate }}</mat-label>
+                    <input matInput formControlName="clientSecret" />
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="formfield">
+                    <mat-label>{{ 'IAM.IDP.ISSUER' | translate }}</mat-label>
+                    <input matInput formControlName="issuer" />
+                </mat-form-field>
+                <!-- <mat-form-field appearance="outline" class="formfield">
+                    <mat-label>{{ 'IAM.IDP.SCOPESLIST' | translate }}</mat-label>
+                    <input matInput formControlName="clientSecret" />
+                </mat-form-field> -->
+            </ng-container>
+        </div>
+
+        <button color="primary" mat-raised-button class="continue-button" [disabled]="formGroup.invalid" type="submit">
+            {{ 'ACTIONS.SAVE' | translate }}
+        </button>
+    </form>
+</div>

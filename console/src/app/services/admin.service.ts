@@ -14,6 +14,13 @@ import {
     IamMemberSearchQuery,
     IamMemberSearchRequest,
     IamMemberSearchResponse,
+    Idp,
+    IdpID,
+    IdpSearchQuery,
+    IdpSearchRequest,
+    IdpSearchResponse,
+    IdpView,
+    OidcIdpConfigCreate,
     OrgIamPolicy,
     OrgIamPolicyID,
     OrgIamPolicyRequest,
@@ -74,6 +81,58 @@ export class AdminService {
         req.setViewName(viewname);
         req.setFailedSequence(sequence);
         return this.grpcService.admin.removeFailedEvent(req);
+    }
+
+    public async SearchIdps(
+        limit: number,
+        offset: number,
+        queryList?: IdpSearchQuery[],
+    ): Promise<IdpSearchResponse> {
+        const req = new IdpSearchRequest();
+        req.setLimit(limit);
+        req.setOffset(offset);
+        if (queryList) {
+            req.setQueriesList(queryList);
+        }
+        return this.grpcService.admin.searchIdps(req);
+    }
+
+    public async IdpByID(
+        id: string,
+    ): Promise<IdpView> {
+        const req = new IdpID();
+        req.setId(id);
+        return this.grpcService.admin.idpByID(req);
+    }
+
+    public async CreateOidcIdp(
+        req: OidcIdpConfigCreate,
+    ): Promise<Idp> {
+        return this.grpcService.admin.createOidcIdp(req);
+    }
+
+    public async RemoveIdpConfig(
+        id: string,
+    ): Promise<Empty> {
+        const req = new IdpID;
+        req.setId(id);
+        return this.grpcService.admin.removeIdpConfig(req);
+    }
+
+    public async DeactivateIdpConfig(
+        id: string,
+    ): Promise<Empty> {
+        const req = new IdpID;
+        req.setId(id);
+        return this.grpcService.admin.deactivateIdpConfig(req);
+    }
+
+    public async ReactivateIdpConfig(
+        id: string,
+    ): Promise<Empty> {
+        const req = new IdpID;
+        req.setId(id);
+        return this.grpcService.admin.reactivateIdpConfig(req);
     }
 
     public async SearchIamMembers(

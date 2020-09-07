@@ -22,6 +22,14 @@ const routes: Routes = [
             roles: ['iam.member.read'],
         },
     },
+    {
+        path: 'idp/create',
+        loadChildren: () => import('./idp-create/idp-create.module').then(m => m.IdpCreateModule),
+        canActivate: [AuthGuard, RoleGuard],
+        data: {
+            roles: ['iam.write'],
+        },
+    },
 ];
 
 @NgModule({
