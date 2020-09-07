@@ -1,9 +1,8 @@
 package handler
 
 import (
-	"net/http"
-
 	"golang.org/x/text/language"
+	"net/http"
 
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -18,13 +17,14 @@ const (
 )
 
 type registerFormData struct {
-	Email     string `schema:"email"`
-	Firstname string `schema:"firstname"`
-	Lastname  string `schema:"lastname"`
-	Language  string `schema:"language"`
-	Gender    int32  `schema:"gender"`
-	Password  string `schema:"register-password"`
-	Password2 string `schema:"register-password-confirmation"`
+	Email        string `schema:"email"`
+	Firstname    string `schema:"firstname"`
+	Lastname     string `schema:"lastname"`
+	Language     string `schema:"language"`
+	Gender       int32  `schema:"gender"`
+	Password     string `schema:"register-password"`
+	Password2    string `schema:"register-password-confirmation"`
+	TermsConfirm bool   `schema:"terms-confirm"`
 }
 
 type registerData struct {
@@ -94,7 +94,6 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	if formData.Language == "" {
 		formData.Language = l.renderer.Lang(r).String()
 	}
-
 	data := registerData{
 		baseData:         l.getBaseData(r, authRequest, "Register", errType, errMessage),
 		registerFormData: *formData,

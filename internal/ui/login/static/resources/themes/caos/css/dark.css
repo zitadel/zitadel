@@ -240,6 +240,20 @@ form .field.radio-button label {
   padding: 3px 0 0 15px;
   width: 100%;
 }
+form .field.check-box {
+  display: flex;
+}
+form .field.check-box input[type=checkbox] {
+  height: 20px;
+  vertical-align: middle;
+}
+form .field.check-box label {
+  height: 20px;
+  text-transform: inherit;
+  display: inline-block;
+  padding: 2px 0 0 15px;
+  width: 100%;
+}
 form label {
   color: #898989;
   text-transform: uppercase;
@@ -422,6 +436,12 @@ footer {
   -moz-osx-font-smoothing: grayscale;
   /* Support for IE. */
   font-feature-settings: "liga";
+}
+
+.free-tier {
+  border: 2px solid #F20D6B;
+  border-radius: 5px;
+  padding: 10px;
 }
 
 /*# sourceMappingURL=dark.css.map */
