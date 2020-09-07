@@ -39,7 +39,7 @@
 
 <svelte:head>
   <title>
-    Caos • Documentation
+    ZITADEL • Documentation
   </title>
 </svelte:head>
 
@@ -53,6 +53,7 @@
             <p>{$_('description3')}</p>
 
             <a href="/documentation" >{$_('button')}</a>
+            <br>
             <a href="/manuals" >{$_('button')}</a>
         </div>
     </Section>
