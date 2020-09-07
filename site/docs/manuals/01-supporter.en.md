@@ -1,5 +1,5 @@
 ---
-title: Integration
+title: Introduction
 ---
 
 ### Before we begin
