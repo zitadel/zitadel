@@ -2,7 +2,14 @@ import { Component, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { CreateHumanRequest, CreateUserRequest, Gender, UserResponse } from 'src/app/proto/generated/management_pb';
+import {
+    CreateHumanRequest,
+    CreateUserRequest,
+    Gender,
+    OrgDomain,
+    UserResponse,
+} from 'src/app/proto/generated/management_pb';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -40,14 +47,17 @@ export class UserCreateComponent implements OnDestroy {
     public userLoginMustBeDomain: boolean = false;
     public loading: boolean = false;
 
+    private primaryDomain!: OrgDomain.AsObject;
+
     constructor(
         private router: Router,
         private toast: ToastService,
-        public userService: ManagementService,
         private fb: FormBuilder,
         private mgmtService: ManagementService,
+        private authenticationService: AuthenticationService,
     ) {
         this.loading = true;
+        this.loadOrg();
         this.mgmtService.GetMyOrgIamPolicy().then((iampolicy) => {
             this.userLoginMustBeDomain = iampolicy.toObject().userLoginMustBeDomain;
             this.initForm();
@@ -57,6 +67,14 @@ export class UserCreateComponent implements OnDestroy {
             this.initForm();
             this.loading = false;
         });
+    }
+
+    private async loadOrg(): Promise<void> {
+        const domains = (await this.mgmtService.SearchMyOrgDomains(0, 100).then(doms => doms.toObject()));
+        const found = domains.resultList.find(domain => domain.primary);
+        if (found) {
+            this.primaryDomain = found;
+        }
     }
 
     private initForm(): void {
@@ -93,7 +111,7 @@ export class UserCreateComponent implements OnDestroy {
         humanReq.setGender(this.gender?.value);
         humanReq.setCountry(this.country?.value);
 
-        this.userService
+        this.mgmtService
             .CreateUserHuman(this.userName?.value, humanReq)
             .then((data: UserResponse) => {
                 this.loading = false;
@@ -149,5 +167,13 @@ export class UserCreateComponent implements OnDestroy {
     }
     public get country(): AbstractControl | null {
         return this.userForm.get('country');
+    }
+
+    public get envSuffix(): string {
+        if (this.userLoginMustBeDomain) {
+            return `@${this.primaryDomain.domain}`;
+        } else {
+            return '';
+        }
     }
 }

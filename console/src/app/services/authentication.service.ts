@@ -8,7 +8,7 @@ import { StatehandlerService } from './statehandler.service';
     providedIn: 'root',
 })
 export class AuthenticationService {
-    private authConfig!: AuthConfig;
+    public authConfig!: AuthConfig;
     private _authenticated: boolean = false;
     private readonly _authenticationChanged: BehaviorSubject<
         boolean
