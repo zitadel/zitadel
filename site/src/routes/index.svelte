@@ -52,10 +52,10 @@
             <p>{$_('description2')}</p>
             <p>{$_('description3')}</p>
             
-            <ul style=none>
+            <ul style='list-style-type: none;'>
             <li><a href="/documentation" >{$_('introlink')}</a></li>
             <li><a href="/manuals" >{$_('manualslink')}</a></li>
-            <li><a href="/developer-and-integration" >{$_("devintlink")}</a></li>
+            <li><a href="/developer-and-integration" >{$_('devintlink')}</a></li>
             </ul>
             
         </div>
