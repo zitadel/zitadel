@@ -10,3 +10,9 @@ import (
 func DefaultTraceHandler(handler http.Handler) http.Handler {
 	return tracing.TraceHandler(handler, http_utils.Probes...)
 }
+
+func TraceHandler(ignoredMethods ...string) func(http.Handler) http.Handler {
+	return func(handler http.Handler) http.Handler {
+		return tracing.TraceHandler(handler, ignoredMethods...)
+	}
+}

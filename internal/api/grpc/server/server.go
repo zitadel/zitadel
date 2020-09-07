@@ -27,7 +27,7 @@ type Server interface {
 
 func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, lang language.Tag) *grpc.Server {
 	return grpc.NewServer(
-		middleware.TracingStatsServer(http.Healthz, http.Readiness, http.Validation),
+		middleware.DefaultTracingStatsServer(),
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
 				middleware.ErrorHandler(),

@@ -18,7 +18,6 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/form"
 	"github.com/caos/zitadel/internal/id"
-
 	_ "github.com/caos/zitadel/internal/ui/login/statik"
 )
 
@@ -73,7 +72,7 @@ func CreateLogin(config Config, authRepo *eventsourcing.EsRepository, localDevMo
 	security := middleware.SecurityHeaders(csp(), login.cspErrorHandler)
 	userAgentCookie, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator, localDevMode)
 	logging.Log("CONFI-Dvwf2").OnError(err).Panic("unable to create userAgentInterceptor")
-	login.router = CreateRouter(login, statikFS, csrf, cache, security, userAgentCookie)
+	login.router = CreateRouter(login, statikFS, csrf, cache, security, userAgentCookie, middleware.TraceHandler(EndpointResources))
 	login.renderer = CreateRenderer(prefix, statikFS, config.LanguageCookieName, config.DefaultLanguage)
 	login.parser = form.NewParser()
 	return login, handlerPrefix

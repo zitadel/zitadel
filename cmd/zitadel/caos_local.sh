@@ -6,7 +6,7 @@ gopass sync --store zitadel-secrets
 gopass zitadel-secrets/zitadel/developer/default/zitadel-svc-account-zitadel-local | base64 -D > "$BASEDIR/local_svc-account-tracing.json"
 export GOOGLE_APPLICATION_CREDENTIALS="$BASEDIR/local_svc-account-tracing.json"
 
-export ZITADEL_TRACING_PROJECT_ID=caos-citadel-test
+export ZITADEL_TRACING_PROJECT_ID=zitadel-dev
 export ZITADEL_TRACING_FRACTION=0.1
 
 # Log
