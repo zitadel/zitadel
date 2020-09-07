@@ -9,7 +9,6 @@ import {
     OrgDomain,
     UserResponse,
 } from 'src/app/proto/generated/management_pb';
-import { AuthenticationService } from 'src/app/services/authentication.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -54,7 +53,6 @@ export class UserCreateComponent implements OnDestroy {
         private toast: ToastService,
         private fb: FormBuilder,
         private mgmtService: ManagementService,
-        private authenticationService: AuthenticationService,
     ) {
         this.loading = true;
         this.loadOrg();

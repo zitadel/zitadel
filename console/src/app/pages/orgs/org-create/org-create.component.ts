@@ -8,6 +8,7 @@ import { take } from 'rxjs/operators';
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
 import { CreateHumanRequest, CreateOrgRequest, Gender, OrgSetUpResponse } from 'src/app/proto/generated/admin_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/auth_pb';
+import { OrgDomain } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -61,6 +62,10 @@ export class OrgCreateComponent {
     public usePassword: boolean = false;
 
     public forSelf: boolean = true;
+
+    private userLoginMustBeDomain: boolean = false;
+    private primaryDomain!: OrgDomain.AsObject;
+
     constructor(
         private router: Router,
         private toast: ToastService,
@@ -82,6 +87,22 @@ export class OrgCreateComponent {
         });
 
         this.initForm();
+
+        this.adminService.getDefaultLoginPolicy().then(policy => {
+            if (policy.toObject().) {
+                this.userLoginMustBeDomain = true;
+            }
+        });
+
+        this.mgmtService.SearchMyOrgDomains(0, 100).then(doms => {
+            const domains = doms.toObject();
+
+            const found = domains.resultList.find(domain => domain.primary);
+            if (found) {
+                this.primaryDomain = found;
+            }
+        });
+
     }
 
     public createSteps: number = 2;
@@ -138,34 +159,35 @@ export class OrgCreateComponent {
         const validators: Validators[] = [Validators.required];
 
         if (this.usePassword) {
-            this.mgmtService.GetDefaultPasswordComplexityPolicy().then(data => {
-                this.policy = data.toObject();
+            this.mgmtService.
+                this.mgmtService.GetDefaultPasswordComplexityPolicy().then(data => {
+                    this.policy = data.toObject();
 
-                if (this.policy.minLength) {
-                    validators.push(Validators.minLength(this.policy.minLength));
-                }
-                if (this.policy.hasLowercase) {
-                    validators.push(lowerCaseValidator);
-                }
-                if (this.policy.hasUppercase) {
-                    validators.push(upperCaseValidator);
-                }
-                if (this.policy.hasNumber) {
-                    validators.push(numberValidator);
-                }
-                if (this.policy.hasSymbol) {
-                    validators.push(symbolValidator);
-                }
+                    if (this.policy.minLength) {
+                        validators.push(Validators.minLength(this.policy.minLength));
+                    }
+                    if (this.policy.hasLowercase) {
+                        validators.push(lowerCaseValidator);
+                    }
+                    if (this.policy.hasUppercase) {
+                        validators.push(upperCaseValidator);
+                    }
+                    if (this.policy.hasNumber) {
+                        validators.push(numberValidator);
+                    }
+                    if (this.policy.hasSymbol) {
+                        validators.push(symbolValidator);
+                    }
 
-                // this.initForm(validators);
-                const pwdValidators = [...validators] as ValidatorFn[];
-                const confirmPwdValidators = [...validators, passwordConfirmValidator] as ValidatorFn[];
-                this.pwdForm = this.fb.group({
-                    password: ['', pwdValidators],
-                    confirmPassword: ['', confirmPwdValidators],
+                    // this.initForm(validators);
+                    const pwdValidators = [...validators] as ValidatorFn[];
+                    const confirmPwdValidators = [...validators, passwordConfirmValidator] as ValidatorFn[];
+                    this.pwdForm = this.fb.group({
+                        password: ['', pwdValidators],
+                        confirmPassword: ['', confirmPwdValidators],
+                    });
+
                 });
-
-            });
         } else {
             this.pwdForm = this.fb.group({
                 password: ['', []],
@@ -243,6 +265,14 @@ export class OrgCreateComponent {
 
     public get confirmPassword(): AbstractControl | null {
         return this.pwdForm.get('confirmPassword');
+    }
+
+    public get envSuffix(): string {
+        if (this.userLoginMustBeDomain && this.primaryDomain?.domain) {
+            return `@${this.primaryDomain.domain}`;
+        } else {
+            return '';
+        }
     }
 
     public close(): void {

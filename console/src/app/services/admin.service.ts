@@ -7,6 +7,7 @@ import {
     CreateHumanRequest,
     CreateOrgRequest,
     CreateUserRequest,
+    DefaultLoginPolicyView,
     FailedEventID,
     FailedEvents,
     IamMember,
@@ -49,6 +50,11 @@ export class AdminService {
     public async GetIamMemberRoles(): Promise<IamMemberRoles> {
         const req = new Empty();
         return this.grpcService.admin.getIamMemberRoles(req);
+    }
+
+    public async getDefaultLoginPolicy(): Promise<DefaultLoginPolicyView> {
+        const req = new Empty();
+        return this.grpcService.admin.getDefaultLoginPolicy(req);
     }
 
     public async GetViews(): Promise<Views> {
