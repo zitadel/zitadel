@@ -51,9 +51,12 @@
             <p>{$_('description')}</p>
             <p>{$_('description2')}</p>
             <p>{$_('description3')}</p>
-
-            <a href="/documentation" >{$_('button')}</a>
-            <br>
-            <a href="/manuals" >{$_('button')}</a>
+            
+            <ul style=none>
+            <a href="/documentation" >{$_('introlink')}</a>
+            <a href="/manuals" >{$_('manualslink')}</a>
+            <a href="/manuals" >{$_("devintlink")}</a>
+            </ul>
+            
         </div>
     </Section>
