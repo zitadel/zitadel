@@ -170,7 +170,7 @@ export class UserCreateComponent implements OnDestroy {
     }
 
     public get envSuffix(): string {
-        if (this.userLoginMustBeDomain) {
+        if (this.userLoginMustBeDomain && this.primaryDomain?.domain) {
             return `@${this.primaryDomain.domain}`;
         } else {
             return '';

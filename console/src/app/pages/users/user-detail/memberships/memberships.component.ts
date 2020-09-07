@@ -48,7 +48,6 @@ export class MembershipsComponent implements OnInit {
 
     ngOnInit(): void {
         this.loadManager(this.user.id);
-        console.log(this.disabled);
     }
 
     public async loadManager(userId: string): Promise<void> {
