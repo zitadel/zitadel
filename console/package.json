@@ -27,7 +27,7 @@
     "@types/file-saver": "^2.0.1",
     "@types/uuid": "^8.3.0",
     "@types/google-protobuf": "^3.7.3",
-    "angularx-qrcode": "^10.0.6",
+    "angularx-qrcode": "^10.0.10",
     "angular-oauth2-oidc": "^10.0.3",
     "cors": "^2.8.5",
     "file-saver": "^2.0.2",
