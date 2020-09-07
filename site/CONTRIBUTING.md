@@ -7,7 +7,7 @@ Zitadel's static site generator uses a Markdown file format. The flavour of the 
 ## Using headings
 Make use of headings to structure and organise the document. The static site generator will make sure that the headings are rendered as a means of navigation for the site's content.
 
-## Headings capitalisaion conventions
+## Headings capitalisation conventions
 In order to keep consistency across the documentation we urge you to only write the very first word of a heading with a capital letter. The styling of the static site generator will then guarantee the consistent rendering of first caps, all caps, word caps or whatever style is chosen for the output.
 
 ## Using captions
