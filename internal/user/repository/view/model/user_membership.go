@@ -5,13 +5,14 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/lib/pq"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/user/model"
-	"github.com/lib/pq"
 )
 
 const (
@@ -28,41 +29,28 @@ type UserMembershipView struct {
 	AggregateID string `json:"-" gorm:"column:aggregate_id;primary_key"`
 	ObjectID    string `json:"-" gorm:"column:object_id;primary_key"`
 
-	Roles         pq.StringArray `json:"-" gorm:"column:roles"`
-	DisplayName   string         `json:"-" gorm:"column:display_name"`
-	CreationDate  time.Time      `json:"-" gorm:"column:creation_date"`
-	ChangeDate    time.Time      `json:"-" gorm:"column:change_date"`
-	ResourceOwner string         `json:"-" gorm:"column:resource_owner"`
-	Sequence      uint64         `json:"-" gorm:"column:sequence"`
-}
-
-func UserMembershipFromModel(membership *model.UserMembershipView) *UserMembershipView {
-	return &UserMembershipView{
-		UserID:        membership.UserID,
-		MemberType:    int32(membership.MemberType),
-		AggregateID:   membership.AggregateID,
-		ObjectID:      membership.ObjectID,
-		Roles:         membership.Roles,
-		DisplayName:   membership.DisplayName,
-		ChangeDate:    membership.ChangeDate,
-		CreationDate:  membership.CreationDate,
-		ResourceOwner: membership.ResourceOwner,
-		Sequence:      membership.Sequence,
-	}
+	Roles             pq.StringArray `json:"-" gorm:"column:roles"`
+	DisplayName       string         `json:"-" gorm:"column:display_name"`
+	CreationDate      time.Time      `json:"-" gorm:"column:creation_date"`
+	ChangeDate        time.Time      `json:"-" gorm:"column:change_date"`
+	ResourceOwner     string         `json:"-" gorm:"column:resource_owner"`
+	ResourceOwnerName string         `json:"-" gorm:"column:resource_owner_name"`
+	Sequence          uint64         `json:"-" gorm:"column:sequence"`
 }
 
 func UserMembershipToModel(membership *UserMembershipView) *model.UserMembershipView {
 	return &model.UserMembershipView{
-		UserID:        membership.UserID,
-		MemberType:    model.MemberType(membership.MemberType),
-		AggregateID:   membership.AggregateID,
-		ObjectID:      membership.ObjectID,
-		Roles:         membership.Roles,
-		DisplayName:   membership.DisplayName,
-		ChangeDate:    membership.ChangeDate,
-		CreationDate:  membership.CreationDate,
-		ResourceOwner: membership.ResourceOwner,
-		Sequence:      membership.Sequence,
+		UserID:            membership.UserID,
+		MemberType:        model.MemberType(membership.MemberType),
+		AggregateID:       membership.AggregateID,
+		ObjectID:          membership.ObjectID,
+		Roles:             membership.Roles,
+		DisplayName:       membership.DisplayName,
+		ChangeDate:        membership.ChangeDate,
+		CreationDate:      membership.CreationDate,
+		ResourceOwner:     membership.ResourceOwner,
+		ResourceOwnerName: membership.ResourceOwnerName,
+		Sequence:          membership.Sequence,
 	}
 }
 
@@ -82,22 +70,26 @@ func (u *UserMembershipView) AppendEvent(event *models.Event) (err error) {
 	case iam_es_model.IAMMemberAdded:
 		u.setRootData(event, model.MemberTypeIam)
 		err = u.setIamMemberData(event)
-	case iam_es_model.IAMMemberChanged:
+	case iam_es_model.IAMMemberChanged,
+		iam_es_model.IAMMemberRemoved:
 		err = u.setIamMemberData(event)
 	case org_es_model.OrgMemberAdded:
 		u.setRootData(event, model.MemberTypeOrganisation)
 		err = u.setOrgMemberData(event)
-	case org_es_model.OrgMemberChanged:
+	case org_es_model.OrgMemberChanged,
+		org_es_model.OrgMemberRemoved:
 		err = u.setOrgMemberData(event)
 	case proj_es_model.ProjectMemberAdded:
 		u.setRootData(event, model.MemberTypeProject)
 		err = u.setProjectMemberData(event)
-	case proj_es_model.ProjectMemberChanged:
+	case proj_es_model.ProjectMemberChanged,
+		proj_es_model.ProjectMemberRemoved:
 		err = u.setProjectMemberData(event)
 	case proj_es_model.ProjectGrantMemberAdded:
 		u.setRootData(event, model.MemberTypeProjectGrant)
 		err = u.setProjectMemberData(event)
-	case proj_es_model.ProjectGrantMemberChanged:
+	case proj_es_model.ProjectGrantMemberChanged,
+		proj_es_model.ProjectGrantMemberRemoved:
 		err = u.setProjectMemberData(event)
 	}
 	return err
