@@ -53,5 +53,6 @@
             <p>{$_('description3')}</p>
 
             <a href="/get_started" >{$_('button')}</a>
+            <a href="/manuals" >{$_('button')}</a>
         </div>
     </Section>
