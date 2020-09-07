@@ -438,4 +438,10 @@ footer {
   font-feature-settings: "liga";
 }
 
+.free-tier {
+  border: 2px solid #F20D6B;
+  border-radius: 5px;
+  padding: 10px;
+}
+
 /*# sourceMappingURL=dark.css.map */
