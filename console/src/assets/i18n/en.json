@@ -299,6 +299,17 @@
             "DELETE":"Remove",
             "DELETESUCCESS":"Failed Events removed!"
         },
+        "IDP":{
+            "LIST": {
+                "TITLE":"Identity Providers",
+                "DESCRIPTION":"Define additional Identity Providers, which can be used to authenticate in your organisations."
+            },
+            "NAME":"Name",
+            "CONFIG":"Configuration",
+            "STATE":"State",
+            "CREATIONDATE":"Created At",
+            "CHANGEDATE":"Last Modified"
+        },
         "TOAST":{
             "MEMBERREMOVED":"Manager removed!",
             "MEMBERSADDED": "Managers added!",

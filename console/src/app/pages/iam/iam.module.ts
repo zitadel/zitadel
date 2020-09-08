@@ -25,17 +25,18 @@ import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
+import { IdpTableModule } from '../../modules/idp-table/idp-table.module';
 import { FailedEventsComponent } from './failed-events/failed-events.component';
 import { IamRoutingModule } from './iam-routing.module';
 import { IamViewsComponent } from './iam-views/iam-views.component';
 import { IamComponent } from './iam.component';
-import { IdpTableComponent } from './idp-table/idp-table.component';
 
 @NgModule({
-    declarations: [IamComponent, IamViewsComponent, FailedEventsComponent, IdpTableComponent],
+    declarations: [IamComponent, IamViewsComponent, FailedEventsComponent],
     imports: [
         CommonModule,
         IamRoutingModule,
+        IdpTableModule,
         ChangesModule,
         CardModule,
         MatAutocompleteModule,

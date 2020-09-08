@@ -18,6 +18,14 @@ const routes: Routes = [
         loadChildren: () => import('./org-create/org-create.module').then(m => m.OrgCreateModule),
     },
     {
+        path: 'idp/create',
+        loadChildren: () => import('src/app/modules/idp-create/idp-create.module').then(m => m.IdpCreateModule),
+        canActivate: [RoleGuard],
+        data: {
+            roles: ['org.idp.write'],
+        },
+    },
+    {
         path: 'policy/:policytype/create',
         component: PasswordPolicyComponent,
         data: {

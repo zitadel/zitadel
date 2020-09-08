@@ -299,6 +299,17 @@
             "DELETE":"Entfernen",
             "DELETESUCCESS":"Gescheiterte Events entfernt!"
         },
+        "IDP":{
+            "LIST": {
+                "TITLE":"Identity Providers",
+                "DESCRIPTION":"Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können."
+            },
+            "NAME":"Name",
+            "CONFIG":"Konfiguration",
+            "STATE":"Status",
+            "CREATIONDATE":"Erstelldatum",
+            "CHANGEDATE":"Letzte Änderung"
+        },
         "TOAST":{
             "MEMBERREMOVED":"Manager entfernt!",
             "MEMBERSADDED": "Manager hinzugefügt!",

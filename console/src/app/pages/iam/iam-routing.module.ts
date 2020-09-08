@@ -24,10 +24,10 @@ const routes: Routes = [
     },
     {
         path: 'idp/create',
-        loadChildren: () => import('./idp-create/idp-create.module').then(m => m.IdpCreateModule),
+        loadChildren: () => import('src/app/modules/idp-create/idp-create.module').then(m => m.IdpCreateModule),
         canActivate: [AuthGuard, RoleGuard],
         data: {
-            roles: ['iam.write'],
+            roles: ['iam.idp.write'],
         },
     },
 ];

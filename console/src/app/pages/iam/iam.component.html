@@ -3,10 +3,12 @@
         <h1 class="h1">{{'IAM.DETAIL.TITLE' | translate}}</h1>
         <p class="sub">{{'IAM.DETAIL.DESCRIPTION' | translate}} </p>
 
-        <app-card title="{{ 'IAM.IDP.LIST.TITLE' | translate }}"
-            description="{{ 'IAM.IDP.LIST.DESCRIPTION' | translate }}">
-            <app-idp-table> </app-idp-table>
-        </app-card>
+        <ng-template appHasRole [appHasRole]="['iam.idp.read']">
+            <app-card title="{{ 'IAM.IDP.LIST.TITLE' | translate }}"
+                description="{{ 'IAM.IDP.LIST.DESCRIPTION' | translate }}">
+                <app-idp-table> </app-idp-table>
+            </app-card>
+        </ng-template>
 
         <app-card title="{{ 'IAM.VIEWS.TITLE' | translate }}" description="{{ 'IAM.VIEWS.DESCRIPTION' | translate }}">
             <app-iam-views></app-iam-views>
