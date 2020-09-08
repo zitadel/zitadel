@@ -134,6 +134,18 @@ func (repo *AuthRequestRepo) CheckLoginName(ctx context.Context, id, loginName, 
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
+func (repo *AuthRequestRepo) SelectExternalIDP(ctx context.Context, authReqID, idpConfigID, userAgentID string) error {
+	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
+	if err != nil {
+		return err
+	}
+	err = repo.checkSelectedExternalIDP(request, idpConfigID)
+	if err != nil {
+		return err
+	}
+	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
 func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAgentID string) error {
 	request, err := repo.getAuthRequest(ctx, id, userAgentID)
 	if err != nil {
@@ -179,6 +191,10 @@ func (repo *AuthRequestRepo) getAuthRequestNextSteps(ctx context.Context, id, us
 		return nil, err
 	}
 	request.PossibleSteps = steps
+	err = repo.fillLoginPolicy(ctx, request)
+	if err != nil {
+		return nil, err
+	}
 	return request, nil
 }
 
@@ -189,6 +205,10 @@ func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID
 	}
 	if request.AgentID != userAgentID {
 		return nil, errors.ThrowPermissionDenied(nil, "EVENT-adk13", "Errors.AuthRequest.UserAgentNotCorresponding")
+	}
+	err = repo.fillLoginPolicy(ctx, request)
+	if err != nil {
+		return nil, err
 	}
 	return request, nil
 }
@@ -207,7 +227,7 @@ func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *model
 	if !policy.AllowExternalIDP {
 		return nil
 	}
-	idpProviders, err := repo.getLoginPolicyIDPConfigs(ctx, orgID, policy.Default)
+	idpProviders, err := repo.getLoginPolicyIDPProviders(ctx, orgID, policy.Default)
 	if err != nil {
 		return err
 	}
@@ -227,6 +247,19 @@ func (repo *AuthRequestRepo) checkLoginName(request *model.AuthRequest, loginNam
 		return err
 	}
 	request.SetUserInfo(user.ID, loginName, "", user.ResourceOwner)
+	return nil
+}
+
+func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *model.AuthRequest, idpConfigID string) error {
+	orgID := request.GetScopeOrgID()
+	if orgID == "" {
+		orgID = repo.SystemDefaults.IamID
+	}
+	_, err := repo.View.IDPProviderByAggregateAndIDPConfigID(orgID, idpConfigID)
+	if err != nil {
+		return err
+	}
+	request.SelectedIDPConfigID = idpConfigID
 	return nil
 }
 
@@ -370,19 +403,19 @@ func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (
 	return iam_es_model.LoginPolicyViewToModel(policy), err
 }
 
-func (repo *AuthRequestRepo) getLoginPolicyIDPConfigs(ctx context.Context, orgID string, defaultPolicy bool) ([]*iam_model.IDPConfigView, error) {
+func (repo *AuthRequestRepo) getLoginPolicyIDPProviders(ctx context.Context, orgID string, defaultPolicy bool) ([]*iam_model.IDPProviderView, error) {
 	if defaultPolicy {
-		idpConfigs, err := repo.View.GetIDPConfigsByAggregateID(repo.SystemDefaults.IamID)
+		idpProviders, err := repo.View.IDPProvidersByAggregateID(repo.SystemDefaults.IamID)
 		if err != nil {
 			return nil, err
 		}
-		return iam_es_model.IdpConfigViewsToModel(idpConfigs), nil
+		return iam_es_model.IDPProviderViewsToModel(idpProviders), nil
 	}
-	idpConfigs, err := repo.View.GetIDPConfigsByAggregateID(orgID)
+	idpProviders, err := repo.View.IDPProvidersByAggregateID(orgID)
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.IdpConfigViewsToModel(idpConfigs), nil
+	return iam_es_model.IDPProviderViewsToModel(idpProviders), nil
 }
 
 func checkVerificationTime(verificationTime time.Time, lifetime time.Duration) bool {

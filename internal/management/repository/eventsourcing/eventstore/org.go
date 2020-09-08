@@ -218,7 +218,7 @@ func (repo *OrgRepository) IDPConfigByID(ctx context.Context, idpConfigID string
 	if err != nil {
 		return nil, err
 	}
-	return iam_view_model.IdpConfigViewToModel(idp), nil
+	return iam_view_model.IDPConfigViewToModel(idp), nil
 }
 func (repo *OrgRepository) AddOIDCIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
 	idp.AggregateID = authz.GetCtxData(ctx).OrgID

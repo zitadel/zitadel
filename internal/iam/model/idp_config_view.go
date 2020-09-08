@@ -66,3 +66,7 @@ func (r *IDPConfigSearchRequest) EnsureLimit(limit uint64) {
 func (r *IDPConfigSearchRequest) AppendMyOrgQuery(orgID, iamID string) {
 	r.Queries = append(r.Queries, &IDPConfigSearchQuery{Key: IDPConfigSearchKeyAggregateID, Method: model.SearchMethodIsOneOf, Value: []string{orgID, iamID}})
 }
+
+func (r *IDPConfigView) authorize(authReqID string) {
+
+}

@@ -10,19 +10,32 @@
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
+    {{if .LoginPolicy.AllowUsernamePassword }}
     <div class="fields">
         <div class="field">
             <label class="label" for="loginName">{{t "Login.Loginname"}}</label>
             <input class="input" type="text" id="loginName" name="loginName" placeholder="{{t "Login.LoginnamePlaceHolder"}}" value="{{ .LoginName }}" autocomplete="username" autofocus required>
         </div>
     </div>
+    {{end}}
 
     {{template "error-message" .}}
 
     <div class="actions">
         <button class="primary right" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
-        <button class="secondary right" name="register" value="true" formnovalidate>{{t "Actions.Register"}}</button>
+        {{if .LoginPolicy.AllowRegister}}
+            <button class="secondary right" name="register" value="true" formnovalidate>{{t "Actions.Register"}}</button>
+        {{end}}
     </div>
+
+    {{if .LoginPolicy.AllowExternalIDP}}
+        {{ $reqid := .AuthReqID}}
+        {{range $provider := .IDPProviders}}
+            <a href="{{ externalIDPAuthURL $reqid $provider.AggregateID $provider.IDPConfigID}}" class="secondary idp-providers">
+                {{$provider.Name}}
+            </a>
+        {{end}}
+    {{end}}
 </form>
 
 

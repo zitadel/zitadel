@@ -35,3 +35,18 @@ CREATE TABLE auth.login_policies (
 
     PRIMARY KEY (aggregate_id)
 );
+
+CREATE TABLE auth.idp_providers (
+    aggregate_id TEXT,
+    idp_config_id TEXT,
+
+    creation_date TIMESTAMPTZ,
+    change_date TIMESTAMPTZ,
+    sequence BIGINT,
+
+    name string,
+    idp_config_type SMALLINT,
+    idp_provider_type SMALLINT,
+
+    PRIMARY KEY (aggregate_id, idp_config_id)
+);

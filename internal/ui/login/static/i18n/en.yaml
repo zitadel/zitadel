@@ -195,6 +195,8 @@ Errors:
         NotReady: Multifactor OTP (OneTimePassword) isn't ready
     Locked: User is locked
     NotActive: User is not active
+    ExternalIDP:
+      IDPTypeNotImplemented: IDP Typ ist nicht implementiert
 
 
 optional: (optional)

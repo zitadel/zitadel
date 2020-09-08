@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"fmt"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"html/template"
 	"net/http"
 	"path"
@@ -65,6 +66,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		},
 		"loginUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointLogin)
+		},
+		"externalIDPAuthURL": func(authReqID, aggregateID, idpConfigID string) string {
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%s&%s=%s", EndpointExternalLogin, queryAuthRequestID, authReqID, queryIDPConfigID, idpConfigID, queryAggregateID, aggregateID))
 		},
 		"registerUrl": func(id string) string {
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointRegister, queryAuthRequestID, id))
@@ -214,14 +218,16 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 			ErrType:    errType,
 			ErrMessage: errMessage,
 		},
-		Lang:      l.renderer.Lang(r).String(),
-		Title:     title,
-		Theme:     l.getTheme(authReq),
-		ThemeMode: l.getThemeMode(r),
-		OrgID:     l.getOrgID(authReq),
-		AuthReqID: getRequestID(authReq, r),
-		CSRF:      csrf.TemplateField(r),
-		Nonce:     http_mw.GetNonce(r),
+		Lang:         l.renderer.Lang(r).String(),
+		Title:        title,
+		Theme:        l.getTheme(authReq),
+		ThemeMode:    l.getThemeMode(r),
+		OrgID:        l.getOrgID(authReq),
+		AuthReqID:    getRequestID(authReq, r),
+		CSRF:         csrf.TemplateField(r),
+		Nonce:        http_mw.GetNonce(r),
+		LoginPolicy:  authReq.LoginPolicy,
+		IDPProviders: authReq.AllowedExternalIDPs,
 	}
 }
 
@@ -258,7 +264,6 @@ func (l *Login) getThemeMode(r *http.Request) string {
 func (l *Login) getOrgID(authReq *model.AuthRequest) string {
 	switch request := authReq.Request.(type) {
 	case *model.AuthRequestOIDC:
-		fmt.Printf("SCOPES: %v", request.Scopes)
 		for _, scope := range request.Scopes {
 			if strings.HasPrefix(scope, model.OrgIDScope) {
 				scopeParts := strings.Split(scope, ":")
@@ -291,14 +296,16 @@ func (l *Login) cspErrorHandler(err error) http.Handler {
 
 type baseData struct {
 	errorData
-	Lang      string
-	Title     string
-	Theme     string
-	ThemeMode string
-	OrgID     string
-	AuthReqID string
-	CSRF      template.HTML
-	Nonce     string
+	Lang         string
+	Title        string
+	Theme        string
+	ThemeMode    string
+	OrgID        string
+	AuthReqID    string
+	CSRF         template.HTML
+	Nonce        string
+	LoginPolicy  *iam_model.LoginPolicyView
+	IDPProviders []*iam_model.IDPProviderView
 }
 
 type errorData struct {

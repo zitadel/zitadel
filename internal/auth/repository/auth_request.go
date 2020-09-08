@@ -15,6 +15,7 @@ type AuthRequestRepository interface {
 	DeleteAuthRequest(ctx context.Context, id string) error
 	CheckLoginName(ctx context.Context, id, loginName, userAgentID string) error
 	SelectUser(ctx context.Context, id, userID, userAgentID string) error
+	SelectExternalIDP(ctx context.Context, authReqID, idpConfigID, userAgentID string) error
 	VerifyPassword(ctx context.Context, id, userID, password, userAgentID string, info *model.BrowserInfo) error
 	VerifyMfaOTP(ctx context.Context, agentID, authRequestID, code, userAgentID string, info *model.BrowserInfo) error
 }

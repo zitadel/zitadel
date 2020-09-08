@@ -29,6 +29,7 @@ type AuthRequest struct {
 	LoginName           string
 	DisplayName         string
 	UserOrgID           string
+	SelectedIDPConfigID string
 	PossibleSteps       []NextStep
 	PasswordVerified    bool
 	MfasVerified        []MfaType
@@ -36,7 +37,7 @@ type AuthRequest struct {
 	AuthTime            time.Time
 	Code                string
 	LoginPolicy         *model.LoginPolicyView
-	AllowedExternalIDPs []*model.IDPConfigView
+	AllowedExternalIDPs []*model.IDPProviderView
 }
 
 type Prompt int32

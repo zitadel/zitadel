@@ -59,7 +59,7 @@ func IDPConfigViewFromModel(idp *model.IDPConfigView) *IDPConfigView {
 	}
 }
 
-func IdpConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
+func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
 	return &model.IDPConfigView{
 		IDPConfigID:      idp.IDPConfigID,
 		AggregateID:      idp.AggregateID,
@@ -80,7 +80,7 @@ func IdpConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
 func IdpConfigViewsToModel(idps []*IDPConfigView) []*model.IDPConfigView {
 	result := make([]*model.IDPConfigView, len(idps))
 	for i, idp := range idps {
-		result[i] = IdpConfigViewToModel(idp)
+		result[i] = IDPConfigViewToModel(idp)
 	}
 	return result
 }

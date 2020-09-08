@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 
 	auth_model "github.com/caos/zitadel/internal/auth/model"
 	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
@@ -96,5 +98,13 @@ func (repo *OrgRepository) RegisterOrg(ctx context.Context, register *auth_model
 }
 
 func (repo *OrgRepository) GetOrgIamPolicy(ctx context.Context, orgID string) (*org_model.OrgIAMPolicy, error) {
-	return repo.OrgEventstore.GetOrgIAMPolicy(ctx, policy_model.DefaultPolicy)
+	return repo.OrgEventstore.GetOrgIAMPolicy(ctx, orgID)
+}
+
+func (repo *OrgRepository) GetIDPConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IDPConfigView, error) {
+	idpConfig, err := repo.View.IDPConfigByID(idpConfigID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_view_model.IDPConfigViewToModel(idpConfig), nil
 }
