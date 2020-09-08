@@ -24,6 +24,12 @@ import {
     Gender,
     GrantedProjectSearchRequest,
     Iam,
+    Idp,
+    IdpID,
+    IdpSearchQuery,
+    IdpSearchRequest,
+    IdpSearchResponse,
+    IdpView,
     LoginName,
     MachineKeyIDRequest,
     MachineKeySearchRequest,
@@ -35,6 +41,7 @@ import {
     OIDCApplicationCreate,
     OIDCConfig,
     OIDCConfigUpdate,
+    OidcIdpConfigCreate,
     Org,
     OrgCreateRequest,
     OrgDomain,
@@ -144,6 +151,58 @@ export type ResponseMapper<TResp, TMappedResp> = (resp: TResp) => TMappedResp;
 })
 export class ManagementService {
     constructor(private readonly grpcService: GrpcService) { }
+
+    public async SearchIdps(
+        limit: number,
+        offset: number,
+        queryList?: IdpSearchQuery[],
+    ): Promise<IdpSearchResponse> {
+        const req = new IdpSearchRequest();
+        req.setLimit(limit);
+        req.setOffset(offset);
+        if (queryList) {
+            req.setQueriesList(queryList);
+        }
+        return this.grpcService.mgmt.searchIdps(req);
+    }
+
+    public async IdpByID(
+        id: string,
+    ): Promise<IdpView> {
+        const req = new IdpID();
+        req.setId(id);
+        return this.grpcService.mgmt.idpByID(req);
+    }
+
+    public async CreateOidcIdp(
+        req: OidcIdpConfigCreate,
+    ): Promise<Idp> {
+        return this.grpcService.mgmt.createOidcIdp(req);
+    }
+
+    public async RemoveIdpConfig(
+        id: string,
+    ): Promise<Empty> {
+        const req = new IdpID;
+        req.setId(id);
+        return this.grpcService.mgmt.removeIdpConfig(req);
+    }
+
+    public async DeactivateIdpConfig(
+        id: string,
+    ): Promise<Empty> {
+        const req = new IdpID;
+        req.setId(id);
+        return this.grpcService.mgmt.deactivateIdpConfig(req);
+    }
+
+    public async ReactivateIdpConfig(
+        id: string,
+    ): Promise<Empty> {
+        const req = new IdpID;
+        req.setId(id);
+        return this.grpcService.mgmt.reactivateIdpConfig(req);
+    }
 
     public async CreateUserHuman(username: string, user: CreateHumanRequest): Promise<UserResponse> {
         const req = new CreateUserRequest();

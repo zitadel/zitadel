@@ -56,7 +56,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     constructor(
         private dialog: MatDialog,
         public translate: TranslateService,
-        private mgmtService: ManagementService,
+        public mgmtService: ManagementService,
         private toast: ToastService,
         private router: Router,
     ) { }

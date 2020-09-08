@@ -3,34 +3,36 @@
         <button (click)="close()" mat-icon-button>
             <mat-icon>close</mat-icon>
         </button>
-        <span class="abort">{{ 'PROJECT.ROLE.ADDTITLE' | translate }}</span><span class="abort-2">Step
+        <span class="abort">{{ 'IDP.CREATE.TITLE' | translate }}</span><span class="abort-2">Step
             {{ currentCreateStep }} of
             {{ createSteps }}</span>
     </div>
 
-    <h1>{{'PROJECT.ROLE.ADDDESCRIPTION' | translate}}</h1>
+    <h1>{{'IDP.CREATE.TITLE' | translate}}</h1>
+    <p>{{'IDP.CREATE.DESCRIPTION' | translate}}</p>
+
     <form (ngSubmit)="addIdp()">
         <div class="content">
             <ng-container [formGroup]="formGroup">
                 <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'IAM.IDP.NAME' | translate }}</mat-label>
+                    <mat-label>{{ 'IDP.NAME' | translate }}</mat-label>
                     <input matInput formControlName="name" />
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'IAM.IDP.LOGOSRC' | translate }}</mat-label>
+                    <mat-label>{{ 'IDP.LOGOSRC' | translate }}</mat-label>
                     <input matInput formControlName="logoSrc" />
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'IAM.IDP.CLIENTID' | translate }}</mat-label>
+                    <mat-label>{{ 'IDP.CLIENTID' | translate }}</mat-label>
                     <input matInput formControlName="clientId" />
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'IAM.IDP.CLIENTSECRET' | translate }}</mat-label>
+                    <mat-label>{{ 'IDP.CLIENTSECRET' | translate }}</mat-label>
                     <input matInput formControlName="clientSecret" />
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'IAM.IDP.ISSUER' | translate }}</mat-label>
+                    <mat-label>{{ 'IDP.ISSUER' | translate }}</mat-label>
                     <input matInput formControlName="issuer" />
                 </mat-form-field>
                 <!-- <mat-form-field appearance="outline" class="formfield">

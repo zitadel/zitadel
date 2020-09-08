@@ -2,11 +2,15 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
+import { RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { IdpSearchResponse, IdpView } from 'src/app/proto/generated/admin_pb';
+import { IdpSearchResponse as AdminIdpSearchResponse, IdpView as AdminIdpView } from 'src/app/proto/generated/admin_pb';
+import { IdpView as MgmtIdpView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+
 
 
 @Component({
@@ -15,19 +19,22 @@ import { ToastService } from 'src/app/services/toast.service';
     styleUrls: ['./idp-table.component.scss'],
 })
 export class IdpTableComponent implements OnInit {
+    @Input() service!: AdminService | ManagementService;
     @Input() disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    public dataSource: MatTableDataSource<IdpView.AsObject> = new MatTableDataSource<IdpView.AsObject>();
-    public selection: SelectionModel<IdpView.AsObject> = new SelectionModel<IdpView.AsObject>(true, []);
-    public idpResult!: IdpSearchResponse.AsObject;
+    public dataSource: MatTableDataSource<AdminIdpView.AsObject | MgmtIdpView.AsObject>
+        = new MatTableDataSource<AdminIdpView.AsObject | MgmtIdpView.AsObject>();
+    public selection: SelectionModel<AdminIdpView.AsObject | MgmtIdpView.AsObject>
+        = new SelectionModel<AdminIdpView.AsObject | MgmtIdpView.AsObject>(true, []);
+    public idpResult!: AdminIdpSearchResponse.AsObject;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     @Input() public displayedColumns: string[] = ['select', 'name', 'config', 'creationDate', 'changeDate', 'state'];
 
-    @Output() public changedSelection: EventEmitter<Array<IdpView.AsObject>> = new EventEmitter();
+    @Output() public changedSelection: EventEmitter<Array<AdminIdpView.AsObject | MgmtIdpView.AsObject>>
+        = new EventEmitter();
 
-    constructor(public translate: TranslateService, private adminService: AdminService,
-        private toast: ToastService) {
+    constructor(public translate: TranslateService, private toast: ToastService) {
         this.selection.changed.subscribe(() => {
             this.changedSelection.emit(this.selection.selected);
         });
@@ -56,7 +63,7 @@ export class IdpTableComponent implements OnInit {
 
     public deactivateSelectedIdps(): void {
         Promise.all(this.selection.selected.map(value => {
-            return this.adminService.DeactivateIdpConfig(value.id);
+            return this.service.DeactivateIdpConfig(value.id);
         })).then(() => {
             this.toast.showInfo('USER.TOAST.SELECTEDDEACTIVATED', true);
             this.getData(10, 0);
@@ -65,7 +72,7 @@ export class IdpTableComponent implements OnInit {
 
     public reactivateSelectedIdps(): void {
         Promise.all(this.selection.selected.map(value => {
-            return this.adminService.ReactivateIdpConfig(value.id);
+            return this.service.ReactivateIdpConfig(value.id);
         })).then(() => {
             this.toast.showInfo('USER.TOAST.SELECTEDREACTIVATED', true);
             this.getData(10, 0);
@@ -74,13 +81,8 @@ export class IdpTableComponent implements OnInit {
 
     private async getData(limit: number, offset: number): Promise<void> {
         this.loadingSubject.next(true);
-        // const query = new UserSearchQuery();
-        // query.setKey(UserSearchKey.USERSEARCHKEY_TYPE);
-        // query.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
-        // query.setValue(filterTypeValue);
-        // console.log(filterTypeValue);
 
-        this.adminService.SearchIdps(limit, offset).then(resp => {
+        this.service.SearchIdps(limit, offset).then(resp => {
             this.idpResult = resp.toObject();
             this.dataSource.data = this.idpResult.resultList;
             console.log(this.idpResult.resultList);
@@ -93,5 +95,13 @@ export class IdpTableComponent implements OnInit {
 
     public refreshPage(): void {
         this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
+    }
+
+    public get createRouterLink(): RouterLink | any {
+        if (this.service instanceof AdminService) {
+            return ['/iam', 'idp', 'create'];
+        } else if (this.service instanceof ManagementService) {
+            return ['/org', 'idp', 'create'];
+        }
     }
 }

@@ -20,7 +20,7 @@ export class IamComponent {
     public membersSubject: BehaviorSubject<OrgMemberView.AsObject[]>
         = new BehaviorSubject<OrgMemberView.AsObject[]>([]);
 
-    constructor(private adminService: AdminService, private dialog: MatDialog, private toast: ToastService,
+    constructor(public adminService: AdminService, private dialog: MatDialog, private toast: ToastService,
         private router: Router) {
         this.loadMembers();
     }
