@@ -58,6 +58,7 @@
             <li><a href="/administrate" >{$_('administratelink')}</a></li>
             <li><a href="/develop" >{$_('developlink')}</a></li>
             <li><a href="/documentation" >{$_('docslink')}</a></li>
+            <li><a href="/use" >{$_('uselink')}</a></li>
             </ul>
             
         </div>
