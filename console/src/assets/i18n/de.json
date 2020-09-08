@@ -621,6 +621,12 @@
         "CREATIONDATE":"Erstelldatum",
         "CHANGEDATE":"Letzte Änderung"
     },
+    "LOGINPOLICY": {
+        "CREATE": {
+            "TITLE":"Login Policy",
+            "DESCRIPTION":"Definieren Sie hier, mit welchen Idps sich Ihre Benutzer anmelden können."
+        }
+    },
     "APP": {
         "LIST": "Applications",
         "PAGES": {

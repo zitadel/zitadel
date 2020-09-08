@@ -5,6 +5,8 @@ import { RoleGuard } from 'src/app/guards/role.guard';
 import { OrgCreateComponent } from './org-create/org-create.component';
 import { OrgDetailComponent } from './org-detail/org-detail.component';
 import { OrgGridComponent } from './org-grid/org-grid.component';
+import { PasswordAgePolicyComponent } from './password-age-policy/password-age-policy.component';
+import { PasswordLockoutPolicyComponent } from './password-lockout-policy/password-lockout-policy.component';
 import { PasswordPolicyComponent, PolicyComponentAction } from './password-policy/password-policy.component';
 
 const routes: Routes = [
@@ -26,13 +28,30 @@ const routes: Routes = [
         },
     },
     {
+        path: 'policy/age',
+        component: PasswordAgePolicyComponent,
+        data: {
+            action: PolicyComponentAction.MODIFY,
+        },
+        loadChildren: () => import('./password-age-policy/password-age-policy.module')
+            .then(m => m.PasswordAgePolicyModule),
+    },
+    {
+        path: 'policy/lockout',
+        component: PasswordLockoutPolicyComponent,
+        data: {
+            action: PolicyComponentAction.MODIFY,
+        },
+        loadChildren: () => import('./password-lockout-policy/password-lockout-policy.module')
+            .then(m => m.PasswordLockoutPolicyModule),
+    },
+    {
         path: 'policy/:policytype/create',
         component: PasswordPolicyComponent,
         data: {
             action: PolicyComponentAction.CREATE,
         },
     },
-    /// TODO: add roleguard for iam policy
     {
         path: 'policy/:policytype',
         component: PasswordPolicyComponent,
