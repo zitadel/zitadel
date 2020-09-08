@@ -26,6 +26,11 @@ import {
     Iam,
     Idp,
     IdpID,
+    IdpProviderAdd,
+    IdpProviderID,
+    IdpProviderSearchRequest,
+    IdpProviderSearchResponse,
+    IdpProviderType,
     IdpSearchQuery,
     IdpSearchRequest,
     IdpSearchResponse,
@@ -179,6 +184,30 @@ export class ManagementService {
 
     public async RemoveLoginPolicy(): Promise<Empty> {
         return this.grpcService.mgmt.removeLoginPolicy(new Empty());
+    }
+
+    public async AddIdpProviderToDefaultLoginPolicy(configId: string, idpType: IdpProviderType): Promise<IdpProviderID> {
+        const req = new IdpProviderAdd();
+        req.setIdpProviderType(idpType);
+        req.setIdpConfigId(configId);
+        return this.grpcService.mgmt.addIdpProviderToLoginPolicy(req);
+    }
+
+    public async RemoveIdpProviderFromDefaultLoginPolicy(configId: string): Promise<Empty> {
+        const req = new IdpProviderID();
+        req.setIdpConfigId(configId);
+        return this.grpcService.mgmt.removeIdpProviderFromLoginPolicy(req);
+    }
+
+    public async GetDefaultLoginPolicyIdpProviders(limit?: number, offset?: number): Promise<IdpProviderSearchResponse> {
+        const req = new IdpProviderSearchRequest();
+        if (limit) {
+            req.setLimit(limit);
+        }
+        if (offset) {
+            req.setOffset(offset);
+        }
+        return this.grpcService.mgmt.getLoginPolicyIdpProviders(req);
     }
 
     public async IdpByID(

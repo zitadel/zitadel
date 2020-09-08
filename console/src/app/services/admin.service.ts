@@ -19,6 +19,8 @@ import {
     Idp,
     IdpID,
     IdpProviderID,
+    IdpProviderSearchRequest,
+    IdpProviderSearchResponse,
     IdpSearchQuery,
     IdpSearchRequest,
     IdpSearchResponse,
@@ -96,10 +98,27 @@ export class AdminService {
         return this.grpcService.admin.updateDefaultLoginPolicy(req);
     }
 
-    public async addIdpProviderToDefaultLoginPolicy(configId: string): Promise<IdpProviderID> {
+    public async AddIdpProviderToDefaultLoginPolicy(configId: string): Promise<IdpProviderID> {
         const req = new IdpProviderID();
         req.setIdpConfigId(configId);
         return this.grpcService.admin.addIdpProviderToDefaultLoginPolicy(req);
+    }
+
+    public async RemoveIdpProviderFromDefaultLoginPolicy(configId: string): Promise<Empty> {
+        const req = new IdpProviderID();
+        req.setIdpConfigId(configId);
+        return this.grpcService.admin.removeIdpProviderFromDefaultLoginPolicy(req);
+    }
+
+    public async GetDefaultLoginPolicyIdpProviders(limit?: number, offset?: number): Promise<IdpProviderSearchResponse> {
+        const req = new IdpProviderSearchRequest();
+        if (limit) {
+            req.setLimit(limit);
+        }
+        if (offset) {
+            req.setOffset(offset);
+        }
+        return this.grpcService.admin.getDefaultLoginPolicyIdpProviders(req);
     }
 
     public async SearchIdps(

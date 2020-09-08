@@ -1,11 +1,11 @@
-<app-detail-layout [backRouterLink]="[ '/org']" [title]="title ? (title | translate) : ''"
-    [description]="desc ? (desc | translate) : ''">
-    <ng-template appHasRole [appHasRole]="['policy.delete']">
+<app-detail-layout [backRouterLink]="[ '/org']" [title]="'ORG.POLICY.LOGIN_POLICY.TITLECREATE' | translate"
+    [description]="'ORG.POLICY.LOGIN_POLICY.DESCRIPTIONCREATE' | translate">
+    <ng-container *ngIf="(['policy.delete'] | hasRole | async) && serviceType == PolicyComponentServiceType.MGMT">
         <button matTooltip="{{'ORG.POLICY.DELETE' | translate}}" color="warn" (click)="deletePolicy()"
             mat-stroked-button>
             {{'ORG.POLICY.DELETE' | translate}}
         </button>
-    </ng-template>
+    </ng-container>
 
     <div class="content" *ngIf="loginData">
         <div class="row">
@@ -27,6 +27,14 @@
             <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
                 [(ngModel)]="loginData.allowExternalIdp">
             </mat-slide-toggle>
+        </div>
+    </div>
+
+    <div class="idps">
+        <div class="idp" *ngFor="idp of idps">
+            <p>{{idp.name}}</p>
+            <span>{{idp.type}}</span>
+            <span>{{idp.configId}}</span>
         </div>
     </div>
 

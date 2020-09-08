@@ -8,8 +8,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
-import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 
 import { LoginPolicyRoutingModule } from './login-policy-routing.module';
 import { LoginPolicyComponent } from './login-policy.component';
@@ -25,7 +25,7 @@ import { LoginPolicyComponent } from './login-policy.component';
         MatButtonModule,
         MatSlideToggleModule,
         MatIconModule,
-        HasRoleModule,
+        HasRolePipeModule,
         MatTooltipModule,
         TranslateModule,
         DetailLayoutModule,
