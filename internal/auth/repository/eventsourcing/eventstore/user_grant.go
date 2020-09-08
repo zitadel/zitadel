@@ -104,8 +104,8 @@ func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]st
 			},
 			{
 				Key:    user_model.UserMembershipSearchKeyResourceOwner,
-				Method: global_model.SearchMethodEquals,
-				Value:  ctxData.OrgID,
+				Method: global_model.SearchMethodIsOneOf,
+				Value:  []string{repo.IamID, ctxData.OrgID},
 			},
 		},
 	})
