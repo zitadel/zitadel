@@ -9,7 +9,12 @@ import {
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
-import { PolicyComponentType } from '../password-policy/password-policy.component';
+export enum PolicyComponentType {
+    LOCKOUT = 'lockout',
+    AGE = 'age',
+    COMPLEXITY = 'complexity',
+    IAM_POLICY = 'iam_policy',
+}
 
 @Component({
     selector: 'app-policy-grid',

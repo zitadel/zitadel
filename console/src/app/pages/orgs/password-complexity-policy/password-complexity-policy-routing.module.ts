@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { PasswordPolicyComponent } from './password-policy.component';
+import { PasswordComplexityPolicyComponent } from './password-complexity-policy.component';
 
 const routes: Routes = [
     {
         path: '',
-        component: PasswordPolicyComponent,
+        component: PasswordComplexityPolicyComponent,
         data: { animation: 'DetailPage' },
     },
 ];
@@ -15,4 +15,4 @@ const routes: Routes = [
     imports: [RouterModule.forChild(routes)],
     exports: [RouterModule],
 })
-export class PasswordPolicyRoutingModule { }
+export class PasswordComplexityPolicyRoutingModule { }

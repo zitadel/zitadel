@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PasswordPolicyComponent } from './password-policy.component';
+import { PasswordIamPolicyComponent } from './password-iam-policy.component';
 
-describe('PasswordPolicyComponent', () => {
-    let component: PasswordPolicyComponent;
-    let fixture: ComponentFixture<PasswordPolicyComponent>;
+describe('PasswordIamPolicyComponent', () => {
+    let component: PasswordIamPolicyComponent;
+    let fixture: ComponentFixture<PasswordIamPolicyComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [PasswordPolicyComponent],
+            declarations: [PasswordIamPolicyComponent],
         })
             .compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(PasswordPolicyComponent);
+        fixture = TestBed.createComponent(PasswordIamPolicyComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

@@ -5,9 +5,11 @@ import { RoleGuard } from 'src/app/guards/role.guard';
 import { OrgCreateComponent } from './org-create/org-create.component';
 import { OrgDetailComponent } from './org-detail/org-detail.component';
 import { OrgGridComponent } from './org-grid/org-grid.component';
-import { PasswordAgePolicyComponent } from './password-age-policy/password-age-policy.component';
-import { PasswordLockoutPolicyComponent } from './password-lockout-policy/password-lockout-policy.component';
-import { PasswordPolicyComponent, PolicyComponentAction } from './password-policy/password-policy.component';
+
+export enum PolicyComponentAction {
+    CREATE = 'create',
+    MODIFY = 'modify',
+}
 
 const routes: Routes = [
     {
@@ -29,7 +31,6 @@ const routes: Routes = [
     },
     {
         path: 'policy/age',
-        component: PasswordAgePolicyComponent,
         data: {
             action: PolicyComponentAction.MODIFY,
         },
@@ -37,8 +38,15 @@ const routes: Routes = [
             .then(m => m.PasswordAgePolicyModule),
     },
     {
+        path: 'policy/lockout/create',
+        data: {
+            action: PolicyComponentAction.CREATE,
+        },
+        loadChildren: () => import('./password-lockout-policy/password-lockout-policy.module')
+            .then(m => m.PasswordLockoutPolicyModule),
+    },
+    {
         path: 'policy/lockout',
-        component: PasswordLockoutPolicyComponent,
         data: {
             action: PolicyComponentAction.MODIFY,
         },
@@ -46,19 +54,36 @@ const routes: Routes = [
             .then(m => m.PasswordLockoutPolicyModule),
     },
     {
-        path: 'policy/:policytype/create',
-        component: PasswordPolicyComponent,
+        path: 'policy/complexity/create',
         data: {
             action: PolicyComponentAction.CREATE,
         },
+        loadChildren: () => import('./password-complexity-policy/password-complexity-policy.module')
+            .then(m => m.PasswordComplexityPolicyModule),
     },
     {
-        path: 'policy/:policytype',
-        component: PasswordPolicyComponent,
+        path: 'policy/complexity',
         data: {
             action: PolicyComponentAction.MODIFY,
         },
-        loadChildren: () => import('./password-policy/password-policy.module').then(m => m.PasswordPolicyModule),
+        loadChildren: () => import('./password-complexity-policy/password-complexity-policy.module')
+            .then(m => m.PasswordComplexityPolicyModule),
+    },
+    {
+        path: 'policy/iam_policy/create',
+        data: {
+            action: PolicyComponentAction.CREATE,
+        },
+        loadChildren: () => import('./password-iam-policy/password-iam-policy.module')
+            .then(m => m.PasswordIamPolicyModule),
+    },
+    {
+        path: 'policy/iam_policy',
+        data: {
+            action: PolicyComponentAction.MODIFY,
+        },
+        loadChildren: () => import('./password-iam-policy/password-iam-policy.module')
+            .then(m => m.PasswordIamPolicyModule),
     },
     {
         path: 'members',

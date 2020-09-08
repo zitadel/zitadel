@@ -1,5 +1,4 @@
 import { Component, OnDestroy } from '@angular/core';
-import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -16,11 +15,11 @@ import { PolicyComponentAction } from '../orgs-routing.module';
 
 
 @Component({
-    selector: 'app-password-age-policy',
-    templateUrl: './password-age-policy.component.html',
-    styleUrls: ['./password-age-policy.component.scss'],
+    selector: 'app-password-policy',
+    templateUrl: './password-complexity-policy.component.html',
+    styleUrls: ['./password-complexity-policy.component.scss'],
 })
-export class PasswordAgePolicyComponent implements OnDestroy {
+export class PasswordComplexityPolicyComponent implements OnDestroy {
     public title: string = '';
     public desc: string = '';
 
@@ -28,8 +27,7 @@ export class PasswordAgePolicyComponent implements OnDestroy {
 
     public PolicyComponentAction: any = PolicyComponentAction;
 
-    public ageForm!: FormGroup;
-    public ageData!: PasswordAgePolicy.AsObject;
+    public complexityData!: PasswordComplexityPolicy.AsObject;
 
     private sub: Subscription = new Subscription();
 
@@ -43,13 +41,13 @@ export class PasswordAgePolicyComponent implements OnDestroy {
             this.componentAction = data.action;
             return this.route.params;
         })).subscribe(params => {
-            this.title = 'ORG.POLICY.PWD_AGE.TITLECREATE';
-            this.desc = 'ORG.POLICY.PWD_AGE.DESCRIPTIONCREATE';
+            this.title = 'ORG.POLICY.PWD_COMPLEXITY.TITLECREATE';
+            this.desc = 'ORG.POLICY.PWD_COMPLEXITY.DESCRIPTIONCREATE';
 
             if (this.componentAction === PolicyComponentAction.MODIFY) {
                 this.getData(params).then(data => {
                     if (data) {
-                        this.ageData = data.toObject() as PasswordAgePolicy.AsObject;
+                        this.complexityData = data.toObject() as PasswordComplexityPolicy.AsObject;
                     }
                 });
             }
@@ -62,50 +60,41 @@ export class PasswordAgePolicyComponent implements OnDestroy {
 
     private async getData(params: any):
         Promise<PasswordLockoutPolicy | PasswordAgePolicy | PasswordComplexityPolicy | OrgIamPolicy | undefined> {
-        this.title = 'ORG.POLICY.PWD_AGE.TITLE';
-        this.desc = 'ORG.POLICY.PWD_AGE.DESCRIPTION';
-        return this.mgmtService.GetPasswordAgePolicy();
+        this.title = 'ORG.POLICY.PWD_COMPLEXITY.TITLE';
+        this.desc = 'ORG.POLICY.PWD_COMPLEXITY.DESCRIPTION';
+        return this.mgmtService.GetPasswordComplexityPolicy();
     }
 
     public deletePolicy(): void {
-        this.mgmtService.DeletePasswordAgePolicy(this.ageData.id).then(() => {
+        this.mgmtService.DeletePasswordComplexityPolicy(this.complexityData.id).then(() => {
             this.toast.showInfo('Successfully deleted');
         }).catch(error => {
             this.toast.showError(error);
         });
     }
 
-    public incrementExpireWarnDays(): void {
-        if (this.ageData?.expireWarnDays !== undefined) {
-            this.ageData.expireWarnDays++;
+    public incrementLength(): void {
+        if (this.complexityData?.minLength !== undefined && this.complexityData?.minLength <= 72) {
+            this.complexityData.minLength++;
         }
     }
 
-    public decrementExpireWarnDays(): void {
-        if (this.ageData?.expireWarnDays && this.ageData?.expireWarnDays > 0) {
-            this.ageData.expireWarnDays--;
-        }
-    }
-
-    public incrementMaxAgeDays(): void {
-        if (this.ageData?.maxAgeDays !== undefined) {
-            this.ageData.maxAgeDays++;
-        }
-    }
-
-    public decrementMaxAgeDays(): void {
-        if (this.ageData?.maxAgeDays && this.ageData?.maxAgeDays > 0) {
-            this.ageData.maxAgeDays--;
+    public decrementLength(): void {
+        if (this.complexityData?.minLength && this.complexityData?.minLength > 1) {
+            this.complexityData.minLength--;
         }
     }
 
     public savePolicy(): void {
         if (this.componentAction === PolicyComponentAction.CREATE) {
 
-            this.mgmtService.CreatePasswordAgePolicy(
-                this.ageData.description,
-                this.ageData.maxAgeDays,
-                this.ageData.expireWarnDays,
+            this.mgmtService.CreatePasswordComplexityPolicy(
+                this.complexityData.description,
+                this.complexityData.hasLowercase,
+                this.complexityData.hasUppercase,
+                this.complexityData.hasNumber,
+                this.complexityData.hasSymbol,
+                this.complexityData.minLength,
             ).then(() => {
                 this.router.navigate(['org']);
             }).catch(error => {
@@ -114,10 +103,13 @@ export class PasswordAgePolicyComponent implements OnDestroy {
 
         } else if (this.componentAction === PolicyComponentAction.MODIFY) {
 
-            this.mgmtService.UpdatePasswordAgePolicy(
-                this.ageData.description,
-                this.ageData.maxAgeDays,
-                this.ageData.expireWarnDays,
+            this.mgmtService.UpdatePasswordComplexityPolicy(
+                this.complexityData.description,
+                this.complexityData.hasLowercase,
+                this.complexityData.hasUppercase,
+                this.complexityData.hasNumber,
+                this.complexityData.hasSymbol,
+                this.complexityData.minLength,
             ).then(() => {
                 this.router.navigate(['org']);
             }).catch(error => {
