@@ -3,6 +3,8 @@
         <h1 class="h1">{{'IAM.DETAIL.TITLE' | translate}}</h1>
         <p class="sub">{{'IAM.DETAIL.DESCRIPTION' | translate}} </p>
 
+        <app-iam-policy-grid></app-iam-policy-grid>
+
         <ng-template appHasRole [appHasRole]="['iam.idp.read']">
             <app-card title="{{ 'IDP.LIST.TITLE' | translate }}" description="{{ 'IDP.LIST.DESCRIPTION' | translate }}">
                 <app-idp-table [service]="adminService"> </app-idp-table>

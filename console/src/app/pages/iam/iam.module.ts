@@ -27,12 +27,13 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.
 
 import { IdpTableModule } from '../../modules/idp-table/idp-table.module';
 import { FailedEventsComponent } from './failed-events/failed-events.component';
+import { IamPolicyGridComponent } from './iam-policy-grid/iam-policy-grid.component';
 import { IamRoutingModule } from './iam-routing.module';
 import { IamViewsComponent } from './iam-views/iam-views.component';
 import { IamComponent } from './iam.component';
 
 @NgModule({
-    declarations: [IamComponent, IamViewsComponent, FailedEventsComponent],
+    declarations: [IamComponent, IamViewsComponent, FailedEventsComponent, IamPolicyGridComponent],
     imports: [
         CommonModule,
         IamRoutingModule,

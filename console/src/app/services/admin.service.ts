@@ -18,6 +18,7 @@ import {
     IamMemberSearchResponse,
     Idp,
     IdpID,
+    IdpProviderID,
     IdpSearchQuery,
     IdpSearchRequest,
     IdpSearchResponse,
@@ -93,6 +94,12 @@ export class AdminService {
 
     public async UpdateDefaultLoginPolicy(req: DefaultLoginPolicy): Promise<DefaultLoginPolicy> {
         return this.grpcService.admin.updateDefaultLoginPolicy(req);
+    }
+
+    public async addIdpProviderToDefaultLoginPolicy(configId: string): Promise<IdpProviderID> {
+        const req = new IdpProviderID();
+        req.setIdpConfigId(configId);
+        return this.grpcService.admin.addIdpProviderToDefaultLoginPolicy(req);
     }
 
     public async SearchIdps(
