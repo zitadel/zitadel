@@ -2,10 +2,12 @@
 title: User Manual
 ---
 
-### Account Creation
+### Register User
 
-### Password Change
+### Verify Mail
 
-### Password Reset
+### Verify Phone
 
-### Multifactor Setup
+### Change Password
+
+### Setup Multifactor
