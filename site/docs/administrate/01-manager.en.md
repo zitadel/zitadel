@@ -1,5 +1,5 @@
 ---
-title: Administrator
+title: Manager
 ---
 
 ### Organisation Creation

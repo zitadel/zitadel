@@ -53,9 +53,11 @@
             <p>{$_('description3')}</p>
             
             <ul style="list-style-type: none;">
-            <li><a href="/documentation" >{$_('introlink')}</a></li>
-            <li><a href="/manuals" >{$_('manualslink')}</a></li>
-            <li><a href="/developer-and-integration" >{$_('devintlink')}</a></li>
+            <li><a href="/start" >{$_('startlink')}</a></li>
+            <li><a href="/integrate" >{$_('integratelink')}</a></li>
+            <li><a href="/administrate" >{$_('administratelink')}</a></li>
+            <li><a href="/develop" >{$_('developlink')}</a></li>
+            <li><a href="/documentation" >{$_('docslink')}</a></li>
             </ul>
             
         </div>
