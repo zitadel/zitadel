@@ -1,4 +1,4 @@
 ---
-title: Organisation Management
+title: Organisations
 ---
 

@@ -1,3 +1,3 @@
 ---
-title: User Management
+title: Users
 ---
