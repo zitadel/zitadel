@@ -9,12 +9,11 @@ Either use ZITADEL.ch or deploy a dedicated instance.
 
 ### Use ZITADEL.ch
 
-#### Create an organisation
+#### Create your organisation
 
-- Create Org
-- (Optional) Verify Domain & Set primary
+#### Verify your domainname (optional)
 
-#### Add Users
+#### Add Users to your organisation
 
 #### Setup an application
 
