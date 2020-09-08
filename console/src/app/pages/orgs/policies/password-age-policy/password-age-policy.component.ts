@@ -12,7 +12,7 @@ import {
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { PolicyComponentAction } from '../../orgs-routing.module';
+import { PolicyComponentAction } from '../policy-component-action.enum';
 
 
 @Component({
