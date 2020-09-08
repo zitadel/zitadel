@@ -1,11 +1,7 @@
 ---
-title: Manager
+title: Overview
 ---
 
-### Organisation Creation
+### Features
 
-### Domain Verification
-
-### Projekte Creation
-
-### Permission Management
+### Concepts
