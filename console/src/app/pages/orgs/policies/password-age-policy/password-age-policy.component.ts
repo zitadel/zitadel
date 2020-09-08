@@ -12,17 +12,15 @@ import {
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-export enum PolicyComponentAction {
-    CREATE = 'create',
-    MODIFY = 'modify',
-}
+import { PolicyComponentAction } from '../../orgs-routing.module';
+
 
 @Component({
-    selector: 'app-password-lockout-policy',
-    templateUrl: './password-lockout-policy.component.html',
-    styleUrls: ['./password-lockout-policy.component.scss'],
+    selector: 'app-password-age-policy',
+    templateUrl: './password-age-policy.component.html',
+    styleUrls: ['./password-age-policy.component.scss'],
 })
-export class PasswordLockoutPolicyComponent implements OnDestroy {
+export class PasswordAgePolicyComponent implements OnDestroy {
     public title: string = '';
     public desc: string = '';
 
@@ -30,8 +28,9 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
 
     public PolicyComponentAction: any = PolicyComponentAction;
 
-    public lockoutForm!: FormGroup;
-    public lockoutData!: PasswordLockoutPolicy.AsObject;
+    public ageForm!: FormGroup;
+    public ageData!: PasswordAgePolicy.AsObject;
+
     private sub: Subscription = new Subscription();
 
     constructor(
@@ -44,13 +43,13 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
             this.componentAction = data.action;
             return this.route.params;
         })).subscribe(params => {
-            this.title = 'ORG.POLICY.PWD_LOCKOUT.TITLECREATE';
-            this.desc = 'ORG.POLICY.PWD_LOCKOUT.DESCRIPTIONCREATE';
+            this.title = 'ORG.POLICY.PWD_AGE.TITLECREATE';
+            this.desc = 'ORG.POLICY.PWD_AGE.DESCRIPTIONCREATE';
 
             if (this.componentAction === PolicyComponentAction.MODIFY) {
                 this.getData(params).then(data => {
                     if (data) {
-                        this.lockoutData = data.toObject() as PasswordLockoutPolicy.AsObject;
+                        this.ageData = data.toObject() as PasswordAgePolicy.AsObject;
                     }
                 });
             }
@@ -63,49 +62,62 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
 
     private async getData(params: any):
         Promise<PasswordLockoutPolicy | PasswordAgePolicy | PasswordComplexityPolicy | OrgIamPolicy | undefined> {
-
-        this.title = 'ORG.POLICY.PWD_LOCKOUT.TITLE';
-        this.desc = 'ORG.POLICY.PWD_LOCKOUT.DESCRIPTION';
-        return this.mgmtService.GetPasswordLockoutPolicy();
+        this.title = 'ORG.POLICY.PWD_AGE.TITLE';
+        this.desc = 'ORG.POLICY.PWD_AGE.DESCRIPTION';
+        return this.mgmtService.GetPasswordAgePolicy();
     }
 
     public deletePolicy(): void {
-        this.mgmtService.DeletePasswordLockoutPolicy(this.lockoutData.id).then(() => {
+        this.mgmtService.DeletePasswordAgePolicy(this.ageData.id).then(() => {
             this.toast.showInfo('Successfully deleted');
         }).catch(error => {
             this.toast.showError(error);
         });
     }
 
-    public incrementMaxAttempts(): void {
-        if (this.lockoutData?.maxAttempts !== undefined) {
-            this.lockoutData.maxAttempts++;
+    public incrementExpireWarnDays(): void {
+        if (this.ageData?.expireWarnDays !== undefined) {
+            this.ageData.expireWarnDays++;
         }
     }
 
-    public decrementMaxAttempts(): void {
-        if (this.lockoutData?.maxAttempts && this.lockoutData?.maxAttempts > 0) {
-            this.lockoutData.maxAttempts--;
+    public decrementExpireWarnDays(): void {
+        if (this.ageData?.expireWarnDays && this.ageData?.expireWarnDays > 0) {
+            this.ageData.expireWarnDays--;
+        }
+    }
+
+    public incrementMaxAgeDays(): void {
+        if (this.ageData?.maxAgeDays !== undefined) {
+            this.ageData.maxAgeDays++;
+        }
+    }
+
+    public decrementMaxAgeDays(): void {
+        if (this.ageData?.maxAgeDays && this.ageData?.maxAgeDays > 0) {
+            this.ageData.maxAgeDays--;
         }
     }
 
     public savePolicy(): void {
         if (this.componentAction === PolicyComponentAction.CREATE) {
-            this.mgmtService.CreatePasswordLockoutPolicy(
-                this.lockoutData.description,
-                this.lockoutData.maxAttempts,
-                this.lockoutData.showLockOutFailures,
+
+            this.mgmtService.CreatePasswordAgePolicy(
+                this.ageData.description,
+                this.ageData.maxAgeDays,
+                this.ageData.expireWarnDays,
             ).then(() => {
                 this.router.navigate(['org']);
             }).catch(error => {
                 this.toast.showError(error);
             });
+
         } else if (this.componentAction === PolicyComponentAction.MODIFY) {
 
-            this.mgmtService.UpdatePasswordLockoutPolicy(
-                this.lockoutData.description,
-                this.lockoutData.maxAttempts,
-                this.lockoutData.showLockOutFailures,
+            this.mgmtService.UpdatePasswordAgePolicy(
+                this.ageData.description,
+                this.ageData.maxAgeDays,
+                this.ageData.expireWarnDays,
             ).then(() => {
                 this.router.navigate(['org']);
             }).catch(error => {

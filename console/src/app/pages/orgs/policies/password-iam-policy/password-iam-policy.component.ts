@@ -13,7 +13,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { PolicyComponentAction } from '../orgs-routing.module';
+import { PolicyComponentAction } from '../policy-component-action.enum';
 
 @Component({
     selector: 'app-password-iam-policy',
@@ -42,6 +42,7 @@ export class PasswordIamPolicyComponent implements OnDestroy {
     ) {
         this.sub = this.route.data.pipe(switchMap(data => {
             this.componentAction = data.action;
+            console.log(data.action);
             return this.route.params;
         })).subscribe(params => {
             this.title = 'ORG.POLICY.IAM_POLICY.TITLECREATE';
