@@ -1,5 +1,4 @@
 import { Component, OnDestroy } from '@angular/core';
-import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -28,7 +27,6 @@ export class PasswordAgePolicyComponent implements OnDestroy {
 
     public PolicyComponentAction: any = PolicyComponentAction;
 
-    public ageForm!: FormGroup;
     public ageData!: PasswordAgePolicy.AsObject;
 
     private sub: Subscription = new Subscription();

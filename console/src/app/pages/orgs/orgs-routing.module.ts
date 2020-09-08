@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { RoleGuard } from 'src/app/guards/role.guard';
+import { PolicyComponentServiceType, PolicyComponentType } from 'src/app/modules/policies/policy-component-types.enum';
 
 import { OrgCreateComponent } from './org-create/org-create.component';
 import { OrgDetailComponent } from './org-detail/org-detail.component';
@@ -28,24 +29,32 @@ const routes: Routes = [
         path: 'policy',
         children: [
             {
-                path: 'age',
-                loadChildren: () => import('./policies/password-age-policy/password-age-policy.module')
+                path: PolicyComponentType.AGE,
+                loadChildren: () => import('src/app/modules/policies/password-age-policy/password-age-policy.module')
                     .then(m => m.PasswordAgePolicyModule),
             },
             {
-                path: 'lockout',
-                loadChildren: () => import('./policies/password-lockout-policy/password-lockout-policy.module')
+                path: PolicyComponentType.LOCKOUT,
+                loadChildren: () => import('src/app/modules/policies/password-lockout-policy/password-lockout-policy.module')
                     .then(m => m.PasswordLockoutPolicyModule),
             },
             {
-                path: 'complexity',
-                loadChildren: () => import('./policies/password-complexity-policy/password-complexity-policy.module')
+                path: PolicyComponentType.COMPLEXITY,
+                loadChildren: () => import('src/app/modules/policies/password-complexity-policy/password-complexity-policy.module')
                     .then(m => m.PasswordComplexityPolicyModule),
             },
             {
-                path: 'iam_policy',
-                loadChildren: () => import('./policies/password-iam-policy/password-iam-policy.module')
+                path: PolicyComponentType.IAM,
+                loadChildren: () => import('src/app/modules/policies/password-iam-policy/password-iam-policy.module')
                     .then(m => m.PasswordIamPolicyModule),
+            },
+            {
+                path: PolicyComponentType.LOGIN,
+                data: {
+                    serviceType: PolicyComponentServiceType.MGMT
+                },
+                loadChildren: () => import('src/app/modules/policies/login-policy/login-policy.module')
+                    .then(m => m.LoginPolicyModule),
             },
         ],
     },

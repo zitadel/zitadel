@@ -1,0 +1,37 @@
+<app-detail-layout [backRouterLink]="[ '/org']" [title]="title ? (title | translate) : ''"
+    [description]="desc ? (desc | translate) : ''">
+    <ng-template appHasRole [appHasRole]="['policy.delete']">
+        <button matTooltip="{{'ORG.POLICY.DELETE' | translate}}" color="warn" (click)="deletePolicy()"
+            mat-stroked-button>
+            {{'ORG.POLICY.DELETE' | translate}}
+        </button>
+    </ng-template>
+
+    <div class="content" *ngIf="loginData">
+        <div class="row">
+            <span class="left-desc">{{'ORG.POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate}}</span>
+            <span class="fill-space"></span>
+            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+                [(ngModel)]="loginData.allowUsernamePassword">
+            </mat-slide-toggle>
+        </div>
+        <div class="row">
+            <span class="left-desc">{{'ORG.POLICY.DATA.ALLOWREGISTER' | translate}}</span>
+            <span class="fill-space"></span>
+            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="loginData.allowRegister">
+            </mat-slide-toggle>
+        </div>
+        <div class="row">
+            <span class="left-desc">{{'ORG.POLICY.DATA.ALLOWEXTERNALIDP' | translate}}</span>
+            <span class="fill-space"></span>
+            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+                [(ngModel)]="loginData.allowExternalIdp">
+            </mat-slide-toggle>
+        </div>
+    </div>
+
+    <div class="btn-container">
+        <button (click)="savePolicy()" color="primary" type="submit"
+            mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+    </div>
+</app-detail-layout>

@@ -7,6 +7,8 @@ import {
     CreateHumanRequest,
     CreateOrgRequest,
     CreateUserRequest,
+    DefaultLoginPolicy,
+    DefaultLoginPolicyView,
     FailedEventID,
     FailedEvents,
     IamMember,
@@ -81,6 +83,16 @@ export class AdminService {
         req.setViewName(viewname);
         req.setFailedSequence(sequence);
         return this.grpcService.admin.removeFailedEvent(req);
+    }
+
+    public async GetDefaultLoginPolicy(
+    ): Promise<DefaultLoginPolicyView> {
+        const req = new Empty();
+        return this.grpcService.admin.getDefaultLoginPolicy(req);
+    }
+
+    public async UpdateDefaultLoginPolicy(req: DefaultLoginPolicy): Promise<DefaultLoginPolicy> {
+        return this.grpcService.admin.updateDefaultLoginPolicy(req);
     }
 
     public async SearchIdps(

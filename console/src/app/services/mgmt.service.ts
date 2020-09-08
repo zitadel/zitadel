@@ -31,6 +31,8 @@ import {
     IdpSearchResponse,
     IdpView,
     LoginName,
+    LoginPolicy,
+    LoginPolicyView,
     MachineKeyIDRequest,
     MachineKeySearchRequest,
     MachineKeySearchResponse,
@@ -164,6 +166,19 @@ export class ManagementService {
             req.setQueriesList(queryList);
         }
         return this.grpcService.mgmt.searchIdps(req);
+    }
+
+    public async GetLoginPolicy(): Promise<LoginPolicyView> {
+        const req = new Empty();
+        return this.grpcService.mgmt.getLoginPolicy(req);
+    }
+
+    public async UpdateLoginPolicy(req: LoginPolicy): Promise<LoginPolicy> {
+        return this.grpcService.mgmt.updateLoginPolicy(req);
+    }
+
+    public async RemoveLoginPolicy(): Promise<Empty> {
+        return this.grpcService.mgmt.removeLoginPolicy(new Empty());
     }
 
     public async IdpByID(

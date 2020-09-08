@@ -385,6 +385,12 @@
                 "TITLECREATE":"Set IAM Access preferences",
                 "DESCRIPTIONCREATE":"Emails as username is not allowed for enabled UserLoginMustBeDomain"
             },
+            "LOGIN_POLICY": {
+                "TITLE":"Login Policy",
+                "DESCRIPTION":"Define how Users can be authenticated",
+                "TITLECREATE":"Define how Users can be authenticated",
+                "DESCRIPTIONCREATE":"Users can choose from all of the available identity providers."
+            },
             "BTN_INSTALL":"Setup",
             "BTN_EDIT":"Modify",
             "DATA": {
@@ -398,7 +404,10 @@
                 "MAXATTEMPTS":"Max Attempts",
                 "EXPIREWARNDAYS":"Expiration Warning after day",
                 "MAXAGEDAYS":"Max Age in days",
-                "USERLOGINMUSTBEDOMAIN":"User Login must be Domain"
+                "USERLOGINMUSTBEDOMAIN":"User Login must be Domain",
+                "ALLOWUSERNAMEPASSWORD":"Username Password allowed",
+                "ALLOWEXTERNALIDP":"External IDP allowed",
+                "ALLOWREGISTER":"Register allowed"
             },
             "DELETE":"Uninstall / Reset Policy"
         },

@@ -385,6 +385,12 @@
                 "TITLECREATE":"IAM Zugangseinstellungen festlegen",
                 "DESCRIPTIONCREATE":"Emails als Benutzername sind nicht erlaubt wenn UserLoginMustBeDomain gesetzt ist."
             },
+            "LOGIN_POLICY": {
+                "TITLE":"Login Richtlinien",
+                "DESCRIPTION":"Definiere die Loginmethoden für Benutzer",
+                "TITLECREATE":"Definiere die Loginmethoden für Benutzer",
+                "DESCRIPTIONCREATE":"Nutzer können Sich mit den verfügbaren Idps authentifizieren."
+            },
             "BTN_INSTALL":"Installieren",
             "BTN_EDIT":"Modifizieren",
             "DATA": {
@@ -398,7 +404,10 @@
                 "MAXATTEMPTS":"Maximale Anzahl an Versuchen",
                 "EXPIREWARNDAYS":"Ablauf Warnung nach Tagen",
                 "MAXAGEDAYS":"Maximale Gültigkeit in Tagen",
-                "USERLOGINMUSTBEDOMAIN":"User Login must be Domain"
+                "USERLOGINMUSTBEDOMAIN":"User Login must be Domain",
+                "ALLOWUSERNAMEPASSWORD":"Benutzername Password erlaubt",
+                "ALLOWEXTERNALIDP":"Externer IDP erlaubt",
+                "ALLOWREGISTER":"Registrieren erlaubt"
             },
             "DELETE":"Richtlinie entfernen / zurücksetzen"
         },
