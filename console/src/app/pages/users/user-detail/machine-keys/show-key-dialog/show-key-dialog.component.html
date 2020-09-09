@@ -4,7 +4,7 @@
     <ng-container *ngIf="addedKey">
         <div class="row">
             <p class="left">{{'USER.MACHINE.ID' | translate}}</p>
-            <p class="right">{{addedKey?.keyDetails}}</p>
+            <p class="right">{{addedKey?.id}}</p>
         </div>
         <div class="row">
             <p class="left">{{'USER.MACHINE.TYPE' | translate}}</p>
@@ -18,10 +18,7 @@
             <p class="left">{{'USER.MACHINE.EXPIRATIONDATE' | translate}}</p>
             <p class="right">{{addedKey?.expirationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}</p>
         </div>
-        <div class="row">
-            <p class="left">{{'USER.MACHINE.KEYDETAILS' | translate}}</p>
-            <p class="right">{{addedKey?.keyDetails}}</p>
-        </div>
+        <button class="download-button" mat-stroked-button color="primary" (click)="saveFile()">Download</button>
     </ng-container>
 </div>
 <div mat-dialog-actions class="action">

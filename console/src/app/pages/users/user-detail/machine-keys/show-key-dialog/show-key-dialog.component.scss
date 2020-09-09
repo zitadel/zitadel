@@ -4,7 +4,7 @@
 }
 
 .desc {
-  color: #8795a1;
+  color: rgb(201, 51, 71);
   font-size: .9rem;
 }
 
@@ -48,4 +48,9 @@
     margin-bottom: 1rem;
     overflow: auto;
   }
+}
+
+.download-button {
+    margin-bottom: 1rem;
+    border-radius: .5rem;
 }
