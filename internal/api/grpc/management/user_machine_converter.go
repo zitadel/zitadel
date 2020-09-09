@@ -92,12 +92,12 @@ func addMachineKeyFromModel(key *usr_model.MachineKey) *management.AddMachineKey
 	detail, err := json.Marshal(struct {
 		Type   string `json:"type"`
 		KeyID  string `json:"keyId"`
-		Key    []byte `json:"key"`
+		Key    string `json:"key"`
 		UserID string `json:"userId"`
 	}{
 		Type:   "serviceaccount",
 		KeyID:  key.KeyID,
-		Key:    key.PrivateKey,
+		Key:    string(key.PrivateKey),
 		UserID: key.AggregateID,
 	})
 	logging.Log("MANAG-lFQ2g").OnError(err).Warn("unable to marshall key")
