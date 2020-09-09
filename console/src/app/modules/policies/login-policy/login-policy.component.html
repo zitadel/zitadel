@@ -30,11 +30,16 @@
         </div>
     </div>
 
+    <p>{{'LOGINPOLICY.IDPS' | translate}}</p>
+
     <div class="idps">
-        <div class="idp" *ngFor="idp of idps">
+        <div class="idp" *ngFor="let idp of idps">
             <p>{{idp.name}}</p>
             <span>{{idp.type}}</span>
             <span>{{idp.configId}}</span>
+        </div>
+        <div class="new-idp">
+            <mat-icon>add</mat-icon>
         </div>
     </div>
 

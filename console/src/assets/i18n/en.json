@@ -634,7 +634,8 @@
         "CREATE": {
             "TITLE":"Login Policy",
             "DESCRIPTION":"Define how your users can be authenticated on your organisation."
-        }
+        },
+        "IDPS":"Identity Providers"
     },
     "APP": {
         "LIST": "Applications",

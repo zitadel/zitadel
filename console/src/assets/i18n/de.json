@@ -634,7 +634,8 @@
         "CREATE": {
             "TITLE":"Login Policy",
             "DESCRIPTION":"Definieren Sie hier, mit welchen Idps sich Ihre Benutzer anmelden können."
-        }
+        },
+        "IDPS":"Identity Providers"
     },
     "APP": {
         "LIST": "Applications",
