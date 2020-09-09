@@ -60,12 +60,15 @@ export class MachineKeysComponent implements OnInit {
     }
 
     public deleteSelectedKeys(): void {
-        Promise.all(this.selection.selected.map(value => {
+        const mappedDeletions = this.selection.selected.map(value => {
             return this.userService.DeleteMachineKey(value.id, this.userId);
-        })).then(() => {
+        });
+        Promise.all(mappedDeletions).then(() => {
             this.selection.clear();
             this.toast.showInfo('USER.TOAST.SELECTEDKEYSDELETED', true);
             this.getData(10, 0);
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 

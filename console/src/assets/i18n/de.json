@@ -155,7 +155,7 @@
             "KEYSDESC":"Definieren Sie Ihre Schlüssel mit einem optionalen Ablaufdatum",
             "ID":"Schlüssel Id",
             "TYPE":"Typ",
-            "EXPIRYDATE":"Ablaufdatum",
+            "EXPIRATIONDATE":"Ablaufdatum",
             "CHOOSEEXPIRY":"Definieren Sie ein Ablaufdatum",
             "CREATIONDATE":"Erstelldatum",
             "KEYDETAILS":"Schlüssel Details",
