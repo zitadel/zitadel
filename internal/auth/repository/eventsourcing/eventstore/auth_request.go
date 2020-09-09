@@ -146,6 +146,26 @@ func (repo *AuthRequestRepo) SelectExternalIDP(ctx context.Context, authReqID, i
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
+func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReqID, userAgentID string, externalUser *model.ExternalUser) error {
+	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
+	if err != nil {
+		return err
+	}
+	err = repo.checkExternalUserLogin(request, externalUser.IDPConfigID, externalUser.ExternalUserID)
+	if errors.IsNotFound(err) {
+		return repo.SetLinkingUser(ctx, request, externalUser, userAgentID)
+	}
+	if err != nil {
+		return err
+	}
+	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
+func (repo *AuthRequestRepo) SetLinkingUser(ctx context.Context, request *model.AuthRequest, externalUser *model.ExternalUser, userAgentID string) error {
+	request.LinkingUsers = append(request.LinkingUsers, externalUser)
+	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
 func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAgentID string) error {
 	request, err := repo.getAuthRequest(ctx, id, userAgentID)
 	if err != nil {
@@ -179,6 +199,24 @@ func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, us
 		return errors.ThrowPreconditionFailed(nil, "EVENT-ADJ26", "Errors.User.NotMatchingUserID")
 	}
 	return repo.UserEvents.CheckMfaOTP(ctx, userID, code, request.WithCurrentInfo(info))
+}
+
+func (repo *AuthRequestRepo) AddUserExternalIDPs(ctx context.Context, userID string, externalLogins []*model.ExternalUser) error {
+	for _, externalLogin := range externalLogins {
+		externalIDP := &user_model.ExternalIDP{
+			ObjectRoot: es_models.ObjectRoot{
+				AggregateID: userID,
+			},
+			IDPConfigID: externalLogin.IDPConfigID,
+			UserID:      externalLogin.ExternalUserID,
+			DisplayName: externalLogin.DisplayName,
+		}
+		externalIDP, err := repo.UserEvents.AddExternalIDP(ctx, externalIDP)
+		if err != nil {
+			return nil
+		}
+	}
+	return nil
 }
 
 func (repo *AuthRequestRepo) getAuthRequestNextSteps(ctx context.Context, id, userAgentID string, checkLoggedIn bool) (*model.AuthRequest, error) {
@@ -263,6 +301,21 @@ func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *model.AuthRequest
 	return nil
 }
 
+func (repo *AuthRequestRepo) checkExternalUserLogin(request *model.AuthRequest, idpConfigID, externalUserID string) (err error) {
+	orgID := request.GetScopeOrgID()
+	externalIDP := new(user_view_model.ExternalIDPView)
+	if orgID != "" {
+		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(externalUserID, idpConfigID, orgID)
+	} else {
+		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigID(externalUserID, idpConfigID)
+	}
+	if err != nil {
+		return err
+	}
+	request.SetUserInfo(externalIDP.UserID, "", "", externalIDP.ResourceOwner)
+	return nil
+}
+
 func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthRequest, checkLoggedIn bool) ([]model.NextStep, error) {
 	if request == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-ds27a", "Errors.Internal")
@@ -288,6 +341,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 	if err != nil {
 		return nil, err
 	}
+	request.LoginName = user.PreferredLoginName
 	userSession, err := userSessionByIDs(ctx, repo.UserSessionViewProvider, repo.UserEventProvider, request.AgentID, user)
 	if err != nil {
 		return nil, err
@@ -324,6 +378,9 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 		return steps, nil
 	}
 
+	if len(request.LinkingUsers) != 0 {
+
+	}
 	//PLANNED: consent step
 	return append(steps, &model.RedirectToCallbackStep{}), nil
 }

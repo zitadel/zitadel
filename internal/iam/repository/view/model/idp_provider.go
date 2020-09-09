@@ -39,6 +39,7 @@ func IDPProviderViewFromModel(policy *model.IDPProviderView) *IDPProviderView {
 		CreationDate:    policy.CreationDate,
 		ChangeDate:      policy.ChangeDate,
 		Name:            policy.Name,
+		IDPConfigID:     policy.IDPConfigID,
 		IDPConfigType:   int32(policy.IDPConfigType),
 		IDPProviderType: int32(policy.IDPProviderType),
 	}
@@ -51,6 +52,7 @@ func IDPProviderViewToModel(policy *IDPProviderView) *model.IDPProviderView {
 		CreationDate:    policy.CreationDate,
 		ChangeDate:      policy.ChangeDate,
 		Name:            policy.Name,
+		IDPConfigID:     policy.IDPConfigID,
 		IDPConfigType:   model.IdpConfigType(policy.IDPConfigType),
 		IDPProviderType: model.IDPProviderType(policy.IDPProviderType),
 	}

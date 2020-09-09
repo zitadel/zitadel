@@ -30,6 +30,7 @@ type AuthRequest struct {
 	DisplayName         string
 	UserOrgID           string
 	SelectedIDPConfigID string
+	LinkingUsers        []*ExternalUser
 	PossibleSteps       []NextStep
 	PasswordVerified    bool
 	MfasVerified        []MfaType
@@ -38,6 +39,12 @@ type AuthRequest struct {
 	Code                string
 	LoginPolicy         *model.LoginPolicyView
 	AllowedExternalIDPs []*model.IDPProviderView
+}
+
+type ExternalUser struct {
+	IDPConfigID    string
+	ExternalUserID string
+	DisplayName    string
 }
 
 type Prompt int32

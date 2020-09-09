@@ -67,8 +67,8 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		"loginUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointLogin)
 		},
-		"externalIDPAuthURL": func(authReqID, aggregateID, idpConfigID string) string {
-			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%s&%s=%s", EndpointExternalLogin, queryAuthRequestID, authReqID, queryIDPConfigID, idpConfigID, queryAggregateID, aggregateID))
+		"externalIDPAuthURL": func(authReqID, idpConfigID string) string {
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%s", EndpointExternalLogin, queryAuthRequestID, authReqID, queryIDPConfigID, idpConfigID))
 		},
 		"registerUrl": func(id string) string {
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointRegister, queryAuthRequestID, id))

@@ -31,7 +31,7 @@
     {{if .LoginPolicy.AllowExternalIDP}}
         {{ $reqid := .AuthReqID}}
         {{range $provider := .IDPProviders}}
-            <a href="{{ externalIDPAuthURL $reqid $provider.AggregateID $provider.IDPConfigID}}" class="secondary idp-providers">
+            <a href="{{ externalIDPAuthURL $reqid $provider.IDPConfigID}}" class="secondary idp-providers">
                 {{$provider.Name}}
             </a>
         {{end}}

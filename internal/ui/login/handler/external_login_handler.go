@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"fmt"
+	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/rp"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
@@ -9,13 +9,10 @@ import (
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"net/http"
-	"path"
 )
 
 const (
 	queryIDPConfigID = "idpConfigID"
-	queryAggregateID = "aggregateID"
-	queryState       = "state"
 )
 
 var (
@@ -24,11 +21,11 @@ var (
 
 type externalIDPData struct {
 	IDPConfigID string `schema:"idpConfigID"`
-	AggregateID string `schema:"aggregateID"`
 }
 
 type externalIDPCallbackData struct {
 	State string `schema:"state"`
+	Code  string `schema:"code"`
 }
 
 func (l *Login) handleExternalLogin(w http.ResponseWriter, r *http.Request) {
@@ -57,29 +54,11 @@ func (l *Login) handleExternalLogin(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, caos_errors.ThrowInternal(nil, "LOGIN-Rio9s", "Errors.User.ExternalIDP.IDPTypeNotImplemented"))
 		return
 	}
-	l.handleOIDCAuthorize(w, r, data, authReq, idpConfig)
+	l.handleOIDCAuthorize(w, r, authReq, idpConfig)
 }
 
-func (l *Login) handleOIDCAuthorize(w http.ResponseWriter, r *http.Request, data *externalIDPData, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView) {
-	oidcClientSecret, err := crypto.DecryptString(idpConfig.OIDCClientSecret, l.IDPConfigAesCrypto)
-	if err != nil {
-		l.renderError(w, r, authReq, err)
-		return
-	}
-	rpConfig := &rp.Config{
-		ClientID:     idpConfig.OIDCClientID,
-		ClientSecret: oidcClientSecret,
-		Issuer:       idpConfig.OIDCIssuer,
-		CallbackURL:  path.Join(l.renderer.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointExternalLoginCallback)),
-		Scopes:       scopes,
-	}
-
-	provider, err := rp.NewDefaultRP(rpConfig)
-	if err != nil {
-		l.renderError(w, r, authReq, err)
-		return
-	}
-
+func (l *Login) handleOIDCAuthorize(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView) {
+	provider := l.getRPConfig(w, r, authReq, idpConfig)
 	http.Redirect(w, r, provider.AuthURL(authReq.ID), http.StatusFound)
 }
 
@@ -90,5 +69,62 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		l.renderError(w, r, nil, err)
 		return
 	}
-	fmt.Println("Callback DATA: %v", data)
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.State, userAgentID)
+	if err != nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
+	idpConfig, err := l.authRepo.GetIDPConfigByID(r.Context(), authReq.SelectedIDPConfigID)
+	if err != nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
+	provider := l.getRPConfig(w, r, authReq, idpConfig)
+	tokens, err := provider.CodeExchange(r.Context(), data.Code)
+	if err != nil {
+		l.renderLogin(w, r, nil, err)
+		return
+	}
+	l.handleExternalUserAuthenticated(w, r, authReq, idpConfig, userAgentID, tokens)
+}
+
+func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView) rp.DelegationTokenExchangeRP {
+	oidcClientSecret, err := crypto.DecryptString(idpConfig.OIDCClientSecret, l.IDPConfigAesCrypto)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return nil
+	}
+	rpConfig := &rp.Config{
+		ClientID:     idpConfig.OIDCClientID,
+		ClientSecret: oidcClientSecret,
+		Issuer:       idpConfig.OIDCIssuer,
+		CallbackURL:  l.baseURL + EndpointExternalLoginCallback,
+		Scopes:       scopes,
+	}
+
+	provider, err := rp.NewDefaultRP(rpConfig)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return nil
+	}
+	return provider
+}
+
+func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
+	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
+	err := l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, userAgentID, externalUser)
+	if err != nil {
+		l.renderLogin(w, r, authReq, err)
+		return
+	}
+	l.renderNextStep(w, r, authReq)
+}
+
+func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) *model.ExternalUser {
+	return &model.ExternalUser{
+		IDPConfigID:    idpConfig.IDPConfigID,
+		ExternalUserID: tokens.IDTokenClaims.Subject,
+		DisplayName:    tokens.IDTokenClaims.PreferredUsername,
+	}
 }

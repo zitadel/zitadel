@@ -14,8 +14,10 @@ type AuthRequestRepository interface {
 	SaveAuthCode(ctx context.Context, id, code, userAgentID string) error
 	DeleteAuthRequest(ctx context.Context, id string) error
 	CheckLoginName(ctx context.Context, id, loginName, userAgentID string) error
+	CheckExternalUserLogin(ctx context.Context, authReqID, userAgentID string, user *model.ExternalUser) error
 	SelectUser(ctx context.Context, id, userID, userAgentID string) error
 	SelectExternalIDP(ctx context.Context, authReqID, idpConfigID, userAgentID string) error
 	VerifyPassword(ctx context.Context, id, userID, password, userAgentID string, info *model.BrowserInfo) error
 	VerifyMfaOTP(ctx context.Context, agentID, authRequestID, code, userAgentID string, info *model.BrowserInfo) error
+	AddUserExternalIDPs(ctx context.Context, userID string, linkingUsers []*model.ExternalUser) error
 }

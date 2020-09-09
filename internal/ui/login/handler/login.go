@@ -29,12 +29,14 @@ type Login struct {
 	renderer            *Renderer
 	parser              *form.Parser
 	authRepo            auth_repository.Repository
+	baseURL             string
 	zitadelURL          string
 	oidcAuthCallbackURL string
 	IDPConfigAesCrypto  crypto.EncryptionAlgorithm
 }
 
 type Config struct {
+	BaseURL               string
 	OidcAuthCallbackURL   string
 	ZitadelURL            string
 	LanguageCookieName    string
@@ -62,6 +64,7 @@ func CreateLogin(config Config, authRepo *eventsourcing.EsRepository, systemDefa
 	}
 	login := &Login{
 		oidcAuthCallbackURL: config.OidcAuthCallbackURL,
+		baseURL:             config.BaseURL,
 		zitadelURL:          config.ZitadelURL,
 		authRepo:            authRepo,
 		IDPConfigAesCrypto:  aesCrypto,

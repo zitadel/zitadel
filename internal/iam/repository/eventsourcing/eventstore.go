@@ -380,7 +380,10 @@ func (es *IAMEventstore) ChangeIDPOIDCConfig(ctx context.Context, config *iam_mo
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Fms8w", "Errors.IAM.IdpIsNotOIDC")
 	}
 	if config.ClientSecretString != "" {
-		err = idp.OIDCConfig.CryptSecret(es.secretCrypto)
+		err = config.CryptSecret(es.secretCrypto)
+		if err != nil {
+			return nil, err
+		}
 	} else {
 		config.ClientSecret = nil
 	}

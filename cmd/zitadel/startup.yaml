@@ -222,6 +222,7 @@ UI:
   Port: 50003
   Login:
     Handler:
+      BaseURL: '$ZITADEL_ACCOUNTS'
       OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/'
       ZitadelURL: '$ZITADEL_CONSOLE'
       LanguageCookieName: 'caos.zitadel.login.lang'
