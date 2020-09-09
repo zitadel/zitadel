@@ -48,7 +48,6 @@
                             <mat-form-field class="formfield" appearance="outline">
                                 <mat-label>{{ 'USER.PROFILE.USERNAME' | translate }}</mat-label>
                                 <input matInput formControlName="userName" required />
-                                <span *ngIf="envSuffix" matSuffix>{{envSuffix}}</span>
                                 <mat-error *ngIf="userName?.invalid && userName?.errors?.required">
                                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                                 </mat-error>

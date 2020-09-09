@@ -88,12 +88,6 @@ export class OrgCreateComponent {
 
         this.initForm();
 
-        this.adminService.getDefaultLoginPolicy().then(policy => {
-            if (policy.toObject().) {
-                this.userLoginMustBeDomain = true;
-            }
-        });
-
         this.mgmtService.SearchMyOrgDomains(0, 100).then(doms => {
             const domains = doms.toObject();
 
@@ -159,35 +153,32 @@ export class OrgCreateComponent {
         const validators: Validators[] = [Validators.required];
 
         if (this.usePassword) {
-            this.mgmtService.
-                this.mgmtService.GetDefaultPasswordComplexityPolicy().then(data => {
-                    this.policy = data.toObject();
+            this.mgmtService.GetDefaultPasswordComplexityPolicy().then(data => {
+                this.policy = data.toObject();
 
-                    if (this.policy.minLength) {
-                        validators.push(Validators.minLength(this.policy.minLength));
-                    }
-                    if (this.policy.hasLowercase) {
-                        validators.push(lowerCaseValidator);
-                    }
-                    if (this.policy.hasUppercase) {
-                        validators.push(upperCaseValidator);
-                    }
-                    if (this.policy.hasNumber) {
-                        validators.push(numberValidator);
-                    }
-                    if (this.policy.hasSymbol) {
-                        validators.push(symbolValidator);
-                    }
+                if (this.policy.minLength) {
+                    validators.push(Validators.minLength(this.policy.minLength));
+                }
+                if (this.policy.hasLowercase) {
+                    validators.push(lowerCaseValidator);
+                }
+                if (this.policy.hasUppercase) {
+                    validators.push(upperCaseValidator);
+                }
+                if (this.policy.hasNumber) {
+                    validators.push(numberValidator);
+                }
+                if (this.policy.hasSymbol) {
+                    validators.push(symbolValidator);
+                }
 
-                    // this.initForm(validators);
-                    const pwdValidators = [...validators] as ValidatorFn[];
-                    const confirmPwdValidators = [...validators, passwordConfirmValidator] as ValidatorFn[];
-                    this.pwdForm = this.fb.group({
-                        password: ['', pwdValidators],
-                        confirmPassword: ['', confirmPwdValidators],
-                    });
-
+                const pwdValidators = [...validators] as ValidatorFn[];
+                const confirmPwdValidators = [...validators, passwordConfirmValidator] as ValidatorFn[];
+                this.pwdForm = this.fb.group({
+                    password: ['', pwdValidators],
+                    confirmPassword: ['', confirmPwdValidators],
                 });
+            });
         } else {
             this.pwdForm = this.fb.group({
                 password: ['', []],
@@ -265,14 +256,6 @@ export class OrgCreateComponent {
 
     public get confirmPassword(): AbstractControl | null {
         return this.pwdForm.get('confirmPassword');
-    }
-
-    public get envSuffix(): string {
-        if (this.userLoginMustBeDomain && this.primaryDomain?.domain) {
-            return `@${this.primaryDomain.domain}`;
-        } else {
-            return '';
-        }
     }
 
     public close(): void {
