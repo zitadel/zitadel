@@ -8,7 +8,6 @@ import { take } from 'rxjs/operators';
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
 import { CreateHumanRequest, CreateOrgRequest, Gender, OrgSetUpResponse } from 'src/app/proto/generated/admin_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/auth_pb';
-import { OrgDomain } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -63,9 +62,6 @@ export class OrgCreateComponent {
 
     public forSelf: boolean = true;
 
-    private userLoginMustBeDomain: boolean = false;
-    private primaryDomain!: OrgDomain.AsObject;
-
     constructor(
         private router: Router,
         private toast: ToastService,
@@ -87,16 +83,6 @@ export class OrgCreateComponent {
         });
 
         this.initForm();
-
-        this.mgmtService.SearchMyOrgDomains(0, 100).then(doms => {
-            const domains = doms.toObject();
-
-            const found = domains.resultList.find(domain => domain.primary);
-            if (found) {
-                this.primaryDomain = found;
-            }
-        });
-
     }
 
     public createSteps: number = 2;
