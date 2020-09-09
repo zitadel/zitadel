@@ -158,9 +158,14 @@
             "EXPIRYDATE":"Expiration date",
             "CHOOSEEXPIRY":"Select an expiration Date",
             "CREATIONDATE":"Creation Date",
+            "KEYDETAILS":"Key Details",
             "ADD": {
                 "TITLE":"Add Key",
                 "DESCRIPTION":"Select your key type and choose an optional expiry date."
+            },
+            "ADDED": {
+                "TITLE":"The key was created",
+                "DESCRIPTION":"Copy the data as it won't be visible after closing the dialog!"
             },
             "KEYTYPES": {
                 "1":"JSON"

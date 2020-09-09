@@ -11,6 +11,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AddKeyDialogComponent } from './add-key-dialog/add-key-dialog.component';
+import { ShowKeyDialogComponent } from './show-key-dialog/show-key-dialog.component';
 
 @Component({
     selector: 'app-machine-keys',
@@ -94,8 +95,16 @@ export class MachineKeysComponent implements OnInit {
 
                 if (type) {
                     console.log(this.userId, type, date);
-                    return this.userService.AddMachineKey(this.userId, type, date).then(() => {
-                        this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
+                    return this.userService.AddMachineKey(this.userId, type, date).then((response) => {
+                        if (response) {
+                            console.log(response.toObject());
+                            this.dialog.open(ShowKeyDialogComponent, {
+                                data: {
+                                    key: response.toObject(),
+                                },
+                                width: '400px',
+                            });
+                        }
                     }).catch((error: any) => {
                         this.toast.showError(error);
                     });

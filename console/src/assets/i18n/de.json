@@ -158,9 +158,14 @@
             "EXPIRYDATE":"Ablaufdatum",
             "CHOOSEEXPIRY":"Definieren Sie ein Ablaufdatum",
             "CREATIONDATE":"Erstelldatum",
+            "KEYDETAILS":"Schlüssel Details",
             "ADD": {
                 "TITLE":"Schlüssel hinzufügen",
                 "DESCRIPTION":"Wählen Sie den Typ und selektieren Sie ein optionales Ablaufdatum."
+            },
+            "ADDED": {
+                "TITLE":"Schlüssel wurde erstellt",
+                "DESCRIPTION":"Kopieren Sie die Daten, Der Schlüssel kann später nicht nochmal aufgerufen werden!"
             },
             "KEYTYPES": {
                 "1":"JSON"

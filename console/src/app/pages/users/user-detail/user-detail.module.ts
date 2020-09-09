@@ -38,6 +38,7 @@ import { DetailFormMachineModule } from './detail-form-machine/detail-form-machi
 import { DetailFormModule } from './detail-form/detail-form.module';
 import { AddKeyDialogModule } from './machine-keys/add-key-dialog/add-key-dialog.module';
 import { MachineKeysComponent } from './machine-keys/machine-keys.component';
+import { ShowKeyDialogModule } from './machine-keys/show-key-dialog/show-key-dialog.module';
 import { MembershipsComponent } from './memberships/memberships.component';
 import { PasswordComponent } from './password/password.component';
 import { UserDetailRoutingModule } from './user-detail-routing.module';
@@ -69,6 +70,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         QRCodeModule,
         MetaLayoutModule,
         AddKeyDialogModule,
+        ShowKeyDialogModule,
         MatCheckboxModule,
         HasRolePipeModule,
         MatFormFieldModule,
