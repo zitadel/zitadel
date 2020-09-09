@@ -1,6 +1,6 @@
 # Security Policy
 
-At CAOS we are extremely grateful for security aware people that disclose vulnerabilities to us and the open source community. All reports will be investigated by our team.
+At CAOS we are extremely grateful for security aware people who disclose vulnerabilities to us and the open source community. All reports will be investigated by our team.
 
 ## Supported Versions
 
@@ -13,15 +13,15 @@ After the initial Release the following version support will apply
 
 ## Reporting a vulnerability
 
-To file a incident, please disclose by email to security@caos.ch with the security details.
+To file an incident, please disclose it by e-mail to security@caos.ch including the  details of the vulnerability.
 
 At the moment GPG encryption is no yet supported, however you may sign your message at will.
 
 ### When should I report a vulnerability
 
-* You think you discovered a ...
-  * ... potential security vulnerability in zitadel
-  * ... vulnerability in another project that zitadel bases on
+* You think you discovered a
+  * potential security vulnerability in `ZITADEL`
+  * vulnerability in another project that `ZITADEL` is based on
 * For projects with their own vulnerability reporting and disclosure process, please report it directly there
 
 ### When should I NOT report a vulnerability
@@ -35,7 +35,7 @@ TBD
 
 ## Public Disclosure
 
-All accepted and mitigated vulnerabilitys will be published on the [Github Security Page](https://github.com/caos/zitadel/security/advisories)
+All accepted and mitigated vulnerabilities will be published on the [GitHub Security Page](https://github.com/caos/zitadel/security/advisories)
 
 ### Timing
 
