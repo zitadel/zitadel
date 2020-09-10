@@ -1,0 +1,33 @@
+<h1 mat-dialog-title>
+    <span class="title">{{'LOGINPOLICY.ADDIDP.TITLE' | translate}}</span>
+</h1>
+<p class="desc"> {{'LOGINPOLICY.ADDIDP.DESCRIPTION' | translate}}</p>
+
+<div mat-dialog-content>
+    <mat-form-field class="full-width" appearance="outline">
+        <mat-label>{{ 'IDP.TYPE' | translate }}</mat-label>
+        <mat-select [(ngModel)]="idpType" (selectionChange)="loadIdps()">
+            <mat-option *ngFor="let type of idpTypes" [value]="type">
+                {{ 'IDP.TYPES.'+type | translate}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <ng-container *ngIf="idpType === IdpProviderType.IDPPROVIDERTYPE_SYSTEM">
+        <p>{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</p>
+        <!-- <app-search-project-autocomplete class="block" singleOutput="true"
+                (selectionChanged)="selectProject($event)"
+                [autocompleteType]="creationType === CreationType.PROJECT_OWNED ? ProjectAutocompleteType.PROJECT_OWNED : creationType === CreationType.PROJECT_GRANTED ? ProjectAutocompleteType.PROJECT_GRANTED : undefined">
+            </app-search-project-autocomplete> -->
+    </ng-container>
+</div>
+<div mat-dialog-actions class="action">
+    <button mat-button (click)="closeDialog()">
+        {{'ACTIONS.CANCEL' | translate}}
+    </button>
+
+    <button [disabled]="idps.length == 0" color="primary" mat-raised-button class="ok-button"
+        (click)="closeDialogWithSuccess()">
+        {{'ACTIONS.ADD' | translate}}
+    </button>
+</div>

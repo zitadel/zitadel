@@ -11,6 +11,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 
+import { AddIdpDialogModule } from './add-idp-dialog/add-idp-dialog.module';
 import { LoginPolicyRoutingModule } from './login-policy-routing.module';
 import { LoginPolicyComponent } from './login-policy.component';
 
@@ -29,6 +30,7 @@ import { LoginPolicyComponent } from './login-policy.component';
         MatTooltipModule,
         TranslateModule,
         DetailLayoutModule,
+        AddIdpDialogModule,
     ],
 })
 export class LoginPolicyModule { }
