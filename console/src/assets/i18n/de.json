@@ -620,6 +620,12 @@
             "TITLE":"Neuer Identity Provider",
             "DESCRIPTION":"Definieren Sie hier die Zugangsdaten des neuen Identity Providers"
         },
+        "TYPES": {
+            "0":"unknown",
+            "1":"System",
+            "2":"Organisation"
+        },
+        "TYPE":"Typ",
         "NAME":"Name",
         "CONFIG":"Konfiguration",
         "STATE":"Status",
@@ -635,7 +641,12 @@
             "TITLE":"Login Policy",
             "DESCRIPTION":"Definieren Sie hier, mit welchen Idps sich Ihre Benutzer anmelden können."
         },
-        "IDPS":"Identity Providers"
+        "IDPS":"Identity Providers",
+        "ADDIDP": {
+            "TITLE":"Identity Provider hinzufügen",
+            "DESCRIPTION":"Sie können vordefinierte oder selbsterstellten Provider auswählen",
+            "SELECTIDPS":"Identity Provider"
+        }
     },
     "APP": {
         "LIST": "Applications",

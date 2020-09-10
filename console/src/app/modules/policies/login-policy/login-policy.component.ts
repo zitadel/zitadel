@@ -1,4 +1,5 @@
 import { Component, Injector, OnDestroy, Type } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Subscription } from 'rxjs';
@@ -7,13 +8,21 @@ import {
     DefaultLoginPolicy,
     DefaultLoginPolicyView,
     IdpProviderView as AdminIdpProviderView,
+    IdpView as AdminIdpView,
 } from 'src/app/proto/generated/admin_pb';
-import { IdpProviderView as MgmtIdpProviderView, LoginPolicy, LoginPolicyView } from 'src/app/proto/generated/management_pb';
+import {
+    IdpProviderType,
+    IdpProviderView as MgmtIdpProviderView,
+    IdpView as MgmtIdpView,
+    LoginPolicy,
+    LoginPolicyView,
+} from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
+import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component';
 
 @Component({
     selector: 'app-login-policy',
@@ -32,6 +41,7 @@ export class LoginPolicyComponent implements OnDestroy {
         private route: ActivatedRoute,
         private router: Router,
         private toast: ToastService,
+        private dialog: MatDialog,
         private injector: Injector,
     ) {
         this.sub = this.route.data.pipe(switchMap(data => {
@@ -114,6 +124,32 @@ export class LoginPolicyComponent implements OnDestroy {
                 return (this.service as ManagementService).RemoveLoginPolicy();
             case PolicyComponentServiceType.ADMIN:
                 return (this.service as AdminService).GetDefaultLoginPolicy();
+        }
+    }
+
+    public openDialog(): void {
+        const dialogRef = this.dialog.open(AddIdpDialogComponent, {
+            data: {
+                idpType: IdpProviderType.IDPPROVIDERTYPE_SYSTEM,
+                serviceType: this.serviceType,
+            },
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp && resp.idp && resp.type) {
+                this.addIdp(resp.idp, resp.type);
+            }
+        });
+    }
+
+    private addIdp(idp: AdminIdpView.AsObject | MgmtIdpView.AsObject,
+        type: IdpProviderType = IdpProviderType.IDPPROVIDERTYPE_SYSTEM): Promise<any> {
+        switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+                return (this.service as ManagementService).addIdpProviderToLoginPolicy(idp.id, type);
+            case PolicyComponentServiceType.ADMIN:
+                return (this.service as AdminService).AddIdpProviderToDefaultLoginPolicy(idp.id);
         }
     }
 }

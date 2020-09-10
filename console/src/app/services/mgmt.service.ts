@@ -160,13 +160,17 @@ export class ManagementService {
     constructor(private readonly grpcService: GrpcService) { }
 
     public async SearchIdps(
-        limit: number,
-        offset: number,
+        limit?: number,
+        offset?: number,
         queryList?: IdpSearchQuery[],
     ): Promise<IdpSearchResponse> {
         const req = new IdpSearchRequest();
-        req.setLimit(limit);
-        req.setOffset(offset);
+        if (limit) {
+            req.setLimit(limit);
+        }
+        if (offset) {
+            req.setOffset(offset);
+        }
         if (queryList) {
             req.setQueriesList(queryList);
         }
@@ -186,7 +190,7 @@ export class ManagementService {
         return this.grpcService.mgmt.removeLoginPolicy(new Empty());
     }
 
-    public async AddIdpProviderToDefaultLoginPolicy(configId: string, idpType: IdpProviderType): Promise<IdpProviderID> {
+    public async addIdpProviderToLoginPolicy(configId: string, idpType: IdpProviderType): Promise<IdpProviderID> {
         const req = new IdpProviderAdd();
         req.setIdpProviderType(idpType);
         req.setIdpConfigId(configId);

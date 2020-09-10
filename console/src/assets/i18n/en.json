@@ -620,6 +620,12 @@
             "TITLE":"New Identity Provider",
             "DESCRIPTION":"Configure the Endpoint of your new service provider."
         },
+        "TYPES": {
+            "0":"unknown",
+            "1":"System",
+            "2":"Organisation"
+        },
+        "TYPE":"Type",
         "NAME":"Name",
         "CONFIG":"Configuration",
         "STATE":"State",
@@ -635,7 +641,12 @@
             "TITLE":"Login Policy",
             "DESCRIPTION":"Define how your users can be authenticated on your organisation."
         },
-        "IDPS":"Identity Providers"
+        "IDPS":"Identity Providers",
+        "ADDIDP": {
+            "TITLE":"Add Identity Providers",
+            "DESCRIPTION":"You can select predefined or selfcreated providers for authentication.",
+            "SELECTIDPS":"Identity providers"
+        }
     },
     "APP": {
         "LIST": "Applications",

@@ -1,6 +1,18 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Idp, IdpProviderType, UserView } from 'src/app/proto/generated/management_pb';
+import { IdpView as AdminIdpView } from 'src/app/proto/generated/admin_pb';
+import {
+    Idp,
+    IdpProviderType,
+    IdpSearchKey,
+    IdpSearchQuery,
+    IdpView as MgmtIdpView,
+    SearchMethod,
+} from 'src/app/proto/generated/management_pb';
+import { AdminService } from 'src/app/services/admin.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
+
+import { PolicyComponentServiceType } from '../../policy-component-types.enum';
 
 @Component({
     selector: 'app-add-idp-dialog',
@@ -8,30 +20,51 @@ import { Idp, IdpProviderType, UserView } from 'src/app/proto/generated/manageme
     styleUrls: ['./add-idp-dialog.component.scss'],
 })
 export class AddIdpDialogComponent {
-    public preselectedIdps: Array<UserView.AsObject> = [];
+    public PolicyComponentServiceType: any = PolicyComponentServiceType;
+    public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
     public idpType!: IdpProviderType;
     public idpTypes: IdpProviderType[] = [
-        IdpProviderType.IDPPROVIDERTYPE_UNSPECIFIED,
         IdpProviderType.IDPPROVIDERTYPE_SYSTEM,
         IdpProviderType.IDPPROVIDERTYPE_ORG,
     ];
 
-    public idps: Array<Idp.AsObject> | string[] = [];
+    public idp: Idp.AsObject | undefined = undefined;
+    public availableIdps: Array<AdminIdpView.AsObject | MgmtIdpView.AsObject> | string[] = [];
     public IdpProviderType: any = IdpProviderType;
 
     constructor(
+        private mgmtService: ManagementService,
+        private adminService: AdminService,
         public dialogRef: MatDialogRef<AddIdpDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
     ) {
-        if (data?.user) {
-            this.preselectedIdps = [data.idps];
-            this.idps = [data.idps];
+        if (data.idpType) {
+            this.idpType = data.idpType;
         }
+
+        if (data.serviceType) {
+            this.serviceType = data.serviceType;
+        }
+
+        this.loadIdps();
     }
 
     public loadIdps(): void {
-
+        this.idp = undefined;
+        if (this.serviceType === PolicyComponentServiceType.MGMT) {
+            const query: IdpSearchQuery = new IdpSearchQuery();
+            query.setKey(IdpSearchKey.IDPSEARCHKEY_PROVIDER_TYPE);
+            query.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
+            query.setValue(this.idpType.toString());
+            this.mgmtService.SearchIdps().then(idps => {
+                this.availableIdps = idps.toObject().resultList;
+            });
+        } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
+            this.adminService.SearchIdps().then(idps => {
+                this.availableIdps = idps.toObject().resultList;
+            });
+        }
     }
 
     public closeDialog(): void {
@@ -40,7 +73,8 @@ export class AddIdpDialogComponent {
 
     public closeDialogWithSuccess(): void {
         this.dialogRef.close({
-            idps: this.idps,
+            idp: this.idp,
+            type: this.idpType,
         });
     }
 }

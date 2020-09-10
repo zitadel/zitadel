@@ -122,13 +122,17 @@ export class AdminService {
     }
 
     public async SearchIdps(
-        limit: number,
-        offset: number,
+        limit?: number,
+        offset?: number,
         queryList?: IdpSearchQuery[],
     ): Promise<IdpSearchResponse> {
         const req = new IdpSearchRequest();
-        req.setLimit(limit);
-        req.setOffset(offset);
+        if (limit) {
+            req.setLimit(limit);
+        }
+        if (offset) {
+            req.setOffset(offset);
+        }
         if (queryList) {
             req.setQueriesList(queryList);
         }
