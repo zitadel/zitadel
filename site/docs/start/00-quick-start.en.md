@@ -3,7 +3,7 @@ title: Quick-Start
 description: A quick-start reference for the impatient reader.
 ---
 
-> All documentations are under active work and subject to change soon! 
+> All documentations are under active work and subject to change soon!
 
 ### Try ZITADEL
 
