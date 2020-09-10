@@ -32,15 +32,19 @@
                 </mat-form-field>
             </div>
             <div class="content">
-                <p class="desc">Client Id / Client Secret</p>
-                <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'IDP.CLIENTID' | translate }}</mat-label>
-                    <input matInput formControlName="clientId" />
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'IDP.CLIENTSECRET' | translate }}</mat-label>
-                    <input matInput formControlName="clientSecret" />
-                </mat-form-field>
+                <mat-checkbox class="desc" [(ngModel)]="showIdSecretSection" [ngModelOptions]="{standalone: true}">
+                    Update Client Id / Client Secret
+                </mat-checkbox>
+                <ng-container *ngIf="showIdSecretSection">
+                    <mat-form-field appearance="outline" class="formfield">
+                        <mat-label>{{ 'IDP.CLIENTID' | translate }}</mat-label>
+                        <input matInput formControlName="clientId" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="formfield">
+                        <mat-label>{{ 'IDP.CLIENTSECRET' | translate }}</mat-label>
+                        <input matInput formControlName="clientSecret" />
+                    </mat-form-field>
+                </ng-container>
             </div>
             <div class="content">
                 <mat-form-field appearance="outline" class="formfield">

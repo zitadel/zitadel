@@ -63,7 +63,7 @@
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr class="data-row" mat-row *matRowDef="let row; columns: displayedColumns;"
-                [routerLink]="row.id ? ['/idp', row.id ]: null">
+                [routerLink]="row.id ? [serviceType == PolicyComponentServiceType.ADMIN ? '/iam' : '/org', 'idp', row.id ]: null">
             </tr>
 
         </table>

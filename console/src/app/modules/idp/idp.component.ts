@@ -20,6 +20,7 @@ import { PolicyComponentServiceType } from '../policies/policy-component-types.e
     styleUrls: ['./idp.component.scss'],
 })
 export class IdpComponent implements OnInit, OnDestroy {
+    public showIdSecretSection: boolean = false;
     public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
     private service!: ManagementService | AdminService;
     public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];

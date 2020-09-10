@@ -11,7 +11,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-
+import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 
 @Component({
     selector: 'app-idp-table',
@@ -19,6 +19,7 @@ import { ToastService } from 'src/app/services/toast.service';
     styleUrls: ['./idp-table.component.scss'],
 })
 export class IdpTableComponent implements OnInit {
+    @Input() public serviceType!: PolicyComponentServiceType;
     @Input() service!: AdminService | ManagementService;
     @Input() disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
@@ -29,6 +30,7 @@ export class IdpTableComponent implements OnInit {
     public idpResult!: AdminIdpSearchResponse.AsObject;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
+    public PolicyComponentServiceType: any = PolicyComponentServiceType;
     @Input() public displayedColumns: string[] = ['select', 'name', 'config', 'creationDate', 'changeDate', 'state'];
 
     @Output() public changedSelection: EventEmitter<Array<AdminIdpView.AsObject | MgmtIdpView.AsObject>>
@@ -90,6 +92,14 @@ export class IdpTableComponent implements OnInit {
 
     private async getData(limit: number, offset: number): Promise<void> {
         this.loadingSubject.next(true);
+
+        // let query: AdminIdpSearchQuery | MgmtIdpSearchQuery;
+        // if (this.service instanceof AdminService) {
+        //     query = new AdminIdpSearchQuery();
+        //     query.setKey(AdminIdpSearchKey.)
+        // } else if (this.service instanceof ManagementService) {
+        //     return ['/org', 'idp', 'create'];
+        // }
 
         this.service.SearchIdps(limit, offset).then(resp => {
             this.idpResult = resp.toObject();

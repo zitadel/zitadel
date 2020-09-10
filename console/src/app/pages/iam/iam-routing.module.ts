@@ -24,20 +24,20 @@ const routes: Routes = [
         },
     },
     {
-        path: 'idp/:id',
-        loadChildren: () => import('src/app/modules/idp/idp.module').then(m => m.IdpModule),
-        canActivate: [AuthGuard, RoleGuard],
-        data: {
-            roles: ['iam.idp.read'],
-            serviceType: PolicyComponentServiceType.ADMIN,
-        },
-    },
-    {
         path: 'idp/create',
         loadChildren: () => import('src/app/modules/idp-create/idp-create.module').then(m => m.IdpCreateModule),
         canActivate: [AuthGuard, RoleGuard],
         data: {
             roles: ['iam.idp.write'],
+            serviceType: PolicyComponentServiceType.ADMIN,
+        },
+    },
+    {
+        path: 'idp/:id',
+        loadChildren: () => import('src/app/modules/idp/idp.module').then(m => m.IdpModule),
+        canActivate: [AuthGuard, RoleGuard],
+        data: {
+            roles: ['iam.idp.read'],
             serviceType: PolicyComponentServiceType.ADMIN,
         },
     },

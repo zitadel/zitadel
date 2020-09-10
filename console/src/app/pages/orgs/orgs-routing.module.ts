@@ -18,22 +18,28 @@ const routes: Routes = [
         loadChildren: () => import('./org-create/org-create.module').then(m => m.OrgCreateModule),
     },
     {
-        path: 'idp/:id',
-        loadChildren: () => import('src/app/modules/idp/idp.module').then(m => m.IdpModule),
-        canActivate: [RoleGuard],
-        data: {
-            roles: ['iam.idp.read'],
-            serviceType: PolicyComponentServiceType.ADMIN,
-        },
+        path: 'idp',
+        children: [
+            {
+                path: 'create',
+                loadChildren: () => import('src/app/modules/idp-create/idp-create.module').then(m => m.IdpCreateModule),
+                canActivate: [RoleGuard],
+                data: {
+                    roles: ['org.idp.write'],
+                },
+            },
+            {
+                path: ':id',
+                loadChildren: () => import('src/app/modules/idp/idp.module').then(m => m.IdpModule),
+                canActivate: [RoleGuard],
+                data: {
+                    roles: ['iam.idp.read'],
+                    serviceType: PolicyComponentServiceType.ADMIN,
+                },
+            },
+        ],
     },
-    {
-        path: 'idp/create',
-        loadChildren: () => import('src/app/modules/idp-create/idp-create.module').then(m => m.IdpCreateModule),
-        canActivate: [RoleGuard],
-        data: {
-            roles: ['org.idp.write'],
-        },
-    },
+
     {
         path: 'policy',
         children: [
