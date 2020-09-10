@@ -291,7 +291,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *model.
 	} else {
 		user, err = repo.View.UserByLoginName(loginName)
 		if err != nil {
-			err = repo.checkLoginPolicyForExternalLinkingWithResourceOwner(ctx, request, user)
+			err = repo.checkLoginPolicyWithResourceOwner(ctx, request, user)
 			if err != nil {
 				return err
 			}
@@ -305,7 +305,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *model.
 	return nil
 }
 
-func (repo AuthRequestRepo) checkLoginPolicyForExternalLinkingWithResourceOwner(ctx context.Context, request *model.AuthRequest, user *user_view_model.UserView) error {
+func (repo AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *model.AuthRequest, user *user_view_model.UserView) error {
 	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, user.ResourceOwner)
 	if err != nil {
 		return err

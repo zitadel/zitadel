@@ -262,6 +262,9 @@ func (l *Login) getThemeMode(r *http.Request) string {
 }
 
 func (l *Login) getOrgID(authReq *model.AuthRequest) string {
+	if authReq.UserOrgID != "" {
+		return authReq.UserOrgID
+	}
 	switch request := authReq.Request.(type) {
 	case *model.AuthRequestOIDC:
 		for _, scope := range request.Scopes {
