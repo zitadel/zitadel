@@ -48,7 +48,9 @@ import {
     OIDCApplicationCreate,
     OIDCConfig,
     OIDCConfigUpdate,
+    OidcIdpConfig,
     OidcIdpConfigCreate,
+    OidcIdpConfigUpdate,
     Org,
     OrgCreateRequest,
     OrgDomain,
@@ -226,6 +228,12 @@ export class ManagementService {
         req: OidcIdpConfigCreate,
     ): Promise<Idp> {
         return this.grpcService.mgmt.createOidcIdp(req);
+    }
+
+    public async UpdateOidcIdpConfig(
+        req: OidcIdpConfigUpdate,
+    ): Promise<OidcIdpConfig> {
+        return this.grpcService.mgmt.updateOidcIdpConfig(req);
     }
 
     public async RemoveIdpConfig(

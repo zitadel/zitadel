@@ -25,7 +25,9 @@ import {
     IdpSearchRequest,
     IdpSearchResponse,
     IdpView,
+    OidcIdpConfig,
     OidcIdpConfigCreate,
+    OidcIdpConfigUpdate,
     OrgIamPolicy,
     OrgIamPolicyID,
     OrgIamPolicyRequest,
@@ -151,6 +153,12 @@ export class AdminService {
         req: OidcIdpConfigCreate,
     ): Promise<Idp> {
         return this.grpcService.admin.createOidcIdp(req);
+    }
+
+    public async UpdateOidcIdpConfig(
+        req: OidcIdpConfigUpdate,
+    ): Promise<OidcIdpConfig> {
+        return this.grpcService.mgmt.updateOidcIdpConfig(req);
     }
 
     public async RemoveIdpConfig(

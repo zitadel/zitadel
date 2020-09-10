@@ -11,9 +11,13 @@
     <h1>{{'IDP.CREATE.TITLE' | translate}}</h1>
     <p>{{'IDP.CREATE.DESCRIPTION' | translate}}</p>
 
-    <form (ngSubmit)="addIdp()">
+    <form (ngSubmit)="updateIdp()">
         <ng-container [formGroup]="formGroup">
             <div class="content">
+                <mat-form-field appearance="outline" class="formfield">
+                    <mat-label>{{ 'IDP.ID' | translate }}</mat-label>
+                    <input matInput formControlName="id" />
+                </mat-form-field>
                 <mat-form-field appearance="outline" class="formfield">
                     <mat-label>{{ 'IDP.NAME' | translate }}</mat-label>
                     <input matInput formControlName="name" />

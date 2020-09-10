@@ -3,10 +3,11 @@ import { Location } from '@angular/common';
 import { Component, Injector, OnDestroy, OnInit, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
-import { OidcIdpConfigCreate } from 'src/app/proto/generated/admin_pb';
+import { OidcIdpConfigUpdate as AdminOidcIdpConfigUpdate } from 'src/app/proto/generated/admin_pb';
+import { OidcIdpConfigUpdate as MgmtOidcIdpConfigUpdate } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -31,15 +32,16 @@ export class IdpComponent implements OnInit, OnDestroy {
     public currentCreateStep: number = 1;
 
     constructor(
-        private router: Router,
+        // private router: Router,
         private toast: ToastService,
         private injector: Injector,
         private route: ActivatedRoute,
         private _location: Location,
     ) {
         this.formGroup = new FormGroup({
-            name: new FormControl('', [Validators.required]),
-            logoSrc: new FormControl('', []),
+            id: new FormControl({ disabled: true, value: '' }, [Validators.required]),
+            name: new FormControl({ disabled: true, value: '' }, [Validators.required]),
+            logoSrc: new FormControl({ disabled: true, value: '' }, [Validators.required]),
             clientId: new FormControl('', [Validators.required]),
             clientSecret: new FormControl('', [Validators.required]),
             issuer: new FormControl('', [Validators.required]),
@@ -81,19 +83,25 @@ export class IdpComponent implements OnInit, OnDestroy {
         this.projectId = projectid;
     }
 
-    public addIdp(): void {
-        const req: OidcIdpConfigCreate = new OidcIdpConfigCreate();
+    public updateIdp(): void {
+        let req: AdminOidcIdpConfigUpdate | MgmtOidcIdpConfigUpdate;
 
-        req.setName(this.name?.value);
+        switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+                req = new MgmtOidcIdpConfigUpdate();
+                break;
+            case PolicyComponentServiceType.ADMIN:
+                req = new AdminOidcIdpConfigUpdate();
+                break;
+        }
+
         req.setClientId(this.clientId?.value);
         req.setClientSecret(this.clientSecret?.value);
         req.setIssuer(this.issuer?.value);
-        req.setLogoSrc(this.logoSrc?.value);
         req.setScopesList(this.scopesList?.value);
 
-        // console.log(req.toObject());
-        this.service.CreateOidcIdp(req).then((idp) => {
-            this.router.navigate(['idp', idp.getId()]);
+        this.service.UpdateOidcIdpConfig(req).then((idp) => {
+            // this.router.navigate(['idp', ]);
         }).catch(error => {
             this.toast.showError(error);
         });
@@ -127,12 +135,12 @@ export class IdpComponent implements OnInit, OnDestroy {
         }
     }
 
-    public get name(): AbstractControl | null {
-        return this.formGroup.get('name');
+    public get id(): AbstractControl | null {
+        return this.formGroup.get('id');
     }
 
-    public get logoSrc(): AbstractControl | null {
-        return this.formGroup.get('logoSrc');
+    public get name(): AbstractControl | null {
+        return this.formGroup.get('name');
     }
 
     public get clientId(): AbstractControl | null {
@@ -141,6 +149,10 @@ export class IdpComponent implements OnInit, OnDestroy {
 
     public get clientSecret(): AbstractControl | null {
         return this.formGroup.get('clientSecret');
+    }
+
+    public get logoSrc(): AbstractControl | null {
+        return this.formGroup.get('logoSrc');
     }
 
     public get issuer(): AbstractControl | null {
