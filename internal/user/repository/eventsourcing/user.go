@@ -155,7 +155,7 @@ func HumanCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCr
 	return append(uniqueAggregates, agg), nil
 }
 
-func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, resourceOwner string, initCode *model.InitUserCode, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
+func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, externalIDP *model.ExternalIDP, resourceOwner string, initCode *model.InitUserCode, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
 	if user == nil || resourceOwner == "" || initCode == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-duxk2", "user, resourceowner, initcode must be set")
 	}
@@ -169,14 +169,38 @@ func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateC
 		return nil, err
 	}
 
-	if !userLoginMustBeDomain {
+	aggregates := make([]*es_models.Aggregate, 0)
+
+	if externalIDP != nil {
+		if externalIDP == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Di9os", "Errors.Internal")
+		}
+		validationQuery := es_models.NewSearchQuery().
+			AggregateTypeFilter(org_es_model.OrgAggregate, iam_es_model.IAMAggregate).
+			AggregateIDsFilter()
+
+		if !userLoginMustBeDomain {
+			validation := addUserNameAndIDPConfigExistingValidation(user.UserName, externalIDP.IDPConfigID)
+			agg.SetPrecondition(validationQuery, validation)
+		} else {
+			validation := addIDPConfigExistingValidation(externalIDP.IDPConfigID)
+			agg.SetPrecondition(validationQuery, validation)
+		}
+
+		agg, err = agg.AppendEvent(model.HumanExternalIDPAdded, externalIDP)
+		uniqueExternalIDPAggregate, err := reservedUniqueExternalIDPAggregate(ctx, aggCreator, resourceOwner, externalIDP)
+		if err != nil {
+			return nil, err
+		}
+		aggregates = append(aggregates, uniqueExternalIDPAggregate)
+	} else if !userLoginMustBeDomain {
 		validationQuery := es_models.NewSearchQuery().
 			AggregateTypeFilter(org_es_model.OrgAggregate).
 			AggregateIDsFilter()
-
 		validation := addUserNameValidation(user.UserName)
 		agg.SetPrecondition(validationQuery, validation)
 	}
+
 	agg, err = agg.AppendEvent(model.HumanRegistered, user)
 	if err != nil {
 		return nil, err
@@ -240,7 +264,7 @@ func releasedUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.
 	return aggregate.SetPrecondition(UserUserNameUniqueQuery(username), isEventValidation(aggregate, model.UserUserNameReleased)), nil
 }
 
-func changeUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, oldUsername, username string, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
+func changeUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, userID, oldUsername, username string, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
 	aggregates := make([]*es_models.Aggregate, 2)
 	var err error
 	aggregates[0], err = releasedUniqueUserNameAggregate(ctx, aggCreator, resourceOwner, oldUsername)
@@ -695,7 +719,7 @@ func SignOutAggregates(aggCreator *es_models.AggregateCreator, users []*model.Us
 }
 
 func DomainClaimedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, tempName string) ([]*es_models.Aggregate, error) {
-	aggregates, err := changeUniqueUserNameAggregate(ctx, aggCreator, user.ResourceOwner, user.UserName, tempName, false)
+	aggregates, err := changeUniqueUserNameAggregate(ctx, aggCreator, user.ResourceOwner, authz.GetCtxData(ctx).UserID, user.UserName, tempName, false)
 	if err != nil {
 		return nil, err
 	}
@@ -737,7 +761,7 @@ func ExternalIDPAddedAggregate(ctx context.Context, aggCreator *es_models.Aggreg
 	agg.SetPrecondition(validationQuery, validation)
 	agg, err = agg.AppendEvent(model.HumanExternalIDPAdded, externalIDP)
 
-	uniqueAggregate, err := reservedUniqueExternalIDPAggregate(ctx, aggCreator, authz.GetCtxData(ctx).OrgID, externalIDP)
+	uniqueAggregate, err := reservedUniqueExternalIDPAggregate(ctx, aggCreator, "", externalIDP)
 	if err != nil {
 		return nil, err
 	}
@@ -796,7 +820,7 @@ func releasedUniqueExternalIDPAggregate(ctx context.Context, aggCreator *es_mode
 }
 
 func UsernameChangedAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, oldUsername string, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
-	aggregates, err := changeUniqueUserNameAggregate(ctx, aggCreator, user.ResourceOwner, oldUsername, user.UserName, userLoginMustBeDomain)
+	aggregates, err := changeUniqueUserNameAggregate(ctx, aggCreator, user.ResourceOwner, authz.GetCtxData(ctx).UserID, oldUsername, user.UserName, userLoginMustBeDomain)
 	if err != nil {
 		return nil, err
 	}
@@ -837,43 +861,52 @@ func addUserNameValidation(userName string) func(...*es_models.Event) error {
 	return func(events ...*es_models.Event) error {
 		domains := make([]*org_es_model.OrgDomain, 0)
 		for _, event := range events {
-			switch event.Type {
-			case org_es_model.OrgDomainAdded:
-				domain := new(org_es_model.OrgDomain)
-				domain.SetData(event)
-				domains = append(domains, domain)
-			case org_es_model.OrgDomainVerified:
-				domain := new(org_es_model.OrgDomain)
-				domain.SetData(event)
-				for _, d := range domains {
-					if d.Domain == domain.Domain {
-						d.Verified = true
-					}
-				}
-			case org_es_model.OrgDomainRemoved:
-				domain := new(org_es_model.OrgDomain)
-				domain.SetData(event)
-				for i, d := range domains {
-					if d.Domain == domain.Domain {
-						domains[i] = domains[len(domains)-1]
-						domains[len(domains)-1] = nil
-						domains = domains[:len(domains)-1]
-						break
-					}
-				}
-			}
+			domains = handleDomainEvents(domains, event)
 		}
-		split := strings.Split(userName, "@")
-		if len(split) != 2 {
-			return nil
-		}
+		return handleCheckDomainAllowedAsUsername(domains, userName)
+	}
+}
+
+func handleDomainEvents(domains []*org_es_model.OrgDomain, event *es_models.Event) []*org_es_model.OrgDomain {
+	switch event.Type {
+	case org_es_model.OrgDomainAdded:
+		domain := new(org_es_model.OrgDomain)
+		domain.SetData(event)
+		domains = append(domains, domain)
+	case org_es_model.OrgDomainVerified:
+		domain := new(org_es_model.OrgDomain)
+		domain.SetData(event)
 		for _, d := range domains {
-			if d.Verified && d.Domain == split[1] {
-				return errors.ThrowPreconditionFailed(nil, "EVENT-us5Zw", "Errors.User.DomainNotAllowedAsUsername")
+			if d.Domain == domain.Domain {
+				d.Verified = true
 			}
 		}
+	case org_es_model.OrgDomainRemoved:
+		domain := new(org_es_model.OrgDomain)
+		domain.SetData(event)
+		for i, d := range domains {
+			if d.Domain == domain.Domain {
+				domains[i] = domains[len(domains)-1]
+				domains[len(domains)-1] = nil
+				domains = domains[:len(domains)-1]
+				break
+			}
+		}
+	}
+	return domains
+}
+
+func handleCheckDomainAllowedAsUsername(domains []*org_es_model.OrgDomain, userName string) error {
+	split := strings.Split(userName, "@")
+	if len(split) != 2 {
 		return nil
 	}
+	for _, d := range domains {
+		if d.Verified && d.Domain == split[1] {
+			return errors.ThrowPreconditionFailed(nil, "EVENT-us5Zw", "Errors.User.DomainNotAllowedAsUsername")
+		}
+	}
+	return nil
 }
 
 func addIDPConfigExistingValidation(idpConfigID string) func(...*es_models.Event) error {
@@ -889,25 +922,54 @@ func addIDPConfigExistingValidation(idpConfigID string) func(...*es_models.Event
 				handleIAMLoginPolicy(event, iamLoginPolicy)
 			}
 		}
-		if orgPolicyExisting {
-			if !orgLoginPolicy.AllowExternalIdp {
-				return errors.ThrowPreconditionFailed(nil, "EVENT-Wmi9s", "Errors.User.ExternalIDP.NotAllowed")
-			}
-			for _, provider := range orgLoginPolicy.IDPProviders {
-				if provider.IDPConfigID == idpConfigID {
-					return nil
-				}
-			}
+		return handleIDPConfigExisting(iamLoginPolicy, orgLoginPolicy, orgPolicyExisting, idpConfigID)
+	}
+}
+
+func handleIDPConfigExisting(iamLoginPolicy, orgLoginPolicy *iam_es_model.LoginPolicy, orgPolicyExisting bool, idpConfigID string) error {
+	if orgPolicyExisting {
+		if !orgLoginPolicy.AllowExternalIdp {
+			return errors.ThrowPreconditionFailed(nil, "EVENT-Wmi9s", "Errors.User.ExternalIDP.NotAllowed")
 		}
-		if !iamLoginPolicy.AllowExternalIdp {
-			return errors.ThrowPreconditionFailed(nil, "EVENT-Ns7uf", "Errors.User.ExternalIDP.NotAllowed")
-		}
-		for _, provider := range iamLoginPolicy.IDPProviders {
+		for _, provider := range orgLoginPolicy.IDPProviders {
 			if provider.IDPConfigID == idpConfigID {
 				return nil
 			}
 		}
-		return errors.ThrowPreconditionFailed(nil, "EVENT-Wmi9s", "Errors.User.ExternalIDP.IDPConfigNotExisting")
+	}
+	if !iamLoginPolicy.AllowExternalIdp {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Ns7uf", "Errors.User.ExternalIDP.NotAllowed")
+	}
+	for _, provider := range iamLoginPolicy.IDPProviders {
+		if provider.IDPConfigID == idpConfigID {
+			return nil
+		}
+	}
+	return errors.ThrowPreconditionFailed(nil, "EVENT-Wmi9s", "Errors.User.ExternalIDP.IDPConfigNotExisting")
+}
+
+func addUserNameAndIDPConfigExistingValidation(userName, idpConfigID string) func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		domains := make([]*org_es_model.OrgDomain, 0)
+		iamLoginPolicy := new(iam_es_model.LoginPolicy)
+		orgPolicyExisting := false
+		orgLoginPolicy := new(iam_es_model.LoginPolicy)
+
+		for _, event := range events {
+			domains = handleDomainEvents(domains, event)
+
+			switch event.AggregateType {
+			case org_es_model.OrgAggregate:
+				orgPolicyExisting = handleOrgLoginPolicy(event, orgPolicyExisting, orgLoginPolicy)
+			case iam_es_model.IAMAggregate:
+				handleIAMLoginPolicy(event, iamLoginPolicy)
+			}
+		}
+		err := handleCheckDomainAllowedAsUsername(domains, userName)
+		if err != nil {
+			return err
+		}
+		return handleIDPConfigExisting(iamLoginPolicy, orgLoginPolicy, orgPolicyExisting, idpConfigID)
 	}
 }
 

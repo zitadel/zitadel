@@ -9,6 +9,7 @@ import (
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"net/http"
+	"time"
 )
 
 const (
@@ -50,11 +51,11 @@ func (l *Login) handleExternalLogin(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, caos_errors.ThrowInternal(nil, "LOGIN-Rio9s", "Errors.User.ExternalIDP.IDPTypeNotImplemented"))
 		return
 	}
-	l.handleOIDCAuthorize(w, r, authReq, idpConfig)
+	l.handleOIDCAuthorize(w, r, authReq, idpConfig, EndpointExternalLoginCallback)
 }
 
-func (l *Login) handleOIDCAuthorize(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView) {
-	provider := l.getRPConfig(w, r, authReq, idpConfig)
+func (l *Login) handleOIDCAuthorize(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) {
+	provider := l.getRPConfig(w, r, authReq, idpConfig, callbackEndpoint)
 	http.Redirect(w, r, provider.AuthURL(authReq.ID), http.StatusFound)
 }
 
@@ -76,7 +77,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	provider := l.getRPConfig(w, r, authReq, idpConfig)
+	provider := l.getRPConfig(w, r, authReq, idpConfig, EndpointExternalLoginCallback)
 	tokens, err := provider.CodeExchange(r.Context(), data.Code)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
@@ -85,7 +86,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 	l.handleExternalUserAuthenticated(w, r, authReq, idpConfig, userAgentID, tokens)
 }
 
-func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView) rp.DelegationTokenExchangeRP {
+func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) rp.DelegationTokenExchangeRP {
 	oidcClientSecret, err := crypto.DecryptString(idpConfig.OIDCClientSecret, l.IDPConfigAesCrypto)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
@@ -95,11 +96,11 @@ func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *mod
 		ClientID:     idpConfig.OIDCClientID,
 		ClientSecret: oidcClientSecret,
 		Issuer:       idpConfig.OIDCIssuer,
-		CallbackURL:  l.baseURL + EndpointExternalLoginCallback,
+		CallbackURL:  l.baseURL + callbackEndpoint,
 		Scopes:       idpConfig.OIDCScopes,
 	}
 
-	provider, err := rp.NewDefaultRP(rpConfig)
+	provider, err := rp.NewDefaultRP(rpConfig, rp.WithVerifierOpts(rp.WithIssuedAtOffset(3*time.Second)))
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return nil

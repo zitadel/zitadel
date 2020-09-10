@@ -51,6 +51,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		tmplPasswordResetDone:  "password_reset_done.html",
 		tmplChangePassword:     "change_password.html",
 		tmplChangePasswordDone: "change_password_done.html",
+		tmplRegisterOption:     "register_option.html",
 		tmplRegister:           "register.html",
 		tmplLogoutDone:         "logout_done.html",
 		tmplRegisterOrg:        "register_org.html",
@@ -69,6 +70,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		},
 		"externalIDPAuthURL": func(authReqID, idpConfigID string) string {
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%s", EndpointExternalLogin, queryAuthRequestID, authReqID, queryIDPConfigID, idpConfigID))
+		},
+		"externalIDPRegisterURL": func(authReqID, idpConfigID string) string {
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%s", EndpointExternalRegister, queryAuthRequestID, authReqID, queryIDPConfigID, idpConfigID))
 		},
 		"registerUrl": func(id string) string {
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointRegister, queryAuthRequestID, id))
@@ -111,6 +115,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		},
 		"changePasswordUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointChangePassword)
+		},
+		"registerOptionUrl": func() string {
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s", EndpointRegisterOption))
 		},
 		"registrationUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointRegister)

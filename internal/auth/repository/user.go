@@ -10,6 +10,7 @@ import (
 
 type UserRepository interface {
 	Register(ctx context.Context, user *model.User, member *org_model.OrgMember, resourceOwner string) (*model.User, error)
+	RegisterExternalUser(ctx context.Context, user *model.User, externalIDP *model.ExternalIDP, member *org_model.OrgMember, resourceOwner string) (*model.User, error)
 
 	myUserRepo
 	SkipMfaInit(ctx context.Context, userID string) error

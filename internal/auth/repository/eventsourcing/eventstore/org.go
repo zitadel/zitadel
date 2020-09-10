@@ -74,7 +74,7 @@ func (repo *OrgRepository) RegisterOrg(ctx context.Context, register *auth_model
 	if err != nil {
 		return nil, err
 	}
-	user, userAggregates, err := repo.UserEventstore.PrepareRegisterUser(ctx, register.User, pwPolicy, orgPolicy, org.AggregateID)
+	user, userAggregates, err := repo.UserEventstore.PrepareRegisterUser(ctx, register.User, nil, pwPolicy, orgPolicy, org.AggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -95,6 +95,10 @@ func (repo *OrgRepository) RegisterOrg(ctx context.Context, register *auth_model
 	}
 
 	return RegisterToModel(registerModel), nil
+}
+
+func (repo *OrgRepository) GetDefaultOrgIamPolicy(ctx context.Context) (*org_model.OrgIAMPolicy, error) {
+	return repo.OrgEventstore.GetDefaultOrgIAMPolicy(ctx)
 }
 
 func (repo *OrgRepository) GetOrgIamPolicy(ctx context.Context, orgID string) (*org_model.OrgIAMPolicy, error) {

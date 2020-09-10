@@ -26,7 +26,7 @@ type ExternalIDP struct {
 }
 
 const (
-	externalIDPTable = "auth.external_idps"
+	externalIDPTable = "auth.user_external_idps"
 )
 
 func (m *ExternalIDP) ViewModel() string {

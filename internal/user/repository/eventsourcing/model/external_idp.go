@@ -42,10 +42,14 @@ func ExternalIDPsFromModel(members []*model.ExternalIDP) []*ExternalIDP {
 }
 
 func ExternalIDPFromModel(idp *model.ExternalIDP) *ExternalIDP {
+	if idp == nil {
+		return nil
+	}
 	return &ExternalIDP{
 		ObjectRoot:  idp.ObjectRoot,
 		IDPConfigID: idp.IDPConfigID,
 		UserID:      idp.UserID,
+		DisplayName: idp.DisplayName,
 	}
 }
 

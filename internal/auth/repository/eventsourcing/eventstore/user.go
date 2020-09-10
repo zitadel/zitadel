@@ -45,7 +45,40 @@ func (repo *UserRepo) Register(ctx context.Context, registerUser *model.User, or
 	if err != nil {
 		return nil, err
 	}
-	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, pwPolicy, orgPolicy, resourceOwner)
+	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, nil, pwPolicy, orgPolicy, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if orgMember != nil {
+		orgMember.UserID = user.AggregateID
+		_, memberAggregate, err := repo.OrgEvents.PrepareAddOrgMember(ctx, orgMember, policyResourceOwner)
+		if err != nil {
+			return nil, err
+		}
+		aggregates = append(aggregates, memberAggregate)
+	}
+
+	err = sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, user.AppendEvents, aggregates...)
+	if err != nil {
+		return nil, err
+	}
+	return usr_model.UserToModel(user), nil
+}
+
+func (repo *UserRepo) RegisterExternalUser(ctx context.Context, registerUser *model.User, externalIDP *model.ExternalIDP, orgMember *org_model.OrgMember, resourceOwner string) (*model.User, error) {
+	policyResourceOwner := authz.GetCtxData(ctx).OrgID
+	if resourceOwner != "" {
+		policyResourceOwner = resourceOwner
+	}
+	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, policyResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, externalIDP, pwPolicy, orgPolicy, resourceOwner)
 	if err != nil {
 		return nil, err
 	}

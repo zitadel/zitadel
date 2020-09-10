@@ -103,6 +103,11 @@ EmailVerificationDone:
   Title: E-Mail Verifizierung
   Description: Deine E-Mail Adresse wurde erfolgreich verifiziert.
 
+RegisterOption:
+  Title: Registrations Möglichkeiten
+  Description: Wähle aus wie du dich registrieren möchtest.
+  RegisterUsernamePassword: Mit Benutzername Passwort
+
 Registration:
   Title: Registration
   Description: Gib deine Benutzerangaben an. Die E-Mail Adresse wird als Benutzernamen verwendet.

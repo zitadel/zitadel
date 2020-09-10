@@ -46,7 +46,7 @@ func (u *Human) SetNamesAsDisplayname() {
 }
 
 func (u *Human) IsValid() bool {
-	return u.Profile != nil && u.FirstName != "" && u.LastName != "" && u.Email != nil && u.Email.IsValid() && u.Phone == nil || (u.Phone != nil && u.Phone.IsValid())
+	return u.Profile != nil && u.FirstName != "" && u.LastName != "" && u.Email != nil && u.Email.IsValid() && u.Phone == nil || (u.Phone != nil && u.Phone.PhoneNumber != "" && u.Phone.IsValid())
 }
 
 func (u *Human) IsInitialState() bool {

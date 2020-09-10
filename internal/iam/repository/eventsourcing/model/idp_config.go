@@ -78,13 +78,12 @@ func IDPConfigFromModel(idp *model.IDPConfig) *IDPConfig {
 
 func IDPConfigToModel(idp *IDPConfig) *model.IDPConfig {
 	converted := &model.IDPConfig{
-		ObjectRoot:         idp.ObjectRoot,
-		IDPConfigID:        idp.IDPConfigID,
-		Name:               idp.Name,
-		LogoSrc:            idp.LogoSrc,
-		State:              model.IDPConfigState(idp.State),
-		Type:               model.IdpConfigType(idp.Type),
-		DisplayNameMapping: idp.DisplayNameMapping,
+		ObjectRoot:  idp.ObjectRoot,
+		IDPConfigID: idp.IDPConfigID,
+		Name:        idp.Name,
+		LogoSrc:     idp.LogoSrc,
+		State:       model.IDPConfigState(idp.State),
+		Type:        model.IdpConfigType(idp.Type),
 	}
 	if idp.OIDCIDPConfig != nil {
 		converted.OIDCConfig = OIDCIDPConfigToModel(idp.OIDCIDPConfig)
