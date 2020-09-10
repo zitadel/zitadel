@@ -175,5 +175,5 @@ export class LoginPolicyComponent implements OnDestroy {
                 (this.service as AdminService).RemoveIdpProviderFromDefaultLoginPolicy(idp.id);
                 break;
         }
-    };
+    }
 }
