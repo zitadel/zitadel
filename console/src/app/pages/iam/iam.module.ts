@@ -22,6 +22,7 @@ import { ContributorsModule } from 'src/app/modules/contributors/contributors.mo
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
@@ -63,6 +64,7 @@ import { IamComponent } from './iam.component';
         TimestampToDatePipeModule,
         SharedModule,
         RefreshTableModule,
+        HasRolePipeModule,
     ],
 })
 export class IamModule { }

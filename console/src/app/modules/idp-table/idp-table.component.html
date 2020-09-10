@@ -9,6 +9,10 @@
             mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
             <mat-icon svgIcon="mdi_account_check_outline"></mat-icon>
         </button>
+        <button (click)="removeSelectedIdps()" matTooltip="{{'IAM.IDP.ACTIVATE' | translate}}" class="icon-button"
+            mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
+            <i class="las la-trash"></i>
+        </button>
         <a class="add-button" [routerLink]="createRouterLink" color="primary" mat-raised-button [disabled]="disabled">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>

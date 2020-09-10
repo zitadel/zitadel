@@ -39,12 +39,16 @@ export class AddIdpDialogComponent {
         public dialogRef: MatDialogRef<AddIdpDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
     ) {
-        if (data.idpType) {
-            this.idpType = data.idpType;
-        }
-
         if (data.serviceType) {
             this.serviceType = data.serviceType;
+            switch (this.serviceType) {
+                case PolicyComponentServiceType.MGMT:
+                    this.idpType = IdpProviderType.IDPPROVIDERTYPE_ORG;
+                    break;
+                case PolicyComponentServiceType.ADMIN:
+                    this.idpType = IdpProviderType.IDPPROVIDERTYPE_SYSTEM;
+                    break;
+            }
         }
 
         this.loadIdps();

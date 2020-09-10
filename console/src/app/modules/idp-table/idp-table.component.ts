@@ -79,6 +79,15 @@ export class IdpTableComponent implements OnInit {
         });
     }
 
+    public removeSelectedIdps(): void {
+        Promise.all(this.selection.selected.map(value => {
+            return this.service.RemoveIdpConfig(value.id);
+        })).then(() => {
+            this.toast.showInfo('USER.TOAST.SELECTEDDEACTIVATED', true);
+            this.getData(10, 0);
+        });
+    }
+
     private async getData(limit: number, offset: number): Promise<void> {
         this.loadingSubject.next(true);
 

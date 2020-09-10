@@ -49,11 +49,9 @@ export class LoginPolicyComponent implements OnDestroy {
             this.serviceType = data.serviceType;
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
-                    console.log('mgmt');
                     this.service = this.injector.get(ManagementService as Type<ManagementService>);
                     break;
                 case PolicyComponentServiceType.ADMIN:
-                    console.log('admin');
                     this.service = this.injector.get(AdminService as Type<AdminService>);
                     break;
             }
@@ -130,7 +128,6 @@ export class LoginPolicyComponent implements OnDestroy {
     public openDialog(): void {
         const dialogRef = this.dialog.open(AddIdpDialogComponent, {
             data: {
-                idpType: IdpProviderType.IDPPROVIDERTYPE_SYSTEM,
                 serviceType: this.serviceType,
             },
             width: '400px',

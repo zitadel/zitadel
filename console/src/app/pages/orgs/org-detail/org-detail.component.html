@@ -29,7 +29,8 @@
 
         <ng-template appHasRole [appHasRole]="['org.idp.read']">
             <app-card title="{{ 'IDP.LIST.TITLE' | translate }}" description="{{ 'IDP.LIST.DESCRIPTION' | translate }}">
-                <app-idp-table [service]="mgmtService"> </app-idp-table>
+                <app-idp-table [service]="mgmtService" [disabled]="(['iam.idp.write'] | hasRole | async) == false">
+                </app-idp-table>
             </app-card>
         </ng-template>
 
