@@ -1,5 +1,0 @@
----
-title: OpenID Connect
----
-
-> TBD

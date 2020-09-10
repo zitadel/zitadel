@@ -1,5 +1,5 @@
 ---
-title: Übersicht
+title: OpenID Connect
 description: ...
 ---
 

@@ -3,14 +3,8 @@ title: Overview
 description: ...
 ---
 
-### Projects
+### Application Integration
 
-### Roles
+### Service Integration
 
-#### Clients
-
-### Supported Protocols
-
-#### OpenID Connect 1.0
-
-#### OAuth 2.0
+### RBAC

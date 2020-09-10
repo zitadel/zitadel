@@ -2,7 +2,9 @@
 title: Identity Providers
 ---
 
-### Identity Federation
+### Manage Identity Providers
+
+### Identity Brokering
 
 ### Federation Protocols
 

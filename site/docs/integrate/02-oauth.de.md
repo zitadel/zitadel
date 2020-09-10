@@ -1,5 +1,5 @@
 ---
-title: Übersicht
+title: OAuth 2.0
 description: ...
 ---
 
