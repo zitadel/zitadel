@@ -15,10 +15,6 @@ const (
 	queryIDPConfigID = "idpConfigID"
 )
 
-var (
-	scopes = []string{"openid", "profile", "email"}
-)
-
 type externalIDPData struct {
 	IDPConfigID string `schema:"idpConfigID"`
 }
@@ -100,7 +96,7 @@ func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *mod
 		ClientSecret: oidcClientSecret,
 		Issuer:       idpConfig.OIDCIssuer,
 		CallbackURL:  l.baseURL + EndpointExternalLoginCallback,
-		Scopes:       scopes,
+		Scopes:       idpConfig.OIDCScopes,
 	}
 
 	provider, err := rp.NewDefaultRP(rpConfig)
@@ -122,9 +118,17 @@ func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.R
 }
 
 func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) *model.ExternalUser {
+	displayName := tokens.IDTokenClaims.PreferredUsername
+	switch idpConfig.OIDCIDPDisplayNameMapping {
+	case iam_model.OIDCMappingFieldEmail:
+		if tokens.IDTokenClaims.EmailVerified && tokens.IDTokenClaims.Email != "" {
+			displayName = tokens.IDTokenClaims.Email
+		}
+	}
+
 	return &model.ExternalUser{
 		IDPConfigID:    idpConfig.IDPConfigID,
 		ExternalUserID: tokens.IDTokenClaims.Subject,
-		DisplayName:    tokens.IDTokenClaims.PreferredUsername,
+		DisplayName:    displayName,
 	}
 }

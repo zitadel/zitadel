@@ -1,3 +1,8 @@
+ALTER TABLE adminapi.idp_configs ADD COLUMN oidc_idp_display_name_mapping SMALLINT;
+ALTER TABLE adminapi.idp_configs ADD COLUMN oidc_idp_username_mapping SMALLINT;
+
+ALTER TABLE management.idp_configs ADD COLUMN oidc_idp_display_name_mapping SMALLINT;
+ALTER TABLE management.idp_configs ADD COLUMN oidc_idp_username_mapping SMALLINT;
 
 CREATE TABLE auth.idp_configs (
     idp_config_id TEXT,
@@ -16,6 +21,8 @@ CREATE TABLE auth.idp_configs (
     oidc_client_secret JSONB,
     oidc_issuer TEXT,
     oidc_scopes TEXT ARRAY,
+    oidc_idp_display_name_mapping SMALLINT,
+    oidc_idp_username_mapping SMALLINT,
 
     PRIMARY KEY (idp_config_id)
 );

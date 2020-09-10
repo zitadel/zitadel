@@ -17,11 +17,13 @@ type IDPConfigView struct {
 	Sequence        uint64
 	IDPProviderType IDPProviderType
 
-	IsOIDC           bool
-	OIDCClientID     string
-	OIDCClientSecret *crypto.CryptoValue
-	OIDCIssuer       string
-	OIDCScopes       []string
+	IsOIDC                    bool
+	OIDCClientID              string
+	OIDCClientSecret          *crypto.CryptoValue
+	OIDCIssuer                string
+	OIDCScopes                []string
+	OIDCIDPDisplayNameMapping OIDCMappingField
+	OIDCUsernameMapping       OIDCMappingField
 }
 
 type IDPConfigSearchRequest struct {

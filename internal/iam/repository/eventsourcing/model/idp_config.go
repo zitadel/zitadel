@@ -10,12 +10,11 @@ import (
 
 type IDPConfig struct {
 	es_models.ObjectRoot
-	IDPConfigID        string `json:"idpConfigId"`
-	State              int32  `json:"-"`
-	Name               string `json:"name,omitempty"`
-	Type               int32  `json:"idpType,omitempty"`
-	LogoSrc            []byte `json:"logoSrc,omitempty"`
-	DisplayNameMapping string `json:"displayNameMapping,omitempty"`
+	IDPConfigID string `json:"idpConfigId"`
+	State       int32  `json:"-"`
+	Name        string `json:"name,omitempty"`
+	Type        int32  `json:"idpType,omitempty"`
+	LogoSrc     []byte `json:"logoSrc,omitempty"`
 
 	OIDCIDPConfig *OIDCIDPConfig `json:"-"`
 }
@@ -43,9 +42,6 @@ func (c *IDPConfig) Changes(changed *IDPConfig) map[string]interface{} {
 	if changed.LogoSrc != nil && bytes.Equal(c.LogoSrc, changed.LogoSrc) {
 		changes["logoSrc"] = changed.LogoSrc
 	}
-	if changed.DisplayNameMapping != "" && c.DisplayNameMapping != changed.DisplayNameMapping {
-		changes["displayNameMapping"] = changed.DisplayNameMapping
-	}
 	return changes
 }
 
@@ -67,13 +63,12 @@ func IDPConfigsFromModel(idps []*model.IDPConfig) []*IDPConfig {
 
 func IDPConfigFromModel(idp *model.IDPConfig) *IDPConfig {
 	converted := &IDPConfig{
-		ObjectRoot:         idp.ObjectRoot,
-		IDPConfigID:        idp.IDPConfigID,
-		Name:               idp.Name,
-		State:              int32(idp.State),
-		Type:               int32(idp.Type),
-		LogoSrc:            idp.LogoSrc,
-		DisplayNameMapping: idp.DisplayNameMapping,
+		ObjectRoot:  idp.ObjectRoot,
+		IDPConfigID: idp.IDPConfigID,
+		Name:        idp.Name,
+		State:       int32(idp.State),
+		Type:        int32(idp.Type),
+		LogoSrc:     idp.LogoSrc,
 	}
 	if idp.OIDCConfig != nil {
 		converted.OIDCIDPConfig = OIDCIDPConfigFromModel(idp.OIDCConfig)
