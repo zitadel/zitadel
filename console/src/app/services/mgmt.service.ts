@@ -197,13 +197,13 @@ export class ManagementService {
         return this.grpcService.mgmt.addIdpProviderToLoginPolicy(req);
     }
 
-    public async RemoveIdpProviderFromDefaultLoginPolicy(configId: string): Promise<Empty> {
+    public async RemoveIdpProviderFromLoginPolicy(configId: string): Promise<Empty> {
         const req = new IdpProviderID();
         req.setIdpConfigId(configId);
         return this.grpcService.mgmt.removeIdpProviderFromLoginPolicy(req);
     }
 
-    public async GetDefaultLoginPolicyIdpProviders(limit?: number, offset?: number): Promise<IdpProviderSearchResponse> {
+    public async GetLoginPolicyIdpProviders(limit?: number, offset?: number): Promise<IdpProviderSearchResponse> {
         const req = new IdpProviderSearchRequest();
         if (limit) {
             req.setLimit(limit);

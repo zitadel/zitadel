@@ -61,6 +61,15 @@ button {
         border: 1px solid #8795a1;
         border-radius: .5rem;
         cursor: pointer;
+        position: relative;
+
+        .rm {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform: translateX(-50%) translateY(-50%);
+            cursor: pointer;
+        }
 
         &:hover {
             background-color: #ffffff10;

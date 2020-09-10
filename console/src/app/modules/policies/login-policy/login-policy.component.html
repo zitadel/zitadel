@@ -34,6 +34,7 @@
 
     <div class="idps">
         <div class="idp" *ngFor="let idp of idps">
+            <mat-icon (click)="removeIdp(idp)" class="rm">remove_circle</mat-icon>
             <p>{{idp.name}}</p>
             <span>{{idp.type}}</span>
             <span>{{idp.configId}}</span>

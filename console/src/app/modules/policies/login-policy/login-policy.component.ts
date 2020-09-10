@@ -63,9 +63,10 @@ export class LoginPolicyComponent implements OnDestroy {
                     this.loginData = data.toObject();
                 }
             });
-            this.service.GetDefaultLoginPolicyIdpProviders()
-                .then(prov => prov.toObject())
-                .then((providers) => this.idps = providers.resultList);
+            this.getIdps().then(idps => {
+                console.log(idps);
+                this.idps = idps;
+            });
         });
     }
 
@@ -80,6 +81,21 @@ export class LoginPolicyComponent implements OnDestroy {
                 return (this.service as ManagementService).GetLoginPolicy();
             case PolicyComponentServiceType.ADMIN:
                 return (this.service as AdminService).GetDefaultLoginPolicy();
+        }
+    }
+
+    private async getIdps(): Promise<MgmtIdpProviderView.AsObject[] | AdminIdpProviderView.AsObject[]> {
+        switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+                return (this.service as ManagementService).GetLoginPolicyIdpProviders()
+                    .then((providers) => {
+                        return providers.toObject().resultList;
+                    });
+            case PolicyComponentServiceType.ADMIN:
+                return (this.service as AdminService).GetDefaultLoginPolicyIdpProviders()
+                    .then((providers) => {
+                        return providers.toObject().resultList;
+                    });
         }
     }
 
@@ -149,4 +165,15 @@ export class LoginPolicyComponent implements OnDestroy {
                 return (this.service as AdminService).AddIdpProviderToDefaultLoginPolicy(idp.id);
         }
     }
+
+    public removeIdp(idp: AdminIdpView.AsObject | MgmtIdpView.AsObject): void {
+        switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+                (this.service as ManagementService).RemoveIdpProviderFromLoginPolicy(idp.id);
+                break;
+            case PolicyComponentServiceType.ADMIN:
+                (this.service as AdminService).RemoveIdpProviderFromDefaultLoginPolicy(idp.id);
+                break;
+        }
+    };
 }
