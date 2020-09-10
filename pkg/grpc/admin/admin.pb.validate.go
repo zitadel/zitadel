@@ -3512,6 +3512,10 @@ func (m *OidcIdpConfigCreate) Validate() error {
 		}
 	}
 
+	// no validation rules for IdpDisplayNameMapping
+
+	// no validation rules for UsernameMapping
+
 	return nil
 }
 
@@ -3601,6 +3605,10 @@ func (m *OidcIdpConfigUpdate) Validate() error {
 			reason: "value length must be between 1 and 200 runes, inclusive",
 		}
 	}
+
+	// no validation rules for IdpDisplayNameMapping
+
+	// no validation rules for UsernameMapping
 
 	return nil
 }
@@ -3882,6 +3890,10 @@ func (m *OidcIdpConfigView) Validate() error {
 	// no validation rules for ClientId
 
 	// no validation rules for Issuer
+
+	// no validation rules for IdpDisplayNameMapping
+
+	// no validation rules for UsernameMapping
 
 	return nil
 }

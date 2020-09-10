@@ -267,7 +267,10 @@ func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, 
 }
 
 func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *model.AuthRequest) error {
-	orgID := request.GetScopeOrgID()
+	orgID := request.UserOrgID
+	if orgID == "" {
+		orgID = request.GetScopeOrgID()
+	}
 	if orgID == "" {
 		orgID = repo.SystemDefaults.IamID
 	}
