@@ -32,6 +32,8 @@ type UserRepository interface {
 	SignOut(ctx context.Context, agentID string) error
 
 	UserByID(ctx context.Context, userID string) (*model.UserView, error)
+
+	MachineKeysByUserID(ctx context.Context, userID string) ([]*model.MachineKeyView, error)
 }
 
 type myUserRepo interface {

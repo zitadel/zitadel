@@ -2,8 +2,10 @@ package oidc
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"golang.org/x/text/language"
+	"gopkg.in/square/go-jose.v2"
 
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
@@ -34,6 +36,23 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (op.Clie
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sdaGg", "client is not active")
 	}
 	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime)
+}
+
+func (o *OPStorage) GetKeysByServiceAccount(ctx context.Context, id string) (*jose.JSONWebKeySet, error) {
+	keys, err := o.repo.MachineKeysByUserID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	webKeys := make([]jose.JSONWebKey, len(keys))
+	for i, key := range keys {
+		webKeys[i] = jose.JSONWebKey{
+			KeyID:     key.ID,
+			Algorithm: key.PublicKey.Algorithm,
+			Use:       "sig",
+			Key:       key.PublicKey.Crypted,
+		}
+	}
+	return &jose.JSONWebKeySet{Keys: webKeys}, nil
 }
 
 func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secret string) error {

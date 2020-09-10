@@ -6,6 +6,7 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
@@ -25,6 +26,8 @@ type MachineKeyView struct {
 	Sequence       uint64    `json:"-" gorm:"column:sequence"`
 
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
+
+	PublicKey *crypto.CryptoValue `json:"publicKey" gorm:"column:public_key"`
 }
 
 func MachineKeyViewFromModel(key *model.MachineKeyView) *MachineKeyView {

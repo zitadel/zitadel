@@ -3,6 +3,7 @@ package model
 import (
 	"time"
 
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/model"
 )
 
@@ -13,6 +14,7 @@ type MachineKeyView struct {
 	Sequence       uint64
 	CreationDate   time.Time
 	ExpirationDate time.Time
+	PublicKey      crypto.CryptoValue
 }
 
 type MachineKeySearchRequest struct {

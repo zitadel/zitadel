@@ -59,7 +59,7 @@ func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) error {
 	return o.repo.DeleteAuthRequest(ctx, id)
 }
 
-func (o *OPStorage) CreateToken(ctx context.Context, authReq op.AuthRequest) (string, time.Time, error) {
+func (o *OPStorage) CreateToken(ctx context.Context, authReq op.TokenRequest) (string, time.Time, error) {
 	app, err := o.repo.ApplicationByClientID(ctx, authReq.GetClientID())
 	if err != nil {
 		return "", time.Time{}, err

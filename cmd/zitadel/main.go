@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"flag"
+	_ "net/http/pprof"
 
 	"github.com/caos/logging"
-
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api"
 	internal_authz "github.com/caos/zitadel/internal/api/authz"
