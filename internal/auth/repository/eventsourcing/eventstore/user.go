@@ -335,10 +335,10 @@ func checkIDs(ctx context.Context, obj es_models.ObjectRoot) error {
 	return nil
 }
 
-func (repo *UserRepo) MachineKeysByUserID(ctx context.Context, userID string) ([]*model.MachineKeyView, error) {
-	keys, err := repo.View.MachineKeysByUserID(userID)
+func (repo *UserRepo) MachineKeyByID(ctx context.Context, keyID string) (*model.MachineKeyView, error) {
+	keys, err := repo.View.MachineKeyByID(keyID)
 	if err != nil {
 		return nil, err
 	}
-	return usr_view_model.MachineKeysToModel(keys), nil
+	return usr_view_model.MachineKeyToModel(keys), nil
 }

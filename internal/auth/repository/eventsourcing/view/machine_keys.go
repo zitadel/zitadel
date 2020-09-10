@@ -19,6 +19,10 @@ func (v *View) MachineKeysByUserID(userID string) ([]*model.MachineKeyView, erro
 	return view.MachineKeysByUserID(v.Db, machineKeyTable, userID)
 }
 
+func (v *View) MachineKeyByID(keyID string) (*model.MachineKeyView, error) {
+	return view.MachineKeyByID(v.Db, machineKeyTable, keyID)
+}
+
 func (v *View) SearchMachineKeys(request *usr_model.MachineKeySearchRequest) ([]*model.MachineKeyView, uint64, error) {
 	return view.SearchMachineKeys(v.Db, machineKeyTable, request)
 }

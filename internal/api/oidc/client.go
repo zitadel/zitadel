@@ -12,6 +12,7 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	user_model "github.com/caos/zitadel/internal/user/model"
@@ -38,21 +39,23 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (op.Clie
 	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime)
 }
 
-func (o *OPStorage) GetKeysByServiceAccount(ctx context.Context, id string) (*jose.JSONWebKeySet, error) {
-	keys, err := o.repo.MachineKeysByUserID(ctx, id)
+func (o *OPStorage) GetKeyByID(ctx context.Context, keyID string) (*jose.JSONWebKeySet, error) {
+	key, err := o.repo.MachineKeyByID(ctx, keyID)
 	if err != nil {
 		return nil, err
 	}
-	webKeys := make([]jose.JSONWebKey, len(keys))
-	for i, key := range keys {
-		webKeys[i] = jose.JSONWebKey{
-			KeyID:     key.ID,
-			Algorithm: key.PublicKey.Algorithm,
-			Use:       "sig",
-			Key:       key.PublicKey.Crypted,
-		}
+	publicKey, err := crypto.BytesToPublicKey(key.PublicKey)
+	if err != nil {
+		return nil, err
 	}
-	return &jose.JSONWebKeySet{Keys: webKeys}, nil
+	return &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{
+		{
+			KeyID: key.ID,
+			// Algorithm: key.PublicKey.Algorithm, //TODO: do we need this?
+			Use: "sig",
+			Key: publicKey,
+		},
+	}}, nil
 }
 
 func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secret string) error {
