@@ -6,6 +6,14 @@ title: OpenID Connect 1.0 & OAuth 2.0
 
 This chapter documents the OpenID Connect 1.0 and OAuth 2.0 features provided by **ZITADEL**.
 
+Under normal circumstances **ZITADEL** need four domain names to operate properly. Three of those names are used for OpenID Connect and OAuth.
+
+| Domain Name | Example             | Description                                                                        |
+|:------------|:--------------------|------------------------------------------------------------------------------------|
+| issuer      | issuer.zitadel.ch   | [Provides the OpenID Connect 1.0 Discovery Endpoint](#openid-connect-10-discovery) |
+| api         | api.zitadel.ch      |                                                                                    |
+| login       | accounts.zitadel.ch |                                                                                    |
+
 #### OpenID Connect 1.0 Discovery
 
 The OpenID Connect Discovery Endpoint is located with the issuer domain.

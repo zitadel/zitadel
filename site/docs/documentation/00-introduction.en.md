@@ -3,6 +3,8 @@ title: Introduction
 description: This is the place for all things ZITADEL. Whether you are a developer, an integrator or a user of ZITADEL, then the following pages are written for your referral.
 ---
 
+> All documentations are under active work and subject to change soon! 
+
 The documentation for ZITADEL comprises two major subject areas:
 
 1. Manuals for users, support organisations and administrators.
