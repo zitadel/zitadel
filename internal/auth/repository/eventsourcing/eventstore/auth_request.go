@@ -78,7 +78,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 	}
 	request.Audience = ids
 	if request.LoginHint != "" {
-		err = repo.checkLoginName(request, request.LoginHint)
+		err = repo.checkLoginName(ctx, request, request.LoginHint)
 		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID).Debug("login hint invalid")
 	}
 	err = repo.AuthRequests.SaveAuthRequest(ctx, request)
@@ -127,7 +127,7 @@ func (repo *AuthRequestRepo) CheckLoginName(ctx context.Context, id, loginName, 
 	if err != nil {
 		return err
 	}
-	err = repo.checkLoginName(request, loginName)
+	err = repo.checkLoginName(ctx, request, loginName)
 	if err != nil {
 		return err
 	}
@@ -251,40 +251,76 @@ func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID
 	return request, nil
 }
 
+func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, orgID string) (*iam_model.LoginPolicyView, []*iam_model.IDPProviderView, error) {
+	policy, err := repo.getLoginPolicy(ctx, orgID)
+	if err != nil {
+		return nil, nil, err
+	}
+	if !policy.AllowExternalIDP {
+		return policy, nil, nil
+	}
+	idpProviders, err := repo.getLoginPolicyIDPProviders(ctx, orgID, policy.Default)
+	if err != nil {
+		return nil, nil, err
+	}
+	return policy, idpProviders, nil
+}
+
 func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *model.AuthRequest) error {
 	orgID := request.GetScopeOrgID()
 	if orgID == "" {
 		orgID = repo.SystemDefaults.IamID
 	}
 
-	policy, err := repo.getLoginPolicy(ctx, orgID)
+	policy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
 	if err != nil {
 		return err
 	}
 	request.LoginPolicy = policy
-	if !policy.AllowExternalIDP {
-		return nil
+	if idpProviders != nil {
+		request.AllowedExternalIDPs = idpProviders
 	}
-	idpProviders, err := repo.getLoginPolicyIDPProviders(ctx, orgID, policy.Default)
-	if err != nil {
-		return err
-	}
-	request.AllowedExternalIDPs = idpProviders
 	return nil
 }
 
-func (repo *AuthRequestRepo) checkLoginName(request *model.AuthRequest, loginName string) (err error) {
+func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *model.AuthRequest, loginName string) (err error) {
 	orgID := request.GetScopeOrgID()
 	user := new(user_view_model.UserView)
 	if orgID != "" {
 		user, err = repo.View.UserByLoginNameAndResourceOwner(loginName, orgID)
 	} else {
 		user, err = repo.View.UserByLoginName(loginName)
+		if err != nil {
+			err = repo.checkLoginPolicyForExternalLinkingWithResourceOwner(ctx, request, user)
+			if err != nil {
+				return err
+			}
+		}
 	}
 	if err != nil {
 		return err
 	}
+
 	request.SetUserInfo(user.ID, loginName, "", user.ResourceOwner)
+	return nil
+}
+
+func (repo AuthRequestRepo) checkLoginPolicyForExternalLinkingWithResourceOwner(ctx context.Context, request *model.AuthRequest, user *user_view_model.UserView) error {
+	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, user.ResourceOwner)
+	if err != nil {
+		return err
+	}
+	if len(request.LinkingUsers) != 0 && loginPolicy.AllowExternalIDP {
+		return errors.ThrowInvalidArgument(nil, "LOGIN-Dj89o", "Errors.User.NotAllowedToLink")
+	}
+	if len(request.LinkingUsers) != 0 {
+		exists := linkingIDPConfigExistingInAllowedIDPs(request.LinkingUsers, idpProviders)
+		if !exists {
+			return errors.ThrowInvalidArgument(nil, "LOGIN-Dj89o", "Errors.User.NotAllowedToLink")
+		}
+	}
+	request.LoginPolicy = loginPolicy
+	request.AllowedExternalIDPs = idpProviders
 	return nil
 }
 
@@ -574,4 +610,20 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 		}
 	}
 	return user_view_model.UserToModel(&userCopy), nil
+}
+
+func linkingIDPConfigExistingInAllowedIDPs(linkingUsers []*model.ExternalUser, idpProviders []*iam_model.IDPProviderView) bool {
+	for _, linkingUser := range linkingUsers {
+		exists := false
+		for _, idp := range idpProviders {
+			if idp.IDPConfigID == linkingUser.IDPConfigID {
+				exists = true
+				continue
+			}
+		}
+		if !exists {
+			return false
+		}
+	}
+	return true
 }

@@ -72,18 +72,18 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.State, userAgentID)
 	if err != nil {
-		l.renderError(w, r, nil, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
 	idpConfig, err := l.authRepo.GetIDPConfigByID(r.Context(), authReq.SelectedIDPConfigID)
 	if err != nil {
-		l.renderError(w, r, nil, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
 	provider := l.getRPConfig(w, r, authReq, idpConfig)
 	tokens, err := provider.CodeExchange(r.Context(), data.Code)
 	if err != nil {
-		l.renderLogin(w, r, nil, err)
+		l.renderLogin(w, r, authReq, err)
 		return
 	}
 	l.handleExternalUserAuthenticated(w, r, authReq, idpConfig, userAgentID, tokens)

@@ -166,6 +166,7 @@ Errors:
     UserIDMissing: UserID is empty
     Invalid: Invalid userdata
     DomainNotAllowedAsUsername: Domain is already reserved and cannot be used
+    NotAllowedToLink: User is not allowed to link with external login provider
     Password:
       ConfirmationWrong: Passwordconfirmation is wrong
       Empty: Password is empty

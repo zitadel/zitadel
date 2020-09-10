@@ -26,6 +26,7 @@ Errors:
     AddressNotFound: Address not found
     NotHuman: The User must be personal
     NotMachine: The User must be technical
+    NotAllowedToLink: User is not allowed to link with external login provider
     Code:
       Empty: Code is empty
       NotFound: Code not found

@@ -26,6 +26,7 @@ Errors:
     AddressNotFound: Addresse nicht gefunden
     NotHuman: Der Benutzer muss eine Person sein
     NotMachine: Der Benutzer muss technisch sein
+    NotAllowedToLink: Der Benutzer darf nicht mit einem externen Login Provider verlinkt werden
     Code:
       Empty: Code ist leer
       NotFound: Code konnte nicht gefunden werden

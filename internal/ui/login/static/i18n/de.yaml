@@ -164,6 +164,7 @@ Errors:
     UserIDMissing: UserID ist leer
     Invalid: Userdaten sind ungültig
     DomainNotAllowedAsUsername: Domäne ist bereits reserviert und kann nicht verwendet werden
+    NotAllowedToLink: Der Benutzer darf nicht mit einem externen Login Provider verlinkt werden
     Password:
       ConfirmationWrong: Passwort Bestätigung stimmt nicht überein
       Empty: Passwort ist leer
