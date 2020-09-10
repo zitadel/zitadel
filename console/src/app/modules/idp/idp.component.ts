@@ -5,7 +5,7 @@ import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/fo
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import { OidcIdpConfigCreate } from 'src/app/proto/generated/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -14,11 +14,11 @@ import { ToastService } from 'src/app/services/toast.service';
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 
 @Component({
-    selector: 'app-idp-create',
-    templateUrl: './idp-create.component.html',
-    styleUrls: ['./idp-create.component.scss'],
+    selector: 'app-idp',
+    templateUrl: './idp.component.html',
+    styleUrls: ['./idp.component.scss'],
 })
-export class IdpCreateComponent implements OnInit, OnDestroy {
+export class IdpComponent implements OnInit, OnDestroy {
     public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
     private service!: ManagementService | AdminService;
     public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
@@ -32,9 +32,9 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
 
     constructor(
         private router: Router,
-        private route: ActivatedRoute,
         private toast: ToastService,
         private injector: Injector,
+        private route: ActivatedRoute,
         private _location: Location,
     ) {
         this.formGroup = new FormGroup({
@@ -46,7 +46,8 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
             scopesList: new FormControl([], []),
         });
 
-        this.route.data.pipe(take(1)).subscribe(data => {
+        this.route.data.pipe(switchMap(data => {
+            console.log(data.serviceType);
             this.serviceType = data.serviceType;
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
@@ -55,6 +56,15 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
                 case PolicyComponentServiceType.ADMIN:
                     this.service = this.injector.get(AdminService as Type<AdminService>);
                     break;
+            }
+
+            return this.route.params.pipe(take(1));
+        })).subscribe((params) => {
+            const { id } = params;
+            if (id) {
+                this.service.IdpByID(id).then(idp => {
+                    this.formGroup.patchValue(idp.toObject());
+                });
             }
         });
     }
@@ -81,6 +91,7 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
         req.setLogoSrc(this.logoSrc?.value);
         req.setScopesList(this.scopesList?.value);
 
+        // console.log(req.toObject());
         this.service.CreateOidcIdp(req).then((idp) => {
             this.router.navigate(['idp', idp.getId()]);
         }).catch(error => {

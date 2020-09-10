@@ -9,23 +9,23 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 
-import { IdpCreateRoutingModule } from './idp-create-routing.module';
-import { IdpCreateComponent } from './idp-create.component';
+import { IdpRoutingModule } from './idp-routing.module';
+import { IdpComponent } from './idp.component';
 
 @NgModule({
-    declarations: [IdpCreateComponent],
+    declarations: [IdpComponent],
     imports: [
-        IdpCreateRoutingModule,
         CommonModule,
+        IdpRoutingModule,
         FormsModule,
         ReactiveFormsModule,
         MatInputModule,
         MatFormFieldModule,
         MatButtonModule,
         MatIconModule,
-        MatChipsModule,
         MatTooltipModule,
         TranslateModule,
+        MatChipsModule,
     ],
 })
-export class IdpCreateModule { }
+export class IdpModule { }

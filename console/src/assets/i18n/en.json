@@ -631,6 +631,7 @@
         "STATE":"State",
         "LOGOSRC":"Logo Src",
         "ISSUER":"Issuer",
+        "SCOPESLIST":"Scopes List",
         "CLIENTID":"Client ID",
         "CLIENTSECRET":"Client Secret",
         "CREATIONDATE":"Created At",
