@@ -29,19 +29,23 @@
     {{template "error-message" .}}
 
     <div class="actions">
-        <button class="primary right" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
+        <button class="primary" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
         {{if .LoginPolicy.AllowRegister}}
-            <button class="secondary right" name="register" value="true" formnovalidate>{{t "Actions.Register"}}</button>
+            <button class="secondary" name="register" value="true" formnovalidate>{{t "Actions.Register"}}</button>
         {{end}}
     </div>
 
     {{if .LoginPolicy.AllowExternalIDP}}
-        {{ $reqid := .AuthReqID}}
-        {{range $provider := .IDPProviders}}
-            <a href="{{ externalIDPAuthURL $reqid $provider.IDPConfigID}}" class="secondary idp-providers">
-                {{$provider.Name}}
-            </a>
-        {{end}}
+        <div class="actions idp-providers">
+            <p>{{t "Login.ExternalLogin"}}</p>
+
+            {{ $reqid := .AuthReqID}}
+            {{range $provider := .IDPProviders}}
+                <a href="{{ externalIDPAuthURL $reqid $provider.IDPConfigID}}" class="secondary idp-providers">
+                    {{$provider.Name}}
+                </a>
+            {{end}}
+        </div>
     {{end}}
 </form>
 

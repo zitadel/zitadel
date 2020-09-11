@@ -221,22 +221,25 @@ func (l *Login) getUserData(r *http.Request, authReq *model.AuthRequest, title s
 }
 
 func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title string, errType, errMessage string) baseData {
-	return baseData{
+	baseData := baseData{
 		errorData: errorData{
 			ErrType:    errType,
 			ErrMessage: errMessage,
 		},
-		Lang:         l.renderer.Lang(r).String(),
-		Title:        title,
-		Theme:        l.getTheme(authReq),
-		ThemeMode:    l.getThemeMode(r),
-		OrgID:        l.getOrgID(authReq),
-		AuthReqID:    getRequestID(authReq, r),
-		CSRF:         csrf.TemplateField(r),
-		Nonce:        http_mw.GetNonce(r),
-		LoginPolicy:  authReq.LoginPolicy,
-		IDPProviders: authReq.AllowedExternalIDPs,
+		Lang:      l.renderer.Lang(r).String(),
+		Title:     title,
+		Theme:     l.getTheme(authReq),
+		ThemeMode: l.getThemeMode(r),
+		OrgID:     l.getOrgID(authReq),
+		AuthReqID: getRequestID(authReq, r),
+		CSRF:      csrf.TemplateField(r),
+		Nonce:     http_mw.GetNonce(r),
 	}
+	if authReq != nil {
+		baseData.LoginPolicy = authReq.LoginPolicy
+		baseData.IDPProviders = authReq.AllowedExternalIDPs
+	}
+	return baseData
 }
 
 func (l *Login) getProfileData(authReq *model.AuthRequest) profileData {
@@ -270,8 +273,14 @@ func (l *Login) getThemeMode(r *http.Request) string {
 }
 
 func (l *Login) getOrgID(authReq *model.AuthRequest) string {
+	if authReq == nil {
+		return ""
+	}
 	if authReq.UserOrgID != "" {
 		return authReq.UserOrgID
+	}
+	if authReq.Request == nil {
+		return ""
 	}
 	switch request := authReq.Request.(type) {
 	case *model.AuthRequestOIDC:

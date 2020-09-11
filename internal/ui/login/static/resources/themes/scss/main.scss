@@ -73,7 +73,7 @@ a {
     }
 }
 
-button {
+button, a {
     background-color: $backgroundColor;
     color: $primaryColor;
     border: 2px solid $primaryColor;
@@ -84,6 +84,10 @@ button {
     transition: all 0.3s ease 0s;
     cursor: pointer;
     outline: none;
+    display: inline-block;
+    text-align: center;
+    line-height: 40px;
+
     &:hover {
         background-color: $primaryColorHover;
         color: $backgroundColor;
@@ -109,6 +113,8 @@ button {
         }
     }
 }
+
+
 
 input:not([type='radio']), select {
     background-color: $inputBackgroundColor;

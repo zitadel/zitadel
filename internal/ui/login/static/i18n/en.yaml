@@ -5,6 +5,7 @@ Login:
   DescriptionLinking: Enter your login data to link your external user with a ZITADEL user.
   Loginname: Loginname
   LoginnamePlaceHolder: username@domain
+  ExternalLogin: Login with an external user.
 
 UserSelection:
   Title: Select account

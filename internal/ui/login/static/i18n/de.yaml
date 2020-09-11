@@ -15,6 +15,7 @@ Login:
   DescriptionLinking: Gib deine Benutzerdaten ein um den externen Benutzer mit einem ZITADEL Benutzer zu linken.
   Loginname: Loginname
   LoginnamePlaceHolder: username@domain
+  ExternalLogin: Melde dich mit einem externen Benutzer an
 
 UserSelection:
   Title: Account auswählen
