@@ -24,6 +24,7 @@ import { ProjectGrantsDataSource } from './project-grants-datasource';
     ],
 })
 export class ProjectGrantsComponent implements OnInit, AfterViewInit {
+    @Input() refreshOnPreviousRoute: string = '';
     @Input() public projectId: string = '';
     @Input() public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;

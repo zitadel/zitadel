@@ -1,6 +1,7 @@
 {{template "main-top" .}}
 
 <h1>{{t "RegistrationOrg.Title"}}</h1>
+<p class="free-tier">{{t "RegistrationOrg.FreeTillEndOfYear"}}</p>
 <p>{{t "RegistrationOrg.Description"}}</p>
 
 <form action="{{ orgRegistrationUrl }}" method="POST">
@@ -53,6 +54,16 @@
         <div class="field">
             <label class="label" for="register-password-confirmation">{{t "RegistrationOrg.Password2"}}</label>
             <input class="input" type="password" id="register-password-confirmation" name="register-password-confirmation" autocomplete="new-password" required>
+        </div>
+        <div class="field">
+            <label class="label" for="register-term-confirmation">{{t "RegistrationOrg.Tos"}}</label>
+            <div class="field check-box">
+                <input class="input" type="checkbox" id="register-term-confirmation" name="register-term-confirmation" required>
+                <label for="register-term-confirmation">
+                    {{t "RegistrationOrg.TosConfirm"}}
+                    <a class="" target="_blank" href="{{t "RegistrationOrg.TosLink"}}">{{t "RegistrationOrg.TosLinkText"}}</a>
+                </label>
+            </div>
         </div>
     </div>
 

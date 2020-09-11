@@ -128,10 +128,15 @@ Registration:
   Diverse: diverse
   Password: Passwort
   Password2: Passwort wiederholen
+  Tos: Allgemeine Geschäftsbedingungen
+  TosConfirm: Ich akzeptiere die
+  TosLinkText: AGBs
+  TosLink: https://zitadel.ch/pdf/agb.pdf
 
 RegistrationOrg:
   Title: Organisations Registration
   Description: Gib deinen Organisationsnamen und deine Benutzerangaben an.
+  FreeTillEndOfYear: Wir bieten den premium Tier FORTRESS während der Einführungsphase bis zum Ende des Jahres 2020 gratis an.
   OrgName: Organisationsname
   OrgDomain: Domäne
   Email: E-Mail
@@ -147,6 +152,10 @@ RegistrationOrg:
   Diverse: diverse
   Password: Passwort
   Password2: Passwort wiederholen
+  Tos: Allgemeine Geschäftsbedingungen
+  TosConfirm: Ich akzeptiere die
+  TosLinkText: AGBs
+  TosLink: https://zitadel.ch/pdf/agb.pdf
 
 LogoutDone:
   Title: Ausgeloggt
