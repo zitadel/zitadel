@@ -164,12 +164,28 @@ func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateC
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ekuEA", "user must be type human")
 	}
 
+	aggregates := make([]*es_models.Aggregate, 0)
 	agg, err := UserAggregateOverwriteContext(ctx, aggCreator, user, resourceOwner, user.AggregateID)
 	if err != nil {
 		return nil, err
 	}
 
-	aggregates := make([]*es_models.Aggregate, 0)
+	agg, err = agg.AppendEvent(model.HumanRegistered, user)
+	if err != nil {
+		return nil, err
+	}
+	if initCode != nil {
+		agg, err = agg.AppendEvent(model.InitializedHumanCodeAdded, initCode)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if user.Email != nil && user.EmailAddress != "" && user.IsEmailVerified {
+		agg, err = agg.AppendEvent(model.HumanEmailVerified, nil)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	if externalIDP != nil {
 		validationQuery := es_models.NewSearchQuery().
@@ -198,22 +214,6 @@ func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateC
 		agg.SetPrecondition(validationQuery, validation)
 	}
 
-	agg, err = agg.AppendEvent(model.HumanRegistered, user)
-	if err != nil {
-		return nil, err
-	}
-	if initCode != nil {
-		agg, err = agg.AppendEvent(model.InitializedHumanCodeAdded, initCode)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if user.Email != nil && user.EmailAddress != "" && user.IsEmailVerified {
-		agg, err = agg.AppendEvent(model.HumanEmailVerified, nil)
-		if err != nil {
-			return nil, err
-		}
-	}
 	uniqueAggregates, err := getUniqueUserAggregates(ctx, aggCreator, user.UserName, user.EmailAddress, resourceOwner, userLoginMustBeDomain)
 	if err != nil {
 		return nil, err

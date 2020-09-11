@@ -50,7 +50,7 @@ func (u *Human) IsValid() bool {
 }
 
 func (u *Human) IsInitialState() bool {
-	return u.Email == nil || !u.IsEmailVerified || u.ExternalIDPs == nil || len(u.ExternalIDPs) == 0 && (u.Password == nil || u.SecretString == "")
+	return u.Email == nil || !u.IsEmailVerified || (u.ExternalIDPs == nil || len(u.ExternalIDPs) == 0) && (u.Password == nil || u.SecretString == "")
 }
 
 func (u *Human) IsOTPReady() bool {
