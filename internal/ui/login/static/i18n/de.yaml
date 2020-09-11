@@ -11,12 +11,16 @@ Password:
 Login:
   Title: Anmeldung
   Description: Gib deine Benutzerdaten ein.
+  TitleLinking: Anmeldung für Benutzer Linking
+  DescriptionLinking: Gib deine Benutzerdaten ein um den externen Benutzer mit einem ZITADEL Benutzer zu linken.
   Loginname: Loginname
   LoginnamePlaceHolder: username@domain
 
 UserSelection:
   Title: Account auswählen
   Description: Wähle deinen Account aus.
+  TitleLinking: Account auswählen um zu verlinken
+  DescriptionLinking: Wähle deinen Account, um diesen mit deinem externen Benutzer zu verlinken.
   OtherUser: Anderer Benutzer
   SessionState0: aktiv
   SessionState1: inaktiv

@@ -216,6 +216,7 @@ func (l *Login) getUserData(r *http.Request, authReq *model.AuthRequest, title s
 	return userData{
 		baseData:    l.getBaseData(r, authReq, title, errType, errMessage),
 		profileData: l.getProfileData(authReq),
+		Linking:     len(authReq.LinkingUsers) > 0,
 	}
 }
 
@@ -329,6 +330,7 @@ type userData struct {
 	PasswordChecked     string
 	MfaProviders        []model.MfaType
 	SelectedMfaProvider model.MfaType
+	Linking             bool
 }
 
 type profileData struct {
@@ -349,7 +351,8 @@ type passwordData struct {
 
 type userSelectionData struct {
 	baseData
-	Users []model.UserSelection
+	Users   []model.UserSelection
+	Linking bool
 }
 
 type mfaData struct {

@@ -1,12 +1,16 @@
 Login:
   Title: Login
   Description: Enter your logindata.
+  TitleLinking: Login for userlinking
+  DescriptionLinking: Enter your login data to link your external user with a ZITADEL user.
   Loginname: Loginname
   LoginnamePlaceHolder: username@domain
 
 UserSelection:
   Title: Select account
   Description: Select your account.
+  TitleLinking: Select account for userlinking
+  DescriptionLinking: Select your account to link with your external user.
   OtherUser: Other User
   SessionState0: active
   SessionState1: inactive
