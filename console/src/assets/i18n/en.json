@@ -165,7 +165,7 @@
             },
             "ADDED": {
                 "TITLE":"The key was created",
-                "DESCRIPTION":"Download the key as it won't be visible after closing the dialog!"
+                "DESCRIPTION":"Download the key as it won't be visible after closing this dialog!"
             },
             "KEYTYPES": {
                 "1":"JSON"
