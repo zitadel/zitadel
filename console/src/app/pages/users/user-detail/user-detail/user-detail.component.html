@@ -102,7 +102,7 @@
                         <mat-form-field class="name">
                             <mat-label>{{ 'USER.EMAIL' | translate }}</mat-label>
                             <input matInput
-                                *ngIf="user.human && user?.human?.email !== undefined && user?.human?.email !== null"
+                                *ngIf="user.human && user.human.email !== undefined && user.human.email !== null"
                                 [(ngModel)]="user.human.email" />
                         </mat-form-field>
                         <button (click)="emailEditState = false" mat-icon-button>
@@ -145,7 +145,7 @@
                     <ng-template #phoneEdit>
                         <mat-form-field class="name">
                             <mat-label>{{ 'USER.PHONE' | translate }}</mat-label>
-                            <input *ngIf="user.human && user?.human?.phone !== undefined && user?.human?.phone !== null"
+                            <input *ngIf="user.human && user.human.phone !== undefined && user.human.phone !== null"
                                 matInput [disabled]="(canWrite$ | async) == false" [(ngModel)]="user.human.phone" />
                         </mat-form-field>
                         <button matTooltip="{{ 'ACTIONS.CLOSE' | translate }}" (click)="phoneEditState = false"
