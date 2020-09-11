@@ -52,6 +52,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             const { id } = params;
             this.mgmtUserService.GetUserByID(id).then(user => {
                 this.user = user.toObject();
+                console.log(this.user);
             }).catch(err => {
                 console.error(err);
             });
