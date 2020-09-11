@@ -7,7 +7,7 @@ description: A quick-start reference for the impatient reader.
 
 ### Try ZITADEL
 
-Either use ZITADEL.ch or deploy a dedicated instance.
+Either use [ZITADEL.ch](https://zitadel.ch) or deploy a dedicated instance.
 
 ### Use ZITADEL.ch
 
