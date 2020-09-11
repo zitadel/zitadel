@@ -2335,7 +2335,7 @@ func TestExternalIDPRemovedAggregates(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ExternalIDPRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.user, tt.args.externalIDP)
+			got, err := ExternalIDPRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.user, tt.args.externalIDP, false)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got %T: %v", err, err)
 			}
