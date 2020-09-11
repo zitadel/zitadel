@@ -728,6 +728,37 @@ func (es *UserEventstore) AddExternalIDP(ctx context.Context, externalIDP *usr_m
 	return nil, errors.ThrowInternal(nil, "EVENT-Msi9d", "Errors.Internal")
 }
 
+func (es *UserEventstore) BulkAddExternalIDP(ctx context.Context, externalIDPs []*usr_model.ExternalIDP) error {
+	if externalIDPs == nil || len(externalIDPs) == 0 {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Ek9s", "Errors.User.ExternalIDP.MinimumExternalIDPNeeded")
+	}
+	for _, externalIDP := range externalIDPs {
+		if !externalIDP.IsValid() {
+			return caos_errs.ThrowPreconditionFailed(nil, "EVENT-idue3", "Errors.User.ExternalIDP.Invalid")
+		}
+	}
+	existingUser, err := es.UserByID(ctx, externalIDPs[0].AggregateID)
+	if err != nil {
+		return err
+	}
+	if existingUser.Human == nil {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Cnk8s", "Errors.User.NotHuman")
+	}
+	repoUser := model.UserFromModel(existingUser)
+	repoExternalIDPs := model.ExternalIDPsFromModel(externalIDPs)
+	aggregates, err := ExternalIDPAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoUser, repoExternalIDPs...)
+	if err != nil {
+		return err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, aggregates...)
+	if err != nil {
+		return err
+	}
+
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
 func (es *UserEventstore) RemoveExternalIDP(ctx context.Context, externalIDP *usr_model.ExternalIDP) error {
 	if externalIDP == nil || !externalIDP.IsValid() {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-Cm8sj", "Errors.User.ExternalIDP.Invalid")

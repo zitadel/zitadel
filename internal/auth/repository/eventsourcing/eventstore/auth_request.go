@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
@@ -293,7 +294,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *model.
 		user, err = repo.View.UserByLoginNameAndResourceOwner(loginName, orgID)
 	} else {
 		user, err = repo.View.UserByLoginName(loginName)
-		if err != nil {
+		if err == nil {
 			err = repo.checkLoginPolicyWithResourceOwner(ctx, request, user)
 			if err != nil {
 				return err
@@ -420,7 +421,10 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 	}
 
 	if len(request.LinkingUsers) != 0 {
-
+		err = repo.linkExternalIDPs(ctx, request)
+		if err != nil {
+			return nil, err
+		}
 	}
 	//PLANNED: consent step
 	return append(steps, &model.RedirectToCallbackStep{}), nil
@@ -441,6 +445,24 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *model.AuthRequest) (
 		}
 	}
 	return users, nil
+}
+
+func (repo *AuthRequestRepo) linkExternalIDPs(ctx context.Context, request *model.AuthRequest) error {
+	externalIDPs := make([]*user_model.ExternalIDP, len(request.LinkingUsers))
+	for i, linkingUser := range request.LinkingUsers {
+		externalIDP := &user_model.ExternalIDP{
+			ObjectRoot:  es_models.ObjectRoot{AggregateID: request.UserID},
+			IDPConfigID: linkingUser.IDPConfigID,
+			UserID:      linkingUser.ExternalUserID,
+			DisplayName: linkingUser.DisplayName,
+		}
+		externalIDPs[i] = externalIDP
+	}
+	data := authz.CtxData{
+		UserID: "LOGIN",
+		OrgID:  request.UserOrgID,
+	}
+	return repo.UserEvents.BulkAddExternalIDP(authz.SetCtxData(ctx, data), externalIDPs)
 }
 
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *model.AuthRequest, user *user_model.UserView) (model.NextStep, bool) {

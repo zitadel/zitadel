@@ -48,6 +48,7 @@ Errors:
       Invalid: Externer IDP ungültig
       IDPConfigNotExisting: IDP Provider ungültig für diese Organisation
       NotAllowed: Externer IDP ist auf dieser Organisation nicht erlaubt.
+      MinimumExternalIDPNeeded: Mindestens ein IDP muss hinzugefügt werden.
     Mfa:
       Otp:
         AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet

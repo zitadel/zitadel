@@ -48,6 +48,7 @@ Errors:
       Invalid: Externer IDP invalid
       IDPConfigNotExisting: IDP provider invalid for this organisation
       NotAllowed: External IDP not allowed on this organisation
+      MinimumExternalIDPNeeded: At least one IDP must be added
     Mfa:
       Otp:
         AlreadyReady: Multifactor OTP (OneTimePassword) is already set up
@@ -100,7 +101,7 @@ Errors:
     MemberInvalid: Project member is invalid
     MemberAlreadyExists: Project member already exists
     MemberNotExisting: Project member doesn't exist
-    MinimumOneRoleNeeded: At least one role should be added
+    MinimumOneRoleNeeded: At least one role must be added
     RoleAlreadyExists: Role already exists
     RoleInvalid: Role is invalid
     RoleNotExisting: Role doesn't exist

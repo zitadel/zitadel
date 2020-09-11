@@ -177,10 +177,10 @@ func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateC
 			AggregateIDsFilter()
 
 		if !userLoginMustBeDomain {
-			validation := addUserNameAndIDPConfigExistingValidation(user.UserName, externalIDP.IDPConfigID)
+			validation := addUserNameAndIDPConfigExistingValidation(user.UserName, externalIDP)
 			agg.SetPrecondition(validationQuery, validation)
 		} else {
-			validation := addIDPConfigExistingValidation(externalIDP.IDPConfigID)
+			validation := addIDPConfigExistingValidation(externalIDP)
 			agg.SetPrecondition(validationQuery, validation)
 		}
 
@@ -741,8 +741,8 @@ func DomainClaimedSentAggregate(aggCreator *es_models.AggregateCreator, user *mo
 	}
 }
 
-func ExternalIDPAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, externalIDP *model.ExternalIDP) ([]*es_models.Aggregate, error) {
-	if externalIDP == nil {
+func ExternalIDPAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, externalIDPs ...*model.ExternalIDP) ([]*es_models.Aggregate, error) {
+	if externalIDPs == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Di9os", "Errors.Internal")
 	}
 	aggregates := make([]*es_models.Aggregate, 0)
@@ -754,15 +754,16 @@ func ExternalIDPAddedAggregate(ctx context.Context, aggCreator *es_models.Aggreg
 		AggregateTypeFilter(org_es_model.OrgAggregate, iam_es_model.IAMAggregate).
 		AggregateIDsFilter()
 
-	validation := addIDPConfigExistingValidation(externalIDP.IDPConfigID)
+	validation := addIDPConfigExistingValidation(externalIDPs...)
 	agg.SetPrecondition(validationQuery, validation)
-	agg, err = agg.AppendEvent(model.HumanExternalIDPAdded, externalIDP)
-
-	uniqueAggregate, err := reservedUniqueExternalIDPAggregate(ctx, aggCreator, "", externalIDP)
-	if err != nil {
-		return nil, err
+	for _, externalIDP := range externalIDPs {
+		agg, err = agg.AppendEvent(model.HumanExternalIDPAdded, externalIDP)
+		uniqueAggregate, err := reservedUniqueExternalIDPAggregate(ctx, aggCreator, "", externalIDP)
+		if err != nil {
+			return nil, err
+		}
+		aggregates = append(aggregates, uniqueAggregate)
 	}
-	aggregates = append(aggregates, uniqueAggregate)
 	return append(aggregates, agg), nil
 }
 
@@ -906,7 +907,7 @@ func handleCheckDomainAllowedAsUsername(domains []*org_es_model.OrgDomain, userN
 	return nil
 }
 
-func addIDPConfigExistingValidation(idpConfigID string) func(...*es_models.Event) error {
+func addIDPConfigExistingValidation(externalIDPs ...*model.ExternalIDP) func(...*es_models.Event) error {
 	return func(events ...*es_models.Event) error {
 		iamLoginPolicy := new(iam_es_model.LoginPolicy)
 		orgPolicyExisting := false
@@ -919,33 +920,47 @@ func addIDPConfigExistingValidation(idpConfigID string) func(...*es_models.Event
 				handleIAMLoginPolicy(event, iamLoginPolicy)
 			}
 		}
-		return handleIDPConfigExisting(iamLoginPolicy, orgLoginPolicy, orgPolicyExisting, idpConfigID)
+		return handleIDPConfigExisting(iamLoginPolicy, orgLoginPolicy, orgPolicyExisting, externalIDPs...)
 	}
 }
 
-func handleIDPConfigExisting(iamLoginPolicy, orgLoginPolicy *iam_es_model.LoginPolicy, orgPolicyExisting bool, idpConfigID string) error {
+func handleIDPConfigExisting(iamLoginPolicy, orgLoginPolicy *iam_es_model.LoginPolicy, orgPolicyExisting bool, externalIDPs ...*model.ExternalIDP) error {
 	if orgPolicyExisting {
 		if !orgLoginPolicy.AllowExternalIdp {
 			return errors.ThrowPreconditionFailed(nil, "EVENT-Wmi9s", "Errors.User.ExternalIDP.NotAllowed")
 		}
-		for _, provider := range orgLoginPolicy.IDPProviders {
-			if provider.IDPConfigID == idpConfigID {
-				return nil
+		for _, externalIDP := range externalIDPs {
+			existing := false
+			for _, provider := range orgLoginPolicy.IDPProviders {
+				if provider.IDPConfigID == externalIDP.IDPConfigID {
+					existing = true
+					break
+				}
+			}
+			if !existing {
+				return errors.ThrowPreconditionFailed(nil, "EVENT-Ms9it", "Errors.User.ExternalIDP.IDPConfigNotExisting")
 			}
 		}
 	}
 	if !iamLoginPolicy.AllowExternalIdp {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-Ns7uf", "Errors.User.ExternalIDP.NotAllowed")
 	}
-	for _, provider := range iamLoginPolicy.IDPProviders {
-		if provider.IDPConfigID == idpConfigID {
-			return nil
+	for _, externalIDP := range externalIDPs {
+		existing := false
+		for _, provider := range iamLoginPolicy.IDPProviders {
+			if provider.IDPConfigID == externalIDP.IDPConfigID {
+				existing = true
+				break
+			}
+		}
+		if !existing {
+			return errors.ThrowPreconditionFailed(nil, "EVENT-Ms9it", "Errors.User.ExternalIDP.IDPConfigNotExisting")
 		}
 	}
-	return errors.ThrowPreconditionFailed(nil, "EVENT-Wmi9s", "Errors.User.ExternalIDP.IDPConfigNotExisting")
+	return nil
 }
 
-func addUserNameAndIDPConfigExistingValidation(userName, idpConfigID string) func(...*es_models.Event) error {
+func addUserNameAndIDPConfigExistingValidation(userName string, externalIDP *model.ExternalIDP) func(...*es_models.Event) error {
 	return func(events ...*es_models.Event) error {
 		domains := make([]*org_es_model.OrgDomain, 0)
 		iamLoginPolicy := new(iam_es_model.LoginPolicy)
@@ -966,7 +981,7 @@ func addUserNameAndIDPConfigExistingValidation(userName, idpConfigID string) fun
 		if err != nil {
 			return err
 		}
-		return handleIDPConfigExisting(iamLoginPolicy, orgLoginPolicy, orgPolicyExisting, idpConfigID)
+		return handleIDPConfigExisting(iamLoginPolicy, orgLoginPolicy, orgPolicyExisting, externalIDP)
 	}
 }
 
