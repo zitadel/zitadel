@@ -55,7 +55,7 @@
                             <mat-icon class="icon" *ngIf="user?.human?.isEmailVerified" color="primary"
                                 aria-hidden="false" aria-label="verified icon">
                                 check_circle_outline</mat-icon>
-                            <ng-container *ngIf="user.human && user?.human?.email && !user?.human?.isEmailVerified">
+                            <ng-container *ngIf="user?.human?.email && !user?.human?.isEmailVerified">
                                 <mat-icon class="icon" color="warn" aria-hidden="false" aria-label="not verified icon">
                                     highlight_off
                                 </mat-icon>
