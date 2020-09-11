@@ -100,6 +100,9 @@ export class MembershipsComponent implements OnInit {
                 return this.adminService.AddIamMember(user.id, roles);
             })).then(() => {
                 this.toast.showInfo('IAM.TOAST.MEMBERADDED', true);
+                setTimeout(() => {
+                    this.loadManager(this.user.id);
+                }, 1000);
             }).catch(error => {
                 this.toast.showError(error);
             });
@@ -115,6 +118,9 @@ export class MembershipsComponent implements OnInit {
                 return this.mgmtService.AddMyOrgMember(user.id, roles);
             })).then(() => {
                 this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
+                setTimeout(() => {
+                    this.loadManager(this.user.id);
+                }, 1000);
             }).catch(error => {
                 this.toast.showError(error);
             });
@@ -134,6 +140,9 @@ export class MembershipsComponent implements OnInit {
                     roles,
                 ).then(() => {
                     this.toast.showInfo('PROJECT.TOAST.MEMBERADDED', true);
+                    setTimeout(() => {
+                        this.loadManager(this.user.id);
+                    }, 1000);
                 }).catch(error => {
                     this.toast.showError(error);
                 });
@@ -150,6 +159,9 @@ export class MembershipsComponent implements OnInit {
                 return this.mgmtService.AddProjectMember(response.projectId, user.id, roles)
                     .then(() => {
                         this.toast.showInfo('PROJECT.TOAST.MEMBERADDED', true);
+                        setTimeout(() => {
+                            this.loadManager(this.user.id);
+                        }, 1000);
                     }).catch(error => {
                         this.toast.showError(error);
                     });
