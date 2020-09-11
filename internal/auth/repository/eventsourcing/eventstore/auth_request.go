@@ -15,6 +15,7 @@ import (
 	cache "github.com/caos/zitadel/internal/auth_request/repository"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/id"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
@@ -33,6 +34,8 @@ type AuthRequestRepo struct {
 	UserViewProvider        userViewProvider
 	UserEventProvider       userEventProvider
 	OrgViewProvider         orgViewProvider
+	LoginPolicyViewProvider loginPolicyViewProvider
+	IDPProviderViewProvider idpProviderViewProvider
 
 	IdGenerator id.Generator
 
@@ -52,8 +55,17 @@ type userViewProvider interface {
 	UserByID(string) (*user_view_model.UserView, error)
 }
 
+type loginPolicyViewProvider interface {
+	LoginPolicyByAggregateID(string) (*iam_view_model.LoginPolicyView, error)
+}
+
+type idpProviderViewProvider interface {
+	IDPProvidersByAggregateID(string) ([]*iam_view_model.IDPProviderView, error)
+}
+
 type userEventProvider interface {
 	UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error)
+	BulkAddExternalIDPs(ctx context.Context, externalIDPs []*user_model.ExternalIDP) error
 }
 
 type orgViewProvider interface {
@@ -260,7 +272,7 @@ func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, 
 	if !policy.AllowExternalIDP {
 		return policy, nil, nil
 	}
-	idpProviders, err := repo.getLoginPolicyIDPProviders(ctx, orgID, policy.Default)
+	idpProviders, err := getLoginPolicyIDPProviders(repo.IDPProviderViewProvider, repo.SystemDefaults.IamID, orgID, policy.Default)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -421,7 +433,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 	}
 
 	if len(request.LinkingUsers) != 0 {
-		err = repo.linkExternalIDPs(ctx, request)
+		err = linkExternalIDPs(ctx, repo.UserEventProvider, request)
 		if err != nil {
 			return nil, err
 		}
@@ -445,24 +457,6 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *model.AuthRequest) (
 		}
 	}
 	return users, nil
-}
-
-func (repo *AuthRequestRepo) linkExternalIDPs(ctx context.Context, request *model.AuthRequest) error {
-	externalIDPs := make([]*user_model.ExternalIDP, len(request.LinkingUsers))
-	for i, linkingUser := range request.LinkingUsers {
-		externalIDP := &user_model.ExternalIDP{
-			ObjectRoot:  es_models.ObjectRoot{AggregateID: request.UserID},
-			IDPConfigID: linkingUser.IDPConfigID,
-			UserID:      linkingUser.ExternalUserID,
-			DisplayName: linkingUser.DisplayName,
-		}
-		externalIDPs[i] = externalIDP
-	}
-	data := authz.CtxData{
-		UserID: "LOGIN",
-		OrgID:  request.UserOrgID,
-	}
-	return repo.UserEvents.BulkAddExternalIDP(authz.SetCtxData(ctx, data), externalIDPs)
 }
 
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *model.AuthRequest, user *user_model.UserView) (model.NextStep, bool) {
@@ -523,15 +517,15 @@ func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (
 	return iam_es_model.LoginPolicyViewToModel(policy), err
 }
 
-func (repo *AuthRequestRepo) getLoginPolicyIDPProviders(ctx context.Context, orgID string, defaultPolicy bool) ([]*iam_model.IDPProviderView, error) {
+func getLoginPolicyIDPProviders(provider idpProviderViewProvider, iamID, orgID string, defaultPolicy bool) ([]*iam_model.IDPProviderView, error) {
 	if defaultPolicy {
-		idpProviders, err := repo.View.IDPProvidersByAggregateID(repo.SystemDefaults.IamID)
+		idpProviders, err := provider.IDPProvidersByAggregateID(iamID)
 		if err != nil {
 			return nil, err
 		}
 		return iam_es_model.IDPProviderViewsToModel(idpProviders), nil
 	}
-	idpProviders, err := repo.View.IDPProvidersByAggregateID(orgID)
+	idpProviders, err := provider.IDPProvidersByAggregateID(orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -637,6 +631,24 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 		}
 	}
 	return user_view_model.UserToModel(&userCopy), nil
+}
+
+func linkExternalIDPs(ctx context.Context, userEventProvider userEventProvider, request *model.AuthRequest) error {
+	externalIDPs := make([]*user_model.ExternalIDP, len(request.LinkingUsers))
+	for i, linkingUser := range request.LinkingUsers {
+		externalIDP := &user_model.ExternalIDP{
+			ObjectRoot:  es_models.ObjectRoot{AggregateID: request.UserID},
+			IDPConfigID: linkingUser.IDPConfigID,
+			UserID:      linkingUser.ExternalUserID,
+			DisplayName: linkingUser.DisplayName,
+		}
+		externalIDPs[i] = externalIDP
+	}
+	data := authz.CtxData{
+		UserID: "LOGIN",
+		OrgID:  request.UserOrgID,
+	}
+	return userEventProvider.BulkAddExternalIDPs(authz.SetCtxData(ctx, data), externalIDPs)
 }
 
 func linkingIDPConfigExistingInAllowedIDPs(linkingUsers []*model.ExternalUser, idpProviders []*iam_model.IDPProviderView) bool {

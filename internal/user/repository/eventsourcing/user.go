@@ -6,7 +6,6 @@ import (
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	"strings"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
