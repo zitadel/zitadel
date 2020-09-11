@@ -1,16 +1,15 @@
 package view
 
 import (
-	global_model "github.com/caos/zitadel/internal/model"
 	"time"
 
-	"github.com/jinzhu/gorm"
-	"github.com/lib/pq"
-
 	"github.com/caos/zitadel/internal/errors"
+	global_model "github.com/caos/zitadel/internal/model"
 	token_model "github.com/caos/zitadel/internal/token/model"
 	"github.com/caos/zitadel/internal/token/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
+	"github.com/jinzhu/gorm"
+	"github.com/lib/pq"
 )
 
 func TokenByID(db *gorm.DB, table, tokenID string) (*model.Token, error) {
@@ -18,7 +17,7 @@ func TokenByID(db *gorm.DB, table, tokenID string) (*model.Token, error) {
 	query := repository.PrepareGetByKey(table, model.TokenSearchKey(token_model.TokenSearchKeyTokenID), tokenID)
 	err := query(db, token)
 	if errors.IsNotFound(err) {
-		return nil, errors.ThrowNotFound(nil, "VIEW-Nqwf1", "Errors.Token.NotFound")
+		return nil, errors.ThrowNotFound(nil, "VIEW-6ub3p", "Errors.Token.NotFound")
 	}
 	return token, err
 }
