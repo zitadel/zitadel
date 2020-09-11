@@ -100,7 +100,10 @@ export class MachineKeysComponent implements OnInit {
                     console.log(this.userId, type, date);
                     return this.userService.AddMachineKey(this.userId, type, date).then((response) => {
                         if (response) {
-                            console.log(response.toObject());
+                            setTimeout(() => {
+                                this.refreshPage();
+                            }, 1000);
+
                             this.dialog.open(ShowKeyDialogComponent, {
                                 data: {
                                     key: response.toObject(),
