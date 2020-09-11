@@ -17,7 +17,7 @@
 
     <mat-form-field class="full-width" appearance="outline">
         <mat-label>{{ 'LOGINPOLICY.ADDIDP.SELECTIDPS' | translate }}</mat-label>
-        <mat-select [(ngModel)]="idp" (selectionChange)="loadIdps()">
+        <mat-select [(ngModel)]="idp">
             <mat-option *ngFor="let idp of availableIdps" [value]="idp">
                 {{ idp.name }}
             </mat-option>
