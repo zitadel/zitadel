@@ -37,7 +37,6 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
     }
 
     public ngOnChanges(): void {
-        console.log('disabled');
         this.profileForm = this.fb.group({
             userName: [{ value: '', disabled: true }, [
                 Validators.required,
