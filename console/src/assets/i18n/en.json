@@ -108,6 +108,10 @@
                 "1": "Not Ready",
                 "2": "Ready",
                 "3": "Deleted"
+            },
+            "DIALOG": {
+                "OTP_DELETE_TITLE":"Remove OTP Factor",
+                "OTP_DELETE_DESCRIPTION":"You are about to delete OTP as second factor. Are you sure?"
             }
         },
         "CREATE": {

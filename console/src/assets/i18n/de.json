@@ -108,6 +108,10 @@
                 "1": "Nicht bereit",
                 "2": "Bereit",
                 "3": "Gelöscht"
+            },
+            "DIALOG": {
+                "OTP_DELETE_TITLE":"OTP Faktor entfernen",
+                "OTP_DELETE_DESCRIPTION":"Sie sind im Begriff OTP als Zweitfaktormethode zu entfernen. Sind sie sicher?"
             }
         },
         "CREATE": {
