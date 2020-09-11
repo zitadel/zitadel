@@ -4,8 +4,8 @@
   import Icon from "./Icon.svelte";
   import manifest from '../../static/manifest.json';
   export let owner = "caos";
-  export let project = "zitadel/site";
-  export let path = "/docs";
+  export let project = "zitadel";
+  export let path = "site/docs";
   export let dir = "";
   export let edit_title = "edit this section";
   export let sections;
