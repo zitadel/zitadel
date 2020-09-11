@@ -386,18 +386,20 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 		return nil, err
 	}
 
-	if user.InitRequired {
-		return append(steps, &model.InitUserStep{PasswordSet: user.PasswordSet}), nil
-	}
-	if !user.PasswordSet {
-		return append(steps, &model.InitPasswordStep{}), nil
-	}
+	if request.SelectedIDPConfigID == "" {
+		if user.InitRequired {
+			return append(steps, &model.InitUserStep{PasswordSet: user.PasswordSet}), nil
+		}
+		if !user.PasswordSet {
+			return append(steps, &model.InitPasswordStep{}), nil
+		}
 
-	if !checkVerificationTime(userSession.PasswordVerification, repo.PasswordCheckLifeTime) {
-		return append(steps, &model.PasswordStep{}), nil
+		if !checkVerificationTime(userSession.PasswordVerification, repo.PasswordCheckLifeTime) {
+			return append(steps, &model.PasswordStep{}), nil
+		}
+		request.PasswordVerified = true
+		request.AuthTime = userSession.PasswordVerification
 	}
-	request.PasswordVerified = true
-	request.AuthTime = userSession.PasswordVerification
 
 	if step, ok := repo.mfaChecked(userSession, request, user); !ok {
 		return append(steps, step), nil

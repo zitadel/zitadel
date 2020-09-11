@@ -172,9 +172,6 @@ func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateC
 	aggregates := make([]*es_models.Aggregate, 0)
 
 	if externalIDP != nil {
-		if externalIDP == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Di9os", "Errors.Internal")
-		}
 		validationQuery := es_models.NewSearchQuery().
 			AggregateTypeFilter(org_es_model.OrgAggregate, iam_es_model.IAMAggregate).
 			AggregateIDsFilter()

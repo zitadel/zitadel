@@ -14,7 +14,7 @@ import (
 func ExternalIDPByExternalUserIDAndIDPConfigID(db *gorm.DB, table, externalUserID, idpConfigID string) (*model.ExternalIDPView, error) {
 	user := new(model.ExternalIDPView)
 	userIDQuery := &model.ExternalIDPSearchQuery{
-		Key:    usr_model.ExternalIDPSearchKeyUserID,
+		Key:    usr_model.ExternalIDPSearchKeyExternalUserID,
 		Method: global_model.SearchMethodEquals,
 		Value:  externalUserID,
 	}

@@ -213,6 +213,7 @@ func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_mod
 		if !externalIDP.IsValid() {
 			return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-4Dj9s", "Errors.User.ExternalIDP.Invalid")
 		}
+		user.ExternalIDPs = append(user.ExternalIDPs, externalIDP)
 	}
 	err = user.HashPasswordIfExisting(policy, es.PasswordAlg, false)
 	if err != nil {

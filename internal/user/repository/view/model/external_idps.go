@@ -14,7 +14,7 @@ const (
 	ExternalIDPKeyExternalUserID = "external_user_id"
 	ExternalIDPKeyUserID         = "user_id"
 	ExternalIDPKeyIDPConfigID    = "idp_config_id"
-	ExternalIDPKeyResourceOwner  = "idp_config_id"
+	ExternalIDPKeyResourceOwner  = "resource_owner"
 )
 
 type ExternalIDPView struct {
