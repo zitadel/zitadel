@@ -85,6 +85,9 @@ export class IamMembersComponent implements AfterViewInit {
     public removeMember(member: ProjectMember.AsObject): void {
         this.adminService.RemoveIamMember(member.userId).then(() => {
             this.toast.showInfo('IAM.TOAST.MEMBERREMOVED', true);
+            setTimeout(() => {
+                this.refreshPage();
+            }, 1000);
         }).catch(error => {
             this.toast.showError(error);
         });
@@ -120,6 +123,9 @@ export class IamMembersComponent implements AfterViewInit {
                         return this.adminService.AddIamMember(user.id, roles);
                     })).then(() => {
                         this.toast.showInfo('IAM.TOAST.MEMBERADDED', true);
+                        setTimeout(() => {
+                            this.refreshPage();
+                        }, 1000);
                     }).catch(error => {
                         this.toast.showError(error);
                     });

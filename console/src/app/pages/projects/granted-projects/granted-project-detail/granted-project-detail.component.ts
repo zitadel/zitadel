@@ -152,6 +152,9 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
                             roles,
                         ).then(() => {
                             this.toast.showInfo('PROJECT.TOAST.MEMBERADDED', true);
+                            setTimeout(() => {
+                                this.loadMembers();
+                            }, 1000);
                         }).catch(error => {
                             this.toast.showError(error);
                         });

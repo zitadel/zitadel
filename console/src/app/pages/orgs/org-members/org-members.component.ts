@@ -82,7 +82,11 @@ export class OrgMembersComponent implements AfterViewInit {
             }).catch(error => {
                 this.toast.showError(error);
             });
-        }));
+        })).then(() => {
+            setTimeout(() => {
+                this.refreshPage();
+            }, 1000);
+        });
     }
 
     public isAllSelected(): boolean {
@@ -115,6 +119,9 @@ export class OrgMembersComponent implements AfterViewInit {
                         return this.mgmtService.AddMyOrgMember(user.id, roles);
                     })).then(() => {
                         this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
+                        setTimeout(() => {
+                            this.refreshPage();
+                        }, 1000);
                     }).catch(error => {
                         this.toast.showError(error);
                     });
