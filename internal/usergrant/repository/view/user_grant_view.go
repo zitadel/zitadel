@@ -139,6 +139,6 @@ func PutUserGrants(db *gorm.DB, table string, grants ...*model.UserGrantView) er
 }
 
 func DeleteUserGrant(db *gorm.DB, table, grantID string) error {
-	delete := repository.PrepareDeleteByKey(table, model.UserGrantSearchKey(grant_model.UserGrantSearchKeyGrantID), grantID)
+	delete := repository.PrepareDeleteByKey(table, model.UserGrantSearchKey(grant_model.UserGrantSearchKeyID), grantID)
 	return delete(db)
 }
