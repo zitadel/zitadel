@@ -19,6 +19,7 @@ import { UserType } from '../user-list.component';
 export class UserTableComponent implements OnInit {
     public UserType: any = UserType;
     @Input() userType: UserType = UserType.HUMAN;
+    @Input() refreshOnPreviousRoute: string = '';
     @Input() disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     public dataSource: MatTableDataSource<UserView.AsObject> = new MatTableDataSource<UserView.AsObject>();

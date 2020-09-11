@@ -24,6 +24,7 @@ import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource
 })
 export class UserGrantsComponent implements OnInit, AfterViewInit {
     @Input() context: UserGrantContext = UserGrantContext.USER;
+    @Input() refreshOnPreviousRoute: string = '';
     public grants: UserGrantView.AsObject[] = [];
 
     public dataSource!: UserGrantsDataSource;

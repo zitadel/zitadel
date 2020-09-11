@@ -1,5 +1,6 @@
 <app-refresh-table [loading]="dataSource?.loading$ | async" (refreshed)="changePage()"
-    [timestamp]="dataSource?.viewTimestamp" [dataSize]="dataSource?.totalResult" [selection]="selection">
+    [emitRefreshOnPreviousRoute]="refreshOnPreviousRoute" [timestamp]="dataSource?.viewTimestamp"
+    [dataSize]="dataSource?.totalResult" [selection]="selection">
     <button color="warn" matTooltip="{{'GRANTS.DELETE' | translate}}" class="icon-button" mat-icon-button actions
         (click)="deleteGrantSelection()" *ngIf="selection.hasValue() && allowDelete">
         <i class="las la-trash"></i>
@@ -21,9 +22,8 @@
                 <td class="selection" mat-cell *matCellDef="let row">
                     <mat-checkbox color="primary" (click)="$event.stopPropagation()"
                         (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
-                        <app-avatar *ngIf="row && (row?.displayName || (row.firstName && row.lastName))" class="avatar"
-                            [name]="row.displayName ? row.displayName : (row.firstName + ' '+ row.lastName)"
-                            [size]="32">
+                        <app-avatar *ngIf="row && row?.displayName && row.firstName && row.lastName" class="avatar"
+                            [name]="row.displayName" [size]="32">
                         </app-avatar>
                     </mat-checkbox>
                 </td>
@@ -33,7 +33,7 @@
             <ng-container matColumnDef="user">
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.USER' | translate }} </th>
                 <td class="pointer" mat-cell *matCellDef="let grant">
-                    {{grant?.firstName}} {{grant?.lastName}}</td>
+                    {{grant?.displayName}}</td>
             </ng-container>
 
             <ng-container matColumnDef="org">
