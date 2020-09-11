@@ -165,7 +165,7 @@
             },
             "ADDED": {
                 "TITLE":"Schlüssel wurde erstellt",
-                "DESCRIPTION":"Kopieren Sie den Schlüssen, Der Schlüssel kann später nicht nochmal aufgerufen werden!"
+                "DESCRIPTION":"Speichern Sie den Schlüssen. Der Schlüssel kann später nicht nochmal aufgerufen werden!"
             },
             "KEYTYPES": {
                 "1":"JSON"
