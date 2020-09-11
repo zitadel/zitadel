@@ -156,7 +156,7 @@ func HumanCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCr
 }
 
 func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, externalIDP *model.ExternalIDP, resourceOwner string, initCode *model.InitUserCode, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
-	if user == nil || resourceOwner == "" || initCode == nil {
+	if user == nil || resourceOwner == "" {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-duxk2", "user, resourceowner, initcode must be set")
 	}
 
@@ -202,15 +202,24 @@ func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateC
 	if err != nil {
 		return nil, err
 	}
-	agg, err = agg.AppendEvent(model.InitializedHumanCodeAdded, initCode)
-	if err != nil {
-		return nil, err
+	if initCode != nil {
+		agg, err = agg.AppendEvent(model.InitializedHumanCodeAdded, initCode)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if user.Email != nil && user.EmailAddress != "" && user.IsEmailVerified {
+		agg, err = agg.AppendEvent(model.HumanEmailVerified, nil)
+		if err != nil {
+			return nil, err
+		}
 	}
 	uniqueAggregates, err := getUniqueUserAggregates(ctx, aggCreator, user.UserName, user.EmailAddress, resourceOwner, userLoginMustBeDomain)
 	if err != nil {
 		return nil, err
 	}
-	return append(uniqueAggregates, agg), nil
+	aggregates = append(aggregates, uniqueAggregates...)
+	return append(aggregates, agg), nil
 }
 
 func getUniqueUserAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, userName, emailAddress, resourceOwner string, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {

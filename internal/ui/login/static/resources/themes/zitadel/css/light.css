@@ -139,7 +139,7 @@ a:hover {
   color: #5b8fd3;
 }
 
-button {
+button, a {
   background-color: #282828;
   color: #3574C6;
   border: 2px solid #3574C6;
@@ -150,25 +150,28 @@ button {
   transition: all 0.3s ease 0s;
   cursor: pointer;
   outline: none;
+  display: inline-block;
+  text-align: center;
+  line-height: 40px;
 }
-button:hover {
+button:hover, a:hover {
   background-color: #5b8fd3;
   color: #282828;
   border: 2px solid #5b8fd3;
 }
-button.primary {
+button.primary, a.primary {
   background-color: #3574C6;
   color: #BBBBC8;
   border: none;
 }
-button.primary:hover {
+button.primary:hover, a.primary:hover {
   background-color: #5b8fd3;
 }
-button:disabled {
+button:disabled, a:disabled {
   background-color: #505050;
   border: 2px solid #505050;
 }
-button:disabled:hover {
+button:disabled:hover, a:disabled:hover {
   background-color: #505050;
   border: 2px solid #505050;
 }
