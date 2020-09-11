@@ -491,6 +491,9 @@ func (es *IAMEventstore) PrepareRemoveIDPProviderFromLoginPolicy(ctx context.Con
 
 func (es *IAMEventstore) RemoveIDPProviderFromLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) error {
 	repoIam, removeAgg, err := es.PrepareRemoveIDPProviderFromLoginPolicy(ctx, provider)
+	if err != nil {
+		return err
+	}
 	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoIam.AppendEvents, removeAgg)
 	if err != nil {
 		return err
