@@ -178,7 +178,7 @@ func (h *Human) AppendEvent(event *es_models.Event) (err error) {
 		h.appendOTPRemovedEvent()
 	case HumanExternalIDPAdded:
 		err = h.appendExternalIDPAddedEvent(event)
-	case HumanExternalIDPRemoved:
+	case HumanExternalIDPRemoved, HumanExternalIDPCascadeRemoved:
 		err = h.appendExternalIDPRemovedEvent(event)
 	}
 	if err != nil {

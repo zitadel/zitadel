@@ -62,7 +62,7 @@ func (m *ExternalIDP) processUser(event *models.Event) (err error) {
 			return err
 		}
 		err = m.fillData(externalIDP)
-	case model.HumanExternalIDPRemoved:
+	case model.HumanExternalIDPRemoved, model.HumanExternalIDPCascadeRemoved:
 		err = externalIDP.SetData(event)
 		if err != nil {
 			return err

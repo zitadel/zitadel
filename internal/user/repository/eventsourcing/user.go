@@ -791,7 +791,7 @@ func ExternalIDPAddedAggregate(ctx context.Context, aggCreator *es_models.Aggreg
 	return append(aggregates, agg), nil
 }
 
-func ExternalIDPRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, externalIDP *model.ExternalIDP) ([]*es_models.Aggregate, error) {
+func ExternalIDPRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, externalIDP *model.ExternalIDP, cascade bool) ([]*es_models.Aggregate, error) {
 	if externalIDP == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Mlo0s", "Errors.Internal")
 	}
@@ -801,7 +801,11 @@ func ExternalIDPRemovedAggregate(ctx context.Context, aggCreator *es_models.Aggr
 	if err != nil {
 		return nil, err
 	}
-	agg, err = agg.AppendEvent(model.HumanExternalIDPRemoved, externalIDP)
+	if cascade {
+		agg, err = agg.AppendEvent(model.HumanExternalIDPCascadeRemoved, externalIDP)
+	} else {
+		agg, err = agg.AppendEvent(model.HumanExternalIDPRemoved, externalIDP)
+	}
 	uniqueReleasedAggregate, err := releasedUniqueExternalIDPAggregate(ctx, aggCreator, externalIDP)
 	if err != nil {
 		return nil, err

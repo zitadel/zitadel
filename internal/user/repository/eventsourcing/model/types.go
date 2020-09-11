@@ -87,8 +87,9 @@ const (
 	HumanExternalIDPReserved models.EventType = "user.human.externalidp.reserved"
 	HumanExternalIDPReleased models.EventType = "user.human.externalidp.released"
 
-	HumanExternalIDPAdded   models.EventType = "user.human.externalidp.added"
-	HumanExternalIDPRemoved models.EventType = "user.human.externalidp.removed"
+	HumanExternalIDPAdded          models.EventType = "user.human.externalidp.added"
+	HumanExternalIDPRemoved        models.EventType = "user.human.externalidp.removed"
+	HumanExternalIDPCascadeRemoved models.EventType = "user.human.externalidp.cascade.removed"
 
 	HumanEmailChanged            models.EventType = "user.human.email.changed"
 	HumanEmailVerified           models.EventType = "user.human.email.verified"
