@@ -572,6 +572,30 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			[]model.NextStep{&model.RedirectToCallbackStep{}},
 			nil,
 		},
+		{
+			"linking process, add external users, callback",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+				},
+				userEventProvider:        &mockEventUser{},
+				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{
+				&model.AuthRequest{
+					UserID:              "UserID",
+					SelectedIDPConfigID: "IDPConfigID",
+					LinkingUsers:        []*model.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "UserID", DisplayName: "DisplayName"}},
+				}, false},
+			[]model.NextStep{&model.RedirectToCallbackStep{}},
+			nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
