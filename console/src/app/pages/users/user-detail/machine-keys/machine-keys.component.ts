@@ -95,7 +95,7 @@ export class MachineKeysComponent implements OnInit {
                 if (type) {
                     console.log(this.userId, type, date);
                     return this.userService.AddMachineKey(this.userId, type, date).then(() => {
-                        this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
+                        this.toast.showInfo('USER.TOAST.KEYADDED', true);
                     }).catch((error: any) => {
                         this.toast.showError(error);
                     });

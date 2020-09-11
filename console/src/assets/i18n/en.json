@@ -250,7 +250,9 @@
             "DEACTIVATED":"User deactivated",
             "SELECTEDREACTIVATED":"Selected Users reactivated",
             "SELECTEDDEACTIVATED":"Selected Users deactivated",
-            "SELECTEDKEYSDELETED":"Selected Keys deleted!"
+            "SELECTEDKEYSDELETED":"Selected Keys deleted!",
+            "KEYADDED":"Key added!",
+            "MACHINEADDED":"Service User created!"
         },
         "MEMBERSHIPS": {
             "TITLE":"Zitadel Manager Roles",
@@ -625,6 +627,10 @@
             "1":"System",
             "2":"Organisation"
         },
+        "STATES":{
+            "0":"active",
+            "1":"inactive"
+        },
         "TYPE":"Type",
         "NAME":"Name",
         "CONFIG":"Configuration",
@@ -635,7 +641,10 @@
         "CLIENTID":"Client ID",
         "CLIENTSECRET":"Client Secret",
         "CREATIONDATE":"Created At",
-        "CHANGEDATE":"Last Modified"
+        "CHANGEDATE":"Last Modified",
+        "DEACTIVATE":"Deactivate",
+        "ACTIVATE":"Activate",
+        "DELETE":"Delete"
     },
     "LOGINPOLICY": {
         "CREATE": {

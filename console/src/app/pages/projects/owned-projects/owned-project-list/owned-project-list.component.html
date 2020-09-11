@@ -17,7 +17,7 @@
             </a>
         </ng-template>
         <div class="table-wrapper">
-            <table class="table background-style" mat-table [dataSource]="dataSource">
+            <table class="table" mat-table [dataSource]="dataSource">
                 <ng-container matColumnDef="select">
                     <th class="selection" mat-header-cell *matHeaderCellDef>
                         <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
@@ -66,8 +66,8 @@
                     [routerLink]="['/projects', row.projectId]"></tr>
 
             </table>
-            <mat-paginator class="paginator background-style" [length]="totalResult" [pageSize]="10"
-                [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
+            <mat-paginator class="paginator" [length]="totalResult" [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"
+                (page)="changePage($event)"></mat-paginator>
         </div>
     </app-refresh-table>
 </div>

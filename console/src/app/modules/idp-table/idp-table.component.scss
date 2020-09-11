@@ -37,3 +37,41 @@ tr {
 .add-button {
   border-radius: .5rem;
 }
+
+.avatar {
+    height: 30px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: black;
+    color: white;
+    
+    span {
+        font-size: 14px;
+        text-transform: uppercase;
+    }
+}
+
+.flex-row {
+    display: flex;
+    justify-content: space-between;
+
+    .key {
+        margin-right: 1rem;
+        font-size: 14px;
+    }
+
+    .value {
+        font-size: 14px;
+    }
+
+    &:first-child {
+        padding-top: .5rem;
+    }
+    
+    &:last-child {
+        padding-bottom: .5rem;
+    }
+}
