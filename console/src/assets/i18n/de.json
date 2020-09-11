@@ -155,12 +155,17 @@
             "KEYSDESC":"Definieren Sie Ihre Schlüssel mit einem optionalen Ablaufdatum",
             "ID":"Schlüssel Id",
             "TYPE":"Typ",
-            "EXPIRYDATE":"Ablaufdatum",
+            "EXPIRATIONDATE":"Ablaufdatum",
             "CHOOSEEXPIRY":"Definieren Sie ein Ablaufdatum",
             "CREATIONDATE":"Erstelldatum",
+            "KEYDETAILS":"Schlüssel Details",
             "ADD": {
                 "TITLE":"Schlüssel hinzufügen",
                 "DESCRIPTION":"Wählen Sie den Typ und selektieren Sie ein optionales Ablaufdatum."
+            },
+            "ADDED": {
+                "TITLE":"Schlüssel wurde erstellt",
+                "DESCRIPTION":"Speichern Sie den Schlüssen. Der Schlüssel kann später nicht nochmal aufgerufen werden!"
             },
             "KEYTYPES": {
                 "1":"JSON"

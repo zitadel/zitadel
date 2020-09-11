@@ -155,12 +155,17 @@
             "KEYSDESC":"Define your keys and add an optional expiration date.",
             "ID":"Key Id",
             "TYPE":"Type",
-            "EXPIRYDATE":"Expiration date",
+            "EXPIRATIONDATE":"Expiration date",
             "CHOOSEEXPIRY":"Select an expiration Date",
             "CREATIONDATE":"Creation Date",
+            "KEYDETAILS":"Key Details",
             "ADD": {
                 "TITLE":"Add Key",
                 "DESCRIPTION":"Select your key type and choose an optional expiry date."
+            },
+            "ADDED": {
+                "TITLE":"The key was created",
+                "DESCRIPTION":"Download the key as it won't be visible after closing this dialog!"
             },
             "KEYTYPES": {
                 "1":"JSON"
