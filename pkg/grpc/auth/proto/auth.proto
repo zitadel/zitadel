@@ -265,10 +265,20 @@ service AuthService {
   }
 
   //ExternalIDP
+  rpc SearchMyExternalIDPs(ExternalIDPSearchRequest) returns (ExternalIDPSearchResponse) {
+    option (google.api.http) = {
+      post: "/users/me/externalidps/_search"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
   rpc AddMyExternalIDP(ExternalIDPAddRequest) returns (ExternalIDPResponse) {
     option (google.api.http) = {
-      post: "/users/me/externalidps"
-      body: "*"
+      delete: "/users/me/externalidps"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
@@ -278,7 +288,7 @@ service AuthService {
 
   rpc RemoveMyExternalIDP(ExternalIDPRemoveRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/users/me/externalidps/{idp_config_id}/{user_id}"
+      delete: "/users/me/externalidps/{idp_config_id}/{external_user_id}"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
@@ -751,5 +761,30 @@ message ExternalIDPResponse {
 
 message ExternalIDPRemoveRequest {
   string idp_config_id = 1;
-  string user_id = 2;
+  string external_user_id = 2;
+}
+
+message ExternalIDPSearchRequest {
+  uint64 offset = 1;
+  uint64 limit = 2;
+  string user_id = 3;
+}
+
+message ExternalIDPSearchResponse {
+  uint64 offset = 1;
+  uint64 limit = 2;
+  uint64 total_result = 3;
+  repeated ExternalIDPView result = 4;
+  uint64 processed_sequence = 5;
+  google.protobuf.Timestamp view_timestamp = 6;
+}
+
+message ExternalIDPView {
+  string user_id = 1;
+  string idp_config_id = 2;
+  string external_user_id = 3;
+  string idp_name = 4;
+  string external_user_display_name = 5;
+  google.protobuf.Timestamp creation_date = 6;
+  google.protobuf.Timestamp change_date = 7;
 }

@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"encoding/json"
-
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
@@ -242,6 +241,13 @@ func updateAddressToModel(ctx context.Context, address *auth.UpdateUserAddressRe
 	}
 }
 
+func externalIDPSearchRequestToModel(request *auth.ExternalIDPSearchRequest) *usr_model.ExternalIDPSearchRequest {
+	return &usr_model.ExternalIDPSearchRequest{
+		Limit:  request.Limit,
+		Offset: request.Offset,
+	}
+}
+
 func externalIDPAddToModel(ctx context.Context, idp *auth.ExternalIDPAddRequest) *usr_model.ExternalIDP {
 	return &usr_model.ExternalIDP{
 		ObjectRoot:  models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
@@ -255,7 +261,7 @@ func externalIDPRemoveToModel(ctx context.Context, idp *auth.ExternalIDPRemoveRe
 	return &usr_model.ExternalIDP{
 		ObjectRoot:  models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
 		IDPConfigID: idp.IdpConfigId,
-		UserID:      idp.UserId,
+		UserID:      idp.ExternalUserId,
 	}
 }
 
@@ -264,6 +270,46 @@ func externalIDPResponseFromModel(idp *usr_model.ExternalIDP) *auth.ExternalIDPR
 		IdpConfigId: idp.IDPConfigID,
 		UserId:      idp.UserID,
 		DisplayName: idp.DisplayName,
+	}
+}
+
+func externalIDPSearchResponseFromModel(response *usr_model.ExternalIDPSearchResponse) *auth.ExternalIDPSearchResponse {
+	viewTimestamp, err := ptypes.TimestampProto(response.Timestamp)
+	logging.Log("GRPC-3h8is").OnError(err).Debug("unable to parse timestamp")
+
+	return &auth.ExternalIDPSearchResponse{
+		Offset:            response.Offset,
+		Limit:             response.Limit,
+		TotalResult:       response.TotalResult,
+		ProcessedSequence: response.Sequence,
+		ViewTimestamp:     viewTimestamp,
+		Result:            externalIDPViewsFromModel(response.Result),
+	}
+}
+
+func externalIDPViewsFromModel(externalIDPs []*usr_model.ExternalIDPView) []*auth.ExternalIDPView {
+	converted := make([]*auth.ExternalIDPView, len(externalIDPs))
+	for i, externalIDP := range externalIDPs {
+		converted[i] = externalIDPViewFromModel(externalIDP)
+	}
+	return converted
+}
+
+func externalIDPViewFromModel(externalIDP *usr_model.ExternalIDPView) *auth.ExternalIDPView {
+	creationDate, err := ptypes.TimestampProto(externalIDP.CreationDate)
+	logging.Log("GRPC-Sj8dw").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(externalIDP.ChangeDate)
+	logging.Log("GRPC-Nf8ue").OnError(err).Debug("unable to parse timestamp")
+
+	return &auth.ExternalIDPView{
+		UserId:                  externalIDP.UserID,
+		IdpConfigId:             externalIDP.IDPConfigID,
+		ExternalUserId:          externalIDP.ExternalUserID,
+		ExternalUserDisplayName: externalIDP.UserDisplayName,
+		IdpName:                 externalIDP.IDPName,
+		CreationDate:            creationDate,
+		ChangeDate:              changeDate,
 	}
 }
 

@@ -122,6 +122,14 @@ func (s *Server) ChangeMyPassword(ctx context.Context, request *auth.PasswordCha
 	return &empty.Empty{}, err
 }
 
+func (s *Server) SearchMyExternalIDPs(ctx context.Context, request *auth.ExternalIDPSearchRequest) (*auth.ExternalIDPSearchResponse, error) {
+	externalIDP, err := s.repo.SearchMyExternalIDPs(ctx, externalIDPSearchRequestToModel(request))
+	if err != nil {
+		return nil, err
+	}
+	return externalIDPSearchResponseFromModel(externalIDP), nil
+}
+
 func (s *Server) AddMyExternalIDP(ctx context.Context, request *auth.ExternalIDPAddRequest) (*auth.ExternalIDPResponse, error) {
 	externalIDP, err := s.repo.AddMyExternalIDP(ctx, externalIDPAddToModel(ctx, request))
 	if err != nil {

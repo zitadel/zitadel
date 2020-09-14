@@ -181,6 +181,31 @@ func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_mode
 	return user.GetProfile()
 }
 
+func (repo *UserRepo) SearchExternalIDPs(ctx context.Context, request *usr_model.ExternalIDPSearchRequest) (*usr_model.ExternalIDPSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	sequence, seqErr := repo.View.GetLatestExternalIDPSequence()
+	logging.Log("EVENT-Qs7uf").OnError(seqErr).Warn("could not read latest user sequence")
+	externalIDPS, count, err := repo.View.SearchExternalIDPs(request)
+	if err != nil {
+		return nil, err
+	}
+	result := &usr_model.ExternalIDPSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: count,
+		Result:      model.ExternalIDPViewsToModel(externalIDPS),
+	}
+	if seqErr == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
+	}
+	return result, nil
+}
+
+func (repo *UserRepo) RemoveExternalIDP(ctx context.Context, externalIDP *usr_model.ExternalIDP) error {
+	return repo.UserEvents.RemoveExternalIDP(ctx, externalIDP)
+}
+
 func (repo *UserRepo) ChangeMachine(ctx context.Context, machine *usr_model.Machine) (*usr_model.Machine, error) {
 	return repo.UserEvents.ChangeMachine(ctx, machine)
 }

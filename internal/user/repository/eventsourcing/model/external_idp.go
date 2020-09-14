@@ -25,17 +25,17 @@ func GetExternalIDP(idps []*ExternalIDP, id string) (int, *ExternalIDP) {
 	return -1, nil
 }
 
-func ExternalIDPsToModel(members []*ExternalIDP) []*model.ExternalIDP {
-	convertedIDPs := make([]*model.ExternalIDP, len(members))
-	for i, m := range members {
+func ExternalIDPsToModel(externalIDPs []*ExternalIDP) []*model.ExternalIDP {
+	convertedIDPs := make([]*model.ExternalIDP, len(externalIDPs))
+	for i, m := range externalIDPs {
 		convertedIDPs[i] = ExternalIDPToModel(m)
 	}
 	return convertedIDPs
 }
 
-func ExternalIDPsFromModel(members []*model.ExternalIDP) []*ExternalIDP {
-	convertedIDPs := make([]*ExternalIDP, len(members))
-	for i, m := range members {
+func ExternalIDPsFromModel(externalIDPs []*model.ExternalIDP) []*ExternalIDP {
+	convertedIDPs := make([]*ExternalIDP, len(externalIDPs))
+	for i, m := range externalIDPs {
 		convertedIDPs[i] = ExternalIDPFromModel(m)
 	}
 	return convertedIDPs

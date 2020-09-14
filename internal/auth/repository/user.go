@@ -57,6 +57,7 @@ type myUserRepo interface {
 
 	ChangeMyPassword(ctx context.Context, old, new string) error
 
+	SearchMyExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error)
 	AddMyExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) (*model.ExternalIDP, error)
 	RemoveMyExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) error
 

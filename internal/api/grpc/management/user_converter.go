@@ -2,8 +2,8 @@ package management
 
 import (
 	"encoding/json"
-
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/model"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -63,6 +63,62 @@ func passwordRequestToModel(r *management.PasswordRequest) *usr_model.Password {
 	return &usr_model.Password{
 		ObjectRoot:   models.ObjectRoot{AggregateID: r.Id},
 		SecretString: r.Password,
+	}
+}
+
+func externalIDPSearchRequestToModel(request *management.ExternalIDPSearchRequest) *usr_model.ExternalIDPSearchRequest {
+	return &usr_model.ExternalIDPSearchRequest{
+		Limit:   request.Limit,
+		Offset:  request.Offset,
+		Queries: []*usr_model.ExternalIDPSearchQuery{{Key: usr_model.ExternalIDPSearchKeyUserID, Method: model.SearchMethodEquals, Value: request.UserId}},
+	}
+}
+
+func externalIDPRemoveToModel(idp *management.ExternalIDPRemoveRequest) *usr_model.ExternalIDP {
+	return &usr_model.ExternalIDP{
+		ObjectRoot:  models.ObjectRoot{AggregateID: idp.UserId},
+		IDPConfigID: idp.IdpConfigId,
+		UserID:      idp.ExternalUserId,
+	}
+}
+
+func externalIDPSearchResponseFromModel(response *usr_model.ExternalIDPSearchResponse) *management.ExternalIDPSearchResponse {
+	viewTimestamp, err := ptypes.TimestampProto(response.Timestamp)
+	logging.Log("GRPC-3h8is").OnError(err).Debug("unable to parse timestamp")
+
+	return &management.ExternalIDPSearchResponse{
+		Offset:            response.Offset,
+		Limit:             response.Limit,
+		TotalResult:       response.TotalResult,
+		ProcessedSequence: response.Sequence,
+		ViewTimestamp:     viewTimestamp,
+		Result:            externalIDPViewsFromModel(response.Result),
+	}
+}
+
+func externalIDPViewsFromModel(externalIDPs []*usr_model.ExternalIDPView) []*management.ExternalIDPView {
+	converted := make([]*management.ExternalIDPView, len(externalIDPs))
+	for i, externalIDP := range externalIDPs {
+		converted[i] = externalIDPViewFromModel(externalIDP)
+	}
+	return converted
+}
+
+func externalIDPViewFromModel(externalIDP *usr_model.ExternalIDPView) *management.ExternalIDPView {
+	creationDate, err := ptypes.TimestampProto(externalIDP.CreationDate)
+	logging.Log("GRPC-Fdu8s").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(externalIDP.ChangeDate)
+	logging.Log("GRPC-Was7u").OnError(err).Debug("unable to parse timestamp")
+
+	return &management.ExternalIDPView{
+		UserId:                  externalIDP.UserID,
+		IdpConfigId:             externalIDP.IDPConfigID,
+		ExternalUserId:          externalIDP.ExternalUserID,
+		ExternalUserDisplayName: externalIDP.UserDisplayName,
+		IdpName:                 externalIDP.IDPName,
+		CreationDate:            creationDate,
+		ChangeDate:              changeDate,
 	}
 }
 

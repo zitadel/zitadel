@@ -55,3 +55,7 @@ func (r *ExternalIDPSearchRequest) EnsureLimit(limit uint64) {
 		r.Limit = limit
 	}
 }
+
+func (r *ExternalIDPSearchRequest) AppendUserQuery(userID string) {
+	r.Queries = append(r.Queries, &ExternalIDPSearchQuery{Key: ExternalIDPSearchKeyUserID, Method: model.SearchMethodEquals, Value: userID})
+}

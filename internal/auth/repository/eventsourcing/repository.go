@@ -128,6 +128,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 	return &EsRepository{
 		spool,
 		eventstore.UserRepo{
+			SearchLimit:  conf.SearchLimit,
 			Eventstore:   es,
 			UserEvents:   user,
 			OrgEvents:    org,
