@@ -231,12 +231,12 @@
         "TARGET": {
             "SELF":"If you want to grant a user of an other organisation access",
             "EXTERNAL":"To grant a user of your organisation access",
-            "CLICKHERE":"Click here"
+            "CLICKHERE":"click here"
         },
-        "SIGNEDOUT":"You are signed out. Click the button below to sign in again.",
+        "SIGNEDOUT":"You are signed out. Click the button \"Sign In\" to sign in again.",
         "SIGNEDOUT_BTN":"Sign In",
         "EDITACCOUNT":"Edit Account",
-        "ADDACCOUNT":"Log in with another account",
+        "ADDACCOUNT":"Log in With Another Account",
         "TOAST": {
             "CREATED":"User created successfully.",
             "SAVED":"Profile saved successfully.",
