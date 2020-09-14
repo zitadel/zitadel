@@ -207,7 +207,7 @@
             }
         },
         "VALIDATION": {
-            "INVALIDPATTERN": "## TODO - Replace with Password Policy text - TODO ##",
+            "INVALIDPATTERN": "Das Passwort erfüllt nicht die vorgegebenen Regeln.",
             "REQUIRED": "Das Eingagefeld ist leer.",
             "MINLENGTH":"Das Password muss mindestens {{requiredLength}} Zeichen lang sein.",
             "NOEMAIL":"Benutzername darf keine E-Mail-Adresse sein.",
