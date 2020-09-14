@@ -2,7 +2,9 @@
 title: Users
 ---
 
-### Humane vs. Machine Users
+### What are users
+
+#### Humane vs. Machine Users
 
 ### Manage Users
 
