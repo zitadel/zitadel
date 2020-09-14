@@ -342,8 +342,7 @@
       }
     },
     "/users/me/externalidps": {
-      "post": {
-        "summary": "ExternalIDP",
+      "delete": {
         "operationId": "AddMyExternalIDP",
         "responses": {
           "200": {
@@ -355,11 +354,48 @@
         },
         "parameters": [
           {
+            "name": "idp_config_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "display_name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/externalidps/_search": {
+      "post": {
+        "summary": "ExternalIDP",
+        "operationId": "SearchMyExternalIDPs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ExternalIDPSearchResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1ExternalIDPAddRequest"
+              "$ref": "#/definitions/v1ExternalIDPSearchRequest"
             }
           }
         ],
@@ -368,7 +404,7 @@
         ]
       }
     },
-    "/users/me/externalidps/{idp_config_id}/{user_id}": {
+    "/users/me/externalidps/{idp_config_id}/{external_user_id}": {
       "delete": {
         "operationId": "RemoveMyExternalIDP",
         "responses": {
@@ -387,7 +423,7 @@
             "type": "string"
           },
           {
-            "name": "user_id",
+            "name": "external_user_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -833,7 +869,7 @@
         }
       }
     },
-    "v1ExternalIDPAddRequest": {
+    "v1ExternalIDPResponse": {
       "type": "object",
       "properties": {
         "idp_config_id": {
@@ -847,17 +883,78 @@
         }
       }
     },
-    "v1ExternalIDPResponse": {
+    "v1ExternalIDPSearchRequest": {
       "type": "object",
       "properties": {
-        "idp_config_id": {
-          "type": "string"
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
         },
         "user_id": {
           "type": "string"
+        }
+      }
+    },
+    "v1ExternalIDPSearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
         },
-        "display_name": {
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ExternalIDPView"
+          }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1ExternalIDPView": {
+      "type": "object",
+      "properties": {
+        "user_id": {
           "type": "string"
+        },
+        "idp_config_id": {
+          "type": "string"
+        },
+        "external_user_id": {
+          "type": "string"
+        },
+        "idp_name": {
+          "type": "string"
+        },
+        "external_user_display_name": {
+          "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

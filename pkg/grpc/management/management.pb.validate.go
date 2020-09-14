@@ -15005,3 +15005,344 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = IdpProviderSearchRequestValidationError{}
+
+// Validate checks the field values on ExternalIDPSearchRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ExternalIDPSearchRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Offset
+
+	// no validation rules for Limit
+
+	// no validation rules for UserId
+
+	return nil
+}
+
+// ExternalIDPSearchRequestValidationError is the validation error returned by
+// ExternalIDPSearchRequest.Validate if the designated constraints aren't met.
+type ExternalIDPSearchRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ExternalIDPSearchRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ExternalIDPSearchRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ExternalIDPSearchRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ExternalIDPSearchRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ExternalIDPSearchRequestValidationError) ErrorName() string {
+	return "ExternalIDPSearchRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ExternalIDPSearchRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sExternalIDPSearchRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ExternalIDPSearchRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ExternalIDPSearchRequestValidationError{}
+
+// Validate checks the field values on ExternalIDPSearchResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ExternalIDPSearchResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Offset
+
+	// no validation rules for Limit
+
+	// no validation rules for TotalResult
+
+	for idx, item := range m.GetResult() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ExternalIDPSearchResponseValidationError{
+					field:  fmt.Sprintf("Result[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for ProcessedSequence
+
+	if v, ok := interface{}(m.GetViewTimestamp()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExternalIDPSearchResponseValidationError{
+				field:  "ViewTimestamp",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// ExternalIDPSearchResponseValidationError is the validation error returned by
+// ExternalIDPSearchResponse.Validate if the designated constraints aren't met.
+type ExternalIDPSearchResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ExternalIDPSearchResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ExternalIDPSearchResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ExternalIDPSearchResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ExternalIDPSearchResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ExternalIDPSearchResponseValidationError) ErrorName() string {
+	return "ExternalIDPSearchResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ExternalIDPSearchResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sExternalIDPSearchResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ExternalIDPSearchResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ExternalIDPSearchResponseValidationError{}
+
+// Validate checks the field values on ExternalIDPView with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *ExternalIDPView) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for UserId
+
+	// no validation rules for IdpConfigId
+
+	// no validation rules for ExternalUserId
+
+	// no validation rules for IdpName
+
+	// no validation rules for ExternalUserDisplayName
+
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExternalIDPViewValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExternalIDPViewValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// ExternalIDPViewValidationError is the validation error returned by
+// ExternalIDPView.Validate if the designated constraints aren't met.
+type ExternalIDPViewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ExternalIDPViewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ExternalIDPViewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ExternalIDPViewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ExternalIDPViewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ExternalIDPViewValidationError) ErrorName() string { return "ExternalIDPViewValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ExternalIDPViewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sExternalIDPView.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ExternalIDPViewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ExternalIDPViewValidationError{}
+
+// Validate checks the field values on ExternalIDPRemoveRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ExternalIDPRemoveRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for UserId
+
+	// no validation rules for IdpConfigId
+
+	// no validation rules for ExternalUserId
+
+	return nil
+}
+
+// ExternalIDPRemoveRequestValidationError is the validation error returned by
+// ExternalIDPRemoveRequest.Validate if the designated constraints aren't met.
+type ExternalIDPRemoveRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ExternalIDPRemoveRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ExternalIDPRemoveRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ExternalIDPRemoveRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ExternalIDPRemoveRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ExternalIDPRemoveRequestValidationError) ErrorName() string {
+	return "ExternalIDPRemoveRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ExternalIDPRemoveRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sExternalIDPRemoveRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ExternalIDPRemoveRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ExternalIDPRemoveRequestValidationError{}

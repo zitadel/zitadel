@@ -114,6 +114,11 @@ var AuthService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.auth.api.v1.AuthService/SearchMyExternalIDPs": authz.Option{
+		Permission: "authenticated",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.auth.api.v1.AuthService/AddMyExternalIDP": authz.Option{
 		Permission: "authenticated",
 		CheckParam: "",
