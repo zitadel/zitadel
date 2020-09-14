@@ -103,14 +103,20 @@ html {
     }
 }
 
-form ul#passwordcomplexity li {
-    i {
-        color: $okColorLight;
+form {
+    .field.check-box label {
+        color: $fontColorLight;
     }
 
-    &.invalid {
-        i {
-            color: $nokColorLight;
-        }
-    }
+ ul#passwordcomplexity li {
+     i {
+         color: $okColorLight;
+     }
+
+     &.invalid {
+         i {
+             color: $nokColorLight;
+         }
+     }
+ }
 }
