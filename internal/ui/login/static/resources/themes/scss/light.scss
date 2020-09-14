@@ -14,23 +14,34 @@ html {
         color: $fontColorLight;
     }
 
-    button {
+    button, .button {
         background-color: $backgroundColorLight;
         color: $primaryColorLight;
-        border: 2px solid $primaryColorLight;
+        border: 1px solid $primaryColorLight;
 
         &:hover {
             background-color: $primaryColorHoverLight;
-            border: 2px solid $primaryColorHoverLight;
+            border: 1px solid $primaryColorHoverLight;
+            color: $buttonBackgroundColorHoverLight
         }
 
         &.primary {
             background-color: $primaryColor;
-            color: $fontColor;
+            color: $buttonBackgroundColorHoverLight;
             border: none;
             box-shadow: 0px 10px 30px $primaryColor;
             &:hover {
                 background-color: $primaryColorHover;
+            }
+        }
+
+        &:disabled {
+            background-color: $inputBorderColor;
+            border: 1px solid $inputBorderColor;
+
+            &:hover {
+                background-color: $inputBorderColor;
+                border: 1px solid $inputBorderColor;
             }
         }
 
@@ -88,6 +99,18 @@ html {
     footer {
         @if($footerimgLight != "") {
             background-image: url($footerimgLight);
+        }
+    }
+}
+
+form ul#passwordcomplexity li {
+    i {
+        color: $okColorLight;
+    }
+
+    &.invalid {
+        i {
+            color: $nokColorLight;
         }
     }
 }

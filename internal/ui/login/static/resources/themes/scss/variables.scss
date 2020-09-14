@@ -27,13 +27,14 @@ $fontColor: #BBBBC8;
 $primaryColor: #3574C6;
 $primaryColorHover: lighten($primaryColor, 10%);
 $labelColor: #898989;
-$inputBorderColor: #505050;
+$inputBorderColor: #999999;
 $inputBackgroundColor: #252525;
 $buttonBackgroundColorHover: $inputBackgroundColor;
 $profileImgDark: "../../../images/icon-user-dark";
 $otherUserImgDark: "../../../images/icon-newuser-dark";
 $nokColor: #F20D6B;
 $okColor: #0DF279;
+$errorColor: red;
 
 
 // ----- LIGHT-THEME --------
@@ -45,3 +46,5 @@ $inputBackgroundColorLight: #FFFFFF;
 $buttonBackgroundColorHoverLight: $inputBackgroundColorLight;
 $profileImgLight: "../../../images/icon-user-light";
 $otherUserImgLight: "../../../images/icon-newuser-light";
+$nokColorLight: #F20D6B;
+$okColorLight: #50CA3D;

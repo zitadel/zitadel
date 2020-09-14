@@ -1,8 +1,10 @@
 
 {{template "main-top" .}}
 
-<h1>{{t "RegisterOption.Title"}}</h1>
-<p>{{t "RegisterOption.Description"}}</p>
+<div class="head">
+    <h1>{{t "RegisterOption.Title"}}</h1>
+    <p>{{t "RegisterOption.Description"}}</p>
+</div>
 
 <form action="{{ registerOptionUrl }}" method="POST">
 
@@ -17,7 +19,7 @@
         {{if .LoginPolicy.AllowExternalIDP}}
             {{ $reqid := .AuthReqID}}
             {{range $provider := .IDPProviders}}
-                <a href="{{ externalIDPRegisterURL $reqid $provider.IDPConfigID}}" class="secondary idp-providers">
+                <a href="{{ externalIDPRegisterURL $reqid $provider.IDPConfigID}}" class="button secondary idp-providers">
                     {{$provider.Name}}
                 </a>
             {{end}}

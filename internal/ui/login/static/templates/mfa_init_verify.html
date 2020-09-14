@@ -1,8 +1,10 @@
 {{template "main-top" .}}
 
-{{ template "user-profile" . }}
+<div class="head">
+    {{ template "user-profile" . }}
 
-<p>{{t "MfaInitVerify.Description"}}</p>
+    <p>{{t "MfaInitVerify.Description"}}</p>
+</div>
 
 <form action="{{ mfaInitVerifyUrl }}" method="POST">
 
@@ -35,10 +37,10 @@
 
     <div class="actions">
         <button class="primary right" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
-        <a href="{{ mfaPromptChangeUrl .AuthReqID .MfaType }}">
-            <button class="secondary" type="button">{{t "Actions.Back"}}</button>
+        <a class="button secondary" href="{{ mfaPromptChangeUrl .AuthReqID .MfaType }}">
+            {{t "Actions.Back"}}
         </a>
-        <a class="secondary" href="{{ loginUrl }}">
+        <a class="button secondary" href="{{ loginUrl }}">
             {{t "Actions.Cancel"}}
         </a>
     </div>

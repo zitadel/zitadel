@@ -1,8 +1,10 @@
 {{template "main-top" .}}
 
-{{ template "user-profile" . }}
+<div class="head">
+    {{ template "user-profile" . }}
 
-<p>{{t "InitUser.Description" }}</p>
+    <p>{{t "InitUser.Description" }}</p>
+</div>
 
 <form action="{{ initUserUrl }}" method="POST">
 
@@ -49,7 +51,7 @@
                 value="false"
                 class="primary right">{{t "Actions.Next"}}</button>
         <button type="submit" name="resend" value="true" class="secondary right" formnovalidate>{{t "Actions.Resend" }}</button>
-        <a class="secondary" href="{{ loginUrl }}">
+        <a class="button secondary" href="{{ loginUrl }}">
             {{t "Actions.Cancel"}}
         </a>
     </div>
