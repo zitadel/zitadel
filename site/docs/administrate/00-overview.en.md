@@ -34,25 +34,3 @@ title: Overview
 ### Concepts
 
 With ZITADEL there are some key concepts some should be aware of before using it to secure your applications and services.
-
-#### Users
-
-#### UserName
-
-#### LoginName
-
-#### Service Users
-
-#### Organisations
-
-#### Projects
-
-#### Policies
-
-#### System
-
-#### Roles
-
-#### Grants
-
-#### Clients
