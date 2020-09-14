@@ -3,23 +3,23 @@
     "HOME": {
         "TITLE": "ZITADEL",
         "SECURITYANDPRIVACY": "Datenschutz und Personalisierung",
-        "SECURITYANDPRIVACY_DESC": "Verwalte deine Informationen und Sicherheitseinstellungen.",
+        "SECURITYANDPRIVACY_DESC": "Verwalten Sie Ihre Informationen und Sicherheitseinstellungen.",
         "SECURITYANDPRIVACY_BUTTON": "Daten verwalten und personalisieren",
         "PROTECTION": "Organisationsrichtlinien",
-        "PROTECTION_DESC": "Verwalte deine Organisationsrichtlinien und entdecke die vorgefertigte Lösungen, die Zeit sparen und Sicherheit gewährleisten.",
+        "PROTECTION_DESC": "Verwalten Sie Ihre Organisationsrichtlinien und entdecken Sie die vorgefertigte Lösungen, die Zeit sparen und Sicherheit gewährleisten.",
         "PROTECTION_BUTTON": "Erkunden",
         "PROJECTS": "Volle Skalierbarkeit und Anpassungsfähigkeit",
-        "PROJECTS_DESC": "Autorisiere andere Benutzer, deine eigenen Projekte zu verwenden oder definieren benutzerdefinierte Rollen für berechtigte Projekte",
-        "PROJECTS_BUTTON": "Projekt Übersicht",
-        "USERS": "Erstelle und verwalte deine Benutzer.",
-        "USERS_DESC": "Überwache dein Rollenkonzept in Echtzeit. Ergreife sofort Massnahmen.",
+        "PROJECTS_DESC": "Autorisieren Sie andere Benutzer, Ihre eigenen Projekte zu verwenden oder erstellen Sie benutzerdefinierte Rollen für berechtigte Projekte",
+        "PROJECTS_BUTTON": "Projektübersicht",
+        "USERS": "Erstellen und verwalten Sie Ihre Benutzer.",
+        "USERS_DESC": "Überwachen Sie Ihr Rollenkonzept in Echtzeit. Ergreifen Sie sofort Massnahmen.",
         "USERS_BUTTON": "Benutzer anzeigen",
         "IAM": "Identity and Access Management",
-        "IAM_DESC": "Verwalte deine Organisationen und Administratoren.",
+        "IAM_DESC": "Verwalten Sie Ihre Organisationen und Administratoren.",
         "IAM_BUTTON": "ZITADEL verwalten",
         "WELCOME":"Willkommen",
-        "WELCOMESENTENCE":"Hier findest du die empfohlenen Aktionen basierend auf deinen zuletzt erworbenen Berechtigungen. Beachte bitte, dass du möglicherweise deine Organisation in der Kopfzeile wechseln musst.",
-        "DISCLAIMER":"Du kannst nur die Einstellungen deiner aktuellen Organisation sehen, die in der Kopfzeile angegeben ist. ZITADEL behandelt deine Daten vertraulich und sicher.",
+        "WELCOMESENTENCE":"Hier finden Sie die empfohlenen Aktionen basierend auf Ihren zuletzt erworbenen Berechtigungen. Beachten Sie bitte, dass Sie möglicherweise Ihre Organisation in der Kopfzeile wechseln müssen.",
+        "DISCLAIMER":"Sie können nur die Einstellungen Ihrer aktuellen Organisation, die in der Kopfzeile angegeben ist, sehen. ZITADEL behandelt Ihre Daten vertraulich und sicher.",
         "DISCLAIMERLINK":"Mehr Informationen zur Sicherheit"
     },
     "MENU": {
@@ -31,10 +31,10 @@
         "GRANTEDPROJECT":"Berechtigte Projekte",
         "USERSECTION":"Benutzersektion",
         "HUMANUSERS": "Benutzer",
-        "MACHINEUSERS":"Service Benutzer",
+        "MACHINEUSERS":"Service-Benutzer",
         "LOGOUT": "Alle Benutzer abmelden",
         "NEWORG":"Neue Organisation",
-        "IAMADMIN":"Du bist ein IAM Administrator. Achtung du hast erhöhte Rechte!",
+        "IAMADMIN":"Sie sind ein IAM-Administrator. Beachten Sie, dass Sie erhöhte Rechte besitzen.",
         "SHOWORGS":"Alle Organisationen anzeigen"
     },
     "ACTIONS": {
@@ -47,7 +47,7 @@
         "CLOSE": "Schliessen",
         "CANCEL":"Abbrechen",
         "INFO": "Info",
-        "OK": "Ok",
+        "OK": "OK",
         "VIEW": "Öffnen",
         "DELETE": "Löschen",
         "REMOVE":"Entfernen",
@@ -57,33 +57,33 @@
         "REACTIVATE":"Aktivieren",
         "DEACTIVATE":"Deaktivieren",
         "REFRESH":"Aktualisieren",
-        "LOGIN":"Login",
+        "LOGIN":"Einloggen",
         "EDIT":"Bearbeiten"
     },
     "ERRORS": {
-        "REQUIRED": "Bitte fülle alle benötigten Felder aus!",
+        "REQUIRED": "Bitte füllen Sie alle benötigten Felder aus.",
         "TOKENINVALID": {
-            "TITLE":"Du bist abgemeldet",
-            "DESCRIPTION":"Klicke auf Knopf Login um dich wieder einzuloggen!"
+            "TITLE":"Sie sind abgemeldet",
+            "DESCRIPTION":"Klicken Sie auf \"Einloggen\", um sich erneut anzumelden."
         }
     },
     "USER": {
         "TITLE": "Persönliche Informationen",
-        "DESCRIPTION": "Verwalte deine persönlichen Informationen und Sicherheits Einstellungen",
+        "DESCRIPTION": "Verwalten Sie Ihre persönlichen Informationen und Sicherheitseinstellungen",
         "PAGES": {
             "LIST": "Benutzer",
             "TITLE": "Benutzer",
-            "DESCRIPTION": "Erfasse und verwalte die Benutzer in deiner Organisation",
-            "LISTMACHINE": "Service Benutzer",
-            "DESCRIPTIONMACHINE": "Erfassen und verwalten Sie die Service Benutzer Ihrer Organisation",
+            "DESCRIPTION": "Erfassem und verwalten Sie die Benutzer in Ihrer Organisation.",
+            "LISTMACHINE": "Service-Benutzer",
+            "DESCRIPTIONMACHINE": "Erfassen und verwalten Sie die Service-Benutzer Ihrer Organisation.",
             "DETAIL": "Detail",
             "CREATE": "Erstellen",
             "MY": "Meine Informationen",
-            "LOGINNAMES":"Loginnamen",
-            "LOGINNAMESDESC":"Mit diesen Namen kannst du dich anmelden",
+            "LOGINNAMES":"Login-Namen",
+            "LOGINNAMESDESC":"Mit diesen Namen können Sie sich anmelden",
             "COPY":"In die Zwischenablage kopieren",
-            "COPIED":"In die Zwischenablage kopiert!",
-            "NOUSER":"Kein User",
+            "COPIED":"In die Zwischenablage kopier.!",
+            "NOUSER":"Kein Benutzer",
             "REACTIVATE":"Reaktivieren",
             "DEACTIVATE":"Deaktivieren"
         },
@@ -91,12 +91,12 @@
             "TABLETYPE":"Typ",
             "TABLESTATE":"Status",
             "TABLEACTIONS":"Aktionen",
-            "TITLE": "Multifaktor-Authentifizierung",
-            "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um deinen Account optimal zu schützen.",
-            "MANAGE_DESCRIPTION": "Verwalte die Multifaktor Merkmale deiner Benutzer.",
+            "TITLE": "Multifaktor-Authentisierung",
+            "DESCRIPTION": "Fügen Sie einen zusätzlichen Faktor hinzu, um Ihr Konto optimal zu schützen.",
+            "MANAGE_DESCRIPTION": "Verwalten Sie die Multifaktor-Merkmale Ihrer Benutzer.",
             "OTP": "OTP konfigurieren",
             "OTP_DIALOG_TITLE": "OTP hinzufügen",
-            "OTP_DIALOG_DESCRIPTION": "Scanne den QR Code mit einer Authenticator-App und verifiziere den erhaltenen Code um OTP zu aktivieren.",
+            "OTP_DIALOG_DESCRIPTION": "Scannen Sie den QR-Code mit einer Authenticator App und verifizieren Sie den erhaltenen Code, um OTP zu aktivieren.",
             "TYPE": {
                 "0":"Keine MFA definiert",
                 "1":"SMS",
@@ -111,16 +111,16 @@
         },
         "CREATE": {
             "TITLE": "Neuen Benutzer erstellen",
-            "DESCRIPTION": "Gebe die erforderlichen Daten ein.",
-            "NAMEANDEMAILSECTION":"Name und Email",
+            "DESCRIPTION": "Geben Sie die erforderlichen Daten ein.",
+            "NAMEANDEMAILSECTION":"Name und E-Mail",
             "GENDERLANGSECTION":"Geschlecht und Sprache",
             "PHONESECTION":"Telefonnummer",
-            "PASSWORDSECTION":"Setze ein initiales Passwort.",
+            "PASSWORDSECTION":"Setzen Sie ein initiales Passwort.",
             "ADDRESSANDPHONESECTION":"Telefonnummer"
         },
         "CODEDIALOG": {
             "TITLE":"Telefonnummer verifizieren",
-            "DESCRIPTION":"Gib deinen erhaltenen Code ein um die Nummer zu bestätigen.",
+            "DESCRIPTION":"Gen Sie Ihren erhaltenen Code ein, um die Telefonnummer zu bestätigen.",
             "CODE":"Code"
         },
         "DATA": {
@@ -135,7 +135,7 @@
         },
         "PROFILE": {
             "TITLE": "Profil",
-            "EMAIL": "Email",
+            "EMAIL": "E-Mail",
             "PHONE": "Telefonnummer",
             "USERNAME": "Benutzername",
             "FIRSTNAME": "Vorname",
@@ -147,13 +147,13 @@
             "PASSWORD":"Passwort"
         },
         "MACHINE": {
-            "TITLE":"Service Benutzer Details",
+            "TITLE":"Details Service-Benutzer",
             "USERNAME":"Benutzername",
             "NAME":"Name",
             "DESCRIPTION":"Beschreibung",
             "KEYSTITLE":"Schlüssel",
             "KEYSDESC":"Definieren Sie Ihre Schlüssel mit einem optionalen Ablaufdatum",
-            "ID":"Schlüssel Id",
+            "ID":"Schlüssel-ID",
             "TYPE":"Typ",
             "EXPIRYDATE":"Ablaufdatum",
             "CHOOSEEXPIRY":"Definieren Sie ein Ablaufdatum",
@@ -168,42 +168,42 @@
         },
         "PASSWORD": {
             "TITLE": "Passwort",
-            "DESCRIPTION": "Gib das neue Password unter Einhaltung der Richtlinie für die Komplexität ein.",
+            "DESCRIPTION": "Geben Sie das neue Password unter Einhaltung der Richtlinie für die Komplexität ein.",
             "OLD": "Aktuelles Passwort",
             "NEW": "Neues Passwort",
             "CONFIRM": "Neues Passwort wiederholen",
             "RESET": "Passwort zurücksetzen",
             "SET":"Password neu setzen",
-            "RESENDNOTIFICATION": "Passwort Reset Link senden.",
-            "REQUIRED": "Bitte prüfe das alle notwendigen Felder befüllt sind.",
-            "MINLENGTHERROR":"Das Passwort muss mindestens {{value}} Zeichen lang sein",
-            "NOTEQUAL":"Das Passwort muss übereinstimmen!"
+            "RESENDNOTIFICATION": "Link für das Zurücksetzen des Passworts senden",
+            "REQUIRED": "Bitte prüfen Sie, dass alle notwendigen Felder ausgefüllt sind.",
+            "MINLENGTHERROR":"Das Passwort muss mindestens {{value}} Zeichen lang sein.",
+            "NOTEQUAL":"Die Passwörter stimmen nicht überein."
         },
-        "EMAIL": "Email",
+        "EMAIL": "E-Mail",
         "PHONE": "Telefonnummer",
         "LOGINMETHODS": {
-            "TITLE": "Kontakt Informationen",
-            "DESCRIPTION": "Die Kontakt Informationen werden benötigt um dir wichtige Informationen wie Passwort und Reset Email zu senden.",
+            "TITLE": "Kontaktinformationen",
+            "DESCRIPTION": "Die Kontaktinformationen werden benötigt, um Ihnen wichtige Informationen wie Verifikationsnachrichten und Links für das Zurücksetzen des Passworts per E-Mail zu senden.",
             "EMAIL": {
-                "TITLE": "Email",
+                "TITLE": "E-Mail",
                 "VALID": "Validiert",
                 "RESEND": "Verifikationsmail erneut senden"
             },
             "PHONE": {
                 "TITLE": "Telefon",
                 "VALID": "Validiert",
-                "RESEND": "Verifikationsnachricht erneute senden"
+                "RESEND": "Verifikationsnachricht erneut senden"
             },
             "RESENDCODE": "Code erneut senden",
             "ENTERCODE":"Verifizieren",
-            "ENTERCODE_DESC":"Code verifizieren"
+            "ENTERCODE_DESC":"Verifikationscode senden und verifizieren."
         },
         "GRANTS": {
-            "TITLE": "Benutzer Grants",
-            "DESCRIPTION": "Erteile diesem Benutzer Verwaltunszugriff auf bestimmte Projekte",
+            "TITLE": "Benutzer-Grants",
+            "DESCRIPTION": "Erteilen Sie diesem Benutzer Verwaltunszugriff auf bestimmte Projekte.",
             "CREATE": {
-                "TITLE": "Benutzer Grant erstellen",
-                "DESCRIPTION": "Suche nach der Organisation, dem Projekt und den verfügbaren Rollen!"
+                "TITLE": "Benutzer-Grant erstellen",
+                "DESCRIPTION": "Suchen Sie nach der Organisation, dem Projekt und den verfügbaren Rollen."
             }
         },
         "VALIDATION": {
@@ -735,62 +735,6 @@
         "USER": {
             "TITLE":"Aktivität",
             "DESCRIPTION":"Hier siehst du die letzten Vorkommnisse die den Benutzer betreffen"
-        },
-        "EVENTS": {
-            "org.added": "Org. erstellt",
-            "org.changed":"Org. editiert",
-            "org.member.added":"Organisation Member erstellt",
-            "org.member.removed":"Organisation Member gelöscht",
-            "org.domain.added":"Org. Domain hinzugefügt",
-            "org.domain.verified":"Org. Domain verifiziert",
-            "org.domain.primary.set":"Primäre domain gesetzt",
-            "org.domain.removed":"Org. domain entfernt",
-            "org.iam.policy.added":"IAM Policy hinzugefügt",
-            "project.added": "Projekt erstellt",
-            "project.changed":"Projekt editiert",
-            "project.deactivated":"Projekt deaktiviert",
-            "project.member.added":"Projekt Member erstellt",
-            "project.member.removed":"Projekt Member gelöscht",
-            "project.role.added":"Rolle erstellt",
-            "project.role.removed":"Rolle gelöscht",
-            "project.application.added":"App hinzugefügt",
-            "project.application.config.oidc.added":"OIDC Konfiguration hinzugefügt",
-            "user.added":"User hinzugefügt",
-            "user.initialization.code.added":"Init Code hinzugefügt",
-            "user.phone.code.added":"User phone Code hinzugefügt",
-            "user.phone.code.sent":"User phone Code gesendet",
-            "user.initialization.code.sent":"Init Code gesendet",
-            "user.email.verification.sended": "User Email verifiziert",
-            "user.email.code.added":"Email Code hinzugefügt",
-            "user.email.code.sent":"Email Code gesendet",
-            "user.email.verified":"Email verifiziert",
-            "user.phone.verificationsended":"User phone verifikation gesendet",
-            "user.phone.code":"User phone Code erstellt",
-            "user.initialization.verification.sended":"User mail verifikation gesendet",
-            "user.initialization.code.created":"InitialisationsCode gesendet",
-            "created.user.email.code":"User Email Code erstellt",
-            "created.user.phone.code":"Phone Code erstellt",
-            "updated.user.password": "User password update",
-            "skipped.init.mfauser": "Mfa Methode übersprungen",
-            "verified.user.email":"User Email verifiziert",
-            "registered.user":"User registriert",
-            "created.user":"User erstellt",
-            "skipped.init.mfa.user":"User MFA init überspungen",
-            "user.email.password.request.sended":"User Email Password Anfrage gesended",
-            "user.password.set.requested":"Password Anfrage",
-            "user.phone.verification.sended":"User Nummer verifikation gesendet",
-            "user.phone.changed":"User phone geändert",
-            "user.phone.verified":"User phone verifiziert",
-            "updated.user.profile":"User Profil update",
-            "user.email.init.sended":"User Email init sended",
-            "user.password.changed":"Password changed",
-            "user.initialization.check.succeeded":"Init check erfolgreich",
-            "user.password.check.succeeded":"Password check erfolgreich",
-            "user.mfa.init.skipped":"MFA init übersprungen",
-            "user.mfa.otp.added":"MFA OTP hinzugefügt",
-            "user.mfa.otp.verified":"MFA OTP verifiziert",
-            "user.mfa.otp.removed":"MFA OTP entfernt",
-            "user.selfregistered":"selbst registriert"
         }
     }
 }

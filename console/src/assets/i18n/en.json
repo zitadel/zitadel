@@ -24,7 +24,7 @@
         "WELCOME":"Welcome",
         "WELCOMESENTENCE":"Here you can find recommended actions based on your last acquired permissions. Note that you may have to select your organisation in the header above.",
         "DISCLAIMER":"You can only see settings of your current organisation specified in the header. ZITADEL treats your data confidentially and securely.",
-        "DISCLAIMERLINK":"Further Information"
+        "DISCLAIMERLINK":"Further information"
     },
     "MENU": {
         "PERSONAL_INFO": "Personal Information",
@@ -451,15 +451,15 @@
     "PROJECT": {
         "PAGES": {
             "TITLE": "Project",
-            "DESCRIPTION": "Here you can define applications, manage roles and grant other organisations to use your project",
+            "DESCRIPTION": "Here you can define applications, manage roles and grant other organisations to use your project.",
             "LIST": "Projects",
             "LISTDESCRIPTION":"Here you can find all projects you are allowed to view or perform actions on. If you can't find a project, contact a project owner or someone with the corresponding rights to gain project access.",
             "DETAIL": "Detail",
             "CREATE": "Create project",
-            "CREATE_DESC": "Insert your projects name",
+            "CREATE_DESC": "Insert your project's name.",
             "ROLE": "Role",
             "NOITEMS": "No projects",
-            "ZITADELPROJECT":"This belongs to ZITADEL project. If you change something, ZITADEL may not behave as intended!",
+            "ZITADELPROJECT":"This belongs to the ZITADEL project. Beware: If you make changes ZITADEL may not behave as intended.",
             "TYPE":{
                 "OWNED":"Owned Projects",
                 "GRANTED":"Granted Projects"
@@ -468,19 +468,19 @@
             "ALL": "All",
             "CREATEDON":"Created on",
             "LASTMODIFIED":"Last modified on",
-            "ADDNEW":"Create new project",
+            "ADDNEW":"Create New Project",
             "DIALOG": {
                 "REACTIVATE": {
-                    "TITLE":"Reactivate project",
+                    "TITLE":"Reactivate Project",
                     "DESCRIPTION":"Do you really want to ractivate your project?"
                 },
                 "DEACTIVATE": {
-                    "TITLE":"Deactivate project",
+                    "TITLE":"Deactivate Project",
                     "DESCRIPTION":"Do you really want to deactivate your project?"
                 },
                 "DELETE": {
-                    "TITLE":"Projekt löschen",
-                    "DESCRIPTION":"Wollen Sie das Project wirklich löschen?"
+                    "TITLE":"Delete Project",
+                    "DESCRIPTION":"Do you really want to delete your project?"
                 }
             }
         },
@@ -499,38 +499,38 @@
         "NAME": "Name",
         "MEMBER": {
             "TITLE": "Managers",
-            "TITLEDESC":"Managers can make changes on this project, based on their role.",
+            "TITLEDESC":"Managers can make changes to this project based on their role.",
             "DESCRIPTION":"Here you can find all managers of this project. You can add a new member and manage existing ones.",
-            "USERNAME": "Username",
-            "FIRSTNAME": "Firstname",
-            "LASTNAME": "Lastname",
-            "EMAIL": "Email",
+            "USERNAME": "User Name",
+            "FIRSTNAME": "First Name",
+            "LASTNAME": "Last Name",
+            "EMAIL": "E-mail",
             "ROLES": "Roles",
-            "USERID":"User Id"
+            "USERID":"User ID"
         },
         "GRANT": {
-            "TITLE": "Granted organisations",
-            "DESCRIPTION": "Allow an other organisation to use your project",
+            "TITLE": "Granted Organisations",
+            "DESCRIPTION": "Allow an other organisation to use your project.",
             "CREATE": {
-                "TITLE": "Create organisation grant",
-                "SEL_USERS": "Select the users you wish to grant",
+                "TITLE": "Create Organisation Grant",
+                "SEL_USERS": "Select the users you wish to grant access",
                 "SEL_PROJECT": "Search for a project",
                 "SEL_ROLES": "Select the roles you want to be added to the grant",
                 "SEL_USER":"Search for a user",
                 "SEL_ORG": "Set the domain",
-                "SEL_ORG_DESC":"Enter the complete domain to specify the organisation to grant!",
+                "SEL_ORG_DESC":"Enter the complete domain to specify the organisation to grant.",
                 "ORG_TITLE":"Organisation",
-                "ORG_DESCRIPTION":"You are about to grant a user for the organisation {{name}}",
-                "ORG_DESCRIPTION_DESC":"Switch the context in the header above to grant a user for another organisation",
+                "ORG_DESCRIPTION":"You are about to grant a user for the organisation {{name}}.",
+                "ORG_DESCRIPTION_DESC":"Switch the context in the header above to grant a user for another organisation.",
                 "SEL_ORG_FORMFIELD":"Complete Domain",
                 "SEL_ORG_BUTTON": "Search Organisation",
                 "FOR_ORG":"The grant is created for:"
             },
             "DETAIL": {
-                "TITLE":"Managers of the granted organisation",
-                "DESC":"These are the Managers of the granted organisation. You can select which users are allowed to maintain control of the project.",
+                "TITLE":"Managers of the Granted Organisation",
+                "DESC":"These are the managers of the granted organisation. You can select which users are allowed to maintain control of the project.",
                 "MEMBERTITLE":"Managers",
-                "MEMBERDESC":"These are the managers of the granted organisation. Add users here, who should gain access to edit data of the project.",
+                "MEMBERDESC":"These are the managers of the granted organisation. Add users here who should gain access to edit the data of the project.",
                 "PROJECTNAME":"Project Name",
                 "RESOURCEOWNER":"Resource Owner"
             },
@@ -541,18 +541,18 @@
             "GRANTEDORG": "Granted Organisation",
             "GRANTEDORGDOMAIN": "Domain",
             "RESOURCEOWNER":"Resource Owner",
-            "GRANTEDORGNAME":"Org. Name",
+            "GRANTEDORGNAME":"Organisation Name",
             "CREATIONDATE": "Creation Date",
-            "CHANGEDATE": "Last Modified",
+            "CHANGEDATE": "Last modified",
             "ROLENAMESLIST": "Roles",
             "NOROLES":"No roles",
             "TOAST": {
-                "PROJECTGRANTUSERGRANTADDED":"Project Grant created!",
-                "PROJECTGRANTADDED":"Project Grant created!",
-                "PROJECTGRANTCHANGED":"Project Grant changed!",
-                "PROJECTGRANTMEMBERADDED":"Grant Manager added!",
-                "PROJECTGRANTMEMBERCHANGED":"Grant Manager changed!",
-                "PROJECTGRANTMEMBERREMOVED":"Grant Manager removed!"
+                "PROJECTGRANTUSERGRANTADDED":"Project grant created.",
+                "PROJECTGRANTADDED":"Project grant created.",
+                "PROJECTGRANTCHANGED":"Project grant changed.",
+                "PROJECTGRANTMEMBERADDED":"Grant manager added.",
+                "PROJECTGRANTMEMBERCHANGED":"Grant manager changed.",
+                "PROJECTGRANTMEMBERREMOVED":"Grant manager removed."
             },
             "ROLES":"Project Roles"
         },
@@ -565,18 +565,18 @@
             "ADDNEWLINE":"Add additional role",
             "KEY":"Key",
             "TITLE": "Roles",
-            "DESCRIPTION":"Define some roles which can be used to create project-grants",
+            "DESCRIPTION":"Define some roles which can be used to create project-grants.",
             "NAME": "Name",
             "DISPLAY_NAME": "Display Name",
             "GROUP": "Group",
             "ACTIONS": "Actions",
-            "ADDTITLE": "Create role",
-            "ADDDESCRIPTION": "Enter the data for the new role!",
-            "EDITTITLE": "Edit role",
-            "EDITDESCRIPTION": "Enter the new data for the role!",
+            "ADDTITLE": "Create Role",
+            "ADDDESCRIPTION": "Enter the data for the new role.",
+            "EDITTITLE": "Edit Role",
+            "EDITDESCRIPTION": "Enter the new data for the role.",
             "DELETE":"Delete Role",
             "CREATIONDATE":"Created",
-            "SELECTGROUPTOOLTIP":"Select all Roles of the group {{group}}"
+            "SELECTGROUPTOOLTIP":"Select all Roles of the group {{group}}."
         },
         "TABLE": {
             "TOTAL": "Entries total:",
@@ -584,35 +584,35 @@
             "DEACTIVATE": "Deactivate Project",
             "ACTIVATE": "Activate Project",
             "DELETE": "Delete Project",
-            "ORGNAME":"Org. Name",
-            "ORGDOMAIN":"Or.g Domain",
+            "ORGNAME":"Organisation Name",
+            "ORGDOMAIN":"Organisation Domain",
             "STATE":"Status",
             "TYPE":"Type",
-            "CREATIONDATE":"Created At",
-            "CHANGEDATE":"Last Modified",
+            "CREATIONDATE":"Created at",
+            "CHANGEDATE":"Last modified",
             "RESOURCEOWNER":"Owner"
         },
         "TOAST":{
-            "MEMBERREMOVED":"Manager removed!",
-            "MEMBERSADDED": "Managers added!",
-            "MEMBERADDED": "Manager added!",
-            "MEMBERCHANGED":"Manager changed!",
-            "ROLEREMOVED":"Role removed!",
-            "ROLECHANGED":"Role changed!",
-            "REACTIVATED":"Reactivated!",
-            "DEACTIVATED":"Deactivated!",
-            "UPDATED":"Project changed!",
-            "GRANTUPDATED":"Grant changed!",
-            "DELETED":"Deleted Project!"
+            "MEMBERREMOVED":"Manager removed.",
+            "MEMBERSADDED": "Managers added.",
+            "MEMBERADDED": "Manager added.",
+            "MEMBERCHANGED":"Manager changed.",
+            "ROLEREMOVED":"Role removed.",
+            "ROLECHANGED":"Role changed.",
+            "REACTIVATED":"Reactivated.",
+            "DEACTIVATED":"Deactivated.",
+            "UPDATED":"Project changed.",
+            "GRANTUPDATED":"Grant changed.",
+            "DELETED":"Deleted Project."
         }
     },
     "APP": {
         "LIST": "Applications",
         "PAGES": {
             "TITLE": "Application",
-            "DESCRIPTION": "Here you can edit your application data and its configuration",
+            "DESCRIPTION": "Here you can edit your application data and it's configuration.",
             "CREATE_OIDC": "OIDC Application",
-            "CREATE_OIDC_DESC_TITLE": "Enter your application details step by step",
+            "CREATE_OIDC_DESC_TITLE": "Enter Your Application Details Step by Step",
             "CREATE_OIDC_DESC_SUB": "A recommended configuration will be automatically generated.",
             "DETAIL": {
                 "TITLE": "Detail",
@@ -624,58 +624,58 @@
             }
         },
         "NAME": "Name",
-        "TYPE":"Application type",
+        "TYPE":"Application Type",
         "GRANT":"Grant Types",
         "OIDC": {
             "PROSWITCH":"I'm a pro. Skip this wizard.",
             "NAMEANDTYPESECTION":"Name and Type",
-            "TITLEFIRST":"Insert a name first!",
+            "TITLEFIRST":"Insert a name first.",
             "TYPETITLE":"What type of application do you want to create?",
-            "REDIRECTTITLE":"Specify the urls where the login will redirect to.",
-            "POSTREDIRECTTITLE":"This is the redirect after logout.",
-            "REDIRECTDESCRIPTIONWEB":"Redirects must begin with https://. http:// is only valid with enabled dev mode.",
-            "REDIRECTDESCRIPTIONNATIVE":"Redirects must begin with your own protocol or http://localhost!",
-            "REDIRECTNOTVALID":"This redirect is not valid!",
-            "TYPEREQUIRED":"The type is required!",
+            "REDIRECTTITLE":"Specify the URIs where the login will redirect to.",
+            "POSTREDIRECTTITLE":"This is the redirect URI after logout.",
+            "REDIRECTDESCRIPTIONWEB":"Redirect URIs must begin with https://. http:// is only valid with enabled development mode.",
+            "REDIRECTDESCRIPTIONNATIVE":"Redirect URIs must begin with your own protocol or http://localhost.",
+            "REDIRECTNOTVALID":"This redirect URI is not valid.",
+            "TYPEREQUIRED":"The type is required.",
             "TITLE": "OIDC Configuration",
             "CLIENTID": "Client ID",
             "CLIENTSECRET": "Client Secret",
-            "CLIENTSECRET_DESCRIPTION": "Save your Client Secret as it will disappear once the dialog is closed!",
+            "CLIENTSECRET_DESCRIPTION": "Keep your client cecret at a safe place as it will disappear once the dialog is closed.",
             "REGENERATESECRET": "Regenerate Client Secret",
-            "DEVMODE":"Dev Mode",
-            "DEVMODEDESC":"With enabled dev mode, redirect uris will not be validated!",
+            "DEVMODE":"Development Mode",
+            "DEVMODEDESC":"Beware: With development mode enabled redirect URIs will not be validated.",
             "REDIRECT": "Redirect URIs",
             "REDIRECTSECTION": "Redirect URIs",
-            "POSTLOGOUTREDIRECT":"Post logout URIs",
+            "POSTLOGOUTREDIRECT":"Post Logout URIs",
             "RESPONSE": "Response Types",
             "RESPONSESECTION": "Response Types",
             "GRANT": "Grant Types",
             "GRANTSECTION":"Grant Types",
-            "GRANTTITLE":"Select your grant types. Note: Implicit is only available for browser based applications.",
-            "APPTYPE": "App Types",
+            "GRANTTITLE":"Select your grant types. Note: Implicit is only available for browser-based applications.",
+            "APPTYPE": "Application Types",
             "RESPONSE0": "Code",
-            "RESPONSE1": "Id Token",
-            "RESPONSE2": "Token-Id Token",
+            "RESPONSE1": "ID Token",
+            "RESPONSE2": "Token-ID Token",
             "GRANT0": "Authorization Code",
             "GRANT1": "Implicit",
             "GRANT2": "Refresh Token",
             "APPTYPE0": "Web",
             "APPTYPE1": "User Agent",
             "APPTYPE2": "Native",
-            "AUTHMETHOD":"Auth Method",
-            "AUTHMETHODSECTION":"Auth Method",
+            "AUTHMETHOD":"Authentication Method",
+            "AUTHMETHODSECTION":"Authentication Method",
             "AUTHMETHOD0":"Basic",
             "AUTHMETHOD1":"Post",
             "AUTHMETHOD2":"None",
             "UNSECUREREDIRECT":"I sure hope you know what you are doing.",
             "OVERVIEWSECTION":"Overview",
-            "OVERVIEWTITLE":"You are now done. Review your configuration"
+            "OVERVIEWTITLE":"You are now done. Review your configuration."
         },
         "TOAST": {
-            "REACTIVATED":"App reactivated!",
-            "DEACTIVATED":"App deactivated!",
-            "OIDCUPDATED":"OIDC Config updated!",
-            "OIDCCLIENTSECRETREGENERATED":"OIDC Client Secret generated!"
+            "REACTIVATED":"Application reactivated.",
+            "DEACTIVATED":"Application deactivated.",
+            "OIDCUPDATED":"OIDC configuration updated.",
+            "OIDCCLIENTSECRETREGENERATED":"OIDC client secret generated."
         }
     },
     "GENDERS": {
@@ -689,7 +689,7 @@
         "en": "English"
     },
     "MEMBER":{
-        "ADD":"Add a manager",
+        "ADD":"Add a Manager",
         "CREATIONTYPE":"Creation Type",
         "CREATIONTYPES":{
             "3":"IAM",
@@ -701,100 +701,44 @@
     },
     "ROLESLABEL":"Roles",
     "GRANTS": {
-        "DELETE":"delete authorization",
-        "ADD":"create authorization",
+        "DELETE":"Delete Authorisation",
+        "ADD":"Create Authorisation",
         "ADD_BTN":"New",
         "PROJECT": {
-            "TITLE": "Authorizations",
-            "DESCRIPTION": "Define Authorizations for the specified project. Note that you can only see entries from projects and users where you are permitted to."
+            "TITLE": "Authorisations",
+            "DESCRIPTION": "Define authorisations for the specified project. Note that you can only see entries of projects and users for which you have the permissions."
         },
         "USER": {
-            "TITLE": "Authorizations",
-            "DESCRIPTION": "Define Authorizations for the specified user. Note that you can only see entries from projects and users where you are permitted to."
+            "TITLE": "Authorisations",
+            "DESCRIPTION": "Define authorisations for the specified user. Note that you can only see entries of projects and users for which you have the permissions."
         },
         "CREATE": {
-            "TITLE": "Create authorization",
-            "DESCRIPTION": "Search for the orgnanization, the project and the corresponding roles."
+            "TITLE": "Create authorisation",
+            "DESCRIPTION": "Search for the orgnanisation, the project, and the corresponding roles."
         },
         "DETAIL": {
-            "TITLE":"Authorization Detail",
-            "DESCRIPTION":""
+            "TITLE":"Authorisation Detail",
+            "DESCRIPTION":"Here you can see all the details of the authorisation."
         },
         "TOAST": {
-            "UPDATED":"Grant updated!",
-            "BULKREMOVED":"Grants removed!"
+            "UPDATED":"Grant updated.",
+            "BULKREMOVED":"Grants removed."
         }
     },
     "CHANGES": {
         "LISTTITLE":"Last Changes",
-        "BOTTOM":"You've arrived at the bottom",
+        "BOTTOM":"You've reached the end of the list.",
         "ORG": {
             "TITLE":"Activity",
-            "DESCRIPTION":"Here you can see the latest events that have affected an organisation change"
+            "DESCRIPTION":"Here you can see the latest events that have generated an organisation change."
         },
         "PROJECT": {
             "TITLE":"Activity",
-            "DESCRIPTION":"Here you can see the latest events that have affected a projectchange"
+            "DESCRIPTION":"Here you can see the latest events that have generated a project change."
         },
         "USER": {
             "TITLE":"Activity",
-            "DESCRIPTION":"Here you can see the latest events that have affected a userchange"
-        },
-        "EVENTS": {
-            "org.added": "created",
-            "org.changed":"changed",
-            "org.member.added":"member created",
-            "org.member.removed":"member deleted",
-            "org.domain.added":"domain added",
-            "org.domain.verified":"domain verified",
-            "org.domain.primary.set":"set primary domain",
-            "org.domain.removed":"domain removed",
-            "org.iam.policy.added":"IAM policy added",
-            "project.added": "project added",
-            "project.changed":"changed",
-            "project.deactivated":"deactivated",
-            "project.member.added":"added member",
-            "project.member.removed":"member deleted",
-            "project.role.added":"created role",
-            "project.role.removed":"deleted role",
-            "project.application.added":"added app",
-            "project.application.config.oidc.added":"added OIDC config",  
-            "user.added":"User added",
-            "user.initialization.code.added":"Init code added",
-            "user.phone.code.added":"Phone code added",
-            "user.phone.code.sent":"User phone code sent",
-            "user.initialization.code.sent":"Init code sent",
-            "user.email.verification.sended": "User email verified",
-            "user.email.code.added":"Email code added",
-            "user.email.code.sent":"Email code sent",           
-            "user.email.verified":"Email verified",
-            "user.phone.verificationsended":"User phone verification sent",
-            "user.phone.code":"User phone code created",
-            "user.initialization.verification.sended":"User mail verification sent",
-            "user.initialization.code.created":"Initialization code sent",
-            "created.user.email.code":"User email code created",
-            "created.user.phone.code":"Phone code created",
-            "updated.user.password": "Update Password",
-            "skipped.init.mfauser": "Mfa Method skipped",
-            "verified.user.email":"User email verified",
-            "registered.user":"User registered",
-            "created.user":"User created",
-            "skipped.init.mfa.user":"User MFA init skipped",
-            "user.email.password.request.sended":"Email password request sended",
-            "user.password.set.requested":"Password request",
-            "user.phone.verification.sended":"User Phone verification sended",
-            "user.phone.changed":"User phone changed",
-            "user.phone.verified":"User phone verified",
-            "updated.user.profile":"User Profile update",
-            "user.email.init.sended":"User Email init sended",
-            "user.password.changed":"Password geändert",
-            "user.initialization.check.succeeded":"Init check succeeded",
-            "user.password.check.succeeded":"Password check succeeded",
-            "user.mfa.init.skipped":"MFA init skipped",
-            "user.mfa.otp.added":"MFA OTP added",
-            "user.mfa.otp.verified":"MFA OTP verified",
-            "user.mfa.otp.removed":"MFA OTP removed",
-            "user.selfregistered":"self registered"
+            "DESCRIPTION":"Here you can see the latest events that have generated a user change."
         }
     }
 }
