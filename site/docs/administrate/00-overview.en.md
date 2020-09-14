@@ -17,7 +17,10 @@ title: Overview
   - Mobile Clients
     - Android
     - iOS / iPadOS
-  - API
+  - APIs
+    - REST
+    - GRPC
+    - GraphQL
 - Role Based Access Control
 - OpenID Connect 1.0 (OIDC) support
 - OAuth 2.0 support
