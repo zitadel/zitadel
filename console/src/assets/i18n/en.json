@@ -372,10 +372,10 @@
                 "PATTERNERROR":"The password does not meet the required pattern."
             },
             "PWD_AGE": {
-                "TITLE":"Maximal Password Age",
-                "DESCRIPTION":"You can set a maximum-age property for passwords. This policy emits a warning after the specific time has elapsed.",
-                "TITLECREATE":"Create Password Age Policy",
-                "DESCRIPTIONCREATE":"You can set a maximum-age property for passwords. This policy emits a warning after the specific time has elapsed."
+                "TITLE":"Password Aging",
+                "DESCRIPTION":"You can set a policy for the aging of passwords. This policy emits a warning after the specific aging time has elapsed.",
+                "TITLECREATE":"Create Password Aging Policy",
+                "DESCRIPTIONCREATE":"You can set a policy for the aging of passwords. This policy emits a warning after the specific aging time has elapsed."
             },
             "PWD_LOCKOUT": {
                 "TITLE":"Password Lockout",
@@ -387,7 +387,7 @@
                 "TITLE":"IAM Access Preferences",
                 "DESCRIPTION":"Define access properties of your users.",
                 "TITLECREATE":"Set IAM Access Preferences",
-                "DESCRIPTIONCREATE":"If the property UserLoginMustBeDomain is enabled an e-mail address cannot be used as a user name."
+                "DESCRIPTIONCREATE":"If the property \"UserLoginMustBeDomain\" is enabled an e-mail address cannot be used as a user name."
             },
             "BTN_INSTALL":"Setup",
             "BTN_EDIT":"Modify",
