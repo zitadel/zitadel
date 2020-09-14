@@ -4,7 +4,7 @@ title: Overview
 
 > All documentations are under active work and subject to change soon!
 
-### ZITADEL Features
+### Features
 
 - Single-Sign On (SSO) and Single-Log Out (SLO)
   - Web applications
