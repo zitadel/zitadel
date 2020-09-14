@@ -88,6 +88,8 @@ github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGX
 github.com/cockroachdb/apd v1.1.0/go.mod h1:8Sl8LxpKi29FqWXR16WEFZRNSz3SoPzUzeMeY4+DwBQ=
 github.com/cockroachdb/cockroach-go/v2 v2.0.5 h1:kG3i3YDEcg8Sby8PzUu3Wvp67Ienevj4bRAnHDF/xNc=
 github.com/cockroachdb/cockroach-go/v2 v2.0.5/go.mod h1:hAuDgiVgDVkfirP9JnhXEfcXEPRKBpYdGz+l7mvYSzw=
+github.com/cockroachdb/cockroach-go/v2 v2.0.7 h1:Xkv9PbnvBrZjxRdW7l6GLz76bxAE/xaro+SGTyLz6gQ=
+github.com/cockroachdb/cockroach-go/v2 v2.0.7/go.mod h1:nkf7rUmgPdawp3EwRjXIumihI2AYg9usGNWbJ2hsJqI=
 github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
 github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
 github.com/creack/pty v1.1.7/go.mod h1:lj5s0c3V2DBrqTV7llrYr5NG6My20zk30Fl46Y7DoTY=
