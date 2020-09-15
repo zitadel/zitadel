@@ -3,7 +3,6 @@ package oidc
 import (
 	"context"
 
-	"github.com/caos/logging"
 	"golang.org/x/text/language"
 	"gopkg.in/square/go-jose.v2"
 
@@ -94,22 +93,34 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, sc
 		case scopeOpenID:
 			userInfo.Subject = user.ID
 		case scopeEmail:
+			if user.HumanView == nil {
+				continue
+			}
 			userInfo.Email = user.Email
 			userInfo.EmailVerified = user.IsEmailVerified
 		case scopeProfile:
-			userInfo.Name = user.DisplayName
-			userInfo.FamilyName = user.LastName
-			userInfo.GivenName = user.FirstName
-			userInfo.Nickname = user.NickName
 			userInfo.PreferredUsername = user.PreferredLoginName
 			userInfo.UpdatedAt = user.ChangeDate
-			userInfo.Gender = oidc.Gender(getGender(user.Gender))
-			userInfo.Locale, err = language.Parse(user.PreferredLanguage)
-			logging.Log("OIDC-4ks9F").OnError(err).Debug("unable to parse locale")
+			if user.HumanView != nil {
+				userInfo.Name = user.DisplayName
+				userInfo.FamilyName = user.LastName
+				userInfo.GivenName = user.FirstName
+				userInfo.Nickname = user.NickName
+				userInfo.Gender = oidc.Gender(getGender(user.Gender))
+				userInfo.Locale, err = language.Parse(user.PreferredLanguage)
+			} else {
+				userInfo.Name = user.MachineView.Name
+			}
 		case scopePhone:
+			if user.HumanView == nil {
+				continue
+			}
 			userInfo.PhoneNumber = user.Phone
 			userInfo.PhoneNumberVerified = user.IsPhoneVerified
 		case scopeAddress:
+			if user.HumanView == nil {
+				continue
+			}
 			userInfo.Address.StreetAddress = user.StreetAddress
 			userInfo.Address.Locality = user.Locality
 			userInfo.Address.Region = user.Region
