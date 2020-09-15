@@ -39,23 +39,23 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (op.Clie
 	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime)
 }
 
-func (o *OPStorage) GetKeyByID(ctx context.Context, keyID string) (*jose.JSONWebKeySet, error) {
+func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID string) (*jose.JSONWebKey, error) {
 	key, err := o.repo.MachineKeyByID(ctx, keyID)
 	if err != nil {
 		return nil, err
+	}
+	if key.UserID != userID {
+		return nil, errors.ThrowPermissionDenied(nil, "OIDC-24jm3", "key from different user")
 	}
 	publicKey, err := crypto.BytesToPublicKey(key.PublicKey)
 	if err != nil {
 		return nil, err
 	}
-	return &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{
-		{
-			KeyID: key.ID,
-			// Algorithm: key.PublicKey.Algorithm, //TODO: do we need this?
-			Use: "sig",
-			Key: publicKey,
-		},
-	}}, nil
+	return &jose.JSONWebKey{
+		KeyID: key.ID,
+		Use:   "sig",
+		Key:   publicKey,
+	}, nil
 }
 
 func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secret string) error {

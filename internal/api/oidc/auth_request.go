@@ -59,15 +59,14 @@ func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) error {
 	return o.repo.DeleteAuthRequest(ctx, id)
 }
 
-func (o *OPStorage) CreateToken(ctx context.Context, authReq op.TokenRequest) (string, time.Time, error) {
-	app, err := o.repo.ApplicationByClientID(ctx, authReq.GetClientID())
-	if err != nil {
-		return "", time.Time{}, err
+func (o *OPStorage) CreateToken(ctx context.Context, req op.TokenRequest) (string, time.Time, error) {
+	var userAgentID, applicationID string
+	authReq, ok := req.(*AuthRequest)
+	if ok {
+		userAgentID = authReq.AgentID
+		applicationID = authReq.ApplicationID
 	}
-	grants, err := o.repo.UserGrantsByProjectAndUserID(app.ProjectID, authReq.GetSubject())
-	scopes := append(authReq.GetScopes(), grantsToScopes(grants)...)
-	req, _ := authReq.(*AuthRequest)
-	resp, err := o.repo.CreateToken(ctx, req.AgentID, req.ApplicationID, req.UserID, req.Audience, scopes, o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
+	resp, err := o.repo.CreateToken(ctx, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
 	if err != nil {
 		return "", time.Time{}, err
 	}
