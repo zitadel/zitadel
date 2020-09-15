@@ -71,12 +71,14 @@ func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, origin st
 	if err != nil {
 		return nil, err
 	}
-	app, err := o.repo.ApplicationByClientID(ctx, token.ApplicationID)
-	if err != nil {
-		return nil, err
-	}
-	if origin != "" && !http.IsOriginAllowed(app.OriginAllowList, origin) {
-		return nil, errors.ThrowPermissionDenied(nil, "OIDC-da1f3", "origin is not allowed")
+	if token.ApplicationID != "" {
+		app, err := o.repo.ApplicationByClientID(ctx, token.ApplicationID)
+		if err != nil {
+			return nil, err
+		}
+		if origin != "" && !http.IsOriginAllowed(app.OriginAllowList, origin) {
+			return nil, errors.ThrowPermissionDenied(nil, "OIDC-da1f3", "origin is not allowed")
+		}
 	}
 	return o.GetUserinfoFromScopes(ctx, token.UserID, token.Scopes)
 }
