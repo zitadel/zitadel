@@ -352,15 +352,15 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 		switch event.Type {
 		case es_model.UserPasswordCheckSucceeded,
 			es_model.UserPasswordCheckFailed,
-			es_model.MfaOtpCheckSucceeded,
-			es_model.MfaOtpCheckFailed,
+			es_model.MFAOTPCheckSucceeded,
+			es_model.MFAOTPCheckFailed,
 			es_model.SignedOut,
 			es_model.UserLocked,
 			es_model.UserDeactivated,
 			es_model.HumanPasswordCheckSucceeded,
 			es_model.HumanPasswordCheckFailed,
-			es_model.HumanMfaOtpCheckSucceeded,
-			es_model.HumanMfaOtpCheckFailed,
+			es_model.HumanMFAOTPCheckSucceeded,
+			es_model.HumanMFAOTPCheckFailed,
 			es_model.HumanSignedOut:
 			eventData, err := user_view_model.UserSessionFromEvent(event)
 			if err != nil {

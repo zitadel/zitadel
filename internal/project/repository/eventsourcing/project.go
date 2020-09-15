@@ -368,12 +368,12 @@ func OIDCClientSecretCheckFailedAggregate(aggCreator *es_models.AggregateCreator
 	}
 }
 
-func ProjectGrantAddedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, grant *model.ProjectGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ProjectGrantAddedAggregate(aggCreator *es_models.AggregateCreator, project *model.Project, grant *model.ProjectGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if grant == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kd89w", "Errors.Internal")
 		}
-		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
+		agg, err := ProjectAggregate(ctx, aggCreator, project)
 		if err != nil {
 			return nil, err
 		}

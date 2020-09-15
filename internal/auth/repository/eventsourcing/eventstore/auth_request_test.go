@@ -107,9 +107,9 @@ type mockViewUser struct {
 func (m *mockViewUser) UserByID(string) (*user_view_model.UserView, error) {
 	return &user_view_model.UserView{
 		State:    int32(user_model.UserStateActive),
-		UserName: "schofseckel",
+		UserName: "UserName",
 		HumanView: &user_view_model.HumanView{
-			FirstName:              "schof",
+			FirstName:              "FirstName",
 			InitRequired:           m.InitRequired,
 			PasswordSet:            m.PasswordSet,
 			PasswordChangeRequired: m.PasswordChangeRequired,
@@ -753,7 +753,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				userProvider: &mockViewUserSession{
 					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
 				},
-				user:          &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "schof"}},
+				user:          &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
 				eventProvider: &mockEventErrUser{},
 			},
 			&user_model.UserSessionView{
@@ -770,11 +770,11 @@ func Test_userSessionByIDs(t *testing.T) {
 					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
 				},
 				agentID: "agentID",
-				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "schof"}},
+				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
 				eventProvider: &mockEventUser{
 					&es_models.Event{
 						AggregateType: user_es_model.UserAggregate,
-						Type:          user_es_model.MfaOtpCheckSucceeded,
+						Type:          user_es_model.MFAOTPCheckSucceeded,
 						CreationDate:  time.Now().UTC().Round(1 * time.Second),
 					},
 				},
@@ -797,7 +797,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				eventProvider: &mockEventUser{
 					&es_models.Event{
 						AggregateType: user_es_model.UserAggregate,
-						Type:          user_es_model.MfaOtpCheckSucceeded,
+						Type:          user_es_model.MFAOTPCheckSucceeded,
 						CreationDate:  time.Now().UTC().Round(1 * time.Second),
 						Data: func() []byte {
 							data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "otherID"})
@@ -820,11 +820,11 @@ func Test_userSessionByIDs(t *testing.T) {
 					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
 				},
 				agentID: "agentID",
-				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "schof"}},
+				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
 				eventProvider: &mockEventUser{
 					&es_models.Event{
 						AggregateType: user_es_model.UserAggregate,
-						Type:          user_es_model.MfaOtpCheckSucceeded,
+						Type:          user_es_model.MFAOTPCheckSucceeded,
 						CreationDate:  time.Now().UTC().Round(1 * time.Second),
 						Data: func() []byte {
 							data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})
@@ -903,10 +903,10 @@ func Test_userByID(t *testing.T) {
 			},
 			&user_model.UserView{
 				State:    user_model.UserStateActive,
-				UserName: "schofseckel",
+				UserName: "UserName",
 				HumanView: &user_model.HumanView{
 					PasswordChangeRequired: true,
-					FirstName:              "schof",
+					FirstName:              "FirstName",
 				},
 			},
 			nil,
@@ -928,10 +928,10 @@ func Test_userByID(t *testing.T) {
 			},
 			&user_model.UserView{
 				State:    user_model.UserStateActive,
-				UserName: "schofseckel",
+				UserName: "UserName",
 				HumanView: &user_model.HumanView{
 					PasswordChangeRequired: true,
-					FirstName:              "schof",
+					FirstName:              "FirstName",
 				},
 			},
 			nil,
@@ -957,11 +957,11 @@ func Test_userByID(t *testing.T) {
 			&user_model.UserView{
 				ChangeDate: time.Now().UTC().Round(1 * time.Second),
 				State:      user_model.UserStateActive,
-				UserName:   "schofseckel",
+				UserName:   "UserName",
 				HumanView: &user_model.HumanView{
 					PasswordChangeRequired: false,
 					PasswordChanged:        time.Now().UTC().Round(1 * time.Second),
-					FirstName:              "schof",
+					FirstName:              "FirstName",
 				},
 			},
 			nil,

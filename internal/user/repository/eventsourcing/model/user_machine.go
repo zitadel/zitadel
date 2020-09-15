@@ -32,10 +32,6 @@ func (sa *Machine) AppendEvent(event *models.Event) (err error) {
 	switch event.Type {
 	case MachineAdded, MachineChanged:
 		err = sa.setData(event)
-	case MachineKeyAdded:
-		fallthrough
-	case MachineKeyRemoved:
-		logging.Log("MODEL-iBgOc").Warn("key unimplemented")
 	}
 
 	return err
