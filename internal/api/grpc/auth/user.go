@@ -130,14 +130,6 @@ func (s *Server) SearchMyExternalIDPs(ctx context.Context, request *auth.Externa
 	return externalIDPSearchResponseFromModel(externalIDP), nil
 }
 
-func (s *Server) AddMyExternalIDP(ctx context.Context, request *auth.ExternalIDPAddRequest) (*auth.ExternalIDPResponse, error) {
-	externalIDP, err := s.repo.AddMyExternalIDP(ctx, externalIDPAddToModel(ctx, request))
-	if err != nil {
-		return nil, err
-	}
-	return externalIDPResponseFromModel(externalIDP), nil
-}
-
 func (s *Server) RemoveMyExternalIDP(ctx context.Context, request *auth.ExternalIDPRemoveRequest) (*empty.Empty, error) {
 	err := s.repo.RemoveMyExternalIDP(ctx, externalIDPRemoveToModel(ctx, request))
 	return &empty.Empty{}, err

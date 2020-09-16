@@ -422,18 +422,10 @@ func TestUserRegisterAggregate(t *testing.T) {
 			name: "new user nil",
 			args: args{
 				ctx:           authz.NewMockContext("orgID", "userID"),
-				user:           nil,
+				user:          nil,
 				initCode:      &model.InitUserCode{},
 				resourceOwner: "newResourceowner",
-				user: &model.User{
-					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					UserName:   "UserName",
-					Human: &model.Human{
-						Profile: &model.Profile{DisplayName: "DisplayName"},
-						Email:   &model.Email{EmailAddress: "EmailAddress"},
-					},
-				},
-				aggCreator: models.NewAggregateCreator("Test"),
+				aggCreator:    models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,

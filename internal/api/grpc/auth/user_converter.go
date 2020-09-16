@@ -248,15 +248,6 @@ func externalIDPSearchRequestToModel(request *auth.ExternalIDPSearchRequest) *us
 	}
 }
 
-func externalIDPAddToModel(ctx context.Context, idp *auth.ExternalIDPAddRequest) *usr_model.ExternalIDP {
-	return &usr_model.ExternalIDP{
-		ObjectRoot:  models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
-		IDPConfigID: idp.IdpConfigId,
-		UserID:      idp.UserId,
-		DisplayName: idp.DisplayName,
-	}
-}
-
 func externalIDPRemoveToModel(ctx context.Context, idp *auth.ExternalIDPRemoveRequest) *usr_model.ExternalIDP {
 	return &usr_model.ExternalIDP{
 		ObjectRoot:  models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},

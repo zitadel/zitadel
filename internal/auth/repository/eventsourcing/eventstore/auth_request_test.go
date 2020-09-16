@@ -194,6 +194,15 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
+			"user not set no active session, linking users, external user not found option",
+			fields{
+				userSessionViewProvider: &mockViewNoUserSession{},
+			},
+			args{&model.AuthRequest{LinkingUsers: []*model.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "ExternalUserID"}}}, false},
+			[]model.NextStep{&model.ExternalNotFoundOptionStep{}},
+			nil,
+		},
+		{
 			"user not set, prompt select account and internal error, internal error",
 			fields{
 				userSessionViewProvider: &mockViewErrUserSession{},
@@ -593,7 +602,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					SelectedIDPConfigID: "IDPConfigID",
 					LinkingUsers:        []*model.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "UserID", DisplayName: "DisplayName"}},
 				}, false},
-			[]model.NextStep{&model.RedirectToCallbackStep{}},
+			[]model.NextStep{&model.LinkUsersStep{}},
 			nil,
 		},
 	}
