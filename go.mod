@@ -15,7 +15,7 @@ require (
 	github.com/aws/aws-sdk-go v1.34.24 // indirect
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.7.4
+	github.com/caos/oidc v0.9.0
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/cockroachdb/cockroach-go/v2 v2.0.7
 	github.com/envoyproxy/protoc-gen-validate v0.4.1
@@ -53,11 +53,9 @@ require (
 	go.opencensus.io v0.22.4
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 	golang.org/x/text v0.3.3
-	golang.org/x/tools v0.0.0-20200916124019-c8d9e05b1c61
-	google.golang.org/genproto v0.0.0-20200915202801-9f80d0600517
+	golang.org/x/tools v0.0.0-20200916140129-56d9a0cd3487
+	google.golang.org/genproto v0.0.0-20200916143405-f6a2fa72f0c4
 	google.golang.org/grpc v1.32.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/square/go-jose.v2 v2.5.1
 )
-
-replace github.com/caos/oidc => /Users/silvanreusser/go/src/github.com/caos/oidc
