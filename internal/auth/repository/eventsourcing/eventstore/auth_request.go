@@ -341,16 +341,13 @@ func (repo AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Contex
 }
 
 func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *model.AuthRequest, idpConfigID string) error {
-	orgID := request.GetScopeOrgID()
-	if orgID == "" {
-		orgID = repo.SystemDefaults.IamID
+	for _, externalIDP := range request.AllowedExternalIDPs {
+		if externalIDP.IDPConfigID == idpConfigID {
+			request.SelectedIDPConfigID = idpConfigID
+			return nil
+		}
 	}
-	_, err := repo.View.IDPProviderByAggregateAndIDPConfigID(orgID, idpConfigID)
-	if err != nil {
-		return err
-	}
-	request.SelectedIDPConfigID = idpConfigID
-	return nil
+	return errors.ThrowNotFound(nil, "LOGIN-Nsm8r", "Errors.User.ExternalIDP.NotAllowed")
 }
 
 func (repo *AuthRequestRepo) checkExternalUserLogin(request *model.AuthRequest, idpConfigID, externalUserID string) (err error) {
