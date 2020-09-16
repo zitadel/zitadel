@@ -121,10 +121,6 @@ func (key *MachineKey) GenerateMachineKeyPair(keySize int, alg crypto.Encryption
 	if err != nil {
 		return err
 	}
-	// key.PublicKey, err = crypto.Encrypt(publicKeyBytes, alg)
-	// if err != nil {
-	// 	return err
-	// }
 	key.privateKey = crypto.PrivateKeyToBytes(privateKey)
 	return nil
 }

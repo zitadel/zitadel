@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	_ "net/http/pprof"
 
 	"github.com/caos/logging"
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
