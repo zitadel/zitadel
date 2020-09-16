@@ -40,13 +40,13 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 	switch event.Type {
 	case es_model.UserPasswordCheckSucceeded,
 		es_model.UserPasswordCheckFailed,
-		es_model.MfaOtpCheckSucceeded,
-		es_model.MfaOtpCheckFailed,
+		es_model.MFAOTPCheckSucceeded,
+		es_model.MFAOTPCheckFailed,
 		es_model.SignedOut,
 		es_model.HumanPasswordCheckSucceeded,
 		es_model.HumanPasswordCheckFailed,
-		es_model.HumanMfaOtpCheckSucceeded,
-		es_model.HumanMfaOtpCheckFailed,
+		es_model.HumanMFAOTPCheckSucceeded,
+		es_model.HumanMFAOTPCheckFailed,
 		es_model.HumanSignedOut:
 		eventData, err := view_model.UserSessionFromEvent(event)
 		if err != nil {

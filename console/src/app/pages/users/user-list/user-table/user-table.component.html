@@ -1,5 +1,6 @@
 <app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
-    [timestamp]="userResult?.viewTimestamp" [selection]="selection">
+    [timestamp]="userResult?.viewTimestamp" [selection]="selection"
+    [emitRefreshOnPreviousRoute]="refreshOnPreviousRoute">
     <ng-template appHasRole [appHasRole]="['user.write']" actions>
         <button (click)="deactivateSelectedUsers()" matTooltip="{{'ORG_DETAIL.TABLE.DEACTIVATE' | translate}}"
             class="icon-button" mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">

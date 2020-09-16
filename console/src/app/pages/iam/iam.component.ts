@@ -59,6 +59,9 @@ export class IamComponent {
                         return this.adminService.AddIamMember(user.id, roles);
                     })).then(() => {
                         this.toast.showInfo('IAM.TOAST.MEMBERADDED');
+                        setTimeout(() => {
+                            this.loadMembers();
+                        }, 1000);
                     }).catch(error => {
                         this.toast.showError(error);
                     });

@@ -182,6 +182,9 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
                         return this.mgmtService.AddMyOrgMember(user.id, roles);
                     })).then(() => {
                         this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
+                        setTimeout(() => {
+                            this.loadMembers();
+                        }, 1000);
                     }).catch(error => {
                         this.toast.showError(error);
                     });

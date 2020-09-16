@@ -101,10 +101,10 @@ func TestUserQuery(t *testing.T) {
 	}
 }
 
-func TestUserCreateAggregate(t *testing.T) {
+func TestHumanCreateAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		new        *model.User
+		user       *model.User
 		initCode   *model.InitUserCode
 		phoneCode  *model.PhoneCode
 		aggCreator *models.AggregateCreator
@@ -126,7 +126,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			name: "user create aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.User{
+				user: &model.User{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserName:   "UserName",
 					Human: &model.Human{
@@ -147,7 +147,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			name: "new user nil",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				new:        nil,
+				user:       nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -159,7 +159,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			name: "create with init code",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.User{
+				user: &model.User{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserName:   "UserName",
 					Human: &model.Human{
@@ -181,7 +181,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			name: "create with phone code",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.User{
+				user: &model.User{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserName:   "UserName",
 					Human: &model.Human{
@@ -203,7 +203,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			name: "create with email verified",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.User{
+				user: &model.User{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserName:   "UserName",
 					Human: &model.Human{
@@ -224,7 +224,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			name: "create with phone verified",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.User{
+				user: &model.User{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserName:   "UserName",
 					Human: &model.Human{
@@ -245,7 +245,7 @@ func TestUserCreateAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			aggregates, err := HumanCreateAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.new, tt.args.initCode, tt.args.phoneCode, "", true)
+			aggregates, err := HumanCreateAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.user, tt.args.initCode, tt.args.phoneCode, "", true)
 
 			if !tt.res.wantErr && len(aggregates) != tt.res.aggregatesLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.aggregatesLen, len(aggregates))
@@ -272,10 +272,92 @@ func TestUserCreateAggregate(t *testing.T) {
 	}
 }
 
+func TestMachineCreateAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		user       *model.User
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen      int
+		eventTypes    []models.EventType
+		aggregatesLen int
+		checkData     []bool
+		wantErr       bool
+		errFunc       func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "user create aggregate ok",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				user: &model.User{
+					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					UserName:   "UserName",
+					Machine: &model.Machine{
+						Description: "Description",
+						Name:        "Name",
+					},
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:      1,
+				eventTypes:    []models.EventType{model.MachineAdded},
+				checkData:     []bool{true},
+				aggregatesLen: 2,
+			},
+		},
+		{
+			name: "new user nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				user:       nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			aggregates, err := MachineCreateAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.user, "", true)
+
+			if !tt.res.wantErr && len(aggregates) != tt.res.aggregatesLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.aggregatesLen, len(aggregates))
+			}
+
+			if !tt.res.wantErr && len(aggregates[0].Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(aggregates[1].Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && aggregates[0].Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], aggregates[0].Events[i].Type.String())
+				}
+				if !tt.res.wantErr && tt.res.checkData[i] && aggregates[0].Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+				if !tt.res.wantErr && !tt.res.checkData[i] && aggregates[0].Events[i].Data != nil {
+					t.Errorf("should not have data in event")
+				}
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
 func TestUserRegisterAggregate(t *testing.T) {
 	type args struct {
 		ctx           context.Context
-		new           *model.User
+		user          *model.User
 		initCode      *model.InitUserCode
 		resourceOwner string
 		aggCreator    *models.AggregateCreator
@@ -294,7 +376,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 			name: "user register aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.User{
+				user: &model.User{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserName:   "UserName",
 					Human: &model.Human{
@@ -315,7 +397,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 			name: "new user nil",
 			args: args{
 				ctx:           authz.NewMockContext("orgID", "userID"),
-				new:           nil,
+				user:          nil,
 				initCode:      &model.InitUserCode{},
 				resourceOwner: "newResourceowner",
 				aggCreator:    models.NewAggregateCreator("Test"),
@@ -329,7 +411,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContext("orgID", "userID"),
 				resourceOwner: "newResourceowner",
-				new: &model.User{
+				user: &model.User{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserName:   "UserName",
 					Human: &model.Human{
@@ -347,7 +429,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 			name: "create with init code",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.User{
+				user: &model.User{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserName:   "UserName",
 					Human: &model.Human{
@@ -368,7 +450,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 			name: "create no resourceowner",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.User{
+				user: &model.User{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserName:   "UserName",
 					Human: &model.Human{
@@ -386,7 +468,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			aggregates, err := UserRegisterAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.new, tt.args.resourceOwner, tt.args.initCode, false)
+			aggregates, err := UserRegisterAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.user, tt.args.resourceOwner, tt.args.initCode, false)
 
 			if tt.res.errFunc == nil && len(aggregates[1].Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(aggregates[1].Events))
@@ -409,7 +491,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 func TestUserDeactivateAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		new        *model.User
+		user       *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -426,12 +508,9 @@ func TestUserDeactivateAggregate(t *testing.T) {
 			name: "user deactivate aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.User{
+				user: &model.User{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserName:   "UserName",
-					Human: &model.Human{
-						Profile: &model.Profile{DisplayName: "DisplayName"},
-					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -444,7 +523,7 @@ func TestUserDeactivateAggregate(t *testing.T) {
 			name: "new user nil",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				new:        nil,
+				user:       nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -454,7 +533,7 @@ func TestUserDeactivateAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := UserDeactivateAggregate(tt.args.aggCreator, tt.args.new)(tt.args.ctx)
+			agg, err := UserDeactivateAggregate(tt.args.aggCreator, tt.args.user)(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -472,7 +551,7 @@ func TestUserDeactivateAggregate(t *testing.T) {
 func TestUserReactivateAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		new        *model.User
+		user       *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -489,12 +568,9 @@ func TestUserReactivateAggregate(t *testing.T) {
 			name: "user reactivate aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.User{
+				user: &model.User{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserName:   "UserName",
-					Human: &model.Human{
-						Profile: &model.Profile{DisplayName: "DisplayName"},
-					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -507,7 +583,7 @@ func TestUserReactivateAggregate(t *testing.T) {
 			name: "new user nil",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				new:        nil,
+				user:       nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -517,7 +593,7 @@ func TestUserReactivateAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := UserReactivateAggregate(tt.args.aggCreator, tt.args.new)(tt.args.ctx)
+			agg, err := UserReactivateAggregate(tt.args.aggCreator, tt.args.user)(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -535,7 +611,7 @@ func TestUserReactivateAggregate(t *testing.T) {
 func TestUserLockedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		new        *model.User
+		user       *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -552,12 +628,9 @@ func TestUserLockedAggregate(t *testing.T) {
 			name: "user locked aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.User{
+				user: &model.User{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserName:   "UserName",
-					Human: &model.Human{
-						Profile: &model.Profile{DisplayName: "DisplayName"},
-					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -570,7 +643,7 @@ func TestUserLockedAggregate(t *testing.T) {
 			name: "new user nil",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				new:        nil,
+				user:       nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -580,7 +653,7 @@ func TestUserLockedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := UserLockAggregate(tt.args.aggCreator, tt.args.new)(tt.args.ctx)
+			agg, err := UserLockAggregate(tt.args.aggCreator, tt.args.user)(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -598,7 +671,7 @@ func TestUserLockedAggregate(t *testing.T) {
 func TestUserUnlockedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		new        *model.User
+		user       *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -615,12 +688,9 @@ func TestUserUnlockedAggregate(t *testing.T) {
 			name: "user unlocked aggregate ok",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.User{
+				user: &model.User{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserName:   "UserName",
-					Human: &model.Human{
-						Profile: &model.Profile{DisplayName: "DisplayName"},
-					},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -633,7 +703,7 @@ func TestUserUnlockedAggregate(t *testing.T) {
 			name: "new user nil",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				new:        nil,
+				user:       nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -643,7 +713,7 @@ func TestUserUnlockedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := UserUnlockAggregate(tt.args.aggCreator, tt.args.new)(tt.args.ctx)
+			agg, err := UserUnlockAggregate(tt.args.aggCreator, tt.args.user)(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -904,7 +974,7 @@ func TestInitCodeCheckFailedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.HumanMfaInitSkipped,
+				eventType: model.HumanMFAInitSkipped,
 			},
 		},
 	}
@@ -2045,7 +2115,7 @@ func TestChangeAddressAggregate(t *testing.T) {
 	}
 }
 
-func TestOtpAddAggregate(t *testing.T) {
+func TestOTPAddAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		user       *model.User
@@ -2109,7 +2179,7 @@ func TestOtpAddAggregate(t *testing.T) {
 	}
 }
 
-func TestOtpVerifyAggregate(t *testing.T) {
+func TestOTPVerifyAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		user       *model.User
@@ -2157,7 +2227,7 @@ func TestOtpVerifyAggregate(t *testing.T) {
 	}
 }
 
-func TestOtpRemoveAggregate(t *testing.T) {
+func TestOTPRemoveAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		user       *model.User

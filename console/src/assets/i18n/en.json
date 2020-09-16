@@ -45,6 +45,7 @@
         "CONTINUE": "Continue",
         "BACK": "Back",
         "CLOSE": "Close",
+        "CLEAR": "Clear",
         "CANCEL":"Cancel",
         "INFO": "Info",
         "OK": "OK",
@@ -107,6 +108,10 @@
                 "1": "Not Ready",
                 "2": "Ready",
                 "3": "Deleted"
+            },
+            "DIALOG": {
+                "OTP_DELETE_TITLE":"Remove OTP Factor",
+                "OTP_DELETE_DESCRIPTION":"You are about to delete OTP as second factor. Are you sure?"
             }
         },
         "CREATE": {
@@ -155,12 +160,17 @@
             "KEYSDESC":"Define your keys and add an optional expiration date.",
             "ID":"Key Id",
             "TYPE":"Type",
-            "EXPIRYDATE":"Expiration date",
+            "EXPIRATIONDATE":"Expiration date",
             "CHOOSEEXPIRY":"Select an expiration Date",
             "CREATIONDATE":"Creation Date",
+            "KEYDETAILS":"Key Details",
             "ADD": {
                 "TITLE":"Add Key",
                 "DESCRIPTION":"Select your key type and choose an optional expiry date."
+            },
+            "ADDED": {
+                "TITLE":"The key was created",
+                "DESCRIPTION":"Download the key as it won't be visible after closing this dialog!"
             },
             "KEYTYPES": {
                 "1":"JSON"

@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
@@ -57,6 +58,7 @@ func MachineCreateAggregate(ctx context.Context, aggCreator *es_models.Aggregate
 	if resourceOwner != "" {
 		agg, err = UserAggregateOverwriteContext(ctx, aggCreator, user, resourceOwner, user.AggregateID)
 	} else {
+		resourceOwner = authz.GetCtxData(ctx).OrgID
 		agg, err = UserAggregate(ctx, aggCreator, user)
 	}
 	if err != nil {
@@ -95,6 +97,7 @@ func HumanCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCr
 	if resourceOwner != "" {
 		agg, err = UserAggregateOverwriteContext(ctx, aggCreator, user, resourceOwner, user.AggregateID)
 	} else {
+		resourceOwner = authz.GetCtxData(ctx).OrgID
 		agg, err = UserAggregate(ctx, aggCreator, user)
 	}
 	if err != nil {
@@ -194,6 +197,10 @@ func getUniqueUserAggregates(ctx context.Context, aggCreator *es_models.Aggregat
 }
 
 func reservedUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, userName string, userLoginMustBeDomain bool) (*es_models.Aggregate, error) {
+	if userLoginMustBeDomain && resourceOwner == "" {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-wWfgH", "Errors.Internal")
+	}
+
 	uniqueUserName := userName
 	if userLoginMustBeDomain {
 		uniqueUserName = userName + resourceOwner
@@ -214,10 +221,19 @@ func reservedUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.
 	return aggregate.SetPrecondition(UserUserNameUniqueQuery(uniqueUserName), isEventValidation(aggregate, model.UserUserNameReserved)), nil
 }
 
-func releasedUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, username string) (aggregate *es_models.Aggregate, err error) {
-	aggregate, err = aggCreator.NewAggregate(ctx, username, model.UserUserNameAggregate, model.UserVersion, 0)
+func releasedUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, userName string, userLoginMustBeDomain bool) (aggregate *es_models.Aggregate, err error) {
+	if userLoginMustBeDomain && resourceOwner == "" {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-sK9Kg", "Errors.Internal")
+	}
+
+	uniqueUserName := userName
+	if userLoginMustBeDomain {
+		uniqueUserName = userName + resourceOwner
+	}
+
+	aggregate, err = aggCreator.NewAggregate(ctx, uniqueUserName, model.UserUserNameAggregate, model.UserVersion, 0)
 	if resourceOwner != "" {
-		aggregate, err = aggCreator.NewAggregate(ctx, username, model.UserUserNameAggregate, model.UserVersion, 0, es_models.OverwriteResourceOwner(resourceOwner))
+		aggregate, err = aggCreator.NewAggregate(ctx, uniqueUserName, model.UserUserNameAggregate, model.UserVersion, 0, es_models.OverwriteResourceOwner(resourceOwner))
 	}
 	if err != nil {
 		return nil, err
@@ -227,13 +243,13 @@ func releasedUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.
 		return nil, err
 	}
 
-	return aggregate.SetPrecondition(UserUserNameUniqueQuery(username), isEventValidation(aggregate, model.UserUserNameReleased)), nil
+	return aggregate.SetPrecondition(UserUserNameUniqueQuery(uniqueUserName), isEventValidation(aggregate, model.UserUserNameReserved)), nil
 }
 
 func changeUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, oldUsername, username string, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
 	aggregates := make([]*es_models.Aggregate, 2)
 	var err error
-	aggregates[0], err = releasedUniqueUserNameAggregate(ctx, aggCreator, resourceOwner, oldUsername)
+	aggregates[0], err = releasedUniqueUserNameAggregate(ctx, aggCreator, resourceOwner, oldUsername, userLoginMustBeDomain)
 	if err != nil {
 		return nil, err
 	}
@@ -331,7 +347,7 @@ func SkipMfaAggregate(aggCreator *es_models.AggregateCreator, user *model.User) 
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.HumanMfaInitSkipped, nil)
+		return agg.AppendEvent(model.HumanMFAInitSkipped, nil)
 	}
 }
 
@@ -642,7 +658,7 @@ func MFAOTPCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, user 
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.HumanMfaOtpCheckSucceeded, authReq)
+		return agg.AppendEvent(model.HumanMFAOTPCheckSucceeded, authReq)
 	}
 }
 
@@ -655,7 +671,7 @@ func MFAOTPCheckFailedAggregate(aggCreator *es_models.AggregateCreator, user *mo
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.HumanMfaOtpCheckFailed, authReq)
+		return agg.AppendEvent(model.HumanMFAOTPCheckFailed, authReq)
 	}
 }
 
