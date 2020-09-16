@@ -47,8 +47,8 @@ const (
 	MFAOTPAdded          models.EventType = "user.mfa.otp.added"
 	MFAOTPVerified       models.EventType = "user.mfa.otp.verified"
 	MFAOTPRemoved        models.EventType = "user.mfa.otp.removed"
-	MfaOtpCheckSucceeded models.EventType = "user.mfa.otp.check.succeeded"
-	MfaOtpCheckFailed    models.EventType = "user.mfa.otp.check.failed"
+	MFAOTPCheckSucceeded models.EventType = "user.mfa.otp.check.succeeded"
+	MFAOTPCheckFailed    models.EventType = "user.mfa.otp.check.failed"
 	MFAInitSkipped       models.EventType = "user.mfa.init.skipped"
 
 	SignedOut models.EventType = "user.signed.out"
@@ -110,9 +110,9 @@ const (
 	HumanMFAOTPAdded          models.EventType = "user.human.mfa.otp.added"
 	HumanMFAOTPVerified       models.EventType = "user.human.mfa.otp.verified"
 	HumanMFAOTPRemoved        models.EventType = "user.human.mfa.otp.removed"
-	HumanMfaOtpCheckSucceeded models.EventType = "user.human.mfa.otp.check.succeeded"
-	HumanMfaOtpCheckFailed    models.EventType = "user.human.mfa.otp.check.failed"
-	HumanMfaInitSkipped       models.EventType = "user.human.mfa.init.skipped"
+	HumanMFAOTPCheckSucceeded models.EventType = "user.human.mfa.otp.check.succeeded"
+	HumanMFAOTPCheckFailed    models.EventType = "user.human.mfa.otp.check.failed"
+	HumanMFAInitSkipped       models.EventType = "user.human.mfa.init.skipped"
 
 	HumanSignedOut models.EventType = "user.human.signed.out"
 )

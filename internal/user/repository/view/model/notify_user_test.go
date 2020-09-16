@@ -1,9 +1,10 @@
 package model
 
 import (
+	"testing"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	"testing"
 )
 
 func TestNotifyUserAppendEvent(t *testing.T) {
@@ -19,7 +20,15 @@ func TestNotifyUserAppendEvent(t *testing.T) {
 		{
 			name: "append added user event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullUser(nil))},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullHuman(nil))},
+				user:  &NotifyUser{},
+			},
+			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone"},
+		},
+		{
+			name: "append added human event",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullHuman(nil))},
 				user:  &NotifyUser{},
 			},
 			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone"},

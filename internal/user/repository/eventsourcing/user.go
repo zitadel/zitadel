@@ -386,7 +386,7 @@ func SkipMfaAggregate(aggCreator *es_models.AggregateCreator, user *model.User) 
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.HumanMfaInitSkipped, nil)
+		return agg.AppendEvent(model.HumanMFAInitSkipped, nil)
 	}
 }
 
@@ -697,7 +697,7 @@ func MFAOTPCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, user 
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.HumanMfaOtpCheckSucceeded, authReq)
+		return agg.AppendEvent(model.HumanMFAOTPCheckSucceeded, authReq)
 	}
 }
 
@@ -710,7 +710,7 @@ func MFAOTPCheckFailedAggregate(aggCreator *es_models.AggregateCreator, user *mo
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.HumanMfaOtpCheckFailed, authReq)
+		return agg.AppendEvent(model.HumanMFAOTPCheckFailed, authReq)
 	}
 }
 
