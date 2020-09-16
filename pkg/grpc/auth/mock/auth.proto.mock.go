@@ -57,26 +57,6 @@ func (mr *MockAuthServiceClientMockRecorder) AddMfaOTP(arg0, arg1 interface{}, a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMfaOTP", reflect.TypeOf((*MockAuthServiceClient)(nil).AddMfaOTP), varargs...)
 }
 
-// AddMyExternalIDP mocks base method
-func (m *MockAuthServiceClient) AddMyExternalIDP(arg0 context.Context, arg1 *auth.ExternalIDPAddRequest, arg2 ...grpc.CallOption) (*auth.ExternalIDPResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "AddMyExternalIDP", varargs...)
-	ret0, _ := ret[0].(*auth.ExternalIDPResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// AddMyExternalIDP indicates an expected call of AddMyExternalIDP
-func (mr *MockAuthServiceClientMockRecorder) AddMyExternalIDP(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMyExternalIDP", reflect.TypeOf((*MockAuthServiceClient)(nil).AddMyExternalIDP), varargs...)
-}
-
 // ChangeMyPassword mocks base method
 func (m *MockAuthServiceClient) ChangeMyPassword(arg0 context.Context, arg1 *auth.PasswordChange, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()

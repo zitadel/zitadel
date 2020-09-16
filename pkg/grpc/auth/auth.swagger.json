@@ -431,48 +431,6 @@
         ]
       }
     },
-    "/users/me/externalidps": {
-      "delete": {
-        "operationId": "AuthService_AddMyExternalIDP",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1ExternalIDPResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "idp_config_id",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "user_id",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "display_name",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "AuthService"
-        ]
-      }
-    },
     "/users/me/externalidps/_search": {
       "post": {
         "summary": "ExternalIDP",
@@ -1042,20 +1000,6 @@
         "limit": {
           "type": "string",
           "format": "uint64"
-        }
-      }
-    },
-    "v1ExternalIDPResponse": {
-      "type": "object",
-      "properties": {
-        "idp_config_id": {
-          "type": "string"
-        },
-        "user_id": {
-          "type": "string"
-        },
-        "display_name": {
-          "type": "string"
         }
       }
     },

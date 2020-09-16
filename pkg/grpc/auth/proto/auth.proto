@@ -276,16 +276,6 @@ service AuthService {
     };
   }
 
-  rpc AddMyExternalIDP(ExternalIDPAddRequest) returns (ExternalIDPResponse) {
-    option (google.api.http) = {
-      delete: "/users/me/externalidps"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "authenticated"
-    };
-  }
-
   rpc RemoveMyExternalIDP(ExternalIDPRemoveRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/users/me/externalidps/{idp_config_id}/{external_user_id}"
@@ -745,12 +735,6 @@ message PasswordComplexityPolicy {
   bool has_symbol = 9;
   uint64 sequence = 10;
   bool is_default = 11;
-}
-
-message ExternalIDPAddRequest {
-  string idp_config_id = 1;
-  string user_id = 2;
-  string display_name = 3;
 }
 
 message ExternalIDPResponse {
