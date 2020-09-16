@@ -57,6 +57,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		tmplRegisterOrg:        "register_org.html",
 		tmplChangeUsername:     "change_username.html",
 		tmplChangeUsernameDone: "change_username_done.html",
+		tmplLinkUsersDone:      "link_users_done.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -198,6 +199,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderInitUser(w, r, authReq, "", "", step.PasswordSet, nil)
 	case *model.ChangeUsernameStep:
 		l.renderChangeUsername(w, r, authReq, nil)
+	case *model.LinkUsersStep:
+		l.linkUsers(w, r, authReq, err)
 	default:
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}

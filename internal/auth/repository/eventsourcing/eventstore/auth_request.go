@@ -232,6 +232,19 @@ func (repo *AuthRequestRepo) AddUserExternalIDPs(ctx context.Context, userID str
 	return nil
 }
 
+func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, userAgentID string) error {
+	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
+	if err != nil {
+		return err
+	}
+	err = linkExternalIDPs(ctx, repo.UserEventProvider, request)
+	if err != nil {
+		return err
+	}
+	request.LinkingUsers = nil
+	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
 func (repo *AuthRequestRepo) getAuthRequestNextSteps(ctx context.Context, id, userAgentID string, checkLoggedIn bool) (*model.AuthRequest, error) {
 	request, err := repo.getAuthRequest(ctx, id, userAgentID)
 	if err != nil {
@@ -429,11 +442,9 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 		return steps, nil
 	}
 
-	if len(request.LinkingUsers) != 0 {
-		err = linkExternalIDPs(ctx, repo.UserEventProvider, request)
-		if err != nil {
-			return nil, err
-		}
+	if request.LinkingUsers != nil && len(request.LinkingUsers) != 0 {
+		return append(steps, &model.LinkUsersStep{}), nil
+
 	}
 	//PLANNED: consent step
 	return append(steps, &model.RedirectToCallbackStep{}), nil

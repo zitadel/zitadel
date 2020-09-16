@@ -20,4 +20,5 @@ type AuthRequestRepository interface {
 	VerifyPassword(ctx context.Context, id, userID, password, userAgentID string, info *model.BrowserInfo) error
 	VerifyMfaOTP(ctx context.Context, agentID, authRequestID, code, userAgentID string, info *model.BrowserInfo) error
 	AddUserExternalIDPs(ctx context.Context, userID string, linkingUsers []*model.ExternalUser) error
+	LinkExternalUsers(ctx context.Context, authReqID, userAgenID string) error
 }

@@ -19,6 +19,7 @@ const (
 	NextStepMfaVerify
 	NextStepRedirectToCallback
 	NextStepChangeUsername
+	NextStepLinkUsers
 )
 
 type UserSessionState int32
@@ -102,6 +103,12 @@ type MfaVerificationStep struct {
 
 func (s *MfaVerificationStep) Type() NextStepType {
 	return NextStepMfaVerify
+}
+
+type LinkUsersStep struct{}
+
+func (s *LinkUsersStep) Type() NextStepType {
+	return NextStepLinkUsers
 }
 
 type RedirectToCallbackStep struct{}

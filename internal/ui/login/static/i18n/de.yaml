@@ -157,6 +157,10 @@ RegistrationOrg:
   TosLinkText: AGBs
   TosLink: https://zitadel.ch/pdf/agb.pdf
 
+LinkingUsersDone:
+  Title: Benutzerlinking
+  Description: Benuzterlinking erledigt.
+
 LogoutDone:
   Title: Ausgeloggt
   Description: Du wurdest erfolgreich ausgeloggt.

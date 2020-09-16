@@ -162,6 +162,10 @@ LogoutDone:
   Title: Logged out
   Description: You have logged out successfully.
 
+LinkingUsersDone:
+  Title: Userlinking
+  Description: Userlinking done.
+
 Actions:
   Login: login
   Next: next
@@ -172,7 +176,6 @@ Actions:
   ForgotPassword: reset password
   Cancel: cancel
   Save: save
-
 
 Errors:
   Internal: An internal error occured
