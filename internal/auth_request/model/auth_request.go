@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/caos/zitadel/internal/iam/model"
+	"golang.org/x/text/language"
 	"strings"
 	"time"
 
@@ -42,9 +43,18 @@ type AuthRequest struct {
 }
 
 type ExternalUser struct {
-	IDPConfigID    string
-	ExternalUserID string
-	DisplayName    string
+	IDPConfigID       string
+	ExternalUserID    string
+	DisplayName       string
+	PreferredUsername string
+	FirstName         string
+	LastName          string
+	NickName          string
+	Email             string
+	IsEmailVerified   bool
+	PreferredLanguage language.Tag
+	Phone             string
+	IsPhoneVerified   bool
 }
 
 type Prompt int32

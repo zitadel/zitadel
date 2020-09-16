@@ -137,6 +137,8 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 		},
 		eventstore.AuthRequestRepo{
 			UserEvents:               user,
+			OrgEvents:                org,
+			PolicyEvents:             policy,
 			AuthRequests:             authReq,
 			View:                     view,
 			UserSessionViewProvider:  view,

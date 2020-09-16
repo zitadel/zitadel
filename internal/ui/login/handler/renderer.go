@@ -34,30 +34,31 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		pathPrefix: pathPrefix,
 	}
 	tmplMapping := map[string]string{
-		tmplError:              "error.html",
-		tmplLogin:              "login.html",
-		tmplUserSelection:      "select_user.html",
-		tmplPassword:           "password.html",
-		tmplMfaVerify:          "mfa_verify.html",
-		tmplMfaPrompt:          "mfa_prompt.html",
-		tmplMfaInitVerify:      "mfa_init_verify.html",
-		tmplMfaInitDone:        "mfa_init_done.html",
-		tmplMailVerification:   "mail_verification.html",
-		tmplMailVerified:       "mail_verified.html",
-		tmplInitPassword:       "init_password.html",
-		tmplInitPasswordDone:   "init_password_done.html",
-		tmplInitUser:           "init_user.html",
-		tmplInitUserDone:       "init_user_done.html",
-		tmplPasswordResetDone:  "password_reset_done.html",
-		tmplChangePassword:     "change_password.html",
-		tmplChangePasswordDone: "change_password_done.html",
-		tmplRegisterOption:     "register_option.html",
-		tmplRegister:           "register.html",
-		tmplLogoutDone:         "logout_done.html",
-		tmplRegisterOrg:        "register_org.html",
-		tmplChangeUsername:     "change_username.html",
-		tmplChangeUsernameDone: "change_username_done.html",
-		tmplLinkUsersDone:      "link_users_done.html",
+		tmplError:                  "error.html",
+		tmplLogin:                  "login.html",
+		tmplUserSelection:          "select_user.html",
+		tmplPassword:               "password.html",
+		tmplMfaVerify:              "mfa_verify.html",
+		tmplMfaPrompt:              "mfa_prompt.html",
+		tmplMfaInitVerify:          "mfa_init_verify.html",
+		tmplMfaInitDone:            "mfa_init_done.html",
+		tmplMailVerification:       "mail_verification.html",
+		tmplMailVerified:           "mail_verified.html",
+		tmplInitPassword:           "init_password.html",
+		tmplInitPasswordDone:       "init_password_done.html",
+		tmplInitUser:               "init_user.html",
+		tmplInitUserDone:           "init_user_done.html",
+		tmplPasswordResetDone:      "password_reset_done.html",
+		tmplChangePassword:         "change_password.html",
+		tmplChangePasswordDone:     "change_password_done.html",
+		tmplRegisterOption:         "register_option.html",
+		tmplRegister:               "register.html",
+		tmplLogoutDone:             "logout_done.html",
+		tmplRegisterOrg:            "register_org.html",
+		tmplChangeUsername:         "change_username.html",
+		tmplChangeUsernameDone:     "change_username_done.html",
+		tmplLinkUsersDone:          "link_users_done.html",
+		tmplExternalNotFoundOption: "external_not_found_option.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -128,6 +129,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		},
 		"changeUsernameUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointChangeUsername)
+		},
+		"externalNotFoundOptionUrl": func() string {
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s", EndpointExternalNotFoundOption))
 		},
 		"selectedLanguage": func(l string) bool {
 			return false
@@ -201,6 +205,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderChangeUsername(w, r, authReq, nil)
 	case *model.LinkUsersStep:
 		l.linkUsers(w, r, authReq, err)
+	case *model.ExternalNotFoundOptionStep:
+		l.renderExternalNotFoundOption(w, r, authReq, err)
 	default:
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}

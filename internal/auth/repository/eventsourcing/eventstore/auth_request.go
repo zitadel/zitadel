@@ -4,8 +4,11 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/eventstore/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	"time"
 
 	"github.com/caos/logging"
@@ -27,6 +30,8 @@ import (
 
 type AuthRequestRepo struct {
 	UserEvents   *user_event.UserEventstore
+	OrgEvents    *org_event.OrgEventstore
+	PolicyEvents *policy_event.PolicyEventstore
 	AuthRequests cache.AuthRequestCache
 	View         *view.View
 
@@ -245,6 +250,46 @@ func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, u
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
+func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, registerUser *user_model.User, externalIDP *user_model.ExternalIDP, orgMember *org_model.OrgMember, authReqID, userAgentID, resourceOwner string) error {
+	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
+	if err != nil {
+		return err
+	}
+	policyResourceOwner := authz.GetCtxData(ctx).OrgID
+	if resourceOwner != "" {
+		policyResourceOwner = resourceOwner
+	}
+	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
+	if err != nil {
+		return err
+	}
+	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, policyResourceOwner)
+	if err != nil {
+		return err
+	}
+	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, externalIDP, pwPolicy, orgPolicy, resourceOwner)
+	if err != nil {
+		return err
+	}
+	if orgMember != nil {
+		orgMember.UserID = user.AggregateID
+		_, memberAggregate, err := repo.OrgEvents.PrepareAddOrgMember(ctx, orgMember, policyResourceOwner)
+		if err != nil {
+			return err
+		}
+		aggregates = append(aggregates, memberAggregate)
+	}
+
+	err = sdk.PushAggregates(ctx, repo.UserEvents.PushAggregates, user.AppendEvents, aggregates...)
+	if err != nil {
+		return err
+	}
+	request.UserID = user.AggregateID
+	request.SelectedIDPConfigID = externalIDP.IDPConfigID
+	request.LinkingUsers = nil
+	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
 func (repo *AuthRequestRepo) getAuthRequestNextSteps(ctx context.Context, id, userAgentID string, checkLoggedIn bool) (*model.AuthRequest, error) {
 	request, err := repo.getAuthRequest(ctx, id, userAgentID)
 	if err != nil {
@@ -387,6 +432,10 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 		return append(steps, &model.RedirectToCallbackStep{}), nil
 	}
 	if request.UserID == "" {
+		if request.LinkingUsers != nil && len(request.LinkingUsers) > 0 {
+			steps = append(steps, new(model.ExternalNotFoundOptionStep))
+			return steps, nil
+		}
 		steps = append(steps, new(model.LoginStep))
 		if request.Prompt == model.PromptSelectAccount || request.Prompt == model.PromptUnspecified {
 			users, err := repo.usersForUserSelection(request)

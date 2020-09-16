@@ -157,7 +157,6 @@ RegistrationOrg:
   TosLinkText: TOS
   TosLink: https://zitadel.ch/pdf/tos.pdf
 
-
 LogoutDone:
   Title: Logged out
   Description: You have logged out successfully.
@@ -165,6 +164,12 @@ LogoutDone:
 LinkingUsersDone:
   Title: Userlinking
   Description: Userlinking done.
+
+ExternalNotFoundOption:
+  Title: External User
+  Description: External user not foun. Do you want to link your user or auto register a new one.
+  Link: Link
+  AutoRegister: Auto register
 
 Actions:
   Login: login

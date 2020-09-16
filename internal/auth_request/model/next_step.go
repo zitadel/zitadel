@@ -20,6 +20,7 @@ const (
 	NextStepRedirectToCallback
 	NextStepChangeUsername
 	NextStepLinkUsers
+	NextStepExternalNotFoundOption
 )
 
 type UserSessionState int32
@@ -52,6 +53,12 @@ type UserSelection struct {
 
 type InitUserStep struct {
 	PasswordSet bool
+}
+
+type ExternalNotFoundOptionStep struct{}
+
+func (s *ExternalNotFoundOptionStep) Type() NextStepType {
+	return NextStepExternalNotFoundOption
 }
 
 func (s *InitUserStep) Type() NextStepType {
