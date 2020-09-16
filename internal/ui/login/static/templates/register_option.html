@@ -24,6 +24,9 @@
                 </a>
             {{end}}
         {{end}}
+        <a class="button secondary" href="{{ loginNameChangeUrl .AuthReqID }}">
+            {{t "Actions.Back"}}
+        </a>
     </div>
 
     {{template "error-message" .}}

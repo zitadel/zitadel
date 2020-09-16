@@ -326,8 +326,8 @@ func (repo AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Contex
 	if err != nil {
 		return err
 	}
-	if len(request.LinkingUsers) != 0 && loginPolicy.AllowExternalIDP {
-		return errors.ThrowInvalidArgument(nil, "LOGIN-Dj89o", "Errors.User.NotAllowedToLink")
+	if len(request.LinkingUsers) != 0 && !loginPolicy.AllowExternalIDP {
+		return errors.ThrowInvalidArgument(nil, "LOGIN-s9sio", "Errors.User.NotAllowedToLink")
 	}
 	if len(request.LinkingUsers) != 0 {
 		exists := linkingIDPConfigExistingInAllowedIDPs(request.LinkingUsers, idpProviders)
