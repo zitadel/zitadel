@@ -2,13 +2,14 @@ package eventstore
 
 import (
 	"context"
+	"strings"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	"strings"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
@@ -269,6 +270,21 @@ func (repo *OrgRepository) SearchIDPConfigs(ctx context.Context, request *iam_mo
 		result.Timestamp = sequence.CurrentTimestamp
 	}
 	return result, nil
+}
+
+func (repo *OrgRepository) GetLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
+	policy, err := repo.View.LabelPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if errors.IsNotFound(err) {
+		policy, err = repo.View.LabelPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
+		policy.Default = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.LabelPolicyViewToModel(policy), err
 }
 
 func (repo *OrgRepository) GetLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {

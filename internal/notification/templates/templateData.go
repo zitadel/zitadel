@@ -5,13 +5,15 @@ import (
 )
 
 type TemplateData struct {
-	Title      string
-	PreHeader  string
-	Subject    string
-	Greeting   string
-	Text       string
-	Href       string
-	ButtonText string
+	Title          string
+	PreHeader      string
+	Subject        string
+	Greeting       string
+	Text           string
+	Href           string
+	ButtonText     string
+	PrimaryColor   string
+	SecundaryColor string
 }
 
 func (data *TemplateData) Translate(i18n *i18n.Translator, args map[string]interface{}, langs ...string) {

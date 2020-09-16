@@ -1,13 +1,14 @@
 package types
 
 import (
+	"net/http"
+
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/notification/templates"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
-	"net/http"
 )
 
 type InitCodeEmailData struct {
@@ -39,6 +40,9 @@ func SendUserInitCode(dir http.FileSystem, i18n *i18n.Translator, user *view_mod
 	systemDefaults.Notifications.TemplateData.InitCode.Translate(i18n, args, user.PreferredLanguage)
 	initCodeData := &InitCodeEmailData{TemplateData: systemDefaults.Notifications.TemplateData.InitCode, URL: url}
 
+	// Da Farbe setzten in initCodeData
+	initCodeData.PrimaryColor = "tomato"
+	initCodeData.SecundaryColor = "black"
 	template, err := templates.GetParsedTemplate(dir, initCodeData)
 	if err != nil {
 		return err
