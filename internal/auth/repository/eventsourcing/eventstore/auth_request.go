@@ -3,7 +3,6 @@ package eventstore
 import (
 	"context"
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/eventstore/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
@@ -49,7 +48,7 @@ type AuthRequestRepo struct {
 	MfaSoftwareCheckLifeTime time.Duration
 	MfaHardwareCheckLifeTime time.Duration
 
-	SystemDefaults systemdefaults.SystemDefaults
+	IAMID string
 }
 
 type userSessionViewProvider interface {
@@ -330,7 +329,7 @@ func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, 
 	if !policy.AllowExternalIDP {
 		return policy, nil, nil
 	}
-	idpProviders, err := getLoginPolicyIDPProviders(repo.IDPProviderViewProvider, repo.SystemDefaults.IamID, orgID, policy.Default)
+	idpProviders, err := getLoginPolicyIDPProviders(repo.IDPProviderViewProvider, repo.IAMID, orgID, policy.Default)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -343,7 +342,7 @@ func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *model
 		orgID = request.GetScopeOrgID()
 	}
 	if orgID == "" {
-		orgID = repo.SystemDefaults.IamID
+		orgID = repo.IAMID
 	}
 
 	policy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
@@ -562,7 +561,7 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
 func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (*iam_model.LoginPolicyView, error) {
 	policy, err := repo.View.LoginPolicyByAggregateID(orgID)
 	if errors.IsNotFound(err) {
-		policy, err = repo.View.LoginPolicyByAggregateID(repo.SystemDefaults.IamID)
+		policy, err = repo.View.LoginPolicyByAggregateID(repo.IAMID)
 		if err != nil {
 			return nil, err
 		}

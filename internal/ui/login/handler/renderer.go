@@ -3,15 +3,13 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"github.com/caos/logging"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/gorilla/csrf"
+	"golang.org/x/text/language"
 	"html/template"
 	"net/http"
 	"path"
-	"strings"
-
-	"github.com/caos/logging"
-	"github.com/gorilla/csrf"
-	"golang.org/x/text/language"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
@@ -237,7 +235,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 		},
 		Lang:      l.renderer.Lang(r).String(),
 		Title:     title,
-		Theme:     l.getTheme(authReq),
+		Theme:     l.getTheme(r),
 		ThemeMode: l.getThemeMode(r),
 		OrgID:     l.getOrgID(authReq),
 		AuthReqID: getRequestID(authReq, r),
@@ -273,7 +271,7 @@ func (l *Login) getErrorMessage(r *http.Request, err error) (errMsg string) {
 	return err.Error()
 }
 
-func (l *Login) getTheme(authReq *model.AuthRequest) string {
+func (l *Login) getTheme(r *http.Request) string {
 	return "zitadel" //TODO: impl
 }
 
@@ -291,16 +289,7 @@ func (l *Login) getOrgID(authReq *model.AuthRequest) string {
 	if authReq.Request == nil {
 		return ""
 	}
-	switch request := authReq.Request.(type) {
-	case *model.AuthRequestOIDC:
-		for _, scope := range request.Scopes {
-			if strings.HasPrefix(scope, model.OrgIDScope) {
-				scopeParts := strings.Split(scope, ":")
-				return scopeParts[len(scopeParts)-1]
-			}
-		}
-	}
-	return ""
+	return authReq.GetScopeOrgID()
 }
 
 func getRequestID(authReq *model.AuthRequest, r *http.Request) string {

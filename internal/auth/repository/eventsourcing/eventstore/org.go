@@ -3,7 +3,6 @@ package eventstore
 import (
 	"context"
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 
@@ -28,7 +27,6 @@ type OrgRepository struct {
 	OrgEventstore    *org_es.OrgEventstore
 	UserEventstore   *usr_es.UserEventstore
 	PolicyEventstore *policy_es.PolicyEventstore
-	SystemDefaults   systemdefaults.SystemDefaults
 
 	View *auth_view.View
 }
@@ -44,7 +42,7 @@ func (repo *OrgRepository) SearchOrgs(ctx context.Context, request *org_model.Or
 	result := &org_model.OrgSearchResult{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
-		TotalResult: uint64(count),
+		TotalResult: count,
 		Result:      model.OrgsToModel(members),
 	}
 	if err == nil {
@@ -97,7 +95,7 @@ func (repo *OrgRepository) RegisterOrg(ctx context.Context, register *auth_model
 	return RegisterToModel(registerModel), nil
 }
 
-func (repo *OrgRepository) GetDefaultOrgIamPolicy(ctx context.Context) (*org_model.OrgIAMPolicy, error) {
+func (repo *OrgRepository) GetDefaultOrgIamPolicy(ctx context.Context) *org_model.OrgIAMPolicy {
 	return repo.OrgEventstore.GetDefaultOrgIAMPolicy(ctx)
 }
 

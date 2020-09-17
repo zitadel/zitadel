@@ -6,7 +6,7 @@ import "github.com/caos/zitadel/internal/eventstore/models"
 const (
 	UserAggregate            models.AggregateType = "user"
 	UserUserNameAggregate    models.AggregateType = "user.username"
-	UserExternalIDPAggregate models.AggregateType = "user.externalidp"
+	UserExternalIDPAggregate models.AggregateType = "user.human.externalidp"
 )
 
 // the following consts are for user v1 events

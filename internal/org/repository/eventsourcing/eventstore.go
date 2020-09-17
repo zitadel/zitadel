@@ -464,8 +464,8 @@ func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.
 	return es_sdk.Push(ctx, es.PushAggregates, repoMember.AppendEvents, orgAggregate)
 }
 
-func (es *OrgEventstore) GetDefaultOrgIAMPolicy(ctx context.Context) (*org_model.OrgIAMPolicy, error) {
-	return es.defaultOrgIamPolicy, nil
+func (es *OrgEventstore) GetDefaultOrgIAMPolicy(ctx context.Context) *org_model.OrgIAMPolicy {
+	return es.defaultOrgIamPolicy
 }
 
 func (es *OrgEventstore) GetOrgIAMPolicy(ctx context.Context, orgID string) (*org_model.OrgIAMPolicy, error) {
