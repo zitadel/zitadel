@@ -2,7 +2,6 @@ package spooler
 
 import (
 	"context"
-	"log"
 	"strconv"
 
 	"github.com/caos/logging"
@@ -86,8 +85,6 @@ func (s *spooledHandler) load(workerID string) {
 		}
 	}
 	<-ctx.Done()
-
-	log.Println("i bims fertig")
 }
 
 func (s *spooledHandler) awaitError(cancel func(), errs chan error, workerID string) {
