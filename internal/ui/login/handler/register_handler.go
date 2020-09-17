@@ -71,7 +71,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		ObjectRoot: models.ObjectRoot{AggregateID: iam.GlobalOrgID},
 		Roles:      []string{orgProjectCreatorRole},
 	}
-	if authRequest.GetScopeOrgID() == iam.GlobalOrgID || authRequest.GetScopeOrgID() == "" {
+	if authRequest.GetScopeOrgID() != "" && authRequest.GetScopeOrgID() != iam.GlobalOrgID {
 		member = nil
 		resourceOwner = authRequest.GetScopeOrgID()
 	}
