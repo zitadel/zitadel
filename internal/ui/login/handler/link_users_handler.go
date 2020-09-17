@@ -18,7 +18,7 @@ func (l *Login) linkUsers(w http.ResponseWriter, r *http.Request, authReq *model
 		return
 	}
 	resourceOwner := iam.GlobalOrgID
-	if authReq.GetScopeOrgID() != iam.GlobalOrgID && authReq.GetScopeOrgID() != "" {
+	if authReq.GetScopeOrgID() != "" {
 		resourceOwner = authReq.GetScopeOrgID()
 	}
 
