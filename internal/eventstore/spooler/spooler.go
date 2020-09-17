@@ -65,6 +65,7 @@ func (s *spooledHandler) load(workerID string) {
 	ctx, cancel := context.WithCancel(context.Background())
 	go s.awaitError(cancel, errs, workerID)
 	hasLocked := s.lock(ctx, errs, workerID)
+	defer close(hasLocked)
 
 	if <-hasLocked {
 		go func() {
@@ -166,8 +167,10 @@ func (s *spooledHandler) lock(ctx context.Context, errs chan<- error, workerID s
 				err := s.locker.Renew(workerID, s.ViewModel(), s.MinimumCycleDuration()*2)
 				logging.Log("SPOOL-u4j6k").WithField("view", s.ViewModel()).WithField("worker", workerID).WithError(err).Debug("renew done")
 				if err == nil {
-					locked <- true
-					renewTimer = time.After(renewDuration)
+					if ctx.Err() == nil {
+						locked <- true
+						renewTimer = time.After(renewDuration)
+					}
 					continue
 				}
 

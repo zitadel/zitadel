@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { PasswordPolicyComponent } from './password-policy.component';
+import { IdpCreateComponent } from './idp-create.component';
 
 const routes: Routes = [
     {
         path: '',
-        component: PasswordPolicyComponent,
+        component: IdpCreateComponent,
         data: { animation: 'DetailPage' },
     },
 ];
@@ -15,4 +15,4 @@ const routes: Routes = [
     imports: [RouterModule.forChild(routes)],
     exports: [RouterModule],
 })
-export class PasswordPolicyRoutingModule { }
+export class IdpCreateRoutingModule { }

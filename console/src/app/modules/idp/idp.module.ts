@@ -1,32 +1,33 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 
-import { SearchOrgAutocompleteComponent } from './search-org-autocomplete.component';
+import { IdpRoutingModule } from './idp-routing.module';
+import { IdpComponent } from './idp.component';
 
 @NgModule({
-    declarations: [SearchOrgAutocompleteComponent],
+    declarations: [IdpComponent],
     imports: [
         CommonModule,
-        MatAutocompleteModule,
-        MatChipsModule,
-        MatButtonModule,
-        MatFormFieldModule,
-        MatIconModule,
-        ReactiveFormsModule,
-        MatProgressSpinnerModule,
+        IdpRoutingModule,
         FormsModule,
+        ReactiveFormsModule,
+        MatInputModule,
+        MatFormFieldModule,
+        MatButtonModule,
+        MatIconModule,
+        MatTooltipModule,
         TranslateModule,
-    ],
-    exports: [
-        SearchOrgAutocompleteComponent,
+        MatCheckboxModule,
+        MatChipsModule,
     ],
 })
-export class SearchOrgAutocompleteModule { }
+export class IdpModule { }

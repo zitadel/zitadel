@@ -260,7 +260,9 @@
             "DEACTIVATED":"User deactivated",
             "SELECTEDREACTIVATED":"Selected Users reactivated",
             "SELECTEDDEACTIVATED":"Selected Users deactivated",
-            "SELECTEDKEYSDELETED":"Selected Keys deleted!"
+            "SELECTEDKEYSDELETED":"Selected Keys deleted!",
+            "KEYADDED":"Key added!",
+            "MACHINEADDED":"Service User created!"
         },
         "MEMBERSHIPS": {
             "TITLE":"Zitadel Manager Roles",
@@ -395,6 +397,12 @@
                 "TITLECREATE":"Set IAM Access preferences",
                 "DESCRIPTIONCREATE":"Emails as username is not allowed for enabled UserLoginMustBeDomain"
             },
+            "LOGIN_POLICY": {
+                "TITLE":"Login Policy",
+                "DESCRIPTION":"Define how Users can be authenticated",
+                "TITLECREATE":"Define how Users can be authenticated",
+                "DESCRIPTIONCREATE":"Users can choose from all of the available identity providers."
+            },
             "BTN_INSTALL":"Setup",
             "BTN_EDIT":"Modify",
             "DATA": {
@@ -408,7 +416,10 @@
                 "MAXATTEMPTS":"Max Attempts",
                 "EXPIREWARNDAYS":"Expiration Warning after day",
                 "MAXAGEDAYS":"Max Age in days",
-                "USERLOGINMUSTBEDOMAIN":"User Login must be Domain"
+                "USERLOGINMUSTBEDOMAIN":"User Login must be Domain",
+                "ALLOWUSERNAMEPASSWORD":"Username Password allowed",
+                "ALLOWEXTERNALIDP":"External IDP allowed",
+                "ALLOWREGISTER":"Register allowed"
             },
             "DELETE":"Uninstall / Reset Policy"
         },
@@ -610,6 +621,51 @@
             "UPDATED":"Project changed!",
             "GRANTUPDATED":"Grant changed!",
             "DELETED":"Deleted Project!"
+        }
+    },
+    "IDP":{
+        "LIST": {
+            "TITLE":"Identity Providers",
+            "DESCRIPTION":"Define additional Identity Providers, which can be used to authenticate in your organisations."
+        },
+        "CREATE": {
+            "TITLE":"New Identity Provider",
+            "DESCRIPTION":"Configure the Endpoint of your new service provider."
+        },
+        "TYPES": {
+            "0":"unknown",
+            "1":"System",
+            "2":"Organisation"
+        },
+        "STATES":{
+            "0":"active",
+            "1":"inactive"
+        },
+        "TYPE":"Type",
+        "NAME":"Name",
+        "CONFIG":"Configuration",
+        "STATE":"State",
+        "LOGOSRC":"Logo Src",
+        "ISSUER":"Issuer",
+        "SCOPESLIST":"Scopes List",
+        "CLIENTID":"Client ID",
+        "CLIENTSECRET":"Client Secret",
+        "CREATIONDATE":"Created At",
+        "CHANGEDATE":"Last Modified",
+        "DEACTIVATE":"Deactivate",
+        "ACTIVATE":"Activate",
+        "DELETE":"Delete"
+    },
+    "LOGINPOLICY": {
+        "CREATE": {
+            "TITLE":"Login Policy",
+            "DESCRIPTION":"Define how your users can be authenticated on your organisation."
+        },
+        "IDPS":"Identity Providers",
+        "ADDIDP": {
+            "TITLE":"Add Identity Provider",
+            "DESCRIPTION":"You can select predefined or selfcreated providers for authentication.",
+            "SELECTIDPS":"Identity providers"
         }
     },
     "APP": {

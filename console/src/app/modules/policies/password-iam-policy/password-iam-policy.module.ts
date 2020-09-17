@@ -11,13 +11,13 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 
-import { PasswordPolicyRoutingModule } from './password-policy-routing.module';
-import { PasswordPolicyComponent } from './password-policy.component';
+import { PasswordIamPolicyRoutingModule } from './password-iam-policy-routing.module';
+import { PasswordIamPolicyComponent } from './password-iam-policy.component';
 
 @NgModule({
-    declarations: [PasswordPolicyComponent],
+    declarations: [PasswordIamPolicyComponent],
     imports: [
-        PasswordPolicyRoutingModule,
+        PasswordIamPolicyRoutingModule,
         CommonModule,
         FormsModule,
         MatInputModule,
@@ -31,4 +31,4 @@ import { PasswordPolicyComponent } from './password-policy.component';
         DetailLayoutModule,
     ],
 })
-export class PasswordPolicyModule { }
+export class PasswordIamPolicyModule { }

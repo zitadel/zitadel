@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
+import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { OrgMemberView, UserView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -14,13 +15,14 @@ import { ToastService } from 'src/app/services/toast.service';
     styleUrls: ['./iam.component.scss'],
 })
 export class IamComponent {
+    public PolicyComponentServiceType: any = PolicyComponentServiceType;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     public totalMemberResult: number = 0;
     public membersSubject: BehaviorSubject<OrgMemberView.AsObject[]>
         = new BehaviorSubject<OrgMemberView.AsObject[]>([]);
 
-    constructor(private adminService: AdminService, private dialog: MatDialog, private toast: ToastService,
+    constructor(public adminService: AdminService, private dialog: MatDialog, private toast: ToastService,
         private router: Router) {
         this.loadMembers();
     }

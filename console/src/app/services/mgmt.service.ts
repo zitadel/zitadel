@@ -24,7 +24,20 @@ import {
     Gender,
     GrantedProjectSearchRequest,
     Iam,
+    Idp,
+    IdpID,
+    IdpProviderAdd,
+    IdpProviderID,
+    IdpProviderSearchRequest,
+    IdpProviderSearchResponse,
+    IdpProviderType,
+    IdpSearchQuery,
+    IdpSearchRequest,
+    IdpSearchResponse,
+    IdpView,
     LoginName,
+    LoginPolicy,
+    LoginPolicyView,
     MachineKeyIDRequest,
     MachineKeySearchRequest,
     MachineKeySearchResponse,
@@ -35,6 +48,9 @@ import {
     OIDCApplicationCreate,
     OIDCConfig,
     OIDCConfigUpdate,
+    OidcIdpConfig,
+    OidcIdpConfigCreate,
+    OidcIdpConfigUpdate,
     Org,
     OrgCreateRequest,
     OrgDomain,
@@ -144,6 +160,105 @@ export type ResponseMapper<TResp, TMappedResp> = (resp: TResp) => TMappedResp;
 })
 export class ManagementService {
     constructor(private readonly grpcService: GrpcService) { }
+
+    public async SearchIdps(
+        limit?: number,
+        offset?: number,
+        queryList?: IdpSearchQuery[],
+    ): Promise<IdpSearchResponse> {
+        const req = new IdpSearchRequest();
+        if (limit) {
+            req.setLimit(limit);
+        }
+        if (offset) {
+            req.setOffset(offset);
+        }
+        if (queryList) {
+            req.setQueriesList(queryList);
+        }
+        return this.grpcService.mgmt.searchIdps(req);
+    }
+
+    public async GetLoginPolicy(): Promise<LoginPolicyView> {
+        const req = new Empty();
+        return this.grpcService.mgmt.getLoginPolicy(req);
+    }
+
+    public async UpdateLoginPolicy(req: LoginPolicy): Promise<LoginPolicy> {
+        return this.grpcService.mgmt.updateLoginPolicy(req);
+    }
+
+    public async RemoveLoginPolicy(): Promise<Empty> {
+        return this.grpcService.mgmt.removeLoginPolicy(new Empty());
+    }
+
+    public async addIdpProviderToLoginPolicy(configId: string, idpType: IdpProviderType): Promise<IdpProviderID> {
+        const req = new IdpProviderAdd();
+        req.setIdpProviderType(idpType);
+        req.setIdpConfigId(configId);
+        return this.grpcService.mgmt.addIdpProviderToLoginPolicy(req);
+    }
+
+    public async RemoveIdpProviderFromLoginPolicy(configId: string): Promise<Empty> {
+        const req = new IdpProviderID();
+        req.setIdpConfigId(configId);
+        return this.grpcService.mgmt.removeIdpProviderFromLoginPolicy(req);
+    }
+
+    public async GetLoginPolicyIdpProviders(limit?: number, offset?: number): Promise<IdpProviderSearchResponse> {
+        const req = new IdpProviderSearchRequest();
+        if (limit) {
+            req.setLimit(limit);
+        }
+        if (offset) {
+            req.setOffset(offset);
+        }
+        return this.grpcService.mgmt.getLoginPolicyIdpProviders(req);
+    }
+
+    public async IdpByID(
+        id: string,
+    ): Promise<IdpView> {
+        const req = new IdpID();
+        req.setId(id);
+        return this.grpcService.mgmt.idpByID(req);
+    }
+
+    public async CreateOidcIdp(
+        req: OidcIdpConfigCreate,
+    ): Promise<Idp> {
+        return this.grpcService.mgmt.createOidcIdp(req);
+    }
+
+    public async UpdateOidcIdpConfig(
+        req: OidcIdpConfigUpdate,
+    ): Promise<OidcIdpConfig> {
+        return this.grpcService.mgmt.updateOidcIdpConfig(req);
+    }
+
+    public async RemoveIdpConfig(
+        id: string,
+    ): Promise<Empty> {
+        const req = new IdpID;
+        req.setId(id);
+        return this.grpcService.mgmt.removeIdpConfig(req);
+    }
+
+    public async DeactivateIdpConfig(
+        id: string,
+    ): Promise<Empty> {
+        const req = new IdpID;
+        req.setId(id);
+        return this.grpcService.mgmt.deactivateIdpConfig(req);
+    }
+
+    public async ReactivateIdpConfig(
+        id: string,
+    ): Promise<Empty> {
+        const req = new IdpID;
+        req.setId(id);
+        return this.grpcService.mgmt.reactivateIdpConfig(req);
+    }
 
     public async CreateUserHuman(username: string, user: CreateHumanRequest): Promise<UserResponse> {
         const req = new CreateUserRequest();
