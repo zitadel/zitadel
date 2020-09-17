@@ -228,7 +228,7 @@ func (setUp *initializer) orgs(ctx context.Context, orgs []Org) error {
 			return err
 		}
 
-		err = setUp.projects(ctx, iamOrg.Projects)
+		err = setUp.projects(ctx, iamOrg.Projects, setUp.createdUsers[iamOrg.Owners[0]].AggregateID)
 		if err != nil {
 			logging.LogWithFields("SETUP-wUzqY", "Org", iamOrg.Name).WithError(err).Error("unable to set up org projects")
 			return err
@@ -364,9 +364,13 @@ func (setUp *initializer) orgOwner(ctx context.Context, org *org_model.Org, user
 	return err
 }
 
-func (setUp *initializer) projects(ctx context.Context, projects []Project) error {
+func (setUp *initializer) projects(ctx context.Context, projects []Project, ownerID string) error {
+	ctxData := authz.GetCtxData(ctx)
+	ctxData.UserID = ownerID
+	projectCtx := authz.SetCtxData(ctx, ctxData)
+
 	for _, project := range projects {
-		createdProject, err := setUp.project(ctx, project)
+		createdProject, err := setUp.project(projectCtx, project)
 		if err != nil {
 			return err
 		}
