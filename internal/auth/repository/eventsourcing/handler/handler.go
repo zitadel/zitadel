@@ -52,6 +52,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 			projectEvents: repos.ProjectEvents,
 			iamEvents:     repos.IamEvents,
 			iamID:         systemDefaults.IamID},
+		&MachineKeys{handler: handler{view, bulkLimit, configs.cycleDuration("MachineKey"), errorCount}},
 		&LoginPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount}},
 		&IDPConfig{handler: handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount}},
 		&IDPProvider{handler: handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount}, systemDefaults: systemDefaults, orgEvents: repos.OrgEvents, iamEvents: repos.IamEvents},

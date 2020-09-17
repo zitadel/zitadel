@@ -69,10 +69,10 @@ func MachineToModel(machine *Machine) *model.Machine {
 
 type MachineKey struct {
 	es_models.ObjectRoot `json:"-"`
-	KeyID                string              `json:"keyId,omitempty"`
-	Type                 int32               `json:"type,omitempty"`
-	ExpirationDate       time.Time           `json:"expirationDate,omitempty"`
-	PublicKey            *crypto.CryptoValue `json:"publicKey,omitempty"`
+	KeyID                string    `json:"keyId,omitempty"`
+	Type                 int32     `json:"type,omitempty"`
+	ExpirationDate       time.Time `json:"expirationDate,omitempty"`
+	PublicKey            []byte    `json:"publicKey,omitempty"`
 	privateKey           []byte
 }
 
@@ -117,11 +117,7 @@ func (key *MachineKey) GenerateMachineKeyPair(keySize int, alg crypto.Encryption
 	if err != nil {
 		return err
 	}
-	publicKeyBytes, err := crypto.PublicKeyToBytes(publicKey)
-	if err != nil {
-		return err
-	}
-	key.PublicKey, err = crypto.Encrypt(publicKeyBytes, alg)
+	key.PublicKey, err = crypto.PublicKeyToBytes(publicKey)
 	if err != nil {
 		return err
 	}
