@@ -8,7 +8,7 @@ import (
 
 func (l *Login) getOrgIamPolicy(r *http.Request, orgID string) (*org_model.OrgIAMPolicy, error) {
 	if orgID == "" {
-		return l.authRepo.GetDefaultOrgIamPolicy(r.Context())
+		return l.authRepo.GetDefaultOrgIamPolicy(r.Context()), nil
 	}
 	return l.authRepo.GetOrgIamPolicy(r.Context(), orgID)
 }
