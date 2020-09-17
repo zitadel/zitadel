@@ -431,11 +431,11 @@ footer {
 }
 
 .free-tier {
-    border: 2px solid #F20D6B;
+    border: 2px solid $nokColor;
     border-radius: 5px;
     padding: 10px;
 }
 
 .error {
-    color: $errorColor;
+    color: $nokColor;
 }

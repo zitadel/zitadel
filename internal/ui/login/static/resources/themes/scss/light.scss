@@ -131,3 +131,11 @@ form {
         @include retina-background-image($profileImgLight, "png", true, 80px, 80px);
     }
 }
+
+.free-tier {
+    border: 2px solid $nokColorLight;
+}
+
+.error {
+    color: $nokColorLight;
+}

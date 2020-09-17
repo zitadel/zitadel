@@ -460,7 +460,7 @@ footer {
 }
 
 .error {
-  color: red;
+  color: #F20D6B;
 }
 
 html {
@@ -587,6 +587,14 @@ form ul#passwordcomplexity li.invalid i {
     background-image: url("../../../images/icon-user-light-hover@2x.png");
     background-size: 80px 80px;
   }
+}
+
+.free-tier {
+  border: 2px solid #F20D6B;
+}
+
+.error {
+  color: #F20D6B;
 }
 
 /*# sourceMappingURL=light.css.map */
