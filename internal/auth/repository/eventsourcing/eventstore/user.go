@@ -336,9 +336,9 @@ func checkIDs(ctx context.Context, obj es_models.ObjectRoot) error {
 }
 
 func (repo *UserRepo) MachineKeyByID(ctx context.Context, keyID string) (*model.MachineKeyView, error) {
-	keys, err := repo.View.MachineKeyByID(keyID)
+	key, err := repo.View.MachineKeyByID(keyID)
 	if err != nil {
 		return nil, err
 	}
-	return usr_view_model.MachineKeyToModel(keys), nil
+	return usr_view_model.MachineKeyToModel(key), nil
 }

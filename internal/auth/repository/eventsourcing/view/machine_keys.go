@@ -27,8 +27,8 @@ func (v *View) SearchMachineKeys(request *usr_model.MachineKeySearchRequest) ([]
 	return view.SearchMachineKeys(v.Db, machineKeyTable, request)
 }
 
-func (v *View) PutMachineKey(org *model.MachineKeyView, sequence uint64) error {
-	err := view.PutMachineKey(v.Db, machineKeyTable, org)
+func (v *View) PutMachineKey(key *model.MachineKeyView, sequence uint64) error {
+	err := view.PutMachineKey(v.Db, machineKeyTable, key)
 	if err != nil {
 		return err
 	}
