@@ -117,7 +117,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 			return path.Join(r.pathPrefix, EndpointChangePassword)
 		},
 		"registerOptionUrl": func() string {
-			return path.Join(r.pathPrefix, fmt.Sprintf("%s", EndpointRegisterOption))
+			return path.Join(r.pathPrefix, EndpointRegisterOption)
 		},
 		"registrationUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointRegister)
@@ -129,7 +129,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 			return path.Join(r.pathPrefix, EndpointChangeUsername)
 		},
 		"externalNotFoundOptionUrl": func() string {
-			return path.Join(r.pathPrefix, fmt.Sprintf("%s", EndpointExternalNotFoundOption))
+			return path.Join(r.pathPrefix, EndpointExternalNotFoundOption)
 		},
 		"selectedLanguage": func(l string) bool {
 			return false
