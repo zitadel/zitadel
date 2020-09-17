@@ -6,6 +6,7 @@ $headerFont: Lato;
 $inputHeight: 50px;
 $headerSize: 40px;
 $header2Size: 30px;
+$header3Size: 26px;
 $retina: "only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx)";
 
 @mixin retina-background-image($file, $type, $hover, $width, $height) {
