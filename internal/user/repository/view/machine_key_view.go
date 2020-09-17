@@ -49,6 +49,18 @@ func MachineKeysByUserID(db *gorm.DB, table string, userID string) ([]*model.Mac
 	return keys, nil
 }
 
+func MachineKeyByID(db *gorm.DB, table string, keyID string) (*model.MachineKeyView, error) {
+	key := new(model.MachineKeyView)
+	query := repository.PrepareGetByQuery(table,
+		model.MachineKeySearchQuery{Key: usr_model.MachineKeyKeyID, Method: global_model.SearchMethodEquals, Value: keyID},
+	)
+	err := query(db, key)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-BjN6x", "Errors.User.KeyNotFound")
+	}
+	return key, err
+}
+
 func PutMachineKey(db *gorm.DB, table string, role *model.MachineKeyView) error {
 	save := repository.PrepareSave(table)
 	return save(db, role)
