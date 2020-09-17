@@ -1,0 +1,36 @@
+<h1 mat-dialog-title>
+    <span class="title">{{'LOGINPOLICY.ADDIDP.TITLE' | translate}}</span>
+</h1>
+<p class="desc"> {{'LOGINPOLICY.ADDIDP.DESCRIPTION' | translate}}</p>
+
+<div mat-dialog-content>
+    <mat-form-field *ngIf="serviceType == PolicyComponentServiceType.MGMT" class="full-width" appearance="outline">
+        <mat-label>{{ 'IDP.TYPE' | translate }}</mat-label>
+        <mat-select [(ngModel)]="idpType" (selectionChange)="loadIdps()" (selectionChange)="loadIdps()">
+            <mat-option *ngFor="let type of idpTypes" [value]="type">
+                {{ 'IDP.TYPES.'+type | translate}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <p>{{'LOGINPOLICY.ADDIDP.SELECTIDPS' | translate}}</p>
+
+    <mat-form-field class="full-width" appearance="outline">
+        <mat-label>{{ 'LOGINPOLICY.ADDIDP.SELECTIDPS' | translate }}</mat-label>
+        <mat-select [(ngModel)]="idp">
+            <mat-option *ngFor="let idp of availableIdps" [value]="idp">
+                {{ idp.name }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>
+<div mat-dialog-actions class="action">
+    <button mat-button (click)="closeDialog()">
+        {{'ACTIONS.CANCEL' | translate}}
+    </button>
+
+    <button [disabled]="!idp || !idpType " color="primary" mat-raised-button class="ok-button"
+        (click)="closeDialogWithSuccess()">
+        {{'ACTIONS.ADD' | translate}}
+    </button>
+</div>

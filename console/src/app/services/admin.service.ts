@@ -7,6 +7,7 @@ import {
     CreateHumanRequest,
     CreateOrgRequest,
     CreateUserRequest,
+    DefaultLoginPolicy,
     DefaultLoginPolicyView,
     FailedEventID,
     FailedEvents,
@@ -15,6 +16,18 @@ import {
     IamMemberSearchQuery,
     IamMemberSearchRequest,
     IamMemberSearchResponse,
+    Idp,
+    IdpID,
+    IdpProviderID,
+    IdpProviderSearchRequest,
+    IdpProviderSearchResponse,
+    IdpSearchQuery,
+    IdpSearchRequest,
+    IdpSearchResponse,
+    IdpView,
+    OidcIdpConfig,
+    OidcIdpConfigCreate,
+    OidcIdpConfigUpdate,
     OrgIamPolicy,
     OrgIamPolicyID,
     OrgIamPolicyRequest,
@@ -52,11 +65,6 @@ export class AdminService {
         return this.grpcService.admin.getIamMemberRoles(req);
     }
 
-    public async getDefaultLoginPolicy(): Promise<DefaultLoginPolicyView> {
-        const req = new Empty();
-        return this.grpcService.admin.getDefaultLoginPolicy(req);
-    }
-
     public async GetViews(): Promise<Views> {
         const req = new Empty();
         return this.grpcService.admin.getViews(req);
@@ -80,6 +88,101 @@ export class AdminService {
         req.setViewName(viewname);
         req.setFailedSequence(sequence);
         return this.grpcService.admin.removeFailedEvent(req);
+    }
+
+    public async GetDefaultLoginPolicy(
+    ): Promise<DefaultLoginPolicyView> {
+        const req = new Empty();
+        return this.grpcService.admin.getDefaultLoginPolicy(req);
+    }
+
+    public async UpdateDefaultLoginPolicy(req: DefaultLoginPolicy): Promise<DefaultLoginPolicy> {
+        return this.grpcService.admin.updateDefaultLoginPolicy(req);
+    }
+
+    public async AddIdpProviderToDefaultLoginPolicy(configId: string): Promise<IdpProviderID> {
+        const req = new IdpProviderID();
+        req.setIdpConfigId(configId);
+        return this.grpcService.admin.addIdpProviderToDefaultLoginPolicy(req);
+    }
+
+    public async RemoveIdpProviderFromDefaultLoginPolicy(configId: string): Promise<Empty> {
+        const req = new IdpProviderID();
+        req.setIdpConfigId(configId);
+        return this.grpcService.admin.removeIdpProviderFromDefaultLoginPolicy(req);
+    }
+
+    public async GetDefaultLoginPolicyIdpProviders(limit?: number, offset?: number): Promise<IdpProviderSearchResponse> {
+        const req = new IdpProviderSearchRequest();
+        if (limit) {
+            req.setLimit(limit);
+        }
+        if (offset) {
+            req.setOffset(offset);
+        }
+        return this.grpcService.admin.getDefaultLoginPolicyIdpProviders(req);
+    }
+
+    public async SearchIdps(
+        limit?: number,
+        offset?: number,
+        queryList?: IdpSearchQuery[],
+    ): Promise<IdpSearchResponse> {
+        const req = new IdpSearchRequest();
+        if (limit) {
+            req.setLimit(limit);
+        }
+        if (offset) {
+            req.setOffset(offset);
+        }
+        if (queryList) {
+            req.setQueriesList(queryList);
+        }
+        return this.grpcService.admin.searchIdps(req);
+    }
+
+    public async IdpByID(
+        id: string,
+    ): Promise<IdpView> {
+        const req = new IdpID();
+        req.setId(id);
+        return this.grpcService.admin.idpByID(req);
+    }
+
+    public async CreateOidcIdp(
+        req: OidcIdpConfigCreate,
+    ): Promise<Idp> {
+        return this.grpcService.admin.createOidcIdp(req);
+    }
+
+    public async UpdateOidcIdpConfig(
+        req: OidcIdpConfigUpdate,
+    ): Promise<OidcIdpConfig> {
+        return this.grpcService.mgmt.updateOidcIdpConfig(req);
+    }
+
+    public async RemoveIdpConfig(
+        id: string,
+    ): Promise<Empty> {
+        const req = new IdpID;
+        req.setId(id);
+        return this.grpcService.admin.removeIdpConfig(req);
+    }
+
+    public async DeactivateIdpConfig(
+        id: string,
+    ): Promise<Empty> {
+        const req = new IdpID;
+        req.setId(id);
+        return this.grpcService.admin.deactivateIdpConfig(req);
+    }
+
+    public async ReactivateIdpConfig(
+        id: string,
+    ): Promise<Empty> {
+        const req = new IdpID;
+        req.setId(id);
+        return this.grpcService.admin.reactivateIdpConfig(req);
     }
 
     public async SearchIamMembers(

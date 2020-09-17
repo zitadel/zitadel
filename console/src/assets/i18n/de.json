@@ -260,7 +260,9 @@
             "DEACTIVATED":"User deaktiviert!",
             "SELECTEDREACTIVATED":"Selektierte User reaktiviert!",
             "SELECTEDDEACTIVATED":"Selektierte Benutzer deaktiviert!",
-            "SELECTEDKEYSDELETED":"Selektierte Schlüssel gelöscht!"
+            "SELECTEDKEYSDELETED":"Selektierte Schlüssel gelöscht!",
+            "KEYADDED":"Schlüssel hinzugefügt!",
+            "MACHINEADDED":"Service User erstellt!"
         },
         "MEMBERSHIPS": {
             "TITLE":"Zitadel Manager Rollen",
@@ -395,6 +397,12 @@
                 "TITLECREATE":"IAM Zugangseinstellungen festlegen",
                 "DESCRIPTIONCREATE":"Emails als Benutzername sind nicht erlaubt wenn UserLoginMustBeDomain gesetzt ist."
             },
+            "LOGIN_POLICY": {
+                "TITLE":"Login Richtlinien",
+                "DESCRIPTION":"Definiere die Loginmethoden für Benutzer",
+                "TITLECREATE":"Definiere die Loginmethoden für Benutzer",
+                "DESCRIPTIONCREATE":"Nutzer können Sich mit den verfügbaren Idps authentifizieren."
+            },
             "BTN_INSTALL":"Installieren",
             "BTN_EDIT":"Modifizieren",
             "DATA": {
@@ -408,7 +416,10 @@
                 "MAXATTEMPTS":"Maximale Anzahl an Versuchen",
                 "EXPIREWARNDAYS":"Ablauf Warnung nach Tagen",
                 "MAXAGEDAYS":"Maximale Gültigkeit in Tagen",
-                "USERLOGINMUSTBEDOMAIN":"User Login must be Domain"
+                "USERLOGINMUSTBEDOMAIN":"User Login must be Domain",
+                "ALLOWUSERNAMEPASSWORD":"Benutzername Password erlaubt",
+                "ALLOWEXTERNALIDP":"Externer IDP erlaubt",
+                "ALLOWREGISTER":"Registrieren erlaubt"
             },
             "DELETE":"Richtlinie entfernen / zurücksetzen"
         },
@@ -610,6 +621,51 @@
             "UPDATED":"Projekt gespeichert!",
             "GRANTUPDATED":"Berechtigung verändert!",
             "DELETED":"Projekt gelöscht!"
+        }
+    },
+    "IDP":{
+        "LIST": {
+            "TITLE":"Identity Providers",
+            "DESCRIPTION":"Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können."
+        },
+        "CREATE": {
+            "TITLE":"Neuer Identity Provider",
+            "DESCRIPTION":"Definieren Sie hier die Zugangsdaten des neuen Identity Providers"
+        },
+        "TYPES": {
+            "0":"unknown",
+            "1":"System",
+            "2":"Organisation"
+        },
+        "STATES":{
+            "0":"aktiv",
+            "1":"inaktiv"
+        },
+        "TYPE":"Typ",
+        "NAME":"Name",
+        "CONFIG":"Konfiguration",
+        "STATE":"Status",
+        "LOGOSRC":"Logo Src",
+        "ISSUER":"Issuer",
+        "SCOPESLIST":"Scopes List",
+        "CLIENTID":"Client ID",
+        "CLIENTSECRET":"Client Secret",
+        "CREATIONDATE":"Erstelldatum",
+        "CHANGEDATE":"Letzte Änderung",
+        "DEACTIVATE":"Deaktivieren",
+        "ACTIVATE":"Aktivieren",
+        "DELETE":"Löschen"
+    },
+    "LOGINPOLICY": {
+        "CREATE": {
+            "TITLE":"Login Policy",
+            "DESCRIPTION":"Definieren Sie hier, mit welchen Idps sich Ihre Benutzer anmelden können."
+        },
+        "IDPS":"Identity Providers",
+        "ADDIDP": {
+            "TITLE":"Identity Provider hinzufügen",
+            "DESCRIPTION":"Sie können vordefinierte oder selbsterstellten Provider auswählen",
+            "SELECTIDPS":"Identity Provider"
         }
     },
     "APP": {

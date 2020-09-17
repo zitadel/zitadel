@@ -13,7 +13,7 @@
         [selection]="selection" [loading]="loading$ | async">
 
         <div class="table-wrapper">
-            <table class="table background-style" mat-table [dataSource]="dataSource">
+            <table class="table" mat-table [dataSource]="dataSource">
                 <ng-container matColumnDef="select">
                     <th class="selection" mat-header-cell *matHeaderCellDef>
                         <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
@@ -67,7 +67,7 @@
                     [routerLink]="['/granted-projects', row.projectId, 'grant', row.id]"></tr>
 
             </table>
-            <mat-paginator class="paginator background-style" #paginator [length]="totalResult" [pageSize]="10"
+            <mat-paginator class="paginator" #paginator [length]="totalResult" [pageSize]="10"
                 [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
         </div>
     </app-refresh-table>
