@@ -81,7 +81,7 @@
 
             <span class="fill-space"></span>
             <div class="btn-wrapper">
-                <ng-template appHasRole [appHasRole]="['iam.policy.write']">
+                <ng-template appHasRole [appHasRole]="['policy.write']">
                     <button [disabled]="loginPolicy" [routerLink]="[ 'policy', PolicyComponentType.LOGIN,'create' ]"
                         color="primary" mat-raised-button>{{'ORG.POLICY.BTN_INSTALL' | translate}}</button>
                     <button [disabled]="!loginPolicy" [routerLink]="[ 'policy', PolicyComponentType.LOGIN ]"
