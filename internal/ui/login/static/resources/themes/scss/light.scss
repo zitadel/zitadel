@@ -120,3 +120,14 @@ form {
      }
  }
 }
+
+
+%profile-image {
+    .profile-image {
+        @include retina-background-image($profileImgLight, "png", false, 80px, 80px);
+    }
+
+    &:hover .profile-image {
+        @include retina-background-image($profileImgLight, "png", true, 80px, 80px);
+    }
+}

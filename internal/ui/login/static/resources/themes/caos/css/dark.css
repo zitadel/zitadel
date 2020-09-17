@@ -226,7 +226,7 @@ form button.user-selection:hover .profile-image, .login-profile:hover .profile-i
   text-align: center;
 }
 .login-profile .names div:first-of-type {
-  font-size: 40px;
+  font-size: 26px;
   font-weight: 300;
 }
 .login-profile .names div:nth-of-type(2) {
