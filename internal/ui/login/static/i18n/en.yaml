@@ -167,7 +167,7 @@ LinkingUsersDone:
 
 ExternalNotFoundOption:
   Title: External User
-  Description: External user not foun. Do you want to link your user or auto register a new one.
+  Description: External user not found. Do you want to link your user or auto register a new one.
   Link: Link
   AutoRegister: Auto register
 
