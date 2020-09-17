@@ -38,7 +38,7 @@ type IDPConfigView struct {
 	OIDCIssuer                string              `json:"issuer" gorm:"column:oidc_issuer"`
 	OIDCScopes                pq.StringArray      `json:"scopes" gorm:"column:oidc_scopes"`
 	OIDCIDPDisplayNameMapping int32               `json:"idpDisplayNameMapping" gorm:"column:oidc_idp_display_name_mapping"`
-	OIDCUsernameMapping       int32               `json:"idpDisplayNameMapping" gorm:"column:oidc_idp_username_mapping"`
+	OIDCUsernameMapping       int32               `json:"usernameMapping" gorm:"column:oidc_idp_username_mapping"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }

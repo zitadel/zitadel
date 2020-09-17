@@ -184,7 +184,7 @@ func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_mode
 func (repo *UserRepo) SearchExternalIDPs(ctx context.Context, request *usr_model.ExternalIDPSearchRequest) (*usr_model.ExternalIDPSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, seqErr := repo.View.GetLatestExternalIDPSequence()
-	logging.Log("EVENT-Qs7uf").OnError(seqErr).Warn("could not read latest user sequence")
+	logging.Log("EVENT-Qs7uf").OnError(seqErr).Warn("could not read latest external idp sequence")
 	externalIDPS, count, err := repo.View.SearchExternalIDPs(request)
 	if err != nil {
 		return nil, err

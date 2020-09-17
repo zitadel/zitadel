@@ -381,7 +381,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
-			"password not set, linking process, callback",
+			"external user (no password set), callback",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
 					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
@@ -414,7 +414,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
-			"password not verified, linking process, callback",
+			"external user (no password check needed), callback",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
 					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
@@ -455,7 +455,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
-			"mfa not verified, linking process, mfa check step",
+			"external user, mfa not verified, mfa check step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
 					PasswordVerification: time.Now().UTC().Add(-5 * time.Minute),
@@ -582,7 +582,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
-			"linking process, add external users, callback",
+			"linking users, link users step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
 					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
