@@ -224,7 +224,7 @@ Errors:
     Locked: User is locked
     NotActive: User is not active
     ExternalIDP:
-      IDPTypeNotImplemented: IDP Typ ist nicht implementiert
+      IDPTypeNotImplemented: IDP Type is not implemented
 
 
 optional: (optional)
