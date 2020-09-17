@@ -119,7 +119,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 			return path.Join(r.pathPrefix, EndpointChangePassword)
 		},
 		"registerOptionUrl": func() string {
-			return path.Join(r.pathPrefix, fmt.Sprintf("%s", EndpointRegisterOption))
+			return path.Join(r.pathPrefix, EndpointRegisterOption)
 		},
 		"registrationUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointRegister)
