@@ -3,7 +3,6 @@ module github.com/caos/zitadel
 go 1.14
 
 require (
-	cloud.google.com/go v0.61.0 // indirect
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.3
 	github.com/BurntSushi/toml v0.3.1
 	github.com/DATA-DOG/go-sqlmock v1.5.0
@@ -16,7 +15,7 @@ require (
 	github.com/aws/aws-sdk-go v1.33.13 // indirect
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.8.0
+	github.com/caos/oidc v0.9.0
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/cockroachdb/cockroach-go/v2 v2.0.5
 	github.com/envoyproxy/protoc-gen-validate v0.4.1
@@ -24,7 +23,6 @@ require (
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.4.4
 	github.com/golang/protobuf v1.4.2
-	github.com/google/go-cmp v0.5.1 // indirect
 	github.com/gorilla/csrf v1.7.0
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/schema v1.2.0
@@ -54,11 +52,10 @@ require (
 	github.com/ttacon/libphonenumber v1.1.0
 	go.opencensus.io v0.22.4
 	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899
-	golang.org/x/sys v0.0.0-20200728102440-3e129f6d46b1 // indirect
 	golang.org/x/text v0.3.3
-	golang.org/x/tools v0.0.0-20200727233628-55644ead90ce
-	google.golang.org/genproto v0.0.0-20200728010541-3dc8dca74b7b
-	google.golang.org/grpc v1.30.0
+	golang.org/x/tools v0.0.0-20200825202427-b303f430e36d
+	google.golang.org/genproto v0.0.0-20200825200019-8632dd797987
+	google.golang.org/grpc v1.31.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/square/go-jose.v2 v2.5.1
 )

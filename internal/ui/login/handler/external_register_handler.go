@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/caos/oidc/pkg/oidc"
+	"github.com/caos/oidc/pkg/rp"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errors "github.com/caos/zitadel/internal/errors"
@@ -61,7 +62,7 @@ func (l *Login) handleExternalRegisterCallback(w http.ResponseWriter, r *http.Re
 		return
 	}
 	provider := l.getRPConfig(w, r, authReq, idpConfig, EndpointExternalRegisterCallback)
-	tokens, err := provider.CodeExchange(r.Context(), data.Code)
+	tokens, err := rp.CodeExchange(r.Context(), data.Code, provider)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return

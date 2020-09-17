@@ -70,7 +70,7 @@ func (l *Login) handleExternalLogin(w http.ResponseWriter, r *http.Request) {
 
 func (l *Login) handleOIDCAuthorize(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) {
 	provider := l.getRPConfig(w, r, authReq, idpConfig, callbackEndpoint)
-	http.Redirect(w, r, provider.AuthURL(authReq.ID), http.StatusFound)
+	http.Redirect(w, r, rp.AuthURL(authReq.ID, provider), http.StatusFound)
 }
 
 func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Request) {
@@ -92,7 +92,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	provider := l.getRPConfig(w, r, authReq, idpConfig, EndpointExternalLoginCallback)
-	tokens, err := provider.CodeExchange(r.Context(), data.Code)
+	tokens, err := rp.CodeExchange(r.Context(), data.Code, provider)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
 		return
@@ -100,21 +100,13 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 	l.handleExternalUserAuthenticated(w, r, authReq, idpConfig, userAgentID, tokens)
 }
 
-func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) rp.DelegationTokenExchangeRP {
+func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) rp.RelayingParty {
 	oidcClientSecret, err := crypto.DecryptString(idpConfig.OIDCClientSecret, l.IDPConfigAesCrypto)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return nil
 	}
-	rpConfig := &rp.Config{
-		ClientID:     idpConfig.OIDCClientID,
-		ClientSecret: oidcClientSecret,
-		Issuer:       idpConfig.OIDCIssuer,
-		CallbackURL:  l.baseURL + callbackEndpoint,
-		Scopes:       idpConfig.OIDCScopes,
-	}
-
-	provider, err := rp.NewDefaultRP(rpConfig, rp.WithVerifierOpts(rp.WithIssuedAtOffset(3*time.Second)))
+	provider, err := rp.NewRelayingPartyOIDC(idpConfig.OIDCIssuer, idpConfig.OIDCClientID, oidcClientSecret, l.baseURL+callbackEndpoint, idpConfig.OIDCScopes, rp.WithVerifierOpts(rp.WithIssuedAtOffset(3*time.Second)))
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return nil
