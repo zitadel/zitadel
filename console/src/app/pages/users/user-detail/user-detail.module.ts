@@ -45,6 +45,7 @@ import { PasswordComponent } from './password/password.component';
 import { UserDetailRoutingModule } from './user-detail-routing.module';
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
+import { ExternalIdpsComponent } from './external-idps/external-idps.component';
 
 @NgModule({
     declarations: [
@@ -58,6 +59,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         CodeDialogComponent,
         MembershipsComponent,
         MachineKeysComponent,
+        ExternalIdpsComponent,
     ],
     imports: [
         UserDetailRoutingModule,

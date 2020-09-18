@@ -114,6 +114,14 @@
                 "OTP_DELETE_DESCRIPTION":"Sie sind im Begriff OTP als Zweitfaktormethode zu entfernen. Sind sie sicher?"
             }
         },
+        "EXTERNALIDP": {
+          "TITLE": "Externe Identitäts Provider",
+          "DESC": "",
+          "IDPCONFIGID": "Idp Konfig ID",
+          "IDPNAME": "Idp Name",
+          "USERDISPLAYNAME":  "Externer Name",
+          "EXTERNALUSERID": "Externe Benutzer ID"
+        },
         "CREATE": {
             "TITLE": "Neuen Benutzer erstellen",
             "DESCRIPTION": "Gebe die erforderlichen Daten ein.",

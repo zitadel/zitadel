@@ -114,6 +114,14 @@
                 "OTP_DELETE_DESCRIPTION":"You are about to delete OTP as second factor. Are you sure?"
             }
         },
+        "EXTERNALIDP": {
+          "TITLE": "External Identity Providers",
+          "DESC": "",
+          "IDPCONFIGID": "Idp Config ID",
+          "IDPNAME": "Idp Name",
+          "USERDISPLAYNAME":  "External Name",
+          "EXTERNALUSERID": "External User ID"
+        },
         "CREATE": {
             "TITLE": "Create a new User",
             "DESCRIPTION": "Please provide the necesary information.",
@@ -820,7 +828,7 @@
             "project.role.added":"created role",
             "project.role.removed":"deleted role",
             "project.application.added":"added app",
-            "project.application.config.oidc.added":"added OIDC config",  
+            "project.application.config.oidc.added":"added OIDC config",
             "user.added":"User added",
             "user.initialization.code.added":"Init code added",
             "user.phone.code.added":"Phone code added",
@@ -828,7 +836,7 @@
             "user.initialization.code.sent":"Init code sent",
             "user.email.verification.sended": "User email verified",
             "user.email.code.added":"Email code added",
-            "user.email.code.sent":"Email code sent",           
+            "user.email.code.sent":"Email code sent",
             "user.email.verified":"Email verified",
             "user.phone.verificationsended":"User phone verification sent",
             "user.phone.code":"User phone code created",
