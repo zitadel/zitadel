@@ -271,7 +271,7 @@
     "IAM": {
         "DETAIL": {
             "TITLE":"Administration Identity- und Access-Management Administration",
-            "DESCRIPTION":"Verwalten Sie die Einstellungen von ZITADEL."
+            "DESCRIPTION":"Verwalte die Einstellungen von ZITADEL."
         },
         "MEMBER": {
             "TITLE":"Manager",
