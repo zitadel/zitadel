@@ -8,7 +8,7 @@ describe('ExternalIdpsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ExternalIdpsComponent ]
+      declarations: [ ExternalIdpsComponent ],
     })
     .compileComponents();
   }));

@@ -1,19 +1,19 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {MatPaginator, PageEvent} from "@angular/material/paginator";
-import {MatTableDataSource} from "@angular/material/table";
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatTableDataSource} from '@angular/material/table';
 import {
   ExternalIDPSearchResponse,
   ExternalIDPView,
-} from "../../../../proto/generated/management_pb";
-import {BehaviorSubject, Observable} from "rxjs";
-import {ManagementService} from "../../../../services/mgmt.service";
-import {ToastService} from "../../../../services/toast.service";
-import {SelectionModel} from "@angular/cdk/collections";
+} from '../../../../proto/generated/management_pb';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {ManagementService} from '../../../../services/mgmt.service';
+import {ToastService} from '../../../../services/toast.service';
+import {SelectionModel} from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-external-idps',
   templateUrl: './external-idps.component.html',
-  styleUrls: ['./external-idps.component.scss']
+  styleUrls: ['./external-idps.component.scss'],
 })
 export class ExternalIdpsComponent implements OnInit {
   @Input() userId!: string;
