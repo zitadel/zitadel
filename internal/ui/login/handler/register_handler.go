@@ -66,11 +66,16 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	resourceOwner := iam.GlobalOrgID
 	member := &org_model.OrgMember{
 		ObjectRoot: models.ObjectRoot{AggregateID: iam.GlobalOrgID},
 		Roles:      []string{orgProjectCreatorRole},
 	}
-	user, err := l.authRepo.Register(setContext(r.Context(), iam.GlobalOrgID), data.toUserModel(), member, iam.GlobalOrgID)
+	if authRequest.GetScopeOrgID() != "" && authRequest.GetScopeOrgID() != iam.GlobalOrgID {
+		member = nil
+		resourceOwner = authRequest.GetScopeOrgID()
+	}
+	user, err := l.authRepo.Register(setContext(r.Context(), resourceOwner), data.toUserModel(), member, resourceOwner)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return

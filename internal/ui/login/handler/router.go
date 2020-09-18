@@ -7,26 +7,32 @@ import (
 )
 
 const (
-	EndpointRoot             = "/"
-	EndpointHealthz          = "/healthz"
-	EndpointReadiness        = "/ready"
-	EndpointLogin            = "/login"
-	EndpointLoginName        = "/loginname"
-	EndpointUserSelection    = "/userselection"
-	EndpointChangeUsername   = "/username/change"
-	EndpointPassword         = "/password"
-	EndpointInitPassword     = "/password/init"
-	EndpointChangePassword   = "/password/change"
-	EndpointPasswordReset    = "/password/reset"
-	EndpointInitUser         = "/user/init"
-	EndpointMfaVerify        = "/mfa/verify"
-	EndpointMfaPrompt        = "/mfa/prompt"
-	EndpointMfaInitVerify    = "/mfa/init/verify"
-	EndpointMailVerification = "/mail/verification"
-	EndpointMailVerified     = "/mail/verified"
-	EndpointRegister         = "/register"
-	EndpointRegisterOrg      = "/register/org"
-	EndpointLogoutDone       = "/logout/done"
+	EndpointRoot                     = "/"
+	EndpointHealthz                  = "/healthz"
+	EndpointReadiness                = "/ready"
+	EndpointLogin                    = "/login"
+	EndpointExternalLogin            = "/login/externalidp"
+	EndpointExternalLoginCallback    = "/login/externalidp/callback"
+	EndpointLoginName                = "/loginname"
+	EndpointUserSelection            = "/userselection"
+	EndpointChangeUsername           = "/username/change"
+	EndpointPassword                 = "/password"
+	EndpointInitPassword             = "/password/init"
+	EndpointChangePassword           = "/password/change"
+	EndpointPasswordReset            = "/password/reset"
+	EndpointInitUser                 = "/user/init"
+	EndpointMfaVerify                = "/mfa/verify"
+	EndpointMfaPrompt                = "/mfa/prompt"
+	EndpointMfaInitVerify            = "/mfa/init/verify"
+	EndpointMailVerification         = "/mail/verification"
+	EndpointMailVerified             = "/mail/verified"
+	EndpointRegisterOption           = "/register/option"
+	EndpointRegister                 = "/register"
+	EndpointExternalRegister         = "/register/externalidp"
+	EndpointExternalRegisterCallback = "/register/externalidp/callback"
+	EndpointRegisterOrg              = "/register/org"
+	EndpointLogoutDone               = "/logout/done"
+	EndpointExternalNotFoundOption   = "/externaluser/option"
 
 	EndpointResources = "/resources"
 )
@@ -38,6 +44,8 @@ func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.M
 	router.HandleFunc(EndpointHealthz, login.handleHealthz).Methods(http.MethodGet)
 	router.HandleFunc(EndpointReadiness, login.handleReadiness).Methods(http.MethodGet)
 	router.HandleFunc(EndpointLogin, login.handleLogin).Methods(http.MethodGet, http.MethodPost)
+	router.HandleFunc(EndpointExternalLogin, login.handleExternalLogin).Methods(http.MethodGet)
+	router.HandleFunc(EndpointExternalLoginCallback, login.handleExternalLoginCallback).Methods(http.MethodGet)
 	router.HandleFunc(EndpointLoginName, login.handleLoginName).Methods(http.MethodGet)
 	router.HandleFunc(EndpointLoginName, login.handleLoginNameCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointUserSelection, login.handleSelectUser).Methods(http.MethodPost)
@@ -55,8 +63,13 @@ func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.M
 	router.HandleFunc(EndpointMailVerification, login.handleMailVerification).Methods(http.MethodGet)
 	router.HandleFunc(EndpointMailVerification, login.handleMailVerificationCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointChangePassword, login.handleChangePassword).Methods(http.MethodPost)
+	router.HandleFunc(EndpointRegisterOption, login.handleRegisterOption).Methods(http.MethodGet)
+	router.HandleFunc(EndpointRegisterOption, login.handleRegisterOptionCheck).Methods(http.MethodPost)
+	router.HandleFunc(EndpointExternalNotFoundOption, login.handleExternalNotFoundOptionCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointRegister, login.handleRegister).Methods(http.MethodGet)
 	router.HandleFunc(EndpointRegister, login.handleRegisterCheck).Methods(http.MethodPost)
+	router.HandleFunc(EndpointExternalRegister, login.handleExternalRegister).Methods(http.MethodGet)
+	router.HandleFunc(EndpointExternalRegisterCallback, login.handleExternalRegisterCallback).Methods(http.MethodGet)
 	router.HandleFunc(EndpointLogoutDone, login.handleLogoutDone).Methods(http.MethodGet)
 	router.PathPrefix(EndpointResources).Handler(login.handleResources(staticDir)).Methods(http.MethodGet)
 	router.HandleFunc(EndpointRegisterOrg, login.handleRegisterOrg).Methods(http.MethodGet)

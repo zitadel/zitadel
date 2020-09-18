@@ -18,6 +18,10 @@ const (
 	AuthRequestTypeSAML
 )
 
+const (
+	OrgIDScope = "urn:zitadel:organisation:id:"
+)
+
 type AuthRequestOIDC struct {
 	Scopes        []string
 	ResponseType  OIDCResponseType

@@ -19,6 +19,8 @@ const (
 	NextStepMfaVerify
 	NextStepRedirectToCallback
 	NextStepChangeUsername
+	NextStepLinkUsers
+	NextStepExternalNotFoundOption
 )
 
 type UserSessionState int32
@@ -51,6 +53,12 @@ type UserSelection struct {
 
 type InitUserStep struct {
 	PasswordSet bool
+}
+
+type ExternalNotFoundOptionStep struct{}
+
+func (s *ExternalNotFoundOptionStep) Type() NextStepType {
+	return NextStepExternalNotFoundOption
 }
 
 func (s *InitUserStep) Type() NextStepType {
@@ -102,6 +110,12 @@ type MfaVerificationStep struct {
 
 func (s *MfaVerificationStep) Type() NextStepType {
 	return NextStepMfaVerify
+}
+
+type LinkUsersStep struct{}
+
+func (s *LinkUsersStep) Type() NextStepType {
+	return NextStepLinkUsers
 }
 
 type RedirectToCallbackStep struct{}

@@ -1,8 +1,10 @@
 {{template "main-top" .}}
 
-{{ template "user-profile" . }}
+<div class="head">
+    {{ template "user-profile" . }}
 
-<p>{{t "UsernameChange.Description"}}</p>
+    <p>{{t "UsernameChange.Description"}}</p>
+</div>
 
 <form action="{{ changeUsernameUrl }}" method="POST">
 
@@ -21,8 +23,8 @@
 
     <div class="actions">
         <button type="submit" id="submit-button" value="false" class="primary right">{{t "Actions.Next"}}</button>
-        <a href="{{ loginUrl }}">
-            <button class="secondary" type="button">{{t "Actions.Cancel"}}</button>
+        <a class="button secondary" href="{{ loginUrl }}">
+            {{t "Actions.Cancel"}}
         </a>
     </div>
 </form>

@@ -11,12 +11,17 @@ Password:
 Login:
   Title: Anmeldung
   Description: Gib deine Benutzerdaten ein.
+  TitleLinking: Anmeldung für Benutzer Linking
+  DescriptionLinking: Gib deine Benutzerdaten ein um den externen Benutzer mit einem ZITADEL Benutzer zu linken.
   Loginname: Loginname
   LoginnamePlaceHolder: username@domain
+  ExternalLogin: Melde dich mit einem externen Benutzer an
 
 UserSelection:
   Title: Account auswählen
   Description: Wähle deinen Account aus.
+  TitleLinking: Account auswählen um zu verlinken
+  DescriptionLinking: Wähle deinen Account, um diesen mit deinem externen Benutzer zu verlinken.
   OtherUser: Anderer Benutzer
   SessionState0: aktiv
   SessionState1: inaktiv
@@ -103,6 +108,11 @@ EmailVerificationDone:
   Title: E-Mail Verifizierung
   Description: Deine E-Mail Adresse wurde erfolgreich verifiziert.
 
+RegisterOption:
+  Title: Registrations Möglichkeiten
+  Description: Wähle aus wie du dich registrieren möchtest.
+  RegisterUsernamePassword: Mit Benutzername Passwort
+
 Registration:
   Title: Registration
   Description: Gib deine Benutzerangaben an. Die E-Mail Adresse wird als Benutzernamen verwendet.
@@ -147,6 +157,16 @@ RegistrationOrg:
   TosLinkText: AGBs
   TosLink: https://zitadel.ch/pdf/agb.pdf
 
+LinkingUsersDone:
+  Title: Benutzerlinking
+  Description: Benuzterlinking erledigt.
+
+ExternalNotFoundOption:
+  Title: Externer Benutzer
+  Description: Externer Benutzer konnte nicht gefunden werden. Willst du deinen Benutzer mit einem bestehenden verlinken oder diesen als neuen Benutzer registrieren.
+  Link: Verlinken
+  AutoRegister: Automatisches registrieren
+
 LogoutDone:
   Title: Ausgeloggt
   Description: Du wurdest erfolgreich ausgeloggt.
@@ -173,6 +193,7 @@ Errors:
     UserIDMissing: UserID ist leer
     Invalid: Userdaten sind ungültig
     DomainNotAllowedAsUsername: Domäne ist bereits reserviert und kann nicht verwendet werden
+    NotAllowedToLink: Der Benutzer darf nicht mit einem externen Login Provider verlinkt werden
     Password:
       ConfirmationWrong: Passwort Bestätigung stimmt nicht überein
       Empty: Passwort ist leer
@@ -202,5 +223,7 @@ Errors:
         NotReady: Multifaktor OTP (OneTimePassword) ist nicht bereit
     Locked: Benutzer ist gesperrt
     NotActive: Benutzer ist nicht aktiv
+    ExternalIDP:
+      IDPTypeNotImplemented: IDP Typ ist nicht implementiert
 
 optional: (optional)

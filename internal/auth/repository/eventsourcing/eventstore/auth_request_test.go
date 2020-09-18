@@ -88,10 +88,18 @@ func (m *mockEventUser) UserEventsByID(ctx context.Context, id string, sequence 
 	return events, nil
 }
 
+func (m *mockEventUser) BulkAddExternalIDPs(ctx context.Context, userID string, externalIDPs []*user_model.ExternalIDP) error {
+	return nil
+}
+
 type mockEventErrUser struct{}
 
 func (m *mockEventErrUser) UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
+}
+
+func (m *mockEventErrUser) BulkAddExternalIDPs(ctx context.Context, userID string, externalIDPs []*user_model.ExternalIDP) error {
+	return errors.ThrowInternal(nil, "id", "internal error")
 }
 
 type mockViewUser struct {
@@ -183,6 +191,15 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&model.AuthRequest{}, false},
 			[]model.NextStep{&model.LoginStep{}},
+			nil,
+		},
+		{
+			"user not set no active session, linking users, external user not found option",
+			fields{
+				userSessionViewProvider: &mockViewNoUserSession{},
+			},
+			args{&model.AuthRequest{LinkingUsers: []*model.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "ExternalUserID"}}}, false},
+			[]model.NextStep{&model.ExternalNotFoundOptionStep{}},
 			nil,
 		},
 		{
@@ -364,6 +381,24 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
+			"external user (no password set), callback",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+				},
+				userEventProvider:        &mockEventUser{},
+				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID"}, false},
+			[]model.NextStep{&model.RedirectToCallbackStep{}},
+			nil,
+		},
+		{
 			"password not verified, password check step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{},
@@ -376,6 +411,25 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&model.AuthRequest{UserID: "UserID"}, false},
 			[]model.NextStep{&model.PasswordStep{}},
+			nil,
+		},
+		{
+			"external user (no password check needed), callback",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+				},
+				userEventProvider:        &mockEventUser{},
+				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID"}, false},
+			[]model.NextStep{&model.RedirectToCallbackStep{}},
 			nil,
 		},
 		{
@@ -395,6 +449,28 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
 			args{&model.AuthRequest{UserID: "UserID"}, false},
+			[]model.NextStep{&model.MfaVerificationStep{
+				MfaProviders: []model.MfaType{model.MfaTypeOTP},
+			}},
+			nil,
+		},
+		{
+			"external user, mfa not verified, mfa check step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet: true,
+					OTPState:    int32(user_model.MfaStateReady),
+					MfaMaxSetUp: int32(model.MfaLevelSoftware),
+				},
+				userEventProvider:        &mockEventUser{},
+				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
+				PasswordCheckLifeTime:    10 * 24 * time.Hour,
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID"}, false},
 			[]model.NextStep{&model.MfaVerificationStep{
 				MfaProviders: []model.MfaType{model.MfaTypeOTP},
 			}},
@@ -503,6 +579,30 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&model.AuthRequest{UserID: "UserID", Prompt: model.PromptNone}, true},
 			[]model.NextStep{&model.RedirectToCallbackStep{}},
+			nil,
+		},
+		{
+			"linking users, link users step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+				},
+				userEventProvider:        &mockEventUser{},
+				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{
+				&model.AuthRequest{
+					UserID:              "UserID",
+					SelectedIDPConfigID: "IDPConfigID",
+					LinkingUsers:        []*model.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "UserID", DisplayName: "DisplayName"}},
+				}, false},
+			[]model.NextStep{&model.LinkUsersStep{}},
 			nil,
 		},
 	}

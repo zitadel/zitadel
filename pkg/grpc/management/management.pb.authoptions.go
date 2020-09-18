@@ -159,6 +159,16 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/SearchUserExternalIDPs": authz.Option{
+		Permission: "user.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveExternalIDP": authz.Option{
+		Permission: "user.write",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/GetUserMfas": authz.Option{
 		Permission: "user.read",
 		CheckParam: "",

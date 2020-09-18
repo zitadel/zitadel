@@ -1,12 +1,17 @@
 Login:
   Title: Login
   Description: Enter your logindata.
+  TitleLinking: Login for userlinking
+  DescriptionLinking: Enter your login data to link your external user with a ZITADEL user.
   Loginname: Loginname
   LoginnamePlaceHolder: username@domain
+  ExternalLogin: Login with an external user.
 
 UserSelection:
   Title: Select account
   Description: Select your account.
+  TitleLinking: Select account for userlinking
+  DescriptionLinking: Select your account to link with your external user.
   OtherUser: Other User
   SessionState0: active
   SessionState1: inactive
@@ -103,6 +108,11 @@ EmailVerificationDone:
   Title: E-Mail Verification
   Description: Your email address has been successfully verified.
 
+RegistrationOption:
+  Title: Registration Options
+  Description: Choose how you'd like to register
+  RegisterUsernamePassword: With username password
+
 Registration:
   Title: Registration
   Description: Enter your Userdata. Your email address will be used as loginname.
@@ -147,10 +157,19 @@ RegistrationOrg:
   TosLinkText: TOS
   TosLink: https://zitadel.ch/pdf/tos.pdf
 
-
 LogoutDone:
   Title: Logged out
   Description: You have logged out successfully.
+
+LinkingUsersDone:
+  Title: Userlinking
+  Description: Userlinking done.
+
+ExternalNotFoundOption:
+  Title: External User
+  Description: External user not found. Do you want to link your user or auto register a new one.
+  Link: Link
+  AutoRegister: Auto register
 
 Actions:
   Login: login
@@ -163,7 +182,6 @@ Actions:
   Cancel: cancel
   Save: save
 
-
 Errors:
   Internal: An internal error occured
   AuthRequest:
@@ -175,6 +193,7 @@ Errors:
     UserIDMissing: UserID is empty
     Invalid: Invalid userdata
     DomainNotAllowedAsUsername: Domain is already reserved and cannot be used
+    NotAllowedToLink: User is not allowed to link with external login provider
     Password:
       ConfirmationWrong: Passwordconfirmation is wrong
       Empty: Password is empty
@@ -204,6 +223,8 @@ Errors:
         NotReady: Multifactor OTP (OneTimePassword) isn't ready
     Locked: User is locked
     NotActive: User is not active
+    ExternalIDP:
+      IDPTypeNotImplemented: IDP Type is not implemented
 
 
 optional: (optional)

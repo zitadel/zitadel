@@ -285,17 +285,15 @@ func LoginPolicyIDPProviderAddedAggregate(aggCreator *es_models.AggregateCreator
 	}
 }
 
-func LoginPolicyIDPProviderRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, provider *model.IDPProviderID) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if provider == nil || existing == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sml9d", "Errors.Internal")
-		}
-		agg, err := IAMAggregate(ctx, aggCreator, existing)
-		if err != nil {
-			return nil, err
-		}
-		return agg.AppendEvent(model.LoginPolicyIDPProviderRemoved, provider)
+func LoginPolicyIDPProviderRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.IAM, provider *model.IDPProviderID) (*es_models.Aggregate, error) {
+	if provider == nil || existing == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sml9d", "Errors.Internal")
 	}
+	agg, err := IAMAggregate(ctx, aggCreator, existing)
+	if err != nil {
+		return nil, err
+	}
+	return agg.AppendEvent(model.LoginPolicyIDPProviderRemoved, provider)
 }
 
 func checkExistingLoginPolicyValidation() func(...*es_models.Event) error {

@@ -87,6 +87,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 		IAMRepository: eventstore.IAMRepository{
 			IAMEventstore:  iam,
 			OrgEvents:      org,
+			UserEvents:     user,
 			View:           view,
 			SystemDefaults: systemDefaults,
 			SearchLimit:    conf.SearchLimit,

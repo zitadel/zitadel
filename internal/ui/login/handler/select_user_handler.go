@@ -19,6 +19,7 @@ func (l *Login) renderUserSelection(w http.ResponseWriter, r *http.Request, auth
 	data := userSelectionData{
 		baseData: l.getBaseData(r, authReq, "Select User", "", ""),
 		Users:    selectionData.Users,
+		Linking:  len(authReq.LinkingUsers) > 0,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplUserSelection], data, nil)
 }

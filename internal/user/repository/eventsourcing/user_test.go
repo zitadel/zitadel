@@ -358,6 +358,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 	type args struct {
 		ctx           context.Context
 		user          *model.User
+		externalIDP   *model.ExternalIDP
 		initCode      *model.InitUserCode
 		resourceOwner string
 		aggCreator    *models.AggregateCreator
@@ -365,6 +366,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 	type res struct {
 		eventLen   int
 		eventTypes []models.EventType
+		aggLen     int
 		errFunc    func(err error) bool
 	}
 	tests := []struct {
@@ -391,6 +393,29 @@ func TestUserRegisterAggregate(t *testing.T) {
 			res: res{
 				eventLen:   2,
 				eventTypes: []models.EventType{model.HumanRegistered, model.InitializedHumanCodeAdded},
+				aggLen:     2,
+			},
+		},
+		{
+			name: "user register with erxternalIDP aggregate ok",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				user: &model.User{
+					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					UserName:   "UserName",
+					Human: &model.Human{
+						Profile: &model.Profile{DisplayName: "DisplayName"},
+						Email:   &model.Email{EmailAddress: "EmailAddress"},
+					},
+				},
+				externalIDP:   &model.ExternalIDP{IDPConfigID: "IDPConfigID"},
+				resourceOwner: "newResourceowner",
+				aggCreator:    models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   2,
+				eventTypes: []models.EventType{model.HumanRegistered, model.HumanExternalIDPAdded},
+				aggLen:     3,
 			},
 		},
 		{
@@ -401,25 +426,6 @@ func TestUserRegisterAggregate(t *testing.T) {
 				initCode:      &model.InitUserCode{},
 				resourceOwner: "newResourceowner",
 				aggCreator:    models.NewAggregateCreator("Test"),
-			},
-			res: res{
-				errFunc: caos_errs.IsPreconditionFailed,
-			},
-		},
-		{
-			name: "code nil",
-			args: args{
-				ctx:           authz.NewMockContext("orgID", "userID"),
-				resourceOwner: "newResourceowner",
-				user: &model.User{
-					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					UserName:   "UserName",
-					Human: &model.Human{
-						Profile: &model.Profile{DisplayName: "DisplayName"},
-						Email:   &model.Email{EmailAddress: "EmailAddress"},
-					},
-				},
-				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -444,6 +450,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 			res: res{
 				eventLen:   2,
 				eventTypes: []models.EventType{model.HumanRegistered, model.InitializedHumanCodeAdded},
+				aggLen:     2,
 			},
 		},
 		{
@@ -468,16 +475,20 @@ func TestUserRegisterAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			aggregates, err := UserRegisterAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.user, tt.args.resourceOwner, tt.args.initCode, false)
+			aggregates, err := UserRegisterAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.user, tt.args.externalIDP, tt.args.resourceOwner, tt.args.initCode, false)
 
-			if tt.res.errFunc == nil && len(aggregates[1].Events) != tt.res.eventLen {
-				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(aggregates[1].Events))
+			if tt.res.errFunc == nil && len(aggregates) != tt.res.aggLen {
+				t.Errorf("got wrong aggregates len: expected: %v, actual: %v ", tt.res.aggLen, len(aggregates))
+			}
+
+			if tt.res.errFunc == nil && len(aggregates[tt.res.aggLen-1].Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(aggregates[tt.res.aggLen-1].Events))
 			}
 			for i := 0; i < tt.res.eventLen; i++ {
-				if tt.res.errFunc == nil && aggregates[1].Events[i].Type != tt.res.eventTypes[i] {
-					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], aggregates[1].Events[i].Type.String())
+				if tt.res.errFunc == nil && aggregates[tt.res.aggLen-1].Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], aggregates[tt.res.aggLen-1].Events[i].Type.String())
 				}
-				if tt.res.errFunc == nil && aggregates[1].Events[i].Data == nil {
+				if tt.res.errFunc == nil && aggregates[tt.res.aggLen-1].Events[i].Data == nil {
 					t.Errorf("should have data in event")
 				}
 			}
@@ -2270,6 +2281,139 @@ func TestOTPRemoveAggregate(t *testing.T) {
 			}
 			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestExternalIDPAddedAggregates(t *testing.T) {
+	type res struct {
+		aggregateCount int
+		isErr          func(error) bool
+	}
+	type args struct {
+		ctx         context.Context
+		aggCreator  *models.AggregateCreator
+		user        *model.User
+		externalIDP *model.ExternalIDP
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "no user error",
+			args: args{
+				ctx:        authz.NewMockContext("org", "user"),
+				aggCreator: models.NewAggregateCreator("test"),
+				user:       nil,
+			},
+			res: res{
+				aggregateCount: 0,
+				isErr:          caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "user add external idp successful",
+			args: args{
+				ctx:        authz.NewMockContext("org", "user"),
+				aggCreator: models.NewAggregateCreator("test"),
+				user: &model.User{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "AggregateID",
+						Sequence:    5,
+					},
+				},
+				externalIDP: &model.ExternalIDP{
+					IDPConfigID: "IDPConfigID",
+					UserID:      "UserID",
+					DisplayName: "DisplayName",
+				},
+			},
+			res: res{
+				aggregateCount: 2,
+				isErr:          nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ExternalIDPAddedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.user, tt.args.externalIDP)
+			if tt.res.isErr == nil && err != nil {
+				t.Errorf("no error expected got %T: %v", err, err)
+			}
+			if tt.res.isErr != nil && !tt.res.isErr(err) {
+				t.Errorf("wrong error got %T: %v", err, err)
+			}
+			if tt.res.isErr == nil && len(got) != tt.res.aggregateCount {
+				t.Errorf("ExternalIDPAddedAggregate() aggregate count = %d, wanted count %d", len(got), tt.res.aggregateCount)
+			}
+		})
+	}
+}
+
+func TestExternalIDPRemovedAggregates(t *testing.T) {
+	type res struct {
+		aggregateCount int
+		isErr          func(error) bool
+	}
+	type args struct {
+		ctx         context.Context
+		aggCreator  *models.AggregateCreator
+		user        *model.User
+		externalIDP *model.ExternalIDP
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "no user error",
+			args: args{
+				ctx:        authz.NewMockContext("org", "user"),
+				aggCreator: models.NewAggregateCreator("test"),
+				user:       nil,
+			},
+			res: res{
+				aggregateCount: 0,
+				isErr:          caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "user removed external idp successful",
+			args: args{
+				ctx:        authz.NewMockContext("org", "user"),
+				aggCreator: models.NewAggregateCreator("test"),
+				user: &model.User{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "AggregateID",
+						Sequence:    5,
+					},
+				},
+				externalIDP: &model.ExternalIDP{
+					IDPConfigID: "IDPConfigID",
+					UserID:      "UserID",
+				},
+			},
+			res: res{
+				aggregateCount: 2,
+				isErr:          nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ExternalIDPRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.user, tt.args.externalIDP, false)
+			if tt.res.isErr == nil && err != nil {
+				t.Errorf("no error expected got %T: %v", err, err)
+			}
+			if tt.res.isErr != nil && !tt.res.isErr(err) {
+				t.Errorf("wrong error got %T: %v", err, err)
+			}
+			if tt.res.isErr == nil && len(got) != tt.res.aggregateCount {
+				t.Errorf("ExternalIDPRemovedAggregate() aggregate count = %d, wanted count %d", len(got), tt.res.aggregateCount)
 			}
 		})
 	}

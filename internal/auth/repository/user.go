@@ -10,6 +10,7 @@ import (
 
 type UserRepository interface {
 	Register(ctx context.Context, user *model.User, member *org_model.OrgMember, resourceOwner string) (*model.User, error)
+	RegisterExternalUser(ctx context.Context, user *model.User, externalIDP *model.ExternalIDP, member *org_model.OrgMember, resourceOwner string) (*model.User, error)
 
 	myUserRepo
 	SkipMfaInit(ctx context.Context, userID string) error
@@ -57,6 +58,10 @@ type myUserRepo interface {
 	ChangeMyAddress(ctx context.Context, address *model.Address) (*model.Address, error)
 
 	ChangeMyPassword(ctx context.Context, old, new string) error
+
+	SearchMyExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error)
+	AddMyExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) (*model.ExternalIDP, error)
+	RemoveMyExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) error
 
 	MyUserMfas(ctx context.Context) ([]*model.MultiFactor, error)
 	AddMyMfaOTP(ctx context.Context) (*model.OTP, error)
