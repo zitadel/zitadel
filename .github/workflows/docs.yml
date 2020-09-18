@@ -1,8 +1,8 @@
 name: Docs
-on: push
-  # push:
-    # paths:
-    # - 'site/**'
+on:
+  push:
+    paths:
+      - 'site/**'
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -30,10 +30,7 @@ jobs:
     name: Deploy
     needs: builddocs
     runs-on: ubuntu-latest
-    # defaults:
-    #   run:
-    #     working-directory: ./site
-    # if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout Repo
         uses: actions/checkout@master
