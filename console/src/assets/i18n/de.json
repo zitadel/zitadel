@@ -389,7 +389,7 @@
                 "TITLE":"Passwortsperre",
                 "DESCRIPTION":"Standardmässig sind die Passwortwiederholungen bei Falscheingabe nicht begrenzt. Du musst diese Richtlinie installieren, wenn Du Wiederholungsversuche anzeigen, oder eine maximale Anzahl von wiederholten Passworteingaben festlegen möchtest.",
                 "TITLECREATE":"Richtline zur Passwortsperre festlegen",
-                "DESCRIPTIONCREATE":"Standardmässig sind die Passwortwiederholungen bei Falscheingabe nicht begrenzt. Du musst diese Richtlinie installieren, wenn Du Wiederholungsversuche anzeigen, oder eine maximale Anzahl von wiederholten Passworteingaben festlegen möchtest."
+                "DESCRIPTIONCREATE":"Standardmässig sind die Passwortwiederholungen bei Falscheingabe nicht begrenzt. Du musst diese Richtlinie anwenden, wenn Du Wiederholungsversuche anzeigen, oder eine maximale Anzahl von wiederholten Passworteingaben festlegen möchtest."
             },
             "IAM_POLICY": {
                 "TITLE":"Zugangseinstellungen IAM",
