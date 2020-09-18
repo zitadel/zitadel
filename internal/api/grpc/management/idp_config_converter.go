@@ -18,7 +18,7 @@ func createOidcIdpToModel(idp *management.OidcIdpConfigCreate) *iam_model.IDPCon
 			Issuer:                idp.Issuer,
 			Scopes:                idp.Scopes,
 			IDPDisplayNameMapping: oidcMappingFieldToModel(idp.IdpDisplayNameMapping),
-			UsernameMapping:       oidcMappingFieldToModel(idp.IdpDisplayNameMapping),
+			UsernameMapping:       oidcMappingFieldToModel(idp.UsernameMapping),
 		},
 	}
 }
@@ -39,7 +39,7 @@ func updateOidcIdpToModel(idp *management.OidcIdpConfigUpdate) *iam_model.OIDCID
 		Issuer:                idp.Issuer,
 		Scopes:                idp.Scopes,
 		IDPDisplayNameMapping: oidcMappingFieldToModel(idp.IdpDisplayNameMapping),
-		UsernameMapping:       oidcMappingFieldToModel(idp.IdpDisplayNameMapping),
+		UsernameMapping:       oidcMappingFieldToModel(idp.UsernameMapping),
 	}
 }
 

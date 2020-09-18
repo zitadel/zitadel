@@ -728,7 +728,7 @@ func (es *UserEventstore) AddExternalIDP(ctx context.Context, externalIDP *usr_m
 	return nil, errors.ThrowInternal(nil, "EVENT-Msi9d", "Errors.Internal")
 }
 
-func (es *UserEventstore) BulkAddExternalIDPs(ctx context.Context, externalIDPs []*usr_model.ExternalIDP) error {
+func (es *UserEventstore) BulkAddExternalIDPs(ctx context.Context, userID string, externalIDPs []*usr_model.ExternalIDP) error {
 	if externalIDPs == nil || len(externalIDPs) == 0 {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-Ek9s", "Errors.User.ExternalIDP.MinimumExternalIDPNeeded")
 	}
@@ -737,7 +737,7 @@ func (es *UserEventstore) BulkAddExternalIDPs(ctx context.Context, externalIDPs 
 			return caos_errs.ThrowPreconditionFailed(nil, "EVENT-idue3", "Errors.User.ExternalIDP.Invalid")
 		}
 	}
-	existingUser, err := es.UserByID(ctx, externalIDPs[0].AggregateID)
+	existingUser, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
 	}

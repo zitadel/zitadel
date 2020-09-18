@@ -285,7 +285,7 @@ func releasedUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.
 	return aggregate.SetPrecondition(UserUserNameUniqueQuery(uniqueUserName), isEventValidation(aggregate, model.UserUserNameReserved)), nil
 }
 
-func changeUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, userID, oldUsername, username string, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
+func changeUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, oldUsername, username string, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
 	aggregates := make([]*es_models.Aggregate, 2)
 	var err error
 	aggregates[0], err = releasedUniqueUserNameAggregate(ctx, aggCreator, resourceOwner, oldUsername, userLoginMustBeDomain)
@@ -740,7 +740,7 @@ func SignOutAggregates(aggCreator *es_models.AggregateCreator, users []*model.Us
 }
 
 func DomainClaimedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, tempName string) ([]*es_models.Aggregate, error) {
-	aggregates, err := changeUniqueUserNameAggregate(ctx, aggCreator, user.ResourceOwner, authz.GetCtxData(ctx).UserID, user.UserName, tempName, false)
+	aggregates, err := changeUniqueUserNameAggregate(ctx, aggCreator, user.ResourceOwner, user.UserName, tempName, false)
 	if err != nil {
 		return nil, err
 	}
@@ -846,7 +846,7 @@ func releasedUniqueExternalIDPAggregate(ctx context.Context, aggCreator *es_mode
 }
 
 func UsernameChangedAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, oldUsername string, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
-	aggregates, err := changeUniqueUserNameAggregate(ctx, aggCreator, user.ResourceOwner, authz.GetCtxData(ctx).UserID, oldUsername, user.UserName, userLoginMustBeDomain)
+	aggregates, err := changeUniqueUserNameAggregate(ctx, aggCreator, user.ResourceOwner, oldUsername, user.UserName, userLoginMustBeDomain)
 	if err != nil {
 		return nil, err
 	}

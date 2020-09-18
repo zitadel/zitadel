@@ -69,7 +69,7 @@ type idpProviderViewProvider interface {
 
 type userEventProvider interface {
 	UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error)
-	BulkAddExternalIDPs(ctx context.Context, externalIDPs []*user_model.ExternalIDP) error
+	BulkAddExternalIDPs(ctx context.Context, userID string, externalIDPs []*user_model.ExternalIDP) error
 }
 
 type orgViewProvider interface {
@@ -170,7 +170,7 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 	}
 	err = repo.checkExternalUserLogin(request, externalUser.IDPConfigID, externalUser.ExternalUserID)
 	if errors.IsNotFound(err) {
-		return repo.SetLinkingUser(ctx, request, externalUser, userAgentID)
+		return repo.setLinkingUser(ctx, request, externalUser)
 	}
 	if err != nil {
 		return err
@@ -178,7 +178,7 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) SetLinkingUser(ctx context.Context, request *model.AuthRequest, externalUser *model.ExternalUser, userAgentID string) error {
+func (repo *AuthRequestRepo) setLinkingUser(ctx context.Context, request *model.AuthRequest, externalUser *model.ExternalUser) error {
 	request.LinkingUsers = append(request.LinkingUsers, externalUser)
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
@@ -216,24 +216,6 @@ func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, us
 		return errors.ThrowPreconditionFailed(nil, "EVENT-ADJ26", "Errors.User.NotMatchingUserID")
 	}
 	return repo.UserEvents.CheckMfaOTP(ctx, userID, code, request.WithCurrentInfo(info))
-}
-
-func (repo *AuthRequestRepo) AddUserExternalIDPs(ctx context.Context, userID string, externalLogins []*model.ExternalUser) error {
-	for _, externalLogin := range externalLogins {
-		externalIDP := &user_model.ExternalIDP{
-			ObjectRoot: es_models.ObjectRoot{
-				AggregateID: userID,
-			},
-			IDPConfigID: externalLogin.IDPConfigID,
-			UserID:      externalLogin.ExternalUserID,
-			DisplayName: externalLogin.DisplayName,
-		}
-		externalIDP, err := repo.UserEvents.AddExternalIDP(ctx, externalIDP)
-		if err != nil {
-			return nil
-		}
-	}
-	return nil
 }
 
 func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, userAgentID string) error {
@@ -299,10 +281,6 @@ func (repo *AuthRequestRepo) getAuthRequestNextSteps(ctx context.Context, id, us
 		return nil, err
 	}
 	request.PossibleSteps = steps
-	err = repo.fillLoginPolicy(ctx, request)
-	if err != nil {
-		return nil, err
-	}
 	return request, nil
 }
 
@@ -704,7 +682,7 @@ func linkExternalIDPs(ctx context.Context, userEventProvider userEventProvider, 
 		UserID: "LOGIN",
 		OrgID:  request.UserOrgID,
 	}
-	return userEventProvider.BulkAddExternalIDPs(authz.SetCtxData(ctx, data), externalIDPs)
+	return userEventProvider.BulkAddExternalIDPs(authz.SetCtxData(ctx, data), request.UserID, externalIDPs)
 }
 
 func linkingIDPConfigExistingInAllowedIDPs(linkingUsers []*model.ExternalUser, idpProviders []*iam_model.IDPProviderView) bool {

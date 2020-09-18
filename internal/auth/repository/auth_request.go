@@ -21,7 +21,6 @@ type AuthRequestRepository interface {
 	SelectExternalIDP(ctx context.Context, authReqID, idpConfigID, userAgentID string) error
 	VerifyPassword(ctx context.Context, id, userID, password, userAgentID string, info *model.BrowserInfo) error
 	VerifyMfaOTP(ctx context.Context, agentID, authRequestID, code, userAgentID string, info *model.BrowserInfo) error
-	AddUserExternalIDPs(ctx context.Context, userID string, linkingUsers []*model.ExternalUser) error
 	LinkExternalUsers(ctx context.Context, authReqID, userAgentID string) error
 	AutoRegisterExternalUser(ctx context.Context, user *user_model.User, externalIDP *user_model.ExternalIDP, member *org_model.OrgMember, authReqID, userAgentID, resourceOwner string) error
 }
