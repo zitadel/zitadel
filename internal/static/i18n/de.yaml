@@ -26,6 +26,9 @@ Errors:
     AddressNotFound: Addresse nicht gefunden
     NotHuman: Der Benutzer muss eine Person sein
     NotMachine: Der Benutzer muss technisch sein
+    NotAllowedToLink: Der Benutzer darf nicht mit einem externen Login Provider verlinkt werden
+    Username:
+      Reservied: Benutzername ist bereits vergeben
     Code:
       Empty: Code ist leer
       NotFound: Code konnte nicht gefunden werden
@@ -43,6 +46,11 @@ Errors:
       HasUpper: Passwort beinhaltet keinen Grossbuchstaben
       HasNumber: Passwort beinhaltet keine Nummer
       HasSymbol: Passwort beinhaltet kein Symbol
+    ExternalIDP:
+      Invalid: Externer IDP ungültig
+      IDPConfigNotExisting: IDP Provider ungültig für diese Organisation
+      NotAllowed: Externer IDP ist auf dieser Organisation nicht erlaubt.
+      MinimumExternalIDPNeeded: Mindestens ein IDP muss hinzugefügt werden.
     Mfa:
       Otp:
         AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet

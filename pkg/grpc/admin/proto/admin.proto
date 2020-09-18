@@ -732,6 +732,12 @@ enum IdpState {
     IDPCONFIGSTATE_INACTIVE = 2;
 }
 
+enum OIDCMappingField {
+    OIDCMAPPINGFIELD_UNSPECIFIED = 0;
+    OIDCMAPPINGFIELD_PREFERRED_USERNAME = 1;
+    OIDCMAPPINGFIELD_EMAIL = 2;
+}
+
 message OidcIdpConfigCreate {
     string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     bytes logo_src = 2;
@@ -739,6 +745,8 @@ message OidcIdpConfigCreate {
     string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string issuer = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string scopes = 6;
+    OIDCMappingField idp_display_name_mapping = 7;
+    OIDCMappingField username_mapping = 8;
 }
 
 message OidcIdpConfigUpdate {
@@ -747,6 +755,8 @@ message OidcIdpConfigUpdate {
     string client_secret = 3;
     string issuer = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string scopes = 5;
+    OIDCMappingField idp_display_name_mapping = 6;
+    OIDCMappingField username_mapping = 7;
 }
 
 message IdpSearchResponse {
@@ -775,6 +785,8 @@ message OidcIdpConfigView {
     string client_id = 1;
     string issuer = 2;
     repeated string scopes = 3;
+    OIDCMappingField idp_display_name_mapping = 4;
+    OIDCMappingField username_mapping = 5;
 }
 
 message IdpSearchRequest {

@@ -226,6 +226,9 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
                         return this.mgmtService.AddProjectMember(this.projectId, user.id, roles)
                             .then(() => {
                                 this.toast.showInfo('PROJECT.TOAST.MEMBERADDED', true);
+                                setTimeout(() => {
+                                    this.loadMembers();
+                                }, 1000);
                             }).catch(error => {
                                 this.toast.showError(error);
                             });

@@ -89,6 +89,7 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
             role.setKey(element.key);
             role.setDisplayName(element.displayName);
             role.setGroup(element.group);
+            role.setId(this.projectId);
             return role;
         });
 

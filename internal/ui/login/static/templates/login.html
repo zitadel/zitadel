@@ -1,8 +1,16 @@
 
 {{template "main-top" .}}
 
-<h1>{{t "Login.Title"}}</h1>
-<p>{{t "Login.Description"}}</p>
+<div class="head">
+    {{if .Linking}}
+        <h1>{{t "Login.TitleLinking"}}</h1>
+        <p>{{t "Login.DescriptionLinking"}}</p>
+    {{else}}
+        <h1>{{t "Login.Title"}}</h1>
+        <p>{{t "Login.Description"}}</p>
+    {{end}}
+</div>
+
 
 <form action="{{ loginNameUrl }}" method="POST">
 
@@ -10,19 +18,36 @@
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
+    {{if .LoginPolicy.AllowUsernamePassword }}
     <div class="fields">
         <div class="field">
             <label class="label" for="loginName">{{t "Login.Loginname"}}</label>
             <input class="input" type="text" id="loginName" name="loginName" placeholder="{{t "Login.LoginnamePlaceHolder"}}" value="{{ .LoginName }}" autocomplete="username" autofocus required>
         </div>
     </div>
+    {{end}}
 
     {{template "error-message" .}}
 
     <div class="actions">
-        <button class="primary right" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
-        <button class="secondary right" name="register" value="true" formnovalidate>{{t "Actions.Register"}}</button>
+        <button class="primary" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
+        {{if .LoginPolicy.AllowRegister}}
+            <button class="secondary" name="register" value="true" formnovalidate>{{t "Actions.Register"}}</button>
+        {{end}}
     </div>
+
+    {{if .LoginPolicy.AllowExternalIDP}}
+        <div class="actions idp-providers">
+            <p>{{t "Login.ExternalLogin"}}</p>
+
+            {{ $reqid := .AuthReqID}}
+            {{range $provider := .IDPProviders}}
+                <a href="{{ externalIDPAuthURL $reqid $provider.IDPConfigID}}" class="button secondary idp-providers">
+                    {{$provider.Name}}
+                </a>
+            {{end}}
+        </div>
+    {{end}}
 </form>
 
 

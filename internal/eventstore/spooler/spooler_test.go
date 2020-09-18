@@ -293,14 +293,19 @@ func TestSpooler_lock(t *testing.T) {
 			}
 
 			errs := make(chan error, 1)
+			defer close(errs)
 			ctx, _ := context.WithDeadline(context.Background(), tt.args.deadline)
 
 			locked := s.lock(ctx, errs, "test-worker")
 
 			if tt.fields.expectsErr {
+				lock := <-locked
 				err := <-errs
 				if err == nil {
 					t.Error("No error in error queue")
+				}
+				if lock {
+					t.Error("lock should have failed")
 				}
 			} else {
 				lock := <-locked

@@ -10,13 +10,13 @@ import (
 )
 
 func UserGrantByID(db *gorm.DB, table, grantID string) (*model.UserGrantView, error) {
-	user := new(model.UserGrantView)
-	query := repository.PrepareGetByKey(table, model.UserGrantSearchKey(grant_model.UserGrantSearchKeyGrantID), grantID)
-	err := query(db, user)
+	grant := new(model.UserGrantView)
+	query := repository.PrepareGetByKey(table, model.UserGrantSearchKey(grant_model.UserGrantSearchKeyID), grantID)
+	err := query(db, grant)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Nqwf1", "Errors.Token.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Nqwf1", "Errors.UserGrant.NotFound")
 	}
-	return user, err
+	return grant, err
 }
 
 func UserGrantByIDs(db *gorm.DB, table, resourceOwnerID, projectID, userID string) (*model.UserGrantView, error) {
@@ -139,6 +139,6 @@ func PutUserGrants(db *gorm.DB, table string, grants ...*model.UserGrantView) er
 }
 
 func DeleteUserGrant(db *gorm.DB, table, grantID string) error {
-	delete := repository.PrepareDeleteByKey(table, model.UserGrantSearchKey(grant_model.UserGrantSearchKeyGrantID), grantID)
+	delete := repository.PrepareDeleteByKey(table, model.UserGrantSearchKey(grant_model.UserGrantSearchKeyID), grantID)
 	return delete(db)
 }

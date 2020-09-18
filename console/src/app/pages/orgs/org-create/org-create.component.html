@@ -3,9 +3,6 @@
         <button (click)="close()" mat-icon-button>
             <mat-icon>close</mat-icon>
         </button>
-        <span class="abort">{{ 'ORG.PAGES.CREATE' | translate }}</span><span class="abort-2">Step
-            {{ currentCreateStep }} of
-            {{ createSteps }}</span>
     </div>
 
     <ng-template appHasRole [appHasRole]="['iam.write']">

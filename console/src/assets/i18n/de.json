@@ -45,6 +45,7 @@
         "CONTINUE": "Weiter",
         "BACK": "Zurück",
         "CLOSE": "Schliessen",
+        "CLEAR": "Zurücksetzen",
         "CANCEL":"Abbrechen",
         "INFO": "Info",
         "OK": "OK",
@@ -107,6 +108,10 @@
                 "1": "Nicht bereit",
                 "2": "Bereit",
                 "3": "Gelöscht"
+            },
+            "DIALOG": {
+                "OTP_DELETE_TITLE":"OTP Faktor entfernen",
+                "OTP_DELETE_DESCRIPTION":"Sie sind im Begriff OTP als Zweitfaktormethode zu entfernen. Sind sie sicher?"
             }
         },
         "CREATE": {
@@ -158,9 +163,14 @@
             "EXPIRYDATE":"Ablaufdatum",
             "CHOOSEEXPIRY":"Definiere ein Ablaufdatum",
             "CREATIONDATE":"Erstelldatum",
+            "KEYDETAILS":"Schlüssel Details",
             "ADD": {
                 "TITLE":"Schlüssel hinzufügen",
                 "DESCRIPTION":"Wähle den Typ und selektiere ein optionales Ablaufdatum."
+            },
+            "ADDED": {
+                "TITLE":"Schlüssel wurde erstellt",
+                "DESCRIPTION":"Speichern Sie den Schlüssen. Der Schlüssel kann später nicht nochmal aufgerufen werden!"
             },
             "KEYTYPES": {
                 "1":"JSON"
@@ -250,7 +260,9 @@
             "DEACTIVATED":"Benutzer deaktiviert.",
             "SELECTEDREACTIVATED":"Selektierte Benutzer reaktiviert.",
             "SELECTEDDEACTIVATED":"Selektierte Benutzer deaktiviert.",
-            "SELECTEDKEYSDELETED":"Selektierte Schlüssel gelöscht."
+            "SELECTEDKEYSDELETED":"Selektierte Schlüssel gelöscht.",
+            "KEYADDED":"Schlüssel hinzugefügt!",
+            "MACHINEADDED":"Service User erstellt!"
         },
         "MEMBERSHIPS": {
             "TITLE":"ZITADEL Manager-Rollen",
@@ -385,6 +397,12 @@
                 "TITLECREATE":"Zugangseinstellungen für IAM festlegen",
                 "DESCRIPTIONCREATE":"E-Mails als Benutzernamen sind nicht erlaubt, wenn die Eigenschaft \"UserLoginMustBeDomain\" gesetzt ist."
             },
+            "LOGIN_POLICY": {
+                "TITLE":"Login Richtlinien",
+                "DESCRIPTION":"Definiere die Loginmethoden für Benutzer",
+                "TITLECREATE":"Definiere die Loginmethoden für Benutzer",
+                "DESCRIPTIONCREATE":"Nutzer können Sich mit den verfügbaren Idps authentifizieren."
+            },
             "BTN_INSTALL":"Installieren",
             "BTN_EDIT":"Modifizieren",
             "DATA": {
@@ -398,7 +416,10 @@
                 "MAXATTEMPTS":"Maximale Anzahl an Versuchen",
                 "EXPIREWARNDAYS":"Ablauf Warnung nach Tagen",
                 "MAXAGEDAYS":"Maximale Gültigkeit in Tagen",
-                "USERLOGINMUSTBEDOMAIN":"Benutzer-Login muss eine Domain sein"
+                "USERLOGINMUSTBEDOMAIN":"Benutzer-Login muss eine Domain sein",
+                "ALLOWUSERNAMEPASSWORD":"Benutzername Password erlaubt",
+                "ALLOWEXTERNALIDP":"Externer IDP erlaubt",
+                "ALLOWREGISTER":"Registrieren erlaubt"
             },
             "DELETE":"Richtlinie entfernen/zurücksetzen"
         },
@@ -600,6 +621,51 @@
             "UPDATED":"Projekt gespeichert.",
             "GRANTUPDATED":"Berechtigung geändert.",
             "DELETED":"Projekt gelöscht."
+        }
+    },
+    "IDP":{
+        "LIST": {
+            "TITLE":"Identity Providers",
+            "DESCRIPTION":"Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können."
+        },
+        "CREATE": {
+            "TITLE":"Neuer Identity Provider",
+            "DESCRIPTION":"Definieren Sie hier die Zugangsdaten des neuen Identity Providers"
+        },
+        "TYPES": {
+            "0":"unknown",
+            "1":"System",
+            "2":"Organisation"
+        },
+        "STATES":{
+            "0":"aktiv",
+            "1":"inaktiv"
+        },
+        "TYPE":"Typ",
+        "NAME":"Name",
+        "CONFIG":"Konfiguration",
+        "STATE":"Status",
+        "LOGOSRC":"Logo Src",
+        "ISSUER":"Issuer",
+        "SCOPESLIST":"Scopes List",
+        "CLIENTID":"Client ID",
+        "CLIENTSECRET":"Client Secret",
+        "CREATIONDATE":"Erstelldatum",
+        "CHANGEDATE":"Letzte Änderung",
+        "DEACTIVATE":"Deaktivieren",
+        "ACTIVATE":"Aktivieren",
+        "DELETE":"Löschen"
+    },
+    "LOGINPOLICY": {
+        "CREATE": {
+            "TITLE":"Login Policy",
+            "DESCRIPTION":"Definieren Sie hier, mit welchen Idps sich Ihre Benutzer anmelden können."
+        },
+        "IDPS":"Identity Providers",
+        "ADDIDP": {
+            "TITLE":"Identity Provider hinzufügen",
+            "DESCRIPTION":"Sie können vordefinierte oder selbsterstellten Provider auswählen",
+            "SELECTIDPS":"Identity Provider"
         }
     },
     "APP": {

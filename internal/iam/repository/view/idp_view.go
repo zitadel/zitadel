@@ -20,6 +20,23 @@ func IDPByID(db *gorm.DB, table, idpID string) (*model.IDPConfigView, error) {
 	return idp, err
 }
 
+func GetIDPConfigsByAggregateID(db *gorm.DB, table string, aggregateID string) ([]*model.IDPConfigView, error) {
+	idps := make([]*model.IDPConfigView, 0)
+	queries := []*iam_model.IDPConfigSearchQuery{
+		{
+			Key:    iam_model.IDPConfigSearchKeyAggregateID,
+			Value:  aggregateID,
+			Method: global_model.SearchMethodEquals,
+		},
+	}
+	query := repository.PrepareSearchQuery(table, model.IDPConfigSearchRequest{Queries: queries})
+	_, err := query(db, &idps)
+	if err != nil {
+		return nil, err
+	}
+	return idps, nil
+}
+
 func SearchIDPs(db *gorm.DB, table string, req *iam_model.IDPConfigSearchRequest) ([]*model.IDPConfigView, uint64, error) {
 	idps := make([]*model.IDPConfigView, 0)
 	query := repository.PrepareSearchQuery(table, model.IDPConfigSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
