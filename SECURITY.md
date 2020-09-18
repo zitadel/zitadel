@@ -13,7 +13,7 @@ After the initial Release the following version support will apply
 
 ## Reporting a vulnerability
 
-To file an incident, please disclose it by e-mail to security@caos.ch including the  details of the vulnerability.
+To file an incident, please disclose it by e-mail to security@zitadel.ch including the  details of the vulnerability.
 
 At the moment GPG encryption is no yet supported, however you may sign your message at will.
 
@@ -40,4 +40,3 @@ All accepted and mitigated vulnerabilities will be published on [ZITADEL's GitHu
 ### Timing
 
 We think it is crucial to publish advisories `ASAP` as mitigations are ready. But due to the unknown nature of the discloures the time frame can range from 7 to 90 days.
-
