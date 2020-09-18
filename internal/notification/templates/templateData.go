@@ -4,6 +4,7 @@ import (
 	"github.com/caos/zitadel/internal/i18n"
 )
 
+// ToDo Michi
 type TemplateData struct {
 	Title          string
 	PreHeader      string

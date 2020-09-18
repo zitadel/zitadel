@@ -1,0 +1,49 @@
+<mjml>
+  <mj-head>
+    <mj-attributes>
+      <mj-text align="center" color="#ffffff" font-family="Lato" />
+      <mj-section padding="0" full-width="full-width" />
+      <mj-body background-color="#222324" />
+      <mj-image padding="0" />
+      <mj-column padding="0" />
+      <mj-wrapper padding-left="0" />
+      <mj-wrapper full-width="full-width" />
+      <mj-class name="left" position="" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body>
+    <mj-wrapper background-url="http://www.bummert.ch/bilder/caos/zitadel-logo-outline-light.png" border="0" background-repeat="no-repeat">
+      <mj-section>
+        <mj-group>
+          <mj-column>
+            <mj-image src="http://www.bummert.ch/bilder/caos/zitadel-logo-light.png" align="left" width="100px" padding="0" />
+          </mj-column>
+        </mj-group>
+      </mj-section>
+      <mj-section>
+        <mj-group>
+          <mj-column width="20%">
+            <mj-image src="http://www.bummert.ch/bilder/caos/flavor-spikes-small-opacity40.png" align="left" heigh="80%" width="80%" />
+          </mj-column>
+          <mj-column width="60%">
+            <mj-text font-size="2rem" font-weight="light">{{.Greeting}}</mj-text>
+            <mj-text font-size="1.25rem" font-weight="light">{{.Text}}</mj-text>
+            <mj-button href="{{.URL}}" background-color="#5282C1" font-size="16px">{{.ButtonText}}</mj-button>
+            <mj-text>
+              <a href="http://www.caos.ch" style="color:#e91e63; text-decoration: none;" target="_blank"> CAOS AG </a> | Teufener Strasse 19 | CH-9000 St. Gallen </mj-text>
+          </mj-column>
+          <mj-column width="20%">
+            <mj-image src="http://www.bummert.ch/bilder/caos/flavor-spikes-big-opacity40.png" align="right" />
+          </mj-column>
+        </mj-group>
+      </mj-section>
+      <mj-section>
+        <mj-group>
+          <mj-column>
+            <mj-image src="http://www.bummert.ch/bilder/caos/logo_whitefont_transparentbg.png" align="right"  heigh="65%" width="65%" padding-right="20px" />
+          </mj-column>
+        </mj-group>
+      </mj-section>
+    </mj-wrapper>
+  </mj-body>
+</mjml>
