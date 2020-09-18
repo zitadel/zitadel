@@ -189,7 +189,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) *model.ExternalUser {
 	displayName := tokens.IDTokenClaims.PreferredUsername
 	if displayName == "" && tokens.IDTokenClaims.Email != "" {
-		displayName = tokens.IDTokenClaims.PreferredUsername
+		displayName = tokens.IDTokenClaims.Email
 	}
 	switch idpConfig.OIDCIDPDisplayNameMapping {
 	case iam_model.OIDCMappingFieldEmail:
