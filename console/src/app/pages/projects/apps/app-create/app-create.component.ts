@@ -19,7 +19,6 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
-import { nativeValidator, webValidator } from '../appTypeValidator';
 
 @Component({
     selector: 'app-app-create',
@@ -120,8 +119,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                             [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
                         this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
 
-                        this.redirectControl = new FormControl('', [nativeValidator as ValidatorFn]);
-                        this.postRedirectControl = new FormControl('', [nativeValidator as ValidatorFn]);
+                        // this.redirectControl = new FormControl('', [nativeValidator as ValidatorFn]);
+                        // this.postRedirectControl = new FormControl('', [nativeValidator as ValidatorFn]);
                         break;
                     case OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB:
                         this.oidcAuthMethodType[0].disabled = false;
@@ -137,8 +136,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                         this.oidcApp.grantTypesList =
                             [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
 
-                        this.redirectControl = new FormControl('', [webValidator as ValidatorFn]);
-                        this.postRedirectControl = new FormControl('', [webValidator as ValidatorFn]);
+                        // this.redirectControl = new FormControl('', [webValidator as ValidatorFn]);
+                        // this.postRedirectControl = new FormControl('', [webValidator as ValidatorFn]);
                         break;
                     case OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT:
                         this.oidcResponseTypes[0].checked = true;
@@ -149,8 +148,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
                         this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
 
-                        this.redirectControl = new FormControl('', [webValidator as ValidatorFn]);
-                        this.postRedirectControl = new FormControl('', [webValidator as ValidatorFn]);
+                        // this.redirectControl = new FormControl('', [webValidator as ValidatorFn]);
+                        // this.postRedirectControl = new FormControl('', [webValidator as ValidatorFn]);
                         break;
                 }
 
