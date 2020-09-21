@@ -14,6 +14,7 @@ import (
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/tracing"
 	"github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -224,6 +225,8 @@ func (repo *UserRepo) ChangeMyPassword(ctx context.Context, old, new string) err
 }
 
 func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return err

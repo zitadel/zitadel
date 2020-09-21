@@ -622,7 +622,9 @@ func (es *UserEventstore) ChangeMachine(ctx context.Context, machine *usr_model.
 	return model.MachineToModel(repoUser.Machine), nil
 }
 
-func (es *UserEventstore) ChangePassword(ctx context.Context, policy *policy_model.PasswordComplexityPolicy, userID, old, new string) (*usr_model.Password, error) {
+func (es *UserEventstore) ChangePassword(ctx context.Context, policy *policy_model.PasswordComplexityPolicy, userID, old, new string) (_ *usr_model.Password, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -633,15 +635,20 @@ func (es *UserEventstore) ChangePassword(ctx context.Context, policy *policy_mod
 	if user.Password == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Fds3s", "Errors.User.Password.Empty")
 	}
-	if err := crypto.CompareHash(user.Password.SecretCrypto, []byte(old), es.PasswordAlg); err != nil {
+	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
+	err = crypto.CompareHash(user.Password.SecretCrypto, []byte(old), es.PasswordAlg)
+	spanPasswordComparison.EndWithError(err)
+	if err != nil {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-s56a3", "Errors.User.Password.Invalid")
 	}
 	return es.changedPassword(ctx, user, policy, new, false)
 }
 
-func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, password string, onetime bool) (*usr_model.Password, error) {
+func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, password string, onetime bool) (_ *usr_model.Password, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	pw := &usr_model.Password{SecretString: password}
-	err := pw.HashPasswordIfExisting(policy, es.PasswordAlg, onetime)
+	err = pw.HashPasswordIfExisting(policy, es.PasswordAlg, onetime)
 	if err != nil {
 		return nil, err
 	}
