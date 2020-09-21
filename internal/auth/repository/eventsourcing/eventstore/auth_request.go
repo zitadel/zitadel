@@ -96,7 +96,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 	request.Audience = ids
 	if request.LoginHint != "" {
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
-		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID).Debug("login hint invalid")
+		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID).OnError(err).Debug("login hint invalid")
 	}
 	err = repo.AuthRequests.SaveAuthRequest(ctx, request)
 	if err != nil {
