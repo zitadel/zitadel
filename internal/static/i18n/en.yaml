@@ -181,12 +181,11 @@ EventTypes:
         added: Email address verification code generated
         sent: Email address verification code sent
     machine:
-      machine:
-        added: Technical user added
-        changed: Technical user changed
-        key:
-          added: Key added
-          removed: Key removed
+      added: Technical user added
+      changed: Technical user changed
+      key:
+        added: Key added
+        removed: Key removed
     human:
       added: Person added
       selfregistered: Person registered himself

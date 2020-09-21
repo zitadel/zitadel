@@ -181,12 +181,11 @@ EventTypes:
         added: E-Mail Code generiert
         sent: E-Mail Code gesendet
     machine:
-      machine:
-        added: Technischer Benutzer hinzugefügt
-        changed: Technischer Benutzer geändert
-        key:
-          added: Key added
-          removed: Key removed
+      added: Technischer Benutzer hinzugefügt
+      changed: Technischer Benutzer geändert
+      key:
+        added: Key added
+        removed: Key removed
     human:
       added: Benutzer hinzugefügt
       selfregistered: Benutzer hat sich selbst registriert
