@@ -71,10 +71,8 @@ github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc h1:biVzkmvwrH8
 github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/caos/logging v0.0.2 h1:ebg5C/HN0ludYR+WkvnFjwSExF4wvyiWPyWGcKMYsoo=
 github.com/caos/logging v0.0.2/go.mod h1:9LKiDE2ChuGv6CHYif/kiugrfEXu9AwDiFWSreX7Wp0=
-github.com/caos/oidc v0.9.0 h1:de2ASx4VmTsH7viU8kigypFGNk1kh0sPXz7ivzBNl9E=
-github.com/caos/oidc v0.9.0/go.mod h1:RREtWSRzH/mXQXJkxB63mFDZ/RUNyzoU6czd6UJfvJI=
-github.com/caos/oidc v0.10.0 h1:/GKyQgKHvkc2jNCXzmdJs9hCXDYdArCMm3d5FXaiNWA=
-github.com/caos/oidc v0.10.0/go.mod h1:RREtWSRzH/mXQXJkxB63mFDZ/RUNyzoU6czd6UJfvJI=
+github.com/caos/oidc v0.9.1 h1:w/QccYOrEe6mkd/I2QKbCGwz8P+jnCpVF3+5FYQWMV4=
+github.com/caos/oidc v0.9.1/go.mod h1:RREtWSRzH/mXQXJkxB63mFDZ/RUNyzoU6czd6UJfvJI=
 github.com/census-instrumentation/opencensus-proto v0.2.1 h1:glEXhBS5PSLLv4IXzLA5yPRVX4bilULVyxxbrfOtDAk=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
