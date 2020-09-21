@@ -70,7 +70,7 @@ func (l *Login) handleExternalLogin(w http.ResponseWriter, r *http.Request) {
 
 func (l *Login) handleOIDCAuthorize(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) {
 	provider := l.getRPConfig(w, r, authReq, idpConfig, callbackEndpoint)
-	http.Redirect(w, r, rp.AuthURL(authReq.ID, provider), http.StatusFound)
+	http.Redirect(w, r, rp.AuthURL(authReq.ID, provider, rp.WithPrompt(oidc.PromptSelectAccount)), http.StatusFound)
 }
 
 func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Request) {
