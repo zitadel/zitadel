@@ -19,18 +19,6 @@ func OrgByID(db *gorm.DB, table, orgID string) (*model.OrgView, error) {
 	return org, err
 }
 
-func OrgExists(db *gorm.DB, table, orgID string) error {
-	org := new(struct {
-		ID string `json:"-" gorm:"column:id;primary_key"`
-	})
-	query := repository.PrepareGetByKey(table, model.OrgSearchKey(org_model.OrgSearchKeyOrgID), orgID)
-	err := query(db, org)
-	if caos_errs.IsNotFound(err) {
-		return caos_errs.ThrowNotFound(nil, "VIEW-GEwea", "Errors.Org.NotFound")
-	}
-	return err
-}
-
 func SearchOrgs(db *gorm.DB, table string, req *org_model.OrgSearchRequest) ([]*model.OrgView, uint64, error) {
 	orgs := make([]*model.OrgView, 0)
 	query := repository.PrepareSearchQuery(table, model.OrgSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
