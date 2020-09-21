@@ -137,6 +137,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		"selectedGender": func(g int32) bool {
 			return false
 		},
+		"hasExternalLogin": func() bool {
+			return false
+		},
 	}
 	var err error
 	r.Renderer, err = renderer.NewRenderer(

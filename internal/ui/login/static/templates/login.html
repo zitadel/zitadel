@@ -36,7 +36,7 @@
         {{end}}
     </div>
 
-    {{if .LoginPolicy.AllowExternalIDP}}
+    {{if hasExternalLogin }}
         <div class="actions idp-providers">
             <p>{{t "Login.ExternalLogin"}}</p>
 
