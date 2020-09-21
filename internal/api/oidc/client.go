@@ -14,6 +14,7 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
 )
 
@@ -27,7 +28,9 @@ const (
 	oidcCtx = "oidc"
 )
 
-func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (op.Client, error) {
+func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Client, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	client, err := o.repo.ApplicationByClientID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -38,7 +41,9 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (op.Clie
 	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime)
 }
 
-func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID string) (*jose.JSONWebKey, error) {
+func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID string) (_ *jose.JSONWebKey, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	key, err := o.repo.MachineKeyByID(ctx, keyID)
 	if err != nil {
 		return nil, err
@@ -57,7 +62,9 @@ func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID strin
 	}, nil
 }
 
-func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secret string) error {
+func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secret string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	ctx = authz.SetCtxData(ctx, authz.CtxData{
 		UserID: oidcCtx,
 		OrgID:  oidcCtx,
@@ -65,7 +72,9 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 	return o.repo.AuthorizeOIDCApplication(ctx, id, secret)
 }
 
-func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, origin string) (*oidc.Userinfo, error) {
+func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, origin string) (_ *oidc.Userinfo, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	token, err := o.repo.TokenByID(ctx, tokenID)
 	if err != nil {
 		return nil, err
@@ -82,7 +91,9 @@ func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, origin st
 	return o.GetUserinfoFromScopes(ctx, token.UserID, token.Scopes)
 }
 
-func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, scopes []string) (*oidc.Userinfo, error) {
+func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, scopes []string) (_ *oidc.Userinfo, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	user, err := o.repo.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
