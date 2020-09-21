@@ -8,7 +8,7 @@ import (
 )
 
 func getUserMethodPermissions(ctx context.Context, t *TokenVerifier, requiredPerm string, authConfig Config) (_ context.Context, _ []string, err error) {
-	ctx, span := tracing.NewServerInterceptorSpan(ctx, "getUserMethodPermissions")
+	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	ctxData := GetCtxData(ctx)

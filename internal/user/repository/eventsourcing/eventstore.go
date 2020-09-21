@@ -12,6 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	policy_model "github.com/caos/zitadel/internal/policy/model"
+	"github.com/caos/zitadel/internal/tracing"
 
 	"github.com/pquerna/otp/totp"
 
@@ -531,7 +532,9 @@ func (es *UserEventstore) UserPasswordByID(ctx context.Context, userID string) (
 	return nil, caos_errs.ThrowNotFound(nil, "EVENT-d8e2", "Errors.User.Password.NotFound")
 }
 
-func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password string, authRequest *req_model.AuthRequest) error {
+func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password string, authRequest *req_model.AuthRequest) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
@@ -542,7 +545,10 @@ func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password st
 	if user.Password == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-s35Fa", "Errors.User.Password.Empty")
 	}
-	if err := crypto.CompareHash(user.Password.SecretCrypto, []byte(password), es.PasswordAlg); err == nil {
+	ctx, spanPasswordComparison := tracing.NewSpan(ctx)
+	err = crypto.CompareHash(user.Password.SecretCrypto, []byte(password), es.PasswordAlg)
+	spanPasswordComparison.EndWithError(err)
+	if err == nil {
 		return es.setPasswordCheckResult(ctx, user, authRequest, PasswordCheckSucceededAggregate)
 	}
 	if err := es.setPasswordCheckResult(ctx, user, authRequest, PasswordCheckFailedAggregate); err != nil {

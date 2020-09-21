@@ -37,7 +37,7 @@ type Grant struct {
 }
 
 func VerifyTokenAndWriteCtxData(ctx context.Context, token, orgID string, t *TokenVerifier, method string) (_ context.Context, err error) {
-	ctx, span := tracing.NewServerInterceptorSpan(ctx, "VerifyTokenAndWriteCtxData")
+	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if orgID != "" {

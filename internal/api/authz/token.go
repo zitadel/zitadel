@@ -64,7 +64,7 @@ func prefixFromMethod(method string) (string, bool) {
 }
 
 func (v *TokenVerifier) clientIDFromMethod(ctx context.Context, method string) (_ string, err error) {
-	ctx, span := tracing.NewServerInterceptorSpan(ctx, "clientIDFromMethod")
+	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	prefix, ok := prefixFromMethod(method)
@@ -89,20 +89,20 @@ func (v *TokenVerifier) clientIDFromMethod(ctx context.Context, method string) (
 }
 
 func (v *TokenVerifier) ResolveGrant(ctx context.Context) (_ *Grant, err error) {
-	ctx, span := tracing.NewServerInterceptorSpan(ctx, "getUserMethodPermissions")
+	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	return v.authZRepo.ResolveGrants(ctx)
 }
 
 func (v *TokenVerifier) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (_ string, _ []string, err error) {
-	ctx, span := tracing.NewServerInterceptorSpan(ctx, "ProjectIDAndOriginsByClientID")
+	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	return v.authZRepo.ProjectIDAndOriginsByClientID(ctx, clientID)
 }
 
 func (v *TokenVerifier) ExistsOrg(ctx context.Context, orgID string) (err error) {
-	ctx, span := tracing.NewServerInterceptorSpan(ctx, "ExistsOrg")
+	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	return v.authZRepo.ExistsOrg(ctx, orgID)
 }
@@ -113,7 +113,7 @@ func (v *TokenVerifier) CheckAuthMethod(method string) (Option, bool) {
 }
 
 func verifyAccessToken(ctx context.Context, token string, t *TokenVerifier, method string) (userID, clientID, agentID, prefLang string, err error) {
-	ctx, span := tracing.NewServerInterceptorSpan(ctx, "verifyAccessToken")
+	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	parts := strings.Split(token, BearerPrefix)

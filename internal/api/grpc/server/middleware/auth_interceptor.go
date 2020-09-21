@@ -20,8 +20,9 @@ func AuthorizationInterceptor(verifier *authz.TokenVerifier, authConfig authz.Co
 }
 
 func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier *authz.TokenVerifier, authConfig authz.Config) (_ interface{}, err error) {
-	ctx, span := tracing.NewServerInterceptorSpan(ctx, "authorize")
+	ctx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
 	authOpt, needsToken := verifier.CheckAuthMethod(info.FullMethod)
 	if !needsToken {
 		span.End()
