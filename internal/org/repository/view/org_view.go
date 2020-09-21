@@ -1,11 +1,12 @@
 package view
 
 import (
+	"github.com/jinzhu/gorm"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"github.com/jinzhu/gorm"
 )
 
 func OrgByID(db *gorm.DB, table, orgID string) (*model.OrgView, error) {
@@ -16,6 +17,18 @@ func OrgByID(db *gorm.DB, table, orgID string) (*model.OrgView, error) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-GEwea", "Errors.Org.NotFound")
 	}
 	return org, err
+}
+
+func OrgExists(db *gorm.DB, table, orgID string) error {
+	org := new(struct {
+		ID string `json:"-" gorm:"column:id;primary_key"`
+	})
+	query := repository.PrepareGetByKey(table, model.OrgSearchKey(org_model.OrgSearchKeyOrgID), orgID)
+	err := query(db, org)
+	if caos_errs.IsNotFound(err) {
+		return caos_errs.ThrowNotFound(nil, "VIEW-GEwea", "Errors.Org.NotFound")
+	}
+	return err
 }
 
 func SearchOrgs(db *gorm.DB, table string, req *org_model.OrgSearchRequest) ([]*model.OrgView, uint64, error) {

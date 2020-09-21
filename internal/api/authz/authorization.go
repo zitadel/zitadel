@@ -7,14 +7,18 @@ import (
 	"strings"
 
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/tracing"
 )
 
 const (
 	authenticated = "authenticated"
 )
 
-func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID string, verifier *TokenVerifier, authConfig Config, requiredAuthOption Option, method string) (context.Context, error) {
-	ctx, err := VerifyTokenAndWriteCtxData(ctx, token, orgID, verifier, method)
+func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID string, verifier *TokenVerifier, authConfig Config, requiredAuthOption Option, method string) (_ context.Context, err error) {
+	ctx, span := tracing.NewServerInterceptorSpan(ctx, "CheckUserAuthorization")
+	defer func() { span.EndWithError(err) }()
+
+	ctx, err = VerifyTokenAndWriteCtxData(ctx, token, orgID, verifier, method)
 	if err != nil {
 		return nil, err
 	}
@@ -29,10 +33,12 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID s
 		return nil, err
 	}
 
+	ctx, span2 := tracing.NewServerInterceptorSpan(ctx, "checkUserPermissions")
 	err = checkUserPermissions(req, perms, requiredAuthOption)
 	if err != nil {
 		return nil, err
 	}
+	span2.EndWithError(err)
 
 	return ctx, nil
 }

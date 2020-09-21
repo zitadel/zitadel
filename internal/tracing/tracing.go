@@ -63,7 +63,7 @@ func NewServerInterceptorSpan(ctx context.Context, name string) (context.Context
 	if T == nil {
 		return ctx, CreateSpan(nil)
 	}
-	return T.NewServerInterceptorSpan(ctx, name)
+	return T.NewServerInterceptorSpan(ctx, GetCaller())
 }
 
 func NewSpanHTTP(r *http.Request) (*http.Request, *Span) {

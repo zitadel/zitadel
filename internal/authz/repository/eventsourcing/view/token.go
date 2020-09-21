@@ -1,8 +1,11 @@
 package view
 
 import (
+	"context"
+
 	"github.com/caos/zitadel/internal/token/repository/view"
 	"github.com/caos/zitadel/internal/token/repository/view/model"
+	"github.com/caos/zitadel/internal/tracing"
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
@@ -10,7 +13,9 @@ const (
 	tokenTable = "auth.tokens"
 )
 
-func (v *View) TokenByID(tokenID string) (*model.Token, error) {
+func (v *View) TokenByID(ctx context.Context, tokenID string) (_ *model.Token, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	return view.TokenByID(v.Db, tokenTable, tokenID)
 }
 

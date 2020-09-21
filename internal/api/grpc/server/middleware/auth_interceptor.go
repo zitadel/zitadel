@@ -10,6 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/tracing"
 )
 
 func AuthorizationInterceptor(verifier *authz.TokenVerifier, authConfig authz.Config) grpc.UnaryServerInterceptor {
@@ -18,9 +19,12 @@ func AuthorizationInterceptor(verifier *authz.TokenVerifier, authConfig authz.Co
 	}
 }
 
-func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier *authz.TokenVerifier, authConfig authz.Config) (interface{}, error) {
+func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier *authz.TokenVerifier, authConfig authz.Config) (_ interface{}, err error) {
+	ctx, span := tracing.NewServerInterceptorSpan(ctx, "authorize")
+	defer func() { span.EndWithError(err) }()
 	authOpt, needsToken := verifier.CheckAuthMethod(info.FullMethod)
 	if !needsToken {
+		span.End()
 		return handler(ctx, req)
 	}
 
@@ -31,10 +35,10 @@ func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 
 	orgID := grpc_util.GetHeader(ctx, http.ZitadelOrgID)
 
-	ctx, err := authz.CheckUserAuthorization(ctx, req, authToken, orgID, verifier, authConfig, authOpt, info.FullMethod)
+	ctx, err = authz.CheckUserAuthorization(ctx, req, authToken, orgID, verifier, authConfig, authOpt, info.FullMethod)
 	if err != nil {
 		return nil, err
 	}
-
+	span.End()
 	return handler(ctx, req)
 }
