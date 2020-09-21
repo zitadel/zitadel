@@ -216,6 +216,11 @@ EventTypes:
         check:
           succeeded: Passwortvalidierung erfolgreich
           failed: Passwortvalidierung fehlgeschlagen
+      externalidp:
+        added: Externer IDP wurde hinzugefügt
+        removed: Externer IDP wurde gelöscht
+        cascade:
+          removed: Externer IDP wurde kaskadiert gelöscht
       phone:
         changed: Telefonnummer geändert
         verified: Telefonnummer verifiziert
