@@ -54,7 +54,7 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, repo repository.Re
 	cookieHandler, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator, localDevMode)
 	logging.Log("OIDC-sd4fd").OnError(err).Panic("cannot user agent handler")
 	config.OPConfig.CodeMethodS256 = true
-	provider, err := op.NewDefaultOP(
+	provider, err := op.NewOpenIDProvider(
 		ctx,
 		config.OPConfig,
 		newStorage(config.StorageConfig, repo),

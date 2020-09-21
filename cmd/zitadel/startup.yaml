@@ -4,7 +4,7 @@ Log:
     Format: text
 
 Tracing:
-  Type: $TRACING_TYPE
+  Type: $ZITADEL_TRACING_TYPE
   Config:
     ProjectID: $ZITADEL_TRACING_PROJECT_ID
     MetricPrefix: ZITADEL-V1
@@ -222,6 +222,7 @@ UI:
   Port: 50003
   Login:
     Handler:
+      BaseURL: '$ZITADEL_ACCOUNTS'
       OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/'
       ZitadelURL: '$ZITADEL_CONSOLE'
       LanguageCookieName: 'caos.zitadel.login.lang'

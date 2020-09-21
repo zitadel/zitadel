@@ -5,16 +5,18 @@
     <form *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="createUser()" class="form">
         <div class="content">
             <p class="section">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>
-            <mat-form-field class="formfield">
+            <mat-form-field class="formfield" appearance="fill">
                 <mat-label>{{ 'USER.PROFILE.EMAIL' | translate }}</mat-label>
                 <input matInput formControlName="email" required />
                 <mat-error *ngIf="email?.invalid && email?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                 </mat-error>
             </mat-form-field>
-            <mat-form-field class="formfield">
+            <mat-form-field class="formfield" appearance="fill">
                 <mat-label>{{ 'USER.PROFILE.USERNAME' | translate }}</mat-label>
                 <input matInput formControlName="userName" required />
+                <span *ngIf="envSuffix" matSuffix>{{envSuffix}}</span>
+
                 <mat-error *ngIf="userName?.invalid && userName?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                 </mat-error>
@@ -22,21 +24,23 @@
                     {{ 'USER.VALIDATION.NOEMAIL' | translate }}
                 </mat-error>
             </mat-form-field>
-            <mat-form-field class="formfield">
+        </div>
+        <div class="content">
+            <mat-form-field class="formfield" appearance="fill">
                 <mat-label>{{ 'USER.PROFILE.FIRSTNAME' | translate }}</mat-label>
                 <input matInput formControlName="firstName" required />
                 <mat-error *ngIf="firstName?.invalid && firstName?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                 </mat-error>
             </mat-form-field>
-            <mat-form-field class="formfield">
+            <mat-form-field class="formfield" appearance="fill">
                 <mat-label>{{ 'USER.PROFILE.LASTNAME' | translate }}</mat-label>
                 <input matInput formControlName="lastName" required />
                 <mat-error *ngIf="lastName?.invalid && lastName?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                 </mat-error>
             </mat-form-field>
-            <mat-form-field class="formfield">
+            <mat-form-field class="formfield" appearance="fill">
                 <mat-label>{{ 'USER.PROFILE.NICKNAME' | translate }}</mat-label>
                 <input matInput formControlName="nickName" />
                 <mat-error *ngIf="nickName?.invalid && nickName?.errors?.required">
@@ -46,7 +50,7 @@
 
             <p class="section">{{ 'USER.CREATE.GENDERLANGSECTION' | translate }}</p>
 
-            <mat-form-field class="formfield">
+            <mat-form-field class="formfield" appearance="fill">
                 <mat-label>{{ 'USER.PROFILE.GENDER' | translate }}</mat-label>
                 <mat-select formControlName="gender">
                     <mat-option *ngFor="let gender of genders" [value]="gender">
@@ -57,7 +61,7 @@
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                 </mat-error>
             </mat-form-field>
-            <mat-form-field class="formfield">
+            <mat-form-field class="formfield" appearance="fill">
                 <mat-label>{{ 'USER.PROFILE.PREFERRED_LANGUAGE' | translate }}</mat-label>
                 <mat-select formControlName="preferredLanguage">
                     <mat-option *ngFor="let language of languages" [value]="language">
@@ -71,7 +75,7 @@
 
             <p class="section">{{ 'USER.CREATE.ADDRESSANDPHONESECTION' | translate }}</p>
 
-            <mat-form-field class="formfield">
+            <mat-form-field class="formfield" appearance="fill">
                 <mat-label>{{ 'USER.PROFILE.PHONE' | translate }}</mat-label>
                 <input matInput formControlName="phone" />
                 <mat-error *ngIf="phone?.invalid && phone?.errors?.required">

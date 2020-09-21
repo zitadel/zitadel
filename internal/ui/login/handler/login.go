@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"net"
 	"net/http"
 
@@ -27,11 +28,14 @@ type Login struct {
 	renderer            *Renderer
 	parser              *form.Parser
 	authRepo            auth_repository.Repository
+	baseURL             string
 	zitadelURL          string
 	oidcAuthCallbackURL string
+	IDPConfigAesCrypto  crypto.EncryptionAlgorithm
 }
 
 type Config struct {
+	BaseURL               string
 	OidcAuthCallbackURL   string
 	ZitadelURL            string
 	LanguageCookieName    string
@@ -52,11 +56,17 @@ const (
 	handlerPrefix = "/login"
 )
 
-func CreateLogin(config Config, authRepo *eventsourcing.EsRepository, localDevMode bool) (*Login, string) {
+func CreateLogin(config Config, authRepo *eventsourcing.EsRepository, systemDefaults systemdefaults.SystemDefaults, localDevMode bool) (*Login, string) {
+	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.IDPConfigVerificationKey)
+	if err != nil {
+		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")
+	}
 	login := &Login{
 		oidcAuthCallbackURL: config.OidcAuthCallbackURL,
+		baseURL:             config.BaseURL,
 		zitadelURL:          config.ZitadelURL,
 		authRepo:            authRepo,
+		IDPConfigAesCrypto:  aesCrypto,
 	}
 	prefix := ""
 	if localDevMode {

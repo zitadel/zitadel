@@ -25,7 +25,7 @@ func TestAppendEvent(t *testing.T) {
 		result *UserSessionView
 	}{
 		{
-			name: "append password check succeeded event",
+			name: "append user password check succeeded event",
 			args: args{
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.UserPasswordCheckSucceeded},
 				userView: &UserSessionView{},
@@ -33,7 +33,15 @@ func TestAppendEvent(t *testing.T) {
 			result: &UserSessionView{ChangeDate: now(), PasswordVerification: now()},
 		},
 		{
-			name: "append password check failed event",
+			name: "append human password check succeeded event",
+			args: args{
+				event:    &es_models.Event{CreationDate: now(), Type: es_model.HumanPasswordCheckSucceeded},
+				userView: &UserSessionView{},
+			},
+			result: &UserSessionView{ChangeDate: now(), PasswordVerification: now()},
+		},
+		{
+			name: "append user password check failed event",
 			args: args{
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.UserPasswordCheckFailed},
 				userView: &UserSessionView{PasswordVerification: now()},
@@ -41,7 +49,15 @@ func TestAppendEvent(t *testing.T) {
 			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}},
 		},
 		{
-			name: "append password changed event",
+			name: "append human password check failed event",
+			args: args{
+				event:    &es_models.Event{CreationDate: now(), Type: es_model.HumanPasswordCheckFailed},
+				userView: &UserSessionView{PasswordVerification: now()},
+			},
+			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}},
+		},
+		{
+			name: "append user password changed event",
 			args: args{
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.UserPasswordChanged},
 				userView: &UserSessionView{PasswordVerification: now()},
@@ -49,33 +65,73 @@ func TestAppendEvent(t *testing.T) {
 			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}},
 		},
 		{
-			name: "append otp check succeeded event",
+			name: "append human password changed event",
 			args: args{
-				event:    &es_models.Event{CreationDate: now(), Type: es_model.MfaOtpCheckSucceeded},
+				event:    &es_models.Event{CreationDate: now(), Type: es_model.HumanPasswordChanged},
+				userView: &UserSessionView{PasswordVerification: now()},
+			},
+			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}},
+		},
+		{
+			name: "append user otp check succeeded event",
+			args: args{
+				event:    &es_models.Event{CreationDate: now(), Type: es_model.MFAOTPCheckSucceeded},
 				userView: &UserSessionView{},
 			},
 			result: &UserSessionView{ChangeDate: now(), MfaSoftwareVerification: now()},
 		},
 		{
-			name: "append otp check failed event",
+			name: "append human otp check succeeded event",
 			args: args{
-				event:    &es_models.Event{CreationDate: now(), Type: es_model.MfaOtpCheckFailed},
+				event:    &es_models.Event{CreationDate: now(), Type: es_model.HumanMFAOTPCheckSucceeded},
+				userView: &UserSessionView{},
+			},
+			result: &UserSessionView{ChangeDate: now(), MfaSoftwareVerification: now()},
+		},
+		{
+			name: "append user otp check failed event",
+			args: args{
+				event:    &es_models.Event{CreationDate: now(), Type: es_model.MFAOTPCheckFailed},
 				userView: &UserSessionView{MfaSoftwareVerification: now()},
 			},
 			result: &UserSessionView{ChangeDate: now(), MfaSoftwareVerification: time.Time{}},
 		},
 		{
-			name: "append otp removed event",
+			name: "append human otp check failed event",
 			args: args{
-				event:    &es_models.Event{CreationDate: now(), Type: es_model.MfaOtpCheckFailed},
+				event:    &es_models.Event{CreationDate: now(), Type: es_model.HumanMFAOTPCheckFailed},
 				userView: &UserSessionView{MfaSoftwareVerification: now()},
 			},
 			result: &UserSessionView{ChangeDate: now(), MfaSoftwareVerification: time.Time{}},
 		},
 		{
-			name: "append otp removed event",
+			name: "append user otp removed event",
+			args: args{
+				event:    &es_models.Event{CreationDate: now(), Type: es_model.MFAOTPRemoved},
+				userView: &UserSessionView{MfaSoftwareVerification: now()},
+			},
+			result: &UserSessionView{ChangeDate: now(), MfaSoftwareVerification: time.Time{}},
+		},
+		{
+			name: "append human otp removed event",
+			args: args{
+				event:    &es_models.Event{CreationDate: now(), Type: es_model.HumanMFAOTPRemoved},
+				userView: &UserSessionView{MfaSoftwareVerification: now()},
+			},
+			result: &UserSessionView{ChangeDate: now(), MfaSoftwareVerification: time.Time{}},
+		},
+		{
+			name: "append user signed out event",
 			args: args{
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.SignedOut},
+				userView: &UserSessionView{PasswordVerification: now(), MfaSoftwareVerification: now()},
+			},
+			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}, MfaSoftwareVerification: time.Time{}, State: 1},
+		},
+		{
+			name: "append human signed out event",
+			args: args{
+				event:    &es_models.Event{CreationDate: now(), Type: es_model.HumanSignedOut},
 				userView: &UserSessionView{PasswordVerification: now(), MfaSoftwareVerification: now()},
 			},
 			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}, MfaSoftwareVerification: time.Time{}, State: 1},

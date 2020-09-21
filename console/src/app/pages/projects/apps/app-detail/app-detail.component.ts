@@ -22,7 +22,6 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
-import { nativeValidator } from '../appTypeValidator';
 
 enum RedirectType {
     REDIRECT = 'redirect',
@@ -134,11 +133,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             if (this.app.oidcConfig?.redirectUrisList) {
                 this.redirectUrisList = this.app.oidcConfig.redirectUrisList;
 
-                this.redirectControl = new FormControl('', [nativeValidator as ValidatorFn]);
+                // this.redirectControl = new FormControl('', [nativeValidator as ValidatorFn]);
             }
             if (this.app.oidcConfig?.postLogoutRedirectUrisList) {
                 this.postLogoutRedirectUrisList = this.app.oidcConfig.postLogoutRedirectUrisList;
-                this.postRedirectControl = new FormControl('', [nativeValidator as ValidatorFn]);
+                // this.postRedirectControl = new FormControl('', [nativeValidator as ValidatorFn]);
             }
             if (this.app.oidcConfig) {
                 this.appForm.patchValue(this.app.oidcConfig);

@@ -19,6 +19,7 @@ import { UserType } from '../user-list.component';
 export class UserTableComponent implements OnInit {
     public UserType: any = UserType;
     @Input() userType: UserType = UserType.HUMAN;
+    @Input() refreshOnPreviousRoute: string = '';
     @Input() disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     public dataSource: MatTableDataSource<UserView.AsObject> = new MatTableDataSource<UserView.AsObject>();
@@ -82,12 +83,10 @@ export class UserTableComponent implements OnInit {
         query.setKey(UserSearchKey.USERSEARCHKEY_TYPE);
         query.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
         query.setValue(filterTypeValue);
-        console.log(filterTypeValue);
 
         this.userService.SearchUsers(limit, offset, [query]).then(resp => {
             this.userResult = resp.toObject();
             this.dataSource.data = this.userResult.resultList;
-            console.log(this.userResult.resultList);
             this.loadingSubject.next(false);
         }).catch(error => {
             this.toast.showError(error);

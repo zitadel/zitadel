@@ -22,7 +22,7 @@ func GetIDPProviderByAggregateIDAndConfigID(db *gorm.DB, table, aggregateID, idp
 }
 
 func IDPProvidersByIdpConfigID(db *gorm.DB, table string, idpConfigID string) ([]*model.IDPProviderView, error) {
-	members := make([]*model.IDPProviderView, 0)
+	providers := make([]*model.IDPProviderView, 0)
 	queries := []*iam_model.IDPProviderSearchQuery{
 		{
 			Key:    iam_model.IDPProviderSearchKeyIdpConfigID,
@@ -31,11 +31,28 @@ func IDPProvidersByIdpConfigID(db *gorm.DB, table string, idpConfigID string) ([
 		},
 	}
 	query := repository.PrepareSearchQuery(table, model.IDPProviderSearchRequest{Queries: queries})
-	_, err := query(db, &members)
+	_, err := query(db, &providers)
 	if err != nil {
 		return nil, err
 	}
-	return members, nil
+	return providers, nil
+}
+
+func IDPProvidersByAggregateID(db *gorm.DB, table string, aggregateID string) ([]*model.IDPProviderView, error) {
+	providers := make([]*model.IDPProviderView, 0)
+	queries := []*iam_model.IDPProviderSearchQuery{
+		{
+			Key:    iam_model.IDPProviderSearchKeyAggregateID,
+			Value:  aggregateID,
+			Method: global_model.SearchMethodEquals,
+		},
+	}
+	query := repository.PrepareSearchQuery(table, model.IDPProviderSearchRequest{Queries: queries})
+	_, err := query(db, &providers)
+	if err != nil {
+		return nil, err
+	}
+	return providers, nil
 }
 
 func SearchIDPProviders(db *gorm.DB, table string, req *iam_model.IDPProviderSearchRequest) ([]*model.IDPProviderView, uint64, error) {

@@ -8,6 +8,7 @@ export GOOGLE_APPLICATION_CREDENTIALS="$BASEDIR/local_svc-account-tracing.json"
 
 export ZITADEL_TRACING_PROJECT_ID=zitadel-dev
 export ZITADEL_TRACING_FRACTION=0.1
+export ZITADEL_TRACING_TYPE=google
 
 # Log
 export ZITADEL_LOG_LEVEL=debug
@@ -65,8 +66,6 @@ export ZITADEL_CONSOLE_ENV_DIR=../../console/src/assets/
 #Org
 export ZITADEL_DEFAULT_DOMAIN=zitadel.ch
 
-#Tracing
-export TRACING_TYPE=google
 
 #Setup
 export ZITADEL_CONSOLE_RESPONSE_TYPE='ID_TOKEN TOKEN'

@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { MfaOtpResponse, MFAState, MfaType, MultiFactor } from 'src/app/proto/generated/auth_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -73,18 +74,32 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     }
 
     public deleteMFA(type: MfaType): void {
-        if (type === MfaType.MFATYPE_OTP) {
-            this.service.RemoveMfaOTP().then(() => {
-                this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
+        const dialogRef = this.dialog.open(WarnDialogComponent, {
+            data: {
+                confirmKey: 'ACTIONS.DELETE',
+                cancelKey: 'ACTIONS.CANCEL',
+                titleKey: 'USER.MFA.DIALOG.OTP_DELETE_TITLE',
+                descriptionKey: 'USER.MFA.DIALOG.OTP_DELETE_DESCRIPTION',
+            },
+            width: '400px',
+        });
 
-                const index = this.dataSource.data.findIndex(mfa => mfa.type === type);
-                if (index > -1) {
-                    this.dataSource.data.splice(index, 1);
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                if (type === MfaType.MFATYPE_OTP) {
+                    this.service.RemoveMfaOTP().then(() => {
+                        this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
+
+                        const index = this.dataSource.data.findIndex(mfa => mfa.type === type);
+                        if (index > -1) {
+                            this.dataSource.data.splice(index, 1);
+                        }
+                        this.getOTP();
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
                 }
-
-            }).catch(error => {
-                this.toast.showError(error);
-            });
-        }
+            }
+        });
     }
 }

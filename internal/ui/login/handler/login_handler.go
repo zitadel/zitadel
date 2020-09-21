@@ -30,12 +30,12 @@ func (l *Login) handleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) handleLoginName(w http.ResponseWriter, r *http.Request) {
-	authSession, err := l.getAuthRequest(r)
+	authReq, err := l.getAuthRequest(r)
 	if err != nil {
-		l.renderError(w, r, authSession, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
-	l.renderLogin(w, r, authSession, nil)
+	l.renderLogin(w, r, authReq, nil)
 }
 
 func (l *Login) handleLoginNameCheck(w http.ResponseWriter, r *http.Request) {
@@ -46,6 +46,10 @@ func (l *Login) handleLoginNameCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if data.Register {
+		if authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0 {
+			l.handleRegisterOption(w, r)
+			return
+		}
 		l.handleRegister(w, r)
 		return
 	}

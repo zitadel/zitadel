@@ -417,6 +417,26 @@ func (mr *MockAuthServiceClientMockRecorder) RemoveMfaOTP(arg0, arg1 interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMfaOTP", reflect.TypeOf((*MockAuthServiceClient)(nil).RemoveMfaOTP), varargs...)
 }
 
+// RemoveMyExternalIDP mocks base method
+func (m *MockAuthServiceClient) RemoveMyExternalIDP(arg0 context.Context, arg1 *auth.ExternalIDPRemoveRequest, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RemoveMyExternalIDP", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemoveMyExternalIDP indicates an expected call of RemoveMyExternalIDP
+func (mr *MockAuthServiceClientMockRecorder) RemoveMyExternalIDP(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMyExternalIDP", reflect.TypeOf((*MockAuthServiceClient)(nil).RemoveMyExternalIDP), varargs...)
+}
+
 // RemoveMyUserPhone mocks base method
 func (m *MockAuthServiceClient) RemoveMyUserPhone(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
@@ -475,6 +495,26 @@ func (mr *MockAuthServiceClientMockRecorder) ResendMyPhoneVerificationCode(arg0,
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResendMyPhoneVerificationCode", reflect.TypeOf((*MockAuthServiceClient)(nil).ResendMyPhoneVerificationCode), varargs...)
+}
+
+// SearchMyExternalIDPs mocks base method
+func (m *MockAuthServiceClient) SearchMyExternalIDPs(arg0 context.Context, arg1 *auth.ExternalIDPSearchRequest, arg2 ...grpc.CallOption) (*auth.ExternalIDPSearchResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SearchMyExternalIDPs", varargs...)
+	ret0, _ := ret[0].(*auth.ExternalIDPSearchResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SearchMyExternalIDPs indicates an expected call of SearchMyExternalIDPs
+func (mr *MockAuthServiceClientMockRecorder) SearchMyExternalIDPs(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchMyExternalIDPs", reflect.TypeOf((*MockAuthServiceClient)(nil).SearchMyExternalIDPs), varargs...)
 }
 
 // SearchMyProjectOrgs mocks base method

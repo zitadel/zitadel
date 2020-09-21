@@ -73,7 +73,7 @@
 *, *::before, *::after {
   box-sizing: border-box;
   font-family: Lato;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 400;
 }
 
@@ -98,6 +98,7 @@ h1 {
   font-family: Lato;
   font-weight: 300;
   font-size: 40px;
+  text-align: center;
 }
 
 h2 {
@@ -123,7 +124,13 @@ header .logo {
   margin: 30px;
 }
 
-.content {
+.head {
+  width: 100%;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.content form {
   margin: auto;
   padding: 20px;
   width: 100%;
@@ -138,11 +145,14 @@ a {
 a:hover {
   color: #5b8fd3;
 }
+a.tos-link {
+  font-size: 14px;
+}
 
-button {
+button, .button {
   background-color: #282828;
   color: #3574C6;
-  border: 2px solid #3574C6;
+  border: 1px solid #3574C6;
   border-radius: 5px;
   width: 100%;
   max-width: 600px;
@@ -150,36 +160,39 @@ button {
   transition: all 0.3s ease 0s;
   cursor: pointer;
   outline: none;
+  display: inline-block;
+  text-align: center;
+  line-height: 40px;
 }
-button:hover {
+button:hover, .button:hover {
   background-color: #5b8fd3;
   color: #282828;
-  border: 2px solid #5b8fd3;
+  border: 1px solid #5b8fd3;
 }
-button.primary {
+button.primary, .button.primary {
   background-color: #3574C6;
   color: #BBBBC8;
   border: none;
 }
-button.primary:hover {
+button.primary:hover, .button.primary:hover {
   background-color: #5b8fd3;
 }
-button:disabled {
-  background-color: #505050;
-  border: 2px solid #505050;
+button:disabled, .button:disabled {
+  background-color: #999999;
+  border: 1px solid #999999;
 }
-button:disabled:hover {
-  background-color: #505050;
-  border: 2px solid #505050;
+button:disabled:hover, .button:disabled:hover {
+  background-color: #999999;
+  border: 1px solid #999999;
 }
 
 input:not([type=radio]), select {
   background-color: #252525;
   color: #BBBBC8;
   height: 50px;
-  border: 2px solid #505050;
+  border: 1px solid #999999;
   border-radius: 5px;
-  padding-left: 15px;
+  padding-left: 8px;
 }
 
 form button.user-selection .profile-image, .login-profile .profile-image {
@@ -214,7 +227,7 @@ form button.user-selection:hover .profile-image, .login-profile:hover .profile-i
   text-align: center;
 }
 .login-profile .names div:first-of-type {
-  font-size: 40px;
+  font-size: 26px;
   font-weight: 300;
 }
 .login-profile .names div:nth-of-type(2) {
@@ -241,10 +254,25 @@ form .field.radio-button label {
   padding: 3px 0 0 15px;
   width: 100%;
 }
+form .field.check-box {
+  display: flex;
+}
+form .field.check-box input[type=checkbox] {
+  height: 16px;
+  vertical-align: middle;
+}
+form .field.check-box label {
+  height: 16px;
+  text-transform: inherit;
+  display: inline-block;
+  padding: 2px 0 0 15px;
+  width: 100%;
+  color: #BBBBC8;
+}
 form label {
   color: #898989;
   text-transform: uppercase;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   margin-bottom: 3px;
 }
 form label span.optional {
@@ -288,7 +316,7 @@ form button.user-selection .sessionstate {
   height: 20px;
   width: 20px;
   border-radius: 20px;
-  border-color: #505050;
+  border-color: #999999;
   border-style: solid;
   border-width: 1px;
   position: absolute;
@@ -349,6 +377,7 @@ form ul#passwordcomplexity {
   flex-wrap: wrap;
   padding: 0;
   list-style: none;
+  margin-bottom: 0;
 }
 form ul#passwordcomplexity li {
   flex: 1 0 50%;
@@ -424,6 +453,16 @@ footer {
   font-feature-settings: "liga";
 }
 
+.free-tier {
+  border: 2px solid #F20D6B;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.error {
+  color: #F20D6B;
+}
+
 html {
   background-color: #f5f5f5;
   color: #282828;
@@ -435,66 +474,75 @@ html header .logo {
 html h1, html h2 {
   color: #282828;
 }
-html button {
+html button, html .button {
   background-color: #f5f5f5;
   color: #3574C6;
-  border: 2px solid #3574C6;
+  border: 1px solid #3574C6;
 }
-html button:hover {
+html button:hover, html .button:hover {
   background-color: #5b8fd3;
-  border: 2px solid #5b8fd3;
+  border: 1px solid #5b8fd3;
+  color: #FFFFFF;
 }
-html button.primary {
+html button.primary, html .button.primary {
   background-color: #3574C6;
-  color: #BBBBC8;
+  color: #FFFFFF;
   border: none;
   box-shadow: 0px 10px 30px #3574C6;
 }
-html button.primary:hover {
+html button.primary:hover, html .button.primary:hover {
   background-color: #5b8fd3;
 }
-html button.clean {
+html button:disabled, html .button:disabled {
+  background-color: #999999;
+  border: 1px solid #999999;
+}
+html button:disabled:hover, html .button:disabled:hover {
+  background-color: #999999;
+  border: 1px solid #999999;
+}
+html button.clean, html .button.clean {
   color: #282828;
 }
-html button.clean:hover {
+html button.clean:hover, html .button.clean:hover {
   border: none;
   background-color: #FFFFFF;
 }
-html button.user-selection .profile-image {
+html button.user-selection .profile-image, html .button.user-selection .profile-image {
   background-image: url("../../../images/icon-user-light.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-  html button.user-selection .profile-image {
+  html button.user-selection .profile-image, html .button.user-selection .profile-image {
     background-image: url("../../../images/icon-user-light@2x.png");
     background-size: 80px 80px;
   }
 }
-html button.user-selection:hover {
+html button.user-selection:hover, html .button.user-selection:hover {
   background-color: #FFFFFF;
 }
-html button.user-selection:hover .profile-image {
+html button.user-selection:hover .profile-image, html .button.user-selection:hover .profile-image {
   background-image: url("../../../images/icon-user-light-hover.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-  html button.user-selection:hover .profile-image {
+  html button.user-selection:hover .profile-image, html .button.user-selection:hover .profile-image {
     background-image: url("../../../images/icon-user-light-hover@2x.png");
     background-size: 80px 80px;
   }
 }
-html button.other-user .other-user-image {
+html button.other-user .other-user-image, html .button.other-user .other-user-image {
   background-image: url("../../../images/icon-newuser-light.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-  html button.other-user .other-user-image {
+  html button.other-user .other-user-image, html .button.other-user .other-user-image {
     background-image: url("../../../images/icon-newuser-light@2x.png");
     background-size: 80px 60px;
   }
 }
-html button.other-user:hover .other-user-image {
+html button.other-user:hover .other-user-image, html .button.other-user:hover .other-user-image {
   background-image: url("../../../images/icon-newuser-light-hover.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-  html button.other-user:hover .other-user-image {
+  html button.other-user:hover .other-user-image, html .button.other-user:hover .other-user-image {
     background-image: url("../../../images/icon-newuser-light-hover@2x.png");
     background-size: 80px 60px;
   }
@@ -508,6 +556,42 @@ html #qrcode svg rect.color {
 }
 html #qrcode svg rect.bg-color {
   fill: #f5f5f5;
+}
+form .field.check-box label {
+  color: #282828;
+}
+form ul#passwordcomplexity li i {
+  color: #50CA3D;
+}
+form ul#passwordcomplexity li.invalid i {
+  color: #F20D6B;
+}
+
+.login-profile .profile-image, form button.user-selection .profile-image {
+  background-image: url("../../../images/icon-user-light.png");
+}
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+  .login-profile .profile-image, form button.user-selection .profile-image {
+    background-image: url("../../../images/icon-user-light@2x.png");
+    background-size: 80px 80px;
+  }
+}
+.login-profile:hover .profile-image, form button.user-selection:hover .profile-image {
+  background-image: url("../../../images/icon-user-light-hover.png");
+}
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+  .login-profile:hover .profile-image, form button.user-selection:hover .profile-image {
+    background-image: url("../../../images/icon-user-light-hover@2x.png");
+    background-size: 80px 80px;
+  }
+}
+
+.free-tier {
+  border: 2px solid #F20D6B;
+}
+
+.error {
+  color: #F20D6B;
 }
 
 /*# sourceMappingURL=light.css.map */

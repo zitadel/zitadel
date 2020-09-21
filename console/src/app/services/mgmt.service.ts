@@ -3,137 +3,153 @@ import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 
 import {
-    AddMachineKeyRequest,
-    AddMachineKeyResponse,
-    AddOrgDomainRequest,
-    AddOrgMemberRequest,
-    Application,
-    ApplicationID,
-    ApplicationSearchQuery,
-    ApplicationSearchRequest,
-    ApplicationSearchResponse,
-    ApplicationUpdate,
-    ApplicationView,
-    ChangeOrgMemberRequest,
-    ChangeRequest,
-    Changes,
-    CreateHumanRequest,
-    CreateMachineRequest,
-    CreateUserRequest,
-    Domain,
-    Gender,
-    GrantedProjectSearchRequest,
-    Iam,
-    LoginName,
-    MachineKeyIDRequest,
-    MachineKeySearchRequest,
-    MachineKeySearchResponse,
-    MachineKeyType,
-    MachineResponse,
-    MultiFactors,
-    NotificationType,
-    OIDCApplicationCreate,
-    OIDCConfig,
-    OIDCConfigUpdate,
-    Org,
-    OrgCreateRequest,
-    OrgDomain,
-    OrgDomainSearchQuery,
-    OrgDomainSearchRequest,
-    OrgDomainSearchResponse,
-    OrgDomainValidationRequest,
-    OrgDomainValidationResponse,
-    OrgDomainValidationType,
-    OrgIamPolicy,
-    OrgMember,
-    OrgMemberRoles,
-    OrgMemberSearchRequest,
-    OrgMemberSearchResponse,
-    OrgView,
-    PasswordAgePolicy,
-    PasswordAgePolicyCreate,
-    PasswordAgePolicyID,
-    PasswordAgePolicyUpdate,
-    PasswordComplexityPolicy,
-    PasswordComplexityPolicyCreate,
-    PasswordComplexityPolicyID,
-    PasswordComplexityPolicyUpdate,
-    PasswordLockoutPolicy,
-    PasswordLockoutPolicyCreate,
-    PasswordLockoutPolicyID,
-    PasswordLockoutPolicyUpdate,
-    PasswordRequest,
-    PrimaryOrgDomainRequest,
-    Project,
-    ProjectCreateRequest,
-    ProjectGrant,
-    ProjectGrantCreate,
-    ProjectGrantID,
-    ProjectGrantMember,
-    ProjectGrantMemberAdd,
-    ProjectGrantMemberChange,
-    ProjectGrantMemberRemove,
-    ProjectGrantMemberRoles,
-    ProjectGrantMemberSearchQuery,
-    ProjectGrantMemberSearchRequest,
-    ProjectGrantSearchRequest,
-    ProjectGrantSearchResponse,
-    ProjectGrantUpdate,
-    ProjectGrantView,
-    ProjectID,
-    ProjectMember,
-    ProjectMemberAdd,
-    ProjectMemberChange,
-    ProjectMemberRemove,
-    ProjectMemberRoles,
-    ProjectMemberSearchQuery,
-    ProjectMemberSearchRequest,
-    ProjectMemberSearchResponse,
-    ProjectRole,
-    ProjectRoleAdd,
-    ProjectRoleAddBulk,
-    ProjectRoleChange,
-    ProjectRoleRemove,
-    ProjectRoleSearchQuery,
-    ProjectRoleSearchRequest,
-    ProjectRoleSearchResponse,
-    ProjectSearchQuery,
-    ProjectSearchRequest,
-    ProjectSearchResponse,
-    ProjectUpdateRequest,
-    ProjectView,
-    RemoveOrgDomainRequest,
-    RemoveOrgMemberRequest,
-    SetPasswordNotificationRequest,
-    UpdateMachineRequest,
-    UpdateUserAddressRequest,
-    UpdateUserEmailRequest,
-    UpdateUserPhoneRequest,
-    UpdateUserProfileRequest,
-    UserAddress,
-    UserEmail,
-    UserGrant,
-    UserGrantCreate,
-    UserGrantID,
-    UserGrantRemoveBulk,
-    UserGrantSearchQuery,
-    UserGrantSearchRequest,
-    UserGrantSearchResponse,
-    UserGrantUpdate,
-    UserGrantView,
-    UserID,
-    UserMembershipSearchQuery,
-    UserMembershipSearchRequest,
-    UserMembershipSearchResponse,
-    UserPhone,
-    UserProfile,
-    UserResponse,
-    UserSearchQuery,
-    UserSearchRequest,
-    UserSearchResponse,
-    UserView,
-    ValidateOrgDomainRequest,
-    ZitadelDocs,
+  AddMachineKeyRequest,
+  AddMachineKeyResponse,
+  AddOrgDomainRequest,
+  AddOrgMemberRequest,
+  Application,
+  ApplicationID,
+  ApplicationSearchQuery,
+  ApplicationSearchRequest,
+  ApplicationSearchResponse,
+  ApplicationUpdate,
+  ApplicationView,
+  ChangeOrgMemberRequest,
+  ChangeRequest,
+  Changes,
+  CreateHumanRequest,
+  CreateMachineRequest,
+  CreateUserRequest,
+  Domain, ExternalIDPSearchRequest, ExternalIDPSearchResponse,
+  Gender,
+  GrantedProjectSearchRequest,
+  Iam,
+  Idp,
+  IdpID,
+  IdpProviderAdd,
+  IdpProviderID,
+  IdpProviderSearchRequest,
+  IdpProviderSearchResponse,
+  IdpProviderType,
+  IdpSearchQuery,
+  IdpSearchRequest,
+  IdpSearchResponse,
+  IdpView,
+  LoginName,
+  LoginPolicy,
+  LoginPolicyView,
+  MachineKeyIDRequest,
+  MachineKeySearchRequest,
+  MachineKeySearchResponse,
+  MachineKeyType,
+  MachineResponse,
+  MultiFactors,
+  NotificationType,
+  OIDCApplicationCreate,
+  OIDCConfig,
+  OIDCConfigUpdate,
+  OidcIdpConfig,
+  OidcIdpConfigCreate,
+  OidcIdpConfigUpdate,
+  Org,
+  OrgCreateRequest,
+  OrgDomain,
+  OrgDomainSearchQuery,
+  OrgDomainSearchRequest,
+  OrgDomainSearchResponse,
+  OrgDomainValidationRequest,
+  OrgDomainValidationResponse,
+  OrgDomainValidationType,
+  OrgIamPolicy,
+  OrgMember,
+  OrgMemberRoles,
+  OrgMemberSearchRequest,
+  OrgMemberSearchResponse,
+  OrgView,
+  PasswordAgePolicy,
+  PasswordAgePolicyCreate,
+  PasswordAgePolicyID,
+  PasswordAgePolicyUpdate,
+  PasswordComplexityPolicy,
+  PasswordComplexityPolicyCreate,
+  PasswordComplexityPolicyID,
+  PasswordComplexityPolicyUpdate,
+  PasswordLockoutPolicy,
+  PasswordLockoutPolicyCreate,
+  PasswordLockoutPolicyID,
+  PasswordLockoutPolicyUpdate,
+  PasswordRequest,
+  PrimaryOrgDomainRequest,
+  Project,
+  ProjectCreateRequest,
+  ProjectGrant,
+  ProjectGrantCreate,
+  ProjectGrantID,
+  ProjectGrantMember,
+  ProjectGrantMemberAdd,
+  ProjectGrantMemberChange,
+  ProjectGrantMemberRemove,
+  ProjectGrantMemberRoles,
+  ProjectGrantMemberSearchQuery,
+  ProjectGrantMemberSearchRequest,
+  ProjectGrantSearchRequest,
+  ProjectGrantSearchResponse,
+  ProjectGrantUpdate,
+  ProjectGrantView,
+  ProjectID,
+  ProjectMember,
+  ProjectMemberAdd,
+  ProjectMemberChange,
+  ProjectMemberRemove,
+  ProjectMemberRoles,
+  ProjectMemberSearchQuery,
+  ProjectMemberSearchRequest,
+  ProjectMemberSearchResponse,
+  ProjectRole,
+  ProjectRoleAdd,
+  ProjectRoleAddBulk,
+  ProjectRoleChange,
+  ProjectRoleRemove,
+  ProjectRoleSearchQuery,
+  ProjectRoleSearchRequest,
+  ProjectRoleSearchResponse,
+  ProjectSearchQuery,
+  ProjectSearchRequest,
+  ProjectSearchResponse,
+  ProjectUpdateRequest,
+  ProjectView,
+  RemoveOrgDomainRequest,
+  RemoveOrgMemberRequest,
+  SetPasswordNotificationRequest,
+  UpdateMachineRequest,
+  UpdateUserAddressRequest,
+  UpdateUserEmailRequest,
+  UpdateUserPhoneRequest,
+  UpdateUserProfileRequest,
+  UserAddress,
+  UserEmail,
+  UserGrant,
+  UserGrantCreate,
+  UserGrantID,
+  UserGrantRemoveBulk,
+  UserGrantSearchQuery,
+  UserGrantSearchRequest,
+  UserGrantSearchResponse,
+  UserGrantUpdate,
+  UserGrantView,
+  UserID,
+  UserMembershipSearchQuery,
+  UserMembershipSearchRequest,
+  UserMembershipSearchResponse,
+  UserPhone,
+  UserProfile,
+  UserResponse,
+  UserSearchQuery,
+  UserSearchRequest,
+  UserSearchResponse,
+  UserView,
+  ValidateOrgDomainRequest,
+  ZitadelDocs,
 } from '../proto/generated/management_pb';
 import { GrpcService } from './grpc.service';
 
@@ -144,6 +160,105 @@ export type ResponseMapper<TResp, TMappedResp> = (resp: TResp) => TMappedResp;
 })
 export class ManagementService {
     constructor(private readonly grpcService: GrpcService) { }
+
+    public async SearchIdps(
+        limit?: number,
+        offset?: number,
+        queryList?: IdpSearchQuery[],
+    ): Promise<IdpSearchResponse> {
+        const req = new IdpSearchRequest();
+        if (limit) {
+            req.setLimit(limit);
+        }
+        if (offset) {
+            req.setOffset(offset);
+        }
+        if (queryList) {
+            req.setQueriesList(queryList);
+        }
+        return this.grpcService.mgmt.searchIdps(req);
+    }
+
+    public async GetLoginPolicy(): Promise<LoginPolicyView> {
+        const req = new Empty();
+        return this.grpcService.mgmt.getLoginPolicy(req);
+    }
+
+    public async UpdateLoginPolicy(req: LoginPolicy): Promise<LoginPolicy> {
+        return this.grpcService.mgmt.updateLoginPolicy(req);
+    }
+
+    public async RemoveLoginPolicy(): Promise<Empty> {
+        return this.grpcService.mgmt.removeLoginPolicy(new Empty());
+    }
+
+    public async addIdpProviderToLoginPolicy(configId: string, idpType: IdpProviderType): Promise<IdpProviderID> {
+        const req = new IdpProviderAdd();
+        req.setIdpProviderType(idpType);
+        req.setIdpConfigId(configId);
+        return this.grpcService.mgmt.addIdpProviderToLoginPolicy(req);
+    }
+
+    public async RemoveIdpProviderFromLoginPolicy(configId: string): Promise<Empty> {
+        const req = new IdpProviderID();
+        req.setIdpConfigId(configId);
+        return this.grpcService.mgmt.removeIdpProviderFromLoginPolicy(req);
+    }
+
+    public async GetLoginPolicyIdpProviders(limit?: number, offset?: number): Promise<IdpProviderSearchResponse> {
+        const req = new IdpProviderSearchRequest();
+        if (limit) {
+            req.setLimit(limit);
+        }
+        if (offset) {
+            req.setOffset(offset);
+        }
+        return this.grpcService.mgmt.getLoginPolicyIdpProviders(req);
+    }
+
+    public async IdpByID(
+        id: string,
+    ): Promise<IdpView> {
+        const req = new IdpID();
+        req.setId(id);
+        return this.grpcService.mgmt.idpByID(req);
+    }
+
+    public async CreateOidcIdp(
+        req: OidcIdpConfigCreate,
+    ): Promise<Idp> {
+        return this.grpcService.mgmt.createOidcIdp(req);
+    }
+
+    public async UpdateOidcIdpConfig(
+        req: OidcIdpConfigUpdate,
+    ): Promise<OidcIdpConfig> {
+        return this.grpcService.mgmt.updateOidcIdpConfig(req);
+    }
+
+    public async RemoveIdpConfig(
+        id: string,
+    ): Promise<Empty> {
+        const req = new IdpID;
+        req.setId(id);
+        return this.grpcService.mgmt.removeIdpConfig(req);
+    }
+
+    public async DeactivateIdpConfig(
+        id: string,
+    ): Promise<Empty> {
+        const req = new IdpID;
+        req.setId(id);
+        return this.grpcService.mgmt.deactivateIdpConfig(req);
+    }
+
+    public async ReactivateIdpConfig(
+        id: string,
+    ): Promise<Empty> {
+        const req = new IdpID;
+        req.setId(id);
+        return this.grpcService.mgmt.reactivateIdpConfig(req);
+    }
 
     public async CreateUserHuman(username: string, user: CreateHumanRequest): Promise<UserResponse> {
         const req = new CreateUserRequest();
@@ -216,6 +331,18 @@ export class ManagementService {
         return this.grpcService.mgmt.searchMachineKeys(req);
     }
 
+  public async SearchExternalIdps(
+    userId: string,
+    limit: number,
+    offset: number,
+    asc?: boolean,
+  ): Promise<ExternalIDPSearchResponse> {
+    const req = new ExternalIDPSearchRequest();
+    req.setUserId(userId);
+    req.setLimit(limit);
+    req.setOffset(offset);
+    return this.grpcService.mgmt.searchUserExternalIDPs(req);
+  }
     public async GetIam(): Promise<Iam> {
         const req = new Empty();
         return this.grpcService.mgmt.getIam(req);
