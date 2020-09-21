@@ -121,11 +121,16 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, sc
 			if user.HumanView == nil {
 				continue
 			}
-			userInfo.Address.StreetAddress = user.StreetAddress
-			userInfo.Address.Locality = user.Locality
-			userInfo.Address.Region = user.Region
-			userInfo.Address.PostalCode = user.PostalCode
-			userInfo.Address.Country = user.Country
+			if user.StreetAddress == "" && user.Locality == "" && user.Region == "" && user.PostalCode == "" && user.Country == "" {
+				continue
+			}
+			userInfo.Address = &oidc.UserinfoAddress{
+				StreetAddress: user.StreetAddress,
+				Locality:      user.Locality,
+				Region:        user.Region,
+				PostalCode:    user.PostalCode,
+				Country:       user.Country,
+			}
 		default:
 			userInfo.Authorizations = append(userInfo.Authorizations, scope)
 		}
