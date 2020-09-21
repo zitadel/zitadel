@@ -223,7 +223,7 @@ func (repo *UserRepo) ChangeMyPassword(ctx context.Context, old, new string) err
 	return err
 }
 
-func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new string) error {
+func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new string) (err error) {
 	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return err
