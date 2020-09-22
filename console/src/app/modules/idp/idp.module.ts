@@ -29,7 +29,7 @@ import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.
         TranslateModule,
         MatCheckboxModule,
         MatChipsModule,
-        DetailLayoutModule
+        DetailLayoutModule,
     ],
 })
 export class IdpModule { }
