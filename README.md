@@ -7,7 +7,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/caos/zitadel)](https://goreportcard.com/report/github.com/caos/zitadel)
 [![codecov](https://codecov.io/gh/caos/zitadel/branch/master/graph/badge.svg)](https://codecov.io/gh/caos/zitadel)
 
-> This project is in a alpha state. The application will continue breaking until version 1.0.0 is released
+> This project is in a beta state and API might still change a bit
 
 ## What Is It
 
@@ -18,7 +18,7 @@ We optimized `ZITADEL` for the usage as `service provider IAM`. By `service prov
 ## How Does It Work
 
 We built `ZITADEL` around the idea that the IAM should be easy to deploy and scale. That's why we tried to reduce external systems as much as possible.
-For example, `ZITADEL` is eventsourced but it does not rely on a pub/sub system to function. Instead we built all the functionality right into one binary.
+For example, `ZITADEL` is event sourced but it does not rely on a pub/sub system to function. Instead we built all the functionality right into one binary.
 `ZITADEL` only needs `Kubernetes` for orchestration and `CockroachDB` as storage.
 
 ## Why Another IAM
@@ -30,8 +30,9 @@ One feature that we often missed, was a solid `audit trail` of all IAM resources
 
 ### Use our free tier
 
-Stay tuned, we will publish how you can register an organisation in our cloud offering `zitadel.ch` soon.
-Yes we have a free tier!
+We provide a shared-cloud ZITADEL system where people can register there own organisation.
+Until end of 2020 we operator under a `early access` model where everything is free.
+Go check it out under [zitadel.ch](https://zitadel.ch)
 
 ### Run your own IAM
 
@@ -44,11 +45,11 @@ See our progress [here](https://github.com/caos/orbos/pull/256)
 
 ## Give me some docs
 
-This is work in progess but will change soon.
+Have a look at our constantly evolving docs page [docs.zitadel.ch](https://docs.zitadel.ch).
 
 ## How To Contribute
 
-TBA
+Details need to be announced, but feel free to contribute already. As long as you are okay with accepting to contribute under this projects OSS [License](##License) you are fine.
 
 ## Security
 
