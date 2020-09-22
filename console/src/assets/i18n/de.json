@@ -633,12 +633,16 @@
     },
     "IDP":{
         "LIST": {
-            "TITLE":"Identity Providers",
+            "TITLE":"Identitäts Providers",
             "DESCRIPTION":"Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können."
         },
         "CREATE": {
-            "TITLE":"Neuer Identity Provider",
-            "DESCRIPTION":"Definieren Sie hier die Zugangsdaten des neuen Identity Providers"
+            "TITLE":"Neuer Identitäts Provider",
+            "DESCRIPTION":"Definieren Sie hier die Zugangsdaten des neuen Identitäts Providers"
+        },
+        "DETAIL": {
+          "TITLE":"Identitäts Provider",
+          "DESCRIPTION":"Konfiguration deines Identitäts Providers"
         },
         "TYPES": {
             "0":"unknown",

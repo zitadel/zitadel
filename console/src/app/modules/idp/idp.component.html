@@ -1,15 +1,6 @@
 <div class="container">
-    <div class="abort-container">
-        <button (click)="close()" mat-icon-button>
-            <mat-icon>close</mat-icon>
-        </button>
-        <span class="abort">{{ 'IDP.CREATE.TITLE' | translate }}</span><span class="abort-2">Step
-            {{ currentCreateStep }} of
-            {{ createSteps }}</span>
-    </div>
-
-    <h1>{{'IDP.CREATE.TITLE' | translate}}</h1>
-    <p>{{'IDP.CREATE.DESCRIPTION' | translate}}</p>
+    <h1>{{'IDP.DETAIL.TITLE' | translate}}</h1>
+    <p>{{'IDP.DETAIL.DESCRIPTION' | translate}}</p>
 
     <form (ngSubmit)="updateIdp()">
         <ng-container [formGroup]="formGroup">
@@ -22,35 +13,35 @@
                     <mat-label>{{ 'IDP.NAME' | translate }}</mat-label>
                     <input matInput formControlName="name" />
                 </mat-form-field>
-                <mat-form-field appearance="outline" class="formfield">
+                <!--<mat-form-field appearance="outline" class="formfield">
                     <mat-label>{{ 'IDP.LOGOSRC' | translate }}</mat-label>
                     <input matInput formControlName="logoSrc" />
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="formfield">
+                </mat-form-field>-->
+                <mat-form-field formGroupName="oidcConfig" appearance="outline" class="formfield">
                     <mat-label>{{ 'IDP.ISSUER' | translate }}</mat-label>
                     <input matInput formControlName="issuer" />
                 </mat-form-field>
             </div>
             <div class="content">
-                <mat-checkbox class="desc" [(ngModel)]="showIdSecretSection" [ngModelOptions]="{standalone: true}">
-                    Update Client Id / Client Secret
-                </mat-checkbox>
-                <ng-container *ngIf="showIdSecretSection">
-                    <mat-form-field appearance="outline" class="formfield">
-                        <mat-label>{{ 'IDP.CLIENTID' | translate }}</mat-label>
-                        <input matInput formControlName="clientId" />
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="formfield">
-                        <mat-label>{{ 'IDP.CLIENTSECRET' | translate }}</mat-label>
-                        <input matInput formControlName="clientSecret" />
-                    </mat-form-field>
-                </ng-container>
+                  <mat-form-field formGroupName="oidcConfig" appearance="outline" class="formfield">
+                      <mat-label>{{ 'IDP.CLIENTID' | translate }}</mat-label>
+                      <input matInput formControlName="clientId" />
+                  </mat-form-field>
             </div>
-            <div class="content">
-                <mat-form-field appearance="outline" class="formfield">
+          <div class="content">
+              <mat-checkbox class="desc" [(ngModel)]="showIdSecretSection" [ngModelOptions]="{standalone: true}">
+                Update Client Secret
+              </mat-checkbox>
+              <mat-form-field formGroupName="oidcConfig" appearance="outline" class="formfield" *ngIf="showIdSecretSection">
+                <mat-label>{{ 'IDP.CLIENTSECRET' | translate }}</mat-label>
+                <input matInput formControlName="clientSecret" />
+              </mat-form-field>
+          </div>
+          <div class="content">
+                <mat-form-field formGroupName="oidcConfig" appearance="outline" class="formfield">
                     <mat-label>{{ 'IDP.SCOPESLIST' | translate }}</mat-label>
-                    <mat-chip-list #chipScopesList aria-label="scope selection" *ngIf="scopesList">
-                        <mat-chip class="chip" *ngFor="let scope of scopesList.value" selectable="false" removable
+                    <mat-chip-list formControlName="scopesList" #chipScopesList aria-label="scope selection" >
+                        <mat-chip class="chip" *ngFor="let scope of scopesList?.value" selectable="false" removable
                             (removed)="removeScope(scope)">
                             {{scope}} <mat-icon matChipRemove>cancel</mat-icon>
                         </mat-chip>

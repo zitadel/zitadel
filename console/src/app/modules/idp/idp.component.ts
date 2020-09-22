@@ -29,8 +29,6 @@ export class IdpComponent implements OnInit, OnDestroy {
     public projectId: string = '';
 
     public formGroup!: FormGroup;
-    public createSteps: number = 1;
-    public currentCreateStep: number = 1;
 
     constructor(
         // private router: Router,
@@ -41,12 +39,14 @@ export class IdpComponent implements OnInit, OnDestroy {
     ) {
         this.formGroup = new FormGroup({
             id: new FormControl({ disabled: true, value: '' }, [Validators.required]),
-            name: new FormControl({ disabled: true, value: '' }, [Validators.required]),
+            name: new FormControl('', [Validators.required]),
             logoSrc: new FormControl({ disabled: true, value: '' }, [Validators.required]),
-            clientId: new FormControl('', [Validators.required]),
-            clientSecret: new FormControl('', [Validators.required]),
-            issuer: new FormControl('', [Validators.required]),
-            scopesList: new FormControl([], []),
+            oidcConfig: new FormGroup({
+              clientId: new FormControl('', [Validators.required]),
+              clientSecret: new FormControl(''),
+              issuer: new FormControl('', [Validators.required]),
+              scopesList: new FormControl([], []),
+            })
         });
 
         this.route.data.pipe(switchMap(data => {
@@ -66,7 +66,7 @@ export class IdpComponent implements OnInit, OnDestroy {
             const { id } = params;
             if (id) {
                 this.service.IdpByID(id).then(idp => {
-                    this.formGroup.patchValue(idp.toObject());
+                  this.formGroup.patchValue(idp.toObject());
                 });
             }
         });

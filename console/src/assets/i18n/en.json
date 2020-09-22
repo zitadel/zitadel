@@ -640,6 +640,10 @@
             "TITLE":"New Identity Provider",
             "DESCRIPTION":"Configure the Endpoint of your new service provider."
         },
+        "DETAIL": {
+          "TITLE":"Identity Provider",
+          "DESCRIPTION":"Configuration of your identity provider."
+        },
         "TYPES": {
             "0":"unknown",
             "1":"System",
