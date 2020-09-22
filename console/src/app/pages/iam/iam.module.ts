@@ -26,7 +26,6 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
-import { IdpTableModule } from '../../modules/idp-table/idp-table.module';
 import { FailedEventsComponent } from './failed-events/failed-events.component';
 import { IamPolicyGridComponent } from './iam-policy-grid/iam-policy-grid.component';
 import { IamRoutingModule } from './iam-routing.module';
@@ -38,7 +37,6 @@ import { IamComponent } from './iam.component';
     imports: [
         CommonModule,
         IamRoutingModule,
-        IdpTableModule,
         ChangesModule,
         CardModule,
         MatAutocompleteModule,

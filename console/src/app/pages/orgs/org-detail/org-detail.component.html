@@ -27,14 +27,6 @@
             </app-card>
         </ng-container>
 
-        <ng-template appHasRole [appHasRole]="['org.idp.read']">
-            <app-card title="{{ 'IDP.LIST.TITLE' | translate }}" description="{{ 'IDP.LIST.DESCRIPTION' | translate }}">
-                <app-idp-table [service]="mgmtService" [serviceType]="PolicyComponentServiceType.MGMT"
-                    [disabled]="(['iam.idp.write'] | hasRole | async) == false">
-                </app-idp-table>
-            </app-card>
-        </ng-template>
-
         <ng-template appHasRole [appHasRole]="['policy.read']">
             <app-policy-grid></app-policy-grid>
         </ng-template>

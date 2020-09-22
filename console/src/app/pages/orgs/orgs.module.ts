@@ -16,7 +16,6 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/member-create-dialog.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
-import { IdpTableModule } from 'src/app/modules/idp-table/idp-table.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
@@ -41,7 +40,6 @@ import { PolicyGridComponent } from './policy-grid/policy-grid.component';
         MatFormFieldModule,
         MatInputModule,
         MatButtonModule,
-        IdpTableModule,
         MatDialogModule,
         CardModule,
         MatIconModule,

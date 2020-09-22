@@ -70,7 +70,7 @@ export class IdpComponent implements OnInit, OnDestroy {
             const { id } = params;
             if (id) {
                 this.service.IdpByID(id).then(idp => {
-                  let idpObject = idp.toObject();
+                  const idpObject = idp.toObject();
                   this.idpForm.patchValue(idpObject);
                   if (idpObject.oidcConfig) {
                     this.oidcConfigForm.patchValue(idpObject.oidcConfig);
@@ -109,7 +109,7 @@ export class IdpComponent implements OnInit, OnDestroy {
         req.setLogoSrc(this.logoSrc?.value);
 
         this.service.UpdateIdp(req).then((idp) => {
-          this.toast.showInfo("IDP.TOAST.SAVED", true);
+          this.toast.showInfo('IDP.TOAST.SAVED', true);
             // this.router.navigate(['idp', ]);
         }).catch(error => {
             this.toast.showError(error);
@@ -135,7 +135,7 @@ export class IdpComponent implements OnInit, OnDestroy {
       req.setScopesList(this.scopesList?.value);
 
       this.service.UpdateOidcIdpConfig(req).then((oidcConfig) => {
-        this.toast.showInfo("IDP.TOAST.SAVED", true);
+        this.toast.showInfo('IDP.TOAST.SAVED', true);
         // this.router.navigate(['idp', ]);
       }).catch(error => {
         this.toast.showError(error);

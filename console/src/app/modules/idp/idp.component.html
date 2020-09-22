@@ -1,7 +1,6 @@
-<div class="container">
-    <h1>{{'IDP.DETAIL.TITLE' | translate}}</h1>
-    <p>{{'IDP.DETAIL.DESCRIPTION' | translate}}</p>
-
+<app-detail-layout [backRouterLink]="[ '/org', 'policy', 'login']" [title]="'IDP.DETAIL.TITLE' | translate"
+                   [description]="'IDP.DETAIL.DESCRIPTION' | translate">
+  <div class="container">
     <form (ngSubmit)="updateIdp()">
         <ng-container [formGroup]="idpForm">
             <div class="content">
@@ -70,3 +69,5 @@
         </button>
     </form>
 </div>
+
+</app-detail-layout>

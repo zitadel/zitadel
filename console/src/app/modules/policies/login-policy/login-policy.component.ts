@@ -33,7 +33,7 @@ export class LoginPolicyComponent implements OnDestroy {
     public loginData!: LoginPolicy.AsObject | DefaultLoginPolicy.AsObject;
 
     private sub: Subscription = new Subscription();
-    private service!: ManagementService | AdminService;
+    public service!: ManagementService | AdminService;
     PolicyComponentServiceType: any = PolicyComponentServiceType;
     public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
     public idps: MgmtIdpProviderView.AsObject[] | AdminIdpProviderView.AsObject[] = [];

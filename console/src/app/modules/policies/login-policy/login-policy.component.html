@@ -48,4 +48,13 @@
         <button (click)="savePolicy()" color="primary" type="submit"
             mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
     </div>
+
+
+    <ng-template appHasRole [appHasRole]="['org.idp.read']">
+      <app-card title="{{ 'IDP.LIST.TITLE' | translate }}" description="{{ 'IDP.LIST.DESCRIPTION' | translate }}">
+        <app-idp-table [service]="service" [serviceType]="serviceType"
+                       [disabled]="(['iam.idp.write'] | hasRole | async) == false">
+        </app-idp-table>
+      </app-card>
+    </ng-template>
 </app-detail-layout>

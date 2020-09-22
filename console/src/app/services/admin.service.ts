@@ -38,7 +38,7 @@ import {
     Views,
 } from '../proto/generated/admin_pb';
 import { GrpcService } from './grpc.service';
-import {IdpUpdate} from "../proto/generated/management_pb";
+import {IdpUpdate} from '../proto/generated/management_pb';
 
 @Injectable({
     providedIn: 'root',

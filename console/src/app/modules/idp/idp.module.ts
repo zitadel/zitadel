@@ -12,6 +12,7 @@ import { TranslateModule } from '@ngx-translate/core';
 
 import { IdpRoutingModule } from './idp-routing.module';
 import { IdpComponent } from './idp.component';
+import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 
 @NgModule({
     declarations: [IdpComponent],
@@ -28,6 +29,7 @@ import { IdpComponent } from './idp.component';
         TranslateModule,
         MatCheckboxModule,
         MatChipsModule,
+        DetailLayoutModule
     ],
 })
 export class IdpModule { }
