@@ -11,7 +11,7 @@ You can either use [ZITADEL.ch](https://zitadel.ch) or deploy a dedicated ZITADE
 
 ### Use ZITADEL.ch
 
-To register your free organisation, visit this link [Register organisation](https://accounts.zitadel.ch/register/org).
+To register your free organisation, visit this link [register organisation](https://accounts.zitadel.ch/register/org).
 After accepting the TOS and filling out all the required fields you will receive a mail with further instructions.
 
 #### Verify your domain name (optional)

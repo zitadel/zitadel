@@ -1,5 +1,5 @@
 ---
-title: OpenID Connect
+title: OpenID Connect & OAuth
 description: ...
 ---
 
