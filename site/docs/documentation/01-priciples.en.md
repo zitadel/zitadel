@@ -20,3 +20,4 @@ title: Principles
 - Embrace (industry) standard as much as possible
 - Make use of platform features
 - Be able to run with a CDN and WAF
+- Releases utilized sematic versioning and release whenever feasible

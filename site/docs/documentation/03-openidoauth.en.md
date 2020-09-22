@@ -8,11 +8,12 @@ This chapter documents the OpenID Connect 1.0 and OAuth 2.0 features provided by
 
 Under normal circumstances **ZITADEL** need four domain names to operate properly. Three of those names are used for OpenID Connect and OAuth.
 
-| Domain Name | Example             | Description                                                                        |
-|:------------|:--------------------|------------------------------------------------------------------------------------|
-| issuer      | issuer.zitadel.ch   | [Provides the OpenID Connect 1.0 Discovery Endpoint](#openid-connect-10-discovery) |
-| api         | api.zitadel.ch      |                                                                                    |
-| login       | accounts.zitadel.ch |                                                                                    |
+| Domain Name | Example             | Description                                                                                                                          |
+| :---------- | :------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| issuer      | issuer.zitadel.ch   | Provides the [OpenID Connect 1.0 Discovery Endpoint](#openid-connect-10-discovery)                                                   |
+| api         | api.zitadel.ch      | All ZITADEL API's are located under this domain see [TODO API LINK]() for details                                                    |
+| login       | accounts.zitadel.ch | The accounts.* page provides server renderer pages like login and register and as well the authorization_endpoint for OpenID Connect |
+| console     | console.zitadel.ch  | With the console.* domain we serve the assets for the management gui                                                                 |
 
 #### OpenID Connect 1.0 Discovery
 
@@ -25,30 +26,45 @@ For example with [zitadel.ch](zitadel.ch) this would be the domain [issuer.zitad
 
 [https://accounts.zitadel.ch/oauth/v2/authorize](https://accounts.zitadel.ch/oauth/v2/authorize)
 
+> The authorization_endpoint is located with the login page, due to the need of accessing the same cookie domain
+
 #### token_endpoint
+
+[https://api.zitadel.ch/oauth/v2/token](https://api.zitadel.ch/oauth/v2/token)
 
 #### userinfo_endpoint
 
+[https://api.zitadel.ch/oauth/v2/userinfo](https://api.zitadel.ch/oauth/v2/userinfo)
+
 #### end_session_endpoint
+
+[https://accounts.zitadel.ch/oauth/v2/endsession](https://accounts.zitadel.ch/oauth/v2/endsession)
+
+> The end_session_endpoint is located with the login page, due to the need of accessing the same cookie domain
 
 #### jwks_uri
 
+[https://api.zitadel.ch/oauth/v2/keys](https://api.zitadel.ch/oauth/v2/keys)
+
+> Be aware that these keys can be rotated without any prior notice. We will however make sure that a proper `kid` is set with each key
+
 #### OAuth 2.0 Metadata
 
-ZITADEL does not provide a OAuth 2.0 Metadata endpoint but instead provides a OpenID Connect Discovery Endpoint.
-TODO: Insert Link.
+ZITADEL does not provide a OAuth 2.0 Metadata endpoint but instead provides a [OpenID Connect Discovery Endpoint](#openid-connect-10-discovery).
 
 ### Grant Types
 
+For a list of supported or unsupported `Grant Types` please have a look at the table below.
+
 | Grant Type                                            | Supported           |
-|:------------------------------------------------------|:--------------------|
+| :---------------------------------------------------- | :------------------ |
 | Authorization Code                                    | yes                 |
 | Implicit                                              | yes                 |
 | Resource Owner Password Credentials                   | no                  |
 | Client Credentials                                    | yes                 |
 | Device Authorization                                  | under consideration |
 | Refresh Token                                         | work in progress    |
-| JSON Web Token (JWT) Profile                          | yes                 |
+| JSON Web Token (JWT) Profile                          | partially           |
 | Security Assertion Markup Language (SAML) 2.0 Profile | no                  |
 | Token Exchange                                        | work in progress    |
 
