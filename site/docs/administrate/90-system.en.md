@@ -8,7 +8,7 @@ System describes the root of ZITADEL and includes all other elements like organi
 
 ### Default Policies
 
-### Manage Readmodels
+### Manage Read Models
 
 ### Secret Handling
 

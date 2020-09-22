@@ -2,7 +2,7 @@
 title: Identity Providers
 ---
 
-### What are providers
+### What are Identity providers
 
 ### Manage Identity Providers
 
