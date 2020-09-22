@@ -36,8 +36,16 @@ To make it more easily to differentiate ZITADEL Console displays these both as s
 
 ### Setup new project
 
+> Screenshot here
+
 #### Define project specific roles
+
+> Screenshot here
 
 ### Grant project to a third party
 
+> Screenshot here
+
 ### Audit project changes
+
+> Screenshot here

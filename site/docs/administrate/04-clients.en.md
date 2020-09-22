@@ -4,7 +4,7 @@ title: Clients
 
 ### What are clients
 
-### Manage Clients
+### Manage clients
 
 #### Register OpenID Connect 1.0 Client
 
