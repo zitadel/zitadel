@@ -10,6 +10,6 @@ With these events ZITADEL can provide you with a super detailed audit trail wher
 
 Over the next few releases we will steadily enhance and build features tailored to reporting and audit.
 
-> It is important to mention that even if ZITADEL does not yet supply the Grapical User Interface for certain audit aspects it still has all the data to generate these reports later on!
+> It is important to mention that even if ZITADEL does not yet supply the Graphical User Interface for certain audit aspects it still has all the data to generate these reports later on!
 
 > TBA General Audit capabilities

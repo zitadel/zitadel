@@ -21,7 +21,7 @@ In the ZITADEL Console is a section called administration available where the ad
 There is even a possibility to regenerate a read model.
 
 > When a read model is regenerated it might take up some time to be fully operational again
-> Depending on the model which is regenerated this might have a operational impact for the endusers
+> Depending on the model which is regenerated this might have a operational impact for the end-users
 
 > Screenshot here
 
