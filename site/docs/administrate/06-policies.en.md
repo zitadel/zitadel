@@ -4,14 +4,16 @@ title: Policies
 
 ### What are policies
 
-Polices are a means of enforcing certain behavior of ZITADEL.
+Polices are a means of enforcing certain behaviour of ZITADEL.
 ZITADEL defines a default policy on the system level. However a org. owner can change these aspects within his own org.
 
 Below is a list of available policies
 
 ### Password complexity
 
-- min lenght
+This policy enforces passwords of users within the org. to be compliant.
+
+- min length
 - has number
 - has symbol
 - has lower case
@@ -19,19 +21,17 @@ Below is a list of available policies
 
 > Screenshot here
 
-### Password age
+### IAM Access Preference
+
+This policy enforces, when set to true, that usernames are suffixed with the organisations domain.
+Under normal operation this policy is only false on the `global` org. so that users can choose there email as username.
+Only available for the `IAM Administrator`
 
 > Screenshot here
 
-### Password failure count
+### Login Options
 
-> Screenshot here
-
-### Logon name must be org. domain
-
-> Screenshot here
-
-### Login options
+With this policy it is possible to define what options a user sees in the login process.
 
 - Username Password allowed
 - Self Register allowed
@@ -42,3 +42,8 @@ Below is a list of available policies
 ### Audit policy changes
 
 > Screenshot here
+
+### Upcoming Policies
+
+- Password age
+- Password failure count
