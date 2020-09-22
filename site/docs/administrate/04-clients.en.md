@@ -13,10 +13,10 @@ Clients might use different protocols for integrating with an IAM. With ZITADEL 
 
 > Screenshot here
 
-#### Register OpenID Connect 1.0 Client
+### Configure OpenID Connect 1.0 Client
 
-> Screenshot here
-
-#### Configure OpenID Connect 1.0 Client
+To make configuration of a client easy we provide a wizard which generates a specification conferment setup.
+The wizard can be skipped for people who are needing special settings.
+For use cases where your configuration is not compliant we provide you a "dev mode" which disables conformance checks.
 
 > Screenshot here

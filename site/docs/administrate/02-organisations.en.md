@@ -30,7 +30,7 @@ For dedicated ZITADEL instances this URL might be different, but in most cases s
 
 ### Verify a domain name
 
-Once you created your organisation you will receive a generated domain name from ZITADEL for your organisation. For example if you call your organisation "ACME" you will receive "acme.zitadel.ch" as name. Furthermore the users you create will be suffixed with this domain name. To improve the user experience you can verify a domain name which you control. If you control acme.ch you can verify the ownership by DNS or HTTP challenge.
+Once you created your organisation you will receive a generated domain name from ZITADEL for your organisation. For example if you call your organisation `ACME` you will receive `acme.zitadel.ch` as name. Furthermore the users you create will be suffixed with this domain name. To improve the user experience you can verify a domain name which you control. If you control acme.ch you can verify the ownership by DNS or HTTP challenge.
 After the domain is verified your users can use both domain names to log-in. The user "coyote" can now use "coyote@acme.zitadel.ch" and "coyote@acme.ch".
 An organisation can have multiple domain names, but only one of it can be primary. The primary domain defines which login name ZITADEL displays to the user, and also what information gets asserted in access_tokens (preferred_username).
 
