@@ -16,14 +16,14 @@ We urge you to always add captions to listings, code snippets, tables, graphics 
 Numbering is **required** for captions. See next section.
 
 ## Numbering of captions
-Numbering has to be continuous using arabic style numbers. The caption is composed of a prefix and a descriptive text. The prefix is composed of the item type (Listing, Table, Image, Graphic), an incrementing number in arabic style followed by a period and a description.
+Numbering has to be continuous using Arabic style numbers. The caption is composed of a prefix and a descriptive text. The prefix is composed of the item type (Listing, Table, Image, Graphic), an incrementing number in Arabic style followed by a period and a description.
 
 If the description consists of **one term** only you must omit any trailing punctuation. If the description represents a complete sentence you must terminate it with a period.
 
 Examples:
 
 * Snippet 3. Example of a protobuf interface deriving ZITADEL's OIDC connector.
-* Figure 1. Inside the ESO Atacama Large Millimeter/submillimeter Array.
+* Figure 1. Inside the ESO Atacama Large Millimetre/submillimetre Array.
 * Table 21. Representation of all supported quantum-singularity proximation algorithms.
 * Image 13. Higgs Boson
 
@@ -34,6 +34,7 @@ Use sparsely. You should always make sure that inline images do not exceed 48 by
 When documenting the usage of UI components don't forget to include the keyboard shortcuts available. Use the `kbd:` macro or `<kbd>` HTML tag to style the keys accordingly. To ensure platform-independent documentation always include the modifier-keys for **all** supported platforms, i.e. [kbd:]Ctrl or [kbd:]Opt [kbd:]C, which renders <kbd>Ctrl</kbd> or <kbd>Opt</kbd> <kbd>C</kbd>.
 
 # File name conventions
+
 ## File name
 If and when the file name of a Markdown file consist of more than **one** contiguous word you must use a hyphen `-` to separate the word elements.
 
