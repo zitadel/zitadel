@@ -1,8 +1,8 @@
 # How to contribute to ZITADEL's documentation
-Before you start your editing process please take some time to familiarise yourself with the rules for contributing to the documentation of Zitadel.
+Before you start your editing process please take some time to familiarise yourself with the rules for contributing to the documentation of ZITADEL.
 
 ## File format
-Zitadel's static site generator uses a Markdown file format. The flavour of the Markdown is specified in the [Caos Static Site Generator](/docs/cssg.md) document.
+ZITADEL's static site generator uses a Markdown file format. The flavour of the Markdown is specified in the [CAOS Static Site Generator](/docs/cssg.md) document.
 
 ## Using headings
 Make use of headings to structure and organise the document. The static site generator will make sure that the headings are rendered as a means of navigation for the site's content.
@@ -18,11 +18,11 @@ Numbering is **required** for captions. See next section.
 ## Numbering of captions
 Numbering has to be continuous using arabic style numbers. The caption is composed of a prefix and a descriptive text. The prefix is composed of the item type (Listing, Table, Image, Graphic), an incrementing number in arabic style followed by a period and a description.
 
-If the description consists of **one term** only you must omit any trailing punctuation. If the description represents a complete sentense you must terminate it with a period.
+If the description consists of **one term** only you must omit any trailing punctuation. If the description represents a complete sentence you must terminate it with a period.
 
 Examples:
 
-* Snippet 3. Example of a protobuf interface deriving Zitadel's OIDC connector.
+* Snippet 3. Example of a protobuf interface deriving ZITADEL's OIDC connector.
 * Figure 1. Inside the ESO Atacama Large Millimeter/submillimeter Array.
 * Table 21. Representation of all supported quantum-singularity proximation algorithms.
 * Image 13. Higgs Boson
