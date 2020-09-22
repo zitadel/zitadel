@@ -642,7 +642,10 @@
         },
         "DETAIL": {
           "TITLE":"Identity Provider",
-          "DESCRIPTION":"Configuration of your identity provider."
+          "DESCRIPTION":"Configuration of your identity provider.",
+          "OIDC": {
+            "TITLE": "OIDC Configuration"
+          }
         },
         "TYPES": {
             "0":"unknown",
@@ -654,6 +657,7 @@
             "1":"inactive"
         },
         "TYPE":"Type",
+        "ID": "ID",
         "NAME":"Name",
         "CONFIG":"Configuration",
         "STATE":"State",
@@ -666,7 +670,10 @@
         "CHANGEDATE":"Last Modified",
         "DEACTIVATE":"Deactivate",
         "ACTIVATE":"Activate",
-        "DELETE":"Delete"
+        "DELETE":"Delete",
+        "TOAST": {
+            "SAVED": "Successfully saved."
+        }
     },
     "LOGINPOLICY": {
         "CREATE": {

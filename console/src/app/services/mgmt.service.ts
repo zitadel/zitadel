@@ -26,6 +26,7 @@ import {
   Iam,
   Idp,
   IdpID,
+  IdpUpdate,
   IdpProviderAdd,
   IdpProviderID,
   IdpProviderSearchRequest,
@@ -222,6 +223,12 @@ export class ManagementService {
         const req = new IdpID();
         req.setId(id);
         return this.grpcService.mgmt.idpByID(req);
+    }
+
+    public async UpdateIdp(
+      req: IdpUpdate,
+    ): Promise<Idp> {
+      return this.grpcService.mgmt.updateIdpConfig(req);
     }
 
     public async CreateOidcIdp(

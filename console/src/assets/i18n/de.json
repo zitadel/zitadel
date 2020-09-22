@@ -642,7 +642,10 @@
         },
         "DETAIL": {
           "TITLE":"Identitäts Provider",
-          "DESCRIPTION":"Konfiguration deines Identitäts Providers"
+          "DESCRIPTION":"Konfiguration deines Identitäts Providers",
+          "OIDC": {
+            "TITLE": "OIDC Konfiguration"
+          }
         },
         "TYPES": {
             "0":"unknown",
@@ -654,6 +657,7 @@
             "1":"inaktiv"
         },
         "TYPE":"Typ",
+        "ID": "ID",
         "NAME":"Name",
         "CONFIG":"Konfiguration",
         "STATE":"Status",
@@ -666,7 +670,10 @@
         "CHANGEDATE":"Letzte Änderung",
         "DEACTIVATE":"Deaktivieren",
         "ACTIVATE":"Aktivieren",
-        "DELETE":"Löschen"
+        "DELETE":"Löschen",
+        "TOAST": {
+            "SAVED": "Erfolgreich gespeichert."
+        }
     },
     "LOGINPOLICY": {
         "CREATE": {

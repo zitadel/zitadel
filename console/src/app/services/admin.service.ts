@@ -38,6 +38,7 @@ import {
     Views,
 } from '../proto/generated/admin_pb';
 import { GrpcService } from './grpc.service';
+import {IdpUpdate} from "../proto/generated/management_pb";
 
 @Injectable({
     providedIn: 'root',
@@ -149,6 +150,12 @@ export class AdminService {
         return this.grpcService.admin.idpByID(req);
     }
 
+    public async UpdateIdp(
+      req: IdpUpdate,
+    ): Promise<Idp> {
+      return this.grpcService.admin.updateIdpConfig(req);
+    }
+
     public async CreateOidcIdp(
         req: OidcIdpConfigCreate,
     ): Promise<Idp> {
@@ -158,7 +165,7 @@ export class AdminService {
     public async UpdateOidcIdpConfig(
         req: OidcIdpConfigUpdate,
     ): Promise<OidcIdpConfig> {
-        return this.grpcService.mgmt.updateOidcIdpConfig(req);
+        return this.grpcService.admin.updateOidcIdpConfig(req);
     }
 
     public async RemoveIdpConfig(
