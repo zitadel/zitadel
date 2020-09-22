@@ -51,6 +51,8 @@ Have a look at our constantly evolving docs page [docs.zitadel.ch](https://docs.
 
 Details need to be announced, but feel free to contribute already. As long as you are okay with accepting to contribute under this projects OSS [License](##License) you are fine.
 
+We already have documentation specific [guidelines](./site/CONTRIBUTING.md).
+
 ## Security
 
 See the policy [here](./SECURITY.md)
