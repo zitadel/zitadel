@@ -30,7 +30,7 @@ import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component
     styleUrls: ['./login-policy.component.scss'],
 })
 export class LoginPolicyComponent implements OnDestroy {
-    public loginData!: LoginPolicy.AsObject | DefaultLoginPolicy.AsObject;
+    public loginData!: LoginPolicyView.AsObject | DefaultLoginPolicyView.AsObject;
 
     private sub: Subscription = new Subscription();
     public service!: ManagementService | AdminService;
