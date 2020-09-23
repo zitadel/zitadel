@@ -218,10 +218,10 @@ EventTypes:
           succeeded: Password check succeeded
           failed: Password check failed
       externalidp:
-        added: Externer IDP wurde hinzugefügt
-        removed: Externer IDP wurde gelöscht
+        added: Externer IDP added
+        removed: Externer IDP removed
         cascade:
-          removed: Externer IDP wurde kaskadiert gelöscht
+          removed: Externer IDP cascade removed
       phone:
         changed: Phone number changed
         verified: Phone number verified
