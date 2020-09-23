@@ -11,11 +11,11 @@ import {
     IdpView as AdminIdpView,
 } from 'src/app/proto/generated/admin_pb';
 import {
-    IdpProviderType,
-    IdpProviderView as MgmtIdpProviderView,
-    IdpView as MgmtIdpView,
-    LoginPolicy,
-    LoginPolicyView,
+  IdpProviderType,
+  IdpProviderView as MgmtIdpProviderView,
+  IdpView as MgmtIdpView,
+  LoginPolicy,
+  LoginPolicyView, OrgDomainView,
 } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -23,6 +23,7 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component';
+import {AddDomainDialogComponent} from "../../../pages/orgs/org-detail/add-domain-dialog/add-domain-dialog.component";
 
 @Component({
     selector: 'app-login-policy',
@@ -166,13 +167,13 @@ export class LoginPolicyComponent implements OnDestroy {
         }
     }
 
-    public removeIdp(idp: AdminIdpView.AsObject | MgmtIdpView.AsObject): void {
+    public removeIdp(idp: AdminIdpProviderView.AsObject | MgmtIdpProviderView.AsObject): void {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                (this.service as ManagementService).RemoveIdpProviderFromLoginPolicy(idp.id);
+                (this.service as ManagementService).RemoveIdpProviderFromLoginPolicy(idp.idpConfigId);
                 break;
             case PolicyComponentServiceType.ADMIN:
-                (this.service as AdminService).RemoveIdpProviderFromDefaultLoginPolicy(idp.id);
+                (this.service as AdminService).RemoveIdpProviderFromDefaultLoginPolicy(idp.idpConfigId);
                 break;
         }
     }
