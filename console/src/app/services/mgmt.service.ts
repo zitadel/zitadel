@@ -338,18 +338,18 @@ export class ManagementService {
         return this.grpcService.mgmt.searchMachineKeys(req);
     }
 
-  public async SearchExternalIdps(
-    userId: string,
-    limit: number,
-    offset: number,
-    asc?: boolean,
-  ): Promise<ExternalIDPSearchResponse> {
-    const req = new ExternalIDPSearchRequest();
-    req.setUserId(userId);
-    req.setLimit(limit);
-    req.setOffset(offset);
-    return this.grpcService.mgmt.searchUserExternalIDPs(req);
-  }
+    public async SearchExternalIdps(
+      userId: string,
+      limit: number,
+      offset: number,
+      asc?: boolean,
+    ): Promise<ExternalIDPSearchResponse> {
+      const req = new ExternalIDPSearchRequest();
+      req.setUserId(userId);
+      req.setLimit(limit);
+      req.setOffset(offset);
+      return this.grpcService.mgmt.searchUserExternalIDPs(req);
+    }
     public async GetIam(): Promise<Iam> {
         const req = new Empty();
         return this.grpcService.mgmt.getIam(req);

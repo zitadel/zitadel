@@ -7,6 +7,8 @@ import { catchError, filter, finalize, first, map, mergeMap, switchMap, take, ti
 import {
     Changes,
     ChangesRequest,
+    ExternalIDPSearchRequest,
+    ExternalIDPSearchResponse,
     Gender,
     MfaOtpResponse,
     MultiFactors,
@@ -281,6 +283,18 @@ export class GrpcAuthService {
         req.setOldPassword(oldPassword);
         req.setNewPassword(newPassword);
         return this.grpcService.auth.changeMyPassword(req);
+    }
+
+    public async SearchExternalIdps(
+      userId: string,
+      limit: number,
+      offset: number,
+      asc?: boolean,
+    ): Promise<ExternalIDPSearchResponse> {
+      const req = new ExternalIDPSearchRequest();
+      req.setLimit(limit);
+      req.setOffset(offset);
+      return this.grpcService.auth.searchMyExternalIDPs(req);
     }
 
     public async AddMfaOTP(): Promise<MfaOtpResponse> {

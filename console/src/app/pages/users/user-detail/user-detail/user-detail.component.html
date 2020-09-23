@@ -45,7 +45,7 @@
 
           <app-card *ngIf="user.human && user.id" title="{{ 'USER.EXTERNALIDP.TITLE' | translate }}"
                     description="{{ 'USER.EXTERNALIDP.DESC' | translate }}">
-            <app-external-idps [userId]="user.id"></app-external-idps>
+            <app-external-idps [userId]="user.id" [service]="mgmtService" ></app-external-idps>
           </app-card>
 
             <app-card *ngIf="user.machine" title="{{ 'USER.MACHINE.TITLE' | translate }}">
