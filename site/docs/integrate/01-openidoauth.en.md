@@ -3,10 +3,39 @@ title:  OpenID Connect & OAuth
 description: ...
 ---
 
-### Single Page Application
+### Client Types / Profiles
 
-### Server Side Application
+#### Single Page Application
 
-### Mobile App
+If your client is a singe page application we recommend that you use authorization_code with pkce.
 
-### Native App
+This flow has great support with most modern languages and frameworks.
+
+In the OIDC and OAuth world this client profile is called "user-agent-based application"
+
+#### Server Side Application
+
+In the OIDC and OAuth world this client profile is called "web application"
+
+#### Mobile App / Native App
+
+In the OIDC and OAuth world this client profile is called "native application"
+
+### How to consume authorizations in your application or service
+
+With ZITADEL you can manage the [roles](administrate#Roles) a [project](administrate#Projects) supplies to your users in the form of authorizations.
+On the [project](administrate#Projects) it can be configured how **project roles** are supplied to the [clients](administrate#Clients).
+By default ZITADEL asserts the claim **projectrole** to the [userinfo_endpoint](documentation#userinfo_endpoint)
+
+- Assert the claim **projectrole** to **access_token**
+- Assert the claim **projectrole** to **id_token**
+
+```JSON
+{
+	"projectroles": [{
+		"user": ["orgid1", "orgid1"]
+	}]
+}
+```
+
+For more details about how **ZITADEL** treats [scopes](documentation#Scopes) and [claims](documentation#Claims) see the [documentations](documentation).

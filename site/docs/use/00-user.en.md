@@ -13,4 +13,3 @@ title: User Manual
 ### Change Password
 
 ### Setup Multifactor
-

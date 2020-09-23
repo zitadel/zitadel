@@ -52,6 +52,26 @@ For example with [zitadel.ch](zitadel.ch) this would be the domain [issuer.zitad
 
 ZITADEL does not provide a OAuth 2.0 Metadata endpoint but instead provides a [OpenID Connect Discovery Endpoint](#openid-connect-10-discovery).
 
+### Scopes
+
+#### How scopes work
+
+> TODO describe
+
+#### Reserved Scopes
+
+- openid
+- email
+- profile
+- address
+- projectrole:{rolename}
+
+### Claims
+
+#### Reserved Claims
+
+- projectroles
+
 ### Grant Types
 
 For a list of supported or unsupported `Grant Types` please have a look at the table below.
