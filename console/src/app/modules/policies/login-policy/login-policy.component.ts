@@ -23,7 +23,6 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component';
-import {AddDomainDialogComponent} from "../../../pages/orgs/org-detail/add-domain-dialog/add-domain-dialog.component";
 
 @Component({
     selector: 'app-login-policy',
@@ -186,7 +185,7 @@ export class LoginPolicyComponent implements OnDestroy {
         return  ['/iam'];
         break;
     }
-    return []
+    return [];
   }
 
 }

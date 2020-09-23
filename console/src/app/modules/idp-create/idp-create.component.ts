@@ -8,7 +8,7 @@ import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import {
   OidcIdpConfigCreate as AdminOidcIdpConfigCreate,
-  OIDCMappingField as authMappingFields
+  OIDCMappingField as authMappingFields,
 } from 'src/app/proto/generated/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -17,8 +17,8 @@ import { ToastService } from 'src/app/services/toast.service';
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import {
   OidcIdpConfigCreate as MgmtOidcIdpConfigCreate,
-  OIDCMappingField as mgmtMappingFields
-} from "../../proto/generated/management_pb";
+  OIDCMappingField as mgmtMappingFields,
+} from '../../proto/generated/management_pb';
 
 @Component({
     selector: 'app-idp-create',
@@ -61,11 +61,15 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
                     this.service = this.injector.get(ManagementService as Type<ManagementService>);
-                    this.mappingFields = [mgmtMappingFields.OIDCMAPPINGFIELD_PREFERRED_USERNAME, mgmtMappingFields.OIDCMAPPINGFIELD_EMAIL];
+                    this.mappingFields = [
+                        mgmtMappingFields.OIDCMAPPINGFIELD_PREFERRED_USERNAME,
+                        mgmtMappingFields.OIDCMAPPINGFIELD_EMAIL];
                     break;
                 case PolicyComponentServiceType.ADMIN:
                     this.service = this.injector.get(AdminService as Type<AdminService>);
-                    this.mappingFields = [authMappingFields.OIDCMAPPINGFIELD_PREFERRED_USERNAME, authMappingFields.OIDCMAPPINGFIELD_EMAIL];
+                    this.mappingFields = [
+                      authMappingFields.OIDCMAPPINGFIELD_PREFERRED_USERNAME,
+                      authMappingFields.OIDCMAPPINGFIELD_EMAIL];
                     break;
             }
         });

@@ -32,7 +32,7 @@
             </app-card>
         </div>
 
-        <app-card *ngIf="user.human && user.id" title="{{ 'USER.EXTERNALIDP.TITLE' | translate }}"
+        <app-card *ngIf="user && user.human && user.id" title="{{ 'USER.EXTERNALIDP.TITLE' | translate }}"
                   description="{{ 'USER.EXTERNALIDP.DESC' | translate }}">
           <app-external-idps [userId]="user.id" [service]="userService"></app-external-idps>
         </app-card>

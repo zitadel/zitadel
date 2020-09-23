@@ -9,12 +9,12 @@ import { switchMap, take } from 'rxjs/operators';
 import {
   OIDCMappingField as authMappingFields,
   OidcIdpConfigUpdate as AdminOidcIdpConfigUpdate,
-  IdpUpdate as AdminIdpConfigUpdate
+  IdpUpdate as AdminIdpConfigUpdate,
 } from 'src/app/proto/generated/admin_pb';
 import {
   OIDCMappingField as mgmtMappingFields,
   OidcIdpConfigUpdate as MgmtOidcIdpConfigUpdate,
-  IdpUpdate as MgmtIdpConfigUpdate, Gender,
+  IdpUpdate as MgmtIdpConfigUpdate,
 } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -68,11 +68,15 @@ export class IdpComponent implements OnInit, OnDestroy {
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
                     this.service = this.injector.get(ManagementService as Type<ManagementService>);
-                    this.mappingFields = [mgmtMappingFields.OIDCMAPPINGFIELD_PREFERRED_USERNAME, mgmtMappingFields.OIDCMAPPINGFIELD_EMAIL];
+                    this.mappingFields = [
+                      mgmtMappingFields.OIDCMAPPINGFIELD_PREFERRED_USERNAME,
+                      mgmtMappingFields.OIDCMAPPINGFIELD_EMAIL];
                     break;
                 case PolicyComponentServiceType.ADMIN:
                     this.service = this.injector.get(AdminService as Type<AdminService>);
-                    this.mappingFields = [authMappingFields.OIDCMAPPINGFIELD_PREFERRED_USERNAME, authMappingFields.OIDCMAPPINGFIELD_EMAIL];
+                    this.mappingFields = [
+                      authMappingFields.OIDCMAPPINGFIELD_PREFERRED_USERNAME,
+                      authMappingFields.OIDCMAPPINGFIELD_EMAIL];
                     break;
             }
 
@@ -191,7 +195,7 @@ export class IdpComponent implements OnInit, OnDestroy {
               return  ['/iam', 'policy', 'login'];
               break;
         }
-        return []
+        return [];
     }
 
     public get id(): AbstractControl | null {

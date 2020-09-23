@@ -11,7 +11,7 @@ import { TranslateModule } from '@ngx-translate/core';
 
 import { IdpCreateRoutingModule } from './idp-create-routing.module';
 import { IdpCreateComponent } from './idp-create.component';
-import {MatSelectModule} from "@angular/material/select";
+import {MatSelectModule} from '@angular/material/select';
 
 @NgModule({
     declarations: [IdpCreateComponent],
