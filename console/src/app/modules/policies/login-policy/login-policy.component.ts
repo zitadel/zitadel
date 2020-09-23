@@ -176,4 +176,16 @@ export class LoginPolicyComponent implements OnDestroy {
                 break;
         }
     }
+
+  public get backroutes(): string[] {
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.MGMT:
+        return  ['/org'];
+      case PolicyComponentServiceType.ADMIN:
+        return  ['/iam'];
+        break;
+    }
+    return []
+  }
+
 }

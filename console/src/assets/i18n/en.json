@@ -653,8 +653,12 @@
             "2":"Organisation"
         },
         "STATES":{
-            "0":"active",
-            "1":"inactive"
+            "1":"active",
+            "2":"inactive"
+        },
+        "MAPPINTFIELD": {
+          "1": "Preferred Username",
+          "2": "Email"
         },
         "TYPE":"Type",
         "ID": "ID",
@@ -666,6 +670,8 @@
         "SCOPESLIST":"Scopes List",
         "CLIENTID":"Client ID",
         "CLIENTSECRET":"Client Secret",
+        "IDPDISPLAYNAMMAPPING": "IDP Anzeigename Mapping",
+        "USERNAMEMAPPING": "Username Mapping",
         "CREATIONDATE":"Created At",
         "CHANGEDATE":"Last Modified",
         "DEACTIVATE":"Deactivate",

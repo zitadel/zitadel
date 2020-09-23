@@ -20,8 +20,8 @@ func (v *View) IDPProvidersByIDPConfigID(idpConfigID string) ([]*model.IDPProvid
 	return view.IDPProvidersByIdpConfigID(v.Db, idpProviderTable, idpConfigID)
 }
 
-func (v *View) IDPProvidersByAggregateID(aggregateID string) ([]*model.IDPProviderView, error) {
-	return view.IDPProvidersByAggregateID(v.Db, idpProviderTable, aggregateID)
+func (v *View) IDPProvidersByAggregateIDAndState(aggregateID string, idpConfigState iam_model.IDPConfigState) ([]*model.IDPProviderView, error) {
+	return view.IDPProvidersByAggregateIDAndState(v.Db, idpProviderTable, aggregateID, idpConfigState)
 }
 
 func (v *View) SearchIDPProviders(request *iam_model.IDPProviderSearchRequest) ([]*model.IDPProviderView, uint64, error) {

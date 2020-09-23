@@ -17,7 +17,6 @@ import {
 } from 'src/app/proto/generated/management_pb';
 import {ManagementService} from 'src/app/services/mgmt.service';
 import {ToastService} from 'src/app/services/toast.service';
-import {UserServiceType} from "../user-types.enum";
 
 @Component({
     selector: 'app-user-detail',

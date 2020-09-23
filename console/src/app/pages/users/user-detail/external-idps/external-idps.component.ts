@@ -7,8 +7,8 @@ import {
   IdpView as MgmtIdpView,
 } from '../../../../proto/generated/management_pb';
 import {
-  ExternalIDPView as AuthExternalIDPView
-} from "../../../../proto/generated/auth_pb";
+  ExternalIDPView as AuthExternalIDPView,
+} from '../../../../proto/generated/auth_pb';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {ManagementService} from '../../../../services/mgmt.service';
 import {ToastService} from '../../../../services/toast.service';

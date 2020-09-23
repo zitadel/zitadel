@@ -1,15 +1,21 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { Component, Injector, OnDestroy, OnInit, Type } from '@angular/core';
+import {Component, Injector, Input, OnDestroy, OnInit, Type} from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
-import { OidcIdpConfigUpdate as AdminOidcIdpConfigUpdate } from 'src/app/proto/generated/admin_pb';
-import { OidcIdpConfigUpdate as MgmtOidcIdpConfigUpdate } from 'src/app/proto/generated/management_pb';
-import { IdpUpdate as AdminIdpConfigUpdate } from 'src/app/proto/generated/admin_pb';
-import { IdpUpdate as MgmtIdpConfigUpdate } from 'src/app/proto/generated/management_pb';
+import {
+  OIDCMappingField as authMappingFields,
+  OidcIdpConfigUpdate as AdminOidcIdpConfigUpdate,
+  IdpUpdate as AdminIdpConfigUpdate
+} from 'src/app/proto/generated/admin_pb';
+import {
+  OIDCMappingField as mgmtMappingFields,
+  OidcIdpConfigUpdate as MgmtOidcIdpConfigUpdate,
+  IdpUpdate as MgmtIdpConfigUpdate, Gender,
+} from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -22,6 +28,7 @@ import { PolicyComponentServiceType } from '../policies/policy-component-types.e
     styleUrls: ['./idp.component.scss'],
 })
 export class IdpComponent implements OnInit, OnDestroy {
+    public mappingFields: mgmtMappingFields[] | authMappingFields[] = [];
     public showIdSecretSection: boolean = false;
     public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
     private service!: ManagementService | AdminService;
@@ -51,6 +58,8 @@ export class IdpComponent implements OnInit, OnDestroy {
           clientSecret: new FormControl(''),
           issuer: new FormControl('', [Validators.required]),
           scopesList: new FormControl([], []),
+          idpDisplayNameMapping: new FormControl(0),
+          usernameMapping: new FormControl(0),
         });
 
         this.route.data.pipe(switchMap(data => {
@@ -59,9 +68,11 @@ export class IdpComponent implements OnInit, OnDestroy {
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
                     this.service = this.injector.get(ManagementService as Type<ManagementService>);
+                    this.mappingFields = [mgmtMappingFields.OIDCMAPPINGFIELD_PREFERRED_USERNAME, mgmtMappingFields.OIDCMAPPINGFIELD_EMAIL];
                     break;
                 case PolicyComponentServiceType.ADMIN:
                     this.service = this.injector.get(AdminService as Type<AdminService>);
+                    this.mappingFields = [authMappingFields.OIDCMAPPINGFIELD_PREFERRED_USERNAME, authMappingFields.OIDCMAPPINGFIELD_EMAIL];
                     break;
             }
 
@@ -133,6 +144,8 @@ export class IdpComponent implements OnInit, OnDestroy {
       req.setClientSecret(this.clientSecret?.value);
       req.setIssuer(this.issuer?.value);
       req.setScopesList(this.scopesList?.value);
+      req.setUsernameMapping(this.usernameMapping?.value);
+      req.setIdpDisplayNameMapping(this.idpDisplayNameMapping?.value);
 
       this.service.UpdateOidcIdpConfig(req).then((oidcConfig) => {
         this.toast.showInfo('IDP.TOAST.SAVED', true);
@@ -170,6 +183,17 @@ export class IdpComponent implements OnInit, OnDestroy {
         }
     }
 
+    public get backroutes(): string[] {
+        switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+                return  ['/org', 'policy', 'login'];
+            case PolicyComponentServiceType.ADMIN:
+              return  ['/iam', 'policy', 'login'];
+              break;
+        }
+        return []
+    }
+
     public get id(): AbstractControl | null {
         return this.idpForm.get('id');
     }
@@ -196,5 +220,13 @@ export class IdpComponent implements OnInit, OnDestroy {
 
     public get scopesList(): AbstractControl | null {
         return this.oidcConfigForm.get('scopesList');
+    }
+
+    public get idpDisplayNameMapping(): AbstractControl | null {
+      return this.oidcConfigForm.get('idpDisplayNameMapping');
+    }
+
+    public get usernameMapping(): AbstractControl | null {
+      return this.oidcConfigForm.get('usernameMapping');
     }
 }
