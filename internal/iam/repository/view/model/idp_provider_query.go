@@ -55,6 +55,8 @@ func (key IDPProviderSearchKey) ToColumnName() string {
 		return IDPProviderKeyAggregateID
 	case iam_model.IDPProviderSearchKeyIdpConfigID:
 		return IDPProviderKeyIdpConfigID
+	case iam_model.IDPProviderSearchKeyState:
+		return IDPProviderKeyState
 	default:
 		return ""
 	}

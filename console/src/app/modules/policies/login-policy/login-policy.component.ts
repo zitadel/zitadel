@@ -11,11 +11,11 @@ import {
     IdpView as AdminIdpView,
 } from 'src/app/proto/generated/admin_pb';
 import {
-    IdpProviderType,
-    IdpProviderView as MgmtIdpProviderView,
-    IdpView as MgmtIdpView,
-    LoginPolicy,
-    LoginPolicyView,
+  IdpProviderType,
+  IdpProviderView as MgmtIdpProviderView,
+  IdpView as MgmtIdpView,
+  LoginPolicy,
+  LoginPolicyView, OrgDomainView,
 } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -30,10 +30,10 @@ import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component
     styleUrls: ['./login-policy.component.scss'],
 })
 export class LoginPolicyComponent implements OnDestroy {
-    public loginData!: LoginPolicy.AsObject | DefaultLoginPolicy.AsObject;
+    public loginData!: LoginPolicyView.AsObject | DefaultLoginPolicyView.AsObject;
 
     private sub: Subscription = new Subscription();
-    private service!: ManagementService | AdminService;
+    public service!: ManagementService | AdminService;
     PolicyComponentServiceType: any = PolicyComponentServiceType;
     public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
     public idps: MgmtIdpProviderView.AsObject[] | AdminIdpProviderView.AsObject[] = [];
@@ -166,14 +166,26 @@ export class LoginPolicyComponent implements OnDestroy {
         }
     }
 
-    public removeIdp(idp: AdminIdpView.AsObject | MgmtIdpView.AsObject): void {
+    public removeIdp(idp: AdminIdpProviderView.AsObject | MgmtIdpProviderView.AsObject): void {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                (this.service as ManagementService).RemoveIdpProviderFromLoginPolicy(idp.id);
+                (this.service as ManagementService).RemoveIdpProviderFromLoginPolicy(idp.idpConfigId);
                 break;
             case PolicyComponentServiceType.ADMIN:
-                (this.service as AdminService).RemoveIdpProviderFromDefaultLoginPolicy(idp.id);
+                (this.service as AdminService).RemoveIdpProviderFromDefaultLoginPolicy(idp.idpConfigId);
                 break;
         }
     }
+
+  public get backroutes(): string[] {
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.MGMT:
+        return  ['/org'];
+      case PolicyComponentServiceType.ADMIN:
+        return  ['/iam'];
+        break;
+    }
+    return [];
+  }
+
 }

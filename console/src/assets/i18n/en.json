@@ -640,16 +640,28 @@
             "TITLE":"New Identity Provider",
             "DESCRIPTION":"Configure the Endpoint of your new service provider."
         },
+        "DETAIL": {
+          "TITLE":"Identity Provider",
+          "DESCRIPTION":"Configuration of your identity provider.",
+          "OIDC": {
+            "TITLE": "OIDC Configuration"
+          }
+        },
         "TYPES": {
             "0":"unknown",
             "1":"System",
             "2":"Organisation"
         },
         "STATES":{
-            "0":"active",
-            "1":"inactive"
+            "1":"active",
+            "2":"inactive"
+        },
+        "MAPPINTFIELD": {
+          "1": "Preferred Username",
+          "2": "Email"
         },
         "TYPE":"Type",
+        "ID": "ID",
         "NAME":"Name",
         "CONFIG":"Configuration",
         "STATE":"State",
@@ -658,11 +670,16 @@
         "SCOPESLIST":"Scopes List",
         "CLIENTID":"Client ID",
         "CLIENTSECRET":"Client Secret",
+        "IDPDISPLAYNAMMAPPING": "IDP Anzeigename Mapping",
+        "USERNAMEMAPPING": "Username Mapping",
         "CREATIONDATE":"Created At",
         "CHANGEDATE":"Last Modified",
         "DEACTIVATE":"Deactivate",
         "ACTIVATE":"Activate",
-        "DELETE":"Delete"
+        "DELETE":"Delete",
+        "TOAST": {
+            "SAVED": "Successfully saved."
+        }
     },
     "LOGINPOLICY": {
         "CREATE": {

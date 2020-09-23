@@ -47,6 +47,7 @@ func IDPConfigViewFromModel(idp *model.IDPConfigView) *IDPConfigView {
 	return &IDPConfigView{
 		IDPConfigID:               idp.IDPConfigID,
 		AggregateID:               idp.AggregateID,
+		IDPState:                  int32(idp.State),
 		Name:                      idp.Name,
 		LogoSrc:                   idp.LogoSrc,
 		Sequence:                  idp.Sequence,
@@ -67,6 +68,7 @@ func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
 	return &model.IDPConfigView{
 		IDPConfigID:               idp.IDPConfigID,
 		AggregateID:               idp.AggregateID,
+		State:                     model.IDPConfigState(idp.IDPState),
 		Name:                      idp.Name,
 		LogoSrc:                   idp.LogoSrc,
 		Sequence:                  idp.Sequence,

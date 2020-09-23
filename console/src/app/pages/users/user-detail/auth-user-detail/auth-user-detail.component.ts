@@ -35,7 +35,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     constructor(
         public translate: TranslateService,
         private toast: ToastService,
-        private userService: GrpcAuthService,
+        public userService: GrpcAuthService,
         private dialog: MatDialog,
     ) {
         this.loading = true;

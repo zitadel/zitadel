@@ -64,7 +64,7 @@ type loginPolicyViewProvider interface {
 }
 
 type idpProviderViewProvider interface {
-	IDPProvidersByAggregateID(string) ([]*iam_view_model.IDPProviderView, error)
+	IDPProvidersByAggregateIDAndState(string, iam_model.IDPConfigState) ([]*iam_view_model.IDPProviderView, error)
 }
 
 type userEventProvider interface {
@@ -553,13 +553,13 @@ func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (
 
 func getLoginPolicyIDPProviders(provider idpProviderViewProvider, iamID, orgID string, defaultPolicy bool) ([]*iam_model.IDPProviderView, error) {
 	if defaultPolicy {
-		idpProviders, err := provider.IDPProvidersByAggregateID(iamID)
+		idpProviders, err := provider.IDPProvidersByAggregateIDAndState(iamID, iam_model.IDPConfigStateActive)
 		if err != nil {
 			return nil, err
 		}
 		return iam_es_model.IDPProviderViewsToModel(idpProviders), nil
 	}
-	idpProviders, err := provider.IDPProvidersByAggregateID(orgID)
+	idpProviders, err := provider.IDPProvidersByAggregateIDAndState(orgID, iam_model.IDPConfigStateActive)
 	if err != nil {
 		return nil, err
 	}

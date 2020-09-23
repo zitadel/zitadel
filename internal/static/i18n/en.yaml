@@ -84,6 +84,7 @@ Errors:
     OIDCConfigInvalid: OIDC IDP configuration is invalid
     IdpIsNotOIDC: IDP configuration is not of type oidc
     LoginPolicy:
+      Invalid: Login Policy is invalid
       NotExisting: Login Policy not existig
       AlreadyExists: Login Policy already exists
       IdpProviderAlreadyExisting: Idp Provider already existing
@@ -133,6 +134,7 @@ Errors:
     OIDCConfigInvalid: OIDC IDP configuration is invalid
     IdpIsNotOIDC: IDP configuration is not of type oidc
     LoginPolicyInvalid: Login Policy is invalid
+    LoginPolicyNotExisting: Login Policy doesn't exist
     IdpProviderInvalid: Idp Provider is invalid
     LoginPolicy:
       NotExisting: Default Login Policy not existig
@@ -181,12 +183,11 @@ EventTypes:
         added: Email address verification code generated
         sent: Email address verification code sent
     machine:
-      machine:
-        added: Technical user added
-        changed: Technical user changed
-        key:
-          added: Key added
-          removed: Key removed
+      added: Technical user added
+      changed: Technical user changed
+      key:
+        added: Key added
+        removed: Key removed
     human:
       added: Person added
       selfregistered: Person registered himself
@@ -216,6 +217,11 @@ EventTypes:
         check:
           succeeded: Password check succeeded
           failed: Password check failed
+      externalidp:
+        added: Externer IDP added
+        removed: Externer IDP removed
+        cascade:
+          removed: Externer IDP cascade removed
       phone:
         changed: Phone number changed
         verified: Phone number verified

@@ -218,7 +218,7 @@ func (repo *IAMRepository) AddIDPProviderToLoginPolicy(ctx context.Context, prov
 	return repo.IAMEventstore.AddIDPProviderToLoginPolicy(ctx, provider)
 }
 
-func (repo *IAMRepository) RemoveIDPProviderFromIDPProvider(ctx context.Context, provider *iam_model.IDPProvider) error {
+func (repo *IAMRepository) RemoveIDPProviderFromLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) error {
 	aggregates := make([]*es_models.Aggregate, 0)
 	provider.AggregateID = repo.SystemDefaults.IamID
 	_, removeAgg, err := repo.IAMEventstore.PrepareRemoveIDPProviderFromLoginPolicy(ctx, provider)

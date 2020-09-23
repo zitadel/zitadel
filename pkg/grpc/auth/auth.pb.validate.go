@@ -3589,8 +3589,6 @@ func (m *ExternalIDPSearchRequest) Validate() error {
 
 	// no validation rules for Limit
 
-	// no validation rules for UserId
-
 	return nil
 }
 
