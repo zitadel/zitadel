@@ -9,7 +9,7 @@ This chapter documents the OpenID Connect 1.0 and OAuth 2.0 features provided by
 Under normal circumstances **ZITADEL** need four domain names to operate properly. Three of those names are used for OpenID Connect and OAuth.
 
 | Domain Name | Example             | Description                                                                                                                          |
-| :---------- | :------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+|:------------|:--------------------|--------------------------------------------------------------------------------------------------------------------------------------|
 | issuer      | issuer.zitadel.ch   | Provides the [OpenID Connect 1.0 Discovery Endpoint](#openid-connect-10-discovery)                                                   |
 | api         | api.zitadel.ch      | All ZITADEL API's are located under this domain see [TODO API LINK]() for details                                                    |
 | login       | accounts.zitadel.ch | The accounts.* page provides server renderer pages like login and register and as well the authorization_endpoint for OpenID Connect |
@@ -77,8 +77,9 @@ ZITADEL does not provide a OAuth 2.0 Metadata endpoint but instead provides a [O
 For a list of supported or unsupported `Grant Types` please have a look at the table below.
 
 | Grant Type                                            | Supported           |
-| :---------------------------------------------------- | :------------------ |
+|:------------------------------------------------------|:--------------------|
 | Authorization Code                                    | yes                 |
+| Authorization Code with PKCE                          | yes                 |
 | Implicit                                              | yes                 |
 | Resource Owner Password Credentials                   | no                  |
 | Client Credentials                                    | yes                 |
@@ -90,7 +91,11 @@ For a list of supported or unsupported `Grant Types` please have a look at the t
 
 #### Authorization Code
 
-**Link to spec.** [The OAuth 2.0 Authorization Framework Section 1.3.1](https://tools.ietf.org/html/rfc6749#section-1.3.1)  
+**Link to spec.** [The OAuth 2.0 Authorization Framework Section 1.3.1](https://tools.ietf.org/html/rfc6749#section-1.3.1)
+
+#### Proof Key for Code Exchange
+
+**Link to spec.** [Proof Key for Code Exchange by OAuth Public Clients](https://tools.ietf.org/html/rfc7636)
 
 #### Implicit
 

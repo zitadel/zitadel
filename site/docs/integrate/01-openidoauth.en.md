@@ -7,11 +7,11 @@ description: ...
 
 #### Single Page Application
 
-If your client is a singe page application we recommend that you use authorization_code with pkce.
+If your [client](administrate#Clients) is a single page application (SPA) we recommend that you use [Authorization Code](documentation#Authorization_Code) with [Proof Key for Code Exchange](documentation#Proof_Key_for_Code_Exchange).
 
 This flow has great support with most modern languages and frameworks.
 
-In the OIDC and OAuth world this client profile is called "user-agent-based application"
+> In the OIDC and OAuth world this **client profile** is called "user-agent-based application"
 
 #### Server Side Application
 
