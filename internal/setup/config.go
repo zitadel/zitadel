@@ -1,11 +1,41 @@
 package setup
 
+import (
+	"github.com/caos/zitadel/internal/errors"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+)
+
 type IAMSetUp struct {
-	GlobalOrg          string
-	IAMProject         string
-	DefaultLoginPolicy LoginPolicy
-	Orgs               []Org
-	Owners             []string
+	Step1 *Step1
+	//TODO: label policy
+	// Step2 *Step2
+}
+
+func (setup *IAMSetUp) steps(currentDone iam_model.Step) ([]step, error) {
+	steps := make([]step, 0)
+	missingSteps := make([]iam_model.Step, 0)
+
+	for _, step := range []step{
+		setup.Step1,
+		//TODO: label policy
+		// setup.Step2,
+	} {
+		if step.step() <= currentDone {
+			continue
+		}
+
+		if step.isNil() {
+			missingSteps = append(missingSteps, step.step())
+			continue
+		}
+		steps = append(steps, step)
+	}
+
+	if len(missingSteps) > 0 {
+		return nil, errors.ThrowPreconditionFailedf(nil, "SETUP-1nk49", "steps %v not configured", missingSteps)
+	}
+
+	return steps, nil
 }
 
 type LoginPolicy struct {
@@ -13,6 +43,12 @@ type LoginPolicy struct {
 	AllowUsernamePassword bool
 	AllowExternalIdp      bool
 }
+
+//TODO: label policy
+// type LabelPolicy struct {
+// 	PrimaryColor  string
+// 	SecondayColor string
+// }
 
 type User struct {
 	FirstName string
