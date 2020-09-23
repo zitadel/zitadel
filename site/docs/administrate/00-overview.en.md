@@ -6,7 +6,7 @@ title: Overview
 
 ### Features
 
-- Single-Sign On (SSO) and Single-Log Out (SLO)
+- Single-Sign On (SSO) and Single-Log Out (SLO) for
   - Web applications
     - Server Renderer
     - Single Page
@@ -17,15 +17,15 @@ title: Overview
   - Mobile Clients
     - Android
     - iOS / iPadOS
-  - APIs
-    - REST
-    - GRPC
-    - GraphQL
+- Bearer Tokens to use with APIs
+  - REST
+  - GRPC
+  - GraphQL
 - Role Based Access Control
 - OpenID Connect 1.0 (OIDC) support
 - OAuth 2.0 support
 - Identity Brokering
-  - Federation with external OIDC and OAuth 2.0 Identity Providers
+  - Federation with OIDC and OAuth 2.0 Identity Providers
   - Social Login
 - Management Console for central management of your data
 - Multi-factor Authentication

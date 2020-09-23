@@ -5,7 +5,7 @@ title: Organisations
 ### What are organisations
 
 Organisations are comparable to tenants of a system or OU's (organisational units) if we speak of a directory based system.
-ZITADEL is organised around the idea that multiple organisations share the same [System](#What_is_meant_by_system) and that they can grant each other rights so self manage certain things.
+ZITADEL is organised around the idea that multiple organisations share the same [System](administrate#What_is_meant_by_system) and that they can grant each other rights so self manage certain things.
 
 #### Global organisation
 
@@ -26,7 +26,7 @@ You can simply create a new organisation by visiting the [ZITADEL Console](https
 
 > Screenshot here
 
-For dedicated ZITADEL instances this URL might be different, but in most cases should be something like https://console.YOURDOMAIN.TLD
+For dedicated ZITADEL instances this URL might be different, but in most cases should be something like `https://console.YOURDOMAIN.TLD`
 
 ### Verify a domain name
 
@@ -38,6 +38,6 @@ An organisation can have multiple domain names, but only one of it can be primar
 
 ### Audit organisation changes
 
-All changes to the organisation are displayed on the organisation menu within [ZITADEL Console](https://console.zitadel.ch/org) organisation menu. Located on the right hand side under "activity"
+All changes to the organisation are displayed on the organisation menu within [ZITADEL Console](https://console.zitadel.ch/org) organisation menu. Located on the right hand side under "activity".
 
 > Screenshot here

@@ -10,6 +10,7 @@ Normally this federation uses protocols like OpenID Connect 1.0 / OAuth 2.0 and 
 Some examples include:
 
 **Social Providers**
+
 - Google Account
 - Microsoft Live Account
 - Apple ID
@@ -18,14 +19,17 @@ Some examples include:
 - ...
 
 **Enterprise Providers**
+
 - Azure AD Tenant
 - Gsuite hosted domain
 - ...
 
 **Generic**
+
 - ADFS
+- ADDS
 - Keycloak
-- ...
+- LDAP
 
 ### What is Identity Brokering
 

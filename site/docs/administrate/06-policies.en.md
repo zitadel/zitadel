@@ -4,7 +4,7 @@ title: Policies
 
 ### What are policies
 
-Polices are a means of enforcing certain behaviour of ZITADEL.
+Polices are a means of enforcing certain behavior of ZITADEL.
 ZITADEL defines a default policy on the system level. However a org. owner can change these aspects within his own org.
 
 Below is a list of available policies

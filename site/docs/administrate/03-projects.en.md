@@ -11,7 +11,7 @@ A project belongs to exactly one organisation.
 
 **Clients**
 
-Clients are described here [What are clients](###what_are_clients)
+Clients are described here [What are clients](administrate#What_are_clients)
 Basically these are you applications who initiate the authorization flow
 
 **Roles**

@@ -45,7 +45,7 @@ These keys are randomly generated within ZITADEL and are rotated on a regular ba
 
 **TLS**
 Under normal operations ZITADEL's API nodes are located behind a reverse proxy. So the TLS Key handlings is out of context in this regard.
-However ZITADEL can use TLS keys at runtime level. 
+However ZITADEL can use TLS keys at runtime level.
 
 > TODO Document TLS config
 
