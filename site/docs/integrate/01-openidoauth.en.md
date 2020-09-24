@@ -25,16 +25,16 @@ In the OIDC and OAuth world this client profile is called "native application"
 
 With ZITADEL you can manage the [roles](administrate#Roles) a [project](administrate#Projects) supplies to your users in the form of authorizations.
 On the [project](administrate#Projects) it can be configured how **project roles** are supplied to the [clients](administrate#Clients).
-By default ZITADEL asserts the claim **projectrole** to the [userinfo_endpoint](documentation#userinfo_endpoint)
+By default ZITADEL asserts the claim **urn:zitadel:iam:org:project:roles** to the [Userinfo Endpoint](documentation#userinfo_endpoint)
 
-- Assert the claim **projectrole** to **access_token**
-- Assert the claim **projectrole** to **id_token**
+- Assert the claim **urn:zitadel:iam:org:project:roles** to **access_token**
+- Assert the claim **urn:zitadel:iam:org:project:roles** to **id_token**
 
 ```JSON
 {
-	"projectroles": [{
-		"user": ["orgid1", "orgid1"]
-	}]
+  "urn:zitadel:iam:org:project:roles": [{
+    "user": ["acme.ch", "caos.ch"]
+  }]
 }
 ```
 

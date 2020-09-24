@@ -4,7 +4,7 @@ title: User Manual
 
 > All documentations are under active work and subject to change soon!
 
-### Register User
+### Self Register User
 
 ### Verify Mail
 
@@ -12,4 +12,10 @@ title: User Manual
 
 ### Change Password
 
-### Setup Multifactor
+### Manage Multi Factor
+
+### Federation
+
+#### Auto Register
+
+#### Manage Account Linking
