@@ -81,6 +81,12 @@ func (step *Step1) execute(ctx context.Context) (err error) {
 		logging.Log("SETUP-kaWjq").WithError(err).Error("unable to set zitadel project")
 		return err
 	}
+
+	_, err = step.setup.IamEvents.SetupDone(ctx, step.setup.iamID, step.step())
+	if err != nil {
+		logging.Log("SETUP-de342").WithField("step", step.step()).WithError(err).Error("unable to finish setup")
+		return err
+	}
 	return nil
 }
 

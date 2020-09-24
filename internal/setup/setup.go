@@ -135,14 +135,24 @@ func (s *Setup) Execute(ctx context.Context, setUpConfig IAMSetUp) error {
 			return err
 		}
 
-		iam, err = s.IamEvents.SetupDone(ctx, s.iamID, step.step())
+		err = s.validateExecutedStep(ctx)
 		if err != nil {
-			logging.Log("SETUP-de342").WithField("step", step.step()).WithError(err).Error("unable to finish setup")
 			return err
 		}
 	}
 
 	logging.Log("SETUP-ds31h").Info("setup done")
+	return nil
+}
+
+func (s *Setup) validateExecutedStep(ctx context.Context) error {
+	iam, err := s.IamEvents.IAMByID(ctx, s.iamID)
+	if err != nil {
+		return err
+	}
+	if iam.SetUpStarted != iam.SetUpDone {
+		return errors.ThrowInternal(nil, "SETUP-QeukK", "started step is not equal to done")
+	}
 	return nil
 }
 
