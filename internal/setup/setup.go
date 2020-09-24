@@ -10,6 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
@@ -105,6 +106,10 @@ func (s *Setup) Execute(ctx context.Context, setUpConfig IAMSetUp) error {
 	if iam != nil && (iam.SetUpDone == iam_model.StepCount-1 || iam.SetUpStarted != iam.SetUpDone) {
 		logging.Log("SETUP-cWEsn").Info("all steps done")
 		return nil
+	}
+
+	if iam == nil {
+		iam = &iam_model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: s.iamID}}
 	}
 
 	steps, err := setUpConfig.steps(iam.SetUpDone)
