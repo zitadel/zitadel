@@ -435,7 +435,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 		return nil, err
 	}
 
-	if request.SelectedIDPConfigID == "" {
+	if request.SelectedIDPConfigID == "" && request.LinkingUsers != nil && len(request.LinkingUsers) > 0 {
 		if user.InitRequired {
 			return append(steps, &model.InitUserStep{PasswordSet: user.PasswordSet}), nil
 		}
