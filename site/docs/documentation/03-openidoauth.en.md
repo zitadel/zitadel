@@ -60,17 +60,25 @@ ZITADEL does not provide a OAuth 2.0 Metadata endpoint but instead provides a [O
 
 #### Reserved Scopes
 
-- openid
-- email
-- profile
-- address
-- projectrole:{rolename}
+In addition to the standard compliant scopes we utilize the following scopes.
+
+| Scope                                           | Description                                                                                                                                                     | Example                                    |
+|:------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------|
+| urn:zitadel:iam:org:project:role:{rolename}     |                                                                                                                                                                 |                                            |
+| urn:zitadel:iam:org:domain:primary:{domainname} | When requesting this scope ZITADEL will enforce that the user is member of the selected organisation. If the organisation does not exist a failure is displayed | urn:zitadel:iam:org:domain:primary:acme.ch |
+| urn:zitadel:iam:role:{rolename}                 |                                                                                                                                                                 |                                            |
 
 ### Claims
 
+> TODO describe
+
 #### Reserved Claims
 
-- projectroles
+| Claims                                          | Description | Example                                                                                          |
+|:------------------------------------------------|:------------|--------------------------------------------------------------------------------------------------|
+| urn:zitadel:iam:org:domain:primary:{domainname} |             | `{"urn:zitadel:iam:org:domain:primary": "acme.ch"}`                                              |
+| urn:zitadel:iam:org:project:roles:{rolename}    |             | `{"urn:zitadel:iam:org:project:roles": [ {"user": [ "acme.ch", "caos.ch" ] } ]}` |
+| urn:zitadel:iam:roles:{rolename}                |             |                                                                                                  |
 
 ### Grant Types
 
