@@ -15,9 +15,6 @@
     <div class="actions">
         <button class="secondary right" name="link" value="true" formnovalidate>{{t "ExternalNotFoundOption.Link"}}</button>
         <button class="secondary right" name="autoregister" value="true" formnovalidate>{{t "ExternalNotFoundOption.AutoRegister"}}</button>
-        <a class="button secondary" href="{{ loginUrl .AuthReqID }}">
-            {{t "Actions.Back"}}
-        </a>
     </div>
 
     {{template "error-message" .}}

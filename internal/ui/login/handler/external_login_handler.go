@@ -150,16 +150,12 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 }
 
 func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
-	orgIamPolicy, err := l.getOrgIamPolicy(r, authReq.GetScopeOrgID())
-	if err != nil {
-		l.renderExternalNotFoundOption(w, r, authReq, err)
-		return
-	}
 	iam, err := l.authRepo.GetIAM(r.Context())
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, err)
 		return
 	}
+
 	resourceOwner := iam.GlobalOrgID
 	member := &org_model.OrgMember{
 		ObjectRoot: models.ObjectRoot{AggregateID: iam.GlobalOrgID},
@@ -168,6 +164,12 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 	if authReq.GetScopeOrgID() != iam.GlobalOrgID && authReq.GetScopeOrgID() != "" {
 		member = nil
 		resourceOwner = authReq.GetScopeOrgID()
+	}
+
+	orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
+	if err != nil {
+		l.renderExternalNotFoundOption(w, r, authReq, err)
+		return
 	}
 
 	idpConfig, err := l.authRepo.GetIDPConfigByID(r.Context(), authReq.SelectedIDPConfigID)
