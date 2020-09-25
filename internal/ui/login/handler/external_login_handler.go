@@ -33,6 +33,7 @@ type externalIDPCallbackData struct {
 type externalNotFoundOptionFormData struct {
 	Link         bool `schema:"link"`
 	AutoRegister bool `schema:"autoregister"`
+	ResetLinking bool `schema:"resetlinking"`
 }
 
 type externalNotFoundOptionData struct {
@@ -144,6 +145,14 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 	}
 	if data.Link {
 		l.renderLogin(w, r, authReq, nil)
+		return
+	} else if data.ResetLinking {
+		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+		err = l.authRepo.ResetLinkingUsers(r.Context(), authReq.ID, userAgentID)
+		if err != nil {
+			l.renderExternalNotFoundOption(w, r, authReq, err)
+		}
+		l.handleLogin(w, r)
 		return
 	}
 	l.handleAutoRegister(w, r, authReq)
