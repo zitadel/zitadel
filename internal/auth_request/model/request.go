@@ -19,7 +19,7 @@ const (
 )
 
 const (
-	OrgIDScope = "urn:zitadel:organisation:id:"
+	OrgDomainPrimaryScope = "urn:zitadel:org:domain:primary:"
 )
 
 type AuthRequestOIDC struct {

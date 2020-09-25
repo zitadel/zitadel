@@ -140,7 +140,7 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 	data := new(externalNotFoundOptionFormData)
 	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
-		l.renderError(w, r, authReq, err)
+		l.renderExternalNotFoundOption(w, r, authReq, err)
 		return
 	}
 	if data.Link {
@@ -170,9 +170,16 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 		ObjectRoot: models.ObjectRoot{AggregateID: iam.GlobalOrgID},
 		Roles:      []string{orgProjectCreatorRole},
 	}
-	if authReq.GetScopeOrgID() != iam.GlobalOrgID && authReq.GetScopeOrgID() != "" {
-		member = nil
-		resourceOwner = authReq.GetScopeOrgID()
+	if authReq.GetScopeOrgPrimaryDomain() != "" {
+		primaryDomain := authReq.GetScopeOrgPrimaryDomain()
+		org, err := l.authRepo.GetOrgByPrimaryDomain(primaryDomain)
+		if err != nil {
+			l.renderExternalNotFoundOption(w, r, authReq, err)
+		}
+		if org.ID != iam.GlobalOrgID {
+			member = nil
+			resourceOwner = org.ID
+		}
 	}
 
 	orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)

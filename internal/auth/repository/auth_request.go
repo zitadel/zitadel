@@ -24,4 +24,5 @@ type AuthRequestRepository interface {
 	LinkExternalUsers(ctx context.Context, authReqID, userAgentID string) error
 	AutoRegisterExternalUser(ctx context.Context, user *user_model.User, externalIDP *user_model.ExternalIDP, member *org_model.OrgMember, authReqID, userAgentID, resourceOwner string) error
 	ResetLinkingUsers(ctx context.Context, authReqID, userAgentID string) error
+	GetOrgByPrimaryDomain(primaryDomain string) (*org_model.OrgView, error)
 }

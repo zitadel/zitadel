@@ -292,7 +292,12 @@ func (l *Login) getOrgID(authReq *model.AuthRequest) string {
 	if authReq.Request == nil {
 		return ""
 	}
-	return authReq.GetScopeOrgID()
+	primaryDomain := authReq.GetScopeOrgPrimaryDomain()
+	org, _ := l.authRepo.GetOrgByPrimaryDomain(primaryDomain)
+	if org != nil {
+		return org.ID
+	}
+	return ""
 }
 
 func getRequestID(authReq *model.AuthRequest, r *http.Request) string {
