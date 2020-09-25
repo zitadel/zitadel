@@ -30,4 +30,7 @@ const (
 	LoginPolicyIDPProviderAdded          models.EventType = "iam.policy.login.idpprovider.added"
 	LoginPolicyIDPProviderRemoved        models.EventType = "iam.policy.login.idpprovider.removed"
 	LoginPolicyIDPProviderCascadeRemoved models.EventType = "iam.policy.login.idpprovider.cascade.removed"
+
+	PasswordComplexityPolicyAdded   models.EventType = "iam.policy.password.complexity.added"
+	PasswordComplexityPolicyChanged models.EventType = "iam.policy.password.complexity.changed"
 )

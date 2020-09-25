@@ -16,7 +16,6 @@ var (
 type PasswordComplexityPolicy struct {
 	models.ObjectRoot
 
-	Description  string
 	State        PolicyState
 	MinLength    uint64
 	HasLowercase bool

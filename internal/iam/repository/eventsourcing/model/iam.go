@@ -14,13 +14,14 @@ const (
 
 type IAM struct {
 	es_models.ObjectRoot
-	SetUpStarted       bool         `json:"-"`
-	SetUpDone          bool         `json:"-"`
-	GlobalOrgID        string       `json:"globalOrgId,omitempty"`
-	IAMProjectID       string       `json:"iamProjectId,omitempty"`
-	Members            []*IAMMember `json:"-"`
-	IDPs               []*IDPConfig `json:"-"`
-	DefaultLoginPolicy *LoginPolicy `json:"-"`
+	SetUpStarted                    bool                      `json:"-"`
+	SetUpDone                       bool                      `json:"-"`
+	GlobalOrgID                     string                    `json:"globalOrgId,omitempty"`
+	IAMProjectID                    string                    `json:"iamProjectId,omitempty"`
+	Members                         []*IAMMember              `json:"-"`
+	IDPs                            []*IDPConfig              `json:"-"`
+	DefaultLoginPolicy              *LoginPolicy              `json:"-"`
+	DefaultPasswordComplexityPolicy *PasswordComplexityPolicy `json:"-"`
 }
 
 func IAMFromModel(iam *model.IAM) *IAM {
@@ -37,6 +38,9 @@ func IAMFromModel(iam *model.IAM) *IAM {
 	}
 	if iam.DefaultLoginPolicy != nil {
 		converted.DefaultLoginPolicy = LoginPolicyFromModel(iam.DefaultLoginPolicy)
+	}
+	if iam.DefaultPasswordComplexityPolicy != nil {
+		converted.DefaultPasswordComplexityPolicy = PasswordComplexityPolicyFromModel(iam.DefaultPasswordComplexityPolicy)
 	}
 	return converted
 }
@@ -55,6 +59,9 @@ func IAMToModel(iam *IAM) *model.IAM {
 	}
 	if iam.DefaultLoginPolicy != nil {
 		converted.DefaultLoginPolicy = LoginPolicyToModel(iam.DefaultLoginPolicy)
+	}
+	if iam.DefaultPasswordComplexityPolicy != nil {
+		converted.DefaultPasswordComplexityPolicy = PasswordComplexityPolicyToModel(iam.DefaultPasswordComplexityPolicy)
 	}
 	return converted
 }
@@ -106,6 +113,10 @@ func (i *IAM) AppendEvent(event *es_models.Event) (err error) {
 		return i.appendAddIDPProviderToLoginPolicyEvent(event)
 	case LoginPolicyIDPProviderRemoved:
 		return i.appendRemoveIDPProviderFromLoginPolicyEvent(event)
+	case PasswordComplexityPolicyAdded:
+		return i.appendAddPasswordComplexityPolicyEvent(event)
+	case PasswordComplexityPolicyChanged:
+		return i.appendChangePasswordComplexityPolicyEvent(event)
 	}
 
 	return err

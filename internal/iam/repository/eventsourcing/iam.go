@@ -296,12 +296,61 @@ func LoginPolicyIDPProviderRemovedAggregate(ctx context.Context, aggCreator *es_
 	return agg.AppendEvent(model.LoginPolicyIDPProviderRemoved, provider)
 }
 
+func PasswordComplexityPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.PasswordComplexityPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if policy == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Smla8", "Errors.Internal")
+		}
+		agg, err := IAMAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		validationQuery := es_models.NewSearchQuery().
+			AggregateTypeFilter(model.IAMAggregate).
+			EventTypesFilter(model.PasswordComplexityPolicyAdded).
+			AggregateIDFilter(existing.AggregateID)
+
+		validation := checkExistingPasswordComplexityPolicyValidation()
+		agg.SetPrecondition(validationQuery, validation)
+		return agg.AppendEvent(model.PasswordComplexityPolicyAdded, policy)
+	}
+}
+
+func PasswordComplexityPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.PasswordComplexityPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if policy == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Mlco9", "Errors.Internal")
+		}
+		agg, err := IAMAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		changes := existing.DefaultPasswordComplexityPolicy.Changes(policy)
+		if len(changes) == 0 {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Smk8d", "Errors.NoChangesFound")
+		}
+		return agg.AppendEvent(model.PasswordComplexityPolicyChanged, changes)
+	}
+}
+
 func checkExistingLoginPolicyValidation() func(...*es_models.Event) error {
 	return func(events ...*es_models.Event) error {
 		for _, event := range events {
 			switch event.Type {
 			case model.LoginPolicyAdded:
 				return errors.ThrowPreconditionFailed(nil, "EVENT-Ski9d", "Errors.IAM.LoginPolicy.AlreadyExists")
+			}
+		}
+		return nil
+	}
+}
+
+func checkExistingPasswordComplexityPolicyValidation() func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		for _, event := range events {
+			switch event.Type {
+			case model.PasswordComplexityPolicyAdded:
+				return errors.ThrowPreconditionFailed(nil, "EVENT-Ski9d", "Errors.IAM.PasswordComplexityPolicy.AlreadyExists")
 			}
 		}
 		return nil

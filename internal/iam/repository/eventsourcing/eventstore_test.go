@@ -1603,3 +1603,159 @@ func TestRemoveIdpProviderFromLoginPolicy(t *testing.T) {
 		})
 	}
 }
+
+func TestAddPasswordComplexityPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IAMEventstore
+		ctx    context.Context
+		policy *iam_model.PasswordComplexityPolicy
+	}
+	type res struct {
+		result  *iam_model.PasswordComplexityPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add password complexity policy, ok",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MinLength:  10,
+				},
+			},
+			res: res{
+				result: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MinLength:  10,
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIamNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MinLength:  10,
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddPasswordComplexityPolicy(tt.args.ctx, tt.args.policy)
+
+			if !tt.res.wantErr && result.MinLength != tt.res.result.MinLength {
+				t.Errorf("got wrong result MinLength: expected: %v, actual: %v ", tt.res.result.MinLength, result.MinLength)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangePasswordComplexityPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IAMEventstore
+		ctx    context.Context
+		policy *iam_model.PasswordComplexityPolicy
+	}
+	type res struct {
+		result  *iam_model.PasswordComplexityPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change password complexity policy, ok",
+			args: args{
+				es:  GetMockManipulateIamWithPasswodComplexityPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MinLength:  5,
+				},
+			},
+			res: res{
+				result: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MinLength:  5,
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIamNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MinLength:  10,
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangePasswordComplexityPolicy(tt.args.ctx, tt.args.policy)
+
+			if !tt.res.wantErr && result.MinLength != tt.res.result.MinLength {
+				t.Errorf("got wrong result MinLength: expected: %v, actual: %v ", tt.res.result.MinLength, result.MinLength)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}

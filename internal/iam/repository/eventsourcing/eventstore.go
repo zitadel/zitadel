@@ -501,3 +501,51 @@ func (es *IAMEventstore) RemoveIDPProviderFromLoginPolicy(ctx context.Context, p
 	es.iamCache.cacheIAM(repoIam)
 	return nil
 }
+
+func (es *IAMEventstore) AddPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+	if policy == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.IAM.PasswordComplexityPolicy.Empty")
+	}
+	if err := policy.IsValid(); err != nil {
+		return nil, err
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoPasswordComplexityPolicy := model.PasswordComplexityPolicyFromModel(policy)
+
+	addAggregate := PasswordComplexityPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoPasswordComplexityPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.PasswordComplexityPolicyToModel(repoIam.DefaultPasswordComplexityPolicy), nil
+}
+
+func (es *IAMEventstore) ChangePasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+	if policy == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.IAM.PasswordComplexityPolicy.Empty")
+	}
+	if err := policy.IsValid(); err != nil {
+		return nil, err
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoPasswordComplexityPolicy := model.PasswordComplexityPolicyFromModel(policy)
+
+	addAggregate := PasswordComplexityPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoPasswordComplexityPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.PasswordComplexityPolicyToModel(repoIam.DefaultPasswordComplexityPolicy), nil
+}

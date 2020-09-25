@@ -141,6 +141,10 @@ Errors:
       AlreadyExists: Default Login Policy existiert bereits
       IdpProviderAlreadyExisting: Idp Provider existiert bereits
       IdpProviderNotExisting: Idp Provider existiert nicht
+    PasswordComplexityPolicy:
+      NotExisting: Default Password Complexity Policy existiert nicht
+      AlreadyExists: Default Password Complexity Policy existiert bereits
+      Empty: Default Password Complexity Policy leer
   Policy:
     AlreadyExists: Policy existiert bereits
   UserGrant:
