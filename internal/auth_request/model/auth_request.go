@@ -131,7 +131,7 @@ func (a *AuthRequest) GetScopeOrgID() string {
 	case *AuthRequestOIDC:
 		for _, scope := range request.Scopes {
 			if strings.HasPrefix(scope, OrgIDScope) {
-				strings.TrimPrefix(scope, OrgIDScope)
+				return strings.TrimPrefix(scope, OrgIDScope)
 			}
 		}
 	}
