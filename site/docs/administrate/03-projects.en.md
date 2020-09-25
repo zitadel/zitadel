@@ -16,8 +16,8 @@ Basically these are you applications who initiate the authorization flow
 
 **Roles**
 
-Roles (or Project Roles) is a mean of managing users access rights for a certain project. 
-These roles are opaque for ZITADEL and have no weight in relation to each other. 
+Roles (or Project Roles) is a mean of managing users access rights for a certain project.
+These roles are opaque for ZITADEL and have no weight in relation to each other.
 So if a user has two roles, admin and user in a certain project, the information will be treated additive.
 
 **Grants**
@@ -34,9 +34,14 @@ This feature is especially useful for service providers, because they are able t
 The simple difference of a project vs a granted project is that a project belongs to your organisation and the granted project belongs to a third party who did grant you some rights to manage certain roles of their project.
 To make it more easily to differentiate ZITADEL Console displays these both as separate menu in the project section.
 
-### Setup new project
+### Manage a project
 
 > Screenshot here
+
+#### RBAC Settings
+
+- Authorisation Check option (Check if the user at least has one role granted)
+- Enable Project_Role Assertion (if this is enabled assert project_roles, with the config of the corresponding client)
 
 #### Define project specific roles
 

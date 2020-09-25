@@ -2,16 +2,16 @@
 title: OpenID Connect 1.0 & OAuth 2.0
 ---
 
-### Endpoints
+### Endpoints and Domains
 
-This chapter documents the OpenID Connect 1.0 and OAuth 2.0 features provided by **ZITADEL**.
+This chapter documents the [OpenID Connect 1.0](https://openid.net/connect/) and [OAuth 2.0](https://oauth.net/2/) features provided by **ZITADEL**.
 
-Under normal circumstances **ZITADEL** need four domain names to operate properly. Three of those names are used for OpenID Connect and OAuth.
+Under normal circumstances **ZITADEL** need four domain names to operate properly.
 
 | Domain Name | Example             | Description                                                                                                                          |
 |:------------|:--------------------|--------------------------------------------------------------------------------------------------------------------------------------|
 | issuer      | issuer.zitadel.ch   | Provides the [OpenID Connect 1.0 Discovery Endpoint](#openid-connect-10-discovery)                                                   |
-| api         | api.zitadel.ch      | All ZITADEL API's are located under this domain see [API explanation](develop#APIs) for details                                                    |
+| api         | api.zitadel.ch      | All ZITADEL API's are located under this domain see [API explanation](develop#APIs) for details                                      |
 | login       | accounts.zitadel.ch | The accounts.* page provides server renderer pages like login and register and as well the authorization_endpoint for OpenID Connect |
 | console     | console.zitadel.ch  | With the console.* domain we serve the assets for the management gui                                                                 |
 
@@ -50,7 +50,7 @@ For example with [zitadel.ch](zitadel.ch) this would be the domain [issuer.zitad
 
 #### OAuth 2.0 Metadata
 
-ZITADEL does not provide a OAuth 2.0 Metadata endpoint but instead provides a [OpenID Connect Discovery Endpoint](#openid-connect-10-discovery).
+**ZITADEL** does not provide a OAuth 2.0 Metadata endpoint but instead provides a [OpenID Connect Discovery Endpoint](#openid-connect-10-discovery).
 
 ### Scopes
 
@@ -64,8 +64,8 @@ In addition to the standard compliant scopes we utilize the following scopes.
 
 | Scope                                           | Description                                                                                                                                                     | Example                                    |
 |:------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------|
-| urn:zitadel:iam:org:project:role:{rolename}     |                                                                                                                                                                 |                                            |
-| urn:zitadel:iam:org:domain:primary:{domainname} | When requesting this scope ZITADEL will enforce that the user is member of the selected organisation. If the organisation does not exist a failure is displayed | urn:zitadel:iam:org:domain:primary:acme.ch |
+| urn:zitadel:iam:org:project:role:{rolename}     | By using this scope a [client](administrate#clients) can request the claim urn:zitadel:iam:roles:rolename} to be asserted when possible. As an alternative approach you can enable all [roles](administrate#Roles) to be asserted from the [project](administrate#projects) a [client](administrate#clients) belongs to. See details [here](administrate#RBAC_Settings)                                                  | urn:zitadel:iam:org:project:role:user      |
+| urn:zitadel:iam:org:domain:primary:{domainname} | When requesting this scope **ZITADEL** will enforce that the user is member of the selected organisation. If the organisation does not exist a failure is displayed | urn:zitadel:iam:org:domain:primary:acme.ch |
 | urn:zitadel:iam:role:{rolename}                 |                                                                                                                                                                 |                                            |
 
 ### Claims
@@ -74,11 +74,11 @@ In addition to the standard compliant scopes we utilize the following scopes.
 
 #### Reserved Claims
 
-| Claims                                          | Description | Example                                                                                          |
-|:------------------------------------------------|:------------|--------------------------------------------------------------------------------------------------|
-| urn:zitadel:iam:org:domain:primary:{domainname} |             | `{"urn:zitadel:iam:org:domain:primary": "acme.ch"}`                                              |
+| Claims                                          | Description | Example                                                                          |
+|:------------------------------------------------|:------------|----------------------------------------------------------------------------------|
+| urn:zitadel:iam:org:domain:primary:{domainname} |             | `{"urn:zitadel:iam:org:domain:primary": "acme.ch"}`                              |
 | urn:zitadel:iam:org:project:roles:{rolename}    |             | `{"urn:zitadel:iam:org:project:roles": [ {"user": [ "acme.ch", "caos.ch" ] } ]}` |
-| urn:zitadel:iam:roles:{rolename}                |             |                                                                                                  |
+| urn:zitadel:iam:roles:{rolename}                |             |                                                                                  |
 
 ### Grant Types
 
