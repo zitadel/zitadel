@@ -329,11 +329,13 @@ func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *model
 	orgID := request.UserOrgID
 	if orgID == "" {
 		primaryDomain := request.GetScopeOrgPrimaryDomain()
-		org, err := repo.GetOrgByPrimaryDomain(primaryDomain)
-		if err != nil {
-			return err
+		if primaryDomain != "" {
+			org, err := repo.GetOrgByPrimaryDomain(primaryDomain)
+			if err != nil {
+				return err
+			}
+			orgID = org.ID
 		}
-		orgID = org.ID
 	}
 	if orgID == "" {
 		orgID = repo.IAMID
@@ -352,13 +354,18 @@ func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *model
 
 func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *model.AuthRequest, loginName string) (err error) {
 	primaryDomain := request.GetScopeOrgPrimaryDomain()
-	org, err := repo.GetOrgByPrimaryDomain(primaryDomain)
-	if err != nil {
-		return err
+	orgID := ""
+	if primaryDomain != "" {
+		org, err := repo.GetOrgByPrimaryDomain(primaryDomain)
+		if err != nil {
+			return err
+		}
+		orgID = org.ID
 	}
+
 	user := new(user_view_model.UserView)
-	if org.ID != "" {
-		user, err = repo.View.UserByLoginNameAndResourceOwner(loginName, org.ID)
+	if orgID != "" {
+		user, err = repo.View.UserByLoginNameAndResourceOwner(loginName, orgID)
 	} else {
 		user, err = repo.View.UserByLoginName(loginName)
 		if err == nil {
