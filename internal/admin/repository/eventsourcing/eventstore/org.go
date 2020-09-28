@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
 	"github.com/caos/logging"
 	admin_model "github.com/caos/zitadel/internal/admin/model"
@@ -35,10 +36,11 @@ type OrgRepo struct {
 }
 
 func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) (*admin_model.SetupOrg, error) {
-	pwPolicy, err := repo.PolicyEventstore.GetPasswordComplexityPolicy(ctx, policy_model.DefaultPolicy)
+	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {
 		return nil, err
 	}
+	pwPolicyView := iam_es_model.PasswordComplexityPolicyToModel(pwPolicy)
 	orgPolicy, err := repo.OrgEventstore.GetOrgIAMPolicy(ctx, policy_model.DefaultPolicy)
 	if err != nil {
 		return nil, err
@@ -54,7 +56,7 @@ func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) 
 	if err != nil {
 		return nil, err
 	}
-	user, userAggregates, err := repo.UserEventstore.PrepareCreateUser(ctx, setUp.User, pwPolicy, orgPolicy, org.AggregateID)
+	user, userAggregates, err := repo.UserEventstore.PrepareCreateUser(ctx, setUp.User, pwPolicyView, orgPolicy, org.AggregateID)
 	if err != nil {
 		return nil, err
 	}

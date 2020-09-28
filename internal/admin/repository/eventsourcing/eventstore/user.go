@@ -2,6 +2,10 @@ package eventstore
 
 import (
 	"context"
+	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
@@ -11,9 +15,11 @@ import (
 )
 
 type UserRepo struct {
-	UserEvents   *usr_event.UserEventstore
-	PolicyEvents *policy_event.PolicyEventstore
-	OrgEvents    *org_event.OrgEventstore
+	UserEvents     *usr_event.UserEventstore
+	PolicyEvents   *policy_event.PolicyEventstore
+	OrgEvents      *org_event.OrgEventstore
+	View           *admin_view.View
+	SystemDefaults systemdefaults.SystemDefaults
 }
 
 func (repo *UserRepo) UserByID(ctx context.Context, id string) (project *usr_model.User, err error) {
@@ -21,15 +27,22 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (project *usr_mod
 }
 
 func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
-	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if err != nil && caos_errs.IsNotFound(err) {
+		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
+	pwPolicyView := iam_es_model.PasswordComplexityPolicyToModel(pwPolicy)
 	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return repo.UserEvents.CreateUser(ctx, user, pwPolicy, orgPolicy)
+	return repo.UserEvents.CreateUser(ctx, user, pwPolicyView, orgPolicy)
 }
 
 func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*usr_model.User, error) {
@@ -37,13 +50,21 @@ func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, re
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner
 	}
-	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
+	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if err != nil && caos_errs.IsNotFound(err) {
+		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
+	pwPolicyView := iam_es_model.PasswordComplexityPolicyToModel(pwPolicy)
+
 	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, policyResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	return repo.UserEvents.RegisterUser(ctx, user, pwPolicy, orgPolicy, resourceOwner)
+	return repo.UserEvents.RegisterUser(ctx, user, pwPolicyView, orgPolicy, resourceOwner)
 }

@@ -244,11 +244,11 @@ func (repo *IAMRepository) RemoveIDPProviderFromLoginPolicy(ctx context.Context,
 }
 
 func (repo *IAMRepository) GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error) {
-	policy, err := repo.View.PasswordComplexityByAggregateID(repo.SystemDefaults.IamID)
+	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.PasswordComplexityPolicyViewToModel(policy), err
+	return iam_es_model.PasswordComplexityViewToModel(policy), err
 }
 
 func (repo *IAMRepository) AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {

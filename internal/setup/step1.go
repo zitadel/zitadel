@@ -25,7 +25,7 @@ type Step1 struct {
 	createdUsers       map[string]*usr_model.User
 	createdOrgs        map[string]*org_model.Org
 	createdProjects    map[string]*proj_model.Project
-	pwComplexityPolicy *policy_model.PasswordComplexityPolicy
+	pwComplexityPolicy *iam_model.PasswordComplexityPolicyView
 }
 
 func (s *Step1) isNil() bool {
@@ -50,12 +50,7 @@ func (step *Step1) execute(ctx context.Context) (err error) {
 		return err
 	}
 
-	pwComplexityPolicy, err := step.setup.PolicyEvents.GetPasswordComplexityPolicy(ctx, policy_model.DefaultPolicy)
-	if err != nil {
-		logging.Log("SETUP-9osWF").WithError(err).Error("unable to read complexity policy")
-		return err
-	}
-	step.pwComplexityPolicy = pwComplexityPolicy
+	step.pwComplexityPolicy = new(iam_model.PasswordComplexityPolicyView)
 
 	err = step.orgs(ctx, step.Orgs)
 	if err != nil {
