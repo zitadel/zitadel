@@ -1,31 +1,9 @@
 
 .container {
-  padding: 4rem 4rem 2rem 4rem;
+  width: 100%;
 
   @media only screen and (max-width: 450px) {
     padding: 4rem 1rem 2rem 1rem;
-  }
-
-  .abort-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 2rem;
-
-    .abort {
-      font-size: 1.2rem;
-      margin-left: 2rem;
-    }
-
-    .abort-2 {
-      font-size: 1.2rem;
-      margin-left: 2rem;
-      white-space: nowrap;
-    }
-  }
-
-  .add-line-btn {
-    margin-bottom: 1rem;
-    border-radius: .5rem;
   }
 }
 
@@ -52,7 +30,7 @@
 }
 
 .continue-button {
-  margin-top: 3rem;
+  margin-bottom: 4rem;
   display: block;
   padding: .5rem 4rem;
   border-radius: .5rem;

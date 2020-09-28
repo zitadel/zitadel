@@ -71,11 +71,6 @@ func (l *Login) handleExternalRegisterCallback(w http.ResponseWriter, r *http.Re
 }
 
 func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
-	orgIamPolicy, err := l.getOrgIamPolicy(r, authReq.GetScopeOrgID())
-	if err != nil {
-		l.renderRegisterOption(w, r, authReq, err)
-		return
-	}
 	iam, err := l.authRepo.GetIAM(r.Context())
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
@@ -86,11 +81,24 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		ObjectRoot: models.ObjectRoot{AggregateID: iam.GlobalOrgID},
 		Roles:      []string{orgProjectCreatorRole},
 	}
-	if authReq.GetScopeOrgID() != iam.GlobalOrgID && authReq.GetScopeOrgID() != "" {
-		member = nil
-		resourceOwner = authReq.GetScopeOrgID()
-	}
 
+	if authReq.GetScopeOrgPrimaryDomain() != "" {
+		primaryDomain := authReq.GetScopeOrgPrimaryDomain()
+		org, err := l.authRepo.GetOrgByPrimaryDomain(primaryDomain)
+		if err != nil {
+			l.renderRegisterOption(w, r, authReq, err)
+			return
+		}
+		if org.ID != iam.GlobalOrgID {
+			member = nil
+			resourceOwner = org.ID
+		}
+	}
+	orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
+	if err != nil {
+		l.renderRegisterOption(w, r, authReq, err)
+		return
+	}
 	user, externalIDP := l.mapTokenToLoginUserAndExternalIDP(orgIamPolicy, tokens, idpConfig)
 	_, err = l.authRepo.RegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, member, resourceOwner)
 	if err != nil {

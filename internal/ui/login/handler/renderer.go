@@ -137,6 +137,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		"selectedGender": func(g int32) bool {
 			return false
 		},
+		"hasExternalLogin": func() bool {
+			return false
+		},
 	}
 	var err error
 	r.Renderer, err = renderer.NewRenderer(
@@ -289,7 +292,14 @@ func (l *Login) getOrgID(authReq *model.AuthRequest) string {
 	if authReq.Request == nil {
 		return ""
 	}
-	return authReq.GetScopeOrgID()
+	primaryDomain := authReq.GetScopeOrgPrimaryDomain()
+	if primaryDomain != "" {
+		org, _ := l.authRepo.GetOrgByPrimaryDomain(primaryDomain)
+		if org != nil {
+			return org.ID
+		}
+	}
+	return ""
 }
 
 func getRequestID(authReq *model.AuthRequest, r *http.Request) string {

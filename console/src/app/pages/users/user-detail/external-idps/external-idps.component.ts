@@ -3,12 +3,17 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatTableDataSource} from '@angular/material/table';
 import {
   ExternalIDPSearchResponse,
-  ExternalIDPView,
+  ExternalIDPView as MgmtExternalIDPView,
+  IdpView as MgmtIdpView,
 } from '../../../../proto/generated/management_pb';
+import {
+  ExternalIDPView as AuthExternalIDPView,
+} from '../../../../proto/generated/auth_pb';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {ManagementService} from '../../../../services/mgmt.service';
 import {ToastService} from '../../../../services/toast.service';
 import {SelectionModel} from '@angular/cdk/collections';
+import {GrpcAuthService} from '../../../../services/grpc-auth.service';
 
 @Component({
   selector: 'app-external-idps',
@@ -16,17 +21,19 @@ import {SelectionModel} from '@angular/cdk/collections';
   styleUrls: ['./external-idps.component.scss'],
 })
 export class ExternalIdpsComponent implements OnInit {
+  @Input() service!: GrpcAuthService | ManagementService;
   @Input() userId!: string;
   @ViewChild(MatPaginator) public paginator!: MatPaginator;
   public externalIdpResult!: ExternalIDPSearchResponse.AsObject;
-  public dataSource: MatTableDataSource<ExternalIDPView.AsObject> = new MatTableDataSource<ExternalIDPView.AsObject>();
-  public selection: SelectionModel<ExternalIDPView.AsObject> = new SelectionModel<ExternalIDPView.AsObject>(true, []);
+  public dataSource: MatTableDataSource<MgmtExternalIDPView.AsObject | AuthExternalIDPView.AsObject>
+    = new MatTableDataSource<MgmtExternalIDPView.AsObject | AuthExternalIDPView.AsObject>();
+  public selection: SelectionModel<MgmtExternalIDPView.AsObject | AuthExternalIDPView.AsObject>
+    = new SelectionModel<MgmtExternalIDPView.AsObject | AuthExternalIDPView.AsObject>(true, []);
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   @Input() public displayedColumns: string[] = [ 'idpConfigId', 'idpName', 'externalUserId', 'externalUserDisplayName'];
 
-  constructor(private mgmtService: ManagementService,
-              private toast: ToastService) { }
+  constructor(private toast: ToastService) { }
 
   ngOnInit(): void {
     this.getData(10, 0);
@@ -51,7 +58,7 @@ export class ExternalIdpsComponent implements OnInit {
   private async getData(limit: number, offset: number): Promise<void> {
     this.loadingSubject.next(true);
 
-    this.mgmtService.SearchExternalIdps(this.userId, limit, offset).then(resp => {
+    this.service.SearchExternalIdps(this.userId, limit, offset).then(resp => {
       this.externalIdpResult = resp.toObject();
       this.dataSource.data = this.externalIdpResult.resultList;
       console.log(this.externalIdpResult.resultList);

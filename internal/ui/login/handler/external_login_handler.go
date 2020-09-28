@@ -33,6 +33,7 @@ type externalIDPCallbackData struct {
 type externalNotFoundOptionFormData struct {
 	Link         bool `schema:"link"`
 	AutoRegister bool `schema:"autoregister"`
+	ResetLinking bool `schema:"resetlinking"`
 }
 
 type externalNotFoundOptionData struct {
@@ -70,7 +71,7 @@ func (l *Login) handleExternalLogin(w http.ResponseWriter, r *http.Request) {
 
 func (l *Login) handleOIDCAuthorize(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) {
 	provider := l.getRPConfig(w, r, authReq, idpConfig, callbackEndpoint)
-	http.Redirect(w, r, rp.AuthURL(authReq.ID, provider), http.StatusFound)
+	http.Redirect(w, r, rp.AuthURL(authReq.ID, provider, rp.WithPrompt(oidc.PromptSelectAccount)), http.StatusFound)
 }
 
 func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Request) {
@@ -139,35 +140,52 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 	data := new(externalNotFoundOptionFormData)
 	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
-		l.renderError(w, r, authReq, err)
+		l.renderExternalNotFoundOption(w, r, authReq, err)
 		return
 	}
 	if data.Link {
 		l.renderLogin(w, r, authReq, nil)
+		return
+	} else if data.ResetLinking {
+		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+		err = l.authRepo.ResetLinkingUsers(r.Context(), authReq.ID, userAgentID)
+		if err != nil {
+			l.renderExternalNotFoundOption(w, r, authReq, err)
+		}
+		l.handleLogin(w, r)
 		return
 	}
 	l.handleAutoRegister(w, r, authReq)
 }
 
 func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
-	orgIamPolicy, err := l.getOrgIamPolicy(r, authReq.GetScopeOrgID())
-	if err != nil {
-		l.renderExternalNotFoundOption(w, r, authReq, err)
-		return
-	}
 	iam, err := l.authRepo.GetIAM(r.Context())
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, err)
 		return
 	}
+
 	resourceOwner := iam.GlobalOrgID
 	member := &org_model.OrgMember{
 		ObjectRoot: models.ObjectRoot{AggregateID: iam.GlobalOrgID},
 		Roles:      []string{orgProjectCreatorRole},
 	}
-	if authReq.GetScopeOrgID() != iam.GlobalOrgID && authReq.GetScopeOrgID() != "" {
-		member = nil
-		resourceOwner = authReq.GetScopeOrgID()
+	if authReq.GetScopeOrgPrimaryDomain() != "" {
+		primaryDomain := authReq.GetScopeOrgPrimaryDomain()
+		org, err := l.authRepo.GetOrgByPrimaryDomain(primaryDomain)
+		if err != nil {
+			l.renderExternalNotFoundOption(w, r, authReq, err)
+		}
+		if org.ID != iam.GlobalOrgID {
+			member = nil
+			resourceOwner = org.ID
+		}
+	}
+
+	orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
+	if err != nil {
+		l.renderExternalNotFoundOption(w, r, authReq, err)
+		return
 	}
 
 	idpConfig, err := l.authRepo.GetIDPConfigByID(r.Context(), authReq.SelectedIDPConfigID)
@@ -216,7 +234,6 @@ func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.ID
 	}
 	return externalUser
 }
-
 func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *org_model.OrgIAMPolicy, linkingUser *model.ExternalUser, idpConfig *iam_model.IDPConfigView) (*usr_model.User, *usr_model.ExternalIDP) {
 	username := linkingUser.PreferredUsername
 	switch idpConfig.OIDCUsernameMapping {

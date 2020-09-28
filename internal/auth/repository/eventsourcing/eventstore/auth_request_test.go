@@ -139,9 +139,19 @@ func (m *mockViewOrg) OrgByID(string) (*org_view_model.OrgView, error) {
 	}, nil
 }
 
+func (m *mockViewOrg) OrgByPrimaryDomain(string) (*org_view_model.OrgView, error) {
+	return &org_view_model.OrgView{
+		State: int32(m.State),
+	}, nil
+}
+
 type mockViewErrOrg struct{}
 
 func (m *mockViewErrOrg) OrgByID(string) (*org_view_model.OrgView, error) {
+	return nil, errors.ThrowInternal(nil, "id", "internal error")
+}
+
+func (m *mockViewErrOrg) OrgByPrimaryDomain(string) (*org_view_model.OrgView, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
 }
 
@@ -582,7 +592,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
-			"linking users, link users step",
+			"linking users, password step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
 					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
@@ -595,6 +605,32 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userEventProvider:        &mockEventUser{},
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{
+				&model.AuthRequest{
+					UserID:              "UserID",
+					SelectedIDPConfigID: "IDPConfigID",
+					LinkingUsers:        []*model.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "UserID", DisplayName: "DisplayName"}},
+				}, false},
+			[]model.NextStep{&model.PasswordStep{}},
+			nil,
+		},
+		{
+			"linking users, linking step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:    time.Now().UTC().Add(-5 * time.Minute),
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+				},
+				userEventProvider:        &mockEventUser{},
+				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 			},
 			args{
 				&model.AuthRequest{

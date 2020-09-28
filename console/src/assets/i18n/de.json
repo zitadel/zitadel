@@ -633,12 +633,19 @@
     },
     "IDP":{
         "LIST": {
-            "TITLE":"Identity Providers",
+            "TITLE":"Identitäts Providers",
             "DESCRIPTION":"Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können."
         },
         "CREATE": {
-            "TITLE":"Neuer Identity Provider",
-            "DESCRIPTION":"Definieren Sie hier die Zugangsdaten des neuen Identity Providers"
+            "TITLE":"Neuer Identitäts Provider",
+            "DESCRIPTION":"Definieren Sie hier die Zugangsdaten des neuen Identitäts Providers"
+        },
+        "DETAIL": {
+          "TITLE":"Identitäts Provider",
+          "DESCRIPTION":"Konfiguration deines Identitäts Providers",
+          "OIDC": {
+            "TITLE": "OIDC Konfiguration"
+          }
         },
         "TYPES": {
             "0":"unknown",
@@ -646,10 +653,15 @@
             "2":"Organisation"
         },
         "STATES":{
-            "0":"aktiv",
-            "1":"inaktiv"
+            "1":"aktiv",
+            "2":"inaktiv"
+        },
+        "MAPPINTFIELD": {
+          "1": "Preferred Username",
+          "2": "Email"
         },
         "TYPE":"Typ",
+        "ID": "ID",
         "NAME":"Name",
         "CONFIG":"Konfiguration",
         "STATE":"Status",
@@ -658,11 +670,16 @@
         "SCOPESLIST":"Scopes List",
         "CLIENTID":"Client ID",
         "CLIENTSECRET":"Client Secret",
+        "IDPDISPLAYNAMMAPPING": "IDP Anzeigename Mapping",
+        "USERNAMEMAPPING": "Username Mapping",
         "CREATIONDATE":"Erstelldatum",
         "CHANGEDATE":"Letzte Änderung",
         "DEACTIVATE":"Deaktivieren",
         "ACTIVATE":"Aktivieren",
-        "DELETE":"Löschen"
+        "DELETE":"Löschen",
+        "TOAST": {
+            "SAVED": "Erfolgreich gespeichert."
+        }
     },
     "LOGINPOLICY": {
         "CREATE": {
