@@ -35,7 +35,7 @@ func (p *Password) IsValid() bool {
 	return p.AggregateID != "" && p.SecretString != ""
 }
 
-func (p *Password) HashPasswordIfExisting(policy *iam_model.PasswordComplexityPolicy, passwordAlg crypto.HashAlgorithm, onetime bool) error {
+func (p *Password) HashPasswordIfExisting(policy *iam_model.PasswordComplexityPolicyView, passwordAlg crypto.HashAlgorithm, onetime bool) error {
 	if p.SecretString == "" {
 		return nil
 	}

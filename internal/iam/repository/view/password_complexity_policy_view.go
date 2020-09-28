@@ -9,8 +9,8 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func GetPasswordComplexityPolicyByAggregateID(db *gorm.DB, table, aggregateID string) (*model.PasswordComplexityView, error) {
-	policy := new(model.PasswordComplexityView)
+func GetPasswordComplexityPolicyByAggregateID(db *gorm.DB, table, aggregateID string) (*model.PasswordComplexityPolicyView, error) {
+	policy := new(model.PasswordComplexityPolicyView)
 	userIDQuery := &model.PasswordComplexityPolicySearchQuery{Key: iam_model.PasswordComplexityPolicySearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, userIDQuery)
 	err := query(db, policy)
@@ -20,7 +20,7 @@ func GetPasswordComplexityPolicyByAggregateID(db *gorm.DB, table, aggregateID st
 	return policy, err
 }
 
-func PutPasswordComplexityPolicy(db *gorm.DB, table string, policy *model.PasswordComplexityView) error {
+func PutPasswordComplexityPolicy(db *gorm.DB, table string, policy *model.PasswordComplexityPolicyView) error {
 	save := repository.PrepareSave(table)
 	return save(db, policy)
 }

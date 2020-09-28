@@ -306,6 +306,15 @@ func (repo *OrgRepository) GetLoginPolicy(ctx context.Context) (*iam_model.Login
 	return iam_es_model.LoginPolicyViewToModel(policy), err
 }
 
+func (repo *OrgRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
+	policy, err := repo.View.LoginPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	policy.Default = true
+	return iam_es_model.LoginPolicyViewToModel(policy), err
+}
+
 func (repo *OrgRepository) AddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
 	policy.AggregateID = authz.GetCtxData(ctx).OrgID
 	return repo.OrgEventstore.AddLoginPolicy(ctx, policy)
@@ -379,4 +388,45 @@ func (repo *OrgRepository) RemoveIDPProviderFromIdpProvider(ctx context.Context,
 		aggregates = append(aggregates, idpAgg...)
 	}
 	return sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
+}
+
+func (repo *OrgRepository) GetPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error) {
+	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if errors.IsNotFound(err) {
+		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
+		policy.Default = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.PasswordComplexityViewToModel(policy), err
+}
+
+func (repo *OrgRepository) GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error) {
+	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	policy.Default = true
+	return iam_es_model.PasswordComplexityViewToModel(policy), err
+}
+
+func (repo *OrgRepository) AddPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+	policy.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.AddPasswordComplexityPolicy(ctx, policy)
+}
+
+func (repo *OrgRepository) ChangePasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+	policy.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.ChangePasswordComplexityPolicy(ctx, policy)
+}
+
+func (repo *OrgRepository) RemovePasswordComplexityPolicy(ctx context.Context) error {
+	policy := &iam_model.PasswordComplexityPolicy{ObjectRoot: models.ObjectRoot{
+		AggregateID: authz.GetCtxData(ctx).OrgID,
+	}}
+	return repo.OrgEventstore.RemovePasswordComplexityPolicy(ctx, policy)
 }

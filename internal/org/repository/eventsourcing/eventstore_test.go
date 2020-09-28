@@ -2705,3 +2705,268 @@ func TestRemoveIdpProviderFromLoginPolicy(t *testing.T) {
 		})
 	}
 }
+
+func TestAddPasswordComplexityPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *OrgEventstore
+		ctx    context.Context
+		policy *iam_model.PasswordComplexityPolicy
+	}
+	type res struct {
+		result  *iam_model.PasswordComplexityPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add password complexity policy, ok",
+			args: args{
+				es:  GetMockChangesOrgOK(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MinLength:    10,
+					HasLowercase: true,
+					HasUppercase: true,
+					HasSymbol:    true,
+					HasNumber:    true,
+				},
+			},
+			res: res{
+				result: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MinLength:    10,
+					HasLowercase: true,
+					HasUppercase: true,
+					HasSymbol:    true,
+					HasNumber:    true,
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockChangesOrgOK(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "existing org not found",
+			args: args{
+				es:  GetMockChangesOrgNoEvents(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddPasswordComplexityPolicy(tt.args.ctx, tt.args.policy)
+
+			if !tt.res.wantErr && result.MinLength != tt.res.result.MinLength {
+				t.Errorf("got wrong result MinLength: expected: %v, actual: %v ", tt.res.result.MinLength, result.MinLength)
+			}
+			if !tt.res.wantErr && result.HasLowercase != tt.res.result.HasLowercase {
+				t.Errorf("got wrong result HasLowercase: expected: %v, actual: %v ", tt.res.result.HasLowercase, result.HasLowercase)
+			}
+			if !tt.res.wantErr && result.HasUppercase != tt.res.result.HasUppercase {
+				t.Errorf("got wrong result HasUppercase: expected: %v, actual: %v ", tt.res.result.HasUppercase, result.HasUppercase)
+			}
+			if !tt.res.wantErr && result.HasNumber != tt.res.result.HasNumber {
+				t.Errorf("got wrong result HasNumber: expected: %v, actual: %v ", tt.res.result.HasNumber, result.HasNumber)
+			}
+			if !tt.res.wantErr && result.HasSymbol != tt.res.result.HasSymbol {
+				t.Errorf("got wrong result HasSymbol: expected: %v, actual: %v ", tt.res.result.HasSymbol, result.HasSymbol)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangePasswordComplexityPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *OrgEventstore
+		ctx    context.Context
+		policy *iam_model.PasswordComplexityPolicy
+	}
+	type res struct {
+		result  *iam_model.PasswordComplexityPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change password complexity policy, ok",
+			args: args{
+				es:  GetMockChangesOrgWithPasswordComplexityPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MinLength:    5,
+					HasLowercase: false,
+					HasUppercase: false,
+					HasSymbol:    false,
+					HasNumber:    false,
+				},
+			},
+			res: res{
+				result: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MinLength:    5,
+					HasLowercase: false,
+					HasUppercase: false,
+					HasSymbol:    false,
+					HasNumber:    false,
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockChangesOrgOK(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockChangesOrgNoEvents(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangePasswordComplexityPolicy(tt.args.ctx, tt.args.policy)
+
+			if !tt.res.wantErr && result.MinLength != tt.res.result.MinLength {
+				t.Errorf("got wrong result MinLength: expected: %v, actual: %v ", tt.res.result.MinLength, result.MinLength)
+			}
+			if !tt.res.wantErr && result.HasLowercase != tt.res.result.HasLowercase {
+				t.Errorf("got wrong result HasLowercase: expected: %v, actual: %v ", tt.res.result.HasLowercase, result.HasLowercase)
+			}
+			if !tt.res.wantErr && result.HasUppercase != tt.res.result.HasUppercase {
+				t.Errorf("got wrong result HasUppercase: expected: %v, actual: %v ", tt.res.result.HasUppercase, result.HasUppercase)
+			}
+			if !tt.res.wantErr && result.HasNumber != tt.res.result.HasNumber {
+				t.Errorf("got wrong result HasNumber: expected: %v, actual: %v ", tt.res.result.HasNumber, result.HasNumber)
+			}
+			if !tt.res.wantErr && result.HasSymbol != tt.res.result.HasSymbol {
+				t.Errorf("got wrong result HasSymbol: expected: %v, actual: %v ", tt.res.result.HasSymbol, result.HasSymbol)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestRemovePasswordComplexityPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *OrgEventstore
+		ctx    context.Context
+		policy *iam_model.PasswordComplexityPolicy
+	}
+	type res struct {
+		result  *iam_model.PasswordComplexityPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove password compelxity policy, ok",
+			args: args{
+				es:  GetMockChangesOrgWithPasswordComplexityPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockChangesOrgOK(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockChangesOrgNoEvents(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemovePasswordComplexityPolicy(tt.args.ctx, tt.args.policy)
+
+			if !tt.res.wantErr && err != nil {
+				t.Errorf("got wrong result should not get err: %v", err)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}

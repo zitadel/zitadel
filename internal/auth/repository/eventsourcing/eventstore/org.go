@@ -3,6 +3,9 @@ package eventstore
 import (
 	"context"
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 
@@ -28,7 +31,8 @@ type OrgRepository struct {
 	UserEventstore   *usr_es.UserEventstore
 	PolicyEventstore *policy_es.PolicyEventstore
 
-	View *auth_view.View
+	View           *auth_view.View
+	SystemDefaults systemdefaults.SystemDefaults
 }
 
 func (repo *OrgRepository) SearchOrgs(ctx context.Context, request *org_model.OrgSearchRequest) (*org_model.OrgSearchResult, error) {
@@ -53,10 +57,11 @@ func (repo *OrgRepository) SearchOrgs(ctx context.Context, request *org_model.Or
 }
 
 func (repo *OrgRepository) RegisterOrg(ctx context.Context, register *auth_model.RegisterOrg) (*auth_model.RegisterOrg, error) {
-	pwPolicy, err := repo.PolicyEventstore.GetPasswordComplexityPolicy(ctx, policy_model.DefaultPolicy)
+	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(policy_model.DefaultPolicy)
 	if err != nil {
 		return nil, err
 	}
+	pwPolicyView := iam_view_model.PasswordComplexityViewToModel(pwPolicy)
 	orgPolicy, err := repo.OrgEventstore.GetOrgIAMPolicy(ctx, policy_model.DefaultPolicy)
 	if err != nil {
 		return nil, err
@@ -72,7 +77,7 @@ func (repo *OrgRepository) RegisterOrg(ctx context.Context, register *auth_model
 	if err != nil {
 		return nil, err
 	}
-	user, userAggregates, err := repo.UserEventstore.PrepareRegisterUser(ctx, register.User, nil, pwPolicy, orgPolicy, org.AggregateID)
+	user, userAggregates, err := repo.UserEventstore.PrepareRegisterUser(ctx, register.User, nil, pwPolicyView, orgPolicy, org.AggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -109,4 +114,19 @@ func (repo *OrgRepository) GetIDPConfigByID(ctx context.Context, idpConfigID str
 		return nil, err
 	}
 	return iam_view_model.IDPConfigViewToModel(idpConfig), nil
+}
+
+func (repo *OrgRepository) GetMyPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error) {
+	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if errors.IsNotFound(err) {
+		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
+		policy.Default = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_view_model.PasswordComplexityViewToModel(policy), err
 }

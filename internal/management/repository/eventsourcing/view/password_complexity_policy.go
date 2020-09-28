@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	passwordComplexityPolicyTable = "adminapi.password_complexity_policies"
+	passwordComplexityPolicyTable = "management.password_complexity_policies"
 )
 
 func (v *View) PasswordComplexityPolicyByAggregateID(aggregateID string) (*model.PasswordComplexityPolicyView, error) {

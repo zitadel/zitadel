@@ -54,4 +54,5 @@ const (
 
 	PasswordComplexityPolicyAdded   models.EventType = "org.policy.password.complexity.added"
 	PasswordComplexityPolicyChanged models.EventType = "org.policy.password.complexity.changed"
+	PasswordComplexityPolicyRemoved models.EventType = "org.policy.password.complexity.removed"
 )

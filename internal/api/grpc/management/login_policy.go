@@ -14,6 +14,14 @@ func (s *Server) GetLoginPolicy(ctx context.Context, _ *empty.Empty) (*managemen
 	return loginPolicyViewFromModel(result), nil
 }
 
+func (s *Server) GetDefaultLoginPolicy(ctx context.Context, _ *empty.Empty) (*management.LoginPolicyView, error) {
+	result, err := s.org.GetDefaultLoginPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return loginPolicyViewFromModel(result), nil
+}
+
 func (s *Server) CreateLoginPolicy(ctx context.Context, policy *management.LoginPolicyAdd) (*management.LoginPolicy, error) {
 	result, err := s.org.AddLoginPolicy(ctx, loginPolicyAddToModel(policy))
 	if err != nil {

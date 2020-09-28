@@ -838,3 +838,71 @@ func (es *OrgEventstore) RemoveIDPProviderFromLoginPolicy(ctx context.Context, p
 	}
 	return es_sdk.PushAggregates(ctx, es.PushAggregates, repoOrg.AppendEvents, agg)
 }
+
+func (es *OrgEventstore) AddPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+	if policy == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sjkl9", "Errors.Org.PasswordComplexityPolicy.Invalid")
+	}
+
+	if err := policy.IsValid(); err != nil {
+		return nil, err
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	if err != nil {
+		return nil, err
+	}
+
+	repoOrg := model.OrgFromModel(existing)
+	repoPasswordComplexityPolicy := iam_es_model.PasswordComplexityPolicyFromModel(policy)
+
+	addAggregate := PasswordComplexityPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPasswordComplexityPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.PasswordComplexityPolicyToModel(repoOrg.PasswordComplexityPolicy), nil
+}
+
+func (es *OrgEventstore) ChangePasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+	if policy == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-r5Hd", "Errors.Org.PasswordComplexityPolicy.Empty")
+	}
+	if err := policy.IsValid(); err != nil {
+		return nil, err
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	if err != nil {
+		return nil, err
+	}
+
+	if existing.LoginPolicy == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-v6Hdr", "Errors.Org.PasswordComplexityPolicy.NotExisting")
+	}
+
+	repoOrg := model.OrgFromModel(existing)
+	repoPasswordComplexityPolicy := iam_es_model.PasswordComplexityPolicyFromModel(policy)
+
+	addAggregate := PasswordComplexityPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPasswordComplexityPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.PasswordComplexityPolicyToModel(repoOrg.PasswordComplexityPolicy), nil
+}
+
+func (es *OrgEventstore) RemovePasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) error {
+	if policy == nil {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-3Ghs8", "Errors.Org.PasswordComplexityPolicy.Empty")
+	}
+	if err := policy.IsValid(); err != nil {
+		return err
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	if err != nil {
+		return err
+	}
+	repoOrg := model.OrgFromModel(existing)
+
+	addAggregate := PasswordComplexityPolicyRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg)
+	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+}

@@ -89,6 +89,10 @@ Errors:
       AlreadyExists: Login Policy existiert bereits
       IdpProviderAlreadyExisting: Idp Provider existiert bereits
       IdpProviderNotExisting: Idp Provider existiert nicht
+    PasswordComplexity:
+      Empty: Passwort Komplexitäts Policy ist leer
+      NotExisting: Passwort Komplexitäts Policy existiert nicht
+      AlreadyExists: Passwort Komplexitäts Policy existiert bereits
   Project:
     ProjectIDMissing: Project Id fehlt
     AlreadyExists: Project existiert bereits auf der Organisation

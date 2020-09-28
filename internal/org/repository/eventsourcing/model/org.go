@@ -20,11 +20,12 @@ type Org struct {
 	Name  string `json:"name,omitempty"`
 	State int32  `json:"-"`
 
-	Domains      []*OrgDomain              `json:"-"`
-	Members      []*OrgMember              `json:"-"`
-	OrgIamPolicy *OrgIAMPolicy             `json:"-"`
-	LoginPolicy  *iam_es_model.LoginPolicy `json:"-"`
-	IDPs         []*iam_es_model.IDPConfig `json:"-"`
+	Domains                  []*OrgDomain                           `json:"-"`
+	Members                  []*OrgMember                           `json:"-"`
+	OrgIamPolicy             *OrgIAMPolicy                          `json:"-"`
+	IDPs                     []*iam_es_model.IDPConfig              `json:"-"`
+	LoginPolicy              *iam_es_model.LoginPolicy              `json:"-"`
+	PasswordComplexityPolicy *iam_es_model.PasswordComplexityPolicy `json:"-"`
 }
 
 func OrgFromModel(org *org_model.Org) *Org {
@@ -45,6 +46,9 @@ func OrgFromModel(org *org_model.Org) *Org {
 	if org.LoginPolicy != nil {
 		converted.LoginPolicy = iam_es_model.LoginPolicyFromModel(org.LoginPolicy)
 	}
+	if org.PasswordComplexityPolicy != nil {
+		converted.PasswordComplexityPolicy = iam_es_model.PasswordComplexityPolicyFromModel(org.PasswordComplexityPolicy)
+	}
 	return converted
 }
 
@@ -62,6 +66,9 @@ func OrgToModel(org *Org) *org_model.Org {
 	}
 	if org.LoginPolicy != nil {
 		converted.LoginPolicy = iam_es_model.LoginPolicyToModel(org.LoginPolicy)
+	}
+	if org.PasswordComplexityPolicy != nil {
+		converted.PasswordComplexityPolicy = iam_es_model.PasswordComplexityPolicyToModel(org.PasswordComplexityPolicy)
 	}
 	return converted
 }
@@ -164,6 +171,12 @@ func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 		err = o.appendAddIdpProviderToLoginPolicyEvent(event)
 	case LoginPolicyIDPProviderRemoved:
 		err = o.appendRemoveIdpProviderFromLoginPolicyEvent(event)
+	case PasswordComplexityPolicyAdded:
+		err = o.appendAddPasswordComplexityPolicyEvent(event)
+	case PasswordComplexityPolicyChanged:
+		err = o.appendChangePasswordComplexityPolicyEvent(event)
+	case PasswordComplexityPolicyRemoved:
+		o.appendRemovePasswordComplexityPolicyEvent(event)
 	}
 	if err != nil {
 		return err

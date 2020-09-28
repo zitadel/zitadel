@@ -17,7 +17,7 @@ const (
 	PasswordComplexityKeyAggregateID = "aggregate_id"
 )
 
-type PasswordComplexityView struct {
+type PasswordComplexityPolicyView struct {
 	AggregateID  string    `json:"-" gorm:"column:aggregate_id;primary_key"`
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
@@ -33,8 +33,8 @@ type PasswordComplexityView struct {
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }
 
-func PasswordComplexityViewFromModel(policy *model.PasswordComplexityPolicyView) *PasswordComplexityView {
-	return &PasswordComplexityView{
+func PasswordComplexityViewFromModel(policy *model.PasswordComplexityPolicyView) *PasswordComplexityPolicyView {
+	return &PasswordComplexityPolicyView{
 		AggregateID:  policy.AggregateID,
 		Sequence:     policy.Sequence,
 		CreationDate: policy.CreationDate,
@@ -48,7 +48,7 @@ func PasswordComplexityViewFromModel(policy *model.PasswordComplexityPolicyView)
 	}
 }
 
-func PasswordComplexityViewToModel(policy *PasswordComplexityView) *model.PasswordComplexityPolicyView {
+func PasswordComplexityViewToModel(policy *PasswordComplexityPolicyView) *model.PasswordComplexityPolicyView {
 	return &model.PasswordComplexityPolicyView{
 		AggregateID:  policy.AggregateID,
 		Sequence:     policy.Sequence,
@@ -63,7 +63,7 @@ func PasswordComplexityViewToModel(policy *PasswordComplexityView) *model.Passwo
 	}
 }
 
-func (i *PasswordComplexityView) AppendEvent(event *models.Event) (err error) {
+func (i *PasswordComplexityPolicyView) AppendEvent(event *models.Event) (err error) {
 	i.Sequence = event.Sequence
 	i.ChangeDate = event.CreationDate
 	switch event.Type {
@@ -77,11 +77,11 @@ func (i *PasswordComplexityView) AppendEvent(event *models.Event) (err error) {
 	return err
 }
 
-func (r *PasswordComplexityView) setRootData(event *models.Event) {
+func (r *PasswordComplexityPolicyView) setRootData(event *models.Event) {
 	r.AggregateID = event.AggregateID
 }
 
-func (r *PasswordComplexityView) SetData(event *models.Event) error {
+func (r *PasswordComplexityPolicyView) SetData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, r); err != nil {
 		logging.Log("EVEN-Dmi9g").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-Hs8uf", "Could not unmarshal data")

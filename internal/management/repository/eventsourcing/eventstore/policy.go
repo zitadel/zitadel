@@ -13,19 +13,6 @@ type PolicyRepo struct {
 	//view      *view.View
 }
 
-func (repo *PolicyRepo) CreatePasswordComplexityPolicy(ctx context.Context, policy *pol_model.PasswordComplexityPolicy) (*pol_model.PasswordComplexityPolicy, error) {
-	return repo.PolicyEvents.CreatePasswordComplexityPolicy(ctx, policy)
-}
-func (repo *PolicyRepo) GetPasswordComplexityPolicy(ctx context.Context) (*pol_model.PasswordComplexityPolicy, error) {
-	ctxData := authz.GetCtxData(ctx)
-	return repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, ctxData.OrgID)
-}
-func (repo *PolicyRepo) GetDefaultPasswordComplexityPolicy(ctx context.Context) (*pol_model.PasswordComplexityPolicy, error) {
-	return repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, "0")
-}
-func (repo *PolicyRepo) UpdatePasswordComplexityPolicy(ctx context.Context, policy *pol_model.PasswordComplexityPolicy) (*pol_model.PasswordComplexityPolicy, error) {
-	return repo.PolicyEvents.UpdatePasswordComplexityPolicy(ctx, policy)
-}
 func (repo *PolicyRepo) CreatePasswordAgePolicy(ctx context.Context, policy *pol_model.PasswordAgePolicy) (*pol_model.PasswordAgePolicy, error) {
 	return repo.PolicyEvents.CreatePasswordAgePolicy(ctx, policy)
 }

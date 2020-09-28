@@ -2,12 +2,13 @@ package handler
 
 import (
 	"github.com/caos/logging"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
-	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
 type PasswordComplexityPolicy struct {
@@ -15,7 +16,7 @@ type PasswordComplexityPolicy struct {
 }
 
 const (
-	passwordComplexityPolicyTable = "adminapi.password_complexity_policies"
+	passwordComplexityPolicyTable = "auth.password_complexity_policies"
 )
 
 func (m *PasswordComplexityPolicy) ViewModel() string {
@@ -28,13 +29,13 @@ func (m *PasswordComplexityPolicy) EventQuery() (*models.SearchQuery, error) {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.IAMAggregate).
+		AggregateTypeFilter(model.OrgAggregate, iam_es_model.IAMAggregate).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (m *PasswordComplexityPolicy) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
-	case model.IAMAggregate:
+	case model.OrgAggregate, iam_es_model.IAMAggregate:
 		err = m.processPasswordComplexityPolicy(event)
 	}
 	return err
@@ -43,9 +44,9 @@ func (m *PasswordComplexityPolicy) Reduce(event *models.Event) (err error) {
 func (m *PasswordComplexityPolicy) processPasswordComplexityPolicy(event *models.Event) (err error) {
 	policy := new(iam_model.PasswordComplexityPolicyView)
 	switch event.Type {
-	case model.PasswordComplexityPolicyAdded:
+	case iam_es_model.PasswordComplexityPolicyAdded, model.PasswordComplexityPolicyAdded:
 		err = policy.AppendEvent(event)
-	case model.PasswordComplexityPolicyChanged:
+	case iam_es_model.PasswordComplexityPolicyChanged, model.PasswordComplexityPolicyChanged:
 		policy, err = m.view.PasswordComplexityPolicyByAggregateID(event.AggregateID)
 		if err != nil {
 			return err
@@ -61,6 +62,6 @@ func (m *PasswordComplexityPolicy) processPasswordComplexityPolicy(event *models
 }
 
 func (m *PasswordComplexityPolicy) OnError(event *models.Event, err error) error {
-	logging.LogWithFields("SPOOL-4Sj9d", "id", event.AggregateID).WithError(err).Warn("something went wrong in login policy handler")
+	logging.LogWithFields("SPOOL-4Djo9", "id", event.AggregateID).WithError(err).Warn("something went wrong in passwordComplexity policy handler")
 	return spooler.HandleError(event, err, m.view.GetLatestPasswordComplexityPolicyFailedEvent, m.view.ProcessedPasswordComplexityPolicyFailedEvent, m.view.ProcessedPasswordComplexityPolicySequence, m.errorCountUntilSkip)
 }

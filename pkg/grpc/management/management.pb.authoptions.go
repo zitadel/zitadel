@@ -189,31 +189,6 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetPasswordComplexityPolicy": authz.Option{
-		Permission: "policy.read",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/GetDefaultPasswordComplexityPolicy": authz.Option{
-		Permission: "policy.read",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/CreatePasswordComplexityPolicy": authz.Option{
-		Permission: "policy.write",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/UpdatePasswordComplexityPolicy": authz.Option{
-		Permission: "policy.write",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/DeletePasswordComplexityPolicy": authz.Option{
-		Permission: "policy.delete",
-		CheckParam: "",
-	},
-
 	"/caos.zitadel.management.api.v1.ManagementService/GetPasswordAgePolicy": authz.Option{
 		Permission: "policy.read",
 		CheckParam: "",
@@ -639,6 +614,11 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/GetDefaultLoginPolicy": authz.Option{
+		Permission: "policy.read",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/CreateLoginPolicy": authz.Option{
 		Permission: "policy.write",
 		CheckParam: "",
@@ -666,6 +646,31 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 
 	"/caos.zitadel.management.api.v1.ManagementService/RemoveIdpProviderFromLoginPolicy": authz.Option{
 		Permission: "policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GetPasswordComplexityPolicy": authz.Option{
+		Permission: "policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GetDefaultPasswordComplexityPolicy": authz.Option{
+		Permission: "policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/CreatePasswordComplexityPolicy": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/UpdatePasswordComplexityPolicy": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/RemovePasswordComplexityPolicy": authz.Option{
+		Permission: "policy.delete",
 		CheckParam: "",
 	},
 }

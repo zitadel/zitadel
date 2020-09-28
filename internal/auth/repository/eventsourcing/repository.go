@@ -45,7 +45,6 @@ type EsRepository struct {
 	eventstore.UserGrantRepo
 	eventstore.OrgRepository
 	eventstore.IAMRepository
-	eventstore.PolicyRepo
 }
 
 func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, authZRepo *authz_repo.EsRepository) (*EsRepository, error) {
@@ -180,13 +179,11 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 			OrgEventstore:    org,
 			PolicyEventstore: policy,
 			UserEventstore:   user,
+			SystemDefaults:   systemDefaults,
 		},
 		eventstore.IAMRepository{
 			IAMEvents: iam,
 			IAMID:     systemDefaults.IamID,
-		},
-		eventstore.PolicyRepo{
-			PolicyEvents: policy,
 		},
 	}, nil
 }
