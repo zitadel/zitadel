@@ -62,7 +62,7 @@
     "karma-jasmine-html-reporter": "^1.5.0",
     "prettier": "^2.1.1",
     "protractor": "~7.0.0",
-    "stylelint": "^13.7.1",
+    "stylelint": "^13.7.2",
     "stylelint-config-standard": "^20.0.0",
     "stylelint-scss": "^3.18.0",
     "ts-node": "~9.0.0",
