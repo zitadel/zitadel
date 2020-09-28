@@ -1,12 +1,12 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { ViewportScroller } from '@angular/common';
+import { DOCUMENT, ViewportScroller } from '@angular/common';
 import { Component, HostBinding, Inject, OnDestroy, ViewChild } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router, RouterOutlet } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { Observable, of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -70,6 +70,7 @@ export class AppComponent implements OnDestroy {
         private toast: ToastService,
         private router: Router,
         update: UpdateService,
+        @Inject(DOCUMENT) private document: Document,
     ) {
         console.log('%cWait!', 'text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; color: #5282c1; font-size: 50px');
         console.log('%cInserting something here could give attackers access to your zitadel account.', 'color: red; font-size: 18px');
@@ -160,6 +161,10 @@ export class AppComponent implements OnDestroy {
 
         this.isDarkTheme = this.themeService.isDarkTheme;
         this.isDarkTheme.subscribe(thema => this.onSetTheme(thema ? 'dark-theme' : 'light-theme'));
+
+        this.translate.onLangChange.subscribe((language: LangChangeEvent) => {
+            this.document.documentElement.lang = language.lang;
+        });
     }
 
     public ngOnDestroy(): void {
@@ -202,6 +207,8 @@ export class AppComponent implements OnDestroy {
             this.profile = userprofile;
             const lang = userprofile.preferredLanguage.match(/en|de/) ? userprofile.preferredLanguage : 'en';
             this.translate.use(lang);
+            console.log(this.document.documentElement.lang);
+            this.document.documentElement.lang = lang;
         });
     }
 
