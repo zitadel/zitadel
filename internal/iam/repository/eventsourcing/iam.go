@@ -43,7 +43,7 @@ func IAMSetupStartedAggregate(aggCreator *es_models.AggregateCreator, iam *model
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.IAMSetupStarted, nil)
+		return agg.AppendEvent(model.IAMSetupStarted, &struct{ Step model.Step }{Step: iam.SetUpStarted})
 	}
 }
 
@@ -54,7 +54,7 @@ func IAMSetupDoneAggregate(aggCreator *es_models.AggregateCreator, iam *model.IA
 			return nil, err
 		}
 
-		return agg.AppendEvent(model.IAMSetupDone, nil)
+		return agg.AppendEvent(model.IAMSetupDone, &struct{ Step model.Step }{Step: iam.SetUpDone})
 	}
 }
 

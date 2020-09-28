@@ -1513,8 +1513,14 @@ message ZitadelDocs {
 message Iam {
   string global_org_id = 1;
   string iam_project_id = 2;
-  bool set_up_done = 3;
-  bool set_up_started = 4;
+  IamSetupStep set_up_done = 3;
+  IamSetupStep set_up_started = 4;
+}
+
+enum IamSetupStep {
+  iam_setup_step_UNDEFINED = 0;
+  iam_setup_step_1 = 1;
+  iam_setup_step_2 = 2;
 }
 
 message ChangeRequest {

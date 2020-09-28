@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -12,15 +13,24 @@ const (
 	IAMVersion = "v1"
 )
 
+type Step int
+
+const (
+	Step1 = Step(model.Step1)
+	//TODO: label policy
+	// Step2     = Step(model.Step2)
+	StepCount = Step(model.StepCount)
+)
+
 type IAM struct {
 	es_models.ObjectRoot
-	SetUpStarted                    bool                      `json:"-"`
-	SetUpDone                       bool                      `json:"-"`
-	GlobalOrgID                     string                    `json:"globalOrgId,omitempty"`
-	IAMProjectID                    string                    `json:"iamProjectId,omitempty"`
-	Members                         []*IAMMember              `json:"-"`
-	IDPs                            []*IDPConfig              `json:"-"`
-	DefaultLoginPolicy              *LoginPolicy              `json:"-"`
+	SetUpStarted       Step         `json:"-"`
+	SetUpDone          Step         `json:"-"`
+	GlobalOrgID        string       `json:"globalOrgId,omitempty"`
+	IAMProjectID       string       `json:"iamProjectId,omitempty"`
+	Members            []*IAMMember `json:"-"`
+	IDPs               []*IDPConfig `json:"-"`
+	DefaultLoginPolicy *LoginPolicy `json:"-"`
 	DefaultPasswordComplexityPolicy *PasswordComplexityPolicy `json:"-"`
 }
 
@@ -29,8 +39,8 @@ func IAMFromModel(iam *model.IAM) *IAM {
 	idps := IDPConfigsFromModel(iam.IDPs)
 	converted := &IAM{
 		ObjectRoot:   iam.ObjectRoot,
-		SetUpStarted: iam.SetUpStarted,
-		SetUpDone:    iam.SetUpDone,
+		SetUpStarted: Step(iam.SetUpStarted),
+		SetUpDone:    Step(iam.SetUpDone),
 		GlobalOrgID:  iam.GlobalOrgID,
 		IAMProjectID: iam.IAMProjectID,
 		Members:      members,
@@ -50,8 +60,8 @@ func IAMToModel(iam *IAM) *model.IAM {
 	idps := IDPConfigsToModel(iam.IDPs)
 	converted := &model.IAM{
 		ObjectRoot:   iam.ObjectRoot,
-		SetUpStarted: iam.SetUpStarted,
-		SetUpDone:    iam.SetUpDone,
+		SetUpStarted: model.Step(iam.SetUpStarted),
+		SetUpDone:    model.Step(iam.SetUpDone),
 		GlobalOrgID:  iam.GlobalOrgID,
 		IAMProjectID: iam.IAMProjectID,
 		Members:      members,
@@ -79,9 +89,27 @@ func (i *IAM) AppendEvent(event *es_models.Event) (err error) {
 	i.ObjectRoot.AppendEvent(event)
 	switch event.Type {
 	case IAMSetupStarted:
-		i.SetUpStarted = true
+		if len(event.Data) == 0 {
+			i.SetUpStarted = Step(model.Step1)
+			return
+		}
+		step := new(struct{ Step Step })
+		err = json.Unmarshal(event.Data, step)
+		if err != nil {
+			return err
+		}
+		i.SetUpStarted = step.Step
 	case IAMSetupDone:
-		i.SetUpDone = true
+		if len(event.Data) == 0 {
+			i.SetUpDone = Step(model.Step1)
+			return
+		}
+		step := new(struct{ Step Step })
+		err = json.Unmarshal(event.Data, step)
+		if err != nil {
+			return err
+		}
+		i.SetUpDone = step.Step
 	case IAMProjectSet,
 		GlobalOrgSet:
 		err = i.SetData(event)

@@ -77,10 +77,10 @@ func (a *API) healthHandler() http.Handler {
 			if err != nil && !errors.IsNotFound(err) {
 				return errors.ThrowPreconditionFailed(err, "API-dsgT2", "IAM SETUP CHECK FAILED")
 			}
-			if iam == nil || !iam.SetUpStarted {
+			if iam == nil || iam.SetUpStarted < iam_model.StepCount-1 {
 				return errors.ThrowPreconditionFailed(nil, "API-HBfs3", "IAM NOT SET UP")
 			}
-			if !iam.SetUpDone {
+			if iam.SetUpDone < iam_model.StepCount-1 {
 				return errors.ThrowPreconditionFailed(nil, "API-DASs2", "IAM SETUP RUNNING")
 			}
 			return nil

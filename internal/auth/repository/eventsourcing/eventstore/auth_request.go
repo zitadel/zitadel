@@ -74,6 +74,7 @@ type userEventProvider interface {
 
 type orgViewProvider interface {
 	OrgByID(string) (*org_view_model.OrgView, error)
+	OrgByPrimaryDomain(string) (*org_view_model.OrgView, error)
 }
 
 func (repo *AuthRequestRepo) Health(ctx context.Context) error {
@@ -231,6 +232,16 @@ func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, u
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
+func (repo *AuthRequestRepo) ResetLinkingUsers(ctx context.Context, authReqID, userAgentID string) error {
+	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
+	if err != nil {
+		return err
+	}
+	request.LinkingUsers = nil
+	request.SelectedIDPConfigID = ""
+	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
 func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, registerUser *user_model.User, externalIDP *user_model.ExternalIDP, orgMember *org_model.OrgMember, authReqID, userAgentID, resourceOwner string) error {
 	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
@@ -318,7 +329,14 @@ func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, 
 func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *model.AuthRequest) error {
 	orgID := request.UserOrgID
 	if orgID == "" {
-		orgID = request.GetScopeOrgID()
+		primaryDomain := request.GetScopeOrgPrimaryDomain()
+		if primaryDomain != "" {
+			org, err := repo.GetOrgByPrimaryDomain(primaryDomain)
+			if err != nil {
+				return err
+			}
+			orgID = org.ID
+		}
 	}
 	if orgID == "" {
 		orgID = repo.IAMID
@@ -336,7 +354,16 @@ func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *model
 }
 
 func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *model.AuthRequest, loginName string) (err error) {
-	orgID := request.GetScopeOrgID()
+	primaryDomain := request.GetScopeOrgPrimaryDomain()
+	orgID := ""
+	if primaryDomain != "" {
+		org, err := repo.GetOrgByPrimaryDomain(primaryDomain)
+		if err != nil {
+			return err
+		}
+		orgID = org.ID
+	}
+
 	user := new(user_view_model.UserView)
 	if orgID != "" {
 		user, err = repo.View.UserByLoginNameAndResourceOwner(loginName, orgID)
@@ -355,6 +382,14 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *model.
 
 	request.SetUserInfo(user.ID, loginName, "", user.ResourceOwner)
 	return nil
+}
+
+func (repo AuthRequestRepo) GetOrgByPrimaryDomain(primaryDomain string) (*org_model.OrgView, error) {
+	org, err := repo.OrgViewProvider.OrgByPrimaryDomain(primaryDomain)
+	if err != nil {
+		return nil, err
+	}
+	return org_view_model.OrgToModel(org), nil
 }
 
 func (repo AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *model.AuthRequest, user *user_view_model.UserView) error {
@@ -387,10 +422,15 @@ func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *model.AuthRequest
 }
 
 func (repo *AuthRequestRepo) checkExternalUserLogin(request *model.AuthRequest, idpConfigID, externalUserID string) (err error) {
-	orgID := request.GetScopeOrgID()
+	primaryDomain := request.GetScopeOrgPrimaryDomain()
 	externalIDP := new(user_view_model.ExternalIDPView)
-	if orgID != "" {
-		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(externalUserID, idpConfigID, orgID)
+	org := new(org_model.OrgView)
+	if primaryDomain != "" {
+		org, err = repo.GetOrgByPrimaryDomain(primaryDomain)
+		if err != nil {
+			return err
+		}
+		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(externalUserID, idpConfigID, org.ID)
 	} else {
 		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigID(externalUserID, idpConfigID)
 	}
@@ -436,7 +476,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 		return nil, err
 	}
 
-	if request.SelectedIDPConfigID == "" {
+	if request.SelectedIDPConfigID == "" || (request.SelectedIDPConfigID != "" && request.LinkingUsers != nil && len(request.LinkingUsers) > 0) {
 		if user.InitRequired {
 			return append(steps, &model.InitUserStep{PasswordSet: user.PasswordSet}), nil
 		}
