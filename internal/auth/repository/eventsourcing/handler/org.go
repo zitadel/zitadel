@@ -46,6 +46,17 @@ func (o *Org) Reduce(event *es_models.Event) (err error) {
 			return err
 		}
 		err = org.AppendEvent(event)
+	case model.OrgDomainPrimarySet:
+		domain := new(org_model.OrgDomainView)
+		err = domain.SetData(event)
+		if err != nil {
+			return err
+		}
+		org, err = o.view.OrgByID(event.AggregateID)
+		if err != nil {
+			return err
+		}
+		org.Domain = domain.Domain
 	default:
 		return o.view.ProcessedOrgSequence(event.Sequence)
 	}
