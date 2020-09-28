@@ -237,6 +237,26 @@ func (mr *MockAdminServiceClientMockRecorder) GetDefaultLoginPolicyIdpProviders(
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultLoginPolicyIdpProviders", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultLoginPolicyIdpProviders), varargs...)
 }
 
+// GetDefaultPasswordComlexityPolicy mocks base method
+func (m *MockAdminServiceClient) GetDefaultPasswordComlexityPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.DefaultPasswordComplexityPolicyView, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetDefaultPasswordComlexityPolicy", varargs...)
+	ret0, _ := ret[0].(*admin.DefaultPasswordComplexityPolicyView)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDefaultPasswordComlexityPolicy indicates an expected call of GetDefaultPasswordComlexityPolicy
+func (mr *MockAdminServiceClientMockRecorder) GetDefaultPasswordComlexityPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultPasswordComlexityPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultPasswordComlexityPolicy), varargs...)
+}
+
 // GetFailedEvents mocks base method
 func (m *MockAdminServiceClient) GetFailedEvents(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.FailedEvents, error) {
 	m.ctrl.T.Helper()
@@ -615,6 +635,26 @@ func (mr *MockAdminServiceClientMockRecorder) UpdateDefaultLoginPolicy(arg0, arg
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDefaultLoginPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).UpdateDefaultLoginPolicy), varargs...)
+}
+
+// UpdateDefaultPasswordComplexityPolicy mocks base method
+func (m *MockAdminServiceClient) UpdateDefaultPasswordComplexityPolicy(arg0 context.Context, arg1 *admin.DefaultPasswordComplexityPolicy, arg2 ...grpc.CallOption) (*admin.DefaultPasswordComplexityPolicy, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateDefaultPasswordComplexityPolicy", varargs...)
+	ret0, _ := ret[0].(*admin.DefaultPasswordComplexityPolicy)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateDefaultPasswordComplexityPolicy indicates an expected call of UpdateDefaultPasswordComplexityPolicy
+func (mr *MockAdminServiceClientMockRecorder) UpdateDefaultPasswordComplexityPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDefaultPasswordComplexityPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).UpdateDefaultPasswordComplexityPolicy), varargs...)
 }
 
 // UpdateIdpConfig mocks base method

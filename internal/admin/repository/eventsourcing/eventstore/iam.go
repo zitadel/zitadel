@@ -242,3 +242,21 @@ func (repo *IAMRepository) RemoveIDPProviderFromLoginPolicy(ctx context.Context,
 	}
 	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
 }
+
+func (repo *IAMRepository) GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error) {
+	policy, err := repo.View.PasswordComplexityByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.PasswordComplexityPolicyViewToModel(policy), err
+}
+
+func (repo *IAMRepository) AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.AddPasswordComplexityPolicy(ctx, policy)
+}
+
+func (repo *IAMRepository) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.ChangePasswordComplexityPolicy(ctx, policy)
+}

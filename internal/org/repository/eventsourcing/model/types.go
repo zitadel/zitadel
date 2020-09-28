@@ -51,4 +51,7 @@ const (
 	LoginPolicyIDPProviderAdded          models.EventType = "org.policy.login.idpprovider.added"
 	LoginPolicyIDPProviderRemoved        models.EventType = "org.policy.login.idpprovider.removed"
 	LoginPolicyIDPProviderCascadeRemoved models.EventType = "org.policy.login.idpprovider.cascade.removed"
+
+	PasswordComplexityPolicyAdded   models.EventType = "org.policy.password.complexity.added"
+	PasswordComplexityPolicyChanged models.EventType = "org.policy.password.complexity.changed"
 )

@@ -374,6 +374,27 @@ service AdminService {
             permission: "iam.policy.write"
         };
     }
+
+    rpc GetDefaultPasswordComlexityPolicy(google.protobuf.Empty) returns (DefaultPasswordComplexityPolicyView) {
+        option (google.api.http) = {
+            get: "/policies/password/complexity"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc UpdateDefaultPasswordComplexityPolicy(DefaultPasswordComplexityPolicy) returns (DefaultPasswordComplexityPolicy) {
+        option (google.api.http) = {
+            put: "/policies/password/complexity"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
 }
 
 message OrgID {
@@ -847,4 +868,20 @@ message IdpProviderSearchResponse {
 message IdpProviderSearchRequest {
     uint64 offset = 1;
     uint64 limit = 2;
+}
+
+message DefaultPasswordComplexityPolicy {
+    uint64 min_length = 1;
+    bool has_uppercase = 2;
+    bool has_lowercase = 3;
+    bool has_number = 4;
+    bool has_symbol = 5;
+}
+
+message DefaultPasswordComplexityPolicyView {
+    uint64 min_length = 1;
+    bool has_uppercase = 2;
+    bool has_lowercase = 3;
+    bool has_number = 4;
+    bool has_symbol = 5;
 }

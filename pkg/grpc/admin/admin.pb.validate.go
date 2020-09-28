@@ -4577,3 +4577,159 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = IdpProviderSearchRequestValidationError{}
+
+// Validate checks the field values on DefaultPasswordComplexityPolicy with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DefaultPasswordComplexityPolicy) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for MinLength
+
+	// no validation rules for HasUppercase
+
+	// no validation rules for HasLowercase
+
+	// no validation rules for HasNumber
+
+	// no validation rules for HasSymbol
+
+	return nil
+}
+
+// DefaultPasswordComplexityPolicyValidationError is the validation error
+// returned by DefaultPasswordComplexityPolicy.Validate if the designated
+// constraints aren't met.
+type DefaultPasswordComplexityPolicyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultPasswordComplexityPolicyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultPasswordComplexityPolicyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultPasswordComplexityPolicyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultPasswordComplexityPolicyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultPasswordComplexityPolicyValidationError) ErrorName() string {
+	return "DefaultPasswordComplexityPolicyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DefaultPasswordComplexityPolicyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultPasswordComplexityPolicy.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultPasswordComplexityPolicyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultPasswordComplexityPolicyValidationError{}
+
+// Validate checks the field values on DefaultPasswordComplexityPolicyView with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *DefaultPasswordComplexityPolicyView) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for MinLength
+
+	// no validation rules for HasUppercase
+
+	// no validation rules for HasLowercase
+
+	// no validation rules for HasNumber
+
+	// no validation rules for HasSymbol
+
+	return nil
+}
+
+// DefaultPasswordComplexityPolicyViewValidationError is the validation error
+// returned by DefaultPasswordComplexityPolicyView.Validate if the designated
+// constraints aren't met.
+type DefaultPasswordComplexityPolicyViewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultPasswordComplexityPolicyViewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultPasswordComplexityPolicyViewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultPasswordComplexityPolicyViewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultPasswordComplexityPolicyViewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultPasswordComplexityPolicyViewValidationError) ErrorName() string {
+	return "DefaultPasswordComplexityPolicyViewValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DefaultPasswordComplexityPolicyViewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultPasswordComplexityPolicyView.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultPasswordComplexityPolicyViewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultPasswordComplexityPolicyViewValidationError{}
