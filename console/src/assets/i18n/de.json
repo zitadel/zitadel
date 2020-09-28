@@ -409,7 +409,8 @@
                 "TITLE":"Login Richtlinien",
                 "DESCRIPTION":"Definiere die Loginmethoden für Benutzer",
                 "TITLECREATE":"Definiere die Loginmethoden für Benutzer",
-                "DESCRIPTIONCREATE":"Nutzer können Sich mit den verfügbaren Idps authentifizieren."
+                "DESCRIPTIONCREATEADMIN":"Nutzer können Sich mit den verfügbaren Idps authentifizieren.",
+                "DESCRIPTIONCREATEMGMT":"Nutzer können Sich mit den verfügbaren Idps authentifizieren. Achtung: Sie können von System-, sowie von selbsterstellten Providern Ihrer Organisation wählen."
             },
             "BTN_INSTALL":"Installieren",
             "BTN_EDIT":"Modifizieren",
