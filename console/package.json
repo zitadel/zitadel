@@ -35,7 +35,7 @@
     "google-protobuf": "^3.13.0",
     "grpc": "^1.24.3",
     "grpc-web": "^1.2.1",
-    "moment": "^2.27.0",
+    "moment": "^2.29.0",
     "ngx-moment": "^5.0.0",
     "ngx-quicklink": "^0.2.4",
     "rxjs": "~6.6.3",
