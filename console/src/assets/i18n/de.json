@@ -305,7 +305,12 @@
             "SEQUENCE":"Sequenz",
             "TIMESTAMP":"Zeitstempel",
             "ACTIONS":"Aktionen",
-            "CLEAR":"Aufräumen"
+            "CLEAR":"Aufräumen",
+            "CLEARED":"View wurde erfolgreich zurückgesetzt!",
+            "DIALOG": {
+                "VIEW_CLEAR_TITLE": "View zurücksetzen?",
+                "VIEW_CLEAR_DESCRIPTION":"Sie sind im Begriff eine View zu löschen. Durch das Löschen einer View wird ein Prozess gestartet, bei dem Daten für Endbenutzer möglicherweise nicht oder verzügert verfügbar sind. Sind Sie sicher?"
+            }
         },
         "FAILEDEVENTS": {
             "TITLE":"Gescheiterte Events",

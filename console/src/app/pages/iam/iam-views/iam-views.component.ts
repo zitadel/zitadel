@@ -1,10 +1,13 @@
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { View } from 'src/app/proto/generated/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
     selector: 'app-iam-views',
@@ -19,7 +22,7 @@ export class IamViewsComponent implements AfterViewInit {
 
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-    constructor(private adminService: AdminService) {
+    constructor(private adminService: AdminService, private dialog: MatDialog, private toast: ToastService) {
         this.loadViews();
     }
 
@@ -42,6 +45,26 @@ export class IamViewsComponent implements AfterViewInit {
     }
 
     public cancelView(viewname: string, db: string): void {
-        this.adminService.ClearView(viewname, db);
+
+        const dialogRef = this.dialog.open(WarnDialogComponent, {
+            data: {
+                confirmKey: 'ACTIONS.CLEAR',
+                cancelKey: 'ACTIONS.CANCEL',
+                titleKey: 'IAM.VIEWS.DIALOG.VIEW_CLEAR_TITLE',
+                descriptionKey: 'IAM.VIEWS.DIALOG.VIEW_CLEAR_DESCRIPTION',
+            },
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                this.adminService.ClearView(viewname, db).then(() => {
+                    this.toast.showInfo('IAM.VIEWS.CLEARED', true);
+                    this.loadViews();
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
+            }
+        });
     }
 }

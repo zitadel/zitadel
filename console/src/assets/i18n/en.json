@@ -305,7 +305,12 @@
             "SEQUENCE":"Sequence",
             "TIMESTAMP":"Timestamp",
             "ACTIONS":"Actions",
-            "CLEAR":"Clear"
+            "CLEAR":"Clear",
+            "CLEARED":"View was successfully cleared!",
+            "DIALOG": {
+                "VIEW_CLEAR_TITLE": "Clear View",
+                "VIEW_CLEAR_DESCRIPTION":"You are about to clear a view. Clearing a view creates a process during which data is possibly not available for endusers. Are you really sure?"
+            }
         },
         "FAILEDEVENTS": {
             "TITLE":"Failed Events",
