@@ -11,7 +11,13 @@ import { Observable, of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { accountCard, navAnimations, routeAnimations, toolbarAnimation } from './animations';
-import { Org, UserProfileView } from './proto/generated/auth_pb';
+import {
+    MyProjectOrgSearchKey,
+    MyProjectOrgSearchQuery,
+    Org,
+    SearchMethod,
+    UserProfileView,
+} from './proto/generated/auth_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';
@@ -172,9 +178,17 @@ export class AppComponent implements OnDestroy {
         this.orgSub.unsubscribe();
     }
 
-    public loadOrgs(): void {
+    public loadOrgs(filter?: string): void {
+        let query;
+        if (filter) {
+            query = new MyProjectOrgSearchQuery();
+            query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS);
+            query.setKey(MyProjectOrgSearchKey.MYPROJECTORGSEARCHKEY_ORG_NAME);
+            query.setValue(filter);
+        }
+
         this.orgLoading = true;
-        this.authService.SearchMyProjectOrgs(10, 0).then(res => {
+        this.authService.SearchMyProjectOrgs(10, 0, query ? [query] : undefined).then(res => {
             this.orgs = res.toObject().resultList;
             this.orgLoading = false;
         }).catch(error => {
@@ -230,6 +244,13 @@ export class AppComponent implements OnDestroy {
                 });
             }
         });
+    }
+
+    public applyFilter(event: Event): void {
+        const filterValue = (event.target as HTMLInputElement).value;
+        this.loadOrgs(
+            filterValue.trim().toLowerCase(),
+        );
     }
 }
 

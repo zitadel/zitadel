@@ -2,22 +2,20 @@
     <app-refresh-table *ngIf="dataSource" (refreshed)="loadViews()" [dataSize]="dataSource.data.length"
         [loading]="loading$ | async">
 
-        <table [dataSource]="dataSource" mat-table class="table" aria-label="Elements">
+        <table [dataSource]="dataSource" mat-table class="table" aria-label="Elements" matSort>
             <ng-container matColumnDef="viewName">
-                <th mat-header-cell *matHeaderCellDef> {{ 'IAM.VIEWS.VIEWNAME' | translate }} </th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'IAM.VIEWS.VIEWNAME' | translate }} </th>
                 <td mat-cell *matCellDef="let view"> {{view.viewName}} </td>
             </ng-container>
 
             <ng-container matColumnDef="database">
-                <th mat-header-cell *matHeaderCellDef> {{ 'IAM.VIEWS.DATABASE' | translate }} </th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'IAM.VIEWS.DATABASE' | translate }} </th>
                 <td mat-cell *matCellDef="let view"> {{view.database}} </td>
             </ng-container>
 
             <ng-container matColumnDef="sequence">
                 <th mat-header-cell *matHeaderCellDef> {{ 'IAM.VIEWS.SEQUENCE' | translate }} </th>
-                <td mat-cell *matCellDef="let view">
-                    <span>{{view?.processedSequence}}</span>
-                </td>
+                <td mat-cell *matCellDef="let view"> {{view.processedSequence}} </td>
             </ng-container>
 
             <ng-container matColumnDef="timestamp">

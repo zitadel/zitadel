@@ -337,6 +337,10 @@
     },
     "ORG": {
         "PAGES": {
+            "NAME":"Name",
+            "ID":"ID",
+            "FILTER":"Filter",
+            "FILTERPLACEHOLDER":"Filter for the name",
             "LIST": "Organisations",
             "LISTDESCRIPTION":"Choose an organisation.",
             "ACTIVE":"Active",

@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
@@ -15,6 +16,8 @@ import { ToastService } from 'src/app/services/toast.service';
     styleUrls: ['./iam-views.component.scss'],
 })
 export class IamViewsComponent implements AfterViewInit {
+    @ViewChild(MatSort) sort!: MatSort;
+
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     public dataSource!: MatTableDataSource<View.AsObject>;
 
@@ -41,6 +44,7 @@ export class IamViewsComponent implements AfterViewInit {
         ).subscribe(views => {
             this.dataSource = new MatTableDataSource(views);
             this.dataSource.paginator = this.paginator;
+            this.dataSource.sort = this.sort;
         });
     }
 

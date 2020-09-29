@@ -1,0 +1,40 @@
+h1 {
+  margin-top: 0;
+}
+
+.top-desc {
+  color: #8795a1;
+}
+
+.table,
+.paginator {
+    width: 100%;
+
+td,
+th {
+    padding: 0 1rem;
+
+    &:first-child {
+    padding-left: 0;
+    padding-right: 1rem;
+    }
+
+    &:last-child {
+    padding-right: 0;
+    }
+}
+
+.selection {
+    width: 50px;
+    max-width: 50px;
+}
+}
+
+.pointer {
+    outline: none;
+    cursor: pointer;
+}
+
+.filter {
+    margin-left: 1rem;
+}

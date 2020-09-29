@@ -23,6 +23,12 @@
                 <button class="show-all" mat-menu-item
                     [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' | translate}}</button>
 
+                <mat-form-field class="filter">
+                    <mat-label>{{'ORG.PAGES.FILTER' | translate}}</mat-label>
+                    <input matInput (click)="$event.stopPropagation()" (keyup)="applyFilter($event)"
+                        placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}" #input>
+                </mat-form-field>
+
                 <button [ngClass]="{'active': temporg.id === org?.id}" [disabled]="!temporg.id"
                     *ngFor="let temporg of orgs" mat-menu-item (click)="setActiveOrg(temporg)">
                     {{temporg?.name ? temporg.name : 'NO NAME'}}
