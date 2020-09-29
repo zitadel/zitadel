@@ -125,6 +125,9 @@ export class GrpcAuthService {
             first(),
             switchMap(() => from(this.GetMyzitadelPermissions())),
             map(rolesResp => rolesResp.toObject().permissionsList),
+            catchError(_ => {
+                return of([]);
+            }),
         ).subscribe(roles => {
             this.zitadelPermissions.next(roles);
         });
@@ -286,15 +289,15 @@ export class GrpcAuthService {
     }
 
     public async SearchExternalIdps(
-      userId: string,
-      limit: number,
-      offset: number,
-      asc?: boolean,
+        userId: string,
+        limit: number,
+        offset: number,
+        asc?: boolean,
     ): Promise<ExternalIDPSearchResponse> {
-      const req = new ExternalIDPSearchRequest();
-      req.setLimit(limit);
-      req.setOffset(offset);
-      return this.grpcService.auth.searchMyExternalIDPs(req);
+        const req = new ExternalIDPSearchRequest();
+        req.setLimit(limit);
+        req.setOffset(offset);
+        return this.grpcService.auth.searchMyExternalIDPs(req);
     }
 
     public async AddMfaOTP(): Promise<MfaOtpResponse> {

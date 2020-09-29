@@ -3,9 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
-import { take } from 'rxjs/operators';
 
-import { WarnDialogComponent } from '../modules/warn-dialog/warn-dialog.component';
 import { AuthenticationService } from './authentication.service';
 
 @Injectable({
@@ -32,24 +30,8 @@ export class ToastService {
 
     public showError(grpcError: any): void {
         const { message, code, metadata } = grpcError;
-        // TODO: remove check for code === 7
-        if (code === 16 || (code === 7 && message === 'invalid token')) {
-            const dialogRef = this.dialog.open(WarnDialogComponent, {
-                data: {
-                    confirmKey: 'ACTIONS.LOGIN',
-                    titleKey: 'ERRORS.TOKENINVALID.TITLE',
-                    descriptionKey: 'ERRORS.TOKENINVALID.DESCRIPTION',
-                },
-                width: '400px',
-            });
-
-            dialogRef.afterClosed().pipe(take(1)).subscribe(resp => {
-                if (resp) {
-                    this.authService.authenticate(undefined, true, true);
-                }
-            });
-        } else {
-            this.showMessage(decodeURI(message), 'close', { duration: 3000 });
+        if (code !== 16) {
+            this.showMessage(decodeURI(message), 'close', { duration: 4000 });
         }
     }
 
