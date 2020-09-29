@@ -1,20 +1,23 @@
 <app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
-    [timestamp]="idpResult?.viewTimestamp" [selection]="selection">
+    emitRefreshOnPreviousRoute="/iam/idp/create" [timestamp]="idpResult?.viewTimestamp" [selection]="selection">
     <ng-template appHasRole [appHasRole]="['iam.write']" actions>
         <button (click)="deactivateSelectedIdps()" matTooltip="{{'IDP.DEACTIVATE' | translate}}" class="icon-button"
-            mat-icon-button *ngIf="selection.hasValue() && serviceType!=PolicyComponentServiceType.MGMT" [disabled]="disabled">
+            mat-icon-button *ngIf="selection.hasValue() && serviceType!=PolicyComponentServiceType.MGMT"
+            [disabled]="disabled">
             <mat-icon svgIcon="mdi_account_cancel"></mat-icon>
         </button>
         <button (click)="reactivateSelectedIdps()" matTooltip="{{'IDP.ACTIVATE' | translate}}" class="icon-button"
-                mat-icon-button *ngIf="selection.hasValue() && serviceType!=PolicyComponentServiceType.MGMT" [disabled]="disabled">
+            mat-icon-button *ngIf="selection.hasValue() && serviceType!=PolicyComponentServiceType.MGMT"
+            [disabled]="disabled">
             <mat-icon svgIcon="mdi_account_check_outline"></mat-icon>
         </button>
         <button color="warn" (click)="removeSelectedIdps()" matTooltip="{{'IDP.DELETE' | translate}}"
-                class="icon-button" mat-icon-button *ngIf="selection.hasValue() && serviceType!=PolicyComponentServiceType.MGMT" [disabled]="disabled">
+            class="icon-button" mat-icon-button
+            *ngIf="selection.hasValue() && serviceType!=PolicyComponentServiceType.MGMT" [disabled]="disabled">
             <i class="las la-trash"></i>
         </button>
         <a class="add-button" [routerLink]="createRouterLink" color="primary" mat-raised-button [disabled]="disabled"
-           *ngIf="serviceType!=PolicyComponentServiceType.MGMT">
+            *ngIf="serviceType!=PolicyComponentServiceType.MGMT">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
     </ng-template>
@@ -74,9 +77,18 @@
                     {{idp.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }} </td>
             </ng-container>
 
+            <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef> {{ 'IDP.TYPE' | translate }} </th>
+                <td class="pointer" mat-cell *matCellDef="let idp">
+                    {{'IDP.TYPES.'+idp.providerType | translate }} </td>
+            </ng-container>
+
+
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr class="data-row" mat-row *matRowDef="let row; columns: displayedColumns;"
-                [routerLink]="row.id ? [serviceType == PolicyComponentServiceType.ADMIN ? '/iam' : '/org', 'idp', row.id ]: null">
+            <tr class="data-row"
+                [ngClass]="{'disabled': serviceType==PolicyComponentServiceType.MGMT && row?.providerType == IdpProviderType.IDPPROVIDERTYPE_SYSTEM}"
+                mat-row *matRowDef="let row; columns: displayedColumns;"
+                [routerLink]="serviceType==PolicyComponentServiceType.ADMIN ? routerLinkForRow(row): null">
             </tr>
 
         </table>

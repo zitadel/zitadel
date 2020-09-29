@@ -13,7 +13,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
-import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { ProjectGrantCreateRoutingModule } from './project-grant-create-routing.module';
 import { ProjectGrantCreateComponent } from './project-grant-create.component';

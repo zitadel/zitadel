@@ -19,7 +19,7 @@ import { ContributorsModule } from 'src/app/modules/contributors/contributors.mo
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
-import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { ChangesModule } from '../../modules/changes/changes.module';
 import { AddDomainDialogModule } from './org-detail/add-domain-dialog/add-domain-dialog.module';

@@ -44,6 +44,8 @@ export class GrpcAuthService {
     private _activeOrgChanged: Subject<Org.AsObject> = new Subject();
     public user!: Observable<UserProfileView.AsObject>;
     private zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject(['user.resourceowner']);
+    public readonly fetchedZitadelPermissions: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
+
     private cachedOrgs: Org.AsObject[] = [];
 
     constructor(
@@ -125,6 +127,12 @@ export class GrpcAuthService {
             first(),
             switchMap(() => from(this.GetMyzitadelPermissions())),
             map(rolesResp => rolesResp.toObject().permissionsList),
+            catchError(_ => {
+                return of([]);
+            }),
+            finalize(() => {
+                this.fetchedZitadelPermissions.next(true);
+            }),
         ).subscribe(roles => {
             this.zitadelPermissions.next(roles);
         });
@@ -136,9 +144,7 @@ export class GrpcAuthService {
      */
     public isAllowed(roles: string[] | RegExp[]): Observable<boolean> {
         if (roles && roles.length > 0) {
-            return this.zitadelPermissions.pipe(switchMap(zroles => {
-                return of(this.hasRoles(zroles, roles));
-            }));
+            return this.zitadelPermissions.pipe(switchMap(zroles => of(this.hasRoles(zroles, roles))));
         } else {
             return of(false);
         }
@@ -220,6 +226,10 @@ export class GrpcAuthService {
         return this.grpcService.auth.updateMyUserProfile(req);
     }
 
+    public get zitadelPermissionsChanged(): Observable<string[]> {
+        return this.zitadelPermissions;
+    }
+
     public async getMyUserSessions(): Promise<UserSessionViews> {
         return this.grpcService.auth.getMyUserSessions(
             new Empty(),
@@ -286,15 +296,15 @@ export class GrpcAuthService {
     }
 
     public async SearchExternalIdps(
-      userId: string,
-      limit: number,
-      offset: number,
-      asc?: boolean,
+        userId: string,
+        limit: number,
+        offset: number,
+        asc?: boolean,
     ): Promise<ExternalIDPSearchResponse> {
-      const req = new ExternalIDPSearchRequest();
-      req.setLimit(limit);
-      req.setOffset(offset);
-      return this.grpcService.auth.searchMyExternalIDPs(req);
+        const req = new ExternalIDPSearchRequest();
+        req.setLimit(limit);
+        req.setOffset(offset);
+        return this.grpcService.auth.searchMyExternalIDPs(req);
     }
 
     public async AddMfaOTP(): Promise<MfaOtpResponse> {

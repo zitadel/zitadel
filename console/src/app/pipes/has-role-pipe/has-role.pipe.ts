@@ -1,7 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { Observable } from 'rxjs';
-
-import { GrpcAuthService } from '../services/grpc-auth.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 @Pipe({
     name: 'hasRole',
