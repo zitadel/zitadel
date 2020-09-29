@@ -252,6 +252,12 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 		policyResourceOwner = resourceOwner
 	}
 	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(policyResourceOwner)
+	if err != nil && errors.IsNotFound(err) {
+		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.IAMID)
+		if err != nil {
+			return err
+		}
+	}
 	if err != nil {
 		return err
 	}

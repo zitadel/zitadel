@@ -43,11 +43,11 @@ func (step *Step1) init(setup *Setup) {
 	step.createdProjects = make(map[string]*proj_model.Project)
 }
 
-func (step *Step1) execute(ctx context.Context) (err error) {
-	err = step.loginPolicy(ctx, step.DefaultLoginPolicy)
+func (step *Step1) execute(ctx context.Context) (*iam_model.IAM, error) {
+	err := step.loginPolicy(ctx, step.DefaultLoginPolicy)
 	if err != nil {
 		logging.Log("SETUP-Hdu8S").WithError(err).Error("unable to create login policy")
-		return err
+		return nil, err
 	}
 
 	step.pwComplexityPolicy = new(iam_model.PasswordComplexityPolicyView)
@@ -55,34 +55,34 @@ func (step *Step1) execute(ctx context.Context) (err error) {
 	err = step.orgs(ctx, step.Orgs)
 	if err != nil {
 		logging.Log("SETUP-p4oWq").WithError(err).Error("unable to set up orgs")
-		return err
+		return nil, err
 	}
 
 	ctx = setSetUpContextData(ctx, step.setup.iamID)
 	err = step.iamOwners(ctx, step.Owners)
 	if err != nil {
 		logging.Log("SETUP-WHr01").WithError(err).Error("unable to set up iam owners")
-		return err
+		return nil, err
 	}
 
 	err = step.setGlobalOrg(ctx, step.GlobalOrg)
 	if err != nil {
 		logging.Log("SETUP-0874m").WithError(err).Error("unable to set global org")
-		return err
+		return nil, err
 	}
 
 	err = step.setIamProject(ctx, step.IAMProject)
 	if err != nil {
 		logging.Log("SETUP-kaWjq").WithError(err).Error("unable to set zitadel project")
-		return err
+		return nil, err
 	}
 
-	_, err = step.setup.IamEvents.SetupDone(ctx, step.setup.iamID, step.step())
+	iam, err := step.setup.IamEvents.SetupDone(ctx, step.setup.iamID, step.step())
 	if err != nil {
 		logging.Log("SETUP-de342").WithField("step", step.step()).WithError(err).Error("unable to finish setup")
-		return err
+		return nil, err
 	}
-	return nil
+	return iam, nil
 }
 
 func (step *Step1) loginPolicy(ctx context.Context, policy LoginPolicy) error {

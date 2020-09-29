@@ -3,6 +3,7 @@ package eventsourcing
 import (
 	"context"
 	"encoding/json"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"net"
 	"testing"
 	"time"
@@ -15,7 +16,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	policy_model "github.com/caos/zitadel/internal/policy/model"
 	"github.com/caos/zitadel/internal/user/model"
 	repo_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
@@ -95,7 +95,7 @@ func TestCreateUser(t *testing.T) {
 		es        *UserEventstore
 		ctx       context.Context
 		user      *model.User
-		policy    *policy_model.PasswordComplexityPolicy
+		policy    *iam_model.PasswordComplexityPolicyView
 		orgPolicy *org_model.OrgIAMPolicy
 	}
 	type res struct {
@@ -133,7 +133,7 @@ func TestCreateUser(t *testing.T) {
 						},
 					},
 				},
-				policy:    &policy_model.PasswordComplexityPolicy{},
+				policy:    &iam_model.PasswordComplexityPolicyView{},
 				orgPolicy: &org_model.OrgIAMPolicy{},
 			},
 			res: res{
@@ -176,7 +176,7 @@ func TestCreateUser(t *testing.T) {
 						},
 					},
 				},
-				policy:    &policy_model.PasswordComplexityPolicy{},
+				policy:    &iam_model.PasswordComplexityPolicyView{},
 				orgPolicy: &org_model.OrgIAMPolicy{UserLoginMustBeDomain: false},
 			},
 			res: res{
@@ -226,7 +226,7 @@ func TestCreateUser(t *testing.T) {
 						},
 					},
 				},
-				policy:    &policy_model.PasswordComplexityPolicy{},
+				policy:    &iam_model.PasswordComplexityPolicyView{},
 				orgPolicy: &org_model.OrgIAMPolicy{},
 			},
 			res: res{
@@ -275,7 +275,7 @@ func TestCreateUser(t *testing.T) {
 						},
 					},
 				},
-				policy:    &policy_model.PasswordComplexityPolicy{},
+				policy:    &iam_model.PasswordComplexityPolicyView{},
 				orgPolicy: &org_model.OrgIAMPolicy{},
 			},
 			res: res{
@@ -301,7 +301,7 @@ func TestCreateUser(t *testing.T) {
 				es:        GetMockManipulateUser(ctrl),
 				ctx:       authz.NewMockContext("orgID", "userID"),
 				user:      &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Human: &model.Human{}},
-				policy:    &policy_model.PasswordComplexityPolicy{},
+				policy:    &iam_model.PasswordComplexityPolicyView{},
 				orgPolicy: &org_model.OrgIAMPolicy{},
 			},
 			res: res{
@@ -326,7 +326,7 @@ func TestCreateUser(t *testing.T) {
 				es:     GetMockManipulateUser(ctrl),
 				ctx:    authz.NewMockContext("orgID", "userID"),
 				user:   &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Human: &model.Human{}},
-				policy: &policy_model.PasswordComplexityPolicy{},
+				policy: &iam_model.PasswordComplexityPolicyView{},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -367,7 +367,7 @@ func TestRegisterUser(t *testing.T) {
 		ctx           context.Context
 		user          *model.User
 		resourceOwner string
-		policy        *policy_model.PasswordComplexityPolicy
+		policy        *iam_model.PasswordComplexityPolicyView
 		orgPolicy     *org_model.OrgIAMPolicy
 	}
 	type res struct {
@@ -406,7 +406,7 @@ func TestRegisterUser(t *testing.T) {
 						},
 					},
 				},
-				policy:        &policy_model.PasswordComplexityPolicy{},
+				policy:        &iam_model.PasswordComplexityPolicyView{},
 				orgPolicy:     &org_model.OrgIAMPolicy{UserLoginMustBeDomain: true},
 				resourceOwner: "ResourceOwner",
 			},
@@ -450,7 +450,7 @@ func TestRegisterUser(t *testing.T) {
 						},
 					},
 				},
-				policy:        &policy_model.PasswordComplexityPolicy{},
+				policy:        &iam_model.PasswordComplexityPolicyView{},
 				orgPolicy:     &org_model.OrgIAMPolicy{UserLoginMustBeDomain: false},
 				resourceOwner: "ResourceOwner",
 			},
@@ -476,7 +476,7 @@ func TestRegisterUser(t *testing.T) {
 				es:            GetMockManipulateUser(ctrl),
 				ctx:           authz.NewMockContext("orgID", "userID"),
 				user:          &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1}, Human: &model.Human{}},
-				policy:        &policy_model.PasswordComplexityPolicy{},
+				policy:        &iam_model.PasswordComplexityPolicyView{},
 				orgPolicy:     &org_model.OrgIAMPolicy{},
 				resourceOwner: "ResourceOwner",
 			},
@@ -502,7 +502,7 @@ func TestRegisterUser(t *testing.T) {
 						},
 					},
 				},
-				policy:        &policy_model.PasswordComplexityPolicy{},
+				policy:        &iam_model.PasswordComplexityPolicyView{},
 				orgPolicy:     &org_model.OrgIAMPolicy{},
 				resourceOwner: "ResourceOwner",
 			},
@@ -528,7 +528,7 @@ func TestRegisterUser(t *testing.T) {
 						},
 					},
 				},
-				policy:    &policy_model.PasswordComplexityPolicy{},
+				policy:    &iam_model.PasswordComplexityPolicyView{},
 				orgPolicy: &org_model.OrgIAMPolicy{},
 			},
 			res: res{
@@ -577,7 +577,7 @@ func TestRegisterUser(t *testing.T) {
 						},
 					},
 				},
-				policy: &policy_model.PasswordComplexityPolicy{},
+				policy: &iam_model.PasswordComplexityPolicyView{},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -1078,7 +1078,7 @@ func TestInitCodeVerify(t *testing.T) {
 	type args struct {
 		es         *UserEventstore
 		ctx        context.Context
-		policy     *policy_model.PasswordComplexityPolicy
+		policy     *iam_model.PasswordComplexityPolicyView
 		userID     string
 		verifyCode string
 		password   string
@@ -1105,7 +1105,7 @@ func TestInitCodeVerify(t *testing.T) {
 					},
 				),
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				policy:     &policy_model.PasswordComplexityPolicy{},
+				policy:     &iam_model.PasswordComplexityPolicyView{},
 				verifyCode: "code",
 				userID:     "userID",
 			},
@@ -1125,7 +1125,7 @@ func TestInitCodeVerify(t *testing.T) {
 					},
 				),
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				policy:     &policy_model.PasswordComplexityPolicy{},
+				policy:     &iam_model.PasswordComplexityPolicyView{},
 				userID:     "userID",
 				verifyCode: "code",
 				password:   "password",
@@ -1145,7 +1145,7 @@ func TestInitCodeVerify(t *testing.T) {
 					},
 				),
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				policy:     &policy_model.PasswordComplexityPolicy{},
+				policy:     &iam_model.PasswordComplexityPolicyView{},
 				userID:     "userID",
 				verifyCode: "code",
 				password:   "password",
@@ -1156,7 +1156,7 @@ func TestInitCodeVerify(t *testing.T) {
 			args: args{
 				es:         GetMockManipulateUser(ctrl),
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				policy:     &policy_model.PasswordComplexityPolicy{},
+				policy:     &iam_model.PasswordComplexityPolicyView{},
 				userID:     "",
 				verifyCode: "code",
 				password:   "password",
@@ -1170,7 +1170,7 @@ func TestInitCodeVerify(t *testing.T) {
 			args: args{
 				es:         GetMockManipulateUser(ctrl),
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				policy:     &policy_model.PasswordComplexityPolicy{HasNumber: true},
+				policy:     &iam_model.PasswordComplexityPolicyView{HasNumber: true},
 				userID:     "userID",
 				verifyCode: "code",
 				password:   "password",
@@ -1184,7 +1184,7 @@ func TestInitCodeVerify(t *testing.T) {
 			args: args{
 				es:         GetMockManipulateUserNoEventsWithPw(ctrl),
 				ctx:        authz.NewMockContext("orgID", "userID"),
-				policy:     &policy_model.PasswordComplexityPolicy{},
+				policy:     &iam_model.PasswordComplexityPolicyView{},
 				userID:     "userID",
 				password:   "password",
 				verifyCode: "code",
@@ -1352,7 +1352,7 @@ func TestSetOneTimePassword(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		policy   *policy_model.PasswordComplexityPolicy
+		policy   *iam_model.PasswordComplexityPolicyView
 		password *model.Password
 	}
 	type res struct {
@@ -1369,7 +1369,7 @@ func TestSetOneTimePassword(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserWithPasswordCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, Human: &repo_model.Human{}}),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				policy:   &policy_model.PasswordComplexityPolicy{},
+				policy:   &iam_model.PasswordComplexityPolicyView{},
 				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SecretString: "Password"},
 			},
 			res: res{
@@ -1381,7 +1381,7 @@ func TestSetOneTimePassword(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				policy:   &policy_model.PasswordComplexityPolicy{},
+				policy:   &iam_model.PasswordComplexityPolicyView{},
 				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: ""}, SecretString: "Password"},
 			},
 			res: res{
@@ -1393,7 +1393,7 @@ func TestSetOneTimePassword(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				policy:   &policy_model.PasswordComplexityPolicy{},
+				policy:   &iam_model.PasswordComplexityPolicyView{},
 				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SecretString: "Password"},
 			},
 			res: res{
@@ -1557,7 +1557,7 @@ func TestSetPassword(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		policy   *policy_model.PasswordComplexityPolicy
+		policy   *iam_model.PasswordComplexityPolicyView
 		userID   string
 		code     string
 		password string
@@ -1587,7 +1587,7 @@ func TestSetPassword(t *testing.T) {
 					},
 				),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				policy:   &policy_model.PasswordComplexityPolicy{},
+				policy:   &iam_model.PasswordComplexityPolicyView{},
 				userID:   "userID",
 				code:     "code",
 				password: "password",
@@ -1599,7 +1599,7 @@ func TestSetPassword(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				policy:   &policy_model.PasswordComplexityPolicy{},
+				policy:   &iam_model.PasswordComplexityPolicyView{},
 				userID:   "",
 				code:     "code",
 				password: "password",
@@ -1613,7 +1613,7 @@ func TestSetPassword(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				policy:   &policy_model.PasswordComplexityPolicy{},
+				policy:   &iam_model.PasswordComplexityPolicyView{},
 				userID:   "userID",
 				code:     "code",
 				password: "password",
@@ -1632,7 +1632,7 @@ func TestSetPassword(t *testing.T) {
 					},
 				),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				policy:   &policy_model.PasswordComplexityPolicy{},
+				policy:   &iam_model.PasswordComplexityPolicyView{},
 				userID:   "userID",
 				code:     "code",
 				password: "password",
@@ -1658,7 +1658,7 @@ func TestSetPassword(t *testing.T) {
 					},
 				),
 				ctx:      authz.NewMockContext("orgID", "userID"),
-				policy:   &policy_model.PasswordComplexityPolicy{},
+				policy:   &iam_model.PasswordComplexityPolicyView{},
 				userID:   "userID",
 				code:     "code",
 				password: "password",
@@ -1687,7 +1687,7 @@ func TestChangePassword(t *testing.T) {
 	type args struct {
 		es     *UserEventstore
 		ctx    context.Context
-		policy *policy_model.PasswordComplexityPolicy
+		policy *iam_model.PasswordComplexityPolicyView
 		userID string
 		old    string
 		new    string
@@ -1717,7 +1717,7 @@ func TestChangePassword(t *testing.T) {
 					},
 				),
 				ctx:    authz.NewMockContext("orgID", "userID"),
-				policy: &policy_model.PasswordComplexityPolicy{},
+				policy: &iam_model.PasswordComplexityPolicyView{},
 				userID: "userID",
 				old:    "old",
 				new:    "new",
@@ -1731,7 +1731,7 @@ func TestChangePassword(t *testing.T) {
 			args: args{
 				es:     GetMockManipulateUser(ctrl),
 				ctx:    authz.NewMockContext("orgID", "userID"),
-				policy: &policy_model.PasswordComplexityPolicy{},
+				policy: &iam_model.PasswordComplexityPolicyView{},
 				userID: "",
 				old:    "old",
 				new:    "new",
@@ -1745,7 +1745,7 @@ func TestChangePassword(t *testing.T) {
 			args: args{
 				es:     GetMockManipulateUserNoEvents(ctrl),
 				ctx:    authz.NewMockContext("orgID", "userID"),
-				policy: &policy_model.PasswordComplexityPolicy{},
+				policy: &iam_model.PasswordComplexityPolicyView{},
 				userID: "userID",
 				old:    "old",
 				new:    "new",
@@ -1764,7 +1764,7 @@ func TestChangePassword(t *testing.T) {
 					},
 				),
 				ctx:    authz.NewMockContext("orgID", "userID"),
-				policy: &policy_model.PasswordComplexityPolicy{},
+				policy: &iam_model.PasswordComplexityPolicyView{},
 				userID: "userID",
 				old:    "old",
 				new:    "new",
@@ -1789,7 +1789,7 @@ func TestChangePassword(t *testing.T) {
 					},
 				),
 				ctx:    authz.NewMockContext("orgID", "userID"),
-				policy: &policy_model.PasswordComplexityPolicy{},
+				policy: &iam_model.PasswordComplexityPolicyView{},
 				userID: "userID",
 				old:    "old",
 				new:    "new",

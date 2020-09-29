@@ -237,24 +237,24 @@ func (mr *MockAdminServiceClientMockRecorder) GetDefaultLoginPolicyIdpProviders(
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultLoginPolicyIdpProviders", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultLoginPolicyIdpProviders), varargs...)
 }
 
-// GetDefaultPasswordComlexityPolicy mocks base method
-func (m *MockAdminServiceClient) GetDefaultPasswordComlexityPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.DefaultPasswordComplexityPolicyView, error) {
+// GetDefaultPasswordComplexityPolicy mocks base method
+func (m *MockAdminServiceClient) GetDefaultPasswordComplexityPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.DefaultPasswordComplexityPolicyView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetDefaultPasswordComlexityPolicy", varargs...)
+	ret := m.ctrl.Call(m, "GetDefaultPasswordComplexityPolicy", varargs...)
 	ret0, _ := ret[0].(*admin.DefaultPasswordComplexityPolicyView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetDefaultPasswordComlexityPolicy indicates an expected call of GetDefaultPasswordComlexityPolicy
-func (mr *MockAdminServiceClientMockRecorder) GetDefaultPasswordComlexityPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+// GetDefaultPasswordComplexityPolicy indicates an expected call of GetDefaultPasswordComplexityPolicy
+func (mr *MockAdminServiceClientMockRecorder) GetDefaultPasswordComplexityPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultPasswordComlexityPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultPasswordComlexityPolicy), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultPasswordComplexityPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultPasswordComplexityPolicy), varargs...)
 }
 
 // GetFailedEvents mocks base method

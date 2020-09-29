@@ -57,7 +57,7 @@ func (repo *OrgRepository) SearchOrgs(ctx context.Context, request *org_model.Or
 }
 
 func (repo *OrgRepository) RegisterOrg(ctx context.Context, register *auth_model.RegisterOrg) (*auth_model.RegisterOrg, error) {
-	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(policy_model.DefaultPolicy)
+	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {
 		return nil, err
 	}

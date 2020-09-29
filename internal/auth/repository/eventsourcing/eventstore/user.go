@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 
 	"github.com/caos/logging"
@@ -22,12 +23,13 @@ import (
 )
 
 type UserRepo struct {
-	SearchLimit  uint64
-	Eventstore   eventstore.Eventstore
-	UserEvents   *user_event.UserEventstore
-	OrgEvents    *org_event.OrgEventstore
-	PolicyEvents *policy_event.PolicyEventstore
-	View         *view.View
+	SearchLimit    uint64
+	Eventstore     eventstore.Eventstore
+	UserEvents     *user_event.UserEventstore
+	OrgEvents      *org_event.OrgEventstore
+	PolicyEvents   *policy_event.PolicyEventstore
+	View           *view.View
+	SystemDefaults systemdefaults.SystemDefaults
 }
 
 func (repo *UserRepo) Health(ctx context.Context) error {
@@ -48,6 +50,12 @@ func (repo *UserRepo) registerUser(ctx context.Context, registerUser *model.User
 		policyResourceOwner = resourceOwner
 	}
 	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(policyResourceOwner)
+	if err != nil && errors.IsNotFound(err) {
+		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -218,6 +226,12 @@ func (repo *UserRepo) ChangeMyAddress(ctx context.Context, address *model.Addres
 
 func (repo *UserRepo) ChangeMyPassword(ctx context.Context, old, new string) error {
 	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if err != nil && errors.IsNotFound(err) {
+		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return err
+		}
+	}
 	if err != nil {
 		return err
 	}
@@ -228,6 +242,12 @@ func (repo *UserRepo) ChangeMyPassword(ctx context.Context, old, new string) err
 
 func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new string) error {
 	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if err != nil && errors.IsNotFound(err) {
+		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return err
+		}
+	}
 	if err != nil {
 		return err
 	}
@@ -296,6 +316,12 @@ func (repo *UserRepo) ResendInitVerificationMail(ctx context.Context, userID str
 
 func (repo *UserRepo) VerifyInitCode(ctx context.Context, userID, code, password string) error {
 	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if err != nil && errors.IsNotFound(err) {
+		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return err
+		}
+	}
 	if err != nil {
 		return err
 	}
@@ -317,6 +343,12 @@ func (repo *UserRepo) RequestPasswordReset(ctx context.Context, loginname string
 
 func (repo *UserRepo) SetPassword(ctx context.Context, userID, code, password string) error {
 	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if err != nil && errors.IsNotFound(err) {
+		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return err
+		}
+	}
 	if err != nil {
 		return err
 	}

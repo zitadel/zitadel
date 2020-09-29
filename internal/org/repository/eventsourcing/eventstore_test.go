@@ -2769,6 +2769,7 @@ func TestAddPasswordComplexityPolicy(t *testing.T) {
 				ctx: authz.NewMockContext("orgID", "userID"),
 				policy: &iam_model.PasswordComplexityPolicy{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MinLength:  10,
 				},
 			},
 			res: res{
@@ -2856,7 +2857,7 @@ func TestChangePasswordComplexityPolicy(t *testing.T) {
 			},
 			res: res{
 				wantErr: true,
-				errFunc: caos_errs.IsPreconditionFailed,
+				errFunc: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -2866,6 +2867,7 @@ func TestChangePasswordComplexityPolicy(t *testing.T) {
 				ctx: authz.NewMockContext("orgID", "userID"),
 				policy: &iam_model.PasswordComplexityPolicy{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MinLength:  10,
 				},
 			},
 			res: res{

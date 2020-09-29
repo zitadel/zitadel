@@ -949,7 +949,7 @@
     },
     "/policies/password/complexity": {
       "get": {
-        "operationId": "AdminService_GetDefaultPasswordComlexityPolicy",
+        "operationId": "AdminService_GetDefaultPasswordComplexityPolicy",
         "responses": {
           "200": {
             "description": "A successful response.",

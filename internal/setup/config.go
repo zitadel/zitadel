@@ -7,8 +7,7 @@ import (
 
 type IAMSetUp struct {
 	Step1 *Step1
-	//TODO: label policy
-	// Step2 *Step2
+	Step2 *Step2
 }
 
 func (setup *IAMSetUp) steps(currentDone iam_model.Step) ([]step, error) {
@@ -17,8 +16,7 @@ func (setup *IAMSetUp) steps(currentDone iam_model.Step) ([]step, error) {
 
 	for _, step := range []step{
 		setup.Step1,
-		//TODO: label policy
-		// setup.Step2,
+		setup.Step2,
 	} {
 		if step.step() <= currentDone {
 			continue

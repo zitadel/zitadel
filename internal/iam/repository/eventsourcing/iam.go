@@ -58,6 +58,10 @@ func IAMSetupDoneAggregate(aggCreator *es_models.AggregateCreator, iam *model.IA
 	}
 }
 
+func IAMSetupDoneEvent(ctx context.Context, agg *es_models.Aggregate, iam *model.IAM) (*es_models.Aggregate, error) {
+	return agg.AppendEvent(model.IAMSetupDone, &struct{ Step model.Step }{Step: iam.SetUpDone})
+}
+
 func IAMSetGlobalOrgAggregate(aggCreator *es_models.AggregateCreator, iam *model.IAM, globalOrg string) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if globalOrg == "" {
@@ -229,24 +233,22 @@ func OIDCIDPConfigChangedAggregate(aggCreator *es_models.AggregateCreator, exist
 	}
 }
 
-func LoginPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.LoginPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if policy == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Smla8", "Errors.Internal")
-		}
-		agg, err := IAMAggregate(ctx, aggCreator, existing)
-		if err != nil {
-			return nil, err
-		}
-		validationQuery := es_models.NewSearchQuery().
-			AggregateTypeFilter(model.IAMAggregate).
-			EventTypesFilter(model.LoginPolicyAdded).
-			AggregateIDFilter(existing.AggregateID)
-
-		validation := checkExistingLoginPolicyValidation()
-		agg.SetPrecondition(validationQuery, validation)
-		return agg.AppendEvent(model.LoginPolicyAdded, policy)
+func LoginPolicyAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.LoginPolicy) (*es_models.Aggregate, error) {
+	if policy == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Smla8", "Errors.Internal")
 	}
+	agg, err := IAMAggregate(ctx, aggCreator, existing)
+	if err != nil {
+		return nil, err
+	}
+	validationQuery := es_models.NewSearchQuery().
+		AggregateTypeFilter(model.IAMAggregate).
+		EventTypesFilter(model.LoginPolicyAdded).
+		AggregateIDFilter(existing.AggregateID)
+
+	validation := checkExistingLoginPolicyValidation()
+	agg.SetPrecondition(validationQuery, validation)
+	return agg.AppendEvent(model.LoginPolicyAdded, policy)
 }
 
 func LoginPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.LoginPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
@@ -296,24 +298,22 @@ func LoginPolicyIDPProviderRemovedAggregate(ctx context.Context, aggCreator *es_
 	return agg.AppendEvent(model.LoginPolicyIDPProviderRemoved, provider)
 }
 
-func PasswordComplexityPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.PasswordComplexityPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if policy == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Smla8", "Errors.Internal")
-		}
-		agg, err := IAMAggregate(ctx, aggCreator, existing)
-		if err != nil {
-			return nil, err
-		}
-		validationQuery := es_models.NewSearchQuery().
-			AggregateTypeFilter(model.IAMAggregate).
-			EventTypesFilter(model.PasswordComplexityPolicyAdded).
-			AggregateIDFilter(existing.AggregateID)
-
-		validation := checkExistingPasswordComplexityPolicyValidation()
-		agg.SetPrecondition(validationQuery, validation)
-		return agg.AppendEvent(model.PasswordComplexityPolicyAdded, policy)
+func PasswordComplexityPolicyAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.PasswordComplexityPolicy) (*es_models.Aggregate, error) {
+	if policy == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Smla8", "Errors.Internal")
 	}
+	agg, err := IAMAggregate(ctx, aggCreator, existing)
+	if err != nil {
+		return nil, err
+	}
+	validationQuery := es_models.NewSearchQuery().
+		AggregateTypeFilter(model.IAMAggregate).
+		EventTypesFilter(model.PasswordComplexityPolicyAdded).
+		AggregateIDFilter(existing.AggregateID)
+
+	validation := checkExistingPasswordComplexityPolicyValidation()
+	agg.SetPrecondition(validationQuery, validation)
+	return agg.AppendEvent(model.PasswordComplexityPolicyAdded, policy)
 }
 
 func PasswordComplexityPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.PasswordComplexityPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {

@@ -130,7 +130,7 @@ func (s *Setup) Execute(ctx context.Context, setUpConfig IAMSetUp) error {
 			return err
 		}
 
-		err = step.execute(ctx)
+		iam, err = step.execute(ctx)
 		if err != nil {
 			return err
 		}

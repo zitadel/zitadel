@@ -1657,7 +1657,7 @@ func TestAddPasswordComplexityPolicy(t *testing.T) {
 			},
 			res: res{
 				wantErr: true,
-				errFunc: caos_errs.IsPreconditionFailed,
+				errFunc: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 		{

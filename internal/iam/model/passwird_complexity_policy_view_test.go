@@ -6,7 +6,7 @@ import (
 
 func TestCheckPasswordComplexityPolicy(t *testing.T) {
 	type args struct {
-		policy   *PasswordComplexityPolicy
+		policy   *PasswordComplexityPolicyView
 		password string
 	}
 	tests := []struct {
@@ -17,7 +17,7 @@ func TestCheckPasswordComplexityPolicy(t *testing.T) {
 		{
 			name: "has minlength ok",
 			args: args{
-				policy: &PasswordComplexityPolicy{
+				policy: &PasswordComplexityPolicyView{
 					HasLowercase: false,
 					HasUppercase: false,
 					HasSymbol:    false,
@@ -31,7 +31,7 @@ func TestCheckPasswordComplexityPolicy(t *testing.T) {
 		{
 			name: "has minlength not ok",
 			args: args{
-				policy: &PasswordComplexityPolicy{
+				policy: &PasswordComplexityPolicyView{
 					HasLowercase: false,
 					HasUppercase: false,
 					HasSymbol:    false,
@@ -45,7 +45,7 @@ func TestCheckPasswordComplexityPolicy(t *testing.T) {
 		{
 			name: "has lowercase ok",
 			args: args{
-				policy: &PasswordComplexityPolicy{
+				policy: &PasswordComplexityPolicyView{
 					HasLowercase: true,
 					HasUppercase: false,
 					HasSymbol:    false,
@@ -59,7 +59,7 @@ func TestCheckPasswordComplexityPolicy(t *testing.T) {
 		{
 			name: "has lowercase not ok",
 			args: args{
-				policy: &PasswordComplexityPolicy{
+				policy: &PasswordComplexityPolicyView{
 					HasLowercase: true,
 					HasUppercase: false,
 					HasSymbol:    false,
@@ -73,7 +73,7 @@ func TestCheckPasswordComplexityPolicy(t *testing.T) {
 		{
 			name: "has uppercase ok",
 			args: args{
-				policy: &PasswordComplexityPolicy{
+				policy: &PasswordComplexityPolicyView{
 					HasLowercase: false,
 					HasUppercase: true,
 					HasSymbol:    false,
@@ -87,7 +87,7 @@ func TestCheckPasswordComplexityPolicy(t *testing.T) {
 		{
 			name: "has uppercase not ok",
 			args: args{
-				policy: &PasswordComplexityPolicy{
+				policy: &PasswordComplexityPolicyView{
 					HasLowercase: false,
 					HasUppercase: true,
 					HasSymbol:    false,
@@ -101,7 +101,7 @@ func TestCheckPasswordComplexityPolicy(t *testing.T) {
 		{
 			name: "has symbol ok",
 			args: args{
-				policy: &PasswordComplexityPolicy{
+				policy: &PasswordComplexityPolicyView{
 					HasLowercase: false,
 					HasUppercase: false,
 					HasSymbol:    true,
@@ -115,7 +115,7 @@ func TestCheckPasswordComplexityPolicy(t *testing.T) {
 		{
 			name: "has symbol not ok",
 			args: args{
-				policy: &PasswordComplexityPolicy{
+				policy: &PasswordComplexityPolicyView{
 					HasLowercase: false,
 					HasUppercase: false,
 					HasSymbol:    true,
@@ -129,7 +129,7 @@ func TestCheckPasswordComplexityPolicy(t *testing.T) {
 		{
 			name: "has number ok",
 			args: args{
-				policy: &PasswordComplexityPolicy{
+				policy: &PasswordComplexityPolicyView{
 					HasLowercase: false,
 					HasUppercase: false,
 					HasSymbol:    false,
@@ -143,7 +143,7 @@ func TestCheckPasswordComplexityPolicy(t *testing.T) {
 		{
 			name: "has number not ok",
 			args: args{
-				policy: &PasswordComplexityPolicy{
+				policy: &PasswordComplexityPolicyView{
 					HasLowercase: false,
 					HasUppercase: false,
 					HasSymbol:    false,
@@ -157,7 +157,7 @@ func TestCheckPasswordComplexityPolicy(t *testing.T) {
 		{
 			name: "has everything ok",
 			args: args{
-				policy: &PasswordComplexityPolicy{
+				policy: &PasswordComplexityPolicyView{
 					HasLowercase: true,
 					HasUppercase: true,
 					HasSymbol:    true,
@@ -171,7 +171,7 @@ func TestCheckPasswordComplexityPolicy(t *testing.T) {
 		{
 			name: "has everything not ok",
 			args: args{
-				policy: &PasswordComplexityPolicy{
+				policy: &PasswordComplexityPolicyView{
 					HasLowercase: true,
 					HasUppercase: true,
 					HasSymbol:    true,

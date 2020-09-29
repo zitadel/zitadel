@@ -875,7 +875,7 @@ func (es *OrgEventstore) ChangePasswordComplexityPolicy(ctx context.Context, pol
 		return nil, err
 	}
 
-	if existing.LoginPolicy == nil {
+	if existing.PasswordComplexityPolicy == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-v6Hdr", "Errors.Org.PasswordComplexityPolicy.NotExisting")
 	}
 
@@ -891,11 +891,8 @@ func (es *OrgEventstore) ChangePasswordComplexityPolicy(ctx context.Context, pol
 }
 
 func (es *OrgEventstore) RemovePasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) error {
-	if policy == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-3Ghs8", "Errors.Org.PasswordComplexityPolicy.Empty")
-	}
-	if err := policy.IsValid(); err != nil {
-		return err
+	if policy == nil || policy.AggregateID == "" {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-3Ghs8", "Errors.Org.PasswordComplexityPolicy.Invalid")
 	}
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
 	if err != nil {

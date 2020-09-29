@@ -164,7 +164,7 @@ var AdminService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultPasswordComlexityPolicy": authz.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultPasswordComplexityPolicy": authz.Option{
 		Permission: "iam.policy.read",
 		CheckParam: "",
 	},

@@ -2,7 +2,7 @@ package eventstore
 
 import (
 	"context"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view/model"
 
 	"github.com/caos/logging"
 	admin_model "github.com/caos/zitadel/internal/admin/model"
@@ -40,7 +40,7 @@ func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) 
 	if err != nil {
 		return nil, err
 	}
-	pwPolicyView := iam_es_model.PasswordComplexityPolicyToModel(pwPolicy)
+	pwPolicyView := iam_view.PasswordComplexityViewToModel(pwPolicy)
 	orgPolicy, err := repo.OrgEventstore.GetOrgIAMPolicy(ctx, policy_model.DefaultPolicy)
 	if err != nil {
 		return nil, err

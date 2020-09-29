@@ -102,6 +102,15 @@ func (es *IAMEventstore) SetupDone(ctx context.Context, iamID string, step iam_m
 	return model.IAMToModel(repoIam), nil
 }
 
+func (es *IAMEventstore) PrepareSetupDone(ctx context.Context, iam *model.IAM, aggregate *models.Aggregate, step iam_model.Step) (*model.IAM, *models.Aggregate, func(ctx context.Context, aggregates ...*models.Aggregate) error, error) {
+	iam.SetUpDone = model.Step(step)
+	agg, err := IAMSetupDoneEvent(ctx, aggregate, iam)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	return iam, agg, es.PushAggregates, nil
+}
+
 func (es *IAMEventstore) SetGlobalOrg(ctx context.Context, iamID, globalOrg string) (*iam_model.IAM, error) {
 	iam, err := es.IAMByID(ctx, iamID)
 	if err != nil {
@@ -407,20 +416,31 @@ func (es *IAMEventstore) ChangeIDPOIDCConfig(ctx context.Context, config *iam_mo
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-Sldk8", "Errors.Internal")
 }
 
-func (es *IAMEventstore) AddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
+func (es *IAMEventstore) PrepareAddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*model.IAM, *models.Aggregate, error) {
 	if policy == nil || !policy.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.IAM.LoginPolicyInvalid")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.IAM.LoginPolicyInvalid")
 	}
 	iam, err := es.IAMByID(ctx, policy.AggregateID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	repoIam := model.IAMFromModel(iam)
 	repoLoginPolicy := model.LoginPolicyFromModel(policy)
 
-	addAggregate := LoginPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoLoginPolicy)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	addAggregate, err := LoginPolicyAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoIam, repoLoginPolicy)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoIam, addAggregate, nil
+}
+
+func (es *IAMEventstore) AddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
+	repoIam, addAggregate, err := es.PrepareAddLoginPolicy(ctx, policy)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
 	if err != nil {
 		return nil, err
 	}
@@ -507,23 +527,33 @@ func (es *IAMEventstore) RemoveIDPProviderFromLoginPolicy(ctx context.Context, p
 	return nil
 }
 
-func (es *IAMEventstore) AddPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+func (es *IAMEventstore) PrepareAddPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*model.IAM, *models.Aggregate, error) {
 	if policy == nil {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.IAM.PasswordComplexityPolicy.Empty")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.IAM.PasswordComplexityPolicy.Empty")
 	}
 	if err := policy.IsValid(); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	iam, err := es.IAMByID(ctx, policy.AggregateID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	repoIam := model.IAMFromModel(iam)
 	repoPasswordComplexityPolicy := model.PasswordComplexityPolicyFromModel(policy)
 
-	addAggregate := PasswordComplexityPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoPasswordComplexityPolicy)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	addAggregate, err := PasswordComplexityPolicyAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoIam, repoPasswordComplexityPolicy)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoIam, addAggregate, nil
+}
+func (es *IAMEventstore) AddPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+	repoIam, addAggregate, err := es.PrepareAddPasswordComplexityPolicy(ctx, policy)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
 	if err != nil {
 		return nil, err
 	}
