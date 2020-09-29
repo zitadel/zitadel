@@ -44,6 +44,8 @@ export class GrpcAuthService {
     private _activeOrgChanged: Subject<Org.AsObject> = new Subject();
     public user!: Observable<UserProfileView.AsObject>;
     private zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject(['user.resourceowner']);
+    public readonly fetchedZitadelPermissions: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
+
     private cachedOrgs: Org.AsObject[] = [];
 
     constructor(
@@ -128,6 +130,9 @@ export class GrpcAuthService {
             catchError(_ => {
                 return of([]);
             }),
+            finalize(() => {
+                this.fetchedZitadelPermissions.next(true);
+            }),
         ).subscribe(roles => {
             this.zitadelPermissions.next(roles);
         });
@@ -139,9 +144,7 @@ export class GrpcAuthService {
      */
     public isAllowed(roles: string[] | RegExp[]): Observable<boolean> {
         if (roles && roles.length > 0) {
-            return this.zitadelPermissions.pipe(switchMap(zroles => {
-                return of(this.hasRoles(zroles, roles));
-            }));
+            return this.zitadelPermissions.pipe(switchMap(zroles => of(this.hasRoles(zroles, roles))));
         } else {
             return of(false);
         }
@@ -221,6 +224,10 @@ export class GrpcAuthService {
             req.setPreferredLanguage(preferredLanguage);
         }
         return this.grpcService.auth.updateMyUserProfile(req);
+    }
+
+    public get zitadelPermissionsChanged(): Observable<string[]> {
+        return this.zitadelPermissions;
     }
 
     public async getMyUserSessions(): Promise<UserSessionViews> {
