@@ -53,7 +53,7 @@ export class OrgListComponent implements AfterViewInit {
         let query;
         if (filter) {
             query = new MyProjectOrgSearchQuery();
-            query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS);
+            query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
             query.setKey(MyProjectOrgSearchKey.MYPROJECTORGSEARCHKEY_ORG_NAME);
             query.setValue(filter);
         }

@@ -27,7 +27,7 @@ export class UserTableComponent implements OnInit {
     public userResult!: UserSearchResponse.AsObject;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-    @Input() public displayedColumns: string[] = ['select', 'firstname', 'lastname', 'username', 'email', 'state'];
+    @Input() public displayedColumns: string[] = ['select', /*'firstname', 'lastname' ,*/ 'displayName', 'username', 'email', 'state'];
 
     @Output() public changedSelection: EventEmitter<Array<UserView.AsObject>> = new EventEmitter();
 
@@ -77,14 +77,26 @@ export class UserTableComponent implements OnInit {
         });
     }
 
-    private async getData(limit: number, offset: number, filterTypeValue: UserType): Promise<void> {
+    private async getData(limit: number, offset: number, filterTypeValue: UserType, filterName?: string): Promise<void> {
         this.loadingSubject.next(true);
         const query = new UserSearchQuery();
         query.setKey(UserSearchKey.USERSEARCHKEY_TYPE);
         query.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
         query.setValue(filterTypeValue);
 
-        this.userService.SearchUsers(limit, offset, [query]).then(resp => {
+        let namequery;
+        if (filterName) {
+            namequery = new UserSearchQuery();
+            namequery.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
+            namequery.setKey(
+                this.userType === UserType.HUMAN ?
+                    UserSearchKey.USERSEARCHKEY_DISPLAY_NAME :
+                    UserSearchKey.USERSEARCHKEY_USER_NAME,
+            );
+            namequery.setValue(filterName.toLowerCase());
+        }
+
+        this.userService.SearchUsers(limit, offset, namequery ? [query, namequery] : [query]).then(resp => {
             this.userResult = resp.toObject();
             this.dataSource.data = this.userResult.resultList;
             this.loadingSubject.next(false);
@@ -96,5 +108,16 @@ export class UserTableComponent implements OnInit {
 
     public refreshPage(): void {
         this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.userType);
+    }
+
+    public applyFilter(event: Event): void {
+        const filterValue = (event.target as HTMLInputElement).value;
+        this.getData(
+            this.paginator.pageSize,
+            this.paginator.pageIndex * this.paginator.pageSize,
+            this.userType,
+            filterValue,
+        );
+
     }
 }

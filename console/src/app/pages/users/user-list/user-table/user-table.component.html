@@ -2,11 +2,18 @@
     [timestamp]="userResult?.viewTimestamp" [selection]="selection"
     [emitRefreshOnPreviousRoute]="refreshOnPreviousRoute">
     <ng-template appHasRole [appHasRole]="['user.write']" actions>
-        <button (click)="deactivateSelectedUsers()" matTooltip="{{'ORG_DETAIL.TABLE.DEACTIVATE' | translate}}"
+        <mat-form-field actions class="filtername">
+            <mat-label>{{'ORG.PAGES.FILTER' | translate}}</mat-label>
+            <input matInput (keyup)="applyFilter($event)"
+                placeholder="{{ (userType == UserType.HUMAN ? 'USER.TABLE.FILTERDISPLAYNAME' : 'USER.TABLE.FILTERUSERNAME') | translate }}"
+                #input>
+        </mat-form-field>
+
+        <button (click)="deactivateSelectedUsers()" matTooltip="{{'USER.TABLE.DEACTIVATE' | translate}}"
             class="icon-button" mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
             <mat-icon svgIcon="mdi_account_cancel"></mat-icon>
         </button>
-        <button (click)="reactivateSelectedUsers()" matTooltip="{{'ORG_DETAIL.TABLE.ACTIVATE' | translate}}"
+        <button (click)="reactivateSelectedUsers()" matTooltip="{{'USER.TABLE.ACTIVATE' | translate}}"
             class="icon-button" mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
             <mat-icon svgIcon="mdi_account_check_outline"></mat-icon>
         </button>
@@ -43,6 +50,11 @@
             <ng-container matColumnDef="lastname">
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.PROFILE.LASTNAME' | translate }} </th>
                 <td mat-cell *matCellDef="let user"> {{user[userType]?.lastName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="displayName">
+                <th mat-header-cell *matHeaderCellDef> {{ 'USER.PROFILE.DISPLAYNAME' | translate }} </th>
+                <td mat-cell *matCellDef="let user"> {{user[userType]?.displayName}} </td>
             </ng-container>
 
             <ng-container matColumnDef="name">

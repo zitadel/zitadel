@@ -88,6 +88,12 @@
             "REACTIVATE":"Reactivate",
             "DEACTIVATE":"Deactivate"
         },
+        "TABLE":{
+            "DEACTIVATE":"Deactivate",
+            "ACTIVATE":"Activate",
+            "FILTERUSERNAME":"Filter for Username",
+            "FILTERDISPLAYNAME":"Filter for Displayname"
+        },
         "MFA": {
             "TABLETYPE":"Type",
             "TABLESTATE":"Status",

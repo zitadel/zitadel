@@ -160,8 +160,6 @@ $custom-typography:
   @include component-themes($light-theme);
   @include angular-material-theme($light-theme);
 
-  color: #202124;
-
   .sidenav,
   .main-container,
   .mat-dialog-container {
