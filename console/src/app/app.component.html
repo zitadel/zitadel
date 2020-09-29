@@ -23,7 +23,7 @@
                 <button class="show-all" mat-menu-item
                     [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' | translate}}</button>
 
-                <mat-form-field class="filter">
+                <mat-form-field class="filter-form">
                     <mat-label>{{'ORG.PAGES.FILTER' | translate}}</mat-label>
                     <input matInput (click)="$event.stopPropagation()" (keyup)="applyFilter($event)"
                         placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}" #input>
