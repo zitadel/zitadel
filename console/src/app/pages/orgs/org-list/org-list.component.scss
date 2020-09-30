@@ -38,3 +38,16 @@ th {
 .filter {
     margin-left: 1rem;
 }
+
+th {
+    .search-button {
+        visibility: hidden;
+    }
+
+    &:hover,
+    &.search-active {
+        .search-button {
+            visibility: visible;
+        }
+    }
+}

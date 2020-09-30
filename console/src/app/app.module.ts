@@ -127,7 +127,13 @@ const authConfig: AuthConfig = {
             provide: APP_INITIALIZER,
             useFactory: appInitializerFn,
             multi: true,
-            deps: [GrpcService, StatehandlerService],
+            deps: [GrpcService],
+        },
+        {
+            provide: APP_INITIALIZER,
+            useFactory: stateHandlerFn,
+            multi: true,
+            deps: [StatehandlerService],
         },
         {
             provide: AuthConfig,

@@ -5,7 +5,7 @@
     <app-refresh-table *ngIf="dataSource" (refreshed)="refresh()" [dataSize]="dataSource.data.length"
         [loading]="loading$ | async">
 
-        <mat-form-field actions class="filter">
+        <mat-form-field @appearfade *ngIf="orgSearchKey != undefined" actions class="filter">
             <mat-label>{{'ORG.PAGES.FILTER' | translate}}</mat-label>
             <input matInput (keyup)="applyFilter($event)" placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}"
                 #input>
@@ -30,7 +30,12 @@
             </ng-container>
 
             <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'ORG.PAGES.NAME' | translate }} </th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                    [ngClass]="{'search-active': this.orgSearchKey == MyProjectOrgSearchKey.MYPROJECTORGSEARCHKEY_ORG_NAME}">
+                    {{ 'ORG.PAGES.NAME' | translate }}
+                    <template [ngTemplateOutlet]="templateRef"
+                        [ngTemplateOutletContext]="{key: MyProjectOrgSearchKey.MYPROJECTORGSEARCHKEY_ORG_NAME}"></template>
+                </th>
                 <td mat-cell *matCellDef="let org"> {{org.name}} </td>
             </ng-container>
 
@@ -41,3 +46,11 @@
         </mat-paginator>
     </app-refresh-table>
 </div>
+
+<ng-template #templateRef let-key="key">
+    <button class="search-button" mat-icon-button
+        (click)="this.orgSearchKey != key ? this.orgSearchKey = key : this.orgSearchKey = undefined">
+        <mat-icon *ngIf="this.orgSearchKey != key">search</mat-icon>
+        <mat-icon *ngIf="this.orgSearchKey == key">search_off</mat-icon>
+    </button>
+</ng-template>

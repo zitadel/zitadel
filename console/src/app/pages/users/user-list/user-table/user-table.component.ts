@@ -4,6 +4,7 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { enterAnimations } from 'src/app/animations';
 import { UserView } from 'src/app/proto/generated/auth_pb';
 import { SearchMethod, UserSearchKey, UserSearchQuery, UserSearchResponse } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -15,8 +16,12 @@ import { UserType } from '../user-list.component';
     selector: 'app-user-table',
     templateUrl: './user-table.component.html',
     styleUrls: ['./user-table.component.scss'],
+    animations: [
+        enterAnimations,
+    ],
 })
 export class UserTableComponent implements OnInit {
+    public userSearchKey: UserSearchKey | undefined = undefined;
     public UserType: any = UserType;
     @Input() userType: UserType = UserType.HUMAN;
     @Input() refreshOnPreviousRoute: string = '';
@@ -30,7 +35,7 @@ export class UserTableComponent implements OnInit {
     @Input() public displayedColumns: string[] = ['select', /*'firstname', 'lastname' ,*/ 'displayName', 'username', 'email', 'state'];
 
     @Output() public changedSelection: EventEmitter<Array<UserView.AsObject>> = new EventEmitter();
-
+    UserSearchKey: any = UserSearchKey;
     constructor(public translate: TranslateService, private userService: ManagementService,
         private toast: ToastService) {
         this.selection.changed.subscribe(() => {
@@ -85,14 +90,10 @@ export class UserTableComponent implements OnInit {
         query.setValue(filterTypeValue);
 
         let namequery;
-        if (filterName) {
+        if (filterName && this.userSearchKey !== undefined) {
             namequery = new UserSearchQuery();
             namequery.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
-            namequery.setKey(
-                this.userType === UserType.HUMAN ?
-                    UserSearchKey.USERSEARCHKEY_DISPLAY_NAME :
-                    UserSearchKey.USERSEARCHKEY_USER_NAME,
-            );
+            namequery.setKey(this.userSearchKey);
             namequery.setValue(filterName.toLowerCase());
         }
 
@@ -118,6 +119,14 @@ export class UserTableComponent implements OnInit {
             this.userType,
             filterValue,
         );
+    }
 
+    public setFilter(key: UserSearchKey): void {
+        if (this.userSearchKey !== key) {
+            this.userSearchKey = key;
+        } else {
+            this.userSearchKey = undefined;
+            this.refreshPage();
+        }
     }
 }

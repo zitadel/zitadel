@@ -6,16 +6,21 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
+import { enterAnimations } from 'src/app/animations';
 import { MyProjectOrgSearchKey, MyProjectOrgSearchQuery, Org, SearchMethod } from 'src/app/proto/generated/auth_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
-import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
     selector: 'app-org-list',
     templateUrl: './org-list.component.html',
     styleUrls: ['./org-list.component.scss'],
+    animations: [
+        enterAnimations,
+    ],
 })
 export class OrgListComponent implements AfterViewInit {
+    public orgSearchKey: MyProjectOrgSearchKey | undefined = undefined;
+
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatSort) sort!: MatSort;
 
@@ -32,10 +37,10 @@ export class OrgListComponent implements AfterViewInit {
     public loading: boolean = false;
 
     public notPinned: Array<Org.AsObject> = [];
+    public MyProjectOrgSearchKey: any = MyProjectOrgSearchKey;
 
     constructor(
         private authService: GrpcAuthService,
-        private toast: ToastService,
         private router: Router,
     ) {
         this.loading = true;

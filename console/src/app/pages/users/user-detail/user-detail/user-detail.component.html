@@ -65,7 +65,7 @@
                 <div class="method-row">
                     <span class="label">{{ 'USER.PROFILE.PASSWORD' | translate }}</span>
                     <span>******</span>
-                    <div class="actions">
+                    <div>
                         <button [disabled]="(canWrite$ | async) == false" (click)="sendSetPasswordNotification()"
                             mat-stroked-button color="primary"
                             *ngIf="user.state === UserState.USERSTATE_INITIAL">{{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
@@ -94,7 +94,7 @@
                             </ng-container>
                         </div>
 
-                        <div class="actions">
+                        <div>
                             <button [disabled]="(canWrite$ | async) == false" (click)="emailEditState = true"
                                 mat-icon-button>
                                 <mat-icon class="icon">edit</mat-icon>
@@ -137,7 +137,7 @@
                             </ng-container>
                         </div>
 
-                        <div class="actions">
+                        <div>
                             <button [disabled]="(canWrite$ | async) == false" (click)="phoneEditState = true"
                                 mat-icon-button>
                                 <mat-icon class="icon">edit</mat-icon>

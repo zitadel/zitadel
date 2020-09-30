@@ -91,8 +91,13 @@
         "TABLE":{
             "DEACTIVATE":"Deactivate",
             "ACTIVATE":"Activate",
-            "FILTERUSERNAME":"Filter for Username",
-            "FILTERDISPLAYNAME":"Filter for Displayname"
+            "FILTER": {
+                "1":"Filter for Username",
+                "2":"filter for Firstname",
+                "3":"filter for Lastname",
+                "5":"filter for DisplayName",
+                "6":"filter for email"
+            }
         },
         "MFA": {
             "TABLETYPE":"Type",
