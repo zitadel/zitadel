@@ -490,11 +490,11 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 		return nil, err
 	}
 
-	if request.SelectedIDPConfigID != "" || userSession.SelectedIDPConfigID != "" && (request.LinkingUsers == nil || len(request.LinkingUsers) == 0) {
-		if !checkVerificationTime(userSession.ExternalLoginVerification, repo.PasswordCheckLifeTime) {
-			return append(steps, &model.SelectUserStep{}), nil
+	if (request.SelectedIDPConfigID != "" || userSession.SelectedIDPConfigID != "") && (request.LinkingUsers == nil || len(request.LinkingUsers) == 0) {
+		if !checkVerificationTime(userSession.ExternalLoginVerification, repo.ExternalLoginCheckLifeTime) {
+			return append(steps, &model.ExternalLoginStep{}), nil
 		}
-	} else if request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == "" || (request.SelectedIDPConfigID != "" && request.LinkingUsers != nil && len(request.LinkingUsers) > 0) {
+	} else if (request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == "") || (request.SelectedIDPConfigID != "" && request.LinkingUsers != nil && len(request.LinkingUsers) > 0) {
 		if user.InitRequired {
 			return append(steps, &model.InitUserStep{PasswordSet: user.PasswordSet}), nil
 		}
@@ -712,7 +712,7 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	user, viewErr := viewProvider.UserByID(userID)
 	if viewErr != nil && !errors.IsNotFound(viewErr) {
 		return nil, viewErr
-	} else {
+	} else if user == nil {
 		user = new(user_view_model.UserView)
 	}
 	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence)
