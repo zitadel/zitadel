@@ -1,5 +1,3 @@
-BEGIN;
-
 ALTER TABLE management.org_domains ADD COLUMN validation_type SMALLINT;
 
 CREATE TABLE adminapi.users (
@@ -40,5 +38,3 @@ CREATE TABLE adminapi.users (
 
   PRIMARY KEY (id)
 );
-
-COMMIT;

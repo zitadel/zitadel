@@ -1,4 +1,3 @@
-
 CREATE TABLE adminapi.idp_configs (
     idp_config_id TEXT,
 
