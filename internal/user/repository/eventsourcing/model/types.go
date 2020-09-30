@@ -84,6 +84,8 @@ const (
 	HumanPasswordCheckSucceeded models.EventType = "user.human.password.check.succeeded"
 	HumanPasswordCheckFailed    models.EventType = "user.human.password.check.failed"
 
+	HumanExternalLoginCheckSucceeded models.EventType = "user.human.externallogin.check.succeeded"
+
 	HumanExternalIDPReserved models.EventType = "user.human.externalidp.reserved"
 	HumanExternalIDPReleased models.EventType = "user.human.externalidp.released"
 

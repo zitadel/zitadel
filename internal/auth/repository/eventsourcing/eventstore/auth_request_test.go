@@ -157,17 +157,18 @@ func (m *mockViewErrOrg) OrgByPrimaryDomain(string) (*org_view_model.OrgView, er
 
 func TestAuthRequestRepo_nextSteps(t *testing.T) {
 	type fields struct {
-		UserEvents               *user_event.UserEventstore
-		AuthRequests             *cache.AuthRequestCache
-		View                     *view.View
-		userSessionViewProvider  userSessionViewProvider
-		userViewProvider         userViewProvider
-		userEventProvider        userEventProvider
-		orgViewProvider          orgViewProvider
-		PasswordCheckLifeTime    time.Duration
-		MfaInitSkippedLifeTime   time.Duration
-		MfaSoftwareCheckLifeTime time.Duration
-		MfaHardwareCheckLifeTime time.Duration
+		UserEvents                 *user_event.UserEventstore
+		AuthRequests               *cache.AuthRequestCache
+		View                       *view.View
+		userSessionViewProvider    userSessionViewProvider
+		userViewProvider           userViewProvider
+		userEventProvider          userEventProvider
+		orgViewProvider            orgViewProvider
+		PasswordCheckLifeTime      time.Duration
+		ExternalLoginCheckLifeTime time.Duration
+		MfaInitSkippedLifeTime     time.Duration
+		MfaSoftwareCheckLifeTime   time.Duration
+		MfaHardwareCheckLifeTime   time.Duration
 	}
 	type args struct {
 		request       *model.AuthRequest
@@ -645,17 +646,18 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			repo := &AuthRequestRepo{
-				UserEvents:               tt.fields.UserEvents,
-				AuthRequests:             tt.fields.AuthRequests,
-				View:                     tt.fields.View,
-				UserSessionViewProvider:  tt.fields.userSessionViewProvider,
-				UserViewProvider:         tt.fields.userViewProvider,
-				UserEventProvider:        tt.fields.userEventProvider,
-				OrgViewProvider:          tt.fields.orgViewProvider,
-				PasswordCheckLifeTime:    tt.fields.PasswordCheckLifeTime,
-				MfaInitSkippedLifeTime:   tt.fields.MfaInitSkippedLifeTime,
-				MfaSoftwareCheckLifeTime: tt.fields.MfaSoftwareCheckLifeTime,
-				MfaHardwareCheckLifeTime: tt.fields.MfaHardwareCheckLifeTime,
+				UserEvents:                 tt.fields.UserEvents,
+				AuthRequests:               tt.fields.AuthRequests,
+				View:                       tt.fields.View,
+				UserSessionViewProvider:    tt.fields.userSessionViewProvider,
+				UserViewProvider:           tt.fields.userViewProvider,
+				UserEventProvider:          tt.fields.userEventProvider,
+				OrgViewProvider:            tt.fields.orgViewProvider,
+				PasswordCheckLifeTime:      tt.fields.PasswordCheckLifeTime,
+				ExternalLoginCheckLifeTime: tt.fields.ExternalLoginCheckLifeTime,
+				MfaInitSkippedLifeTime:     tt.fields.MfaInitSkippedLifeTime,
+				MfaSoftwareCheckLifeTime:   tt.fields.MfaSoftwareCheckLifeTime,
+				MfaHardwareCheckLifeTime:   tt.fields.MfaHardwareCheckLifeTime,
 			}
 			got, err := repo.nextSteps(context.Background(), tt.args.request, tt.args.checkLoggedIn)
 			if (err != nil && tt.wantErr == nil) || (tt.wantErr != nil && !tt.wantErr(err)) {

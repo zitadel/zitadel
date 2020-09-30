@@ -45,6 +45,7 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		es_model.SignedOut,
 		es_model.HumanPasswordCheckSucceeded,
 		es_model.HumanPasswordCheckFailed,
+		es_model.HumanExternalLoginCheckSucceeded,
 		es_model.HumanMFAOTPCheckSucceeded,
 		es_model.HumanMFAOTPCheckFailed,
 		es_model.HumanSignedOut:
