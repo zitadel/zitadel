@@ -64,11 +64,11 @@
         
         
       </head>
-      <body style="background-color:#222324;">
+      <body style="background-color:{{.PrimaryColor}};">
         
         
       <div
-         style="background-color:#222324;"
+         style="background-color{{.PrimaryColor}};"
       >
         
       <table
@@ -382,7 +382,7 @@
               >
                 
       <div
-         style="font-family:Lato;font-size:2rem;font-weight:light;line-height:1;text-align:center;color:#ffffff;"
+         style="font-family:Lato;font-size:2rem;font-weight:light;line-height:1;text-align:center;color:{{.SecundaryColor}};"
       >{{.Greeting}}</div>
     
               </td>
@@ -394,7 +394,7 @@
               >
                 
       <div
-         style="font-family:Lato;font-size:1.25rem;font-weight:light;line-height:1;text-align:center;color:#ffffff;"
+         style="font-family:Lato;font-size:1.25rem;font-weight:light;line-height:1;text-align:center;color:{{.SecundaryColor}};"
       >{{.Text}}</div>
     
               </td>
@@ -413,7 +413,7 @@
              align="center" bgcolor="#5282C1" role="presentation" style="border:none;border-radius:3px;cursor:auto;mso-padding-alt:10px 25px;background:#5282C1;" valign="middle"
           >
             <a
-               href="{{.URL}}" style="display:inline-block;background:#5282C1;color:#ffffff;font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:16px;font-weight:normal;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:3px;" target="_blank"
+               href="{{.URL}}" style="display:inline-block;background:#5282C1;color:{{.SecundaryColor}};font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:16px;font-weight:normal;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:3px;" target="_blank"
             >
               {{.ButtonText}}
             </a>
@@ -430,7 +430,7 @@
               >
                 
       <div
-         style="font-family:Lato;font-size:13px;line-height:1;text-align:center;color:#ffffff;"
+         style="font-family:Lato;font-size:13px;line-height:1;text-align:center;color:{{.SecundaryColor}};"
       ><a href="http://www.caos.ch" style="color:#e91e63; text-decoration: none;" target="_blank"> CAOS AG </a> | Teufener Strasse 19 | CH-9000 St. Gallen</div>
     
               </td>
