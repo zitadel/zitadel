@@ -1,4 +1,4 @@
-package eventstore
+package repository
 
 import (
 	"reflect"

@@ -1,7 +1,21 @@
-package eventstore
+package repository
 
-import (
-	"github.com/caos/zitadel/internal/errors"
+import "github.com/caos/zitadel/internal/errors"
+
+type SearchQuery struct {
+	Columns Columns
+	Limit   uint64
+	Desc    bool
+	Filters []*Filter
+}
+
+type Columns int32
+
+const (
+	Columns_Event = iota
+	Columns_Max_Sequence
+	//insert new columns-types above this ColumnsCount because count is needed for validation
+	ColumnsCount
 )
 
 type Filter struct {
@@ -52,16 +66,16 @@ func (f *Filter) Value() interface{} {
 
 func (f *Filter) Validate() error {
 	if f == nil {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-z6KcG", "filter is nil")
+		return errors.ThrowPreconditionFailed(nil, "REPO-z6KcG", "filter is nil")
 	}
 	if f.field <= 0 {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-zw62U", "field not definded")
+		return errors.ThrowPreconditionFailed(nil, "REPO-zw62U", "field not definded")
 	}
 	if f.value == nil {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-GJ9ct", "no value definded")
+		return errors.ThrowPreconditionFailed(nil, "REPO-GJ9ct", "no value definded")
 	}
 	if f.operation <= 0 {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-RrQTy", "operation not definded")
+		return errors.ThrowPreconditionFailed(nil, "REPO-RrQTy", "operation not definded")
 	}
 	return nil
 }

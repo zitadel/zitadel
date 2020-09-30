@@ -2,10 +2,11 @@ package eventstore
 
 import (
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
 type SearchQueryFactory struct {
-	columns        Columns
+	columns        repository.Columns
 	limit          uint64
 	desc           bool
 	aggregateTypes []AggregateType
@@ -15,21 +16,15 @@ type SearchQueryFactory struct {
 	resourceOwner  string
 }
 
-type searchQuery struct {
-	Columns Columns
-	Limit   uint64
-	Desc    bool
-	Filters []*Filter
-}
-
-type Columns int32
+type Columns repository.Columns
 
 const (
-	Columns_Event = iota
-	Columns_Max_Sequence
-	//insert new columns-types above this columnsCount because count is needed for validation
-	columnsCount
+	Columns_Event        Columns = repository.Columns_Event
+	Columns_Max_Sequence Columns = repository.Columns_Max_Sequence
 )
+
+type AggregateType repository.AggregateType
+type EventType repository.EventType
 
 func NewSearchQueryFactory(aggregateTypes ...AggregateType) *SearchQueryFactory {
 	return &SearchQueryFactory{
@@ -38,7 +33,7 @@ func NewSearchQueryFactory(aggregateTypes ...AggregateType) *SearchQueryFactory 
 }
 
 func (factory *SearchQueryFactory) Columns(columns Columns) *SearchQueryFactory {
-	factory.columns = columns
+	factory.columns = repository.Columns(columns)
 	return factory
 }
 
@@ -77,17 +72,17 @@ func (factory *SearchQueryFactory) OrderAsc() *SearchQueryFactory {
 	return factory
 }
 
-func (factory *SearchQueryFactory) Build() (*searchQuery, error) {
+func (factory *SearchQueryFactory) Build() (*repository.SearchQuery, error) {
 	if factory == nil ||
 		len(factory.aggregateTypes) < 1 ||
-		(factory.columns < 0 || factory.columns >= columnsCount) {
+		(factory.columns < 0 || factory.columns >= repository.ColumnsCount) {
 		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-tGAD3", "factory invalid")
 	}
-	filters := []*Filter{
+	filters := []*repository.Filter{
 		factory.aggregateTypeFilter(),
 	}
 
-	for _, f := range []func() *Filter{
+	for _, f := range []func() *repository.Filter{
 		factory.aggregateIDFilter,
 		factory.eventSequenceFilter,
 		factory.eventTypeFilter,
@@ -98,55 +93,55 @@ func (factory *SearchQueryFactory) Build() (*searchQuery, error) {
 		}
 	}
 
-	return &searchQuery{
-		Columns: factory.columns,
+	return &repository.SearchQuery{
+		Columns: repository.Columns(factory.columns),
 		Limit:   factory.limit,
 		Desc:    factory.desc,
 		Filters: filters,
 	}, nil
 }
 
-func (factory *SearchQueryFactory) aggregateIDFilter() *Filter {
+func (factory *SearchQueryFactory) aggregateIDFilter() *repository.Filter {
 	if len(factory.aggregateIDs) < 1 {
 		return nil
 	}
 	if len(factory.aggregateIDs) == 1 {
-		return NewFilter(Field_AggregateID, factory.aggregateIDs[0], Operation_Equals)
+		return repository.NewFilter(repository.Field_AggregateID, factory.aggregateIDs[0], repository.Operation_Equals)
 	}
-	return NewFilter(Field_AggregateID, factory.aggregateIDs, Operation_In)
+	return repository.NewFilter(repository.Field_AggregateID, factory.aggregateIDs, repository.Operation_In)
 }
 
-func (factory *SearchQueryFactory) eventTypeFilter() *Filter {
+func (factory *SearchQueryFactory) eventTypeFilter() *repository.Filter {
 	if len(factory.eventTypes) < 1 {
 		return nil
 	}
 	if len(factory.eventTypes) == 1 {
-		return NewFilter(Field_EventType, factory.eventTypes[0], Operation_Equals)
+		return repository.NewFilter(repository.Field_EventType, factory.eventTypes[0], repository.Operation_Equals)
 	}
-	return NewFilter(Field_EventType, factory.eventTypes, Operation_In)
+	return repository.NewFilter(repository.Field_EventType, factory.eventTypes, repository.Operation_In)
 }
 
-func (factory *SearchQueryFactory) aggregateTypeFilter() *Filter {
+func (factory *SearchQueryFactory) aggregateTypeFilter() *repository.Filter {
 	if len(factory.aggregateTypes) == 1 {
-		return NewFilter(Field_AggregateType, factory.aggregateTypes[0], Operation_Equals)
+		return repository.NewFilter(repository.Field_AggregateType, factory.aggregateTypes[0], repository.Operation_Equals)
 	}
-	return NewFilter(Field_AggregateType, factory.aggregateTypes, Operation_In)
+	return repository.NewFilter(repository.Field_AggregateType, factory.aggregateTypes, repository.Operation_In)
 }
 
-func (factory *SearchQueryFactory) eventSequenceFilter() *Filter {
+func (factory *SearchQueryFactory) eventSequenceFilter() *repository.Filter {
 	if factory.eventSequence == 0 {
 		return nil
 	}
-	sortOrder := Operation_Greater
+	sortOrder := repository.Operation_Greater
 	if factory.desc {
-		sortOrder = Operation_Less
+		sortOrder = repository.Operation_Less
 	}
-	return NewFilter(Field_LatestSequence, factory.eventSequence, sortOrder)
+	return repository.NewFilter(repository.Field_LatestSequence, factory.eventSequence, sortOrder)
 }
 
-func (factory *SearchQueryFactory) resourceOwnerFilter() *Filter {
+func (factory *SearchQueryFactory) resourceOwnerFilter() *repository.Filter {
 	if factory.resourceOwner == "" {
 		return nil
 	}
-	return NewFilter(Field_ResourceOwner, factory.resourceOwner, Operation_Equals)
+	return repository.NewFilter(repository.Field_ResourceOwner, factory.resourceOwner, repository.Operation_Equals)
 }
