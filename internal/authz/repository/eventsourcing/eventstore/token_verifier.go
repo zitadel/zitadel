@@ -2,7 +2,6 @@ package eventstore
 
 import (
 	"context"
-	"time"
 
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/crypto"
@@ -25,12 +24,9 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 	if err != nil {
 		return "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-8EF0zZ", "invalid token")
 	}
-	token, err := repo.View.TokenByID(tokenID)
+	token, err := repo.View.ValidTokenByID(tokenID)
 	if err != nil {
 		return "", "", "", caos_errs.ThrowUnauthenticated(err, "APP-BxUSiL", "invalid token")
-	}
-	if !token.Expiration.After(time.Now().UTC()) {
-		return "", "", "", caos_errs.ThrowUnauthenticated(err, "APP-k9KS0", "invalid token")
 	}
 
 	for _, aud := range token.Audience {

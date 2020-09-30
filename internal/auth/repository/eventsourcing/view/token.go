@@ -1,8 +1,9 @@
 package view
 
 import (
-	"github.com/caos/zitadel/internal/view/repository"
 	"time"
+
+	"github.com/caos/zitadel/internal/view/repository"
 
 	"github.com/caos/zitadel/internal/token/repository/view"
 	"github.com/caos/zitadel/internal/token/repository/view/model"
@@ -12,16 +13,12 @@ const (
 	tokenTable = "auth.tokens"
 )
 
-func (v *View) TokenByID(tokenID string) (*model.Token, error) {
-	return view.TokenByID(v.Db, tokenTable, tokenID)
+func (v *View) ValidTokenByID(tokenID string) (*model.Token, error) {
+	return view.ValidTokenByID(v.Db, tokenTable, tokenID)
 }
 
 func (v *View) TokensByUserID(userID string) ([]*model.Token, error) {
 	return view.TokensByUserID(v.Db, tokenTable, userID)
-}
-
-func (v *View) IsTokenValid(tokenID string) (bool, error) {
-	return view.IsTokenValid(v.Db, tokenTable, tokenID)
 }
 
 func (v *View) CreateToken(agentID, applicationID, userID, preferredLanguage string, audience, scopes []string, lifetime time.Duration) (*model.Token, error) {

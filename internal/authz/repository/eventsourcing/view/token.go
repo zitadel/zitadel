@@ -10,12 +10,8 @@ const (
 	tokenTable = "auth.tokens"
 )
 
-func (v *View) TokenByID(tokenID string) (*model.Token, error) {
-	return view.TokenByID(v.Db, tokenTable, tokenID)
-}
-
-func (v *View) IsTokenValid(tokenID string) (bool, error) {
-	return view.IsTokenValid(v.Db, tokenTable, tokenID)
+func (v *View) ValidTokenByID(tokenID string) (*model.Token, error) {
+	return view.ValidTokenByID(v.Db, tokenTable, tokenID)
 }
 
 func (v *View) PutToken(token *model.Token) error {

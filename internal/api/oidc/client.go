@@ -65,10 +65,10 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 	return o.repo.AuthorizeOIDCApplication(ctx, id, secret)
 }
 
-func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, origin string) (*oidc.Userinfo, error) {
-	token, err := o.repo.TokenByID(ctx, tokenID)
+func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, origin string) (oidc.UserInfoSetter, error) {
+	token, err := o.repo.ValidTokenByID(ctx, tokenID)
 	if err != nil {
-		return nil, err
+		return nil, errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
 	if token.ApplicationID != "" {
 		app, err := o.repo.ApplicationByClientID(ctx, token.ApplicationID)
@@ -82,41 +82,40 @@ func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, origin st
 	return o.GetUserinfoFromScopes(ctx, token.UserID, token.Scopes)
 }
 
-func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, scopes []string) (*oidc.Userinfo, error) {
+func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, scopes []string) (oidc.UserInfoSetter, error) {
 	user, err := o.repo.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	userInfo := new(oidc.Userinfo)
+	userInfo := oidc.NewUserInfo()
 	for _, scope := range scopes {
 		switch scope {
 		case scopeOpenID:
-			userInfo.Subject = user.ID
+			userInfo.SetSubject(user.ID)
 		case scopeEmail:
 			if user.HumanView == nil {
 				continue
 			}
-			userInfo.Email = user.Email
-			userInfo.EmailVerified = user.IsEmailVerified
+			userInfo.SetEmail(user.Email, user.IsEmailVerified)
 		case scopeProfile:
-			userInfo.PreferredUsername = user.PreferredLoginName
-			userInfo.UpdatedAt = user.ChangeDate
+			userInfo.SetPreferredUsername(user.PreferredLoginName)
+			userInfo.SetUpdatedAt(user.ChangeDate)
 			if user.HumanView != nil {
-				userInfo.Name = user.DisplayName
-				userInfo.FamilyName = user.LastName
-				userInfo.GivenName = user.FirstName
-				userInfo.Nickname = user.NickName
-				userInfo.Gender = oidc.Gender(getGender(user.Gender))
-				userInfo.Locale, err = language.Parse(user.PreferredLanguage)
+				userInfo.SetName(user.DisplayName)
+				userInfo.SetFamilyName(user.LastName)
+				userInfo.SetGivenName(user.FirstName)
+				userInfo.SetNickname(user.NickName)
+				userInfo.SetGender(oidc.Gender(getGender(user.Gender)))
+				locale, _ := language.Parse(user.PreferredLanguage)
+				userInfo.SetLocale(locale)
 			} else {
-				userInfo.Name = user.MachineView.Name
+				userInfo.SetName(user.MachineView.Name)
 			}
 		case scopePhone:
 			if user.HumanView == nil {
 				continue
 			}
-			userInfo.PhoneNumber = user.Phone
-			userInfo.PhoneNumberVerified = user.IsPhoneVerified
+			userInfo.SetPhone(user.Phone, user.IsPhoneVerified)
 		case scopeAddress:
 			if user.HumanView == nil {
 				continue
@@ -124,15 +123,10 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, sc
 			if user.StreetAddress == "" && user.Locality == "" && user.Region == "" && user.PostalCode == "" && user.Country == "" {
 				continue
 			}
-			userInfo.Address = &oidc.UserinfoAddress{
-				StreetAddress: user.StreetAddress,
-				Locality:      user.Locality,
-				Region:        user.Region,
-				PostalCode:    user.PostalCode,
-				Country:       user.Country,
-			}
+			userInfo.SetAddress(oidc.NewUserInfoAddress(user.StreetAddress, user.Locality, user.Region, user.PostalCode, user.Country, ""))
 		default:
-			userInfo.Authorizations = append(userInfo.Authorizations, scope)
+			userInfo.AppendClaims("authorizations", scopes)
+			//userInfo.Authorizations = append(userInfo.Authorizations, scope)
 		}
 	}
 	return userInfo, nil

@@ -2,12 +2,16 @@ package eventstore
 
 import (
 	"context"
+
+	"github.com/caos/oidc/pkg/oidc"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/eventstore/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
+	"strings"
 	"time"
 
 	"github.com/caos/logging"
@@ -89,11 +93,10 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 		return nil, err
 	}
 	request.ID = reqID
-	ids, err := repo.View.AppIDsFromProjectByClientID(ctx, request.ApplicationID)
-	if err != nil {
-		return nil, err
+	switch req := request.Request.(type) {
+	case *model.AuthRequestOIDC:
+		repo.handleOIDC(request, req)
 	}
-	request.Audience = ids
 	if request.LoginHint != "" {
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
 		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID).OnError(err).Debug("login hint invalid")
@@ -103,6 +106,20 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 		return nil, err
 	}
 	return request, nil
+}
+
+func (repo *AuthRequestRepo) handleOIDC(request *model.AuthRequest, oidc *model.AuthRequestOIDC) {
+	//app, err := repo.View.ApplicationByClientID(ctx, request.ApplicationID)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//app.
+	//request.Audience = ids
+	//for i, scope := range oidc.Scopes {
+	//	if strings.HasPrefix(scope, "urn:zitadel:iam:org:project:role:") {
+	//
+	//	}
+	//}
 }
 
 func (repo *AuthRequestRepo) AuthRequestByID(ctx context.Context, id, userAgentID string) (*model.AuthRequest, error) {

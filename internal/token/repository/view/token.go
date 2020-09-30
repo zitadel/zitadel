@@ -3,18 +3,40 @@ package view
 import (
 	"time"
 
+	"github.com/jinzhu/gorm"
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
 	token_model "github.com/caos/zitadel/internal/token/model"
 	"github.com/caos/zitadel/internal/token/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"github.com/jinzhu/gorm"
-	"github.com/lib/pq"
 )
 
 func TokenByID(db *gorm.DB, table, tokenID string) (*model.Token, error) {
 	token := new(model.Token)
 	query := repository.PrepareGetByKey(table, model.TokenSearchKey(token_model.TokenSearchKeyTokenID), tokenID)
+	err := query(db, token)
+	if errors.IsNotFound(err) {
+		return nil, errors.ThrowNotFound(nil, "VIEW-6ub3p", "Errors.Token.NotFound")
+	}
+	return token, err
+}
+
+func ValidTokenByID(db *gorm.DB, table, tokenID string) (*model.Token, error) {
+	token := new(model.Token)
+	query := repository.PrepareGetByQuery(table,
+		model.TokenSearchQuery{
+			Key:    token_model.TokenSearchKeyTokenID,
+			Method: global_model.SearchMethodEquals,
+			Value:  tokenID,
+		},
+		model.TokenSearchQuery{
+			Key:    token_model.TokenSearchKeyExpiration,
+			Method: global_model.SearchMethodGreaterThan,
+			Value:  time.Now().UTC(),
+		},
+	)
 	err := query(db, token)
 	if errors.IsNotFound(err) {
 		return nil, errors.ThrowNotFound(nil, "VIEW-6ub3p", "Errors.Token.NotFound")
@@ -34,17 +56,6 @@ func TokensByUserID(db *gorm.DB, table, userID string) ([]*model.Token, error) {
 	})
 	_, err := query(db, &tokens)
 	return tokens, err
-}
-
-func IsTokenValid(db *gorm.DB, table, tokenID string) (bool, error) {
-	token, err := TokenByID(db, table, tokenID)
-	if err == nil {
-		return token.Expiration.After(time.Now().UTC()), nil
-	}
-	if errors.IsNotFound(err) {
-		return false, nil
-	}
-	return false, err
 }
 
 func PutToken(db *gorm.DB, table string, token *model.Token) error {

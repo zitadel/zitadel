@@ -26,12 +26,8 @@ func (repo *TokenRepo) CreateToken(ctx context.Context, agentID, applicationID, 
 	return token_view_model.TokenToModel(token), nil
 }
 
-func (repo *TokenRepo) IsTokenValid(ctx context.Context, tokenID string) (bool, error) {
-	return repo.View.IsTokenValid(tokenID)
-}
-
-func (repo *TokenRepo) TokenByID(ctx context.Context, tokenID string) (*token_model.Token, error) {
-	token, err := repo.View.TokenByID(tokenID)
+func (repo *TokenRepo) ValidTokenByID(ctx context.Context, tokenID string) (*token_model.Token, error) {
+	token, err := repo.View.ValidTokenByID(tokenID)
 	if err != nil {
 		return nil, err
 	}
