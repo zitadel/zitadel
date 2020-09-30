@@ -16,6 +16,7 @@ require (
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.10.0
+	github.com/caos/orbos v0.31.8-0.20200930091341-5c0756e20bb9
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/cockroachdb/cockroach-go/v2 v2.0.7
 	github.com/envoyproxy/protoc-gen-validate v0.4.1
@@ -43,10 +44,12 @@ require (
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.1 // indirect
 	github.com/nicksnyder/go-i18n/v2 v2.0.3
+	github.com/pkg/errors v0.9.1
 	github.com/pquerna/otp v1.2.0
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.7.0
 	github.com/sony/sonyflake v1.0.0
+	github.com/spf13/cobra v1.0.0
 	github.com/stretchr/testify v1.6.1
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.1.0
@@ -58,4 +61,7 @@ require (
 	google.golang.org/grpc v1.32.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/square/go-jose.v2 v2.5.1
+	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
+	k8s.io/api v0.18.5
+	k8s.io/apimachinery v0.18.5
 )
