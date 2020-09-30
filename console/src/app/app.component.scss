@@ -225,33 +225,33 @@
 }
 
 @mixin textvar($theme) {
-    .filter-form {
-        margin: 0 .5rem;
-        /* stylelint-disable */
+  .filter-form {
+    margin: 0 .5rem;
+    /* stylelint-disable */
 
-        $foreground: map-get($theme, foreground);
-        color: mat-color($foreground, text) !important;
-        /* stylelint-enable */
-    }
+    $foreground: map-get($theme, foreground);
+    color: mat-color($foreground, text) !important;
+  }
 
-    .show-all {
-        $primary: map-get($theme, primary);
-        color: mat-color($primary, 300) !important;
-        border-bottom: 2px solid #8795a1;
-        margin-bottom: .5rem;
-    }
+  .show-all {
+    $primary: map-get($theme, primary);
+    color: mat-color($primary, 300) !important;
+    border-bottom: 2px solid #8795a1;
+    margin-bottom: .5rem;
+  }
+  /* stylelint-enable */
 }
 
 .menu {
-    position: relative;
+  position: relative;
 
-    .spinner-w {
-        top: 1rem;
-        left: 0;
-        right: 0;
-        position: absolute;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+  .spinner-w {
+    top: 1rem;
+    left: 0;
+    right: 0;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }

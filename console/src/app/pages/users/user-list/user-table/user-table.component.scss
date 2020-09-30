@@ -35,18 +35,18 @@ tr {
 }
 
 th {
-    .search-button {
-        visibility: hidden;
-    }
+  .search-button {
+    visibility: hidden;
+  }
 
-    &:hover,
-    &.search-active {
-        .search-button {
-            visibility: visible;
-        }
+  &:hover,
+  &.search-active {
+    .search-button {
+      visibility: visible;
     }
+  }
 }
 
 .filtername {
-    margin: 0 1rem;
+  margin: 0 1rem;
 }

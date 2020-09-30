@@ -105,7 +105,7 @@ export class ChangesComponent implements OnInit {
             return from(col).pipe(
                 take(1),
                 tap((res: Changes) => {
-                    let values = res.toObject().changesList;
+                    const values = res.toObject().changesList;
                     // update source with new values, done loading
                     this._data.next(values);
 
