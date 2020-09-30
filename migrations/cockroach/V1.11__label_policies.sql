@@ -26,3 +26,6 @@ CREATE TABLE management.label_policies (
 
     PRIMARY KEY (aggregate_id)
 );
+
+GRANT SELECT ON TABLE adminapi.label_policies TO notification;
+GRANT SELECT ON TABLE management.label_policies TO notification;

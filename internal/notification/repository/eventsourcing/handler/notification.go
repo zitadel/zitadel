@@ -10,11 +10,14 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/i18n"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/notification/types"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
@@ -78,13 +81,20 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 	if err != nil || alreadyHandled {
 		return err
 	}
+
+	// ToDo Michi
+	colors, err := n.getLabelPolicy(context.Background())
+	if err != nil {
+		return err
+	}
+
 	initCode := new(es_model.InitUserCode)
 	initCode.SetData(event)
 	user, err := n.view.NotifyUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
-	err = types.SendUserInitCode(n.statikDir, n.i18n, user, initCode, n.systemDefaults, n.AesCrypto)
+	err = types.SendUserInitCode(n.statikDir, n.i18n, user, initCode, n.systemDefaults, n.AesCrypto, colors)
 	if err != nil {
 		return err
 	}
@@ -195,4 +205,21 @@ func (n *Notification) OnError(event *models.Event, err error) error {
 
 func getSetNotifyContextData(orgID string) context.Context {
 	return authz.SetCtxData(context.Background(), authz.CtxData{UserID: NotifyUserID, OrgID: orgID})
+}
+
+// Todo Michi
+// Read organization specific colors
+func (n *Notification) getLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
+	policy, err := n.view.LabelPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if errors.IsNotFound(err) {
+		policy, err = n.view.LabelPolicyByAggregateID(n.systemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
+		policy.Default = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.LabelPolicyViewToModel(policy), err
 }
