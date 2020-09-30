@@ -241,3 +241,17 @@
         margin-bottom: .5rem;
     }
 }
+
+.menu {
+    position: relative;
+
+    .spinner-w {
+        top: 1rem;
+        left: 0;
+        right: 0;
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}

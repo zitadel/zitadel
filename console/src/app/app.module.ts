@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -110,6 +111,7 @@ const authConfig: AuthConfig = {
         MatInputModule,
         HasRolePipeModule,
         MatProgressBarModule,
+        MatProgressSpinnerModule,
         MatToolbarModule,
         MatMenuModule,
         MatSnackBarModule,
@@ -125,13 +127,7 @@ const authConfig: AuthConfig = {
             provide: APP_INITIALIZER,
             useFactory: appInitializerFn,
             multi: true,
-            deps: [GrpcService],
-        },
-        {
-            provide: APP_INITIALIZER,
-            useFactory: stateHandlerFn,
-            multi: true,
-            deps: [StatehandlerService],
+            deps: [GrpcService, StatehandlerService],
         },
         {
             provide: AuthConfig,

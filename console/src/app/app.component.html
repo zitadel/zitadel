@@ -18,13 +18,13 @@
                     arrow_drop_down</mat-icon>
             </button>
 
-            <mat-menu #menu="matMenu">
-                <mat-progress-bar *ngIf="orgLoading" color="accent" mode="indeterminate"></mat-progress-bar>
-                <!-- <button class="show-all" mat-menu-item
-                    [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' | translate}}</button> -->
+            <mat-menu class="menu" #menu="matMenu">
+                <div class="spinner-w">
+                    <mat-spinner diameter="20" *ngIf="orgLoading" color="accent">
+                    </mat-spinner>
+                </div>
 
                 <mat-form-field class="filter-form" appearance="fill">
-                    <!-- <mat-label>{{'ORG.PAGES.FILTER' | translate}}</mat-label> -->
                     <input matInput (click)="$event.stopPropagation()" (keyup)="applyFilter($event)"
                         placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}" #input>
                 </mat-form-field>
