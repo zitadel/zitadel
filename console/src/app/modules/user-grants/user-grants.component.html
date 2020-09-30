@@ -6,7 +6,7 @@
         <i class="las la-trash"></i>
     </button>
     <a *ngIf="allowCreate && context !== UserGrantContext.USER" matTooltip="{{'GRANTS.ADD' | translate}}" actions
-        color="primary" class="add-button" color="primary" mat-raised-button [routerLink]="routerLink">
+        color="primary" color="primary" mat-raised-button [routerLink]="routerLink">
         <mat-icon class="icon">add</mat-icon>{{ 'GRANTS.ADD_BTN' | translate }}
     </a>
 

@@ -9,8 +9,7 @@
             </button>
         </ng-template>
         <ng-template appHasRole actions [appHasRole]="['org.member.write:'+org?.id,'org.member.write']">
-            <a color="primary" [disabled]="disabled" class="add-button" (click)="openAddMember()" color="primary"
-                mat-raised-button>
+            <a color="primary" [disabled]="disabled" (click)="openAddMember()" color="primary" mat-raised-button>
                 <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
             </a>
         </ng-template>

@@ -17,16 +17,6 @@
   .fill-space {
     flex: 1;
   }
-
-  .state-button {
-    border-radius: .5rem;
-  }
-}
-
-.card-actions {
-  button {
-    border-radius: .5rem;
-  }
 }
 
 .method-col {
@@ -52,10 +42,6 @@
       display: flex;
       justify-content: flex-end;
       align-items: center;
-
-      .notify-change-pwd {
-        border-radius: .5rem;
-      }
     }
 
     .label {
@@ -66,10 +52,6 @@
 
     .icon {
       margin-right: .5rem;
-    }
-
-    .submit-button {
-      border-radius: .5rem;
     }
 
     .verify {

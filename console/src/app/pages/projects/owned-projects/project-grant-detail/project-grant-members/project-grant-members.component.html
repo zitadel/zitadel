@@ -8,7 +8,7 @@
     </button>
     <a color="primary"
         [disabled]="(['project.grant.member.write','project.grant.member.write:' + grantId] | hasRole | async) == false"
-        class="add-button" (click)="openAddMember()" color="primary" mat-raised-button>
+        (click)="openAddMember()" color="primary" mat-raised-button>
         <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
     </a>
 

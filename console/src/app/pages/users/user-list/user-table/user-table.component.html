@@ -17,8 +17,8 @@
             class="icon-button" mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
             <mat-icon svgIcon="mdi_account_check_outline"></mat-icon>
         </button>
-        <a class="add-button" [routerLink]="[ '/users',userType == UserType.HUMAN ? 'create' : 'create-machine']"
-            color="primary" mat-raised-button [disabled]="disabled">
+        <a [routerLink]="[ '/users',userType == UserType.HUMAN ? 'create' : 'create-machine']" color="primary"
+            mat-raised-button [disabled]="disabled">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
     </ng-template>

@@ -4,7 +4,7 @@
     <app-refresh-table class="refresh-table" (refreshed)="refreshPage()" [dataSize]="dataSource?.totalResult"
         [timestamp]="dataSource?.viewTimestamp" [selection]="selection" [loading]="dataSource?.loading$ | async">
 
-        <a actions color="primary" class="add-button" (click)="addMember()" color="primary" mat-raised-button>
+        <a actions color="primary" (click)="addMember()" color="primary" mat-raised-button>
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
 

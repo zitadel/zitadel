@@ -152,7 +152,9 @@ $custom-typography:
 @include component-themes($dark-theme);
 @include angular-material-theme($dark-theme);
 
-.mat-dialog-container {
+.mat-dialog-container,
+.mat-raised-button,
+.mat-stroked-button {
   border-radius: .5rem !important;
 }
 

@@ -10,7 +10,7 @@
     </ng-template>
     <ng-template appHasRole [appHasRole]="['project.grant.member.write:'+projectId,'project.grant.member.write']"
         actions>
-        <a [disabled]="disabled" color="primary" class="rounded-button" color="primary" mat-raised-button
+        <a [disabled]="disabled" color="primary" color="primary" mat-raised-button
             [routerLink]="[ '/projects', projectId, 'grants', 'create']">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>

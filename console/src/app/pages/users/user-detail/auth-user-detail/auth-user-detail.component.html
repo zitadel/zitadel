@@ -33,8 +33,8 @@
         </div>
 
         <app-card *ngIf="user && user.human && user.id" title="{{ 'USER.EXTERNALIDP.TITLE' | translate }}"
-                  description="{{ 'USER.EXTERNALIDP.DESC' | translate }}">
-          <app-external-idps [userId]="user.id" [service]="userService"></app-external-idps>
+            description="{{ 'USER.EXTERNALIDP.DESC' | translate }}">
+            <app-external-idps [userId]="user.id" [service]="userService"></app-external-idps>
         </app-card>
 
         <app-card *ngIf="user" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
@@ -84,9 +84,8 @@
                         <button (click)="emailEditState = false" mat-icon-button>
                             <mat-icon class="icon">close</mat-icon>
                         </button>
-                        <button *ngIf="user.human" [disabled]="!user.human.email" class="submit-button" type="button"
-                            color="primary" (click)="saveEmail()"
-                            mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+                        <button *ngIf="user.human" [disabled]="!user.human.email" type="button" color="primary"
+                            (click)="saveEmail()" mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
                     </ng-template>
                 </div>
 
