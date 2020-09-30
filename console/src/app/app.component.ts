@@ -232,7 +232,7 @@ export class AppComponent implements OnDestroy {
     }
 
     private getProjectCount(): void {
-        this.authService.isAllowed(['project.read']).subscribe((allowed) => {
+        this.authService.isAllowed(['project.read$']).subscribe((allowed) => {
             if (allowed) {
                 this.mgmtService.SearchProjects(0, 0).then(res => {
                     this.ownedProjectsCount = res.toObject().totalResult;
