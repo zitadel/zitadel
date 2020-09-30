@@ -75,7 +75,7 @@ jobs:
 
   ## go lint, will be added later
 
-  go-build-zitadel:
+  go-build:
     runs-on: ubuntu-18.04
     needs: [angular-build, angular-lint, go-test] ### We need the artifact from the angular build and that's why we wait here
     name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
@@ -109,7 +109,7 @@ jobs:
 
   container-prod:
     runs-on: ubuntu-18.04
-    needs: go-build
+    needs: [go-build]
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
