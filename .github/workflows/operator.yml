@@ -1,0 +1,117 @@
+name: Operator Release
+on: push
+
+env:
+  GITHUB_TOKEN: ${{ secrets.CR_PAT }}
+  REGISTRY: ghcr.io
+  GO_VERSION: '1.14'
+  DOCKER_IMAGE_NAME: ${{ github.repository }}-operator
+
+jobs:
+
+  go-test:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2-beta
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - run: go test -race -v -coverprofile=profile.cov ./...
+      - uses: actions/upload-artifact@v2
+        with:
+          name: go-coverage
+          path: profile.cov
+      - uses: codecov/codecov-action@v1
+        with:
+          file: ./profile.cov
+          name: codecov-go
+
+  go-build:
+    runs-on: ubuntu-18.04
+    needs: go-test
+    name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
+    strategy:
+      matrix:
+        goos: [ 'linux', 'darwin', 'windows' ]
+        goarch: [ 'amd64' ]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2-beta
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - run: echo "::set-env name=CAOS_NEXT_VERSION::${GITHUB_REF##*/}"
+      - name: Semantic Release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v2
+        with:
+          dry_run: true
+          semantic_version: 17.1.2
+      - name: Tag semantic
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: echo "::set-env name=CAOS_NEXT_VERSION::${{ steps.semantic.outputs.new_release_version }}"
+      - run: CGO_ENABLED=0 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -a -installsuffix cgo -ldflags "-X main.version=$CAOS_NEXT_VERSION" -o zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }} cmd/zitadelctl/main.go
+      - uses: actions/upload-artifact@v2
+        with:
+          name: zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
+
+  container-prod:
+    runs-on: ubuntu-18.04
+    needs: go-build
+    steps:
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: zitadelctl-linux-amd64
+          path: .artifacts
+      - uses: docker/build-push-action@v1
+        with:
+          dockerfile: build/docker/operator/Dockerfile
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT }}
+          registry: ${{ env.REGISTRY }}
+          repository: ${{ env.DOCKER_IMAGE_NAME }}
+          tag_with_ref: true
+          tag_with_sha: true
+
+  release:
+    runs-on: ubuntu-18.04
+    needs: [container-prod]
+    env:
+      DOCKER_USERNAME: ${{ github.actor }}
+      DOCKER_PASSWORD: ${{ secrets.CR_PAT }}
+    steps:
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - name: Generate Short SHA Container Tag
+        id: vars
+        run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
+      - uses: actions/download-artifact@v2
+        with:
+          path: .artifacts
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: .artifacts
+      - name: Docker Login
+        run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
+      - name: Docker Pull short-sha
+        run: docker pull $REGISTRY/$DOCKER_IMAGE_NAME:${{ steps.vars.outputs.sha_short }}
+      - name: Semantic Release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v2
+        with:
+          dry_run: false
+          semantic_version: 17.1.2
+      - name: Docker Tag Version
+        run: docker tag $REGISTRY/$DOCKER_IMAGE_NAME:${{ steps.vars.outputs.sha_short }} $REGISTRY/$DOCKER_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
+        if: steps.semantic.outputs.new_release_published == 'true'
+      - name: Docker Tag Latest
+        run: docker tag $REGISTRY/$DOCKER_IMAGE_NAME:${{ steps.vars.outputs.sha_short }} $REGISTRY/$DOCKER_IMAGE_NAME:latest
+        if: steps.semantic.outputs.new_release_published == 'true'
+      - name: Docker Push Version
+        run: docker push $REGISTRY/$DOCKER_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
+        if: steps.semantic.outputs.new_release_published == 'true'
+      - name: Docker Push Latest
+        run: docker push $REGISTRY/$DOCKER_IMAGE_NAME:latest
+        if: steps.semantic.outputs.new_release_published == 'true'
