@@ -54,7 +54,7 @@
 
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr class="data-row" mat-row *matRowDef="let row; columns: displayedColumns;"
+            <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"
                 [routerLink]="row.id ? ['/users', row.id ]: null">
             </tr>
 

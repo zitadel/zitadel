@@ -85,7 +85,7 @@
 
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr class="data-row"
+            <tr class="highlight"
                 [ngClass]="{'disabled': serviceType==PolicyComponentServiceType.MGMT && row?.providerType == IdpProviderType.IDPPROVIDERTYPE_SYSTEM}"
                 mat-row *matRowDef="let row; columns: displayedColumns;"
                 [routerLink]="serviceType==PolicyComponentServiceType.ADMIN ? routerLinkForRow(row): null">
