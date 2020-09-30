@@ -221,7 +221,6 @@ export class AppComponent implements OnDestroy {
             this.profile = userprofile;
             const lang = userprofile.preferredLanguage.match(/en|de/) ? userprofile.preferredLanguage : 'en';
             this.translate.use(lang);
-            console.log(this.document.documentElement.lang);
             this.document.documentElement.lang = lang;
         });
     }

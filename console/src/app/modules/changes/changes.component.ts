@@ -103,11 +103,9 @@ export class ChangesComponent implements OnInit {
             this._loading.next(true);
 
             return from(col).pipe(
+                take(1),
                 tap((res: Changes) => {
                     let values = res.toObject().changesList;
-                    // If prepending, reverse the batch order
-                    values = false ? values.reverse() : values;
-
                     // update source with new values, done loading
                     this._data.next(values);
 
@@ -118,12 +116,11 @@ export class ChangesComponent implements OnInit {
                         this._done.next(true);
                     }
                 }),
-                catchError(err => {
+                catchError(_ => {
                     this._loading.next(false);
                     this.bottom = true;
                     return of([]);
                 }),
-                take(1),
             ).subscribe();
         }
     }

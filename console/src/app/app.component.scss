@@ -1,3 +1,5 @@
+@import '~@angular/material/theming';
+
 .root-header {
   position: fixed;
   z-index: 100;
@@ -229,9 +231,9 @@
   }
 }
 
-.filter-form {
-    margin: 0 1rem;
-    @mixin textvar($theme) {
+@mixin textvar($theme) {
+    .filter-form {
+        margin: 0 1rem;
         /* stylelint-disable */
         $foreground: map-get($theme, foreground);
         color: mat-color($foreground, text) !important;
