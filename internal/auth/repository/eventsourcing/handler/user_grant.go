@@ -71,7 +71,7 @@ func (u *UserGrant) Reduce(event *models.Event) (err error) {
 	case proj_es_model.ProjectAggregate:
 		err = u.processProject(event)
 	case iam_es_model.IAMAggregate:
-		err = u.processIamMember(event, "IAM", false)
+		err = u.processIAMMember(event, "IAM", false)
 	case org_es_model.OrgAggregate:
 		return u.processOrg(event)
 	}
@@ -132,7 +132,6 @@ func (u *UserGrant) processUser(event *models.Event) (err error) {
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
 	}
-	return nil
 }
 
 func (u *UserGrant) processProject(event *models.Event) (err error) {
@@ -161,7 +160,6 @@ func (u *UserGrant) processProject(event *models.Event) (err error) {
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
 	}
-	return nil
 }
 
 func (u *UserGrant) processOrg(event *models.Event) (err error) {
@@ -175,7 +173,7 @@ func (u *UserGrant) processOrg(event *models.Event) (err error) {
 	}
 }
 
-func (u *UserGrant) processIamMember(event *models.Event, rolePrefix string, suffix bool) error {
+func (u *UserGrant) processIAMMember(event *models.Event, rolePrefix string, suffix bool) error {
 	member := new(iam_es_model.IAMMember)
 
 	switch event.Type {
