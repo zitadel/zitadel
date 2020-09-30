@@ -233,15 +233,18 @@
 
 @mixin textvar($theme) {
     .filter-form {
-        margin: 0 1rem;
+        margin: 0 .5rem;
         /* stylelint-disable */
+
         $foreground: map-get($theme, foreground);
         color: mat-color($foreground, text) !important;
         /* stylelint-enable */
     }
-}
 
-.show-all {
-    border-bottom: 2px solid #8795a1;
-    margin-bottom: .5rem;
+    .show-all {
+        $primary: map-get($theme, primary);
+        color: mat-color($primary, 300) !important;
+        border-bottom: 2px solid #8795a1;
+        margin-bottom: .5rem;
+    }
 }

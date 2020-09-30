@@ -12,19 +12,19 @@
                 </ng-template>
             </a>
 
-            <button (click)="loadOrgs()" *ngIf="profile?.id && org" mat-button
-                [matMenuTriggerFor]="menu">{{org?.name ? org.name : 'NO NAME'}}
+            <button (click)="loadOrgs()" *ngIf="profile?.id && org" mat-button [matMenuTriggerFor]="menu"
+                (menuOpened)="focusFilter()">{{org?.name ? org.name : 'NO NAME'}}
                 <mat-icon>
                     arrow_drop_down</mat-icon>
             </button>
 
             <mat-menu #menu="matMenu">
                 <mat-progress-bar *ngIf="orgLoading" color="accent" mode="indeterminate"></mat-progress-bar>
-                <button class="show-all" mat-menu-item
-                    [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' | translate}}</button>
+                <!-- <button class="show-all" mat-menu-item
+                    [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' | translate}}</button> -->
 
-                <mat-form-field class="filter-form">
-                    <mat-label>{{'ORG.PAGES.FILTER' | translate}}</mat-label>
+                <mat-form-field class="filter-form" appearance="fill">
+                    <!-- <mat-label>{{'ORG.PAGES.FILTER' | translate}}</mat-label> -->
                     <input matInput (click)="$event.stopPropagation()" (keyup)="applyFilter($event)"
                         placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}" #input>
                 </mat-form-field>
@@ -33,6 +33,9 @@
                     *ngFor="let temporg of orgs" mat-menu-item (click)="setActiveOrg(temporg)">
                     {{temporg?.name ? temporg.name : 'NO NAME'}}
                 </button>
+
+                <button class="show-all" mat-menu-item
+                    [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' | translate}}</button>
 
                 <ng-template appHasRole [appHasRole]="['org.create','iam.write']">
                     <button mat-menu-item [routerLink]="[ '/org/create' ]">
