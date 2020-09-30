@@ -28,7 +28,7 @@ func GetQueryAndDestroyFuncs(
 
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("adapting %s failed: %w", desiredTree.Common.Kind)
+			err = fmt.Errorf("adapting %s failed: %w", desiredTree.Common.Kind, err)
 		}
 	}()
 
