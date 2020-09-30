@@ -1052,7 +1052,9 @@ func Test_userByID(t *testing.T) {
 		{
 			"not found, not found error",
 			args{
-				viewProvider: &mockViewNoUser{},
+				userID:        "userID",
+				viewProvider:  &mockViewNoUser{},
+				eventProvider: &mockEventUser{},
 			},
 			nil,
 			errors.IsNotFound,

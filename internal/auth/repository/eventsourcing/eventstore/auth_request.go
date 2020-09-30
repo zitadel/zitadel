@@ -721,6 +721,9 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 		return user_view_model.UserToModel(user), nil
 	}
 	if len(events) == 0 {
+		if viewErr != nil {
+			return nil, viewErr
+		}
 		return user_view_model.UserToModel(user), viewErr
 	}
 	userCopy := *user
