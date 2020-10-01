@@ -28,15 +28,15 @@
 }
 
 tr {
-    button {
-        visibility: hidden;
-    }
+  button {
+    visibility: hidden;
+  }
 
-    &:hover {
-        button {
-            visibility: visible; 
-        } 
+  &:hover {
+    button {
+      visibility: visible;
     }
+  }
 }
 
 .pointer {

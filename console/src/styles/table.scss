@@ -36,8 +36,8 @@
     &.highlight {
       &:hover {
         td {
-            // TODO: replace with non transparent color so that columns are not getting overlayed colorwise twice
-            background-color: rgba($inv-color, .05);
+          // TODO: replace with non transparent color so that columns are not getting overlayed colorwise twice
+          background-color: rgba($inv-color, .05);
         }
       }
     }

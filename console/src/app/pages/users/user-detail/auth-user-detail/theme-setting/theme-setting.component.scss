@@ -1,5 +1,5 @@
 $dark-background: #212224;
-$light-background: rgb(220,220,220);
+$light-background: rgb(220, 220, 220);
 
 :root {
   transition: none;
@@ -16,13 +16,13 @@ $light-background: rgb(220,220,220);
 }
 
 .circle {
-    z-index: 1;
-    position: relative;
-    border-radius: 100%;
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(40deg, #ff0080, #ff8c00 70%);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, .12);
+  z-index: 1;
+  position: relative;
+  border-radius: 100%;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(40deg, #ff0080, #ff8c00 70%);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, .12);
 }
 
 .crescent {
@@ -80,39 +80,39 @@ label {
 }
 
 [type="checkbox"]:checked {
-    .toggle {
-        transform: translateX(100%);
-        background-color: $dark-background;
-    }
+  .toggle {
+    transform: translateX(100%);
+    background-color: $dark-background;
+  }
 
-    .light {
-        opacity: .5;
-    }
-    .dark {
-        opacity: 1;
-    }     
+  .light {
+    opacity: .5;
+  }
 
-    .theme-app {
-        background-color: inherit;
-        color: inherit;
-    }      
+  .dark {
+    opacity: 1;
+  }
+
+  .theme-app {
+    background-color: inherit;
+    color: inherit;
+  }
 }
 
-
 [type="checkbox"]:checked + .theme-app .crescent {
-    transform: scale(1);
-    background: $dark-background;
+  transform: scale(1);
+  background: $dark-background;
 }
 
 [type="checkbox"]:checked + .theme-app .circle {
-    background: linear-gradient(40deg, #8983f7, #a3dafb 70%);
+  background: linear-gradient(40deg, #8983f7, #a3dafb 70%);
 }
-  
+
 [type="checkbox"]:checked + .theme-app .main-circle {
-    background: linear-gradient(40deg, #8983f7, #a3dafb 70%);
+  background: linear-gradient(40deg, #8983f7, #a3dafb 70%);
 }
-  
-[type="checkbox"]:checked + .app .toggle{
-    transform: translateX(100%);
-    background-color: #34323D;
+
+[type="checkbox"]:checked + .app .toggle {
+  transform: translateX(100%);
+  background-color: #34323d;
 }
