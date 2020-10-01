@@ -335,6 +335,10 @@
             "DELETE":"Entfernen",
             "DELETESUCCESS":"Gescheiterte Events entfernt."
         },
+        "POLICY": {
+            "TITLE":"Standardrichtlinien für ihre Organisationen",
+            "DESCRIPTION":"Diese Einstellungen können von Organisationen erweitert und/oder verändert werden."
+        },
         "TOAST":{
             "MEMBERREMOVED":"Manager entfernt.",
             "MEMBERSADDED": "Manager hinzugefügt.",

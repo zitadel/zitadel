@@ -335,6 +335,10 @@
             "DELETE":"Remove",
             "DELETESUCCESS":"Failed events removed."
         },
+        "POLICY": {
+            "TITLE":"Default policies for organisations",
+            "DESCRIPTION":"These settings can be enhanced and/or customized by registered organisations."
+        },
         "TOAST":{
             "MEMBERREMOVED":"Manager removed.",
             "MEMBERSADDED": "Managers added.",

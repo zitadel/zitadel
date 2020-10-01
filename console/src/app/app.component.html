@@ -25,7 +25,7 @@
                 </div>
 
                 <mat-form-field class="filter-form" appearance="fill">
-                    <input matInput (click)="$event.stopPropagation()" (keyup)="applyFilter($event)"
+                    <input autocomplete="off" matInput (click)="$event.stopPropagation()" (keyup)="applyFilter($event)"
                         placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}" #input>
                 </mat-form-field>
 
