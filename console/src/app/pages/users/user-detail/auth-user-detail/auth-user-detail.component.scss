@@ -1,11 +1,22 @@
-.h1 {
-  margin-top: 0;
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    
+    .h1 { 
+        margin-top: 0;
+    }
+      
+    .sub {
+        color: #8795a1;
+    }
+
+    .theme {
+        min-width: 250px;
+    }
 }
 
-.sub {
-  color: #8795a1;
-  margin-bottom: 2rem;
-}
 
 .login-name-row {
   display: flex;
@@ -106,13 +117,13 @@
     margin: .5rem;
   }
 
-  .theme-card {
-    max-width: 300px;
+//   .theme-card {
+//     max-width: 300px;
 
-    @media only screen and (max-width: 450px) {
-      max-width: none;
-    }
-  }
+//     @media only screen and (max-width: 450px) {
+//       max-width: none;
+//     }
+//   }
 }
 
 .side {

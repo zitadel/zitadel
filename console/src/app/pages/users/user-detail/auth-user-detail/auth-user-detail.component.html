@@ -1,8 +1,15 @@
 <app-meta-layout>
     <div class="max-width-container">
-        <h1 class="h1">{{ 'USER.TITLE' | translate }}</h1>
-        <p class="sub">{{'USER.DESCRIPTION' | translate}}</p>
+        <div class="header-row">
+            <div>
+                <h1 class="h1">{{ 'USER.TITLE' | translate }}</h1>
+                <p class="sub">{{'USER.DESCRIPTION' | translate}}</p>
+            </div>
 
+            <div class="theme">
+                <app-theme-setting></app-theme-setting>
+            </div>
+        </div>
         <mat-progress-bar *ngIf="loading" color="accent" mode="indeterminate"></mat-progress-bar>
 
         <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
@@ -20,17 +27,17 @@
             </div>
         </app-card>
 
-        <div class="col" *ngIf="user">
-            <app-card class="app-card" title="{{ 'USER.PROFILE.TITLE' | translate }}">
-                <app-detail-form [genders]="genders" [languages]="languages" [username]="user.userName"
-                    [user]="user.human" (changedLanguage)="changedLanguage($event)" (submitData)="saveProfile($event)">
-                </app-detail-form>
-            </app-card>
+        <!-- <div class="col" *ngIf="user"> -->
+        <app-card *ngIf="user" class="app-card" title="{{ 'USER.PROFILE.TITLE' | translate }}">
+            <app-detail-form [genders]="genders" [languages]="languages" [username]="user.userName" [user]="user.human"
+                (changedLanguage)="changedLanguage($event)" (submitData)="saveProfile($event)">
+            </app-detail-form>
+        </app-card>
 
-            <app-card title="Theme" class="app-card theme-card">
+        <!-- <app-card title="Theme" class="app-card theme-card">
                 <app-theme-setting></app-theme-setting>
-            </app-card>
-        </div>
+            </app-card> -->
+        <!-- </div> -->
 
         <app-card *ngIf="user && user.human && user.id" title="{{ 'USER.EXTERNALIDP.TITLE' | translate }}"
             description="{{ 'USER.EXTERNALIDP.DESC' | translate }}">
