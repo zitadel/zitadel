@@ -18,10 +18,9 @@
 
         <div>
             <button mat-stroked-button color="warn" *ngIf="grant?.state === ProjectGrantState.PROJECTGRANTSTATE_ACTIVE"
-                class="state-button"
                 (click)="changeState(ProjectGrantState.PROJECTGRANTSTATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' | translate}}</button>
             <button mat-stroked-button color="warn"
-                *ngIf="grant?.state === ProjectGrantState.PROJECTGRANTSTATE_INACTIVE" class="state-button"
+                *ngIf="grant?.state === ProjectGrantState.PROJECTGRANTSTATE_INACTIVE"
                 (click)="changeState(ProjectGrantState.PROJECTGRANTSTATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' | translate}}</button>
         </div>
     </div>

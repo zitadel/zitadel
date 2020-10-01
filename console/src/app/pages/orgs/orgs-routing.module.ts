@@ -5,7 +5,6 @@ import { PolicyComponentServiceType, PolicyComponentType } from 'src/app/modules
 
 import { OrgCreateComponent } from './org-create/org-create.component';
 import { OrgDetailComponent } from './org-detail/org-detail.component';
-import { OrgGridComponent } from './org-grid/org-grid.component';
 
 const routes: Routes = [
     {
@@ -82,7 +81,7 @@ const routes: Routes = [
     },
     {
         path: 'overview',
-        component: OrgGridComponent,
+        loadChildren: () => import('./org-list/org-list.module').then(m => m.OrgListModule),
     },
 ];
 

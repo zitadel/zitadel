@@ -1,5 +1,5 @@
 <app-detail-layout [backRouterLink]="backroutes" [title]="'ORG.POLICY.LOGIN_POLICY.TITLECREATE' | translate"
-    [description]="serviceType==PolicyComponentServiceType.MGMT ? 'ORG.POLICY.LOGIN_POLICY.DESCRIPTIONCREATEMGMT' : PolicyComponentServiceType.ADMIN ? 'ORG.POLICY.LOGIN_POLICY.DESCRIPTIONCREATEADMIN' : '' | translate">
+    [description]="(serviceType==PolicyComponentServiceType.MGMT ? 'ORG.POLICY.LOGIN_POLICY.DESCRIPTIONCREATEMGMT' : PolicyComponentServiceType.ADMIN ? 'ORG.POLICY.LOGIN_POLICY.DESCRIPTIONCREATEADMIN' : '') | translate">
     <ng-container *ngIf="(['policy.delete'] | hasRole | async) && serviceType == PolicyComponentServiceType.MGMT">
         <!--<button matTooltip="{{'ORG.POLICY.DELETE' | translate}}" color="warn" (click)="deletePolicy()"
             mat-stroked-button>

@@ -86,7 +86,19 @@
             "COPIED":"Copied to clipboard.",
             "NOUSER":"No associated users.",
             "REACTIVATE":"Reactivate",
-            "DEACTIVATE":"Deactivate"
+            "DEACTIVATE":"Deactivate",
+            "FILTER":"Filter"
+        },
+        "TABLE":{
+            "DEACTIVATE":"Deactivate",
+            "ACTIVATE":"Activate",
+            "FILTER": {
+                "1":"Filter for Username",
+                "2":"filter for Firstname",
+                "3":"filter for Lastname",
+                "5":"filter for DisplayName",
+                "6":"filter for email"
+            }
         },
         "MFA": {
             "TABLETYPE":"Type",
@@ -305,7 +317,12 @@
             "SEQUENCE":"Sequence",
             "TIMESTAMP":"Timestamp",
             "ACTIONS":"Actions",
-            "CLEAR":"Clear"
+            "CLEAR":"Clear",
+            "CLEARED":"View was successfully cleared!",
+            "DIALOG": {
+                "VIEW_CLEAR_TITLE": "Clear View",
+                "VIEW_CLEAR_DESCRIPTION":"You are about to clear a view. Clearing a view creates a process during which data is possibly not available for endusers. Are you really sure?"
+            }
         },
         "FAILEDEVENTS": {
             "TITLE":"Failed Events",
@@ -318,6 +335,10 @@
             "ACTIONS":"Actions",
             "DELETE":"Remove",
             "DELETESUCCESS":"Failed events removed."
+        },
+        "POLICY": {
+            "TITLE":"Default policies for organisations",
+            "DESCRIPTION":"These settings can be enhanced and/or customized by registered organisations."
         },
         "TOAST":{
             "MEMBERREMOVED":"Manager removed.",
@@ -332,6 +353,10 @@
     },
     "ORG": {
         "PAGES": {
+            "NAME":"Name",
+            "ID":"ID",
+            "FILTER":"Filter",
+            "FILTERPLACEHOLDER":"Filter for the name",
             "LIST": "Organisations",
             "LISTDESCRIPTION":"Choose an organisation.",
             "ACTIVE":"Active",

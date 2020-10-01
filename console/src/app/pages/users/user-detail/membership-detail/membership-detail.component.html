@@ -4,7 +4,7 @@
     <app-refresh-table class="refresh-table" (refreshed)="refreshPage()" [dataSize]="dataSource?.totalResult"
         [timestamp]="dataSource?.viewTimestamp" [selection]="selection" [loading]="dataSource?.loading$ | async">
 
-        <a actions color="primary" class="add-button" (click)="addMember()" color="primary" mat-raised-button>
+        <a actions color="primary" (click)="addMember()" color="primary" mat-raised-button>
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
 
@@ -57,7 +57,7 @@
                 </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr class="data-row" mat-row *matRowDef="let row; columns: displayedColumns;">
+                <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;">
                 </tr>
             </table>
 

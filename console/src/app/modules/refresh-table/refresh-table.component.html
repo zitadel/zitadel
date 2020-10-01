@@ -13,9 +13,12 @@
     </div>
     <span class="fill-space"></span>
     <mat-spinner class="spinner" *ngIf="loading" diameter="20"></mat-spinner>
+    <ng-content select="[actions]"></ng-content>
+
     <button mat-icon-button (click)="emitRefresh()" class="icon-button" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
         <mat-icon>refresh</mat-icon>
     </button>
-    <ng-content select="[actions]"></ng-content>
 </div>
-<ng-content></ng-content>
+<div class="table-wrapper">
+    <ng-content></ng-content>
+</div>

@@ -19,14 +19,6 @@
         padding-right: 0;
       }
     }
-
-    .data-row {
-      cursor: pointer;
-
-      &:hover {
-        background-color: #ffffff05;
-      }
-    }
   }
 }
 
@@ -36,10 +28,6 @@ tr {
   &.disabled * {
     color: #8795a1;
   }
-}
-
-.add-button {
-  border-radius: .5rem;
 }
 
 .avatar {

@@ -11,11 +11,11 @@ import {
     IdpView as AdminIdpView,
 } from 'src/app/proto/generated/admin_pb';
 import {
-  IdpProviderType,
-  IdpProviderView as MgmtIdpProviderView,
-  IdpView as MgmtIdpView,
-  LoginPolicy,
-  LoginPolicyView, OrgDomainView,
+    IdpProviderType,
+    IdpProviderView as MgmtIdpProviderView,
+    IdpView as MgmtIdpView,
+    LoginPolicy,
+    LoginPolicyView,
 } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -151,7 +151,9 @@ export class LoginPolicyComponent implements OnDestroy {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp && resp.idp && resp.type) {
-                this.addIdp(resp.idp, resp.type);
+                this.addIdp(resp.idp, resp.type).then(() => {
+                    this.getData();
+                });
             }
         });
     }
@@ -177,15 +179,15 @@ export class LoginPolicyComponent implements OnDestroy {
         }
     }
 
-  public get backroutes(): string[] {
-    switch (this.serviceType) {
-      case PolicyComponentServiceType.MGMT:
-        return  ['/org'];
-      case PolicyComponentServiceType.ADMIN:
-        return  ['/iam'];
-        break;
+    public get backroutes(): string[] {
+        switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+                return ['/org'];
+            case PolicyComponentServiceType.ADMIN:
+                return ['/iam'];
+                break;
+        }
+        return [];
     }
-    return [];
-  }
 
 }

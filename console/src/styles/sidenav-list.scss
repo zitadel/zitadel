@@ -7,17 +7,8 @@
   $primary-color: mat-color($primary, 500);
   $accent-color: mat-color($accent, 500);
   $primary-dark: mat-color($primary, A900);
-  $inverse-color: mat-color($primary, A600);
   $sec-dark: mat-color($primary, A800);
   /* stylelint-enable */
-
-  .mat-menu-item {
-    &.show-all {
-      height: 2rem;
-      line-height: 2rem;
-      color: mat-color($primary, a700);
-    }
-  }
 
   .nav-item {
     color: inherit;

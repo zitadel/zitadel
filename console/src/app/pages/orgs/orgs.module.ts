@@ -25,12 +25,11 @@ import { ChangesModule } from '../../modules/changes/changes.module';
 import { AddDomainDialogModule } from './org-detail/add-domain-dialog/add-domain-dialog.module';
 import { DomainVerificationComponent } from './org-detail/domain-verification/domain-verification.component';
 import { OrgDetailComponent } from './org-detail/org-detail.component';
-import { OrgGridComponent } from './org-grid/org-grid.component';
 import { OrgsRoutingModule } from './orgs-routing.module';
 import { PolicyGridComponent } from './policy-grid/policy-grid.component';
 
 @NgModule({
-    declarations: [OrgDetailComponent, OrgGridComponent, PolicyGridComponent, DomainVerificationComponent],
+    declarations: [OrgDetailComponent, PolicyGridComponent, DomainVerificationComponent],
     imports: [
         CommonModule,
         HasRolePipeModule,

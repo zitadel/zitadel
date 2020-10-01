@@ -16,7 +16,7 @@
             *ngIf="selection.hasValue() && serviceType!=PolicyComponentServiceType.MGMT" [disabled]="disabled">
             <i class="las la-trash"></i>
         </button>
-        <a class="add-button" [routerLink]="createRouterLink" color="primary" mat-raised-button [disabled]="disabled"
+        <a [routerLink]="createRouterLink" color="primary" mat-raised-button [disabled]="disabled"
             *ngIf="serviceType!=PolicyComponentServiceType.MGMT">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
@@ -85,14 +85,14 @@
 
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr class="data-row"
+            <tr class="highlight"
                 [ngClass]="{'disabled': serviceType==PolicyComponentServiceType.MGMT && row?.providerType == IdpProviderType.IDPPROVIDERTYPE_SYSTEM}"
                 mat-row *matRowDef="let row; columns: displayedColumns;"
                 [routerLink]="serviceType==PolicyComponentServiceType.ADMIN ? routerLinkForRow(row): null">
             </tr>
 
         </table>
-        <mat-paginator #paginator class="paginator" [length]="idpResult?.totalResult || 0" [pageSize]="10"
-            [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
     </div>
+    <mat-paginator #paginator class="paginator" [length]="idpResult?.totalResult || 0" [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
 </app-refresh-table>

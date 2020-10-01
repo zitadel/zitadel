@@ -35,7 +35,6 @@ export class AuthInterceptor<TReq = unknown, TResp = unknown> implements UnaryIn
         return invoker(request).then((response: any) => {
             return response;
         }).catch((error: any) => {
-            console.error('error: ', error);
             if (error.code === 16) {
                 const dialogRef = this.dialog.open(WarnDialogComponent, {
                     data: {
@@ -52,6 +51,7 @@ export class AuthInterceptor<TReq = unknown, TResp = unknown> implements UnaryIn
                     }
                 });
             }
+            return Promise.reject(error);
         });
     }
 }

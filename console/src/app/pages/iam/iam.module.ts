@@ -63,6 +63,7 @@ import { IamComponent } from './iam.component';
         SharedModule,
         RefreshTableModule,
         HasRolePipeModule,
+        MatSortModule,
     ],
 })
 export class IamModule { }

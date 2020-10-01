@@ -6,7 +6,6 @@
 
   .icon-button {
     display: block;
-    border-radius: .5rem;
   }
 }
 
@@ -30,14 +29,6 @@
 
       &:last-child {
         padding-right: 0;
-      }
-    }
-
-    .data-row {
-      cursor: pointer;
-
-      &:hover {
-        background-color: #ffffff05;
       }
     }
 

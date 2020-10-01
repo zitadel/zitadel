@@ -12,8 +12,7 @@
             </button>
         </ng-template>
         <ng-template appHasRole actions [appHasRole]="['iam.member.write']">
-            <a color="primary" [disabled]="disabled" class="add-button" (click)="openAddMember()" color="primary"
-                mat-raised-button>
+            <a color="primary" [disabled]="disabled" (click)="openAddMember()" color="primary" mat-raised-button>
                 <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
             </a>
         </ng-template>
@@ -76,7 +75,7 @@
                 </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr class="data-row" mat-row *matRowDef="let row; columns: displayedColumns;">
+                <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;">
                 </tr>
             </table>
 

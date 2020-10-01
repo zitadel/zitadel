@@ -86,7 +86,19 @@
             "COPIED":"In die Zwischenablage kopiert.",
             "NOUSER":"Kein Benutzer",
             "REACTIVATE":"Reaktivieren",
-            "DEACTIVATE":"Deaktivieren"
+            "DEACTIVATE":"Deaktivieren",
+            "FILTER":"Filter"
+        },
+        "TABLE":{
+            "DEACTIVATE":"Deaktivieren",
+            "ACTIVATE":"Aktivieren",
+            "FILTER": {
+                "1":"Nach Username filtern",
+                "2":"Nach Vornamen filtern",
+                "3":"Nach Nachnamen filtern",
+                "5":"Nach Display Namen filtern",
+                "6":"Nach Email filtern"
+            }
         },
         "MFA": {
             "TABLETYPE":"Typ",
@@ -305,7 +317,12 @@
             "SEQUENCE":"Sequenz",
             "TIMESTAMP":"Zeitstempel",
             "ACTIONS":"Aktionen",
-            "CLEAR":"Aufräumen"
+            "CLEAR":"Aufräumen",
+            "CLEARED":"View wurde erfolgreich zurückgesetzt!",
+            "DIALOG": {
+                "VIEW_CLEAR_TITLE": "View zurücksetzen?",
+                "VIEW_CLEAR_DESCRIPTION":"Sie sind im Begriff eine View zu löschen. Durch das Löschen einer View wird ein Prozess gestartet, bei dem Daten für Endbenutzer möglicherweise nicht oder verzügert verfügbar sind. Sind Sie sicher?"
+            }
         },
         "FAILEDEVENTS": {
             "TITLE":"Gescheiterte Events",
@@ -318,6 +335,10 @@
             "ACTIONS":"Aktionen",
             "DELETE":"Entfernen",
             "DELETESUCCESS":"Gescheiterte Events entfernt."
+        },
+        "POLICY": {
+            "TITLE":"Standardrichtlinien für ihre Organisationen",
+            "DESCRIPTION":"Diese Einstellungen können von Organisationen erweitert und/oder verändert werden."
         },
         "TOAST":{
             "MEMBERREMOVED":"Manager entfernt.",
@@ -332,6 +353,10 @@
     },
     "ORG": {
         "PAGES": {
+            "NAME":"Name",
+            "ID":"ID",
+            "FILTER":"Filter",
+            "FILTERPLACEHOLDER":"Filtern Sie nach dem Namen",
             "LIST": "Organisationen",
             "LISTDESCRIPTION":"Wähle eine Organisation aus.",
             "ACTIVE":"Aktiv",

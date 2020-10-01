@@ -2,16 +2,22 @@
     [timestamp]="userResult?.viewTimestamp" [selection]="selection"
     [emitRefreshOnPreviousRoute]="refreshOnPreviousRoute">
     <ng-template appHasRole [appHasRole]="['user.write']" actions>
-        <button (click)="deactivateSelectedUsers()" matTooltip="{{'ORG_DETAIL.TABLE.DEACTIVATE' | translate}}"
+        <mat-form-field @appearfade *ngIf="userSearchKey != undefined" actions class="filtername">
+            <mat-label>{{'USER.PAGES.FILTER' | translate}}</mat-label>
+            <input matInput (keyup)="applyFilter($event)"
+                [placeholder]="('USER.TABLE.FILTER.' + userSearchKey.toString()) | translate" #input>
+        </mat-form-field>
+
+        <button (click)="deactivateSelectedUsers()" matTooltip="{{'USER.TABLE.DEACTIVATE' | translate}}"
             class="icon-button" mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
             <mat-icon svgIcon="mdi_account_cancel"></mat-icon>
         </button>
-        <button (click)="reactivateSelectedUsers()" matTooltip="{{'ORG_DETAIL.TABLE.ACTIVATE' | translate}}"
+        <button (click)="reactivateSelectedUsers()" matTooltip="{{'USER.TABLE.ACTIVATE' | translate}}"
             class="icon-button" mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
             <mat-icon svgIcon="mdi_account_check_outline"></mat-icon>
         </button>
-        <a class="add-button" [routerLink]="[ '/users',userType == UserType.HUMAN ? 'create' : 'create-machine']"
-            color="primary" mat-raised-button [disabled]="disabled">
+        <a [routerLink]="[ '/users',userType == UserType.HUMAN ? 'create' : 'create-machine']" color="primary"
+            mat-raised-button [disabled]="disabled">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
     </ng-template>
@@ -36,17 +42,39 @@
             </ng-container>
 
             <ng-container matColumnDef="firstname">
-                <th mat-header-cell *matHeaderCellDef> {{ 'USER.PROFILE.FIRSTNAME' | translate }} </th>
+                <th mat-header-cell *matHeaderCellDef
+                    [ngClass]="{'search-active': this.userSearchKey == UserSearchKey.USERSEARCHKEY_FIRST_NAME}">
+                    {{ 'USER.PROFILE.FIRSTNAME' | translate }}
+                    <template [ngTemplateOutlet]="templateRef"
+                        [ngTemplateOutletContext]="{key: UserSearchKey.USERSEARCHKEY_FIRST_NAME}"></template>
+                </th>
                 <td mat-cell *matCellDef="let user"> {{user[userType]?.firstName}} </td>
             </ng-container>
 
             <ng-container matColumnDef="lastname">
-                <th mat-header-cell *matHeaderCellDef> {{ 'USER.PROFILE.LASTNAME' | translate }} </th>
+                <th mat-header-cell *matHeaderCellDef
+                    [ngClass]="{'search-active': this.userSearchKey == UserSearchKey.USERSEARCHKEY_LAST_NAME}">
+                    {{ 'USER.PROFILE.LASTNAME' | translate }}
+                    <template [ngTemplateOutlet]="templateRef"
+                        [ngTemplateOutletContext]="{key: UserSearchKey.USERSEARCHKEY_LAST_NAME}"></template>
+                </th>
                 <td mat-cell *matCellDef="let user"> {{user[userType]?.lastName}} </td>
             </ng-container>
 
+            <ng-container matColumnDef="displayName">
+                <th mat-header-cell *matHeaderCellDef
+                    [ngClass]="{'search-active': this.userSearchKey == UserSearchKey.USERSEARCHKEY_DISPLAY_NAME}">
+                    {{ 'USER.PROFILE.DISPLAYNAME' | translate }}
+                    <template [ngTemplateOutlet]="templateRef"
+                        [ngTemplateOutletContext]="{key: UserSearchKey.USERSEARCHKEY_DISPLAY_NAME}"></template>
+                </th>
+                <td mat-cell *matCellDef="let user"> {{user[userType]?.displayName}} </td>
+            </ng-container>
+
             <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.NAME' | translate }} </th>
+                <th mat-header-cell *matHeaderCellDef>
+                    {{ 'USER.MACHINE.NAME' | translate }}
+                </th>
                 <td mat-cell *matCellDef="let user"> {{user[userType]?.name}} </td>
             </ng-container>
 
@@ -56,12 +84,22 @@
             </ng-container>
 
             <ng-container matColumnDef="username">
-                <th mat-header-cell *matHeaderCellDef> {{ 'USER.PROFILE.USERNAME' | translate }} </th>
+                <th mat-header-cell *matHeaderCellDef
+                    [ngClass]="{'search-active': this.userSearchKey == UserSearchKey.USERSEARCHKEY_USER_NAME}">
+                    {{ 'USER.PROFILE.USERNAME' | translate }}
+                    <template [ngTemplateOutlet]="templateRef"
+                        [ngTemplateOutletContext]="{key: UserSearchKey.USERSEARCHKEY_USER_NAME}"></template>
+                </th>
                 <td mat-cell *matCellDef="let user"> {{user.userName}} </td>
             </ng-container>
 
             <ng-container matColumnDef="email">
-                <th mat-header-cell *matHeaderCellDef> {{ 'USER.EMAIL' | translate }} </th>
+                <th mat-header-cell *matHeaderCellDef
+                    [ngClass]="{'search-active': this.userSearchKey == UserSearchKey.USERSEARCHKEY_EMAIL}">
+                    {{ 'USER.EMAIL' | translate }}
+                    <template [ngTemplateOutlet]="templateRef"
+                        [ngTemplateOutletContext]="{key: UserSearchKey.USERSEARCHKEY_EMAIL}"></template>
+                </th>
                 <td mat-cell *matCellDef="let user"> {{user[userType]?.email}} </td>
             </ng-container>
             <ng-container matColumnDef="state">
@@ -70,7 +108,7 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr class="data-row" mat-row *matRowDef="let row; columns: displayedColumns;"
+            <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"
                 [routerLink]="row.id ? ['/users', row.id ]: null">
             </tr>
 
@@ -79,3 +117,10 @@
             [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
     </div>
 </app-refresh-table>
+
+<ng-template #templateRef let-key="key">
+    <button class="search-button" mat-icon-button (click)="setFilter(key)">
+        <mat-icon *ngIf="this.userSearchKey != key">search</mat-icon>
+        <mat-icon *ngIf="this.userSearchKey == key">search_off</mat-icon>
+    </button>
+</ng-template>
