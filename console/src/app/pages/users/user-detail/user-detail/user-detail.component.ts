@@ -1,22 +1,22 @@
-import {Location} from '@angular/common';
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
-import {TranslateService} from '@ngx-translate/core';
-import {Subscription} from 'rxjs';
-import {ChangeType} from 'src/app/modules/changes/changes.component';
+import { Location } from '@angular/common';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
+import { ChangeType } from 'src/app/modules/changes/changes.component';
 import {
-  Gender,
-  MachineResponse,
-  MachineView,
-  NotificationType,
-  UserEmail,
-  UserPhone,
-  UserProfile,
-  UserState,
-  UserView,
+    Gender,
+    MachineResponse,
+    MachineView,
+    NotificationType,
+    UserEmail,
+    UserPhone,
+    UserProfile,
+    UserState,
+    UserView,
 } from 'src/app/proto/generated/management_pb';
-import {ManagementService} from 'src/app/services/mgmt.service';
-import {ToastService} from 'src/app/services/toast.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
     selector: 'app-user-detail',
@@ -42,9 +42,8 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         public translate: TranslateService,
         private route: ActivatedRoute,
         private toast: ToastService,
-        private mgmtUserService: ManagementService,
+        public mgmtUserService: ManagementService,
         private _location: Location,
-        public mgmtService: ManagementService,
     ) { }
 
     public ngOnInit(): void {
