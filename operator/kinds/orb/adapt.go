@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func AdaptFunc(orbconfig *orb.Orb) operator.AdaptFunc {
+func AdaptFunc(orbconfig *orb.Orb, action string, features []string) operator.AdaptFunc {
 	return func(monitor mntr.Monitor, desiredTree *tree.Tree, currentTree *tree.Tree) (queryFunc operator.QueryFunc, destroyFunc operator.DestroyFunc, err error) {
 		defer func() {
 			err = errors.Wrapf(err, "building %s failed", desiredTree.Common.Kind)
@@ -46,6 +46,8 @@ func AdaptFunc(orbconfig *orb.Orb) operator.AdaptFunc {
 			desiredKind.Spec.NodeSelector,
 			desiredKind.Spec.Tolerations,
 			orbconfig,
+			action,
+			features,
 		)
 		if err != nil {
 			return nil, nil, err

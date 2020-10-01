@@ -3,6 +3,7 @@ package start
 import (
 	"context"
 	"github.com/caos/orbos/mntr"
+	"github.com/caos/orbos/pkg/databases"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
 	orbconfig "github.com/caos/orbos/pkg/orb"
@@ -31,7 +32,7 @@ func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 			return err
 		}
 
-		takeoff := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(orbConfig), k8sClient)
+		takeoff := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(orbConfig, "ensure", []string{"iam"}), k8sClient)
 
 		go func() {
 			started := time.Now()
@@ -47,4 +48,31 @@ func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 	}
 
 	return nil
+}
+
+func Restore(monitor mntr.Monitor, gitClient *git.Client, k8sClient *kubernetes.Client, backup string) error {
+	databasesList := []string{
+		"notification",
+		"adminapi",
+		"auth",
+		"authz",
+		"eventstore",
+		"management",
+	}
+
+	if err := databases.Clear(monitor, k8sClient, gitClient, databasesList); err != nil {
+		return err
+	}
+
+	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(nil, "migration", []string{"migration"}), k8sClient)(); err != nil {
+		return err
+	}
+
+	return databases.Restore(
+		monitor,
+		k8sClient,
+		gitClient,
+		backup,
+		databasesList,
+	)
 }

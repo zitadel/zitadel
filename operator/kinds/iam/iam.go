@@ -20,6 +20,8 @@ func GetQueryAndDestroyFuncs(
 	nodeselector map[string]string,
 	tolerations []core.Toleration,
 	orbconfig *orb.Orb,
+	action string,
+	features []string,
 ) (
 	query operator.QueryFunc,
 	destroy operator.DestroyFunc,
@@ -34,7 +36,7 @@ func GetQueryAndDestroyFuncs(
 
 	switch desiredTree.Common.Kind {
 	case "zitadel.caos.ch/Zitadel":
-		return zitadel.AdaptFunc(nodeselector, tolerations, orbconfig)(monitor, desiredTree, currentTree)
+		return zitadel.AdaptFunc(nodeselector, tolerations, orbconfig, action, features)(monitor, desiredTree, currentTree)
 	default:
 		return nil, nil, errors.Errorf("unknown iam kind %s", desiredTree.Common.Kind)
 	}
@@ -51,21 +53,6 @@ func GetSecrets(
 	switch desiredTree.Common.Kind {
 	case "zitadel.caos.ch/Zitadel":
 		return zitadel.SecretsFunc()(monitor, desiredTree)
-	default:
-		return nil, errors.Errorf("unknown iam kind %s", desiredTree.Common.Kind)
-	}
-}
-
-func GetBackupList(
-	monitor mntr.Monitor,
-	desiredTree *tree.Tree,
-) (
-	[]string,
-	error,
-) {
-	switch desiredTree.Common.Kind {
-	case "zitadel.caos.ch/Zitadel":
-		return zitadel.BackupListFunc()(monitor, desiredTree)
 	default:
 		return nil, errors.Errorf("unknown iam kind %s", desiredTree.Common.Kind)
 	}

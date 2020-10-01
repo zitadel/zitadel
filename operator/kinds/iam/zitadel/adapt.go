@@ -20,7 +20,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-func AdaptFunc(nodeselector map[string]string, tolerations []core.Toleration, orbconfig *orb.Orb) operator.AdaptFunc {
+func AdaptFunc(
+	nodeselector map[string]string,
+	tolerations []core.Toleration,
+	orbconfig *orb.Orb,
+	action string,
+	features []string,
+) operator.AdaptFunc {
 	return func(
 		monitor mntr.Monitor,
 		desired *tree.Tree,
@@ -129,7 +135,7 @@ func AdaptFunc(nodeselector map[string]string, tolerations []core.Toleration, or
 		queryM, destroyM, migrationDone, _, err := migration.AdaptFunc(
 			internalMonitor,
 			namespaceStr,
-			"init",
+			action,
 			internalLabels,
 			secretPasswordName,
 			migrationUser,
@@ -181,30 +187,43 @@ func AdaptFunc(nodeselector map[string]string, tolerations []core.Toleration, or
 			return nil, nil, err
 		}
 
-		queriers := []operator.QueryFunc{
-			operator.ResourceQueryToZitadelQuery(queryNS),
-			//database
-			//queryDB,
-			//configuration
-			queryC,
-			//migration
-			queryM,
-			//services
-			queryS,
-			queryD,
-			operator.EnsureFuncToQueryFunc(ensureInit),
-			operator.EnsureFuncToQueryFunc(deploymentReady),
-			queryAmbassador,
-		}
-
-		destroyers := []operator.DestroyFunc{
-			destroyAmbassador,
-			destroyS,
-			destroyM,
-			destroyD,
-			//destroyDB,
-			destroyC,
-			operator.ResourceDestroyToZitadelDestroy(destroyNS),
+		destroyers := make([]operator.DestroyFunc, 0)
+		queriers := make([]operator.QueryFunc, 0)
+		for _, feature := range features {
+			switch feature {
+			case "migration":
+				queriers = append(queriers,
+					//configuration
+					queryC,
+					//migration
+					queryM,
+				)
+				destroyers = append(destroyers,
+					destroyM,
+				)
+			case "iam":
+				queriers = append(queriers,
+					operator.ResourceQueryToZitadelQuery(queryNS),
+					//configuration
+					queryC,
+					//migration
+					queryM,
+					//services
+					queryS,
+					queryD,
+					operator.EnsureFuncToQueryFunc(ensureInit),
+					operator.EnsureFuncToQueryFunc(deploymentReady),
+					queryAmbassador,
+				)
+				destroyers = append(destroyers,
+					destroyAmbassador,
+					destroyS,
+					destroyM,
+					destroyD,
+					destroyC,
+					operator.ResourceDestroyToZitadelDestroy(destroyNS),
+				)
+			}
 		}
 
 		return func(k8sClient *kubernetes.Client, queried map[string]interface{}) (operator.EnsureFunc, error) {

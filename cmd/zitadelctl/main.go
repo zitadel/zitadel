@@ -16,10 +16,14 @@ func main() {
 
 	startCmd := cmds.StartOperator(rootValues)
 	takeoffCmd := cmds.TakeoffCommand(rootValues)
+	backuplistCmd := cmds.BackupListCommand(rootValues)
+	restoreCmd := cmds.RestoreCommand(rootValues)
 
 	rootCmd.AddCommand(
 		startCmd,
 		takeoffCmd,
+		backuplistCmd,
+		restoreCmd,
 	)
 
 	if err := rootCmd.Execute(); err != nil {

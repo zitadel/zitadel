@@ -7,6 +7,7 @@ import (
 	"github.com/caos/zitadel/operator/api"
 	"github.com/caos/zitadel/operator/kinds/orb"
 	"github.com/spf13/cobra"
+	"io/ioutil"
 )
 
 func TakeoffCommand(rv RootValues) *cobra.Command {
@@ -14,13 +15,13 @@ func TakeoffCommand(rv RootValues) *cobra.Command {
 		kubeconfig string
 		cmd        = &cobra.Command{
 			Use:   "takeoff",
-			Short: "Launch an ZITADEL operator",
-			Long:  "Ensures a desired state",
+			Short: "Launch a ZITADEL operator on the orb",
+			Long:  "Ensures a desired state of the resources on the orb",
 		}
 	)
 
 	flags := cmd.Flags()
-	flags.StringVar(&kubeconfig, "kubeconfig", "", "Kubeconfig for boom deployment")
+	flags.StringVar(&kubeconfig, "kubeconfig", "", "Kubeconfig for ZITADEL operator deployment")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		_, monitor, orbConfig, gitClient, version, errFunc := rv()
@@ -29,19 +30,28 @@ func TakeoffCommand(rv RootValues) *cobra.Command {
 		}
 
 		if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
+			monitor.Error(err)
 			return err
 		}
 
-		k8sClient := kubernetes.NewK8sClient(monitor, &kubeconfig)
-		if k8sClient.Available() {
-			return deployOperator(
-				monitor,
-				gitClient,
-				&kubeconfig,
-				version,
-			)
+		if err := gitClient.Clone(); err != nil {
+			monitor.Error(err)
+			return err
 		}
-		return nil
+
+		value, err := ioutil.ReadFile(kubeconfig)
+		if err != nil {
+			monitor.Error(err)
+			return err
+		}
+		kubeconfigStr := string(value)
+
+		return deployOperator(
+			monitor,
+			gitClient,
+			&kubeconfigStr,
+			version,
+		)
 	}
 	return cmd
 }
