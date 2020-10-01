@@ -21,6 +21,7 @@ import {
     CreateMachineRequest,
     CreateUserRequest,
     Domain,
+    ExternalIDPRemoveRequest,
     ExternalIDPSearchRequest,
     ExternalIDPSearchResponse,
     Gender,
@@ -340,6 +341,18 @@ export class ManagementService {
         return this.grpcService.mgmt.searchMachineKeys(req);
     }
 
+    public RemoveExternalIDP(
+        externalUserId: string,
+        idpConfigId: string,
+        userId: string,
+    ): Promise<Empty> {
+        const req = new ExternalIDPRemoveRequest();
+        req.setUserId(userId);
+        req.setExternalUserId(externalUserId);
+        req.setIdpConfigId(idpConfigId);
+        return this.grpcService.mgmt.removeExternalIDP(req);
+    }
+
     public SearchUserExternalIDPs(
         limit: number,
         offset: number,
@@ -351,6 +364,7 @@ export class ManagementService {
         req.setOffset(offset);
         return this.grpcService.mgmt.searchUserExternalIDPs(req);
     }
+
     public GetIam(): Promise<Iam> {
         const req = new Empty();
         return this.grpcService.mgmt.getIam(req);

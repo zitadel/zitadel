@@ -79,4 +79,21 @@ export class ExternalIdpsComponent implements OnInit {
     public refreshPage(): void {
         this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
     }
+
+    public removeExternalIdp(idp: AuthExternalIDPView.AsObject | MgmtExternalIDPView.AsObject): void {
+        let promise;
+        if (this.service instanceof ManagementService) {
+            promise = (this.service as ManagementService).RemoveExternalIDP(idp.externalUserId, idp.idpConfigId, idp.userId);
+        } else if (this.service instanceof GrpcAuthService) {
+            promise = (this.service as GrpcAuthService).RemoveExternalIDP(idp.externalUserId, idp.idpConfigId);
+        }
+
+        if (promise) {
+            promise.then(_ => {
+                this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
+            }).catch((error: any) => {
+                this.toast.showError(error);
+            });
+        }
+    }
 }

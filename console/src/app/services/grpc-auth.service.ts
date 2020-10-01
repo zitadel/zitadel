@@ -7,6 +7,7 @@ import { catchError, filter, finalize, first, map, mergeMap, switchMap, take, ti
 import {
     Changes,
     ChangesRequest,
+    ExternalIDPRemoveRequest,
     ExternalIDPSearchRequest,
     ExternalIDPSearchResponse,
     Gender,
@@ -293,6 +294,16 @@ export class GrpcAuthService {
         req.setOldPassword(oldPassword);
         req.setNewPassword(newPassword);
         return this.grpcService.auth.changeMyPassword(req);
+    }
+
+    public RemoveExternalIDP(
+        externalUserId: string,
+        idpConfigId: string,
+    ): Promise<Empty> {
+        const req = new ExternalIDPRemoveRequest();
+        req.setExternalUserId(externalUserId);
+        req.setIdpConfigId(idpConfigId);
+        return this.grpcService.auth.removeMyExternalIDP(req);
     }
 
     public SearchMyExternalIdps(
