@@ -3,7 +3,7 @@
     [emitRefreshOnPreviousRoute]="refreshOnPreviousRoute">
     <ng-template appHasRole [appHasRole]="['user.write']" actions>
         <mat-form-field @appearfade *ngIf="userSearchKey != undefined" actions class="filtername">
-            <mat-label>{{'ORG.PAGES.FILTER' | translate}}</mat-label>
+            <mat-label>{{'USER.PAGES.FILTER' | translate}}</mat-label>
             <input matInput (keyup)="applyFilter($event)"
                 [placeholder]="('USER.TABLE.FILTER.' + userSearchKey.toString()) | translate" #input>
         </mat-form-field>

@@ -86,7 +86,8 @@
             "COPIED":"Copied to clipboard.",
             "NOUSER":"No associated users.",
             "REACTIVATE":"Reactivate",
-            "DEACTIVATE":"Deactivate"
+            "DEACTIVATE":"Deactivate",
+            "FILTER":"Filter"
         },
         "TABLE":{
             "DEACTIVATE":"Deactivate",

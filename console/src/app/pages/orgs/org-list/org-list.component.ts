@@ -1,9 +1,7 @@
-import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
@@ -28,22 +26,12 @@ export class OrgListComponent implements AfterViewInit {
     public displayedColumns: string[] = ['select', 'id', 'name'];
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-
     public activeOrg!: Org.AsObject;
-    public orgList: Org.AsObject[] = [];
-
-    public selection: SelectionModel<Org.AsObject> = new SelectionModel<Org.AsObject>(true, []);
-    public selectedIndex: number = -1;
-    public loading: boolean = false;
-
-    public notPinned: Array<Org.AsObject> = [];
     public MyProjectOrgSearchKey: any = MyProjectOrgSearchKey;
 
     constructor(
         private authService: GrpcAuthService,
-        private router: Router,
     ) {
-        this.loading = true;
         this.loadOrgs(10, 0);
 
         this.authService.GetActiveOrg().then(org => this.activeOrg = org);
@@ -78,10 +66,6 @@ export class OrgListComponent implements AfterViewInit {
 
     public selectOrg(item: Org.AsObject, event?: any): void {
         this.authService.setActiveOrg(item);
-    }
-
-    public routeToOrg(item: Org.AsObject): void {
-        this.router.navigate(['/orgs', item.id]);
     }
 
     public refresh(): void {

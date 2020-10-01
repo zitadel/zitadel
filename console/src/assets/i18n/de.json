@@ -86,7 +86,8 @@
             "COPIED":"In die Zwischenablage kopiert.",
             "NOUSER":"Kein Benutzer",
             "REACTIVATE":"Reaktivieren",
-            "DEACTIVATE":"Deaktivieren"
+            "DEACTIVATE":"Deaktivieren",
+            "FILTER":"Filter"
         },
         "TABLE":{
             "DEACTIVATE":"Deaktivieren",
