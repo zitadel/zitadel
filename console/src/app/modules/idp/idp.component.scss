@@ -9,6 +9,7 @@
 
 .content {
   display: flex;
+  flex-direction: row;
   margin: 0 -.5rem;
   flex-wrap: wrap;
 
@@ -20,8 +21,12 @@
   }
 
   .formfield {
-    flex: 1 0 auto;
+    flex: 1 1 auto;
     margin: 0 .5rem;
+
+    &.fullwidth {
+        flex-basis: 100%;
+    }
 
     @media only screen and (max-width: 450px) {
       flex-basis: 100%;
@@ -29,13 +34,17 @@
   }
 }
 
-.continue-button {
-  margin-bottom: 4rem;
-  display: block;
-  padding: .5rem 4rem;
+.btn-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    .continue-button {
+        margin-bottom: 4rem;
+        display: block;
+        padding: .5rem 4rem;
 
-  @media only screen and (max-width: 450px) {
-    margin-top: 1rem;
-    margin-bottom: 2rem;
-  }
+        @media only screen and (max-width: 450px) {
+            margin-top: 1rem;
+            margin-bottom: 2rem;
+        }
+    }
 }

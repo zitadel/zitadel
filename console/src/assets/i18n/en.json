@@ -668,9 +668,10 @@
         },
         "DETAIL": {
           "TITLE":"Identity Provider",
-          "DESCRIPTION":"Configuration of your identity provider.",
+          "DESCRIPTION":"General Configuration of your identity provider.",
           "OIDC": {
-            "TITLE": "OIDC Configuration"
+            "TITLE": "OIDC Configuration",
+            "DESCRIPTION":"Provide the correct OIDC Configuration for your identity Provider below!"
           }
         },
         "TYPES": {
