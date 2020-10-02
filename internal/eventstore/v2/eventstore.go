@@ -87,20 +87,20 @@ func (es *Eventstore) aggregatesToEvents(aggregates []aggregater) ([]*repository
 	for _, aggregate := range aggregates {
 		var previousEvent *repository.Event
 		for _, event := range aggregate.Events() {
+			//TODO: map event.Data() into json
+			var data []byte
 			events = append(events, &repository.Event{
-				AggregateID:   aggregate.ID(),
-				AggregateType: repository.AggregateType(aggregate.Type()),
-				ResourceOwner: aggregate.ResourceOwner(),
-				EditorService: event.EditorService(),
-				EditorUser:    event.EditorUser(),
-				Type:          repository.EventType(event.Type()),
-				Version:       repository.Version(aggregate.Version()),
-				PreviousEvent: previousEvent,
-				Data:          event.Data(),
+				AggregateID:      aggregate.ID(),
+				AggregateType:    repository.AggregateType(aggregate.Type()),
+				ResourceOwner:    aggregate.ResourceOwner(),
+				EditorService:    event.EditorService(),
+				EditorUser:       event.EditorUser(),
+				Type:             repository.EventType(event.Type()),
+				Version:          repository.Version(aggregate.Version()),
+				PreviousEvent:    previousEvent,
+				Data:             data,
+				PreviousSequence: event.PreviousSequence(),
 			})
-			if previousEvent != nil && event.CheckPrevious() {
-				events[len(events)-1].PreviousSequence = event.PreviousSequence()
-			}
 			previousEvent = events[len(events)-1]
 		}
 	}

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -11,6 +12,7 @@ type Event struct {
 
 	//Sequence is the sequence of the event
 	Sequence uint64
+
 	//PreviousSequence is the sequence of the previous sequence
 	// if it's 0 then it's the first event of this aggregate
 	PreviousSequence uint64
@@ -18,6 +20,10 @@ type Event struct {
 	//PreviousEvent is needed in push to update PreviousSequence
 	// it implements a linked list
 	PreviousEvent *Event
+
+	//CheckPreviousSequence decides if the event can only be written
+	// if event.PreviousSequence == max(event_sequence) of this aggregate
+	CheckPreviousSequence bool
 
 	//CreationDate is the time the event is created
 	// it's used for human readability.
@@ -31,7 +37,7 @@ type Event struct {
 
 	//Data describe the changed fields (e.g. userName = "hodor")
 	// data must always a pointer to a struct, a struct or a byte array containing json bytes
-	Data interface{}
+	Data []byte
 
 	//EditorService should be a unique identifier for the service which created the event
 	// it's meant for maintainability
@@ -54,6 +60,8 @@ type Event struct {
 	// an aggregate can only be managed by one organisation
 	// use the ID of the org
 	ResourceOwner string
+
+	stmt *sql.Stmt
 }
 
 //EventType is the description of the change
