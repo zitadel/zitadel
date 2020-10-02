@@ -6,8 +6,8 @@
             mat-icon-button *ngIf="selection.hasValue()">
             <i class="las la-trash"></i>
         </button>
-        <a class="add-button" [disabled]="([('user.write:' + userId), 'user.write'] | hasRole | async) == false"
-            color="primary" mat-raised-button (click)="openAddKey()">
+        <a [disabled]="([('user.write:' + userId), 'user.write'] | hasRole | async) == false" color="primary"
+            mat-raised-button (click)="openAddKey()">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
     </ng-template>
@@ -54,7 +54,7 @@
 
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr class="data-row" mat-row *matRowDef="let row; columns: displayedColumns;"
+            <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"
                 [routerLink]="row.id ? ['/users', row.id ]: null">
             </tr>
 

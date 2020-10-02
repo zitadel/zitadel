@@ -3,154 +3,157 @@ import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 
 import {
-  AddMachineKeyRequest,
-  AddMachineKeyResponse,
-  AddOrgDomainRequest,
-  AddOrgMemberRequest,
-  Application,
-  ApplicationID,
-  ApplicationSearchQuery,
-  ApplicationSearchRequest,
-  ApplicationSearchResponse,
-  ApplicationUpdate,
-  ApplicationView,
-  ChangeOrgMemberRequest,
-  ChangeRequest,
-  Changes,
-  CreateHumanRequest,
-  CreateMachineRequest,
-  CreateUserRequest,
-  Domain, ExternalIDPSearchRequest, ExternalIDPSearchResponse,
-  Gender,
-  GrantedProjectSearchRequest,
-  Iam,
-  Idp,
-  IdpID,
-  IdpUpdate,
-  IdpProviderAdd,
-  IdpProviderID,
-  IdpProviderSearchRequest,
-  IdpProviderSearchResponse,
-  IdpProviderType,
-  IdpSearchQuery,
-  IdpSearchRequest,
-  IdpSearchResponse,
-  IdpView,
-  LoginName,
-  LoginPolicy,
-  LoginPolicyView,
-  MachineKeyIDRequest,
-  MachineKeySearchRequest,
-  MachineKeySearchResponse,
-  MachineKeyType,
-  MachineResponse,
-  MultiFactors,
-  NotificationType,
-  OIDCApplicationCreate,
-  OIDCConfig,
-  OIDCConfigUpdate,
-  OidcIdpConfig,
-  OidcIdpConfigCreate,
-  OidcIdpConfigUpdate,
-  Org,
-  OrgCreateRequest,
-  OrgDomain,
-  OrgDomainSearchQuery,
-  OrgDomainSearchRequest,
-  OrgDomainSearchResponse,
-  OrgDomainValidationRequest,
-  OrgDomainValidationResponse,
-  OrgDomainValidationType,
-  OrgIamPolicy,
-  OrgMember,
-  OrgMemberRoles,
-  OrgMemberSearchRequest,
-  OrgMemberSearchResponse,
-  OrgView,
-  PasswordAgePolicy,
-  PasswordAgePolicyCreate,
-  PasswordAgePolicyID,
-  PasswordAgePolicyUpdate,
-  PasswordComplexityPolicy,
-  PasswordComplexityPolicyCreate,
-  PasswordComplexityPolicyID,
-  PasswordComplexityPolicyUpdate,
-  PasswordLockoutPolicy,
-  PasswordLockoutPolicyCreate,
-  PasswordLockoutPolicyID,
-  PasswordLockoutPolicyUpdate,
-  PasswordRequest,
-  PrimaryOrgDomainRequest,
-  Project,
-  ProjectCreateRequest,
-  ProjectGrant,
-  ProjectGrantCreate,
-  ProjectGrantID,
-  ProjectGrantMember,
-  ProjectGrantMemberAdd,
-  ProjectGrantMemberChange,
-  ProjectGrantMemberRemove,
-  ProjectGrantMemberRoles,
-  ProjectGrantMemberSearchQuery,
-  ProjectGrantMemberSearchRequest,
-  ProjectGrantSearchRequest,
-  ProjectGrantSearchResponse,
-  ProjectGrantUpdate,
-  ProjectGrantView,
-  ProjectID,
-  ProjectMember,
-  ProjectMemberAdd,
-  ProjectMemberChange,
-  ProjectMemberRemove,
-  ProjectMemberRoles,
-  ProjectMemberSearchQuery,
-  ProjectMemberSearchRequest,
-  ProjectMemberSearchResponse,
-  ProjectRole,
-  ProjectRoleAdd,
-  ProjectRoleAddBulk,
-  ProjectRoleChange,
-  ProjectRoleRemove,
-  ProjectRoleSearchQuery,
-  ProjectRoleSearchRequest,
-  ProjectRoleSearchResponse,
-  ProjectSearchQuery,
-  ProjectSearchRequest,
-  ProjectSearchResponse,
-  ProjectUpdateRequest,
-  ProjectView,
-  RemoveOrgDomainRequest,
-  RemoveOrgMemberRequest,
-  SetPasswordNotificationRequest,
-  UpdateMachineRequest,
-  UpdateUserAddressRequest,
-  UpdateUserEmailRequest,
-  UpdateUserPhoneRequest,
-  UpdateUserProfileRequest,
-  UserAddress,
-  UserEmail,
-  UserGrant,
-  UserGrantCreate,
-  UserGrantID,
-  UserGrantRemoveBulk,
-  UserGrantSearchQuery,
-  UserGrantSearchRequest,
-  UserGrantSearchResponse,
-  UserGrantUpdate,
-  UserGrantView,
-  UserID,
-  UserMembershipSearchQuery,
-  UserMembershipSearchRequest,
-  UserMembershipSearchResponse,
-  UserPhone,
-  UserProfile,
-  UserResponse,
-  UserSearchQuery,
-  UserSearchRequest,
-  UserSearchResponse,
-  UserView,
-  ValidateOrgDomainRequest,
-  ZitadelDocs,
+    AddMachineKeyRequest,
+    AddMachineKeyResponse,
+    AddOrgDomainRequest,
+    AddOrgMemberRequest,
+    Application,
+    ApplicationID,
+    ApplicationSearchQuery,
+    ApplicationSearchRequest,
+    ApplicationSearchResponse,
+    ApplicationUpdate,
+    ApplicationView,
+    ChangeOrgMemberRequest,
+    ChangeRequest,
+    Changes,
+    CreateHumanRequest,
+    CreateMachineRequest,
+    CreateUserRequest,
+    Domain,
+    ExternalIDPRemoveRequest,
+    ExternalIDPSearchRequest,
+    ExternalIDPSearchResponse,
+    Gender,
+    GrantedProjectSearchRequest,
+    Iam,
+    Idp,
+    IdpID,
+    IdpProviderAdd,
+    IdpProviderID,
+    IdpProviderSearchRequest,
+    IdpProviderSearchResponse,
+    IdpProviderType,
+    IdpSearchQuery,
+    IdpSearchRequest,
+    IdpSearchResponse,
+    IdpUpdate,
+    IdpView,
+    LoginName,
+    LoginPolicy,
+    LoginPolicyView,
+    MachineKeyIDRequest,
+    MachineKeySearchRequest,
+    MachineKeySearchResponse,
+    MachineKeyType,
+    MachineResponse,
+    MultiFactors,
+    NotificationType,
+    OIDCApplicationCreate,
+    OIDCConfig,
+    OIDCConfigUpdate,
+    OidcIdpConfig,
+    OidcIdpConfigCreate,
+    OidcIdpConfigUpdate,
+    Org,
+    OrgCreateRequest,
+    OrgDomain,
+    OrgDomainSearchQuery,
+    OrgDomainSearchRequest,
+    OrgDomainSearchResponse,
+    OrgDomainValidationRequest,
+    OrgDomainValidationResponse,
+    OrgDomainValidationType,
+    OrgIamPolicy,
+    OrgMember,
+    OrgMemberRoles,
+    OrgMemberSearchRequest,
+    OrgMemberSearchResponse,
+    OrgView,
+    PasswordAgePolicy,
+    PasswordAgePolicyCreate,
+    PasswordAgePolicyID,
+    PasswordAgePolicyUpdate,
+    PasswordComplexityPolicy,
+    PasswordComplexityPolicyCreate,
+    PasswordComplexityPolicyID,
+    PasswordComplexityPolicyUpdate,
+    PasswordLockoutPolicy,
+    PasswordLockoutPolicyCreate,
+    PasswordLockoutPolicyID,
+    PasswordLockoutPolicyUpdate,
+    PasswordRequest,
+    PrimaryOrgDomainRequest,
+    Project,
+    ProjectCreateRequest,
+    ProjectGrant,
+    ProjectGrantCreate,
+    ProjectGrantID,
+    ProjectGrantMember,
+    ProjectGrantMemberAdd,
+    ProjectGrantMemberChange,
+    ProjectGrantMemberRemove,
+    ProjectGrantMemberRoles,
+    ProjectGrantMemberSearchQuery,
+    ProjectGrantMemberSearchRequest,
+    ProjectGrantSearchRequest,
+    ProjectGrantSearchResponse,
+    ProjectGrantUpdate,
+    ProjectGrantView,
+    ProjectID,
+    ProjectMember,
+    ProjectMemberAdd,
+    ProjectMemberChange,
+    ProjectMemberRemove,
+    ProjectMemberRoles,
+    ProjectMemberSearchQuery,
+    ProjectMemberSearchRequest,
+    ProjectMemberSearchResponse,
+    ProjectRole,
+    ProjectRoleAdd,
+    ProjectRoleAddBulk,
+    ProjectRoleChange,
+    ProjectRoleRemove,
+    ProjectRoleSearchQuery,
+    ProjectRoleSearchRequest,
+    ProjectRoleSearchResponse,
+    ProjectSearchQuery,
+    ProjectSearchRequest,
+    ProjectSearchResponse,
+    ProjectUpdateRequest,
+    ProjectView,
+    RemoveOrgDomainRequest,
+    RemoveOrgMemberRequest,
+    SetPasswordNotificationRequest,
+    UpdateMachineRequest,
+    UpdateUserAddressRequest,
+    UpdateUserEmailRequest,
+    UpdateUserPhoneRequest,
+    UpdateUserProfileRequest,
+    UserAddress,
+    UserEmail,
+    UserGrant,
+    UserGrantCreate,
+    UserGrantID,
+    UserGrantRemoveBulk,
+    UserGrantSearchQuery,
+    UserGrantSearchRequest,
+    UserGrantSearchResponse,
+    UserGrantUpdate,
+    UserGrantView,
+    UserID,
+    UserMembershipSearchQuery,
+    UserMembershipSearchRequest,
+    UserMembershipSearchResponse,
+    UserPhone,
+    UserProfile,
+    UserResponse,
+    UserSearchQuery,
+    UserSearchRequest,
+    UserSearchResponse,
+    UserView,
+    ValidateOrgDomainRequest,
+    ZitadelDocs,
 } from '../proto/generated/management_pb';
 import { GrpcService } from './grpc.service';
 
@@ -162,7 +165,7 @@ export type ResponseMapper<TResp, TMappedResp> = (resp: TResp) => TMappedResp;
 export class ManagementService {
     constructor(private readonly grpcService: GrpcService) { }
 
-    public async SearchIdps(
+    public SearchIdps(
         limit?: number,
         offset?: number,
         queryList?: IdpSearchQuery[],
@@ -180,33 +183,33 @@ export class ManagementService {
         return this.grpcService.mgmt.searchIdps(req);
     }
 
-    public async GetLoginPolicy(): Promise<LoginPolicyView> {
+    public GetLoginPolicy(): Promise<LoginPolicyView> {
         const req = new Empty();
         return this.grpcService.mgmt.getLoginPolicy(req);
     }
 
-    public async UpdateLoginPolicy(req: LoginPolicy): Promise<LoginPolicy> {
+    public UpdateLoginPolicy(req: LoginPolicy): Promise<LoginPolicy> {
         return this.grpcService.mgmt.updateLoginPolicy(req);
     }
 
-    public async RemoveLoginPolicy(): Promise<Empty> {
+    public RemoveLoginPolicy(): Promise<Empty> {
         return this.grpcService.mgmt.removeLoginPolicy(new Empty());
     }
 
-    public async addIdpProviderToLoginPolicy(configId: string, idpType: IdpProviderType): Promise<IdpProviderID> {
+    public addIdpProviderToLoginPolicy(configId: string, idpType: IdpProviderType): Promise<IdpProviderID> {
         const req = new IdpProviderAdd();
         req.setIdpProviderType(idpType);
         req.setIdpConfigId(configId);
         return this.grpcService.mgmt.addIdpProviderToLoginPolicy(req);
     }
 
-    public async RemoveIdpProviderFromLoginPolicy(configId: string): Promise<Empty> {
+    public RemoveIdpProviderFromLoginPolicy(configId: string): Promise<Empty> {
         const req = new IdpProviderID();
         req.setIdpConfigId(configId);
         return this.grpcService.mgmt.removeIdpProviderFromLoginPolicy(req);
     }
 
-    public async GetLoginPolicyIdpProviders(limit?: number, offset?: number): Promise<IdpProviderSearchResponse> {
+    public GetLoginPolicyIdpProviders(limit?: number, offset?: number): Promise<IdpProviderSearchResponse> {
         const req = new IdpProviderSearchRequest();
         if (limit) {
             req.setLimit(limit);
@@ -217,7 +220,7 @@ export class ManagementService {
         return this.grpcService.mgmt.getLoginPolicyIdpProviders(req);
     }
 
-    public async IdpByID(
+    public IdpByID(
         id: string,
     ): Promise<IdpView> {
         const req = new IdpID();
@@ -225,25 +228,25 @@ export class ManagementService {
         return this.grpcService.mgmt.idpByID(req);
     }
 
-    public async UpdateIdp(
-      req: IdpUpdate,
+    public UpdateIdp(
+        req: IdpUpdate,
     ): Promise<Idp> {
-      return this.grpcService.mgmt.updateIdpConfig(req);
+        return this.grpcService.mgmt.updateIdpConfig(req);
     }
 
-    public async CreateOidcIdp(
+    public CreateOidcIdp(
         req: OidcIdpConfigCreate,
     ): Promise<Idp> {
         return this.grpcService.mgmt.createOidcIdp(req);
     }
 
-    public async UpdateOidcIdpConfig(
+    public UpdateOidcIdpConfig(
         req: OidcIdpConfigUpdate,
     ): Promise<OidcIdpConfig> {
         return this.grpcService.mgmt.updateOidcIdpConfig(req);
     }
 
-    public async RemoveIdpConfig(
+    public RemoveIdpConfig(
         id: string,
     ): Promise<Empty> {
         const req = new IdpID;
@@ -251,7 +254,7 @@ export class ManagementService {
         return this.grpcService.mgmt.removeIdpConfig(req);
     }
 
-    public async DeactivateIdpConfig(
+    public DeactivateIdpConfig(
         id: string,
     ): Promise<Empty> {
         const req = new IdpID;
@@ -259,7 +262,7 @@ export class ManagementService {
         return this.grpcService.mgmt.deactivateIdpConfig(req);
     }
 
-    public async ReactivateIdpConfig(
+    public ReactivateIdpConfig(
         id: string,
     ): Promise<Empty> {
         const req = new IdpID;
@@ -267,7 +270,7 @@ export class ManagementService {
         return this.grpcService.mgmt.reactivateIdpConfig(req);
     }
 
-    public async CreateUserHuman(username: string, user: CreateHumanRequest): Promise<UserResponse> {
+    public CreateUserHuman(username: string, user: CreateHumanRequest): Promise<UserResponse> {
         const req = new CreateUserRequest();
 
         req.setUserName(username);
@@ -276,7 +279,7 @@ export class ManagementService {
         return this.grpcService.mgmt.createUser(req);
     }
 
-    public async CreateUserMachine(username: string, user: CreateMachineRequest): Promise<UserResponse> {
+    public CreateUserMachine(username: string, user: CreateMachineRequest): Promise<UserResponse> {
         const req = new CreateUserRequest();
 
         req.setUserName(username);
@@ -285,7 +288,7 @@ export class ManagementService {
         return this.grpcService.mgmt.createUser(req);
     }
 
-    public async UpdateUserMachine(
+    public UpdateUserMachine(
         id: string,
         description?: string,
     ): Promise<MachineResponse> {
@@ -297,7 +300,7 @@ export class ManagementService {
         return this.grpcService.mgmt.updateUserMachine(req);
     }
 
-    public async AddMachineKey(
+    public AddMachineKey(
         userId: string,
         type: MachineKeyType,
         date?: Timestamp,
@@ -311,7 +314,7 @@ export class ManagementService {
         return this.grpcService.mgmt.addMachineKey(req);
     }
 
-    public async DeleteMachineKey(
+    public DeleteMachineKey(
         keyId: string,
         userId: string,
     ): Promise<Empty> {
@@ -322,7 +325,7 @@ export class ManagementService {
         return this.grpcService.mgmt.deleteMachineKey(req);
     }
 
-    public async SearchMachineKeys(
+    public SearchMachineKeys(
         userId: string,
         limit: number,
         offset: number,
@@ -338,46 +341,58 @@ export class ManagementService {
         return this.grpcService.mgmt.searchMachineKeys(req);
     }
 
-    public async SearchExternalIdps(
-      userId: string,
-      limit: number,
-      offset: number,
-      asc?: boolean,
-    ): Promise<ExternalIDPSearchResponse> {
-      const req = new ExternalIDPSearchRequest();
-      req.setUserId(userId);
-      req.setLimit(limit);
-      req.setOffset(offset);
-      return this.grpcService.mgmt.searchUserExternalIDPs(req);
+    public RemoveExternalIDP(
+        externalUserId: string,
+        idpConfigId: string,
+        userId: string,
+    ): Promise<Empty> {
+        const req = new ExternalIDPRemoveRequest();
+        req.setUserId(userId);
+        req.setExternalUserId(externalUserId);
+        req.setIdpConfigId(idpConfigId);
+        return this.grpcService.mgmt.removeExternalIDP(req);
     }
-    public async GetIam(): Promise<Iam> {
+
+    public SearchUserExternalIDPs(
+        limit: number,
+        offset: number,
+        userId: string,
+    ): Promise<ExternalIDPSearchResponse> {
+        const req = new ExternalIDPSearchRequest();
+        req.setUserId(userId);
+        req.setLimit(limit);
+        req.setOffset(offset);
+        return this.grpcService.mgmt.searchUserExternalIDPs(req);
+    }
+
+    public GetIam(): Promise<Iam> {
         const req = new Empty();
         return this.grpcService.mgmt.getIam(req);
     }
 
-    public async GetDefaultPasswordComplexityPolicy(): Promise<PasswordComplexityPolicy> {
+    public GetDefaultPasswordComplexityPolicy(): Promise<PasswordComplexityPolicy> {
         const req = new Empty();
         return this.grpcService.mgmt.getDefaultPasswordComplexityPolicy(req);
     }
 
-    public async GetMyOrg(): Promise<OrgView> {
+    public GetMyOrg(): Promise<OrgView> {
         const req = new Empty();
         return this.grpcService.mgmt.getMyOrg(req);
     }
 
-    public async AddMyOrgDomain(domain: string): Promise<OrgDomain> {
+    public AddMyOrgDomain(domain: string): Promise<OrgDomain> {
         const req: AddOrgDomainRequest = new AddOrgDomainRequest();
         req.setDomain(domain);
         return this.grpcService.mgmt.addMyOrgDomain(req);
     }
 
-    public async RemoveMyOrgDomain(domain: string): Promise<Empty> {
+    public RemoveMyOrgDomain(domain: string): Promise<Empty> {
         const req: RemoveOrgDomainRequest = new AddOrgDomainRequest();
         req.setDomain(domain);
         return this.grpcService.mgmt.removeMyOrgDomain(req);
     }
 
-    public async SearchMyOrgDomains(offset: number, limit: number, queryList?: OrgDomainSearchQuery[]):
+    public SearchMyOrgDomains(offset: number, limit: number, queryList?: OrgDomainSearchQuery[]):
         Promise<OrgDomainSearchResponse> {
         const req: OrgDomainSearchRequest = new OrgDomainSearchRequest();
         req.setLimit(limit);
@@ -389,13 +404,13 @@ export class ManagementService {
         return this.grpcService.mgmt.searchMyOrgDomains(req);
     }
 
-    public async setMyPrimaryOrgDomain(domain: string): Promise<Empty> {
+    public setMyPrimaryOrgDomain(domain: string): Promise<Empty> {
         const req: PrimaryOrgDomainRequest = new PrimaryOrgDomainRequest();
         req.setDomain(domain);
         return this.grpcService.mgmt.setMyPrimaryOrgDomain(req);
     }
 
-    public async GenerateMyOrgDomainValidation(domain: string, type: OrgDomainValidationType):
+    public GenerateMyOrgDomainValidation(domain: string, type: OrgDomainValidationType):
         Promise<OrgDomainValidationResponse> {
         const req: OrgDomainValidationRequest = new OrgDomainValidationRequest();
         req.setDomain(domain);
@@ -404,7 +419,7 @@ export class ManagementService {
         return this.grpcService.mgmt.generateMyOrgDomainValidation(req);
     }
 
-    public async ValidateMyOrgDomain(domain: string):
+    public ValidateMyOrgDomain(domain: string):
         Promise<Empty> {
         const req: ValidateOrgDomainRequest = new ValidateOrgDomainRequest();
         req.setDomain(domain);
@@ -412,26 +427,26 @@ export class ManagementService {
         return this.grpcService.mgmt.validateMyOrgDomain(req);
     }
 
-    public async SearchMyOrgMembers(limit: number, offset: number): Promise<OrgMemberSearchResponse> {
+    public SearchMyOrgMembers(limit: number, offset: number): Promise<OrgMemberSearchResponse> {
         const req = new OrgMemberSearchRequest();
         req.setLimit(limit);
         req.setOffset(offset);
         return this.grpcService.mgmt.searchMyOrgMembers(req);
     }
 
-    public async getOrgByDomainGlobal(domain: string): Promise<Org> {
+    public getOrgByDomainGlobal(domain: string): Promise<Org> {
         const req = new Domain();
         req.setDomain(domain);
         return this.grpcService.mgmt.getOrgByDomainGlobal(req);
     }
 
-    public async CreateOrg(name: string): Promise<Org> {
+    public CreateOrg(name: string): Promise<Org> {
         const req = new OrgCreateRequest();
         req.setName(name);
         return this.grpcService.mgmt.createOrg(req);
     }
 
-    public async AddMyOrgMember(userId: string, rolesList: string[]): Promise<Empty> {
+    public AddMyOrgMember(userId: string, rolesList: string[]): Promise<Empty> {
         const req = new AddOrgMemberRequest();
         req.setUserId(userId);
         if (rolesList) {
@@ -440,7 +455,7 @@ export class ManagementService {
         return this.grpcService.mgmt.addMyOrgMember(req);
     }
 
-    public async ChangeMyOrgMember(userId: string, rolesList: string[]): Promise<OrgMember> {
+    public ChangeMyOrgMember(userId: string, rolesList: string[]): Promise<OrgMember> {
         const req = new ChangeOrgMemberRequest();
         req.setUserId(userId);
         req.setRolesList(rolesList);
@@ -448,23 +463,23 @@ export class ManagementService {
     }
 
 
-    public async RemoveMyOrgMember(userId: string): Promise<Empty> {
+    public RemoveMyOrgMember(userId: string): Promise<Empty> {
         const req = new RemoveOrgMemberRequest();
         req.setUserId(userId);
         return this.grpcService.mgmt.removeMyOrgMember(req);
     }
 
-    public async DeactivateMyOrg(): Promise<Org> {
+    public DeactivateMyOrg(): Promise<Org> {
         const req = new Empty();
         return this.grpcService.mgmt.deactivateMyOrg(req);
     }
 
-    public async ReactivateMyOrg(): Promise<Org> {
+    public ReactivateMyOrg(): Promise<Org> {
         const req = new Empty();
         return this.grpcService.mgmt.reactivateMyOrg(req);
     }
 
-    public async CreateProjectGrant(
+    public CreateProjectGrant(
         orgId: string,
         projectId: string,
         roleKeysList: string[],
@@ -476,25 +491,25 @@ export class ManagementService {
         return this.grpcService.mgmt.createProjectGrant(req);
     }
 
-    public async GetOrgMemberRoles(): Promise<OrgMemberRoles> {
+    public GetOrgMemberRoles(): Promise<OrgMemberRoles> {
         const req = new Empty();
         return this.grpcService.mgmt.getOrgMemberRoles(req);
     }
 
     // Policy
 
-    public async GetMyOrgIamPolicy(): Promise<OrgIamPolicy> {
+    public GetMyOrgIamPolicy(): Promise<OrgIamPolicy> {
         const req = new Empty();
         return this.grpcService.mgmt.getMyOrgIamPolicy(req);
     }
 
-    public async GetPasswordAgePolicy(): Promise<PasswordAgePolicy> {
+    public GetPasswordAgePolicy(): Promise<PasswordAgePolicy> {
         const req = new Empty();
 
         return this.grpcService.mgmt.getPasswordAgePolicy(req);
     }
 
-    public async CreatePasswordAgePolicy(
+    public CreatePasswordAgePolicy(
         description: string,
         maxAgeDays: number,
         expireWarnDays: number,
@@ -507,13 +522,13 @@ export class ManagementService {
         return this.grpcService.mgmt.createPasswordAgePolicy(req);
     }
 
-    public async DeletePasswordAgePolicy(id: string): Promise<Empty> {
+    public DeletePasswordAgePolicy(id: string): Promise<Empty> {
         const req = new PasswordAgePolicyID();
         req.setId(id);
         return this.grpcService.mgmt.deletePasswordAgePolicy(req);
     }
 
-    public async UpdatePasswordAgePolicy(
+    public UpdatePasswordAgePolicy(
         description: string,
         maxAgeDays: number,
         expireWarnDays: number,
@@ -525,12 +540,12 @@ export class ManagementService {
         return this.grpcService.mgmt.updatePasswordAgePolicy(req);
     }
 
-    public async GetPasswordComplexityPolicy(): Promise<PasswordComplexityPolicy> {
+    public GetPasswordComplexityPolicy(): Promise<PasswordComplexityPolicy> {
         const req = new Empty();
         return this.grpcService.mgmt.getPasswordComplexityPolicy(req);
     }
 
-    public async CreatePasswordComplexityPolicy(
+    public CreatePasswordComplexityPolicy(
         description: string,
         hasLowerCase: boolean,
         hasUpperCase: boolean,
@@ -548,13 +563,13 @@ export class ManagementService {
         return this.grpcService.mgmt.createPasswordComplexityPolicy(req);
     }
 
-    public async DeletePasswordComplexityPolicy(id: string): Promise<Empty> {
+    public DeletePasswordComplexityPolicy(id: string): Promise<Empty> {
         const req = new PasswordComplexityPolicyID();
         req.setId(id);
         return this.grpcService.mgmt.deletePasswordComplexityPolicy(req);
     }
 
-    public async UpdatePasswordComplexityPolicy(
+    public UpdatePasswordComplexityPolicy(
         description: string,
         hasLowerCase: boolean,
         hasUpperCase: boolean,
@@ -572,13 +587,13 @@ export class ManagementService {
         return this.grpcService.mgmt.updatePasswordComplexityPolicy(req);
     }
 
-    public async GetPasswordLockoutPolicy(): Promise<PasswordLockoutPolicy> {
+    public GetPasswordLockoutPolicy(): Promise<PasswordLockoutPolicy> {
         const req = new Empty();
 
         return this.grpcService.mgmt.getPasswordLockoutPolicy(req);
     }
 
-    public async CreatePasswordLockoutPolicy(
+    public CreatePasswordLockoutPolicy(
         description: string,
         maxAttempts: number,
         showLockoutFailures: boolean,
@@ -591,14 +606,14 @@ export class ManagementService {
         return this.grpcService.mgmt.createPasswordLockoutPolicy(req);
     }
 
-    public async DeletePasswordLockoutPolicy(id: string): Promise<Empty> {
+    public DeletePasswordLockoutPolicy(id: string): Promise<Empty> {
         const req = new PasswordLockoutPolicyID();
         req.setId(id);
 
         return this.grpcService.mgmt.deletePasswordLockoutPolicy(req);
     }
 
-    public async UpdatePasswordLockoutPolicy(
+    public UpdatePasswordLockoutPolicy(
         description: string,
         maxAttempts: number,
         showLockoutFailures: boolean,
@@ -622,13 +637,13 @@ export class ManagementService {
         }
     }
 
-    public async GetUserByID(id: string): Promise<UserView> {
+    public GetUserByID(id: string): Promise<UserView> {
         const req = new UserID();
         req.setId(id);
         return this.grpcService.mgmt.getUserByID(req);
     }
 
-    public async SearchProjectMembers(
+    public SearchProjectMembers(
         projectId: string,
         limit: number,
         offset: number,
@@ -644,7 +659,7 @@ export class ManagementService {
         return this.grpcService.mgmt.searchProjectMembers(req);
     }
 
-    public async SearchUserMemberships(userId: string,
+    public SearchUserMemberships(userId: string,
         limit: number, offset: number, queryList?: UserMembershipSearchQuery[]): Promise<UserMembershipSearchResponse> {
         const req = new UserMembershipSearchRequest();
         req.setLimit(limit);
@@ -656,19 +671,19 @@ export class ManagementService {
         return this.grpcService.mgmt.searchUserMemberships(req);
     }
 
-    public async GetUserProfile(id: string): Promise<UserProfile> {
+    public GetUserProfile(id: string): Promise<UserProfile> {
         const req = new UserID();
         req.setId(id);
         return this.grpcService.mgmt.getUserProfile(req);
     }
 
-    public async getUserMfas(id: string): Promise<MultiFactors> {
+    public getUserMfas(id: string): Promise<MultiFactors> {
         const req = new UserID();
         req.setId(id);
         return this.grpcService.mgmt.getUserMfas(req);
     }
 
-    public async SaveUserProfile(
+    public SaveUserProfile(
         id: string,
         firstName?: string,
         lastName?: string,
@@ -696,45 +711,45 @@ export class ManagementService {
         return this.grpcService.mgmt.updateUserProfile(req);
     }
 
-    public async GetUserEmail(id: string): Promise<UserEmail> {
+    public GetUserEmail(id: string): Promise<UserEmail> {
         const req = new UserID();
         req.setId(id);
         return this.grpcService.mgmt.getUserEmail(req);
     }
 
-    public async SaveUserEmail(id: string, email: string): Promise<UserEmail> {
+    public SaveUserEmail(id: string, email: string): Promise<UserEmail> {
         const req = new UpdateUserEmailRequest();
         req.setId(id);
         req.setEmail(email);
         return this.grpcService.mgmt.changeUserEmail(req);
     }
 
-    public async GetUserPhone(id: string): Promise<UserPhone> {
+    public GetUserPhone(id: string): Promise<UserPhone> {
         const req = new UserID();
         req.setId(id);
         return this.grpcService.mgmt.getUserPhone(req);
     }
 
-    public async SaveUserPhone(id: string, phone: string): Promise<UserPhone> {
+    public SaveUserPhone(id: string, phone: string): Promise<UserPhone> {
         const req = new UpdateUserPhoneRequest();
         req.setId(id);
         req.setPhone(phone);
         return this.grpcService.mgmt.changeUserPhone(req);
     }
 
-    public async RemoveUserPhone(id: string): Promise<Empty> {
+    public RemoveUserPhone(id: string): Promise<Empty> {
         const req = new UserID();
         req.setId(id);
         return this.grpcService.mgmt.removeUserPhone(req);
     }
 
-    public async DeactivateUser(id: string): Promise<UserResponse> {
+    public DeactivateUser(id: string): Promise<UserResponse> {
         const req = new UserID();
         req.setId(id);
         return this.grpcService.mgmt.deactivateUser(req);
     }
 
-    public async CreateUserGrant(
+    public CreateUserGrant(
         userId: string,
         roleNamesList: string[],
         projectId?: string,
@@ -749,13 +764,13 @@ export class ManagementService {
         return this.grpcService.mgmt.createUserGrant(req);
     }
 
-    public async ReactivateUser(id: string): Promise<UserResponse> {
+    public ReactivateUser(id: string): Promise<UserResponse> {
         const req = new UserID();
         req.setId(id);
         return this.grpcService.mgmt.reactivateUser(req);
     }
 
-    public async AddRole(id: string, key: string, displayName: string, group: string): Promise<Empty> {
+    public AddRole(id: string, key: string, displayName: string, group: string): Promise<Empty> {
         const req = new ProjectRoleAdd();
         req.setId(id);
         req.setKey(key);
@@ -766,39 +781,39 @@ export class ManagementService {
         return this.grpcService.mgmt.addProjectRole(req);
     }
 
-    public async GetUserAddress(id: string): Promise<UserAddress> {
+    public GetUserAddress(id: string): Promise<UserAddress> {
         const req = new UserID();
         req.setId(id);
         return this.grpcService.mgmt.getUserAddress(req);
     }
 
-    public async ResendEmailVerification(id: string): Promise<any> {
+    public ResendEmailVerification(id: string): Promise<any> {
         const req = new UserID();
         req.setId(id);
         return this.grpcService.mgmt.resendEmailVerificationMail(req);
     }
 
-    public async ResendPhoneVerification(id: string): Promise<any> {
+    public ResendPhoneVerification(id: string): Promise<any> {
         const req = new UserID();
         req.setId(id);
         return this.grpcService.mgmt.resendPhoneVerificationCode(req);
     }
 
-    public async SetInitialPassword(id: string, password: string): Promise<any> {
+    public SetInitialPassword(id: string, password: string): Promise<any> {
         const req = new PasswordRequest();
         req.setId(id);
         req.setPassword(password);
         return this.grpcService.mgmt.setInitialPassword(req);
     }
 
-    public async SendSetPasswordNotification(id: string, type: NotificationType): Promise<any> {
+    public SendSetPasswordNotification(id: string, type: NotificationType): Promise<any> {
         const req = new SetPasswordNotificationRequest();
         req.setId(id);
         req.setType(type);
         return this.grpcService.mgmt.sendSetPasswordNotification(req);
     }
 
-    public async SaveUserAddress(address: UserAddress.AsObject): Promise<UserAddress> {
+    public SaveUserAddress(address: UserAddress.AsObject): Promise<UserAddress> {
         const req = new UpdateUserAddressRequest();
         req.setId(address.id);
         req.setStreetAddress(address.streetAddress);
@@ -809,7 +824,7 @@ export class ManagementService {
         return this.grpcService.mgmt.updateUserAddress(req);
     }
 
-    public async SearchUsers(limit: number, offset: number, queryList?: UserSearchQuery[]): Promise<UserSearchResponse> {
+    public SearchUsers(limit: number, offset: number, queryList?: UserSearchQuery[]): Promise<UserSearchResponse> {
         const req = new UserSearchRequest();
         req.setLimit(limit);
         req.setOffset(offset);
@@ -819,7 +834,7 @@ export class ManagementService {
         return this.grpcService.mgmt.searchUsers(req);
     }
 
-    public async GetUserByLoginNameGlobal(loginname: string): Promise<UserView> {
+    public GetUserByLoginNameGlobal(loginname: string): Promise<UserView> {
         const req = new LoginName();
         req.setLoginName(loginname);
         return this.grpcService.mgmt.getUserByLoginNameGlobal(req);
@@ -827,7 +842,7 @@ export class ManagementService {
 
     // USER GRANTS
 
-    public async SearchUserGrants(
+    public SearchUserGrants(
         limit: number,
         offset: number,
         queryList?: UserGrantSearchQuery[],
@@ -842,7 +857,7 @@ export class ManagementService {
     }
 
 
-    public async UserGrantByID(
+    public UserGrantByID(
         id: string,
         userId: string,
     ): Promise<UserGrantView> {
@@ -853,7 +868,7 @@ export class ManagementService {
         return this.grpcService.mgmt.userGrantByID(req);
     }
 
-    public async UpdateUserGrant(
+    public UpdateUserGrant(
         id: string,
         userId: string,
         roleKeysList: string[],
@@ -866,7 +881,7 @@ export class ManagementService {
         return this.grpcService.mgmt.updateUserGrant(req);
     }
 
-    public async RemoveUserGrant(
+    public RemoveUserGrant(
         id: string,
         userId: string,
     ): Promise<Empty> {
@@ -877,7 +892,7 @@ export class ManagementService {
         return this.grpcService.mgmt.removeUserGrant(req);
     }
 
-    public async BulkRemoveUserGrant(
+    public BulkRemoveUserGrant(
         idsList: string[],
     ): Promise<Empty> {
         const req = new UserGrantRemoveBulk();
@@ -888,7 +903,7 @@ export class ManagementService {
 
     //
 
-    public async ApplicationChanges(id: string, limit: number, offset: number): Promise<Changes> {
+    public ApplicationChanges(id: string, limit: number, offset: number): Promise<Changes> {
         const req = new ChangeRequest();
         req.setId(id);
         req.setLimit(limit);
@@ -896,7 +911,7 @@ export class ManagementService {
         return this.grpcService.mgmt.applicationChanges(req);
     }
 
-    public async OrgChanges(id: string, limit: number, offset: number): Promise<Changes> {
+    public OrgChanges(id: string, limit: number, offset: number): Promise<Changes> {
         const req = new ChangeRequest();
         req.setId(id);
         req.setLimit(limit);
@@ -904,7 +919,7 @@ export class ManagementService {
         return this.grpcService.mgmt.orgChanges(req);
     }
 
-    public async ProjectChanges(id: string, limit: number, offset: number): Promise<Changes> {
+    public ProjectChanges(id: string, limit: number, offset: number): Promise<Changes> {
         const req = new ChangeRequest();
         req.setId(id);
         req.setLimit(limit);
@@ -912,7 +927,7 @@ export class ManagementService {
         return this.grpcService.mgmt.projectChanges(req);
     }
 
-    public async UserChanges(id: string, limit: number, sequenceoffset: number): Promise<Changes> {
+    public UserChanges(id: string, limit: number, sequenceoffset: number): Promise<Changes> {
         const req = new ChangeRequest();
         req.setId(id);
         req.setLimit(limit);
@@ -922,7 +937,7 @@ export class ManagementService {
 
     // project
 
-    public async SearchProjects(
+    public SearchProjects(
         limit: number, offset: number, queryList?: ProjectSearchQuery[]): Promise<ProjectSearchResponse> {
         const req = new ProjectSearchRequest();
         req.setLimit(limit);
@@ -933,7 +948,7 @@ export class ManagementService {
         return this.grpcService.mgmt.searchProjects(req);
     }
 
-    public async SearchGrantedProjects(
+    public SearchGrantedProjects(
         limit: number, offset: number, queryList?: ProjectSearchQuery[]): Promise<ProjectGrantSearchResponse> {
         const req = new GrantedProjectSearchRequest();
         req.setLimit(limit);
@@ -945,38 +960,38 @@ export class ManagementService {
     }
 
 
-    public async GetZitadelDocs(): Promise<ZitadelDocs> {
+    public GetZitadelDocs(): Promise<ZitadelDocs> {
         const req = new Empty();
         return this.grpcService.mgmt.getZitadelDocs(req);
     }
 
-    public async GetProjectById(projectId: string): Promise<ProjectView> {
+    public GetProjectById(projectId: string): Promise<ProjectView> {
         const req = new ProjectID();
         req.setId(projectId);
         return this.grpcService.mgmt.projectByID(req);
     }
 
-    public async GetGrantedProjectByID(projectId: string, id: string): Promise<ProjectGrantView> {
+    public GetGrantedProjectByID(projectId: string, id: string): Promise<ProjectGrantView> {
         const req = new ProjectGrantID();
         req.setId(id);
         req.setProjectId(projectId);
         return this.grpcService.mgmt.getGrantedProjectByID(req);
     }
 
-    public async CreateProject(project: ProjectCreateRequest.AsObject): Promise<Project> {
+    public CreateProject(project: ProjectCreateRequest.AsObject): Promise<Project> {
         const req = new ProjectCreateRequest();
         req.setName(project.name);
         return this.grpcService.mgmt.createProject(req);
     }
 
-    public async UpdateProject(id: string, name: string): Promise<Project> {
+    public UpdateProject(id: string, name: string): Promise<Project> {
         const req = new ProjectUpdateRequest();
         req.setName(name);
         req.setId(id);
         return this.grpcService.mgmt.updateProject(req);
     }
 
-    public async UpdateProjectGrant(id: string, projectId: string, rolesList: string[]): Promise<ProjectGrant> {
+    public UpdateProjectGrant(id: string, projectId: string, rolesList: string[]): Promise<ProjectGrant> {
         const req = new ProjectGrantUpdate();
         req.setRoleKeysList(rolesList);
         req.setId(id);
@@ -984,26 +999,26 @@ export class ManagementService {
         return this.grpcService.mgmt.updateProjectGrant(req);
     }
 
-    public async RemoveProjectGrant(id: string, projectId: string): Promise<Empty> {
+    public RemoveProjectGrant(id: string, projectId: string): Promise<Empty> {
         const req = new ProjectGrantID();
         req.setId(id);
         req.setProjectId(projectId);
         return this.grpcService.mgmt.removeProjectGrant(req);
     }
 
-    public async DeactivateProject(projectId: string): Promise<Project> {
+    public DeactivateProject(projectId: string): Promise<Project> {
         const req = new ProjectID();
         req.setId(projectId);
         return this.grpcService.mgmt.deactivateProject(req);
     }
 
-    public async ReactivateProject(projectId: string): Promise<Project> {
+    public ReactivateProject(projectId: string): Promise<Project> {
         const req = new ProjectID();
         req.setId(projectId);
         return this.grpcService.mgmt.reactivateProject(req);
     }
 
-    public async SearchProjectGrants(projectId: string, limit: number, offset: number): Promise<ProjectGrantSearchResponse> {
+    public SearchProjectGrants(projectId: string, limit: number, offset: number): Promise<ProjectGrantSearchResponse> {
         const req = new ProjectGrantSearchRequest();
         req.setProjectId(projectId);
         req.setLimit(limit);
@@ -1011,12 +1026,12 @@ export class ManagementService {
         return this.grpcService.mgmt.searchProjectGrants(req);
     }
 
-    public async GetProjectGrantMemberRoles(): Promise<ProjectGrantMemberRoles> {
+    public GetProjectGrantMemberRoles(): Promise<ProjectGrantMemberRoles> {
         const req = new Empty();
         return this.grpcService.mgmt.getProjectGrantMemberRoles(req);
     }
 
-    public async AddProjectMember(id: string, userId: string, rolesList: string[]): Promise<Empty> {
+    public AddProjectMember(id: string, userId: string, rolesList: string[]): Promise<Empty> {
         const req = new ProjectMemberAdd();
         req.setId(id);
         req.setUserId(userId);
@@ -1024,7 +1039,7 @@ export class ManagementService {
         return this.grpcService.mgmt.addProjectMember(req);
     }
 
-    public async ChangeProjectMember(id: string, userId: string, rolesList: string[]): Promise<ProjectMember> {
+    public ChangeProjectMember(id: string, userId: string, rolesList: string[]): Promise<ProjectMember> {
         const req = new ProjectMemberChange();
         req.setId(id);
         req.setUserId(userId);
@@ -1032,7 +1047,7 @@ export class ManagementService {
         return this.grpcService.mgmt.changeProjectMember(req);
     }
 
-    public async AddProjectGrantMember(
+    public AddProjectGrantMember(
         projectId: string,
         grantId: string,
         userId: string,
@@ -1046,7 +1061,7 @@ export class ManagementService {
         return this.grpcService.mgmt.addProjectGrantMember(req);
     }
 
-    public async ChangeProjectGrantMember(
+    public ChangeProjectGrantMember(
         projectId: string,
         grantId: string,
         userId: string,
@@ -1060,7 +1075,7 @@ export class ManagementService {
         return this.grpcService.mgmt.changeProjectGrantMember(req);
     }
 
-    public async SearchProjectGrantMembers(
+    public SearchProjectGrantMembers(
         projectId: string,
         grantId: string,
         limit: number,
@@ -1078,7 +1093,7 @@ export class ManagementService {
         return this.grpcService.mgmt.searchProjectGrantMembers(req);
     }
 
-    public async RemoveProjectGrantMember(
+    public RemoveProjectGrantMember(
         projectId: string,
         grantId: string,
         userId: string,
@@ -1090,7 +1105,7 @@ export class ManagementService {
         return this.grpcService.mgmt.removeProjectGrantMember(req);
     }
 
-    public async ReactivateApplication(projectId: string, appId: string): Promise<Application> {
+    public ReactivateApplication(projectId: string, appId: string): Promise<Application> {
         const req = new ApplicationID();
         req.setId(appId);
         req.setProjectId(projectId);
@@ -1098,7 +1113,7 @@ export class ManagementService {
         return this.grpcService.mgmt.reactivateApplication(req);
     }
 
-    public async DeactivateApplication(projectId: string, appId: string): Promise<Application> {
+    public DeactivateApplication(projectId: string, appId: string): Promise<Application> {
         const req = new ApplicationID();
         req.setId(appId);
         req.setProjectId(projectId);
@@ -1106,14 +1121,14 @@ export class ManagementService {
         return this.grpcService.mgmt.deactivateApplication(req);
     }
 
-    public async RegenerateOIDCClientSecret(id: string, projectId: string): Promise<any> {
+    public RegenerateOIDCClientSecret(id: string, projectId: string): Promise<any> {
         const req = new ApplicationID();
         req.setId(id);
         req.setProjectId(projectId);
         return this.grpcService.mgmt.regenerateOIDCClientSecret(req);
     }
 
-    public async SearchProjectRoles(
+    public SearchProjectRoles(
         projectId: string,
         limit: number,
         offset: number,
@@ -1129,7 +1144,7 @@ export class ManagementService {
         return this.grpcService.mgmt.searchProjectRoles(req);
     }
 
-    public async AddProjectRole(role: ProjectRoleAdd.AsObject): Promise<Empty> {
+    public AddProjectRole(role: ProjectRoleAdd.AsObject): Promise<Empty> {
         const req = new ProjectRoleAdd();
         req.setId(role.id);
         if (role.displayName) {
@@ -1140,7 +1155,7 @@ export class ManagementService {
         return this.grpcService.mgmt.addProjectRole(req);
     }
 
-    public async BulkAddProjectRole(
+    public BulkAddProjectRole(
         id: string,
         rolesList: ProjectRoleAdd[],
     ): Promise<Empty> {
@@ -1150,7 +1165,7 @@ export class ManagementService {
         return this.grpcService.mgmt.bulkAddProjectRole(req);
     }
 
-    public async RemoveProjectRole(projectId: string, key: string): Promise<Empty> {
+    public RemoveProjectRole(projectId: string, key: string): Promise<Empty> {
         const req = new ProjectRoleRemove();
         req.setId(projectId);
         req.setKey(key);
@@ -1158,7 +1173,7 @@ export class ManagementService {
     }
 
 
-    public async ChangeProjectRole(projectId: string, key: string, displayName: string, group: string):
+    public ChangeProjectRole(projectId: string, key: string, displayName: string, group: string):
         Promise<ProjectRole> {
         const req = new ProjectRoleChange();
         req.setId(projectId);
@@ -1169,14 +1184,14 @@ export class ManagementService {
     }
 
 
-    public async RemoveProjectMember(id: string, userId: string): Promise<Empty> {
+    public RemoveProjectMember(id: string, userId: string): Promise<Empty> {
         const req = new ProjectMemberRemove();
         req.setId(id);
         req.setUserId(userId);
         return this.grpcService.mgmt.removeProjectMember(req);
     }
 
-    public async SearchApplications(
+    public SearchApplications(
         projectId: string,
         limit: number,
         offset: number,
@@ -1191,47 +1206,47 @@ export class ManagementService {
         return this.grpcService.mgmt.searchApplications(req);
     }
 
-    public async GetApplicationById(projectId: string, applicationId: string): Promise<ApplicationView> {
+    public GetApplicationById(projectId: string, applicationId: string): Promise<ApplicationView> {
         const req = new ApplicationID();
         req.setProjectId(projectId);
         req.setId(applicationId);
         return this.grpcService.mgmt.applicationByID(req);
     }
 
-    public async GetProjectMemberRoles(): Promise<ProjectMemberRoles> {
+    public GetProjectMemberRoles(): Promise<ProjectMemberRoles> {
         const req = new Empty();
         return this.grpcService.mgmt.getProjectMemberRoles(req);
     }
 
-    public async ProjectGrantByID(id: string, projectId: string): Promise<ProjectGrantView> {
+    public ProjectGrantByID(id: string, projectId: string): Promise<ProjectGrantView> {
         const req = new ProjectGrantID();
         req.setId(id);
         req.setProjectId(projectId);
         return this.grpcService.mgmt.projectGrantByID(req);
     }
 
-    public async RemoveProject(id: string): Promise<Empty> {
+    public RemoveProject(id: string): Promise<Empty> {
         const req = new ProjectID();
         req.setId(id);
         return this.grpcService.mgmt.removeProject(req);
     }
 
 
-    public async DeactivateProjectGrant(id: string, projectId: string): Promise<ProjectGrant> {
+    public DeactivateProjectGrant(id: string, projectId: string): Promise<ProjectGrant> {
         const req = new ProjectGrantID();
         req.setId(id);
         req.setProjectId(projectId);
         return this.grpcService.mgmt.deactivateProjectGrant(req);
     }
 
-    public async ReactivateProjectGrant(id: string, projectId: string): Promise<ProjectGrant> {
+    public ReactivateProjectGrant(id: string, projectId: string): Promise<ProjectGrant> {
         const req = new ProjectGrantID();
         req.setId(id);
         req.setProjectId(projectId);
         return this.grpcService.mgmt.reactivateProjectGrant(req);
     }
 
-    public async CreateOIDCApp(app: OIDCApplicationCreate.AsObject): Promise<Application> {
+    public CreateOIDCApp(app: OIDCApplicationCreate.AsObject): Promise<Application> {
         const req = new OIDCApplicationCreate();
         req.setProjectId(app.projectId);
         req.setName(app.name);
@@ -1245,7 +1260,7 @@ export class ManagementService {
         return this.grpcService.mgmt.createOIDCApplication(req);
     }
 
-    public async UpdateApplication(projectId: string, appId: string, name: string): Promise<Application> {
+    public UpdateApplication(projectId: string, appId: string, name: string): Promise<Application> {
         const req = new ApplicationUpdate();
         req.setId(appId);
         req.setName(name);
@@ -1253,7 +1268,7 @@ export class ManagementService {
         return this.grpcService.mgmt.updateApplication(req);
     }
 
-    public async UpdateOIDCAppConfig(projectId: string,
+    public UpdateOIDCAppConfig(projectId: string,
         appId: string, oidcConfig: OIDCConfig.AsObject): Promise<OIDCConfig> {
         const req = new OIDCConfigUpdate();
         req.setProjectId(projectId);

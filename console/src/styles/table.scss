@@ -5,6 +5,7 @@
   $primary: map-get($theme, primary);
   $primary-dark: mat-color($primary, A900);
   $secondary-dark: mat-color($primary, A800);
+  $inv-color: mat-color($primary, A600);
   $foreground: map-get($theme, foreground);
 
   .mat-table,
@@ -26,6 +27,19 @@
   td {
     .mat-form-field-wrapper {
       padding-bottom: 0;
+    }
+  }
+
+  tr {
+    cursor: pointer;
+
+    &.highlight {
+      &:hover {
+        td {
+          // TODO: replace with non transparent color so that columns are not getting overlayed colorwise twice
+          background-color: rgba($inv-color, .05);
+        }
+      }
     }
   }
 }

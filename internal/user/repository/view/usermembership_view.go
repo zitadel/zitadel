@@ -20,7 +20,7 @@ func UserMembershipByIDs(db *gorm.DB, table, userID, aggregateID, objectID strin
 	query := repository.PrepareGetByQuery(table, userIDQuery, aggregateIDQuery, objectIDQuery, memberTypeQuery)
 	err := query(db, memberships)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-sj8Sw", "Errors.UserMembership.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-5Tsji", "Errors.UserMembership.NotFound")
 	}
 	return memberships, err
 }

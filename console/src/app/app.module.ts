@@ -7,9 +7,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -21,7 +24,7 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import { QuicklinkModule } from 'ngx-quicklink';
-import { RegExpPipeModule } from 'src/app/pipes/regexp-pipe.module';
+import { RegExpPipeModule } from 'src/app/pipes/regexp-pipe/regexp-pipe.module';
 
 import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
@@ -32,7 +35,7 @@ import { AccountsCardModule } from './modules/accounts-card/accounts-card.module
 import { AvatarModule } from './modules/avatar/avatar.module';
 import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
-import { HasRolePipeModule } from './pipes/has-role-pipe.module';
+import { HasRolePipeModule } from './pipes/has-role-pipe/has-role-pipe.module';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { GrpcService } from './services/grpc.service';
 import { AuthInterceptor } from './services/interceptors/auth.interceptor';
@@ -104,8 +107,11 @@ const authConfig: AuthConfig = {
         MatSidenavModule,
         MatCardModule,
         OutsideClickModule,
+        MatFormFieldModule,
+        MatInputModule,
         HasRolePipeModule,
         MatProgressBarModule,
+        MatProgressSpinnerModule,
         MatToolbarModule,
         MatMenuModule,
         MatSnackBarModule,

@@ -1,17 +1,13 @@
 <input type="checkbox" id="switch" (change)="change($event.target.checked)" [(checked)]="isDarkTheme">
 <div class="theme-app">
     <div class="theme-content">
-        <div class="circle">
-            <div class="crescent"></div>
-        </div>
-        <p class="heading">Choose a style</p>
-        <p class="desc">Pop or subtle. Day or night.<br>
-            Customize your interface
-        </p>
         <label for="switch">
             <div class="toggle"></div>
             <div class="names">
                 <p class="light">Light</p>
+                <div class="circle">
+                    <div class="crescent"></div>
+                </div>
                 <p class="dark">Dark</p>
             </div>
         </label>

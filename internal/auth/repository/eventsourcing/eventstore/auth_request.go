@@ -41,10 +41,11 @@ type AuthRequestRepo struct {
 
 	IdGenerator id.Generator
 
-	PasswordCheckLifeTime    time.Duration
-	MfaInitSkippedLifeTime   time.Duration
-	MfaSoftwareCheckLifeTime time.Duration
-	MfaHardwareCheckLifeTime time.Duration
+	PasswordCheckLifeTime      time.Duration
+	ExternalLoginCheckLifeTime time.Duration
+	MfaInitSkippedLifeTime     time.Duration
+	MfaSoftwareCheckLifeTime   time.Duration
+	MfaHardwareCheckLifeTime   time.Duration
 
 	IAMID string
 }
@@ -162,7 +163,7 @@ func (repo *AuthRequestRepo) SelectExternalIDP(ctx context.Context, authReqID, i
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReqID, userAgentID string, externalUser *model.ExternalUser) error {
+func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReqID, userAgentID string, externalUser *model.ExternalUser, info *model.BrowserInfo) error {
 	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
@@ -171,6 +172,11 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 	if errors.IsNotFound(err) {
 		return repo.setLinkingUser(ctx, request, externalUser)
 	}
+	if err != nil {
+		return err
+	}
+
+	err = repo.UserEvents.ExternalLoginChecked(ctx, request.UserID, request.WithCurrentInfo(info))
 	if err != nil {
 		return err
 	}
@@ -217,12 +223,16 @@ func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, us
 	return repo.UserEvents.CheckMfaOTP(ctx, userID, code, request.WithCurrentInfo(info))
 }
 
-func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, userAgentID string) error {
+func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, userAgentID string, info *model.BrowserInfo) error {
 	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
 	}
 	err = linkExternalIDPs(ctx, repo.UserEventProvider, request)
+	if err != nil {
+		return err
+	}
+	err = repo.UserEvents.ExternalLoginChecked(ctx, request.UserID, request.WithCurrentInfo(info))
 	if err != nil {
 		return err
 	}
@@ -240,7 +250,7 @@ func (repo *AuthRequestRepo) ResetLinkingUsers(ctx context.Context, authReqID, u
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, registerUser *user_model.User, externalIDP *user_model.ExternalIDP, orgMember *org_model.OrgMember, authReqID, userAgentID, resourceOwner string) error {
+func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, registerUser *user_model.User, externalIDP *user_model.ExternalIDP, orgMember *org_model.OrgMember, authReqID, userAgentID, resourceOwner string, info *model.BrowserInfo) error {
 	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
@@ -282,8 +292,13 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 		return err
 	}
 	request.UserID = user.AggregateID
+	request.UserOrgID = user.ResourceOwner
 	request.SelectedIDPConfigID = externalIDP.IDPConfigID
 	request.LinkingUsers = nil
+	err = repo.UserEvents.ExternalLoginChecked(ctx, request.UserID, request.WithCurrentInfo(info))
+	if err != nil {
+		return err
+	}
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
@@ -480,7 +495,11 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 		return nil, err
 	}
 
-	if request.SelectedIDPConfigID == "" || (request.SelectedIDPConfigID != "" && request.LinkingUsers != nil && len(request.LinkingUsers) > 0) {
+	if (request.SelectedIDPConfigID != "" || userSession.SelectedIDPConfigID != "") && (request.LinkingUsers == nil || len(request.LinkingUsers) == 0) {
+		if !checkVerificationTime(userSession.ExternalLoginVerification, repo.ExternalLoginCheckLifeTime) {
+			return append(steps, &model.ExternalLoginStep{}), nil
+		}
+	} else if (request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == "") || (request.SelectedIDPConfigID != "" && request.LinkingUsers != nil && len(request.LinkingUsers) > 0) {
 		if user.InitRequired {
 			return append(steps, &model.InitUserStep{PasswordSet: user.PasswordSet}), nil
 		}
@@ -648,6 +667,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			es_model.UserDeactivated,
 			es_model.HumanPasswordCheckSucceeded,
 			es_model.HumanPasswordCheckFailed,
+			es_model.HumanExternalLoginCheckSucceeded,
 			es_model.HumanMFAOTPCheckSucceeded,
 			es_model.HumanMFAOTPCheckFailed,
 			es_model.HumanSignedOut:
@@ -694,14 +714,22 @@ func activeUserByID(ctx context.Context, userViewProvider userViewProvider, user
 }
 
 func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider userEventProvider, userID string) (*user_model.UserView, error) {
-	user, err := viewProvider.UserByID(userID)
-	if err != nil {
-		return nil, err
+	user, viewErr := viewProvider.UserByID(userID)
+	if viewErr != nil && !errors.IsNotFound(viewErr) {
+		return nil, viewErr
+	} else if user == nil {
+		user = new(user_view_model.UserView)
 	}
 	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence)
 	if err != nil {
 		logging.Log("EVENT-dfg42").WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserToModel(user), nil
+	}
+	if len(events) == 0 {
+		if viewErr != nil {
+			return nil, viewErr
+		}
+		return user_view_model.UserToModel(user), viewErr
 	}
 	userCopy := *user
 	for _, event := range events {

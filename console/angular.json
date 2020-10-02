@@ -26,7 +26,7 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/manifest.webmanifest",
+              "src/manifest.webmanifest"
             ],
             "styles": [
               "src/styles.scss"
@@ -34,8 +34,9 @@
             "scripts": [],
             "allowedCommonJsDependencies": [
                 "@angular/common/locales/de",
-                "src/app/proto/generated/*.js",
-                "src/app/proto/generated/**/*.js"
+                "src/app/proto/generated/**",
+                "file-saver",
+                "qrcode"
              ]
           },
           "configurations": {

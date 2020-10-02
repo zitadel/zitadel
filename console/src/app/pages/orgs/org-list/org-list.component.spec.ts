@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OrgGridComponent } from './org-grid.component';
+import { OrgListComponent } from './org-list.component';
 
-describe('OrgGridComponent', () => {
-    let component: OrgGridComponent;
-    let fixture: ComponentFixture<OrgGridComponent>;
+describe('OrgListComponent', () => {
+    let component: OrgListComponent;
+    let fixture: ComponentFixture<OrgListComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [OrgGridComponent],
+            declarations: [OrgListComponent],
         })
             .compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(OrgGridComponent);
+        fixture = TestBed.createComponent(OrgListComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

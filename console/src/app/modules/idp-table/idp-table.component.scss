@@ -19,23 +19,15 @@
         padding-right: 0;
       }
     }
-
-    .data-row {
-      cursor: pointer;
-
-      &:hover {
-        background-color: #ffffff05;
-      }
-    }
   }
 }
 
 tr {
   outline: none;
-}
 
-.add-button {
-  border-radius: .5rem;
+  &.disabled * {
+    color: #8795a1;
+  }
 }
 
 .avatar {
@@ -57,14 +49,22 @@ tr {
 .flex-row {
   display: flex;
   justify-content: space-between;
+  padding: 2px 0;
+  width: 250px;
 
   .key {
-    margin-right: 1rem;
-    font-size: 14px;
+    margin-right: .5rem;
+    font-size: 12px;
+    flex: 1 0 50%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .value {
-    font-size: 14px;
+    font-size: 12px;
+    flex: 1 0 50%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   &:first-child {

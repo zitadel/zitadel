@@ -30,7 +30,9 @@ type UserSessionView struct {
 	UserName                    string    `json:"-" gorm:"column:user_name"`
 	LoginName                   string    `json:"-" gorm:"column:login_name"`
 	DisplayName                 string    `json:"-" gorm:"column:user_display_name"`
+	SelectedIDPConfigID         string    `json:"selectedIDPConfigID" gorm:"column:selected_idp_config_id"`
 	PasswordVerification        time.Time `json:"-" gorm:"column:password_verification"`
+	ExternalLoginVerification   time.Time `json:"-" gorm:"column:external_login_verification"`
 	MfaSoftwareVerification     time.Time `json:"-" gorm:"column:mfa_software_verification"`
 	MfaSoftwareVerificationType int32     `json:"-" gorm:"column:mfa_software_verification_type"`
 	MfaHardwareVerification     time.Time `json:"-" gorm:"column:mfa_hardware_verification"`
@@ -58,7 +60,9 @@ func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 		UserName:                    userSession.UserName,
 		LoginName:                   userSession.LoginName,
 		DisplayName:                 userSession.DisplayName,
+		SelectedIDPConfigID:         userSession.SelectedIDPConfigID,
 		PasswordVerification:        userSession.PasswordVerification,
+		ExternalLoginVerification:   userSession.ExternalLoginVerification,
 		MfaSoftwareVerification:     userSession.MfaSoftwareVerification,
 		MfaSoftwareVerificationType: req_model.MfaType(userSession.MfaSoftwareVerificationType),
 		MfaHardwareVerification:     userSession.MfaHardwareVerification,
@@ -82,6 +86,12 @@ func (v *UserSessionView) AppendEvent(event *models.Event) {
 	case es_model.UserPasswordCheckSucceeded,
 		es_model.HumanPasswordCheckSucceeded:
 		v.PasswordVerification = event.CreationDate
+		v.State = int32(req_model.UserSessionStateActive)
+	case es_model.HumanExternalLoginCheckSucceeded:
+		data := new(es_model.AuthRequest)
+		data.SetData(event)
+		v.ExternalLoginVerification = event.CreationDate
+		v.SelectedIDPConfigID = data.SelectedIDPConfigID
 		v.State = int32(req_model.UserSessionStateActive)
 	case es_model.UserPasswordCheckFailed,
 		es_model.UserPasswordChanged,

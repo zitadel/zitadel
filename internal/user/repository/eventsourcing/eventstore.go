@@ -591,6 +591,25 @@ func (es *UserEventstore) SetPassword(ctx context.Context, policy *iam_model.Pas
 	return err
 }
 
+func (es *UserEventstore) ExternalLoginChecked(ctx context.Context, userID string, authRequest *req_model.AuthRequest) error {
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if user.Human == nil {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Gns8i", "Errors.User.NotHuman")
+	}
+	repoUser := model.UserFromModel(user)
+	repoAuthRequest := model.AuthRequestFromModel(authRequest)
+	agg := ExternalLoginCheckSucceededAggregate(es.AggregateCreator(), repoUser, repoAuthRequest)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
 func (es *UserEventstore) ChangeMachine(ctx context.Context, machine *usr_model.Machine) (*usr_model.Machine, error) {
 	user, err := es.UserByID(ctx, machine.AggregateID)
 	if err != nil {
