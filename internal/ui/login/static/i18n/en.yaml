@@ -225,6 +225,7 @@ Errors:
     NotActive: User is not active
     ExternalIDP:
       IDPTypeNotImplemented: IDP Type is not implemented
+      NotAllowed: External Login Provider not allowed
 
 
 optional: (optional)

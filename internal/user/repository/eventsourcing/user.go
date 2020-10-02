@@ -445,6 +445,16 @@ func PasswordCodeSentAggregate(aggCreator *es_models.AggregateCreator, user *mod
 	}
 }
 
+func ExternalLoginCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, user *model.User, check *model.AuthRequest) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, user)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.HumanExternalLoginCheckSucceeded, check)
+	}
+}
+
 func MachineChangeAggregate(aggCreator *es_models.AggregateCreator, user *model.User, machine *model.Machine) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if machine == nil {

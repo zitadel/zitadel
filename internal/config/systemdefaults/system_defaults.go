@@ -53,10 +53,11 @@ type OTPConfig struct {
 }
 
 type VerificationLifetimes struct {
-	PasswordCheck    types.Duration
-	MfaInitSkip      types.Duration
-	MfaSoftwareCheck types.Duration
-	MfaHardwareCheck types.Duration
+	PasswordCheck      types.Duration
+	ExternalLoginCheck types.Duration
+	MfaInitSkip        types.Duration
+	MfaSoftwareCheck   types.Duration
+	MfaHardwareCheck   types.Duration
 }
 
 type DefaultPolicies struct {
