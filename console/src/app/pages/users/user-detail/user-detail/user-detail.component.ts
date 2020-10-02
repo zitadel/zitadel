@@ -15,6 +15,7 @@ import {
     UserState,
     UserView,
 } from 'src/app/proto/generated/management_pb';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -40,6 +41,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         public translate: TranslateService,
         private route: ActivatedRoute,
         private toast: ToastService,
+        private grpcAuthService: GrpcAuthService,
         public mgmtUserService: ManagementService,
         private _location: Location,
     ) { }

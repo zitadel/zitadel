@@ -62,9 +62,10 @@
         <app-card *ngIf="user.human" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
             description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
 
-            <app-contact disablePhoneCode="true" *ngIf="user?.human" [human]="user.human"
-                (savedPhone)="savePhone($event)" (savedEmail)="saveEmail($event)" (deletedPhone)="deletePhone()"
-                (resendEmailVerification)="resendEmailVerification()"
+            <app-contact disablePhoneCode="true"
+                [canWrite]="(['user.write:' + user?.id, 'user.write'] | hasRole | async)" *ngIf="user?.human"
+                [human]="user.human" (savedPhone)="savePhone($event)" (savedEmail)="saveEmail($event)"
+                (deletedPhone)="deletePhone()" (resendEmailVerification)="resendEmailVerification()"
                 (resendPhoneVerification)="resendPhoneVerification()">
                 <button [disabled]="(canWrite$ | async) == false" (click)="sendSetPasswordNotification()"
                     mat-stroked-button color="primary"
@@ -76,9 +77,11 @@
 
         <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
             description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
-            <app-user-grants [userId]="user.id" [allowCreate]="['user.grant.write'] | hasRole | async"
+            <app-user-grants [userId]="user.id"
+                [allowWrite]="['user.grant.write$'+ 'user.grant.write:'+user?.id] | hasRole | async"
                 [displayedColumns]="['select', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']"
-                [allowDelete]="['user.grant.delete'] | hasRole | async"></app-user-grants>
+                [allowDelete]="['user.grant.delete$', 'user.grant.delete'+ user?.id] | hasRole | async">
+            </app-user-grants>
         </app-card>
     </div>
 

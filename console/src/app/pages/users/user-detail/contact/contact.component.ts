@@ -12,6 +12,7 @@ import { CodeDialogComponent } from '../auth-user-detail/code-dialog/code-dialog
 })
 export class ContactComponent implements OnInit {
     @Input() disablePhoneCode: boolean = false;
+    @Input() canWrite: boolean = false;
     @Input() human!: AuthHumanView.AsObject | MgmtHumanView.AsObject;
     @Output() savedPhone: EventEmitter<string> = new EventEmitter();
     @Output() savedEmail: EventEmitter<string> = new EventEmitter();

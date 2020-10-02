@@ -11,8 +11,7 @@
       border-bottom: 1px solid #ffffff20;
       flex-wrap: wrap;
   
-      .label,
-      .name {
+      .label {
         margin-right: 1rem;
       }
   
@@ -22,10 +21,12 @@
         justify-content: flex-end;
         align-items: center;
         flex-direction: column;
+        min-width: 150px;
       }
   
       .label {
         font-size: .9rem;
+        min-width: 100px;
         color: #8795a1;
       }
   

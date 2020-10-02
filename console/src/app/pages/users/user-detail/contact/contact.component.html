@@ -5,7 +5,7 @@
         <span>*********</span>
         <div>
             <ng-content select="[phoneAction]"></ng-content>
-            <a [routerLink]="['password']" mat-icon-button>
+            <a [disabled]="!canWrite" [routerLink]="['password']" mat-icon-button>
                 <mat-icon class="icon">chevron_right</mat-icon>
             </a>
         </div>
@@ -24,13 +24,13 @@
                     <mat-icon class="icon" color="warn" aria-hidden="false" aria-label="not verified icon">
                         highlight_off
                     </mat-icon>
-                    <a class="verify" matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
+                    <a *ngIf="canWrite" class="verify" matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
                         (click)="emitEmailVerification()">{{'USER.LOGINMETHODS.RESENDCODE' | translate}}</a>
                 </ng-container>
             </div>
 
             <div>
-                <button (click)="emailEditState = true" mat-icon-button>
+                <button [disabled]="!canWrite" (click)="emailEditState = true" mat-icon-button>
                     <mat-icon class="icon">edit</mat-icon>
                 </button>
             </div>
@@ -62,16 +62,16 @@
                     <mat-icon class="icon" color="warn" aria-hidden="false" aria-label="not verified icon">
                         highlight_off
                     </mat-icon>
-                    <a *ngIf="!disablePhoneCode" class="verify"
+                    <a *ngIf="!disablePhoneCode && !canWrite" class="verify"
                         matTooltip="{{'USER.LOGINMETHODS.ENTERCODE_DESC' | translate}}"
                         (click)="enterCode()">{{'USER.LOGINMETHODS.ENTERCODE' | translate}}</a>
-                    <a class="verify" matTooltip="{{'USER.LOGINMETHODS.PHONE.RESEND' | translate}}"
+                    <a *ngIf="canWrite" class="verify" matTooltip="{{'USER.LOGINMETHODS.PHONE.RESEND' | translate}}"
                         (click)="emitPhoneVerification()">{{'USER.LOGINMETHODS.RESENDCODE' | translate}}</a>
                 </ng-container>
             </div>
 
             <div>
-                <button (click)="phoneEditState = true" mat-icon-button>
+                <button [disabled]="!canWrite" (click)="phoneEditState = true" mat-icon-button>
                     <mat-icon class="icon">edit</mat-icon>
                 </button>
             </div>
