@@ -59,7 +59,8 @@
         "DEACTIVATE":"Deaktivieren",
         "REFRESH":"Aktualisieren",
         "LOGIN":"Einloggen",
-        "EDIT":"Bearbeiten"
+        "EDIT":"Bearbeiten",
+        "CONFIGURE":"Konfigurieren"
     },
     "ERRORS": {
         "REQUIRED": "Bitte fülle alle benötigten Felder aus.",
@@ -211,6 +212,7 @@
         },
         "EMAIL": "E-Mail",
         "PHONE": "Telefonnummer",
+        "PREFERRED_LOGINNAME":"Bevorzugter Loginname",
         "LOGINMETHODS": {
             "TITLE": "Kontaktinformationen",
             "DESCRIPTION": "Die Kontaktinformationen werden benötigt, um Dir wichtige Informationen wie Verifikationsnachrichten und Links für das Zurücksetzen des Passworts per E-Mail zu senden.",

@@ -59,7 +59,8 @@
         "DEACTIVATE":"Deactivate",
         "REFRESH":"Refresh",
         "LOGIN":"Login",
-        "EDIT":"Edit"
+        "EDIT":"Edit",
+        "CONFIGURE":"Configure"
     },
     "ERRORS": {
         "REQUIRED": "Some required fields are missing.",
@@ -211,6 +212,7 @@
         },
         "EMAIL": "E-mail",
         "PHONE": "Phone Number",
+        "PREFERRED_LOGINNAME":"Preferred Loginname",
         "LOGINMETHODS": {
             "TITLE": "Contact Information",
             "DESCRIPTION": "The provided information is used to send important information, like password reset e-mails to you.",

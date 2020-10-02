@@ -52,7 +52,7 @@
     <div *ngIf="user" class="side" metainfo>
         <div class="details">
             <div class="row" *ngIf="user?.preferredLoginName">
-                <span class="first">Preferred Loginname:</span>
+                <span class="first">{{'USER.PREFERRED_LOGINNAME' | translate}}</span>
                 <span class="second"><span style="display: block;">{{user.preferredLoginName}}</span></span>
             </div>
         </div>

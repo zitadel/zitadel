@@ -47,6 +47,16 @@
   .fill-space {
     flex: 1;
   }
+
+  .rem-button {
+      visibility: hidden;
+  }
+
+  &:hover {
+      .rem-button {
+          visibility: visible;
+      }
+  }
 }
 
 .new-desc {
