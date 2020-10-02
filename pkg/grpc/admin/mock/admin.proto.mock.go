@@ -237,6 +237,26 @@ func (mr *MockAdminServiceClientMockRecorder) GetDefaultLoginPolicyIdpProviders(
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultLoginPolicyIdpProviders", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultLoginPolicyIdpProviders), varargs...)
 }
 
+// GetDefaultPasswordAgePolicy mocks base method
+func (m *MockAdminServiceClient) GetDefaultPasswordAgePolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.DefaultPasswordAgePolicyView, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetDefaultPasswordAgePolicy", varargs...)
+	ret0, _ := ret[0].(*admin.DefaultPasswordAgePolicyView)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDefaultPasswordAgePolicy indicates an expected call of GetDefaultPasswordAgePolicy
+func (mr *MockAdminServiceClientMockRecorder) GetDefaultPasswordAgePolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultPasswordAgePolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultPasswordAgePolicy), varargs...)
+}
+
 // GetDefaultPasswordComplexityPolicy mocks base method
 func (m *MockAdminServiceClient) GetDefaultPasswordComplexityPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.DefaultPasswordComplexityPolicyView, error) {
 	m.ctrl.T.Helper()
@@ -255,6 +275,26 @@ func (mr *MockAdminServiceClientMockRecorder) GetDefaultPasswordComplexityPolicy
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultPasswordComplexityPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultPasswordComplexityPolicy), varargs...)
+}
+
+// GetDefaultPasswordLockoutPolicy mocks base method
+func (m *MockAdminServiceClient) GetDefaultPasswordLockoutPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.DefaultPasswordLockoutPolicyView, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetDefaultPasswordLockoutPolicy", varargs...)
+	ret0, _ := ret[0].(*admin.DefaultPasswordLockoutPolicyView)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDefaultPasswordLockoutPolicy indicates an expected call of GetDefaultPasswordLockoutPolicy
+func (mr *MockAdminServiceClientMockRecorder) GetDefaultPasswordLockoutPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultPasswordLockoutPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultPasswordLockoutPolicy), varargs...)
 }
 
 // GetFailedEvents mocks base method
@@ -637,6 +677,26 @@ func (mr *MockAdminServiceClientMockRecorder) UpdateDefaultLoginPolicy(arg0, arg
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDefaultLoginPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).UpdateDefaultLoginPolicy), varargs...)
 }
 
+// UpdateDefaultPasswordAgePolicy mocks base method
+func (m *MockAdminServiceClient) UpdateDefaultPasswordAgePolicy(arg0 context.Context, arg1 *admin.DefaultPasswordAgePolicy, arg2 ...grpc.CallOption) (*admin.DefaultPasswordAgePolicy, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateDefaultPasswordAgePolicy", varargs...)
+	ret0, _ := ret[0].(*admin.DefaultPasswordAgePolicy)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateDefaultPasswordAgePolicy indicates an expected call of UpdateDefaultPasswordAgePolicy
+func (mr *MockAdminServiceClientMockRecorder) UpdateDefaultPasswordAgePolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDefaultPasswordAgePolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).UpdateDefaultPasswordAgePolicy), varargs...)
+}
+
 // UpdateDefaultPasswordComplexityPolicy mocks base method
 func (m *MockAdminServiceClient) UpdateDefaultPasswordComplexityPolicy(arg0 context.Context, arg1 *admin.DefaultPasswordComplexityPolicy, arg2 ...grpc.CallOption) (*admin.DefaultPasswordComplexityPolicy, error) {
 	m.ctrl.T.Helper()
@@ -655,6 +715,26 @@ func (mr *MockAdminServiceClientMockRecorder) UpdateDefaultPasswordComplexityPol
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDefaultPasswordComplexityPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).UpdateDefaultPasswordComplexityPolicy), varargs...)
+}
+
+// UpdateDefaultPasswordLockoutPolicy mocks base method
+func (m *MockAdminServiceClient) UpdateDefaultPasswordLockoutPolicy(arg0 context.Context, arg1 *admin.DefaultPasswordLockoutPolicy, arg2 ...grpc.CallOption) (*admin.DefaultPasswordLockoutPolicy, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateDefaultPasswordLockoutPolicy", varargs...)
+	ret0, _ := ret[0].(*admin.DefaultPasswordLockoutPolicy)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateDefaultPasswordLockoutPolicy indicates an expected call of UpdateDefaultPasswordLockoutPolicy
+func (mr *MockAdminServiceClientMockRecorder) UpdateDefaultPasswordLockoutPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDefaultPasswordLockoutPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).UpdateDefaultPasswordLockoutPolicy), varargs...)
 }
 
 // UpdateIdpConfig mocks base method

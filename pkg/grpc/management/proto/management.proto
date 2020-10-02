@@ -435,92 +435,6 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
-  // returns default if nothing other set on organisation
-  rpc GetPasswordAgePolicy(google.protobuf.Empty) returns (PasswordAgePolicy) {
-    option (google.api.http) = {
-      get: "/policies/passwords/age"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "policy.read"
-    };
-  }
-
-  rpc CreatePasswordAgePolicy(PasswordAgePolicyCreate) returns (PasswordAgePolicy) {
-    option (google.api.http) = {
-      post: "/policies/passwords/age"
-      body: "*"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "policy.write"
-    };
-  }
-
-  rpc UpdatePasswordAgePolicy(PasswordAgePolicyUpdate) returns (PasswordAgePolicy) {
-    option (google.api.http) = {
-      put: "/policies/passwords/age"
-      body: "*"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "policy.write"
-    };
-  }
-
-  rpc DeletePasswordAgePolicy(PasswordAgePolicyID) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      delete: "/policies/passwords/age"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "policy.delete"
-    };
-  }
-
-  // returns default if nothing other set on organisation
-  rpc GetPasswordLockoutPolicy(google.protobuf.Empty) returns (PasswordLockoutPolicy) {
-    option (google.api.http) = {
-      get: "/policies/passwords/lockout"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "policy.read"
-    };
-  }
-
-  rpc CreatePasswordLockoutPolicy(PasswordLockoutPolicyCreate) returns (PasswordLockoutPolicy) {
-    option (google.api.http) = {
-      post: "/policies/passwords/lockout"
-      body: "*"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "policy.write"
-    };
-  }
-
-  rpc UpdatePasswordLockoutPolicy(PasswordLockoutPolicyUpdate) returns (PasswordLockoutPolicy) {
-    option (google.api.http) = {
-      put: "/policies/passwords/lockout"
-      body: "*"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "policy.write"
-    };
-  }
-
-  rpc DeletePasswordLockoutPolicy(PasswordLockoutPolicyID) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      delete: "/policies/passwords/lockout"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "policy.delete"
-    };
-  }
-
   rpc CreateOrg(OrgCreateRequest) returns (Org) {
     option (google.api.http) = {
       post: "/orgs"
@@ -1450,7 +1364,6 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
-
   rpc GetPasswordComplexityPolicy(google.protobuf.Empty) returns (PasswordComplexityPolicyView) {
     option (google.api.http) = {
       get: "/orgs/me/policies/password/complexity"
@@ -1503,6 +1416,109 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
+  rpc GetPasswordAgePolicy(google.protobuf.Empty) returns (PasswordAgePolicyView) {
+    option (google.api.http) = {
+      get: "/orgs/me/policies/password/age"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "policy.read"
+    };
+  }
+
+  rpc GetDefaultPasswordAgePolicy(google.protobuf.Empty) returns (PasswordAgePolicyView) {
+    option (google.api.http) = {
+      get: "/orgs/default/policies/password/age"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "policy.read"
+    };
+  }
+
+  rpc CreatePasswordAgePolicy(PasswordAgePolicyAdd) returns (PasswordAgePolicy) {
+    option (google.api.http) = {
+      post: "/orgs/me/policies/password/age"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "policy.write"
+    };
+  }
+
+  rpc UpdatePasswordAgePolicy(PasswordAgePolicy) returns (PasswordAgePolicy) {
+    option (google.api.http) = {
+      put: "/orgs/me/policies/password/age"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "policy.write"
+    };
+  }
+
+  rpc RemovePasswordAgePolicy(google.protobuf.Empty) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/orgs/me/policies/password/age"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "policy.delete"
+    };
+  }
+
+  rpc GetPasswordLockoutPolicy(google.protobuf.Empty) returns (PasswordLockoutPolicyView) {
+    option (google.api.http) = {
+      get: "/orgs/me/policies/password/lockout"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "policy.read"
+    };
+  }
+
+  rpc GetDefaultPasswordLockoutPolicy(google.protobuf.Empty) returns (PasswordLockoutPolicyView) {
+    option (google.api.http) = {
+      get: "/orgs/default/policies/password/lockout"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "policy.read"
+    };
+  }
+
+  rpc CreatePasswordLockoutPolicy(PasswordLockoutPolicyAdd) returns (PasswordLockoutPolicy) {
+    option (google.api.http) = {
+      post: "/orgs/me/policies/password/lockout"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "policy.write"
+    };
+  }
+
+  rpc UpdatePasswordLockoutPolicy(PasswordLockoutPolicy) returns (PasswordLockoutPolicy) {
+    option (google.api.http) = {
+      put: "/orgs/me/policies/password/lockout"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "policy.write"
+    };
+  }
+
+  rpc RemovePasswordLockoutPolicy(google.protobuf.Empty) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/orgs/me/policies/password/lockout"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "policy.delete"
+    };
+  }
 }
 
 message ZitadelDocs {
@@ -1970,64 +1986,6 @@ message SetPasswordNotificationRequest {
 enum NotificationType {
   NOTIFICATIONTYPE_EMAIL = 0;
   NOTIFICATIONTYPE_SMS = 1;
-}
-
-message PasswordAgePolicyID { //TODO: why do we need this?
-  string id = 1;
-}
-
-message PasswordAgePolicy {
-  string id = 1; //TODO: do we need id?
-  string description = 2;
-  PolicyState state = 3;
-  google.protobuf.Timestamp creation_date = 4;
-  google.protobuf.Timestamp change_date = 5;
-  uint64 max_age_days = 6;
-  uint64 expire_warn_days = 7;
-  uint64 sequence = 8;
-  bool is_default = 9;
-}
-
-message PasswordAgePolicyCreate {
-  string description = 1 [(validate.rules).string = {max_len: 500}];
-  uint64 max_age_days = 2;
-  uint64 expire_warn_days = 3;
-}
-
-message PasswordAgePolicyUpdate {
-  string id = 1; //TODO: do we need id?
-  string description = 2 [(validate.rules).string = {max_len: 500}];
-  uint64 max_age_days = 3;
-  uint64 expire_warn_days = 4;
-}
-
-message PasswordLockoutPolicyID {
-  string id = 1; //TODO: why do we need this?
-}
-
-message PasswordLockoutPolicy {
-  string id = 1; //TODO: why do we need this?
-  string description = 2;
-  PolicyState state = 3;
-  google.protobuf.Timestamp creation_date = 4;
-  google.protobuf.Timestamp change_date = 5;
-  uint64 max_attempts = 6;
-  bool show_lock_out_failures = 7;
-  uint64 sequence = 8;
-  bool is_default = 9;
-}
-
-message PasswordLockoutPolicyCreate {
-  string description = 1 [(validate.rules).string = {max_len: 500}];
-  uint64 max_attempts = 2;
-  bool show_lock_out_failures = 3;
-}
-
-message PasswordLockoutPolicyUpdate {
-  string id = 1; //TODO: do we need id?
-  string description = 2 [(validate.rules).string = {max_len: 500}];
-  uint64 max_attempts = 3;
-  bool show_lock_out_failures = 4;
 }
 
 enum PolicyState {
@@ -2988,6 +2946,8 @@ message LoginPolicy {
     bool allow_username_password = 1;
     bool allow_register = 2;
     bool allow_external_idp = 3;
+    google.protobuf.Timestamp creation_date = 4;
+    google.protobuf.Timestamp change_date = 5;
 }
 
 message LoginPolicyAdd {
@@ -3015,6 +2975,8 @@ message LoginPolicyView {
     bool allow_username_password = 2;
     bool allow_register = 3;
     bool allow_external_idp = 4;
+    google.protobuf.Timestamp creation_date = 5;
+    google.protobuf.Timestamp change_date = 6;
 }
 
 message IdpProviderView {
@@ -3094,6 +3056,8 @@ message PasswordComplexityPolicy {
   bool has_number = 4;
   bool has_symbol = 5;
   uint64 sequence = 6;
+  google.protobuf.Timestamp creation_date = 7;
+  google.protobuf.Timestamp change_date = 8;
 }
 
 message PasswordComplexityPolicyAdd {
@@ -3102,7 +3066,6 @@ message PasswordComplexityPolicyAdd {
   bool has_uppercase = 3;
   bool has_number = 4;
   bool has_symbol = 5;
-  uint64 sequence = 6;
 }
 
 message PasswordComplexityPolicyView {
@@ -3115,4 +3078,48 @@ message PasswordComplexityPolicyView {
   uint64 sequence = 7;
   google.protobuf.Timestamp creation_date = 8;
   google.protobuf.Timestamp change_date = 9;
+}
+
+message PasswordAgePolicy {
+  uint64 max_age_days = 1;
+  uint64 expire_warn_days = 2;
+  uint64 sequence = 3;
+  google.protobuf.Timestamp creation_date = 4;
+  google.protobuf.Timestamp change_date = 5;
+}
+
+message PasswordAgePolicyAdd {
+  uint64 max_age_days = 1;
+  uint64 expire_warn_days = 2;
+}
+
+message PasswordAgePolicyView {
+  bool default = 1;
+  uint64 max_age_days = 2;
+  uint64 expire_warn_days = 3;
+  uint64 sequence = 4;
+  google.protobuf.Timestamp creation_date = 5;
+  google.protobuf.Timestamp change_date = 6;
+}
+
+message PasswordLockoutPolicy {
+  uint64 max_attempts = 1;
+  bool show_lockout_failure = 2;
+  uint64 sequence = 3;
+  google.protobuf.Timestamp creation_date = 4;
+  google.protobuf.Timestamp change_date = 5;
+}
+
+message PasswordLockoutPolicyAdd {
+  uint64 max_attempts = 1;
+  bool show_lockout_failure = 2;
+}
+
+message PasswordLockoutPolicyView {
+  bool default = 1;
+  uint64 max_attempts = 2;
+  bool show_lockout_failure = 3;
+  uint64 sequence = 4;
+  google.protobuf.Timestamp creation_date = 5;
+  google.protobuf.Timestamp change_date = 6;
 }

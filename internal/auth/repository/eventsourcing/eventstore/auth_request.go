@@ -7,7 +7,6 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	"time"
 
 	"github.com/caos/logging"
@@ -30,7 +29,6 @@ import (
 type AuthRequestRepo struct {
 	UserEvents   *user_event.UserEventstore
 	OrgEvents    *org_event.OrgEventstore
-	PolicyEvents *policy_event.PolicyEventstore
 	AuthRequests cache.AuthRequestCache
 	View         *view.View
 

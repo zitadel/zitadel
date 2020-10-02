@@ -584,3 +584,109 @@ func (es *IAMEventstore) ChangePasswordComplexityPolicy(ctx context.Context, pol
 	es.iamCache.cacheIAM(repoIam)
 	return model.PasswordComplexityPolicyToModel(repoIam.DefaultPasswordComplexityPolicy), nil
 }
+
+func (es *IAMEventstore) PrepareAddPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*model.IAM, *models.Aggregate, error) {
+	if policy == nil || policy.AggregateID == "" {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-2dGt6", "Errors.IAM.PasswordAgePolicy.Empty")
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoPasswordAgePolicy := model.PasswordAgePolicyFromModel(policy)
+
+	addAggregate, err := PasswordAgePolicyAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoIam, repoPasswordAgePolicy)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoIam, addAggregate, nil
+}
+
+func (es *IAMEventstore) AddPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
+	repoIam, addAggregate, err := es.PrepareAddPasswordAgePolicy(ctx, policy)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.PasswordAgePolicyToModel(repoIam.DefaultPasswordAgePolicy), nil
+}
+
+func (es *IAMEventstore) ChangePasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
+	if policy == nil || policy.AggregateID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-2Fgt6", "Errors.IAM.PasswordAgePolicy.Empty")
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoPasswordAgePolicy := model.PasswordAgePolicyFromModel(policy)
+
+	addAggregate := PasswordAgePolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoPasswordAgePolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.PasswordAgePolicyToModel(repoIam.DefaultPasswordAgePolicy), nil
+}
+
+func (es *IAMEventstore) PrepareAddPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*model.IAM, *models.Aggregate, error) {
+	if policy == nil || policy.AggregateID == "" {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-3R56z", "Errors.IAM.PasswordLockoutPolicy.Empty")
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoPasswordLockoutPolicy := model.PasswordLockoutPolicyFromModel(policy)
+
+	addAggregate, err := PasswordLockoutPolicyAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoIam, repoPasswordLockoutPolicy)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoIam, addAggregate, nil
+}
+
+func (es *IAMEventstore) AddPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
+	repoIam, addAggregate, err := es.PrepareAddPasswordLockoutPolicy(ctx, policy)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.PasswordLockoutPolicyToModel(repoIam.DefaultPasswordLockoutPolicy), nil
+}
+
+func (es *IAMEventstore) ChangePasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
+	if policy == nil || policy.AggregateID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-6Zsj9", "Errors.IAM.PasswordLockoutPolicy.Empty")
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoPasswordLockoutPolicy := model.PasswordLockoutPolicyFromModel(policy)
+
+	addAggregate := PasswordLockoutPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoPasswordLockoutPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.PasswordLockoutPolicyToModel(repoIam.DefaultPasswordLockoutPolicy), nil
+}

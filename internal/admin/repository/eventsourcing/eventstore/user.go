@@ -9,14 +9,12 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type UserRepo struct {
 	UserEvents     *usr_event.UserEventstore
-	PolicyEvents   *policy_event.PolicyEventstore
 	OrgEvents      *org_event.OrgEventstore
 	View           *admin_view.View
 	SystemDefaults systemdefaults.SystemDefaults

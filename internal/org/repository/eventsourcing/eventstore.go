@@ -903,3 +903,119 @@ func (es *OrgEventstore) RemovePasswordComplexityPolicy(ctx context.Context, pol
 	addAggregate := PasswordComplexityPolicyRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg)
 	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
 }
+
+func (es *OrgEventstore) AddPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
+	if policy == nil || policy.AggregateID == "" {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sjkl9", "Errors.Org.PasswordAgePolicy.Invalid")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	if err != nil {
+		return nil, err
+	}
+
+	repoOrg := model.OrgFromModel(existing)
+	repoPasswordAgePolicy := iam_es_model.PasswordAgePolicyFromModel(policy)
+
+	addAggregate := PasswordAgePolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPasswordAgePolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.PasswordAgePolicyToModel(repoOrg.PasswordAgePolicy), nil
+}
+
+func (es *OrgEventstore) ChangePasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
+	if policy == nil || policy.AggregateID == "" {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-r5Hd", "Errors.Org.PasswordAgePolicy.Empty")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	if err != nil {
+		return nil, err
+	}
+
+	if existing.PasswordAgePolicy == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-v6Hdr", "Errors.Org.PasswordAgePolicy.NotExisting")
+	}
+
+	repoOrg := model.OrgFromModel(existing)
+	repoPasswordAgePolicy := iam_es_model.PasswordAgePolicyFromModel(policy)
+
+	addAggregate := PasswordAgePolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPasswordAgePolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.PasswordAgePolicyToModel(repoOrg.PasswordAgePolicy), nil
+}
+
+func (es *OrgEventstore) RemovePasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) error {
+	if policy == nil || policy.AggregateID == "" {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-3Ghs8", "Errors.Org.PasswordAgePolicy.Invalid")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	if err != nil {
+		return err
+	}
+	repoOrg := model.OrgFromModel(existing)
+
+	addAggregate := PasswordAgePolicyRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg)
+	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+}
+
+func (es *OrgEventstore) AddPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
+	if policy == nil || policy.AggregateID == "" {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-6Zdk9", "Errors.Org.PasswordLockoutPolicy.Invalid")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	if err != nil {
+		return nil, err
+	}
+
+	repoOrg := model.OrgFromModel(existing)
+	repoPasswordLockoutPolicy := iam_es_model.PasswordLockoutPolicyFromModel(policy)
+
+	addAggregate := PasswordLockoutPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPasswordLockoutPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.PasswordLockoutPolicyToModel(repoOrg.PasswordLockoutPolicy), nil
+}
+
+func (es *OrgEventstore) ChangePasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
+	if policy == nil || policy.AggregateID == "" {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-lp0Sf", "Errors.Org.PasswordLockoutPolicy.Empty")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	if err != nil {
+		return nil, err
+	}
+
+	if existing.PasswordLockoutPolicy == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-3Fks9", "Errors.Org.PasswordLockoutPolicy.NotExisting")
+	}
+
+	repoOrg := model.OrgFromModel(existing)
+	repoPasswordLockoutPolicy := iam_es_model.PasswordLockoutPolicyFromModel(policy)
+
+	addAggregate := PasswordLockoutPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPasswordLockoutPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.PasswordLockoutPolicyToModel(repoOrg.PasswordLockoutPolicy), nil
+}
+
+func (es *OrgEventstore) RemovePasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) error {
+	if policy == nil || policy.AggregateID == "" {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-6Hls0", "Errors.Org.PasswordLockoutPolicy.Invalid")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	if err != nil {
+		return err
+	}
+	repoOrg := model.OrgFromModel(existing)
+
+	addAggregate := PasswordLockoutPolicyRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg)
+	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+}

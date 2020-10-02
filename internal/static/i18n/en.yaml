@@ -145,6 +145,26 @@ Errors:
       AlreadyExists: Default Login Policy already exists
       IdpProviderAlreadyExisting: Idp Provider already existing
       IdpProviderNotExisting: Idp Provider not existing
+    PasswordComplexityPolicy:
+      NotExisting: Default Password Complexity Policy not existing
+      AlreadyExists: Default Password Complexity Policy already existing
+      Empty: Default Password Complexity Policy empty
+    PasswordAgePolicy:
+      NotExisting: Default Password Age Policy not existing
+      AlreadyExists: Default Password Age Policy already existing
+      Empty: Default Password Age Policy empty
+    PasswordLockoutPolicy:
+      NotExisting: Default Password Lockout Policy not existing
+      AlreadyExists: Default Password Lockout Policy already existing
+      Empty: Default Password Lockout Policy empty
+    PasswordLockout:
+      Empty: Passwort Lockout Policy is empty
+      NotExisting: Passwort Lockout Policy not existing
+      AlreadyExists: Passwort Lockout Policy already exists
+    PasswordAge:
+      Empty: Passwort Age Policy is empty
+      NotExisting: Passwort Age Policy not existing
+      AlreadyExists: Passwort Age Policy already exists
   Policy:
     AlreadyExists: Policy already exists
   UserGrant:

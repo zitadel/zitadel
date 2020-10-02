@@ -16,8 +16,6 @@ import (
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	es_policy "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
-	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
@@ -31,7 +29,6 @@ type Setup struct {
 	OrgEvents     *org_event.OrgEventstore
 	UserEvents    *usr_event.UserEventstore
 	ProjectEvents *proj_event.ProjectEventstore
-	PolicyEvents  *policy_event.PolicyEventstore
 }
 
 const (
@@ -86,13 +83,6 @@ func StartSetup(esConfig es_int.Config, sd systemdefaults.SystemDefaults) (*Setu
 		return nil, err
 	}
 
-	setup.PolicyEvents, err = es_policy.StartPolicy(es_policy.PolicyConfig{
-		Eventstore: es,
-		Cache:      esConfig.Cache,
-	}, sd)
-	if err != nil {
-		return nil, err
-	}
 	return setup, nil
 }
 

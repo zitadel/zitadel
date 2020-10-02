@@ -395,6 +395,48 @@ service AdminService {
             permission: "iam.policy.write"
         };
     }
+
+    rpc GetDefaultPasswordAgePolicy(google.protobuf.Empty) returns (DefaultPasswordAgePolicyView) {
+        option (google.api.http) = {
+            get: "/policies/password/age"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc UpdateDefaultPasswordAgePolicy(DefaultPasswordAgePolicy) returns (DefaultPasswordAgePolicy) {
+        option (google.api.http) = {
+            put: "/policies/password/age"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc GetDefaultPasswordLockoutPolicy(google.protobuf.Empty) returns (DefaultPasswordLockoutPolicyView) {
+        option (google.api.http) = {
+            get: "/policies/password/lockout"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc UpdateDefaultPasswordLockoutPolicy(DefaultPasswordLockoutPolicy) returns (DefaultPasswordLockoutPolicy) {
+        option (google.api.http) = {
+            put: "/policies/password/lockout"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
 }
 
 message OrgID {
@@ -832,6 +874,8 @@ message DefaultLoginPolicy {
     bool allow_username_password = 1;
     bool allow_register = 2;
     bool allow_external_idp = 3;
+    google.protobuf.Timestamp creation_date = 4;
+    google.protobuf.Timestamp change_date = 5;
 }
 
 message IdpProviderID {
@@ -842,6 +886,8 @@ message DefaultLoginPolicyView {
     bool allow_username_password = 1;
     bool allow_register = 2;
     bool allow_external_idp = 3;
+    google.protobuf.Timestamp creation_date = 4;
+    google.protobuf.Timestamp change_date = 5;
 }
 
 message IdpProviderView {
@@ -876,6 +922,8 @@ message DefaultPasswordComplexityPolicy {
     bool has_lowercase = 3;
     bool has_number = 4;
     bool has_symbol = 5;
+    google.protobuf.Timestamp creation_date = 6;
+    google.protobuf.Timestamp change_date = 7;
 }
 
 message DefaultPasswordComplexityPolicyView {
@@ -884,4 +932,34 @@ message DefaultPasswordComplexityPolicyView {
     bool has_lowercase = 3;
     bool has_number = 4;
     bool has_symbol = 5;
+    google.protobuf.Timestamp creation_date = 6;
+    google.protobuf.Timestamp change_date = 7;
+}
+
+message DefaultPasswordAgePolicy {
+    uint64 max_age_days = 1;
+    uint64 expire_warn_days = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
+}
+
+message DefaultPasswordAgePolicyView {
+    uint64 max_age_days = 1;
+    uint64 expire_warn_days = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
+}
+
+message DefaultPasswordLockoutPolicy {
+    uint64 max_attempts = 1;
+    bool show_lockout_failure = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
+}
+
+message DefaultPasswordLockoutPolicyView {
+    uint64 max_attempts = 1;
+    bool show_lockout_failure = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
 }

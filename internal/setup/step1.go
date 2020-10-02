@@ -9,7 +9,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	policy_model "github.com/caos/zitadel/internal/policy/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 )
@@ -117,7 +116,7 @@ func (step *Step1) orgs(ctx context.Context, orgs []Org) error {
 				return err
 			}
 		} else {
-			policy, err = step.setup.OrgEvents.GetOrgIAMPolicy(ctx, policy_model.DefaultPolicy)
+			policy, err = step.setup.OrgEvents.GetOrgIAMPolicy(ctx, "0")
 			if err != nil {
 				logging.LogWithFields("SETUP-IS8wS", "Org IAM Policy", iamOrg.Name).WithError(err).Error("unable to get default iam org policy")
 				return err

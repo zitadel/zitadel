@@ -2972,3 +2972,481 @@ func TestRemovePasswordComplexityPolicy(t *testing.T) {
 		})
 	}
 }
+
+func TestAddPasswordAgePolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *OrgEventstore
+		ctx    context.Context
+		policy *iam_model.PasswordAgePolicy
+	}
+	type res struct {
+		result  *iam_model.PasswordAgePolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add password age policy, ok",
+			args: args{
+				es:  GetMockChangesOrgOK(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordAgePolicy{
+					ObjectRoot:     es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAgeDays:     10,
+					ExpireWarnDays: 10,
+				},
+			},
+			res: res{
+				result: &iam_model.PasswordAgePolicy{
+					ObjectRoot:     es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAgeDays:     10,
+					ExpireWarnDays: 10,
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockChangesOrgOK(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordAgePolicy{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing org not found",
+			args: args{
+				es:  GetMockChangesOrgNoEvents(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordAgePolicy{
+					ObjectRoot:     es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAgeDays:     10,
+					ExpireWarnDays: 10,
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddPasswordAgePolicy(tt.args.ctx, tt.args.policy)
+
+			if !tt.res.wantErr && result.MaxAgeDays != tt.res.result.MaxAgeDays {
+				t.Errorf("got wrong result MaxAgeDays: expected: %v, actual: %v ", tt.res.result.MaxAgeDays, result.MaxAgeDays)
+			}
+			if !tt.res.wantErr && result.ExpireWarnDays != tt.res.result.ExpireWarnDays {
+				t.Errorf("got wrong result.ExpireWarnDays: expected: %v, actual: %v ", tt.res.result.ExpireWarnDays, result.ExpireWarnDays)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangePasswordAgePolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *OrgEventstore
+		ctx    context.Context
+		policy *iam_model.PasswordAgePolicy
+	}
+	type res struct {
+		result  *iam_model.PasswordAgePolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change password age policy, ok",
+			args: args{
+				es:  GetMockChangesOrgWithPasswordAgePolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordAgePolicy{
+					ObjectRoot:     es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAgeDays:     5,
+					ExpireWarnDays: 5,
+				},
+			},
+			res: res{
+				result: &iam_model.PasswordAgePolicy{
+					ObjectRoot:     es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAgeDays:     5,
+					ExpireWarnDays: 5,
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockChangesOrgOK(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordAgePolicy{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockChangesOrgNoEvents(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordAgePolicy{
+					ObjectRoot:     es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAgeDays:     10,
+					ExpireWarnDays: 10,
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangePasswordAgePolicy(tt.args.ctx, tt.args.policy)
+
+			if !tt.res.wantErr && result.MaxAgeDays != tt.res.result.MaxAgeDays {
+				t.Errorf("got wrong result MaxAgeDays: expected: %v, actual: %v ", tt.res.result.MaxAgeDays, result.MaxAgeDays)
+			}
+			if !tt.res.wantErr && result.ExpireWarnDays != tt.res.result.ExpireWarnDays {
+				t.Errorf("got wrong result.ExpireWarnDays: expected: %v, actual: %v ", tt.res.result.ExpireWarnDays, result.ExpireWarnDays)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestRemovePasswordAgePolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *OrgEventstore
+		ctx    context.Context
+		policy *iam_model.PasswordAgePolicy
+	}
+	type res struct {
+		result  *iam_model.PasswordAgePolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove password age policy, ok",
+			args: args{
+				es:  GetMockChangesOrgWithPasswordAgePolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordAgePolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockChangesOrgOK(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordAgePolicy{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockChangesOrgNoEvents(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordAgePolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemovePasswordAgePolicy(tt.args.ctx, tt.args.policy)
+
+			if !tt.res.wantErr && err != nil {
+				t.Errorf("got wrong result should not get err: %v", err)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestAddPasswordLockoutPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *OrgEventstore
+		ctx    context.Context
+		policy *iam_model.PasswordLockoutPolicy
+	}
+	type res struct {
+		result  *iam_model.PasswordLockoutPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add password lockout policy, ok",
+			args: args{
+				es:  GetMockChangesOrgOK(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordLockoutPolicy{
+					ObjectRoot:          es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAttempts:         10,
+					ShowLockOutFailures: true,
+				},
+			},
+			res: res{
+				result: &iam_model.PasswordLockoutPolicy{
+					ObjectRoot:          es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAttempts:         10,
+					ShowLockOutFailures: true,
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockChangesOrgOK(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordLockoutPolicy{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing org not found",
+			args: args{
+				es:  GetMockChangesOrgNoEvents(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordLockoutPolicy{
+					ObjectRoot:          es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAttempts:         10,
+					ShowLockOutFailures: true,
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddPasswordLockoutPolicy(tt.args.ctx, tt.args.policy)
+
+			if !tt.res.wantErr && result.MaxAttempts != tt.res.result.MaxAttempts {
+				t.Errorf("got wrong result MaxAttempts: expected: %v, actual: %v ", tt.res.result.MaxAttempts, result.MaxAttempts)
+			}
+			if !tt.res.wantErr && result.ShowLockOutFailures != tt.res.result.ShowLockOutFailures {
+				t.Errorf("got wrong result.ShowLockOutFailures: expected: %v, actual: %v ", tt.res.result.ShowLockOutFailures, result.ShowLockOutFailures)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangePasswordLockoutPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *OrgEventstore
+		ctx    context.Context
+		policy *iam_model.PasswordLockoutPolicy
+	}
+	type res struct {
+		result  *iam_model.PasswordLockoutPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change password lockout policy, ok",
+			args: args{
+				es:  GetMockChangesOrgWithPasswordLockoutPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordLockoutPolicy{
+					ObjectRoot:          es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAttempts:         5,
+					ShowLockOutFailures: false,
+				},
+			},
+			res: res{
+				result: &iam_model.PasswordLockoutPolicy{
+					ObjectRoot:          es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAttempts:         5,
+					ShowLockOutFailures: false,
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockChangesOrgOK(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordLockoutPolicy{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockChangesOrgNoEvents(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordLockoutPolicy{
+					ObjectRoot:          es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAttempts:         10,
+					ShowLockOutFailures: true,
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangePasswordLockoutPolicy(tt.args.ctx, tt.args.policy)
+
+			if !tt.res.wantErr && result.MaxAttempts != tt.res.result.MaxAttempts {
+				t.Errorf("got wrong result MaxAttempts: expected: %v, actual: %v ", tt.res.result.MaxAttempts, result.MaxAttempts)
+			}
+			if !tt.res.wantErr && result.ShowLockOutFailures != tt.res.result.ShowLockOutFailures {
+				t.Errorf("got wrong result.ShowLockOutFailures: expected: %v, actual: %v ", tt.res.result.ShowLockOutFailures, result.ShowLockOutFailures)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestRemovePasswordLockoutPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *OrgEventstore
+		ctx    context.Context
+		policy *iam_model.PasswordLockoutPolicy
+	}
+	type res struct {
+		result  *iam_model.PasswordLockoutPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove password lockout policy, ok",
+			args: args{
+				es:  GetMockChangesOrgWithPasswordLockoutPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordLockoutPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockChangesOrgOK(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordLockoutPolicy{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockChangesOrgNoEvents(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordLockoutPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemovePasswordLockoutPolicy(tt.args.ctx, tt.args.policy)
+
+			if !tt.res.wantErr && err != nil {
+				t.Errorf("got wrong result should not get err: %v", err)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}

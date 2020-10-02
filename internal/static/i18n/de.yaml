@@ -93,6 +93,14 @@ Errors:
       Empty: Passwort Komplexitäts Policy ist leer
       NotExisting: Passwort Komplexitäts Policy existiert nicht
       AlreadyExists: Passwort Komplexitäts Policy existiert bereits
+    PasswordLockout:
+      Empty: Passwort Lockout Policy ist leer
+      NotExisting: Passwort Lockout Policy existiert nicht
+      AlreadyExists: Passwort Lockout Policy existiert bereits
+    PasswordAge:
+      Empty: Passwort Age Policy ist leer
+      NotExisting: Passwort Age Policy existiert nicht
+      AlreadyExists: Passwort Age Policy existiert bereits
   Project:
     ProjectIDMissing: Project Id fehlt
     AlreadyExists: Project existiert bereits auf der Organisation
@@ -149,6 +157,14 @@ Errors:
       NotExisting: Default Password Complexity Policy existiert nicht
       AlreadyExists: Default Password Complexity Policy existiert bereits
       Empty: Default Password Complexity Policy leer
+    PasswordAgePolicy:
+      NotExisting: Default Password Age Policy existiert nicht
+      AlreadyExists: Default Password Age Policy existiert bereits
+      Empty: Default Password Age Policy leer
+    PasswordLockoutPolicy:
+      NotExisting: Default Password Lockout Policy existiert nicht
+      AlreadyExists: Default Password Lockout Policy existiert bereits
+      Empty: Default Password Lockout Policy leer
   Policy:
     AlreadyExists: Policy existiert bereits
   UserGrant:

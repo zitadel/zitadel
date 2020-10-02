@@ -16,8 +16,6 @@ import (
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
-	policy_model "github.com/caos/zitadel/internal/policy/model"
-	policy_es "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
@@ -26,10 +24,9 @@ const (
 )
 
 type OrgRepository struct {
-	SearchLimit      uint64
-	OrgEventstore    *org_es.OrgEventstore
-	UserEventstore   *usr_es.UserEventstore
-	PolicyEventstore *policy_es.PolicyEventstore
+	SearchLimit    uint64
+	OrgEventstore  *org_es.OrgEventstore
+	UserEventstore *usr_es.UserEventstore
 
 	View           *auth_view.View
 	SystemDefaults systemdefaults.SystemDefaults
@@ -62,7 +59,7 @@ func (repo *OrgRepository) RegisterOrg(ctx context.Context, register *auth_model
 		return nil, err
 	}
 	pwPolicyView := iam_view_model.PasswordComplexityViewToModel(pwPolicy)
-	orgPolicy, err := repo.OrgEventstore.GetOrgIAMPolicy(ctx, policy_model.DefaultPolicy)
+	orgPolicy, err := repo.OrgEventstore.GetOrgIAMPolicy(ctx, "0")
 	if err != nil {
 		return nil, err
 	}

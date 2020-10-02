@@ -14,8 +14,6 @@ import (
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
-	policy_model "github.com/caos/zitadel/internal/policy/model"
-	policy_es "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
@@ -24,10 +22,9 @@ const (
 )
 
 type OrgRepo struct {
-	Eventstore       eventstore.Eventstore
-	OrgEventstore    *org_es.OrgEventstore
-	UserEventstore   *usr_es.UserEventstore
-	PolicyEventstore *policy_es.PolicyEventstore
+	Eventstore     eventstore.Eventstore
+	OrgEventstore  *org_es.OrgEventstore
+	UserEventstore *usr_es.UserEventstore
 
 	View *admin_view.View
 
@@ -41,7 +38,7 @@ func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) 
 		return nil, err
 	}
 	pwPolicyView := iam_view.PasswordComplexityViewToModel(pwPolicy)
-	orgPolicy, err := repo.OrgEventstore.GetOrgIAMPolicy(ctx, policy_model.DefaultPolicy)
+	orgPolicy, err := repo.OrgEventstore.GetOrgIAMPolicy(ctx, "0")
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +91,7 @@ func (repo *OrgRepo) SearchOrgs(ctx context.Context, query *org_model.OrgSearchR
 	result := &org_model.OrgSearchResult{
 		Offset:      query.Offset,
 		Limit:       query.Limit,
-		TotalResult: uint64(count),
+		TotalResult: count,
 		Result:      model.OrgsToModel(orgs),
 	}
 	if err == nil {

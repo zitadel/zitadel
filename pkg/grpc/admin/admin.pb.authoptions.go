@@ -173,4 +173,24 @@ var AdminService_AuthMethods = authz.MethodMapping{
 		Permission: "iam.policy.write",
 		CheckParam: "",
 	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultPasswordAgePolicy": authz.Option{
+		Permission: "iam.policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/UpdateDefaultPasswordAgePolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultPasswordLockoutPolicy": authz.Option{
+		Permission: "iam.policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/UpdateDefaultPasswordLockoutPolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
 }

@@ -13,7 +13,6 @@ import (
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/spooler"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	es_pol "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_grant "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
@@ -33,7 +32,6 @@ type EsRepository struct {
 	eventstore.ProjectRepo
 	eventstore.UserRepo
 	eventstore.UserGrantRepo
-	eventstore.PolicyRepo
 	eventstore.IAMRepository
 }
 
@@ -53,13 +51,6 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 	}
 
 	project, err := es_proj.StartProject(es_proj.ProjectConfig{
-		Eventstore: es,
-		Cache:      conf.Eventstore.Cache,
-	}, systemDefaults)
-	if err != nil {
-		return nil, err
-	}
-	policy, err := es_pol.StartPolicy(es_pol.PolicyConfig{
 		Eventstore: es,
 		Cache:      conf.Eventstore.Cache,
 	}, systemDefaults)
@@ -96,9 +87,8 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 		spooler:       spool,
 		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, org, user, view, roles, systemDefaults},
 		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, project, usergrant, user, iam, view, roles, systemDefaults.IamID},
-		UserRepo:      eventstore.UserRepo{conf.SearchLimit, user, policy, org, view, systemDefaults},
+		UserRepo:      eventstore.UserRepo{conf.SearchLimit, user, org, view, systemDefaults},
 		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
-		PolicyRepo:    eventstore.PolicyRepo{policy},
 		IAMRepository: eventstore.IAMRepository{iam},
 	}, nil
 }

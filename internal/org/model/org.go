@@ -18,6 +18,8 @@ type Org struct {
 	OrgIamPolicy             *OrgIAMPolicy
 	LoginPolicy              *iam_model.LoginPolicy
 	PasswordComplexityPolicy *iam_model.PasswordComplexityPolicy
+	PasswordAgePolicy        *iam_model.PasswordAgePolicy
+	PasswordLockoutPolicy    *iam_model.PasswordLockoutPolicy
 
 	IDPs []*iam_model.IDPConfig
 }

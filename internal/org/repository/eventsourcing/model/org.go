@@ -26,6 +26,8 @@ type Org struct {
 	IDPs                     []*iam_es_model.IDPConfig              `json:"-"`
 	LoginPolicy              *iam_es_model.LoginPolicy              `json:"-"`
 	PasswordComplexityPolicy *iam_es_model.PasswordComplexityPolicy `json:"-"`
+	PasswordAgePolicy        *iam_es_model.PasswordAgePolicy        `json:"-"`
+	PasswordLockoutPolicy    *iam_es_model.PasswordLockoutPolicy    `json:"-"`
 }
 
 func OrgFromModel(org *org_model.Org) *Org {
@@ -49,6 +51,12 @@ func OrgFromModel(org *org_model.Org) *Org {
 	if org.PasswordComplexityPolicy != nil {
 		converted.PasswordComplexityPolicy = iam_es_model.PasswordComplexityPolicyFromModel(org.PasswordComplexityPolicy)
 	}
+	if org.PasswordAgePolicy != nil {
+		converted.PasswordAgePolicy = iam_es_model.PasswordAgePolicyFromModel(org.PasswordAgePolicy)
+	}
+	if org.PasswordLockoutPolicy != nil {
+		converted.PasswordLockoutPolicy = iam_es_model.PasswordLockoutPolicyFromModel(org.PasswordLockoutPolicy)
+	}
 	return converted
 }
 
@@ -69,6 +77,12 @@ func OrgToModel(org *Org) *org_model.Org {
 	}
 	if org.PasswordComplexityPolicy != nil {
 		converted.PasswordComplexityPolicy = iam_es_model.PasswordComplexityPolicyToModel(org.PasswordComplexityPolicy)
+	}
+	if org.PasswordAgePolicy != nil {
+		converted.PasswordAgePolicy = iam_es_model.PasswordAgePolicyToModel(org.PasswordAgePolicy)
+	}
+	if org.PasswordLockoutPolicy != nil {
+		converted.PasswordLockoutPolicy = iam_es_model.PasswordLockoutPolicyToModel(org.PasswordLockoutPolicy)
 	}
 	return converted
 }
@@ -177,6 +191,18 @@ func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 		err = o.appendChangePasswordComplexityPolicyEvent(event)
 	case PasswordComplexityPolicyRemoved:
 		o.appendRemovePasswordComplexityPolicyEvent(event)
+	case PasswordAgePolicyAdded:
+		err = o.appendAddPasswordAgePolicyEvent(event)
+	case PasswordAgePolicyChanged:
+		err = o.appendChangePasswordAgePolicyEvent(event)
+	case PasswordAgePolicyRemoved:
+		o.appendRemovePasswordAgePolicyEvent(event)
+	case PasswordLockoutPolicyAdded:
+		err = o.appendAddPasswordLockoutPolicyEvent(event)
+	case PasswordLockoutPolicyChanged:
+		err = o.appendChangePasswordLockoutPolicyEvent(event)
+	case PasswordLockoutPolicyRemoved:
+		o.appendRemovePasswordLockoutPolicyEvent(event)
 	}
 	if err != nil {
 		return err

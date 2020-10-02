@@ -333,6 +333,76 @@ func PasswordComplexityPolicyChangedAggregate(aggCreator *es_models.AggregateCre
 	}
 }
 
+func PasswordAgePolicyAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.PasswordAgePolicy) (*es_models.Aggregate, error) {
+	if policy == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-T7sui", "Errors.Internal")
+	}
+	agg, err := IAMAggregate(ctx, aggCreator, existing)
+	if err != nil {
+		return nil, err
+	}
+	validationQuery := es_models.NewSearchQuery().
+		AggregateTypeFilter(model.IAMAggregate).
+		EventTypesFilter(model.PasswordAgePolicyAdded).
+		AggregateIDFilter(existing.AggregateID)
+
+	validation := checkExistingPasswordAgePolicyValidation()
+	agg.SetPrecondition(validationQuery, validation)
+	return agg.AppendEvent(model.PasswordAgePolicyAdded, policy)
+}
+
+func PasswordAgePolicyChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.PasswordAgePolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if policy == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-3Gs0o", "Errors.Internal")
+		}
+		agg, err := IAMAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		changes := existing.DefaultPasswordAgePolicy.Changes(policy)
+		if len(changes) == 0 {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-3Wdos", "Errors.NoChangesFound")
+		}
+		return agg.AppendEvent(model.PasswordAgePolicyChanged, changes)
+	}
+}
+
+func PasswordLockoutPolicyAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.PasswordLockoutPolicy) (*es_models.Aggregate, error) {
+	if policy == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-w5Tds", "Errors.Internal")
+	}
+	agg, err := IAMAggregate(ctx, aggCreator, existing)
+	if err != nil {
+		return nil, err
+	}
+	validationQuery := es_models.NewSearchQuery().
+		AggregateTypeFilter(model.IAMAggregate).
+		EventTypesFilter(model.PasswordLockoutPolicyAdded).
+		AggregateIDFilter(existing.AggregateID)
+
+	validation := checkExistingPasswordLockoutPolicyValidation()
+	agg.SetPrecondition(validationQuery, validation)
+	return agg.AppendEvent(model.PasswordLockoutPolicyAdded, policy)
+}
+
+func PasswordLockoutPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.PasswordLockoutPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if policy == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-2D0fs", "Errors.Internal")
+		}
+		agg, err := IAMAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		changes := existing.DefaultPasswordLockoutPolicy.Changes(policy)
+		if len(changes) == 0 {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-7Hsk9", "Errors.NoChangesFound")
+		}
+		return agg.AppendEvent(model.PasswordLockoutPolicyChanged, changes)
+	}
+}
+
 func checkExistingLoginPolicyValidation() func(...*es_models.Event) error {
 	return func(events ...*es_models.Event) error {
 		for _, event := range events {
@@ -351,6 +421,30 @@ func checkExistingPasswordComplexityPolicyValidation() func(...*es_models.Event)
 			switch event.Type {
 			case model.PasswordComplexityPolicyAdded:
 				return errors.ThrowPreconditionFailed(nil, "EVENT-Ski9d", "Errors.IAM.PasswordComplexityPolicy.AlreadyExists")
+			}
+		}
+		return nil
+	}
+}
+
+func checkExistingPasswordAgePolicyValidation() func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		for _, event := range events {
+			switch event.Type {
+			case model.PasswordAgePolicyAdded:
+				return errors.ThrowPreconditionFailed(nil, "EVENT-Ski9d", "Errors.IAM.PasswordAgePolicy.AlreadyExists")
+			}
+		}
+		return nil
+	}
+}
+
+func checkExistingPasswordLockoutPolicyValidation() func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		for _, event := range events {
+			switch event.Type {
+			case model.PasswordLockoutPolicyAdded:
+				return errors.ThrowPreconditionFailed(nil, "EVENT-Ski9d", "Errors.IAM.PasswordLockoutPolicy.AlreadyExists")
 			}
 		}
 		return nil

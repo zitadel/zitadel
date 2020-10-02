@@ -39,6 +39,6 @@ func (s *Server) UpdatePasswordComplexityPolicy(ctx context.Context, policy *man
 }
 
 func (s *Server) RemovePasswordComplexityPolicy(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
-	err := s.org.RemoveLoginPolicy(ctx)
+	err := s.org.RemovePasswordComplexityPolicy(ctx)
 	return &empty.Empty{}, err
 }

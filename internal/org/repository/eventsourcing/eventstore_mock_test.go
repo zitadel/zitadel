@@ -123,3 +123,37 @@ func GetMockChangesOrgWithPasswordComplexityPolicy(ctrl *gomock.Controller) *Org
 	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
 	return GetMockedEventstore(ctrl, mockEs)
 }
+
+func GetMockChangesOrgWithPasswordLockoutPolicy(ctrl *gomock.Controller) *OrgEventstore {
+	orgData, _ := json.Marshal(model.Org{Name: "MusterOrg"})
+	passwordLockoutPolicy, _ := json.Marshal(iam_es_model.PasswordLockoutPolicy{
+		MaxAttempts:         10,
+		ShowLockOutFailures: true,
+	})
+	events := []*es_models.Event{
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.OrgAdded, Data: orgData},
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.PasswordLockoutPolicyAdded, Data: passwordLockoutPolicy},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
+func GetMockChangesOrgWithPasswordAgePolicy(ctrl *gomock.Controller) *OrgEventstore {
+	orgData, _ := json.Marshal(model.Org{Name: "MusterOrg"})
+	passwordAgePolicy, _ := json.Marshal(iam_es_model.PasswordAgePolicy{
+		MaxAgeDays:     10,
+		ExpireWarnDays: 10,
+	})
+	events := []*es_models.Event{
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.OrgAdded, Data: orgData},
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.PasswordAgePolicyAdded, Data: passwordAgePolicy},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}

@@ -8,6 +8,8 @@ import (
 type IAMSetUp struct {
 	Step1 *Step1
 	Step2 *Step2
+	Step3 *Step3
+	Step4 *Step4
 }
 
 func (setup *IAMSetUp) steps(currentDone iam_model.Step) ([]step, error) {
@@ -17,6 +19,8 @@ func (setup *IAMSetUp) steps(currentDone iam_model.Step) ([]step, error) {
 	for _, step := range []step{
 		setup.Step1,
 		setup.Step2,
+		setup.Step3,
+		setup.Step4,
 	} {
 		if step.step() <= currentDone {
 			continue
@@ -41,12 +45,6 @@ type LoginPolicy struct {
 	AllowUsernamePassword bool
 	AllowExternalIdp      bool
 }
-
-//TODO: label policy
-// type LabelPolicy struct {
-// 	PrimaryColor  string
-// 	SecondayColor string
-// }
 
 type User struct {
 	FirstName string

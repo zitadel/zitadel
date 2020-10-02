@@ -430,3 +430,85 @@ func (repo *OrgRepository) RemovePasswordComplexityPolicy(ctx context.Context) e
 	}}
 	return repo.OrgEventstore.RemovePasswordComplexityPolicy(ctx, policy)
 }
+
+func (repo *OrgRepository) GetPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error) {
+	policy, err := repo.View.PasswordAgePolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if errors.IsNotFound(err) {
+		policy, err = repo.View.PasswordAgePolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
+		policy.Default = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.PasswordAgeViewToModel(policy), err
+}
+
+func (repo *OrgRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error) {
+	policy, err := repo.View.PasswordAgePolicyByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	policy.Default = true
+	return iam_es_model.PasswordAgeViewToModel(policy), err
+}
+
+func (repo *OrgRepository) AddPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
+	policy.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.AddPasswordAgePolicy(ctx, policy)
+}
+
+func (repo *OrgRepository) ChangePasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
+	policy.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.ChangePasswordAgePolicy(ctx, policy)
+}
+
+func (repo *OrgRepository) RemovePasswordAgePolicy(ctx context.Context) error {
+	policy := &iam_model.PasswordAgePolicy{ObjectRoot: models.ObjectRoot{
+		AggregateID: authz.GetCtxData(ctx).OrgID,
+	}}
+	return repo.OrgEventstore.RemovePasswordAgePolicy(ctx, policy)
+}
+
+func (repo *OrgRepository) GetPasswordLockoutPolicy(ctx context.Context) (*iam_model.PasswordLockoutPolicyView, error) {
+	policy, err := repo.View.PasswordLockoutPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if errors.IsNotFound(err) {
+		policy, err = repo.View.PasswordLockoutPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
+		policy.Default = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.PasswordLockoutViewToModel(policy), err
+}
+
+func (repo *OrgRepository) GetDefaultPasswordLockoutPolicy(ctx context.Context) (*iam_model.PasswordLockoutPolicyView, error) {
+	policy, err := repo.View.PasswordLockoutPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	policy.Default = true
+	return iam_es_model.PasswordLockoutViewToModel(policy), err
+}
+
+func (repo *OrgRepository) AddPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
+	policy.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.AddPasswordLockoutPolicy(ctx, policy)
+}
+
+func (repo *OrgRepository) ChangePasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
+	policy.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.ChangePasswordLockoutPolicy(ctx, policy)
+}
+
+func (repo *OrgRepository) RemovePasswordLockoutPolicy(ctx context.Context) error {
+	policy := &iam_model.PasswordLockoutPolicy{ObjectRoot: models.ObjectRoot{
+		AggregateID: authz.GetCtxData(ctx).OrgID,
+	}}
+	return repo.OrgEventstore.RemovePasswordLockoutPolicy(ctx, policy)
+}

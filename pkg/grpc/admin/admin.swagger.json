@@ -947,6 +947,58 @@
         ]
       }
     },
+    "/policies/password/age": {
+      "get": {
+        "operationId": "AdminService_GetDefaultPasswordAgePolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordAgePolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "operationId": "AdminService_UpdateDefaultPasswordAgePolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordAgePolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordAgePolicy"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/policies/password/complexity": {
       "get": {
         "operationId": "AdminService_GetDefaultPasswordComplexityPolicy",
@@ -991,6 +1043,58 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/v1DefaultPasswordComplexityPolicy"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/password/lockout": {
+      "get": {
+        "operationId": "AdminService_GetDefaultPasswordLockoutPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordLockoutPolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "operationId": "AdminService_UpdateDefaultPasswordLockoutPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordLockoutPolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordLockoutPolicy"
             }
           }
         ],
@@ -1278,6 +1382,14 @@
         "allow_external_idp": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -1295,6 +1407,56 @@
         "allow_external_idp": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultPasswordAgePolicy": {
+      "type": "object",
+      "properties": {
+        "max_age_days": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "expire_warn_days": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultPasswordAgePolicyView": {
+      "type": "object",
+      "properties": {
+        "max_age_days": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "expire_warn_days": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -1320,6 +1482,14 @@
         "has_symbol": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -1345,6 +1515,56 @@
         "has_symbol": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultPasswordLockoutPolicy": {
+      "type": "object",
+      "properties": {
+        "max_attempts": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "show_lockout_failure": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultPasswordLockoutPolicyView": {
+      "type": "object",
+      "properties": {
+        "max_attempts": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "show_lockout_failure": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

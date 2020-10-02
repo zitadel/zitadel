@@ -4132,6 +4132,26 @@ func (m *DefaultLoginPolicy) Validate() error {
 
 	// no validation rules for AllowExternalIdp
 
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultLoginPolicyValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultLoginPolicyValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -4276,6 +4296,26 @@ func (m *DefaultLoginPolicyView) Validate() error {
 	// no validation rules for AllowRegister
 
 	// no validation rules for AllowExternalIdp
+
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultLoginPolicyViewValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultLoginPolicyViewValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	return nil
 }
@@ -4596,6 +4636,26 @@ func (m *DefaultPasswordComplexityPolicy) Validate() error {
 
 	// no validation rules for HasSymbol
 
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultPasswordComplexityPolicyValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultPasswordComplexityPolicyValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -4674,6 +4734,26 @@ func (m *DefaultPasswordComplexityPolicyView) Validate() error {
 
 	// no validation rules for HasSymbol
 
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultPasswordComplexityPolicyViewValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultPasswordComplexityPolicyViewValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -4733,3 +4813,370 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DefaultPasswordComplexityPolicyViewValidationError{}
+
+// Validate checks the field values on DefaultPasswordAgePolicy with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DefaultPasswordAgePolicy) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for MaxAgeDays
+
+	// no validation rules for ExpireWarnDays
+
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultPasswordAgePolicyValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultPasswordAgePolicyValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// DefaultPasswordAgePolicyValidationError is the validation error returned by
+// DefaultPasswordAgePolicy.Validate if the designated constraints aren't met.
+type DefaultPasswordAgePolicyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultPasswordAgePolicyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultPasswordAgePolicyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultPasswordAgePolicyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultPasswordAgePolicyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultPasswordAgePolicyValidationError) ErrorName() string {
+	return "DefaultPasswordAgePolicyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DefaultPasswordAgePolicyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultPasswordAgePolicy.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultPasswordAgePolicyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultPasswordAgePolicyValidationError{}
+
+// Validate checks the field values on DefaultPasswordAgePolicyView with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DefaultPasswordAgePolicyView) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for MaxAgeDays
+
+	// no validation rules for ExpireWarnDays
+
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultPasswordAgePolicyViewValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultPasswordAgePolicyViewValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// DefaultPasswordAgePolicyViewValidationError is the validation error returned
+// by DefaultPasswordAgePolicyView.Validate if the designated constraints
+// aren't met.
+type DefaultPasswordAgePolicyViewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultPasswordAgePolicyViewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultPasswordAgePolicyViewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultPasswordAgePolicyViewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultPasswordAgePolicyViewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultPasswordAgePolicyViewValidationError) ErrorName() string {
+	return "DefaultPasswordAgePolicyViewValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DefaultPasswordAgePolicyViewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultPasswordAgePolicyView.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultPasswordAgePolicyViewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultPasswordAgePolicyViewValidationError{}
+
+// Validate checks the field values on DefaultPasswordLockoutPolicy with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DefaultPasswordLockoutPolicy) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for MaxAttempts
+
+	// no validation rules for ShowLockoutFailure
+
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultPasswordLockoutPolicyValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultPasswordLockoutPolicyValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// DefaultPasswordLockoutPolicyValidationError is the validation error returned
+// by DefaultPasswordLockoutPolicy.Validate if the designated constraints
+// aren't met.
+type DefaultPasswordLockoutPolicyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultPasswordLockoutPolicyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultPasswordLockoutPolicyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultPasswordLockoutPolicyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultPasswordLockoutPolicyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultPasswordLockoutPolicyValidationError) ErrorName() string {
+	return "DefaultPasswordLockoutPolicyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DefaultPasswordLockoutPolicyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultPasswordLockoutPolicy.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultPasswordLockoutPolicyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultPasswordLockoutPolicyValidationError{}
+
+// Validate checks the field values on DefaultPasswordLockoutPolicyView with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *DefaultPasswordLockoutPolicyView) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for MaxAttempts
+
+	// no validation rules for ShowLockoutFailure
+
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultPasswordLockoutPolicyViewValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultPasswordLockoutPolicyViewValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// DefaultPasswordLockoutPolicyViewValidationError is the validation error
+// returned by DefaultPasswordLockoutPolicyView.Validate if the designated
+// constraints aren't met.
+type DefaultPasswordLockoutPolicyViewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultPasswordLockoutPolicyViewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultPasswordLockoutPolicyViewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultPasswordLockoutPolicyViewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultPasswordLockoutPolicyViewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultPasswordLockoutPolicyViewValidationError) ErrorName() string {
+	return "DefaultPasswordLockoutPolicyViewValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DefaultPasswordLockoutPolicyViewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultPasswordLockoutPolicyView.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultPasswordLockoutPolicyViewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultPasswordLockoutPolicyViewValidationError{}

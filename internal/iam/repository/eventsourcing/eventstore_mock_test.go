@@ -135,6 +135,32 @@ func GetMockManipulateIamWithPasswodComplexityPolicy(ctrl *gomock.Controller) *I
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
+func GetMockManipulateIamWithPasswordAgePolicy(ctrl *gomock.Controller) *IAMEventstore {
+	policyData, _ := json.Marshal(model.PasswordAgePolicy{MaxAgeDays: 10, ExpireWarnDays: 10})
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.IAMSetupStarted},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.PasswordAgePolicyAdded, Data: policyData},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
+func GetMockManipulateIamWithPasswordLockoutPolicy(ctrl *gomock.Controller) *IAMEventstore {
+	policyData, _ := json.Marshal(model.PasswordLockoutPolicy{MaxAttempts: 10, ShowLockOutFailures: true})
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.IAMSetupStarted},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.PasswordLockoutPolicyAdded, Data: policyData},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
 func GetMockManipulateIamNotExisting(ctrl *gomock.Controller) *IAMEventstore {
 	events := []*es_models.Event{}
 	mockEs := mock.NewMockEventstore(ctrl)

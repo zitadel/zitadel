@@ -80,3 +80,11 @@ SetUp:
       HasUppercase: true
       HasSymbol: true
       HasNumber: true
+  Step3:
+    DefaultPasswordAgePolicy:
+      MaxAgeDays: 0
+      ExpireWarnDays: 0
+  Step4:
+    DefaultPasswordLockoutPolicy:
+      MaxAttempts: 5
+      ShowLockOutFailures: false

@@ -13,7 +13,6 @@ import (
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	es_policy "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
@@ -56,13 +55,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 	if err != nil {
 		return nil, err
 	}
-	policy, err := es_policy.StartPolicy(es_policy.PolicyConfig{
-		Eventstore: es,
-		Cache:      conf.Eventstore.Cache,
-	}, systemDefaults)
-	if err != nil {
-		return nil, err
-	}
 	sqlClient, err := conf.View.Start()
 	if err != nil {
 		return nil, err
@@ -77,13 +69,12 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 	return &EsRepository{
 		spooler: spool,
 		OrgRepo: eventstore.OrgRepo{
-			Eventstore:       es,
-			OrgEventstore:    org,
-			UserEventstore:   user,
-			PolicyEventstore: policy,
-			View:             view,
-			SearchLimit:      conf.SearchLimit,
-			SystemDefaults:   systemDefaults,
+			Eventstore:     es,
+			OrgEventstore:  org,
+			UserEventstore: user,
+			View:           view,
+			SearchLimit:    conf.SearchLimit,
+			SystemDefaults: systemDefaults,
 		},
 		IAMRepository: eventstore.IAMRepository{
 			IAMEventstore:  iam,
@@ -99,7 +90,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 		},
 		UserRepo: eventstore.UserRepo{
 			UserEvents:     user,
-			PolicyEvents:   policy,
 			OrgEvents:      org,
 			View:           view,
 			SystemDefaults: systemDefaults,
