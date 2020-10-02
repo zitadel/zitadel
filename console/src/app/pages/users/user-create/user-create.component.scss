@@ -15,7 +15,8 @@
 
 .content {
   width: 100%;
-  display: flex wrap;
+  display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
   margin: 0 -.5rem;
 

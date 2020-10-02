@@ -17,6 +17,10 @@
   src: url(assets/ailerons.otf) format('opentype');
 }
 
+:root {
+    --grey: #8795a1,
+}
+
 $caos-dark-brand: (
   50: #fff,
   100: #dde6f3,

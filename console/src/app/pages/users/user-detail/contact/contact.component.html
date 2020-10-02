@@ -59,7 +59,8 @@
                     aria-label="verified icon">
                     check_circle_outline</mat-icon>
                 <ng-container *ngIf="human?.phone && !human?.isPhoneVerified">
-                    <mat-icon class="icon" color="warn" aria-hidden="false" aria-label="not verified icon">
+                    <mat-icon class="icon" matTooltip="not verified" color="warn" aria-hidden="false"
+                        aria-label="not verified icon">
                         highlight_off
                     </mat-icon>
                     <a *ngIf="!disablePhoneCode && !canWrite" class="verify"
