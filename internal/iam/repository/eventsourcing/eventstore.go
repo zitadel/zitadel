@@ -548,6 +548,7 @@ func (es *IAMEventstore) PrepareAddPasswordComplexityPolicy(ctx context.Context,
 	}
 	return repoIam, addAggregate, nil
 }
+
 func (es *IAMEventstore) AddPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
 	repoIam, addAggregate, err := es.PrepareAddPasswordComplexityPolicy(ctx, policy)
 	if err != nil {
@@ -689,4 +690,57 @@ func (es *IAMEventstore) ChangePasswordLockoutPolicy(ctx context.Context, policy
 	}
 	es.iamCache.cacheIAM(repoIam)
 	return model.PasswordLockoutPolicyToModel(repoIam.DefaultPasswordLockoutPolicy), nil
+}
+
+func (es *IAMEventstore) PrepareAddOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*model.IAM, *models.Aggregate, error) {
+	if policy == nil || policy.AggregateID == "" {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-3R56z", "Errors.IAM.OrgIAMPolicy.Empty")
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoOrgIAMPolicy := model.OrgIAMPolicyFromModel(policy)
+
+	addAggregate, err := OrgIAMPolicyAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoIam, repoOrgIAMPolicy)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoIam, addAggregate, nil
+}
+
+func (es *IAMEventstore) AddOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
+	repoIam, addAggregate, err := es.PrepareAddOrgIAMPolicy(ctx, policy)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.OrgIAMPolicyToModel(repoIam.DefaultOrgIAMPolicy), nil
+}
+
+func (es *IAMEventstore) ChangeOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
+	if policy == nil || policy.AggregateID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-6Zsj9", "Errors.IAM.OrgIAMPolicy.Empty")
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoOrgIAMPolicy := model.OrgIAMPolicyFromModel(policy)
+
+	addAggregate := OrgIAMPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoOrgIAMPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.OrgIAMPolicyToModel(repoIam.DefaultOrgIAMPolicy), nil
 }

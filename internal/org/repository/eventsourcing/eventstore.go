@@ -27,7 +27,6 @@ type OrgEventstore struct {
 	idGenerator           id.Generator
 	verificationAlgorithm crypto.EncryptionAlgorithm
 	verificationGenerator crypto.Generator
-	defaultOrgIamPolicy   *org_model.OrgIAMPolicy
 	verificationValidator func(domain string, token string, verifier string, checkType http_utils.CheckType) error
 	secretCrypto          crypto.Crypto
 }
@@ -39,9 +38,6 @@ type OrgConfig struct {
 }
 
 func StartOrg(conf OrgConfig, defaults systemdefaults.SystemDefaults) *OrgEventstore {
-	policy := defaults.DefaultPolicies.OrgIam
-	policy.Default = true
-	policy.IamDomain = conf.IAMDomain
 	verificationAlg, err := crypto.NewAESCrypto(defaults.DomainVerification.VerificationKey)
 	logging.Log("EVENT-aZ22d").OnError(err).Panic("cannot create verificationAlgorithm for domain verification")
 	verificationGen := crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, verificationAlg)
@@ -57,7 +53,6 @@ func StartOrg(conf OrgConfig, defaults systemdefaults.SystemDefaults) *OrgEvents
 		verificationValidator: http_utils.ValidateDomain,
 		IAMDomain:             conf.IAMDomain,
 		IamID:                 defaults.IamID,
-		defaultOrgIamPolicy:   &policy,
 		secretCrypto:          aesCrypto,
 	}
 }
@@ -464,22 +459,7 @@ func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.
 	return es_sdk.Push(ctx, es.PushAggregates, repoMember.AppendEvents, orgAggregate)
 }
 
-func (es *OrgEventstore) GetDefaultOrgIAMPolicy(ctx context.Context) *org_model.OrgIAMPolicy {
-	return es.defaultOrgIamPolicy
-}
-
-func (es *OrgEventstore) GetOrgIAMPolicy(ctx context.Context, orgID string) (*org_model.OrgIAMPolicy, error) {
-	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
-	if err != nil && !errors.IsNotFound(err) {
-		return nil, err
-	}
-	if existingOrg != nil && existingOrg.OrgIamPolicy != nil {
-		return existingOrg.OrgIamPolicy, nil
-	}
-	return es.defaultOrgIamPolicy, nil
-}
-
-func (es *OrgEventstore) AddOrgIAMPolicy(ctx context.Context, policy *org_model.OrgIAMPolicy) (*org_model.OrgIAMPolicy, error) {
+func (es *OrgEventstore) AddOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
 	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
 	if err != nil {
 		return nil, err
@@ -488,7 +468,7 @@ func (es *OrgEventstore) AddOrgIAMPolicy(ctx context.Context, policy *org_model.
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-7Usj3", "Errors.Org.PolicyAlreadyExists")
 	}
 	repoOrg := model.OrgFromModel(existingOrg)
-	repoPolicy := model.OrgIAMPolicyFromModel(policy)
+	repoPolicy := iam_es_model.OrgIAMPolicyFromModel(policy)
 	orgAggregate := OrgIAMPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPolicy)
 	if err != nil {
 		return nil, err
@@ -498,10 +478,10 @@ func (es *OrgEventstore) AddOrgIAMPolicy(ctx context.Context, policy *org_model.
 		return nil, err
 	}
 
-	return model.OrgIAMPolicyToModel(repoOrg.OrgIamPolicy), nil
+	return iam_es_model.OrgIAMPolicyToModel(repoOrg.OrgIamPolicy), nil
 }
 
-func (es *OrgEventstore) ChangeOrgIAMPolicy(ctx context.Context, policy *org_model.OrgIAMPolicy) (*org_model.OrgIAMPolicy, error) {
+func (es *OrgEventstore) ChangeOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
 	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
 	if err != nil {
 		return nil, err
@@ -510,7 +490,7 @@ func (es *OrgEventstore) ChangeOrgIAMPolicy(ctx context.Context, policy *org_mod
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-8juSd", "Errors.Org.PolicyNotExisting")
 	}
 	repoOrg := model.OrgFromModel(existingOrg)
-	repoPolicy := model.OrgIAMPolicyFromModel(policy)
+	repoPolicy := iam_es_model.OrgIAMPolicyFromModel(policy)
 	orgAggregate := OrgIAMPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPolicy)
 	if err != nil {
 		return nil, err
@@ -520,7 +500,7 @@ func (es *OrgEventstore) ChangeOrgIAMPolicy(ctx context.Context, policy *org_mod
 		return nil, err
 	}
 
-	return model.OrgIAMPolicyToModel(repoOrg.OrgIamPolicy), nil
+	return iam_es_model.OrgIAMPolicyToModel(repoOrg.OrgIamPolicy), nil
 }
 
 func (es *OrgEventstore) RemoveOrgIAMPolicy(ctx context.Context, orgID string) error {

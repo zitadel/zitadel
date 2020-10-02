@@ -101,6 +101,10 @@ Errors:
       Empty: Passwort Age Policy ist leer
       NotExisting: Passwort Age Policy existiert nicht
       AlreadyExists: Passwort Age Policy existiert bereits
+    OrgIAM:
+      Empty: Org IAM Policy ist leer
+      NotExisting: Org IAM Policy existiert nicht
+      AlreadyExists: Org IAM Policy existiert bereits
   Project:
     ProjectIDMissing: Project Id fehlt
     AlreadyExists: Project existiert bereits auf der Organisation
@@ -165,6 +169,10 @@ Errors:
       NotExisting: Default Password Lockout Policy existiert nicht
       AlreadyExists: Default Password Lockout Policy existiert bereits
       Empty: Default Password Lockout Policy leer
+    OrgIAM:
+      NotExisting: Default Org IAM Policy existiert nicht
+      AlreadyExists: Default Org IAM Policy existiert bereits
+      Empty: Default Org IAM Policy leer
   Policy:
     AlreadyExists: Policy existiert bereits
   UserGrant:

@@ -403,6 +403,41 @@ func PasswordLockoutPolicyChangedAggregate(aggCreator *es_models.AggregateCreato
 	}
 }
 
+func OrgIAMPolicyAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.OrgIAMPolicy) (*es_models.Aggregate, error) {
+	if policy == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-w5Tds", "Errors.Internal")
+	}
+	agg, err := IAMAggregate(ctx, aggCreator, existing)
+	if err != nil {
+		return nil, err
+	}
+	validationQuery := es_models.NewSearchQuery().
+		AggregateTypeFilter(model.IAMAggregate).
+		EventTypesFilter(model.OrgIAMPolicyAdded).
+		AggregateIDFilter(existing.AggregateID)
+
+	validation := checkExistingOrgIAMPolicyValidation()
+	agg.SetPrecondition(validationQuery, validation)
+	return agg.AppendEvent(model.OrgIAMPolicyAdded, policy)
+}
+
+func OrgIAMPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.OrgIAMPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if policy == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-2D0fs", "Errors.Internal")
+		}
+		agg, err := IAMAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		changes := existing.DefaultOrgIAMPolicy.Changes(policy)
+		if len(changes) == 0 {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-7Hsk9", "Errors.NoChangesFound")
+		}
+		return agg.AppendEvent(model.OrgIAMPolicyChanged, changes)
+	}
+}
+
 func checkExistingLoginPolicyValidation() func(...*es_models.Event) error {
 	return func(events ...*es_models.Event) error {
 		for _, event := range events {
@@ -445,6 +480,18 @@ func checkExistingPasswordLockoutPolicyValidation() func(...*es_models.Event) er
 			switch event.Type {
 			case model.PasswordLockoutPolicyAdded:
 				return errors.ThrowPreconditionFailed(nil, "EVENT-Ski9d", "Errors.IAM.PasswordLockoutPolicy.AlreadyExists")
+			}
+		}
+		return nil
+	}
+}
+
+func checkExistingOrgIAMPolicyValidation() func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		for _, event := range events {
+			switch event.Type {
+			case model.OrgIAMPolicyAdded:
+				return errors.ThrowPreconditionFailed(nil, "EVENT-bSm8f", "Errors.IAM.OrgIAMPolicy.AlreadyExists")
 			}
 		}
 		return nil

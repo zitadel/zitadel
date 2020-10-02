@@ -136,7 +136,7 @@ func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
 	if err != nil {
 		return err
 	}
-	policy, err := u.orgEvents.GetOrgIAMPolicy(context.Background(), event.ResourceOwner)
+	policy, err := u.view.OrgIAMPolicyByAggregateID(event.ResourceOwner)
 	if err != nil {
 		return err
 	}

@@ -2093,3 +2093,156 @@ func TestChangePasswordLockoutPolicy(t *testing.T) {
 		})
 	}
 }
+
+func TestAddOrgIAMPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IAMEventstore
+		ctx    context.Context
+		policy *iam_model.OrgIAMPolicy
+	}
+	type res struct {
+		result  *iam_model.OrgIAMPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add org iam policy, ok",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.OrgIAMPolicy{
+					ObjectRoot:            es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					UserLoginMustBeDomain: true,
+				},
+			},
+			res: res{
+				result: &iam_model.OrgIAMPolicy{
+					ObjectRoot:            es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					UserLoginMustBeDomain: true,
+				},
+			},
+		},
+		{
+			name: "empty policy",
+			args: args{
+				es:     GetMockManipulateIam(ctrl),
+				ctx:    authz.NewMockContext("orgID", "userID"),
+				policy: nil,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIamNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.OrgIAMPolicy{
+					ObjectRoot:            es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					UserLoginMustBeDomain: true,
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddOrgIAMPolicy(tt.args.ctx, tt.args.policy)
+
+			if !tt.res.wantErr && result.UserLoginMustBeDomain != tt.res.result.UserLoginMustBeDomain {
+				t.Errorf("got wrong result UserLoginMustBeDomain: expected: %v, actual: %v ", tt.res.result.UserLoginMustBeDomain, result.UserLoginMustBeDomain)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangeOrgIAMPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IAMEventstore
+		ctx    context.Context
+		policy *iam_model.OrgIAMPolicy
+	}
+	type res struct {
+		result  *iam_model.OrgIAMPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change org iam policy, ok",
+			args: args{
+				es:  GetMockManipulateIamWithOrgIAMPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.OrgIAMPolicy{
+					ObjectRoot:            es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					UserLoginMustBeDomain: true,
+				},
+			},
+			res: res{
+				result: &iam_model.OrgIAMPolicy{
+					ObjectRoot:            es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					UserLoginMustBeDomain: true,
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:     GetMockManipulateIam(ctrl),
+				ctx:    authz.NewMockContext("orgID", "userID"),
+				policy: nil,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIamNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.OrgIAMPolicy{
+					ObjectRoot:            es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					UserLoginMustBeDomain: true,
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeOrgIAMPolicy(tt.args.ctx, tt.args.policy)
+
+			if !tt.res.wantErr && result.UserLoginMustBeDomain != tt.res.result.UserLoginMustBeDomain {
+				t.Errorf("got wrong result UserLoginMustBeDomain: expected: %v, actual: %v ", tt.res.result.UserLoginMustBeDomain, result.UserLoginMustBeDomain)
+			}
+
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}

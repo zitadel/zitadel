@@ -108,7 +108,7 @@ func (step *Step1) orgs(ctx context.Context, orgs []Org) error {
 		}
 		step.createdOrgs[iamOrg.Name] = org
 
-		var policy *org_model.OrgIAMPolicy
+		var policy *iam_model.OrgIAMPolicyView
 		if iamOrg.OrgIamPolicy {
 			policy, err = step.iamorgpolicy(ctx, org)
 			if err != nil {
@@ -116,10 +116,8 @@ func (step *Step1) orgs(ctx context.Context, orgs []Org) error {
 				return err
 			}
 		} else {
-			policy, err = step.setup.OrgEvents.GetOrgIAMPolicy(ctx, "0")
-			if err != nil {
-				logging.LogWithFields("SETUP-IS8wS", "Org IAM Policy", iamOrg.Name).WithError(err).Error("unable to get default iam org policy")
-				return err
+			policy = &iam_model.OrgIAMPolicyView{
+				UserLoginMustBeDomain: true,
 			}
 		}
 
@@ -155,13 +153,20 @@ func (step *Step1) org(ctx context.Context, org Org) (*org_model.Org, error) {
 	return step.setup.OrgEvents.CreateOrg(ctx, createOrg, nil)
 }
 
-func (step *Step1) iamorgpolicy(ctx context.Context, org *org_model.Org) (*org_model.OrgIAMPolicy, error) {
+func (step *Step1) iamorgpolicy(ctx context.Context, org *org_model.Org) (*iam_model.OrgIAMPolicyView, error) {
 	ctx = setSetUpContextData(ctx, org.AggregateID)
-	policy := &org_model.OrgIAMPolicy{
+	policy := &iam_model.OrgIAMPolicy{
 		ObjectRoot:            models.ObjectRoot{AggregateID: org.AggregateID},
 		UserLoginMustBeDomain: false,
 	}
-	return step.setup.OrgEvents.AddOrgIAMPolicy(ctx, policy)
+	createdpolicy, err := step.setup.OrgEvents.AddOrgIAMPolicy(ctx, policy)
+	if err != nil {
+		return nil, err
+	}
+	return &iam_model.OrgIAMPolicyView{
+		AggregateID:           org.AggregateID,
+		UserLoginMustBeDomain: createdpolicy.UserLoginMustBeDomain,
+	}, nil
 }
 
 func (step *Step1) iamOwners(ctx context.Context, owners []string) error {
@@ -214,7 +219,7 @@ func (step *Step1) setIamProject(ctx context.Context, iamProjectName string) err
 	return nil
 }
 
-func (step *Step1) users(ctx context.Context, users []User, orgPolicy *org_model.OrgIAMPolicy) error {
+func (step *Step1) users(ctx context.Context, users []User, orgPolicy *iam_model.OrgIAMPolicyView) error {
 	for _, user := range users {
 		created, err := step.user(ctx, user, orgPolicy)
 		if err != nil {
@@ -226,7 +231,7 @@ func (step *Step1) users(ctx context.Context, users []User, orgPolicy *org_model
 	return nil
 }
 
-func (step *Step1) user(ctx context.Context, user User, orgPolicy *org_model.OrgIAMPolicy) (*usr_model.User, error) {
+func (step *Step1) user(ctx context.Context, user User, orgPolicy *iam_model.OrgIAMPolicyView) (*usr_model.User, error) {
 	createUser := &usr_model.User{
 		UserName: user.UserName,
 		Human: &usr_model.Human{

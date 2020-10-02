@@ -7,16 +7,7 @@ import (
 type OrgIAMPolicy struct {
 	models.ObjectRoot
 
-	Description           string
 	State                 PolicyState
 	UserLoginMustBeDomain bool
-	Default               bool
 	IamDomain             string
 }
-
-type PolicyState int32
-
-const (
-	PolicyStateActive PolicyState = iota
-	PolicyStateRemoved
-)

@@ -24,6 +24,7 @@ type IAM struct {
 	Members                         []*IAMMember
 	IDPs                            []*IDPConfig
 	DefaultLoginPolicy              *LoginPolicy
+	DefaultOrgIAMPolicy             *OrgIAMPolicy
 	DefaultPasswordComplexityPolicy *PasswordComplexityPolicy
 	DefaultPasswordAgePolicy        *PasswordAgePolicy
 	DefaultPasswordLockoutPolicy    *PasswordLockoutPolicy

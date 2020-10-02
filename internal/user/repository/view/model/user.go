@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"time"
 
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -169,7 +170,7 @@ func (u *UserView) GenerateLoginName(domain string, appendDomain bool) string {
 	return u.UserName + "@" + domain
 }
 
-func (u *UserView) SetLoginNames(policy *org_model.OrgIAMPolicy, domains []*org_model.OrgDomain) {
+func (u *UserView) SetLoginNames(policy *iam_model.OrgIAMPolicy, domains []*org_model.OrgDomain) {
 	loginNames := make([]string, 0)
 	for _, d := range domains {
 		if d.Verified {

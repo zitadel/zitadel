@@ -296,3 +296,21 @@ func (repo *IAMRepository) ChangeDefaultPasswordLockoutPolicy(ctx context.Contex
 	policy.AggregateID = repo.SystemDefaults.IamID
 	return repo.IAMEventstore.ChangePasswordLockoutPolicy(ctx, policy)
 }
+
+func (repo *IAMRepository) GetOrgIAMLockoutPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
+	policy, err := repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.OrgIAMViewToModel(policy), err
+}
+
+func (repo *IAMRepository) AddDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.AddOrgIAMPolicy(ctx, policy)
+}
+
+func (repo *IAMRepository) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.ChangeOrgIAMPolicy(ctx, policy)
+}

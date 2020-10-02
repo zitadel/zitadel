@@ -30,6 +30,7 @@ type IAM struct {
 	Members                         []*IAMMember              `json:"-"`
 	IDPs                            []*IDPConfig              `json:"-"`
 	DefaultLoginPolicy              *LoginPolicy              `json:"-"`
+	DefaultOrgIAMPolicy             *OrgIAMPolicy             `json:"-"`
 	DefaultPasswordComplexityPolicy *PasswordComplexityPolicy `json:"-"`
 	DefaultPasswordAgePolicy        *PasswordAgePolicy        `json:"-"`
 	DefaultPasswordLockoutPolicy    *PasswordLockoutPolicy    `json:"-"`
@@ -59,6 +60,9 @@ func IAMFromModel(iam *model.IAM) *IAM {
 	if iam.DefaultPasswordLockoutPolicy != nil {
 		converted.DefaultPasswordLockoutPolicy = PasswordLockoutPolicyFromModel(iam.DefaultPasswordLockoutPolicy)
 	}
+	if iam.DefaultOrgIAMPolicy != nil {
+		converted.DefaultOrgIAMPolicy = OrgIAMPolicyFromModel(iam.DefaultOrgIAMPolicy)
+	}
 	return converted
 }
 
@@ -85,6 +89,9 @@ func IAMToModel(iam *IAM) *model.IAM {
 	}
 	if iam.DefaultPasswordLockoutPolicy != nil {
 		converted.DefaultPasswordLockoutPolicy = PasswordLockoutPolicyToModel(iam.DefaultPasswordLockoutPolicy)
+	}
+	if iam.DefaultOrgIAMPolicy != nil {
+		converted.DefaultOrgIAMPolicy = OrgIAMPolicyToModel(iam.DefaultOrgIAMPolicy)
 	}
 	return converted
 }
@@ -166,6 +173,10 @@ func (i *IAM) AppendEvent(event *es_models.Event) (err error) {
 		return i.appendAddPasswordLockoutPolicyEvent(event)
 	case PasswordLockoutPolicyChanged:
 		return i.appendChangePasswordLockoutPolicyEvent(event)
+	case OrgIAMPolicyAdded:
+		return i.appendAddOrgIAMPolicyEvent(event)
+	case OrgIAMPolicyChanged:
+		return i.appendChangeOrgIAMPolicyEvent(event)
 	}
 
 	return err

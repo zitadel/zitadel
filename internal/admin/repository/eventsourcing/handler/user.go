@@ -2,6 +2,8 @@ package handler
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 
 	"github.com/caos/logging"
 
@@ -18,8 +20,9 @@ import (
 
 type User struct {
 	handler
-	eventstore eventstore.Eventstore
-	orgEvents  *org_events.OrgEventstore
+	eventstore     eventstore.Eventstore
+	orgEvents      *org_events.OrgEventstore
+	systemDefaults systemdefaults.SystemDefaults
 }
 
 const (
@@ -136,9 +139,12 @@ func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
 	if err != nil {
 		return err
 	}
-	policy, err := u.orgEvents.GetOrgIAMPolicy(context.Background(), event.ResourceOwner)
-	if err != nil {
-		return err
+	policy, err := u.view.OrgIAMPolicyByAggregateID(event.ResourceOwner)
+	if err != nil && caos_errs.IsNotFound(err) {
+		policy, err = u.view.OrgIAMPolicyByAggregateID(u.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
 	}
 	users, err := u.view.UsersByOrgID(event.AggregateID)
 	if err != nil {

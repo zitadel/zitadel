@@ -2,13 +2,14 @@ package eventsourcing
 
 import (
 	"context"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
-func OrgIAMPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org, policy *model.OrgIAMPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+func OrgIAMPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org, policy *iam_es_model.OrgIAMPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if policy == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-i9sJS", "Errors.Internal")
@@ -21,7 +22,7 @@ func OrgIAMPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, org *mod
 	}
 }
 
-func OrgIAMPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org, policy *model.OrgIAMPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+func OrgIAMPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org, policy *iam_es_model.OrgIAMPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if policy == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9Ksie", "Errors.Internal")

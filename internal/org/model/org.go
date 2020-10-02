@@ -15,7 +15,7 @@ type Org struct {
 	Domains []*OrgDomain
 
 	Members                  []*OrgMember
-	OrgIamPolicy             *OrgIAMPolicy
+	OrgIamPolicy             *iam_model.OrgIAMPolicy
 	LoginPolicy              *iam_model.LoginPolicy
 	PasswordComplexityPolicy *iam_model.PasswordComplexityPolicy
 	PasswordAgePolicy        *iam_model.PasswordAgePolicy

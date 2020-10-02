@@ -36,11 +36,15 @@ func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*us
 		return nil, err
 	}
 	pwPolicyView := iam_view.PasswordComplexityViewToModel(pwPolicy)
-	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if err != nil && caos_errs.IsNotFound(err) {
+		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return repo.UserEvents.CreateUser(ctx, user, pwPolicyView, orgPolicy)
+	orgPolicyView := iam_view.OrgIAMViewToModel(orgPolicy)
+	return repo.UserEvents.CreateUser(ctx, user, pwPolicyView, orgPolicyView)
 }
 
 func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*usr_model.User, error) {
@@ -48,7 +52,7 @@ func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, re
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner
 	}
-	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(policyResourceOwner)
 	if err != nil && caos_errs.IsNotFound(err) {
 		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
 		if err != nil {
@@ -60,9 +64,13 @@ func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, re
 	}
 	pwPolicyView := iam_view.PasswordComplexityViewToModel(pwPolicy)
 
-	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, policyResourceOwner)
-	if err != nil {
-		return nil, err
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(policyResourceOwner)
+	if err != nil && caos_errs.IsNotFound(err) {
+		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return repo.UserEvents.RegisterUser(ctx, user, pwPolicyView, orgPolicy, resourceOwner)
+	orgPolicyView := iam_view.OrgIAMViewToModel(orgPolicy)
+	return repo.UserEvents.RegisterUser(ctx, user, pwPolicyView, orgPolicyView, resourceOwner)
 }
