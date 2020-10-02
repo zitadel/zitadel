@@ -12,18 +12,18 @@
     </mj-attributes>
   </mj-head>
   <mj-body>
-    <mj-wrapper background-url="http://www.bummert.ch/bilder/caos/zitadel-logo-outline-dark.png" border="0" background-repeat="no-repeat">
+    <mj-wrapper background-url="https://static.zitadel.ch/zitadel-logo-outline-dark.png" border="0" background-repeat="no-repeat">
       <mj-section>
         <mj-group>
           <mj-column>
-            <mj-image src="http://www.bummert.ch/bilder/caos/zitadel-logo-dark.png" align="left" width="100px" padding="0"  />
+            <mj-image src="https://static.zitadel.ch/zitadel-logo-dark.png" align="left" width="100px" padding="0"  />
           </mj-column>
         </mj-group>
       </mj-section>
       <mj-section>
         <mj-group>
           <mj-column width="20%">
-            <mj-image src="http://www.bummert.ch/bilder/caos/flavor-spikes-small-opacity40.png" align="left" />
+            <mj-image src="https://static.zitadel.ch/flavor-spikes-small-opacity40.png" align="left" />
           </mj-column>
           <mj-column width="60%">
             <mj-text font-size="2rem" font-weight="light">{{.Greeting}}</mj-text>
@@ -33,14 +33,14 @@
               <a href="http://www.caos.ch" style="color:#e91e63; text-decoration: none;" target="_blank"> CAOS AG </a> | Teufener Strasse 19 | CH-9000 St. Gallen </mj-text>
           </mj-column>
           <mj-column width="20%">
-            <mj-image src="http://www.bummert.ch/bilder/caos/flavor-spikes-big-opacity40.png" align="right" />
+            <mj-image src="https://static.zitadel.ch/flavor-spikes-big-opacity40.png" align="right" />
           </mj-column>
         </mj-group>
       </mj-section>
       <mj-section>
         <mj-group>
           <mj-column>
-            <mj-image src="http://www.bummert.ch/bilder/caos/logo-gsuite-light.png" align="right" width="100px" />
+            <mj-image src="https://static.zitadel.ch/logo-gsuite-light.png" align="right" width="100px" />
           </mj-column>
         </mj-group>
       </mj-section>
