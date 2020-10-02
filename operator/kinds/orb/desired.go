@@ -9,10 +9,11 @@ import (
 type DesiredV0 struct {
 	Common *tree.Common `yaml:",inline"`
 	Spec   struct {
-		Verbose      bool
-		NodeSelector map[string]string   `yaml:"nodeSelector,omitempty"`
-		Tolerations  []corev1.Toleration `yaml:"tolerations,omitempty"`
-		Version      string              `yaml:"version,omitempty"`
+		Verbose         bool
+		NodeSelector    map[string]string   `yaml:"nodeSelector,omitempty"`
+		Tolerations     []corev1.Toleration `yaml:"tolerations,omitempty"`
+		Version         string              `yaml:"version,omitempty"`
+		SelfReconciling bool                `yaml:"selfReconciling"`
 	}
 	IAM *tree.Tree
 }

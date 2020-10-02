@@ -250,7 +250,7 @@ func AdaptFunc(
 								LocalObjectReference: corev1.LocalObjectReference{Name: cmName},
 							}}},
 						VolumeMounts: volMounts,
-						LivenessProbe: &corev1.Probe{
+						/*LivenessProbe: &corev1.Probe{
 							Handler: corev1.Handler{
 								HTTPGet: &corev1.HTTPGetAction{
 									Path:   "/healthz",
@@ -261,7 +261,7 @@ func AdaptFunc(
 							PeriodSeconds:       5,
 							FailureThreshold:    2,
 							InitialDelaySeconds: 60,
-						},
+						},*/
 						ReadinessProbe: &corev1.Probe{
 							Handler: corev1.Handler{
 								HTTPGet: &corev1.HTTPGetAction{

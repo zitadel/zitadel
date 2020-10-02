@@ -29,15 +29,6 @@ func AdaptFunc(orbconfig *orb.Orb, action string, features []string) operator.Ad
 			orbMonitor = orbMonitor.Verbose()
 		}
 
-		/* TODO: self-reconciling
-		query := operator.EnsureFuncToQueryFunc(func(k8sClient *kubernetes.Client) error {
-			if err := kubernetes.EnsureZitadelArtifacts(monitor, k8sClient, desiredKind.Spec.Version, desiredKind.Spec.NodeSelector, desiredKind.Spec.Tolerations); err != nil {
-				monitor.Error(errors.Wrap(err, "Failed to deploy zitadel-operator into k8s-cluster"))
-				return err
-			}
-			return nil
-		})*/
-
 		iamCurrent := &tree.Tree{}
 		queryIAM, destroyIAM, err := iam.GetQueryAndDestroyFuncs(
 			orbMonitor,
@@ -54,8 +45,10 @@ func AdaptFunc(orbconfig *orb.Orb, action string, features []string) operator.Ad
 		}
 
 		queriers := []operator.QueryFunc{
-			//query,
 			queryIAM,
+		}
+		if desiredKind.Spec.SelfReconciling {
+			queriers = append(queriers, operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredTree)))
 		}
 
 		destroyers := []operator.DestroyFunc{

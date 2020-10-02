@@ -149,7 +149,7 @@ func AdaptFunc(
 			return nil, nil, err
 		}
 
-		queryD, destroyD, deploymentReady, _, ensureInit, err := deployment.AdaptFunc(
+		queryD, destroyD, deploymentReady, scaleDeployment, ensureInit, err := deployment.AdaptFunc(
 			internalMonitor,
 			namespaceStr,
 			internalLabels,
@@ -222,6 +222,14 @@ func AdaptFunc(
 					destroyD,
 					destroyC,
 					operator.ResourceDestroyToZitadelDestroy(destroyNS),
+				)
+			case "scaledown":
+				queriers = append(queriers,
+					operator.EnsureFuncToQueryFunc(scaleDeployment(0)),
+				)
+			case "scaleup":
+				queriers = append(queriers,
+					operator.EnsureFuncToQueryFunc(scaleDeployment(desiredKind.Spec.ReplicaCount)),
 				)
 			}
 		}

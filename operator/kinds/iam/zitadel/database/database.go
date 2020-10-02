@@ -14,6 +14,10 @@ func newGit(monitor mntr.Monitor, repoURL string, repoKey string) (*git.Client, 
 		monitor.Error(err)
 		return nil, err
 	}
+
+	if err := gitClient.Clone(); err != nil {
+		return nil, err
+	}
 	return gitClient, nil
 }
 

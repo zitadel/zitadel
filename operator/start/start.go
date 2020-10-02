@@ -9,6 +9,7 @@ import (
 	orbconfig "github.com/caos/orbos/pkg/orb"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/kinds/orb"
+	kubernetes2 "github.com/caos/zitadel/pkg/kubernetes"
 	"runtime/debug"
 	"time"
 )
@@ -59,20 +60,41 @@ func Restore(monitor mntr.Monitor, gitClient *git.Client, k8sClient *kubernetes.
 		"eventstore",
 		"management",
 	}
+	emptyOrbConfig := &orbconfig.Orb{}
+
+	if err := kubernetes2.ScaleZitadelOperator(monitor, k8sClient, 0); err != nil {
+		return err
+	}
+
+	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(emptyOrbConfig, "scaledown", []string{"scaledown"}), k8sClient)(); err != nil {
+		return err
+	}
 
 	if err := databases.Clear(monitor, k8sClient, gitClient, databasesList); err != nil {
 		return err
 	}
 
-	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(nil, "migration", []string{"migration"}), k8sClient)(); err != nil {
+	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(emptyOrbConfig, "migration", []string{"migration"}), k8sClient)(); err != nil {
 		return err
 	}
 
-	return databases.Restore(
+	if err := databases.Restore(
 		monitor,
 		k8sClient,
 		gitClient,
 		backup,
 		databasesList,
-	)
+	); err != nil {
+		return err
+	}
+
+	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(emptyOrbConfig, "scaleup", []string{"scaleup"}), k8sClient)(); err != nil {
+		return err
+	}
+
+	if err := kubernetes2.ScaleZitadelOperator(monitor, k8sClient, 1); err != nil {
+		return err
+	}
+
+	return nil
 }
