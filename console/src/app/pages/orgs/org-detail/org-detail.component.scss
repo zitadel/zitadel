@@ -49,13 +49,13 @@
   }
 
   .rem-button {
-      visibility: hidden;
+    visibility: hidden;
   }
 
   &:hover {
-      .rem-button {
-          visibility: visible;
-      }
+    .rem-button {
+      visibility: visible;
+    }
   }
 }
 

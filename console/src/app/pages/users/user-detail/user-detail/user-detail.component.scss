@@ -19,69 +19,6 @@
   }
 }
 
-.method-col {
-  display: flex;
-  flex-direction: column;
-  margin: -.5rem;
-
-  .method-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: .5rem;
-    border-bottom: 1px solid #ffffff20;
-    flex-wrap: wrap;
-
-    .label,
-    .name {
-      padding-right: 1rem;
-    }
-
-    .actions {
-      flex: 1;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      flex-direction: column;
-    }
-
-    .label {
-      font-size: .9rem;
-      color: #818a8a;
-    }
-
-    .icon {
-      margin: .5rem;
-    }
-
-    .verify {
-      text-decoration: none;
-      font-size: .8rem;
-      color: #8795a1;
-      border-radius: .5rem;
-      cursor: pointer;
-      word-wrap: none;
-      white-space: nowrap;
-      margin-right: 1rem;
-
-      &:hover {
-        color: white;
-        text-decoration: underline;
-      }
-    }
-
-    @media only screen and (max-width: 700px) {
-      flex-direction: column;
-      align-items: center;
-
-      .label,
-      .name {
-        padding-right: 0;
-      }
-    }
-  }
-}
-
 .img-phone-email {
   width: 300px;
 }
