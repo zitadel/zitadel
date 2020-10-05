@@ -12,6 +12,7 @@ import (
 type testEvent struct {
 	description         string
 	shouldCheckPrevious bool
+	data                func() interface{}
 }
 
 func (e *testEvent) CheckPrevious() bool {
@@ -28,7 +29,7 @@ func (e *testEvent) Type() EventType {
 	return "test.event"
 }
 func (e *testEvent) Data() interface{} {
-	return nil
+	return e.data()
 }
 
 func (e *testEvent) PreviousSequence() uint64 {
@@ -278,6 +279,137 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 
 			if !reflect.DeepEqual(tt.res.event, event) {
 				t.Errorf("events should be deep equal. \ngot %v\nwant %v", event, tt.res.event)
+			}
+		})
+	}
+}
+
+func Test_eventData(t *testing.T) {
+	type args struct {
+		event Event
+	}
+	type res struct {
+		jsonText []byte
+		wantErr  bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "data as json bytes",
+			args: args{
+				event: &testEvent{
+					data: func() interface{} {
+						return []byte(`{"piff":"paff"}`)
+					},
+				},
+			},
+			res: res{
+				jsonText: []byte(`{"piff":"paff"}`),
+				wantErr:  false,
+			},
+		},
+		{
+			name: "data as invalid json bytes",
+			args: args{
+				event: &testEvent{
+					data: func() interface{} {
+						return []byte(`{"piffpaff"}`)
+					},
+				},
+			},
+			res: res{
+				jsonText: []byte(nil),
+				wantErr:  true,
+			},
+		},
+		{
+			name: "data as struct",
+			args: args{
+				event: &testEvent{
+					data: func() interface{} {
+						return struct {
+							Piff string `json:"piff"`
+						}{Piff: "paff"}
+					},
+				},
+			},
+			res: res{
+				jsonText: []byte(`{"piff":"paff"}`),
+				wantErr:  false,
+			},
+		},
+		{
+			name: "data as ptr to struct",
+			args: args{
+				event: &testEvent{
+					data: func() interface{} {
+						return &struct {
+							Piff string `json:"piff"`
+						}{Piff: "paff"}
+					},
+				},
+			},
+			res: res{
+				jsonText: []byte(`{"piff":"paff"}`),
+				wantErr:  false,
+			},
+		},
+		{
+			name: "no data",
+			args: args{
+				event: &testEvent{
+					data: func() interface{} {
+						return nil
+					},
+				},
+			},
+			res: res{
+				jsonText: []byte(nil),
+				wantErr:  false,
+			},
+		},
+		{
+			name: "invalid because primitive",
+			args: args{
+				event: &testEvent{
+					data: func() interface{} {
+						return ""
+					},
+				},
+			},
+			res: res{
+				jsonText: []byte(nil),
+				wantErr:  true,
+			},
+		},
+		{
+			name: "invalid because pointer to primitive",
+			args: args{
+				event: &testEvent{
+					data: func() interface{} {
+						var s string
+						return &s
+					},
+				},
+			},
+			res: res{
+				jsonText: []byte(nil),
+				wantErr:  true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := eventData(tt.args.event)
+			if (err != nil) != tt.res.wantErr {
+				t.Errorf("eventData() error = %v, wantErr %v", err, tt.res.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.res.jsonText) {
+				t.Errorf("eventData() = %v, want %v", string(got), string(tt.res.jsonText))
 			}
 		})
 	}

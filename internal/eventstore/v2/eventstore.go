@@ -2,6 +2,8 @@ package eventstore
 
 import (
 	"context"
+	"encoding/json"
+	"reflect"
 	"sync"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -87,8 +89,10 @@ func (es *Eventstore) aggregatesToEvents(aggregates []aggregater) ([]*repository
 	for _, aggregate := range aggregates {
 		var previousEvent *repository.Event
 		for _, event := range aggregate.Events() {
-			//TODO: map event.Data() into json
-			var data []byte
+			data, err := eventData(event)
+			if err != nil {
+				return nil, err
+			}
 			events = append(events, &repository.Event{
 				AggregateID:      aggregate.ID(),
 				AggregateType:    repository.AggregateType(aggregate.Type()),
@@ -168,8 +172,12 @@ func (es *Eventstore) FilterToReadModel(ctx context.Context, searchQuery *Search
 	return readModel.Reduce()
 }
 
-func (es *Eventstore) LatestSequence(ctx context.Context, searchQuery *SearchQueryFactory) (uint64, error) {
-	return 0, nil
+func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQueryFactory) (uint64, error) {
+	query, err := queryFactory.Build()
+	if err != nil {
+		return 0, err
+	}
+	return es.repo.LatestSequence(ctx, query)
 }
 
 //RegisterPushEventMapper registers a function for mapping an eventstore event to an event
@@ -202,4 +210,28 @@ func (es *Eventstore) RegisterPushEventMapper(eventType EventType, mapper func(E
 	es.eventMapper[eventType] = interceptor
 
 	return nil
+}
+
+func eventData(event Event) ([]byte, error) {
+	switch data := event.Data().(type) {
+	case nil:
+		return nil, nil
+	case []byte:
+		if json.Valid(data) {
+			return data, nil
+		}
+		return nil, errors.ThrowInvalidArgument(nil, "V2-6SbbS", "data bytes are not json")
+	}
+	dataType := reflect.TypeOf(event.Data())
+	if dataType.Kind() == reflect.Ptr {
+		dataType = dataType.Elem()
+	}
+	if dataType.Kind() == reflect.Struct {
+		dataBytes, err := json.Marshal(event.Data())
+		if err != nil {
+			return nil, errors.ThrowInvalidArgument(err, "V2-xG87M", "could  not marhsal data")
+		}
+		return dataBytes, nil
+	}
+	return nil, errors.ThrowInvalidArgument(nil, "V2-91NRm", "wrong type of event data")
 }
