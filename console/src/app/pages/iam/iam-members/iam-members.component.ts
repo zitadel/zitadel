@@ -18,7 +18,6 @@ import { IamMembersDataSource } from './iam-members-datasource';
 export class IamMembersComponent {
     public INITIALPAGESIZE: number = 25;
     public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
-    public disabled: boolean = false;
     public dataSource!: IamMembersDataSource;
 
     public memberRoleOptions: string[] = [];

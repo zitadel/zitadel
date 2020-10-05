@@ -29,7 +29,6 @@ export class ProjectMembersComponent {
     public INITIALPAGESIZE: number = 25;
     public project!: ProjectView.AsObject | ProjectGrantView.AsObject;
     public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
-    public disabled: boolean = false;
     public grantId: string = '';
     public projectName: string = '';
     public dataSource!: ProjectMembersDataSource;

@@ -50,6 +50,7 @@
         "INFO": "Info",
         "OK": "OK",
         "VIEW": "Öffnen",
+        "SELECTIONDELETE":"Ausgewählte löschen",
         "DELETE": "Löschen",
         "REMOVE":"Entfernen",
         "VERIFY":"Verifizieren",

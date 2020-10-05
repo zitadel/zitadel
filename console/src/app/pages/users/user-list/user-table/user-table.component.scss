@@ -8,7 +8,7 @@
 
     td,
     th {
-      padding: 0 1rem;
+      padding: .5rem;
 
       &:first-child {
         padding-left: 0;
@@ -18,6 +18,11 @@
       &:last-child {
         padding-right: 0;
       }
+    }
+
+    .selection {
+      width: 50px;
+      max-width: 50px;
     }
   }
 }
@@ -41,4 +46,15 @@ th {
 
 .filtername {
   margin: 0 1rem;
+}
+
+
+.sa-icon {
+  display: block;
+  width: 32px;
+  margin: 0 .5rem;
+
+  i {
+    margin: auto;
+  }
 }

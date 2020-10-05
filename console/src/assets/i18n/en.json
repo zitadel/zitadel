@@ -50,6 +50,7 @@
         "INFO": "Info",
         "OK": "OK",
         "VIEW": "Show",
+        "SELECTIONDELETE":"Delete selection",
         "DELETE": "Delete",
         "REMOVE":"Remove",
         "VERIFY":"Verify",

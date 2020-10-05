@@ -1,11 +1,9 @@
-import { SelectionModel } from '@angular/cdk/collections';
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { Component, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
+import { PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
-import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { Org, OrgMemberView, ProjectType, UserView } from 'src/app/proto/generated/management_pb';
+import { Org, OrgMemberView, UserView } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -16,18 +14,16 @@ import { OrgMembersDataSource } from './org-members-datasource';
     templateUrl: './org-members.component.html',
     styleUrls: ['./org-members.component.scss'],
 })
-export class OrgMembersComponent implements AfterViewInit {
+export class OrgMembersComponent {
+    public INITIALPAGESIZE: number = 25;
     public org!: Org.AsObject;
-    public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
-    public disabled: boolean = false;
-    @ViewChild(MatPaginator) public paginator!: MatPaginator;
+    public disableWrite: boolean = false;
     public dataSource!: OrgMembersDataSource;
-    public selection: SelectionModel<OrgMemberView.AsObject> = new SelectionModel<OrgMemberView.AsObject>(true, []);
 
     public memberRoleOptions: string[] = [];
-
-    /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-    public displayedColumns: string[] = ['select', 'firstname', 'lastname', 'username', 'email', 'roles'];
+    public changePageFactory!: Function;
+    public changePage: EventEmitter<void> = new EventEmitter();
+    public selection: Array<OrgMemberView.AsObject> = [];
 
     constructor(
         private mgmtService: ManagementService,
@@ -37,18 +33,17 @@ export class OrgMembersComponent implements AfterViewInit {
         this.mgmtService.GetMyOrg().then(org => {
             this.org = org.toObject();
             this.dataSource = new OrgMembersDataSource(this.mgmtService);
-            this.dataSource.loadMembers(0, 25);
+            this.dataSource.loadMembers(0, this.INITIALPAGESIZE);
         });
 
         this.getRoleOptions();
-    }
 
-    public ngAfterViewInit(): void {
-        this.paginator.page
-            .pipe(
-                tap(() => this.loadMembersPage()),
-            )
-            .subscribe();
+        this.changePageFactory = (event?: PageEvent) => {
+            return this.dataSource.loadMembers(
+                event?.pageIndex ?? 0,
+                event?.pageSize ?? this.INITIALPAGESIZE,
+            );
+        };
     }
 
     public getRoleOptions(): void {
@@ -68,15 +63,8 @@ export class OrgMembersComponent implements AfterViewInit {
             });
     }
 
-    private loadMembersPage(): void {
-        this.dataSource.loadMembers(
-            this.paginator.pageIndex,
-            this.paginator.pageSize,
-        );
-    }
-
     public removeOrgMemberSelection(): void {
-        Promise.all(this.selection.selected.map(member => {
+        Promise.all(this.selection.map(member => {
             return this.mgmtService.RemoveMyOrgMember(member.userId).then(() => {
                 this.toast.showInfo('ORG.TOAST.MEMBERREMOVED', true);
             }).catch(error => {
@@ -84,21 +72,9 @@ export class OrgMembersComponent implements AfterViewInit {
             });
         })).then(() => {
             setTimeout(() => {
-                this.refreshPage();
+                this.changePage.emit();
             }, 1000);
         });
-    }
-
-    public isAllSelected(): boolean {
-        const numSelected = this.selection.selected.length;
-        const numRows = this.dataSource.membersSubject.value.length;
-        return numSelected === numRows;
-    }
-
-    public masterToggle(): void {
-        this.isAllSelected() ?
-            this.selection.clear() :
-            this.dataSource.membersSubject.value.forEach(row => this.selection.select(row));
     }
 
     public openAddMember(): void {
@@ -120,7 +96,7 @@ export class OrgMembersComponent implements AfterViewInit {
                     })).then(() => {
                         this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
                         setTimeout(() => {
-                            this.refreshPage();
+                            this.changePage.emit();
                         }, 1000);
                     }).catch(error => {
                         this.toast.showError(error);
@@ -128,10 +104,5 @@ export class OrgMembersComponent implements AfterViewInit {
                 }
             }
         });
-    }
-
-    public refreshPage(): void {
-        this.selection.clear();
-        this.dataSource.loadMembers(this.paginator.pageIndex, this.paginator.pageSize);
     }
 }
