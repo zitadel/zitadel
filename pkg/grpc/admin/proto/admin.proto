@@ -102,7 +102,7 @@ service AdminService {
     //ORG_IAM_POLICY
     rpc GetDefaultOrgIamPolicy(google.protobuf.Empty) returns (OrgIamPolicyView) {
         option (google.api.http) = {
-            get: "/orgs/default/iampolicy"
+            get: "/orgs/default/policies/orgiam"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -112,7 +112,7 @@ service AdminService {
 
     rpc GetOrgIamPolicy(OrgIamPolicyID) returns (OrgIamPolicyView) {
         option (google.api.http) = {
-            get: "/orgs/{org_id}/iampolicy"
+            get: "/orgs/{org_id}/policies/orgiam"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -122,7 +122,7 @@ service AdminService {
 
     rpc CreateOrgIamPolicy(OrgIamPolicyRequest) returns (OrgIamPolicy) {
         option (google.api.http) = {
-            post: "/orgs/{org_id}/iampolicy"
+            post: "/orgs/{org_id}/policies/orgiam"
             body: "*"
         };
 
@@ -133,7 +133,7 @@ service AdminService {
 
     rpc UpdateOrgIamPolicy(OrgIamPolicyRequest) returns (OrgIamPolicy) {
         option (google.api.http) = {
-            put: "/orgs/{org_id}/iampolicy"
+            put: "/orgs/{org_id}/policies/orgiam"
             body: "*"
         };
 
@@ -144,7 +144,7 @@ service AdminService {
 
     rpc DeleteOrgIamPolicy(OrgIamPolicyID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/orgs/{org_id}/iampolicy"
+            delete: "/orgs/{org_id}/policies/orgiam"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {

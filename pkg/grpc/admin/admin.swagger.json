@@ -632,7 +632,7 @@
         ]
       }
     },
-    "/orgs/default/iampolicy": {
+    "/orgs/default/policies/orgiam": {
       "get": {
         "summary": "ORG_IAM_POLICY",
         "operationId": "AdminService_GetDefaultOrgIamPolicy",
@@ -685,7 +685,7 @@
         ]
       }
     },
-    "/orgs/{org_id}/iampolicy": {
+    "/orgs/{org_id}/policies/orgiam": {
       "get": {
         "operationId": "AdminService_GetOrgIamPolicy",
         "responses": {

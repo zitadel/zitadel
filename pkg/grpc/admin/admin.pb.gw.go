@@ -3396,15 +3396,15 @@ var (
 
 	pattern_AdminService_SetUpOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"orgs", "_setup"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_GetDefaultOrgIamPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"orgs", "default", "iampolicy"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_AdminService_GetDefaultOrgIamPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"orgs", "default", "policies", "orgiam"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_GetOrgIamPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "org_id", "iampolicy"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_AdminService_GetOrgIamPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"orgs", "org_id", "policies", "orgiam"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_CreateOrgIamPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "org_id", "iampolicy"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_AdminService_CreateOrgIamPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"orgs", "org_id", "policies", "orgiam"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_UpdateOrgIamPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "org_id", "iampolicy"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_AdminService_UpdateOrgIamPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"orgs", "org_id", "policies", "orgiam"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_DeleteOrgIamPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "org_id", "iampolicy"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_AdminService_DeleteOrgIamPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"orgs", "org_id", "policies", "orgiam"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_AdminService_GetIamMemberRoles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"members", "roles"}, "", runtime.AssumeColonVerbOpt(true)))
 
