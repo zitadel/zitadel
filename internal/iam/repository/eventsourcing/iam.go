@@ -2,8 +2,6 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
@@ -319,7 +317,6 @@ func checkExistingLoginPolicyIDPProviderValidation(idpConfigID string) func(...*
 				config := new(model.IDPConfig)
 				err := config.SetData(event)
 				if err != nil {
-					logging.LogWithFields("ERROR-6Hs9d", "event", event).WithError(err).Error("could not set data")
 					return err
 				}
 				idpConfigs = append(idpConfigs, config)
@@ -327,7 +324,6 @@ func checkExistingLoginPolicyIDPProviderValidation(idpConfigID string) func(...*
 				config := new(model.IDPConfig)
 				err := config.SetData(event)
 				if err != nil {
-					logging.LogWithFields("ERROR-fGj8s", "event", event).WithError(err).Error("could not set data")
 					return err
 				}
 				for i := len(idpConfigs) - 1; i >= 0; i-- {
@@ -342,7 +338,6 @@ func checkExistingLoginPolicyIDPProviderValidation(idpConfigID string) func(...*
 				idp := new(model.IDPProvider)
 				err := idp.SetData(event)
 				if err != nil {
-					logging.LogWithFields("ERROR-6Hjs8", "event", event).WithError(err).Error("could not set data")
 					return err
 				}
 				idps = append(idps, idp)
@@ -350,7 +345,6 @@ func checkExistingLoginPolicyIDPProviderValidation(idpConfigID string) func(...*
 				idp := new(model.IDPProvider)
 				err := idp.SetData(event)
 				if err != nil {
-					logging.LogWithFields("ERROR-6fh8s", "event", event).WithError(err).Error("could not set data")
 					return err
 				}
 				for i := len(idps) - 1; i >= 0; i-- {
