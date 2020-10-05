@@ -61,129 +61,34 @@
 
         <app-card *ngIf="user.human" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
             description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
-            <div class="method-col">
-                <div class="method-row">
-                    <span class="label">{{ 'USER.PROFILE.PASSWORD' | translate }}</span>
-                    <span>******</span>
-                    <div>
-                        <button [disabled]="(canWrite$ | async) == false" (click)="sendSetPasswordNotification()"
-                            mat-stroked-button color="primary"
-                            *ngIf="user.state === UserState.USERSTATE_INITIAL">{{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
-                        <a [disabled]="(canWrite$ | async) == false" [routerLink]="['password']" mat-icon-button>
-                            <mat-icon class="icon">chevron_right</mat-icon>
-                        </a>
-                    </div>
-                </div>
-                <div class="method-row">
-                    <span class="label">{{ 'USER.EMAIL' | translate }}</span>
 
-                    <ng-container *ngIf="!emailEditState; else emailEdit">
-                        <div class="actions">
-                            <span class="name">{{user?.human?.email}}</span>
-                            <mat-icon class="icon" *ngIf="user?.human?.isEmailVerified" color="primary"
-                                aria-hidden="false" aria-label="verified icon">
-                                check_circle_outline</mat-icon>
-                            <ng-container *ngIf="user?.human?.email && !user?.human?.isEmailVerified">
-                                <mat-icon class="icon" color="warn" aria-hidden="false" aria-label="not verified icon">
-                                    highlight_off
-                                </mat-icon>
-                                <ng-container *ngIf="(canWrite$ | async)">
-                                    <a class="verify" matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
-                                        (click)="resendVerification()">{{'USER.LOGINMETHODS.RESENDCODE' | translate}}</a>
-                                </ng-container>
-                            </ng-container>
-                        </div>
-
-                        <div>
-                            <button [disabled]="(canWrite$ | async) == false" (click)="emailEditState = true"
-                                mat-icon-button>
-                                <mat-icon class="icon">edit</mat-icon>
-                            </button>
-                        </div>
-                    </ng-container>
-                    <ng-template #emailEdit>
-                        <mat-form-field class="name">
-                            <mat-label>{{ 'USER.EMAIL' | translate }}</mat-label>
-                            <input matInput
-                                *ngIf="user.human && user.human.email !== undefined && user.human.email !== null"
-                                [(ngModel)]="user.human.email" />
-                        </mat-form-field>
-                        <button (click)="emailEditState = false" mat-icon-button>
-                            <mat-icon class="icon">close</mat-icon>
-                        </button>
-                        <button *ngIf="user.human" [disabled]="!user.human.email || (canWrite$ | async) == false"
-                            type="button" color="primary" (click)="saveEmail()"
-                            mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
-                    </ng-template>
-                </div>
-
-                <div class="method-row">
-                    <span class="label">{{ 'USER.PHONE' | translate }}</span>
-
-                    <ng-container *ngIf="!phoneEditState; else phoneEdit">
-                        <div class="actions">
-                            <span class="name">{{user?.human?.phone}}</span>
-                            <mat-icon class="icon" *ngIf="user?.human?.isPhoneVerified" color="primary"
-                                aria-hidden="false" aria-label="verified icon">
-                                check_circle_outline</mat-icon>
-                            <ng-container *ngIf="user?.human?.phone && !user?.human?.isPhoneVerified">
-                                <mat-icon class="icon" color="warn" aria-hidden="false" aria-label="not verified icon">
-                                    highlight_off
-                                </mat-icon>
-                                <ng-container *ngIf="(canWrite$ | async)">
-                                    <a class="verify" matTooltip="{{'USER.LOGINMETHODS.PHONE.RESEND' | translate}}"
-                                        (click)="resendPhoneVerification()">{{'USER.LOGINMETHODS.RESENDCODE' | translate}}</a>
-                                </ng-container>
-                            </ng-container>
-                        </div>
-
-                        <div>
-                            <button [disabled]="(canWrite$ | async) == false" (click)="phoneEditState = true"
-                                mat-icon-button>
-                                <mat-icon class="icon">edit</mat-icon>
-                            </button>
-                        </div>
-                    </ng-container>
-
-                    <ng-template #phoneEdit>
-                        <mat-form-field class="name">
-                            <mat-label>{{ 'USER.PHONE' | translate }}</mat-label>
-                            <input *ngIf="user.human && user.human.phone !== undefined && user.human.phone !== null"
-                                matInput [disabled]="(canWrite$ | async) == false" [(ngModel)]="user.human.phone" />
-                        </mat-form-field>
-                        <button matTooltip="{{ 'ACTIONS.CLOSE' | translate }}" (click)="phoneEditState = false"
-                            mat-icon-button [disabled]="(canWrite$ | async) == false">
-                            <mat-icon class="icon">close</mat-icon>
-                        </button>
-                        <button *ngIf="user.human?.phone" color="warn" (click)="deletePhone()"
-                            [disabled]="(canWrite$ | async) == false" mat-icon-button
-                            matTooltip="{{ 'ACTIONS.CLEAR' | translate }}">
-                            <i class="las la-trash"></i>
-                        </button>
-
-                        <button *ngIf="user.human" [disabled]="!user.human.phone || (canWrite$ | async) == false"
-                            type="button" color="primary" (click)="savePhone()"
-                            matTooltip="{{ 'ACTIONS.SAVE' | translate }}" mat-raised-button>
-                            {{ 'ACTIONS.SAVE' | translate }}</button>
-                    </ng-template>
-                </div>
-            </div>
+            <app-contact disablePhoneCode="true"
+                [canWrite]="(['user.write:' + user?.id, 'user.write'] | hasRole | async)" *ngIf="user?.human"
+                [human]="user.human" (savedPhone)="savePhone($event)" (savedEmail)="saveEmail($event)"
+                (deletedPhone)="deletePhone()" (resendEmailVerification)="resendEmailVerification()"
+                (resendPhoneVerification)="resendPhoneVerification()">
+                <button phoneAction [disabled]="(canWrite$ | async) == false" (click)="sendSetPasswordNotification()"
+                    mat-stroked-button color="primary"
+                    *ngIf="user.state === UserState.USERSTATE_INITIAL">{{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
+            </app-contact>
         </app-card>
 
         <app-user-mfa *ngIf="user && user.human" [user]="user"></app-user-mfa>
 
         <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
             description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
-            <app-user-grants [userId]="user.id" [allowCreate]="['user.grant.write'] | hasRole | async"
+            <app-user-grants [userId]="user.id"
+                [allowWrite]="['user.grant.write$'+ 'user.grant.write:'+user?.id] | hasRole | async"
                 [displayedColumns]="['select', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']"
-                [allowDelete]="['user.grant.delete'] | hasRole | async"></app-user-grants>
+                [allowDelete]="['user.grant.delete$', 'user.grant.delete'+ user?.id] | hasRole | async">
+            </app-user-grants>
         </app-card>
     </div>
 
     <div *ngIf="user" class="side" metainfo>
         <div class="details">
             <div class="row" *ngIf="user?.preferredLoginName">
-                <span class="first">Preferred Loginname:</span>
+                <span class="first">{{'USER.PREFERRED_LOGINNAME' | translate}}</span>
                 <span class="second"><span style="display: block;">{{user.preferredLoginName}}</span></span>
             </div>
         </div>

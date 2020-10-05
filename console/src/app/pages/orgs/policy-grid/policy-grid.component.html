@@ -26,7 +26,8 @@
             <button [disabled]="complexityPolicy" [routerLink]="[ 'policy', PolicyComponentType.COMPLEXITY,'create' ]"
                 color="primary" mat-raised-button>{{'ORG.POLICY.BTN_INSTALL' | translate}}</button>
             <button [disabled]="!complexityPolicy" [routerLink]="[ 'policy', PolicyComponentType.COMPLEXITY ]"
-                mat-stroked-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
+                mat-stroked-button
+                [matTooltip]="'ACTIONS.CONFIGURE' | translate">{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
         </div>
     </div>
 
@@ -55,7 +56,8 @@
                     <button [disabled]="iamPolicy" [routerLink]="[ 'policy', PolicyComponentType.IAM,'create' ]"
                         color="primary" mat-raised-button>{{'ORG.POLICY.BTN_INSTALL' | translate}}</button>
                     <button [disabled]="!iamPolicy" [routerLink]="[ 'policy', PolicyComponentType.IAM ]"
-                        mat-stroked-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
+                        mat-stroked-button
+                        [matTooltip]="'ACTIONS.CONFIGURE' | translate">{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
                 </ng-template>
             </div>
         </div>
@@ -73,7 +75,6 @@
                 </button>
             </div>
 
-
             <ng-template #showDescIAM>
                 <p class="desc">
                     {{'ORG.POLICY.LOGIN_POLICY.DESCRIPTION' | translate}}</p>
@@ -85,7 +86,8 @@
                     <button [disabled]="loginPolicy" [routerLink]="[ 'policy', PolicyComponentType.LOGIN,'create' ]"
                         color="primary" mat-raised-button>{{'ORG.POLICY.BTN_INSTALL' | translate}}</button>
                     <button [disabled]="!loginPolicy" [routerLink]="[ 'policy', PolicyComponentType.LOGIN ]"
-                        mat-stroked-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
+                        mat-stroked-button
+                        [matTooltip]="'ACTIONS.CONFIGURE' | translate">{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
                 </ng-template>
             </div>
         </div>

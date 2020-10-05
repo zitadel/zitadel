@@ -13,12 +13,13 @@
 
                     <i matTooltip="verified" *ngIf="domain.verified" class="verified las la-check-circle"></i>
                     <i matTooltip="primary" *ngIf="domain.primary" class="primary las la-star"></i>
-                    <a *ngIf="!domain.primary" class="primaryset"
+                    <a *ngIf="!domain.primary && (canwrite$ | async)" class="primaryset"
                         (click)="setPrimary(domain)">{{'ORG.DOMAINS.SETPRIMARY' | translate}}</a>
 
                     <span class="fill-space"></span>
-                    <button [disabled]="(canwrite$ | async) == false" matTooltip="Remove domain" color="warn"
-                        mat-icon-button (click)="removeDomain(domain.domain)"><i class="las la-trash"></i></button>
+                    <button class="rem-button" [disabled]="(canwrite$ | async) == false" matTooltip="Remove domain"
+                        color="warn" mat-icon-button (click)="removeDomain(domain.domain)"><i
+                            class="las la-trash"></i></button>
                 </div>
                 <p class="new-desc">{{'ORG.PAGES.ORGDOMAIN_VERIFICATION' | translate}}</p>
                 <button [disabled]="(canwrite$ | async) == false" matTooltip="Add domain" mat-raised-button

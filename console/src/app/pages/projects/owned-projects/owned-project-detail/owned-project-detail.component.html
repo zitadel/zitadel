@@ -90,7 +90,7 @@
                         description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
                         <app-user-grants [context]="UserGrantContext.OWNED_PROJECT" [projectId]="projectId"
                             refreshOnPreviousRoute="/grant-create/project/{{projectId}}"
-                            [allowCreate]="(['user.grant.write', 'user.grant.write:'+projectId] | hasRole) | async"
+                            [allowWrite]="(['user.grant.write', 'user.grant.write:'+projectId] | hasRole) | async"
                             [allowDelete]="(['user.grant.delete','user.grant.delete:'+projectId] | hasRole) | async">
                         </app-user-grants>
                     </app-card>

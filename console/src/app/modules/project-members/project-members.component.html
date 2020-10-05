@@ -37,31 +37,31 @@
 
                 <ng-container matColumnDef="userId">
                     <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.USERID' | translate }} </th>
-                    <td class="pointer" [routerLink]="['/user', member.userId]" mat-cell *matCellDef="let member">
+                    <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
                         {{member.userId}} </td>
                 </ng-container>
 
                 <ng-container matColumnDef="firstname">
                     <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.FIRSTNAME' | translate }} </th>
-                    <td class="pointer" [routerLink]="['/user', member.userId]" mat-cell *matCellDef="let member">
+                    <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
                         {{member.firstName}} </td>
                 </ng-container>
 
                 <ng-container matColumnDef="lastname">
                     <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.LASTNAME' | translate }} </th>
-                    <td class="pointer" [routerLink]="['/user', member.userId]" mat-cell *matCellDef="let member">
+                    <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
                         {{member.lastName}} </td>
                 </ng-container>
 
                 <ng-container matColumnDef="username">
                     <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.USERNAME' | translate }} </th>
-                    <td class="pointer" [routerLink]="['/user', member.userId]" mat-cell *matCellDef="let member">
+                    <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
                         {{member.userName}} </td>
                 </ng-container>
 
                 <ng-container matColumnDef="email">
                     <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.EMAIL' | translate }} </th>
-                    <td class="pointer" [routerLink]="['/user', member.userId]" mat-cell *matCellDef="let member">
+                    <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
                         {{member.email}}
                     </td>
                 </ng-container>
