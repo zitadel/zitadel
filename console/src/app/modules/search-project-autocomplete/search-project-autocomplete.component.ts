@@ -1,10 +1,10 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
-import { forkJoin, from } from 'rxjs';
-import { debounceTime, switchMap, tap } from 'rxjs/operators';
+import { forkJoin, from, Subject } from 'rxjs';
+import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
 import {
     ProjectGrantSearchResponse,
     ProjectGrantView,
@@ -27,7 +27,7 @@ export enum ProjectAutocompleteType {
     templateUrl: './search-project-autocomplete.component.html',
     styleUrls: ['./search-project-autocomplete.component.scss'],
 })
-export class SearchProjectAutocompleteComponent {
+export class SearchProjectAutocompleteComponent implements OnDestroy {
     public selectable: boolean = true;
     public removable: boolean = true;
     public addOnBlur: boolean = true;
@@ -47,9 +47,12 @@ export class SearchProjectAutocompleteComponent {
         | ProjectView.AsObject
         | ProjectView.AsObject[]
     > = new EventEmitter();
+
+    private unsubscribed$: Subject<void> = new Subject();
     constructor(private mgmtService: ManagementService) {
         this.myControl.valueChanges
             .pipe(
+                takeUntil(this.unsubscribed$),
                 debounceTime(200),
                 tap(() => this.isLoading = true),
                 switchMap(value => {
@@ -91,6 +94,10 @@ export class SearchProjectAutocompleteComponent {
                         break;
                 }
             });
+    }
+
+    public ngOnDestroy(): void {
+        this.unsubscribed$.next();
     }
 
     public displayFn(project?: any): string | undefined {

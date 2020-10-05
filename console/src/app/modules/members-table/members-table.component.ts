@@ -67,6 +67,7 @@ export class MembersTableComponent implements OnInit, OnDestroy {
     }
 
     public changePage(event?: PageEvent | MatPaginator): any {
+        this.selection.clear();
         return this.factoryLoadFunc(event ?? this.paginator);
     }
 }
