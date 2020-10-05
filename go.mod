@@ -42,7 +42,7 @@ require (
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.1 // indirect
-	github.com/nicksnyder/go-i18n/v2 v2.0.3
+	github.com/nicksnyder/go-i18n/v2 v2.1.1
 	github.com/pquerna/otp v1.2.0
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.7.0
