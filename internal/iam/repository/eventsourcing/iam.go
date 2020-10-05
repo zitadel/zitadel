@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -316,11 +317,19 @@ func checkExistingLoginPolicyIDPProviderValidation(idpConfigID string) func(...*
 			switch event.Type {
 			case model.IDPConfigAdded:
 				config := new(model.IDPConfig)
-				config.SetData(event)
+				err := config.SetData(event)
+				if err != nil {
+					logging.LogWithFields("ERROR-6Hs9d", "event", event).WithError(err).Error("could not set data")
+					return err
+				}
 				idpConfigs = append(idpConfigs, config)
 			case model.IDPConfigRemoved:
 				config := new(model.IDPConfig)
-				config.SetData(event)
+				err := config.SetData(event)
+				if err != nil {
+					logging.LogWithFields("ERROR-fGj8s", "event", event).WithError(err).Error("could not set data")
+					return err
+				}
 				for i, p := range idpConfigs {
 					if p.IDPConfigID == config.IDPConfigID {
 						idpConfigs[i] = idpConfigs[len(idpConfigs)-1]
@@ -330,11 +339,19 @@ func checkExistingLoginPolicyIDPProviderValidation(idpConfigID string) func(...*
 				}
 			case model.LoginPolicyIDPProviderAdded:
 				idp := new(model.IDPProvider)
-				idp.SetData(event)
+				err := idp.SetData(event)
+				if err != nil {
+					logging.LogWithFields("ERROR-6Hjs8", "event", event).WithError(err).Error("could not set data")
+					return err
+				}
 				idps = append(idps, idp)
 			case model.LoginPolicyIDPProviderRemoved:
 				idp := new(model.IDPProvider)
-				idp.SetData(event)
+				err := idp.SetData(event)
+				if err != nil {
+					logging.LogWithFields("ERROR-6fh8s", "event", event).WithError(err).Error("could not set data")
+					return err
+				}
 				for i, p := range idps {
 					if p.IDPConfigID == idp.IDPConfigID {
 						idps[i] = idps[len(idps)-1]

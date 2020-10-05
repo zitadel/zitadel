@@ -138,7 +138,7 @@ func checkExistingLoginPolicyIDPProviderValidation(idpProvider *iam_es_model.IDP
 			case model.LoginPolicyIDPProviderAdded:
 				idp := new(iam_es_model.IDPProvider)
 				idp.SetData(event)
-			case model.LoginPolicyIDPProviderRemoved:
+			case model.LoginPolicyIDPProviderRemoved, model.LoginPolicyIDPProviderCascadeRemoved:
 				idp := new(iam_es_model.IDPProvider)
 				idp.SetData(event)
 				for i, p := range idps {
