@@ -270,11 +270,18 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 		return err
 	}
 	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(pwPolicy)
-	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, policyResourceOwner)
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(policyResourceOwner)
+	if err != nil && errors.IsNotFound(err) {
+		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.IAMID)
+		if err != nil {
+			return err
+		}
+	}
 	if err != nil {
 		return err
 	}
-	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, externalIDP, pwPolicyView, orgPolicy, resourceOwner)
+	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
+	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, externalIDP, pwPolicyView, orgPolicyView, resourceOwner)
 	if err != nil {
 		return err
 	}

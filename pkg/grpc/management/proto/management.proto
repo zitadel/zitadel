@@ -564,7 +564,7 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
-  rpc GetMyOrgIamPolicy(google.protobuf.Empty) returns (OrgIamPolicy) {
+  rpc GetMyOrgIamPolicy(google.protobuf.Empty) returns (OrgIamPolicyView) {
     option (google.api.http) = {
       get: "/orgs/me/iampolicy"
     };
@@ -1995,11 +1995,9 @@ enum PolicyState {
   POLICYSTATE_DELETED = 3;
 }
 
-message OrgIamPolicy {
-  string org_id = 1; //TODO: do we need id?
-  string description = 2;
-  bool user_login_must_be_domain = 3;
-  bool default = 4;
+message OrgIamPolicyView {
+  bool user_login_must_be_domain = 1;
+  bool default = 2;
 }
 
 message OrgCreateRequest {

@@ -58,11 +58,18 @@ func (repo *UserRepo) registerUser(ctx context.Context, registerUser *model.User
 		return nil, err
 	}
 	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(pwPolicy)
-	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, policyResourceOwner)
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(policyResourceOwner)
+	if err != nil && errors.IsNotFound(err) {
+		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
-	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, externalIDP, pwPolicyView, orgPolicy, resourceOwner)
+	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
+	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, externalIDP, pwPolicyView, orgPolicyView, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -301,11 +308,18 @@ func (repo *UserRepo) RemoveMyMfaOTP(ctx context.Context) error {
 
 func (repo *UserRepo) ChangeMyUsername(ctx context.Context, username string) error {
 	ctxData := authz.GetCtxData(ctx)
-	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, ctxData.OrgID)
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(ctxData.OrgID)
+	if err != nil && errors.IsNotFound(err) {
+		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return err
+		}
+	}
 	if err != nil {
 		return err
 	}
-	return repo.UserEvents.ChangeUsername(ctx, ctxData.UserID, username, orgPolicy)
+	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
+	return repo.UserEvents.ChangeUsername(ctx, ctxData.UserID, username, orgPolicyView)
 }
 func (repo *UserRepo) ResendInitVerificationMail(ctx context.Context, userID string) error {
 	_, err := repo.UserEvents.CreateInitializeUserCodeByID(ctx, userID)
@@ -402,11 +416,18 @@ func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, li
 
 func (repo *UserRepo) ChangeUsername(ctx context.Context, userID, username string) error {
 	policyResourceOwner := authz.GetCtxData(ctx).OrgID
-	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, policyResourceOwner)
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(policyResourceOwner)
+	if err != nil && errors.IsNotFound(err) {
+		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return err
+		}
+	}
 	if err != nil {
 		return err
 	}
-	return repo.UserEvents.ChangeUsername(ctx, userID, username, orgPolicy)
+	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
+	return repo.UserEvents.ChangeUsername(ctx, userID, username, orgPolicyView)
 }
 
 func checkIDs(ctx context.Context, obj es_models.ObjectRoot) error {

@@ -2,7 +2,6 @@ package eventsourcing
 
 import (
 	"context"
-
 	"github.com/caos/zitadel/internal/cache/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -690,6 +689,17 @@ func (es *IAMEventstore) ChangePasswordLockoutPolicy(ctx context.Context, policy
 	}
 	es.iamCache.cacheIAM(repoIam)
 	return model.PasswordLockoutPolicyToModel(repoIam.DefaultPasswordLockoutPolicy), nil
+}
+
+func (es *IAMEventstore) GetOrgIAMPolicy(ctx context.Context, iamID string) (*iam_model.OrgIAMPolicy, error) {
+	existingIAM, err := es.IAMByID(ctx, iamID)
+	if err != nil {
+		return nil, err
+	}
+	if existingIAM.DefaultOrgIAMPolicy == nil {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2Fj8s", "Errors.IAM.OrgIAM.NotExisting")
+	}
+	return existingIAM.DefaultOrgIAMPolicy, nil
 }
 
 func (es *IAMEventstore) PrepareAddOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*model.IAM, *models.Aggregate, error) {

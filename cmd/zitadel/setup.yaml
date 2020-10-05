@@ -88,3 +88,6 @@ SetUp:
     DefaultPasswordLockoutPolicy:
       MaxAttempts: 5
       ShowLockOutFailures: false
+  Step5:
+    DefaultOrgIAMPolicy:
+      UserLoginMustBeDomain: true

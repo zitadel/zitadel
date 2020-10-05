@@ -9,5 +9,5 @@ type OrgIAMPolicy struct {
 
 	State                 PolicyState
 	UserLoginMustBeDomain bool
-	IamDomain             string
+	Default               bool
 }

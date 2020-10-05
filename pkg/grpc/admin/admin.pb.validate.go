@@ -1697,8 +1697,6 @@ func (m *OrgIamPolicy) Validate() error {
 
 	// no validation rules for OrgId
 
-	// no validation rules for Description
-
 	// no validation rules for UserLoginMustBeDomain
 
 	// no validation rules for Default
@@ -1781,6 +1779,99 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = OrgIamPolicyValidationError{}
+
+// Validate checks the field values on OrgIamPolicyView with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *OrgIamPolicyView) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for OrgId
+
+	// no validation rules for UserLoginMustBeDomain
+
+	// no validation rules for Default
+
+	// no validation rules for Sequence
+
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return OrgIamPolicyViewValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return OrgIamPolicyViewValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// OrgIamPolicyViewValidationError is the validation error returned by
+// OrgIamPolicyView.Validate if the designated constraints aren't met.
+type OrgIamPolicyViewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e OrgIamPolicyViewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e OrgIamPolicyViewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e OrgIamPolicyViewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e OrgIamPolicyViewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e OrgIamPolicyViewValidationError) ErrorName() string { return "OrgIamPolicyViewValidationError" }
+
+// Error satisfies the builtin error interface
+func (e OrgIamPolicyViewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sOrgIamPolicyView.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = OrgIamPolicyViewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = OrgIamPolicyViewValidationError{}
 
 // Validate checks the field values on OrgIamPolicyRequest with the rules
 // defined in the proto definition for this message. If any rules are

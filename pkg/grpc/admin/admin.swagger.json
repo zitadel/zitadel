@@ -632,6 +632,29 @@
         ]
       }
     },
+    "/orgs/default/iampolicy": {
+      "get": {
+        "summary": "ORG_IAM_POLICY",
+        "operationId": "AdminService_GetDefaultOrgIamPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OrgIamPolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/orgs/{id}": {
       "get": {
         "operationId": "AdminService_GetOrgByID",
@@ -664,13 +687,12 @@
     },
     "/orgs/{org_id}/iampolicy": {
       "get": {
-        "summary": "ORG_IAM_POLICY",
         "operationId": "AdminService_GetOrgIamPolicy",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1OrgIamPolicy"
+              "$ref": "#/definitions/v1OrgIamPolicyView"
             }
           },
           "default": {
@@ -2255,9 +2277,6 @@
         "org_id": {
           "type": "string"
         },
-        "description": {
-          "type": "string"
-        },
         "user_login_must_be_domain": {
           "type": "boolean",
           "format": "boolean"
@@ -2292,6 +2311,34 @@
         "user_login_must_be_domain": {
           "type": "boolean",
           "format": "boolean"
+        }
+      }
+    },
+    "v1OrgIamPolicyView": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "type": "string"
+        },
+        "user_login_must_be_domain": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "default": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

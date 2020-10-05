@@ -1018,14 +1018,14 @@ func (mr *MockManagementServiceClientMockRecorder) GetMyOrg(arg0, arg1 interface
 }
 
 // GetMyOrgIamPolicy mocks base method
-func (m *MockManagementServiceClient) GetMyOrgIamPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.OrgIamPolicy, error) {
+func (m *MockManagementServiceClient) GetMyOrgIamPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.OrgIamPolicyView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetMyOrgIamPolicy", varargs...)
-	ret0, _ := ret[0].(*management.OrgIamPolicy)
+	ret0, _ := ret[0].(*management.OrgIamPolicyView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

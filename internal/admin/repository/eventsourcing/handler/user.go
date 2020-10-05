@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 
 	"github.com/caos/logging"
 
@@ -22,6 +22,7 @@ type User struct {
 	handler
 	eventstore     eventstore.Eventstore
 	orgEvents      *org_events.OrgEventstore
+	iamEvents      *iam_es.IAMEventstore
 	systemDefaults systemdefaults.SystemDefaults
 }
 
@@ -139,11 +140,11 @@ func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
 	if err != nil {
 		return err
 	}
-	policy, err := u.view.OrgIAMPolicyByAggregateID(event.ResourceOwner)
-	if err != nil && caos_errs.IsNotFound(err) {
-		policy, err = u.view.OrgIAMPolicyByAggregateID(u.SystemDefaults.IamID)
+	policy := org.OrgIamPolicy
+	if policy == nil {
+		policy, err = u.iamEvents.GetOrgIAMPolicy(context.Background(), u.systemDefaults.IamID)
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
 	users, err := u.view.UsersByOrgID(event.AggregateID)
@@ -161,9 +162,12 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
 	if err != nil {
 		return err
 	}
-	policy, err := u.orgEvents.GetOrgIAMPolicy(context.Background(), event.ResourceOwner)
-	if err != nil {
-		return err
+	policy := org.OrgIamPolicy
+	if policy == nil {
+		policy, err = u.iamEvents.GetOrgIAMPolicy(context.Background(), u.systemDefaults.IamID)
+		if err != nil {
+			return err
+		}
 	}
 	if !policy.UserLoginMustBeDomain {
 		return nil
@@ -183,9 +187,12 @@ func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
 	if err != nil {
 		return err
 	}
-	policy, err := u.orgEvents.GetOrgIAMPolicy(context.Background(), user.ResourceOwner)
-	if err != nil {
-		return err
+	policy := org.OrgIamPolicy
+	if policy == nil {
+		policy, err = u.iamEvents.GetOrgIAMPolicy(context.Background(), u.systemDefaults.IamID)
+		if err != nil {
+			return err
+		}
 	}
 	user.SetLoginNames(policy, org.Domains)
 	user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)

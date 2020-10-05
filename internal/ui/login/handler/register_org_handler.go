@@ -108,7 +108,7 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 			data.HasNumber = NumberRegex
 		}
 	}
-	orgPolicy, err := l.getOrgIamPolicy(r, "0")
+	orgPolicy, err := l.getDefaultOrgIamPolicy(r)
 	if orgPolicy != nil {
 		data.UserLoginMustBeDomain = orgPolicy.UserLoginMustBeDomain
 		data.IamDomain = orgPolicy.IamDomain

@@ -59,10 +59,11 @@ func (repo *OrgRepository) RegisterOrg(ctx context.Context, register *auth_model
 		return nil, err
 	}
 	pwPolicyView := iam_view_model.PasswordComplexityViewToModel(pwPolicy)
-	orgPolicy, err := repo.OrgEventstore.GetOrgIAMPolicy(ctx, "0")
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {
 		return nil, err
 	}
+	orgPolicyView := iam_view_model.OrgIAMViewToModel(orgPolicy)
 	users := func(ctx context.Context, domain string) ([]*es_models.Aggregate, error) {
 		userIDs, err := repo.View.UserIDsByDomain(domain)
 		if err != nil {
@@ -74,7 +75,7 @@ func (repo *OrgRepository) RegisterOrg(ctx context.Context, register *auth_model
 	if err != nil {
 		return nil, err
 	}
-	user, userAggregates, err := repo.UserEventstore.PrepareRegisterUser(ctx, register.User, nil, pwPolicyView, orgPolicy, org.AggregateID)
+	user, userAggregates, err := repo.UserEventstore.PrepareRegisterUser(ctx, register.User, nil, pwPolicyView, orgPolicyView, org.AggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -97,12 +98,28 @@ func (repo *OrgRepository) RegisterOrg(ctx context.Context, register *auth_model
 	return RegisterToModel(registerModel), nil
 }
 
-func (repo *OrgRepository) GetDefaultOrgIamPolicy(ctx context.Context) *org_model.OrgIAMPolicy {
-	return repo.OrgEventstore.GetDefaultOrgIAMPolicy(ctx)
+func (repo *OrgRepository) GetDefaultOrgIamPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	policy := iam_view_model.OrgIAMViewToModel(orgPolicy)
+	policy.IamDomain = repo.SystemDefaults.Domain
+	return policy, err
 }
 
-func (repo *OrgRepository) GetOrgIamPolicy(ctx context.Context, orgID string) (*org_model.OrgIAMPolicy, error) {
-	return repo.OrgEventstore.GetOrgIAMPolicy(ctx, orgID)
+func (repo *OrgRepository) GetOrgIamPolicy(ctx context.Context, orgID string) (*iam_model.OrgIAMPolicyView, error) {
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(orgID)
+	if err != nil && errors.IsNotFound(err) {
+		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_view_model.OrgIAMViewToModel(orgPolicy), nil
 }
 
 func (repo *OrgRepository) GetIDPConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IDPConfigView, error) {

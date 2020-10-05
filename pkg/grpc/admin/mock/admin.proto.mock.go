@@ -237,6 +237,26 @@ func (mr *MockAdminServiceClientMockRecorder) GetDefaultLoginPolicyIdpProviders(
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultLoginPolicyIdpProviders", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultLoginPolicyIdpProviders), varargs...)
 }
 
+// GetDefaultOrgIamPolicy mocks base method
+func (m *MockAdminServiceClient) GetDefaultOrgIamPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.OrgIamPolicyView, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetDefaultOrgIamPolicy", varargs...)
+	ret0, _ := ret[0].(*admin.OrgIamPolicyView)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDefaultOrgIamPolicy indicates an expected call of GetDefaultOrgIamPolicy
+func (mr *MockAdminServiceClientMockRecorder) GetDefaultOrgIamPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultOrgIamPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultOrgIamPolicy), varargs...)
+}
+
 // GetDefaultPasswordAgePolicy mocks base method
 func (m *MockAdminServiceClient) GetDefaultPasswordAgePolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.DefaultPasswordAgePolicyView, error) {
 	m.ctrl.T.Helper()
@@ -358,14 +378,14 @@ func (mr *MockAdminServiceClientMockRecorder) GetOrgByID(arg0, arg1 interface{},
 }
 
 // GetOrgIamPolicy mocks base method
-func (m *MockAdminServiceClient) GetOrgIamPolicy(arg0 context.Context, arg1 *admin.OrgIamPolicyID, arg2 ...grpc.CallOption) (*admin.OrgIamPolicy, error) {
+func (m *MockAdminServiceClient) GetOrgIamPolicy(arg0 context.Context, arg1 *admin.OrgIamPolicyID, arg2 ...grpc.CallOption) (*admin.OrgIamPolicyView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetOrgIamPolicy", varargs...)
-	ret0, _ := ret[0].(*admin.OrgIamPolicy)
+	ret0, _ := ret[0].(*admin.OrgIamPolicyView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

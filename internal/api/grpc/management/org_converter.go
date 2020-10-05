@@ -2,6 +2,7 @@ package management
 
 import (
 	"encoding/json"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
@@ -227,10 +228,8 @@ func orgChangesToMgtAPI(changes *org_model.OrgChanges) (_ []*management.Change) 
 	return result
 }
 
-func orgIamPolicyFromModel(policy *org_model.OrgIAMPolicy) *management.OrgIamPolicy {
-	return &management.OrgIamPolicy{
-		OrgId:                 policy.AggregateID,
-		Description:           policy.Description,
+func orgIamPolicyViewFromModel(policy *iam_model.OrgIAMPolicyView) *management.OrgIamPolicyView {
+	return &management.OrgIamPolicyView{
 		UserLoginMustBeDomain: policy.UserLoginMustBeDomain,
 		Default:               policy.Default,
 	}

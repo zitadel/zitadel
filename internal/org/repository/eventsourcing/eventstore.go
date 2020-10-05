@@ -459,6 +459,17 @@ func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.
 	return es_sdk.Push(ctx, es.PushAggregates, repoMember.AppendEvents, orgAggregate)
 }
 
+func (es *OrgEventstore) GetOrgIAMPolicy(ctx context.Context, orgID string) (*iam_model.OrgIAMPolicy, error) {
+	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
+	if err != nil {
+		return nil, err
+	}
+	if existingOrg.OrgIamPolicy == nil {
+		return nil, errors.ThrowNotFound(nil, "EVENT-3F9sf", "Errors.Org.OrgIAM.NotExisting")
+	}
+	return existingOrg.OrgIamPolicy, nil
+}
+
 func (es *OrgEventstore) AddOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
 	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
 	if err != nil {

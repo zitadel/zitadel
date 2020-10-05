@@ -132,3 +132,42 @@ CREATE TABLE management.password_lockout_policies (
 
     PRIMARY KEY (aggregate_id)
 );
+
+CREATE TABLE management.org_iam_policies (
+    aggregate_id TEXT,
+
+    creation_date TIMESTAMPTZ,
+    change_date TIMESTAMPTZ,
+    org_iam_policy_state SMALLINT,
+    sequence BIGINT,
+
+    user_login_must_be_domain BOOLEAN,
+
+    PRIMARY KEY (aggregate_id)
+);
+
+CREATE TABLE auth.org_iam_policies (
+    aggregate_id TEXT,
+
+    creation_date TIMESTAMPTZ,
+    change_date TIMESTAMPTZ,
+    org_iam_policy_state SMALLINT,
+    sequence BIGINT,
+
+    user_login_must_be_domain BOOLEAN,
+
+    PRIMARY KEY (aggregate_id)
+);
+
+CREATE TABLE adminapi.org_iam_policies (
+    aggregate_id TEXT,
+
+    creation_date TIMESTAMPTZ,
+    change_date TIMESTAMPTZ,
+    org_iam_policy_state SMALLINT,
+    sequence BIGINT,
+
+    user_login_must_be_domain BOOLEAN,
+
+    PRIMARY KEY (aggregate_id)
+);

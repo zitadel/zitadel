@@ -2,13 +2,16 @@ package handler
 
 import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	org_model "github.com/caos/zitadel/internal/org/model"
 	"net/http"
 )
 
-func (l *Login) getOrgIamPolicy(r *http.Request, orgID string) (*org_model.OrgIAMPolicy, error) {
+func (l *Login) getDefaultOrgIamPolicy(r *http.Request) (*iam_model.OrgIAMPolicyView, error) {
+	return l.authRepo.GetDefaultOrgIamPolicy(r.Context())
+}
+
+func (l *Login) getOrgIamPolicy(r *http.Request, orgID string) (*iam_model.OrgIAMPolicyView, error) {
 	if orgID == "" {
-		return l.authRepo.GetDefaultOrgIamPolicy(r.Context()), nil
+		return l.authRepo.GetDefaultOrgIamPolicy(r.Context())
 	}
 	return l.authRepo.GetOrgIamPolicy(r.Context(), orgID)
 }

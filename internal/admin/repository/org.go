@@ -14,7 +14,8 @@ type OrgRepository interface {
 	OrgByID(ctx context.Context, id string) (*org_model.Org, error)
 	SearchOrgs(ctx context.Context, query *org_model.OrgSearchRequest) (*org_model.OrgSearchResult, error)
 
-	GetOrgIamPolicyByID(ctx context.Context, id string) (*iam_model.OrgIAMPolicy, error)
+	GetOrgIamPolicyByID(ctx context.Context, id string) (*iam_model.OrgIAMPolicyView, error)
+	GetDefaultOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error)
 	CreateOrgIamPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error)
 	ChangeOrgIamPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error)
 	RemoveOrgIamPolicy(ctx context.Context, id string) error

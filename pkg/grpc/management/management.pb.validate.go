@@ -4316,17 +4316,13 @@ var _ interface {
 	ErrorName() string
 } = SetPasswordNotificationRequestValidationError{}
 
-// Validate checks the field values on OrgIamPolicy with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *OrgIamPolicy) Validate() error {
+// Validate checks the field values on OrgIamPolicyView with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *OrgIamPolicyView) Validate() error {
 	if m == nil {
 		return nil
 	}
-
-	// no validation rules for OrgId
-
-	// no validation rules for Description
 
 	// no validation rules for UserLoginMustBeDomain
 
@@ -4335,9 +4331,9 @@ func (m *OrgIamPolicy) Validate() error {
 	return nil
 }
 
-// OrgIamPolicyValidationError is the validation error returned by
-// OrgIamPolicy.Validate if the designated constraints aren't met.
-type OrgIamPolicyValidationError struct {
+// OrgIamPolicyViewValidationError is the validation error returned by
+// OrgIamPolicyView.Validate if the designated constraints aren't met.
+type OrgIamPolicyViewValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -4345,22 +4341,22 @@ type OrgIamPolicyValidationError struct {
 }
 
 // Field function returns field value.
-func (e OrgIamPolicyValidationError) Field() string { return e.field }
+func (e OrgIamPolicyViewValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e OrgIamPolicyValidationError) Reason() string { return e.reason }
+func (e OrgIamPolicyViewValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e OrgIamPolicyValidationError) Cause() error { return e.cause }
+func (e OrgIamPolicyViewValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e OrgIamPolicyValidationError) Key() bool { return e.key }
+func (e OrgIamPolicyViewValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e OrgIamPolicyValidationError) ErrorName() string { return "OrgIamPolicyValidationError" }
+func (e OrgIamPolicyViewValidationError) ErrorName() string { return "OrgIamPolicyViewValidationError" }
 
 // Error satisfies the builtin error interface
-func (e OrgIamPolicyValidationError) Error() string {
+func (e OrgIamPolicyViewValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -4372,14 +4368,14 @@ func (e OrgIamPolicyValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sOrgIamPolicy.%s: %s%s",
+		"invalid %sOrgIamPolicyView.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = OrgIamPolicyValidationError{}
+var _ error = OrgIamPolicyViewValidationError{}
 
 var _ interface {
 	Field() string
@@ -4387,7 +4383,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = OrgIamPolicyValidationError{}
+} = OrgIamPolicyViewValidationError{}
 
 // Validate checks the field values on OrgCreateRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, an
