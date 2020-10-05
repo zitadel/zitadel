@@ -58,10 +58,12 @@ export class IamMembersComponent {
             });
     }
 
-    public removeProjectMemberSelection(): void {
+    public removeMemberSelection(): void {
+        console.log(this.selection);
         Promise.all(this.selection.map(member => {
             return this.adminService.RemoveIamMember(member.userId).then(() => {
                 this.toast.showInfo('IAM.TOAST.MEMBERREMOVED', true);
+                this.changePage.emit();
             }).catch(error => {
                 this.toast.showError(error);
             });

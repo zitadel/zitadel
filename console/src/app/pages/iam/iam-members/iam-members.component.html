@@ -6,7 +6,7 @@
         (changedSelection)="selection = $event" [refreshTrigger]="changePage">
 
         <ng-template appHasRole selectactions [appHasRole]="['iam.member.delete']">
-            <button color="warn" (click)="removeProjectMemberSelection()"
+            <button color="warn" (click)="removeMemberSelection()"
                 matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="del-button" mat-raised-button>
                 <i class="las la-trash"></i>
                 {{'ACTIONS.SELECTIONDELETE' | translate}}

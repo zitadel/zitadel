@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } 
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { IamMembersDataSource } from 'src/app/pages/iam/iam-members/iam-members-datasource';
 import { OrgMembersDataSource } from 'src/app/pages/orgs/org-members/org-members-datasource';
@@ -33,13 +33,13 @@ export class MembersTableComponent implements OnInit, OnDestroy {
     @Output() public updateRoles: EventEmitter<{ member: View, change: MatSelectChange; }> = new EventEmitter();
     @Output() public changedSelection: EventEmitter<any[]> = new EventEmitter();
 
-    private destroyed: BehaviorSubject<any> = new BehaviorSubject(false);
+    private destroyed: Subject<void> = new Subject();
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'userId', 'firstname', 'lastname', 'username', 'email', 'roles'];
 
     constructor() {
-        this.selection.changed.pipe(takeUntil(this.destroyed)).subscribe(value => {
+        this.selection.changed.pipe(takeUntil(this.destroyed)).subscribe(_ => {
             this.changedSelection.emit(this.selection.selected);
         });
     }
@@ -51,7 +51,7 @@ export class MembersTableComponent implements OnInit, OnDestroy {
     }
 
     public ngOnDestroy(): void {
-        this.destroyed.next(true);
+        this.destroyed.next();
     }
 
     public isAllSelected(): boolean {
