@@ -19,9 +19,9 @@ const (
 )
 
 type Filter struct {
-	field     Field
-	value     interface{}
-	operation Operation
+	Field     Field
+	Value     interface{}
+	Operation Operation
 }
 
 type Operation int32
@@ -48,33 +48,33 @@ const (
 //NewFilter is used in tests. Use searchQuery.*Filter() instead
 func NewFilter(field Field, value interface{}, operation Operation) *Filter {
 	return &Filter{
-		field:     field,
-		value:     value,
-		operation: operation,
+		Field:     field,
+		Value:     value,
+		Operation: operation,
 	}
 }
 
-func (f *Filter) Field() Field {
-	return f.field
-}
-func (f *Filter) Operation() Operation {
-	return f.operation
-}
-func (f *Filter) Value() interface{} {
-	return f.value
-}
+// func (f *Filter) Field() Field {
+// 	return f.field
+// }
+// func (f *Filter) Operation() Operation {
+// 	return f.operation
+// }
+// func (f *Filter) Value() interface{} {
+// 	return f.value
+// }
 
 func (f *Filter) Validate() error {
 	if f == nil {
 		return errors.ThrowPreconditionFailed(nil, "REPO-z6KcG", "filter is nil")
 	}
-	if f.field <= 0 {
+	if f.Field <= 0 {
 		return errors.ThrowPreconditionFailed(nil, "REPO-zw62U", "field not definded")
 	}
-	if f.value == nil {
+	if f.Value == nil {
 		return errors.ThrowPreconditionFailed(nil, "REPO-GJ9ct", "no value definded")
 	}
-	if f.operation <= 0 {
+	if f.Operation <= 0 {
 		return errors.ThrowPreconditionFailed(nil, "REPO-RrQTy", "operation not definded")
 	}
 	return nil

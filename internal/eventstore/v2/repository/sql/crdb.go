@@ -158,20 +158,10 @@ func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
 
 // Filter returns all events matching the given search query
 func (db *CRDB) Filter(ctx context.Context, searchQuery *repository.SearchQuery) (events []*repository.Event, err error) {
-	rows, rowScanner, err := db.query(searchQuery)
+	events = []*repository.Event{}
+	err = db.query(searchQuery, &events)
 	if err != nil {
 		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		event := new(repository.Event)
-		err := rowScanner(rows.Scan, event)
-		if err != nil {
-			return nil, err
-		}
-
-		events = append(events, event)
 	}
 
 	return events, nil
@@ -179,37 +169,35 @@ func (db *CRDB) Filter(ctx context.Context, searchQuery *repository.SearchQuery)
 
 //LatestSequence returns the latests sequence found by the the search query
 func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *repository.SearchQuery) (uint64, error) {
-	rows, rowScanner, err := db.query(searchQuery)
-	if err != nil {
-		return 0, err
-	}
-	defer rows.Close()
-
-	if !rows.Next() {
-		return 0, caos_errs.ThrowNotFound(nil, "SQL-cAEzS", "latest sequence not found")
-	}
-
 	var seq Sequence
-	err = rowScanner(rows.Scan, &seq)
+	err := db.query(searchQuery, &seq)
 	if err != nil {
 		return 0, err
 	}
-
 	return uint64(seq), nil
 }
 
-func (db *CRDB) query(searchQuery *repository.SearchQuery) (*sql.Rows, rowScan, error) {
+func (db *CRDB) query(searchQuery *repository.SearchQuery, data interface{}) error {
 	query, values, rowScanner := buildQuery(db, searchQuery)
 	if query == "" {
-		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
+		return caos_errs.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
 
 	rows, err := db.client.Query(query, values...)
 	if err != nil {
 		logging.Log("SQL-HP3Uk").WithError(err).Info("query failed")
-		return nil, nil, caos_errs.ThrowInternal(err, "SQL-IJuyR", "unable to filter events")
+		return caos_errs.ThrowInternal(err, "SQL-IJuyR", "unable to filter events")
 	}
-	return rows, rowScanner, nil
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rowScanner(rows.Scan, nil)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (db *CRDB) eventQuery() string {

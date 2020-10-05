@@ -52,15 +52,15 @@ func buildQuery(criteria criteriaer, searchQuery *repository.SearchQuery) (query
 func prepareColumns(criteria criteriaer, columns repository.Columns) (string, func(s scan, dest interface{}) error) {
 	switch columns {
 	case repository.Columns_Max_Sequence:
-		return criteria.maxSequenceQuery(), maxSequenceRowScanner
+		return criteria.maxSequenceQuery(), maxSequenceScanner
 	case repository.Columns_Event:
-		return criteria.eventQuery(), eventRowScanner
+		return criteria.eventQuery(), eventsScanner
 	default:
 		return "", nil
 	}
 }
 
-func maxSequenceRowScanner(row scan, dest interface{}) (err error) {
+func maxSequenceScanner(row scan, dest interface{}) (err error) {
 	sequence, ok := dest.(*Sequence)
 	if !ok {
 		return z_errors.ThrowInvalidArgument(nil, "SQL-NBjA9", "type must be sequence")
@@ -72,15 +72,16 @@ func maxSequenceRowScanner(row scan, dest interface{}) (err error) {
 	return z_errors.ThrowInternal(err, "SQL-bN5xg", "something went wrong")
 }
 
-func eventRowScanner(row scan, dest interface{}) (err error) {
-	event, ok := dest.(*repository.Event)
+func eventsScanner(scanner scan, dest interface{}) (err error) {
+	events, ok := dest.(*[]*repository.Event)
 	if !ok {
 		return z_errors.ThrowInvalidArgument(nil, "SQL-4GP6F", "type must be event")
 	}
 	var previousSequence Sequence
 	data := make(Data, 0)
+	event := new(repository.Event)
 
-	err = row(
+	err = scanner(
 		&event.CreationDate,
 		&event.Type,
 		&event.Sequence,
@@ -104,6 +105,8 @@ func eventRowScanner(row scan, dest interface{}) (err error) {
 	event.Data = make([]byte, len(data))
 	copy(event.Data, data)
 
+	*events = append(*events, event)
+
 	return nil
 }
 
@@ -115,7 +118,7 @@ func prepareCondition(criteria criteriaer, filters []*repository.Filter) (clause
 		return clause, values
 	}
 	for i, filter := range filters {
-		value := filter.Value()
+		value := filter.Value
 		switch value.(type) {
 		case []bool, []float64, []int64, []string, []repository.AggregateType, []repository.EventType, *[]bool, *[]float64, *[]int64, *[]string, *[]repository.AggregateType, *[]repository.EventType:
 			value = pq.Array(value)
@@ -131,12 +134,12 @@ func prepareCondition(criteria criteriaer, filters []*repository.Filter) (clause
 }
 
 func getCondition(cond criteriaer, filter *repository.Filter) (condition string) {
-	field := cond.columnName(filter.Field())
-	operation := cond.operation(filter.Operation())
+	field := cond.columnName(filter.Field)
+	operation := cond.operation(filter.Operation)
 	if field == "" || operation == "" {
 		return ""
 	}
-	format := cond.conditionFormat(filter.Operation())
+	format := cond.conditionFormat(filter.Operation)
 
 	return fmt.Sprintf(format, field, operation)
 }

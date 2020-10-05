@@ -23,7 +23,7 @@ func TestNewFilter(t *testing.T) {
 				value:     "hodor",
 				operation: Operation_Equals,
 			},
-			want: &Filter{field: Field_AggregateID, operation: Operation_Equals, value: "hodor"},
+			want: &Filter{Field: Field_AggregateID, Operation: Operation_Equals, Value: "hodor"},
 		},
 	}
 	for _, tt := range tests {
@@ -91,9 +91,9 @@ func TestFilter_Validate(t *testing.T) {
 			var f *Filter
 			if !tt.fields.isNil {
 				f = &Filter{
-					field:     tt.fields.field,
-					value:     tt.fields.value,
-					operation: tt.fields.operation,
+					Field:     tt.fields.field,
+					Value:     tt.fields.value,
+					Operation: tt.fields.operation,
 				}
 			}
 			if err := f.Validate(); (err != nil) != tt.wantErr {
