@@ -135,11 +135,12 @@ func checkExistingLoginPolicyIDPProviderValidation(idpProvider *iam_es_model.IDP
 				if err != nil {
 					return err
 				}
-				for i := len(idps) - 1; i >= 0; i-- {
-					if idps[i].IDPConfigID == config.IDPConfigID {
+				for i := len(idpConfigs) - 1; i >= 0; i-- {
+					if idpConfigs[i].IDPConfigID == config.IDPConfigID {
 						idpConfigs[i] = idpConfigs[len(idpConfigs)-1]
 						idpConfigs[len(idpConfigs)-1] = nil
 						idpConfigs = idpConfigs[:len(idpConfigs)-1]
+						break
 					}
 				}
 			case model.LoginPolicyIDPProviderAdded:
@@ -161,6 +162,7 @@ func checkExistingLoginPolicyIDPProviderValidation(idpProvider *iam_es_model.IDP
 						idps[i] = idps[len(idps)-1]
 						idps[len(idps)-1] = nil
 						idps = idps[:len(idps)-1]
+						break
 					}
 				}
 			}

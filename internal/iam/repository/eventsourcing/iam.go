@@ -330,11 +330,12 @@ func checkExistingLoginPolicyIDPProviderValidation(idpConfigID string) func(...*
 					logging.LogWithFields("ERROR-fGj8s", "event", event).WithError(err).Error("could not set data")
 					return err
 				}
-				for i := len(idps) - 1; i >= 0; i-- {
-					if idps[i].IDPConfigID == config.IDPConfigID {
+				for i := len(idpConfigs) - 1; i >= 0; i-- {
+					if idpConfigs[i].IDPConfigID == config.IDPConfigID {
 						idpConfigs[i] = idpConfigs[len(idpConfigs)-1]
 						idpConfigs[len(idpConfigs)-1] = nil
 						idpConfigs = idpConfigs[:len(idpConfigs)-1]
+						break
 					}
 				}
 			case model.LoginPolicyIDPProviderAdded:
@@ -357,6 +358,7 @@ func checkExistingLoginPolicyIDPProviderValidation(idpConfigID string) func(...*
 						idps[i] = idps[len(idps)-1]
 						idps[len(idps)-1] = nil
 						idps = idps[:len(idps)-1]
+						break
 					}
 				}
 			}
