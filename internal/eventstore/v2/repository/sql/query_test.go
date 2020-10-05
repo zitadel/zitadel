@@ -309,19 +309,6 @@ func Test_buildQuery(t *testing.T) {
 		args args
 		res  res
 	}{
-
-		// {
-		//removed because it's no valid test case
-		// 	name: "no query",
-		// 	args: args{
-		// 		query: nil,
-		// 	},
-		// 	res: res{
-		// 		query:      "",
-		// 		rowScanner: false,
-		// 		values:     nil,
-		// 	},
-		// },
 		{
 			name: "with order by desc",
 			args: args{
@@ -386,6 +373,35 @@ func Test_buildQuery(t *testing.T) {
 				query:      "SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC LIMIT $2",
 				rowScanner: true,
 				values:     []interface{}{repository.AggregateType("user"), uint64(5)},
+			},
+		},
+		{
+			name: "error no columns",
+			args: args{
+				query: &repository.SearchQuery{
+					Columns: repository.Columns(-1),
+				},
+			},
+			res: res{
+				query:      "",
+				rowScanner: false,
+				values:     []interface{}(nil),
+			},
+		},
+		{
+			name: "invalid condition",
+			args: args{
+				query: &repository.SearchQuery{
+					Columns: repository.Columns_Event,
+					Filters: []*repository.Filter{
+						{},
+					},
+				},
+			},
+			res: res{
+				query:      "",
+				rowScanner: false,
+				values:     []interface{}(nil),
 			},
 		},
 	}

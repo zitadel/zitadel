@@ -98,7 +98,7 @@ const (
 		"		        END " +
 		"		) " +
 		"	) " +
-		"RETURNING event_sequence, creation_date "
+		"RETURNING id, event_sequence, creation_date "
 )
 
 type CRDB struct {
@@ -127,14 +127,17 @@ func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
 				event.AggregateType,
 				event.AggregateID,
 				event.Version,
-				event.CreationDate,
-				event.Data,
+				&sql.NullTime{
+					Time:  event.CreationDate,
+					Valid: !event.CreationDate.IsZero(),
+				},
+				Data(event.Data),
 				event.EditorUser,
 				event.EditorService,
 				event.ResourceOwner,
-				previousSequence,
+				Sequence(previousSequence),
 				event.CheckPreviousSequence,
-			).Scan(&event.Sequence, &event.CreationDate)
+			).Scan(&event.ID, &event.Sequence, &event.CreationDate)
 
 			if err != nil {
 				tx.Rollback()
