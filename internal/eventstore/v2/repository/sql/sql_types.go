@@ -1,6 +1,8 @@
-package repository
+package sql
 
-import "database/sql/driver"
+import (
+	"database/sql/driver"
+)
 
 // Data represents a byte array that may be null.
 // Data implements the sql.Scanner interface

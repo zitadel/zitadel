@@ -66,3 +66,6 @@ type Event struct {
 
 //EventType is the description of the change
 type EventType string
+
+//AggregateType is the object name
+type AggregateType string

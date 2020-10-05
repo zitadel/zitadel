@@ -1,4 +1,4 @@
-package repository
+package sql
 
 import (
 	"database/sql"
@@ -7,8 +7,7 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/lib/pq"
 )
 
@@ -60,12 +59,12 @@ func Test_numberPlaceholder(t *testing.T) {
 
 func Test_getOperation(t *testing.T) {
 	t.Run("all ops", func(t *testing.T) {
-		for op, expected := range map[es_models.Operation]string{
-			es_models.Operation_Equals:  "=",
-			es_models.Operation_In:      "=",
-			es_models.Operation_Greater: ">",
-			es_models.Operation_Less:    "<",
-			es_models.Operation(-1):     "",
+		for op, expected := range map[repository.Operation]string{
+			repository.Operation_Equals:  "=",
+			repository.Operation_In:      "=",
+			repository.Operation_Greater: ">",
+			repository.Operation_Less:    "<",
+			repository.Operation(-1):     "",
 		} {
 			if got := getOperation(op); got != expected {
 				t.Errorf("getOperation() = %v, want %v", got, expected)
@@ -76,15 +75,15 @@ func Test_getOperation(t *testing.T) {
 
 func Test_getField(t *testing.T) {
 	t.Run("all fields", func(t *testing.T) {
-		for field, expected := range map[es_models.Field]string{
-			es_models.Field_AggregateType:  "aggregate_type",
-			es_models.Field_AggregateID:    "aggregate_id",
-			es_models.Field_LatestSequence: "event_sequence",
-			es_models.Field_ResourceOwner:  "resource_owner",
-			es_models.Field_EditorService:  "editor_service",
-			es_models.Field_EditorUser:     "editor_user",
-			es_models.Field_EventType:      "event_type",
-			es_models.Field(-1):            "",
+		for field, expected := range map[repository.Field]string{
+			repository.Field_AggregateType:  "aggregate_type",
+			repository.Field_AggregateID:    "aggregate_id",
+			repository.Field_LatestSequence: "event_sequence",
+			repository.Field_ResourceOwner:  "resource_owner",
+			repository.Field_EditorService:  "editor_service",
+			repository.Field_EditorUser:     "editor_user",
+			repository.Field_EventType:      "event_type",
+			repository.Field(-1):            "",
 		} {
 			if got := getField(field); got != expected {
 				t.Errorf("getField() = %v, want %v", got, expected)
@@ -95,7 +94,7 @@ func Test_getField(t *testing.T) {
 
 func Test_getConditionFormat(t *testing.T) {
 	type args struct {
-		operation es_models.Operation
+		operation repository.Operation
 	}
 	tests := []struct {
 		name string
@@ -105,14 +104,14 @@ func Test_getConditionFormat(t *testing.T) {
 		{
 			name: "no in operation",
 			args: args{
-				operation: es_models.Operation_Equals,
+				operation: repository.Operation_Equals,
 			},
 			want: "%s %s ?",
 		},
 		{
 			name: "in operation",
 			args: args{
-				operation: es_models.Operation_In,
+				operation: repository.Operation_In,
 			},
 			want: "%s %s ANY(?)",
 		},
@@ -128,7 +127,7 @@ func Test_getConditionFormat(t *testing.T) {
 
 func Test_getCondition(t *testing.T) {
 	type args struct {
-		filter *es_models.Filter
+		filter *repository.Filter
 	}
 	tests := []struct {
 		name string
@@ -137,37 +136,37 @@ func Test_getCondition(t *testing.T) {
 	}{
 		{
 			name: "equals",
-			args: args{filter: es_models.NewFilter(es_models.Field_AggregateID, "", es_models.Operation_Equals)},
+			args: args{filter: repository.NewFilter(repository.Field_AggregateID, "", repository.Operation_Equals)},
 			want: "aggregate_id = ?",
 		},
 		{
 			name: "greater",
-			args: args{filter: es_models.NewFilter(es_models.Field_LatestSequence, 0, es_models.Operation_Greater)},
+			args: args{filter: repository.NewFilter(repository.Field_LatestSequence, 0, repository.Operation_Greater)},
 			want: "event_sequence > ?",
 		},
 		{
 			name: "less",
-			args: args{filter: es_models.NewFilter(es_models.Field_LatestSequence, 5000, es_models.Operation_Less)},
+			args: args{filter: repository.NewFilter(repository.Field_LatestSequence, 5000, repository.Operation_Less)},
 			want: "event_sequence < ?",
 		},
 		{
 			name: "in list",
-			args: args{filter: es_models.NewFilter(es_models.Field_AggregateType, []es_models.AggregateType{"movies", "actors"}, es_models.Operation_In)},
+			args: args{filter: repository.NewFilter(repository.Field_AggregateType, []repository.AggregateType{"movies", "actors"}, repository.Operation_In)},
 			want: "aggregate_type = ANY(?)",
 		},
 		{
 			name: "invalid operation",
-			args: args{filter: es_models.NewFilter(es_models.Field_AggregateType, []es_models.AggregateType{"movies", "actors"}, es_models.Operation(-1))},
+			args: args{filter: repository.NewFilter(repository.Field_AggregateType, []repository.AggregateType{"movies", "actors"}, repository.Operation(-1))},
 			want: "",
 		},
 		{
 			name: "invalid field",
-			args: args{filter: es_models.NewFilter(es_models.Field(-1), []es_models.AggregateType{"movies", "actors"}, es_models.Operation_Equals)},
+			args: args{filter: repository.NewFilter(repository.Field(-1), []repository.AggregateType{"movies", "actors"}, repository.Operation_Equals)},
 			want: "",
 		},
 		{
 			name: "invalid field and operation",
-			args: args{filter: es_models.NewFilter(es_models.Field(-1), []es_models.AggregateType{"movies", "actors"}, es_models.Operation(-1))},
+			args: args{filter: repository.NewFilter(repository.Field(-1), []repository.AggregateType{"movies", "actors"}, repository.Operation(-1))},
 			want: "",
 		},
 	}
@@ -182,7 +181,7 @@ func Test_getCondition(t *testing.T) {
 
 func Test_prepareColumns(t *testing.T) {
 	type args struct {
-		columns models.Columns
+		columns repository.Columns
 		dest    interface{}
 		dbErr   error
 	}
@@ -199,7 +198,7 @@ func Test_prepareColumns(t *testing.T) {
 	}{
 		{
 			name: "invalid columns",
-			args: args{columns: es_models.Columns(-1)},
+			args: args{columns: repository.Columns(-1)},
 			res: res{
 				query: "",
 				dbErr: func(err error) bool { return err == nil },
@@ -208,7 +207,7 @@ func Test_prepareColumns(t *testing.T) {
 		{
 			name: "max column",
 			args: args{
-				columns: es_models.Columns_Max_Sequence,
+				columns: repository.Columns_Max_Sequence,
 				dest:    new(Sequence),
 			},
 			res: res{
@@ -220,7 +219,7 @@ func Test_prepareColumns(t *testing.T) {
 		{
 			name: "max sequence wrong dest type",
 			args: args{
-				columns: es_models.Columns_Max_Sequence,
+				columns: repository.Columns_Max_Sequence,
 				dest:    new(uint64),
 			},
 			res: res{
@@ -231,19 +230,19 @@ func Test_prepareColumns(t *testing.T) {
 		{
 			name: "event",
 			args: args{
-				columns: es_models.Columns_Event,
-				dest:    new(models.Event),
+				columns: repository.Columns_Event,
+				dest:    new(repository.Event),
 			},
 			res: res{
 				query:    "SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
-				dbRow:    []interface{}{time.Time{}, models.EventType(""), uint64(5), Sequence(0), Data(nil), "", "", "", models.AggregateType("user"), "hodor", models.Version("")},
-				expected: models.Event{AggregateID: "hodor", AggregateType: "user", Sequence: 5, Data: make(Data, 0)},
+				dbRow:    []interface{}{time.Time{}, repository.EventType(""), uint64(5), Sequence(0), Data(nil), "", "", "", repository.AggregateType("user"), "hodor", repository.Version("")},
+				expected: repository.Event{AggregateID: "hodor", AggregateType: "user", Sequence: 5, Data: make(Data, 0)},
 			},
 		},
 		{
 			name: "event wrong dest type",
 			args: args{
-				columns: es_models.Columns_Event,
+				columns: repository.Columns_Event,
 				dest:    new(uint64),
 			},
 			res: res{
@@ -254,8 +253,8 @@ func Test_prepareColumns(t *testing.T) {
 		{
 			name: "event query error",
 			args: args{
-				columns: es_models.Columns_Event,
-				dest:    new(models.Event),
+				columns: repository.Columns_Event,
+				dest:    new(repository.Event),
 				dbErr:   sql.ErrConnDone,
 			},
 			res: res{
@@ -290,7 +289,7 @@ func Test_prepareColumns(t *testing.T) {
 	}
 }
 
-func prepareTestScan(err error, res []interface{}) scanner {
+func prepareTestScan(err error, res []interface{}) scan {
 	return func(dests ...interface{}) error {
 		if err != nil {
 			return err
@@ -308,7 +307,7 @@ func prepareTestScan(err error, res []interface{}) scanner {
 
 func Test_prepareCondition(t *testing.T) {
 	type args struct {
-		filters []*models.Filter
+		filters []*repository.Filter
 	}
 	type res struct {
 		clause string
@@ -332,7 +331,7 @@ func Test_prepareCondition(t *testing.T) {
 		{
 			name: "empty filters",
 			args: args{
-				filters: []*es_models.Filter{},
+				filters: []*repository.Filter{},
 			},
 			res: res{
 				clause: "",
@@ -342,8 +341,8 @@ func Test_prepareCondition(t *testing.T) {
 		{
 			name: "invalid condition",
 			args: args{
-				filters: []*es_models.Filter{
-					es_models.NewFilter(es_models.Field_AggregateID, "wrong", es_models.Operation(-1)),
+				filters: []*repository.Filter{
+					repository.NewFilter(repository.Field_AggregateID, "wrong", repository.Operation(-1)),
 				},
 			},
 			res: res{
@@ -354,27 +353,27 @@ func Test_prepareCondition(t *testing.T) {
 		{
 			name: "array as condition value",
 			args: args{
-				filters: []*es_models.Filter{
-					es_models.NewFilter(es_models.Field_AggregateType, []es_models.AggregateType{"user", "org"}, es_models.Operation_In),
+				filters: []*repository.Filter{
+					repository.NewFilter(repository.Field_AggregateType, []repository.AggregateType{"user", "org"}, repository.Operation_In),
 				},
 			},
 			res: res{
 				clause: " WHERE aggregate_type = ANY(?)",
-				values: []interface{}{pq.Array([]es_models.AggregateType{"user", "org"})},
+				values: []interface{}{pq.Array([]repository.AggregateType{"user", "org"})},
 			},
 		},
 		{
 			name: "multiple filters",
 			args: args{
-				filters: []*es_models.Filter{
-					es_models.NewFilter(es_models.Field_AggregateType, []es_models.AggregateType{"user", "org"}, es_models.Operation_In),
-					es_models.NewFilter(es_models.Field_AggregateID, "1234", es_models.Operation_Equals),
-					es_models.NewFilter(es_models.Field_EventType, []es_models.EventType{"user.created", "org.created"}, es_models.Operation_In),
+				filters: []*repository.Filter{
+					repository.NewFilter(repository.Field_AggregateType, []repository.AggregateType{"user", "org"}, repository.Operation_In),
+					repository.NewFilter(repository.Field_AggregateID, "1234", repository.Operation_Equals),
+					repository.NewFilter(repository.Field_EventType, []repository.EventType{"user.created", "org.created"}, repository.Operation_In),
 				},
 			},
 			res: res{
 				clause: " WHERE aggregate_type = ANY(?) AND aggregate_id = ? AND event_type = ANY(?)",
-				values: []interface{}{pq.Array([]es_models.AggregateType{"user", "org"}), "1234", pq.Array([]es_models.EventType{"user.created", "org.created"})},
+				values: []interface{}{pq.Array([]repository.AggregateType{"user", "org"}), "1234", pq.Array([]repository.EventType{"user.created", "org.created"})},
 			},
 		},
 	}
@@ -399,7 +398,7 @@ func Test_prepareCondition(t *testing.T) {
 
 func Test_buildQuery(t *testing.T) {
 	type args struct {
-		queryFactory *models.SearchQueryFactory
+		queryFactory *repository.SearchQuery
 	}
 	type res struct {
 		query      string
@@ -427,35 +426,36 @@ func Test_buildQuery(t *testing.T) {
 		{
 			name: "with order by desc",
 			args: args{
-				queryFactory: es_models.NewSearchQueryFactory("user").OrderDesc(),
+				//  NewSearchQueryFactory("user").OrderDesc()
+				queryFactory: &repository.SearchQuery{Desc: true},
 			},
 			res: res{
 				query:      "SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC",
 				rowScanner: true,
-				values:     []interface{}{es_models.AggregateType("user")},
+				values:     []interface{}{repository.AggregateType("user")},
 			},
 		},
 		{
 			name: "with limit",
 			args: args{
-				queryFactory: es_models.NewSearchQueryFactory("user").Limit(5),
+				queryFactory: repository.NewSearchQueryFactory("user").Limit(5),
 			},
 			res: res{
 				query:      "SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence LIMIT $2",
 				rowScanner: true,
-				values:     []interface{}{es_models.AggregateType("user"), uint64(5)},
+				values:     []interface{}{repository.AggregateType("user"), uint64(5)},
 				limit:      5,
 			},
 		},
 		{
 			name: "with limit and order by desc",
 			args: args{
-				queryFactory: es_models.NewSearchQueryFactory("user").Limit(5).OrderDesc(),
+				queryFactory: repository.NewSearchQueryFactory("user").Limit(5).OrderDesc(),
 			},
 			res: res{
 				query:      "SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC LIMIT $2",
 				rowScanner: true,
-				values:     []interface{}{es_models.AggregateType("user"), uint64(5)},
+				values:     []interface{}{repository.AggregateType("user"), uint64(5)},
 				limit:      5,
 			},
 		},
@@ -484,3 +484,5 @@ func Test_buildQuery(t *testing.T) {
 		})
 	}
 }
+
+// func buildQuery(t *testing.T, factory *reposear)

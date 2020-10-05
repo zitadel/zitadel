@@ -6,7 +6,6 @@ import (
 
 type Repository interface {
 	Health(ctx context.Context) error
-
 	// PushEvents adds all events of the given aggregates to the eventstreams of the aggregates.
 	// This call is transaction save. The transaction will be rolled back if one event fails
 	Push(ctx context.Context, events ...*Event) error

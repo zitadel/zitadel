@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
+// testEvent implements the Event interface
 type testEvent struct {
 	description         string
 	shouldCheckPrevious bool
@@ -15,6 +16,23 @@ type testEvent struct {
 
 func (e *testEvent) CheckPrevious() bool {
 	return e.shouldCheckPrevious
+}
+
+func (e *testEvent) EditorService() string {
+	return "editorService"
+}
+func (e *testEvent) EditorUser() string {
+	return "editorUser"
+}
+func (e *testEvent) Type() EventType {
+	return "test.event"
+}
+func (e *testEvent) Data() interface{} {
+	return nil
+}
+
+func (e *testEvent) PreviousSequence() uint64 {
+	return 0
 }
 
 func testPushMapper(Event) (*repository.Event, error) {

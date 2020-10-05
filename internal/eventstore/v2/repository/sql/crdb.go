@@ -1,12 +1,15 @@
-package repository
+package sql
 
 import (
 	"context"
 	"database/sql"
 	"errors"
+	"regexp"
+	"strconv"
 
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 
 	//sql import for cockroach
@@ -99,15 +102,15 @@ const (
 )
 
 type CRDB struct {
-	db *sql.DB
+	client *sql.DB
 }
 
-func (db *CRDB) Health(ctx context.Context) error { return db.db.Ping() }
+func (db *CRDB) Health(ctx context.Context) error { return db.client.Ping() }
 
 // Push adds all events to the eventstreams of the aggregates.
 // This call is transaction save. The transaction will be rolled back if one event fails
-func (db *CRDB) Push(ctx context.Context, events ...*Event) error {
-	err := crdb.ExecuteTx(ctx, db.db, nil, func(tx *sql.Tx) error {
+func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
+	err := crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
 		stmt, err := tx.PrepareContext(ctx, crdbInsert)
 		if err != nil {
 			tx.Rollback()
@@ -154,74 +157,138 @@ func (db *CRDB) Push(ctx context.Context, events ...*Event) error {
 }
 
 // Filter returns all events matching the given search query
-// func (db *CRDB) Filter(ctx context.Context, searchQuery *SearchQuery) (events []*Event, err error) {
+func (db *CRDB) Filter(ctx context.Context, searchQuery *repository.SearchQuery) (events []*repository.Event, err error) {
+	rows, rowScanner, err := db.query(searchQuery)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
 
-// 	return events, nil
-// }
+	for rows.Next() {
+		event := new(repository.Event)
+		err := rowScanner(rows.Scan, event)
+		if err != nil {
+			return nil, err
+		}
 
-//LatestSequence returns the latests sequence found by the the search query
-func (db *CRDB) LatestSequence(ctx context.Context, queryFactory *SearchQuery) (uint64, error) {
-	return 0, nil
+		events = append(events, event)
+	}
+
+	return events, nil
 }
 
-func (db *CRDB) prepareQuery(columns Columns) (string, func(s scanner, dest interface{}) error) {
-	switch columns {
-	case Columns_Max_Sequence:
-		return "SELECT MAX(event_sequence) FROM eventstore.events", func(scan scanner, dest interface{}) (err error) {
-			sequence, ok := dest.(*Sequence)
-			if !ok {
-				return caos_errs.ThrowInvalidArgument(nil, "SQL-NBjA9", "type must be sequence")
-			}
-			err = scan(sequence)
-			if err == nil || errors.Is(err, sql.ErrNoRows) {
-				return nil
-			}
-			return caos_errs.ThrowInternal(err, "SQL-bN5xg", "something went wrong")
-		}
-	case Columns_Event:
-		return selectStmt, func(row scanner, dest interface{}) (err error) {
-			event, ok := dest.(*Event)
-			if !ok {
-				return caos_errs.ThrowInvalidArgument(nil, "SQL-4GP6F", "type must be event")
-			}
-			var previousSequence Sequence
-			data := make(Data, 0)
+//LatestSequence returns the latests sequence found by the the search query
+func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *repository.SearchQuery) (uint64, error) {
+	rows, rowScanner, err := db.query(searchQuery)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
 
-			err = row(
-				&event.CreationDate,
-				&event.Type,
-				&event.Sequence,
-				&previousSequence,
-				&data,
-				&event.EditorService,
-				&event.EditorUser,
-				&event.ResourceOwner,
-				&event.AggregateType,
-				&event.AggregateID,
-				&event.Version,
-			)
+	if !rows.Next() {
+		return 0, caos_errs.ThrowNotFound(nil, "SQL-cAEzS", "latest sequence not found")
+	}
 
-			if err != nil {
-				logging.Log("SQL-kn1Sw").WithError(err).Warn("unable to scan row")
-				return caos_errs.ThrowInternal(err, "SQL-J0hFS", "unable to scan row")
-			}
+	var seq Sequence
+	err = rowScanner(rows.Scan, &seq)
+	if err != nil {
+		return 0, err
+	}
 
-			event.PreviousSequence = uint64(previousSequence)
+	return uint64(seq), nil
+}
 
-			event.Data = make([]byte, len(data))
-			copy(event.Data, data)
+func (db *CRDB) query(searchQuery *repository.SearchQuery) (*sql.Rows, rowScan, error) {
+	query, values, rowScanner := buildQuery(db, searchQuery)
+	if query == "" {
+		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
+	}
 
-			return nil
-		}
+	rows, err := db.client.Query(query, values...)
+	if err != nil {
+		logging.Log("SQL-HP3Uk").WithError(err).Info("query failed")
+		return nil, nil, caos_errs.ThrowInternal(err, "SQL-IJuyR", "unable to filter events")
+	}
+	return rows, rowScanner, nil
+}
+
+func (db *CRDB) eventQuery() string {
+	return "SELECT" +
+		" creation_date" +
+		", event_type" +
+		", event_sequence" +
+		", previous_sequence" +
+		", event_data" +
+		", editor_service" +
+		", editor_user" +
+		", resource_owner" +
+		", aggregate_type" +
+		", aggregate_id" +
+		", aggregate_version" +
+		" FROM eventstore.events"
+}
+func (db *CRDB) maxSequenceQuery() string {
+	return "SELECT MAX(event_sequence) FROM eventstore.events"
+}
+
+func (db *CRDB) columnName(col repository.Field) string {
+	switch col {
+	case repository.Field_AggregateID:
+		return "aggregate_id"
+	case repository.Field_AggregateType:
+		return "aggregate_type"
+	case repository.Field_LatestSequence:
+		return "event_sequence"
+	case repository.Field_ResourceOwner:
+		return "resource_owner"
+	case repository.Field_EditorService:
+		return "editor_service"
+	case repository.Field_EditorUser:
+		return "editor_user"
+	case repository.Field_EventType:
+		return "event_type"
 	default:
-		return "", nil
+		return ""
 	}
 }
 
-func (db *CRDB) prepareFilter(filters []*Filter) string {
-	filter := ""
-	// for _, f := range filters{
-	// 	f.
-	// }
-	return filter
+func (db *CRDB) conditionFormat(operation repository.Operation) string {
+	if operation == repository.Operation_In {
+		return "%s %s ANY(?)"
+	}
+	return "%s %s ?"
+}
+
+func (db *CRDB) operation(operation repository.Operation) string {
+	switch operation {
+	case repository.Operation_Equals, repository.Operation_In:
+		return "="
+	case repository.Operation_Greater:
+		return ">"
+	case repository.Operation_Less:
+		return "<"
+	}
+	return ""
+}
+
+var (
+	placeholder = regexp.MustCompile(`\?`)
+)
+
+//placeholder replaces all "?" with postgres placeholders ($<NUMBER>)
+func (db *CRDB) placeholder(query string) string {
+	occurances := placeholder.FindAllStringIndex(query, -1)
+	if len(occurances) == 0 {
+		return query
+	}
+	replaced := query[:occurances[0][0]]
+
+	for i, l := range occurances {
+		nextIDX := len(query)
+		if i < len(occurances)-1 {
+			nextIDX = occurances[i+1][0]
+		}
+		replaced = replaced + "$" + strconv.Itoa(i+1) + query[l[1]:nextIDX]
+	}
+	return replaced
 }
