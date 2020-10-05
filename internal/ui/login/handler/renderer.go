@@ -156,6 +156,7 @@ func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID, userAgentID)
 	if err != nil {
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-sio0W", "could not get authreq"))
+		return
 	}
 	if len(authReq.PossibleSteps) == 0 {
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-9sdp4", "no possible steps"))
@@ -208,6 +209,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.linkUsers(w, r, authReq, err)
 	case *model.ExternalNotFoundOptionStep:
 		l.renderExternalNotFoundOption(w, r, authReq, err)
+	case *model.ExternalLoginStep:
+		l.handleExternalLoginStep(w, r, authReq, step.SelectedIDPConfigID)
 	default:
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}
