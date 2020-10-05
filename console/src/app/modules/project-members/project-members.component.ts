@@ -1,5 +1,5 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, ViewChild } from '@angular/core';
+import { Component, EventEmitter, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
@@ -11,6 +11,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { CreationType, MemberCreateDialogComponent } from '../add-member-dialog/member-create-dialog.component';
+import { MembersTableComponent } from '../members-table/members-table.component';
 import { ProjectMembersDataSource } from './project-members-datasource';
 
 
@@ -28,13 +29,16 @@ export class ProjectMembersComponent {
     public projectName: string = '';
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatTable) public table!: MatTable<ProjectMember.AsObject>;
+    @ViewChild(MembersTableComponent) public memberTable!: MembersTableComponent;
+
     public dataSource!: ProjectMembersDataSource;
     public selection: SelectionModel<ProjectMember.AsObject> = new SelectionModel<ProjectMember.AsObject>(true, []);
     public memberRoleOptions: string[] = [];
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'userId', 'firstname', 'lastname', 'username', 'email', 'roles'];
-
+    public changePageFactory!: Function;
+    public changePage: EventEmitter<void> = new EventEmitter();
     constructor(
         private mgmtService: ManagementService,
         private dialog: MatDialog,
@@ -53,6 +57,17 @@ export class ProjectMembersComponent {
                         this.projectName = this.project.name;
                         this.dataSource = new ProjectMembersDataSource(this.mgmtService);
                         this.dataSource.loadMembers(this.project.projectId, this.projectType, 0, this.INITIALPAGESIZE);
+                        this.memberTable = new MembersTableComponent();
+
+                        this.changePageFactory = (event?: PageEvent) => {
+                            return this.dataSource.loadMembers(
+                                this.project.projectId,
+                                this.projectType,
+                                event?.pageIndex ?? this.paginator.pageIndex,
+                                event?.pageSize ?? this.paginator.pageSize,
+                                this.grantId,
+                            );
+                        };
                     });
                 } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
                     this.mgmtService.GetGrantedProjectByID(params.projectid, params.grantid).then(project => {
@@ -65,6 +80,16 @@ export class ProjectMembersComponent {
                             this.INITIALPAGESIZE,
                             this.grantId,
                         );
+
+                        this.changePageFactory = (event?: PageEvent) => {
+                            return this.dataSource.loadMembers(
+                                this.project.projectId,
+                                this.projectType,
+                                event?.pageIndex ?? this.paginator.pageIndex,
+                                event?.pageSize ?? this.paginator.pageSize,
+                                this.grantId,
+                            );
+                        };
                     });
                 }
             });
@@ -105,7 +130,7 @@ export class ProjectMembersComponent {
             }
         })).then(() => {
             setTimeout(() => {
-                this.changePage();
+                this.changePage.emit();
             }, 1000);
         });
     }
@@ -146,7 +171,7 @@ export class ProjectMembersComponent {
                         }
                     })).then(() => {
                         setTimeout(() => {
-                            this.changePage();
+                            this.changePage.emit();
                         }, 1000);
                         this.toast.showInfo('PROJECT.TOAST.MEMBERSADDED', true);
                     }).catch(error => {
@@ -155,7 +180,7 @@ export class ProjectMembersComponent {
                 }
             }
         });
-    }
+    };
 
     updateRoles(member: ProjectMember.AsObject, selectionChange: MatSelectChange): void {
         if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
@@ -174,15 +199,5 @@ export class ProjectMembersComponent {
                     this.toast.showError(error);
                 });
         }
-    }
-
-    public changePage(event?: PageEvent): void {
-        this.dataSource.loadMembers(
-            this.project.projectId,
-            this.projectType,
-            event?.pageIndex ?? this.paginator.pageIndex,
-            event?.pageSize ?? this.paginator.pageSize,
-            this.grantId,
-        );
     }
 }

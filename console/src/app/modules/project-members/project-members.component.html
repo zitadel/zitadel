@@ -1,9 +1,10 @@
 <app-detail-layout *ngIf="project" [backRouterLink]="[ '/projects', project?.projectId]"
     title="{{projectName}} {{ 'PROJECT.MEMBER.TITLE' | translate }}"
     description="{{ 'PROJECT.MEMBER.DESCRIPTION' | translate }}">
-    <app-refresh-table *ngIf="project" (refreshed)="changePage()" [dataSize]="dataSource.totalResult"
-        [timestamp]="dataSource.viewTimestamp" [selection]="selection" [loading]="dataSource?.loading$ | async">
-        <ng-template appHasRole actions
+    <app-members-table *ngIf="project" [dataSource]="dataSource" [memberRoleOptions]="memberRoleOptions"
+        (updateRoles)="updateRoles($event.member, $event.change)" [factoryLoadFunc]="changePageFactory"
+        [refreshTrigger]="changePage">
+        <ng-template appHasRole select-actions
             [appHasRole]="['project.member.delete:' + project.projectId, 'project.member.delete']">
             <button (click)="removeProjectMemberSelection()" color="warn"
                 matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="icon-button" mat-icon-button
@@ -11,85 +12,11 @@
                 <i class="las la-trash"></i>
             </button>
         </ng-template>
-        <ng-template appHasRole actions
+        <ng-template appHasRole write-actions
             [appHasRole]="['project.member.write:'+project.projectId,'project.member.write']">
             <a color="primary" [disabled]="disabled" (click)="openAddMember()" color="primary" mat-raised-button>
                 <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
             </a>
         </ng-template>
-
-        <div class="table-wrapper">
-            <table mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
-                <ng-container matColumnDef="select">
-                    <th class="selection" mat-header-cell *matHeaderCellDef>
-                        <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
-                            [checked]="selection.hasValue() && isAllSelected()"
-                            [indeterminate]="selection.hasValue() && !isAllSelected()">
-                        </mat-checkbox>
-                    </th>
-                    <td class="selection" mat-cell *matCellDef="let row">
-                        <mat-checkbox color="primary" (click)="$event.stopPropagation()"
-                            (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
-                        </mat-checkbox>
-                    </td>
-                </ng-container>
-
-
-                <ng-container matColumnDef="userId">
-                    <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.USERID' | translate }} </th>
-                    <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
-                        {{member.userId}} </td>
-                </ng-container>
-
-                <ng-container matColumnDef="firstname">
-                    <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.FIRSTNAME' | translate }} </th>
-                    <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
-                        {{member.firstName}} </td>
-                </ng-container>
-
-                <ng-container matColumnDef="lastname">
-                    <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.LASTNAME' | translate }} </th>
-                    <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
-                        {{member.lastName}} </td>
-                </ng-container>
-
-                <ng-container matColumnDef="username">
-                    <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.USERNAME' | translate }} </th>
-                    <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
-                        {{member.userName}} </td>
-                </ng-container>
-
-                <ng-container matColumnDef="email">
-                    <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.EMAIL' | translate }} </th>
-                    <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
-                        {{member.email}}
-                    </td>
-                </ng-container>
-
-                <ng-container matColumnDef="roles">
-                    <th mat-header-cell *matHeaderCellDef> {{ 'ROLESLABEL' | translate }} </th>
-                    <td mat-cell *matCellDef="let member">
-                        <mat-form-field class="form-field" appearance="outline" *ngIf="project">
-                            <mat-label>{{ 'ROLESLABEL' | translate }}</mat-label>
-                            <mat-select [(ngModel)]="member.rolesList" multiple
-                                [disabled]="([('project.member.write:' + project.projectId), 'project.member.write'] | hasRole | async) == false"
-                                (selectionChange)="updateRoles(member, $event)">
-                                <mat-option *ngFor="let role of memberRoleOptions" [value]="role">
-                                    {{ role }}
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </td>
-                </ng-container>
-
-                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;">
-                </tr>
-            </table>
-
-            <mat-paginator *ngIf="dataSource" class="paginator" #paginator [pageSize]="INITIALPAGESIZE"
-                [length]="dataSource.totalResult" [pageSizeOptions]="[25, 50, 100, 250]" (page)="changePage($event)">
-            </mat-paginator>
-        </div>
-    </app-refresh-table>
+    </app-members-table>
 </app-detail-layout>
