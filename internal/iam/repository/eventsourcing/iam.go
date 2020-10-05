@@ -335,6 +335,7 @@ func checkExistingLoginPolicyIDPProviderValidation(idpConfigID string) func(...*
 						idpConfigs[i] = idpConfigs[len(idpConfigs)-1]
 						idpConfigs[len(idpConfigs)-1] = nil
 						idpConfigs = idpConfigs[:len(idpConfigs)-1]
+						i--
 					}
 				}
 			case model.LoginPolicyIDPProviderAdded:
@@ -357,6 +358,7 @@ func checkExistingLoginPolicyIDPProviderValidation(idpConfigID string) func(...*
 						idps[i] = idps[len(idps)-1]
 						idps[len(idps)-1] = nil
 						idps = idps[:len(idps)-1]
+						i--
 					}
 				}
 			}
