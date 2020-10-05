@@ -2,7 +2,6 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -147,7 +146,6 @@ func checkExistingLoginPolicyIDPProviderValidation(idpProvider *iam_es_model.IDP
 				idp := new(iam_es_model.IDPProvider)
 				err := idp.SetData(event)
 				if err != nil {
-					logging.LogWithFields("ERROR-6Hjs8", "event", event).WithError(err).Error("could not set data")
 					return err
 				}
 				idps = append(idps, idp)
