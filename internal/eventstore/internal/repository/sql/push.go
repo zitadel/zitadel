@@ -68,7 +68,8 @@ func precondtion(tx *sql.Tx, aggregate *models.Aggregate) error {
 
 func insertEvents(stmt *sql.Stmt, previousSequence Sequence, events []*models.Event) error {
 	for _, event := range events {
-		err := stmt.QueryRow(event.Type, event.AggregateType, event.AggregateID, event.AggregateVersion, event.CreationDate, Data(event.Data), event.EditorUser, event.EditorService, event.ResourceOwner, previousSequence,
+		creationDate := sql.NullTime{Time: event.CreationDate, Valid: !event.CreationDate.IsZero()}
+		err := stmt.QueryRow(event.Type, event.AggregateType, event.AggregateID, event.AggregateVersion, creationDate, Data(event.Data), event.EditorUser, event.EditorService, event.ResourceOwner, previousSequence,
 			event.AggregateType, event.AggregateID, previousSequence, previousSequence).Scan(&previousSequence, &event.CreationDate)
 
 		if err != nil {
