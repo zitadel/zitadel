@@ -1,17 +1,22 @@
-import { SelectionModel } from '@angular/cdk/collections';
-import { Component, EventEmitter, ViewChild } from '@angular/core';
+import { Component, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
-import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs/operators';
-import { ProjectGrantView, ProjectMember, ProjectType, ProjectView, UserView } from 'src/app/proto/generated/management_pb';
+import {
+    ProjectGrantMemberView,
+    ProjectGrantView,
+    ProjectMember,
+    ProjectMemberView,
+    ProjectType,
+    ProjectView,
+    UserView,
+} from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { CreationType, MemberCreateDialogComponent } from '../add-member-dialog/member-create-dialog.component';
-import { MembersTableComponent } from '../members-table/members-table.component';
 import { ProjectMembersDataSource } from './project-members-datasource';
 
 
@@ -27,18 +32,12 @@ export class ProjectMembersComponent {
     public disabled: boolean = false;
     public grantId: string = '';
     public projectName: string = '';
-    @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    @ViewChild(MatTable) public table!: MatTable<ProjectMember.AsObject>;
-    @ViewChild(MembersTableComponent) public memberTable!: MembersTableComponent;
-
     public dataSource!: ProjectMembersDataSource;
-    public selection: SelectionModel<ProjectMember.AsObject> = new SelectionModel<ProjectMember.AsObject>(true, []);
     public memberRoleOptions: string[] = [];
 
-    /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-    public displayedColumns: string[] = ['select', 'userId', 'firstname', 'lastname', 'username', 'email', 'roles'];
     public changePageFactory!: Function;
     public changePage: EventEmitter<void> = new EventEmitter();
+    public selection: Array<ProjectMemberView.AsObject | ProjectGrantMemberView.AsObject> = [];
     constructor(
         private mgmtService: ManagementService,
         private dialog: MatDialog,
@@ -57,14 +56,13 @@ export class ProjectMembersComponent {
                         this.projectName = this.project.name;
                         this.dataSource = new ProjectMembersDataSource(this.mgmtService);
                         this.dataSource.loadMembers(this.project.projectId, this.projectType, 0, this.INITIALPAGESIZE);
-                        this.memberTable = new MembersTableComponent();
 
                         this.changePageFactory = (event?: PageEvent) => {
                             return this.dataSource.loadMembers(
                                 this.project.projectId,
                                 this.projectType,
-                                event?.pageIndex ?? this.paginator.pageIndex,
-                                event?.pageSize ?? this.paginator.pageSize,
+                                event?.pageIndex ?? 0,
+                                event?.pageSize ?? this.INITIALPAGESIZE,
                                 this.grantId,
                             );
                         };
@@ -85,8 +83,8 @@ export class ProjectMembersComponent {
                             return this.dataSource.loadMembers(
                                 this.project.projectId,
                                 this.projectType,
-                                event?.pageIndex ?? this.paginator.pageIndex,
-                                event?.pageSize ?? this.paginator.pageSize,
+                                event?.pageIndex ?? 0,
+                                event?.pageSize ?? this.INITIALPAGESIZE,
                                 this.grantId,
                             );
                         };
@@ -113,7 +111,7 @@ export class ProjectMembersComponent {
     }
 
     public removeProjectMemberSelection(): void {
-        Promise.all(this.selection.selected.map(member => {
+        Promise.all(this.selection.map(member => {
             if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
                 return this.mgmtService.RemoveProjectMember(this.project.projectId, member.userId).then(() => {
                     this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
@@ -133,18 +131,6 @@ export class ProjectMembersComponent {
                 this.changePage.emit();
             }, 1000);
         });
-    }
-
-    public isAllSelected(): boolean {
-        const numSelected = this.selection.selected.length;
-        const numRows = this.dataSource.membersSubject.value.length;
-        return numSelected === numRows;
-    }
-
-    public masterToggle(): void {
-        this.isAllSelected() ?
-            this.selection.clear() :
-            this.dataSource.membersSubject.value.forEach(row => this.selection.select(row));
     }
 
     public openAddMember(): void {
@@ -180,12 +166,12 @@ export class ProjectMembersComponent {
                 }
             }
         });
-    };
+    }
 
     updateRoles(member: ProjectMember.AsObject, selectionChange: MatSelectChange): void {
         if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
             this.mgmtService.ChangeProjectMember(this.project.projectId, member.userId, selectionChange.value)
-                .then((newmember: ProjectMember) => {
+                .then((_: ProjectMember) => {
                     this.toast.showInfo('PROJECT.TOAST.MEMBERCHANGED', true);
                 }).catch(error => {
                     this.toast.showError(error);
@@ -193,7 +179,7 @@ export class ProjectMembersComponent {
         } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
             this.mgmtService.ChangeProjectGrantMember(this.project.projectId,
                 this.grantId, member.userId, selectionChange.value)
-                .then((newmember: ProjectMember) => {
+                .then((_: ProjectMember) => {
                     this.toast.showInfo('PROJECT.TOAST.MEMBERCHANGED', true);
                 }).catch(error => {
                     this.toast.showError(error);

@@ -1,10 +1,12 @@
 <app-refresh-table *ngIf="dataSource" (refreshed)="changePage()" [dataSize]="dataSource.totalResult"
     [timestamp]="dataSource.viewTimestamp" [selection]="selection" [loading]="dataSource?.loading$ | async">
 
-    <ng-content select="[select-actions]"></ng-content>
+    <ng-container *ngIf="selection.hasValue()">
+        <ng-content select="[selectactions]"></ng-content>
+    </ng-container>
 
     <div actions>
-        <ng-content select="[write-actions]"></ng-content>
+        <ng-content select="[writeactions]"></ng-content>
     </div>
 
     <div class="table-wrapper">
@@ -19,6 +21,14 @@
                 <td class="selection" mat-cell *matCellDef="let row">
                     <mat-checkbox color="primary" (click)="$event.stopPropagation()"
                         (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
+                        <app-avatar *ngIf="row?.displayName && row.firstName && row.lastName; else cog" class="avatar"
+                            [name]="row.displayName" [size]="32">
+                        </app-avatar>
+                        <ng-template #cog>
+                            <div class="sa-icon">
+                                <i class="las la-user-cog"></i>
+                            </div>
+                        </ng-template>
                     </mat-checkbox>
                 </td>
             </ng-container>

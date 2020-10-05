@@ -488,6 +488,7 @@
             "USERNAME": "Benutzername",
             "FIRSTNAME": "Vorname",
             "LASTNAME": "Nachname",
+            "LOGINNAME":"Loginname",
             "EMAIL": "E-Mail",
             "ROLES": "Rollen",
             "ADD": "Mitglied hinzufügen",

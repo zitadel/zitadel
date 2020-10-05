@@ -32,6 +32,16 @@
       max-width: 50px;
     }
   }
+
+  .sa-icon {
+    display: block;
+    width: 32px;
+    margin: 0 .5rem;
+
+    i {
+      margin: auto;
+    }
+  }
 }
 
 .pointer {

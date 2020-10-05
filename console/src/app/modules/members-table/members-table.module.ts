@@ -12,6 +12,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 
+import { AvatarModule } from '../avatar/avatar.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
 import { MembersTableComponent } from './members-table.component';
 
@@ -33,6 +34,7 @@ import { MembersTableComponent } from './members-table.component';
         TranslateModule,
         RefreshTableModule,
         RouterModule,
+        AvatarModule,
     ],
     exports: [
         MembersTableComponent,

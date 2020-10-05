@@ -31,12 +31,18 @@ export class MembersTableComponent implements OnInit, OnDestroy {
     @Input() public factoryLoadFunc!: Function;
     @Input() public refreshTrigger!: Observable<void>;
     @Output() public updateRoles: EventEmitter<{ member: View, change: MatSelectChange; }> = new EventEmitter();
+    @Output() public changedSelection: EventEmitter<any[]> = new EventEmitter();
+
     private destroyed: BehaviorSubject<any> = new BehaviorSubject(false);
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'userId', 'firstname', 'lastname', 'username', 'email', 'roles'];
 
-    constructor() { }
+    constructor() {
+        this.selection.changed.pipe(takeUntil(this.destroyed)).subscribe(value => {
+            this.changedSelection.emit(this.selection.selected);
+        });
+    }
 
     public ngOnInit(): void {
         this.refreshTrigger.pipe(takeUntil(this.destroyed)).subscribe(() => {

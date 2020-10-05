@@ -3,16 +3,15 @@
     description="{{ 'PROJECT.MEMBER.DESCRIPTION' | translate }}">
     <app-members-table *ngIf="project" [dataSource]="dataSource" [memberRoleOptions]="memberRoleOptions"
         (updateRoles)="updateRoles($event.member, $event.change)" [factoryLoadFunc]="changePageFactory"
-        [refreshTrigger]="changePage">
-        <ng-template appHasRole select-actions
+        (changedSelection)="selection = $event" [refreshTrigger]="changePage">
+        <ng-template appHasRole selectactions
             [appHasRole]="['project.member.delete:' + project.projectId, 'project.member.delete']">
             <button (click)="removeProjectMemberSelection()" color="warn"
-                matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="icon-button" mat-icon-button
-                *ngIf="selection.hasValue()">
+                matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="icon-button" mat-icon-button>
                 <i class="las la-trash"></i>
             </button>
         </ng-template>
-        <ng-template appHasRole write-actions
+        <ng-template appHasRole writeactions
             [appHasRole]="['project.member.write:'+project.projectId,'project.member.write']">
             <a color="primary" [disabled]="disabled" (click)="openAddMember()" color="primary" mat-raised-button>
                 <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
