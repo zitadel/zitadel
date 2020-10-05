@@ -2194,13 +2194,13 @@ func TestChangeOrgIAMPolicy(t *testing.T) {
 				ctx: authz.NewMockContext("orgID", "userID"),
 				policy: &iam_model.OrgIAMPolicy{
 					ObjectRoot:            es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-					UserLoginMustBeDomain: true,
+					UserLoginMustBeDomain: false,
 				},
 			},
 			res: res{
 				result: &iam_model.OrgIAMPolicy{
 					ObjectRoot:            es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-					UserLoginMustBeDomain: true,
+					UserLoginMustBeDomain: false,
 				},
 			},
 		},

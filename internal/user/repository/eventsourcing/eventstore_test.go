@@ -95,7 +95,7 @@ func TestCreateUser(t *testing.T) {
 		ctx       context.Context
 		user      *model.User
 		policy    *iam_model.PasswordComplexityPolicyView
-		orgPolicy *iam_model.OrgIAMPolicy
+		orgPolicy *iam_model.OrgIAMPolicyView
 	}
 	type res struct {
 		user    *model.User
@@ -133,7 +133,7 @@ func TestCreateUser(t *testing.T) {
 					},
 				},
 				policy:    &iam_model.PasswordComplexityPolicyView{},
-				orgPolicy: &iam_model.OrgIAMPolicy{},
+				orgPolicy: &iam_model.OrgIAMPolicyView{},
 			},
 			res: res{
 				user: &model.User{
@@ -176,7 +176,7 @@ func TestCreateUser(t *testing.T) {
 					},
 				},
 				policy:    &iam_model.PasswordComplexityPolicyView{},
-				orgPolicy: &iam_model.OrgIAMPolicy{UserLoginMustBeDomain: false},
+				orgPolicy: &iam_model.OrgIAMPolicyView{UserLoginMustBeDomain: false},
 			},
 			res: res{
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
@@ -226,7 +226,7 @@ func TestCreateUser(t *testing.T) {
 					},
 				},
 				policy:    &iam_model.PasswordComplexityPolicyView{},
-				orgPolicy: &iam_model.OrgIAMPolicy{},
+				orgPolicy: &iam_model.OrgIAMPolicyView{},
 			},
 			res: res{
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
@@ -275,7 +275,7 @@ func TestCreateUser(t *testing.T) {
 					},
 				},
 				policy:    &iam_model.PasswordComplexityPolicyView{},
-				orgPolicy: &iam_model.OrgIAMPolicy{},
+				orgPolicy: &iam_model.OrgIAMPolicyView{},
 			},
 			res: res{
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
@@ -301,7 +301,7 @@ func TestCreateUser(t *testing.T) {
 				ctx:       authz.NewMockContext("orgID", "userID"),
 				user:      &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Human: &model.Human{}},
 				policy:    &iam_model.PasswordComplexityPolicyView{},
-				orgPolicy: &iam_model.OrgIAMPolicy{},
+				orgPolicy: &iam_model.OrgIAMPolicyView{},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -313,7 +313,7 @@ func TestCreateUser(t *testing.T) {
 				es:        GetMockManipulateUser(ctrl),
 				ctx:       authz.NewMockContext("orgID", "userID"),
 				user:      &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Human: &model.Human{}},
-				orgPolicy: &iam_model.OrgIAMPolicy{},
+				orgPolicy: &iam_model.OrgIAMPolicyView{},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -367,7 +367,7 @@ func TestRegisterUser(t *testing.T) {
 		user          *model.User
 		resourceOwner string
 		policy        *iam_model.PasswordComplexityPolicyView
-		orgPolicy     *iam_model.OrgIAMPolicy
+		orgPolicy     *iam_model.OrgIAMPolicyView
 	}
 	type res struct {
 		user    *model.User
@@ -406,7 +406,7 @@ func TestRegisterUser(t *testing.T) {
 					},
 				},
 				policy:        &iam_model.PasswordComplexityPolicyView{},
-				orgPolicy:     &iam_model.OrgIAMPolicy{UserLoginMustBeDomain: true},
+				orgPolicy:     &iam_model.OrgIAMPolicyView{UserLoginMustBeDomain: true},
 				resourceOwner: "ResourceOwner",
 			},
 			res: res{
@@ -450,7 +450,7 @@ func TestRegisterUser(t *testing.T) {
 					},
 				},
 				policy:        &iam_model.PasswordComplexityPolicyView{},
-				orgPolicy:     &iam_model.OrgIAMPolicy{UserLoginMustBeDomain: false},
+				orgPolicy:     &iam_model.OrgIAMPolicyView{UserLoginMustBeDomain: false},
 				resourceOwner: "ResourceOwner",
 			},
 			res: res{
@@ -476,7 +476,7 @@ func TestRegisterUser(t *testing.T) {
 				ctx:           authz.NewMockContext("orgID", "userID"),
 				user:          &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1}, Human: &model.Human{}},
 				policy:        &iam_model.PasswordComplexityPolicyView{},
-				orgPolicy:     &iam_model.OrgIAMPolicy{},
+				orgPolicy:     &iam_model.OrgIAMPolicyView{},
 				resourceOwner: "ResourceOwner",
 			},
 			res: res{
@@ -502,7 +502,7 @@ func TestRegisterUser(t *testing.T) {
 					},
 				},
 				policy:        &iam_model.PasswordComplexityPolicyView{},
-				orgPolicy:     &iam_model.OrgIAMPolicy{},
+				orgPolicy:     &iam_model.OrgIAMPolicyView{},
 				resourceOwner: "ResourceOwner",
 			},
 			res: res{
@@ -528,7 +528,7 @@ func TestRegisterUser(t *testing.T) {
 					},
 				},
 				policy:    &iam_model.PasswordComplexityPolicyView{},
-				orgPolicy: &iam_model.OrgIAMPolicy{},
+				orgPolicy: &iam_model.OrgIAMPolicyView{},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -552,7 +552,7 @@ func TestRegisterUser(t *testing.T) {
 						},
 					},
 				},
-				orgPolicy: &iam_model.OrgIAMPolicy{},
+				orgPolicy: &iam_model.OrgIAMPolicyView{},
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
