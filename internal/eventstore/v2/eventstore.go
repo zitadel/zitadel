@@ -10,6 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
+//Event is the representation of a state change
 type Event interface {
 	//CheckPrevious ensures the event order if true
 	// if false the previous sequence is not checked on push
@@ -61,7 +62,7 @@ type aggregater interface {
 	//PreviouseSequence should return the sequence of the latest event of this aggregate
 	// stored in the eventstore
 	// it's set to the first event of this push transaction,
-	// later events consume the sequence of the previously pushed event
+	// later events consume the sequence of the previously pushed event of the aggregate
 	PreviousSequence() uint64
 }
 
@@ -111,7 +112,7 @@ func (es *Eventstore) aggregatesToEvents(aggregates []aggregater) ([]*repository
 //FilterEvents filters the stored events based on the searchQuery
 // and maps the events to the defined event structs
 func (es *Eventstore) FilterEvents(ctx context.Context, queryFactory *SearchQueryFactory) ([]Event, error) {
-	query, err := queryFactory.Build()
+	query, err := queryFactory.build()
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +167,7 @@ func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQu
 
 //LatestSequence filters the latest sequence for the given search query
 func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQueryFactory) (uint64, error) {
-	query, err := queryFactory.Build()
+	query, err := queryFactory.build()
 	if err != nil {
 		return 0, err
 	}

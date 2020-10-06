@@ -81,7 +81,7 @@ func TestCRDB_operation(t *testing.T) {
 		{
 			name: "greater",
 			args: args{
-				operation: repository.Operation_Greater,
+				operation: repository.OperationGreater,
 			},
 			res: res{
 				op: ">",
@@ -90,7 +90,7 @@ func TestCRDB_operation(t *testing.T) {
 		{
 			name: "less",
 			args: args{
-				operation: repository.Operation_Less,
+				operation: repository.OperationLess,
 			},
 			res: res{
 				op: "<",
@@ -99,7 +99,7 @@ func TestCRDB_operation(t *testing.T) {
 		{
 			name: "equals",
 			args: args{
-				operation: repository.Operation_Equals,
+				operation: repository.OperationEquals,
 			},
 			res: res{
 				op: "=",
@@ -108,7 +108,7 @@ func TestCRDB_operation(t *testing.T) {
 		{
 			name: "in",
 			args: args{
-				operation: repository.Operation_In,
+				operation: repository.OperationIn,
 			},
 			res: res{
 				op: "=",
@@ -140,7 +140,7 @@ func TestCRDB_conditionFormat(t *testing.T) {
 		{
 			name: "default",
 			args: args{
-				operation: repository.Operation_Equals,
+				operation: repository.OperationEquals,
 			},
 			res: res{
 				format: "%s %s ?",
@@ -149,7 +149,7 @@ func TestCRDB_conditionFormat(t *testing.T) {
 		{
 			name: "in",
 			args: args{
-				operation: repository.Operation_In,
+				operation: repository.OperationIn,
 			},
 			res: res{
 				format: "%s %s ANY(?)",
@@ -190,7 +190,7 @@ func TestCRDB_columnName(t *testing.T) {
 		{
 			name: "aggregate id",
 			args: args{
-				field: repository.Field_AggregateID,
+				field: repository.FieldAggregateID,
 			},
 			res: res{
 				name: "aggregate_id",
@@ -199,7 +199,7 @@ func TestCRDB_columnName(t *testing.T) {
 		{
 			name: "aggregate type",
 			args: args{
-				field: repository.Field_AggregateType,
+				field: repository.FieldAggregateType,
 			},
 			res: res{
 				name: "aggregate_type",
@@ -208,7 +208,7 @@ func TestCRDB_columnName(t *testing.T) {
 		{
 			name: "editor service",
 			args: args{
-				field: repository.Field_EditorService,
+				field: repository.FieldEditorService,
 			},
 			res: res{
 				name: "editor_service",
@@ -217,7 +217,7 @@ func TestCRDB_columnName(t *testing.T) {
 		{
 			name: "editor user",
 			args: args{
-				field: repository.Field_EditorUser,
+				field: repository.FieldEditorUser,
 			},
 			res: res{
 				name: "editor_user",
@@ -226,7 +226,7 @@ func TestCRDB_columnName(t *testing.T) {
 		{
 			name: "event type",
 			args: args{
-				field: repository.Field_EventType,
+				field: repository.FieldEventType,
 			},
 			res: res{
 				name: "event_type",
@@ -235,7 +235,7 @@ func TestCRDB_columnName(t *testing.T) {
 		{
 			name: "latest sequence",
 			args: args{
-				field: repository.Field_LatestSequence,
+				field: repository.FieldSequence,
 			},
 			res: res{
 				name: "event_sequence",
@@ -244,7 +244,7 @@ func TestCRDB_columnName(t *testing.T) {
 		{
 			name: "resource owner",
 			args: args{
-				field: repository.Field_ResourceOwner,
+				field: repository.FieldResourceOwner,
 			},
 			res: res{
 				name: "resource_owner",

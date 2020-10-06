@@ -222,19 +222,19 @@ func (db *CRDB) maxSequenceQuery() string {
 
 func (db *CRDB) columnName(col repository.Field) string {
 	switch col {
-	case repository.Field_AggregateID:
+	case repository.FieldAggregateID:
 		return "aggregate_id"
-	case repository.Field_AggregateType:
+	case repository.FieldAggregateType:
 		return "aggregate_type"
-	case repository.Field_LatestSequence:
+	case repository.FieldSequence:
 		return "event_sequence"
-	case repository.Field_ResourceOwner:
+	case repository.FieldResourceOwner:
 		return "resource_owner"
-	case repository.Field_EditorService:
+	case repository.FieldEditorService:
 		return "editor_service"
-	case repository.Field_EditorUser:
+	case repository.FieldEditorUser:
 		return "editor_user"
-	case repository.Field_EventType:
+	case repository.FieldEventType:
 		return "event_type"
 	default:
 		return ""
@@ -242,7 +242,7 @@ func (db *CRDB) columnName(col repository.Field) string {
 }
 
 func (db *CRDB) conditionFormat(operation repository.Operation) string {
-	if operation == repository.Operation_In {
+	if operation == repository.OperationIn {
 		return "%s %s ANY(?)"
 	}
 	return "%s %s ?"
@@ -250,11 +250,11 @@ func (db *CRDB) conditionFormat(operation repository.Operation) string {
 
 func (db *CRDB) operation(operation repository.Operation) string {
 	switch operation {
-	case repository.Operation_Equals, repository.Operation_In:
+	case repository.OperationEquals, repository.OperationIn:
 		return "="
-	case repository.Operation_Greater:
+	case repository.OperationGreater:
 		return ">"
-	case repository.Operation_Less:
+	case repository.OperationLess:
 		return "<"
 	}
 	return ""

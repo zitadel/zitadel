@@ -1,6 +1,7 @@
 package eventstore
 
 import (
+	"math"
 	"reflect"
 	"testing"
 
@@ -63,6 +64,7 @@ func testSetSortOrder(asc bool) func(factory *SearchQueryFactory) *SearchQueryFa
 
 func TestSearchQueryFactorySetters(t *testing.T) {
 	type args struct {
+		columns        Columns
 		aggregateTypes []AggregateType
 		setters        []func(*SearchQueryFactory) *SearchQueryFactory
 	}
@@ -74,19 +76,21 @@ func TestSearchQueryFactorySetters(t *testing.T) {
 		{
 			name: "New factory",
 			args: args{
+				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user", "org"},
 			},
 			res: &SearchQueryFactory{
+				columns:        repository.Columns(ColumnsEvent),
 				aggregateTypes: []AggregateType{"user", "org"},
 			},
 		},
 		{
 			name: "set columns",
 			args: args{
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{testSetColumns(repository.Columns_Max_Sequence)},
+				setters: []func(*SearchQueryFactory) *SearchQueryFactory{testSetColumns(repository.ColumnsMaxSequence)},
 			},
 			res: &SearchQueryFactory{
-				columns: repository.Columns_Max_Sequence,
+				columns: repository.ColumnsMaxSequence,
 			},
 		},
 		{
@@ -149,7 +153,7 @@ func TestSearchQueryFactorySetters(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			factory := NewSearchQueryFactory(tt.args.aggregateTypes...)
+			factory := NewSearchQueryFactory(tt.args.columns, tt.args.aggregateTypes...)
 			for _, setter := range tt.args.setters {
 				factory = setter(factory)
 			}
@@ -162,6 +166,7 @@ func TestSearchQueryFactorySetters(t *testing.T) {
 
 func TestSearchQueryFactoryBuild(t *testing.T) {
 	type args struct {
+		columns        Columns
 		aggregateTypes []AggregateType
 		setters        []func(*SearchQueryFactory) *SearchQueryFactory
 	}
@@ -177,6 +182,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 		{
 			name: "no aggregate types",
 			args: args{
+				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{},
 				setters:        []func(*SearchQueryFactory) *SearchQueryFactory{},
 			},
@@ -188,6 +194,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 		{
 			name: "invalid column (too low)",
 			args: args{
+				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
 				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
 					testSetColumns(Columns(-1)),
@@ -200,9 +207,10 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 		{
 			name: "invalid column (too high)",
 			args: args{
+				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
 				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
-					testSetColumns(repository.ColumnsCount),
+					testSetColumns(math.MaxInt32),
 				},
 			},
 			res: res{
@@ -212,17 +220,18 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 		{
 			name: "filter aggregate type",
 			args: args{
+				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
 				setters:        []func(*SearchQueryFactory) *SearchQueryFactory{},
 			},
 			res: res{
 				isErr: nil,
 				query: &repository.SearchQuery{
-					Columns: 0,
+					Columns: repository.ColumnsEvent,
 					Desc:    false,
 					Limit:   0,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.Field_AggregateType, AggregateType("user"), repository.Operation_Equals),
+						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
 					},
 				},
 			},
@@ -230,17 +239,18 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 		{
 			name: "filter aggregate types",
 			args: args{
+				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user", "org"},
 				setters:        []func(*SearchQueryFactory) *SearchQueryFactory{},
 			},
 			res: res{
 				isErr: nil,
 				query: &repository.SearchQuery{
-					Columns: 0,
+					Columns: repository.ColumnsEvent,
 					Desc:    false,
 					Limit:   0,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.Field_AggregateType, []AggregateType{"user", "org"}, repository.Operation_In),
+						repository.NewFilter(repository.FieldAggregateType, []AggregateType{"user", "org"}, repository.OperationIn),
 					},
 				},
 			},
@@ -248,6 +258,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 		{
 			name: "filter aggregate type, limit, desc",
 			args: args{
+				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
 				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
 					testSetLimit(5),
@@ -258,12 +269,12 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			res: res{
 				isErr: nil,
 				query: &repository.SearchQuery{
-					Columns: 0,
+					Columns: repository.ColumnsEvent,
 					Desc:    true,
 					Limit:   5,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.Field_AggregateType, AggregateType("user"), repository.Operation_Equals),
-						repository.NewFilter(repository.Field_LatestSequence, uint64(100), repository.Operation_Less),
+						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldSequence, uint64(100), repository.OperationLess),
 					},
 				},
 			},
@@ -271,6 +282,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 		{
 			name: "filter aggregate type, limit, asc",
 			args: args{
+				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
 				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
 					testSetLimit(5),
@@ -281,12 +293,12 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			res: res{
 				isErr: nil,
 				query: &repository.SearchQuery{
-					Columns: 0,
+					Columns: repository.ColumnsEvent,
 					Desc:    false,
 					Limit:   5,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.Field_AggregateType, AggregateType("user"), repository.Operation_Equals),
-						repository.NewFilter(repository.Field_LatestSequence, uint64(100), repository.Operation_Greater),
+						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldSequence, uint64(100), repository.OperationGreater),
 					},
 				},
 			},
@@ -294,23 +306,24 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 		{
 			name: "filter aggregate type, limit, desc, max event sequence cols",
 			args: args{
+				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
 				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
 					testSetLimit(5),
 					testSetSortOrder(false),
 					testSetSequence(100),
-					testSetColumns(repository.Columns_Max_Sequence),
+					testSetColumns(repository.ColumnsMaxSequence),
 				},
 			},
 			res: res{
 				isErr: nil,
 				query: &repository.SearchQuery{
-					Columns: repository.Columns_Max_Sequence,
+					Columns: repository.ColumnsMaxSequence,
 					Desc:    true,
 					Limit:   5,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.Field_AggregateType, AggregateType("user"), repository.Operation_Equals),
-						repository.NewFilter(repository.Field_LatestSequence, uint64(100), repository.Operation_Less),
+						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldSequence, uint64(100), repository.OperationLess),
 					},
 				},
 			},
@@ -318,6 +331,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 		{
 			name: "filter aggregate type and aggregate id",
 			args: args{
+				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
 				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
 					testSetAggregateIDs("1234"),
@@ -326,12 +340,12 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			res: res{
 				isErr: nil,
 				query: &repository.SearchQuery{
-					Columns: 0,
+					Columns: repository.ColumnsEvent,
 					Desc:    false,
 					Limit:   0,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.Field_AggregateType, AggregateType("user"), repository.Operation_Equals),
-						repository.NewFilter(repository.Field_AggregateID, "1234", repository.Operation_Equals),
+						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldAggregateID, "1234", repository.OperationEquals),
 					},
 				},
 			},
@@ -339,6 +353,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 		{
 			name: "filter aggregate type and aggregate ids",
 			args: args{
+				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
 				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
 					testSetAggregateIDs("1234", "0815"),
@@ -347,12 +362,12 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			res: res{
 				isErr: nil,
 				query: &repository.SearchQuery{
-					Columns: 0,
+					Columns: repository.ColumnsEvent,
 					Desc:    false,
 					Limit:   0,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.Field_AggregateType, AggregateType("user"), repository.Operation_Equals),
-						repository.NewFilter(repository.Field_AggregateID, []string{"1234", "0815"}, repository.Operation_In),
+						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldAggregateID, []string{"1234", "0815"}, repository.OperationIn),
 					},
 				},
 			},
@@ -360,6 +375,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 		{
 			name: "filter aggregate type and sequence greater",
 			args: args{
+				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
 				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
 					testSetSequence(8),
@@ -368,12 +384,12 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			res: res{
 				isErr: nil,
 				query: &repository.SearchQuery{
-					Columns: 0,
+					Columns: repository.ColumnsEvent,
 					Desc:    false,
 					Limit:   0,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.Field_AggregateType, AggregateType("user"), repository.Operation_Equals),
-						repository.NewFilter(repository.Field_LatestSequence, uint64(8), repository.Operation_Greater),
+						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldSequence, uint64(8), repository.OperationGreater),
 					},
 				},
 			},
@@ -381,6 +397,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 		{
 			name: "filter aggregate type and event type",
 			args: args{
+				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
 				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
 					testSetEventTypes("user.created"),
@@ -389,12 +406,12 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			res: res{
 				isErr: nil,
 				query: &repository.SearchQuery{
-					Columns: 0,
+					Columns: repository.ColumnsEvent,
 					Desc:    false,
 					Limit:   0,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.Field_AggregateType, AggregateType("user"), repository.Operation_Equals),
-						repository.NewFilter(repository.Field_EventType, EventType("user.created"), repository.Operation_Equals),
+						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldEventType, EventType("user.created"), repository.OperationEquals),
 					},
 				},
 			},
@@ -402,6 +419,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 		{
 			name: "filter aggregate type and event types",
 			args: args{
+				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
 				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
 					testSetEventTypes("user.created", "user.changed"),
@@ -410,12 +428,12 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			res: res{
 				isErr: nil,
 				query: &repository.SearchQuery{
-					Columns: 0,
+					Columns: repository.ColumnsEvent,
 					Desc:    false,
 					Limit:   0,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.Field_AggregateType, AggregateType("user"), repository.Operation_Equals),
-						repository.NewFilter(repository.Field_EventType, []EventType{"user.created", "user.changed"}, repository.Operation_In),
+						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldEventType, []EventType{"user.created", "user.changed"}, repository.OperationIn),
 					},
 				},
 			},
@@ -423,6 +441,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 		{
 			name: "filter aggregate type resource owner",
 			args: args{
+				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
 				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
 					testSetResourceOwner("hodor"),
@@ -431,12 +450,12 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			res: res{
 				isErr: nil,
 				query: &repository.SearchQuery{
-					Columns: 0,
+					Columns: repository.ColumnsEvent,
 					Desc:    false,
 					Limit:   0,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.Field_AggregateType, AggregateType("user"), repository.Operation_Equals),
-						repository.NewFilter(repository.Field_ResourceOwner, "hodor", repository.Operation_Equals),
+						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldResourceOwner, "hodor", repository.OperationEquals),
 					},
 				},
 			},
@@ -444,11 +463,11 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			factory := NewSearchQueryFactory(tt.args.aggregateTypes...)
+			factory := NewSearchQueryFactory(tt.args.columns, tt.args.aggregateTypes...)
 			for _, f := range tt.args.setters {
 				factory = f(factory)
 			}
-			query, err := factory.Build()
+			query, err := factory.build()
 			if tt.res.isErr != nil && !tt.res.isErr(err) {
 				t.Errorf("wrong error: %v", err)
 				return

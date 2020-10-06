@@ -12,7 +12,7 @@ import (
 	"github.com/lib/pq"
 )
 
-type criteriaer interface {
+type querier interface {
 	columnName(repository.Field) string
 	operation(repository.Operation) string
 	conditionFormat(repository.Operation) string
@@ -24,7 +24,7 @@ type criteriaer interface {
 type rowScan func(scan, interface{}) error
 type scan func(dest ...interface{}) error
 
-func buildQuery(criteria criteriaer, searchQuery *repository.SearchQuery) (query string, values []interface{}, rowScanner rowScan) {
+func buildQuery(criteria querier, searchQuery *repository.SearchQuery) (query string, values []interface{}, rowScanner rowScan) {
 	query, rowScanner = prepareColumns(criteria, searchQuery.Columns)
 	where, values := prepareCondition(criteria, searchQuery.Filters)
 	if where == "" || query == "" {
@@ -32,7 +32,7 @@ func buildQuery(criteria criteriaer, searchQuery *repository.SearchQuery) (query
 	}
 	query += where
 
-	if searchQuery.Columns != repository.Columns_Max_Sequence {
+	if searchQuery.Columns != repository.ColumnsMaxSequence {
 		query += " ORDER BY event_sequence"
 		if searchQuery.Desc {
 			query += " DESC"
@@ -49,11 +49,11 @@ func buildQuery(criteria criteriaer, searchQuery *repository.SearchQuery) (query
 	return query, values, rowScanner
 }
 
-func prepareColumns(criteria criteriaer, columns repository.Columns) (string, func(s scan, dest interface{}) error) {
+func prepareColumns(criteria querier, columns repository.Columns) (string, func(s scan, dest interface{}) error) {
 	switch columns {
-	case repository.Columns_Max_Sequence:
+	case repository.ColumnsMaxSequence:
 		return criteria.maxSequenceQuery(), maxSequenceScanner
-	case repository.Columns_Event:
+	case repository.ColumnsEvent:
 		return criteria.eventQuery(), eventsScanner
 	default:
 		return "", nil
@@ -110,7 +110,7 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 	return nil
 }
 
-func prepareCondition(criteria criteriaer, filters []*repository.Filter) (clause string, values []interface{}) {
+func prepareCondition(criteria querier, filters []*repository.Filter) (clause string, values []interface{}) {
 	values = make([]interface{}, len(filters))
 	clauses := make([]string, len(filters))
 
@@ -133,7 +133,7 @@ func prepareCondition(criteria criteriaer, filters []*repository.Filter) (clause
 	return " WHERE " + strings.Join(clauses, " AND "), values
 }
 
-func getCondition(cond criteriaer, filter *repository.Filter) (condition string) {
+func getCondition(cond querier, filter *repository.Filter) (condition string) {
 	field := cond.columnName(filter.Field)
 	operation := cond.operation(filter.Operation)
 	if field == "" || operation == "" {

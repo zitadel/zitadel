@@ -169,11 +169,11 @@ func TestInsert(t *testing.T) {
 	}
 	fmt.Println("====================")
 	filtededEvents, err := crdb.Filter(context.Background(), &repository.SearchQuery{
-		Columns: repository.Columns_Event,
+		Columns: repository.ColumnsEvent,
 		Filters: []*repository.Filter{
 			{
-				Field:     repository.Field_AggregateType,
-				Operation: repository.Operation_Equals,
+				Field:     repository.FieldAggregateType,
+				Operation: repository.OperationEquals,
 				Value:     repository.AggregateType("agg.type"),
 			},
 		},

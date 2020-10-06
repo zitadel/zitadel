@@ -4,7 +4,9 @@ import (
 	"context"
 )
 
+//Repository pushes and filters events
 type Repository interface {
+	//Health checks if the connection to the storage is available
 	Health(ctx context.Context) error
 	// PushEvents adds all events of the given aggregates to the eventstreams of the aggregates.
 	// This call is transaction save. The transaction will be rolled back if one event fails

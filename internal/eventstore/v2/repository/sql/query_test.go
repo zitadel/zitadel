@@ -22,32 +22,32 @@ func Test_getCondition(t *testing.T) {
 	}{
 		{
 			name: "equals",
-			args: args{filter: repository.NewFilter(repository.Field_AggregateID, "", repository.Operation_Equals)},
+			args: args{filter: repository.NewFilter(repository.FieldAggregateID, "", repository.OperationEquals)},
 			want: "aggregate_id = ?",
 		},
 		{
 			name: "greater",
-			args: args{filter: repository.NewFilter(repository.Field_LatestSequence, 0, repository.Operation_Greater)},
+			args: args{filter: repository.NewFilter(repository.FieldSequence, 0, repository.OperationGreater)},
 			want: "event_sequence > ?",
 		},
 		{
 			name: "less",
-			args: args{filter: repository.NewFilter(repository.Field_LatestSequence, 5000, repository.Operation_Less)},
+			args: args{filter: repository.NewFilter(repository.FieldSequence, 5000, repository.OperationLess)},
 			want: "event_sequence < ?",
 		},
 		{
 			name: "in list",
-			args: args{filter: repository.NewFilter(repository.Field_AggregateType, []repository.AggregateType{"movies", "actors"}, repository.Operation_In)},
+			args: args{filter: repository.NewFilter(repository.FieldAggregateType, []repository.AggregateType{"movies", "actors"}, repository.OperationIn)},
 			want: "aggregate_type = ANY(?)",
 		},
 		{
 			name: "invalid operation",
-			args: args{filter: repository.NewFilter(repository.Field_AggregateType, []repository.AggregateType{"movies", "actors"}, repository.Operation(-1))},
+			args: args{filter: repository.NewFilter(repository.FieldAggregateType, []repository.AggregateType{"movies", "actors"}, repository.Operation(-1))},
 			want: "",
 		},
 		{
 			name: "invalid field",
-			args: args{filter: repository.NewFilter(repository.Field(-1), []repository.AggregateType{"movies", "actors"}, repository.Operation_Equals)},
+			args: args{filter: repository.NewFilter(repository.Field(-1), []repository.AggregateType{"movies", "actors"}, repository.OperationEquals)},
 			want: "",
 		},
 		{
@@ -97,7 +97,7 @@ func Test_prepareColumns(t *testing.T) {
 		{
 			name: "max column",
 			args: args{
-				columns: repository.Columns_Max_Sequence,
+				columns: repository.ColumnsMaxSequence,
 				dest:    new(Sequence),
 			},
 			res: res{
@@ -111,7 +111,7 @@ func Test_prepareColumns(t *testing.T) {
 		{
 			name: "max sequence wrong dest type",
 			args: args{
-				columns: repository.Columns_Max_Sequence,
+				columns: repository.ColumnsMaxSequence,
 				dest:    new(uint64),
 			},
 			res: res{
@@ -122,7 +122,7 @@ func Test_prepareColumns(t *testing.T) {
 		{
 			name: "events",
 			args: args{
-				columns: repository.Columns_Event,
+				columns: repository.ColumnsEvent,
 				dest:    &[]*repository.Event{},
 			},
 			res: res{
@@ -138,7 +138,7 @@ func Test_prepareColumns(t *testing.T) {
 		{
 			name: "events wrong dest type",
 			args: args{
-				columns: repository.Columns_Event,
+				columns: repository.ColumnsEvent,
 				dest:    []*repository.Event{},
 			},
 			res: res{
@@ -149,7 +149,7 @@ func Test_prepareColumns(t *testing.T) {
 		{
 			name: "event query error",
 			args: args{
-				columns: repository.Columns_Event,
+				columns: repository.ColumnsEvent,
 				dest:    &[]*repository.Event{},
 				dbErr:   sql.ErrConnDone,
 			},
@@ -240,7 +240,7 @@ func Test_prepareCondition(t *testing.T) {
 			name: "invalid condition",
 			args: args{
 				filters: []*repository.Filter{
-					repository.NewFilter(repository.Field_AggregateID, "wrong", repository.Operation(-1)),
+					repository.NewFilter(repository.FieldAggregateID, "wrong", repository.Operation(-1)),
 				},
 			},
 			res: res{
@@ -252,7 +252,7 @@ func Test_prepareCondition(t *testing.T) {
 			name: "array as condition value",
 			args: args{
 				filters: []*repository.Filter{
-					repository.NewFilter(repository.Field_AggregateType, []repository.AggregateType{"user", "org"}, repository.Operation_In),
+					repository.NewFilter(repository.FieldAggregateType, []repository.AggregateType{"user", "org"}, repository.OperationIn),
 				},
 			},
 			res: res{
@@ -264,9 +264,9 @@ func Test_prepareCondition(t *testing.T) {
 			name: "multiple filters",
 			args: args{
 				filters: []*repository.Filter{
-					repository.NewFilter(repository.Field_AggregateType, []repository.AggregateType{"user", "org"}, repository.Operation_In),
-					repository.NewFilter(repository.Field_AggregateID, "1234", repository.Operation_Equals),
-					repository.NewFilter(repository.Field_EventType, []repository.EventType{"user.created", "org.created"}, repository.Operation_In),
+					repository.NewFilter(repository.FieldAggregateType, []repository.AggregateType{"user", "org"}, repository.OperationIn),
+					repository.NewFilter(repository.FieldAggregateID, "1234", repository.OperationEquals),
+					repository.NewFilter(repository.FieldEventType, []repository.EventType{"user.created", "org.created"}, repository.OperationIn),
 				},
 			},
 			res: res{
@@ -314,13 +314,13 @@ func Test_buildQuery(t *testing.T) {
 			args: args{
 				//  NewSearchQueryFactory("user").OrderDesc()
 				query: &repository.SearchQuery{
-					Columns: repository.Columns_Event,
+					Columns: repository.ColumnsEvent,
 					Desc:    true,
 					Filters: []*repository.Filter{
 						{
-							Field:     repository.Field_AggregateType,
+							Field:     repository.FieldAggregateType,
 							Value:     repository.AggregateType("user"),
-							Operation: repository.Operation_Equals,
+							Operation: repository.OperationEquals,
 						},
 					},
 				},
@@ -335,14 +335,14 @@ func Test_buildQuery(t *testing.T) {
 			name: "with limit",
 			args: args{
 				query: &repository.SearchQuery{
-					Columns: repository.Columns_Event,
+					Columns: repository.ColumnsEvent,
 					Desc:    false,
 					Limit:   5,
 					Filters: []*repository.Filter{
 						{
-							Field:     repository.Field_AggregateType,
+							Field:     repository.FieldAggregateType,
 							Value:     repository.AggregateType("user"),
-							Operation: repository.Operation_Equals,
+							Operation: repository.OperationEquals,
 						},
 					},
 				},
@@ -357,14 +357,14 @@ func Test_buildQuery(t *testing.T) {
 			name: "with limit and order by desc",
 			args: args{
 				query: &repository.SearchQuery{
-					Columns: repository.Columns_Event,
+					Columns: repository.ColumnsEvent,
 					Desc:    true,
 					Limit:   5,
 					Filters: []*repository.Filter{
 						{
-							Field:     repository.Field_AggregateType,
+							Field:     repository.FieldAggregateType,
 							Value:     repository.AggregateType("user"),
-							Operation: repository.Operation_Equals,
+							Operation: repository.OperationEquals,
 						},
 					},
 				},
@@ -392,7 +392,7 @@ func Test_buildQuery(t *testing.T) {
 			name: "invalid condition",
 			args: args{
 				query: &repository.SearchQuery{
-					Columns: repository.Columns_Event,
+					Columns: repository.ColumnsEvent,
 					Filters: []*repository.Filter{
 						{},
 					},
