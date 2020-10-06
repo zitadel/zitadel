@@ -11,7 +11,7 @@ import (
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
-func mockUserData(user *es_model.Human) []byte {
+func mockUserData(user *es_model.User) []byte {
 	data, _ := json.Marshal(user)
 	return data
 }
@@ -41,22 +41,35 @@ func mockAddressData(address *es_model.Address) []byte {
 	return data
 }
 
-func getFullUser(password *es_model.Password) *es_model.Human {
-	return &es_model.Human{
-		Profile: &es_model.Profile{
-			FirstName: "FirstName",
-			LastName:  "LastName",
+func getFullHuman(password *es_model.Password) *es_model.User {
+	return &es_model.User{
+		UserName: "UserName",
+		Human: &es_model.Human{
+			Profile: &es_model.Profile{
+				FirstName: "FirstName",
+				LastName:  "LastName",
+			},
+			Email: &es_model.Email{
+				EmailAddress: "Email",
+			},
+			Phone: &es_model.Phone{
+				PhoneNumber: "Phone",
+			},
+			Address: &es_model.Address{
+				Country: "Country",
+			},
+			Password: password,
 		},
-		Email: &es_model.Email{
-			EmailAddress: "Email",
+	}
+}
+
+func getFullMachine() *es_model.User {
+	return &es_model.User{
+		UserName: "UserName",
+		Machine: &es_model.Machine{
+			Description: "Description",
+			Name:        "Machine",
 		},
-		Phone: &es_model.Phone{
-			PhoneNumber: "Phone",
-		},
-		Address: &es_model.Address{
-			Country: "Country",
-		},
-		Password: password,
 	}
 }
 
@@ -73,15 +86,39 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append added user event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullUser(nil))},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullHuman(nil))},
 				user:  &UserView{},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInitial)},
 		},
 		{
+			name: "append added human event",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullHuman(nil))},
+				user:  &UserView{},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInitial)},
+		},
+		{
+			name: "append added machine event",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.MachineAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullMachine())},
+				user:  &UserView{},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", MachineView: &MachineView{Description: "Description", Name: "Machine"}, State: int32(model.UserStateActive)},
+		},
+		{
 			name: "append added user with password event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullUser(&es_model.Password{Secret: &crypto.CryptoValue{}}))},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullHuman(&es_model.Password{Secret: &crypto.CryptoValue{}}))},
+				user:  &UserView{},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", PasswordSet: true}, State: int32(model.UserStateInitial)},
+		},
+		{
+			name: "append added human with password event",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullHuman(&es_model.Password{Secret: &crypto.CryptoValue{}}))},
 				user:  &UserView{},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", PasswordSet: true}, State: int32(model.UserStateInitial)},
@@ -89,13 +126,21 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append added user with password but change required event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullUser(&es_model.Password{ChangeRequired: true, Secret: &crypto.CryptoValue{}}))},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullHuman(&es_model.Password{ChangeRequired: true, Secret: &crypto.CryptoValue{}}))},
 				user:  &UserView{},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", PasswordSet: true, PasswordChangeRequired: true}, State: int32(model.UserStateInitial)},
 		},
 		{
-			name: "append password change event",
+			name: "append added human with password but change required event",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullHuman(&es_model.Password{ChangeRequired: true, Secret: &crypto.CryptoValue{}}))},
+				user:  &UserView{},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", PasswordSet: true, PasswordChangeRequired: true}, State: int32(model.UserStateInitial)},
+		},
+		{
+			name: "append password change event on user",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserPasswordChanged, ResourceOwner: "OrgID", Data: mockPasswordData(&es_model.Password{Secret: &crypto.CryptoValue{}})},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
@@ -103,9 +148,25 @@ func TestUserAppendEvent(t *testing.T) {
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", PasswordSet: true}, State: int32(model.UserStateActive)},
 		},
 		{
-			name: "append password change with change required event",
+			name: "append password change event on human",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanPasswordChanged, ResourceOwner: "OrgID", Data: mockPasswordData(&es_model.Password{Secret: &crypto.CryptoValue{}})},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", PasswordSet: true}, State: int32(model.UserStateActive)},
+		},
+		{
+			name: "append password change with change required event on user",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserPasswordChanged, ResourceOwner: "OrgID", Data: mockPasswordData(&es_model.Password{ChangeRequired: true, Secret: &crypto.CryptoValue{}})},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", PasswordSet: true, PasswordChangeRequired: true}, State: int32(model.UserStateActive)},
+		},
+		{
+			name: "append password change with change required event on human",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanPasswordChanged, ResourceOwner: "OrgID", Data: mockPasswordData(&es_model.Password{ChangeRequired: true, Secret: &crypto.CryptoValue{}})},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", PasswordSet: true, PasswordChangeRequired: true}, State: int32(model.UserStateActive)},
@@ -119,9 +180,25 @@ func TestUserAppendEvent(t *testing.T) {
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstNameChanged", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInitial)},
 		},
 		{
+			name: "append change human profile event",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanProfileChanged, ResourceOwner: "OrgID", Data: mockProfileData(&es_model.Profile{FirstName: "FirstNameChanged"})},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInitial)},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstNameChanged", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInitial)},
+		},
+		{
 			name: "append change user email event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserEmailChanged, ResourceOwner: "OrgID", Data: mockEmailData(&es_model.Email{EmailAddress: "EmailChanged"})},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "EmailChanged", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
+		},
+		{
+			name: "append change human email event",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanEmailChanged, ResourceOwner: "OrgID", Data: mockEmailData(&es_model.Email{EmailAddress: "EmailChanged"})},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "EmailChanged", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
@@ -135,9 +212,25 @@ func TestUserAppendEvent(t *testing.T) {
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 		},
 		{
+			name: "append verify human email event",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanEmailVerified, ResourceOwner: "OrgID"},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInitial)},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
+		},
+		{
 			name: "append change user phone event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserPhoneChanged, ResourceOwner: "OrgID", Data: mockPhoneData(&es_model.Phone{PhoneNumber: "PhoneChanged"})},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "PhoneChanged", Country: "Country"}, State: int32(model.UserStateActive)},
+		},
+		{
+			name: "append change human phone event",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanPhoneChanged, ResourceOwner: "OrgID", Data: mockPhoneData(&es_model.Phone{PhoneNumber: "PhoneChanged"})},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "PhoneChanged", Country: "Country"}, State: int32(model.UserStateActive)},
@@ -151,9 +244,25 @@ func TestUserAppendEvent(t *testing.T) {
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", IsPhoneVerified: true, Country: "Country"}, State: int32(model.UserStateActive)},
 		},
 		{
+			name: "append verify human phone event",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanPhoneVerified, ResourceOwner: "OrgID"},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", IsPhoneVerified: true, Country: "Country"}, State: int32(model.UserStateActive)},
+		},
+		{
 			name: "append change user address event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserAddressChanged, ResourceOwner: "OrgID", Data: mockAddressData(&es_model.Address{Country: "CountryChanged"})},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "CountryChanged"}, State: int32(model.UserStateActive)},
+		},
+		{
+			name: "append change human address event",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanAddressChanged, ResourceOwner: "OrgID", Data: mockAddressData(&es_model.Address{Country: "CountryChanged"})},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "CountryChanged"}, State: int32(model.UserStateActive)},
@@ -199,9 +308,25 @@ func TestUserAppendEvent(t *testing.T) {
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateNotReady)}, State: int32(model.UserStateActive)},
 		},
 		{
+			name: "append human add otp event",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanMFAOTPAdded, ResourceOwner: "OrgID"},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateNotReady)}, State: int32(model.UserStateActive)},
+		},
+		{
 			name: "append user verify otp event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.MFAOTPVerified, ResourceOwner: "OrgID"},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateNotReady)}, State: int32(model.UserStateActive)},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateReady)}, State: int32(model.UserStateActive)},
+		},
+		{
+			name: "append human verify otp event",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanMFAOTPVerified, ResourceOwner: "OrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateNotReady)}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateReady)}, State: int32(model.UserStateActive)},
@@ -215,9 +340,25 @@ func TestUserAppendEvent(t *testing.T) {
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateUnspecified)}, State: int32(model.UserStateActive)},
 		},
 		{
-			name: "append mfa init skipped event",
+			name: "append human remove otp event",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanMFAOTPRemoved, ResourceOwner: "OrgID"},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateReady)}, State: int32(model.UserStateActive)},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateUnspecified)}, State: int32(model.UserStateActive)},
+		},
+		{
+			name: "append user mfa init skipped event",
 			args: args{
 				event: &es_models.Event{Sequence: 1, CreationDate: time.Now().UTC(), Type: es_model.MFAInitSkipped, AggregateID: "AggregateID", ResourceOwner: "OrgID"},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", MfaInitSkipped: time.Now().UTC()}, State: int32(model.UserStateActive)},
+		},
+		{
+			name: "append human mfa init skipped event",
+			args: args{
+				event: &es_models.Event{Sequence: 1, CreationDate: time.Now().UTC(), Type: es_model.HumanMFAInitSkipped, AggregateID: "AggregateID", ResourceOwner: "OrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", MfaInitSkipped: time.Now().UTC()}, State: int32(model.UserStateActive)},
@@ -229,44 +370,46 @@ func TestUserAppendEvent(t *testing.T) {
 			if tt.args.user.ID != tt.result.ID {
 				t.Errorf("got wrong result ID: expected: %v, actual: %v ", tt.result.ID, tt.args.user.ID)
 			}
-			if tt.args.user.FirstName != tt.result.FirstName {
-				t.Errorf("got wrong result FirstName: expected: %v, actual: %v ", tt.result.FirstName, tt.args.user.FirstName)
-			}
-			if tt.args.user.LastName != tt.result.LastName {
-				t.Errorf("got wrong result FirstName: expected: %v, actual: %v ", tt.result.FirstName, tt.args.user.FirstName)
-			}
 			if tt.args.user.ResourceOwner != tt.result.ResourceOwner {
 				t.Errorf("got wrong result ResourceOwner: expected: %v, actual: %v ", tt.result.ResourceOwner, tt.args.user.ResourceOwner)
-			}
-			if tt.args.user.Email != tt.result.Email {
-				t.Errorf("got wrong result email: expected: %v, actual: %v ", tt.result.Email, tt.args.user.Email)
-			}
-			if tt.args.user.IsEmailVerified != tt.result.IsEmailVerified {
-				t.Errorf("got wrong result IsEmailVerified: expected: %v, actual: %v ", tt.result.IsEmailVerified, tt.args.user.IsEmailVerified)
-			}
-			if tt.args.user.Phone != tt.result.Phone {
-				t.Errorf("got wrong result Phone: expected: %v, actual: %v ", tt.result.Phone, tt.args.user.Phone)
-			}
-			if tt.args.user.IsPhoneVerified != tt.result.IsPhoneVerified {
-				t.Errorf("got wrong result IsPhoneVerified: expected: %v, actual: %v ", tt.result.IsPhoneVerified, tt.args.user.IsPhoneVerified)
-			}
-			if tt.args.user.Country != tt.result.Country {
-				t.Errorf("got wrong result Country: expected: %v, actual: %v ", tt.result.Country, tt.args.user.Country)
 			}
 			if tt.args.user.State != tt.result.State {
 				t.Errorf("got wrong result state: expected: %v, actual: %v ", tt.result.State, tt.args.user.State)
 			}
-			if tt.args.user.OTPState != tt.result.OTPState {
-				t.Errorf("got wrong result OTPState: expected: %v, actual: %v ", tt.result.OTPState, tt.args.user.OTPState)
-			}
-			if tt.args.user.MfaInitSkipped.Round(1*time.Second) != tt.result.MfaInitSkipped.Round(1*time.Second) {
-				t.Errorf("got wrong result MfaInitSkipped: expected: %v, actual: %v ", tt.result.MfaInitSkipped.Round(1*time.Second), tt.args.user.MfaInitSkipped.Round(1*time.Second))
-			}
-			if tt.args.user.PasswordSet != tt.result.PasswordSet {
-				t.Errorf("got wrong result PasswordSet: expected: %v, actual: %v ", tt.result.PasswordSet, tt.args.user.PasswordSet)
-			}
-			if tt.args.user.PasswordChangeRequired != tt.result.PasswordChangeRequired {
-				t.Errorf("got wrong result PasswordChangeRequired: expected: %v, actual: %v ", tt.result.PasswordChangeRequired, tt.args.user.PasswordChangeRequired)
+			if human := tt.args.user.HumanView; human != nil {
+				if human.FirstName != tt.result.FirstName {
+					t.Errorf("got wrong result FirstName: expected: %v, actual: %v ", tt.result.FirstName, tt.args.user.FirstName)
+				}
+				if human.LastName != tt.result.LastName {
+					t.Errorf("got wrong result FirstName: expected: %v, actual: %v ", tt.result.FirstName, human.FirstName)
+				}
+				if human.Email != tt.result.Email {
+					t.Errorf("got wrong result email: expected: %v, actual: %v ", tt.result.Email, human.Email)
+				}
+				if human.IsEmailVerified != tt.result.IsEmailVerified {
+					t.Errorf("got wrong result IsEmailVerified: expected: %v, actual: %v ", tt.result.IsEmailVerified, human.IsEmailVerified)
+				}
+				if human.Phone != tt.result.Phone {
+					t.Errorf("got wrong result Phone: expected: %v, actual: %v ", tt.result.Phone, human.Phone)
+				}
+				if human.IsPhoneVerified != tt.result.IsPhoneVerified {
+					t.Errorf("got wrong result IsPhoneVerified: expected: %v, actual: %v ", tt.result.IsPhoneVerified, human.IsPhoneVerified)
+				}
+				if human.Country != tt.result.Country {
+					t.Errorf("got wrong result Country: expected: %v, actual: %v ", tt.result.Country, human.Country)
+				}
+				if human.OTPState != tt.result.OTPState {
+					t.Errorf("got wrong result OTPState: expected: %v, actual: %v ", tt.result.OTPState, human.OTPState)
+				}
+				if human.MfaInitSkipped.Round(1*time.Second) != tt.result.MfaInitSkipped.Round(1*time.Second) {
+					t.Errorf("got wrong result MfaInitSkipped: expected: %v, actual: %v ", tt.result.MfaInitSkipped.Round(1*time.Second), human.MfaInitSkipped.Round(1*time.Second))
+				}
+				if human.PasswordSet != tt.result.PasswordSet {
+					t.Errorf("got wrong result PasswordSet: expected: %v, actual: %v ", tt.result.PasswordSet, human.PasswordSet)
+				}
+				if human.PasswordChangeRequired != tt.result.PasswordChangeRequired {
+					t.Errorf("got wrong result PasswordChangeRequired: expected: %v, actual: %v ", tt.result.PasswordChangeRequired, human.PasswordChangeRequired)
+				}
 			}
 		})
 	}

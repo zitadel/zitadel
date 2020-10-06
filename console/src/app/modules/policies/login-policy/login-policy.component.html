@@ -1,0 +1,63 @@
+<app-detail-layout [backRouterLink]="backroutes" [title]="'ORG.POLICY.LOGIN_POLICY.TITLECREATE' | translate"
+    [description]="(serviceType==PolicyComponentServiceType.MGMT ? 'ORG.POLICY.LOGIN_POLICY.DESCRIPTIONCREATEMGMT' : PolicyComponentServiceType.ADMIN ? 'ORG.POLICY.LOGIN_POLICY.DESCRIPTIONCREATEADMIN' : '') | translate">
+    <ng-container *ngIf="(['policy.delete'] | hasRole | async) && serviceType == PolicyComponentServiceType.MGMT">
+        <!--<button matTooltip="{{'ORG.POLICY.DELETE' | translate}}" color="warn" (click)="deletePolicy()"
+            mat-stroked-button>
+            {{'ORG.POLICY.DELETE' | translate}}
+        </button>-->
+    </ng-container>
+
+    <div class="content" *ngIf="loginData">
+        <div class="row">
+            <span class="left-desc">{{'ORG.POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate}}</span>
+            <span class="fill-space"></span>
+            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+                [(ngModel)]="loginData.allowUsernamePassword" [disabled]="serviceType==PolicyComponentServiceType.MGMT">
+            </mat-slide-toggle>
+        </div>
+        <div class="row">
+            <span class="left-desc">{{'ORG.POLICY.DATA.ALLOWREGISTER' | translate}}</span>
+            <span class="fill-space"></span>
+            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="loginData.allowRegister"
+                [disabled]="serviceType==PolicyComponentServiceType.MGMT">
+            </mat-slide-toggle>
+        </div>
+        <div class="row">
+            <span class="left-desc">{{'ORG.POLICY.DATA.ALLOWEXTERNALIDP' | translate}}</span>
+            <span class="fill-space"></span>
+            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+                [disabled]="serviceType==PolicyComponentServiceType.MGMT" [(ngModel)]="loginData.allowExternalIdp">
+            </mat-slide-toggle>
+        </div>
+    </div>
+
+    <p class="subheader">{{'LOGINPOLICY.IDPS' | translate}}</p>
+
+    <div class="idps">
+        <div class="idp" *ngFor="let idp of idps">
+            <mat-icon *ngIf="serviceType!=PolicyComponentServiceType.MGMT" (click)="removeIdp(idp)" class="rm">
+                remove_circle</mat-icon>
+            <span>{{idp.name}}</span>
+            <span class="meta">{{ 'IDP.TYPE' | translate }}: {{ 'IDP.TYPES.'+idp.type | translate }}</span>
+            <span class="meta">{{ 'IDP.ID' | translate }}: {{idp.idpConfigId}}</span>
+        </div>
+        <div *ngIf="serviceType!=PolicyComponentServiceType.MGMT" class="new-idp" (click)="openDialog()">
+            <mat-icon>add</mat-icon>
+        </div>
+    </div>
+
+    <div class="btn-container">
+        <button (click)="savePolicy()" color="primary" type="submit"
+            [disabled]="serviceType==PolicyComponentServiceType.MGMT"
+            mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+    </div>
+
+
+    <ng-template appHasRole [appHasRole]="['org.idp.read']">
+        <app-card title="{{ 'IDP.LIST.TITLE' | translate }}" description="{{ 'IDP.LIST.DESCRIPTION' | translate }}">
+            <app-idp-table [service]="service" [serviceType]="serviceType"
+                [disabled]="(['iam.idp.write'] | hasRole | async) == false">
+            </app-idp-table>
+        </app-card>
+    </ng-template>
+</app-detail-layout>

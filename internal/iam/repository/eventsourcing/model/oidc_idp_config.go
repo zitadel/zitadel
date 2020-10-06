@@ -12,11 +12,13 @@ import (
 
 type OIDCIDPConfig struct {
 	es_models.ObjectRoot
-	IDPConfigID  string              `json:"idpConfigId"`
-	ClientID     string              `json:"clientId"`
-	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	Issuer       string              `json:"issuer,omitempty"`
-	Scopes       pq.StringArray      `json:"scopes,omitempty"`
+	IDPConfigID           string              `json:"idpConfigId"`
+	ClientID              string              `json:"clientId"`
+	ClientSecret          *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	Issuer                string              `json:"issuer,omitempty"`
+	Scopes                pq.StringArray      `json:"scopes,omitempty"`
+	IDPDisplayNameMapping int32               `json:"idpDisplayNameMapping,omitempty"`
+	UsernameMapping       int32               `json:"usernameMapping,omitempty"`
 }
 
 func (c *OIDCIDPConfig) Changes(changed *OIDCIDPConfig) map[string]interface{} {
@@ -25,7 +27,7 @@ func (c *OIDCIDPConfig) Changes(changed *OIDCIDPConfig) map[string]interface{} {
 	if c.ClientID != changed.ClientID {
 		changes["clientId"] = changed.ClientID
 	}
-	if c.ClientSecret != nil {
+	if changed.ClientSecret != nil && c.ClientSecret != changed.ClientSecret {
 		changes["clientSecret"] = changed.ClientSecret
 	}
 	if c.Issuer != changed.Issuer {
@@ -34,28 +36,38 @@ func (c *OIDCIDPConfig) Changes(changed *OIDCIDPConfig) map[string]interface{} {
 	if !reflect.DeepEqual(c.Scopes, changed.Scopes) {
 		changes["scopes"] = changed.Scopes
 	}
+	if c.IDPDisplayNameMapping != changed.IDPDisplayNameMapping {
+		changes["idpDisplayNameMapping"] = changed.IDPDisplayNameMapping
+	}
+	if c.UsernameMapping != changed.UsernameMapping {
+		changes["usernameMapping"] = changed.UsernameMapping
+	}
 	return changes
 }
 
 func OIDCIDPConfigFromModel(config *model.OIDCIDPConfig) *OIDCIDPConfig {
 	return &OIDCIDPConfig{
-		ObjectRoot:   config.ObjectRoot,
-		IDPConfigID:  config.IDPConfigID,
-		ClientID:     config.ClientID,
-		ClientSecret: config.ClientSecret,
-		Issuer:       config.Issuer,
-		Scopes:       config.Scopes,
+		ObjectRoot:            config.ObjectRoot,
+		IDPConfigID:           config.IDPConfigID,
+		ClientID:              config.ClientID,
+		ClientSecret:          config.ClientSecret,
+		Issuer:                config.Issuer,
+		Scopes:                config.Scopes,
+		IDPDisplayNameMapping: int32(config.IDPDisplayNameMapping),
+		UsernameMapping:       int32(config.UsernameMapping),
 	}
 }
 
 func OIDCIDPConfigToModel(config *OIDCIDPConfig) *model.OIDCIDPConfig {
 	return &model.OIDCIDPConfig{
-		ObjectRoot:   config.ObjectRoot,
-		IDPConfigID:  config.IDPConfigID,
-		ClientID:     config.ClientID,
-		ClientSecret: config.ClientSecret,
-		Issuer:       config.Issuer,
-		Scopes:       config.Scopes,
+		ObjectRoot:            config.ObjectRoot,
+		IDPConfigID:           config.IDPConfigID,
+		ClientID:              config.ClientID,
+		ClientSecret:          config.ClientSecret,
+		Issuer:                config.Issuer,
+		Scopes:                config.Scopes,
+		IDPDisplayNameMapping: model.OIDCMappingField(config.IDPDisplayNameMapping),
+		UsernameMapping:       model.OIDCMappingField(config.UsernameMapping),
 	}
 }
 

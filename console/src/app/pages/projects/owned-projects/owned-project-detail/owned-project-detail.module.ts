@@ -24,9 +24,9 @@ import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
-import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
-import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
-import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
+import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
+import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
 import { ApplicationGridComponent } from './application-grid/application-grid.component';
 import { ApplicationsComponent } from './applications/applications.component';

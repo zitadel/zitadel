@@ -13,14 +13,13 @@
         </ng-template>
         <ng-template appHasRole actions
             [appHasRole]="['project.member.write:'+project.projectId,'project.member.write']">
-            <a color="primary" [disabled]="disabled" class="add-button" (click)="openAddMember()" color="primary"
-                mat-raised-button>
+            <a color="primary" [disabled]="disabled" (click)="openAddMember()" color="primary" mat-raised-button>
                 <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
             </a>
         </ng-template>
 
         <div class="table-wrapper">
-            <table mat-table class="background-style table" aria-label="Elements" [dataSource]="dataSource">
+            <table mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
                 <ng-container matColumnDef="select">
                     <th class="selection" mat-header-cell *matHeaderCellDef>
                         <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
@@ -84,11 +83,11 @@
                 </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr class="data-row" mat-row *matRowDef="let row; columns: displayedColumns;">
+                <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;">
                 </tr>
             </table>
 
-            <mat-paginator *ngIf="dataSource" class="paginator background-style" #paginator [pageSize]="INITIALPAGESIZE"
+            <mat-paginator *ngIf="dataSource" class="paginator" #paginator [pageSize]="INITIALPAGESIZE"
                 [length]="dataSource.totalResult" [pageSizeOptions]="[25, 50, 100, 250]" (page)="changePage($event)">
             </mat-paginator>
         </div>

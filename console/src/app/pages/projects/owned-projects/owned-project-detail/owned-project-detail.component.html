@@ -23,11 +23,11 @@
 
             <button mat-stroked-button color="warn"
                 [disabled]="isZitadel || (['project.write', 'project.write:'+ project.projectId]| hasRole | async) == false"
-                *ngIf="project?.state === ProjectState.PROJECTSTATE_ACTIVE" class="state-button"
+                *ngIf="project?.state === ProjectState.PROJECTSTATE_ACTIVE"
                 (click)="changeState(ProjectState.PROJECTSTATE_INACTIVE)">{{'PROJECT.TABLE.DEACTIVATE' | translate}}</button>
             <button mat-stroked-button color="warn"
                 [disabled]="isZitadel || (['project.write', 'project.write:'+ project.projectId]| hasRole | async) == false"
-                *ngIf="project?.state === ProjectState.PROJECTSTATE_INACTIVE" class="state-button"
+                *ngIf="project?.state === ProjectState.PROJECTSTATE_INACTIVE"
                 (click)="changeState(ProjectState.PROJECTSTATE_ACTIVE)">{{'PROJECT.TABLE.ACTIVATE' | translate}}</button>
 
             <div class="full-width">
@@ -68,7 +68,7 @@
                     [appHasRole]="['project.grant.read:' + project.projectId, 'project.grant.read']">
                     <app-card title="{{ 'PROJECT.GRANT.TITLE' | translate }}"
                         description="{{ 'PROJECT.GRANT.DESCRIPTION' | translate }}">
-                        <app-project-grants
+                        <app-project-grants refreshOnPreviousRoute="/projects/{{projectId}}/grants/create"
                             [disabled]="((['project.grant.write', 'project.grant.write:'+ project.projectId]| hasRole | async) && (['org.global.read']| hasRole | async))== false"
                             [projectId]="projectId">
                         </app-project-grants>
@@ -89,6 +89,7 @@
                     <app-card *ngIf="project?.projectId" title="{{ 'GRANTS.PROJECT.TITLE' | translate }}"
                         description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
                         <app-user-grants [context]="UserGrantContext.OWNED_PROJECT" [projectId]="projectId"
+                            refreshOnPreviousRoute="/grant-create/project/{{projectId}}"
                             [allowCreate]="(['user.grant.write', 'user.grant.write:'+projectId] | hasRole) | async"
                             [allowDelete]="(['user.grant.delete','user.grant.delete:'+projectId] | hasRole) | async">
                         </app-user-grants>

@@ -1,8 +1,10 @@
 {{template "main-top" .}}
 
-{{ template "user-profile" . }}
+<div class="head">
+    {{ template "user-profile" . }}
 
-<p>{{t "EmailVerification.Description"}}</p>
+    <p>{{t "EmailVerification.Description"}}</p>
+</div>
 
 <form action="{{ mailVerificationUrl }}" method="POST">
 
@@ -25,8 +27,8 @@
         {{ if .UserID }}
         <button type="submit" name="resend" value="true" class="secondary right" formnovalidate>{{t "Actions.Resend"}}</button>
         {{ end }}
-        <a href="{{ loginUrl }}">
-            <button class="secondary" type="button">{{t "Actions.Cancel"}}</button>
+        <a class="button secondary" href="{{ loginUrl }}">
+            {{t "Actions.Cancel"}}
         </a>
     </div>
 </form>

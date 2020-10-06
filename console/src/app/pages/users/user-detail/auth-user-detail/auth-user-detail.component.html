@@ -1,8 +1,15 @@
 <app-meta-layout>
     <div class="max-width-container">
-        <h1 class="h1">{{ 'USER.TITLE' | translate }}</h1>
-        <p class="sub">{{'USER.DESCRIPTION' | translate}}</p>
+        <div class="header-row">
+            <div>
+                <h1 class="h1">{{ 'USER.TITLE' | translate }}</h1>
+                <p class="sub">{{'USER.DESCRIPTION' | translate}}</p>
+            </div>
 
+            <div class="theme">
+                <app-theme-setting></app-theme-setting>
+            </div>
+        </div>
         <mat-progress-bar *ngIf="loading" color="accent" mode="indeterminate"></mat-progress-bar>
 
         <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
@@ -20,17 +27,22 @@
             </div>
         </app-card>
 
-        <div class="col" *ngIf="user">
-            <app-card class="app-card" title="{{ 'USER.PROFILE.TITLE' | translate }}">
-                <app-detail-form [genders]="genders" [languages]="languages" [username]="user.userName"
-                    [user]="user.human" (changedLanguage)="changedLanguage($event)" (submitData)="saveProfile($event)">
-                </app-detail-form>
-            </app-card>
+        <!-- <div class="col" *ngIf="user"> -->
+        <app-card *ngIf="user" class="app-card" title="{{ 'USER.PROFILE.TITLE' | translate }}">
+            <app-detail-form [genders]="genders" [languages]="languages" [username]="user.userName" [user]="user.human"
+                (changedLanguage)="changedLanguage($event)" (submitData)="saveProfile($event)">
+            </app-detail-form>
+        </app-card>
 
-            <app-card title="Theme" class="app-card theme-card">
+        <!-- <app-card title="Theme" class="app-card theme-card">
                 <app-theme-setting></app-theme-setting>
-            </app-card>
-        </div>
+            </app-card> -->
+        <!-- </div> -->
+
+        <app-card *ngIf="user && user.human && user.id" title="{{ 'USER.EXTERNALIDP.TITLE' | translate }}"
+            description="{{ 'USER.EXTERNALIDP.DESC' | translate }}">
+            <app-external-idps [userId]="user.id" [service]="userService"></app-external-idps>
+        </app-card>
 
         <app-card *ngIf="user" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
             description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
@@ -39,7 +51,7 @@
                     <span class="label">{{ 'USER.PROFILE.PASSWORD' | translate }}</span>
 
                     <span>*********</span>
-                    <div class="actions">
+                    <div>
                         <a [routerLink]="['password']" mat-icon-button>
                             <mat-icon class="icon">chevron_right</mat-icon>
                         </a>
@@ -64,7 +76,7 @@
                             </ng-container>
                         </div>
 
-                        <div class="actions">
+                        <div>
                             <button (click)="emailEditState = true" mat-icon-button>
                                 <mat-icon class="icon">edit</mat-icon>
                             </button>
@@ -73,14 +85,14 @@
                     <ng-template #emailEdit>
                         <mat-form-field class="name">
                             <mat-label>{{ 'USER.EMAIL' | translate }}</mat-label>
-                            <input *ngIf="user.human && user.human.email" matInput [(ngModel)]="user.human.email" />
+                            <input *ngIf="user.human && user.human.email !== undefined && user.human.email !== null"
+                                matInput [(ngModel)]="user.human.email" />
                         </mat-form-field>
                         <button (click)="emailEditState = false" mat-icon-button>
                             <mat-icon class="icon">close</mat-icon>
                         </button>
-                        <button *ngIf="user.human" [disabled]="!user.human.email" class="submit-button" type="button"
-                            color="primary" (click)="saveEmail()"
-                            mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+                        <button *ngIf="user.human" [disabled]="!user.human.email" type="button" color="primary"
+                            (click)="saveEmail()" mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
                     </ng-template>
                 </div>
 
@@ -104,7 +116,7 @@
                             </ng-container>
                         </div>
 
-                        <div class="actions">
+                        <div>
                             <button (click)="phoneEditState = true" mat-icon-button>
                                 <mat-icon class="icon">edit</mat-icon>
                             </button>
@@ -114,7 +126,8 @@
                     <ng-template #phoneEdit>
                         <mat-form-field class="name">
                             <mat-label>{{ 'USER.PHONE' | translate }}</mat-label>
-                            <input *ngIf="user.human && user.human.phone" matInput [(ngModel)]="user.human.phone" />
+                            <input *ngIf="user.human && user.human.phone !== undefined && user.human.phone !== null"
+                                matInput [(ngModel)]="user.human.phone" />
                         </mat-form-field>
                         <button (click)="phoneEditState = false" mat-icon-button>
                             <mat-icon class="icon">close</mat-icon>

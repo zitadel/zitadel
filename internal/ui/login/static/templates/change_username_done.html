@@ -1,8 +1,10 @@
 {{template "main-top" .}}
 
-{{ template "user-profile" . }}
+<div class="head">
+    {{ template "user-profile" . }}
 
-<p>{{t "UsernameChangeDone.Description"}}</p>
+    <p>{{t "UsernameChangeDone.Description"}}</p>
+</div>
 
 <form action="{{ loginUrl }}" method="POST">
 

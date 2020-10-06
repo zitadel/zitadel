@@ -1,8 +1,10 @@
 {{template "main-top" .}}
 
-{{ template "user-profile" . }}
+<div class="head">
+    {{ template "user-profile" . }}
 
-<p>{{t "EmailVerificationDone.Description"}}</p>
+    <p>{{t "EmailVerificationDone.Description"}}</p>
+</div>
 
 <form action="{{ loginUrl }}" method="POST">
 
@@ -13,8 +15,8 @@
 
     <div class="actions">
         <button class="primary right" type="submit">{{if .AuthReqID }}{{t "Actions.Next"}}{{else}}{{t "Actions.Login"}}{{end}}</button>
-        <a href="{{ loginUrl }}">
-            <button class="secondary" type="button">{{t "Actions.Cancel"}}</button>
+        <a class="button secondary" href="{{ loginUrl }}">
+            {{t "Actions.Cancel"}}
         </a>
     </div>
 </form>

@@ -2,7 +2,6 @@ package eventsourcing
 
 import (
 	"context"
-
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
@@ -43,7 +42,7 @@ func IAMSetupStartedAggregate(aggCreator *es_models.AggregateCreator, iam *model
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.IAMSetupStarted, nil)
+		return agg.AppendEvent(model.IAMSetupStarted, &struct{ Step model.Step }{Step: iam.SetUpStarted})
 	}
 }
 
@@ -54,7 +53,7 @@ func IAMSetupDoneAggregate(aggCreator *es_models.AggregateCreator, iam *model.IA
 			return nil, err
 		}
 
-		return agg.AppendEvent(model.IAMSetupDone, nil)
+		return agg.AppendEvent(model.IAMSetupDone, &struct{ Step model.Step }{Step: iam.SetUpDone})
 	}
 }
 
@@ -334,17 +333,15 @@ func LoginPolicyIDPProviderAddedAggregate(aggCreator *es_models.AggregateCreator
 	}
 }
 
-func LoginPolicyIDPProviderRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, provider *model.IDPProviderID) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if provider == nil || existing == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sml9d", "Errors.Internal")
-		}
-		agg, err := IAMAggregate(ctx, aggCreator, existing)
-		if err != nil {
-			return nil, err
-		}
-		return agg.AppendEvent(model.LoginPolicyIDPProviderRemoved, provider)
+func LoginPolicyIDPProviderRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.IAM, provider *model.IDPProviderID) (*es_models.Aggregate, error) {
+	if provider == nil || existing == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sml9d", "Errors.Internal")
 	}
+	agg, err := IAMAggregate(ctx, aggCreator, existing)
+	if err != nil {
+		return nil, err
+	}
+	return agg.AppendEvent(model.LoginPolicyIDPProviderRemoved, provider)
 }
 
 func checkExistingLoginPolicyValidation() func(...*es_models.Event) error {
@@ -367,30 +364,44 @@ func checkExistingLoginPolicyIDPProviderValidation(idpConfigID string) func(...*
 			switch event.Type {
 			case model.IDPConfigAdded:
 				config := new(model.IDPConfig)
-				config.SetData(event)
+				err := config.SetData(event)
+				if err != nil {
+					return err
+				}
 				idpConfigs = append(idpConfigs, config)
 			case model.IDPConfigRemoved:
 				config := new(model.IDPConfig)
-				config.SetData(event)
-				for i, p := range idpConfigs {
-					if p.IDPConfigID == config.IDPConfigID {
+				err := config.SetData(event)
+				if err != nil {
+					return err
+				}
+				for i := len(idpConfigs) - 1; i >= 0; i-- {
+					if idpConfigs[i].IDPConfigID == config.IDPConfigID {
 						idpConfigs[i] = idpConfigs[len(idpConfigs)-1]
 						idpConfigs[len(idpConfigs)-1] = nil
 						idpConfigs = idpConfigs[:len(idpConfigs)-1]
+						break
 					}
 				}
 			case model.LoginPolicyIDPProviderAdded:
 				idp := new(model.IDPProvider)
-				idp.SetData(event)
+				err := idp.SetData(event)
+				if err != nil {
+					return err
+				}
 				idps = append(idps, idp)
 			case model.LoginPolicyIDPProviderRemoved:
 				idp := new(model.IDPProvider)
-				idp.SetData(event)
-				for i, p := range idps {
-					if p.IDPConfigID == idp.IDPConfigID {
+				err := idp.SetData(event)
+				if err != nil {
+					return err
+				}
+				for i := len(idps) - 1; i >= 0; i-- {
+					if idps[i].IDPConfigID == idp.IDPConfigID {
 						idps[i] = idps[len(idps)-1]
 						idps[len(idps)-1] = nil
 						idps = idps[:len(idps)-1]
+						break
 					}
 				}
 			}

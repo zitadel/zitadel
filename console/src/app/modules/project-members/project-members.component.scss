@@ -2,10 +2,6 @@
   margin-right: .5rem;
 }
 
-.add-button {
-  border-radius: .5rem;
-}
-
 .table-wrapper {
   overflow-x: auto;
 
@@ -29,12 +25,6 @@
 
     .action {
       width: 40px;
-    }
-
-    .data-row {
-      &:hover {
-        background-color: #ffffff05;
-      }
     }
 
     .selection {

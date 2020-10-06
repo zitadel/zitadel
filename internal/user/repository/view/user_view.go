@@ -46,6 +46,26 @@ func UserByLoginName(db *gorm.DB, table, loginName string) (*model.UserView, err
 	return user, err
 }
 
+func UserByLoginNameAndResourceOwner(db *gorm.DB, table, loginName, resourceOwner string) (*model.UserView, error) {
+	user := new(model.UserView)
+	loginNameQuery := &model.UserSearchQuery{
+		Key:    usr_model.UserSearchKeyLoginNames,
+		Method: global_model.SearchMethodListContains,
+		Value:  loginName,
+	}
+	resourceOwnerQuery := &model.UserSearchQuery{
+		Key:    usr_model.UserSearchKeyResourceOwner,
+		Method: global_model.SearchMethodEquals,
+		Value:  resourceOwner,
+	}
+	query := repository.PrepareGetByQuery(table, loginNameQuery, resourceOwnerQuery)
+	err := query(db, user)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-AD4qs", "Errors.User.NotFound")
+	}
+	return user, err
+}
+
 func UsersByOrgID(db *gorm.DB, table, orgID string) ([]*model.UserView, error) {
 	users := make([]*model.UserView, 0)
 	orgIDQuery := &usr_model.UserSearchQuery{

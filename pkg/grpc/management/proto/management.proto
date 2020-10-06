@@ -369,6 +369,27 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
+  rpc SearchUserExternalIDPs(ExternalIDPSearchRequest) returns (ExternalIDPSearchResponse) {
+    option (google.api.http) = {
+      post: "/users/{user_id}/externalidps/_search"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.read"
+    };
+  }
+
+  rpc RemoveExternalIDP(ExternalIDPRemoveRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/users/{user_id}/externalidps/{idp_config_id}/{external_user_id}"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.write"
+    };
+  }
+
   rpc GetUserMfas(UserID) returns (MultiFactors) {
     option (google.api.http) = {
       get: "/users/{id}/mfas"
@@ -1464,8 +1485,7 @@ rpc GetUserByID(UserID) returns (UserView) {
 
   rpc RemoveIdpProviderFromLoginPolicy(IdpProviderID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/orgs/me/policies/login/idpproviders/{idp_config_id}"
-      body: "*"
+      delete: "/orgs/me/policies/login/idpproviders/{idp_config_id}"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
@@ -1482,8 +1502,14 @@ message ZitadelDocs {
 message Iam {
   string global_org_id = 1;
   string iam_project_id = 2;
-  bool set_up_done = 3;
-  bool set_up_started = 4;
+  IamSetupStep set_up_done = 3;
+  IamSetupStep set_up_started = 4;
+}
+
+enum IamSetupStep {
+  iam_setup_step_UNDEFINED = 0;
+  iam_setup_step_1 = 1;
+  iam_setup_step_2 = 2;
 }
 
 message ChangeRequest {
@@ -2898,12 +2924,20 @@ message OidcIdpConfig {
     string client_secret = 2;
     string issuer = 3;
     repeated string scopes = 4;
+    OIDCMappingField idp_display_name_mapping = 5;
+    OIDCMappingField username_mapping = 6;
 }
 
 enum IdpState {
     IDPCONFIGSTATE_UNSPECIFIED = 0;
     IDPCONFIGSTATE_ACTIVE = 1;
     IDPCONFIGSTATE_INACTIVE = 2;
+}
+
+enum OIDCMappingField {
+  OIDCMAPPINGFIELD_UNSPECIFIED = 0;
+  OIDCMAPPINGFIELD_PREFERRED_USERNAME = 1;
+  OIDCMAPPINGFIELD_EMAIL = 2;
 }
 
 message OidcIdpConfigCreate {
@@ -2913,6 +2947,8 @@ message OidcIdpConfigCreate {
     string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string issuer = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string scopes = 6;
+    OIDCMappingField idp_display_name_mapping = 7;
+    OIDCMappingField username_mapping = 8;
 }
 
 message OidcIdpConfigUpdate {
@@ -2921,6 +2957,8 @@ message OidcIdpConfigUpdate {
     string client_secret = 3;
     string issuer = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string scopes = 5;
+    OIDCMappingField idp_display_name_mapping = 6;
+    OIDCMappingField username_mapping = 7;
 }
 
 message IdpSearchResponse {
@@ -2950,6 +2988,8 @@ message OidcIdpConfigView {
     string client_id = 1;
     string issuer = 2;
     repeated string scopes = 3;
+    OIDCMappingField idp_display_name_mapping = 4;
+    OIDCMappingField username_mapping = 5;
 }
 
 message IdpSearchRequest {
@@ -3041,4 +3081,35 @@ enum ProjectType {
   PROJECTTYPE_UNSPECIFIED = 0;
   PROJECTTYPE_OWNED = 1;
   PROJECTTYPE_GRANTED = 2;
+}
+
+message ExternalIDPSearchRequest {
+  uint64 offset = 1;
+  uint64 limit = 2;
+  string user_id = 3;
+}
+
+message ExternalIDPSearchResponse {
+  uint64 offset = 1;
+  uint64 limit = 2;
+  uint64 total_result = 3;
+  repeated ExternalIDPView result = 4;
+  uint64 processed_sequence = 5;
+  google.protobuf.Timestamp view_timestamp = 6;
+}
+
+message ExternalIDPView {
+  string user_id = 1;
+  string idp_config_id = 2;
+  string external_user_id = 3;
+  string idp_name = 4;
+  string external_user_display_name = 5;
+  google.protobuf.Timestamp creation_date = 6;
+  google.protobuf.Timestamp change_date = 7;
+}
+
+message ExternalIDPRemoveRequest {
+  string user_id = 1;
+  string idp_config_id = 2;
+  string external_user_id = 3;
 }

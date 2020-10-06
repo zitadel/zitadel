@@ -1,10 +1,21 @@
-.h1 {
-  margin-top: 0;
-}
-
-.sub {
-  color: #8795a1;
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
+
+  .h1 {
+    margin-top: 0;
+  }
+
+  .sub {
+    color: #8795a1;
+  }
+
+  .theme {
+    min-width: 250px;
+  }
 }
 
 .login-name-row {
@@ -50,7 +61,7 @@
   .method-row {
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: space-between;
     padding: .5rem;
     border-bottom: 1px solid #ffffff20;
     flex-wrap: wrap;
@@ -65,20 +76,16 @@
       display: flex;
       justify-content: flex-end;
       align-items: center;
+      flex-direction: column;
     }
 
     .label {
-      flex: 1;
       font-size: .9rem;
       color: #8795a1;
     }
 
     .icon {
-      margin-right: .5rem;
-    }
-
-    .submit-button {
-      border-radius: .5rem;
+      margin: .5rem;
     }
 
     .verify {
@@ -110,13 +117,13 @@
     margin: .5rem;
   }
 
-  .theme-card {
-    max-width: 300px;
+  //   .theme-card {
+  //     max-width: 300px;
 
-    @media only screen and (max-width: 450px) {
-      max-width: none;
-    }
-  }
+  //     @media only screen and (max-width: 450px) {
+  //       max-width: none;
+  //     }
+  //   }
 }
 
 .side {

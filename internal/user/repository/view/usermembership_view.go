@@ -20,7 +20,7 @@ func UserMembershipByIDs(db *gorm.DB, table, userID, aggregateID, objectID strin
 	query := repository.PrepareGetByQuery(table, userIDQuery, aggregateIDQuery, objectIDQuery, memberTypeQuery)
 	err := query(db, memberships)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-sj8Sw", "Errors.UserMembership.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-5Tsji", "Errors.UserMembership.NotFound")
 	}
 	return memberships, err
 }
@@ -28,6 +28,16 @@ func UserMembershipByIDs(db *gorm.DB, table, userID, aggregateID, objectID strin
 func UserMembershipsByAggregateID(db *gorm.DB, table, aggregateID string) ([]*model.UserMembershipView, error) {
 	memberships := make([]*model.UserMembershipView, 0)
 	aggregateIDQuery := &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
+	query := repository.PrepareSearchQuery(table, model.UserMembershipSearchRequest{
+		Queries: []*usr_model.UserMembershipSearchQuery{aggregateIDQuery},
+	})
+	_, err := query(db, &memberships)
+	return memberships, err
+}
+
+func UserMembershipsByResourceOwner(db *gorm.DB, table, resourceOwner string) ([]*model.UserMembershipView, error) {
+	memberships := make([]*model.UserMembershipView, 0)
+	aggregateIDQuery := &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyResourceOwner, Value: resourceOwner, Method: global_model.SearchMethodEquals}
 	query := repository.PrepareSearchQuery(table, model.UserMembershipSearchRequest{
 		Queries: []*usr_model.UserMembershipSearchQuery{aggregateIDQuery},
 	})

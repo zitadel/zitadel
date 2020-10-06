@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -11,6 +12,8 @@ import (
 	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
+	user_model "github.com/caos/zitadel/internal/user/model"
+	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
 )
@@ -63,6 +66,7 @@ func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *gra
 		if isAdmin {
 			return repo.SearchAdminOrgs(request)
 		}
+		return repo.searchZitadelOrgs(ctxData, request)
 	}
 	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyProjectID, Method: global_model.SearchMethodEquals, Value: ctxData.ProjectID})
 
@@ -73,35 +77,66 @@ func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *gra
 	if len(grants.Result) > 0 {
 		return grantRespToOrgResp(grants), nil
 	}
-	user, err := repo.View.UserByID(ctxData.UserID)
-	if err != nil {
-		return nil, err
+	return repo.userOrg(ctxData)
+}
+
+func membershipsToOrgResp(memberships []*user_view_model.UserMembershipView, count uint64) *grant_model.ProjectOrgSearchResponse {
+	orgs := make([]*grant_model.Org, 0, len(memberships))
+	for _, m := range memberships {
+		if !containsOrg(orgs, m.ResourceOwner) {
+			orgs = append(orgs, &grant_model.Org{OrgID: m.ResourceOwner, OrgName: m.ResourceOwnerName})
+		}
 	}
-	org, err := repo.View.OrgByID(user.ResourceOwner)
-	if err != nil {
-		return nil, err
+	return &grant_model.ProjectOrgSearchResponse{
+		TotalResult: count,
+		Result:      orgs,
 	}
-	return &grant_model.ProjectOrgSearchResponse{Result: []*grant_model.Org{&grant_model.Org{
-		OrgID:   org.ID,
-		OrgName: org.Name,
-	}}}, nil
 }
 
 func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]string, error) {
-	grant, err := repo.AuthZRepo.ResolveGrants(ctx)
+	ctxData := authz.GetCtxData(ctx)
+	orgMemberships, orgCount, err := repo.View.SearchUserMemberships(&user_model.UserMembershipSearchRequest{
+		Queries: []*user_model.UserMembershipSearchQuery{
+			{
+				Key:    user_model.UserMembershipSearchKeyUserID,
+				Method: global_model.SearchMethodEquals,
+				Value:  ctxData.UserID,
+			},
+			{
+				Key:    user_model.UserMembershipSearchKeyResourceOwner,
+				Method: global_model.SearchMethodEquals,
+				Value:  ctxData.OrgID,
+			},
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
-	if grant == nil {
+	iamMemberships, iamCount, err := repo.View.SearchUserMemberships(&user_model.UserMembershipSearchRequest{
+		Queries: []*user_model.UserMembershipSearchQuery{
+			{
+				Key:    user_model.UserMembershipSearchKeyUserID,
+				Method: global_model.SearchMethodEquals,
+				Value:  ctxData.UserID,
+			},
+			{
+				Key:    user_model.UserMembershipSearchKeyAggregateID,
+				Method: global_model.SearchMethodEquals,
+				Value:  repo.IamID,
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if orgCount == 0 && iamCount == 0 {
 		return []string{}, nil
 	}
+	orgMemberships = append(orgMemberships, iamMemberships...)
 	permissions := &grant_model.Permissions{Permissions: []string{}}
-	for _, role := range grant.Roles {
-		roleName, ctxID := authz.SplitPermission(role)
-		for _, mapping := range repo.Auth.RolePermissionMappings {
-			if mapping.Role == roleName {
-				permissions.AppendPermissions(ctxID, mapping.Permissions...)
-			}
+	for _, membership := range orgMemberships {
+		for _, role := range membership.Roles {
+			permissions = repo.mapRoleToPermission(permissions, membership, role)
 		}
 	}
 	return permissions.Permissions, nil
@@ -159,6 +194,56 @@ func (repo *UserGrantRepo) UserGrantsByProjectAndUserID(projectID, userID string
 	return model.UserGrantsToModel(grants), nil
 }
 
+func (repo *UserGrantRepo) userOrg(ctxData authz.CtxData) (*grant_model.ProjectOrgSearchResponse, error) {
+	user, err := repo.View.UserByID(ctxData.UserID)
+	if err != nil {
+		return nil, err
+	}
+	org, err := repo.View.OrgByID(user.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return &grant_model.ProjectOrgSearchResponse{Result: []*grant_model.Org{&grant_model.Org{
+		OrgID:   org.ID,
+		OrgName: org.Name,
+	}}}, nil
+}
+
+func (repo *UserGrantRepo) searchZitadelOrgs(ctxData authz.CtxData, request *grant_model.UserGrantSearchRequest) (*grant_model.ProjectOrgSearchResponse, error) {
+	memberships, count, err := repo.View.SearchUserMemberships(&user_model.UserMembershipSearchRequest{
+		Offset: request.Offset,
+		Limit:  request.Limit,
+		Asc:    request.Asc,
+		Queries: []*user_model.UserMembershipSearchQuery{
+			{
+				Key:    user_model.UserMembershipSearchKeyUserID,
+				Method: global_model.SearchMethodEquals,
+				Value:  ctxData.UserID,
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(memberships) > 0 {
+		return membershipsToOrgResp(memberships, count), nil
+	}
+	return repo.userOrg(ctxData)
+}
+
+func (repo *UserGrantRepo) mapRoleToPermission(permissions *grant_model.Permissions, membership *user_view_model.UserMembershipView, role string) *grant_model.Permissions {
+	for _, mapping := range repo.Auth.RolePermissionMappings {
+		if mapping.Role == role {
+			ctxID := ""
+			if membership.MemberType == int32(user_model.MemberTypeProject) || membership.MemberType == int32(user_model.MemberTypeProjectGrant) {
+				ctxID = membership.ObjectID
+			}
+			permissions.AppendPermissions(ctxID, mapping.Permissions...)
+		}
+	}
+	return permissions
+}
+
 func grantRespToOrgResp(grants *grant_model.UserGrantSearchResponse) *grant_model.ProjectOrgSearchResponse {
 	resp := &grant_model.ProjectOrgSearchResponse{
 		TotalResult: grants.TotalResult,
@@ -206,4 +291,13 @@ func addIamAdminRoles(orgRoles, iamAdminRoles []string) []string {
 		}
 	}
 	return result
+}
+
+func containsOrg(orgs []*grant_model.Org, resourceOwner string) bool {
+	for _, org := range orgs {
+		if org.OrgID == resourceOwner {
+			return true
+		}
+	}
+	return false
 }

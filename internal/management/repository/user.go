@@ -31,6 +31,9 @@ type UserRepository interface {
 
 	UserMfas(ctx context.Context, userID string) ([]*model.MultiFactor, error)
 
+	SearchExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error)
+	RemoveExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) error
+
 	SearchMachineKeys(ctx context.Context, request *model.MachineKeySearchRequest) (*model.MachineKeySearchResponse, error)
 	GetMachineKey(ctx context.Context, userID, keyID string) (*model.MachineKeyView, error)
 	ChangeMachine(ctx context.Context, machine *model.Machine) (*model.Machine, error)

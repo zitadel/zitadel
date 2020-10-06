@@ -15,10 +15,12 @@
         <form [formGroup]="appNameForm" (ngSubmit)="saveOIDCApp()">
             <div class="content">
                 <mat-button-toggle-group formControlName="state" class="toggle" (change)="changeState($event)">
-                    <mat-button-toggle [value]="AppState.APPSTATE_INACTIVE" matTooltip="Deactivate Org">
+                    <mat-button-toggle [value]="AppState.APPSTATE_INACTIVE"
+                        matTooltip="{{ 'ACTIONS.DEACTIVATE' | translate}}">
                         {{'APP.PAGES.DETAIL.STATE.'+AppState.APPSTATE_INACTIVE | translate}}
                     </mat-button-toggle>
-                    <mat-button-toggle [value]="AppState.APPSTATE_ACTIVE" matTooltip="Activate Org">
+                    <mat-button-toggle [value]="AppState.APPSTATE_ACTIVE"
+                        matTooltip="{{ 'ACTIONS.REACTIVATE' | translate}}">
                         {{'APP.PAGES.DETAIL.STATE.'+AppState.APPSTATE_ACTIVE | translate}}
                     </mat-button-toggle>
                 </mat-button-toggle-group>
@@ -40,8 +42,7 @@
     </app-card>
 
     <app-card title="{{ 'APP.OIDC.TITLE' | translate }}" *ngIf="app && app.oidcConfig">
-        <div class="card-actions" card-actions
-            *ngIf="app?.oidcConfig.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE">
+        <div card-actions *ngIf="app?.oidcConfig?.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE">
             <button mat-stroked-button
                 (click)="regenerateOIDCClientSecret()">{{'APP.OIDC.REGENERATESECRET' | translate}}</button>
         </div>

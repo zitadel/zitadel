@@ -19,14 +19,6 @@
         padding-right: 0;
       }
     }
-
-    .data-row {
-      cursor: pointer;
-
-      &:hover {
-        background-color: #ffffff05;
-      }
-    }
   }
 }
 
@@ -34,6 +26,19 @@ tr {
   outline: none;
 }
 
-.add-button {
-  border-radius: .5rem;
+th {
+  .search-button {
+    visibility: hidden;
+  }
+
+  &:hover,
+  &.search-active {
+    .search-button {
+      visibility: visible;
+    }
+  }
+}
+
+.filtername {
+  margin: 0 1rem;
 }

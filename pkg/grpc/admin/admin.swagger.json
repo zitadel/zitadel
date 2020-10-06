@@ -782,7 +782,7 @@
       }
     },
     "/policies/login/idpproviders/{idp_config_id}": {
-      "post": {
+      "delete": {
         "operationId": "RemoveIdpProviderFromDefaultLoginPolicy",
         "responses": {
           "200": {
@@ -798,14 +798,6 @@
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1IdpProviderID"
-            }
           }
         ],
         "tags": [
@@ -1616,6 +1608,15 @@
         }
       }
     },
+    "v1OIDCMappingField": {
+      "type": "string",
+      "enum": [
+        "OIDCMAPPINGFIELD_UNSPECIFIED",
+        "OIDCMAPPINGFIELD_PREFERRED_USERNAME",
+        "OIDCMAPPINGFIELD_EMAIL"
+      ],
+      "default": "OIDCMAPPINGFIELD_UNSPECIFIED"
+    },
     "v1OidcIdpConfig": {
       "type": "object",
       "properties": {
@@ -1660,6 +1661,12 @@
           "items": {
             "type": "string"
           }
+        },
+        "idp_display_name_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
+        },
+        "username_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
         }
       }
     },
@@ -1683,6 +1690,12 @@
           "items": {
             "type": "string"
           }
+        },
+        "idp_display_name_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
+        },
+        "username_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
         }
       }
     },
@@ -1700,6 +1713,12 @@
           "items": {
             "type": "string"
           }
+        },
+        "idp_display_name_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
+        },
+        "username_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
         }
       }
     },

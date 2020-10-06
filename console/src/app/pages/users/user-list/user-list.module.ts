@@ -4,7 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
@@ -15,7 +17,7 @@ import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
-import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { UserListRoutingModule } from './user-list-routing.module';
 import { UserListComponent } from './user-list.component';
@@ -46,6 +48,8 @@ import { UserTableComponent } from './user-table/user-table.component';
         TranslateModule,
         SharedModule,
         RefreshTableModule,
+        MatFormFieldModule,
+        MatInputModule,
     ],
     exports: [
         UserListComponent,

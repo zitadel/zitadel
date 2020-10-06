@@ -15,7 +15,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
-import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { ProjectGrantDetailRoutingModule } from './project-grant-detail-routing.module';
 import { ProjectGrantDetailComponent } from './project-grant-detail.component';

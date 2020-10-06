@@ -32,55 +32,63 @@ type IDPConfigView struct {
 	IDPState        int32     `json:"-" gorm:"column:idp_state"`
 	IDPProviderType int32     `json:"-" gorm:"column:idp_provider_type"`
 
-	IsOIDC           bool                `json:"-" gorm:"column:is_oidc"`
-	OIDCClientID     string              `json:"clientId" gorm:"column:oidc_client_id"`
-	OIDCClientSecret *crypto.CryptoValue `json:"clientSecret" gorm:"column:oidc_client_secret"`
-	OIDCIssuer       string              `json:"issuer" gorm:"column:oidc_issuer"`
-	OIDCScopes       pq.StringArray      `json:"scopes" gorm:"column:oidc_scopes"`
+	IsOIDC                    bool                `json:"-" gorm:"column:is_oidc"`
+	OIDCClientID              string              `json:"clientId" gorm:"column:oidc_client_id"`
+	OIDCClientSecret          *crypto.CryptoValue `json:"clientSecret" gorm:"column:oidc_client_secret"`
+	OIDCIssuer                string              `json:"issuer" gorm:"column:oidc_issuer"`
+	OIDCScopes                pq.StringArray      `json:"scopes" gorm:"column:oidc_scopes"`
+	OIDCIDPDisplayNameMapping int32               `json:"idpDisplayNameMapping" gorm:"column:oidc_idp_display_name_mapping"`
+	OIDCUsernameMapping       int32               `json:"usernameMapping" gorm:"column:oidc_idp_username_mapping"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }
 
 func IDPConfigViewFromModel(idp *model.IDPConfigView) *IDPConfigView {
 	return &IDPConfigView{
-		IDPConfigID:      idp.IDPConfigID,
-		AggregateID:      idp.AggregateID,
-		Name:             idp.Name,
-		LogoSrc:          idp.LogoSrc,
-		Sequence:         idp.Sequence,
-		CreationDate:     idp.CreationDate,
-		ChangeDate:       idp.ChangeDate,
-		IDPProviderType:  int32(idp.IDPProviderType),
-		IsOIDC:           idp.IsOIDC,
-		OIDCClientID:     idp.OIDCClientID,
-		OIDCClientSecret: idp.OIDCClientSecret,
-		OIDCIssuer:       idp.OIDCIssuer,
-		OIDCScopes:       idp.OIDCScopes,
+		IDPConfigID:               idp.IDPConfigID,
+		AggregateID:               idp.AggregateID,
+		IDPState:                  int32(idp.State),
+		Name:                      idp.Name,
+		LogoSrc:                   idp.LogoSrc,
+		Sequence:                  idp.Sequence,
+		CreationDate:              idp.CreationDate,
+		ChangeDate:                idp.ChangeDate,
+		IDPProviderType:           int32(idp.IDPProviderType),
+		IsOIDC:                    idp.IsOIDC,
+		OIDCClientID:              idp.OIDCClientID,
+		OIDCClientSecret:          idp.OIDCClientSecret,
+		OIDCIssuer:                idp.OIDCIssuer,
+		OIDCScopes:                idp.OIDCScopes,
+		OIDCIDPDisplayNameMapping: int32(idp.OIDCIDPDisplayNameMapping),
+		OIDCUsernameMapping:       int32(idp.OIDCUsernameMapping),
 	}
 }
 
-func IdpConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
+func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
 	return &model.IDPConfigView{
-		IDPConfigID:      idp.IDPConfigID,
-		AggregateID:      idp.AggregateID,
-		Name:             idp.Name,
-		LogoSrc:          idp.LogoSrc,
-		Sequence:         idp.Sequence,
-		CreationDate:     idp.CreationDate,
-		ChangeDate:       idp.ChangeDate,
-		IDPProviderType:  model.IDPProviderType(idp.IDPProviderType),
-		IsOIDC:           idp.IsOIDC,
-		OIDCClientID:     idp.OIDCClientID,
-		OIDCClientSecret: idp.OIDCClientSecret,
-		OIDCIssuer:       idp.OIDCIssuer,
-		OIDCScopes:       idp.OIDCScopes,
+		IDPConfigID:               idp.IDPConfigID,
+		AggregateID:               idp.AggregateID,
+		State:                     model.IDPConfigState(idp.IDPState),
+		Name:                      idp.Name,
+		LogoSrc:                   idp.LogoSrc,
+		Sequence:                  idp.Sequence,
+		CreationDate:              idp.CreationDate,
+		ChangeDate:                idp.ChangeDate,
+		IDPProviderType:           model.IDPProviderType(idp.IDPProviderType),
+		IsOIDC:                    idp.IsOIDC,
+		OIDCClientID:              idp.OIDCClientID,
+		OIDCClientSecret:          idp.OIDCClientSecret,
+		OIDCIssuer:                idp.OIDCIssuer,
+		OIDCScopes:                idp.OIDCScopes,
+		OIDCIDPDisplayNameMapping: model.OIDCMappingField(idp.OIDCIDPDisplayNameMapping),
+		OIDCUsernameMapping:       model.OIDCMappingField(idp.OIDCUsernameMapping),
 	}
 }
 
 func IdpConfigViewsToModel(idps []*IDPConfigView) []*model.IDPConfigView {
 	result := make([]*model.IDPConfigView, len(idps))
 	for i, idp := range idps {
-		result[i] = IdpConfigViewToModel(idp)
+		result[i] = IDPConfigViewToModel(idp)
 	}
 	return result
 }

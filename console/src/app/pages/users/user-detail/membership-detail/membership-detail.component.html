@@ -4,12 +4,12 @@
     <app-refresh-table class="refresh-table" (refreshed)="refreshPage()" [dataSize]="dataSource?.totalResult"
         [timestamp]="dataSource?.viewTimestamp" [selection]="selection" [loading]="dataSource?.loading$ | async">
 
-        <a actions color="primary" class="add-button" (click)="addMember()" color="primary" mat-raised-button>
+        <a actions color="primary" (click)="addMember()" color="primary" mat-raised-button>
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
 
         <div class="table-wrapper">
-            <table mat-table class="background-style table" aria-label="Elements" [dataSource]="dataSource">
+            <table mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
                 <ng-container matColumnDef="select">
                     <th class="selection" mat-header-cell *matHeaderCellDef>
                         <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
@@ -57,12 +57,11 @@
                 </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr class="data-row" mat-row *matRowDef="let row; columns: displayedColumns;">
+                <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;">
                 </tr>
             </table>
 
-            <mat-paginator class="paginator background-style" #paginator [pageSize]="50"
-                [pageSizeOptions]="[25, 50, 100, 250]">
+            <mat-paginator class="paginator" #paginator [pageSize]="50" [pageSizeOptions]="[25, 50, 100, 250]">
             </mat-paginator>
         </div>
     </app-refresh-table>

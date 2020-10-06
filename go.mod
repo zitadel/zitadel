@@ -3,8 +3,7 @@ module github.com/caos/zitadel
 go 1.14
 
 require (
-	cloud.google.com/go v0.61.0 // indirect
-	contrib.go.opencensus.io/exporter/stackdriver v0.13.3
+	contrib.go.opencensus.io/exporter/stackdriver v0.13.4
 	dmitri.shuralyov.com/route/github v0.0.0-20191123213020-a7795e5a0797 // indirect
 	fyne.io/fyne v1.3.3 // indirect
 	gioui.org v0.0.0-20200829162755-829ee4559c5a // indirect
@@ -28,21 +27,21 @@ require (
 	github.com/allegro/bigcache v1.2.1
 	github.com/andygrunwald/go-gerrit v0.0.0-20200503132804-ed2419acda39 // indirect
 	github.com/apache/thrift v0.13.0 // indirect
-	github.com/aws/aws-sdk-go v1.33.13 // indirect
+	github.com/aws/aws-sdk-go v1.34.24 // indirect
 	github.com/aws/aws-sdk-go-v2 v0.24.0 // indirect
 	github.com/beyang/hgo v0.0.0-20150825035631-d45f1891a48a // indirect
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b // indirect
 	github.com/cactus/go-statsd-client/statsd v0.0.0-20200728222731-a2baea3bbfc6 // indirect
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.7.4
+	github.com/caos/oidc v0.10.0
 	github.com/casbin/casbin v1.9.1 // indirect
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/circonus-labs/circonus-gometrics v2.3.1+incompatible // indirect
 	github.com/circonus-labs/circonusllhist v0.1.4 // indirect
 	github.com/clbanning/x2j v0.0.0-20191024224557-825249438eec // indirect
-	github.com/cockroachdb/cockroach-go/v2 v2.0.5
+	github.com/cockroachdb/cockroach-go/v2 v2.0.7
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd // indirect
 	github.com/codegangsta/inject v0.0.0-20150114235600-33e0aa1cb7c0 // indirect
 	github.com/coocood/freecache v1.1.1 // indirect
@@ -82,19 +81,18 @@ require (
 	github.com/gonum/internal v0.0.0-20181124074243-f884aa714029 // indirect
 	github.com/gonum/lapack v0.0.0-20181123203213-e4cdc5a0bff9 // indirect
 	github.com/gonum/matrix v0.0.0-20181209220409-c518dec07be9 // indirect
-	github.com/google/go-cmp v0.5.1 // indirect
 	github.com/gorilla/csrf v1.7.0
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/schema v1.2.0
 	github.com/gorilla/securecookie v1.1.1
 	github.com/graph-gophers/graphql-go v0.0.0-20200819123640-3b5ddcd884ae // indirect
-	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
-	github.com/grpc-ecosystem/grpc-gateway v1.14.6
+	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
+	github.com/grpc-ecosystem/grpc-gateway v1.14.8
 	github.com/hashicorp/consul/api v1.6.0 // indirect
 	github.com/hashicorp/go-retryablehttp v0.6.7 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/hudl/fargo v1.3.0 // indirect
-	github.com/imdario/mergo v0.3.10 // indirect
+	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/inconshreveable/log15 v0.0.0-20200109203555-b30bc20e4fd1 // indirect
 	github.com/influxdata/influxdb1-client v0.0.0-20200827194710-b269163b24ab // indirect
 	github.com/jessevdk/go-flags v1.4.0 // indirect
@@ -106,7 +104,7 @@ require (
 	github.com/kevinburke/go.uuid v1.2.0 // indirect
 	github.com/kevinburke/handlers v0.0.0-20200130012126-6143062796c3 // indirect
 	github.com/kevinburke/rest v0.0.0-20200429221318-0d2892b400f8 // indirect
-	github.com/kevinburke/twilio-go v0.0.0-20200713162607-ff84c3703a29
+	github.com/kevinburke/twilio-go v0.0.0-20200810163702-320748330fac
 	github.com/kisielk/sqlstruct v0.0.0-20150923205031-648daed35d49 // indirect
 	github.com/lib/pq v1.8.0
 	github.com/lightstep/lightstep-tracer-go v0.21.0 // indirect
@@ -163,12 +161,11 @@ require (
 	github.com/urfave/negroni v1.0.0 // indirect
 	go.etcd.io/etcd v3.3.25+incompatible // indirect
 	go.opencensus.io v0.22.4
-	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899
-	golang.org/x/sys v0.0.0-20200728102440-3e129f6d46b1 // indirect
+	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 	golang.org/x/text v0.3.3
-	golang.org/x/tools v0.0.0-20200727233628-55644ead90ce
-	google.golang.org/genproto v0.0.0-20200728010541-3dc8dca74b7b
-	google.golang.org/grpc v1.30.0
+	golang.org/x/tools v0.0.0-20200916140129-56d9a0cd3487
+	google.golang.org/genproto v0.0.0-20200916143405-f6a2fa72f0c4
+	google.golang.org/grpc v1.32.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/cheggaaa/pb.v1 v1.0.28 // indirect
 	gopkg.in/gcfg.v1 v1.2.3 // indirect

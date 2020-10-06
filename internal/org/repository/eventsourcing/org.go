@@ -386,7 +386,9 @@ func IDPConfigRemovedAggregate(ctx context.Context, aggCreator *es_models.Aggreg
 	if err != nil {
 		return nil, err
 	}
+
 	agg, err = agg.AppendEvent(model.IDPConfigRemoved, &iam_es_model.IDPConfigID{IDPConfigID: idp.IDPConfigID})
+
 	if err != nil {
 		return nil, err
 	}

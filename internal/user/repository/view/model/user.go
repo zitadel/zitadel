@@ -257,7 +257,7 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		es_model.HumanMFAOTPRemoved:
 		u.OTPState = int32(model.MfaStateUnspecified)
 	case es_model.MFAInitSkipped,
-		es_model.HumanMfaInitSkipped:
+		es_model.HumanMFAInitSkipped:
 		u.MfaInitSkipped = event.CreationDate
 	case es_model.InitializedUserCodeAdded,
 		es_model.InitializedHumanCodeAdded:
@@ -296,7 +296,7 @@ func (u *UserView) setPasswordData(event *models.Event) error {
 }
 
 func (u *UserView) ComputeObject() {
-	if u.MachineView != nil {
+	if !u.MachineView.IsZero() {
 		if u.State == int32(model.UserStateUnspecified) {
 			u.State = int32(model.UserStateActive)
 		}

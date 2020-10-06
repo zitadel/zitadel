@@ -1,6 +1,9 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/iam/model"
+	"golang.org/x/text/language"
+	"strings"
 	"time"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -22,17 +25,36 @@ type AuthRequest struct {
 	MaxAuthAge    uint32
 	Request       Request
 
-	levelOfAssurance LevelOfAssurance
-	UserID           string
-	LoginName        string
-	DisplayName      string
-	UserOrgID        string
-	PossibleSteps    []NextStep
-	PasswordVerified bool
-	MfasVerified     []MfaType
-	Audience         []string
-	AuthTime         time.Time
-	Code             string
+	levelOfAssurance    LevelOfAssurance
+	UserID              string
+	LoginName           string
+	DisplayName         string
+	UserOrgID           string
+	SelectedIDPConfigID string
+	LinkingUsers        []*ExternalUser
+	PossibleSteps       []NextStep
+	PasswordVerified    bool
+	MfasVerified        []MfaType
+	Audience            []string
+	AuthTime            time.Time
+	Code                string
+	LoginPolicy         *model.LoginPolicyView
+	AllowedExternalIDPs []*model.IDPProviderView
+}
+
+type ExternalUser struct {
+	IDPConfigID       string
+	ExternalUserID    string
+	DisplayName       string
+	PreferredUsername string
+	FirstName         string
+	LastName          string
+	NickName          string
+	Email             string
+	IsEmailVerified   bool
+	PreferredLanguage language.Tag
+	Phone             string
+	IsPhoneVerified   bool
 }
 
 type Prompt int32
@@ -102,4 +124,16 @@ func (a *AuthRequest) SetUserInfo(userID, loginName, displayName, userOrgID stri
 	a.LoginName = loginName
 	a.DisplayName = displayName
 	a.UserOrgID = userOrgID
+}
+
+func (a *AuthRequest) GetScopeOrgPrimaryDomain() string {
+	switch request := a.Request.(type) {
+	case *AuthRequestOIDC:
+		for _, scope := range request.Scopes {
+			if strings.HasPrefix(scope, OrgDomainPrimaryScope) {
+				return strings.TrimPrefix(scope, OrgDomainPrimaryScope)
+			}
+		}
+	}
+	return ""
 }

@@ -7,6 +7,8 @@ import {
     CreateHumanRequest,
     CreateOrgRequest,
     CreateUserRequest,
+    DefaultLoginPolicy,
+    DefaultLoginPolicyView,
     FailedEventID,
     FailedEvents,
     IamMember,
@@ -14,6 +16,18 @@ import {
     IamMemberSearchQuery,
     IamMemberSearchRequest,
     IamMemberSearchResponse,
+    Idp,
+    IdpID,
+    IdpProviderID,
+    IdpProviderSearchRequest,
+    IdpProviderSearchResponse,
+    IdpSearchQuery,
+    IdpSearchRequest,
+    IdpSearchResponse,
+    IdpView,
+    OidcIdpConfig,
+    OidcIdpConfigCreate,
+    OidcIdpConfigUpdate,
     OrgIamPolicy,
     OrgIamPolicyID,
     OrgIamPolicyRequest,
@@ -23,6 +37,7 @@ import {
     ViewID,
     Views,
 } from '../proto/generated/admin_pb';
+import { IdpUpdate } from '../proto/generated/management_pb';
 import { GrpcService } from './grpc.service';
 
 @Injectable({
@@ -31,7 +46,7 @@ import { GrpcService } from './grpc.service';
 export class AdminService {
     constructor(private readonly grpcService: GrpcService) { }
 
-    public async SetUpOrg(
+    public SetUpOrg(
         createOrgRequest: CreateOrgRequest,
         humanRequest: CreateHumanRequest,
     ): Promise<OrgSetUpResponse> {
@@ -46,29 +61,29 @@ export class AdminService {
         return this.grpcService.admin.setUpOrg(req);
     }
 
-    public async GetIamMemberRoles(): Promise<IamMemberRoles> {
+    public GetIamMemberRoles(): Promise<IamMemberRoles> {
         const req = new Empty();
         return this.grpcService.admin.getIamMemberRoles(req);
     }
 
-    public async GetViews(): Promise<Views> {
+    public GetViews(): Promise<Views> {
         const req = new Empty();
         return this.grpcService.admin.getViews(req);
     }
 
-    public async GetFailedEvents(): Promise<FailedEvents> {
+    public GetFailedEvents(): Promise<FailedEvents> {
         const req = new Empty();
         return this.grpcService.admin.getFailedEvents(req);
     }
 
-    public async ClearView(viewname: string, db: string): Promise<Empty> {
+    public ClearView(viewname: string, db: string): Promise<Empty> {
         const req: ViewID = new ViewID();
         req.setDatabase(db);
         req.setViewName(viewname);
         return this.grpcService.admin.clearView(req);
     }
 
-    public async RemoveFailedEvent(viewname: string, db: string, sequence: number): Promise<Empty> {
+    public RemoveFailedEvent(viewname: string, db: string, sequence: number): Promise<Empty> {
         const req: FailedEventID = new FailedEventID();
         req.setDatabase(db);
         req.setViewName(viewname);
@@ -76,7 +91,108 @@ export class AdminService {
         return this.grpcService.admin.removeFailedEvent(req);
     }
 
-    public async SearchIamMembers(
+    public GetDefaultLoginPolicy(
+    ): Promise<DefaultLoginPolicyView> {
+        const req = new Empty();
+        return this.grpcService.admin.getDefaultLoginPolicy(req);
+    }
+
+    public UpdateDefaultLoginPolicy(req: DefaultLoginPolicy): Promise<DefaultLoginPolicy> {
+        return this.grpcService.admin.updateDefaultLoginPolicy(req);
+    }
+
+    public AddIdpProviderToDefaultLoginPolicy(configId: string): Promise<IdpProviderID> {
+        const req = new IdpProviderID();
+        req.setIdpConfigId(configId);
+        return this.grpcService.admin.addIdpProviderToDefaultLoginPolicy(req);
+    }
+
+    public RemoveIdpProviderFromDefaultLoginPolicy(configId: string): Promise<Empty> {
+        const req = new IdpProviderID();
+        req.setIdpConfigId(configId);
+        return this.grpcService.admin.removeIdpProviderFromDefaultLoginPolicy(req);
+    }
+
+    public GetDefaultLoginPolicyIdpProviders(limit?: number, offset?: number): Promise<IdpProviderSearchResponse> {
+        const req = new IdpProviderSearchRequest();
+        if (limit) {
+            req.setLimit(limit);
+        }
+        if (offset) {
+            req.setOffset(offset);
+        }
+        return this.grpcService.admin.getDefaultLoginPolicyIdpProviders(req);
+    }
+
+    public SearchIdps(
+        limit?: number,
+        offset?: number,
+        queryList?: IdpSearchQuery[],
+    ): Promise<IdpSearchResponse> {
+        const req = new IdpSearchRequest();
+        if (limit) {
+            req.setLimit(limit);
+        }
+        if (offset) {
+            req.setOffset(offset);
+        }
+        if (queryList) {
+            req.setQueriesList(queryList);
+        }
+        return this.grpcService.admin.searchIdps(req);
+    }
+
+    public IdpByID(
+        id: string,
+    ): Promise<IdpView> {
+        const req = new IdpID();
+        req.setId(id);
+        return this.grpcService.admin.idpByID(req);
+    }
+
+    public UpdateIdp(
+        req: IdpUpdate,
+    ): Promise<Idp> {
+        return this.grpcService.admin.updateIdpConfig(req);
+    }
+
+    public CreateOidcIdp(
+        req: OidcIdpConfigCreate,
+    ): Promise<Idp> {
+        return this.grpcService.admin.createOidcIdp(req);
+    }
+
+    public UpdateOidcIdpConfig(
+        req: OidcIdpConfigUpdate,
+    ): Promise<OidcIdpConfig> {
+        return this.grpcService.admin.updateOidcIdpConfig(req);
+    }
+
+    public RemoveIdpConfig(
+        id: string,
+    ): Promise<Empty> {
+        const req = new IdpID;
+        req.setId(id);
+        return this.grpcService.admin.removeIdpConfig(req);
+    }
+
+    public DeactivateIdpConfig(
+        id: string,
+    ): Promise<Empty> {
+        const req = new IdpID;
+        req.setId(id);
+        return this.grpcService.admin.deactivateIdpConfig(req);
+    }
+
+    public ReactivateIdpConfig(
+        id: string,
+    ): Promise<Empty> {
+        const req = new IdpID;
+        req.setId(id);
+        return this.grpcService.admin.reactivateIdpConfig(req);
+    }
+
+    public SearchIamMembers(
         limit: number,
         offset: number,
         queryList?: IamMemberSearchQuery[],
@@ -90,7 +206,7 @@ export class AdminService {
         return this.grpcService.admin.searchIamMembers(req);
     }
 
-    public async RemoveIamMember(
+    public RemoveIamMember(
         userId: string,
     ): Promise<Empty> {
         const req = new RemoveIamMemberRequest();
@@ -99,7 +215,7 @@ export class AdminService {
         return this.grpcService.admin.removeIamMember(req);
     }
 
-    public async AddIamMember(
+    public AddIamMember(
         userId: string,
         rolesList: string[],
     ): Promise<IamMember> {
@@ -110,7 +226,7 @@ export class AdminService {
         return this.grpcService.admin.addIamMember(req);
     }
 
-    public async ChangeIamMember(
+    public ChangeIamMember(
         userId: string,
         rolesList: string[],
     ): Promise<IamMember> {
@@ -121,14 +237,14 @@ export class AdminService {
         return this.grpcService.admin.changeIamMember(req);
     }
 
-    public async GetOrgIamPolicy(orgId: string): Promise<OrgIamPolicy> {
+    public GetOrgIamPolicy(orgId: string): Promise<OrgIamPolicy> {
         const req = new OrgIamPolicyID();
         req.setOrgId(orgId);
 
         return this.grpcService.admin.getOrgIamPolicy(req);
     }
 
-    public async CreateOrgIamPolicy(
+    public CreateOrgIamPolicy(
         orgId: string,
         description: string,
         userLoginMustBeDomain: boolean): Promise<OrgIamPolicy> {
@@ -140,7 +256,7 @@ export class AdminService {
         return this.grpcService.admin.createOrgIamPolicy(req);
     }
 
-    public async UpdateOrgIamPolicy(
+    public UpdateOrgIamPolicy(
         orgId: string,
         description: string,
         userLoginMustBeDomain: boolean): Promise<OrgIamPolicy> {
@@ -151,7 +267,7 @@ export class AdminService {
         return this.grpcService.admin.updateOrgIamPolicy(req);
     }
 
-    public async deleteOrgIamPolicy(
+    public deleteOrgIamPolicy(
         orgId: string,
     ): Promise<Empty> {
         const req = new OrgIamPolicyID();

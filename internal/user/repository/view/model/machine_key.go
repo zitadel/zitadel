@@ -25,6 +25,8 @@ type MachineKeyView struct {
 	Sequence       uint64    `json:"-" gorm:"column:sequence"`
 
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
+
+	PublicKey []byte `json:"publicKey" gorm:"column:public_key"`
 }
 
 func MachineKeyViewFromModel(key *model.MachineKeyView) *MachineKeyView {
@@ -46,6 +48,7 @@ func MachineKeyToModel(key *MachineKeyView) *model.MachineKeyView {
 		ExpirationDate: key.ExpirationDate,
 		Sequence:       key.Sequence,
 		CreationDate:   key.CreationDate,
+		PublicKey:      key.PublicKey,
 	}
 }
 

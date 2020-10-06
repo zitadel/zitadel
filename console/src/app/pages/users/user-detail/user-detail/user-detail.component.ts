@@ -42,9 +42,8 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         public translate: TranslateService,
         private route: ActivatedRoute,
         private toast: ToastService,
-        private mgmtUserService: ManagementService,
+        public mgmtUserService: ManagementService,
         private _location: Location,
-        public mgmtService: ManagementService,
     ) { }
 
     public ngOnInit(): void {

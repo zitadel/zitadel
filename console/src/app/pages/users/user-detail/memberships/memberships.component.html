@@ -32,6 +32,11 @@
                 aria-label="add membership">
                 <mat-icon>add</mat-icon>
             </button>
+            <span class="fill-space"></span>
+            <button class="refresh-img" (click)="loadManager(user.id)" [disabled]="disabled" mat-icon-button
+                aria-label="refresh contributors">
+                <mat-icon>refresh</mat-icon>
+            </button>
         </div>
     </div>
 </div>

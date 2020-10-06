@@ -1,0 +1,41 @@
+
+.container {
+  width: 100%;
+
+  @media only screen and (max-width: 450px) {
+    padding: 4rem 1rem 2rem 1rem;
+  }
+}
+
+.content {
+  display: flex;
+  margin: 0 -.5rem;
+  flex-wrap: wrap;
+
+  .desc {
+    flex-basis: 100%;
+    margin: 0 .5rem;
+    margin-bottom: 1rem;
+    color: #8795a1;
+  }
+
+  .formfield {
+    flex: 1 0 auto;
+    margin: 0 .5rem;
+
+    @media only screen and (max-width: 450px) {
+      flex-basis: 100%;
+    }
+  }
+}
+
+.continue-button {
+  margin-bottom: 4rem;
+  display: block;
+  padding: .5rem 4rem;
+
+  @media only screen and (max-width: 450px) {
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+  }
+}

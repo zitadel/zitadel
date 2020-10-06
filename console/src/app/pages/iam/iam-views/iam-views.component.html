@@ -2,22 +2,20 @@
     <app-refresh-table *ngIf="dataSource" (refreshed)="loadViews()" [dataSize]="dataSource.data.length"
         [loading]="loading$ | async">
 
-        <table [dataSource]="dataSource" mat-table class="table background-style" aria-label="Elements">
+        <table [dataSource]="dataSource" mat-table class="table" aria-label="Elements" matSort>
             <ng-container matColumnDef="viewName">
-                <th mat-header-cell *matHeaderCellDef> {{ 'IAM.VIEWS.VIEWNAME' | translate }} </th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'IAM.VIEWS.VIEWNAME' | translate }} </th>
                 <td mat-cell *matCellDef="let view"> {{view.viewName}} </td>
             </ng-container>
 
             <ng-container matColumnDef="database">
-                <th mat-header-cell *matHeaderCellDef> {{ 'IAM.VIEWS.DATABASE' | translate }} </th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'IAM.VIEWS.DATABASE' | translate }} </th>
                 <td mat-cell *matCellDef="let view"> {{view.database}} </td>
             </ng-container>
 
             <ng-container matColumnDef="sequence">
                 <th mat-header-cell *matHeaderCellDef> {{ 'IAM.VIEWS.SEQUENCE' | translate }} </th>
-                <td mat-cell *matCellDef="let view">
-                    <span>{{view?.processedSequence}}</span>
-                </td>
+                <td mat-cell *matCellDef="let view"> {{view.processedSequence}} </td>
             </ng-container>
 
             <ng-container matColumnDef="timestamp">
@@ -27,8 +25,8 @@
                 </td>
             </ng-container>
 
-            <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef> {{ 'IAM.VIEWS.ACTIONS' | translate }} </th>
+            <ng-container matColumnDef="actions" stickyEnd>
+                <th mat-header-cell *matHeaderCellDef></th>
                 <td mat-cell *matCellDef="let view">
                     <button mat-icon-button matTooltip="{{'IAM.VIEWS.CLEAR' | translate}}"
                         (click)="cancelView(view.viewName, view.database)">
@@ -38,10 +36,9 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
-        <mat-paginator class="paginator background-style" [pageSize]="10" #paginator
-            [pageSizeOptions]="[10, 20, 100, 250]">
+        <mat-paginator class="paginator" [pageSize]="10" #paginator [pageSizeOptions]="[10, 20, 100, 250]">
         </mat-paginator>
     </app-refresh-table>
 </div>

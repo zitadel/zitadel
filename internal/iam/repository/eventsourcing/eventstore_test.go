@@ -79,9 +79,10 @@ func TestSetUpStarted(t *testing.T) {
 		es    *IAMEventstore
 		ctx   context.Context
 		iamID string
+		step  iam_model.Step
 	}
 	type res struct {
-		iam     *model.IAM
+		iam     *iam_model.IAM
 		errFunc func(err error) bool
 	}
 	tests := []struct {
@@ -95,9 +96,10 @@ func TestSetUpStarted(t *testing.T) {
 				es:    GetMockManipulateIamNotExisting(ctrl),
 				ctx:   authz.NewMockContext("orgID", "userID"),
 				iamID: "iamID",
+				step:  iam_model.Step1,
 			},
 			res: res{
-				iam: &model.IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "iamID", Sequence: 1}, SetUpStarted: true},
+				iam: &iam_model.IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "iamID", Sequence: 1}, SetUpStarted: iam_model.Step1},
 			},
 		},
 		{
@@ -106,6 +108,7 @@ func TestSetUpStarted(t *testing.T) {
 				es:    GetMockManipulateIam(ctrl),
 				ctx:   authz.NewMockContext("orgID", "userID"),
 				iamID: "iamID",
+				step:  iam_model.Step1,
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -114,8 +117,9 @@ func TestSetUpStarted(t *testing.T) {
 		{
 			name: "setup iam no id",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
-				ctx: authz.NewMockContext("orgID", "userID"),
+				es:   GetMockManipulateIam(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				step: iam_model.Step1,
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -124,7 +128,7 @@ func TestSetUpStarted(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.StartSetup(tt.args.ctx, tt.args.iamID)
+			result, err := tt.args.es.StartSetup(tt.args.ctx, tt.args.iamID, tt.args.step)
 
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
@@ -145,9 +149,10 @@ func TestSetUpDone(t *testing.T) {
 		es    *IAMEventstore
 		ctx   context.Context
 		iamID string
+		step  iam_model.Step
 	}
 	type res struct {
-		iam     *model.IAM
+		iam     *iam_model.IAM
 		errFunc func(err error) bool
 	}
 	tests := []struct {
@@ -161,16 +166,18 @@ func TestSetUpDone(t *testing.T) {
 				es:    GetMockManipulateIam(ctrl),
 				ctx:   authz.NewMockContext("orgID", "userID"),
 				iamID: "iamID",
+				step:  iam_model.Step1,
 			},
 			res: res{
-				iam: &model.IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "iamID", Sequence: 1}, SetUpStarted: true, SetUpDone: true},
+				iam: &iam_model.IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "iamID", Sequence: 1}, SetUpStarted: iam_model.Step1, SetUpDone: iam_model.Step1},
 			},
 		},
 		{
 			name: "setup iam no id",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
-				ctx: authz.NewMockContext("orgID", "userID"),
+				es:   GetMockManipulateIam(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				step: iam_model.Step1,
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -182,6 +189,7 @@ func TestSetUpDone(t *testing.T) {
 				es:    GetMockManipulateIamNotExisting(ctrl),
 				ctx:   authz.NewMockContext("orgID", "userID"),
 				iamID: "iamID",
+				step:  iam_model.Step1,
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -190,7 +198,7 @@ func TestSetUpDone(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.SetupDone(tt.args.ctx, tt.args.iamID)
+			result, err := tt.args.es.SetupDone(tt.args.ctx, tt.args.iamID, tt.args.step)
 
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
@@ -231,7 +239,7 @@ func TestSetGlobalOrg(t *testing.T) {
 				globalOrg: "globalOrg",
 			},
 			res: res{
-				iam: &model.IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "iamID", Sequence: 1}, SetUpStarted: true, GlobalOrgID: "globalOrg"},
+				iam: &model.IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "iamID", Sequence: 1}, SetUpStarted: model.Step1, GlobalOrgID: "globalOrg"},
 			},
 		},
 		{
@@ -312,7 +320,7 @@ func TestSetIamProjectID(t *testing.T) {
 				iamProjectID: "iamProjectID",
 			},
 			res: res{
-				iam: &model.IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "iamID", Sequence: 1}, SetUpStarted: true, IAMProjectID: "iamProjectID"},
+				iam: &model.IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "iamID", Sequence: 1}, SetUpStarted: model.Step1, IAMProjectID: "iamProjectID"},
 			},
 		},
 		{

@@ -5,22 +5,22 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/sdk"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
+	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
@@ -219,7 +219,7 @@ func (repo *OrgRepository) IDPConfigByID(ctx context.Context, idpConfigID string
 	if err != nil {
 		return nil, err
 	}
-	return iam_view_model.IdpConfigViewToModel(idp), nil
+	return iam_view_model.IDPConfigViewToModel(idp), nil
 }
 func (repo *OrgRepository) AddOIDCIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
 	idp.AggregateID = authz.GetCtxData(ctx).OrgID
@@ -240,8 +240,27 @@ func (repo *OrgRepository) ReactivateIDPConfig(ctx context.Context, idpConfigID 
 }
 
 func (repo *OrgRepository) RemoveIDPConfig(ctx context.Context, idpConfigID string) error {
+	aggregates := make([]*es_models.Aggregate, 0)
 	idp := iam_model.NewIDPConfig(authz.GetCtxData(ctx).OrgID, idpConfigID)
-	return repo.OrgEventstore.RemoveIDPConfig(ctx, idp)
+	_, agg, err := repo.OrgEventstore.PrepareRemoveIDPConfig(ctx, idp)
+	if err != nil {
+
+	}
+	aggregates = append(aggregates, agg)
+	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(idpConfigID)
+	if err != nil {
+		return err
+	}
+	for _, externalIDP := range externalIDPs {
+		idpRemove := &usr_model.ExternalIDP{ObjectRoot: es_models.ObjectRoot{AggregateID: externalIDP.UserID}, IDPConfigID: externalIDP.IDPConfigID, UserID: externalIDP.ExternalUserID}
+		idpAgg := make([]*es_models.Aggregate, 0)
+		_, idpAgg, err = repo.UserEvents.PrepareRemoveExternalIDP(ctx, idpRemove, true)
+		if err != nil {
+			return err
+		}
+		aggregates = append(aggregates, idpAgg...)
+	}
+	return sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
 }
 
 func (repo *OrgRepository) ChangeOIDCIDPConfig(ctx context.Context, oidcConfig *iam_model.OIDCIDPConfig) (*iam_model.OIDCIDPConfig, error) {
@@ -354,6 +373,25 @@ func (repo *OrgRepository) AddIDPProviderToLoginPolicy(ctx context.Context, prov
 }
 
 func (repo *OrgRepository) RemoveIDPProviderFromIdpProvider(ctx context.Context, provider *iam_model.IDPProvider) error {
+	aggregates := make([]*es_models.Aggregate, 0)
 	provider.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.RemoveIDPProviderFromLoginPolicy(ctx, provider)
+	_, agg, err := repo.OrgEventstore.PrepareRemoveIDPProviderFromLoginPolicy(ctx, provider, false)
+	if err != nil {
+		return err
+	}
+	aggregates = append(aggregates, agg)
+	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(provider.IdpConfigID)
+	if err != nil {
+		return err
+	}
+	for _, externalIDP := range externalIDPs {
+		idpRemove := &usr_model.ExternalIDP{ObjectRoot: es_models.ObjectRoot{AggregateID: externalIDP.UserID}, IDPConfigID: externalIDP.IDPConfigID, UserID: externalIDP.ExternalUserID}
+		idpAgg := make([]*es_models.Aggregate, 0)
+		_, idpAgg, err = repo.UserEvents.PrepareRemoveExternalIDP(ctx, idpRemove, true)
+		if err != nil {
+			return err
+		}
+		aggregates = append(aggregates, idpAgg...)
+	}
+	return sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
 }

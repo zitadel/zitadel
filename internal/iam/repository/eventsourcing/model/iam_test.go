@@ -2,8 +2,9 @@ package model
 
 import (
 	"encoding/json"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"testing"
+
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 )
 
 func mockIamData(iam *IAM) []byte {
@@ -27,31 +28,31 @@ func TestProjectRoleAppendEvent(t *testing.T) {
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: IAMSetupStarted, ResourceOwner: "OrgID"},
 				iam:   &IAM{},
 			},
-			result: &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true},
+			result: &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: Step1},
 		},
 		{
 			name: "append set up done event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: IAMSetupDone, ResourceOwner: "OrgID"},
-				iam:   &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true},
+				iam:   &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: Step1},
 			},
-			result: &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true, SetUpDone: true},
+			result: &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: Step1, SetUpDone: Step1},
 		},
 		{
 			name: "append globalorg event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: GlobalOrgSet, ResourceOwner: "OrgID", Data: mockIamData(&IAM{GlobalOrgID: "GlobalOrg"})},
-				iam:   &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true},
+				iam:   &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: Step1},
 			},
-			result: &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true, GlobalOrgID: "GlobalOrg"},
+			result: &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: Step1, GlobalOrgID: "GlobalOrg"},
 		},
 		{
 			name: "append iamproject event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: IAMProjectSet, ResourceOwner: "OrgID", Data: mockIamData(&IAM{IAMProjectID: "IamProject"})},
-				iam:   &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true},
+				iam:   &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: Step1},
 			},
-			result: &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: true, IAMProjectID: "IamProject"},
+			result: &IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SetUpStarted: Step1, IAMProjectID: "IamProject"},
 		},
 	}
 	for _, tt := range tests {

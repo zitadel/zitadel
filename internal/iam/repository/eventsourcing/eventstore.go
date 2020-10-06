@@ -60,32 +60,37 @@ func (es *IAMEventstore) IAMByID(ctx context.Context, id string) (*iam_model.IAM
 	return model.IAMToModel(iam), nil
 }
 
-func (es *IAMEventstore) StartSetup(ctx context.Context, iamID string) (*iam_model.IAM, error) {
+func (es *IAMEventstore) StartSetup(ctx context.Context, iamID string, step iam_model.Step) (*iam_model.IAM, error) {
 	iam, err := es.IAMByID(ctx, iamID)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
 
-	if iam != nil && iam.SetUpStarted {
+	if iam != nil && (iam.SetUpStarted >= step || iam.SetUpStarted != iam.SetUpDone) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9so34", "Setup already started")
 	}
 
-	repoIam := &model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: iamID}}
-	createAggregate := IAMSetupStartedAggregate(es.AggregateCreator(), repoIam)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, createAggregate)
+	repoIAM := &model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: iamID}, SetUpStarted: model.Step(step)}
+	if iam != nil {
+		repoIAM.ObjectRoot = iam.ObjectRoot
+	}
+	createAggregate := IAMSetupStartedAggregate(es.AggregateCreator(), repoIAM)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIAM.AppendEvents, createAggregate)
 	if err != nil {
 		return nil, err
 	}
 
-	es.iamCache.cacheIAM(repoIam)
-	return model.IAMToModel(repoIam), nil
+	es.iamCache.cacheIAM(repoIAM)
+	return model.IAMToModel(repoIAM), nil
 }
 
-func (es *IAMEventstore) SetupDone(ctx context.Context, iamID string) (*iam_model.IAM, error) {
+func (es *IAMEventstore) SetupDone(ctx context.Context, iamID string, step iam_model.Step) (*iam_model.IAM, error) {
 	iam, err := es.IAMByID(ctx, iamID)
 	if err != nil {
 		return nil, err
 	}
+	iam.SetUpDone = step
+
 	repoIam := model.IAMFromModel(iam)
 	createAggregate := IAMSetupDoneAggregate(es.AggregateCreator(), repoIam)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, createAggregate)
@@ -380,7 +385,10 @@ func (es *IAMEventstore) ChangeIDPOIDCConfig(ctx context.Context, config *iam_mo
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Fms8w", "Errors.IAM.IdpIsNotOIDC")
 	}
 	if config.ClientSecretString != "" {
-		err = idp.OIDCConfig.CryptSecret(es.secretCrypto)
+		err = config.CryptSecret(es.secretCrypto)
+		if err != nil {
+			return nil, err
+		}
 	} else {
 		config.ClientSecret = nil
 	}
@@ -509,20 +517,31 @@ func (es *IAMEventstore) AddIDPProviderToLoginPolicy(ctx context.Context, provid
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-Slf9s", "Errors.Internal")
 }
 
-func (es *IAMEventstore) RemoveIDPProviderFromLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) error {
+func (es *IAMEventstore) PrepareRemoveIDPProviderFromLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) (*model.IAM, *models.Aggregate, error) {
 	if provider == nil || !provider.IsValid() {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-Esi8c", "Errors.IdpProviderInvalid")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Esi8c", "Errors.IdpProviderInvalid")
 	}
 	iam, err := es.IAMByID(ctx, provider.AggregateID)
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 	if _, m := iam.DefaultLoginPolicy.GetIdpProvider(provider.IdpConfigID); m == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-29skr", "Errors.IAM.LoginPolicy.IdpProviderNotExisting")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-29skr", "Errors.IAM.LoginPolicy.IdpProviderNotExisting")
 	}
 	repoIam := model.IAMFromModel(iam)
-	addAggregate := LoginPolicyIDPProviderRemovedAggregate(es.Eventstore.AggregateCreator(), repoIam, &model.IDPProviderID{provider.IdpConfigID})
-	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	removeAgg, err := LoginPolicyIDPProviderRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoIam, &model.IDPProviderID{provider.IdpConfigID})
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoIam, removeAgg, nil
+}
+
+func (es *IAMEventstore) RemoveIDPProviderFromLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) error {
+	repoIam, removeAgg, err := es.PrepareRemoveIDPProviderFromLoginPolicy(ctx, provider)
+	if err != nil {
+		return err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoIam.AppendEvents, removeAgg)
 	if err != nil {
 		return err
 	}

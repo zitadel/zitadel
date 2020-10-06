@@ -10,10 +10,8 @@
 
             <ng-template appHasRole [appHasRole]="['user.write', 'user.write:'+user?.id]">
                 <button mat-stroked-button color="warn" *ngIf="user?.state === UserState.USERSTATE_ACTIVE"
-                    class="state-button"
                     (click)="changeState(UserState.USERSTATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' | translate}}</button>
                 <button mat-stroked-button color="warn" *ngIf="user?.state === UserState.USERSTATE_INACTIVE"
-                    class="state-button"
                     (click)="changeState(UserState.USERSTATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' | translate}}</button>
             </ng-template>
         </div>
@@ -43,6 +41,11 @@
                 </app-detail-form>
             </app-card>
 
+            <app-card *ngIf="user && user.human && user.id" title="{{ 'USER.EXTERNALIDP.TITLE' | translate }}"
+                description="{{ 'USER.EXTERNALIDP.DESC' | translate }}">
+                <app-external-idps [userId]="user.id" [service]="mgmtUserService"></app-external-idps>
+            </app-card>
+
             <app-card *ngIf="user.machine" title="{{ 'USER.MACHINE.TITLE' | translate }}">
                 <app-detail-form-machine
                     [disabled]="(['user.write:' + user?.id, 'user.write'] | hasRole | async) == false"
@@ -62,9 +65,9 @@
                 <div class="method-row">
                     <span class="label">{{ 'USER.PROFILE.PASSWORD' | translate }}</span>
                     <span>******</span>
-                    <div class="actions">
-                        <button [disabled]="(canWrite$ | async) == false" class="notify-change-pwd"
-                            (click)="sendSetPasswordNotification()" mat-stroked-button color="primary"
+                    <div>
+                        <button [disabled]="(canWrite$ | async) == false" (click)="sendSetPasswordNotification()"
+                            mat-stroked-button color="primary"
                             *ngIf="user.state === UserState.USERSTATE_INITIAL">{{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
                         <a [disabled]="(canWrite$ | async) == false" [routerLink]="['password']" mat-icon-button>
                             <mat-icon class="icon">chevron_right</mat-icon>
@@ -91,7 +94,7 @@
                             </ng-container>
                         </div>
 
-                        <div class="actions">
+                        <div>
                             <button [disabled]="(canWrite$ | async) == false" (click)="emailEditState = true"
                                 mat-icon-button>
                                 <mat-icon class="icon">edit</mat-icon>
@@ -101,13 +104,15 @@
                     <ng-template #emailEdit>
                         <mat-form-field class="name">
                             <mat-label>{{ 'USER.EMAIL' | translate }}</mat-label>
-                            <input matInput *ngIf="user.human && user.human.email" [(ngModel)]="user.human.email" />
+                            <input matInput
+                                *ngIf="user.human && user.human.email !== undefined && user.human.email !== null"
+                                [(ngModel)]="user.human.email" />
                         </mat-form-field>
                         <button (click)="emailEditState = false" mat-icon-button>
                             <mat-icon class="icon">close</mat-icon>
                         </button>
                         <button *ngIf="user.human" [disabled]="!user.human.email || (canWrite$ | async) == false"
-                            class="submit-button" type="button" color="primary" (click)="saveEmail()"
+                            type="button" color="primary" (click)="saveEmail()"
                             mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
                     </ng-template>
                 </div>
@@ -132,7 +137,7 @@
                             </ng-container>
                         </div>
 
-                        <div class="actions">
+                        <div>
                             <button [disabled]="(canWrite$ | async) == false" (click)="phoneEditState = true"
                                 mat-icon-button>
                                 <mat-icon class="icon">edit</mat-icon>
@@ -143,20 +148,22 @@
                     <ng-template #phoneEdit>
                         <mat-form-field class="name">
                             <mat-label>{{ 'USER.PHONE' | translate }}</mat-label>
-                            <input *ngIf="user.human && user.human.phone" matInput
-                                [disabled]="(canWrite$ | async) == false" [(ngModel)]="user.human.phone" />
+                            <input *ngIf="user.human && user.human.phone !== undefined && user.human.phone !== null"
+                                matInput [disabled]="(canWrite$ | async) == false" [(ngModel)]="user.human.phone" />
                         </mat-form-field>
-                        <button (click)="phoneEditState = false" mat-icon-button
-                            [disabled]="(canWrite$ | async) == false">
+                        <button matTooltip="{{ 'ACTIONS.CLOSE' | translate }}" (click)="phoneEditState = false"
+                            mat-icon-button [disabled]="(canWrite$ | async) == false">
                             <mat-icon class="icon">close</mat-icon>
                         </button>
                         <button *ngIf="user.human?.phone" color="warn" (click)="deletePhone()"
-                            [disabled]="(canWrite$ | async) == false" mat-icon-button>
+                            [disabled]="(canWrite$ | async) == false" mat-icon-button
+                            matTooltip="{{ 'ACTIONS.CLEAR' | translate }}">
                             <i class="las la-trash"></i>
                         </button>
 
                         <button *ngIf="user.human" [disabled]="!user.human.phone || (canWrite$ | async) == false"
-                            type="button" color="primary" (click)="savePhone()" mat-raised-button>
+                            type="button" color="primary" (click)="savePhone()"
+                            matTooltip="{{ 'ACTIONS.SAVE' | translate }}" mat-raised-button>
                             {{ 'ACTIONS.SAVE' | translate }}</button>
                     </ng-template>
                 </div>
