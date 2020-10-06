@@ -2,6 +2,10 @@ package eventstore
 
 import (
 	"context"
+	es_int "github.com/caos/zitadel/internal/eventstore"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/authz"
@@ -19,12 +23,14 @@ import (
 )
 
 type UserRepo struct {
-	SearchLimit    uint64
-	UserEvents     *usr_event.UserEventstore
-	PolicyEvents   *policy_event.PolicyEventstore
-	OrgEvents      *org_event.OrgEventstore
-	View           *view.View
-	SystemDefaults systemdefaults.SystemDefaults
+	es_int.Eventstore
+	SearchLimit     uint64
+	UserEvents      *usr_event.UserEventstore
+	PolicyEvents    *policy_event.PolicyEventstore
+	OrgEvents       *org_event.OrgEventstore
+	UserGrantEvents *usr_grant_event.UserGrantEventStore
+	View            *view.View
+	SystemDefaults  systemdefaults.SystemDefaults
 }
 
 func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserView, error) {
@@ -96,6 +102,36 @@ func (repo *UserRepo) UnlockUser(ctx context.Context, id string) (*usr_model.Use
 	return repo.UserEvents.UnlockUser(ctx, id)
 }
 
+func (repo *UserRepo) RemoveUser(ctx context.Context, id string) error {
+	aggregates := make([]*es_models.Aggregate, 0)
+	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return err
+	}
+	user, agg, err := repo.UserEvents.PrepareRemoveUser(ctx, id, orgPolicy)
+	if err != nil {
+		return err
+	}
+	aggregates = append(aggregates, agg...)
+
+	// remove user_grants
+	usergrants, err := repo.View.UserGrantsByUserID(id)
+	if err != nil {
+		return err
+	}
+	for _, grant := range usergrants {
+		_, aggs, err := repo.UserGrantEvents.PrepareRemoveUserGrant(ctx, grant.ID, true)
+		if err != nil {
+			return err
+		}
+		for _, agg := range aggs {
+			aggregates = append(aggregates, agg)
+		}
+	}
+
+	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, user.AppendEvents, aggregates...)
+}
+
 func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSearchRequest) (*usr_model.UserSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, sequenceErr := repo.View.GetLatestUserSequence()
@@ -107,7 +143,7 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 	result := &usr_model.UserSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
-		TotalResult: uint64(count),
+		TotalResult: count,
 		Result:      model.UsersToModel(users),
 	}
 	if sequenceErr == nil {

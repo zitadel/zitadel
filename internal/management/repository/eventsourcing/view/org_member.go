@@ -47,6 +47,14 @@ func (v *View) DeleteOrgMember(orgID, userID string, eventSequence uint64) error
 	return v.ProcessedOrgMemberSequence(eventSequence)
 }
 
+func (v *View) DeleteOrgMembersByUserID(userID string, eventSequence uint64) error {
+	err := view.DeleteOrgMembersByUserID(v.Db, orgMemberTable, userID)
+	if err != nil {
+		return nil
+	}
+	return v.ProcessedOrgMemberSequence(eventSequence)
+}
+
 func (v *View) GetLatestOrgMemberSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(orgMemberTable)
 }

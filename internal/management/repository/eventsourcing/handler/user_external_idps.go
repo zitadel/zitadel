@@ -69,6 +69,8 @@ func (m *ExternalIDP) processUser(event *models.Event) (err error) {
 			return err
 		}
 		return m.view.DeleteExternalIDP(externalIDP.ExternalUserID, externalIDP.IDPConfigID, event.Sequence)
+	case model.UserRemoved:
+		return m.view.DeleteExternalIDPsByUserID(event.AggregateID, event.Sequence)
 	default:
 		return m.view.ProcessedExternalIDPSequence(event.Sequence)
 	}
