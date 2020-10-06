@@ -48,27 +48,29 @@ func TestMain(m *testing.M) {
 
 func TestInsert(t *testing.T) {
 	crdb := &CRDB{client: db}
+	e1 := &repository.Event{
+		AggregateID:           "agg.id",
+		AggregateType:         "agg.type",
+		CheckPreviousSequence: true,
+		EditorService:         "edi.svc",
+		EditorUser:            "edi",
+		ResourceOwner:         "edit",
+		Type:                  "type",
+		Version:               "v1",
+	}
 	events := []*repository.Event{
+		e1,
 		{
 			AggregateID:           "agg.id",
 			AggregateType:         "agg.type",
-			CheckPreviousSequence: false,
-			EditorService:         "edi.svc",
-			EditorUser:            "edi",
-			ResourceOwner:         "edit",
-			Type:                  "type",
-			Version:               "v1",
-		},
-		{
-			AggregateID:           "agg.id",
-			AggregateType:         "agg.type",
-			CheckPreviousSequence: false,
+			CheckPreviousSequence: true,
 			EditorService:         "edi.svc",
 			EditorUser:            "edi",
 			ResourceOwner:         "edit",
 			Type:                  "type",
 			Version:               "v1",
 			CreationDate:          time.Now().Add(-2 * time.Second),
+			PreviousEvent:         e1,
 		},
 		{
 			AggregateID:           "agg.id",
@@ -81,12 +83,66 @@ func TestInsert(t *testing.T) {
 			Version:               "v1",
 			CreationDate:          time.Now().Add(-500 * time.Millisecond),
 		},
+		{
+			AggregateID:           "agg.id2",
+			AggregateType:         "agg.type",
+			CheckPreviousSequence: true,
+			EditorService:         "edi.svc",
+			EditorUser:            "edi",
+			ResourceOwner:         "edit",
+			Type:                  "type",
+			Version:               "v1",
+			CreationDate:          time.Now().Add(-500 * time.Millisecond),
+		},
+		{
+			AggregateID:           "agg.id3",
+			AggregateType:         "agg.type",
+			CheckPreviousSequence: false,
+			EditorService:         "edi.svc",
+			EditorUser:            "edi",
+			ResourceOwner:         "edit",
+			Type:                  "type",
+			Version:               "v1",
+			CreationDate:          time.Now().Add(-500 * time.Millisecond),
+		},
+		{
+			AggregateID:           "agg.id",
+			AggregateType:         "agg.type",
+			CheckPreviousSequence: false,
+			EditorService:         "edi.svc",
+			EditorUser:            "edi",
+			ResourceOwner:         "edit",
+			Type:                  "type",
+			Version:               "v1",
+			CreationDate:          time.Now().Add(-500 * time.Millisecond),
+		},
+		// {
+		// 	AggregateID:           "agg.id4",
+		// 	AggregateType:         "agg.type",
+		// 	CheckPreviousSequence: false,
+		// 	EditorService:         "edi.svc",
+		// 	EditorUser:            "edi",
+		// 	ResourceOwner:         "edit",
+		// 	Type:                  "type",
+		// 	Version:               "v1",
+		// 	CreationDate:          time.Now().Add(-500 * time.Millisecond),
+		// 	PreviousEvent:         e1,
+		// },
+		//fail because wrong previous event
+		// {
+		// 	AggregateID:           "agg.id2",
+		// 	AggregateType:         "agg.type",
+		// 	CheckPreviousSequence: true,
+		// 	EditorService:         "edi.svc",
+		// 	EditorUser:            "edi",
+		// 	ResourceOwner:         "edit",
+		// 	Type:                  "type",
+		// 	Version:               "v1",
+		// 	CreationDate:          time.Now().Add(-500 * time.Millisecond),
+		// 	PreviousEvent:         e1,
+		// },
 	}
 	fmt.Println("==============")
-	fmt.Println("will insert ts:")
-	for _, event := range events {
-		fmt.Printf("%v | %v\n", event.CreationDate, event.ID)
-	}
 	err := crdb.Push(context.Background(), events...)
 	if err != nil {
 		t.Error(err)
@@ -95,35 +151,14 @@ func TestInsert(t *testing.T) {
 
 	fmt.Println("inserted ts:")
 	for _, event := range events {
-		fmt.Printf("%v | %v\n", event.CreationDate, event.ID)
+		fmt.Printf("%+v\n", event)
 	}
 
-	fmt.Println("==============")
-	for _, event := range events {
-		fmt.Printf("%+v", event)
-	}
-
-	// tx, _ := db.Begin()
-
-	// var seq Sequence
-	// var d time.Time
-
-	// row := tx.QueryRow(crdbInsert, "event.type", "aggregate.type", "aggregate.id", repository.Version("v1"), nil, Data(nil), "editor.user", "editor.service", "resource.owner", Sequence(0), false)
-	// err := row.Scan(&seq, &d)
-
-	// row = tx.QueryRow(crdbInsert, "event.type", "aggregate.type", "aggregate.id", repository.Version("v1"), nil, Data(nil), "editor.user", "editor.service", "resource.owner", Sequence(1), true)
-	// err = row.Scan(&seq, &d)
-
-	// row = tx.QueryRow(crdbInsert, "event.type", "aggregate.type", "aggregate.id", repository.Version("v1"), nil, Data(nil), "editor.user", "editor.service", "resource.owner", Sequence(0), false)
-	// err = row.Scan(&seq, &d)
-
-	// tx.Commit()
-
+	fmt.Println("====================")
 	rows, err := db.Query("select * from eventstore.events order by event_sequence")
 	defer rows.Close()
 	fmt.Println(err)
 
-	fmt.Println(rows.Columns())
 	for rows.Next() {
 		i := make([]interface{}, 12)
 		var id string
@@ -132,7 +167,33 @@ func TestInsert(t *testing.T) {
 
 		fmt.Println(i)
 	}
+	fmt.Println("====================")
+	filtededEvents, err := crdb.Filter(context.Background(), &repository.SearchQuery{
+		Columns: repository.Columns_Event,
+		Filters: []*repository.Filter{
+			{
+				Field:     repository.Field_AggregateType,
+				Operation: repository.Operation_Equals,
+				Value:     repository.AggregateType("agg.type"),
+			},
+		},
+	})
+	fmt.Println(err)
 
+	for _, event := range filtededEvents {
+		fmt.Printf("%+v\n", event)
+	}
+	fmt.Println("====================")
+	rows, err = db.Query("select max(event_sequence), count(*) from eventstore.events where aggregate_type = 'agg.type' and aggregate_id = 'agg.id'")
+	defer rows.Close()
+	fmt.Println(err)
+
+	for rows.Next() {
+		i := make([]interface{}, 2)
+		rows.Scan(&i[0], &i[1])
+
+		fmt.Println(i)
+	}
 	t.Fail()
 }
 

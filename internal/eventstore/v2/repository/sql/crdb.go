@@ -30,8 +30,7 @@ const (
 		"    previous_sequence, " +
 		"    check_previous, " +
 		// variables below are calculated
-		"    max_event_seq, " +
-		"    event_count " +
+		"    max_event_seq " +
 		") " +
 		"	AS( " +
 		"		SELECT " +
@@ -46,8 +45,7 @@ const (
 		"			$9::VARCHAR, " +
 		"			$10::BIGINT, " +
 		"			$11::BOOLEAN," +
-		"			MAX(event_sequence) AS max_event_seq, " +
-		"			COUNT(*) AS event_count " +
+		"			MAX(event_sequence) AS max_event_seq " +
 		"	FROM eventstore.events " +
 		"	WHERE " +
 		"		aggregate_type = $2::VARCHAR " +
@@ -80,25 +78,23 @@ const (
 		"			( " +
 		"			    SELECT " +
 		"			        CASE " +
-		"			            WHEN NOT check_previous THEN " +
-		"			                max_event_seq " +
-		"			            ELSE " +
-		"			                previous_sequence " +
+		"			            WHEN NOT check_previous " +
+		"			                THEN max_event_seq " +
+		"			            	ELSE previous_sequence " +
 		"			        END" +
 		"			) " +
 		"		FROM input_event " +
-		"		WHERE EXISTS ( " +
-		"		    SELECT " +
+		"		WHERE 1 = " +
 		"		        CASE " +
-		"		            WHEN NOT check_previous THEN 1 " +
+		"		            WHEN NOT check_previous " +
+		"		            THEN 1 " +
 		"		            ELSE ( " +
 		"		                SELECT 1 FROM input_event " +
-		"		                    WHERE max_event_seq = previous_sequence OR (previous_sequence IS NULL AND event_count = 0) " +
+		"		                    WHERE (max_event_seq IS NULL AND previous_sequence IS NULL) OR (max_event_seq IS NOT NULL AND max_event_seq = previous_sequence) " +
 		"		            ) " +
 		"		        END " +
-		"		) " +
 		"	) " +
-		"RETURNING id, event_sequence, creation_date "
+		"RETURNING id, event_sequence, previous_sequence, creation_date "
 )
 
 type CRDB struct {
@@ -118,9 +114,9 @@ func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
 			return caos_errs.ThrowInternal(err, "SQL-OdXRE", "prepare failed")
 		}
 		for _, event := range events {
-			previousSequence := event.PreviousSequence
+			previousSequence := Sequence(event.PreviousSequence)
 			if event.PreviousEvent != nil {
-				previousSequence = event.PreviousSequence
+				previousSequence = Sequence(event.PreviousEvent.Sequence)
 			}
 			err = stmt.QueryRowContext(ctx,
 				event.Type,
@@ -135,9 +131,11 @@ func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
 				event.EditorUser,
 				event.EditorService,
 				event.ResourceOwner,
-				Sequence(previousSequence),
+				previousSequence,
 				event.CheckPreviousSequence,
-			).Scan(&event.ID, &event.Sequence, &event.CreationDate)
+			).Scan(&event.ID, &event.Sequence, &previousSequence, &event.CreationDate)
+
+			event.PreviousSequence = uint64(previousSequence)
 
 			if err != nil {
 				tx.Rollback()
@@ -180,7 +178,7 @@ func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *repository.Sear
 	return uint64(seq), nil
 }
 
-func (db *CRDB) query(searchQuery *repository.SearchQuery, data interface{}) error {
+func (db *CRDB) query(searchQuery *repository.SearchQuery, dest interface{}) error {
 	query, values, rowScanner := buildQuery(db, searchQuery)
 	if query == "" {
 		return caos_errs.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
@@ -194,7 +192,7 @@ func (db *CRDB) query(searchQuery *repository.SearchQuery, data interface{}) err
 	defer rows.Close()
 
 	for rows.Next() {
-		err = rowScanner(rows.Scan, nil)
+		err = rowScanner(rows.Scan, dest)
 		if err != nil {
 			return err
 		}
