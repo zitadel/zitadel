@@ -50,10 +50,6 @@
     min-height: 166px;
     transition: box-shadow .1s ease-in;
 
-    &:hover {
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
-    }
-
     &.inactive {
       color: #8795a1;
     }
@@ -132,6 +128,8 @@
     }
 
     &:hover {
+      box-shadow: 0 5px 10px rgba(0, 0, 0, .12);
+
       .edit-button {
         opacity: 1;
       }
@@ -177,8 +175,8 @@
     }
 
     &:hover {
-      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
-      
+      box-shadow: 0 5px 10px rgba(0, 0, 0, .12);
+
       .icon,
       span {
         &.disabled {
