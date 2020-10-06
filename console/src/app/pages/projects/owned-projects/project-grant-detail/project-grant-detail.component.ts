@@ -124,7 +124,7 @@ export class ProjectGrantDetailComponent {
                 this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERREMOVED', true);
                 setTimeout(() => {
                     this.changePage.emit();
-                }, 3000);
+                }, 1000);
             }).catch(error => {
                 this.toast.showError(error);
             });
@@ -152,7 +152,9 @@ export class ProjectGrantDetailComponent {
                     );
                 })).then(() => {
                     this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERADDED', true);
-                    this.changePage.emit();
+                    setTimeout(() => {
+                        this.changePage.emit();
+                    }, 3000);
                 }).catch(error => {
                     this.toast.showError(error);
                 });
