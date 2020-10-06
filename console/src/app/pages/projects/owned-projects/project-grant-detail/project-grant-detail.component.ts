@@ -122,7 +122,9 @@ export class ProjectGrantDetailComponent {
         Promise.all(this.selection.map(member => {
             return this.mgmtService.RemoveProjectGrantMember(this.grant.projectId, this.grant.id, member.userId).then(() => {
                 this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERREMOVED', true);
-                this.changePage.emit();
+                setTimeout(() => {
+                    this.changePage.emit();
+                }, 3000);
             }).catch(error => {
                 this.toast.showError(error);
             });

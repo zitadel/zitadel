@@ -84,9 +84,8 @@
             <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;">
             </tr>
         </table>
-
-        <mat-paginator *ngIf="dataSource" class="paginator" #paginator [pageSize]="INITIALPAGESIZE"
-            [length]="dataSource.totalResult" [pageSizeOptions]="[25, 50, 100, 250]" (page)="changePage($event)">
-        </mat-paginator>
     </div>
+    <mat-paginator *ngIf="dataSource" class="paginator" #paginator [pageSize]="INITIALPAGESIZE"
+        [length]="dataSource.totalResult" [pageSizeOptions]="[25, 50, 100, 250]" (page)="changePage($event)">
+    </mat-paginator>
 </app-refresh-table>

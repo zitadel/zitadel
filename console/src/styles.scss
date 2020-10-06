@@ -170,7 +170,7 @@ $custom-typography:
   .main-container,
   .mat-dialog-container {
     background-color: #fafafa;
-    transition: background-color .4s ease-in-out;
+    transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
   }
 
   ::-webkit-scrollbar-track {
@@ -201,7 +201,7 @@ $custom-typography:
   .main-container,
   .mat-dialog-container {
     background-color: #212224;
-    transition: background-color .4s ease-in-out;
+    transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
   }
 
   ::-webkit-scrollbar-track {

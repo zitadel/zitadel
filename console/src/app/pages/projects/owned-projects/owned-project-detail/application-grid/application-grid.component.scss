@@ -52,7 +52,7 @@
         border: 1px solid $accent-color;
         font-weight: 800;
         background-color: $primary-dark;
-        transition: background-color .2s ease-in-out;
+        transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
         background-image:
           linear-gradient(transparent 11px, rgba($accent-color, .5) 12px, transparent 12px),
           linear-gradient(90deg, transparent 11px, rgba($accent-color, .5) 12px, transparent 12px);

@@ -48,6 +48,11 @@
     border-radius: .5rem;
     box-sizing: border-box;
     min-height: 166px;
+    transition: box-shadow .1s ease-in;
+
+    &:hover {
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
+    }
 
     &.inactive {
       color: #8795a1;
@@ -130,21 +135,9 @@
       .edit-button {
         opacity: 1;
       }
-
-      .text-part {
-        .icons {
-          opacity: 1;
-        }
-      }
     }
 
     &.selected {
-      .text-part {
-        .icons {
-          opacity: 1;
-        }
-      }
-
       .edit-button {
         opacity: 1;
       }
@@ -171,6 +164,7 @@
     border-radius: .5rem;
     margin: 1rem;
     box-sizing: border-box;
+    transition: box-shadow .1s ease-in;
 
     .icon {
       display: flex;
@@ -183,8 +177,8 @@
     }
 
     &:hover {
-      background-color: #ffffff25;
-
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
+      
       .icon,
       span {
         &.disabled {

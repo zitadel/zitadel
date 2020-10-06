@@ -44,8 +44,9 @@
         [factoryLoadFunc]="changePageFactory" (changedSelection)="selection = $event" [refreshTrigger]="changePage">
         <button selectactions (click)="removeProjectMemberSelection()"
             [disabled]="(['project.grant.member.delete','project.grant.member.delete:' + grant.id] | hasRole | async) == false"
-            matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="icon-button" color="warn" mat-icon-button>
+            matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="del-button" color="warn" mat-raised-button>
             <i class="las la-trash"></i>
+            {{'ACTIONS.SELECTIONDELETE' | translate}}
         </button>
         <a writeactions color="primary"
             [disabled]="(['project.grant.member.write','project.grant.member.write:' + grant.id] | hasRole | async) == false"

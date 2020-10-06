@@ -48,6 +48,7 @@
     border-radius: .5rem;
     box-sizing: border-box;
     min-height: 166px;
+    transition: box-shadow .1s ease-in;
 
     &.inactive {
       color: #8795a1;
@@ -130,66 +131,11 @@
       .edit-button {
         opacity: 1;
       }
-
-      .text-part {
-        .icons {
-          opacity: 1;
-        }
-      }
     }
 
     &.selected {
-      .text-part {
-        .icons {
-          opacity: 1;
-        }
-      }
-
       .edit-button {
         opacity: 1;
-      }
-
-      .icon {
-        opacity: 1;
-      }
-    }
-
-    @media only screen and (max-width: 450px) {
-      flex-basis: 100%;
-    }
-  }
-
-  .add-project-button {
-    z-index: 100;
-    flex-basis: 250px;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    min-height: 166px;
-    border-radius: .5rem;
-    margin: 1rem;
-    box-sizing: border-box;
-
-    .icon {
-      display: flex;
-      justify-content: center;
-      align-self: center;
-      margin-bottom: 1rem;
-      height: 2.5rem;
-      line-height: 2.5rem;
-      font-size: 2.5rem;
-    }
-
-    &:hover {
-      background-color: #ffffff25;
-
-      .icon,
-      span {
-        &.disabled {
-          color: gray;
-        }
       }
     }
 
