@@ -31,6 +31,7 @@ import {
     OrgIamPolicy,
     OrgIamPolicyID,
     OrgIamPolicyRequest,
+    OrgIamPolicyView,
     OrgSetUpRequest,
     OrgSetUpResponse,
     RemoveIamMemberRequest,
@@ -237,7 +238,7 @@ export class AdminService {
         return this.grpcService.admin.changeIamMember(req);
     }
 
-    public GetOrgIamPolicy(orgId: string): Promise<OrgIamPolicy> {
+    public GetOrgIamPolicy(orgId: string): Promise<OrgIamPolicyView> {
         const req = new OrgIamPolicyID();
         req.setOrgId(orgId);
 
@@ -246,11 +247,9 @@ export class AdminService {
 
     public CreateOrgIamPolicy(
         orgId: string,
-        description: string,
         userLoginMustBeDomain: boolean): Promise<OrgIamPolicy> {
         const req = new OrgIamPolicyRequest();
         req.setOrgId(orgId);
-        req.setDescription(description);
         req.setUserLoginMustBeDomain(userLoginMustBeDomain);
 
         return this.grpcService.admin.createOrgIamPolicy(req);
@@ -258,11 +257,9 @@ export class AdminService {
 
     public UpdateOrgIamPolicy(
         orgId: string,
-        description: string,
         userLoginMustBeDomain: boolean): Promise<OrgIamPolicy> {
         const req = new OrgIamPolicyRequest();
         req.setOrgId(orgId);
-        req.setDescription(description);
         req.setUserLoginMustBeDomain(userLoginMustBeDomain);
         return this.grpcService.admin.updateOrgIamPolicy(req);
     }

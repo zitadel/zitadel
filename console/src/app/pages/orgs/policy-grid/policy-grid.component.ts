@@ -1,6 +1,11 @@
 import { Component } from '@angular/core';
 import { PolicyComponentType } from 'src/app/modules/policies/policy-component-types.enum';
-import { LoginPolicy, OrgIamPolicy, PasswordComplexityPolicy, PolicyState } from 'src/app/proto/generated/management_pb';
+import {
+    LoginPolicyView,
+    OrgIamPolicyView,
+    PasswordComplexityPolicyView,
+    PolicyState,
+} from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 @Component({
@@ -9,9 +14,9 @@ import { ManagementService } from 'src/app/services/mgmt.service';
     styleUrls: ['./policy-grid.component.scss'],
 })
 export class PolicyGridComponent {
-    public complexityPolicy!: PasswordComplexityPolicy.AsObject;
-    public iamPolicy!: OrgIamPolicy.AsObject;
-    public loginPolicy!: LoginPolicy.AsObject;
+    public complexityPolicy!: PasswordComplexityPolicyView.AsObject;
+    public iamPolicy!: OrgIamPolicyView.AsObject;
+    public loginPolicy!: LoginPolicyView.AsObject;
 
     public PolicyState: any = PolicyState;
     public PolicyComponentType: any = PolicyComponentType;

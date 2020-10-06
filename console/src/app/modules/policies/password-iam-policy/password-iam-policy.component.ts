@@ -1,13 +1,9 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, Input, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import {
-    OrgIamPolicy,
-    PasswordAgePolicy,
-    PasswordComplexityPolicy,
-    PasswordLockoutPolicy,
-} from 'src/app/proto/generated/management_pb';
+import { OrgIamPolicyView as AdminOrgIamPolicyView } from 'src/app/proto/generated/admin_pb';
+import { OrgIamPolicyView as MgmtOrgIamPolicyView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
@@ -21,6 +17,7 @@ import { PolicyComponentAction } from '../policy-component-action.enum';
     styleUrls: ['./password-iam-policy.component.scss'],
 })
 export class PasswordIamPolicyComponent implements OnDestroy {
+    @Input() service!: AdminService | ManagementService;
     public title: string = '';
     public desc: string = '';
 
@@ -28,14 +25,12 @@ export class PasswordIamPolicyComponent implements OnDestroy {
 
     public PolicyComponentAction: any = PolicyComponentAction;
 
-    public iamData!: OrgIamPolicy.AsObject;
+    public iamData!: AdminOrgIamPolicyView.AsObject | MgmtOrgIamPolicyView;
 
     private sub: Subscription = new Subscription();
 
     constructor(
         private route: ActivatedRoute,
-        private mgmtService: ManagementService,
-        private adminService: AdminService,
         private router: Router,
         private toast: ToastService,
         private sessionStorage: StorageService,
@@ -44,14 +39,14 @@ export class PasswordIamPolicyComponent implements OnDestroy {
             this.componentAction = data.action;
             console.log(data.action);
             return this.route.params;
-        })).subscribe(params => {
+        })).subscribe(_ => {
             this.title = 'ORG.POLICY.IAM_POLICY.TITLECREATE';
             this.desc = 'ORG.POLICY.IAM_POLICY.DESCRIPTIONCREATE';
 
             if (this.componentAction === PolicyComponentAction.MODIFY) {
-                this.getData(params).then(data => {
+                this.getData().then(data => {
                     if (data) {
-                        this.iamData = data.toObject() as OrgIamPolicy.AsObject;
+                        this.iamData = data.toObject();
                     }
                 });
             }
@@ -62,12 +57,15 @@ export class PasswordIamPolicyComponent implements OnDestroy {
         this.sub.unsubscribe();
     }
 
-    private async getData(params: any):
-        Promise<PasswordLockoutPolicy | PasswordAgePolicy | PasswordComplexityPolicy | OrgIamPolicy | undefined> {
+    private async getData(): Promise<AdminOrgIamPolicyView | MgmtOrgIamPolicyView> {
 
         this.title = 'ORG.POLICY.IAM_POLICY.TITLECREATE';
         this.desc = 'ORG.POLICY.IAM_POLICY.DESCRIPTIONCREATE';
-        return this.mgmtService.GetMyOrgIamPolicy();
+        if (this.service instanceof AdminService) {
+            return this.service.GetOrgIamPolicy(this.org);
+        } else if (this.service instanceof ManagementService) {
+            return this.service.GetMyOrgIamPolicy();
+        }
     }
 
     public savePolicy(): void {
@@ -76,7 +74,6 @@ export class PasswordIamPolicyComponent implements OnDestroy {
             if (orgId) {
                 this.adminService.CreateOrgIamPolicy(
                     orgId,
-                    this.iamData.description,
                     this.iamData.userLoginMustBeDomain,
                 ).then(() => {
                     this.router.navigate(['org']);
@@ -89,7 +86,6 @@ export class PasswordIamPolicyComponent implements OnDestroy {
             if (orgId) {
                 this.adminService.UpdateOrgIamPolicy(
                     orgId,
-                    this.iamData.description,
                     this.iamData.userLoginMustBeDomain,
                 ).then(() => {
                     this.router.navigate(['org']);

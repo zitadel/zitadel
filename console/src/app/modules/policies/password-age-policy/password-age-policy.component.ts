@@ -2,12 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import {
-    OrgIamPolicy,
-    PasswordAgePolicy,
-    PasswordComplexityPolicy,
-    PasswordLockoutPolicy,
-} from 'src/app/proto/generated/management_pb';
+import { PasswordAgePolicy, PasswordAgePolicyView } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -40,12 +35,12 @@ export class PasswordAgePolicyComponent implements OnDestroy {
         this.sub = this.route.data.pipe(switchMap(data => {
             this.componentAction = data.action;
             return this.route.params;
-        })).subscribe(params => {
+        })).subscribe(_ => {
             this.title = 'ORG.POLICY.PWD_AGE.TITLECREATE';
             this.desc = 'ORG.POLICY.PWD_AGE.DESCRIPTIONCREATE';
 
             if (this.componentAction === PolicyComponentAction.MODIFY) {
-                this.getData(params).then(data => {
+                this.getData().then(data => {
                     if (data) {
                         this.ageData = data.toObject() as PasswordAgePolicy.AsObject;
                     }
@@ -58,15 +53,15 @@ export class PasswordAgePolicyComponent implements OnDestroy {
         this.sub.unsubscribe();
     }
 
-    private async getData(params: any):
-        Promise<PasswordLockoutPolicy | PasswordAgePolicy | PasswordComplexityPolicy | OrgIamPolicy | undefined> {
+    private async getData():
+        Promise<PasswordAgePolicyView> {
         this.title = 'ORG.POLICY.PWD_AGE.TITLE';
         this.desc = 'ORG.POLICY.PWD_AGE.DESCRIPTION';
         return this.mgmtService.GetPasswordAgePolicy();
     }
 
     public deletePolicy(): void {
-        this.mgmtService.DeletePasswordAgePolicy(this.ageData.id).then(() => {
+        this.mgmtService.RemovePasswordAgePolicy().then(() => {
             this.toast.showInfo('Successfully deleted');
         }).catch(error => {
             this.toast.showError(error);
@@ -101,7 +96,6 @@ export class PasswordAgePolicyComponent implements OnDestroy {
         if (this.componentAction === PolicyComponentAction.CREATE) {
 
             this.mgmtService.CreatePasswordAgePolicy(
-                this.ageData.description,
                 this.ageData.maxAgeDays,
                 this.ageData.expireWarnDays,
             ).then(() => {
@@ -113,7 +107,6 @@ export class PasswordAgePolicyComponent implements OnDestroy {
         } else if (this.componentAction === PolicyComponentAction.MODIFY) {
 
             this.mgmtService.UpdatePasswordAgePolicy(
-                this.ageData.description,
                 this.ageData.maxAgeDays,
                 this.ageData.expireWarnDays,
             ).then(() => {

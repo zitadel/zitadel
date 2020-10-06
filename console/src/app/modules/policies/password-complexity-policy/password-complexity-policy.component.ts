@@ -2,12 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import {
-    OrgIamPolicy,
-    PasswordAgePolicy,
-    PasswordComplexityPolicy,
-    PasswordLockoutPolicy,
-} from 'src/app/proto/generated/management_pb';
+import { PasswordComplexityPolicy, PasswordComplexityPolicyView } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -44,7 +39,7 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
             this.desc = 'ORG.POLICY.PWD_COMPLEXITY.DESCRIPTIONCREATE';
 
             if (this.componentAction === PolicyComponentAction.MODIFY) {
-                this.getData(params).then(data => {
+                this.getData().then(data => {
                     if (data) {
                         this.complexityData = data.toObject() as PasswordComplexityPolicy.AsObject;
                     }
@@ -57,15 +52,15 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
         this.sub.unsubscribe();
     }
 
-    private async getData(params: any):
-        Promise<PasswordLockoutPolicy | PasswordAgePolicy | PasswordComplexityPolicy | OrgIamPolicy | undefined> {
+    private async getData():
+        Promise<PasswordComplexityPolicyView> {
         this.title = 'ORG.POLICY.PWD_COMPLEXITY.TITLE';
         this.desc = 'ORG.POLICY.PWD_COMPLEXITY.DESCRIPTION';
         return this.mgmtService.GetPasswordComplexityPolicy();
     }
 
     public deletePolicy(): void {
-        this.mgmtService.DeletePasswordComplexityPolicy(this.complexityData.id).then(() => {
+        this.mgmtService.removePasswordComplexityPolicy().then(() => {
             this.toast.showInfo('Successfully deleted');
         }).catch(error => {
             this.toast.showError(error);
@@ -88,7 +83,6 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
         if (this.componentAction === PolicyComponentAction.CREATE) {
 
             this.mgmtService.CreatePasswordComplexityPolicy(
-                this.complexityData.description,
                 this.complexityData.hasLowercase,
                 this.complexityData.hasUppercase,
                 this.complexityData.hasNumber,
@@ -103,7 +97,6 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
         } else if (this.componentAction === PolicyComponentAction.MODIFY) {
 
             this.mgmtService.UpdatePasswordComplexityPolicy(
-                this.complexityData.description,
                 this.complexityData.hasLowercase,
                 this.complexityData.hasUppercase,
                 this.complexityData.hasNumber,
