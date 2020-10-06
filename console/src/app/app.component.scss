@@ -211,7 +211,7 @@
     border: 1px solid #81868a40;
     padding: 2px 1rem;
     border-radius: 50vw;
-    color: #8795a1;
+    color: var(--grey);
     font-size: 12px;
   }
 
@@ -236,7 +236,7 @@
   .show-all {
     $primary: map-get($theme, primary);
     color: mat-color($primary, 300) !important;
-    border-bottom: 2px solid #8795a1;
+    border-bottom: 2px solid var(--grey);
     margin-bottom: .5rem;
   }
   /* stylelint-enable */

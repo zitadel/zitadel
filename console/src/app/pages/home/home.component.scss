@@ -15,7 +15,7 @@
     }
 
     .wlc_stnce {
-      color: #8795a1;
+      color: var(--grey);
       font-size: 16px;
     }
 
@@ -46,7 +46,7 @@
 
         p {
           display: block;
-          color: #8795a1;
+          color: var(--grey);
           font-size: .9rem;
         }
 
@@ -75,7 +75,7 @@
   }
 
   .disclaimer {
-    color: #8795a1;
+    color: var(--grey);
     font-size: 14px;
     margin-top: 3rem;
   }

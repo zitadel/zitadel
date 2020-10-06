@@ -21,13 +21,13 @@
       flex-direction: column;
 
       .editor {
-        color: #8795a1;
+        color: var(--grey);
         font-size: 12px;
         align-self: flex-end;
       }
 
       .seq {
-        color: #8795a1;
+        color: var(--grey);
         font-size: 12px;
         align-self: flex-end;
       }
@@ -55,7 +55,7 @@
 
     .end-container {
       font-size: 12px;
-      color: #8795a1;
+      color: var(--grey);
     }
   }
 }

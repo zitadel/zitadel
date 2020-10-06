@@ -20,7 +20,7 @@
     border-radius: 1rem;
     color: mat-color($foreground, text);
     white-space: nowrap;
-    background-color: #8795a1;
+    background-color: var(--grey);
     padding: 3px 1rem;
   }
 

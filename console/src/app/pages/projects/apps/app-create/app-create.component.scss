@@ -5,7 +5,7 @@ h1 {
 
 p.desc {
   font-size: 14px;
-  color: #8795a1;
+  color: var(--grey);
 }
 
 .proswitch {
@@ -57,12 +57,12 @@ p.desc {
 
   .step-title {
     font-size: 1.2rem;
-    color: #8795a1;
+    color: var(--grey);
   }
 
   .step-description {
     font-size: .9rem;
-    color: #8795a1;
+    color: var(--grey);
   }
 
   .error {
@@ -102,7 +102,7 @@ p.desc {
   .right {
     margin-bottom: .5rem;
     font-size: 14px;
-    color: #8795a1;
+    color: var(--grey);
   }
 }
 

@@ -51,7 +51,7 @@
     transition: box-shadow .1s ease-in;
 
     &.inactive {
-      color: #8795a1;
+      color: var(--grey);
     }
 
     img {
@@ -71,7 +71,7 @@
         font-size: .8rem;
         margin-bottom: 0;
         margin-top: .5rem;
-        color: #8795a1;
+        color: var(--grey);
       }
 
       .name {
@@ -86,7 +86,7 @@
 
       .created {
         font-size: .8rem;
-        color: #8795a1;
+        color: var(--grey);
       }
 
       .organization {
@@ -120,7 +120,7 @@
       right: 0;
       margin: 0;
       margin-bottom: .25rem;
-      color: #8795a1;
+      color: var(--grey);
 
       &.selected {
         opacity: 1;
@@ -194,6 +194,6 @@
 .n-items {
   padding: 0 1rem;
   font-size: .8rem;
-  color: #8795a1;
+  color: var(--grey);
   flex-basis: 100%;
 }

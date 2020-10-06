@@ -23,7 +23,7 @@
     .label {
       font-size: .9rem;
       min-width: 100px;
-      color: #8795a1;
+      color: var(--grey);
     }
 
     .icon {
@@ -33,7 +33,7 @@
     .verify {
       text-decoration: none;
       font-size: .8rem;
-      color: #8795a1;
+      color: var(--grey);
       border-radius: .5rem;
       cursor: pointer;
       word-wrap: none;

@@ -39,7 +39,7 @@ h1 {
   }
 
   .desc {
-    color: #8795a1;
+    color: var(--grey);
     font-size: .9rem;
     margin: 1rem 0;
   }
@@ -70,7 +70,7 @@ h1 {
       width: 100%;
       display: block;
       font-size: .9rem;
-      color: #8795a1;
+      color: var(--grey);
     }
   }
 
@@ -97,7 +97,7 @@ h1 {
       .section {
         padding: .5rem;
         flex-basis: 100%;
-        color: #8795a1;
+        color: var(--grey);
         font-size: .9rem;
       }
 
