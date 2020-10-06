@@ -18,8 +18,10 @@
 }
 
 :root {
-  --grey: #8795a1,;
+  --grey: #8795a1;
+  --table-row-back: #363738;
 }
+
 
 $caos-dark-brand: (
   50: #fff,
@@ -166,6 +168,8 @@ $custom-typography:
   @include component-themes($light-theme);
   @include angular-material-theme($light-theme);
 
+  --table-row-back: #eceef1;
+
   .sidenav,
   .main-container,
   .mat-dialog-container {
@@ -196,6 +200,8 @@ $custom-typography:
 .dark-theme {
   @include component-themes($dark-theme);
   @include angular-material-theme($dark-theme);
+
+  --table-row-back: #363738;
 
   .sidenav,
   .main-container,
