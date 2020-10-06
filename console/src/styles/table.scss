@@ -36,8 +36,7 @@
     &.highlight {
       &:hover {
         td {
-          // TODO: replace with non transparent color so that columns are not getting overlayed colorwise twice
-          background-color: var(--table-row-back);//rgba($inv-color, .05);
+          background-color: var(--table-row-back); // rgba($inv-color, .05);
         }
       }
     }

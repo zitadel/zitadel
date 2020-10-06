@@ -52,7 +52,7 @@
         border: 1px solid $accent-color;
         font-weight: 800;
         background-color: $primary-dark;
-        transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
+        transition: background-color box-shadow .3s ease-in;
         background-image:
           linear-gradient(transparent 11px, rgba($accent-color, .5) 12px, transparent 12px),
           linear-gradient(90deg, transparent 11px, rgba($accent-color, .5) 12px, transparent 12px);
@@ -60,6 +60,7 @@
 
         &:hover {
           background-color: rgba($accent-color, .2);
+          box-shadow: 0 5px 10px rgba(0, 0, 0, .12);
         }
 
         &.add {
