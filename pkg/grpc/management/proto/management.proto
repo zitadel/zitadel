@@ -1299,7 +1299,7 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
-  rpc CreateLoginPolicy(LoginPolicyAdd) returns (LoginPolicy) {
+  rpc CreateLoginPolicy(LoginPolicyRequest) returns (LoginPolicy) {
     option (google.api.http) = {
       post: "/orgs/me/policies/login"
       body: "*"
@@ -1310,7 +1310,7 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
-  rpc UpdateLoginPolicy(LoginPolicy) returns (LoginPolicy) {
+  rpc UpdateLoginPolicy(LoginPolicyRequest) returns (LoginPolicy) {
     option (google.api.http) = {
       put: "/orgs/me/policies/login"
       body: "*"
@@ -1384,7 +1384,7 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
-  rpc CreatePasswordComplexityPolicy(PasswordComplexityPolicyAdd) returns (PasswordComplexityPolicy) {
+  rpc CreatePasswordComplexityPolicy(PasswordComplexityPolicyRequest) returns (PasswordComplexityPolicy) {
     option (google.api.http) = {
       post: "/orgs/me/policies/password/complexity"
       body: "*"
@@ -1395,7 +1395,7 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
-  rpc UpdatePasswordComplexityPolicy(PasswordComplexityPolicy) returns (PasswordComplexityPolicy) {
+  rpc UpdatePasswordComplexityPolicy(PasswordComplexityPolicyRequest) returns (PasswordComplexityPolicy) {
     option (google.api.http) = {
       put: "/orgs/me/policies/password/complexity"
       body: "*"
@@ -1436,7 +1436,7 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
-  rpc CreatePasswordAgePolicy(PasswordAgePolicyAdd) returns (PasswordAgePolicy) {
+  rpc CreatePasswordAgePolicy(PasswordAgePolicyRequest) returns (PasswordAgePolicy) {
     option (google.api.http) = {
       post: "/orgs/me/policies/password/age"
       body: "*"
@@ -1447,7 +1447,7 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
-  rpc UpdatePasswordAgePolicy(PasswordAgePolicy) returns (PasswordAgePolicy) {
+  rpc UpdatePasswordAgePolicy(PasswordAgePolicyRequest) returns (PasswordAgePolicy) {
     option (google.api.http) = {
       put: "/orgs/me/policies/password/age"
       body: "*"
@@ -1488,7 +1488,7 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
-  rpc CreatePasswordLockoutPolicy(PasswordLockoutPolicyAdd) returns (PasswordLockoutPolicy) {
+  rpc CreatePasswordLockoutPolicy(PasswordLockoutPolicyRequest) returns (PasswordLockoutPolicy) {
     option (google.api.http) = {
       post: "/orgs/me/policies/password/lockout"
       body: "*"
@@ -1499,7 +1499,7 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
-  rpc UpdatePasswordLockoutPolicy(PasswordLockoutPolicy) returns (PasswordLockoutPolicy) {
+  rpc UpdatePasswordLockoutPolicy(PasswordLockoutPolicyRequest) returns (PasswordLockoutPolicy) {
     option (google.api.http) = {
       put: "/orgs/me/policies/password/lockout"
       body: "*"
@@ -2948,7 +2948,7 @@ message LoginPolicy {
     google.protobuf.Timestamp change_date = 5;
 }
 
-message LoginPolicyAdd {
+message LoginPolicyRequest {
   bool allow_username_password = 1;
   bool allow_register = 2;
   bool allow_external_idp = 3;
@@ -3058,7 +3058,7 @@ message PasswordComplexityPolicy {
   google.protobuf.Timestamp change_date = 8;
 }
 
-message PasswordComplexityPolicyAdd {
+message PasswordComplexityPolicyRequest {
   uint64 min_length = 1;
   bool has_lowercase = 2;
   bool has_uppercase = 3;
@@ -3086,7 +3086,7 @@ message PasswordAgePolicy {
   google.protobuf.Timestamp change_date = 5;
 }
 
-message PasswordAgePolicyAdd {
+message PasswordAgePolicyRequest {
   uint64 max_age_days = 1;
   uint64 expire_warn_days = 2;
 }
@@ -3108,7 +3108,7 @@ message PasswordLockoutPolicy {
   google.protobuf.Timestamp change_date = 5;
 }
 
-message PasswordLockoutPolicyAdd {
+message PasswordLockoutPolicyRequest {
   uint64 max_attempts = 1;
   bool show_lockout_failure = 2;
 }

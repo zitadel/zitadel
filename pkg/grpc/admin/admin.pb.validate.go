@@ -4302,6 +4302,79 @@ var _ interface {
 	ErrorName() string
 } = DefaultLoginPolicyValidationError{}
 
+// Validate checks the field values on DefaultLoginPolicyRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DefaultLoginPolicyRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for AllowUsernamePassword
+
+	// no validation rules for AllowRegister
+
+	// no validation rules for AllowExternalIdp
+
+	return nil
+}
+
+// DefaultLoginPolicyRequestValidationError is the validation error returned by
+// DefaultLoginPolicyRequest.Validate if the designated constraints aren't met.
+type DefaultLoginPolicyRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultLoginPolicyRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultLoginPolicyRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultLoginPolicyRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultLoginPolicyRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultLoginPolicyRequestValidationError) ErrorName() string {
+	return "DefaultLoginPolicyRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DefaultLoginPolicyRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultLoginPolicyRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultLoginPolicyRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultLoginPolicyRequestValidationError{}
+
 // Validate checks the field values on IdpProviderID with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.
@@ -4807,6 +4880,84 @@ var _ interface {
 	ErrorName() string
 } = DefaultPasswordComplexityPolicyValidationError{}
 
+// Validate checks the field values on DefaultPasswordComplexityPolicyRequest
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *DefaultPasswordComplexityPolicyRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for MinLength
+
+	// no validation rules for HasUppercase
+
+	// no validation rules for HasLowercase
+
+	// no validation rules for HasNumber
+
+	// no validation rules for HasSymbol
+
+	return nil
+}
+
+// DefaultPasswordComplexityPolicyRequestValidationError is the validation
+// error returned by DefaultPasswordComplexityPolicyRequest.Validate if the
+// designated constraints aren't met.
+type DefaultPasswordComplexityPolicyRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultPasswordComplexityPolicyRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultPasswordComplexityPolicyRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultPasswordComplexityPolicyRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultPasswordComplexityPolicyRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultPasswordComplexityPolicyRequestValidationError) ErrorName() string {
+	return "DefaultPasswordComplexityPolicyRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DefaultPasswordComplexityPolicyRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultPasswordComplexityPolicyRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultPasswordComplexityPolicyRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultPasswordComplexityPolicyRequestValidationError{}
+
 // Validate checks the field values on DefaultPasswordComplexityPolicyView with
 // the rules defined in the proto definition for this message. If any rules
 // are violated, an error is returned.
@@ -4996,6 +5147,78 @@ var _ interface {
 	ErrorName() string
 } = DefaultPasswordAgePolicyValidationError{}
 
+// Validate checks the field values on DefaultPasswordAgePolicyRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DefaultPasswordAgePolicyRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for MaxAgeDays
+
+	// no validation rules for ExpireWarnDays
+
+	return nil
+}
+
+// DefaultPasswordAgePolicyRequestValidationError is the validation error
+// returned by DefaultPasswordAgePolicyRequest.Validate if the designated
+// constraints aren't met.
+type DefaultPasswordAgePolicyRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultPasswordAgePolicyRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultPasswordAgePolicyRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultPasswordAgePolicyRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultPasswordAgePolicyRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultPasswordAgePolicyRequestValidationError) ErrorName() string {
+	return "DefaultPasswordAgePolicyRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DefaultPasswordAgePolicyRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultPasswordAgePolicyRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultPasswordAgePolicyRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultPasswordAgePolicyRequestValidationError{}
+
 // Validate checks the field values on DefaultPasswordAgePolicyView with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -5179,6 +5402,78 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DefaultPasswordLockoutPolicyValidationError{}
+
+// Validate checks the field values on DefaultPasswordLockoutPolicyRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *DefaultPasswordLockoutPolicyRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for MaxAttempts
+
+	// no validation rules for ShowLockoutFailure
+
+	return nil
+}
+
+// DefaultPasswordLockoutPolicyRequestValidationError is the validation error
+// returned by DefaultPasswordLockoutPolicyRequest.Validate if the designated
+// constraints aren't met.
+type DefaultPasswordLockoutPolicyRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultPasswordLockoutPolicyRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultPasswordLockoutPolicyRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultPasswordLockoutPolicyRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultPasswordLockoutPolicyRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultPasswordLockoutPolicyRequestValidationError) ErrorName() string {
+	return "DefaultPasswordLockoutPolicyRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DefaultPasswordLockoutPolicyRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultPasswordLockoutPolicyRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultPasswordLockoutPolicyRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultPasswordLockoutPolicyRequestValidationError{}
 
 // Validate checks the field values on DefaultPasswordLockoutPolicyView with
 // the rules defined in the proto definition for this message. If any rules

@@ -7,7 +7,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 )
 
-func passwordLockoutPolicyToModel(policy *admin.DefaultPasswordLockoutPolicy) *iam_model.PasswordLockoutPolicy {
+func passwordLockoutPolicyToModel(policy *admin.DefaultPasswordLockoutPolicyRequest) *iam_model.PasswordLockoutPolicy {
 	return &iam_model.PasswordLockoutPolicy{
 		MaxAttempts:         policy.MaxAttempts,
 		ShowLockOutFailures: policy.ShowLockoutFailure,

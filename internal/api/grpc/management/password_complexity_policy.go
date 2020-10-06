@@ -22,16 +22,16 @@ func (s *Server) GetDefaultPasswordComplexityPolicy(ctx context.Context, _ *empt
 	return passwordComplexityPolicyViewFromModel(result), nil
 }
 
-func (s *Server) CreatePasswordComplexityPolicy(ctx context.Context, policy *management.PasswordComplexityPolicyAdd) (*management.PasswordComplexityPolicy, error) {
-	result, err := s.org.AddPasswordComplexityPolicy(ctx, passwordComplexityPolicyAddToModel(policy))
+func (s *Server) CreatePasswordComplexityPolicy(ctx context.Context, policy *management.PasswordComplexityPolicyRequest) (*management.PasswordComplexityPolicy, error) {
+	result, err := s.org.AddPasswordComplexityPolicy(ctx, passwordComplexityPolicyRequestToModel(policy))
 	if err != nil {
 		return nil, err
 	}
 	return passwordComplexityPolicyFromModel(result), nil
 }
 
-func (s *Server) UpdatePasswordComplexityPolicy(ctx context.Context, policy *management.PasswordComplexityPolicy) (*management.PasswordComplexityPolicy, error) {
-	result, err := s.org.ChangePasswordComplexityPolicy(ctx, passwordComplexityPolicyToModel(policy))
+func (s *Server) UpdatePasswordComplexityPolicy(ctx context.Context, policy *management.PasswordComplexityPolicyRequest) (*management.PasswordComplexityPolicy, error) {
+	result, err := s.org.ChangePasswordComplexityPolicy(ctx, passwordComplexityPolicyRequestToModel(policy))
 	if err != nil {
 		return nil, err
 	}

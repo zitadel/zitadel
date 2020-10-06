@@ -7,7 +7,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 )
 
-func passwordComplexityPolicyToModel(policy *admin.DefaultPasswordComplexityPolicy) *iam_model.PasswordComplexityPolicy {
+func passwordComplexityPolicyToModel(policy *admin.DefaultPasswordComplexityPolicyRequest) *iam_model.PasswordComplexityPolicy {
 	return &iam_model.PasswordComplexityPolicy{
 		MinLength:    policy.MinLength,
 		HasUppercase: policy.HasUppercase,

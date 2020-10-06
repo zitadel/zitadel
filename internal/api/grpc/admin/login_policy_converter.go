@@ -7,7 +7,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 )
 
-func loginPolicyToModel(policy *admin.DefaultLoginPolicy) *iam_model.LoginPolicy {
+func loginPolicyToModel(policy *admin.DefaultLoginPolicyRequest) *iam_model.LoginPolicy {
 	return &iam_model.LoginPolicy{
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		AllowExternalIdp:      policy.AllowExternalIdp,

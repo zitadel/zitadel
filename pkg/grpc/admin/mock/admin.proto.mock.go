@@ -678,7 +678,7 @@ func (mr *MockAdminServiceClientMockRecorder) SetUpOrg(arg0, arg1 interface{}, a
 }
 
 // UpdateDefaultLoginPolicy mocks base method
-func (m *MockAdminServiceClient) UpdateDefaultLoginPolicy(arg0 context.Context, arg1 *admin.DefaultLoginPolicy, arg2 ...grpc.CallOption) (*admin.DefaultLoginPolicy, error) {
+func (m *MockAdminServiceClient) UpdateDefaultLoginPolicy(arg0 context.Context, arg1 *admin.DefaultLoginPolicyRequest, arg2 ...grpc.CallOption) (*admin.DefaultLoginPolicy, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -698,7 +698,7 @@ func (mr *MockAdminServiceClientMockRecorder) UpdateDefaultLoginPolicy(arg0, arg
 }
 
 // UpdateDefaultPasswordAgePolicy mocks base method
-func (m *MockAdminServiceClient) UpdateDefaultPasswordAgePolicy(arg0 context.Context, arg1 *admin.DefaultPasswordAgePolicy, arg2 ...grpc.CallOption) (*admin.DefaultPasswordAgePolicy, error) {
+func (m *MockAdminServiceClient) UpdateDefaultPasswordAgePolicy(arg0 context.Context, arg1 *admin.DefaultPasswordAgePolicyRequest, arg2 ...grpc.CallOption) (*admin.DefaultPasswordAgePolicy, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -718,7 +718,7 @@ func (mr *MockAdminServiceClientMockRecorder) UpdateDefaultPasswordAgePolicy(arg
 }
 
 // UpdateDefaultPasswordComplexityPolicy mocks base method
-func (m *MockAdminServiceClient) UpdateDefaultPasswordComplexityPolicy(arg0 context.Context, arg1 *admin.DefaultPasswordComplexityPolicy, arg2 ...grpc.CallOption) (*admin.DefaultPasswordComplexityPolicy, error) {
+func (m *MockAdminServiceClient) UpdateDefaultPasswordComplexityPolicy(arg0 context.Context, arg1 *admin.DefaultPasswordComplexityPolicyRequest, arg2 ...grpc.CallOption) (*admin.DefaultPasswordComplexityPolicy, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -738,7 +738,7 @@ func (mr *MockAdminServiceClientMockRecorder) UpdateDefaultPasswordComplexityPol
 }
 
 // UpdateDefaultPasswordLockoutPolicy mocks base method
-func (m *MockAdminServiceClient) UpdateDefaultPasswordLockoutPolicy(arg0 context.Context, arg1 *admin.DefaultPasswordLockoutPolicy, arg2 ...grpc.CallOption) (*admin.DefaultPasswordLockoutPolicy, error) {
+func (m *MockAdminServiceClient) UpdateDefaultPasswordLockoutPolicy(arg0 context.Context, arg1 *admin.DefaultPasswordLockoutPolicyRequest, arg2 ...grpc.CallOption) (*admin.DefaultPasswordLockoutPolicy, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {

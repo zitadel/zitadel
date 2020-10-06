@@ -22,16 +22,16 @@ func (s *Server) GetDefaultPasswordAgePolicy(ctx context.Context, _ *empty.Empty
 	return passwordAgePolicyViewFromModel(result), nil
 }
 
-func (s *Server) CreatePasswordAgePolicy(ctx context.Context, policy *management.PasswordAgePolicyAdd) (*management.PasswordAgePolicy, error) {
-	result, err := s.org.AddPasswordAgePolicy(ctx, passwordAgePolicyAddToModel(policy))
+func (s *Server) CreatePasswordAgePolicy(ctx context.Context, policy *management.PasswordAgePolicyRequest) (*management.PasswordAgePolicy, error) {
+	result, err := s.org.AddPasswordAgePolicy(ctx, passwordAgePolicyRequestToModel(policy))
 	if err != nil {
 		return nil, err
 	}
 	return passwordAgePolicyFromModel(result), nil
 }
 
-func (s *Server) UpdatePasswordAgePolicy(ctx context.Context, policy *management.PasswordAgePolicy) (*management.PasswordAgePolicy, error) {
-	result, err := s.org.ChangePasswordAgePolicy(ctx, passwordAgePolicyToModel(policy))
+func (s *Server) UpdatePasswordAgePolicy(ctx context.Context, policy *management.PasswordAgePolicyRequest) (*management.PasswordAgePolicy, error) {
+	result, err := s.org.ChangePasswordAgePolicy(ctx, passwordAgePolicyRequestToModel(policy))
 	if err != nil {
 		return nil, err
 	}

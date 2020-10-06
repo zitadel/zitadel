@@ -7209,7 +7209,7 @@ func local_request_ManagementService_GetDefaultLoginPolicy_0(ctx context.Context
 }
 
 func request_ManagementService_CreateLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq LoginPolicyAdd
+	var protoReq LoginPolicyRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -7226,7 +7226,7 @@ func request_ManagementService_CreateLoginPolicy_0(ctx context.Context, marshale
 }
 
 func local_request_ManagementService_CreateLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq LoginPolicyAdd
+	var protoReq LoginPolicyRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -7243,7 +7243,7 @@ func local_request_ManagementService_CreateLoginPolicy_0(ctx context.Context, ma
 }
 
 func request_ManagementService_UpdateLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq LoginPolicy
+	var protoReq LoginPolicyRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -7260,7 +7260,7 @@ func request_ManagementService_UpdateLoginPolicy_0(ctx context.Context, marshale
 }
 
 func local_request_ManagementService_UpdateLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq LoginPolicy
+	var protoReq LoginPolicyRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -7469,7 +7469,7 @@ func local_request_ManagementService_GetDefaultPasswordComplexityPolicy_0(ctx co
 }
 
 func request_ManagementService_CreatePasswordComplexityPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq PasswordComplexityPolicyAdd
+	var protoReq PasswordComplexityPolicyRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -7486,7 +7486,7 @@ func request_ManagementService_CreatePasswordComplexityPolicy_0(ctx context.Cont
 }
 
 func local_request_ManagementService_CreatePasswordComplexityPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq PasswordComplexityPolicyAdd
+	var protoReq PasswordComplexityPolicyRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -7503,7 +7503,7 @@ func local_request_ManagementService_CreatePasswordComplexityPolicy_0(ctx contex
 }
 
 func request_ManagementService_UpdatePasswordComplexityPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq PasswordComplexityPolicy
+	var protoReq PasswordComplexityPolicyRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -7520,7 +7520,7 @@ func request_ManagementService_UpdatePasswordComplexityPolicy_0(ctx context.Cont
 }
 
 func local_request_ManagementService_UpdatePasswordComplexityPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq PasswordComplexityPolicy
+	var protoReq PasswordComplexityPolicyRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -7591,7 +7591,7 @@ func local_request_ManagementService_GetDefaultPasswordAgePolicy_0(ctx context.C
 }
 
 func request_ManagementService_CreatePasswordAgePolicy_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq PasswordAgePolicyAdd
+	var protoReq PasswordAgePolicyRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -7608,7 +7608,7 @@ func request_ManagementService_CreatePasswordAgePolicy_0(ctx context.Context, ma
 }
 
 func local_request_ManagementService_CreatePasswordAgePolicy_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq PasswordAgePolicyAdd
+	var protoReq PasswordAgePolicyRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -7625,7 +7625,7 @@ func local_request_ManagementService_CreatePasswordAgePolicy_0(ctx context.Conte
 }
 
 func request_ManagementService_UpdatePasswordAgePolicy_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq PasswordAgePolicy
+	var protoReq PasswordAgePolicyRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -7642,7 +7642,7 @@ func request_ManagementService_UpdatePasswordAgePolicy_0(ctx context.Context, ma
 }
 
 func local_request_ManagementService_UpdatePasswordAgePolicy_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq PasswordAgePolicy
+	var protoReq PasswordAgePolicyRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -7713,7 +7713,7 @@ func local_request_ManagementService_GetDefaultPasswordLockoutPolicy_0(ctx conte
 }
 
 func request_ManagementService_CreatePasswordLockoutPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq PasswordLockoutPolicyAdd
+	var protoReq PasswordLockoutPolicyRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -7730,7 +7730,7 @@ func request_ManagementService_CreatePasswordLockoutPolicy_0(ctx context.Context
 }
 
 func local_request_ManagementService_CreatePasswordLockoutPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq PasswordLockoutPolicyAdd
+	var protoReq PasswordLockoutPolicyRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -7747,7 +7747,7 @@ func local_request_ManagementService_CreatePasswordLockoutPolicy_0(ctx context.C
 }
 
 func request_ManagementService_UpdatePasswordLockoutPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq PasswordLockoutPolicy
+	var protoReq PasswordLockoutPolicyRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -7764,7 +7764,7 @@ func request_ManagementService_UpdatePasswordLockoutPolicy_0(ctx context.Context
 }
 
 func local_request_ManagementService_UpdatePasswordLockoutPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq PasswordLockoutPolicy
+	var protoReq PasswordLockoutPolicyRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)

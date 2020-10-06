@@ -341,7 +341,7 @@ service AdminService {
         };
     }
 
-    rpc UpdateDefaultLoginPolicy(DefaultLoginPolicy) returns (DefaultLoginPolicy) {
+    rpc UpdateDefaultLoginPolicy(DefaultLoginPolicyRequest) returns (DefaultLoginPolicy) {
         option (google.api.http) = {
             put: "/policies/login"
             body: "*"
@@ -395,7 +395,7 @@ service AdminService {
         };
     }
 
-    rpc UpdateDefaultPasswordComplexityPolicy(DefaultPasswordComplexityPolicy) returns (DefaultPasswordComplexityPolicy) {
+    rpc UpdateDefaultPasswordComplexityPolicy(DefaultPasswordComplexityPolicyRequest) returns (DefaultPasswordComplexityPolicy) {
         option (google.api.http) = {
             put: "/policies/password/complexity"
             body: "*"
@@ -416,7 +416,7 @@ service AdminService {
         };
     }
 
-    rpc UpdateDefaultPasswordAgePolicy(DefaultPasswordAgePolicy) returns (DefaultPasswordAgePolicy) {
+    rpc UpdateDefaultPasswordAgePolicy(DefaultPasswordAgePolicyRequest) returns (DefaultPasswordAgePolicy) {
         option (google.api.http) = {
             put: "/policies/password/age"
             body: "*"
@@ -437,7 +437,7 @@ service AdminService {
         };
     }
 
-    rpc UpdateDefaultPasswordLockoutPolicy(DefaultPasswordLockoutPolicy) returns (DefaultPasswordLockoutPolicy) {
+    rpc UpdateDefaultPasswordLockoutPolicy(DefaultPasswordLockoutPolicyRequest) returns (DefaultPasswordLockoutPolicy) {
         option (google.api.http) = {
             put: "/policies/password/lockout"
             body: "*"
@@ -896,6 +896,12 @@ message DefaultLoginPolicy {
     google.protobuf.Timestamp change_date = 5;
 }
 
+message DefaultLoginPolicyRequest {
+    bool allow_username_password = 1;
+    bool allow_register = 2;
+    bool allow_external_idp = 3;
+}
+
 message IdpProviderID {
     string idp_config_id = 1 [(validate.rules).string = {min_len: 1}];
 }
@@ -944,6 +950,14 @@ message DefaultPasswordComplexityPolicy {
     google.protobuf.Timestamp change_date = 7;
 }
 
+message DefaultPasswordComplexityPolicyRequest {
+    uint64 min_length = 1;
+    bool has_uppercase = 2;
+    bool has_lowercase = 3;
+    bool has_number = 4;
+    bool has_symbol = 5;
+}
+
 message DefaultPasswordComplexityPolicyView {
     uint64 min_length = 1;
     bool has_uppercase = 2;
@@ -961,6 +975,11 @@ message DefaultPasswordAgePolicy {
     google.protobuf.Timestamp change_date = 4;
 }
 
+message DefaultPasswordAgePolicyRequest {
+    uint64 max_age_days = 1;
+    uint64 expire_warn_days = 2;
+}
+
 message DefaultPasswordAgePolicyView {
     uint64 max_age_days = 1;
     uint64 expire_warn_days = 2;
@@ -973,6 +992,11 @@ message DefaultPasswordLockoutPolicy {
     bool show_lockout_failure = 2;
     google.protobuf.Timestamp creation_date = 3;
     google.protobuf.Timestamp change_date = 4;
+}
+
+message DefaultPasswordLockoutPolicyRequest {
+    uint64 max_attempts = 1;
+    bool show_lockout_failure = 2;
 }
 
 message DefaultPasswordLockoutPolicyView {

@@ -858,7 +858,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1DefaultLoginPolicy"
+              "$ref": "#/definitions/v1DefaultLoginPolicyRequest"
             }
           }
         ],
@@ -1012,7 +1012,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1DefaultPasswordAgePolicy"
+              "$ref": "#/definitions/v1DefaultPasswordAgePolicyRequest"
             }
           }
         ],
@@ -1064,7 +1064,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1DefaultPasswordComplexityPolicy"
+              "$ref": "#/definitions/v1DefaultPasswordComplexityPolicyRequest"
             }
           }
         ],
@@ -1116,7 +1116,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1DefaultPasswordLockoutPolicy"
+              "$ref": "#/definitions/v1DefaultPasswordLockoutPolicyRequest"
             }
           }
         ],
@@ -1415,6 +1415,23 @@
         }
       }
     },
+    "v1DefaultLoginPolicyRequest": {
+      "type": "object",
+      "properties": {
+        "allow_username_password": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "allow_register": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "allow_external_idp": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
     "v1DefaultLoginPolicyView": {
       "type": "object",
       "properties": {
@@ -1458,6 +1475,19 @@
         "change_date": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultPasswordAgePolicyRequest": {
+      "type": "object",
+      "properties": {
+        "max_age_days": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "expire_warn_days": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -1515,6 +1545,31 @@
         }
       }
     },
+    "v1DefaultPasswordComplexityPolicyRequest": {
+      "type": "object",
+      "properties": {
+        "min_length": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "has_uppercase": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "has_lowercase": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "has_number": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "has_symbol": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
     "v1DefaultPasswordComplexityPolicyView": {
       "type": "object",
       "properties": {
@@ -1566,6 +1621,19 @@
         "change_date": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultPasswordLockoutPolicyRequest": {
+      "type": "object",
+      "properties": {
+        "max_attempts": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "show_lockout_failure": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },

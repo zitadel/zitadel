@@ -7,13 +7,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 )
 
-func passwordAgePolicyAddToModel(policy *management.PasswordAgePolicyAdd) *iam_model.PasswordAgePolicy {
-	return &iam_model.PasswordAgePolicy{
-		MaxAgeDays:     policy.MaxAgeDays,
-		ExpireWarnDays: policy.ExpireWarnDays,
-	}
-}
-func passwordAgePolicyToModel(policy *management.PasswordAgePolicy) *iam_model.PasswordAgePolicy {
+func passwordAgePolicyRequestToModel(policy *management.PasswordAgePolicyRequest) *iam_model.PasswordAgePolicy {
 	return &iam_model.PasswordAgePolicy{
 		MaxAgeDays:     policy.MaxAgeDays,
 		ExpireWarnDays: policy.ExpireWarnDays,

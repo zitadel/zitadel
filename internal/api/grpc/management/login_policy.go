@@ -22,16 +22,16 @@ func (s *Server) GetDefaultLoginPolicy(ctx context.Context, _ *empty.Empty) (*ma
 	return loginPolicyViewFromModel(result), nil
 }
 
-func (s *Server) CreateLoginPolicy(ctx context.Context, policy *management.LoginPolicyAdd) (*management.LoginPolicy, error) {
-	result, err := s.org.AddLoginPolicy(ctx, loginPolicyAddToModel(policy))
+func (s *Server) CreateLoginPolicy(ctx context.Context, policy *management.LoginPolicyRequest) (*management.LoginPolicy, error) {
+	result, err := s.org.AddLoginPolicy(ctx, loginPolicyRequestToModel(policy))
 	if err != nil {
 		return nil, err
 	}
 	return loginPolicyFromModel(result), nil
 }
 
-func (s *Server) UpdateLoginPolicy(ctx context.Context, policy *management.LoginPolicy) (*management.LoginPolicy, error) {
-	result, err := s.org.ChangeLoginPolicy(ctx, loginPolicyToModel(policy))
+func (s *Server) UpdateLoginPolicy(ctx context.Context, policy *management.LoginPolicyRequest) (*management.LoginPolicy, error) {
+	result, err := s.org.ChangeLoginPolicy(ctx, loginPolicyRequestToModel(policy))
 	if err != nil {
 		return nil, err
 	}

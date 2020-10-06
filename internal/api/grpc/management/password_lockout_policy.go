@@ -22,16 +22,16 @@ func (s *Server) GetDefaultPasswordLockoutPolicy(ctx context.Context, _ *empty.E
 	return passwordLockoutPolicyViewFromModel(result), nil
 }
 
-func (s *Server) CreatePasswordLockoutPolicy(ctx context.Context, policy *management.PasswordLockoutPolicyAdd) (*management.PasswordLockoutPolicy, error) {
-	result, err := s.org.AddPasswordLockoutPolicy(ctx, passwordLockoutPolicyAddToModel(policy))
+func (s *Server) CreatePasswordLockoutPolicy(ctx context.Context, policy *management.PasswordLockoutPolicyRequest) (*management.PasswordLockoutPolicy, error) {
+	result, err := s.org.AddPasswordLockoutPolicy(ctx, passwordLockoutPolicyRequestToModel(policy))
 	if err != nil {
 		return nil, err
 	}
 	return passwordLockoutPolicyFromModel(result), nil
 }
 
-func (s *Server) UpdatePasswordLockoutPolicy(ctx context.Context, policy *management.PasswordLockoutPolicy) (*management.PasswordLockoutPolicy, error) {
-	result, err := s.org.ChangePasswordLockoutPolicy(ctx, passwordLockoutPolicyToModel(policy))
+func (s *Server) UpdatePasswordLockoutPolicy(ctx context.Context, policy *management.PasswordLockoutPolicyRequest) (*management.PasswordLockoutPolicy, error) {
+	result, err := s.org.ChangePasswordLockoutPolicy(ctx, passwordLockoutPolicyRequestToModel(policy))
 	if err != nil {
 		return nil, err
 	}

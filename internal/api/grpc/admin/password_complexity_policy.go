@@ -14,7 +14,7 @@ func (s *Server) GetDefaultPasswordComplexityPolicy(ctx context.Context, _ *empt
 	return passwordComplexityPolicyViewFromModel(result), nil
 }
 
-func (s *Server) UpdateDefaultPasswordComplexityPolicy(ctx context.Context, policy *admin.DefaultPasswordComplexityPolicy) (*admin.DefaultPasswordComplexityPolicy, error) {
+func (s *Server) UpdateDefaultPasswordComplexityPolicy(ctx context.Context, policy *admin.DefaultPasswordComplexityPolicyRequest) (*admin.DefaultPasswordComplexityPolicy, error) {
 	result, err := s.iam.ChangeDefaultPasswordComplexityPolicy(ctx, passwordComplexityPolicyToModel(policy))
 	if err != nil {
 		return nil, err

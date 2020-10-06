@@ -13406,10 +13406,10 @@ var _ interface {
 	ErrorName() string
 } = LoginPolicyValidationError{}
 
-// Validate checks the field values on LoginPolicyAdd with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *LoginPolicyAdd) Validate() error {
+// Validate checks the field values on LoginPolicyRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *LoginPolicyRequest) Validate() error {
 	if m == nil {
 		return nil
 	}
@@ -13423,9 +13423,9 @@ func (m *LoginPolicyAdd) Validate() error {
 	return nil
 }
 
-// LoginPolicyAddValidationError is the validation error returned by
-// LoginPolicyAdd.Validate if the designated constraints aren't met.
-type LoginPolicyAddValidationError struct {
+// LoginPolicyRequestValidationError is the validation error returned by
+// LoginPolicyRequest.Validate if the designated constraints aren't met.
+type LoginPolicyRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -13433,22 +13433,24 @@ type LoginPolicyAddValidationError struct {
 }
 
 // Field function returns field value.
-func (e LoginPolicyAddValidationError) Field() string { return e.field }
+func (e LoginPolicyRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e LoginPolicyAddValidationError) Reason() string { return e.reason }
+func (e LoginPolicyRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e LoginPolicyAddValidationError) Cause() error { return e.cause }
+func (e LoginPolicyRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e LoginPolicyAddValidationError) Key() bool { return e.key }
+func (e LoginPolicyRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e LoginPolicyAddValidationError) ErrorName() string { return "LoginPolicyAddValidationError" }
+func (e LoginPolicyRequestValidationError) ErrorName() string {
+	return "LoginPolicyRequestValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e LoginPolicyAddValidationError) Error() string {
+func (e LoginPolicyRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -13460,14 +13462,14 @@ func (e LoginPolicyAddValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sLoginPolicyAdd.%s: %s%s",
+		"invalid %sLoginPolicyRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = LoginPolicyAddValidationError{}
+var _ error = LoginPolicyRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -13475,7 +13477,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = LoginPolicyAddValidationError{}
+} = LoginPolicyRequestValidationError{}
 
 // Validate checks the field values on IdpProviderID with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
@@ -14476,10 +14478,10 @@ var _ interface {
 	ErrorName() string
 } = PasswordComplexityPolicyValidationError{}
 
-// Validate checks the field values on PasswordComplexityPolicyAdd with the
+// Validate checks the field values on PasswordComplexityPolicyRequest with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
-func (m *PasswordComplexityPolicyAdd) Validate() error {
+func (m *PasswordComplexityPolicyRequest) Validate() error {
 	if m == nil {
 		return nil
 	}
@@ -14497,10 +14499,10 @@ func (m *PasswordComplexityPolicyAdd) Validate() error {
 	return nil
 }
 
-// PasswordComplexityPolicyAddValidationError is the validation error returned
-// by PasswordComplexityPolicyAdd.Validate if the designated constraints
-// aren't met.
-type PasswordComplexityPolicyAddValidationError struct {
+// PasswordComplexityPolicyRequestValidationError is the validation error
+// returned by PasswordComplexityPolicyRequest.Validate if the designated
+// constraints aren't met.
+type PasswordComplexityPolicyRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -14508,24 +14510,24 @@ type PasswordComplexityPolicyAddValidationError struct {
 }
 
 // Field function returns field value.
-func (e PasswordComplexityPolicyAddValidationError) Field() string { return e.field }
+func (e PasswordComplexityPolicyRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e PasswordComplexityPolicyAddValidationError) Reason() string { return e.reason }
+func (e PasswordComplexityPolicyRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e PasswordComplexityPolicyAddValidationError) Cause() error { return e.cause }
+func (e PasswordComplexityPolicyRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e PasswordComplexityPolicyAddValidationError) Key() bool { return e.key }
+func (e PasswordComplexityPolicyRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e PasswordComplexityPolicyAddValidationError) ErrorName() string {
-	return "PasswordComplexityPolicyAddValidationError"
+func (e PasswordComplexityPolicyRequestValidationError) ErrorName() string {
+	return "PasswordComplexityPolicyRequestValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e PasswordComplexityPolicyAddValidationError) Error() string {
+func (e PasswordComplexityPolicyRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -14537,14 +14539,14 @@ func (e PasswordComplexityPolicyAddValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sPasswordComplexityPolicyAdd.%s: %s%s",
+		"invalid %sPasswordComplexityPolicyRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = PasswordComplexityPolicyAddValidationError{}
+var _ error = PasswordComplexityPolicyRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -14552,7 +14554,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = PasswordComplexityPolicyAddValidationError{}
+} = PasswordComplexityPolicyRequestValidationError{}
 
 // Validate checks the field values on PasswordComplexityPolicyView with the
 // rules defined in the proto definition for this message. If any rules are
@@ -14749,10 +14751,10 @@ var _ interface {
 	ErrorName() string
 } = PasswordAgePolicyValidationError{}
 
-// Validate checks the field values on PasswordAgePolicyAdd with the rules
+// Validate checks the field values on PasswordAgePolicyRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
-func (m *PasswordAgePolicyAdd) Validate() error {
+func (m *PasswordAgePolicyRequest) Validate() error {
 	if m == nil {
 		return nil
 	}
@@ -14764,9 +14766,9 @@ func (m *PasswordAgePolicyAdd) Validate() error {
 	return nil
 }
 
-// PasswordAgePolicyAddValidationError is the validation error returned by
-// PasswordAgePolicyAdd.Validate if the designated constraints aren't met.
-type PasswordAgePolicyAddValidationError struct {
+// PasswordAgePolicyRequestValidationError is the validation error returned by
+// PasswordAgePolicyRequest.Validate if the designated constraints aren't met.
+type PasswordAgePolicyRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -14774,24 +14776,24 @@ type PasswordAgePolicyAddValidationError struct {
 }
 
 // Field function returns field value.
-func (e PasswordAgePolicyAddValidationError) Field() string { return e.field }
+func (e PasswordAgePolicyRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e PasswordAgePolicyAddValidationError) Reason() string { return e.reason }
+func (e PasswordAgePolicyRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e PasswordAgePolicyAddValidationError) Cause() error { return e.cause }
+func (e PasswordAgePolicyRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e PasswordAgePolicyAddValidationError) Key() bool { return e.key }
+func (e PasswordAgePolicyRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e PasswordAgePolicyAddValidationError) ErrorName() string {
-	return "PasswordAgePolicyAddValidationError"
+func (e PasswordAgePolicyRequestValidationError) ErrorName() string {
+	return "PasswordAgePolicyRequestValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e PasswordAgePolicyAddValidationError) Error() string {
+func (e PasswordAgePolicyRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -14803,14 +14805,14 @@ func (e PasswordAgePolicyAddValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sPasswordAgePolicyAdd.%s: %s%s",
+		"invalid %sPasswordAgePolicyRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = PasswordAgePolicyAddValidationError{}
+var _ error = PasswordAgePolicyRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -14818,7 +14820,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = PasswordAgePolicyAddValidationError{}
+} = PasswordAgePolicyRequestValidationError{}
 
 // Validate checks the field values on PasswordAgePolicyView with the rules
 // defined in the proto definition for this message. If any rules are
@@ -15008,10 +15010,10 @@ var _ interface {
 	ErrorName() string
 } = PasswordLockoutPolicyValidationError{}
 
-// Validate checks the field values on PasswordLockoutPolicyAdd with the rules
-// defined in the proto definition for this message. If any rules are
+// Validate checks the field values on PasswordLockoutPolicyRequest with the
+// rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
-func (m *PasswordLockoutPolicyAdd) Validate() error {
+func (m *PasswordLockoutPolicyRequest) Validate() error {
 	if m == nil {
 		return nil
 	}
@@ -15023,9 +15025,10 @@ func (m *PasswordLockoutPolicyAdd) Validate() error {
 	return nil
 }
 
-// PasswordLockoutPolicyAddValidationError is the validation error returned by
-// PasswordLockoutPolicyAdd.Validate if the designated constraints aren't met.
-type PasswordLockoutPolicyAddValidationError struct {
+// PasswordLockoutPolicyRequestValidationError is the validation error returned
+// by PasswordLockoutPolicyRequest.Validate if the designated constraints
+// aren't met.
+type PasswordLockoutPolicyRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -15033,24 +15036,24 @@ type PasswordLockoutPolicyAddValidationError struct {
 }
 
 // Field function returns field value.
-func (e PasswordLockoutPolicyAddValidationError) Field() string { return e.field }
+func (e PasswordLockoutPolicyRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e PasswordLockoutPolicyAddValidationError) Reason() string { return e.reason }
+func (e PasswordLockoutPolicyRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e PasswordLockoutPolicyAddValidationError) Cause() error { return e.cause }
+func (e PasswordLockoutPolicyRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e PasswordLockoutPolicyAddValidationError) Key() bool { return e.key }
+func (e PasswordLockoutPolicyRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e PasswordLockoutPolicyAddValidationError) ErrorName() string {
-	return "PasswordLockoutPolicyAddValidationError"
+func (e PasswordLockoutPolicyRequestValidationError) ErrorName() string {
+	return "PasswordLockoutPolicyRequestValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e PasswordLockoutPolicyAddValidationError) Error() string {
+func (e PasswordLockoutPolicyRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -15062,14 +15065,14 @@ func (e PasswordLockoutPolicyAddValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sPasswordLockoutPolicyAdd.%s: %s%s",
+		"invalid %sPasswordLockoutPolicyRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = PasswordLockoutPolicyAddValidationError{}
+var _ error = PasswordLockoutPolicyRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -15077,7 +15080,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = PasswordLockoutPolicyAddValidationError{}
+} = PasswordLockoutPolicyRequestValidationError{}
 
 // Validate checks the field values on PasswordLockoutPolicyView with the rules
 // defined in the proto definition for this message. If any rules are
