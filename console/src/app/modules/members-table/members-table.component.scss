@@ -33,6 +33,18 @@
     }
   }
 
+  tr {
+    button {
+      visibility: hidden;
+    }
+  
+    &:hover {
+      button {
+        visibility: visible;
+      }
+    }
+  }
+
   .sa-icon {
     display: block;
     width: 32px;

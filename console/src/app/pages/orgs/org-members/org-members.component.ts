@@ -64,7 +64,6 @@ export class OrgMembersComponent {
     }
 
     public removeOrgMemberSelection(): void {
-        console.log(this.selection);
         Promise.all(this.selection.map(member => {
             return this.mgmtService.RemoveMyOrgMember(member.userId).then(() => {
                 this.toast.showInfo('ORG.TOAST.MEMBERREMOVED', true);
@@ -75,6 +74,18 @@ export class OrgMembersComponent {
             setTimeout(() => {
                 this.changePage.emit();
             }, 1000);
+        });
+    }
+
+    public removeOrgMember(member: OrgMemberView.AsObject): void {
+        this.mgmtService.RemoveMyOrgMember(member.userId).then(() => {
+            this.toast.showInfo('ORG.TOAST.MEMBERREMOVED', true);
+
+            setTimeout(() => {
+                this.changePage.emit();
+            }, 1000);
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 

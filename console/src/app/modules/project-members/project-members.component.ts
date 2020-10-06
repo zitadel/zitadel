@@ -132,6 +132,29 @@ export class ProjectMembersComponent {
         });
     }
 
+    public removeProjectMember(member: ProjectMemberView.AsObject | ProjectGrantMemberView.AsObject): void {
+        if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
+            this.mgmtService.RemoveProjectMember(this.project.projectId, member.userId).then(() => {
+                setTimeout(() => {
+                    this.changePage.emit();
+                }, 1000);
+                this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
+            }).catch(error => {
+                this.toast.showError(error);
+            });
+        } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
+            this.mgmtService.RemoveProjectGrantMember(this.project.projectId, this.grantId,
+                member.userId).then(() => {
+                    setTimeout(() => {
+                        this.changePage.emit();
+                    }, 1000);
+                    this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
+        }
+    }
+
     public openAddMember(): void {
         const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
             data: {

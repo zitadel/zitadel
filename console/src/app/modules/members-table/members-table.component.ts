@@ -23,6 +23,7 @@ type MemberDatasource = OrgMembersDataSource | ProjectMembersDataSource | IamMem
 export class MembersTableComponent implements OnInit, OnDestroy {
     public INITIALPAGESIZE: number = 25;
     @Input() public disableWrite: boolean = false;
+    @Input() public canDelete: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatTable) public table!: MatTable<View>;
     @Input() public dataSource!: MemberDatasource;
@@ -32,6 +33,7 @@ export class MembersTableComponent implements OnInit, OnDestroy {
     @Input() public refreshTrigger!: Observable<void>;
     @Output() public updateRoles: EventEmitter<{ member: View, change: MatSelectChange; }> = new EventEmitter();
     @Output() public changedSelection: EventEmitter<any[]> = new EventEmitter();
+    @Output() public deleteMember: EventEmitter<View> = new EventEmitter();
 
     private destroyed: Subject<void> = new Subject();
 
@@ -48,6 +50,10 @@ export class MembersTableComponent implements OnInit, OnDestroy {
         this.refreshTrigger.pipe(takeUntil(this.destroyed)).subscribe(() => {
             this.changePage(this.paginator);
         });
+
+        if (this.canDelete) {
+            this.displayedColumns.push('actions');
+        }
     }
 
     public ngOnDestroy(): void {
@@ -69,5 +75,9 @@ export class MembersTableComponent implements OnInit, OnDestroy {
     public changePage(event?: PageEvent | MatPaginator): any {
         this.selection.clear();
         return this.factoryLoadFunc(event ?? this.paginator);
+    }
+
+    public triggerDeleteMember(member: any): void {
+        this.deleteMember.emit(member);
     }
 }

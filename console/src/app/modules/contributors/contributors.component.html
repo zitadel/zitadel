@@ -8,7 +8,7 @@
             <ng-container *ngIf="totalResult < 10; else compact">
                 <ng-container *ngFor="let member of membersSubject | async; index as i">
                     <div @animate (click)="emitShowDetail()" class="avatar-circle"
-                        matTooltip="{{ member.email }} | {{member.rolesList?.join(' ')}}"
+                        matTooltip="{{ member.displayName }} | {{member.rolesList?.join(' ')}}"
                         [ngStyle]="{'z-index': 100 - i}">
                         <app-avatar
                             *ngIf="member && member.displayName && member.firstName && member.lastName; else cog"
