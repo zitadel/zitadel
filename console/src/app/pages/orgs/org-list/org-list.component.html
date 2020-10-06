@@ -40,7 +40,7 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr (click)="setAndNavigateToOrg(row)" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
         <mat-paginator class="paginator" [pageSize]="10" #paginator [pageSizeOptions]="[10, 20, 100, 250]">
         </mat-paginator>
@@ -48,8 +48,7 @@
 </div>
 
 <ng-template #templateRef let-key="key">
-    <button class="search-button" mat-icon-button
-        (click)="this.orgSearchKey != key ? this.orgSearchKey = key : this.orgSearchKey = undefined">
+    <button class="search-button" mat-icon-button (click)="setFilter(key)">
         <mat-icon *ngIf="this.orgSearchKey != key">search</mat-icon>
         <mat-icon *ngIf="this.orgSearchKey == key">search_off</mat-icon>
     </button>

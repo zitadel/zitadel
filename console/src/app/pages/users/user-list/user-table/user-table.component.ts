@@ -1,5 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { MatInput } from '@angular/material/input';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { TranslateService } from '@ngx-translate/core';
@@ -27,6 +28,7 @@ export class UserTableComponent implements OnInit {
     @Input() refreshOnPreviousRoute: string = '';
     @Input() disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
+    @ViewChild('input') public filter!: MatInput;
     public dataSource: MatTableDataSource<UserView.AsObject> = new MatTableDataSource<UserView.AsObject>();
     public selection: SelectionModel<UserView.AsObject> = new SelectionModel<UserView.AsObject>(true, []);
     public userResult!: UserSearchResponse.AsObject;
@@ -36,6 +38,7 @@ export class UserTableComponent implements OnInit {
 
     @Output() public changedSelection: EventEmitter<Array<UserView.AsObject>> = new EventEmitter();
     UserSearchKey: any = UserSearchKey;
+
     constructor(public translate: TranslateService, private userService: ManagementService,
         private toast: ToastService) {
         this.selection.changed.subscribe(() => {
@@ -113,6 +116,7 @@ export class UserTableComponent implements OnInit {
 
     public applyFilter(event: Event): void {
         const filterValue = (event.target as HTMLInputElement).value;
+
         this.getData(
             this.paginator.pageSize,
             this.paginator.pageIndex * this.paginator.pageSize,
@@ -122,6 +126,12 @@ export class UserTableComponent implements OnInit {
     }
 
     public setFilter(key: UserSearchKey): void {
+        setTimeout(() => {
+            if (this.filter) {
+                (this.filter as any).nativeElement.focus();
+            }
+        }, 100);
+
         if (this.userSearchKey !== key) {
             this.userSearchKey = key;
         } else {
