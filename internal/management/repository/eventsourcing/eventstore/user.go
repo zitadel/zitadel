@@ -55,6 +55,9 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserV
 			return model.UserToModel(user), nil
 		}
 	}
+	if userCopy.State == int32(usr_model.UserStateDeleted) {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4Fm9s", "Errors.User.NotFound")
+	}
 	return model.UserToModel(&userCopy), nil
 }
 

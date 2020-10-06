@@ -206,6 +206,8 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 			return err
 		}
 		err = u.setPasswordData(event)
+	case es_model.UserRemoved:
+		u.State = int32(model.UserStateDeleted)
 	case es_model.UserPasswordChanged,
 		es_model.HumanPasswordChanged:
 		err = u.setPasswordData(event)
