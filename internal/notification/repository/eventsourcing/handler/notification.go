@@ -82,7 +82,6 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	// ToDo Michi
 	colors, err := n.getLabelPolicy(context.Background())
 	if err != nil {
 		return err
@@ -207,7 +206,6 @@ func getSetNotifyContextData(orgID string) context.Context {
 	return authz.SetCtxData(context.Background(), authz.CtxData{UserID: NotifyUserID, OrgID: orgID})
 }
 
-// Todo Michi
 // Read organization specific colors
 func (n *Notification) getLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
 	policy, err := n.view.LabelPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)

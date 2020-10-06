@@ -16,7 +16,6 @@ func generateEmail(user *view_model.NotifyUser, subject, content string, config 
 	if err != nil {
 		return err
 	}
-	// ToDo Michi
 	content = html.UnescapeString(content)
 	message := &email.EmailMessage{
 		SenderEmail: config.Providers.Email.From,

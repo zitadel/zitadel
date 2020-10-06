@@ -159,7 +159,6 @@ func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_mo
 	return result, nil
 }
 
-// ToDo Michi
 func (repo *IAMRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
 	policy, err := repo.View.LabelPolicyByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {

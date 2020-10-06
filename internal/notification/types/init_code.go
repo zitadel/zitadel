@@ -41,7 +41,6 @@ func SendUserInitCode(dir http.FileSystem, i18n *i18n.Translator, user *view_mod
 	systemDefaults.Notifications.TemplateData.InitCode.Translate(i18n, args, user.PreferredLanguage)
 	initCodeData := &InitCodeEmailData{TemplateData: systemDefaults.Notifications.TemplateData.InitCode, URL: url}
 
-	// ToDo Michi
 	// Da Farbe setzten in initCodeData
 	initCodeData.PrimaryColor = colors.PrimaryColor
 	initCodeData.SecundaryColor = colors.SecundaryColor

@@ -320,7 +320,7 @@ service AdminService {
             permission: "iam.idp.read"
         };
     }
-// ToDo Michi
+
     rpc GetDefaultLabelPolicy(google.protobuf.Empty) returns (DefaultLabelPolicyView) {
         option (google.api.http) = {
             get: "/policies/label"

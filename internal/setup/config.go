@@ -1,6 +1,5 @@
 package setup
 
-// ToDo Michi
 type IAMSetUp struct {
 	GlobalOrg          string
 	IAMProject         string

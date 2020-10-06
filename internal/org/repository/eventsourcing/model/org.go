@@ -11,7 +11,6 @@ import (
 	org_model "github.com/caos/zitadel/internal/org/model"
 )
 
-// ToDo Michi
 const (
 	OrgVersion = "v1"
 )
@@ -48,6 +47,9 @@ func OrgFromModel(org *org_model.Org) *Org {
 	if org.LoginPolicy != nil {
 		converted.LoginPolicy = iam_es_model.LoginPolicyFromModel(org.LoginPolicy)
 	}
+	if org.LabelPolicy != nil {
+		converted.LabelPolicy = iam_es_model.LabelPolicyFromModel(org.LabelPolicy)
+	}
 	return converted
 }
 
@@ -65,6 +67,9 @@ func OrgToModel(org *Org) *org_model.Org {
 	}
 	if org.LoginPolicy != nil {
 		converted.LoginPolicy = iam_es_model.LoginPolicyToModel(org.LoginPolicy)
+	}
+	if org.LabelPolicy != nil {
+		converted.LabelPolicy = iam_es_model.LabelPolicyToModel(org.LabelPolicy)
 	}
 	return converted
 }

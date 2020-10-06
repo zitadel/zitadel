@@ -6,7 +6,6 @@ import (
 	"github.com/caos/zitadel/internal/i18n"
 )
 
-// ToDo Michi
 type TemplateData struct {
 	Title          string
 	PreHeader      string
@@ -19,7 +18,6 @@ type TemplateData struct {
 	SecundaryColor string
 }
 
-// ToDo Michi
 func (data *TemplateData) Translate(i18n *i18n.Translator, args map[string]interface{}, langs ...string) {
 	data.Title = i18n.Localize(data.Title, nil, langs...)
 	data.PreHeader = i18n.Localize(data.PreHeader, nil, langs...)

@@ -10,7 +10,6 @@ import (
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
-// ToDo Michi
 func LabelPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, policy *iam_es_model.LabelPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if policy == nil {
@@ -44,7 +43,6 @@ func LabelPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, existin
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Tz130", "Errors.NoChangesFound")
 		}
 		return agg.AppendEvent(model.LabelPolicyChanged, changes)
-		//		return nil, nil
 	}
 }
 

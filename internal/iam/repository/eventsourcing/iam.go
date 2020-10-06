@@ -229,7 +229,6 @@ func OIDCIDPConfigChangedAggregate(aggCreator *es_models.AggregateCreator, exist
 	}
 }
 
-// ToDo Michi
 func LabelPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.LabelPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if policy == nil {
@@ -275,7 +274,7 @@ func LabelPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, existin
 		if len(changes) == 0 {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-hZE24", "Errors.NoChangesFound")
 		}
-		return agg.AppendEvent(model.LoginPolicyChanged, changes)
+		return agg.AppendEvent(model.LabelPolicyChanged, changes)
 	}
 }
 

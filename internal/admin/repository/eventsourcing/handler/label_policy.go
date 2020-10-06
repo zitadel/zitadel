@@ -10,7 +10,6 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 )
 
-// ToDo Michi
 type LabelPolicy struct {
 	handler
 }

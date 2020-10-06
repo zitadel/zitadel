@@ -9,7 +9,6 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// ToDo Michi
 func GetLabelPolicyByAggregateID(db *gorm.DB, table, aggregateID string) (*model.LabelPolicyView, error) {
 	policy := new(model.LabelPolicyView)
 	userIDQuery := &model.LabelPolicySearchQuery{Key: iam_model.LabelPolicySearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}

@@ -33,7 +33,6 @@ type EventstoreRepos struct {
 	OrgEvents  *org_event.OrgEventstore
 }
 
-// ToDo Michi
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos, defaults systemdefaults.SystemDefaults) []query.Handler {
 	return []query.Handler{
 		&Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount}},

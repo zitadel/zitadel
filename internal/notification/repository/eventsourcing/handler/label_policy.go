@@ -14,7 +14,6 @@ type LabelPolicy struct {
 	handler
 }
 
-// ToDo Michi
 const (
 	labelPolicyTable = "management.label_policies"
 )

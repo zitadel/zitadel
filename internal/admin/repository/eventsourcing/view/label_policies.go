@@ -6,7 +6,6 @@ import (
 	global_view "github.com/caos/zitadel/internal/view/repository"
 )
 
-// ToDo Michi
 const (
 	labelPolicyTable = "adminapi.label_policies"
 )
@@ -22,14 +21,6 @@ func (v *View) PutLabelPolicy(policy *model.LabelPolicyView, sequence uint64) er
 	}
 	return v.ProcessedLabelPolicySequence(sequence)
 }
-
-// func (v *View) DeleteLabelPolicy(aggregateID string, eventSequence uint64) error {
-// 	err := view.DeleteLabelPolicy(v.Db, labelPolicyTable, aggregateID)
-// 	if err != nil && !errors.IsNotFound(err) {
-// 		return err
-// 	}
-// 	return v.ProcessedLabelPolicySequence(eventSequence)
-// }
 
 func (v *View) GetLatestLabelPolicySequence() (*global_view.CurrentSequence, error) {
 	return v.latestSequence(labelPolicyTable)

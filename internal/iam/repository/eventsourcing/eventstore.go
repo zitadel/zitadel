@@ -399,7 +399,6 @@ func (es *IAMEventstore) ChangeIDPOIDCConfig(ctx context.Context, config *iam_mo
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-Sldk8", "Errors.Internal")
 }
 
-// ToDo Michi
 func (es *IAMEventstore) AddLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
 	if policy == nil || !policy.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-aAPWI", "Errors.IAM.LabelPolicyInvalid")

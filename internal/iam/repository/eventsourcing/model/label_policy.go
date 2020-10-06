@@ -9,7 +9,6 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
 
-// ToDo Michi
 type LabelPolicy struct {
 	models.ObjectRoot
 	State          int32  `json:"-"`
@@ -48,16 +47,6 @@ func (p *LabelPolicy) Changes(changed *LabelPolicy) map[string]interface{} {
 	return changes
 }
 
-// func (i *IAM) appendAddLabelPolicyEvent(event *es_models.Event) error {
-// 	i.DefaultLabelPolicy = new(LabelPolicy)
-// 	err := i.DefaultLabelPolicy.SetData(event)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	i.DefaultLabelPolicy.ObjectRoot.CreationDate = event.CreationDate
-// 	return nil
-// }
-
 func (i *IAM) appendAddLabelPolicyEvent(event *es_models.Event) error {
 	i.DefaultLabelPolicy = new(LabelPolicy)
 	err := i.DefaultLabelPolicy.SetDataLabel(event)
@@ -71,31 +60,6 @@ func (i *IAM) appendAddLabelPolicyEvent(event *es_models.Event) error {
 func (i *IAM) appendChangeLabelPolicyEvent(event *es_models.Event) error {
 	return i.DefaultLabelPolicy.SetDataLabel(event)
 }
-
-// func (iam *IAM) appendAddIDPProviderToLabelPolicyEvent(event *es_models.Event) error {
-// 	provider := new(IDPProvider)
-// 	err := provider.SetData(event)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	provider.ObjectRoot.CreationDate = event.CreationDate
-// 	iam.DefaultLabelPolicy.IDPProviders = append(iam.DefaultLabelPolicy.IDPProviders, provider)
-// 	return nil
-// }
-
-// func (iam *IAM) appendRemoveIDPProviderFromLabelPolicyEvent(event *es_models.Event) error {
-// 	provider := new(IDPProvider)
-// 	err := provider.SetData(event)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	if i, m := GetIDPProvider(iam.DefaultLabelPolicy.IDPProviders, provider.IDPConfigID); m != nil {
-// 		iam.DefaultLabelPolicy.IDPProviders[i] = iam.DefaultLabelPolicy.IDPProviders[len(iam.DefaultLabelPolicy.IDPProviders)-1]
-// 		iam.DefaultLabelPolicy.IDPProviders[len(iam.DefaultLabelPolicy.IDPProviders)-1] = nil
-// 		iam.DefaultLabelPolicy.IDPProviders = iam.DefaultLabelPolicy.IDPProviders[:len(iam.DefaultLabelPolicy.IDPProviders)-1]
-// 	}
-// 	return nil
-// }
 
 func (p *LabelPolicy) SetDataLabel(event *es_models.Event) error {
 	err := json.Unmarshal(event.Data, p)

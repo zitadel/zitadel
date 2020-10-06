@@ -7,7 +7,6 @@ import (
 	global_view "github.com/caos/zitadel/internal/view/repository"
 )
 
-// ToDo Michi
 const (
 	labelPolicyTable = "management.label_policies"
 )

@@ -1603,3 +1603,162 @@ func TestRemoveIdpProviderFromLoginPolicy(t *testing.T) {
 		})
 	}
 }
+
+func TestAddLabelPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IAMEventstore
+		ctx    context.Context
+		policy *iam_model.LabelPolicy
+	}
+	type res struct {
+		result  *iam_model.LabelPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add login policy, ok",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.LabelPolicy{
+					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					PrimaryColor: "000000",
+				},
+			},
+			res: res{
+				result: &iam_model.LabelPolicy{
+					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					PrimaryColor: "000000",
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.LabelPolicy{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIamNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.LabelPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddLabelPolicy(tt.args.ctx, tt.args.policy)
+
+			if !tt.res.wantErr && result.PrimaryColor != tt.res.result.PrimaryColor {
+				t.Errorf("got wrong result PrimaryColor: expected: %v, actual: %v ", tt.res.result.PrimaryColor, result.PrimaryColor)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangeLabelPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IAMEventstore
+		ctx    context.Context
+		policy *iam_model.LabelPolicy
+	}
+	type res struct {
+		result  *iam_model.LabelPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add login policy, ok",
+			args: args{
+				es:  GetMockManipulateIamWithLabelPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.LabelPolicy{
+					ObjectRoot:     es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					PrimaryColor:   "000000",
+					SecundaryColor: "FFFFFF",
+				},
+			},
+			res: res{
+				result: &iam_model.LabelPolicy{
+					ObjectRoot:     es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					PrimaryColor:   "000000",
+					SecundaryColor: "FFFFFF",
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.LabelPolicy{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIamNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.LabelPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeLabelPolicy(tt.args.ctx, tt.args.policy)
+
+			if !tt.res.wantErr && result.PrimaryColor != tt.res.result.PrimaryColor {
+				t.Errorf("got wrong result PrimaryColor: expected: %v, actual: %v ", tt.res.result.PrimaryColor, result.PrimaryColor)
+			}
+			if !tt.res.wantErr && result.SecundaryColor != tt.res.result.SecundaryColor {
+				t.Errorf("got wrong result SecundaryColor: expected: %v, actual: %v ", tt.res.result.SecundaryColor, result.SecundaryColor)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}

@@ -14,7 +14,6 @@ import (
 	"github.com/caos/zitadel/internal/iam/model"
 )
 
-// ToDo Michi
 const (
 	LabelPolicyKeyAggregateID = "aggregate_id"
 )

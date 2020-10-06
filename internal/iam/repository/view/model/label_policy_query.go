@@ -6,7 +6,6 @@ import (
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
-// ToDo Michi
 type LabelPolicySearchRequest iam_model.LabelPolicySearchRequest
 type LabelPolicySearchQuery iam_model.LabelPolicySearchQuery
 type LabelPolicySearchKey iam_model.LabelPolicySearchKey

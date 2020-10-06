@@ -30,7 +30,6 @@ const (
 	LoginPolicyIDPProviderAdded          models.EventType = "iam.policy.login.idpprovider.added"
 	LoginPolicyIDPProviderRemoved        models.EventType = "iam.policy.login.idpprovider.removed"
 	LoginPolicyIDPProviderCascadeRemoved models.EventType = "iam.policy.login.idpprovider.cascade.removed"
-	// ToDo Michi
 	LabelPolicyAdded                     models.EventType = "iam.policy.label.added"
 	LabelPolicyChanged                   models.EventType = "iam.policy.label.changed"
 	LabelPolicyIDPProviderAdded          models.EventType = "iam.policy.label.idpprovider.added"

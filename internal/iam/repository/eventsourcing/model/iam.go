@@ -9,7 +9,6 @@ import (
 	"github.com/caos/zitadel/internal/iam/model"
 )
 
-// ToDo Michi
 const (
 	IAMVersion = "v1"
 )
@@ -41,6 +40,9 @@ func IAMFromModel(iam *model.IAM) *IAM {
 	if iam.DefaultLoginPolicy != nil {
 		converted.DefaultLoginPolicy = LoginPolicyFromModel(iam.DefaultLoginPolicy)
 	}
+	if iam.DefaultLabelPolicy != nil {
+		converted.DefaultLabelPolicy = LabelPolicyFromModel(iam.DefaultLabelPolicy)
+	}
 	return converted
 }
 
@@ -58,6 +60,9 @@ func IAMToModel(iam *IAM) *model.IAM {
 	}
 	if iam.DefaultLoginPolicy != nil {
 		converted.DefaultLoginPolicy = LoginPolicyToModel(iam.DefaultLoginPolicy)
+	}
+	if iam.DefaultLabelPolicy != nil {
+		converted.DefaultLabelPolicy = LabelPolicyToModel(iam.DefaultLabelPolicy)
 	}
 	return converted
 }
@@ -113,10 +118,6 @@ func (i *IAM) AppendEvent(event *es_models.Event) (err error) {
 		return i.appendAddLabelPolicyEvent(event)
 	case LabelPolicyChanged:
 		return i.appendChangeLabelPolicyEvent(event)
-		// case LabelPolicyIDPProviderAdded:
-		// 	return i.appendAddIDPProviderToLabelPolicyEvent(event)
-		// case LabelPolicyIDPProviderRemoved:
-		// 	return i.appendRemoveIDPProviderFromLabelPolicyEvent(event)
 	}
 
 	return err

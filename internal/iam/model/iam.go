@@ -13,6 +13,7 @@ type IAM struct {
 	Members            []*IAMMember
 	IDPs               []*IDPConfig
 	DefaultLoginPolicy *LoginPolicy
+	DefaultLabelPolicy *LabelPolicy
 }
 
 func (iam *IAM) GetMember(userID string) (int, *IAMMember) {

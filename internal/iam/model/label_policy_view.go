@@ -6,7 +6,6 @@ import (
 	"github.com/caos/zitadel/internal/model"
 )
 
-// ToDo Michi
 type LabelPolicyView struct {
 	AggregateID    string
 	PrimaryColor   string
