@@ -732,6 +732,9 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 			return user_view_model.UserToModel(user), nil
 		}
 	}
+	if userCopy.State == int32(user_model.UserStateDeleted) {
+		return nil, errors.ThrowNotFound(nil, "EVENT-3F9so", "Errors.User.NotFound")
+	}
 	return user_view_model.UserToModel(&userCopy), nil
 }
 

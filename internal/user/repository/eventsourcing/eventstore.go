@@ -104,6 +104,9 @@ func (es *UserEventstore) UserByID(ctx context.Context, id string) (*usr_model.U
 	if err != nil && caos_errs.IsNotFound(err) && user.Sequence == 0 {
 		return nil, err
 	}
+	if user.State == int32(usr_model.UserStateDeleted) {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-6hsK9", "Errors.User.NotFound")
+	}
 	es.userCache.cacheUser(user)
 	return model.UserToModel(user), nil
 }
@@ -321,6 +324,28 @@ func (es *UserEventstore) UnlockUser(ctx context.Context, id string) (*usr_model
 	}
 	es.userCache.cacheUser(repoUser)
 	return model.UserToModel(repoUser), nil
+}
+
+func (es *UserEventstore) PrepareRemoveUser(ctx context.Context, id string, orgIamPolicy *org_model.OrgIAMPolicy) (*model.User, []*es_models.Aggregate, error) {
+	user, err := es.UserByID(ctx, id)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	repoUser := model.UserFromModel(user)
+	aggregate, err := UserRemoveAggregate(ctx, es.AggregateCreator(), repoUser, orgIamPolicy.UserLoginMustBeDomain)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoUser, aggregate, nil
+}
+
+func (es *UserEventstore) RemoveUser(ctx context.Context, id string, orgIamPolicy *org_model.OrgIAMPolicy) error {
+	repoUser, aggregate, err := es.PrepareRemoveUser(ctx, id, orgIamPolicy)
+	if err != nil {
+		return err
+	}
+	return es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, aggregate...)
 }
 
 func (es *UserEventstore) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*usr_model.UserChanges, error) {
