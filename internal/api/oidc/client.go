@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"strings"
 
 	"golang.org/x/text/language"
 	"gopkg.in/square/go-jose.v2"
@@ -15,6 +16,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	user_model "github.com/caos/zitadel/internal/user/model"
+	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 )
 
 const (
@@ -23,6 +25,9 @@ const (
 	scopeEmail   = "email"
 	scopePhone   = "phone"
 	scopeAddress = "address"
+
+	ScopeProjectRolePrefix = "urn:zitadel:iam:org:project:role:"
+	ClaimProjectRoles      = "urn:zitadel:iam:org:project:roles"
 
 	oidcCtx = "oidc"
 )
@@ -35,7 +40,15 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (op.Clie
 	if client.State != proj_model.AppStateActive {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sdaGg", "client is not active")
 	}
-	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime)
+	projectRoles, err := o.repo.ProjectRolesByProjectID(client.ProjectID)
+	if err != nil {
+		return nil, err
+	}
+	allowedScopes := make([]string, len(projectRoles))
+	for i, role := range projectRoles {
+		allowedScopes[i] = ScopeProjectRolePrefix + role.Key
+	}
+	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime, allowedScopes)
 }
 
 func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID string) (*jose.JSONWebKey, error) {
@@ -79,25 +92,26 @@ func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, origin st
 			return nil, errors.ThrowPermissionDenied(nil, "OIDC-da1f3", "origin is not allowed")
 		}
 	}
-	return o.GetUserinfoFromScopes(ctx, token.UserID, token.Scopes)
+	return o.GetUserinfoFromScopes(ctx, token.UserID, token.ApplicationID, token.Scopes)
 }
 
-func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, scopes []string) (oidc.UserInfoSetter, error) {
+func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID, applicationID string, scopes []string) (oidc.UserInfoSetter, error) {
 	user, err := o.repo.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
 	userInfo := oidc.NewUserInfo()
+	roles := make([]string, 0)
 	for _, scope := range scopes {
 		switch scope {
-		case scopeOpenID:
+		case oidc.ScopeOpenID:
 			userInfo.SetSubject(user.ID)
-		case scopeEmail:
+		case oidc.ScopeEmail:
 			if user.HumanView == nil {
 				continue
 			}
 			userInfo.SetEmail(user.Email, user.IsEmailVerified)
-		case scopeProfile:
+		case oidc.ScopeProfile:
 			userInfo.SetPreferredUsername(user.PreferredLoginName)
 			userInfo.SetUpdatedAt(user.ChangeDate)
 			if user.HumanView != nil {
@@ -111,12 +125,12 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, sc
 			} else {
 				userInfo.SetName(user.MachineView.Name)
 			}
-		case scopePhone:
+		case oidc.ScopePhone:
 			if user.HumanView == nil {
 				continue
 			}
 			userInfo.SetPhone(user.Phone, user.IsPhoneVerified)
-		case scopeAddress:
+		case oidc.ScopeAddress:
 			if user.HumanView == nil {
 				continue
 			}
@@ -125,11 +139,56 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, sc
 			}
 			userInfo.SetAddress(oidc.NewUserInfoAddress(user.StreetAddress, user.Locality, user.Region, user.PostalCode, user.Country, ""))
 		default:
-			userInfo.AppendClaims("authorizations", scopes)
-			//userInfo.Authorizations = append(userInfo.Authorizations, scope)
+			if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
+				roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
+			}
 		}
 	}
+
+	if len(roles) == 0 {
+		return userInfo, nil
+	}
+	app, err := o.repo.ApplicationByClientID(ctx, applicationID)
+	if err != nil {
+		return nil, err
+	}
+	if err := o.assertRoles(userInfo, userID, app.ProjectID, roles); err != nil {
+		return nil, err
+	}
+
 	return userInfo, nil
+}
+
+func (o *OPStorage) assertRoles(userInfo oidc.UserInfoSetter, userID, projectID string, requestedRoles []string) error {
+	grants, err := o.repo.UserGrantsByProjectAndUserID(projectID, userID)
+	if err != nil {
+		return err
+	}
+	projectRoles := make(map[string]map[string]string)
+	for _, requestedRole := range requestedRoles {
+		for _, grant := range grants {
+			checkGrantedRoles(projectRoles, grant, requestedRole)
+		}
+	}
+	if len(projectRoles) > 0 {
+		userInfo.AppendClaims(ClaimProjectRoles, projectRoles)
+	}
+	return nil
+}
+
+func checkGrantedRoles(roles map[string]map[string]string, grant *grant_model.UserGrantView, requestedRole string) {
+	for _, grantedRole := range grant.RoleKeys {
+		if requestedRole == grantedRole {
+			appendRole(roles, grantedRole, grant.ResourceOwner, grant.OrgPrimaryDomain)
+		}
+	}
+}
+
+func appendRole(roles map[string]map[string]string, role, orgID, orgPrimaryDomain string) {
+	if roles[role] == nil {
+		roles[role] = make(map[string]string, 0)
+	}
+	roles[role][orgID] = orgPrimaryDomain
 }
 
 func getGender(gender user_model.Gender) string {

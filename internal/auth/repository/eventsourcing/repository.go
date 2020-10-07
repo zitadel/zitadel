@@ -164,6 +164,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 			View:          view,
 			ProjectEvents: project,
 		},
+
 		eventstore.UserSessionRepo{
 			View: view,
 		},

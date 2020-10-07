@@ -2,17 +2,17 @@ package eventstore
 
 import (
 	"context"
-
-	"github.com/caos/oidc/pkg/oidc"
+	"strings"
+	"time"
 
 	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/api/oidc"
 	"github.com/caos/zitadel/internal/eventstore/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
-	"strings"
-	"time"
+	proj_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 
 	"github.com/caos/logging"
 
@@ -95,7 +95,10 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 	request.ID = reqID
 	switch req := request.Request.(type) {
 	case *model.AuthRequestOIDC:
-		repo.handleOIDC(request, req)
+		err = repo.handleOIDC(ctx, request, req)
+	}
+	if err != nil {
+		return nil, err
 	}
 	if request.LoginHint != "" {
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
@@ -108,18 +111,37 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 	return request, nil
 }
 
-func (repo *AuthRequestRepo) handleOIDC(request *model.AuthRequest, oidc *model.AuthRequestOIDC) {
-	//app, err := repo.View.ApplicationByClientID(ctx, request.ApplicationID)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//app.
-	//request.Audience = ids
-	//for i, scope := range oidc.Scopes {
-	//	if strings.HasPrefix(scope, "urn:zitadel:iam:org:project:role:") {
-	//
-	//	}
-	//}
+func (repo *AuthRequestRepo) handleOIDC(ctx context.Context, request *model.AuthRequest, oidc *model.AuthRequestOIDC) error {
+	app, err := repo.View.ApplicationByClientID(ctx, request.ApplicationID)
+	if err != nil {
+		return err
+	}
+	appIDs, err := repo.View.AppIDsFromProjectID(ctx, app.ProjectID)
+	if err != nil {
+		return err
+	}
+	request.Audience = appIDs
+	oidc.Scopes, err = repo.assertProjectRoleScopes(app, oidc.Scopes)
+	return err
+}
+
+func (repo *AuthRequestRepo) assertProjectRoleScopes(app *proj_view_model.ApplicationView, scopes []string) ([]string, error) {
+	if !app.IsOIDC { //TODO: replace with HasRoleAssertion
+		return scopes, nil
+	}
+	for _, scope := range scopes {
+		if strings.HasPrefix(scope, oidc.ScopeProjectRolePrefix) {
+			return scopes, nil
+		}
+	}
+	roles, err := repo.View.ProjectRolesByProjectID(app.ProjectID)
+	if err != nil {
+		return nil, err
+	}
+	for _, role := range roles {
+		scopes = append(scopes, oidc.ScopeProjectRolePrefix+role.Key)
+	}
+	return scopes, nil
 }
 
 func (repo *AuthRequestRepo) AuthRequestByID(ctx context.Context, id, userAgentID string) (*model.AuthRequest, error) {

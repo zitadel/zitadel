@@ -18,8 +18,6 @@ const (
 	amrPassword = "password"
 	amrMFA      = "mfa"
 	amrOTP      = "otp"
-
-	ScopeProjectRole
 )
 
 type AuthRequest struct {

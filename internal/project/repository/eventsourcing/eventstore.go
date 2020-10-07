@@ -318,7 +318,7 @@ func (es *ProjectEventstore) AddProjectRoles(ctx context.Context, roles ...*proj
 	}
 	for _, role := range roles {
 		if !role.IsValid() {
-			return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-idue3", "Errors.Project.MemberInvalid")
+			return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-iduG4", "Errors.Project.RoleInvalid")
 		}
 	}
 	existingProject, err := es.ProjectByID(ctx, roles[0].AggregateID)

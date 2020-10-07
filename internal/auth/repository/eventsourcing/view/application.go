@@ -102,3 +102,27 @@ func (v *View) AppIDsFromProjectByClientID(ctx context.Context, clientID string)
 	}
 	return ids, nil
 }
+
+func (v *View) AppIDsFromProjectID(ctx context.Context, projectID string) ([]string, error) {
+	req := &proj_model.ApplicationSearchRequest{
+		Queries: []*proj_model.ApplicationSearchQuery{
+			{
+				Key:    proj_model.AppSearchKeyProjectID,
+				Method: global_model.SearchMethodEquals,
+				Value:  projectID,
+			},
+		},
+	}
+	apps, _, err := view.SearchApplications(v.Db, applicationTable, req)
+	if err != nil {
+		return nil, errors.ThrowPreconditionFailed(err, "VIEW-Gd24q", "cannot find applications")
+	}
+	ids := make([]string, 0, len(apps))
+	for _, app := range apps {
+		if !app.IsOIDC {
+			continue
+		}
+		ids = append(ids, app.OIDCClientID)
+	}
+	return ids, nil
+}

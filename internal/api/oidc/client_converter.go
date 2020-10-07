@@ -1,8 +1,9 @@
 package oidc
 
 import (
-	"github.com/caos/oidc/pkg/oidc"
 	"time"
+
+	"github.com/caos/oidc/pkg/oidc"
 
 	"github.com/caos/oidc/pkg/op"
 
@@ -15,13 +16,20 @@ type Client struct {
 	defaultLoginURL            string
 	defaultAccessTokenLifetime time.Duration
 	defaultIdTokenLifetime     time.Duration
+	allowedScopes              []string
 }
 
-func ClientFromBusiness(app *model.ApplicationView, defaultLoginURL string, defaultAccessTokenLifetime, defaultIdTokenLifetime time.Duration) (op.Client, error) {
+func ClientFromBusiness(app *model.ApplicationView, defaultLoginURL string, defaultAccessTokenLifetime, defaultIdTokenLifetime time.Duration, allowedScopes []string) (op.Client, error) {
 	if !app.IsOIDC {
 		return nil, errors.ThrowInvalidArgument(nil, "OIDC-d5bhD", "client is not a proper oidc application")
 	}
-	return &Client{ApplicationView: app, defaultLoginURL: defaultLoginURL, defaultAccessTokenLifetime: defaultAccessTokenLifetime, defaultIdTokenLifetime: defaultIdTokenLifetime}, nil
+	return &Client{
+			ApplicationView:            app,
+			defaultLoginURL:            defaultLoginURL,
+			defaultAccessTokenLifetime: defaultAccessTokenLifetime,
+			defaultIdTokenLifetime:     defaultIdTokenLifetime,
+			allowedScopes:              allowedScopes},
+		nil
 }
 
 func (c *Client) ApplicationType() op.ApplicationType {
@@ -54,6 +62,10 @@ func (c *Client) ResponseTypes() []oidc.ResponseType {
 
 func (c *Client) DevMode() bool {
 	return c.ApplicationView.DevMode
+}
+
+func (c *Client) AllowedScopes() []string {
+	return c.allowedScopes
 }
 
 func (c *Client) AccessTokenLifetime() time.Duration {
