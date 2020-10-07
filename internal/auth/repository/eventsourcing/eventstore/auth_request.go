@@ -172,7 +172,10 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 	}
 	err = repo.checkExternalUserLogin(request, externalUser.IDPConfigID, externalUser.ExternalUserID)
 	if errors.IsNotFound(err) {
-		return repo.setLinkingUser(ctx, request, externalUser)
+		if err := repo.setLinkingUser(ctx, request, externalUser); err != nil {
+			return err
+		}
+		return err
 	}
 	if err != nil {
 		return err

@@ -466,7 +466,7 @@ func PasswordCodeSentAggregate(aggCreator *es_models.AggregateCreator, user *mod
 
 func ExternalLoginCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, user *model.User, check *model.AuthRequest) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregate(ctx, aggCreator, user)
+		agg, err := UserAggregateOverwriteContext(ctx, aggCreator, user, user.ResourceOwner, user.AggregateID)
 		if err != nil {
 			return nil, err
 		}
