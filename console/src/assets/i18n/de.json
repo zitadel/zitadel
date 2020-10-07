@@ -87,7 +87,8 @@
             "NOUSER":"Kein Benutzer",
             "REACTIVATE":"Reaktivieren",
             "DEACTIVATE":"Deaktivieren",
-            "FILTER":"Filter"
+            "FILTER":"Filter",
+            "DELETE":"Benutzer löschen"
         },
         "DIALOG": {
             "DELETE_TITLE":"User löschen",

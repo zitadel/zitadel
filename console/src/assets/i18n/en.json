@@ -87,7 +87,8 @@
             "NOUSER":"No associated users.",
             "REACTIVATE":"Reactivate",
             "DEACTIVATE":"Deactivate",
-            "FILTER":"Filter"
+            "FILTER":"Filter",
+            "DELETE":"Delete User"
         },
         "DIALOG": {
             "DELETE_TITLE":"Delete User",

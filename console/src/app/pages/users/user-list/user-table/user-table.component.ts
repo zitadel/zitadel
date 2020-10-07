@@ -34,7 +34,7 @@ export class UserTableComponent implements OnInit {
     public userResult!: UserSearchResponse.AsObject;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-    @Input() public displayedColumns: string[] = ['select', /*'firstname', 'lastname' ,*/ 'displayName', 'username', 'email', 'state', 'actions'];
+    @Input() public displayedColumns: string[] = ['select', 'displayName', 'username', 'email', 'state', 'actions'];
 
     @Output() public changedSelection: EventEmitter<Array<UserView.AsObject>> = new EventEmitter();
     UserSearchKey: any = UserSearchKey;
@@ -142,7 +142,7 @@ export class UserTableComponent implements OnInit {
                 confirmKey: 'ACTIONS.DELETE',
                 cancelKey: 'ACTIONS.CANCEL',
                 titleKey: 'USER.DIALOG.DELETE_TITLE',
-                descriptionParam: user.human,
+                descriptionParam: user.human ?? user.machine ? { displayName: user.machine?.name } : { displayName: '' },
                 descriptionKey: 'USER.DIALOG.DELETE_DESCRIPTION',
             },
             width: '400px',
@@ -151,7 +151,10 @@ export class UserTableComponent implements OnInit {
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
                 this.userService.DeleteUser(user.id).then(() => {
-                    this.toast.showInfo('USER.DELETED', true);
+                    setTimeout(() => {
+                        this.refreshPage();
+                    }, 1000);
+                    this.toast.showInfo('USER.TOAST.DELETED', true);
                 }).catch(error => {
                     this.toast.showError(error);
                 });
