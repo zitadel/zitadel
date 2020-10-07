@@ -14,12 +14,8 @@
             </button>
         </div>
 
-        <p *ngIf="complexityPolicy?.description; else showDescComplexity" class="desc">
-            {{ complexityPolicy.description }}</p>
-        <ng-template #showDescComplexity>
-            <p class="desc">
-                {{'ORG.POLICY.PWD_COMPLEXITY.DESCRIPTION' | translate}}</p>
-        </ng-template>
+        <p class="desc">
+            {{'ORG.POLICY.PWD_COMPLEXITY.DESCRIPTION' | translate}}</p>
 
         <span class="fill-space"></span>
         <div class="btn-wrapper">
@@ -42,12 +38,8 @@
                 </button>
             </div>
 
-            <p *ngIf="iamPolicy?.description; else showDescIAM" class="desc">
-                {{ iamPolicy.description }}</p>
-            <ng-template #showDescIAM>
-                <p class="desc">
-                    {{'ORG.POLICY.IAM_POLICY.DESCRIPTION' | translate}}</p>
-            </ng-template>
+            <p class="desc">
+                {{'ORG.POLICY.IAM_POLICY.DESCRIPTION' | translate}}</p>
 
             <span class="fill-space"></span>
             <div class="btn-wrapper">
@@ -72,7 +64,6 @@
                     <i *ngIf="loginPolicy" class="icon las la-check-circle"></i>
                 </button>
             </div>
-
 
             <ng-template #showDescIAM>
                 <p class="desc">

@@ -9,6 +9,14 @@ import {
     CreateUserRequest,
     DefaultLoginPolicy,
     DefaultLoginPolicyView,
+    DefaultPasswordAgePolicyRequest,
+    DefaultPasswordAgePolicyView,
+    DefaultPasswordComplexityPolicy,
+    DefaultPasswordComplexityPolicyRequest,
+    DefaultPasswordComplexityPolicyView,
+    DefaultPasswordLockoutPolicy,
+    DefaultPasswordLockoutPolicyRequest,
+    DefaultPasswordLockoutPolicyView,
     FailedEventID,
     FailedEvents,
     IamMember,
@@ -31,6 +39,7 @@ import {
     OrgIamPolicy,
     OrgIamPolicyID,
     OrgIamPolicyRequest,
+    OrgIamPolicyView,
     OrgSetUpRequest,
     OrgSetUpResponse,
     RemoveIamMemberRequest,
@@ -91,6 +100,70 @@ export class AdminService {
         return this.grpcService.admin.removeFailedEvent(req);
     }
 
+    /* Policies */
+
+    /* complexity */
+
+    public GetDefaultPasswordComplexityPolicy(): Promise<DefaultPasswordComplexityPolicyView> {
+        const req = new Empty();
+        return this.grpcService.admin.getDefaultPasswordComplexityPolicy(req);
+    }
+
+    public UpdateDefaultPasswordComplexityPolicy(
+        hasLowerCase: boolean,
+        hasUpperCase: boolean,
+        hasNumber: boolean,
+        hasSymbol: boolean,
+        minLength: number,
+    ): Promise<DefaultPasswordComplexityPolicy> {
+        const req = new DefaultPasswordComplexityPolicyRequest();
+        req.setHasLowercase(hasLowerCase);
+        req.setHasUppercase(hasUpperCase);
+        req.setHasNumber(hasNumber);
+        req.setHasSymbol(hasSymbol);
+        req.setMinLength(minLength);
+        return this.grpcService.admin.updateDefaultPasswordComplexityPolicy(req);
+    }
+
+    /* age */
+
+    public GetDefaultPasswordAgePolicy(): Promise<DefaultPasswordAgePolicyView> {
+        const req = new Empty();
+
+        return this.grpcService.admin.getDefaultPasswordAgePolicy(req);
+    }
+
+    public UpdateDefaultPasswordAgePolicy(
+        maxAgeDays: number,
+        expireWarnDays: number,
+    ): Promise<DefaultPasswordAgePolicyView> {
+        const req = new DefaultPasswordAgePolicyRequest();
+        req.setMaxAgeDays(maxAgeDays);
+        req.setExpireWarnDays(expireWarnDays);
+
+        return this.grpcService.admin.updateDefaultPasswordAgePolicy(req);
+    }
+
+    /* lockout */
+
+    public GetDefaultPasswordLockoutPolicy(): Promise<DefaultPasswordLockoutPolicyView> {
+        const req = new Empty();
+        return this.grpcService.admin.getDefaultPasswordLockoutPolicy(req);
+    }
+
+    public UpdateDefaultPasswordLockoutPolicy(
+        maxAttempts: number,
+        showLockoutFailures: boolean,
+    ): Promise<DefaultPasswordLockoutPolicy> {
+        const req = new DefaultPasswordLockoutPolicyRequest();
+        req.setMaxAttempts(maxAttempts);
+        req.setShowLockoutFailure(showLockoutFailures);
+
+        return this.grpcService.admin.updateDefaultPasswordLockoutPolicy(req);
+    }
+
+    /* login */
+
     public GetDefaultLoginPolicy(
     ): Promise<DefaultLoginPolicyView> {
         const req = new Empty();
@@ -100,6 +173,8 @@ export class AdminService {
     public UpdateDefaultLoginPolicy(req: DefaultLoginPolicy): Promise<DefaultLoginPolicy> {
         return this.grpcService.admin.updateDefaultLoginPolicy(req);
     }
+
+    /* policies end */
 
     public AddIdpProviderToDefaultLoginPolicy(configId: string): Promise<IdpProviderID> {
         const req = new IdpProviderID();
@@ -237,7 +312,7 @@ export class AdminService {
         return this.grpcService.admin.changeIamMember(req);
     }
 
-    public GetOrgIamPolicy(orgId: string): Promise<OrgIamPolicy> {
+    public GetOrgIamPolicy(orgId: string): Promise<OrgIamPolicyView> {
         const req = new OrgIamPolicyID();
         req.setOrgId(orgId);
 
@@ -246,11 +321,9 @@ export class AdminService {
 
     public CreateOrgIamPolicy(
         orgId: string,
-        description: string,
         userLoginMustBeDomain: boolean): Promise<OrgIamPolicy> {
         const req = new OrgIamPolicyRequest();
         req.setOrgId(orgId);
-        req.setDescription(description);
         req.setUserLoginMustBeDomain(userLoginMustBeDomain);
 
         return this.grpcService.admin.createOrgIamPolicy(req);
@@ -258,11 +331,9 @@ export class AdminService {
 
     public UpdateOrgIamPolicy(
         orgId: string,
-        description: string,
         userLoginMustBeDomain: boolean): Promise<OrgIamPolicy> {
         const req = new OrgIamPolicyRequest();
         req.setOrgId(orgId);
-        req.setDescription(description);
         req.setUserLoginMustBeDomain(userLoginMustBeDomain);
         return this.grpcService.admin.updateOrgIamPolicy(req);
     }
