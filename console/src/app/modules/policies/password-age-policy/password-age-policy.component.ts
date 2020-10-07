@@ -1,12 +1,15 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { PasswordAgePolicy, PasswordAgePolicyView } from 'src/app/proto/generated/management_pb';
+import { DefaultPasswordAgePolicyView } from 'src/app/proto/generated/admin_pb';
+import { PasswordAgePolicyView } from 'src/app/proto/generated/management_pb';
+import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { PolicyComponentAction } from '../policy-component-action.enum';
+import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 
 @Component({
@@ -18,34 +21,43 @@ export class PasswordAgePolicyComponent implements OnDestroy {
     public title: string = '';
     public desc: string = '';
 
+    public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
     componentAction: PolicyComponentAction = PolicyComponentAction.CREATE;
+    public service!: AdminService | ManagementService;
 
     public PolicyComponentAction: any = PolicyComponentAction;
 
-    public ageData!: PasswordAgePolicy.AsObject;
+    public ageData!: PasswordAgePolicyView.AsObject | DefaultPasswordAgePolicyView.AsObject;
 
     private sub: Subscription = new Subscription();
 
     constructor(
         private route: ActivatedRoute,
-        private mgmtService: ManagementService,
         private router: Router,
         private toast: ToastService,
+        private injector: Injector,
     ) {
         this.sub = this.route.data.pipe(switchMap(data => {
-            this.componentAction = data.action;
+            this.serviceType = data.serviceType;
+            switch (this.serviceType) {
+                case PolicyComponentServiceType.MGMT:
+                    this.service = this.injector.get(ManagementService as Type<ManagementService>);
+                    break;
+                case PolicyComponentServiceType.ADMIN:
+                    this.service = this.injector.get(AdminService as Type<AdminService>);
+                    break;
+            }
+
             return this.route.params;
-        })).subscribe(_ => {
+        })).subscribe(() => {
             this.title = 'ORG.POLICY.PWD_AGE.TITLECREATE';
             this.desc = 'ORG.POLICY.PWD_AGE.DESCRIPTIONCREATE';
 
-            if (this.componentAction === PolicyComponentAction.MODIFY) {
-                this.getData().then(data => {
-                    if (data) {
-                        this.ageData = data.toObject() as PasswordAgePolicy.AsObject;
-                    }
-                });
-            }
+            this.getData().then(data => {
+                if (data) {
+                    this.ageData = data.toObject();
+                }
+            });
         });
     }
 
@@ -54,18 +66,25 @@ export class PasswordAgePolicyComponent implements OnDestroy {
     }
 
     private async getData():
-        Promise<PasswordAgePolicyView> {
+        Promise<PasswordAgePolicyView | DefaultPasswordAgePolicyView> {
         this.title = 'ORG.POLICY.PWD_AGE.TITLE';
         this.desc = 'ORG.POLICY.PWD_AGE.DESCRIPTION';
-        return this.mgmtService.GetPasswordAgePolicy();
+        switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+                return (this.service as ManagementService).GetPasswordAgePolicy();
+            case PolicyComponentServiceType.ADMIN:
+                return (this.service as AdminService).GetDefaultPasswordAgePolicy();
+        }
     }
 
     public deletePolicy(): void {
-        this.mgmtService.RemovePasswordAgePolicy().then(() => {
-            this.toast.showInfo('Successfully deleted');
-        }).catch(error => {
-            this.toast.showError(error);
-        });
+        if (this.serviceType === PolicyComponentServiceType.MGMT) {
+            (this.service as ManagementService).RemovePasswordAgePolicy().then(() => {
+                this.toast.showInfo('Successfully deleted');
+            }).catch(error => {
+                this.toast.showError(error);
+            });
+        }
     }
 
     public incrementExpireWarnDays(): void {
@@ -93,27 +112,42 @@ export class PasswordAgePolicyComponent implements OnDestroy {
     }
 
     public savePolicy(): void {
-        if (this.componentAction === PolicyComponentAction.CREATE) {
+        switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+                if (this.componentAction === PolicyComponentAction.CREATE) {
+                    (this.service as ManagementService).CreatePasswordAgePolicy(
+                        this.ageData.maxAgeDays,
+                        this.ageData.expireWarnDays,
+                    ).then(() => {
+                        this.router.navigate(['/org']);
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
 
-            this.mgmtService.CreatePasswordAgePolicy(
-                this.ageData.maxAgeDays,
-                this.ageData.expireWarnDays,
-            ).then(() => {
-                this.router.navigate(['org']);
-            }).catch(error => {
-                this.toast.showError(error);
-            });
-
-        } else if (this.componentAction === PolicyComponentAction.MODIFY) {
-
-            this.mgmtService.UpdatePasswordAgePolicy(
-                this.ageData.maxAgeDays,
-                this.ageData.expireWarnDays,
-            ).then(() => {
-                this.router.navigate(['org']);
-            }).catch(error => {
-                this.toast.showError(error);
-            });
+                } else if (this.componentAction === PolicyComponentAction.MODIFY) {
+                    (this.service as ManagementService).UpdatePasswordAgePolicy(
+                        this.ageData.maxAgeDays,
+                        this.ageData.expireWarnDays,
+                    ).then(() => {
+                        this.router.navigate(['/org']);
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
+                }
+                break;
+            case PolicyComponentServiceType.ADMIN:
+                if (this.componentAction === PolicyComponentAction.MODIFY) {
+                    (this.service as AdminService).UpdateDefaultPasswordAgePolicy(
+                        this.ageData.maxAgeDays,
+                        this.ageData.expireWarnDays,
+                    ).then(() => {
+                        this.router.navigate(['/iam']);
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
+                }
+                break;
         }
+
     }
 }

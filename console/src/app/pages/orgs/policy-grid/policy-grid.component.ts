@@ -7,6 +7,7 @@ import {
     PolicyState,
 } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
     selector: 'app-policy-grid',
@@ -22,13 +23,16 @@ export class PolicyGridComponent {
     public PolicyComponentType: any = PolicyComponentType;
 
     constructor(
-        private mgmtService: ManagementService,
+        public mgmtService: ManagementService,
+        private toast: ToastService,
     ) {
         this.getData();
     }
 
     private getData(): void {
-        this.mgmtService.GetPasswordComplexityPolicy().then(data => this.complexityPolicy = data.toObject());
+        this.mgmtService.GetPasswordComplexityPolicy().then(data => this.complexityPolicy = data.toObject()).catch(error => {
+            this.toast.showError(error);
+        });
         this.mgmtService.GetMyOrgIamPolicy().then(data => this.iamPolicy = data.toObject());
         this.mgmtService.GetLoginPolicy().then(data => {
             this.loginPolicy = data.toObject();

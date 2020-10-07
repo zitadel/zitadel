@@ -5,7 +5,6 @@ import { switchMap } from 'rxjs/operators';
 import { OrgIamPolicyView as AdminOrgIamPolicyView } from 'src/app/proto/generated/admin_pb';
 import { OrgIamPolicyView as MgmtOrgIamPolicyView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -17,7 +16,7 @@ import { PolicyComponentAction } from '../policy-component-action.enum';
     styleUrls: ['./password-iam-policy.component.scss'],
 })
 export class PasswordIamPolicyComponent implements OnDestroy {
-    @Input() service!: AdminService | ManagementService;
+    @Input() service!: AdminService;
     public title: string = '';
     public desc: string = '';
 
@@ -25,7 +24,7 @@ export class PasswordIamPolicyComponent implements OnDestroy {
 
     public PolicyComponentAction: any = PolicyComponentAction;
 
-    public iamData!: AdminOrgIamPolicyView.AsObject | MgmtOrgIamPolicyView;
+    public iamData!: AdminOrgIamPolicyView.AsObject | MgmtOrgIamPolicyView.AsObject;
 
     private sub: Subscription = new Subscription();
 
@@ -57,34 +56,29 @@ export class PasswordIamPolicyComponent implements OnDestroy {
         this.sub.unsubscribe();
     }
 
-    private async getData(): Promise<AdminOrgIamPolicyView | MgmtOrgIamPolicyView> {
-
+    private async getData(): Promise<AdminOrgIamPolicyView | MgmtOrgIamPolicyView | undefined> {
         this.title = 'ORG.POLICY.IAM_POLICY.TITLECREATE';
         this.desc = 'ORG.POLICY.IAM_POLICY.DESCRIPTIONCREATE';
-        if (this.service instanceof AdminService) {
-            return this.service.GetOrgIamPolicy(this.org);
-        } else if (this.service instanceof ManagementService) {
-            return this.service.GetMyOrgIamPolicy();
+        const orgId = this.sessionStorage.getItem('organization');
+        if (orgId) {
+            return this.service.GetOrgIamPolicy(orgId);
         }
     }
 
     public savePolicy(): void {
-        if (this.componentAction === PolicyComponentAction.CREATE) {
-            const orgId = this.sessionStorage.getItem('organization');
-            if (orgId) {
-                this.adminService.CreateOrgIamPolicy(
-                    orgId,
-                    this.iamData.userLoginMustBeDomain,
-                ).then(() => {
-                    this.router.navigate(['org']);
-                }).catch(error => {
-                    this.toast.showError(error);
-                });
-            }
-        } else if (this.componentAction === PolicyComponentAction.MODIFY) {
-            const orgId = this.sessionStorage.getItem('organization');
-            if (orgId) {
-                this.adminService.UpdateOrgIamPolicy(
+        const orgId = this.sessionStorage.getItem('organization');
+        if (this.componentAction === PolicyComponentAction.CREATE && orgId) {
+            this.service.CreateOrgIamPolicy(
+                orgId,
+                this.iamData.userLoginMustBeDomain,
+            ).then(() => {
+                this.router.navigate(['org']);
+            }).catch(error => {
+                this.toast.showError(error);
+            });
+        } else if (this.componentAction === PolicyComponentAction.MODIFY && orgId) {
+            if (this.service instanceof AdminService) {
+                this.service.UpdateOrgIamPolicy(
                     orgId,
                     this.iamData.userLoginMustBeDomain,
                 ).then(() => {
