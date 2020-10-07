@@ -89,6 +89,10 @@
             "DEACTIVATE":"Deactivate",
             "FILTER":"Filter"
         },
+        "DIALOG": {
+            "DELETE_TITLE":"Delete User",
+            "DELETE_DESCRIPTION":"You are about to permanently delete the user {{displayName}}. Are you sure?"
+        },
         "TABLE":{
             "DEACTIVATE":"Deactivate",
             "ACTIVATE":"Activate",
@@ -282,7 +286,8 @@
             "SELECTEDDEACTIVATED":"Selected users deactivated.",
             "SELECTEDKEYSDELETED":"Selected keys deleted.",
             "KEYADDED":"Key added!",
-            "MACHINEADDED":"Service User created!"
+            "MACHINEADDED":"Service User created!",
+            "DELETED":"User deleted successfully!"
         },
         "MEMBERSHIPS": {
             "TITLE":"ZITADEL Manager Roles",
