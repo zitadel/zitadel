@@ -324,7 +324,7 @@ func (es *UserEventstore) UnlockUser(ctx context.Context, id string) (*usr_model
 	return model.UserToModel(repoUser), nil
 }
 
-func (es *UserEventstore) PrepareRemoveUser(ctx context.Context, id string, orgIamPolicy *org_model.OrgIAMPolicy) (*model.User, []*es_models.Aggregate, error) {
+func (es *UserEventstore) PrepareRemoveUser(ctx context.Context, id string, orgIamPolicy *iam_model.OrgIAMPolicyView) (*model.User, []*es_models.Aggregate, error) {
 	user, err := es.UserByID(ctx, id)
 	if err != nil {
 		return nil, nil, err
@@ -338,7 +338,7 @@ func (es *UserEventstore) PrepareRemoveUser(ctx context.Context, id string, orgI
 	return repoUser, aggregate, nil
 }
 
-func (es *UserEventstore) RemoveUser(ctx context.Context, id string, orgIamPolicy *org_model.OrgIAMPolicy) error {
+func (es *UserEventstore) RemoveUser(ctx context.Context, id string, orgIamPolicy *iam_model.OrgIAMPolicyView) error {
 	repoUser, aggregate, err := es.PrepareRemoveUser(ctx, id, orgIamPolicy)
 	if err != nil {
 		return err

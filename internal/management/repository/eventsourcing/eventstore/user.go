@@ -5,8 +5,8 @@ import (
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
-	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/authz"
@@ -134,11 +134,18 @@ func (repo *UserRepo) UnlockUser(ctx context.Context, id string) (*usr_model.Use
 
 func (repo *UserRepo) RemoveUser(ctx context.Context, id string) error {
 	aggregates := make([]*es_models.Aggregate, 0)
-	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if err != nil && errors.IsNotFound(err) {
+		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return err
+		}
+	}
 	if err != nil {
 		return err
 	}
-	user, agg, err := repo.UserEvents.PrepareRemoveUser(ctx, id, orgPolicy)
+	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
+	user, agg, err := repo.UserEvents.PrepareRemoveUser(ctx, id, orgPolicyView)
 	if err != nil {
 		return err
 	}

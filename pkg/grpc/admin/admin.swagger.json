@@ -632,6 +632,29 @@
         ]
       }
     },
+    "/orgs/default/policies/orgiam": {
+      "get": {
+        "summary": "ORG_IAM_POLICY",
+        "operationId": "AdminService_GetDefaultOrgIamPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OrgIamPolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/orgs/{id}": {
       "get": {
         "operationId": "AdminService_GetOrgByID",
@@ -662,15 +685,14 @@
         ]
       }
     },
-    "/orgs/{org_id}/iampolicy": {
+    "/orgs/{org_id}/policies/orgiam": {
       "get": {
-        "summary": "ORG_IAM_POLICY",
         "operationId": "AdminService_GetOrgIamPolicy",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1OrgIamPolicy"
+              "$ref": "#/definitions/v1OrgIamPolicyView"
             }
           },
           "default": {
@@ -836,7 +858,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1DefaultLoginPolicy"
+              "$ref": "#/definitions/v1DefaultLoginPolicyRequest"
             }
           }
         ],
@@ -932,6 +954,162 @@
             "in": "path",
             "required": true,
             "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/password/age": {
+      "get": {
+        "operationId": "AdminService_GetDefaultPasswordAgePolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordAgePolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "operationId": "AdminService_UpdateDefaultPasswordAgePolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordAgePolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordAgePolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/password/complexity": {
+      "get": {
+        "operationId": "AdminService_GetDefaultPasswordComplexityPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordComplexityPolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "operationId": "AdminService_UpdateDefaultPasswordComplexityPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordComplexityPolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordComplexityPolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/password/lockout": {
+      "get": {
+        "operationId": "AdminService_GetDefaultPasswordLockoutPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordLockoutPolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "operationId": "AdminService_UpdateDefaultPasswordLockoutPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordLockoutPolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordLockoutPolicyRequest"
+            }
           }
         ],
         "tags": [
@@ -1218,6 +1396,31 @@
         "allow_external_idp": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultLoginPolicyRequest": {
+      "type": "object",
+      "properties": {
+        "allow_username_password": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "allow_register": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "allow_external_idp": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -1235,6 +1438,215 @@
         "allow_external_idp": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultPasswordAgePolicy": {
+      "type": "object",
+      "properties": {
+        "max_age_days": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "expire_warn_days": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultPasswordAgePolicyRequest": {
+      "type": "object",
+      "properties": {
+        "max_age_days": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "expire_warn_days": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1DefaultPasswordAgePolicyView": {
+      "type": "object",
+      "properties": {
+        "max_age_days": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "expire_warn_days": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultPasswordComplexityPolicy": {
+      "type": "object",
+      "properties": {
+        "min_length": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "has_uppercase": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "has_lowercase": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "has_number": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "has_symbol": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultPasswordComplexityPolicyRequest": {
+      "type": "object",
+      "properties": {
+        "min_length": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "has_uppercase": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "has_lowercase": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "has_number": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "has_symbol": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "v1DefaultPasswordComplexityPolicyView": {
+      "type": "object",
+      "properties": {
+        "min_length": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "has_uppercase": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "has_lowercase": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "has_number": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "has_symbol": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultPasswordLockoutPolicy": {
+      "type": "object",
+      "properties": {
+        "max_attempts": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "show_lockout_failure": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultPasswordLockoutPolicyRequest": {
+      "type": "object",
+      "properties": {
+        "max_attempts": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "show_lockout_failure": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "v1DefaultPasswordLockoutPolicyView": {
+      "type": "object",
+      "properties": {
+        "max_attempts": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "show_lockout_failure": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -1925,9 +2337,6 @@
         "org_id": {
           "type": "string"
         },
-        "description": {
-          "type": "string"
-        },
         "user_login_must_be_domain": {
           "type": "boolean",
           "format": "boolean"
@@ -1962,6 +2371,34 @@
         "user_login_must_be_domain": {
           "type": "boolean",
           "format": "boolean"
+        }
+      }
+    },
+    "v1OrgIamPolicyView": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "type": "string"
+        },
+        "user_login_must_be_domain": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "default": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
