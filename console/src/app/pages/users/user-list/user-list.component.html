@@ -12,7 +12,7 @@
         <p class="sub">{{ 'USER.PAGES.DESCRIPTIONMACHINE' | translate }}</p>
 
         <app-user-table [userType]="UserType.MACHINE"
-            [displayedColumns]="['select','name', 'username', 'description','state']"
+            [displayedColumns]="['select','name', 'username', 'description','state', 'actions']"
             [disabled]="(['user.write'] | hasRole | async) == false">
         </app-user-table>
     </ng-container>

@@ -1,10 +1,12 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { enterAnimations } from 'src/app/animations';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { UserView } from 'src/app/proto/generated/auth_pb';
 import { SearchMethod, UserSearchKey, UserSearchQuery, UserSearchResponse } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -32,12 +34,16 @@ export class UserTableComponent implements OnInit {
     public userResult!: UserSearchResponse.AsObject;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-    @Input() public displayedColumns: string[] = ['select', /*'firstname', 'lastname' ,*/ 'displayName', 'username', 'email', 'state'];
+    @Input() public displayedColumns: string[] = ['select', 'displayName', 'username', 'email', 'state', 'actions'];
 
     @Output() public changedSelection: EventEmitter<Array<UserView.AsObject>> = new EventEmitter();
     UserSearchKey: any = UserSearchKey;
-    constructor(public translate: TranslateService, private userService: ManagementService,
-        private toast: ToastService) {
+    constructor(
+        public translate: TranslateService,
+        private userService: ManagementService,
+        private toast: ToastService,
+        private dialog: MatDialog,
+    ) {
         this.selection.changed.subscribe(() => {
             this.changedSelection.emit(this.selection.selected);
         });
@@ -128,5 +134,31 @@ export class UserTableComponent implements OnInit {
             this.userSearchKey = undefined;
             this.refreshPage();
         }
+    }
+
+    public deleteUser(user: UserView.AsObject): void {
+        const dialogRef = this.dialog.open(WarnDialogComponent, {
+            data: {
+                confirmKey: 'ACTIONS.DELETE',
+                cancelKey: 'ACTIONS.CANCEL',
+                titleKey: 'USER.DIALOG.DELETE_TITLE',
+                descriptionParam: user.human ?? user.machine ? { displayName: user.machine?.name } : { displayName: '' },
+                descriptionKey: 'USER.DIALOG.DELETE_DESCRIPTION',
+            },
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                this.userService.DeleteUser(user.id).then(() => {
+                    setTimeout(() => {
+                        this.refreshPage();
+                    }, 1000);
+                    this.toast.showInfo('USER.TOAST.DELETED', true);
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
+            }
+        });
     }
 }
