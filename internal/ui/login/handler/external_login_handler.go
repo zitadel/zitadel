@@ -133,6 +133,9 @@ func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.R
 	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
 	err := l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, userAgentID, externalUser, model.BrowserInfoFromRequest(r))
 	if err != nil {
+		if errors.IsNotFound(err) {
+			err = nil
+		}
 		l.renderExternalNotFoundOption(w, r, authReq, err)
 		return
 	}
