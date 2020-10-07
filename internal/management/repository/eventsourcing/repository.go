@@ -87,7 +87,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 		spooler:       spool,
 		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, org, user, view, roles, systemDefaults},
 		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, project, usergrant, user, iam, view, roles, systemDefaults.IamID},
-		UserRepo:      eventstore.UserRepo{conf.SearchLimit, user, org, view, systemDefaults},
+		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, user, org, usergrant, view, systemDefaults},
 		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
 		IAMRepository: eventstore.IAMRepository{iam},
 	}, nil

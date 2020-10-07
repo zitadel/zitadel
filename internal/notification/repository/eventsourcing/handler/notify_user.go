@@ -93,7 +93,7 @@ func (u *NotifyUser) ProcessUser(event *models.Event) (err error) {
 		}
 		u.fillLoginNames(user)
 	case es_model.UserRemoved:
-		err = u.view.DeleteNotifyUser(event.AggregateID, event.Sequence)
+		return u.view.DeleteNotifyUser(event.AggregateID, event.Sequence)
 	default:
 		return u.view.ProcessedNotifyUserSequence(event.Sequence)
 	}

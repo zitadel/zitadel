@@ -14,6 +14,7 @@ type UserRepository interface {
 	ReactivateUser(ctx context.Context, id string) (*model.User, error)
 	LockUser(ctx context.Context, id string) (*model.User, error)
 	UnlockUser(ctx context.Context, id string) (*model.User, error)
+	RemoveUser(ctx context.Context, id string) error
 	SearchUsers(ctx context.Context, request *model.UserSearchRequest) (*model.UserSearchResponse, error)
 
 	GetUserByLoginNameGlobal(ctx context.Context, email string) (*model.UserView, error)

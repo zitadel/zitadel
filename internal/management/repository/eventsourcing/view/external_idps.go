@@ -56,6 +56,13 @@ func (v *View) DeleteExternalIDP(externalUserID, idpConfigID string, eventSequen
 	return v.ProcessedExternalIDPSequence(eventSequence)
 }
 
+func (v *View) DeleteExternalIDPsByUserID(userID string, eventSequence uint64) error {
+	err := view.DeleteExternalIDPsByUserID(v.Db, externalIDPTable, userID)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedExternalIDPSequence(eventSequence)
+}
 func (v *View) GetLatestExternalIDPSequence() (*global_view.CurrentSequence, error) {
 	return v.latestSequence(externalIDPTable)
 }
