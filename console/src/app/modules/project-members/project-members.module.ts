@@ -10,6 +10,7 @@ import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.
 import { MembersTableModule } from 'src/app/modules/members-table/members-table.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
+import { MemberCreateDialogModule } from '../add-member-dialog/member-create-dialog.module';
 import { ProjectMembersRoutingModule } from './project-members-routing.module';
 import { ProjectMembersComponent } from './project-members.component';
 
@@ -27,6 +28,7 @@ import { ProjectMembersComponent } from './project-members.component';
         MatDialogModule,
         MembersTableModule,
         HasRolePipeModule,
+        MemberCreateDialogModule,
     ],
 })
 export class ProjectMembersModule { }

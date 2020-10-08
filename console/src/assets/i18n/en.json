@@ -94,7 +94,7 @@
         },
         "DIALOG": {
             "DELETE_TITLE":"Delete User",
-            "DELETE_DESCRIPTION":"You are about to permanently delete the user {{displayName}}. Are you sure?"
+            "DELETE_DESCRIPTION":"You are about to permanently delete a user. Are you sure?"
         },
         "TABLE":{
             "DEACTIVATE":"Deactivate",

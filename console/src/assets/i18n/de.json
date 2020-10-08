@@ -94,7 +94,7 @@
         },
         "DIALOG": {
             "DELETE_TITLE":"User löschen",
-            "DELETE_DESCRIPTION":"Sie sind im Begriff den Benutzer {{displayName}} entgültig zu löschen. Wollen Sie dies wirklich tun?"
+            "DELETE_DESCRIPTION":"Sie sind im Begriff einen Benutzer endgültig zu löschen. Wollen Sie dies wirklich tun?"
         },
         "TABLE":{
             "DEACTIVATE":"Deaktivieren",
