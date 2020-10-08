@@ -1,4 +1,4 @@
-<app-meta-layout *ngIf="user && (['user.write','user.write:' + user.id] | hasRole) as canWrite$">
+<app-meta-layout *ngIf="user && (['user.write$','user.write:' + user.id] | hasRole) as canWrite$">
     <div class="max-width-container">
         <div class="head">
             <a (click)="navigateBack()" mat-icon-button>
@@ -55,7 +55,7 @@
 
             <app-card *ngIf="user.machine" title="{{ 'USER.MACHINE.TITLE' | translate }}">
                 <app-detail-form-machine
-                    [disabled]="(['user.write:' + user?.id, 'user.write'] | hasRole | async) == false"
+                    [disabled]="(['user.write:' + user?.id, 'user.write$'] | hasRole | async) == false"
                     [username]="user.userName" [user]="user.machine" (submitData)="saveMachine($event)">
                 </app-detail-form-machine>
             </app-card>
@@ -70,7 +70,7 @@
             description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
 
             <app-contact disablePhoneCode="true"
-                [canWrite]="(['user.write:' + user?.id, 'user.write'] | hasRole | async)" *ngIf="user?.human"
+                [canWrite]="(['user.write:' + user?.id, 'user.write$'] | hasRole | async)" *ngIf="user?.human"
                 [human]="user.human" (savedPhone)="savePhone($event)" (savedEmail)="saveEmail($event)"
                 (deletedPhone)="deletePhone()" (resendEmailVerification)="resendEmailVerification()"
                 (resendPhoneVerification)="resendPhoneVerification()">
