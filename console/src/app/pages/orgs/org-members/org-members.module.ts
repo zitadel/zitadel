@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/member-create-dialog.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { MembersTableModule } from 'src/app/modules/members-table/members-table.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
@@ -30,6 +31,7 @@ import { OrgMembersComponent } from './org-members.component';
         RefreshTableModule,
         MembersTableModule,
         HasRolePipeModule,
+        MemberCreateDialogModule,
     ],
 })
 export class OrgMembersModule { }

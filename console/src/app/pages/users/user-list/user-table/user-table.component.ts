@@ -152,7 +152,6 @@ export class UserTableComponent implements OnInit {
                 confirmKey: 'ACTIONS.DELETE',
                 cancelKey: 'ACTIONS.CANCEL',
                 titleKey: 'USER.DIALOG.DELETE_TITLE',
-                descriptionParam: user.human ?? user.machine ? { displayName: user.machine?.name } : { displayName: '' },
                 descriptionKey: 'USER.DIALOG.DELETE_DESCRIPTION',
             },
             width: '400px',
