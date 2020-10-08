@@ -20,8 +20,11 @@ export class AccountsCardComponent implements OnInit {
     constructor(public authService: AuthenticationService, private router: Router, private userService: GrpcAuthService) {
         this.userService.getMyUserSessions().then(sessions => {
             this.users = sessions.toObject().userSessionsList;
+            console.log(sessions.toObject());
             const index = this.users.findIndex(user => user.loginName === this.profile.preferredLoginName);
-            this.users.splice(index, 1);
+            if (index > -1) {
+                this.users.splice(index, 1);
+            }
 
             this.loadingUsers = false;
         }).catch(() => {

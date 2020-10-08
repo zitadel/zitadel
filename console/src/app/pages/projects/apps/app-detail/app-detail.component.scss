@@ -86,10 +86,15 @@
   }
 
   .toggle {
+    outline: none;
     align-self: flex-start;
     margin-bottom: 1rem;
     margin-right: 1rem;
     border-radius: .5rem;
+
+    * {
+        outline: none;
+    }
 
     i {
       margin-right: 1rem;
