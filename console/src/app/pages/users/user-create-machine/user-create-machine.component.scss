@@ -15,14 +15,15 @@
 
 .content {
   width: 100%;
-  display: flex wrap;
+  display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
   margin: 0 -.5rem;
 
   .section {
     padding: .5rem;
     flex-basis: 100%;
-    color: #8795a1;
+    color: var(--grey);
     font-size: .9rem;
   }
 

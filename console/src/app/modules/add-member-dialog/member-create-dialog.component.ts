@@ -23,7 +23,6 @@ export class MemberCreateDialogComponent {
     private grantId: string = '';
     public preselectedUsers: Array<UserView.AsObject> = [];
 
-
     public creationType!: CreationType;
     public creationTypes: CreationType[] = [
         CreationType.IAM,

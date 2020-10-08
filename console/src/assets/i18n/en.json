@@ -50,6 +50,7 @@
         "INFO": "Info",
         "OK": "OK",
         "VIEW": "Show",
+        "SELECTIONDELETE":"Delete selection",
         "DELETE": "Delete",
         "REMOVE":"Remove",
         "VERIFY":"Verify",
@@ -59,7 +60,8 @@
         "DEACTIVATE":"Deactivate",
         "REFRESH":"Refresh",
         "LOGIN":"Login",
-        "EDIT":"Edit"
+        "EDIT":"Edit",
+        "CONFIGURE":"Configure"
     },
     "ERRORS": {
         "REQUIRED": "Some required fields are missing.",
@@ -216,6 +218,7 @@
         },
         "EMAIL": "E-mail",
         "PHONE": "Phone Number",
+        "PREFERRED_LOGINNAME":"Preferred Loginname",
         "LOGINMETHODS": {
             "TITLE": "Contact Information",
             "DESCRIPTION": "The provided information is used to send important information, like password reset e-mails to you.",
@@ -492,6 +495,7 @@
             "USERNAME": "User Name",
             "FIRSTNAME": "First Name",
             "LASTNAME": "Last Name",
+            "LOGINNAME":"Login Name",
             "EMAIL": "E-mail",
             "ROLES": "Roles",
             "ADD": "Add Member",
@@ -674,9 +678,10 @@
         },
         "DETAIL": {
           "TITLE":"Identity Provider",
-          "DESCRIPTION":"Configuration of your identity provider.",
+          "DESCRIPTION":"General Configuration of your identity provider.",
           "OIDC": {
-            "TITLE": "OIDC Configuration"
+            "TITLE": "OIDC Configuration",
+            "DESCRIPTION":"Provide the correct OIDC Configuration for your identity Provider below!"
           }
         },
         "TYPES": {

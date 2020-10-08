@@ -3,7 +3,7 @@
 }
 
 .sub {
-  color: #8795a1;
+  color: var(--grey);
   margin-bottom: 2rem;
 }
 
@@ -46,6 +46,16 @@
 
   .fill-space {
     flex: 1;
+  }
+
+  .rem-button {
+    visibility: hidden;
+  }
+
+  &:hover {
+    .rem-button {
+      visibility: visible;
+    }
   }
 }
 

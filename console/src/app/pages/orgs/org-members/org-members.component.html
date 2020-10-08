@@ -1,83 +1,21 @@
 <app-detail-layout [backRouterLink]="[ '/org']" title="{{org?.name}} {{ 'ORG.MEMBER.TITLE' | translate }}"
     description="{{ 'ORG.MEMBER.DESCRIPTION' | translate }}">
-    <app-refresh-table (refreshed)="refreshPage()" [dataSize]="dataSource?.totalResult"
-        [timestamp]="dataSource?.viewTimestamp" [selection]="selection" [loading]="dataSource?.loading$ | async">
-        <ng-template appHasRole actions [appHasRole]="['org.member.delete:'+org?.id,'org.member.delete']">
+    <app-members-table [dataSource]="dataSource" [memberRoleOptions]="memberRoleOptions"
+        (updateRoles)="updateRoles($event.member, $event.change)" [factoryLoadFunc]="changePageFactory"
+        (changedSelection)="selection = $event" [refreshTrigger]="changePage"
+        [canDelete]="['org.member.delete:'+org?.id,'org.member.delete'] | hasRole | async"
+        (deleteMember)="removeOrgMember($event)">
+        <ng-template appHasRole selectactions [appHasRole]="['org.member.delete:'+org?.id,'org.member.delete']">
             <button (click)="removeOrgMemberSelection()" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}"
-                class="icon-button" mat-icon-button *ngIf="selection.hasValue()" color="warn">
+                class="del-button" mat-raised-button color="warn">
                 <i class="las la-trash"></i>
+                {{'ACTIONS.SELECTIONDELETE' | translate}}
             </button>
         </ng-template>
-        <ng-template appHasRole actions [appHasRole]="['org.member.write:'+org?.id,'org.member.write']">
-            <a color="primary" [disabled]="disabled" (click)="openAddMember()" color="primary" mat-raised-button>
+        <ng-template appHasRole writeactions [appHasRole]="['org.member.write:'+org?.id,'org.member.write']">
+            <a color="primary" (click)="openAddMember()" color="primary" mat-raised-button>
                 <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
             </a>
         </ng-template>
-
-        <div class="table-wrapper">
-            <table mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
-                <ng-container matColumnDef="select">
-                    <th class="selection" mat-header-cell *matHeaderCellDef>
-                        <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
-                            [checked]="selection.hasValue() && isAllSelected()"
-                            [indeterminate]="selection.hasValue() && !isAllSelected()">
-                        </mat-checkbox>
-                    </th>
-                    <td class="selection" mat-cell *matCellDef="let row">
-                        <mat-checkbox color="primary" (click)="$event.stopPropagation()"
-                            (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
-                        </mat-checkbox>
-                    </td>
-                </ng-container>
-
-                <ng-container matColumnDef="firstname">
-                    <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.FIRSTNAME' | translate }} </th>
-                    <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
-                        {{member.firstName}} </td>
-                </ng-container>
-
-                <ng-container matColumnDef="lastname">
-                    <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.LASTNAME' | translate }} </th>
-                    <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
-                        {{member.lastName}} </td>
-                </ng-container>
-
-                <ng-container matColumnDef="username">
-                    <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.USERNAME' | translate }} </th>
-                    <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
-                        {{member.userName}} </td>
-                </ng-container>
-
-                <ng-container matColumnDef="email">
-                    <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.EMAIL' | translate }} </th>
-                    <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
-                        {{member.email}}
-                    </td>
-                </ng-container>
-
-                <ng-container matColumnDef="roles">
-                    <th mat-header-cell *matHeaderCellDef> {{ 'ROLESLABEL' | translate }} </th>
-                    <td class="pointer" mat-cell *matCellDef="let member">
-                        <mat-form-field class="form-field" appearance="outline">
-                            <mat-label>{{ 'ROLESLABEL' | translate }}</mat-label>
-                            <mat-select [(ngModel)]="member.rolesList" multiple
-                                [disabled]="(['org.member.write'] | hasRole | async) == false"
-                                (selectionChange)="updateRoles(member, $event)">
-                                <mat-option *ngFor="let role of memberRoleOptions" [value]="role">
-                                    {{ role  }}
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </td>
-                </ng-container>
-
-                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;">
-                </tr>
-            </table>
-
-            <mat-paginator class="paginator" #paginator [pageSize]="50" [pageSizeOptions]="[25, 50, 100, 250]">
-            </mat-paginator>
-        </div>
-    </app-refresh-table>
+    </app-members-table>
 </app-detail-layout>
