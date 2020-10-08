@@ -48,6 +48,14 @@ func (v *View) DeleteIAMMember(iamID, userID string, eventSequence uint64) error
 	return v.ProcessedIAMMemberSequence(eventSequence)
 }
 
+func (v *View) DeleteIAMMembersByUserID(userID string, eventSequence uint64) error {
+	err := view.DeleteIAMMembersByUserID(v.Db, iamMemberTable, userID)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedIAMMemberSequence(eventSequence)
+}
+
 func (v *View) GetLatestIAMMemberSequence() (*global_view.CurrentSequence, error) {
 	return v.latestSequence(iamMemberTable)
 }

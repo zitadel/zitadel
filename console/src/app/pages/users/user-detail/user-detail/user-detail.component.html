@@ -8,10 +8,17 @@
 
             <span class="fill-space"></span>
 
-            <ng-template appHasRole [appHasRole]="['user.write', 'user.write:'+user?.id]">
-                <button mat-stroked-button color="warn" *ngIf="user?.state === UserState.USERSTATE_ACTIVE"
+            <ng-template appHasRole [appHasRole]="['user.delete$', 'user.delete:'+user?.id]">
+                <button mat-raised-button color="warn" (click)="deleteUser()"><i
+                        class="las la-trash"></i>{{'USER.PAGES.DELETE' | translate}}</button>
+            </ng-template>
+
+            <ng-template appHasRole [appHasRole]="['user.write$', 'user.write:'+user?.id]">
+                <button class="state-button" mat-stroked-button color="warn"
+                    *ngIf="user?.state === UserState.USERSTATE_ACTIVE"
                     (click)="changeState(UserState.USERSTATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' | translate}}</button>
-                <button mat-stroked-button color="warn" *ngIf="user?.state === UserState.USERSTATE_INACTIVE"
+                <button class="state-button" mat-stroked-button color="warn"
+                    *ngIf="user?.state === UserState.USERSTATE_INACTIVE"
                     (click)="changeState(UserState.USERSTATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' | translate}}</button>
             </ng-template>
         </div>

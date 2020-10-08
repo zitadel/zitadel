@@ -172,7 +172,10 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 	}
 	err = repo.checkExternalUserLogin(request, externalUser.IDPConfigID, externalUser.ExternalUserID)
 	if errors.IsNotFound(err) {
-		return repo.setLinkingUser(ctx, request, externalUser)
+		if err := repo.setLinkingUser(ctx, request, externalUser); err != nil {
+			return err
+		}
+		return err
 	}
 	if err != nil {
 		return err
@@ -731,6 +734,9 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 		if err := userCopy.AppendEvent(event); err != nil {
 			return user_view_model.UserToModel(user), nil
 		}
+	}
+	if userCopy.State == int32(user_model.UserStateDeleted) {
+		return nil, errors.ThrowNotFound(nil, "EVENT-3F9so", "Errors.User.NotFound")
 	}
 	return user_view_model.UserToModel(&userCopy), nil
 }

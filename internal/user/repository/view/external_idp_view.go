@@ -115,3 +115,8 @@ func DeleteExternalIDP(db *gorm.DB, table, externalUserID, idpConfigID string) e
 	)
 	return delete(db)
 }
+
+func DeleteExternalIDPsByUserID(db *gorm.DB, table, userID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.ExternalIDPSearchKey(usr_model.ExternalIDPSearchKeyUserID), userID)
+	return delete(db)
+}

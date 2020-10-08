@@ -89,7 +89,12 @@
             "NOUSER":"Kein Benutzer",
             "REACTIVATE":"Reaktivieren",
             "DEACTIVATE":"Deaktivieren",
-            "FILTER":"Filter"
+            "FILTER":"Filter",
+            "DELETE":"Benutzer löschen"
+        },
+        "DIALOG": {
+            "DELETE_TITLE":"User löschen",
+            "DELETE_DESCRIPTION":"Sie sind im Begriff den Benutzer {{displayName}} entgültig zu löschen. Wollen Sie dies wirklich tun?"
         },
         "TABLE":{
             "DEACTIVATE":"Deaktivieren",
@@ -285,7 +290,8 @@
             "SELECTEDDEACTIVATED":"Selektierte Benutzer deaktiviert.",
             "SELECTEDKEYSDELETED":"Selektierte Schlüssel gelöscht.",
             "KEYADDED":"Schlüssel hinzugefügt!",
-            "MACHINEADDED":"Service User erstellt!"
+            "MACHINEADDED":"Service User erstellt!",
+            "DELETED":"Benutzer erfolgreich gelöscht!"
         },
         "MEMBERSHIPS": {
             "TITLE":"ZITADEL Manager-Rollen",

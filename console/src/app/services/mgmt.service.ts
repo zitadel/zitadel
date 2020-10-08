@@ -643,6 +643,12 @@ export class ManagementService {
         return this.grpcService.mgmt.getUserByID(req);
     }
 
+    public DeleteUser(id: string): Promise<Empty> {
+        const req = new UserID();
+        req.setId(id);
+        return this.grpcService.mgmt.deleteUser(req);
+    }
+
     public SearchProjectMembers(
         projectId: string,
         limit: number,

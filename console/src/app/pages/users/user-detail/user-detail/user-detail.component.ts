@@ -1,9 +1,11 @@
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
     Gender,
     MachineResponse,
@@ -42,6 +44,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         private toast: ToastService,
         public mgmtUserService: ManagementService,
         private _location: Location,
+        private dialog: MatDialog,
     ) { }
 
     public ngOnInit(): void {
@@ -188,5 +191,30 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             }).catch(error => {
                 this.toast.showError(error);
             });
+    }
+
+    public deleteUser(): void {
+        const dialogRef = this.dialog.open(WarnDialogComponent, {
+            data: {
+                confirmKey: 'ACTIONS.DELETE',
+                cancelKey: 'ACTIONS.CANCEL',
+                titleKey: 'USER.DIALOG.DELETE_TITLE',
+                descriptionParam: this.user.human ??
+                    this.user.machine ? { displayName: this.user.machine?.name } : { displayName: '' },
+                descriptionKey: 'USER.DIALOG.DELETE_DESCRIPTION',
+            },
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                this.mgmtUserService.DeleteUser(this.user.id).then(() => {
+                    this.navigateBack();
+                    this.toast.showInfo('USER.TOAST.DELETED', true);
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
+            }
+        });
     }
 }
