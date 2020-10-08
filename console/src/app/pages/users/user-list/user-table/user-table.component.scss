@@ -8,6 +8,7 @@
     td,
     th {
       padding: .5rem;
+      outline: none;
 
       &:first-child {
         padding-left: 0;
@@ -27,8 +28,6 @@
 }
 
 tr {
-  outline: none;
-
   button {
     visibility: hidden;
   }
