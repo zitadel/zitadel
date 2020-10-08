@@ -14,7 +14,9 @@ export class I18nInterceptor<TReq = unknown, TResp = unknown> implements UnaryIn
         const metadata = request.getMetadata();
 
         const navLang = navigator.language;
-        metadata[i18nHeader] = navLang;
+        if (navLang) {
+            metadata[i18nHeader] = navLang;
+        }
 
         return invoker(request).then((response: any) => {
             return response;
