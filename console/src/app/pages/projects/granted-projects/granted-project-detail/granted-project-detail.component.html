@@ -18,8 +18,8 @@
                 <app-user-grants *ngIf="projectId && grantId" [context]="UserGrantContext.GRANTED_PROJECT"
                     [projectId]="projectId" [grantId]="grantId"
                     [displayedColumns]="['select','user', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']"
-                    [allowWrite]="['user.grant.write','user.grant.write:'+grantId] | hasRole | async"
-                    [allowDelete]="['user.grant.delete','user.grant.delete:'+grantId] | hasRole | async"
+                    [allowWrite]="['user.grant.write$','user.grant.write:'+grantId] | hasRole | async"
+                    [allowDelete]="['user.grant.delete$','user.grant.delete:'+grantId] | hasRole | async"
                     refreshOnPreviousRoute="/grant-create/project/{{projectId}}/grant/{{grantId}}">
                 </app-user-grants>
             </app-card>
@@ -40,7 +40,7 @@
                     [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
                     description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
                     (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()"
-                    [disabled]="(['project.grant.member.write', 'project.grant.member.write:'+ project.projectId]| hasRole | async) == false">
+                    [disabled]="(['project.grant.member.write$', 'project.grant.member.write:'+ project.projectId]| hasRole | async) == false">
                 </app-contributors>
             </mat-tab>
             <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="flex-col">

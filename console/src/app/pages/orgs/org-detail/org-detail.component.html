@@ -2,7 +2,7 @@
     <div class="enlarged-container">
         <h1 class="h1">{{org?.name}}</h1>
         <p class="sub">{{'ORG_DETAIL.DESCRIPTION' | translate}}</p>
-        <ng-container *ngIf="(['org.write'] | hasRole) as canwrite$">
+        <ng-container *ngIf="(['org.write$'] | hasRole) as canwrite$">
             <app-card title="{{ 'ORG.DOMAINS.TITLE' | translate }}"
                 description="{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}">
 

@@ -4,7 +4,8 @@
     <app-members-table *ngIf="project" [dataSource]="dataSource" [memberRoleOptions]="memberRoleOptions"
         (updateRoles)="updateRoles($event.member, $event.change)" [factoryLoadFunc]="changePageFactory"
         (changedSelection)="selection = $event" [refreshTrigger]="changePage"
-        [canDelete]="['project.member.delete', 'project.member.delete:'+project.projectId] | hasRole | async"
+        [canWrite]="['project.member.write$', 'project.member.write:'+ project.projectId] | hasRole | async"
+        [canDelete]="['project.member.delete$', 'project.member.delete:'+project.projectId] | hasRole | async"
         (deleteMember)="removeProjectMember($event)">
         <ng-template appHasRole selectactions
             [appHasRole]="['project.member.delete:' + project.projectId, 'project.member.delete']">

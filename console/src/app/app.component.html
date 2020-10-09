@@ -1,5 +1,5 @@
 <ng-container *ngIf="(authService.user | async) || {} as user">
-    <ng-container *ngIf="((['iam.read','iam.write'] | hasRole)) as iamuser$">
+    <ng-container *ngIf="((['iam.read$','iam.write$'] | hasRole)) as iamuser$">
         <mat-toolbar class="root-header">
             <button aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
                 <i class="icon las la-bars"></i>
