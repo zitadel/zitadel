@@ -1,7 +1,9 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Observable } from 'rxjs';
 import { ProjectGrantView, ProjectRole, ProjectView, UserView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -24,11 +26,17 @@ export class MemberCreateDialogComponent {
     public preselectedUsers: Array<UserView.AsObject> = [];
 
     public creationType!: CreationType;
-    public creationTypes: CreationType[] = [
-        CreationType.IAM,
-        CreationType.ORG,
-        CreationType.PROJECT_OWNED,
-        CreationType.PROJECT_GRANTED,
+
+    /**
+     *  Specifies options for creating members,
+     *  without ending $, to enable write event permission even if user is allowed
+     *  to create members for only one specific project.
+     */
+    public creationTypes: Array<{ type: CreationType, disabled$: Observable<boolean>; }> = [
+        { type: CreationType.IAM, disabled$: this.authService.isAllowed(['iam.member.write$']) },
+        { type: CreationType.ORG, disabled$: this.authService.isAllowed(['org.member.write$']) },
+        { type: CreationType.PROJECT_OWNED, disabled$: this.authService.isAllowed(['project.member.write(:[0-9]*)?']) },
+        { type: CreationType.PROJECT_GRANTED, disabled$: this.authService.isAllowed(['project.grant.member.write']) },
     ];
     public users: Array<UserView.AsObject> = [];
     public roles: Array<ProjectRole.AsObject> | string[] = [];
@@ -40,6 +48,7 @@ export class MemberCreateDialogComponent {
     constructor(
         private mgmtService: ManagementService,
         private adminService: AdminService,
+        private authService: GrpcAuthService,
         public dialogRef: MatDialogRef<MemberCreateDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         private toastService: ToastService,
