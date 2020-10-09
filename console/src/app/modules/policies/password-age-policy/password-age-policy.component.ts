@@ -8,7 +8,6 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { PolicyComponentAction } from '../policy-component-action.enum';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 
@@ -22,10 +21,7 @@ export class PasswordAgePolicyComponent implements OnDestroy {
     public desc: string = '';
 
     public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
-    componentAction: PolicyComponentAction = PolicyComponentAction.CREATE;
     public service!: AdminService | ManagementService;
-
-    public PolicyComponentAction: any = PolicyComponentAction;
 
     public ageData!: PasswordAgePolicyView.AsObject | DefaultPasswordAgePolicyView.AsObject;
 
@@ -114,7 +110,7 @@ export class PasswordAgePolicyComponent implements OnDestroy {
     public savePolicy(): void {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                if (this.componentAction === PolicyComponentAction.CREATE) {
+                if ((this.ageData as PasswordAgePolicyView.AsObject).pb_default) {
                     (this.service as ManagementService).CreatePasswordAgePolicy(
                         this.ageData.maxAgeDays,
                         this.ageData.expireWarnDays,
@@ -123,8 +119,7 @@ export class PasswordAgePolicyComponent implements OnDestroy {
                     }).catch(error => {
                         this.toast.showError(error);
                     });
-
-                } else if (this.componentAction === PolicyComponentAction.MODIFY) {
+                } else {
                     (this.service as ManagementService).UpdatePasswordAgePolicy(
                         this.ageData.maxAgeDays,
                         this.ageData.expireWarnDays,
@@ -136,16 +131,14 @@ export class PasswordAgePolicyComponent implements OnDestroy {
                 }
                 break;
             case PolicyComponentServiceType.ADMIN:
-                if (this.componentAction === PolicyComponentAction.MODIFY) {
-                    (this.service as AdminService).UpdateDefaultPasswordAgePolicy(
-                        this.ageData.maxAgeDays,
-                        this.ageData.expireWarnDays,
-                    ).then(() => {
-                        this.router.navigate(['/iam']);
-                    }).catch(error => {
-                        this.toast.showError(error);
-                    });
-                }
+                (this.service as AdminService).UpdateDefaultPasswordAgePolicy(
+                    this.ageData.maxAgeDays,
+                    this.ageData.expireWarnDays,
+                ).then(() => {
+                    this.router.navigate(['/iam']);
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
                 break;
         }
 

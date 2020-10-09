@@ -9,7 +9,6 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { PolicyComponentAction } from '../policy-component-action.enum';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
@@ -22,8 +21,6 @@ export class PasswordIamPolicyComponent implements OnDestroy {
     public desc: string = '';
     private managementService!: ManagementService;
     public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
-
-    public PolicyComponentAction: any = PolicyComponentAction;
 
     public iamData!: AdminOrgIamPolicyView.AsObject | MgmtOrgIamPolicyView.AsObject;
 

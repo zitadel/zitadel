@@ -9,7 +9,6 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { PolicyComponentAction } from '../policy-component-action.enum';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
@@ -23,9 +22,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
     public desc: string = '';
 
     public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
-    componentAction: PolicyComponentAction = PolicyComponentAction.CREATE;
 
-    public PolicyComponentAction: any = PolicyComponentAction;
 
     public lockoutForm!: FormGroup;
     public lockoutData!: PasswordLockoutPolicy.AsObject;
@@ -39,7 +36,6 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
     ) {
         this.sub = this.route.data.pipe(switchMap(data => {
             this.serviceType = data.serviceType;
-            this.componentAction = data.action;
 
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
@@ -55,13 +51,11 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
             this.title = 'ORG.POLICY.PWD_LOCKOUT.TITLECREATE';
             this.desc = 'ORG.POLICY.PWD_LOCKOUT.DESCRIPTIONCREATE';
 
-            if (this.componentAction === PolicyComponentAction.MODIFY) {
-                this.getData().then(data => {
-                    if (data) {
-                        this.lockoutData = data.toObject() as PasswordLockoutPolicy.AsObject;
-                    }
-                });
-            }
+            this.getData().then(data => {
+                if (data) {
+                    this.lockoutData = data.toObject() as PasswordLockoutPolicy.AsObject;
+                }
+            });
         });
     }
 
@@ -110,26 +104,26 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
                 this.lockoutData.maxAttempts,
                 this.lockoutData.showLockoutFailure,
             ).then(() => {
-                this.router.navigate(['org']);
+                this.router.navigate(['/iam']);
             }).catch(error => {
                 this.toast.showError(error);
             });
         } else {
-            if (this.componentAction === PolicyComponentAction.CREATE) {
+            if ((this.lockoutData as PasswordLockoutPolicyView.AsObject).pb_default) {
                 promise = this.service.CreatePasswordLockoutPolicy(
                     this.lockoutData.maxAttempts,
                     this.lockoutData.showLockoutFailure,
                 ).then(() => {
-                    this.router.navigate(['org']);
+                    this.router.navigate(['/org']);
                 }).catch(error => {
                     this.toast.showError(error);
                 });
-            } else if (this.componentAction === PolicyComponentAction.MODIFY) {
+            } else {
                 promise = this.service.UpdatePasswordLockoutPolicy(
                     this.lockoutData.maxAttempts,
                     this.lockoutData.showLockoutFailure,
                 ).then(() => {
-                    this.router.navigate(['org']);
+                    this.router.navigate(['/org']);
                 }).catch(error => {
                     this.toast.showError(error);
                 });

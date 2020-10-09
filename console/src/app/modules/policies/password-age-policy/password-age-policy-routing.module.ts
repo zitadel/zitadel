@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { PolicyComponentAction } from '../policy-component-action.enum';
 import { PasswordAgePolicyComponent } from './password-age-policy.component';
 
 const routes: Routes = [
@@ -10,17 +9,16 @@ const routes: Routes = [
         component: PasswordAgePolicyComponent,
         data: {
             animation: 'DetailPage',
-            action: PolicyComponentAction.MODIFY,
         },
     },
-    {
-        path: 'create',
-        component: PasswordAgePolicyComponent,
-        data: {
-            animation: 'DetailPage',
-            action: PolicyComponentAction.CREATE,
-        },
-    },
+    // {
+    //     path: 'create',
+    //     component: PasswordAgePolicyComponent,
+    //     data: {
+    //         animation: 'DetailPage',
+    //         action: PolicyComponentAction.CREATE,
+    //     },
+    // },
 ];
 
 @NgModule({
