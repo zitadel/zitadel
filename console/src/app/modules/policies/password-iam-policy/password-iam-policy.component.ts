@@ -5,7 +5,6 @@ import { switchMap } from 'rxjs/operators';
 import { OrgIamPolicyView as AdminOrgIamPolicyView } from 'src/app/proto/generated/admin_pb';
 import { OrgIamPolicyView as MgmtOrgIamPolicyView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -18,6 +17,7 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
     styleUrls: ['./password-iam-policy.component.scss'],
 })
 export class PasswordIamPolicyComponent implements OnDestroy {
+    @Input() service!: AdminService;
     public title: string = '';
     public desc: string = '';
     private managementService!: ManagementService;

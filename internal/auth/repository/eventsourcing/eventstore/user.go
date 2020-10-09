@@ -396,6 +396,9 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*model.UserView,
 			return usr_view_model.UserToModel(user), nil
 		}
 	}
+	if userCopy.State == int32(model.UserStateDeleted) {
+		return nil, errors.ThrowNotFound(nil, "EVENT-vZ8us", "Errors.User.NotFound")
+	}
 	return usr_view_model.UserToModel(&userCopy), nil
 }
 

@@ -78,3 +78,8 @@ func DeleteUserMembership(db *gorm.DB, table, userID, aggregateID, objectID stri
 	)
 	return delete(db)
 }
+
+func DeleteUserMembershipsByUserID(db *gorm.DB, table, userID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.UserMembershipSearchKey(usr_model.UserMembershipSearchKeyUserID), userID)
+	return delete(db)
+}

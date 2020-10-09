@@ -932,7 +932,7 @@
       }
     },
     "/policies/login/idpproviders/{idp_config_id}": {
-      "post": {
+      "delete": {
         "operationId": "AdminService_RemoveIdpProviderFromDefaultLoginPolicy",
         "responses": {
           "200": {
@@ -954,14 +954,6 @@
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1IdpProviderID"
-            }
           }
         ],
         "tags": [

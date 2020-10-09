@@ -100,6 +100,7 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
             case PolicyComponentServiceType.MGMT:
                 if ((this.complexityData as PasswordComplexityPolicyView.AsObject).pb_default) {
                     (this.service as ManagementService).CreatePasswordComplexityPolicy(
+
                         this.complexityData.hasLowercase,
                         this.complexityData.hasUppercase,
                         this.complexityData.hasNumber,

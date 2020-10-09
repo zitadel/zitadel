@@ -1355,8 +1355,7 @@ rpc GetUserByID(UserID) returns (UserView) {
 
   rpc RemoveIdpProviderFromLoginPolicy(IdpProviderID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/orgs/me/policies/login/idpproviders/{idp_config_id}"
-      body: "*"
+      delete: "/orgs/me/policies/login/idpproviders/{idp_config_id}"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {

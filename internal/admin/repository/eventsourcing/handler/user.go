@@ -110,7 +110,7 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 		}
 		err = u.fillLoginNames(user)
 	case es_model.UserRemoved:
-		err = u.view.DeleteUser(event.AggregateID, event.Sequence)
+		return u.view.DeleteUser(event.AggregateID, event.Sequence)
 	default:
 		return u.view.ProcessedUserSequence(event.Sequence)
 	}

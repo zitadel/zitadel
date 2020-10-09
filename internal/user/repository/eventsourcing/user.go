@@ -282,7 +282,7 @@ func releasedUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.
 		return nil, err
 	}
 
-	return aggregate.SetPrecondition(UserUserNameUniqueQuery(uniqueUserName), isEventValidation(aggregate, model.UserUserNameReserved)), nil
+	return aggregate.SetPrecondition(UserUserNameUniqueQuery(uniqueUserName), isEventValidation(aggregate, model.UserUserNameReleased)), nil
 }
 
 func changeUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, oldUsername, username string, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
@@ -313,6 +313,25 @@ func UserLockAggregate(aggCreator *es_models.AggregateCreator, user *model.User)
 
 func UserUnlockAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return userStateAggregate(aggCreator, user, model.UserUnlocked)
+}
+
+func UserRemoveAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
+	agg, err := UserAggregate(ctx, aggCreator, user)
+	if err != nil {
+		return nil, err
+	}
+	agg, err = agg.AppendEvent(model.UserRemoved, nil)
+	if err != nil {
+		return nil, err
+	}
+	uniqueAgg, err := releasedUniqueUserNameAggregate(ctx, aggCreator, user.ResourceOwner, user.UserName, userLoginMustBeDomain)
+	if err != nil {
+		return nil, err
+	}
+	return []*es_models.Aggregate{
+		agg,
+		uniqueAgg,
+	}, nil
 }
 
 func userStateAggregate(aggCreator *es_models.AggregateCreator, user *model.User, state es_models.EventType) func(ctx context.Context) (*es_models.Aggregate, error) {
