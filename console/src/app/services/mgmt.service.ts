@@ -41,6 +41,7 @@ import {
     IdpView,
     LoginName,
     LoginPolicy,
+    LoginPolicyRequest,
     LoginPolicyView,
     MachineKeyIDRequest,
     MachineKeySearchRequest,
@@ -184,7 +185,7 @@ export class ManagementService {
         return this.grpcService.mgmt.getLoginPolicy(req);
     }
 
-    public UpdateLoginPolicy(req: LoginPolicy): Promise<LoginPolicy> {
+    public UpdateLoginPolicy(req: LoginPolicyRequest): Promise<LoginPolicy> {
         return this.grpcService.mgmt.updateLoginPolicy(req);
     }
 
@@ -525,7 +526,7 @@ export class ManagementService {
         maxAgeDays: number,
         expireWarnDays: number,
     ): Promise<PasswordAgePolicy> {
-        const req = new PasswordAgePolicy();
+        const req = new PasswordAgePolicyRequest();
         req.setMaxAgeDays(maxAgeDays);
         req.setExpireWarnDays(expireWarnDays);
         return this.grpcService.mgmt.updatePasswordAgePolicy(req);
