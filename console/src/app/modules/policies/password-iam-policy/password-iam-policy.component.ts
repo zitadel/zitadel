@@ -1,10 +1,11 @@
-import { Component, Injector, OnDestroy, Type } from '@angular/core';
+import { Component, Injector, Input, OnDestroy, Type } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { OrgIamPolicyView as AdminOrgIamPolicyView } from 'src/app/proto/generated/admin_pb';
 import { OrgIamPolicyView as MgmtOrgIamPolicyView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
