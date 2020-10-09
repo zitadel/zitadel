@@ -1,8 +1,9 @@
 import { Component, Injector, Input, OnDestroy, Type } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { OrgIamPolicyView as AdminOrgIamPolicyView } from 'src/app/proto/generated/admin_pb';
+import { Org } from 'src/app/proto/generated/auth_pb';
 import { OrgIamPolicyView as MgmtOrgIamPolicyView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -26,18 +27,21 @@ export class PasswordIamPolicyComponent implements OnDestroy {
     public iamData!: AdminOrgIamPolicyView.AsObject | MgmtOrgIamPolicyView.AsObject;
 
     private sub: Subscription = new Subscription();
-
+    private org!: Org.AsObject;
     constructor(
         private route: ActivatedRoute,
-        private router: Router,
         private toast: ToastService,
         private sessionStorage: StorageService,
         private injector: Injector,
         private adminService: AdminService,
     ) {
+        const temporg = this.sessionStorage.getItem('organization') as Org.AsObject;
+        if (temporg) {
+            this.org = temporg;
+        }
         this.sub = this.route.data.pipe(switchMap(data => {
             this.serviceType = data.serviceType;
-
+            console.log(data.serviceType);
             if (this.serviceType === PolicyComponentServiceType.MGMT) {
                 this.managementService = this.injector.get(ManagementService as Type<ManagementService>);
             }
@@ -48,6 +52,7 @@ export class PasswordIamPolicyComponent implements OnDestroy {
 
             this.getData().then(data => {
                 if (data) {
+                    console.log(data.toObject());
                     this.iamData = data.toObject();
                 }
             });
@@ -66,9 +71,8 @@ export class PasswordIamPolicyComponent implements OnDestroy {
             case PolicyComponentServiceType.MGMT:
                 return this.managementService.GetMyOrgIamPolicy();
             case PolicyComponentServiceType.ADMIN:
-                const orgId = this.sessionStorage.getItem('organization');
-                if (orgId) {
-                    return this.adminService.GetOrgIamPolicy(orgId);
+                if (this.org?.id) {
+                    return this.adminService.GetOrgIamPolicy(this.org.id);
                 }
                 break;
         }
@@ -77,34 +81,29 @@ export class PasswordIamPolicyComponent implements OnDestroy {
     public savePolicy(): void {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                if ((this.iamData as MgmtOrgIamPolicyView.AsObject)) {
+                if ((this.iamData as MgmtOrgIamPolicyView.AsObject).pb_default) {
                     this.adminService.CreateOrgIamPolicy(
-                        '',
+                        this.org.id,
                         this.iamData.userLoginMustBeDomain,
-                    ).then(() => {
-                        this.router.navigate(['org']);
-                    }).catch(error => {
+                    ).catch(error => {
                         this.toast.showError(error);
                     });
                     break;
                 } else {
                     this.adminService.UpdateOrgIamPolicy(
-                        '',
+                        this.org.id,
                         this.iamData.userLoginMustBeDomain,
-                    ).then(() => {
-                        this.router.navigate(['org']);
-                    }).catch(error => {
+                    ).catch(error => {
                         this.toast.showError(error);
                     });
                     break;
                 }
             case PolicyComponentServiceType.ADMIN:
+                // update Default org iam policy?
                 this.adminService.UpdateOrgIamPolicy(
-                    '',
+                    this.org.id,
                     this.iamData.userLoginMustBeDomain,
-                ).then(() => {
-                    this.router.navigate(['org']);
-                }).catch(error => {
+                ).catch(error => {
                     this.toast.showError(error);
                 });
                 break;

@@ -54,6 +54,14 @@ const routes: Routes = [
         loadChildren: () => import('src/app/modules/policies/login-policy/login-policy.module')
             .then(m => m.LoginPolicyModule),
     },
+    {
+        path: `policy/${PolicyComponentType.IAM}`,
+        data: {
+            serviceType: PolicyComponentServiceType.ADMIN,
+        },
+        loadChildren: () => import('src/app/modules/policies/password-iam-policy/password-iam-policy.module')
+            .then(m => m.PasswordIamPolicyModule),
+    },
 ];
 
 @NgModule({

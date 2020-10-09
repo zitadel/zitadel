@@ -179,7 +179,6 @@ export class AdminService {
     public GetOrgIamPolicy(orgId: string): Promise<OrgIamPolicyView> {
         const req = new OrgIamPolicyID();
         req.setOrgId(orgId);
-
         return this.grpcService.admin.getOrgIamPolicy(req);
     }
 
