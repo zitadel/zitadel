@@ -189,6 +189,10 @@ export class ManagementService {
         return this.grpcService.mgmt.updateLoginPolicy(req);
     }
 
+    public CreateLoginPolicy(req: LoginPolicyRequest): Promise<LoginPolicy> {
+        return this.grpcService.mgmt.createLoginPolicy(req);
+    }
+
     public RemoveLoginPolicy(): Promise<Empty> {
         return this.grpcService.mgmt.removeLoginPolicy(new Empty());
     }

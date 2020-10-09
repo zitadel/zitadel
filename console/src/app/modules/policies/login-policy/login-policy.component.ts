@@ -107,7 +107,11 @@ export class LoginPolicyComponent implements OnDestroy {
                 mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
                 mgmtreq.setAllowRegister(this.loginData.allowRegister);
                 mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
-                return (this.service as ManagementService).UpdateLoginPolicy(mgmtreq);
+                if ((this.loginData as LoginPolicyView.AsObject).pb_default) {
+                    return (this.service as ManagementService).CreateLoginPolicy(mgmtreq);
+                } else {
+                    return (this.service as ManagementService).UpdateLoginPolicy(mgmtreq);
+                }
             case PolicyComponentServiceType.ADMIN:
                 const adminreq = new DefaultLoginPolicy();
                 adminreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
@@ -119,14 +123,7 @@ export class LoginPolicyComponent implements OnDestroy {
 
     public savePolicy(): void {
         this.updateData().then(() => {
-            switch (this.serviceType) {
-                case PolicyComponentServiceType.MGMT:
-                    this.router.navigate(['org']);
-                    break;
-                case PolicyComponentServiceType.ADMIN:
-                    this.router.navigate(['iam']);
-                    break;
-            }
+            this.toast.showInfo('ORG.POLICY.LOGIN_POLICY.SAVED', true);
         }).catch(error => {
             this.toast.showError(error);
         });

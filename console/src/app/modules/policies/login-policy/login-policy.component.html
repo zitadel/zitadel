@@ -12,21 +12,20 @@
             <span class="left-desc">{{'ORG.POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate}}</span>
             <span class="fill-space"></span>
             <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
-                [(ngModel)]="loginData.allowUsernamePassword" [disabled]="serviceType==PolicyComponentServiceType.MGMT">
+                [(ngModel)]="loginData.allowUsernamePassword">
             </mat-slide-toggle>
         </div>
         <div class="row">
             <span class="left-desc">{{'ORG.POLICY.DATA.ALLOWREGISTER' | translate}}</span>
             <span class="fill-space"></span>
-            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="loginData.allowRegister"
-                [disabled]="serviceType==PolicyComponentServiceType.MGMT">
+            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="loginData.allowRegister">
             </mat-slide-toggle>
         </div>
         <div class="row">
             <span class="left-desc">{{'ORG.POLICY.DATA.ALLOWEXTERNALIDP' | translate}}</span>
             <span class="fill-space"></span>
             <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
-                [disabled]="serviceType==PolicyComponentServiceType.MGMT" [(ngModel)]="loginData.allowExternalIdp">
+                [(ngModel)]="loginData.allowExternalIdp">
             </mat-slide-toggle>
         </div>
     </div>
@@ -35,28 +34,28 @@
 
     <div class="idps">
         <div class="idp" *ngFor="let idp of idps">
-            <mat-icon *ngIf="serviceType!=PolicyComponentServiceType.MGMT" (click)="removeIdp(idp)" class="rm">
+            <mat-icon (click)="removeIdp(idp)" class="rm">
                 remove_circle</mat-icon>
             <span>{{idp.name}}</span>
             <span class="meta">{{ 'IDP.TYPE' | translate }}: {{ 'IDP.TYPES.'+idp.type | translate }}</span>
             <span class="meta">{{ 'IDP.ID' | translate }}: {{idp.idpConfigId}}</span>
         </div>
-        <div *ngIf="serviceType!=PolicyComponentServiceType.MGMT" class="new-idp" (click)="openDialog()">
+        <div class="new-idp" (click)="openDialog()">
             <mat-icon>add</mat-icon>
         </div>
     </div>
 
     <div class="btn-container">
         <button (click)="savePolicy()" color="primary" type="submit"
-            [disabled]="serviceType==PolicyComponentServiceType.MGMT"
             mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
     </div>
 
 
     <ng-template appHasRole [appHasRole]="['org.idp.read']">
-        <app-card title="{{ 'IDP.LIST.TITLE' | translate }}" description="{{ 'IDP.LIST.DESCRIPTION' | translate }}">
+        <app-card class="idp-table-card" title="{{ 'IDP.LIST.TITLE' | translate }}"
+            description="{{ 'IDP.LIST.DESCRIPTION' | translate }}">
             <app-idp-table [service]="service" [serviceType]="serviceType"
-                [disabled]="(['iam.idp.write'] | hasRole | async) == false">
+                [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false">
             </app-idp-table>
         </app-card>
     </ng-template>

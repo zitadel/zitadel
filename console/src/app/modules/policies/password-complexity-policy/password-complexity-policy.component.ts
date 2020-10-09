@@ -106,9 +106,7 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
                         this.complexityData.hasNumber,
                         this.complexityData.hasSymbol,
                         this.complexityData.minLength,
-                    ).then(() => {
-                        this.router.navigate(['org']);
-                    }).catch(error => {
+                    ).catch(error => {
                         this.toast.showError(error);
                     });
                 } else {
@@ -118,9 +116,7 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
                         this.complexityData.hasNumber,
                         this.complexityData.hasSymbol,
                         this.complexityData.minLength,
-                    ).then(() => {
-                        this.router.navigate(['/org']);
-                    }).catch(error => {
+                    ).catch(error => {
                         this.toast.showError(error);
                     });
                 }
@@ -132,9 +128,7 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
                     this.complexityData.hasNumber,
                     this.complexityData.hasSymbol,
                     this.complexityData.minLength,
-                ).then(() => {
-                    this.router.navigate(['/iam']);
-                }).catch(error => {
+                ).catch(error => {
                     this.toast.showError(error);
                 });
                 break;

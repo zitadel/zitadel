@@ -44,6 +44,8 @@
     border-top: 1px solid #ffffff30;
     border-bottom: 1px solid #ffffff30;
     padding: .5rem 0;
+    max-height: 310px;
+    overflow-y: auto;
 
     .row {
       padding: .5rem;
