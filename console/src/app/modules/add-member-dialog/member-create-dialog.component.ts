@@ -35,7 +35,7 @@ export class MemberCreateDialogComponent {
     public creationTypes: Array<{ type: CreationType, disabled$: Observable<boolean>; }> = [
         { type: CreationType.IAM, disabled$: this.authService.isAllowed(['iam.member.write$']) },
         { type: CreationType.ORG, disabled$: this.authService.isAllowed(['org.member.write$']) },
-        { type: CreationType.PROJECT_OWNED, disabled$: this.authService.isAllowed(['project.member.write(:[0-9]*)?']) },
+        { type: CreationType.PROJECT_OWNED, disabled$: this.authService.isAllowed(['project.member.write']) },
         { type: CreationType.PROJECT_GRANTED, disabled$: this.authService.isAllowed(['project.grant.member.write']) },
     ];
     public users: Array<UserView.AsObject> = [];
