@@ -53,6 +53,7 @@ export class MembershipsComponent implements OnInit {
     public async loadManager(userId: string): Promise<void> {
         this.mgmtService.SearchUserMemberships(userId, 100, 0, []).then(response => {
             this.memberships = response.toObject();
+            console.log(this.memberships);
             this.loading = false;
         });
     }
