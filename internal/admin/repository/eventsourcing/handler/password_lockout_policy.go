@@ -52,6 +52,8 @@ func (m *PasswordLockoutPolicy) processPasswordLockoutPolicy(event *models.Event
 			return err
 		}
 		err = policy.AppendEvent(event)
+	case model.PasswordLockoutPolicyRemoved:
+		return m.view.DeletePasswordLockoutPolicy(event.AggregateID, event.Sequence)
 	default:
 		return m.view.ProcessedPasswordLockoutPolicySequence(event.Sequence)
 	}

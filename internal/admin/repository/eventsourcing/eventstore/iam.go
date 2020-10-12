@@ -297,7 +297,7 @@ func (repo *IAMRepository) ChangeDefaultPasswordLockoutPolicy(ctx context.Contex
 	return repo.IAMEventstore.ChangePasswordLockoutPolicy(ctx, policy)
 }
 
-func (repo *IAMRepository) GetOrgIAMLockoutPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
+func (repo *IAMRepository) GetOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
 	policy, err := repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {
 		return nil, err

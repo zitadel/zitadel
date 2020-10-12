@@ -110,6 +110,17 @@ service AdminService {
         };
     }
 
+    rpc UpdateDefaultOrgIamPolicy(OrgIamPolicyRequest) returns (OrgIamPolicy) {
+        option (google.api.http) = {
+            put: "/orgs/default/policies/orgiam"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
     rpc GetOrgIamPolicy(OrgIamPolicyID) returns (OrgIamPolicyView) {
         option (google.api.http) = {
             get: "/orgs/{org_id}/policies/orgiam"

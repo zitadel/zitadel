@@ -39,6 +39,11 @@ var AdminService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.admin.api.v1.AdminService/UpdateDefaultOrgIamPolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.admin.api.v1.AdminService/GetOrgIamPolicy": authz.Option{
 		Permission: "iam.policy.read",
 		CheckParam: "",

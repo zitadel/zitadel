@@ -653,6 +653,36 @@
         "tags": [
           "AdminService"
         ]
+      },
+      "put": {
+        "operationId": "AdminService_UpdateDefaultOrgIamPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OrgIamPolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1OrgIamPolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
       }
     },
     "/orgs/{id}": {

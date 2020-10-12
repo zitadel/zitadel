@@ -52,6 +52,8 @@ func (m *OrgIAMPolicy) processOrgIAMPolicy(event *models.Event) (err error) {
 			return err
 		}
 		err = policy.AppendEvent(event)
+	case model.OrgIAMPolicyRemoved:
+		return m.view.DeleteOrgIAMPolicy(event.AggregateID, event.Sequence)
 	default:
 		return m.view.ProcessedOrgIAMPolicySequence(event.Sequence)
 	}

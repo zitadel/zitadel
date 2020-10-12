@@ -39,11 +39,19 @@ func (s *Server) SetUpOrg(ctx context.Context, orgSetUp *admin.OrgSetUpRequest) 
 }
 
 func (s *Server) GetDefaultOrgIamPolicy(ctx context.Context, _ *empty.Empty) (_ *admin.OrgIamPolicyView, err error) {
-	policy, err := s.org.GetDefaultOrgIAMPolicy(ctx)
+	policy, err := s.iam.GetDefaultOrgIAMPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return orgIamPolicyViewFromModel(policy), err
+}
+
+func (s *Server) UpdateDefaultOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyRequest) (_ *admin.OrgIamPolicy, err error) {
+	policy, err := s.iam.ChangeDefaultOrgIAMPolicy(ctx, orgIamPolicyRequestToModel(in))
+	if err != nil {
+		return nil, err
+	}
+	return orgIamPolicyFromModel(policy), err
 }
 
 func (s *Server) GetOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyID) (_ *admin.OrgIamPolicyView, err error) {
