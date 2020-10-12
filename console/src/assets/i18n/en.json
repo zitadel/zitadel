@@ -59,7 +59,8 @@
         "DEACTIVATE":"Deactivate",
         "REFRESH":"Refresh",
         "LOGIN":"Login",
-        "EDIT":"Edit"
+        "EDIT":"Edit",
+        "PIN":"Pin / Unpin"
     },
     "ERRORS": {
         "REQUIRED": "Some required fields are missing.",

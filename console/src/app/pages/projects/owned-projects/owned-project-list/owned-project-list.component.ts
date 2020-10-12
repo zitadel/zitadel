@@ -1,12 +1,13 @@
 import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core'; import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { ProjectView } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -45,7 +46,7 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
 
     public ownedProjectList: ProjectView.AsObject[] = [];
-    public displayedColumns: string[] = ['select', 'name', 'state', 'creationDate', 'changeDate'];
+    public displayedColumns: string[] = ['select', 'name', 'state', 'creationDate', 'changeDate', 'actions'];
     public selection: SelectionModel<ProjectView.AsObject> = new SelectionModel<ProjectView.AsObject>(true, []);
 
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -54,11 +55,18 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
     public grid: boolean = true;
     private subscription?: Subscription;
 
+    public zitadelProjectId: string = '';
+
     constructor(private router: Router,
         public translate: TranslateService,
         private mgmtService: ManagementService,
         private toast: ToastService,
-    ) { }
+        private dialog: MatDialog,
+    ) {
+        this.mgmtService.GetIam().then(iam => {
+            this.zitadelProjectId = iam.toObject().iamProjectId;
+        });
+    }
 
     public ngOnInit(): void {
         this.getData(10, 0);
@@ -139,5 +147,30 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
     public refreshPage(): void {
         this.selection.clear();
         this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
+    }
+
+    public deleteProject(item: ProjectView.AsObject): void {
+        const dialogRef = this.dialog.open(WarnDialogComponent, {
+            data: {
+                confirmKey: 'ACTIONS.DELETE',
+                cancelKey: 'ACTIONS.CANCEL',
+                titleKey: 'PROJECT.PAGES.DIALOG.DELETE.TITLE',
+                descriptionKey: 'PROJECT.PAGES.DIALOG.DELETE.DESCRIPTION',
+            },
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (this.zitadelProjectId && resp && item.projectId !== this.zitadelProjectId) {
+                this.mgmtService.RemoveProject(item.projectId).then(() => {
+                    this.toast.showInfo('PROJECT.TOAST.DELETED', true);
+                    setTimeout(() => {
+                        this.refreshPage();
+                    }, 1000);
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
+            }
+        });
     }
 }

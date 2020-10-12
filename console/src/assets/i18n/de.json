@@ -59,7 +59,8 @@
         "DEACTIVATE":"Deaktivieren",
         "REFRESH":"Aktualisieren",
         "LOGIN":"Einloggen",
-        "EDIT":"Bearbeiten"
+        "EDIT":"Bearbeiten",
+        "PIN":"Anpinnen"
     },
     "ERRORS": {
         "REQUIRED": "Bitte fülle alle benötigten Felder aus.",
