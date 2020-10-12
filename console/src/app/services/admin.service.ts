@@ -201,12 +201,12 @@ export class AdminService {
         return this.grpcService.admin.updateOrgIamPolicy(req);
     }
 
-    public deleteOrgIamPolicy(
+    public RemoveOrgIamPolicy(
         orgId: string,
     ): Promise<Empty> {
         const req = new OrgIamPolicyID();
         req.setOrgId(orgId);
-        return this.grpcService.admin.deleteOrgIamPolicy(req);
+        return this.grpcService.admin.removeOrgIamPolicy(req);
     }
 
     /* admin iam */

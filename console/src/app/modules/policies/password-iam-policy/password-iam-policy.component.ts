@@ -111,7 +111,7 @@ export class PasswordIamPolicyComponent implements OnDestroy {
 
     public removePolicy(): void {
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
-            this.adminService.deleteOrgIamPolicy(this.org.id).then(() => {
+            this.adminService.RemoveOrgIamPolicy(this.org.id).then(() => {
                 this.toast.showInfo('ORG.POLICY.TOAST.RESETSUCCESS', true);
                 setTimeout(() => {
                     this.getData();
