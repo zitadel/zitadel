@@ -59,7 +59,7 @@ var AdminService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.admin.api.v1.AdminService/DeleteOrgIamPolicy": authz.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/RemoveOrgIamPolicy": authz.Option{
 		Permission: "iam.policy.delete",
 		CheckParam: "",
 	},

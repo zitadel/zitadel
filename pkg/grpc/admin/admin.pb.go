@@ -6370,7 +6370,7 @@ var file_admin_proto_rawDesc = []byte{
 	0x67, 0x73, 0x2f, 0x7b, 0x6f, 0x72, 0x67, 0x5f, 0x69, 0x64, 0x7d, 0x2f, 0x70, 0x6f, 0x6c, 0x69,
 	0x63, 0x69, 0x65, 0x73, 0x2f, 0x6f, 0x72, 0x67, 0x69, 0x61, 0x6d, 0x3a, 0x01, 0x2a, 0x82, 0xb5,
 	0x18, 0x12, 0x0a, 0x10, 0x69, 0x61, 0x6d, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x77,
-	0x72, 0x69, 0x74, 0x65, 0x12, 0x96, 0x01, 0x0a, 0x12, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x4f,
+	0x72, 0x69, 0x74, 0x65, 0x12, 0x96, 0x01, 0x0a, 0x12, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x4f,
 	0x72, 0x67, 0x49, 0x61, 0x6d, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x12, 0x29, 0x2e, 0x63, 0x61,
 	0x6f, 0x73, 0x2e, 0x7a, 0x69, 0x74, 0x61, 0x64, 0x65, 0x6c, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e,
 	0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x4f, 0x72, 0x67, 0x49, 0x61, 0x6d, 0x50, 0x6f,
@@ -6863,7 +6863,7 @@ var file_admin_proto_depIdxs = []int32{
 	32,  // 89: caos.zitadel.admin.api.v1.AdminService.GetOrgIamPolicy:input_type -> caos.zitadel.admin.api.v1.OrgIamPolicyID
 	31,  // 90: caos.zitadel.admin.api.v1.AdminService.CreateOrgIamPolicy:input_type -> caos.zitadel.admin.api.v1.OrgIamPolicyRequest
 	31,  // 91: caos.zitadel.admin.api.v1.AdminService.UpdateOrgIamPolicy:input_type -> caos.zitadel.admin.api.v1.OrgIamPolicyRequest
-	32,  // 92: caos.zitadel.admin.api.v1.AdminService.DeleteOrgIamPolicy:input_type -> caos.zitadel.admin.api.v1.OrgIamPolicyID
+	32,  // 92: caos.zitadel.admin.api.v1.AdminService.RemoveOrgIamPolicy:input_type -> caos.zitadel.admin.api.v1.OrgIamPolicyID
 	76,  // 93: caos.zitadel.admin.api.v1.AdminService.GetIamMemberRoles:input_type -> google.protobuf.Empty
 	35,  // 94: caos.zitadel.admin.api.v1.AdminService.AddIamMember:input_type -> caos.zitadel.admin.api.v1.AddIamMemberRequest
 	36,  // 95: caos.zitadel.admin.api.v1.AdminService.ChangeIamMember:input_type -> caos.zitadel.admin.api.v1.ChangeIamMemberRequest
@@ -6904,7 +6904,7 @@ var file_admin_proto_depIdxs = []int32{
 	30,  // 130: caos.zitadel.admin.api.v1.AdminService.GetOrgIamPolicy:output_type -> caos.zitadel.admin.api.v1.OrgIamPolicyView
 	29,  // 131: caos.zitadel.admin.api.v1.AdminService.CreateOrgIamPolicy:output_type -> caos.zitadel.admin.api.v1.OrgIamPolicy
 	29,  // 132: caos.zitadel.admin.api.v1.AdminService.UpdateOrgIamPolicy:output_type -> caos.zitadel.admin.api.v1.OrgIamPolicy
-	76,  // 133: caos.zitadel.admin.api.v1.AdminService.DeleteOrgIamPolicy:output_type -> google.protobuf.Empty
+	76,  // 133: caos.zitadel.admin.api.v1.AdminService.RemoveOrgIamPolicy:output_type -> google.protobuf.Empty
 	33,  // 134: caos.zitadel.admin.api.v1.AdminService.GetIamMemberRoles:output_type -> caos.zitadel.admin.api.v1.IamMemberRoles
 	34,  // 135: caos.zitadel.admin.api.v1.AdminService.AddIamMember:output_type -> caos.zitadel.admin.api.v1.IamMember
 	34,  // 136: caos.zitadel.admin.api.v1.AdminService.ChangeIamMember:output_type -> caos.zitadel.admin.api.v1.IamMember
@@ -7766,7 +7766,7 @@ type AdminServiceClient interface {
 	GetOrgIamPolicy(ctx context.Context, in *OrgIamPolicyID, opts ...grpc.CallOption) (*OrgIamPolicyView, error)
 	CreateOrgIamPolicy(ctx context.Context, in *OrgIamPolicyRequest, opts ...grpc.CallOption) (*OrgIamPolicy, error)
 	UpdateOrgIamPolicy(ctx context.Context, in *OrgIamPolicyRequest, opts ...grpc.CallOption) (*OrgIamPolicy, error)
-	DeleteOrgIamPolicy(ctx context.Context, in *OrgIamPolicyID, opts ...grpc.CallOption) (*empty.Empty, error)
+	RemoveOrgIamPolicy(ctx context.Context, in *OrgIamPolicyID, opts ...grpc.CallOption) (*empty.Empty, error)
 	GetIamMemberRoles(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*IamMemberRoles, error)
 	AddIamMember(ctx context.Context, in *AddIamMemberRequest, opts ...grpc.CallOption) (*IamMember, error)
 	ChangeIamMember(ctx context.Context, in *ChangeIamMemberRequest, opts ...grpc.CallOption) (*IamMember, error)
@@ -7913,9 +7913,9 @@ func (c *adminServiceClient) UpdateOrgIamPolicy(ctx context.Context, in *OrgIamP
 	return out, nil
 }
 
-func (c *adminServiceClient) DeleteOrgIamPolicy(ctx context.Context, in *OrgIamPolicyID, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *adminServiceClient) RemoveOrgIamPolicy(ctx context.Context, in *OrgIamPolicyID, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
-	err := c.cc.Invoke(ctx, "/caos.zitadel.admin.api.v1.AdminService/DeleteOrgIamPolicy", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/caos.zitadel.admin.api.v1.AdminService/RemoveOrgIamPolicy", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -8192,7 +8192,7 @@ type AdminServiceServer interface {
 	GetOrgIamPolicy(context.Context, *OrgIamPolicyID) (*OrgIamPolicyView, error)
 	CreateOrgIamPolicy(context.Context, *OrgIamPolicyRequest) (*OrgIamPolicy, error)
 	UpdateOrgIamPolicy(context.Context, *OrgIamPolicyRequest) (*OrgIamPolicy, error)
-	DeleteOrgIamPolicy(context.Context, *OrgIamPolicyID) (*empty.Empty, error)
+	RemoveOrgIamPolicy(context.Context, *OrgIamPolicyID) (*empty.Empty, error)
 	GetIamMemberRoles(context.Context, *empty.Empty) (*IamMemberRoles, error)
 	AddIamMember(context.Context, *AddIamMemberRequest) (*IamMember, error)
 	ChangeIamMember(context.Context, *ChangeIamMemberRequest) (*IamMember, error)
@@ -8263,8 +8263,8 @@ func (*UnimplementedAdminServiceServer) CreateOrgIamPolicy(context.Context, *Org
 func (*UnimplementedAdminServiceServer) UpdateOrgIamPolicy(context.Context, *OrgIamPolicyRequest) (*OrgIamPolicy, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateOrgIamPolicy not implemented")
 }
-func (*UnimplementedAdminServiceServer) DeleteOrgIamPolicy(context.Context, *OrgIamPolicyID) (*empty.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteOrgIamPolicy not implemented")
+func (*UnimplementedAdminServiceServer) RemoveOrgIamPolicy(context.Context, *OrgIamPolicyID) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveOrgIamPolicy not implemented")
 }
 func (*UnimplementedAdminServiceServer) GetIamMemberRoles(context.Context, *empty.Empty) (*IamMemberRoles, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetIamMemberRoles not implemented")
@@ -8571,20 +8571,20 @@ func _AdminService_UpdateOrgIamPolicy_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AdminService_DeleteOrgIamPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AdminService_RemoveOrgIamPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(OrgIamPolicyID)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AdminServiceServer).DeleteOrgIamPolicy(ctx, in)
+		return srv.(AdminServiceServer).RemoveOrgIamPolicy(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/caos.zitadel.admin.api.v1.AdminService/DeleteOrgIamPolicy",
+		FullMethod: "/caos.zitadel.admin.api.v1.AdminService/RemoveOrgIamPolicy",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AdminServiceServer).DeleteOrgIamPolicy(ctx, req.(*OrgIamPolicyID))
+		return srv.(AdminServiceServer).RemoveOrgIamPolicy(ctx, req.(*OrgIamPolicyID))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -9146,8 +9146,8 @@ var _AdminService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _AdminService_UpdateOrgIamPolicy_Handler,
 		},
 		{
-			MethodName: "DeleteOrgIamPolicy",
-			Handler:    _AdminService_DeleteOrgIamPolicy_Handler,
+			MethodName: "RemoveOrgIamPolicy",
+			Handler:    _AdminService_RemoveOrgIamPolicy_Handler,
 		},
 		{
 			MethodName: "GetIamMemberRoles",

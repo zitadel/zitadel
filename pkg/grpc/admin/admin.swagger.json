@@ -745,7 +745,7 @@
         ]
       },
       "delete": {
-        "operationId": "AdminService_DeleteOrgIamPolicy",
+        "operationId": "AdminService_RemoveOrgIamPolicy",
         "responses": {
           "200": {
             "description": "A successful response.",

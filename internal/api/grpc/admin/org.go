@@ -78,7 +78,7 @@ func (s *Server) UpdateOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyR
 	return orgIamPolicyFromModel(policy), err
 }
 
-func (s *Server) DeleteOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyID) (_ *empty.Empty, err error) {
+func (s *Server) RemoveOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyID) (_ *empty.Empty, err error) {
 	err = s.org.RemoveOrgIamPolicy(ctx, in.OrgId)
 	return &empty.Empty{}, err
 }
