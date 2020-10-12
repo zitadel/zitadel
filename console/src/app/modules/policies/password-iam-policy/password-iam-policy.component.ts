@@ -111,6 +111,16 @@ export class PasswordIamPolicyComponent implements OnDestroy {
         }
     }
 
+    // public removePolicy(): void {
+    //     if (this.service instanceof ManagementService) {
+    //         this.service.removeIamPolicy().then(() => {
+    //             this.toast.showInfo('Successfully deleted');
+    //         }).catch(error => {
+    //             this.toast.showError(error);
+    //         });
+    //     }
+    // }
+
     public get isDefault(): boolean {
         if (this.iamData && this.serviceType === PolicyComponentServiceType.MGMT) {
             return (this.iamData as MgmtOrgIamPolicyView.AsObject).pb_default;

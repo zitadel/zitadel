@@ -11,13 +11,6 @@ const routes: Routes = [
             animation: 'DetailPage',
         },
     },
-    // {
-    //     path: 'create',
-    //     component: PasswordIamPolicyComponent,
-    //     data: {
-    //         animation: 'DetailPage',
-    //     },
-    // },
 ];
 
 @NgModule({

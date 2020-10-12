@@ -47,20 +47,49 @@ const routes: Routes = [
         ],
     },
     {
-        path: `policy/${PolicyComponentType.LOGIN}`,
-        data: {
-            serviceType: PolicyComponentServiceType.ADMIN,
-        },
-        loadChildren: () => import('src/app/modules/policies/login-policy/login-policy.module')
-            .then(m => m.LoginPolicyModule),
-    },
-    {
-        path: `policy/${PolicyComponentType.IAM}`,
-        data: {
-            serviceType: PolicyComponentServiceType.ADMIN,
-        },
-        loadChildren: () => import('src/app/modules/policies/password-iam-policy/password-iam-policy.module')
-            .then(m => m.PasswordIamPolicyModule),
+        path: 'policy',
+        children: [
+            {
+                path: PolicyComponentType.AGE,
+                data: {
+                    serviceType: PolicyComponentServiceType.ADMIN,
+                },
+                loadChildren: () => import('src/app/modules/policies/password-age-policy/password-age-policy.module')
+                    .then(m => m.PasswordAgePolicyModule),
+            },
+            {
+                path: PolicyComponentType.LOCKOUT,
+                data: {
+                    serviceType: PolicyComponentServiceType.ADMIN,
+                },
+                loadChildren: () => import('src/app/modules/policies/password-lockout-policy/password-lockout-policy.module')
+                    .then(m => m.PasswordLockoutPolicyModule),
+            },
+            {
+                path: PolicyComponentType.COMPLEXITY,
+                data: {
+                    serviceType: PolicyComponentServiceType.ADMIN,
+                },
+                loadChildren: () => import('src/app/modules/policies/password-complexity-policy/password-complexity-policy.module')
+                    .then(m => m.PasswordComplexityPolicyModule),
+            },
+            {
+                path: PolicyComponentType.IAM,
+                data: {
+                    serviceType: PolicyComponentServiceType.ADMIN,
+                },
+                loadChildren: () => import('src/app/modules/policies/password-iam-policy/password-iam-policy.module')
+                    .then(m => m.PasswordIamPolicyModule),
+            },
+            {
+                path: PolicyComponentType.LOGIN,
+                data: {
+                    serviceType: PolicyComponentServiceType.ADMIN,
+                },
+                loadChildren: () => import('src/app/modules/policies/login-policy/login-policy.module')
+                    .then(m => m.LoginPolicyModule),
+            },
+        ],
     },
 ];
 

@@ -64,10 +64,13 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
         }
     }
 
-    public deletePolicy(): void {
+    public removePolicy(): void {
         if (this.service instanceof ManagementService) {
             this.service.removePasswordComplexityPolicy().then(() => {
-                this.toast.showInfo('Successfully deleted');
+                this.toast.showInfo('ORG.POLICY.TOAST.RESETSUCCESS', true);
+                setTimeout(() => {
+                    this.getData();
+                }, 1000);
             }).catch(error => {
                 this.toast.showError(error);
             });

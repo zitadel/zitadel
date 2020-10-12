@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { PolicyComponentType } from 'src/app/modules/policies/policy-component-types.enum';
-import { DefaultLoginPolicy, OrgIamPolicyView } from 'src/app/proto/generated/admin_pb';
+import { DefaultLoginPolicy, DefaultPasswordComplexityPolicyView, OrgIamPolicyView } from 'src/app/proto/generated/admin_pb';
 import { PolicyState } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 
@@ -10,6 +10,7 @@ import { AdminService } from 'src/app/services/admin.service';
     styleUrls: ['./iam-policy-grid.component.scss'],
 })
 export class IamPolicyGridComponent {
+    public complexityPolicy!: DefaultPasswordComplexityPolicyView.AsObject;
     public loginPolicy!: DefaultLoginPolicy.AsObject;
     public iamPolicy!: OrgIamPolicyView.AsObject;
 
@@ -25,5 +26,6 @@ export class IamPolicyGridComponent {
     private getData(): void {
         this.adminService.GetDefaultLoginPolicy().then(data => this.loginPolicy = data.toObject());
         this.adminService.GetDefaultOrgIamPolicy().then(data => this.iamPolicy = data.toObject());
+        this.adminService.GetDefaultPasswordComplexityPolicy().then(data => this.complexityPolicy = data.toObject());
     }
 }

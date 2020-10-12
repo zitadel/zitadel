@@ -457,9 +457,10 @@
                 "ALLOWEXTERNALIDP":"External IDP allowed",
                 "ALLOWREGISTER":"Register allowed"
             },
-            "DELETE":"Uninstall/Reset Policy",
+            "RESET":"Reset Policy",
             "TOAST":{
-                "SET":"Policy set successfully!"
+                "SET":"Policy set successfully!",
+                "RESETSUCCESS":"Policy reset successfully!"
             }
         },
         "TOAST": {

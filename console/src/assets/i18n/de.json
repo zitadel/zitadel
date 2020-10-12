@@ -457,9 +457,10 @@
                 "ALLOWEXTERNALIDP":"Externer IDP erlaubt",
                 "ALLOWREGISTER":"Registrieren erlaubt"
             },
-            "DELETE":"Richtlinie entfernen/zurücksetzen",
+            "RESET":"Richtlinie zurücksetzen",
             "TOAST":{
-                "SET":"Richtline erfolgreich gesetzt!"
+                "SET":"Richtline erfolgreich gesetzt!",
+                "RESETSUCCESS":"Richtline zurückgesetzt!"
             }
         },
         "TOAST": {

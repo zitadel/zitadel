@@ -12,7 +12,7 @@
   .row {
     display: flex;
     align-items: center;
-    padding: .5rem 0;
+    padding: .3rem 0;
 
     .left-desc {
       font-size: .9rem;
@@ -20,11 +20,6 @@
 
     .fill-space {
       flex: 1;
-    }
-
-    .length-wrapper {
-      display: flex;
-      align-items: center;
     }
   }
 }

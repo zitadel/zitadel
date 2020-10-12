@@ -1,7 +1,6 @@
 import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
-import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
@@ -128,12 +127,16 @@ export class LoginPolicyComponent implements OnDestroy {
         });
     }
 
-    public deletePolicy(): Promise<Empty> {
-        switch (this.serviceType) {
-            case PolicyComponentServiceType.MGMT:
-                return (this.service as ManagementService).RemoveLoginPolicy();
-            case PolicyComponentServiceType.ADMIN:
-                return (this.service as AdminService).GetDefaultLoginPolicy();
+    public removePolicy(): void {
+        if (this.serviceType === PolicyComponentServiceType.MGMT) {
+            (this.service as ManagementService).RemoveLoginPolicy().then(() => {
+                this.toast.showInfo('ORG.POLICY.TOAST.RESETSUCCESS', true);
+                setTimeout(() => {
+                    this.getData();
+                }, 1000);
+            }).catch(error => {
+                this.toast.showError(error);
+            });
         }
     }
 
