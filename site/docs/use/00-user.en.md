@@ -6,7 +6,7 @@ title: User Manual
 
 ### Self Register User
 
-### Verify Mail
+### Verify EMail
 
 ### Verify Phone
 
