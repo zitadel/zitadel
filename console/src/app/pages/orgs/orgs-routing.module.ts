@@ -67,6 +67,9 @@ const routes: Routes = [
             },
             {
                 path: PolicyComponentType.IAM,
+                data: {
+                    serviceType: PolicyComponentServiceType.MGMT,
+                },
                 loadChildren: () => import('src/app/modules/policies/password-iam-policy/password-iam-policy.module')
                     .then(m => m.PasswordIamPolicyModule),
             },

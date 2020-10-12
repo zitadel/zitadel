@@ -59,7 +59,8 @@
         "DEACTIVATE":"Deaktivieren",
         "REFRESH":"Aktualisieren",
         "LOGIN":"Einloggen",
-        "EDIT":"Bearbeiten"
+        "EDIT":"Bearbeiten",
+        "PIN":"Anpinnen"
     },
     "ERRORS": {
         "REQUIRED": "Bitte fülle alle benötigten Felder aus.",
@@ -435,8 +436,10 @@
                 "DESCRIPTION":"Definiere die Loginmethoden für Benutzer",
                 "TITLECREATE":"Definiere die Loginmethoden für Benutzer",
                 "DESCRIPTIONCREATEADMIN":"Nutzer können Sich mit den verfügbaren Idps authentifizieren.",
-                "DESCRIPTIONCREATEMGMT":"Nutzer können Sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann von System-, sowie von selbsterstellten Providern Ihrer Organisation gewählt werden."
+                "DESCRIPTIONCREATEMGMT":"Nutzer können Sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann von System-, sowie von selbsterstellten Providern Ihrer Organisation gewählt werden.",
+                "SAVED":"Erfolgreich gespeichert."
             },
+            "DEFAULTLABEL":"Die zurzeit gesetzte Richtlinie entspricht der vom IAM gesetztden standartmässigen Eistellung.",
             "BTN_INSTALL":"Installieren",
             "BTN_EDIT":"Modifizieren",
             "DATA": {
@@ -455,7 +458,11 @@
                 "ALLOWEXTERNALIDP":"Externer IDP erlaubt",
                 "ALLOWREGISTER":"Registrieren erlaubt"
             },
-            "DELETE":"Richtlinie entfernen/zurücksetzen"
+            "RESET":"Richtlinie zurücksetzen",
+            "TOAST":{
+                "SET":"Richtline erfolgreich gesetzt!",
+                "RESETSUCCESS":"Richtline zurückgesetzt!"
+            }
         },
         "TOAST": {
             "DEACTIVATED":"Organisation deaktiviert.",

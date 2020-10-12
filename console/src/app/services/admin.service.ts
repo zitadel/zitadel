@@ -174,6 +174,48 @@ export class AdminService {
         return this.grpcService.admin.updateDefaultLoginPolicy(req);
     }
 
+    /* org iam */
+
+    public GetOrgIamPolicy(orgId: string): Promise<OrgIamPolicyView> {
+        const req = new OrgIamPolicyID();
+        req.setOrgId(orgId);
+        return this.grpcService.admin.getOrgIamPolicy(req);
+    }
+
+    public CreateOrgIamPolicy(
+        orgId: string,
+        userLoginMustBeDomain: boolean): Promise<OrgIamPolicy> {
+        const req = new OrgIamPolicyRequest();
+        req.setOrgId(orgId);
+        req.setUserLoginMustBeDomain(userLoginMustBeDomain);
+
+        return this.grpcService.admin.createOrgIamPolicy(req);
+    }
+
+    public UpdateOrgIamPolicy(
+        orgId: string,
+        userLoginMustBeDomain: boolean): Promise<OrgIamPolicy> {
+        const req = new OrgIamPolicyRequest();
+        req.setOrgId(orgId);
+        req.setUserLoginMustBeDomain(userLoginMustBeDomain);
+        return this.grpcService.admin.updateOrgIamPolicy(req);
+    }
+
+    public deleteOrgIamPolicy(
+        orgId: string,
+    ): Promise<Empty> {
+        const req = new OrgIamPolicyID();
+        req.setOrgId(orgId);
+        return this.grpcService.admin.deleteOrgIamPolicy(req);
+    }
+
+    /* admin iam */
+
+    public GetDefaultOrgIamPolicy(): Promise<OrgIamPolicyView> {
+        const req = new Empty();
+        return this.grpcService.admin.getDefaultOrgIamPolicy(req);
+    }
+
     /* policies end */
 
     public AddIdpProviderToDefaultLoginPolicy(configId: string): Promise<IdpProviderID> {
@@ -310,39 +352,5 @@ export class AdminService {
         req.setRolesList(rolesList);
 
         return this.grpcService.admin.changeIamMember(req);
-    }
-
-    public GetOrgIamPolicy(orgId: string): Promise<OrgIamPolicyView> {
-        const req = new OrgIamPolicyID();
-        req.setOrgId(orgId);
-
-        return this.grpcService.admin.getOrgIamPolicy(req);
-    }
-
-    public CreateOrgIamPolicy(
-        orgId: string,
-        userLoginMustBeDomain: boolean): Promise<OrgIamPolicy> {
-        const req = new OrgIamPolicyRequest();
-        req.setOrgId(orgId);
-        req.setUserLoginMustBeDomain(userLoginMustBeDomain);
-
-        return this.grpcService.admin.createOrgIamPolicy(req);
-    }
-
-    public UpdateOrgIamPolicy(
-        orgId: string,
-        userLoginMustBeDomain: boolean): Promise<OrgIamPolicy> {
-        const req = new OrgIamPolicyRequest();
-        req.setOrgId(orgId);
-        req.setUserLoginMustBeDomain(userLoginMustBeDomain);
-        return this.grpcService.admin.updateOrgIamPolicy(req);
-    }
-
-    public deleteOrgIamPolicy(
-        orgId: string,
-    ): Promise<Empty> {
-        const req = new OrgIamPolicyID();
-        req.setOrgId(orgId);
-        return this.grpcService.admin.deleteOrgIamPolicy(req);
     }
 }

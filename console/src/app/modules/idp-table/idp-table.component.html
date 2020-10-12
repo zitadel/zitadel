@@ -16,8 +16,7 @@
             *ngIf="selection.hasValue() && serviceType!=PolicyComponentServiceType.MGMT" [disabled]="disabled">
             <i class="las la-trash"></i>
         </button>
-        <a [routerLink]="createRouterLink" color="primary" mat-raised-button [disabled]="disabled"
-            *ngIf="serviceType!=PolicyComponentServiceType.MGMT">
+        <a [routerLink]="createRouterLink" color="primary" mat-raised-button [disabled]="disabled">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
     </ng-template>

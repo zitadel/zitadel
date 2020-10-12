@@ -3,28 +3,28 @@
 <p class="top-desc">{{'ORG.POLICY.DESCRIPTION' | translate}}</p>
 
 <div class="row-lyt">
-    <div class="p-item card">
-        <div class="avatar">
-            <mat-icon class="icon" svgIcon="mdi_textbox_password"></mat-icon>
-        </div>
-        <div class="title">
-            <span>{{'ORG.POLICY.PWD_COMPLEXITY.TITLE' | translate}}</span>
-            <button mat-icon-button disabled>
-                <i *ngIf="complexityPolicy" class="icon las la-check-circle"></i>
-            </button>
-        </div>
+    <ng-template appHasRole [appHasRole]="['iam.policy.read']">
+        <div class="p-item card">
+            <div class="avatar">
+                <mat-icon class="icon" svgIcon="mdi_textbox_password"></mat-icon>
+            </div>
+            <div class="title">
+                <span>{{'ORG.POLICY.PWD_COMPLEXITY.TITLE' | translate}}</span>
+                <button mat-icon-button disabled>
+                    <i *ngIf="complexityPolicy" class="icon las la-check-circle"></i>
+                </button>
+            </div>
 
-        <p class="desc">
-            {{'ORG.POLICY.PWD_COMPLEXITY.DESCRIPTION' | translate}}</p>
+            <p class="desc">
+                {{'ORG.POLICY.PWD_COMPLEXITY.DESCRIPTION' | translate}}</p>
 
-        <span class="fill-space"></span>
-        <div class="btn-wrapper">
-            <button [disabled]="complexityPolicy" [routerLink]="[ 'policy', PolicyComponentType.COMPLEXITY,'create' ]"
-                color="primary" mat-raised-button>{{'ORG.POLICY.BTN_INSTALL' | translate}}</button>
-            <button [disabled]="!complexityPolicy" [routerLink]="[ 'policy', PolicyComponentType.COMPLEXITY ]"
-                mat-stroked-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
+            <span class="fill-space"></span>
+            <div class="btn-wrapper">
+                <button [disabled]="!complexityPolicy" [routerLink]="[ 'policy', PolicyComponentType.COMPLEXITY ]"
+                    mat-stroked-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
+            </div>
         </div>
-    </div>
+    </ng-template>
 
     <ng-template appHasRole [appHasRole]="['iam.policy.read']">
         <div class="p-item card">
@@ -44,8 +44,6 @@
             <span class="fill-space"></span>
             <div class="btn-wrapper">
                 <ng-template appHasRole [appHasRole]="['iam.policy.write']">
-                    <button [disabled]="iamPolicy" [routerLink]="[ 'policy', PolicyComponentType.IAM,'create' ]"
-                        color="primary" mat-raised-button>{{'ORG.POLICY.BTN_INSTALL' | translate}}</button>
                     <button [disabled]="!iamPolicy" [routerLink]="[ 'policy', PolicyComponentType.IAM ]"
                         mat-stroked-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
                 </ng-template>
@@ -73,8 +71,6 @@
             <span class="fill-space"></span>
             <div class="btn-wrapper">
                 <ng-template appHasRole [appHasRole]="['policy.write']">
-                    <button [disabled]="loginPolicy" [routerLink]="[ 'policy', PolicyComponentType.LOGIN,'create' ]"
-                        color="primary" mat-raised-button>{{'ORG.POLICY.BTN_INSTALL' | translate}}</button>
                     <button [disabled]="!loginPolicy" [routerLink]="[ 'policy', PolicyComponentType.LOGIN ]"
                         mat-stroked-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
                 </ng-template>
