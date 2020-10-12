@@ -46,7 +46,7 @@ For example with [zitadel.ch](zitadel.ch) this would be the domain [issuer.zitad
 
 [https://api.zitadel.ch/oauth/v2/keys](https://api.zitadel.ch/oauth/v2/keys)
 
-> Be aware that these keys can be rotated without any prior notice. We will however make sure that a proper `kid` is set with each key
+> Be aware that these keys can be rotated without any prior notice. We will however make sure that a proper `kid` is set with each key!
 
 #### OAuth 2.0 Metadata
 
@@ -77,7 +77,7 @@ In addition to the standard compliant scopes we utilize the following scopes.
 | Claims                                          | Description | Example                                                                          |
 |:------------------------------------------------|:------------|----------------------------------------------------------------------------------|
 | urn:zitadel:iam:org:domain:primary:{domainname} |             | `{"urn:zitadel:iam:org:domain:primary": "acme.ch"}`                              |
-| urn:zitadel:iam:org:project:roles:{rolename}    |             | `{"urn:zitadel:iam:org:project:roles": [ {"user": [ "acme.ch", "caos.ch" ] } ]}` |
+| urn:zitadel:iam:org:project:roles:{rolename}    |             | `{"urn:zitadel:iam:org:project:roles": [ {"user": {"id1": "acme.zitade.ch", "id2": "caos.ch"} } ] }` |
 | urn:zitadel:iam:roles:{rolename}                |             |                                                                                  |
 
 ### Grant Types

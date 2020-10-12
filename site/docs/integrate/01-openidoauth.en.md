@@ -9,7 +9,7 @@ description: ...
 
 If your [client](administrate#Clients) is a single page application (SPA) we recommend that you use [Authorization Code](documentation#Authorization_Code) in combination with [Proof Key for Code Exchange](documentation#Proof_Key_for_Code_Exchange).
 
-This flow has great support with most modern languages and frameworks and is 
+This flow has great support with most modern languages and frameworks and is the recommended default.
 
 > In the OIDC and OAuth world this **client profile** is called "user-agent-based application"
 
@@ -31,11 +31,12 @@ By default ZITADEL asserts the claim **urn:zitadel:iam:org:project:roles** to th
 - Assert the claim **urn:zitadel:iam:org:project:roles** to **id_token**
 
 ```JSON
-{
-  "urn:zitadel:iam:org:project:roles": [{
-    "user": ["acme.ch", "caos.ch"]
-  }]
-}
+ "urn:zitadel:iam:org:project:roles": {
+    "user": {
+      "id1": "acme.zitadel.ch",
+      "id2": "caos.ch",
+    }
+  }
 ```
 
 For more details about how **ZITADEL** treats [scopes](documentation#Scopes) and [claims](documentation#Claims) see the [documentations](documentation).
