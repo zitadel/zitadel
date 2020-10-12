@@ -112,17 +112,17 @@
     }
 
     .delete-button {
-        opacity: 0;
-        user-select: none;
-        position: absolute;
-        bottom: 0;
-        right: 30px;
-        margin: 0;
-        margin-bottom: .25rem;
+      opacity: 0;
+      user-select: none;
+      position: absolute;
+      bottom: 0;
+      right: 30px;
+      margin: 0;
+      margin-bottom: .25rem;
 
-        &:not(:hover) {
-            color: #8795a1;
-        }
+      &:not(:hover) {
+        color: #8795a1;
+      }
     }
 
     .edit-button {
