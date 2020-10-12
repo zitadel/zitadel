@@ -106,7 +106,9 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
                         this.complexityData.hasNumber,
                         this.complexityData.hasSymbol,
                         this.complexityData.minLength,
-                    ).catch(error => {
+                    ).then(() => {
+                        this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                    }).catch(error => {
                         this.toast.showError(error);
                     });
                 } else {
@@ -116,7 +118,9 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
                         this.complexityData.hasNumber,
                         this.complexityData.hasSymbol,
                         this.complexityData.minLength,
-                    ).catch(error => {
+                    ).then(() => {
+                        this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                    }).catch(error => {
                         this.toast.showError(error);
                     });
                 }
@@ -128,10 +132,20 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
                     this.complexityData.hasNumber,
                     this.complexityData.hasSymbol,
                     this.complexityData.minLength,
-                ).catch(error => {
+                ).then(() => {
+                    this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                }).catch(error => {
                     this.toast.showError(error);
                 });
                 break;
+        }
+    }
+
+    public get isDefault(): boolean {
+        if (this.complexityData && this.serviceType === PolicyComponentServiceType.MGMT) {
+            return (this.complexityData as PasswordComplexityPolicyView.AsObject).pb_default;
+        } else {
+            return false;
         }
     }
 }

@@ -438,6 +438,7 @@
                 "DESCRIPTIONCREATEMGMT":"Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only.",
                 "SAVED":"Saved successfully!"
             },
+            "DEFAULTLABEL":"The currently set guideline corresponds to the standard setting set by the IAM Administrator.",
             "BTN_INSTALL":"Setup",
             "BTN_EDIT":"Modify",
             "DATA": {
@@ -456,7 +457,10 @@
                 "ALLOWEXTERNALIDP":"External IDP allowed",
                 "ALLOWREGISTER":"Register allowed"
             },
-            "DELETE":"Uninstall/Reset Policy"
+            "DELETE":"Uninstall/Reset Policy",
+            "TOAST":{
+                "SET":"Policy set successfully!"
+            }
         },
         "TOAST": {
             "DEACTIVATED":"Organisation deactivated.",

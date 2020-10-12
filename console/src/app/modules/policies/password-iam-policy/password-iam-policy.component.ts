@@ -85,7 +85,9 @@ export class PasswordIamPolicyComponent implements OnDestroy {
                     this.adminService.CreateOrgIamPolicy(
                         this.org.id,
                         this.iamData.userLoginMustBeDomain,
-                    ).catch(error => {
+                    ).then(() => {
+                        this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                    }).catch(error => {
                         this.toast.showError(error);
                     });
                     break;
@@ -93,7 +95,9 @@ export class PasswordIamPolicyComponent implements OnDestroy {
                     this.adminService.UpdateOrgIamPolicy(
                         this.org.id,
                         this.iamData.userLoginMustBeDomain,
-                    ).catch(error => {
+                    ).then(() => {
+                        this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                    }).catch(error => {
                         this.toast.showError(error);
                     });
                     break;
@@ -103,7 +107,9 @@ export class PasswordIamPolicyComponent implements OnDestroy {
                 this.adminService.UpdateOrgIamPolicy(
                     this.org.id,
                     this.iamData.userLoginMustBeDomain,
-                ).catch(error => {
+                ).then(() => {
+                    this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                }).catch(error => {
                     this.toast.showError(error);
                 });
                 break;

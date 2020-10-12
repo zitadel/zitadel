@@ -438,6 +438,7 @@
                 "DESCRIPTIONCREATEMGMT":"Nutzer können Sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann von System-, sowie von selbsterstellten Providern Ihrer Organisation gewählt werden.",
                 "SAVED":"Erfolgreich gespeichert."
             },
+            "DEFAULTLABEL":"Die zurzeit gesetzte Richtlinie entspricht der vom IAM gesetztden standartmässigen Eistellung.",
             "BTN_INSTALL":"Installieren",
             "BTN_EDIT":"Modifizieren",
             "DATA": {
@@ -456,7 +457,10 @@
                 "ALLOWEXTERNALIDP":"Externer IDP erlaubt",
                 "ALLOWREGISTER":"Registrieren erlaubt"
             },
-            "DELETE":"Richtlinie entfernen/zurücksetzen"
+            "DELETE":"Richtlinie entfernen/zurücksetzen",
+            "TOAST":{
+                "SET":"Richtline erfolgreich gesetzt!"
+            }
         },
         "TOAST": {
             "DEACTIVATED":"Organisation deaktiviert.",
