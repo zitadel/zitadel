@@ -133,7 +133,11 @@
           "IDPCONFIGID": "Idp Config ID",
           "IDPNAME": "Idp Name",
           "USERDISPLAYNAME":  "External Name",
-          "EXTERNALUSERID": "External User ID"
+          "EXTERNALUSERID": "External User ID",
+          "DIALOG": {
+            "REMOVE_TITLE":"Remove IDP",
+            "REMOVE_DESCRIPTION":"You are about to delete an Identity Provider from a user. Do you really want to continue?"
+        }
         },
         "CREATE": {
             "TITLE": "Create a New User",
