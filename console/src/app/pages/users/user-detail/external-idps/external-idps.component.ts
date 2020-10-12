@@ -87,8 +87,8 @@ export class ExternalIdpsComponent implements OnInit {
             data: {
                 confirmKey: 'ACTIONS.REMOVE',
                 cancelKey: 'ACTIONS.CANCEL',
-                titleKey: 'USER.EXTERNALIDP.DELETE_TITLE',
-                descriptionKey: 'USER.EXTERNALIDP.DELETE_DESCRIPTION',
+                titleKey: 'USER.EXTERNALIDP.DIALOG.DELETE_TITLE',
+                descriptionKey: 'USER.EXTERNALIDP.DIALOG.DELETE_DESCRIPTION',
             },
             width: '400px',
         });
