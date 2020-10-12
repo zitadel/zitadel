@@ -526,12 +526,6 @@ export class ManagementService {
         return this.grpcService.mgmt.removePasswordAgePolicy(req);
     }
 
-
-    public RemovePasswordAgePolicy(): Promise<Empty> {
-        const req = new Empty();
-        return this.grpcService.admin.deleteOrgIamPolicy(req);
-    }
-
     public UpdatePasswordAgePolicy(
         maxAgeDays: number,
         expireWarnDays: number,

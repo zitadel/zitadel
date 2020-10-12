@@ -42,7 +42,6 @@ export class PasswordIamPolicyComponent implements OnDestroy {
         }
         this.sub = this.route.data.pipe(switchMap(data => {
             this.serviceType = data.serviceType;
-            console.log(data.serviceType);
             if (this.serviceType === PolicyComponentServiceType.MGMT) {
                 this.managementService = this.injector.get(ManagementService as Type<ManagementService>);
             }
@@ -50,7 +49,6 @@ export class PasswordIamPolicyComponent implements OnDestroy {
         })).subscribe(_ => {
             this.getData().then(data => {
                 if (data) {
-                    console.log(data.toObject());
                     this.iamData = data.toObject();
                 }
             });
@@ -111,15 +109,18 @@ export class PasswordIamPolicyComponent implements OnDestroy {
         }
     }
 
-    // public removePolicy(): void {
-    //     if (this.service instanceof ManagementService) {
-    //         this.service.removeIamPolicy().then(() => {
-    //             this.toast.showInfo('Successfully deleted');
-    //         }).catch(error => {
-    //             this.toast.showError(error);
-    //         });
-    //     }
-    // }
+    public removePolicy(): void {
+        if (this.serviceType === PolicyComponentServiceType.MGMT) {
+            this.adminService.deleteOrgIamPolicy(this.org.id).then(() => {
+                this.toast.showInfo('ORG.POLICY.TOAST.RESETSUCCESS', true);
+                setTimeout(() => {
+                    this.getData();
+                }, 1000);
+            }).catch(error => {
+                this.toast.showError(error);
+            });
+        }
+    }
 
     public get isDefault(): boolean {
         if (this.iamData && this.serviceType === PolicyComponentServiceType.MGMT) {
