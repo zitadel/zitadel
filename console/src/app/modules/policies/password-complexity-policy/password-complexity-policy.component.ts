@@ -1,5 +1,5 @@
 import { Component, Injector, OnDestroy, Type } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { DefaultPasswordComplexityPolicy } from 'src/app/proto/generated/admin_pb';
@@ -16,19 +16,15 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
     styleUrls: ['./password-complexity-policy.component.scss'],
 })
 export class PasswordComplexityPolicyComponent implements OnDestroy {
-    public title: string = '';
-    public desc: string = '';
-
     public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
     public service!: ManagementService | AdminService;
 
     public complexityData!: PasswordComplexityPolicyView.AsObject | DefaultPasswordComplexityPolicy.AsObject;
 
     private sub: Subscription = new Subscription();
-
+    public PolicyComponentServiceType: any = PolicyComponentServiceType;
     constructor(
         private route: ActivatedRoute,
-        private router: Router,
         private toast: ToastService,
         private injector: Injector,
     ) {
@@ -46,9 +42,6 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
 
             return this.route.params;
         })).subscribe(() => {
-            this.title = 'ORG.POLICY.PWD_COMPLEXITY.TITLECREATE';
-            this.desc = 'ORG.POLICY.PWD_COMPLEXITY.DESCRIPTIONCREATE';
-
             this.getData().then(data => {
                 if (data) {
                     this.complexityData = data.toObject();
@@ -63,8 +56,6 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
 
     private async getData():
         Promise<PasswordComplexityPolicyView | DefaultPasswordComplexityPolicy> {
-        this.title = 'ORG.POLICY.PWD_COMPLEXITY.TITLE';
-        this.desc = 'ORG.POLICY.PWD_COMPLEXITY.DESCRIPTION';
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
                 return (this.service as ManagementService).GetPasswordComplexityPolicy();

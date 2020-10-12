@@ -1,6 +1,6 @@
 import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -39,7 +39,6 @@ export class LoginPolicyComponent implements OnDestroy {
     public idps: MgmtIdpProviderView.AsObject[] | AdminIdpProviderView.AsObject[] = [];
     constructor(
         private route: ActivatedRoute,
-        private router: Router,
         private toast: ToastService,
         private dialog: MatDialog,
         private injector: Injector,
@@ -176,15 +175,11 @@ export class LoginPolicyComponent implements OnDestroy {
         }
     }
 
-    public get backroutes(): string[] {
-        switch (this.serviceType) {
-            case PolicyComponentServiceType.MGMT:
-                return ['/org'];
-            case PolicyComponentServiceType.ADMIN:
-                return ['/iam'];
-                break;
+    public get isDefault(): boolean {
+        if (this.loginData && this.serviceType === PolicyComponentServiceType.MGMT) {
+            return (this.loginData as LoginPolicyView.AsObject).pb_default;
+        } else {
+            return false;
         }
-        return [];
     }
-
 }

@@ -19,8 +19,6 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
 })
 export class PasswordIamPolicyComponent implements OnDestroy {
     @Input() service!: AdminService;
-    public title: string = '';
-    public desc: string = '';
     private managementService!: ManagementService;
     public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
@@ -28,6 +26,9 @@ export class PasswordIamPolicyComponent implements OnDestroy {
 
     private sub: Subscription = new Subscription();
     private org!: Org.AsObject;
+
+    public PolicyComponentServiceType: any = PolicyComponentServiceType;
+
     constructor(
         private route: ActivatedRoute,
         private toast: ToastService,
@@ -47,9 +48,6 @@ export class PasswordIamPolicyComponent implements OnDestroy {
             }
             return this.route.params;
         })).subscribe(_ => {
-            this.title = 'ORG.POLICY.IAM_POLICY.TITLECREATE';
-            this.desc = 'ORG.POLICY.IAM_POLICY.DESCRIPTIONCREATE';
-
             this.getData().then(data => {
                 if (data) {
                     console.log(data.toObject());
@@ -64,9 +62,6 @@ export class PasswordIamPolicyComponent implements OnDestroy {
     }
 
     private async getData(): Promise<AdminOrgIamPolicyView | MgmtOrgIamPolicyView | undefined> {
-        this.title = 'ORG.POLICY.IAM_POLICY.TITLECREATE';
-        this.desc = 'ORG.POLICY.IAM_POLICY.DESCRIPTIONCREATE';
-
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
                 return this.managementService.GetMyOrgIamPolicy();
@@ -113,6 +108,14 @@ export class PasswordIamPolicyComponent implements OnDestroy {
                     this.toast.showError(error);
                 });
                 break;
+        }
+    }
+
+    public get isDefault(): boolean {
+        if (this.iamData && this.serviceType === PolicyComponentServiceType.MGMT) {
+            return (this.iamData as MgmtOrgIamPolicyView.AsObject).pb_default;
+        } else {
+            return false;
         }
     }
 }
