@@ -13,11 +13,11 @@ import { ToastService } from 'src/app/services/toast.service';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
-    selector: 'app-password-iam-policy',
-    templateUrl: './password-iam-policy.component.html',
-    styleUrls: ['./password-iam-policy.component.scss'],
+    selector: 'app-org-iam-policy',
+    templateUrl: './org-iam-policy.component.html',
+    styleUrls: ['./org-iam-policy.component.scss'],
 })
-export class PasswordIamPolicyComponent implements OnDestroy {
+export class OrgIamPolicyComponent implements OnDestroy {
     @Input() service!: AdminService;
     private managementService!: ManagementService;
     public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;

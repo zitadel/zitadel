@@ -70,8 +70,8 @@ const routes: Routes = [
                 data: {
                     serviceType: PolicyComponentServiceType.MGMT,
                 },
-                loadChildren: () => import('src/app/modules/policies/password-iam-policy/password-iam-policy.module')
-                    .then(m => m.PasswordIamPolicyModule),
+                loadChildren: () => import('src/app/modules/policies/org-iam-policy/org-iam-policy.module')
+                    .then(m => m.OrgIamPolicyModule),
             },
             {
                 path: PolicyComponentType.LOGIN,

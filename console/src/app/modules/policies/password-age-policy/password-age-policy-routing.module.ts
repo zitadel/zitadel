@@ -11,14 +11,6 @@ const routes: Routes = [
             animation: 'DetailPage',
         },
     },
-    // {
-    //     path: 'create',
-    //     component: PasswordAgePolicyComponent,
-    //     data: {
-    //         animation: 'DetailPage',
-    //         action: PolicyComponentAction.CREATE,
-    //     },
-    // },
 ];
 
 @NgModule({

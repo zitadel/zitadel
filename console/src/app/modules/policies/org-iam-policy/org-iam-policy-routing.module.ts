@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { PasswordIamPolicyComponent } from './password-iam-policy.component';
+import { OrgIamPolicyComponent } from './org-iam-policy.component';
 
 const routes: Routes = [
     {
         path: '',
-        component: PasswordIamPolicyComponent,
+        component: OrgIamPolicyComponent,
         data: {
             animation: 'DetailPage',
         },
@@ -17,4 +17,4 @@ const routes: Routes = [
     imports: [RouterModule.forChild(routes)],
     exports: [RouterModule],
 })
-export class PasswordIamPolicyRoutingModule { }
+export class OrgIamPolicyRoutingModule { }
