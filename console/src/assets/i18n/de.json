@@ -443,7 +443,7 @@
                 "DESCRIPTIONCREATEMGMT":"Nutzer können Sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
                 "SAVED":"Erfolgreich gespeichert."
             },
-            "DEFAULTLABEL":"Die zurzeit gesetzte Richtlinie entspricht der vom IAM gesetztden standartmässigen Eistellung.",
+            "DEFAULTLABEL":"Die aktuelle Richtlinie entspricht der IAM-Standard Einstellung.",
             "BTN_INSTALL":"Installieren",
             "BTN_EDIT":"Modifizieren",
             "DATA": {
