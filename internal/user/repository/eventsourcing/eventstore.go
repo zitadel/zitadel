@@ -636,6 +636,27 @@ func (es *UserEventstore) ExternalLoginChecked(ctx context.Context, userID strin
 	return nil
 }
 
+func (es *UserEventstore) TokenAdded(ctx context.Context, token *usr_model.Token) (*usr_model.Token, error) {
+	user, err := es.UserByID(ctx, token.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	id, err := es.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+	token.TokenID = id
+	repoUser := model.UserFromModel(user)
+	repoToken := model.TokenFromModel(token)
+	agg := TokenAddedAggregate(es.AggregateCreator(), repoUser, repoToken)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoToken.AppendEvents, agg)
+	if err != nil {
+		return nil, err
+	}
+	es.userCache.cacheUser(repoUser)
+	return model.TokenToModel(repoToken), nil
+}
+
 func (es *UserEventstore) ChangeMachine(ctx context.Context, machine *usr_model.Machine) (*usr_model.Machine, error) {
 	user, err := es.UserByID(ctx, machine.AggregateID)
 	if err != nil {

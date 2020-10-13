@@ -6,7 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/model"
 )
 
-type Token struct {
+type TokenView struct {
 	ID                string
 	CreationDate      time.Time
 	ChangeDate        time.Time

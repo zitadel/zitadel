@@ -43,6 +43,13 @@ func (u *Token) EventQuery() (*models.SearchQuery, error) {
 
 func (u *Token) Reduce(event *models.Event) (err error) {
 	switch event.Type {
+	case user_es_model.UserTokenAdded:
+		token := new(view_model.TokenView)
+		err := token.AppendEvent(event)
+		if err != nil {
+			return err
+		}
+		return u.view.PutToken(token)
 	case user_es_model.UserProfileChanged,
 		user_es_model.HumanProfileChanged:
 		user := new(view_model.UserView)

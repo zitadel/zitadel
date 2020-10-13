@@ -2,38 +2,85 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"time"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
-	token_model "github.com/caos/zitadel/internal/token/model"
-	token_view_model "github.com/caos/zitadel/internal/token/repository/view/model"
 )
 
 type TokenRepo struct {
-	View *view.View
+	UserEvents *user_event.UserEventstore
+	View       *view.View
 }
 
-func (repo *TokenRepo) CreateToken(ctx context.Context, agentID, applicationID, userID string, audience, scopes []string, lifetime time.Duration) (*token_model.Token, error) {
+func (repo *TokenRepo) CreateToken(ctx context.Context, agentID, applicationID, userID string, audience, scopes []string, lifetime time.Duration) (*usr_model.Token, error) {
 	preferredLanguage := ""
 	user, _ := repo.View.UserByID(userID)
 	if user != nil {
 		preferredLanguage = user.PreferredLanguage
 	}
-	token, err := repo.View.CreateToken(agentID, applicationID, userID, preferredLanguage, audience, scopes, lifetime)
-	if err != nil {
-		return nil, err
+	now := time.Now().UTC()
+	token := &usr_model.Token{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: userID,
+		},
+		UserAgentID:       agentID,
+		ApplicationID:     applicationID,
+		Audience:          audience,
+		Scopes:            scopes,
+		Expiration:        now.Add(lifetime),
+		PreferredLanguage: preferredLanguage,
 	}
-	return token_view_model.TokenToModel(token), nil
+	return repo.UserEvents.TokenAdded(ctx, token)
 }
 
-func (repo *TokenRepo) IsTokenValid(ctx context.Context, tokenID string) (bool, error) {
-	return repo.View.IsTokenValid(tokenID)
+func (repo *TokenRepo) IsTokenValid(ctx context.Context, userID, tokenID string) (bool, error) {
+	token, err := repo.TokenByID(ctx, userID, tokenID)
+	if err == nil {
+		return token.Expiration.After(time.Now().UTC()), nil
+	}
+	if errors.IsNotFound(err) {
+		return false, nil
+	}
+	return false, err
 }
 
-func (repo *TokenRepo) TokenByID(ctx context.Context, tokenID string) (*token_model.Token, error) {
-	token, err := repo.View.TokenByID(tokenID)
-	if err != nil {
-		return nil, err
+func (repo *TokenRepo) TokenByID(ctx context.Context, userID, tokenID string) (*usr_model.TokenView, error) {
+	token, viewErr := repo.View.TokenByID(tokenID)
+	if viewErr != nil && !errors.IsNotFound(viewErr) {
+		return nil, viewErr
 	}
-	return token_view_model.TokenToModel(token), nil
+	if errors.IsNotFound(viewErr) {
+		token = new(model.TokenView)
+		token.UserID = userID
+	}
+
+	events, esErr := repo.UserEvents.UserEventsByID(ctx, userID, token.Sequence)
+	if errors.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, errors.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
+	}
+
+	if esErr != nil {
+		logging.Log("EVENT-5Nm9s").WithError(viewErr).Debug("error retrieving new events")
+		return model.TokenViewToModel(token), nil
+	}
+	viewToken := *token
+	for _, event := range events {
+		err := token.AppendEventIfMyToken(event)
+		if err != nil {
+			return model.TokenViewToModel(&viewToken), nil
+		}
+		if !token.Expiration.After(time.Now().UTC()) {
+			return nil, errors.ThrowNotFound(nil, "EVENT-5N9so", "Errors.Token.NotFound")
+		}
+	}
+	if token.ID == "" || token.Deactivated {
+		return nil, errors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.Token.NotFound")
+	}
+	return model.TokenViewToModel(token), nil
 }

@@ -65,8 +65,8 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 	return o.repo.AuthorizeOIDCApplication(ctx, id, secret)
 }
 
-func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, origin string) (*oidc.Userinfo, error) {
-	token, err := o.repo.TokenByID(ctx, tokenID)
+func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, subject, origin string) (*oidc.Userinfo, error) {
+	token, err := o.repo.TokenByID(ctx, tokenID, subject)
 	if err != nil {
 		return nil, err
 	}

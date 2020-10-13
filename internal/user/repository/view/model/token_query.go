@@ -2,13 +2,13 @@ package model
 
 import (
 	global_model "github.com/caos/zitadel/internal/model"
-	token_model "github.com/caos/zitadel/internal/token/model"
+	"github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
-type TokenSearchRequest token_model.TokenSearchRequest
-type TokenSearchQuery token_model.TokenSearchQuery
-type TokenSearchKey token_model.TokenSearchKey
+type TokenSearchRequest model.TokenSearchRequest
+type TokenSearchQuery model.TokenSearchQuery
+type TokenSearchKey model.TokenSearchKey
 
 func (req TokenSearchRequest) GetLimit() uint64 {
 	return req.Limit
@@ -19,7 +19,7 @@ func (req TokenSearchRequest) GetOffset() uint64 {
 }
 
 func (req TokenSearchRequest) GetSortingColumn() repository.ColumnKey {
-	if req.SortingColumn == token_model.TokenSearchKeyUnspecified {
+	if req.SortingColumn == model.TokenSearchKeyUnspecified {
 		return nil
 	}
 	return TokenSearchKey(req.SortingColumn)
@@ -50,18 +50,18 @@ func (req TokenSearchQuery) GetValue() interface{} {
 }
 
 func (key TokenSearchKey) ToColumnName() string {
-	switch token_model.TokenSearchKey(key) {
-	case token_model.TokenSearchKeyTokenID:
+	switch model.TokenSearchKey(key) {
+	case model.TokenSearchKeyTokenID:
 		return TokenKeyTokenID
-	case token_model.TokenSearchKeyUserAgentID:
+	case model.TokenSearchKeyUserAgentID:
 		return TokenKeyUserAgentID
-	case token_model.TokenSearchKeyUserID:
+	case model.TokenSearchKeyUserID:
 		return TokenKeyUserID
-	case token_model.TokenSearchKeyApplicationID:
+	case model.TokenSearchKeyApplicationID:
 		return TokenKeyApplicationID
-	case token_model.TokenSearchKeyExpiration:
+	case model.TokenSearchKeyExpiration:
 		return TokenKeyExpiration
-	case token_model.TokenSearchKeyResourceOwner:
+	case model.TokenSearchKeyResourceOwner:
 		return TokenKeyResourceOwner
 	default:
 		return ""

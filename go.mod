@@ -51,7 +51,7 @@ require (
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.1.0
 	go.opencensus.io v0.22.4
-	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+	golang.org/x/crypto v0.0.0-20201012173705-84dcc777aaee
 	golang.org/x/text v0.3.3
 	golang.org/x/tools v0.0.0-20200916140129-56d9a0cd3487
 	google.golang.org/genproto v0.0.0-20200916143405-f6a2fa72f0c4
