@@ -27,6 +27,6 @@ export class OrgInterceptor<TReq = unknown, TResp = unknown> implements UnaryInt
                 this.storageService.removeItem(ORG_STORAGE_KEY);
             }
             return Promise.reject(error);
-        });;
+        });
     }
 }
