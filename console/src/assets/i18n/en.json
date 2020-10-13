@@ -379,6 +379,12 @@
             "ORGDOMAIN_VERIFICATION_NEWTOKEN_TITLE":"Request New Token",
             "ORGDOMAIN_VERIFICATION_NEWTOKEN_DESC":"If you want to request a new token, select you preferred method. If you want to validate a persisting token, click the button above.",
             "ORGDOMAIN_VERIFICATION_VALIDATION_ONGOING":"A verification token has already been requested. Click on the button to trigger a verification check.",
+            "ORGDOMAIN_VERIFICATION_VALIDATION_ONGOING_TYPE":"Type of the token:",
+            "ORGDOMAIN_REQUESTNEWTOKEN":"Request new Token",
+            "ORGDOMAIN_TYPES": {
+                "1":"HTTP",
+                "2":"DNS"
+            },
             "DOWNLOAD_FILE":"Download File",
             "SELECTORGTOOLTIP":"Select this organisation.",
             "PRIMARYDOMAIN":"Primary Domain",

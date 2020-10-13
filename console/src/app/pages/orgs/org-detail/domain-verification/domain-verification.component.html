@@ -1,4 +1,4 @@
-<span class="title" mat-dialog-title>{{domain.domain}} {{'ORG.PAGES.ORGDOMAIN_TITLE' | translate}} </span>
+<span class="title" mat-dialog-title>{{'ORG.PAGES.ORGDOMAIN_TITLE' | translate}} {{domain.domain}}</span>
 <div mat-dialog-content>
     <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION' | translate }}</p>
 
@@ -6,42 +6,49 @@
 
 
     <p *ngIf="domain.validationType !== OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_UNSPECIFIED" class="desc">
-        {{'ORG.PAGES.ORGDOMAIN_VERIFICATION_VALIDATION_ONGOING' | translate: domain }}</p>
+        {{'ORG.PAGES.ORGDOMAIN_VERIFICATION_VALIDATION_ONGOING' | translate: domain }}
+        {{'ORG.PAGES.ORGDOMAIN_VERIFICATION_VALIDATION_ONGOING_TYPE' | translate}}
+        {{'ORG.PAGES.ORGDOMAIN_TYPES.'+ domain.validationType | translate}}</p>
     <div *ngIf="domain.validationType !== OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_UNSPECIFIED"
         class="btn-container">
         <button color="primary" type="submit" mat-raised-button
             (click)="validate()">{{ 'ACTIONS.VERIFY' | translate }}</button>
+
+        <button *ngIf="!showNew" mat-stroked-button color="primary"
+            (click)="showNew = true">{{'ORG.PAGES.ORGDOMAIN_REQUESTNEWTOKEN' | translate}}</button>
     </div>
 
-    <p>{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION_NEWTOKEN_TITLE' | translate }}</p>
-    <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION_NEWTOKEN_DESC' | translate }}</p>
+    <ng-container *ngIf="showNew">
+        <p>{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION_NEWTOKEN_TITLE' | translate }}</p>
+        <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION_NEWTOKEN_DESC' | translate }}</p>
 
-    <div class="btn-container" *ngIf="!(http || dns)">
-        <button color="primary" mat-raised-button (click)="loadHttpToken()">HTTP</button>
-        <button color="primary" mat-raised-button (click)="loadDnsToken()">DNS</button>
-    </div>
-    <div *ngIf="http">
-        <p>HTTP TOKEN</p>
-        <p class="entry">{{http?.url}}.txt</p>
-
-        <div class="btn-container">
-            <button mat-stroked-button (click)="saveFile()"
-                color="primary">{{ 'ORG.PAGES.DOWNLOAD_FILE' | translate }}</button>
+        <div class="btn-container" *ngIf="!(http || dns)">
+            <button color="primary" mat-raised-button (click)="loadHttpToken()">HTTP</button>
+            <button color="primary" mat-raised-button (click)="loadDnsToken()">DNS</button>
         </div>
-    </div>
+        <div *ngIf="http">
+            <p>HTTP TOKEN</p>
+            <p class="entry">{{http?.url}}.txt</p>
 
-    <div *ngIf="dns">
-        <p>DNS TOKEN</p>
-        <div class="line" *ngIf="dns?.token">
-            <p class="entry">{{dns?.token}}</p>
-            <button color="primary" [disabled]="copied == data.clientSecret" matTooltip="copy to clipboard"
-                appCopyToClipboard [valueToCopy]="dns.token" (copiedValue)="copied = $event" mat-icon-button>
-                <i *ngIf="copied != dns.token" class="las la-clipboard"></i>
-                <i *ngIf="copied == dns.token" class="las la-clipboard-check"></i>
-            </button>
+            <div class="btn-container">
+                <button mat-stroked-button (click)="saveFile()"
+                    color="primary">{{ 'ORG.PAGES.DOWNLOAD_FILE' | translate }}</button>
+            </div>
         </div>
-        <p class="entry">{{dns?.url}}</p>
-    </div>
+
+        <div *ngIf="dns">
+            <p>DNS TOKEN</p>
+            <div class="line" *ngIf="dns?.token">
+                <p class="entry">{{dns?.token}}</p>
+                <button color="primary" [disabled]="copied == data.clientSecret" matTooltip="copy to clipboard"
+                    appCopyToClipboard [valueToCopy]="dns.token" (copiedValue)="copied = $event" mat-icon-button>
+                    <i *ngIf="copied != dns.token" class="las la-clipboard"></i>
+                    <i *ngIf="copied == dns.token" class="las la-clipboard-check"></i>
+                </button>
+            </div>
+            <p class="entry">{{dns?.url}}</p>
+        </div>
+    </ng-container>
 </div>
 <div mat-dialog-actions class="action">
     <button mat-button class="ok-button" (click)="closeDialog()">

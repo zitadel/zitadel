@@ -379,6 +379,12 @@
             "ORGDOMAIN_VERIFICATION_NEWTOKEN_TITLE":"Neues Token anfordern",
             "ORGDOMAIN_VERIFICATION_NEWTOKEN_DESC":"Wenn Du ein neues Token anfordern willst, klicke auf die gewünschte Methode. Wenn Du ein vorhandenes Token validieren möchtest, klicke auf \"Validieren\".",
             "ORGDOMAIN_VERIFICATION_VALIDATION_ONGOING":"Ein Token zur Validierung wurde bereits angefragt. Klicke auf \"Validieren\", um dieses Token zu validieren.",
+            "ORGDOMAIN_VERIFICATION_VALIDATION_ONGOING_TYPE":"Typ des Tokens:",
+            "ORGDOMAIN_REQUESTNEWTOKEN":"Neues Token anfordern",
+            "ORGDOMAIN_TYPES": {
+                "1":"HTTP",
+                "2":"DNS"
+            },
             "DOWNLOAD_FILE":"Datei herunterladen",
             "SELECTORGTOOLTIP":"Diese Organisation auswählen",
             "PRIMARYDOMAIN":"Primäre Domain",
