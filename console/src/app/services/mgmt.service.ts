@@ -410,12 +410,6 @@ export class ManagementService {
         return this.grpcService.mgmt.setMyPrimaryOrgDomain(req);
     }
 
-    public setMyPrimaryOrgDomain(domain: string): Promise<Empty> {
-        const req: PrimaryOrgDomainRequest = new PrimaryOrgDomainRequest();
-        req.setDomain(domain);
-        return this.grpcService.mgmt.domain(req);
-    }
-
     public GenerateMyOrgDomainValidation(domain: string, type: OrgDomainValidationType):
         Promise<OrgDomainValidationResponse> {
         const req: OrgDomainValidationRequest = new OrgDomainValidationRequest();

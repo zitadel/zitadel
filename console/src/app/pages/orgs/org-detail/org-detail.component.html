@@ -21,7 +21,7 @@
                         color="warn" mat-icon-button (click)="removeDomain(domain.domain)"><i
                             class="las la-trash"></i></button>
                 </div>
-                <p class="new-desc">{{'ORG.PAGES.ORGDOMAIN_VERIFICATION' | translate}}</p>
+                <p class="new-desc">{{'ORG.PAGES.ORGDOMAIN.VERIFICATION' | translate}}</p>
                 <button [disabled]="(canwrite$ | async) == false" matTooltip="Add domain" mat-raised-button
                     color="primary" (click)="addNewDomain()">{{'ORG.DOMAINS.NEW' | translate}}
                 </button>
