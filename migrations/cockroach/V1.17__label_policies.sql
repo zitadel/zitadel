@@ -7,7 +7,7 @@ CREATE TABLE adminapi.label_policies (
     sequence BIGINT,
 
     primary_color TEXT,
-    secundary_color TEXT,
+    secondary_color TEXT,
 
     PRIMARY KEY (aggregate_id)
 );
@@ -22,7 +22,7 @@ CREATE TABLE management.label_policies (
     sequence BIGINT,
 
     primary_color TEXT,
-    secundary_color TEXT,
+    secondary_color TEXT,
 
     PRIMARY KEY (aggregate_id)
 );

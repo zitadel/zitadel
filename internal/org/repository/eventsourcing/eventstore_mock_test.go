@@ -107,12 +107,10 @@ func GetMockChangesOrgWithLoginPolicy(ctrl *gomock.Controller) *OrgEventstore {
 
 func GetMockChangesOrgWithLabelPolicy(ctrl *gomock.Controller) *OrgEventstore {
 	orgData, _ := json.Marshal(model.Org{Name: "MusterOrg"})
-	labelPolicy, _ := json.Marshal(iam_es_model.LabelPolicy{PrimaryColor: "000001", SecundaryColor: "FFFFF1"})
-	idpData, _ := json.Marshal(iam_es_model.IDPProvider{IDPConfigID: "IDPConfigID", Type: int32(iam_model.IDPProviderTypeSystem)})
+	labelPolicy, _ := json.Marshal(iam_es_model.LabelPolicy{PrimaryColor: "000001", SecondaryColor: "FFFFF1"})
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.OrgAdded, Data: orgData},
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.LabelPolicyAdded, Data: labelPolicy},
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.LabelPolicyIDPProviderAdded, Data: idpData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)

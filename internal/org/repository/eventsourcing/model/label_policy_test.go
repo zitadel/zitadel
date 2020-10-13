@@ -23,10 +23,10 @@ func TestAppendAddLabelPolicyEvent(t *testing.T) {
 			name: "append add label policy event",
 			args: args{
 				org:    &Org{},
-				policy: &iam_es_model.LabelPolicy{PrimaryColor: "000000", SecundaryColor: "FFFFFF"},
+				policy: &iam_es_model.LabelPolicy{PrimaryColor: "000000", SecondaryColor: "FFFFFF"},
 				event:  &es_models.Event{},
 			},
-			result: &Org{LabelPolicy: &iam_es_model.LabelPolicy{PrimaryColor: "000000", SecundaryColor: "FFFFFF"}},
+			result: &Org{LabelPolicy: &iam_es_model.LabelPolicy{PrimaryColor: "000000", SecondaryColor: "FFFFFF"}},
 		},
 	}
 	for _, tt := range tests {
@@ -39,8 +39,8 @@ func TestAppendAddLabelPolicyEvent(t *testing.T) {
 			if tt.result.LabelPolicy.PrimaryColor != tt.args.org.LabelPolicy.PrimaryColor {
 				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.LabelPolicy.PrimaryColor, tt.args.org.LabelPolicy.PrimaryColor)
 			}
-			if tt.result.LabelPolicy.SecundaryColor != tt.args.org.LabelPolicy.SecundaryColor {
-				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.LabelPolicy.SecundaryColor, tt.args.org.LabelPolicy.SecundaryColor)
+			if tt.result.LabelPolicy.SecondaryColor != tt.args.org.LabelPolicy.SecondaryColor {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.LabelPolicy.SecondaryColor, tt.args.org.LabelPolicy.SecondaryColor)
 			}
 		})
 	}
@@ -61,14 +61,14 @@ func TestAppendChangeLabelPolicyEvent(t *testing.T) {
 			name: "append change label policy event",
 			args: args{
 				org: &Org{LabelPolicy: &iam_es_model.LabelPolicy{
-					SecundaryColor: "FFFFF0",
+					SecondaryColor: "FFFFF0",
 					PrimaryColor:   "000001",
 				}},
-				policy: &iam_es_model.LabelPolicy{PrimaryColor: "000000", SecundaryColor: "FFFFFF"},
+				policy: &iam_es_model.LabelPolicy{PrimaryColor: "000000", SecondaryColor: "FFFFFF"},
 				event:  &es_models.Event{},
 			},
 			result: &Org{LabelPolicy: &iam_es_model.LabelPolicy{
-				SecundaryColor: "FFFFFF",
+				SecondaryColor: "FFFFFF",
 				PrimaryColor:   "000000",
 			}},
 		},
@@ -83,8 +83,8 @@ func TestAppendChangeLabelPolicyEvent(t *testing.T) {
 			if tt.result.LabelPolicy.PrimaryColor != tt.args.org.LabelPolicy.PrimaryColor {
 				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.LabelPolicy.PrimaryColor, tt.args.org.LabelPolicy.PrimaryColor)
 			}
-			if tt.result.LabelPolicy.SecundaryColor != tt.args.org.LabelPolicy.SecundaryColor {
-				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.LabelPolicy.SecundaryColor, tt.args.org.LabelPolicy.SecundaryColor)
+			if tt.result.LabelPolicy.SecondaryColor != tt.args.org.LabelPolicy.SecondaryColor {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.LabelPolicy.SecondaryColor, tt.args.org.LabelPolicy.SecondaryColor)
 			}
 		})
 	}

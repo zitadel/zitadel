@@ -45,12 +45,6 @@ func (m *LabelPolicy) processLabelPolicy(event *models.Event) (err error) {
 	switch event.Type {
 	case iam_es_model.LabelPolicyAdded, model.LabelPolicyAdded:
 		err = policy.AppendEvent(event)
-	case iam_es_model.LabelPolicyChanged, model.LabelPolicyChanged:
-		policy, err = m.view.LabelPolicyByAggregateID(event.AggregateID)
-		if err != nil {
-			return err
-		}
-		err = policy.AppendEvent(event)
 	default:
 		return m.view.ProcessedLabelPolicySequence(event.Sequence)
 	}

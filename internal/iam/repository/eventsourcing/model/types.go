@@ -32,7 +32,4 @@ const (
 	LoginPolicyIDPProviderCascadeRemoved models.EventType = "iam.policy.login.idpprovider.cascade.removed"
 	LabelPolicyAdded                     models.EventType = "iam.policy.label.added"
 	LabelPolicyChanged                   models.EventType = "iam.policy.label.changed"
-	LabelPolicyIDPProviderAdded          models.EventType = "iam.policy.label.idpprovider.added"
-	LabelPolicyIDPProviderRemoved        models.EventType = "iam.policy.label.idpprovider.removed"
-	LabelPolicyIDPProviderCascadeRemoved models.EventType = "iam.policy.label.idpprovider.cascade.removed"
 )

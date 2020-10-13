@@ -15,7 +15,7 @@ type TemplateData struct {
 	Href           string
 	ButtonText     string
 	PrimaryColor   string
-	SecundaryColor string
+	SecondaryColor string
 }
 
 func (data *TemplateData) Translate(i18n *i18n.Translator, args map[string]interface{}, langs ...string) {

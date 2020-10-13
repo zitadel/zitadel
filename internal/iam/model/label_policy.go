@@ -10,7 +10,7 @@ type LabelPolicy struct {
 	State          PolicyState
 	Default        bool
 	PrimaryColor   string
-	SecundaryColor string
+	SecondaryColor string
 }
 
 func (p *LabelPolicy) IsValid() bool {

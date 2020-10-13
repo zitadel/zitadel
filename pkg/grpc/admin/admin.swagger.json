@@ -680,7 +680,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1DefaultLabelPolicy"
+              "$ref": "#/definitions/v1DefaultLabelPolicyUpdate"
             }
           }
         ],
@@ -1016,7 +1016,26 @@
         "primary_color": {
           "type": "string"
         },
-        "secundary_color": {
+        "secondary_color": {
+          "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultLabelPolicyUpdate": {
+      "type": "object",
+      "properties": {
+        "primary_color": {
+          "type": "string"
+        },
+        "secondary_color": {
           "type": "string"
         }
       }
@@ -1027,8 +1046,16 @@
         "primary_color": {
           "type": "string"
         },
-        "secundary_color": {
+        "secondary_color": {
           "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

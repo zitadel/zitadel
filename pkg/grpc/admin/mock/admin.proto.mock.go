@@ -618,7 +618,7 @@ func (mr *MockAdminServiceClientMockRecorder) SetUpOrg(arg0, arg1 interface{}, a
 }
 
 // UpdateDefaultLabelPolicy mocks base method
-func (m *MockAdminServiceClient) UpdateDefaultLabelPolicy(arg0 context.Context, arg1 *admin.DefaultLabelPolicy, arg2 ...grpc.CallOption) (*admin.DefaultLabelPolicy, error) {
+func (m *MockAdminServiceClient) UpdateDefaultLabelPolicy(arg0 context.Context, arg1 *admin.DefaultLabelPolicyUpdate, arg2 ...grpc.CallOption) (*admin.DefaultLabelPolicy, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {

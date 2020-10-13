@@ -732,7 +732,6 @@ func (es *OrgEventstore) AddLabelPolicy(ctx context.Context, policy *iam_model.L
 		return nil, err
 	}
 	return iam_es_model.LabelPolicyToModel(repoOrg.LabelPolicy), nil
-	//return nil, nil
 }
 
 func (es *OrgEventstore) ChangeLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {

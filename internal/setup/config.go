@@ -45,7 +45,7 @@ type LoginPolicy struct {
 }
 type LabelPolicy struct {
 	PrimaryColor   string
-	SecundaryColor string
+	SecondaryColor string
 }
 type User struct {
 	FirstName string

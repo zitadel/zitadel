@@ -15,7 +15,7 @@ func (s *Server) GetDefaultLabelPolicy(ctx context.Context, _ *empty.Empty) (*ad
 	return labelPolicyViewFromModel(result), nil
 }
 
-func (s *Server) UpdateDefaultLabelPolicy(ctx context.Context, policy *admin.DefaultLabelPolicy) (*admin.DefaultLabelPolicy, error) {
+func (s *Server) UpdateDefaultLabelPolicy(ctx context.Context, policy *admin.DefaultLabelPolicyUpdate) (*admin.DefaultLabelPolicy, error) {
 	result, err := s.iam.ChangeDefaultLabelPolicy(ctx, labelPolicyToModel(policy))
 	if err != nil {
 		return nil, err

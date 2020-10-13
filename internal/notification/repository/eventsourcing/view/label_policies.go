@@ -11,8 +11,8 @@ const (
 	labelPolicyTable = "management.label_policies"
 )
 
-func (v *View) LabelPolicyByAggregateID(aggregateID string) (*model.LabelPolicyView, error) {
-	return view.GetLabelPolicyByAggregateID(v.Db, labelPolicyTable, aggregateID)
+func (v *View) LabelPolicyByAggregateID(aggregateID string, labelPolicyTableVar string) (*model.LabelPolicyView, error) {
+	return view.GetLabelPolicyByAggregateID(v.Db, labelPolicyTableVar, aggregateID)
 }
 
 func (v *View) PutLabelPolicy(policy *model.LabelPolicyView, sequence uint64) error {

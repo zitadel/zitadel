@@ -13,7 +13,7 @@ type LabelPolicy struct {
 	models.ObjectRoot
 	State          int32  `json:"-"`
 	PrimaryColor   string `json:"primaryColor"`
-	SecundaryColor string `json:"secundaryColor"`
+	SecondaryColor string `json:"secondaryColor"`
 }
 
 func LabelPolicyToModel(policy *LabelPolicy) *iam_model.LabelPolicy {
@@ -21,7 +21,7 @@ func LabelPolicyToModel(policy *LabelPolicy) *iam_model.LabelPolicy {
 		ObjectRoot:     policy.ObjectRoot,
 		State:          iam_model.PolicyState(policy.State),
 		PrimaryColor:   policy.PrimaryColor,
-		SecundaryColor: policy.SecundaryColor,
+		SecondaryColor: policy.SecondaryColor,
 	}
 }
 
@@ -30,7 +30,7 @@ func LabelPolicyFromModel(policy *iam_model.LabelPolicy) *LabelPolicy {
 		ObjectRoot:     policy.ObjectRoot,
 		State:          int32(policy.State),
 		PrimaryColor:   policy.PrimaryColor,
-		SecundaryColor: policy.SecundaryColor,
+		SecondaryColor: policy.SecondaryColor,
 	}
 }
 
@@ -40,8 +40,8 @@ func (p *LabelPolicy) Changes(changed *LabelPolicy) map[string]interface{} {
 	if changed.PrimaryColor != p.PrimaryColor {
 		changes["primaryColor"] = changed.PrimaryColor
 	}
-	if changed.SecundaryColor != p.SecundaryColor {
-		changes["secundaryColor"] = changed.SecundaryColor
+	if changed.SecondaryColor != p.SecondaryColor {
+		changes["secondaryColor"] = changed.SecondaryColor
 	}
 
 	return changes

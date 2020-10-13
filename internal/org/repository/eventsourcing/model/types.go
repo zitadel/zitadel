@@ -54,7 +54,4 @@ const (
 	LabelPolicyAdded                     models.EventType = "org.policy.label.added"
 	LabelPolicyChanged                   models.EventType = "org.policy.label.changed"
 	LabelPolicyRemoved                   models.EventType = "org.policy.label.removed"
-	LabelPolicyIDPProviderAdded          models.EventType = "org.policy.label.idpprovider.added"
-	LabelPolicyIDPProviderRemoved        models.EventType = "org.policy.label.idpprovider.removed"
-	LabelPolicyIDPProviderCascadeRemoved models.EventType = "org.policy.label.idpprovider.cascade.removed"
 )

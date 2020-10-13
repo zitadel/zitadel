@@ -709,7 +709,7 @@ func request_AdminService_GetDefaultLabelPolicy_0(ctx context.Context, marshaler
 }
 
 func request_AdminService_UpdateDefaultLabelPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq DefaultLabelPolicy
+	var protoReq DefaultLabelPolicyUpdate
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)

@@ -25,7 +25,7 @@ type LabelPolicyView struct {
 	State        int32     `json:"-" gorm:"column:label_policy_state"`
 
 	PrimaryColor   string `json:"primaryColor" gorm:"column:primary_color"`
-	SecundaryColor string `json:"secundaryColor" gorm:"column:secundary_color"`
+	SecondaryColor string `json:"secondaryColor" gorm:"column:secondary_color"`
 	Default        bool   `json:"-" gorm:"-"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
@@ -38,7 +38,7 @@ func LabelPolicyViewFromModel(policy *model.LabelPolicyView) *LabelPolicyView {
 		CreationDate:   policy.CreationDate,
 		ChangeDate:     policy.ChangeDate,
 		PrimaryColor:   policy.PrimaryColor,
-		SecundaryColor: policy.SecundaryColor,
+		SecondaryColor: policy.SecondaryColor,
 		Default:        policy.Default,
 	}
 }
@@ -50,7 +50,7 @@ func LabelPolicyViewToModel(policy *LabelPolicyView) *model.LabelPolicyView {
 		CreationDate:   policy.CreationDate,
 		ChangeDate:     policy.ChangeDate,
 		PrimaryColor:   policy.PrimaryColor,
-		SecundaryColor: policy.SecundaryColor,
+		SecondaryColor: policy.SecondaryColor,
 		Default:        policy.Default,
 	}
 }

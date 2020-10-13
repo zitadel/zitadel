@@ -127,7 +127,7 @@ func TestLabelPolicyChangedAggregate(t *testing.T) {
 				new: &iam_es_model.LabelPolicy{
 					ObjectRoot:     models.ObjectRoot{AggregateID: "AggregateID"},
 					PrimaryColor:   "000000",
-					SecundaryColor: "FFFFFF",
+					SecondaryColor: "FFFFFF",
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},

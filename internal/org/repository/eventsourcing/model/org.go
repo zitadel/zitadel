@@ -164,6 +164,10 @@ func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 		err = o.appendChangeOIDCIDPConfigEvent(event)
 	case LabelPolicyAdded:
 		err = o.appendAddLabelPolicyEvent(event)
+	case LabelPolicyChanged:
+		err = o.appendChangeLabelPolicyEvent(event)
+	case LabelPolicyRemoved:
+		o.appendRemoveLabelPolicyEvent(event)
 	case LoginPolicyAdded:
 		err = o.appendAddLoginPolicyEvent(event)
 	case LoginPolicyChanged:

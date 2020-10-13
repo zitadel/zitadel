@@ -1714,14 +1714,14 @@ func TestChangeLabelPolicy(t *testing.T) {
 				policy: &iam_model.LabelPolicy{
 					ObjectRoot:     es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
 					PrimaryColor:   "000000",
-					SecundaryColor: "FFFFFF",
+					SecondaryColor: "FFFFFF",
 				},
 			},
 			res: res{
 				result: &iam_model.LabelPolicy{
 					ObjectRoot:     es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
 					PrimaryColor:   "000000",
-					SecundaryColor: "FFFFFF",
+					SecondaryColor: "FFFFFF",
 				},
 			},
 		},
@@ -1761,8 +1761,8 @@ func TestChangeLabelPolicy(t *testing.T) {
 			if !tt.res.wantErr && result.PrimaryColor != tt.res.result.PrimaryColor {
 				t.Errorf("got wrong result PrimaryColor: expected: %v, actual: %v ", tt.res.result.PrimaryColor, result.PrimaryColor)
 			}
-			if !tt.res.wantErr && result.SecundaryColor != tt.res.result.SecundaryColor {
-				t.Errorf("got wrong result SecundaryColor: expected: %v, actual: %v ", tt.res.result.SecundaryColor, result.SecundaryColor)
+			if !tt.res.wantErr && result.SecondaryColor != tt.res.result.SecondaryColor {
+				t.Errorf("got wrong result SecondaryColor: expected: %v, actual: %v ", tt.res.result.SecondaryColor, result.SecondaryColor)
 			}
 			if tt.res.wantErr && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)

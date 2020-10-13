@@ -306,6 +306,16 @@ func (repo *OrgRepository) GetLabelPolicy(ctx context.Context) (*iam_model.Label
 	return iam_es_model.LabelPolicyViewToModel(policy), err
 }
 
+func (repo *OrgRepository) AddLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
+	policy.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.AddLabelPolicy(ctx, policy)
+}
+
+func (repo *OrgRepository) ChangeLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
+	policy.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.ChangeLabelPolicy(ctx, policy)
+}
+
 func (repo *OrgRepository) GetLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
 	policy, err := repo.View.LoginPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if errors.IsNotFound(err) {

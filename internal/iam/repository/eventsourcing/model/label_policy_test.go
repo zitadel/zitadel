@@ -23,8 +23,8 @@ func TestLabelPolicyChanges(t *testing.T) {
 		{
 			name: "labelpolicy all attributes change",
 			args: args{
-				existing: &LabelPolicy{PrimaryColor: "000001", SecundaryColor: "FFFFFA"},
-				new:      &LabelPolicy{PrimaryColor: "000000", SecundaryColor: "FFFFFF"},
+				existing: &LabelPolicy{PrimaryColor: "000001", SecondaryColor: "FFFFFA"},
+				new:      &LabelPolicy{PrimaryColor: "000000", SecondaryColor: "FFFFFF"},
 			},
 			res: res{
 				changesLen: 2,
@@ -33,8 +33,8 @@ func TestLabelPolicyChanges(t *testing.T) {
 		{
 			name: "no changes",
 			args: args{
-				existing: &LabelPolicy{PrimaryColor: "000000", SecundaryColor: "FFFFFF"},
-				new:      &LabelPolicy{PrimaryColor: "000000", SecundaryColor: "FFFFFF"},
+				existing: &LabelPolicy{PrimaryColor: "000000", SecondaryColor: "FFFFFF"},
+				new:      &LabelPolicy{PrimaryColor: "000000", SecondaryColor: "FFFFFF"},
 			},
 			res: res{
 				changesLen: 0,
@@ -66,10 +66,10 @@ func TestAppendAddLabelPolicyEvent(t *testing.T) {
 			name: "append add label policy event",
 			args: args{
 				iam:    new(IAM),
-				policy: &LabelPolicy{PrimaryColor: "000000", SecundaryColor: "FFFFFF"},
+				policy: &LabelPolicy{PrimaryColor: "000000", SecondaryColor: "FFFFFF"},
 				event:  new(es_models.Event),
 			},
-			result: &IAM{DefaultLabelPolicy: &LabelPolicy{PrimaryColor: "000000", SecundaryColor: "FFFFFF"}},
+			result: &IAM{DefaultLabelPolicy: &LabelPolicy{PrimaryColor: "000000", SecondaryColor: "FFFFFF"}},
 		},
 	}
 	for _, tt := range tests {
@@ -82,8 +82,8 @@ func TestAppendAddLabelPolicyEvent(t *testing.T) {
 			if tt.result.DefaultLabelPolicy.PrimaryColor != tt.args.iam.DefaultLabelPolicy.PrimaryColor {
 				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.DefaultLabelPolicy.PrimaryColor, tt.args.iam.DefaultLabelPolicy.PrimaryColor)
 			}
-			if tt.result.DefaultLabelPolicy.SecundaryColor != tt.args.iam.DefaultLabelPolicy.SecundaryColor {
-				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.DefaultLabelPolicy.SecundaryColor, tt.args.iam.DefaultLabelPolicy.SecundaryColor)
+			if tt.result.DefaultLabelPolicy.SecondaryColor != tt.args.iam.DefaultLabelPolicy.SecondaryColor {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.DefaultLabelPolicy.SecondaryColor, tt.args.iam.DefaultLabelPolicy.SecondaryColor)
 			}
 		})
 	}
@@ -104,13 +104,13 @@ func TestAppendChangeLabelPolicyEvent(t *testing.T) {
 			name: "append change label policy event",
 			args: args{
 				iam: &IAM{DefaultLabelPolicy: &LabelPolicy{
-					PrimaryColor: "000001", SecundaryColor: "FFFFF0",
+					PrimaryColor: "000001", SecondaryColor: "FFFFF0",
 				}},
-				policy: &LabelPolicy{PrimaryColor: "000000", SecundaryColor: "FFFFFF"},
+				policy: &LabelPolicy{PrimaryColor: "000000", SecondaryColor: "FFFFFF"},
 				event:  &es_models.Event{},
 			},
 			result: &IAM{DefaultLabelPolicy: &LabelPolicy{
-				PrimaryColor: "000000", SecundaryColor: "FFFFFF",
+				PrimaryColor: "000000", SecondaryColor: "FFFFFF",
 			}},
 		},
 	}
@@ -124,8 +124,8 @@ func TestAppendChangeLabelPolicyEvent(t *testing.T) {
 			if tt.result.DefaultLabelPolicy.PrimaryColor != tt.args.iam.DefaultLabelPolicy.PrimaryColor {
 				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.DefaultLabelPolicy.PrimaryColor, tt.args.iam.DefaultLabelPolicy.PrimaryColor)
 			}
-			if tt.result.DefaultLabelPolicy.SecundaryColor != tt.args.iam.DefaultLabelPolicy.SecundaryColor {
-				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.DefaultLabelPolicy.SecundaryColor, tt.args.iam.DefaultLabelPolicy.SecundaryColor)
+			if tt.result.DefaultLabelPolicy.SecondaryColor != tt.args.iam.DefaultLabelPolicy.SecondaryColor {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.DefaultLabelPolicy.SecondaryColor, tt.args.iam.DefaultLabelPolicy.SecondaryColor)
 			}
 		})
 	}

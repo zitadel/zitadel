@@ -9,7 +9,7 @@ import (
 type LabelPolicyView struct {
 	AggregateID    string
 	PrimaryColor   string
-	SecundaryColor string
+	SecondaryColor string
 	Default        bool
 
 	CreationDate time.Time

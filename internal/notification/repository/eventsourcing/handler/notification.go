@@ -35,8 +35,10 @@ type Notification struct {
 }
 
 const (
-	notificationTable = "notification.notifications"
-	NotifyUserID      = "NOTIFICATION"
+	notificationTable   = "notification.notifications"
+	NotifyUserID        = "NOTIFICATION"
+	labelPolicyTableOrg = "management.label_policies"
+	labelPolicyTableDef = "adminapi.label_policies"
 )
 
 func (n *Notification) ViewModel() string {
@@ -208,9 +210,11 @@ func getSetNotifyContextData(orgID string) context.Context {
 
 // Read organization specific colors
 func (n *Notification) getLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
-	policy, err := n.view.LabelPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	// read from Org
+	policy, err := n.view.LabelPolicyByAggregateID(authz.GetCtxData(ctx).OrgID, labelPolicyTableOrg)
 	if errors.IsNotFound(err) {
-		policy, err = n.view.LabelPolicyByAggregateID(n.systemDefaults.IamID)
+		// read from default
+		policy, err = n.view.LabelPolicyByAggregateID(n.systemDefaults.IamID, labelPolicyTableDef)
 		if err != nil {
 			return nil, err
 		}

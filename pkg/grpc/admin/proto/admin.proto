@@ -331,7 +331,7 @@ service AdminService {
         };
     }
 
-    rpc UpdateDefaultLabelPolicy(DefaultLabelPolicy) returns (DefaultLabelPolicy) {
+    rpc UpdateDefaultLabelPolicy(DefaultLabelPolicyUpdate) returns (DefaultLabelPolicy) {
         option (google.api.http) = {
             put: "/policies/label"
             body: "*"
@@ -829,12 +829,21 @@ enum IdpSearchKey {
 
 message DefaultLabelPolicy {
     string primary_color = 1;
-    string secundary_color = 2;
+    string secondary_color = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
+}
+
+message DefaultLabelPolicyUpdate {
+    string primary_color = 1;
+    string secondary_color = 2;
 }
 
 message DefaultLabelPolicyView {
     string primary_color = 1;
-    string secundary_color = 2;
+    string secondary_color = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
 }
 
 message DefaultLoginPolicy {
