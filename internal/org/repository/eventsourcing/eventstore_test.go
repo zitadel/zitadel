@@ -2815,8 +2815,8 @@ func TestChangeLabelPolicy(t *testing.T) {
 			res: res{
 				result: &iam_model.LabelPolicy{
 					ObjectRoot:     es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-					PrimaryColor:   "000001",
-					SecondaryColor: "FFFFF1",
+					PrimaryColor:   "000000",
+					SecondaryColor: "FFFFFF",
 				},
 			},
 		},
