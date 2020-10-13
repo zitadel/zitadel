@@ -27,6 +27,8 @@ type ApplicationView struct {
 	ComplianceProblems         []string
 	DevMode                    bool
 	OriginAllowList            []string
+	AccessTokenType            OIDCTokenType
+	ProjectRoleAssertion       bool
 
 	Sequence uint64
 }

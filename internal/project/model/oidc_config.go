@@ -34,6 +34,7 @@ type OIDCConfig struct {
 	OIDCVersion            OIDCVersion
 	Compliance             *Compliance
 	DevMode                bool
+	AccessTokenType        OIDCTokenType
 }
 
 type OIDCVersion int32
@@ -78,6 +79,13 @@ type Compliance struct {
 	NoneCompliant bool
 	Problems      []string
 }
+
+type OIDCTokenType int32
+
+const (
+	OIDCTokenTypeBearer OIDCTokenType = iota
+	OIDCTokenTypeJWT
+)
 
 func (c *OIDCConfig) IsValid() bool {
 	grantTypes := c.getRequiredGrantTypes()

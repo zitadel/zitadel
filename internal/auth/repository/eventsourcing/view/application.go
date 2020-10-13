@@ -55,24 +55,7 @@ func (v *View) ProcessedApplicationFailedEvent(failedEvent *repository.FailedEve
 }
 
 func (v *View) ApplicationByClientID(_ context.Context, clientID string) (*model.ApplicationView, error) {
-	req := &proj_model.ApplicationSearchRequest{
-		Limit: 1,
-		Queries: []*proj_model.ApplicationSearchQuery{
-			{
-				Key:    proj_model.AppSearchKeyOIDCClientID,
-				Method: global_model.SearchMethodEquals,
-				Value:  clientID,
-			},
-		},
-	}
-	apps, count, err := view.SearchApplications(v.Db, applicationTable, req)
-	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(err, "VIEW-sd6JQ", "cannot find client")
-	}
-	if count != 1 {
-		return nil, errors.ThrowPreconditionFailed(nil, "VIEW-dfw3as", "cannot find client")
-	}
-	return apps[0], nil
+	return view.ApplicationByOIDCClientID(v.Db, applicationTable, clientID)
 }
 
 func (v *View) AppIDsFromProjectByClientID(ctx context.Context, clientID string) ([]string, error) {

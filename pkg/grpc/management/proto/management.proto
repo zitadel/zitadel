@@ -2247,11 +2247,13 @@ enum OrgMemberSearchKey {
 
 message ProjectCreateRequest {
   string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  bool project_role_assertion = 2;
 }
 
 message ProjectUpdateRequest {
   string id = 1 [(validate.rules).string = {min_len: 1}];
   string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  bool project_role_assertion = 3;
 }
 
 message ProjectSearchResponse {
@@ -2271,6 +2273,7 @@ message ProjectView {
   google.protobuf.Timestamp creation_date = 5;
   string resource_owner = 6;
   uint64 sequence = 7;
+  bool project_role_assertion = 8;
 }
 
 message ProjectSearchRequest {
@@ -2301,6 +2304,7 @@ message Project {
   google.protobuf.Timestamp change_date = 4;
   google.protobuf.Timestamp creation_date = 5;
   uint64 sequence = 6;
+  bool project_role_assertion = 7;
 }
 
 enum ProjectState {
@@ -2490,6 +2494,7 @@ message OIDCConfig {
   bool none_compliant = 10;
   repeated caos.zitadel.api.v1.LocalizedMessage compliance_problems = 11;
   bool dev_mode = 12;
+  OIDCTokenType access_token_type = 13;
 }
 
 message OIDCApplicationCreate {
@@ -2503,10 +2508,16 @@ message OIDCApplicationCreate {
   repeated string post_logout_redirect_uris = 8;
   OIDCVersion version = 9;
   bool dev_mode = 10;
+  OIDCTokenType access_token_type = 11;
 }
 
 enum OIDCVersion {
   OIDCV1_0 = 0;
+}
+
+enum OIDCTokenType {
+    OIDCTokenType_Bearer = 0;
+    OIDCTokenType_JWT = 1;
 }
 
 message OIDCConfigUpdate {
@@ -2519,6 +2530,7 @@ message OIDCConfigUpdate {
   OIDCAuthMethodType auth_method_type = 7;
   repeated string post_logout_redirect_uris = 8;
   bool dev_mode = 9;
+  OIDCTokenType access_token_type = 10;
 }
 
 enum OIDCResponseType {

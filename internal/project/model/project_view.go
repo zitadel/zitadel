@@ -1,18 +1,20 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/model"
 	"time"
+
+	"github.com/caos/zitadel/internal/model"
 )
 
 type ProjectView struct {
-	ProjectID     string
-	Name          string
-	CreationDate  time.Time
-	ChangeDate    time.Time
-	State         ProjectState
-	ResourceOwner string
-	Sequence      uint64
+	ProjectID            string
+	Name                 string
+	CreationDate         time.Time
+	ChangeDate           time.Time
+	State                ProjectState
+	ResourceOwner        string
+	ProjectRoleAssertion bool
+	Sequence             uint64
 }
 
 type ProjectViewSearchRequest struct {

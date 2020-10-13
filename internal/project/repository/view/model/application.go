@@ -43,47 +43,9 @@ type ApplicationView struct {
 	ComplianceProblems         pq.StringArray `json:"-" gorm:"column:compliance_problems"`
 	DevMode                    bool           `json:"devMode" gorm:"column:dev_mode"`
 	OriginAllowList            pq.StringArray `json:"-" gorm:"column:origin_allow_list"`
+	ProjectRoleAssertion       bool           `json:"projectRoleAssertion" gorm:"column:project_role_assertion"`
 
 	Sequence uint64 `json:"-" gorm:"sequence"`
-}
-
-func ApplicationViewFromModel(app *model.ApplicationView) *ApplicationView {
-	return &ApplicationView{
-		ID:           app.ID,
-		ProjectID:    app.ProjectID,
-		Name:         app.Name,
-		State:        int32(app.State),
-		Sequence:     app.Sequence,
-		CreationDate: app.CreationDate,
-		ChangeDate:   app.ChangeDate,
-
-		IsOIDC:                     app.IsOIDC,
-		OIDCClientID:               app.OIDCClientID,
-		OIDCRedirectUris:           app.OIDCRedirectUris,
-		OIDCResponseTypes:          OIDCResponseTypesFromModel(app.OIDCResponseTypes),
-		OIDCGrantTypes:             OIDCGrantTypesFromModel(app.OIDCGrantTypes),
-		OIDCApplicationType:        int32(app.OIDCApplicationType),
-		OIDCAuthMethodType:         int32(app.OIDCAuthMethodType),
-		OIDCPostLogoutRedirectUris: app.OIDCPostLogoutRedirectUris,
-		DevMode:                    app.DevMode,
-		OriginAllowList:            app.OriginAllowList,
-	}
-}
-
-func OIDCResponseTypesFromModel(oidctypes []model.OIDCResponseType) []int64 {
-	result := make([]int64, len(oidctypes))
-	for i, t := range oidctypes {
-		result[i] = int64(t)
-	}
-	return result
-}
-
-func OIDCGrantTypesFromModel(granttypes []model.OIDCGrantType) []int64 {
-	result := make([]int64, len(granttypes))
-	for i, t := range granttypes {
-		result[i] = int64(t)
-	}
-	return result
 }
 
 func ApplicationViewToModel(app *ApplicationView) *model.ApplicationView {
@@ -109,6 +71,7 @@ func ApplicationViewToModel(app *ApplicationView) *model.ApplicationView {
 		ComplianceProblems:         app.ComplianceProblems,
 		DevMode:                    app.DevMode,
 		OriginAllowList:            app.OriginAllowList,
+		ProjectRoleAssertion:       app.ProjectRoleAssertion,
 	}
 }
 
@@ -152,6 +115,8 @@ func (a *ApplicationView) AppendEventIfMyApp(event *models.Event) (err error) {
 		}
 	case es_model.ApplicationRemoved:
 		return view.SetData(event)
+	case es_model.ProjectChanged:
+		return a.AppendEvent(event)
 	case es_model.ProjectRemoved:
 		return a.AppendEvent(event)
 	default:
@@ -186,6 +151,8 @@ func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 		}
 		a.setCompliance()
 		return a.setOriginAllowList()
+	case es_model.ProjectChanged:
+		return a.SetData(event)
 	case es_model.ApplicationDeactivated:
 		a.State = int32(model.AppStateInactive)
 	case es_model.ApplicationReactivated:

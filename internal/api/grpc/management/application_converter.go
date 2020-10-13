@@ -56,6 +56,7 @@ func oidcConfigFromModel(config *proj_model.OIDCConfig) *management.OIDCConfig {
 		NoneCompliant:          config.Compliance.NoneCompliant,
 		ComplianceProblems:     complianceProblemsToLocalizedMessages(config.Compliance.Problems),
 		DevMode:                config.DevMode,
+		AccessTokenType:        oidcTokenTypeFromModel(config.AccessTokenType),
 	}
 }
 
@@ -72,6 +73,7 @@ func oidcConfigFromApplicationViewModel(app *proj_model.ApplicationView) *manage
 		NoneCompliant:          app.NoneCompliant,
 		ComplianceProblems:     complianceProblemsToLocalizedMessages(app.ComplianceProblems),
 		DevMode:                app.DevMode,
+		AccessTokenType:        oidcTokenTypeFromModel(app.AccessTokenType),
 	}
 }
 
@@ -100,6 +102,7 @@ func oidcAppCreateToModel(app *management.OIDCApplicationCreate) *proj_model.App
 			AuthMethodType:         oidcAuthMethodTypeToModel(app.AuthMethodType),
 			PostLogoutRedirectUris: app.PostLogoutRedirectUris,
 			DevMode:                app.DevMode,
+			AccessTokenType:        oidcTokenTypeToModel(app.AccessTokenType),
 		},
 	}
 }
@@ -127,6 +130,7 @@ func oidcConfigUpdateToModel(app *management.OIDCConfigUpdate) *proj_model.OIDCC
 		AuthMethodType:         oidcAuthMethodTypeToModel(app.AuthMethodType),
 		PostLogoutRedirectUris: app.PostLogoutRedirectUris,
 		DevMode:                app.DevMode,
+		AccessTokenType:        oidcTokenTypeToModel(app.AccessTokenType),
 	}
 }
 
@@ -348,6 +352,28 @@ func oidcAuthMethodTypeFromModel(authType proj_model.OIDCAuthMethodType) managem
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE
 	default:
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC
+	}
+}
+
+func oidcTokenTypeToModel(tokenType management.OIDCTokenType) proj_model.OIDCTokenType {
+	switch tokenType {
+	case management.OIDCTokenType_OIDCTokenType_Bearer:
+		return proj_model.OIDCTokenTypeBearer
+	case management.OIDCTokenType_OIDCTokenType_JWT:
+		return proj_model.OIDCTokenTypeJWT
+	default:
+		return proj_model.OIDCTokenTypeBearer
+	}
+}
+
+func oidcTokenTypeFromModel(tokenType proj_model.OIDCTokenType) management.OIDCTokenType {
+	switch tokenType {
+	case proj_model.OIDCTokenTypeBearer:
+		return management.OIDCTokenType_OIDCTokenType_Bearer
+	case proj_model.OIDCTokenTypeJWT:
+		return management.OIDCTokenType_OIDCTokenType_JWT
+	default:
+		return management.OIDCTokenType_OIDCTokenType_Bearer
 	}
 }
 
