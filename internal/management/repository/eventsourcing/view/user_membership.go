@@ -55,6 +55,22 @@ func (v *View) DeleteUserMembershipsByUserID(userID string, eventSequence uint64
 	return v.ProcessedUserMembershipSequence(eventSequence)
 }
 
+func (v *View) DeleteUserMembershipsByAggregateID(aggregateID string, eventSequence uint64) error {
+	err := view.DeleteUserMembershipsByAggregateID(v.Db, userMembershipTable, aggregateID)
+	if err != nil {
+		return nil
+	}
+	return v.ProcessedUserMembershipSequence(eventSequence)
+}
+
+func (v *View) DeleteUserMembershipsByAggregateIDAndObjectID(aggregateID, objectID string, eventSequence uint64) error {
+	err := view.DeleteUserMembershipsByAggregateIDAndObjectID(v.Db, userMembershipTable, aggregateID, objectID)
+	if err != nil {
+		return nil
+	}
+	return v.ProcessedUserMembershipSequence(eventSequence)
+}
+
 func (v *View) GetLatestUserMembershipSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(userMembershipTable)
 }
