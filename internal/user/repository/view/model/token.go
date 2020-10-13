@@ -76,6 +76,7 @@ func (t *TokenView) AppendEventIfMyToken(event *models.Event) (err error) {
 	view := new(TokenView)
 	switch event.Type {
 	case usr_es_model.UserTokenAdded:
+		view.setRootData(event)
 		err = view.setData(event)
 	case usr_es_model.UserRemoved,
 		usr_es_model.UserDeactivated,

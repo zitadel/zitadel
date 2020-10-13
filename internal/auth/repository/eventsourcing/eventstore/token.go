@@ -57,6 +57,7 @@ func (repo *TokenRepo) TokenByID(ctx context.Context, userID, tokenID string) (*
 	}
 	if errors.IsNotFound(viewErr) {
 		token = new(model.TokenView)
+		token.ID = tokenID
 		token.UserID = userID
 	}
 
@@ -75,11 +76,8 @@ func (repo *TokenRepo) TokenByID(ctx context.Context, userID, tokenID string) (*
 		if err != nil {
 			return model.TokenViewToModel(&viewToken), nil
 		}
-		if !token.Expiration.After(time.Now().UTC()) {
-			return nil, errors.ThrowNotFound(nil, "EVENT-5N9so", "Errors.Token.NotFound")
-		}
 	}
-	if token.ID == "" || token.Deactivated {
+	if !token.Expiration.After(time.Now().UTC()) || token.Deactivated {
 		return nil, errors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.Token.NotFound")
 	}
 	return model.TokenViewToModel(token), nil

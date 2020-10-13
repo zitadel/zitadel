@@ -32,6 +32,7 @@ func (repo *TokenVerifierRepo) TokenByID(ctx context.Context, tokenID, userID st
 	}
 	if caos_errs.IsNotFound(viewErr) {
 		token = new(model.TokenView)
+		token.ID = tokenID
 		token.UserID = userID
 	}
 
@@ -50,11 +51,8 @@ func (repo *TokenVerifierRepo) TokenByID(ctx context.Context, tokenID, userID st
 		if err != nil {
 			return model.TokenViewToModel(&viewToken), nil
 		}
-		if !token.Expiration.After(time.Now().UTC()) {
-			return nil, caos_errs.ThrowNotFound(nil, "EVENT-5N9so", "Errors.Token.NotFound")
-		}
 	}
-	if token.ID == "" || token.Deactivated {
+	if !token.Expiration.After(time.Now().UTC()) || token.Deactivated {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.Token.NotFound")
 	}
 	return model.TokenViewToModel(token), nil
