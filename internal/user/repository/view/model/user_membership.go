@@ -87,10 +87,10 @@ func (u *UserMembershipView) AppendEvent(event *models.Event) (err error) {
 		err = u.setProjectMemberData(event)
 	case proj_es_model.ProjectGrantMemberAdded:
 		u.setRootData(event, model.MemberTypeProjectGrant)
-		err = u.setProjectMemberData(event)
+		err = u.setProjectGrantMemberData(event)
 	case proj_es_model.ProjectGrantMemberChanged,
 		proj_es_model.ProjectGrantMemberRemoved:
-		err = u.setProjectMemberData(event)
+		err = u.setProjectGrantMemberData(event)
 	}
 	return err
 }

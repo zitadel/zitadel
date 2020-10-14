@@ -3,7 +3,7 @@
 }
 
 .target-desc {
-  color: #8795a1;
+  color: var(--grey);
   font-size: .8rem;
   margin: 0;
   margin-bottom: 1rem;
@@ -44,5 +44,5 @@
 
 .found-label {
   font-size: .9rem;
-  color: #8795a1;
+  color: var(--grey);
 }

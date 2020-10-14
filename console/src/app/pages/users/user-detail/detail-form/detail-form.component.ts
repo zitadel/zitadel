@@ -31,7 +31,7 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
             firstName: [{ value: '', disabled: this.disabled }, Validators.required],
             lastName: [{ value: '', disabled: this.disabled }, Validators.required],
             nickName: [{ value: '', disabled: this.disabled }],
-            gender: [{ value: 0 }, { disabled: this.disabled }],
+            gender: [{ value: 0, disabled: this.disabled }],
             preferredLanguage: [{ value: '', disabled: this.disabled }],
         });
     }
@@ -44,7 +44,7 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
             firstName: [{ value: '', disabled: this.disabled }, Validators.required],
             lastName: [{ value: '', disabled: this.disabled }, Validators.required],
             nickName: [{ value: '', disabled: this.disabled }],
-            gender: [{ value: 0 }, { disabled: this.disabled }],
+            gender: [{ value: 0, disabled: this.disabled }],
             preferredLanguage: [{ value: '', disabled: this.disabled }],
         });
 

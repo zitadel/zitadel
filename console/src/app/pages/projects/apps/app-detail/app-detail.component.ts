@@ -1,13 +1,14 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 import {
     Application,
     AppState,
@@ -18,6 +19,7 @@ import {
     OIDCResponseType,
     ZitadelDocs,
 } from 'src/app/proto/generated/management_pb';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -34,6 +36,7 @@ enum RedirectType {
     styleUrls: ['./app-detail.component.scss'],
 })
 export class AppDetailComponent implements OnInit, OnDestroy {
+    public canWrite: boolean = false;
     public errorMessage: string = '';
     public removable: boolean = true;
     public addOnBlur: boolean = true;
@@ -78,8 +81,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public OIDCApplicationType: any = OIDCApplicationType;
     public OIDCAuthMethodType: any = OIDCAuthMethodType;
 
-    public redirectControl: FormControl = new FormControl('');
-    public postRedirectControl: FormControl = new FormControl('');
+    public redirectControl: FormControl = new FormControl({ value: '', disabled: true });
+    public postRedirectControl: FormControl = new FormControl({ value: '', disabled: true });
 
 
     constructor(
@@ -90,18 +93,19 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         private _location: Location,
         private dialog: MatDialog,
         private mgmtService: ManagementService,
+        private authService: GrpcAuthService,
     ) {
         this.appNameForm = this.fb.group({
-            state: ['', []],
-            name: ['', [Validators.required]],
+            state: [{ value: '', disabled: true }, []],
+            name: [{ value: '', disabled: true }, [Validators.required]],
         });
         this.appForm = this.fb.group({
-            devMode: [false, []],
+            devMode: [{ value: false, disabled: true }, []],
             clientId: [{ value: '', disabled: true }],
-            responseTypesList: [],
-            grantTypesList: [],
-            applicationType: [],
-            authMethodType: [],
+            responseTypesList: [{ value: [], disabled: true }],
+            grantTypesList: [{ value: [], disabled: true }],
+            applicationType: [{ value: '', disabled: true }],
+            authMethodType: [{ value: '', disabled: true }],
         });
     }
 
@@ -118,35 +122,34 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.mgmtService.GetIam().then(iam => {
             this.isZitadel = iam.toObject().iamProjectId === this.projectId;
         });
+        this.authService.isAllowed(['project.app.write$', 'project.app.write:' + id]).pipe(take(1)).subscribe((allowed) => {
+            this.canWrite = allowed;
+            this.mgmtService.GetApplicationById(projectid, id).then(app => {
+                this.app = app.toObject();
+                this.appNameForm.patchValue(this.app);
+                if (allowed) {
+                    this.appNameForm.enable();
+                    this.appForm.enable();
+                    this.redirectControl.enable();
+                    this.postRedirectControl.enable();
+                }
 
-        this.mgmtService.GetApplicationById(projectid, id).then(app => {
-            this.app = app.toObject();
-            this.appNameForm.patchValue(this.app);
-
-            if (this.app.state !== AppState.APPSTATE_ACTIVE) {
-                this.appNameForm.controls['name'].disable();
-                this.appForm.disable();
-            } else {
-                this.appNameForm.controls['name'].enable();
-                this.appForm.enable();
-            }
-            if (this.app.oidcConfig?.redirectUrisList) {
-                this.redirectUrisList = this.app.oidcConfig.redirectUrisList;
-
-                // this.redirectControl = new FormControl('', [nativeValidator as ValidatorFn]);
-            }
-            if (this.app.oidcConfig?.postLogoutRedirectUrisList) {
-                this.postLogoutRedirectUrisList = this.app.oidcConfig.postLogoutRedirectUrisList;
-                // this.postRedirectControl = new FormControl('', [nativeValidator as ValidatorFn]);
-            }
-            if (this.app.oidcConfig) {
-                this.appForm.patchValue(this.app.oidcConfig);
-            }
-        }).catch(error => {
-            console.error(error);
-            this.toast.showError(error);
-            this.errorMessage = error.message;
+                if (this.app.oidcConfig?.redirectUrisList) {
+                    this.redirectUrisList = this.app.oidcConfig.redirectUrisList;
+                }
+                if (this.app.oidcConfig?.postLogoutRedirectUrisList) {
+                    this.postLogoutRedirectUrisList = this.app.oidcConfig.postLogoutRedirectUrisList;
+                }
+                if (this.app.oidcConfig) {
+                    this.appForm.patchValue(this.app.oidcConfig);
+                }
+            }).catch(error => {
+                console.error(error);
+                this.toast.showError(error);
+                this.errorMessage = error.message;
+            });
         });
+
 
         this.docs = (await this.mgmtService.GetZitadelDocs()).toObject();
     }
@@ -160,19 +163,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             });
         } else if (event.value === AppState.APPSTATE_INACTIVE) {
             this.mgmtService.DeactivateApplication(this.projectId, this.app.id).then(() => {
-                this.toast.showInfo('APP.TOAST.REACTIVATED', true);
+                this.toast.showInfo('APP.TOAST.DEACTIVATED', true);
             }).catch((error: any) => {
                 this.toast.showError(error);
             });
-        }
-
-        if (event.value !== AppState.APPSTATE_ACTIVE) {
-            this.appNameForm.controls['name'].disable();
-            this.appForm.disable();
-        } else {
-            this.appNameForm.controls['name'].enable();
-            this.appForm.enable();
-            this.clientId?.disable();
         }
     }
 

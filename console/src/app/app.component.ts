@@ -220,7 +220,9 @@ export class AppComponent implements OnDestroy {
 
         this.authService.user.subscribe(userprofile => {
             this.profile = userprofile;
-            const lang = userprofile.preferredLanguage.match(/en|de/) ? userprofile.preferredLanguage : 'en';
+            const cropped = navigator.language.split('-')[0] ?? 'en';
+            const fallbackLang = cropped.match(/en|de/) ? cropped : 'en';
+            const lang = userprofile.preferredLanguage.match(/en|de/) ? userprofile.preferredLanguage : fallbackLang;
             this.translate.use(lang);
             this.document.documentElement.lang = lang;
         });

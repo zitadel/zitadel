@@ -163,7 +163,7 @@ func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_mo
 	result := &iam_model.IDPConfigSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
-		TotalResult: uint64(count),
+		TotalResult: count,
 		Result:      iam_es_model.IdpConfigViewsToModel(idps),
 	}
 	if err == nil {

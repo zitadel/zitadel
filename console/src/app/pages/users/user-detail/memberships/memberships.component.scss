@@ -18,7 +18,7 @@
 
     .sub-header {
       font-size: .8rem;
-      color: #8795a1;
+      color: var(--grey);
     }
 
     .people {
@@ -84,7 +84,7 @@
             box-sizing: border-box;
             font-size: 8px;
             border-radius: .5rem;
-            transition: background-color .2s ease-in-out;
+            transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
             background-color: $accent-color;
             cursor: pointer;
             flex-direction: column;

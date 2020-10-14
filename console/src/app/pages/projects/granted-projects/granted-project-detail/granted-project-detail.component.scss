@@ -23,7 +23,7 @@
 
     .desc {
       font-size: .9rem;
-      color: #8795a1;
+      color: var(--grey);
     }
 
     .zitadel-warning {
@@ -37,7 +37,7 @@
   width: 100%;
   display: block;
   font-size: .9rem;
-  color: #8795a1;
+  color: var(--grey);
 }
 
 .side {
