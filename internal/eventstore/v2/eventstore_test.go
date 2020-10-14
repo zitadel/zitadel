@@ -276,6 +276,22 @@ func Test_eventData(t *testing.T) {
 				wantErr:  true,
 			},
 		},
+		{
+			name: "invalid because invalid struct for json",
+			args: args{
+				event: &testEvent{
+					data: func() interface{} {
+						return struct {
+							Field chan string `json:"field"`
+						}{}
+					},
+				},
+			},
+			res: res{
+				jsonText: []byte(nil),
+				wantErr:  true,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

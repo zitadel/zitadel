@@ -42,6 +42,26 @@ func (p *ProjectReadModel) Append(events ...Event) {
 	p.events = append(p.events, events...)
 }
 
+type AppReadModel struct {
+	ReadModel
+	Name string
+}
+
+//Reduce calculates the new state of the read model
+func (a *AppReadModel) Reduce() error {
+	for _, event := range a.events {
+		switch e := event.(type) {
+		case *AddAppEvent:
+			a.Name = e.Name
+			a.ID = e.GetID()
+		case *UpdateAppEvent:
+			a.Name = e.Name
+		}
+		a.ProcessedSequence = event.GetSequence()
+	}
+	return nil
+}
+
 //Reduce calculates the new state of the read model
 func (p *ProjectReadModel) Reduce() error {
 	for i := range p.Apps {
@@ -65,26 +85,6 @@ func (p *ProjectReadModel) Reduce() error {
 			}
 		}
 		p.ProcessedSequence = event.GetSequence()
-	}
-	return nil
-}
-
-type AppReadModel struct {
-	ReadModel
-	Name string
-}
-
-//Reduce calculates the new state of the read model
-func (a *AppReadModel) Reduce() error {
-	for _, event := range a.events {
-		switch e := event.(type) {
-		case *AddAppEvent:
-			a.Name = e.Name
-			a.ID = e.GetID()
-		case *UpdateAppEvent:
-			a.Name = e.Name
-		}
-		a.ProcessedSequence = event.GetSequence()
 	}
 	return nil
 }
