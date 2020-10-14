@@ -1,7 +1,8 @@
 import { DataSource } from '@angular/cdk/collections';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { ProjectMemberView } from 'src/app/proto/generated/management_pb';
+import { ProjectMember } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 /**
@@ -9,10 +10,11 @@ import { ManagementService } from 'src/app/services/mgmt.service';
  * encapsulate all logic for fetching and manipulating the displayed data
  * (including sorting, pagination, and filtering).
  */
-export class ProjectGrantDetailDataSource extends DataSource<ProjectMemberView.AsObject> {
+export class ProjectGrantMembersDataSource extends DataSource<ProjectMember.AsObject> {
     public totalResult: number = 0;
-    public membersSubject: BehaviorSubject<ProjectMemberView.AsObject[]>
-        = new BehaviorSubject<ProjectMemberView.AsObject[]>([]);
+    public viewTimestamp!: Timestamp.AsObject;
+
+    public membersSubject: BehaviorSubject<ProjectMember.AsObject[]> = new BehaviorSubject<ProjectMember.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -20,33 +22,39 @@ export class ProjectGrantDetailDataSource extends DataSource<ProjectMemberView.A
         super();
     }
 
-    public loadMembers(projectId: string, grantId: string,
-        pageIndex: number, pageSize: number, sortDirection?: string): void {
+    public loadGrantMembers(projectId: string, grantId: string, pageIndex: number,
+        pageSize: number): void {
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
 
-        from(this.mgmtService.SearchProjectGrantMembers(projectId, grantId, pageSize, offset)).pipe(
-            map(resp => {
-                this.totalResult = resp.toObject().totalResult;
-                return resp.toObject().resultList;
-            }),
-            catchError(() => of([])),
-            finalize(() => this.loadingSubject.next(false)),
-        ).subscribe(members => {
-            this.membersSubject.next(members);
-        });
-    }
+        from(this.mgmtService.SearchProjectGrantMembers(projectId,
+            grantId, pageSize, offset)).pipe(
+                map(resp => {
+                    const response = resp.toObject();
+                    console.log(response.resultList);
+                    this.totalResult = response.totalResult;
+                    if (response.viewTimestamp) {
+                        this.viewTimestamp = response.viewTimestamp;
+                    }
+                    return response.resultList;
+                }),
+                catchError(() => of([])),
+                finalize(() => this.loadingSubject.next(false)),
+            ).subscribe(members => {
+                this.membersSubject.next(members);
+            });
 
+    }
 
     /**
      * Connect this data source to the table. The table will only update when
      * the returned stream emits new items.
      * @returns A stream of the items to be rendered.
      */
-    public connect(): Observable<ProjectMemberView.AsObject[]> {
+    public connect(): Observable<ProjectMember.AsObject[]> {
         return this.membersSubject.asObservable();
-    };
+    }
 
     /**
      *  Called when the table is being destroyed. Use this function, to clean up

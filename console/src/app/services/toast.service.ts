@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
 
@@ -31,12 +31,12 @@ export class ToastService {
     public showError(grpcError: any): void {
         const { message, code, metadata } = grpcError;
         if (code !== 16) {
-            this.showMessage(decodeURI(message), 'close', { duration: 4000 });
+            this.showMessage(decodeURI(message), 'close');
         }
     }
 
-    private showMessage(message: string, action: string, config?: MatSnackBarConfig): Observable<void> {
-        const ref = this.snackBar.open(message, action, config);
+    private showMessage(message: string, action: string): Observable<void> {
+        const ref = this.snackBar.open(message, action, { duration: 4000 });
 
         return ref.onAction();
     }

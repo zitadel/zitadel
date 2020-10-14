@@ -32,7 +32,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatTable) public table!: MatTable<UserGrantView.AsObject>;
 
-    @Input() allowCreate: boolean = false;
+    @Input() allowWrite: boolean = false;
     @Input() allowDelete: boolean = false;
 
     @Input() userId: string = '';

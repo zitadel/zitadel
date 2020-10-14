@@ -1,4 +1,8 @@
 
+.del-button {
+  margin-right: .5rem;
+}
+
 .master-row {
   display: flex;
   flex-wrap: wrap;
@@ -21,7 +25,7 @@
       }
 
       .first {
-        color: #8795a1;
+        color: var(--grey);
       }
     }
   }
@@ -37,5 +41,5 @@
 
 .divider {
   height: 1px;
-  background-color: #ffffff20;
+  background-color: #8795a140;
 }

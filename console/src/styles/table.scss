@@ -11,7 +11,7 @@
   .mat-table,
   .mat-paginator {
     background-color: inherit !important;
-    transition: background-color .4s ease-in-out;
+    transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
   }
   /* stylelint-enable */
 
@@ -20,7 +20,7 @@
     border-radius: 1rem;
     color: mat-color($foreground, text);
     white-space: nowrap;
-    background-color: #8795a1;
+    background-color: var(--grey);
     padding: 3px 1rem;
   }
 
@@ -36,8 +36,7 @@
     &.highlight {
       &:hover {
         td {
-          // TODO: replace with non transparent color so that columns are not getting overlayed colorwise twice
-          background-color: rgba($inv-color, .05);
+          background-color: var(--table-row-back); // rgba($inv-color, .05);
         }
       }
     }

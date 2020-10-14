@@ -1,10 +1,10 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
-import { from } from 'rxjs';
-import { debounceTime, switchMap, tap } from 'rxjs/operators';
+import { from, Subject } from 'rxjs';
+import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
 import {
     ProjectRole,
     ProjectRoleSearchKey,
@@ -12,7 +12,6 @@ import {
     SearchMethod,
 } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { ToastService } from 'src/app/services/toast.service';
 
 
 @Component({
@@ -20,7 +19,7 @@ import { ToastService } from 'src/app/services/toast.service';
     templateUrl: './search-roles-autocomplete.component.html',
     styleUrls: ['./search-roles-autocomplete.component.scss'],
 })
-export class SearchRolesAutocompleteComponent {
+export class SearchRolesAutocompleteComponent implements OnDestroy {
     public selectable: boolean = true;
     public removable: boolean = true;
     public addOnBlur: boolean = true;
@@ -35,9 +34,12 @@ export class SearchRolesAutocompleteComponent {
     @Input() public projectId: string = '';
     @Input() public singleOutput: boolean = false;
     @Output() public selectionChanged: EventEmitter<ProjectRole.AsObject[] | ProjectRole.AsObject> = new EventEmitter();
-    constructor(private mgmtService: ManagementService, private toast: ToastService) {
+
+    private unsubscribed$: Subject<void> = new Subject();
+    constructor(private mgmtService: ManagementService) {
         this.myControl.valueChanges
             .pipe(
+                takeUntil(this.unsubscribed$),
                 debounceTime(200),
                 tap(() => this.isLoading = true),
                 switchMap(value => {
@@ -53,6 +55,10 @@ export class SearchRolesAutocompleteComponent {
             }, error => {
                 this.isLoading = false;
             });
+    }
+
+    public ngOnDestroy(): void {
+        this.unsubscribed$.next();
     }
 
     public displayFn(project?: ProjectRole.AsObject): string | undefined {
