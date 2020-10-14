@@ -2,7 +2,9 @@ package model
 
 import (
 	"encoding/json"
+
 	"github.com/caos/logging"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 )
@@ -13,12 +15,13 @@ const (
 
 type Project struct {
 	es_models.ObjectRoot
-	Name         string           `json:"name,omitempty"`
-	State        int32            `json:"-"`
-	Members      []*ProjectMember `json:"-"`
-	Roles        []*ProjectRole   `json:"-"`
-	Applications []*Application   `json:"-"`
-	Grants       []*ProjectGrant  `json:"-"`
+	Name                 string           `json:"name,omitempty"`
+	ProjectRoleAssertion bool             `json:"projectRoleAssertion,omitempty"`
+	State                int32            `json:"-"`
+	Members              []*ProjectMember `json:"-"`
+	Roles                []*ProjectRole   `json:"-"`
+	Applications         []*Application   `json:"-"`
+	Grants               []*ProjectGrant  `json:"-"`
 }
 
 func GetProject(projects []*Project, id string) (int, *Project) {
@@ -35,6 +38,9 @@ func (p *Project) Changes(changed *Project) map[string]interface{} {
 	if changed.Name != "" && p.Name != changed.Name {
 		changes["name"] = changed.Name
 	}
+	if p.ProjectRoleAssertion != changed.ProjectRoleAssertion {
+		changes["projectRoleAssertion"] = changed.ProjectRoleAssertion
+	}
 	return changes
 }
 
@@ -44,13 +50,14 @@ func ProjectFromModel(project *model.Project) *Project {
 	apps := AppsFromModel(project.Applications)
 	grants := GrantsFromModel(project.Grants)
 	return &Project{
-		ObjectRoot:   project.ObjectRoot,
-		Name:         project.Name,
-		State:        int32(project.State),
-		Members:      members,
-		Roles:        roles,
-		Applications: apps,
-		Grants:       grants,
+		ObjectRoot:           project.ObjectRoot,
+		Name:                 project.Name,
+		ProjectRoleAssertion: project.ProjectRoleAssertion,
+		State:                int32(project.State),
+		Members:              members,
+		Roles:                roles,
+		Applications:         apps,
+		Grants:               grants,
 	}
 }
 
@@ -60,13 +67,14 @@ func ProjectToModel(project *Project) *model.Project {
 	apps := AppsToModel(project.Applications)
 	grants := GrantsToModel(project.Grants)
 	return &model.Project{
-		ObjectRoot:   project.ObjectRoot,
-		Name:         project.Name,
-		State:        model.ProjectState(project.State),
-		Members:      members,
-		Roles:        roles,
-		Applications: apps,
-		Grants:       grants,
+		ObjectRoot:           project.ObjectRoot,
+		Name:                 project.Name,
+		ProjectRoleAssertion: project.ProjectRoleAssertion,
+		State:                model.ProjectState(project.State),
+		Members:              members,
+		Roles:                roles,
+		Applications:         apps,
+		Grants:               grants,
 	}
 }
 

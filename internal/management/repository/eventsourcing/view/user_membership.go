@@ -32,7 +32,7 @@ func (v *View) PutUserMembership(membership *model.UserMembershipView, sequence 
 }
 
 func (v *View) BulkPutUserMemberships(memberships []*model.UserMembershipView, sequence uint64) error {
-	err := view.PutUserMemberships(v.Db, userTable, memberships...)
+	err := view.PutUserMemberships(v.Db, userMembershipTable, memberships...)
 	if err != nil {
 		return err
 	}

@@ -15,3 +15,21 @@ CREATE TABLE auth.project_roles (
 ALTER TABLE authz.user_grants ADD COLUMN org_primary_domain TEXT;
 ALTER TABLE auth.user_grants ADD COLUMN org_primary_domain TEXT;
 ALTER TABLE management.user_grants ADD COLUMN org_primary_domain TEXT;
+
+ALTER TABLE authz.applications ADD COLUMN access_token_type SMALLINT;
+ALTER TABLE auth.applications ADD COLUMN access_token_type SMALLINT;
+ALTER TABLE management.applications ADD COLUMN access_token_type SMALLINT;
+
+ALTER TABLE management.projects ADD COLUMN project_role_assertion BOOLEAN;
+
+ALTER TABLE authz.applications ADD COLUMN project_role_assertion BOOLEAN;
+ALTER TABLE auth.applications ADD COLUMN project_role_assertion BOOLEAN;
+ALTER TABLE management.applications ADD COLUMN project_role_assertion BOOLEAN;
+
+ALTER TABLE authz.applications ADD COLUMN access_token_role_assertion BOOLEAN;
+ALTER TABLE auth.applications ADD COLUMN access_token_role_assertion BOOLEAN;
+ALTER TABLE management.applications ADD COLUMN access_token_role_assertion BOOLEAN;
+
+ALTER TABLE authz.applications ADD COLUMN id_token_role_assertion BOOLEAN;
+ALTER TABLE auth.applications ADD COLUMN id_token_role_assertion BOOLEAN;
+ALTER TABLE management.applications ADD COLUMN id_token_role_assertion BOOLEAN;

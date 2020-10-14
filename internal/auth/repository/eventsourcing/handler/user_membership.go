@@ -104,7 +104,7 @@ func (m *UserMembership) processOrg(event *models.Event) (err error) {
 	case org_es_model.OrgMemberRemoved:
 		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeOrganisation, event.Sequence)
 	case org_es_model.OrgChanged:
-		err = m.updateOrgName(event)
+		return m.updateOrgName(event)
 	default:
 		return m.view.ProcessedUserMembershipSequence(event.Sequence)
 	}
@@ -175,7 +175,7 @@ func (m *UserMembership) processProject(event *models.Event) (err error) {
 	case proj_es_model.ProjectGrantMemberRemoved:
 		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, member.ObjectID, usr_model.MemberTypeProjectGrant, event.Sequence)
 	case proj_es_model.ProjectChanged:
-		err = m.updateProjectDisplayName(event)
+		return m.updateProjectDisplayName(event)
 	default:
 		return m.view.ProcessedUserMembershipSequence(event.Sequence)
 	}
@@ -211,6 +211,6 @@ func (m *UserMembership) updateProjectDisplayName(event *models.Event) error {
 }
 
 func (m *UserMembership) OnError(event *models.Event, err error) error {
-	logging.LogWithFields("SPOOL-Ms3fj", "id", event.AggregateID).WithError(err).Warn("something went wrong in orgmember handler")
+	logging.LogWithFields("SPOOL-Ms3fj", "id", event.AggregateID).WithError(err).Warn("something went wrong in user membership handler")
 	return spooler.HandleError(event, err, m.view.GetLatestUserMembershipFailedEvent, m.view.ProcessedUserMembershipFailedEvent, m.view.ProcessedUserMembershipSequence, m.errorCountUntilSkip)
 }

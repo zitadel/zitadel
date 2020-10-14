@@ -78,7 +78,7 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 	return o.repo.AuthorizeOIDCApplication(ctx, id, secret)
 }
 
-func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, origin string) (oidc.UserInfoSetter, error) {
+func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, origin string) (oidc.UserInfo, error) {
 	token, err := o.repo.ValidTokenByID(ctx, tokenID)
 	if err != nil {
 		return nil, errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
@@ -95,7 +95,7 @@ func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, origin st
 	return o.GetUserinfoFromScopes(ctx, token.UserID, token.ApplicationID, token.Scopes)
 }
 
-func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID, applicationID string, scopes []string) (oidc.UserInfoSetter, error) {
+func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID, applicationID string, scopes []string) (oidc.UserInfo, error) {
 	user, err := o.repo.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -145,24 +145,48 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID, applicati
 		}
 	}
 
-	if len(roles) == 0 {
+	if len(roles) == 0 || applicationID == "" {
 		return userInfo, nil
 	}
-	app, err := o.repo.ApplicationByClientID(ctx, applicationID)
+	projectRoles, err := o.assertRoles(ctx, userID, applicationID, roles)
 	if err != nil {
 		return nil, err
 	}
-	if err := o.assertRoles(userInfo, userID, app.ProjectID, roles); err != nil {
-		return nil, err
+	if len(projectRoles) > 0 {
+		userInfo.AppendClaims(ClaimProjectRoles, projectRoles)
 	}
 
 	return userInfo, nil
 }
 
-func (o *OPStorage) assertRoles(userInfo oidc.UserInfoSetter, userID, projectID string, requestedRoles []string) error {
-	grants, err := o.repo.UserGrantsByProjectAndUserID(projectID, userID)
+func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, applicationID string, scopes []string) (claims map[string]interface{}, err error) {
+	roles := make([]string, 0)
+	for _, scope := range scopes {
+		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
+			roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
+		}
+	}
+	if len(roles) == 0 || applicationID == "" {
+		return nil, nil
+	}
+	projectRoles, err := o.assertRoles(ctx, userID, applicationID, roles)
 	if err != nil {
-		return err
+		return nil, err
+	}
+	if len(projectRoles) > 0 {
+		claims = map[string]interface{}{ClaimProjectRoles: projectRoles}
+	}
+	return claims, err
+}
+
+func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID string, requestedRoles []string) (map[string]map[string]string, error) {
+	app, err := o.repo.ApplicationByClientID(ctx, applicationID)
+	if err != nil {
+		return nil, err
+	}
+	grants, err := o.repo.UserGrantsByProjectAndUserID(app.ProjectID, userID)
+	if err != nil {
+		return nil, err
 	}
 	projectRoles := make(map[string]map[string]string)
 	for _, requestedRole := range requestedRoles {
@@ -170,10 +194,7 @@ func (o *OPStorage) assertRoles(userInfo oidc.UserInfoSetter, userID, projectID 
 			checkGrantedRoles(projectRoles, grant, requestedRole)
 		}
 	}
-	if len(projectRoles) > 0 {
-		userInfo.AppendClaims(ClaimProjectRoles, projectRoles)
-	}
-	return nil
+	return projectRoles, nil
 }
 
 func checkGrantedRoles(roles map[string]map[string]string, grant *grant_model.UserGrantView, requestedRole string) {

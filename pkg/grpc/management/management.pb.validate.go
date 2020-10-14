@@ -9870,6 +9870,10 @@ func (m *OIDCConfig) Validate() error {
 
 	// no validation rules for AccessTokenType
 
+	// no validation rules for AccessTokenRoleAssertion
+
+	// no validation rules for IdTokenRoleAssertion
+
 	return nil
 }
 
@@ -9959,6 +9963,10 @@ func (m *OIDCApplicationCreate) Validate() error {
 
 	// no validation rules for AccessTokenType
 
+	// no validation rules for AccessTokenRoleAssertion
+
+	// no validation rules for IdTokenRoleAssertion
+
 	return nil
 }
 
@@ -10047,6 +10055,10 @@ func (m *OIDCConfigUpdate) Validate() error {
 	// no validation rules for DevMode
 
 	// no validation rules for AccessTokenType
+
+	// no validation rules for AccessTokenRoleAssertion
+
+	// no validation rules for IdTokenRoleAssertion
 
 	return nil
 }

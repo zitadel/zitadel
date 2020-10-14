@@ -43,7 +43,10 @@ type ApplicationView struct {
 	ComplianceProblems         pq.StringArray `json:"-" gorm:"column:compliance_problems"`
 	DevMode                    bool           `json:"devMode" gorm:"column:dev_mode"`
 	OriginAllowList            pq.StringArray `json:"-" gorm:"column:origin_allow_list"`
+	AccessTokenType            int32          `json:"accessTokenType" gorm:"column:access_token_type"`
 	ProjectRoleAssertion       bool           `json:"projectRoleAssertion" gorm:"column:project_role_assertion"`
+	AccessTokenRoleAssertion   bool           `json:"accessTokenRoleAssertion" gorm:"column:access_token_role_assertion"`
+	IDTokenRoleAssertion       bool           `json:"idTokenRoleAssertion" gorm:"column:id_token_role_assertion"`
 
 	Sequence uint64 `json:"-" gorm:"sequence"`
 }
@@ -71,7 +74,10 @@ func ApplicationViewToModel(app *ApplicationView) *model.ApplicationView {
 		ComplianceProblems:         app.ComplianceProblems,
 		DevMode:                    app.DevMode,
 		OriginAllowList:            app.OriginAllowList,
+		AccessTokenType:            model.OIDCTokenType(app.AccessTokenType),
 		ProjectRoleAssertion:       app.ProjectRoleAssertion,
+		AccessTokenRoleAssertion:   app.AccessTokenRoleAssertion,
+		IDTokenRoleAssertion:       app.IDTokenRoleAssertion,
 	}
 }
 

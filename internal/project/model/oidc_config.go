@@ -21,20 +21,22 @@ const (
 
 type OIDCConfig struct {
 	es_models.ObjectRoot
-	AppID                  string
-	ClientID               string
-	ClientSecret           *crypto.CryptoValue
-	ClientSecretString     string
-	RedirectUris           []string
-	ResponseTypes          []OIDCResponseType
-	GrantTypes             []OIDCGrantType
-	ApplicationType        OIDCApplicationType
-	AuthMethodType         OIDCAuthMethodType
-	PostLogoutRedirectUris []string
-	OIDCVersion            OIDCVersion
-	Compliance             *Compliance
-	DevMode                bool
-	AccessTokenType        OIDCTokenType
+	AppID                    string
+	ClientID                 string
+	ClientSecret             *crypto.CryptoValue
+	ClientSecretString       string
+	RedirectUris             []string
+	ResponseTypes            []OIDCResponseType
+	GrantTypes               []OIDCGrantType
+	ApplicationType          OIDCApplicationType
+	AuthMethodType           OIDCAuthMethodType
+	PostLogoutRedirectUris   []string
+	OIDCVersion              OIDCVersion
+	Compliance               *Compliance
+	DevMode                  bool
+	AccessTokenType          OIDCTokenType
+	AccessTokenRoleAssertion bool
+	IDTokenRoleAssertion     bool
 }
 
 type OIDCVersion int32

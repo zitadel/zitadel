@@ -68,6 +68,14 @@ func (c *Client) AllowedScopes() []string {
 	return c.allowedScopes
 }
 
+func (c *Client) AssertAdditionalIdTokenScopes() bool {
+	return c.IDTokenRoleAssertion
+}
+
+func (c *Client) AssertAdditionalAccessTokenScopes() bool {
+	return c.AccessTokenRoleAssertion
+}
+
 func (c *Client) AccessTokenLifetime() time.Duration {
 	return c.defaultAccessTokenLifetime //PLANNED: impl from real client
 }
@@ -77,7 +85,18 @@ func (c *Client) IDTokenLifetime() time.Duration {
 }
 
 func (c *Client) AccessTokenType() op.AccessTokenType {
-	return op.AccessTokenTypeBearer //PLANNED: impl from real client
+	return accessTokenTypeToOIDC(c.ApplicationView.AccessTokenType)
+}
+
+func accessTokenTypeToOIDC(tokenType model.OIDCTokenType) op.AccessTokenType {
+	switch tokenType {
+	case model.OIDCTokenTypeBearer:
+		return op.AccessTokenTypeBearer
+	case model.OIDCTokenTypeJWT:
+		return op.AccessTokenTypeJWT
+	default:
+		return op.AccessTokenTypeBearer
+	}
 }
 
 func authMethodToOIDC(authType model.OIDCAuthMethodType) op.AuthMethod {

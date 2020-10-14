@@ -29,6 +29,8 @@ type ApplicationView struct {
 	OriginAllowList            []string
 	AccessTokenType            OIDCTokenType
 	ProjectRoleAssertion       bool
+	IDTokenRoleAssertion       bool
+	AccessTokenRoleAssertion   bool
 
 	Sequence uint64
 }
