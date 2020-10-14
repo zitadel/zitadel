@@ -107,13 +107,19 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil || alreadyHandled {
 		return err
 	}
+
+	colors, err := n.getLabelPolicy(context.Background())
+	if err != nil {
+		return err
+	}
+
 	pwCode := new(es_model.PasswordCode)
 	pwCode.SetData(event)
 	user, err := n.view.NotifyUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordCode(n.statikDir, n.i18n, user, pwCode, n.systemDefaults, n.AesCrypto)
+	err = types.SendPasswordCode(n.statikDir, n.i18n, user, pwCode, n.systemDefaults, n.AesCrypto, colors)
 	if err != nil {
 		return err
 	}
@@ -125,13 +131,19 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 	if err != nil || alreadyHandled {
 		return nil
 	}
+
+	colors, err := n.getLabelPolicy(context.Background())
+	if err != nil {
+		return err
+	}
+
 	emailCode := new(es_model.EmailCode)
 	emailCode.SetData(event)
 	user, err := n.view.NotifyUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
-	err = types.SendEmailVerificationCode(n.statikDir, n.i18n, user, emailCode, n.systemDefaults, n.AesCrypto)
+	err = types.SendEmailVerificationCode(n.statikDir, n.i18n, user, emailCode, n.systemDefaults, n.AesCrypto, colors)
 	if err != nil {
 		return err
 	}
