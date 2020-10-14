@@ -98,23 +98,20 @@ func (repo *OrgRepository) RegisterOrg(ctx context.Context, register *auth_model
 	return RegisterToModel(registerModel), nil
 }
 
-func (repo *OrgRepository) GetDefaultOrgIamPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
+func (repo *OrgRepository) GetDefaultOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
 	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {
 		return nil, err
 	}
 	policy := iam_view_model.OrgIAMViewToModel(orgPolicy)
-	policy.IamDomain = repo.SystemDefaults.Domain
+	policy.IAMDomain = repo.SystemDefaults.Domain
 	return policy, err
 }
 
-func (repo *OrgRepository) GetOrgIamPolicy(ctx context.Context, orgID string) (*iam_model.OrgIAMPolicyView, error) {
+func (repo *OrgRepository) GetOrgIAMPolicy(ctx context.Context, orgID string) (*iam_model.OrgIAMPolicyView, error) {
 	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(orgID)
-	if err != nil && errors.IsNotFound(err) {
+	if errors.IsNotFound(err) {
 		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
-		if err != nil {
-			return nil, err
-		}
 	}
 	if err != nil {
 		return nil, err

@@ -5,7 +5,7 @@ import (
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"time"
 
-	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -58,11 +58,11 @@ func (i *PasswordAgePolicyView) AppendEvent(event *models.Event) (err error) {
 	i.Sequence = event.Sequence
 	i.ChangeDate = event.CreationDate
 	switch event.Type {
-	case es_model.PasswordAgePolicyAdded, org_es_model.PasswordAgePolicyAdded:
+	case iam_es_model.PasswordAgePolicyAdded, org_es_model.PasswordAgePolicyAdded:
 		i.setRootData(event)
 		i.CreationDate = event.CreationDate
 		err = i.SetData(event)
-	case es_model.PasswordAgePolicyChanged, org_es_model.PasswordAgePolicyChanged:
+	case iam_es_model.PasswordAgePolicyChanged, org_es_model.PasswordAgePolicyChanged:
 		err = i.SetData(event)
 	}
 	return err

@@ -26,7 +26,7 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (project *usr_mod
 
 func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
 	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if err != nil && caos_errs.IsNotFound(err) {
+	if caos_errs.IsNotFound(err) {
 		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
 		if err != nil {
 			return nil, err
@@ -53,7 +53,7 @@ func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, re
 		policyResourceOwner = resourceOwner
 	}
 	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(policyResourceOwner)
-	if err != nil && caos_errs.IsNotFound(err) {
+	if caos_errs.IsNotFound(err) {
 		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
 		if err != nil {
 			return nil, err
@@ -65,11 +65,14 @@ func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, re
 	pwPolicyView := iam_view.PasswordComplexityViewToModel(pwPolicy)
 
 	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(policyResourceOwner)
-	if err != nil && caos_errs.IsNotFound(err) {
+	if caos_errs.IsNotFound(err) {
 		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
 		if err != nil {
 			return nil, err
 		}
+	}
+	if err != nil {
+		return nil, err
 	}
 	orgPolicyView := iam_view.OrgIAMViewToModel(orgPolicy)
 	return repo.UserEvents.RegisterUser(ctx, user, pwPolicyView, orgPolicyView, resourceOwner)

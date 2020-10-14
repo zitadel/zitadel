@@ -31,7 +31,7 @@ func OrgIAMPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, org *m
 		if err != nil {
 			return nil, err
 		}
-		changes := org.OrgIamPolicy.Changes(policy)
+		changes := org.OrgIAMPolicy.Changes(policy)
 		if len(changes) == 0 {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Js6Vs", "Errors.NoChangesFound")
 		}

@@ -117,7 +117,7 @@ func TestOrgIamPolicyChangedAggregates(t *testing.T) {
 						AggregateID: "sdaf",
 						Sequence:    5,
 					},
-					OrgIamPolicy: &iam_es_model.OrgIAMPolicy{
+					OrgIAMPolicy: &iam_es_model.OrgIAMPolicy{
 						UserLoginMustBeDomain: true,
 					},
 				},
@@ -141,7 +141,7 @@ func TestOrgIamPolicyChangedAggregates(t *testing.T) {
 						AggregateID: "sdaf",
 						Sequence:    5,
 					},
-					OrgIamPolicy: &iam_es_model.OrgIAMPolicy{
+					OrgIAMPolicy: &iam_es_model.OrgIAMPolicy{
 						UserLoginMustBeDomain: true,
 					},
 				},
@@ -200,7 +200,7 @@ func TestOrgIamPolicyRemovedAggregates(t *testing.T) {
 						AggregateID: "sdaf",
 						Sequence:    5,
 					},
-					OrgIamPolicy: &iam_es_model.OrgIAMPolicy{
+					OrgIAMPolicy: &iam_es_model.OrgIAMPolicy{
 						UserLoginMustBeDomain: true,
 					},
 				},

@@ -248,7 +248,7 @@ func (repo *IAMRepository) GetDefaultPasswordComplexityPolicy(ctx context.Contex
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.PasswordComplexityViewToModel(policy), err
+	return iam_es_model.PasswordComplexityViewToModel(policy), nil
 }
 
 func (repo *IAMRepository) AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
@@ -266,7 +266,7 @@ func (repo *IAMRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*ia
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.PasswordAgeViewToModel(policy), err
+	return iam_es_model.PasswordAgeViewToModel(policy), nil
 }
 
 func (repo *IAMRepository) AddDefaultPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
@@ -284,7 +284,7 @@ func (repo *IAMRepository) GetDefaultPasswordLockoutPolicy(ctx context.Context) 
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.PasswordLockoutViewToModel(policy), err
+	return iam_es_model.PasswordLockoutViewToModel(policy), nil
 }
 
 func (repo *IAMRepository) AddDefaultPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
@@ -302,7 +302,7 @@ func (repo *IAMRepository) GetOrgIAMPolicy(ctx context.Context) (*iam_model.OrgI
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.OrgIAMViewToModel(policy), err
+	return iam_es_model.OrgIAMViewToModel(policy), nil
 }
 
 func (repo *IAMRepository) AddDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {

@@ -43,42 +43,42 @@ func (s *Server) GetDefaultOrgIamPolicy(ctx context.Context, _ *empty.Empty) (_ 
 	if err != nil {
 		return nil, err
 	}
-	return orgIamPolicyViewFromModel(policy), err
+	return orgIAMPolicyViewFromModel(policy), err
 }
 
 func (s *Server) UpdateDefaultOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyRequest) (_ *admin.OrgIamPolicy, err error) {
-	policy, err := s.iam.ChangeDefaultOrgIAMPolicy(ctx, orgIamPolicyRequestToModel(in))
+	policy, err := s.iam.ChangeDefaultOrgIAMPolicy(ctx, orgIAMPolicyRequestToModel(in))
 	if err != nil {
 		return nil, err
 	}
-	return orgIamPolicyFromModel(policy), err
+	return orgIAMPolicyFromModel(policy), err
 }
 
 func (s *Server) GetOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyID) (_ *admin.OrgIamPolicyView, err error) {
-	policy, err := s.org.GetOrgIamPolicyByID(ctx, in.OrgId)
+	policy, err := s.org.GetOrgIAMPolicyByID(ctx, in.OrgId)
 	if err != nil {
 		return nil, err
 	}
-	return orgIamPolicyViewFromModel(policy), err
+	return orgIAMPolicyViewFromModel(policy), err
 }
 
 func (s *Server) CreateOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyRequest) (_ *admin.OrgIamPolicy, err error) {
-	policy, err := s.org.CreateOrgIamPolicy(ctx, orgIamPolicyRequestToModel(in))
+	policy, err := s.org.CreateOrgIAMPolicy(ctx, orgIAMPolicyRequestToModel(in))
 	if err != nil {
 		return nil, err
 	}
-	return orgIamPolicyFromModel(policy), err
+	return orgIAMPolicyFromModel(policy), err
 }
 
 func (s *Server) UpdateOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyRequest) (_ *admin.OrgIamPolicy, err error) {
-	policy, err := s.org.ChangeOrgIamPolicy(ctx, orgIamPolicyRequestToModel(in))
+	policy, err := s.org.ChangeOrgIAMPolicy(ctx, orgIAMPolicyRequestToModel(in))
 	if err != nil {
 		return nil, err
 	}
-	return orgIamPolicyFromModel(policy), err
+	return orgIAMPolicyFromModel(policy), err
 }
 
 func (s *Server) RemoveOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyID) (_ *empty.Empty, err error) {
-	err = s.org.RemoveOrgIamPolicy(ctx, in.OrgId)
+	err = s.org.RemoveOrgIAMPolicy(ctx, in.OrgId)
 	return &empty.Empty{}, err
 }

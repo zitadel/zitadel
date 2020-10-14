@@ -22,7 +22,7 @@ type Org struct {
 
 	Domains                  []*OrgDomain                           `json:"-"`
 	Members                  []*OrgMember                           `json:"-"`
-	OrgIamPolicy             *iam_es_model.OrgIAMPolicy             `json:"-"`
+	OrgIAMPolicy             *iam_es_model.OrgIAMPolicy             `json:"-"`
 	IDPs                     []*iam_es_model.IDPConfig              `json:"-"`
 	LoginPolicy              *iam_es_model.LoginPolicy              `json:"-"`
 	PasswordComplexityPolicy *iam_es_model.PasswordComplexityPolicy `json:"-"`
@@ -43,7 +43,7 @@ func OrgFromModel(org *org_model.Org) *Org {
 		IDPs:       idps,
 	}
 	if org.OrgIamPolicy != nil {
-		converted.OrgIamPolicy = iam_es_model.OrgIAMPolicyFromModel(org.OrgIamPolicy)
+		converted.OrgIAMPolicy = iam_es_model.OrgIAMPolicyFromModel(org.OrgIamPolicy)
 	}
 	if org.LoginPolicy != nil {
 		converted.LoginPolicy = iam_es_model.LoginPolicyFromModel(org.LoginPolicy)
@@ -69,8 +69,8 @@ func OrgToModel(org *Org) *org_model.Org {
 		Members:    OrgMembersToModel(org.Members),
 		IDPs:       iam_es_model.IDPConfigsToModel(org.IDPs),
 	}
-	if org.OrgIamPolicy != nil {
-		converted.OrgIamPolicy = iam_es_model.OrgIAMPolicyToModel(org.OrgIamPolicy)
+	if org.OrgIAMPolicy != nil {
+		converted.OrgIamPolicy = iam_es_model.OrgIAMPolicyToModel(org.OrgIAMPolicy)
 	}
 	if org.LoginPolicy != nil {
 		converted.LoginPolicy = iam_es_model.LoginPolicyToModel(org.LoginPolicy)

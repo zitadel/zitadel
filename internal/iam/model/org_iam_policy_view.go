@@ -8,7 +8,7 @@ import (
 type OrgIAMPolicyView struct {
 	AggregateID           string
 	UserLoginMustBeDomain bool
-	IamDomain             string
+	IAMDomain             string
 	Default               bool
 
 	CreationDate time.Time

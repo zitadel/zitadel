@@ -64,9 +64,6 @@ func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*us
 	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if err != nil && caos_errs.IsNotFound(err) {
 		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
-		if err != nil {
-			return nil, err
-		}
 	}
 	if err != nil {
 		return nil, err
@@ -75,9 +72,6 @@ func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*us
 	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if err != nil && errors.IsNotFound(err) {
 		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
-		if err != nil {
-			return nil, err
-		}
 	}
 	if err != nil {
 		return nil, err
@@ -94,9 +88,6 @@ func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, re
 	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(policyResourceOwner)
 	if err != nil && caos_errs.IsNotFound(err) {
 		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
-		if err != nil {
-			return nil, err
-		}
 	}
 	if err != nil {
 		return nil, err
@@ -105,9 +96,6 @@ func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, re
 	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if err != nil && errors.IsNotFound(err) {
 		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
-		if err != nil {
-			return nil, err
-		}
 	}
 	if err != nil {
 		return nil, err
@@ -137,9 +125,6 @@ func (repo *UserRepo) RemoveUser(ctx context.Context, id string) error {
 	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if err != nil && errors.IsNotFound(err) {
 		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
-		if err != nil {
-			return err
-		}
 	}
 	if err != nil {
 		return err
@@ -235,9 +220,6 @@ func (repo *UserRepo) SetOneTimePassword(ctx context.Context, password *usr_mode
 	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if err != nil && caos_errs.IsNotFound(err) {
 		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
-		if err != nil {
-			return nil, err
-		}
 	}
 	if err != nil {
 		return nil, err
@@ -335,9 +317,6 @@ func (repo *UserRepo) ChangeUsername(ctx context.Context, userID, userName strin
 	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if err != nil && errors.IsNotFound(err) {
 		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
-		if err != nil {
-			return err
-		}
 	}
 	if err != nil {
 		return err

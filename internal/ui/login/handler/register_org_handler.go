@@ -111,7 +111,7 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 	orgPolicy, err := l.getDefaultOrgIamPolicy(r)
 	if orgPolicy != nil {
 		data.UserLoginMustBeDomain = orgPolicy.UserLoginMustBeDomain
-		data.IamDomain = orgPolicy.IamDomain
+		data.IamDomain = orgPolicy.IAMDomain
 	}
 
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplRegisterOrg], data, nil)

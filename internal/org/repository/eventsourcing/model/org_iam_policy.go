@@ -6,19 +6,19 @@ import (
 )
 
 func (o *Org) appendAddOrgIAMPolicyEvent(event *es_models.Event) error {
-	o.OrgIamPolicy = new(iam_es_model.OrgIAMPolicy)
-	err := o.OrgIamPolicy.SetData(event)
+	o.OrgIAMPolicy = new(iam_es_model.OrgIAMPolicy)
+	err := o.OrgIAMPolicy.SetData(event)
 	if err != nil {
 		return err
 	}
-	o.OrgIamPolicy.ObjectRoot.CreationDate = event.CreationDate
+	o.OrgIAMPolicy.ObjectRoot.CreationDate = event.CreationDate
 	return nil
 }
 
 func (o *Org) appendChangeOrgIAMPolicyEvent(event *es_models.Event) error {
-	return o.OrgIamPolicy.SetData(event)
+	return o.OrgIAMPolicy.SetData(event)
 }
 
 func (o *Org) appendRemoveOrgIAMPolicyEvent() {
-	o.OrgIamPolicy = nil
+	o.OrgIAMPolicy = nil
 }

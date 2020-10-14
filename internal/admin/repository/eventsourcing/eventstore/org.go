@@ -108,14 +108,10 @@ func (repo *OrgRepo) IsOrgUnique(ctx context.Context, name, domain string) (isUn
 	return repo.OrgEventstore.IsOrgUnique(ctx, name, domain)
 }
 
-func (repo *OrgRepo) GetOrgIamPolicyByID(ctx context.Context, id string) (*iam_model.OrgIAMPolicyView, error) {
+func (repo *OrgRepo) GetOrgIAMPolicyByID(ctx context.Context, id string) (*iam_model.OrgIAMPolicyView, error) {
 	policy, err := repo.View.OrgIAMPolicyByAggregateID(id)
 	if errors.IsNotFound(err) {
-		policy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
-		if err != nil {
-			return nil, err
-		}
-		policy.Default = true
+		return repo.GetDefaultOrgIAMPolicy(ctx)
 	}
 	if err != nil {
 		return nil, err
@@ -132,14 +128,14 @@ func (repo *OrgRepo) GetDefaultOrgIAMPolicy(ctx context.Context) (*iam_model.Org
 	return iam_es_model.OrgIAMViewToModel(policy), err
 }
 
-func (repo *OrgRepo) CreateOrgIamPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
+func (repo *OrgRepo) CreateOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
 	return repo.OrgEventstore.AddOrgIAMPolicy(ctx, policy)
 }
 
-func (repo *OrgRepo) ChangeOrgIamPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
+func (repo *OrgRepo) ChangeOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
 	return repo.OrgEventstore.ChangeOrgIAMPolicy(ctx, policy)
 }
 
-func (repo *OrgRepo) RemoveOrgIamPolicy(ctx context.Context, id string) error {
+func (repo *OrgRepo) RemoveOrgIAMPolicy(ctx context.Context, id string) error {
 	return repo.OrgEventstore.RemoveOrgIAMPolicy(ctx, id)
 }
