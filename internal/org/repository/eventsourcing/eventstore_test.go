@@ -1656,11 +1656,15 @@ func TestChangesOrg(t *testing.T) {
 				if err != nil {
 				}
 			}
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && result.LastSequence != tt.res.changes.LastSequence && org.Name != tt.res.org.Name {
 				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.changes.LastSequence, result.LastSequence)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -1749,7 +1753,13 @@ func TestAddIdpConfiguration(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.AddIDPConfig(tt.args.ctx, tt.args.idp)
-
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && result.IDPConfigID == "" {
 				t.Errorf("result has no id")
 			}
@@ -1764,9 +1774,6 @@ func TestAddIdpConfiguration(t *testing.T) {
 			}
 			if !tt.res.wantErr && result.OIDCConfig.ClientID != tt.res.result.OIDCConfig.ClientID {
 				t.Errorf("got wrong result key: expected: %v, actual: %v ", tt.res.result.OIDCConfig.ClientID, result.OIDCConfig.ClientID)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -1863,7 +1870,13 @@ func TestChangeIdpConfiguration(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.ChangeIDPConfig(tt.args.ctx, tt.args.idp)
-
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
@@ -1872,9 +1885,6 @@ func TestChangeIdpConfiguration(t *testing.T) {
 			}
 			if !tt.res.wantErr && result.Name != tt.res.result.Name {
 				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.result.Name, result.Name)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -2050,7 +2060,13 @@ func TestDeactivateIdpConfiguration(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.DeactivateIDPConfig(tt.args.ctx, tt.args.idp.AggregateID, tt.args.idp.IDPConfigID)
-
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
@@ -2059,9 +2075,6 @@ func TestDeactivateIdpConfiguration(t *testing.T) {
 			}
 			if !tt.res.wantErr && result.State != tt.res.result.State {
 				t.Errorf("got wrong result state: expected: %v, actual: %v ", tt.res.result.State, result.State)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -2157,7 +2170,13 @@ func TestReactivateIdpConfiguration(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.ReactivateIDPConfig(tt.args.ctx, tt.args.idp.AggregateID, tt.args.idp.IDPConfigID)
-
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
@@ -2166,9 +2185,6 @@ func TestReactivateIdpConfiguration(t *testing.T) {
 			}
 			if !tt.res.wantErr && result.State != tt.res.result.State {
 				t.Errorf("got wrong result state: expected: %v, actual: %v ", tt.res.result.State, result.State)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -2267,7 +2283,13 @@ func TestChangeOIDCIDPConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.ChangeIDPOIDCConfig(tt.args.ctx, tt.args.config)
-
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
@@ -2276,9 +2298,6 @@ func TestChangeOIDCIDPConfig(t *testing.T) {
 			}
 			if !tt.res.wantErr && result.ClientID != tt.res.result.ClientID {
 				t.Errorf("got wrong result responsetype: expected: %v, actual: %v ", tt.res.result.ClientID, result.ClientID)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -2431,7 +2450,13 @@ func TestChangeLoginPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.ChangeLoginPolicy(tt.args.ctx, tt.args.policy)
-
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && result.AllowRegister != tt.res.result.AllowRegister {
 				t.Errorf("got wrong result AllowRegister: expected: %v, actual: %v ", tt.res.result.AllowRegister, result.AllowRegister)
 			}
@@ -2440,9 +2465,6 @@ func TestChangeLoginPolicy(t *testing.T) {
 			}
 			if !tt.res.wantErr && result.AllowExternalIdp != tt.res.result.AllowExternalIdp {
 				t.Errorf("got wrong result AllowExternalIDP: expected: %v, actual: %v ", tt.res.result.AllowExternalIdp, result.AllowExternalIdp)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -2603,15 +2625,18 @@ func TestAddIdpProviderToLoginPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.AddIDPProviderToLoginPolicy(tt.args.ctx, tt.args.provider)
-
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && result.IdpConfigID != tt.res.result.IdpConfigID {
 				t.Errorf("got wrong result IDPConfigID: expected: %v, actual: %v ", tt.res.result.IdpConfigID, result.IdpConfigID)
 			}
 			if !tt.res.wantErr && result.Type != tt.res.result.Type {
 				t.Errorf("got wrong result Type: expected: %v, actual: %v ", tt.res.result.Type, result.Type)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -2781,7 +2806,13 @@ func TestAddPasswordComplexityPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.AddPasswordComplexityPolicy(tt.args.ctx, tt.args.policy)
-
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && result.MinLength != tt.res.result.MinLength {
 				t.Errorf("got wrong result MinLength: expected: %v, actual: %v ", tt.res.result.MinLength, result.MinLength)
 			}
@@ -2796,9 +2827,6 @@ func TestAddPasswordComplexityPolicy(t *testing.T) {
 			}
 			if !tt.res.wantErr && result.HasSymbol != tt.res.result.HasSymbol {
 				t.Errorf("got wrong result HasSymbol: expected: %v, actual: %v ", tt.res.result.HasSymbol, result.HasSymbol)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -2879,7 +2907,13 @@ func TestChangePasswordComplexityPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.ChangePasswordComplexityPolicy(tt.args.ctx, tt.args.policy)
-
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && result.MinLength != tt.res.result.MinLength {
 				t.Errorf("got wrong result MinLength: expected: %v, actual: %v ", tt.res.result.MinLength, result.MinLength)
 			}
@@ -2894,9 +2928,6 @@ func TestChangePasswordComplexityPolicy(t *testing.T) {
 			}
 			if !tt.res.wantErr && result.HasSymbol != tt.res.result.HasSymbol {
 				t.Errorf("got wrong result HasSymbol: expected: %v, actual: %v ", tt.res.result.HasSymbol, result.HasSymbol)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -3043,15 +3074,18 @@ func TestAddPasswordAgePolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.AddPasswordAgePolicy(tt.args.ctx, tt.args.policy)
-
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && result.MaxAgeDays != tt.res.result.MaxAgeDays {
 				t.Errorf("got wrong result MaxAgeDays: expected: %v, actual: %v ", tt.res.result.MaxAgeDays, result.MaxAgeDays)
 			}
 			if !tt.res.wantErr && result.ExpireWarnDays != tt.res.result.ExpireWarnDays {
 				t.Errorf("got wrong result.ExpireWarnDays: expected: %v, actual: %v ", tt.res.result.ExpireWarnDays, result.ExpireWarnDays)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -3127,15 +3161,18 @@ func TestChangePasswordAgePolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.ChangePasswordAgePolicy(tt.args.ctx, tt.args.policy)
-
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && result.MaxAgeDays != tt.res.result.MaxAgeDays {
 				t.Errorf("got wrong result MaxAgeDays: expected: %v, actual: %v ", tt.res.result.MaxAgeDays, result.MaxAgeDays)
 			}
 			if !tt.res.wantErr && result.ExpireWarnDays != tt.res.result.ExpireWarnDays {
 				t.Errorf("got wrong result.ExpireWarnDays: expected: %v, actual: %v ", tt.res.result.ExpireWarnDays, result.ExpireWarnDays)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -3282,15 +3319,18 @@ func TestAddPasswordLockoutPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.AddPasswordLockoutPolicy(tt.args.ctx, tt.args.policy)
-
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && result.MaxAttempts != tt.res.result.MaxAttempts {
 				t.Errorf("got wrong result MaxAttempts: expected: %v, actual: %v ", tt.res.result.MaxAttempts, result.MaxAttempts)
 			}
 			if !tt.res.wantErr && result.ShowLockOutFailures != tt.res.result.ShowLockOutFailures {
 				t.Errorf("got wrong result.ShowLockOutFailures: expected: %v, actual: %v ", tt.res.result.ShowLockOutFailures, result.ShowLockOutFailures)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -3366,15 +3406,18 @@ func TestChangePasswordLockoutPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.ChangePasswordLockoutPolicy(tt.args.ctx, tt.args.policy)
-
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && result.MaxAttempts != tt.res.result.MaxAttempts {
 				t.Errorf("got wrong result MaxAttempts: expected: %v, actual: %v ", tt.res.result.MaxAttempts, result.MaxAttempts)
 			}
 			if !tt.res.wantErr && result.ShowLockOutFailures != tt.res.result.ShowLockOutFailures {
 				t.Errorf("got wrong result.ShowLockOutFailures: expected: %v, actual: %v ", tt.res.result.ShowLockOutFailures, result.ShowLockOutFailures)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
