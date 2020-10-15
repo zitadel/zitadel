@@ -143,7 +143,10 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 			MfaHardwareCheckLifeTime:   systemDefaults.VerificationLifetimes.MfaHardwareCheck.Duration,
 			IAMID:                      systemDefaults.IamID,
 		},
-		eventstore.TokenRepo{View: view},
+		eventstore.TokenRepo{
+			UserEvents: user,
+			View:       view,
+		},
 		eventstore.KeyRepository{
 			KeyEvents:          key,
 			View:               view,
