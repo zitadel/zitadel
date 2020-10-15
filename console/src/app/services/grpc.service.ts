@@ -9,6 +9,7 @@ import { AuthServicePromiseClient } from '../proto/generated/auth_grpc_web_pb';
 import { ManagementServicePromiseClient } from '../proto/generated/management_grpc_web_pb';
 import { AuthenticationService } from './authentication.service';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { I18nInterceptor } from './interceptors/i18n.interceptor';
 import { OrgInterceptor } from './interceptors/org.interceptor';
 import { StorageService } from './storage.service';
 
@@ -37,6 +38,7 @@ export class GrpcService {
                         unaryInterceptors: [
                             new OrgInterceptor(this.storageService),
                             new AuthInterceptor(this.authenticationService, this.storageService, this.dialog),
+                            new I18nInterceptor(),
                         ],
                     };
 

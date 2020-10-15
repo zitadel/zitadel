@@ -50,6 +50,7 @@
         "INFO": "Info",
         "OK": "OK",
         "VIEW": "Öffnen",
+        "SELECTIONDELETE":"Ausgewählte löschen",
         "DELETE": "Löschen",
         "REMOVE":"Entfernen",
         "VERIFY":"Verifizieren",
@@ -60,7 +61,8 @@
         "REFRESH":"Aktualisieren",
         "LOGIN":"Einloggen",
         "EDIT":"Bearbeiten",
-        "PIN":"Anpinnen"
+        "PIN":"Anpinnen",
+        "CONFIGURE":"Konfigurieren"
     },
     "ERRORS": {
         "REQUIRED": "Bitte fülle alle benötigten Felder aus.",
@@ -88,7 +90,12 @@
             "NOUSER":"Kein Benutzer",
             "REACTIVATE":"Reaktivieren",
             "DEACTIVATE":"Deaktivieren",
-            "FILTER":"Filter"
+            "FILTER":"Filter",
+            "DELETE":"Benutzer löschen"
+        },
+        "DIALOG": {
+            "DELETE_TITLE":"User löschen",
+            "DELETE_DESCRIPTION":"Sie sind im Begriff einen Benutzer endgültig zu löschen. Wollen Sie dies wirklich tun?"
         },
         "TABLE":{
             "DEACTIVATE":"Deaktivieren",
@@ -216,6 +223,7 @@
         },
         "EMAIL": "E-Mail",
         "PHONE": "Telefonnummer",
+        "PREFERRED_LOGINNAME":"Bevorzugter Loginname",
         "LOGINMETHODS": {
             "TITLE": "Kontaktinformationen",
             "DESCRIPTION": "Die Kontaktinformationen werden benötigt, um Dir wichtige Informationen wie Verifikationsnachrichten und Links für das Zurücksetzen des Passworts per E-Mail zu senden.",
@@ -287,7 +295,8 @@
             "SELECTEDDEACTIVATED":"Selektierte Benutzer deaktiviert.",
             "SELECTEDKEYSDELETED":"Selektierte Schlüssel gelöscht.",
             "KEYADDED":"Schlüssel hinzugefügt!",
-            "MACHINEADDED":"Service User erstellt!"
+            "MACHINEADDED":"Service User erstellt!",
+            "DELETED":"Benutzer erfolgreich gelöscht!"
         },
         "MEMBERSHIPS": {
             "TITLE":"ZITADEL Manager-Rollen",
@@ -497,6 +506,7 @@
             "USERNAME": "Benutzername",
             "FIRSTNAME": "Vorname",
             "LASTNAME": "Nachname",
+            "LOGINNAME":"Loginname",
             "EMAIL": "E-Mail",
             "ROLES": "Rollen",
             "ADD": "Mitglied hinzufügen",
@@ -679,9 +689,10 @@
         },
         "DETAIL": {
           "TITLE":"Identitäts Provider",
-          "DESCRIPTION":"Konfiguration deines Identitäts Providers",
+          "DESCRIPTION":"Generelle Konfiguration deines Identitäts Providers",
           "OIDC": {
-            "TITLE": "OIDC Konfiguration"
+            "TITLE": "OIDC Konfiguration",
+            "DESCRIPTION":"Geben Sie die korrekte OIDC Konfiguration Ihres Identity Providers an!"
           }
         },
         "TYPES": {

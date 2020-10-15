@@ -69,7 +69,6 @@ export class ExternalIdpsComponent implements OnInit {
             promise.then(resp => {
                 this.externalIdpResult = resp.toObject();
                 this.dataSource.data = this.externalIdpResult.resultList;
-                console.log(this.externalIdpResult.resultList);
                 this.loadingSubject.next(false);
             }).catch((error: any) => {
                 this.toast.showError(error);

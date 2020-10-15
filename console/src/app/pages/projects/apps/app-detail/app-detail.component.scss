@@ -19,7 +19,7 @@
     width: 100%;
     display: block;
     font-size: .9rem;
-    color: #8795a1;
+    color: var(--grey);
   }
 
   .zitadel-warning {
@@ -67,7 +67,7 @@
 
   .step-description {
     font-size: .9rem;
-    color: #8795a1;
+    color: var(--grey);
     flex-basis: 100%;
     margin: 0 .5rem 1rem .5rem;
   }
@@ -81,15 +81,20 @@
   .docs-line {
     flex-basis: 100%;
     font-size: 14px;
-    color: #8795a1;
+    color: var(--grey);
     margin-top: 0;
   }
 
   .toggle {
+    outline: none;
     align-self: flex-start;
     margin-bottom: 1rem;
     margin-right: 1rem;
     border-radius: .5rem;
+
+    * {
+      outline: none;
+    }
 
     i {
       margin-right: 1rem;

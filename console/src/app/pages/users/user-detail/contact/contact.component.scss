@@ -1,0 +1,47 @@
+.method-col {
+  display: flex;
+  flex-direction: column;
+  margin: -.5rem;
+
+  .method-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .5rem;
+    border-bottom: 1px solid #ffffff20;
+    flex-wrap: wrap;
+
+    .actions {
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      flex-direction: column;
+      min-width: 150px;
+    }
+
+    .label {
+      font-size: .9rem;
+      min-width: 100px;
+      color: var(--grey);
+    }
+
+    .icon {
+      margin: .5rem;
+    }
+
+    .verify {
+      text-decoration: none;
+      font-size: .8rem;
+      color: var(--grey);
+      border-radius: .5rem;
+      cursor: pointer;
+      word-wrap: none;
+      white-space: nowrap;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

@@ -1,37 +1,7 @@
-.table-wrapper {
-  overflow: auto;
-  width: 100%;
-
-  .table,
-  .paginator {
-    width: 100%;
-
-    td,
-    th {
-      padding: .5rem;
-
-      &:first-child {
-        padding-left: 0;
-        padding-right: 1rem;
-      }
-
-      &:last-child {
-        padding-right: 0;
-      }
-    }
-
-    .action {
-      width: 40px;
-    }
-
-    .selection {
-      width: 50px;
-      max-width: 50px;
-    }
-  }
+.wrapp {
+  width: 100% !important;
 }
 
-.pointer {
-  outline: none;
-  cursor: pointer;
+.del-button {
+  margin-right: .5rem;
 }

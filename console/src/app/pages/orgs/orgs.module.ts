@@ -47,7 +47,6 @@ import { PolicyGridComponent } from './policy-grid/policy-grid.component';
         MetaLayoutModule,
         MatTabsModule,
         MatTooltipModule,
-        MatDialogModule,
         WarnDialogModule,
         MemberCreateDialogModule,
         MatMenuModule,
