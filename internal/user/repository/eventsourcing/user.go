@@ -474,6 +474,16 @@ func ExternalLoginCheckSucceededAggregate(aggCreator *es_models.AggregateCreator
 	}
 }
 
+func TokenAddedAggregate(aggCreator *es_models.AggregateCreator, user *model.User, token *model.Token) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregateOverwriteContext(ctx, aggCreator, user, user.ResourceOwner, user.AggregateID)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.UserTokenAdded, token)
+	}
+}
+
 func MachineChangeAggregate(aggCreator *es_models.AggregateCreator, user *model.User, machine *model.Machine) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if machine == nil {
