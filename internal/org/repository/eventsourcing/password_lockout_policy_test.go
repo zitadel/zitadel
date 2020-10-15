@@ -75,7 +75,13 @@ func TestPasswordLockoutPolicyAddedAggregate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			agg, err := PasswordLockoutPolicyAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
-
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
 			}
@@ -86,10 +92,6 @@ func TestPasswordLockoutPolicyAddedAggregate(t *testing.T) {
 				if !tt.res.wantErr && agg.Events[i].Data == nil {
 					t.Errorf("should have data in event")
 				}
-			}
-
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -164,7 +166,13 @@ func TestPasswordLockoutPolicyChangedAggregate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			agg, err := PasswordLockoutPolicyChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
-
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
 			}
@@ -175,10 +183,6 @@ func TestPasswordLockoutPolicyChangedAggregate(t *testing.T) {
 				if !tt.res.wantErr && agg.Events[i].Data == nil {
 					t.Errorf("should have data in event")
 				}
-			}
-
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -234,7 +238,13 @@ func TestPasswordLockoutPolicyRemovedAggregate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			agg, err := PasswordLockoutPolicyRemovedAggregate(tt.args.aggCreator, tt.args.existing)(tt.args.ctx)
-
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
 			}
@@ -242,10 +252,6 @@ func TestPasswordLockoutPolicyRemovedAggregate(t *testing.T) {
 				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
 					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
 				}
-			}
-
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
