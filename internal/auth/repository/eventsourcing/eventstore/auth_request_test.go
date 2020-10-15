@@ -643,6 +643,56 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
+			"prompt none, checkLoggedIn true, authenticated and required user grants missing, grant required step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:    time.Now().UTC().Add(-5 * time.Minute),
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+				},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider: &mockUserGrants{
+					roleCheck:  true,
+					userGrants: 0,
+				},
+				PasswordCheckLifeTime:    10 * 24 * time.Hour,
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID", Prompt: model.PromptNone, Request: &model.AuthRequestOIDC{}}, true},
+			[]model.NextStep{&model.GrantRequiredStep{}},
+			nil,
+		},
+		{
+			"prompt none, checkLoggedIn true, authenticated and required user grants exist, redirect to callback step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:    time.Now().UTC().Add(-5 * time.Minute),
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+				},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider: &mockUserGrants{
+					roleCheck:  true,
+					userGrants: 2,
+				},
+				PasswordCheckLifeTime:    10 * 24 * time.Hour,
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID", Prompt: model.PromptNone, Request: &model.AuthRequestOIDC{}}, true},
+			[]model.NextStep{&model.RedirectToCallbackStep{}},
+			nil,
+		},
+		{
 			"linking users, password step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
