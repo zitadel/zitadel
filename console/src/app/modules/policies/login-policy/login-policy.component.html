@@ -57,11 +57,8 @@
     <ng-template appHasRole [appHasRole]="['org.idp.read']">
         <app-card class="idp-table-card" title="{{ 'IDP.LIST.TITLE' | translate }}"
             description="{{ 'IDP.LIST.DESCRIPTION' | translate }}">
-            <app-idp-table [service]="service" [serviceType]="serviceType" <<<<<<< HEAD
+            <app-idp-table [service]="service" [serviceType]="serviceType"
                 [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false">
-                =======
-                [disabled]="(['iam.idp.write$'] | hasRole | async) == false">
-                >>>>>>> master
             </app-idp-table>
         </app-card>
     </ng-template>
