@@ -21,6 +21,7 @@ const (
 	NextStepChangeUsername
 	NextStepLinkUsers
 	NextStepExternalNotFoundOption
+	NextStepGrantRequired
 )
 
 type UserSessionState int32
@@ -116,6 +117,12 @@ type LinkUsersStep struct{}
 
 func (s *LinkUsersStep) Type() NextStepType {
 	return NextStepLinkUsers
+}
+
+type GrantRequiredStep struct{}
+
+func (s *GrantRequiredStep) Type() NextStepType {
+	return NextStepGrantRequired
 }
 
 type RedirectToCallbackStep struct{}

@@ -16,6 +16,7 @@ type Project struct {
 	Applications         []*Application
 	Grants               []*ProjectGrant
 	ProjectRoleAssertion bool
+	ProjectRoleCheck     bool
 }
 type ProjectChanges struct {
 	Changes      []*ProjectChange

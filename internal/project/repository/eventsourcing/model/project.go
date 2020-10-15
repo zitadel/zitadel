@@ -17,6 +17,7 @@ type Project struct {
 	es_models.ObjectRoot
 	Name                 string           `json:"name,omitempty"`
 	ProjectRoleAssertion bool             `json:"projectRoleAssertion,omitempty"`
+	ProjectRoleCheck     bool             `json:"projectRoleCheck,omitempty"`
 	State                int32            `json:"-"`
 	Members              []*ProjectMember `json:"-"`
 	Roles                []*ProjectRole   `json:"-"`
@@ -41,6 +42,9 @@ func (p *Project) Changes(changed *Project) map[string]interface{} {
 	if p.ProjectRoleAssertion != changed.ProjectRoleAssertion {
 		changes["projectRoleAssertion"] = changed.ProjectRoleAssertion
 	}
+	if p.ProjectRoleCheck != changed.ProjectRoleCheck {
+		changes["projectRoleCheck"] = changed.ProjectRoleCheck
+	}
 	return changes
 }
 
@@ -53,6 +57,7 @@ func ProjectFromModel(project *model.Project) *Project {
 		ObjectRoot:           project.ObjectRoot,
 		Name:                 project.Name,
 		ProjectRoleAssertion: project.ProjectRoleAssertion,
+		ProjectRoleCheck:     project.ProjectRoleCheck,
 		State:                int32(project.State),
 		Members:              members,
 		Roles:                roles,
@@ -70,6 +75,7 @@ func ProjectToModel(project *Project) *model.Project {
 		ObjectRoot:           project.ObjectRoot,
 		Name:                 project.Name,
 		ProjectRoleAssertion: project.ProjectRoleAssertion,
+		ProjectRoleCheck:     project.ProjectRoleCheck,
 		State:                model.ProjectState(project.State),
 		Members:              members,
 		Roles:                roles,

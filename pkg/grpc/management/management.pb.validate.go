@@ -7393,6 +7393,8 @@ func (m *ProjectCreateRequest) Validate() error {
 
 	// no validation rules for ProjectRoleAssertion
 
+	// no validation rules for ProjectRoleCheck
+
 	return nil
 }
 
@@ -7475,6 +7477,8 @@ func (m *ProjectUpdateRequest) Validate() error {
 	}
 
 	// no validation rules for ProjectRoleAssertion
+
+	// no validation rules for ProjectRoleCheck
 
 	return nil
 }
@@ -7674,6 +7678,8 @@ func (m *ProjectView) Validate() error {
 	// no validation rules for Sequence
 
 	// no validation rules for ProjectRoleAssertion
+
+	// no validation rules for ProjectRoleCheck
 
 	return nil
 }
@@ -8015,6 +8021,8 @@ func (m *Project) Validate() error {
 	// no validation rules for Sequence
 
 	// no validation rules for ProjectRoleAssertion
+
+	// no validation rules for ProjectRoleCheck
 
 	return nil
 }

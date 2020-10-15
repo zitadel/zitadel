@@ -187,6 +187,7 @@ Errors:
   AuthRequest:
     NotFound: Could not find authrequest
     UserAgentNotCorresponding: User Agent does not correspond
+    RequestTypeNotSupported: Request type is not supported
   User:
     NotFound: User could not be found
     NotMatchingUserID: User and user in authrequest don't match

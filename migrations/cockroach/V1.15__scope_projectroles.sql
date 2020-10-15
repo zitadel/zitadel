@@ -21,10 +21,15 @@ ALTER TABLE auth.applications ADD COLUMN access_token_type SMALLINT;
 ALTER TABLE management.applications ADD COLUMN access_token_type SMALLINT;
 
 ALTER TABLE management.projects ADD COLUMN project_role_assertion BOOLEAN;
+ALTER TABLE management.projects ADD COLUMN project_role_check BOOLEAN;
 
 ALTER TABLE authz.applications ADD COLUMN project_role_assertion BOOLEAN;
 ALTER TABLE auth.applications ADD COLUMN project_role_assertion BOOLEAN;
 ALTER TABLE management.applications ADD COLUMN project_role_assertion BOOLEAN;
+
+ALTER TABLE authz.applications ADD COLUMN project_role_check BOOLEAN;
+ALTER TABLE auth.applications ADD COLUMN project_role_check BOOLEAN;
+ALTER TABLE management.applications ADD COLUMN project_role_check BOOLEAN;
 
 ALTER TABLE authz.applications ADD COLUMN access_token_role_assertion BOOLEAN;
 ALTER TABLE auth.applications ADD COLUMN access_token_role_assertion BOOLEAN;

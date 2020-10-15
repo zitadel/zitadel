@@ -29,6 +29,7 @@ func projectFromModel(project *proj_model.Project) *management.Project {
 		Name:                 project.Name,
 		Sequence:             project.Sequence,
 		ProjectRoleAssertion: project.ProjectRoleAssertion,
+		ProjectRoleCheck:     project.ProjectRoleCheck,
 	}
 }
 
@@ -69,6 +70,7 @@ func projectViewFromModel(project *proj_model.ProjectView) *management.ProjectVi
 		Sequence:             project.Sequence,
 		ResourceOwner:        project.ResourceOwner,
 		ProjectRoleAssertion: project.ProjectRoleAssertion,
+		ProjectRoleCheck:     project.ProjectRoleCheck,
 	}
 }
 
@@ -126,6 +128,7 @@ func projectUpdateToModel(project *management.ProjectUpdateRequest) *proj_model.
 		},
 		Name:                 project.Name,
 		ProjectRoleAssertion: project.ProjectRoleAssertion,
+		ProjectRoleCheck:     project.ProjectRoleCheck,
 	}
 }
 

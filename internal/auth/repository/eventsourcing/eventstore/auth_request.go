@@ -7,21 +7,21 @@ import (
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/eventstore/sdk"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
-
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	cache "github.com/caos/zitadel/internal/auth_request/repository"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/id"
 	org_model "github.com/caos/zitadel/internal/org/model"
+	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
+	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
+	project_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -478,6 +478,15 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 
 	}
 	//PLANNED: consent step
+
+	missing, err := repo.userGrantRequired(ctx, request, user)
+	if err != nil {
+		return nil, err
+	}
+	if missing {
+		return append(steps, &model.GrantRequiredStep{}), nil
+	}
+
 	return append(steps, &model.RedirectToCallbackStep{}), nil
 }
 
@@ -539,6 +548,27 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
 		return true
 	}
 	return checkVerificationTime(user.MfaInitSkipped, repo.MfaInitSkippedLifeTime)
+}
+
+func (repo *AuthRequestRepo) userGrantRequired(ctx context.Context, request *model.AuthRequest, user *user_model.UserView) (_ bool, err error) {
+	var app *project_view_model.ApplicationView
+	switch request.Request.Type() {
+	case model.AuthRequestTypeOIDC:
+		app, err = repo.View.ApplicationByClientID(ctx, request.ApplicationID)
+		if err != nil {
+			return false, err
+		}
+	default:
+		return false, errors.ThrowPreconditionFailed(nil, "EVENT-dfrw2", "Errors.AuthRequest.RequestTypeNotSupported")
+	}
+	if !app.ProjectRoleCheck {
+		return false, nil
+	}
+	grants, err := repo.View.UserGrantsByProjectAndUserID(app.ProjectID, user.ID)
+	if err != nil {
+		return false, err
+	}
+	return len(grants) == 0, nil
 }
 
 func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (*iam_model.LoginPolicyView, error) {

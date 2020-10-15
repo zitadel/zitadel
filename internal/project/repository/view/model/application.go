@@ -23,12 +23,14 @@ const (
 )
 
 type ApplicationView struct {
-	ID           string    `json:"appId" gorm:"column:id;primary_key"`
-	ProjectID    string    `json:"-" gorm:"column:project_id"`
-	Name         string    `json:"name" gorm:"column:app_name"`
-	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
-	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
-	State        int32     `json:"-" gorm:"column:app_state"`
+	ID                   string    `json:"appId" gorm:"column:id;primary_key"`
+	ProjectID            string    `json:"-" gorm:"column:project_id"`
+	Name                 string    `json:"name" gorm:"column:app_name"`
+	CreationDate         time.Time `json:"-" gorm:"column:creation_date"`
+	ChangeDate           time.Time `json:"-" gorm:"column:change_date"`
+	State                int32     `json:"-" gorm:"column:app_state"`
+	ProjectRoleAssertion bool      `json:"projectRoleAssertion" gorm:"column:project_role_assertion"`
+	ProjectRoleCheck     bool      `json:"projectRoleCheck" gorm:"column:project_role_check"`
 
 	IsOIDC                     bool           `json:"-" gorm:"column:is_oidc"`
 	OIDCVersion                int32          `json:"oidcVersion" gorm:"column:oidc_version"`
@@ -44,7 +46,6 @@ type ApplicationView struct {
 	DevMode                    bool           `json:"devMode" gorm:"column:dev_mode"`
 	OriginAllowList            pq.StringArray `json:"-" gorm:"column:origin_allow_list"`
 	AccessTokenType            int32          `json:"accessTokenType" gorm:"column:access_token_type"`
-	ProjectRoleAssertion       bool           `json:"projectRoleAssertion" gorm:"column:project_role_assertion"`
 	AccessTokenRoleAssertion   bool           `json:"accessTokenRoleAssertion" gorm:"column:access_token_role_assertion"`
 	IDTokenRoleAssertion       bool           `json:"idTokenRoleAssertion" gorm:"column:id_token_role_assertion"`
 
@@ -53,13 +54,15 @@ type ApplicationView struct {
 
 func ApplicationViewToModel(app *ApplicationView) *model.ApplicationView {
 	return &model.ApplicationView{
-		ID:           app.ID,
-		ProjectID:    app.ProjectID,
-		Name:         app.Name,
-		State:        model.AppState(app.State),
-		Sequence:     app.Sequence,
-		CreationDate: app.CreationDate,
-		ChangeDate:   app.ChangeDate,
+		ID:                   app.ID,
+		ProjectID:            app.ProjectID,
+		Name:                 app.Name,
+		State:                model.AppState(app.State),
+		Sequence:             app.Sequence,
+		CreationDate:         app.CreationDate,
+		ChangeDate:           app.ChangeDate,
+		ProjectRoleAssertion: app.ProjectRoleAssertion,
+		ProjectRoleCheck:     app.ProjectRoleCheck,
 
 		IsOIDC:                     app.IsOIDC,
 		OIDCVersion:                model.OIDCVersion(app.OIDCVersion),
@@ -75,7 +78,6 @@ func ApplicationViewToModel(app *ApplicationView) *model.ApplicationView {
 		DevMode:                    app.DevMode,
 		OriginAllowList:            app.OriginAllowList,
 		AccessTokenType:            model.OIDCTokenType(app.AccessTokenType),
-		ProjectRoleAssertion:       app.ProjectRoleAssertion,
 		AccessTokenRoleAssertion:   app.AccessTokenRoleAssertion,
 		IDTokenRoleAssertion:       app.IDTokenRoleAssertion,
 	}

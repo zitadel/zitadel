@@ -2248,12 +2248,14 @@ enum OrgMemberSearchKey {
 message ProjectCreateRequest {
   string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
   bool project_role_assertion = 2;
+  bool project_role_check = 3;
 }
 
 message ProjectUpdateRequest {
   string id = 1 [(validate.rules).string = {min_len: 1}];
   string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
   bool project_role_assertion = 3;
+  bool project_role_check = 4;
 }
 
 message ProjectSearchResponse {
@@ -2274,6 +2276,7 @@ message ProjectView {
   string resource_owner = 6;
   uint64 sequence = 7;
   bool project_role_assertion = 8;
+  bool project_role_check = 9;
 }
 
 message ProjectSearchRequest {
@@ -2305,6 +2308,7 @@ message Project {
   google.protobuf.Timestamp creation_date = 5;
   uint64 sequence = 6;
   bool project_role_assertion = 7;
+  bool project_role_check = 8;
 }
 
 enum ProjectState {
