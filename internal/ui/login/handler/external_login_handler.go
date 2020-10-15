@@ -133,7 +133,10 @@ func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.R
 	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
 	err := l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, userAgentID, externalUser, model.BrowserInfoFromRequest(r))
 	if err != nil {
-		l.renderExternalNotFoundOption(w, r, authReq, nil)
+		if errors.IsNotFound(err) {
+			err = nil
+		}
+		l.renderExternalNotFoundOption(w, r, authReq, err)
 		return
 	}
 	l.renderNextStep(w, r, authReq)
@@ -248,7 +251,7 @@ func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.ID
 	}
 	return externalUser
 }
-func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *org_model.OrgIAMPolicy, linkingUser *model.ExternalUser, idpConfig *iam_model.IDPConfigView) (*usr_model.User, *usr_model.ExternalIDP) {
+func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *iam_model.OrgIAMPolicyView, linkingUser *model.ExternalUser, idpConfig *iam_model.IDPConfigView) (*usr_model.User, *usr_model.ExternalIDP) {
 	username := linkingUser.PreferredUsername
 	switch idpConfig.OIDCUsernameMapping {
 	case iam_model.OIDCMappingFieldEmail:

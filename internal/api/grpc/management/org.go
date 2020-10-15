@@ -98,10 +98,10 @@ func (s *Server) OrgChanges(ctx context.Context, changesRequest *management.Chan
 	return orgChangesToResponse(response, changesRequest.GetSequenceOffset(), changesRequest.GetLimit()), nil
 }
 
-func (s *Server) GetMyOrgIamPolicy(ctx context.Context, _ *empty.Empty) (_ *management.OrgIamPolicy, err error) {
+func (s *Server) GetMyOrgIamPolicy(ctx context.Context, _ *empty.Empty) (_ *management.OrgIamPolicyView, err error) {
 	policy, err := s.org.GetMyOrgIamPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return orgIamPolicyFromModel(policy), err
+	return orgIamPolicyViewFromModel(policy), err
 }

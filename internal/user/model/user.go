@@ -1,11 +1,11 @@
 package model
 
 import (
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"strings"
 
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/golang/protobuf/ptypes/timestamp"
 )
 
@@ -30,7 +30,7 @@ const (
 	UserStateInitial
 )
 
-func (u *User) CheckOrgIAMPolicy(policy *org_model.OrgIAMPolicy) error {
+func (u *User) CheckOrgIAMPolicy(policy *iam_model.OrgIAMPolicyView) error {
 	if policy == nil {
 		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-zSH7j", "Errors.Users.OrgIamPolicyNil")
 	}
@@ -89,7 +89,7 @@ func (u *User) IsValid() bool {
 	return u.Machine.IsValid()
 }
 
-func (u *User) CheckOrgIamPolicy(policy *org_model.OrgIAMPolicy) error {
+func (u *User) CheckOrgIamPolicy(policy *iam_model.OrgIAMPolicy) error {
 	if policy == nil {
 		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-zSH7j", "Errors.Users.OrgIamPolicyNil")
 	}

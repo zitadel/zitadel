@@ -7,6 +7,7 @@ import (
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 
 	"github.com/caos/logging"
 
@@ -38,7 +39,7 @@ func (m *UserMembership) EventQuery() (*models.SearchQuery, error) {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(iam_es_model.IAMAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate).
+		AggregateTypeFilter(iam_es_model.IAMAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate, model.UserAggregate).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
@@ -50,6 +51,8 @@ func (m *UserMembership) Reduce(event *models.Event) (err error) {
 		err = m.processOrg(event)
 	case proj_es_model.ProjectAggregate:
 		err = m.processProject(event)
+	case model.UserAggregate:
+		err = m.processUser(event)
 	}
 	return err
 }
@@ -164,6 +167,10 @@ func (m *UserMembership) processProject(event *models.Event) (err error) {
 		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, member.ObjectID, usr_model.MemberTypeProjectGrant, event.Sequence)
 	case proj_es_model.ProjectChanged:
 		err = m.updateProjectDisplayName(event)
+	case proj_es_model.ProjectRemoved:
+		return m.view.DeleteUserMembershipsByAggregateID(event.AggregateID, event.Sequence)
+	case proj_es_model.ProjectGrantRemoved:
+		return m.view.DeleteUserMembershipsByAggregateIDAndObjectID(event.AggregateID, member.ObjectID, event.Sequence)
 	default:
 		return m.view.ProcessedUserMembershipSequence(event.Sequence)
 	}
@@ -196,6 +203,15 @@ func (m *UserMembership) updateProjectDisplayName(event *models.Event) error {
 		membership.DisplayName = project.Name
 	}
 	return m.view.BulkPutUserMemberships(memberships, event.Sequence)
+}
+
+func (m *UserMembership) processUser(event *models.Event) (err error) {
+	switch event.Type {
+	case model.UserRemoved:
+		return m.view.DeleteUserMembershipsByUserID(event.AggregateID, event.Sequence)
+	default:
+		return m.view.ProcessedUserMembershipSequence(event.Sequence)
+	}
 }
 
 func (m *UserMembership) OnError(event *models.Event, err error) error {

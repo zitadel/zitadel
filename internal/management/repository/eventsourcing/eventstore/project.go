@@ -62,7 +62,9 @@ func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_mode
 			return model.ProjectToModel(&viewProject), nil
 		}
 	}
-
+	if viewProject.State == int32(proj_model.ProjectStateRemoved) {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-3Mo0s", "Errors.Project.NotFound")
+	}
 	return model.ProjectToModel(project), nil
 }
 

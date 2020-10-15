@@ -160,7 +160,7 @@ require (
 	github.com/urfave/cli v1.22.4 // indirect
 	github.com/urfave/negroni v1.0.0 // indirect
 	go.etcd.io/etcd v3.3.25+incompatible // indirect
-	go.opencensus.io v0.22.4
+	go.opencensus.io v0.22.5
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 	golang.org/x/text v0.3.3
 	golang.org/x/tools v0.0.0-20200916140129-56d9a0cd3487

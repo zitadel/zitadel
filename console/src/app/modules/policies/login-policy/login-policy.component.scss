@@ -1,3 +1,8 @@
+.default {
+  color: #5282c1;
+  margin-top: 0;
+}
+
 .content {
   padding-top: 1rem;
   display: flex;
@@ -7,20 +12,14 @@
   .row {
     display: flex;
     align-items: center;
-    padding: .5rem 0;
+    padding: .3rem 0;
 
     .left-desc {
-      color: #8795a1;
       font-size: .9rem;
     }
 
     .fill-space {
       flex: 1;
-    }
-
-    .length-wrapper {
-      display: flex;
-      align-items: center;
     }
   }
 }
@@ -35,6 +34,10 @@
     display: block;
     padding: .5rem 4rem;
   }
+}
+
+.idp-table-card {
+  width: 100%;
 }
 
 .subheader {
@@ -52,7 +55,7 @@
     justify-content: center;
     margin: .5rem;
     padding: 10px;
-    border: 1px solid #8795a1;
+    border: 1px solid var(--grey);
     border-radius: .5rem;
     cursor: pointer;
     position: relative;

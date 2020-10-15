@@ -3,7 +3,6 @@ package management
 import (
 	"context"
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/golang/protobuf/ptypes/empty"
 )
@@ -91,7 +90,8 @@ func (s *Server) UnlockUser(ctx context.Context, in *management.UserID) (*manage
 }
 
 func (s *Server) DeleteUser(ctx context.Context, in *management.UserID) (*empty.Empty, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-as4fg", "Not implemented")
+	err := s.user.RemoveUser(ctx, in.Id)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) UpdateUserMachine(ctx context.Context, in *management.UpdateMachineRequest) (*management.MachineResponse, error) {

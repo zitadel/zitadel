@@ -1,7 +1,6 @@
 import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
+import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
@@ -39,7 +38,6 @@ export class LoginPolicyComponent implements OnDestroy {
     public idps: MgmtIdpProviderView.AsObject[] | AdminIdpProviderView.AsObject[] = [];
     constructor(
         private route: ActivatedRoute,
-        private router: Router,
         private toast: ToastService,
         private dialog: MatDialog,
         private injector: Injector,
@@ -107,7 +105,11 @@ export class LoginPolicyComponent implements OnDestroy {
                 mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
                 mgmtreq.setAllowRegister(this.loginData.allowRegister);
                 mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
-                return (this.service as ManagementService).UpdateLoginPolicy(mgmtreq);
+                if ((this.loginData as LoginPolicyView.AsObject).pb_default) {
+                    return (this.service as ManagementService).CreateLoginPolicy(mgmtreq);
+                } else {
+                    return (this.service as ManagementService).UpdateLoginPolicy(mgmtreq);
+                }
             case PolicyComponentServiceType.ADMIN:
                 const adminreq = new DefaultLoginPolicy();
                 adminreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
@@ -119,25 +121,22 @@ export class LoginPolicyComponent implements OnDestroy {
 
     public savePolicy(): void {
         this.updateData().then(() => {
-            switch (this.serviceType) {
-                case PolicyComponentServiceType.MGMT:
-                    this.router.navigate(['org']);
-                    break;
-                case PolicyComponentServiceType.ADMIN:
-                    this.router.navigate(['iam']);
-                    break;
-            }
+            this.toast.showInfo('ORG.POLICY.LOGIN_POLICY.SAVED', true);
         }).catch(error => {
             this.toast.showError(error);
         });
     }
 
-    public deletePolicy(): Promise<Empty> {
-        switch (this.serviceType) {
-            case PolicyComponentServiceType.MGMT:
-                return (this.service as ManagementService).RemoveLoginPolicy();
-            case PolicyComponentServiceType.ADMIN:
-                return (this.service as AdminService).GetDefaultLoginPolicy();
+    public removePolicy(): void {
+        if (this.serviceType === PolicyComponentServiceType.MGMT) {
+            (this.service as ManagementService).RemoveLoginPolicy().then(() => {
+                this.toast.showInfo('ORG.POLICY.TOAST.RESETSUCCESS', true);
+                setTimeout(() => {
+                    this.getData();
+                }, 1000);
+            }).catch(error => {
+                this.toast.showError(error);
+            });
         }
     }
 
@@ -179,15 +178,11 @@ export class LoginPolicyComponent implements OnDestroy {
         }
     }
 
-    public get backroutes(): string[] {
-        switch (this.serviceType) {
-            case PolicyComponentServiceType.MGMT:
-                return ['/org'];
-            case PolicyComponentServiceType.ADMIN:
-                return ['/iam'];
-                break;
+    public get isDefault(): boolean {
+        if (this.loginData && this.serviceType === PolicyComponentServiceType.MGMT) {
+            return (this.loginData as LoginPolicyView.AsObject).pb_default;
+        } else {
+            return false;
         }
-        return [];
     }
-
 }

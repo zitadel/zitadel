@@ -76,8 +76,21 @@ SetUp:
                 DevMode: $ZITADEL_CONSOLE_DEV_MODE
     Owners:
       - 'zitadel-admin@caos.ch'
-  #TODO: label policy
-  #Step2:
-  #  DefaulLabelPolicy:
-  #    PrimaryColor: '#222324'
-  #    SecundaryColor: '#ffffff'  
+  Step2:
+    DefaultPasswordComplexityPolicy:
+      MinLength: 8
+      HasLowercase: true
+      HasUppercase: true
+      HasSymbol: true
+      HasNumber: true
+  Step3:
+    DefaultPasswordAgePolicy:
+      MaxAgeDays: 0
+      ExpireWarnDays: 0
+  Step4:
+    DefaultPasswordLockoutPolicy:
+      MaxAttempts: 5
+      ShowLockOutFailures: false
+  Step5:
+    DefaultOrgIAMPolicy:
+      UserLoginMustBeDomain: true

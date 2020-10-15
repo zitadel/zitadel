@@ -50,6 +50,7 @@
         "INFO": "Info",
         "OK": "OK",
         "VIEW": "Öffnen",
+        "SELECTIONDELETE":"Ausgewählte löschen",
         "DELETE": "Löschen",
         "REMOVE":"Entfernen",
         "VERIFY":"Verifizieren",
@@ -59,7 +60,9 @@
         "DEACTIVATE":"Deaktivieren",
         "REFRESH":"Aktualisieren",
         "LOGIN":"Einloggen",
-        "EDIT":"Bearbeiten"
+        "EDIT":"Bearbeiten",
+        "PIN":"Anpinnen",
+        "CONFIGURE":"Konfigurieren"
     },
     "ERRORS": {
         "REQUIRED": "Bitte fülle alle benötigten Felder aus.",
@@ -87,7 +90,12 @@
             "NOUSER":"Kein Benutzer",
             "REACTIVATE":"Reaktivieren",
             "DEACTIVATE":"Deaktivieren",
-            "FILTER":"Filter"
+            "FILTER":"Filter",
+            "DELETE":"Benutzer löschen"
+        },
+        "DIALOG": {
+            "DELETE_TITLE":"User löschen",
+            "DELETE_DESCRIPTION":"Sie sind im Begriff einen Benutzer endgültig zu löschen. Wollen Sie dies wirklich tun?"
         },
         "TABLE":{
             "DEACTIVATE":"Deaktivieren",
@@ -132,7 +140,11 @@
           "IDPCONFIGID": "Idp Konfig ID",
           "IDPNAME": "Idp Name",
           "USERDISPLAYNAME":  "Externer Name",
-          "EXTERNALUSERID": "Externe Benutzer ID"
+          "EXTERNALUSERID": "Externe Benutzer ID",
+          "DIALOG": {
+              "REMOVE_TITLE":"Idp entfernen",
+              "REMOVE_DESCRIPTION":"Sie sind im Begriff einen Identity Provider zu entfernen. Wollen Sie dies wirklich tun?"
+          }
         },
         "CREATE": {
             "TITLE": "Neuen Benutzer erstellen",
@@ -211,6 +223,7 @@
         },
         "EMAIL": "E-Mail",
         "PHONE": "Telefonnummer",
+        "PREFERRED_LOGINNAME":"Bevorzugter Loginname",
         "LOGINMETHODS": {
             "TITLE": "Kontaktinformationen",
             "DESCRIPTION": "Die Kontaktinformationen werden benötigt, um Dir wichtige Informationen wie Verifikationsnachrichten und Links für das Zurücksetzen des Passworts per E-Mail zu senden.",
@@ -282,7 +295,8 @@
             "SELECTEDDEACTIVATED":"Selektierte Benutzer deaktiviert.",
             "SELECTEDKEYSDELETED":"Selektierte Schlüssel gelöscht.",
             "KEYADDED":"Schlüssel hinzugefügt!",
-            "MACHINEADDED":"Service User erstellt!"
+            "MACHINEADDED":"Service User erstellt!",
+            "DELETED":"Benutzer erfolgreich gelöscht!"
         },
         "MEMBERSHIPS": {
             "TITLE":"ZITADEL Manager-Rollen",
@@ -434,9 +448,11 @@
                 "TITLE":"Login Richtlinien",
                 "DESCRIPTION":"Definiere die Loginmethoden für Benutzer",
                 "TITLECREATE":"Definiere die Loginmethoden für Benutzer",
-                "DESCRIPTIONCREATEADMIN":"Nutzer können Sich mit den verfügbaren Idps authentifizieren.",
-                "DESCRIPTIONCREATEMGMT":"Nutzer können Sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann von System-, sowie von selbsterstellten Providern Ihrer Organisation gewählt werden."
+                "DESCRIPTIONCREATEADMIN":"Nutzer können sich mit den verfügbaren Idps authentifizieren.",
+                "DESCRIPTIONCREATEMGMT":"Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
+                "SAVED":"Erfolgreich gespeichert."
             },
+            "DEFAULTLABEL":"Die aktuelle Richtlinie entspricht der IAM-Standard Einstellung.",
             "BTN_INSTALL":"Installieren",
             "BTN_EDIT":"Modifizieren",
             "DATA": {
@@ -455,7 +471,11 @@
                 "ALLOWEXTERNALIDP":"Externer IDP erlaubt",
                 "ALLOWREGISTER":"Registrieren erlaubt"
             },
-            "DELETE":"Richtlinie entfernen/zurücksetzen"
+            "RESET":"Richtlinie zurücksetzen",
+            "TOAST":{
+                "SET":"Richtline erfolgreich gesetzt!",
+                "RESETSUCCESS":"Richtline zurückgesetzt!"
+            }
         },
         "TOAST": {
             "DEACTIVATED":"Organisation deaktiviert.",
@@ -486,6 +506,7 @@
             "USERNAME": "Benutzername",
             "FIRSTNAME": "Vorname",
             "LASTNAME": "Nachname",
+            "LOGINNAME":"Loginname",
             "EMAIL": "E-Mail",
             "ROLES": "Rollen",
             "ADD": "Mitglied hinzufügen",
@@ -668,9 +689,10 @@
         },
         "DETAIL": {
           "TITLE":"Identitäts Provider",
-          "DESCRIPTION":"Konfiguration deines Identitäts Providers",
+          "DESCRIPTION":"Generelle Konfiguration deines Identitäts Providers",
           "OIDC": {
-            "TITLE": "OIDC Konfiguration"
+            "TITLE": "OIDC Konfiguration",
+            "DESCRIPTION":"Geben Sie die korrekte OIDC Konfiguration Ihres Identity Providers an!"
           }
         },
         "TYPES": {

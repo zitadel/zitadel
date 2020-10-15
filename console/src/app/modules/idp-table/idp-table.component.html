@@ -4,20 +4,19 @@
         <button (click)="deactivateSelectedIdps()" matTooltip="{{'IDP.DEACTIVATE' | translate}}" class="icon-button"
             mat-icon-button *ngIf="selection.hasValue() && serviceType!=PolicyComponentServiceType.MGMT"
             [disabled]="disabled">
-            <mat-icon svgIcon="mdi_account_cancel"></mat-icon>
+            <mat-icon>block</mat-icon>
         </button>
         <button (click)="reactivateSelectedIdps()" matTooltip="{{'IDP.ACTIVATE' | translate}}" class="icon-button"
             mat-icon-button *ngIf="selection.hasValue() && serviceType!=PolicyComponentServiceType.MGMT"
             [disabled]="disabled">
-            <mat-icon svgIcon="mdi_account_check_outline"></mat-icon>
+            <mat-icon>play_circle_outline</mat-icon>
         </button>
         <button color="warn" (click)="removeSelectedIdps()" matTooltip="{{'IDP.DELETE' | translate}}"
             class="icon-button" mat-icon-button
             *ngIf="selection.hasValue() && serviceType!=PolicyComponentServiceType.MGMT" [disabled]="disabled">
             <i class="las la-trash"></i>
         </button>
-        <a [routerLink]="createRouterLink" color="primary" mat-raised-button [disabled]="disabled"
-            *ngIf="serviceType!=PolicyComponentServiceType.MGMT">
+        <a [routerLink]="createRouterLink" color="primary" mat-raised-button [disabled]="disabled">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
     </ng-template>

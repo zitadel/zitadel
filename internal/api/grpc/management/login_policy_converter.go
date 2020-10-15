@@ -1,18 +1,13 @@
 package management
 
 import (
+	"github.com/caos/logging"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/golang/protobuf/ptypes"
 )
 
-func loginPolicyAddToModel(policy *management.LoginPolicyAdd) *iam_model.LoginPolicy {
-	return &iam_model.LoginPolicy{
-		AllowUsernamePassword: policy.AllowUsernamePassword,
-		AllowExternalIdp:      policy.AllowExternalIdp,
-		AllowRegister:         policy.AllowRegister,
-	}
-}
-func loginPolicyToModel(policy *management.LoginPolicy) *iam_model.LoginPolicy {
+func loginPolicyRequestToModel(policy *management.LoginPolicyRequest) *iam_model.LoginPolicy {
 	return &iam_model.LoginPolicy{
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		AllowExternalIdp:      policy.AllowExternalIdp,
@@ -21,19 +16,35 @@ func loginPolicyToModel(policy *management.LoginPolicy) *iam_model.LoginPolicy {
 }
 
 func loginPolicyFromModel(policy *iam_model.LoginPolicy) *management.LoginPolicy {
+	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
+	logging.Log("GRPC-2Fsm8").OnError(err).Debug("date parse failed")
+
+	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
+	logging.Log("GRPC-3Flo0").OnError(err).Debug("date parse failed")
+
 	return &management.LoginPolicy{
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		AllowRegister:         policy.AllowRegister,
+		CreationDate:          creationDate,
+		ChangeDate:            changeDate,
 	}
 }
 
 func loginPolicyViewFromModel(policy *iam_model.LoginPolicyView) *management.LoginPolicyView {
+	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
+	logging.Log("GRPC-5Tsm8").OnError(err).Debug("date parse failed")
+
+	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
+	logging.Log("GRPC-8dJgs").OnError(err).Debug("date parse failed")
+
 	return &management.LoginPolicyView{
 		Default:               policy.Default,
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		AllowExternalIdp:      policy.AllowExternalIDP,
 		AllowRegister:         policy.AllowRegister,
+		CreationDate:          creationDate,
+		ChangeDate:            changeDate,
 	}
 }
 

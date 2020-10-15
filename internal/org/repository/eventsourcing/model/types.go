@@ -54,4 +54,16 @@ const (
 	LabelPolicyAdded                     models.EventType = "org.policy.label.added"
 	LabelPolicyChanged                   models.EventType = "org.policy.label.changed"
 	LabelPolicyRemoved                   models.EventType = "org.policy.label.removed"
+
+	PasswordComplexityPolicyAdded   models.EventType = "org.policy.password.complexity.added"
+	PasswordComplexityPolicyChanged models.EventType = "org.policy.password.complexity.changed"
+	PasswordComplexityPolicyRemoved models.EventType = "org.policy.password.complexity.removed"
+
+	PasswordAgePolicyAdded   models.EventType = "org.policy.password.age.added"
+	PasswordAgePolicyChanged models.EventType = "org.policy.password.age.changed"
+	PasswordAgePolicyRemoved models.EventType = "org.policy.password.age.removed"
+
+	PasswordLockoutPolicyAdded   models.EventType = "org.policy.password.lockout.added"
+	PasswordLockoutPolicyChanged models.EventType = "org.policy.password.lockout.changed"
+	PasswordLockoutPolicyRemoved models.EventType = "org.policy.password.lockout.removed"
 )

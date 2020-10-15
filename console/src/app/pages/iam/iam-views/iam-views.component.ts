@@ -49,7 +49,6 @@ export class IamViewsComponent implements AfterViewInit {
     }
 
     public cancelView(viewname: string, db: string): void {
-
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
                 confirmKey: 'ACTIONS.CLEAR',

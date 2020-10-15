@@ -50,6 +50,7 @@
         "INFO": "Info",
         "OK": "OK",
         "VIEW": "Show",
+        "SELECTIONDELETE":"Delete selection",
         "DELETE": "Delete",
         "REMOVE":"Remove",
         "VERIFY":"Verify",
@@ -59,7 +60,9 @@
         "DEACTIVATE":"Deactivate",
         "REFRESH":"Refresh",
         "LOGIN":"Login",
-        "EDIT":"Edit"
+        "EDIT":"Edit",
+        "PIN":"Pin / Unpin",
+        "CONFIGURE":"Configure"
     },
     "ERRORS": {
         "REQUIRED": "Some required fields are missing.",
@@ -87,7 +90,12 @@
             "NOUSER":"No associated users.",
             "REACTIVATE":"Reactivate",
             "DEACTIVATE":"Deactivate",
-            "FILTER":"Filter"
+            "FILTER":"Filter",
+            "DELETE":"Delete User"
+        },
+        "DIALOG": {
+            "DELETE_TITLE":"Delete User",
+            "DELETE_DESCRIPTION":"You are about to permanently delete a user. Are you sure?"
         },
         "TABLE":{
             "DEACTIVATE":"Deactivate",
@@ -132,7 +140,11 @@
           "IDPCONFIGID": "Idp Config ID",
           "IDPNAME": "Idp Name",
           "USERDISPLAYNAME":  "External Name",
-          "EXTERNALUSERID": "External User ID"
+          "EXTERNALUSERID": "External User ID",
+          "DIALOG": {
+            "REMOVE_TITLE":"Remove IDP",
+            "REMOVE_DESCRIPTION":"You are about to delete an Identity Provider from a user. Do you really want to continue?"
+        }
         },
         "CREATE": {
             "TITLE": "Create a New User",
@@ -211,6 +223,7 @@
         },
         "EMAIL": "E-mail",
         "PHONE": "Phone Number",
+        "PREFERRED_LOGINNAME":"Preferred Loginname",
         "LOGINMETHODS": {
             "TITLE": "Contact Information",
             "DESCRIPTION": "The provided information is used to send important information, like password reset e-mails to you.",
@@ -282,7 +295,8 @@
             "SELECTEDDEACTIVATED":"Selected users deactivated.",
             "SELECTEDKEYSDELETED":"Selected keys deleted.",
             "KEYADDED":"Key added!",
-            "MACHINEADDED":"Service User created!"
+            "MACHINEADDED":"Service User created!",
+            "DELETED":"User deleted successfully!"
         },
         "MEMBERSHIPS": {
             "TITLE":"ZITADEL Manager Roles",
@@ -435,8 +449,10 @@
                 "DESCRIPTION":"Define how Users can be authenticated",
                 "TITLECREATE":"Define how Users can be authenticated",
                 "DESCRIPTIONCREATEADMIN":"Users can choose from the available identity providers below.",
-                "DESCRIPTIONCREATEMGMT":"Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only."
+                "DESCRIPTIONCREATEMGMT":"Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only.",
+                "SAVED":"Saved successfully!"
             },
+            "DEFAULTLABEL":"The currently set guideline corresponds to the standard setting set by the IAM Administrator.",
             "BTN_INSTALL":"Setup",
             "BTN_EDIT":"Modify",
             "DATA": {
@@ -455,7 +471,11 @@
                 "ALLOWEXTERNALIDP":"External IDP allowed",
                 "ALLOWREGISTER":"Register allowed"
             },
-            "DELETE":"Uninstall/Reset Policy"
+            "RESET":"Reset Policy",
+            "TOAST":{
+                "SET":"Policy set successfully!",
+                "RESETSUCCESS":"Policy reset successfully!"
+            }
         },
         "TOAST": {
             "DEACTIVATED":"Organisation deactivated.",
@@ -486,6 +506,7 @@
             "USERNAME": "User Name",
             "FIRSTNAME": "First Name",
             "LASTNAME": "Last Name",
+            "LOGINNAME":"Login Name",
             "EMAIL": "E-mail",
             "ROLES": "Roles",
             "ADD": "Add Member",
@@ -668,9 +689,10 @@
         },
         "DETAIL": {
           "TITLE":"Identity Provider",
-          "DESCRIPTION":"Configuration of your identity provider.",
+          "DESCRIPTION":"General Configuration of your identity provider.",
           "OIDC": {
-            "TITLE": "OIDC Configuration"
+            "TITLE": "OIDC Configuration",
+            "DESCRIPTION":"Provide the correct OIDC Configuration for your identity Provider below!"
           }
         },
         "TYPES": {

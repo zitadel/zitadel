@@ -26,7 +26,7 @@ tr {
   outline: none;
 
   &.disabled * {
-    color: #8795a1;
+    color: var(--grey);
   }
 }
 

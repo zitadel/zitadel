@@ -50,7 +50,7 @@
   .root-header {
     box-shadow: 0 5px 10px rgba(0, 0, 0, .12);
     background-color: $primary-dark !important;
-    transition: background-color .4s ease-in-out;
+    transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
   }
 
   .admin-line {
@@ -68,7 +68,7 @@
       left: 0;
       border-bottom: 20px solid $primary-dark;
       border-right: 20px solid transparent;
-      transition: border-color .4s ease-in-out;
+      transition: border-color .3s cubic-bezier(.645, .045, .355, 1);
     }
   }
 }

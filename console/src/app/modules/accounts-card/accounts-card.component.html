@@ -16,7 +16,7 @@
             </app-avatar>
 
             <div class="col">
-                <span class="title">{{user.displayName ? user.displayName : user.userName}} </span>
+                <span class="user-title">{{user.displayName ? user.displayName : user.userName}} </span>
                 <span class="loginname">{{user.loginName}}</span>
                 <span class="email">{{'USER.STATE.'+user.authState | translate}}</span>
             </div>
@@ -28,7 +28,7 @@
                 <i class="las la-user-plus"></i>
             </div>
             <span class="col">
-                <span class="title">{{'USER.ADDACCOUNT' | translate}}</span>
+                <span class="user-title">{{'USER.ADDACCOUNT' | translate}}</span>
             </span>
             <span class="fill-space"></span>
             <mat-icon>keyboard_arrow_right</mat-icon>

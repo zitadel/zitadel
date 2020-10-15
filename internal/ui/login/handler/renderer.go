@@ -226,11 +226,14 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 }
 
 func (l *Login) getUserData(r *http.Request, authReq *model.AuthRequest, title string, errType, errMessage string) userData {
-	return userData{
+	userData := userData{
 		baseData:    l.getBaseData(r, authReq, title, errType, errMessage),
 		profileData: l.getProfileData(authReq),
-		Linking:     len(authReq.LinkingUsers) > 0,
 	}
+	if authReq != nil && authReq.LinkingUsers != nil {
+		userData.Linking = len(authReq.LinkingUsers) > 0
+	}
+	return userData
 }
 
 func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title string, errType, errMessage string) baseData {

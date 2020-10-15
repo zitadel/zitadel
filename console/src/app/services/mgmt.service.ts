@@ -41,6 +41,7 @@ import {
     IdpView,
     LoginName,
     LoginPolicy,
+    LoginPolicyRequest,
     LoginPolicyView,
     MachineKeyIDRequest,
     MachineKeySearchRequest,
@@ -64,24 +65,20 @@ import {
     OrgDomainValidationRequest,
     OrgDomainValidationResponse,
     OrgDomainValidationType,
-    OrgIamPolicy,
+    OrgIamPolicyView,
     OrgMember,
     OrgMemberRoles,
     OrgMemberSearchRequest,
     OrgMemberSearchResponse,
     OrgView,
     PasswordAgePolicy,
-    PasswordAgePolicyCreate,
-    PasswordAgePolicyID,
-    PasswordAgePolicyUpdate,
+    PasswordAgePolicyRequest,
+    PasswordAgePolicyView,
     PasswordComplexityPolicy,
-    PasswordComplexityPolicyCreate,
-    PasswordComplexityPolicyID,
-    PasswordComplexityPolicyUpdate,
+    PasswordComplexityPolicyRequest,
+    PasswordComplexityPolicyView,
     PasswordLockoutPolicy,
-    PasswordLockoutPolicyCreate,
-    PasswordLockoutPolicyID,
-    PasswordLockoutPolicyUpdate,
+    PasswordLockoutPolicyRequest,
     PasswordRequest,
     PrimaryOrgDomainRequest,
     Project,
@@ -188,8 +185,12 @@ export class ManagementService {
         return this.grpcService.mgmt.getLoginPolicy(req);
     }
 
-    public UpdateLoginPolicy(req: LoginPolicy): Promise<LoginPolicy> {
+    public UpdateLoginPolicy(req: LoginPolicyRequest): Promise<LoginPolicy> {
         return this.grpcService.mgmt.updateLoginPolicy(req);
+    }
+
+    public CreateLoginPolicy(req: LoginPolicyRequest): Promise<LoginPolicy> {
+        return this.grpcService.mgmt.createLoginPolicy(req);
     }
 
     public RemoveLoginPolicy(): Promise<Empty> {
@@ -498,63 +499,56 @@ export class ManagementService {
 
     // Policy
 
-    public GetMyOrgIamPolicy(): Promise<OrgIamPolicy> {
+    public GetMyOrgIamPolicy(): Promise<OrgIamPolicyView> {
         const req = new Empty();
         return this.grpcService.mgmt.getMyOrgIamPolicy(req);
     }
 
-    public GetPasswordAgePolicy(): Promise<PasswordAgePolicy> {
+    public GetPasswordAgePolicy(): Promise<PasswordAgePolicyView> {
         const req = new Empty();
 
         return this.grpcService.mgmt.getPasswordAgePolicy(req);
     }
 
     public CreatePasswordAgePolicy(
-        description: string,
         maxAgeDays: number,
         expireWarnDays: number,
     ): Promise<PasswordAgePolicy> {
-        const req = new PasswordAgePolicyCreate();
-        req.setDescription(description);
+        const req = new PasswordAgePolicyRequest();
         req.setMaxAgeDays(maxAgeDays);
         req.setExpireWarnDays(expireWarnDays);
 
         return this.grpcService.mgmt.createPasswordAgePolicy(req);
     }
 
-    public DeletePasswordAgePolicy(id: string): Promise<Empty> {
-        const req = new PasswordAgePolicyID();
-        req.setId(id);
-        return this.grpcService.mgmt.deletePasswordAgePolicy(req);
+    public RemovePasswordAgePolicy(): Promise<Empty> {
+        const req = new Empty();
+        return this.grpcService.mgmt.removePasswordAgePolicy(req);
     }
 
     public UpdatePasswordAgePolicy(
-        description: string,
         maxAgeDays: number,
         expireWarnDays: number,
     ): Promise<PasswordAgePolicy> {
-        const req = new PasswordAgePolicyUpdate();
-        req.setDescription(description);
+        const req = new PasswordAgePolicyRequest();
         req.setMaxAgeDays(maxAgeDays);
         req.setExpireWarnDays(expireWarnDays);
         return this.grpcService.mgmt.updatePasswordAgePolicy(req);
     }
 
-    public GetPasswordComplexityPolicy(): Promise<PasswordComplexityPolicy> {
+    public GetPasswordComplexityPolicy(): Promise<PasswordComplexityPolicyView> {
         const req = new Empty();
         return this.grpcService.mgmt.getPasswordComplexityPolicy(req);
     }
 
     public CreatePasswordComplexityPolicy(
-        description: string,
         hasLowerCase: boolean,
         hasUpperCase: boolean,
         hasNumber: boolean,
         hasSymbol: boolean,
         minLength: number,
     ): Promise<PasswordComplexityPolicy> {
-        const req = new PasswordComplexityPolicyCreate();
-        req.setDescription(description);
+        const req = new PasswordComplexityPolicyRequest();
         req.setHasLowercase(hasLowerCase);
         req.setHasUppercase(hasUpperCase);
         req.setHasNumber(hasNumber);
@@ -563,22 +557,19 @@ export class ManagementService {
         return this.grpcService.mgmt.createPasswordComplexityPolicy(req);
     }
 
-    public DeletePasswordComplexityPolicy(id: string): Promise<Empty> {
-        const req = new PasswordComplexityPolicyID();
-        req.setId(id);
-        return this.grpcService.mgmt.deletePasswordComplexityPolicy(req);
+    public removePasswordComplexityPolicy(): Promise<Empty> {
+        const req = new Empty();
+        return this.grpcService.mgmt.removePasswordComplexityPolicy(req);
     }
 
     public UpdatePasswordComplexityPolicy(
-        description: string,
         hasLowerCase: boolean,
         hasUpperCase: boolean,
         hasNumber: boolean,
         hasSymbol: boolean,
         minLength: number,
     ): Promise<PasswordComplexityPolicy> {
-        const req = new PasswordComplexityPolicyUpdate();
-        req.setDescription(description);
+        const req = new PasswordComplexityPolicy();
         req.setHasLowercase(hasLowerCase);
         req.setHasUppercase(hasUpperCase);
         req.setHasNumber(hasNumber);
@@ -594,34 +585,28 @@ export class ManagementService {
     }
 
     public CreatePasswordLockoutPolicy(
-        description: string,
         maxAttempts: number,
         showLockoutFailures: boolean,
     ): Promise<PasswordLockoutPolicy> {
-        const req = new PasswordLockoutPolicyCreate();
-        req.setDescription(description);
+        const req = new PasswordLockoutPolicyRequest();
         req.setMaxAttempts(maxAttempts);
-        req.setShowLockOutFailures(showLockoutFailures);
+        req.setShowLockoutFailure(showLockoutFailures);
 
         return this.grpcService.mgmt.createPasswordLockoutPolicy(req);
     }
 
-    public DeletePasswordLockoutPolicy(id: string): Promise<Empty> {
-        const req = new PasswordLockoutPolicyID();
-        req.setId(id);
-
-        return this.grpcService.mgmt.deletePasswordLockoutPolicy(req);
+    public RemovePasswordLockoutPolicy(): Promise<Empty> {
+        const req = new Empty();
+        return this.grpcService.mgmt.removePasswordLockoutPolicy(req);
     }
 
     public UpdatePasswordLockoutPolicy(
-        description: string,
         maxAttempts: number,
         showLockoutFailures: boolean,
     ): Promise<PasswordLockoutPolicy> {
-        const req = new PasswordLockoutPolicyUpdate();
-        req.setDescription(description);
+        const req = new PasswordLockoutPolicy();
         req.setMaxAttempts(maxAttempts);
-        req.setShowLockOutFailures(showLockoutFailures);
+        req.setShowLockoutFailure(showLockoutFailures);
         return this.grpcService.mgmt.updatePasswordLockoutPolicy(req);
     }
 
@@ -641,6 +626,12 @@ export class ManagementService {
         const req = new UserID();
         req.setId(id);
         return this.grpcService.mgmt.getUserByID(req);
+    }
+
+    public DeleteUser(id: string): Promise<Empty> {
+        const req = new UserID();
+        req.setId(id);
+        return this.grpcService.mgmt.deleteUser(req);
     }
 
     public SearchProjectMembers(
