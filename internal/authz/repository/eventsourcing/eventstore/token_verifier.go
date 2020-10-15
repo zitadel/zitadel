@@ -66,6 +66,9 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 	}
 
 	splittedToken := strings.Split(tokenIDSubject, ":")
+	if len(splittedToken) != 2 {
+		return "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-GDg3a", "invalid token")
+	}
 	token, err := repo.TokenByID(ctx, splittedToken[0], splittedToken[1])
 	if err != nil {
 		return "", "", "", caos_errs.ThrowUnauthenticated(err, "APP-BxUSiL", "invalid token")
