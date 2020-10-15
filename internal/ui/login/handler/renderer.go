@@ -3,13 +3,13 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"github.com/caos/logging"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/gorilla/csrf"
+	"golang.org/x/text/language"
 	"html/template"
 	"net/http"
 	"path"
-
-	"github.com/caos/logging"
-	"github.com/gorilla/csrf"
-	"golang.org/x/text/language"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
@@ -32,28 +32,31 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		pathPrefix: pathPrefix,
 	}
 	tmplMapping := map[string]string{
-		tmplError:              "error.html",
-		tmplLogin:              "login.html",
-		tmplUserSelection:      "select_user.html",
-		tmplPassword:           "password.html",
-		tmplMfaVerify:          "mfa_verify.html",
-		tmplMfaPrompt:          "mfa_prompt.html",
-		tmplMfaInitVerify:      "mfa_init_verify.html",
-		tmplMfaInitDone:        "mfa_init_done.html",
-		tmplMailVerification:   "mail_verification.html",
-		tmplMailVerified:       "mail_verified.html",
-		tmplInitPassword:       "init_password.html",
-		tmplInitPasswordDone:   "init_password_done.html",
-		tmplInitUser:           "init_user.html",
-		tmplInitUserDone:       "init_user_done.html",
-		tmplPasswordResetDone:  "password_reset_done.html",
-		tmplChangePassword:     "change_password.html",
-		tmplChangePasswordDone: "change_password_done.html",
-		tmplRegister:           "register.html",
-		tmplLogoutDone:         "logout_done.html",
-		tmplRegisterOrg:        "register_org.html",
-		tmplChangeUsername:     "change_username.html",
-		tmplChangeUsernameDone: "change_username_done.html",
+		tmplError:                  "error.html",
+		tmplLogin:                  "login.html",
+		tmplUserSelection:          "select_user.html",
+		tmplPassword:               "password.html",
+		tmplMfaVerify:              "mfa_verify.html",
+		tmplMfaPrompt:              "mfa_prompt.html",
+		tmplMfaInitVerify:          "mfa_init_verify.html",
+		tmplMfaInitDone:            "mfa_init_done.html",
+		tmplMailVerification:       "mail_verification.html",
+		tmplMailVerified:           "mail_verified.html",
+		tmplInitPassword:           "init_password.html",
+		tmplInitPasswordDone:       "init_password_done.html",
+		tmplInitUser:               "init_user.html",
+		tmplInitUserDone:           "init_user_done.html",
+		tmplPasswordResetDone:      "password_reset_done.html",
+		tmplChangePassword:         "change_password.html",
+		tmplChangePasswordDone:     "change_password_done.html",
+		tmplRegisterOption:         "register_option.html",
+		tmplRegister:               "register.html",
+		tmplLogoutDone:             "logout_done.html",
+		tmplRegisterOrg:            "register_org.html",
+		tmplChangeUsername:         "change_username.html",
+		tmplChangeUsernameDone:     "change_username_done.html",
+		tmplLinkUsersDone:          "link_users_done.html",
+		tmplExternalNotFoundOption: "external_not_found_option.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -64,6 +67,12 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		},
 		"loginUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointLogin)
+		},
+		"externalIDPAuthURL": func(authReqID, idpConfigID string) string {
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%s", EndpointExternalLogin, queryAuthRequestID, authReqID, queryIDPConfigID, idpConfigID))
+		},
+		"externalIDPRegisterURL": func(authReqID, idpConfigID string) string {
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%s", EndpointExternalRegister, queryAuthRequestID, authReqID, queryIDPConfigID, idpConfigID))
 		},
 		"registerUrl": func(id string) string {
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointRegister, queryAuthRequestID, id))
@@ -107,6 +116,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		"changePasswordUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointChangePassword)
 		},
+		"registerOptionUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointRegisterOption)
+		},
 		"registrationUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointRegister)
 		},
@@ -116,10 +128,16 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		"changeUsernameUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointChangeUsername)
 		},
+		"externalNotFoundOptionUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointExternalNotFoundOption)
+		},
 		"selectedLanguage": func(l string) bool {
 			return false
 		},
 		"selectedGender": func(g int32) bool {
+			return false
+		},
+		"hasExternalLogin": func() bool {
 			return false
 		},
 	}
@@ -186,6 +204,10 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderInitUser(w, r, authReq, "", "", step.PasswordSet, nil)
 	case *model.ChangeUsernameStep:
 		l.renderChangeUsername(w, r, authReq, nil)
+	case *model.LinkUsersStep:
+		l.linkUsers(w, r, authReq, err)
+	case *model.ExternalNotFoundOptionStep:
+		l.renderExternalNotFoundOption(w, r, authReq, err)
 	default:
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}
@@ -204,11 +226,12 @@ func (l *Login) getUserData(r *http.Request, authReq *model.AuthRequest, title s
 	return userData{
 		baseData:    l.getBaseData(r, authReq, title, errType, errMessage),
 		profileData: l.getProfileData(authReq),
+		Linking:     len(authReq.LinkingUsers) > 0,
 	}
 }
 
 func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title string, errType, errMessage string) baseData {
-	return baseData{
+	baseData := baseData{
 		errorData: errorData{
 			ErrType:    errType,
 			ErrMessage: errMessage,
@@ -217,10 +240,16 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 		Title:     title,
 		Theme:     l.getTheme(r),
 		ThemeMode: l.getThemeMode(r),
+		OrgID:     l.getOrgID(authReq),
 		AuthReqID: getRequestID(authReq, r),
 		CSRF:      csrf.TemplateField(r),
 		Nonce:     http_mw.GetNonce(r),
 	}
+	if authReq != nil {
+		baseData.LoginPolicy = authReq.LoginPolicy
+		baseData.IDPProviders = authReq.AllowedExternalIDPs
+	}
+	return baseData
 }
 
 func (l *Login) getProfileData(authReq *model.AuthRequest) profileData {
@@ -253,6 +282,19 @@ func (l *Login) getThemeMode(r *http.Request) string {
 	return "" //TODO: impl
 }
 
+func (l *Login) getOrgID(authReq *model.AuthRequest) string {
+	if authReq == nil {
+		return ""
+	}
+	if authReq.UserOrgID != "" {
+		return authReq.UserOrgID
+	}
+	if authReq.Request == nil {
+		return ""
+	}
+	return authReq.GetScopeOrgID()
+}
+
 func getRequestID(authReq *model.AuthRequest, r *http.Request) string {
 	if authReq != nil {
 		return authReq.ID
@@ -275,13 +317,16 @@ func (l *Login) cspErrorHandler(err error) http.Handler {
 
 type baseData struct {
 	errorData
-	Lang      string
-	Title     string
-	Theme     string
-	ThemeMode string
-	AuthReqID string
-	CSRF      template.HTML
-	Nonce     string
+	Lang         string
+	Title        string
+	Theme        string
+	ThemeMode    string
+	OrgID        string
+	AuthReqID    string
+	CSRF         template.HTML
+	Nonce        string
+	LoginPolicy  *iam_model.LoginPolicyView
+	IDPProviders []*iam_model.IDPProviderView
 }
 
 type errorData struct {
@@ -295,6 +340,7 @@ type userData struct {
 	PasswordChecked     string
 	MfaProviders        []model.MfaType
 	SelectedMfaProvider model.MfaType
+	Linking             bool
 }
 
 type profileData struct {
@@ -315,7 +361,8 @@ type passwordData struct {
 
 type userSelectionData struct {
 	baseData
-	Users []model.UserSelection
+	Users   []model.UserSelection
+	Linking bool
 }
 
 type mfaData struct {

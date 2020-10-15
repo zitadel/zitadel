@@ -26,6 +26,9 @@ Errors:
     AddressNotFound: Addresse nicht gefunden
     NotHuman: Der Benutzer muss eine Person sein
     NotMachine: Der Benutzer muss technisch sein
+    NotAllowedToLink: Der Benutzer darf nicht mit einem externen Login Provider verlinkt werden
+    Username:
+      Reservied: Benutzername ist bereits vergeben
     Code:
       Empty: Code ist leer
       NotFound: Code konnte nicht gefunden werden
@@ -43,6 +46,11 @@ Errors:
       HasUpper: Passwort beinhaltet keinen Grossbuchstaben
       HasNumber: Passwort beinhaltet keine Nummer
       HasSymbol: Passwort beinhaltet kein Symbol
+    ExternalIDP:
+      Invalid: Externer IDP ungültig
+      IDPConfigNotExisting: IDP Provider ungültig für diese Organisation
+      NotAllowed: Externer IDP ist auf dieser Organisation nicht erlaubt.
+      MinimumExternalIDPNeeded: Mindestens ein IDP muss hinzugefügt werden.
     Mfa:
       Otp:
         AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet
@@ -76,6 +84,7 @@ Errors:
     OIDCConfigInvalid: OIDC IDP Konfiguration ist ungültig
     IdpIsNotOIDC: IDP Konfiguration ist nicht vom Typ OIDC
     LoginPolicy:
+      Invalid: Login Policy ist ungültig
       NotExisting: Login Policy existiert nicht auf dieser Organisation
       AlreadyExists: Login Policy existiert bereits
       IdpProviderAlreadyExisting: Idp Provider existiert bereits
@@ -125,6 +134,7 @@ Errors:
     OIDCConfigInvalid: OIDC IDP Konfiguration ist ungültig
     IdpIsNotOIDC: IDP Konfiguration ist nicht vom Typ OIDC
     LoginPolicyInvalid: Login Policy ist ungültig
+    LoginPolicyNotExisting: Login Policy nicht vorhanden
     IdpProviderInvalid: Idp Provider ist ungültig
     LoginPolicy:
       NotExisting: Default Login Policy existiert nicht
@@ -173,12 +183,11 @@ EventTypes:
         added: E-Mail Code generiert
         sent: E-Mail Code gesendet
     machine:
-      machine:
-        added: Technischer Benutzer hinzugefügt
-        changed: Technischer Benutzer geändert
-        key:
-          added: Key added
-          removed: Key removed
+      added: Technischer Benutzer hinzugefügt
+      changed: Technischer Benutzer geändert
+      key:
+        added: Key added
+        removed: Key removed
     human:
       added: Benutzer hinzugefügt
       selfregistered: Benutzer hat sich selbst registriert
@@ -208,6 +217,11 @@ EventTypes:
         check:
           succeeded: Passwortvalidierung erfolgreich
           failed: Passwortvalidierung fehlgeschlagen
+      externalidp:
+        added: Externer IDP wurde hinzugefügt
+        removed: Externer IDP wurde gelöscht
+        cascade:
+          removed: Externer IDP wurde kaskadiert gelöscht
       phone:
         changed: Telefonnummer geändert
         verified: Telefonnummer verifiziert

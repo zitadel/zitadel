@@ -5,7 +5,6 @@ import (
 	"flag"
 
 	"github.com/caos/logging"
-
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api"
 	internal_authz "github.com/caos/zitadel/internal/api/authz"
@@ -114,7 +113,7 @@ func startZitadel(configPaths []string) {
 func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository) {
 	uis := ui.Create(conf.UI)
 	if *loginEnabled {
-		login, prefix := login.Start(conf.UI.Login, authRepo, *localDevMode)
+		login, prefix := login.Start(conf.UI.Login, authRepo, conf.SystemDefaults, *localDevMode)
 		uis.RegisterHandler(prefix, login.Handler())
 	}
 	if *consoleEnabled {

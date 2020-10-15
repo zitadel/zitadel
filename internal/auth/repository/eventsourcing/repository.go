@@ -128,6 +128,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 	return &EsRepository{
 		spool,
 		eventstore.UserRepo{
+			SearchLimit:  conf.SearchLimit,
 			Eventstore:   es,
 			UserEvents:   user,
 			OrgEvents:    org,
@@ -136,17 +137,22 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 		},
 		eventstore.AuthRequestRepo{
 			UserEvents:               user,
+			OrgEvents:                org,
+			PolicyEvents:             policy,
 			AuthRequests:             authReq,
 			View:                     view,
 			UserSessionViewProvider:  view,
 			UserViewProvider:         view,
 			UserEventProvider:        user,
 			OrgViewProvider:          view,
+			IDPProviderViewProvider:  view,
+			LoginPolicyViewProvider:  view,
 			IdGenerator:              idGenerator,
 			PasswordCheckLifeTime:    systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
 			MfaInitSkippedLifeTime:   systemDefaults.VerificationLifetimes.MfaInitSkip.Duration,
 			MfaSoftwareCheckLifeTime: systemDefaults.VerificationLifetimes.MfaSoftwareCheck.Duration,
 			MfaHardwareCheckLifeTime: systemDefaults.VerificationLifetimes.MfaHardwareCheck.Duration,
+			IAMID:                    systemDefaults.IamID,
 		},
 		eventstore.TokenRepo{View: view},
 		eventstore.KeyRepository{

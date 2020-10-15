@@ -16,6 +16,7 @@ import (
 const (
 	IDPProviderKeyAggregateID = "aggregate_id"
 	IDPProviderKeyIdpConfigID = "idp_config_id"
+	IDPProviderKeyState       = "idp_state"
 )
 
 type IDPProviderView struct {
@@ -28,31 +29,36 @@ type IDPProviderView struct {
 	Name            string `json:"-" gorm:"column:name"`
 	IDPConfigType   int32  `json:"-" gorm:"column:idp_config_type"`
 	IDPProviderType int32  `json:"idpProviderType" gorm:"column:idp_provider_type"`
+	IDPState        int32  `json:"-" gorm:"column:idp_state"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }
 
-func IDPProviderViewFromModel(policy *model.IDPProviderView) *IDPProviderView {
+func IDPProviderViewFromModel(provider *model.IDPProviderView) *IDPProviderView {
 	return &IDPProviderView{
-		AggregateID:     policy.AggregateID,
-		Sequence:        policy.Sequence,
-		CreationDate:    policy.CreationDate,
-		ChangeDate:      policy.ChangeDate,
-		Name:            policy.Name,
-		IDPConfigType:   int32(policy.IDPConfigType),
-		IDPProviderType: int32(policy.IDPProviderType),
+		AggregateID:     provider.AggregateID,
+		Sequence:        provider.Sequence,
+		CreationDate:    provider.CreationDate,
+		ChangeDate:      provider.ChangeDate,
+		Name:            provider.Name,
+		IDPConfigID:     provider.IDPConfigID,
+		IDPConfigType:   int32(provider.IDPConfigType),
+		IDPProviderType: int32(provider.IDPProviderType),
+		IDPState:        int32(provider.IDPState),
 	}
 }
 
-func IDPProviderViewToModel(policy *IDPProviderView) *model.IDPProviderView {
+func IDPProviderViewToModel(provider *IDPProviderView) *model.IDPProviderView {
 	return &model.IDPProviderView{
-		AggregateID:     policy.AggregateID,
-		Sequence:        policy.Sequence,
-		CreationDate:    policy.CreationDate,
-		ChangeDate:      policy.ChangeDate,
-		Name:            policy.Name,
-		IDPConfigType:   model.IdpConfigType(policy.IDPConfigType),
-		IDPProviderType: model.IDPProviderType(policy.IDPProviderType),
+		AggregateID:     provider.AggregateID,
+		Sequence:        provider.Sequence,
+		CreationDate:    provider.CreationDate,
+		ChangeDate:      provider.ChangeDate,
+		Name:            provider.Name,
+		IDPConfigID:     provider.IDPConfigID,
+		IDPConfigType:   model.IdpConfigType(provider.IDPConfigType),
+		IDPProviderType: model.IDPProviderType(provider.IDPProviderType),
+		IDPState:        model.IDPConfigState(provider.IDPState),
 	}
 }
 

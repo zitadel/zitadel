@@ -95,7 +95,7 @@ func membershipsToOrgResp(memberships []*user_view_model.UserMembershipView, cou
 
 func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]string, error) {
 	ctxData := authz.GetCtxData(ctx)
-	memberships, count, err := repo.View.SearchUserMemberships(&user_model.UserMembershipSearchRequest{
+	orgMemberships, orgCount, err := repo.View.SearchUserMemberships(&user_model.UserMembershipSearchRequest{
 		Queries: []*user_model.UserMembershipSearchQuery{
 			{
 				Key:    user_model.UserMembershipSearchKeyUserID,
@@ -112,11 +112,29 @@ func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]st
 	if err != nil {
 		return nil, err
 	}
-	if count == 0 {
+	iamMemberships, iamCount, err := repo.View.SearchUserMemberships(&user_model.UserMembershipSearchRequest{
+		Queries: []*user_model.UserMembershipSearchQuery{
+			{
+				Key:    user_model.UserMembershipSearchKeyUserID,
+				Method: global_model.SearchMethodEquals,
+				Value:  ctxData.UserID,
+			},
+			{
+				Key:    user_model.UserMembershipSearchKeyAggregateID,
+				Method: global_model.SearchMethodEquals,
+				Value:  repo.IamID,
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if orgCount == 0 && iamCount == 0 {
 		return []string{}, nil
 	}
+	orgMemberships = append(orgMemberships, iamMemberships...)
 	permissions := &grant_model.Permissions{Permissions: []string{}}
-	for _, membership := range memberships {
+	for _, membership := range orgMemberships {
 		for _, role := range membership.Roles {
 			permissions = repo.mapRoleToPermission(permissions, membership, role)
 		}

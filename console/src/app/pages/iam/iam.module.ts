@@ -22,17 +22,18 @@ import { ContributorsModule } from 'src/app/modules/contributors/contributors.mo
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
 import { FailedEventsComponent } from './failed-events/failed-events.component';
+import { IamPolicyGridComponent } from './iam-policy-grid/iam-policy-grid.component';
 import { IamRoutingModule } from './iam-routing.module';
 import { IamViewsComponent } from './iam-views/iam-views.component';
 import { IamComponent } from './iam.component';
 
-
 @NgModule({
-    declarations: [IamComponent, IamViewsComponent, FailedEventsComponent],
+    declarations: [IamComponent, IamViewsComponent, FailedEventsComponent, IamPolicyGridComponent],
     imports: [
         CommonModule,
         IamRoutingModule,
@@ -61,6 +62,7 @@ import { IamComponent } from './iam.component';
         TimestampToDatePipeModule,
         SharedModule,
         RefreshTableModule,
+        HasRolePipeModule,
     ],
 })
 export class IamModule { }

@@ -3,7 +3,7 @@
 *, *::before, *::after {
     box-sizing: border-box;
     font-family: $standardFont;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 400;
 }
 
@@ -30,6 +30,7 @@ h1 {
     font-family: $headerFont;
     font-weight: 300;
     font-size: $headerSize;
+    text-align: center;
 }
 
 h2 {
@@ -56,7 +57,13 @@ header {
     }
 }
 
-.content {
+.head {
+    width: 100%;
+    max-width: 1000px;
+    margin: auto;
+}
+
+.content form {
     margin: auto;
     padding: 20px;
     width: 100%;
@@ -71,12 +78,16 @@ a {
     &:hover {
         color: $primaryColorHover;
     }
+
+    &.tos-link {
+        font-size: 14px;
+    }
 }
 
-button {
+button, .button {
     background-color: $backgroundColor;
     color: $primaryColor;
-    border: 2px solid $primaryColor;
+    border: 1px solid $primaryColor;
     border-radius: 5px;
     width: 100%;
     max-width: 600px;
@@ -84,10 +95,14 @@ button {
     transition: all 0.3s ease 0s;
     cursor: pointer;
     outline: none;
+    display: inline-block;
+    text-align: center;
+    line-height: 40px;
+
     &:hover {
         background-color: $primaryColorHover;
         color: $backgroundColor;
-        border: 2px solid $primaryColorHover;
+        border: 1px solid $primaryColorHover;
     }
 
     &.primary {
@@ -101,22 +116,24 @@ button {
 
     &:disabled {
         background-color: $inputBorderColor;
-        border: 2px solid $inputBorderColor;
+        border: 1px solid $inputBorderColor;
 
         &:hover {
             background-color: $inputBorderColor;
-            border: 2px solid $inputBorderColor;
+            border: 1px solid $inputBorderColor;
         }
     }
 }
+
+
 
 input:not([type='radio']), select {
     background-color: $inputBackgroundColor;
     color: $fontColor;
     height: $inputHeight;
-    border: 2px solid $inputBorderColor;
+    border: 1px solid $inputBorderColor;
     border-radius: 5px;
-    padding-left: 15px;
+    padding-left: 8px;
 }
 
 %profile-image {
@@ -145,7 +162,7 @@ input:not([type='radio']), select {
         text-align: center;
 
         div:first-of-type {
-            font-size: $headerSize;
+            font-size: $header3Size;
             font-weight: 300;
         }
 
@@ -184,23 +201,24 @@ form {
         display: flex;
 
         input[type='checkbox'] {
-            height: 20px;
+            height: 16px;
             vertical-align: middle;
         }
 
         & label {
-            height: 20px;
+            height: 16px;
             text-transform: inherit;
             display: inline-block;
             padding: 2px 0 0 15px;
             width: 100%;
+            color: $fontColor;
         }
     }
 
     label {
         color: $labelColor;
         text-transform: uppercase;
-        font-size: 0.9rem;
+        font-size: 0.8rem;
         margin-bottom: 3px;
 
         span.optional {
@@ -320,6 +338,7 @@ form {
         flex-wrap: wrap;
         padding: 0;
         list-style: none;
+        margin-bottom: 0;
 
         li {
             flex: 1 0 50%;
@@ -412,7 +431,11 @@ footer {
 }
 
 .free-tier {
-    border: 2px solid #F20D6B;
+    border: 2px solid $nokColor;
     border-radius: 5px;
     padding: 10px;
+}
+
+.error {
+    color: $nokColor;
 }

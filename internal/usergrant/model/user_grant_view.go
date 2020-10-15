@@ -48,6 +48,7 @@ const (
 	UserGrantSearchKeyGrantID
 	UserGrantSearchKeyOrgName
 	UserGrantSearchKeyRoleKey
+	UserGrantSearchKeyID
 )
 
 type UserGrantSearchQuery struct {

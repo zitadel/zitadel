@@ -2,6 +2,7 @@ import { animate, animation, keyframes, style, transition, trigger, useAnimation
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
+import { RefreshService } from 'src/app/services/refresh.service';
 
 const rotate = animation([
     animate(
@@ -32,13 +33,23 @@ export class RefreshTableComponent implements OnInit {
     @Input() public dataSize: number = 0;
     @Input() public emitRefreshAfterTimeoutInMs: number = 0;
     @Input() public loading: boolean = false;
+    @Input() public emitRefreshOnPreviousRoute: string = '';
     @Output() public refreshed: EventEmitter<void> = new EventEmitter();
+
+    constructor(private refreshService: RefreshService) { }
 
     ngOnInit(): void {
         if (this.emitRefreshAfterTimeoutInMs) {
             setTimeout(() => {
                 this.emitRefresh();
             }, this.emitRefreshAfterTimeoutInMs);
+        }
+
+        if (this.emitRefreshOnPreviousRoute && this.refreshService.previousUrls.includes(this.emitRefreshOnPreviousRoute)) {
+            setTimeout(() => {
+                console.log('refresh now');
+                this.emitRefresh();
+            }, 1000);
         }
     }
 

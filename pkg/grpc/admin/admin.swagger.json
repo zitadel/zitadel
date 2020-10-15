@@ -1612,6 +1612,15 @@
         }
       }
     },
+    "v1OIDCMappingField": {
+      "type": "string",
+      "enum": [
+        "OIDCMAPPINGFIELD_UNSPECIFIED",
+        "OIDCMAPPINGFIELD_PREFERRED_USERNAME",
+        "OIDCMAPPINGFIELD_EMAIL"
+      ],
+      "default": "OIDCMAPPINGFIELD_UNSPECIFIED"
+    },
     "v1OidcIdpConfig": {
       "type": "object",
       "properties": {
@@ -1656,6 +1665,12 @@
           "items": {
             "type": "string"
           }
+        },
+        "idp_display_name_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
+        },
+        "username_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
         }
       }
     },
@@ -1679,6 +1694,12 @@
           "items": {
             "type": "string"
           }
+        },
+        "idp_display_name_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
+        },
+        "username_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
         }
       }
     },
@@ -1696,6 +1717,12 @@
           "items": {
             "type": "string"
           }
+        },
+        "idp_display_name_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
+        },
+        "username_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
         }
       }
     },

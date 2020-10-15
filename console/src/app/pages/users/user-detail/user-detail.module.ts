@@ -25,6 +25,7 @@ import { PasswordComplexityViewModule } from 'src/app/modules/password-complexit
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
+import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
@@ -38,11 +39,13 @@ import { DetailFormMachineModule } from './detail-form-machine/detail-form-machi
 import { DetailFormModule } from './detail-form/detail-form.module';
 import { AddKeyDialogModule } from './machine-keys/add-key-dialog/add-key-dialog.module';
 import { MachineKeysComponent } from './machine-keys/machine-keys.component';
+import { ShowKeyDialogModule } from './machine-keys/show-key-dialog/show-key-dialog.module';
 import { MembershipsComponent } from './memberships/memberships.component';
 import { PasswordComponent } from './password/password.component';
 import { UserDetailRoutingModule } from './user-detail-routing.module';
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
+import { ExternalIdpsComponent } from './external-idps/external-idps.component';
 
 @NgModule({
     declarations: [
@@ -56,6 +59,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         CodeDialogComponent,
         MembershipsComponent,
         MachineKeysComponent,
+        ExternalIdpsComponent,
     ],
     imports: [
         UserDetailRoutingModule,
@@ -65,10 +69,12 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         ReactiveFormsModule,
         DetailFormModule,
         DetailFormMachineModule,
+        WarnDialogModule,
         MatDialogModule,
         QRCodeModule,
         MetaLayoutModule,
         AddKeyDialogModule,
+        ShowKeyDialogModule,
         MatCheckboxModule,
         HasRolePipeModule,
         MatFormFieldModule,

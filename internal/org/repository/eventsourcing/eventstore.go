@@ -464,6 +464,10 @@ func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.
 	return es_sdk.Push(ctx, es.PushAggregates, repoMember.AppendEvents, orgAggregate)
 }
 
+func (es *OrgEventstore) GetDefaultOrgIAMPolicy(ctx context.Context) *org_model.OrgIAMPolicy {
+	return es.defaultOrgIamPolicy
+}
+
 func (es *OrgEventstore) GetOrgIAMPolicy(ctx context.Context, orgID string) (*org_model.OrgIAMPolicy, error) {
 	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
 	if err != nil && !errors.IsNotFound(err) {
@@ -712,7 +716,7 @@ func (es *OrgEventstore) ChangeIDPOIDCConfig(ctx context.Context, config *iam_mo
 
 func (es *OrgEventstore) AddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
 	if policy == nil || !policy.IsValid() {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sjkl9", "Errors.Org.LoginPolicyInvalid")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sjkl9", "Errors.Org.LoginPolicy.Invalid")
 	}
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
 	if err != nil {
@@ -732,11 +736,15 @@ func (es *OrgEventstore) AddLoginPolicy(ctx context.Context, policy *iam_model.L
 
 func (es *OrgEventstore) ChangeLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
 	if policy == nil || !policy.IsValid() {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.Org.LoginPolicyInvalid")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.Org.LoginPolicy.Invalid")
 	}
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
 	if err != nil {
 		return nil, err
+	}
+
+	if existing.LoginPolicy == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.Org.LoginPolicy.NotExisting")
 	}
 
 	repoOrg := model.OrgFromModel(existing)
@@ -752,7 +760,7 @@ func (es *OrgEventstore) ChangeLoginPolicy(ctx context.Context, policy *iam_mode
 
 func (es *OrgEventstore) RemoveLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) error {
 	if policy == nil || !policy.IsValid() {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-O0s9e", "Errors.Org.LoginPolicyInvalid")
+		return errors.ThrowPreconditionFailed(nil, "EVENT-O0s9e", "Errors.Org.LoginPolicy.Invalid")
 	}
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
 	if err != nil {

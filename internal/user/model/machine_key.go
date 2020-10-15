@@ -13,6 +13,7 @@ type MachineKeyView struct {
 	Sequence       uint64
 	CreationDate   time.Time
 	ExpirationDate time.Time
+	PublicKey      []byte
 }
 
 type MachineKeySearchRequest struct {

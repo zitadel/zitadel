@@ -1,5 +1,6 @@
 <app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
-    [timestamp]="userResult?.viewTimestamp" [selection]="selection">
+    [timestamp]="userResult?.viewTimestamp" [selection]="selection"
+    [emitRefreshOnPreviousRoute]="refreshOnPreviousRoute">
     <ng-template appHasRole [appHasRole]="['user.write']" actions>
         <button (click)="deactivateSelectedUsers()" matTooltip="{{'ORG_DETAIL.TABLE.DEACTIVATE' | translate}}"
             class="icon-button" mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
@@ -16,7 +17,7 @@
     </ng-template>
 
     <div class="table-wrapper">
-        <table class="table background-style" mat-table [dataSource]="dataSource">
+        <table class="table" mat-table [dataSource]="dataSource">
             <ng-container matColumnDef="select">
                 <th mat-header-cell *matHeaderCellDef>
                     <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
@@ -74,7 +75,7 @@
             </tr>
 
         </table>
-        <mat-paginator #paginator class="paginator background-style" [length]="userResult?.totalResult || 0"
-            [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
+        <mat-paginator #paginator class="paginator" [length]="userResult?.totalResult || 0" [pageSize]="10"
+            [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
     </div>
 </app-refresh-table>

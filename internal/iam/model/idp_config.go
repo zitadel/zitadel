@@ -17,12 +17,14 @@ type IDPConfig struct {
 
 type OIDCIDPConfig struct {
 	es_models.ObjectRoot
-	IDPConfigID        string
-	ClientID           string
-	ClientSecret       *crypto.CryptoValue
-	ClientSecretString string
-	Issuer             string
-	Scopes             []string
+	IDPConfigID           string
+	ClientID              string
+	ClientSecret          *crypto.CryptoValue
+	ClientSecretString    string
+	Issuer                string
+	Scopes                []string
+	IDPDisplayNameMapping OIDCMappingField
+	UsernameMapping       OIDCMappingField
 }
 
 type IdpConfigType int32
@@ -38,6 +40,14 @@ const (
 	IDPConfigStateActive IDPConfigState = iota
 	IDPConfigStateInactive
 	IDPConfigStateRemoved
+)
+
+type OIDCMappingField int32
+
+const (
+	OIDCMappingFieldUnspecified OIDCMappingField = iota
+	OIDCMappingFieldPreferredLoginName
+	OIDCMappingFieldEmail
 )
 
 func NewIDPConfig(iamID, idpID string) *IDPConfig {

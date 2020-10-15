@@ -1967,6 +1967,191 @@ func TestPasswordCodeSent(t *testing.T) {
 	}
 }
 
+func TestAddExternalIDP(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es          *UserEventstore
+		ctx         context.Context
+		externalIDP *model.ExternalIDP
+	}
+	type res struct {
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add ok",
+			args: args{
+				es:  GetMockManipulateUser(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				externalIDP: &model.ExternalIDP{
+					ObjectRoot: es_models.ObjectRoot{
+						AggregateID: "AggregateID",
+					},
+					IDPConfigID: "IDPConfigID",
+					UserID:      "UserID",
+					DisplayName: "DisplayName",
+				},
+			},
+		},
+		{
+			name: "invalid idp",
+			args: args{
+				es:  GetMockManipulateUser(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				externalIDP: &model.ExternalIDP{
+					ObjectRoot: es_models.ObjectRoot{
+						AggregateID: "AggregateID",
+					},
+					UserID:      "UserID",
+					DisplayName: "DisplayName",
+				},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:  GetMockManipulateUserNoEvents(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				externalIDP: &model.ExternalIDP{
+					ObjectRoot: es_models.ObjectRoot{
+						AggregateID: "AggregateID",
+					},
+					IDPConfigID: "IDPConfigID",
+					UserID:      "UserID",
+					DisplayName: "DisplayName",
+				},
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddExternalIDP(tt.args.ctx, tt.args.externalIDP)
+
+			if tt.res.errFunc == nil && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if tt.res.errFunc == nil && result.IDPConfigID == "" {
+				t.Errorf("result has no idpconfig")
+			}
+			if tt.res.errFunc == nil && result.UserID == "" {
+				t.Errorf("result has no UserID")
+			}
+			if tt.res.errFunc == nil && result == nil {
+				t.Errorf("got wrong result change required: actual: %v ", result)
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestRemoveExternalIDP(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es          *UserEventstore
+		ctx         context.Context
+		externalIDP *model.ExternalIDP
+	}
+	type res struct {
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove ok",
+			args: args{
+				es:  GetMockManipulateUserWithExternalIDP(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				externalIDP: &model.ExternalIDP{
+					ObjectRoot: es_models.ObjectRoot{
+						AggregateID: "AggregateID",
+					},
+					IDPConfigID: "IDPConfigID",
+					UserID:      "UserID",
+				},
+			},
+		},
+		{
+			name: "invalid idp",
+			args: args{
+				es:  GetMockManipulateUser(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				externalIDP: &model.ExternalIDP{
+					ObjectRoot: es_models.ObjectRoot{
+						AggregateID: "AggregateID",
+					},
+					UserID:      "UserID",
+					DisplayName: "DisplayName",
+				},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "remove external idp not existing",
+			args: args{
+				es:  GetMockManipulateUser(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				externalIDP: &model.ExternalIDP{
+					ObjectRoot: es_models.ObjectRoot{
+						AggregateID: "AggregateID",
+					},
+					IDPConfigID: "IDPConfigID",
+					UserID:      "UserID",
+				},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:  GetMockManipulateUserNoEvents(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				externalIDP: &model.ExternalIDP{
+					ObjectRoot: es_models.ObjectRoot{
+						AggregateID: "AggregateID",
+					},
+					IDPConfigID: "IDPConfigID",
+					UserID:      "UserID",
+					DisplayName: "DisplayName",
+				},
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemoveExternalIDP(tt.args.ctx, tt.args.externalIDP)
+
+			if tt.res.errFunc == nil && err != nil {
+				t.Errorf("should not get err, %v", err)
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
 func TestProfileByID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {

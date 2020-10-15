@@ -2,8 +2,9 @@ package eventstore
 
 import (
 	"context"
-
 	"github.com/caos/logging"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 
 	auth_model "github.com/caos/zitadel/internal/auth/model"
 	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
@@ -41,7 +42,7 @@ func (repo *OrgRepository) SearchOrgs(ctx context.Context, request *org_model.Or
 	result := &org_model.OrgSearchResult{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
-		TotalResult: uint64(count),
+		TotalResult: count,
 		Result:      model.OrgsToModel(members),
 	}
 	if err == nil {
@@ -71,7 +72,7 @@ func (repo *OrgRepository) RegisterOrg(ctx context.Context, register *auth_model
 	if err != nil {
 		return nil, err
 	}
-	user, userAggregates, err := repo.UserEventstore.PrepareRegisterUser(ctx, register.User, pwPolicy, orgPolicy, org.AggregateID)
+	user, userAggregates, err := repo.UserEventstore.PrepareRegisterUser(ctx, register.User, nil, pwPolicy, orgPolicy, org.AggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -94,6 +95,18 @@ func (repo *OrgRepository) RegisterOrg(ctx context.Context, register *auth_model
 	return RegisterToModel(registerModel), nil
 }
 
+func (repo *OrgRepository) GetDefaultOrgIamPolicy(ctx context.Context) *org_model.OrgIAMPolicy {
+	return repo.OrgEventstore.GetDefaultOrgIAMPolicy(ctx)
+}
+
 func (repo *OrgRepository) GetOrgIamPolicy(ctx context.Context, orgID string) (*org_model.OrgIAMPolicy, error) {
-	return repo.OrgEventstore.GetOrgIAMPolicy(ctx, policy_model.DefaultPolicy)
+	return repo.OrgEventstore.GetOrgIAMPolicy(ctx, orgID)
+}
+
+func (repo *OrgRepository) GetIDPConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IDPConfigView, error) {
+	idpConfig, err := repo.View.IDPConfigByID(idpConfigID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_view_model.IDPConfigViewToModel(idpConfig), nil
 }

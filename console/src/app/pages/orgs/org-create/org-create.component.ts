@@ -61,6 +61,7 @@ export class OrgCreateComponent {
     public usePassword: boolean = false;
 
     public forSelf: boolean = true;
+
     constructor(
         private router: Router,
         private toast: ToastService,
@@ -157,14 +158,12 @@ export class OrgCreateComponent {
                     validators.push(symbolValidator);
                 }
 
-                // this.initForm(validators);
                 const pwdValidators = [...validators] as ValidatorFn[];
                 const confirmPwdValidators = [...validators, passwordConfirmValidator] as ValidatorFn[];
                 this.pwdForm = this.fb.group({
                     password: ['', pwdValidators],
                     confirmPassword: ['', confirmPwdValidators],
                 });
-
             });
         } else {
             this.pwdForm = this.fb.group({

@@ -43,6 +43,11 @@
                 </app-detail-form>
             </app-card>
 
+          <app-card *ngIf="user && user.human && user.id" title="{{ 'USER.EXTERNALIDP.TITLE' | translate }}"
+                    description="{{ 'USER.EXTERNALIDP.DESC' | translate }}">
+            <app-external-idps [userId]="user.id" [service]="mgmtService" ></app-external-idps>
+          </app-card>
+
             <app-card *ngIf="user.machine" title="{{ 'USER.MACHINE.TITLE' | translate }}">
                 <app-detail-form-machine
                     [disabled]="(['user.write:' + user?.id, 'user.write'] | hasRole | async) == false"
@@ -101,7 +106,9 @@
                     <ng-template #emailEdit>
                         <mat-form-field class="name">
                             <mat-label>{{ 'USER.EMAIL' | translate }}</mat-label>
-                            <input matInput *ngIf="user.human && user.human.email" [(ngModel)]="user.human.email" />
+                            <input matInput
+                                *ngIf="user.human && user.human.email !== undefined && user.human.email !== null"
+                                [(ngModel)]="user.human.email" />
                         </mat-form-field>
                         <button (click)="emailEditState = false" mat-icon-button>
                             <mat-icon class="icon">close</mat-icon>
@@ -143,20 +150,22 @@
                     <ng-template #phoneEdit>
                         <mat-form-field class="name">
                             <mat-label>{{ 'USER.PHONE' | translate }}</mat-label>
-                            <input *ngIf="user.human && user.human.phone" matInput
-                                [disabled]="(canWrite$ | async) == false" [(ngModel)]="user.human.phone" />
+                            <input *ngIf="user.human && user.human.phone !== undefined && user.human.phone !== null"
+                                matInput [disabled]="(canWrite$ | async) == false" [(ngModel)]="user.human.phone" />
                         </mat-form-field>
-                        <button (click)="phoneEditState = false" mat-icon-button
-                            [disabled]="(canWrite$ | async) == false">
+                        <button matTooltip="{{ 'ACTIONS.CLOSE' | translate }}" (click)="phoneEditState = false"
+                            mat-icon-button [disabled]="(canWrite$ | async) == false">
                             <mat-icon class="icon">close</mat-icon>
                         </button>
                         <button *ngIf="user.human?.phone" color="warn" (click)="deletePhone()"
-                            [disabled]="(canWrite$ | async) == false" mat-icon-button>
+                            [disabled]="(canWrite$ | async) == false" mat-icon-button
+                            matTooltip="{{ 'ACTIONS.CLEAR' | translate }}">
                             <i class="las la-trash"></i>
                         </button>
 
                         <button *ngIf="user.human" [disabled]="!user.human.phone || (canWrite$ | async) == false"
-                            type="button" color="primary" (click)="savePhone()" mat-raised-button>
+                            type="button" color="primary" (click)="savePhone()"
+                            matTooltip="{{ 'ACTIONS.SAVE' | translate }}" mat-raised-button>
                             {{ 'ACTIONS.SAVE' | translate }}</button>
                     </ng-template>
                 </div>

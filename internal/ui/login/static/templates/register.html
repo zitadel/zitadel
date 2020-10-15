@@ -1,7 +1,10 @@
 {{template "main-top" .}}
 
-<h1>{{t "Registration.Title"}}</h1>
-<p>{{t "Registration.Description"}}</p>
+<div class="head">
+    <h1>{{t "Registration.Title"}}</h1>
+    <p>{{t "Registration.Description"}}</p>
+</div>
+
 
 <form action="{{ registrationUrl }}" method="POST">
 
@@ -62,7 +65,7 @@
                 <input class="input" type="checkbox" id="register-term-confirmation" name="register-term-confirmation" required>
                 <label for="register-term-confirmation">
                     {{t "Registration.TosConfirm"}}
-                    <a class="" target="_blank" href="{{t "Registration.TosLinkText"}}">{{t "Registration.TosLinkText"}}</a>
+                    <a class="tos-link" target="_blank" href="{{t "Registration.TosLink"}}">{{t "Registration.TosLinkText"}}</a>
                 </label>
             </div>
         </div>
@@ -72,8 +75,8 @@
 
     <div class="actions">
         <button class="primary right" id="register-button" type="submit">{{t "Actions.Next"}}</button>
-        <a href="{{ loginNameChangeUrl .AuthReqID }}">
-            <button class="secondary" type="button">{{t "Actions.Back"}}</button>
+        <a class="button secondary" href="{{ loginNameChangeUrl .AuthReqID }}">
+            {{t "Actions.Back"}}
         </a>
     </div>
 </form>

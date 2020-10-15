@@ -9,6 +9,7 @@ import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
     Org,
@@ -33,6 +34,7 @@ import { DomainVerificationComponent } from './domain-verification/domain-verifi
 })
 export class OrgDetailComponent implements OnInit, OnDestroy {
     public org!: Org.AsObject;
+    public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
     public dataSource: MatTableDataSource<OrgMember.AsObject> = new MatTableDataSource<OrgMember.AsObject>();
     public memberResult!: OrgMemberSearchResponse.AsObject;
@@ -56,7 +58,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     constructor(
         private dialog: MatDialog,
         public translate: TranslateService,
-        private mgmtService: ManagementService,
+        public mgmtService: ManagementService,
         private toast: ToastService,
         private router: Router,
     ) { }
@@ -180,6 +182,9 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
                         return this.mgmtService.AddMyOrgMember(user.id, roles);
                     })).then(() => {
                         this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
+                        setTimeout(() => {
+                            this.loadMembers();
+                        }, 1000);
                     }).catch(error => {
                         this.toast.showError(error);
                     });

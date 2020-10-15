@@ -190,16 +190,17 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, 
 	return model.UserToModel(repoUser), nil
 }
 
-func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, orgIAMPolicy *org_model.OrgIAMPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
+func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, externalIDP *usr_model.ExternalIDP, policy *policy_model.PasswordComplexityPolicy, orgIAMPolicy *org_model.OrgIAMPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	if user.Human == nil {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-ht8Ux", "Errors.User.Invalid")
 	}
+
 	err := user.CheckOrgIAMPolicy(orgIAMPolicy)
 	if err != nil {
 		return nil, nil, err
 	}
 	user.SetNamesAsDisplayname()
-	if !user.IsValid() || user.Password == nil || user.SecretString == "" {
+	if !user.IsValid() || externalIDP == nil && (user.Password == nil || user.SecretString == "") {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Errors.User.Invalid")
 	}
 	id, err := es.idGenerator.Next()
@@ -207,7 +208,13 @@ func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_mod
 		return nil, nil, err
 	}
 	user.AggregateID = id
-
+	if externalIDP != nil {
+		externalIDP.AggregateID = id
+		if !externalIDP.IsValid() {
+			return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-4Dj9s", "Errors.User.ExternalIDP.Invalid")
+		}
+		user.ExternalIDPs = append(user.ExternalIDPs, externalIDP)
+	}
 	err = user.HashPasswordIfExisting(policy, es.PasswordAlg, false)
 	if err != nil {
 		return nil, nil, err
@@ -218,14 +225,15 @@ func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_mod
 	}
 
 	repoUser := model.UserFromModel(user)
+	repoExternalIDP := model.ExternalIDPFromModel(externalIDP)
 	repoInitCode := model.InitCodeFromModel(user.InitCode)
 
-	aggregates, err := UserRegisterAggregate(ctx, es.AggregateCreator(), repoUser, resourceOwner, repoInitCode, orgIAMPolicy.UserLoginMustBeDomain)
+	aggregates, err := UserRegisterAggregate(ctx, es.AggregateCreator(), repoUser, repoExternalIDP, resourceOwner, repoInitCode, orgIAMPolicy.UserLoginMustBeDomain)
 	return repoUser, aggregates, err
 }
 
 func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User, pwPolicy *policy_model.PasswordComplexityPolicy, orgIAMPolicy *org_model.OrgIAMPolicy, resourceOwner string) (*usr_model.User, error) {
-	repoUser, createAggregates, err := es.PrepareRegisterUser(ctx, user, pwPolicy, orgIAMPolicy, resourceOwner)
+	repoUser, createAggregates, err := es.PrepareRegisterUser(ctx, user, nil, pwPolicy, orgIAMPolicy, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -684,6 +692,103 @@ func (es *UserEventstore) PasswordCodeSent(ctx context.Context, userID string) e
 	repoUser := model.UserFromModel(user)
 	agg := PasswordCodeSentAggregate(es.AggregateCreator(), repoUser)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
+func (es *UserEventstore) AddExternalIDP(ctx context.Context, externalIDP *usr_model.ExternalIDP) (*usr_model.ExternalIDP, error) {
+	if externalIDP == nil || !externalIDP.IsValid() {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Ek9s", "Errors.User.ExternalIDP.Invalid")
+	}
+	existingUser, err := es.UserByID(ctx, externalIDP.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	if existingUser.Human == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Cnk8s", "Errors.User.NotHuman")
+	}
+	repoUser := model.UserFromModel(existingUser)
+	repoExternalIDP := model.ExternalIDPFromModel(externalIDP)
+	aggregates, err := ExternalIDPAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoUser, repoExternalIDP)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, aggregates...)
+	if err != nil {
+		return nil, err
+	}
+
+	es.userCache.cacheUser(repoUser)
+	if _, idp := model.GetExternalIDP(repoUser.ExternalIDPs, externalIDP.UserID); idp != nil {
+		return model.ExternalIDPToModel(idp), nil
+	}
+	return nil, errors.ThrowInternal(nil, "EVENT-Msi9d", "Errors.Internal")
+}
+
+func (es *UserEventstore) BulkAddExternalIDPs(ctx context.Context, userID string, externalIDPs []*usr_model.ExternalIDP) error {
+	if externalIDPs == nil || len(externalIDPs) == 0 {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Ek9s", "Errors.User.ExternalIDP.MinimumExternalIDPNeeded")
+	}
+	for _, externalIDP := range externalIDPs {
+		if !externalIDP.IsValid() {
+			return caos_errs.ThrowPreconditionFailed(nil, "EVENT-idue3", "Errors.User.ExternalIDP.Invalid")
+		}
+	}
+	existingUser, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if existingUser.Human == nil {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Cnk8s", "Errors.User.NotHuman")
+	}
+	repoUser := model.UserFromModel(existingUser)
+	repoExternalIDPs := model.ExternalIDPsFromModel(externalIDPs)
+	aggregates, err := ExternalIDPAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoUser, repoExternalIDPs...)
+	if err != nil {
+		return err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, aggregates...)
+	if err != nil {
+		return err
+	}
+
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
+func (es *UserEventstore) PrepareRemoveExternalIDP(ctx context.Context, externalIDP *usr_model.ExternalIDP, cascade bool) (*model.User, []*es_models.Aggregate, error) {
+	if externalIDP == nil || !externalIDP.IsValid() {
+		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-Cm8sj", "Errors.User.ExternalIDP.Invalid")
+	}
+	existingUser, err := es.UserByID(ctx, externalIDP.AggregateID)
+	if err != nil {
+		return nil, nil, err
+	}
+	if existingUser.Human == nil {
+		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-E8iod", "Errors.User.NotHuman")
+	}
+	_, existingIDP := existingUser.GetExternalIDP(externalIDP)
+	if existingIDP == nil {
+		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-3Dh7s", "Errors.User.ExternalIDP.NotOnUser")
+	}
+	repoUser := model.UserFromModel(existingUser)
+	repoExternalIDP := model.ExternalIDPFromModel(externalIDP)
+	agg, err := ExternalIDPRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoUser, repoExternalIDP, cascade)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoUser, agg, err
+}
+
+func (es *UserEventstore) RemoveExternalIDP(ctx context.Context, externalIDP *usr_model.ExternalIDP) error {
+	repoUser, aggregates, err := es.PrepareRemoveExternalIDP(ctx, externalIDP, false)
+	if err != nil {
+		return err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, aggregates...)
 	if err != nil {
 		return err
 	}

@@ -21,6 +21,7 @@ import (
 )
 
 type UserRepo struct {
+	SearchLimit  uint64
 	Eventstore   eventstore.Eventstore
 	UserEvents   *user_event.UserEventstore
 	OrgEvents    *org_event.OrgEventstore
@@ -32,7 +33,15 @@ func (repo *UserRepo) Health(ctx context.Context) error {
 	return repo.UserEvents.Health(ctx)
 }
 
-func (repo *UserRepo) Register(ctx context.Context, registerUser *model.User, orgMember *org_model.OrgMember, resourceOwner string) (*model.User, error) {
+func (repo *UserRepo) Register(ctx context.Context, user *model.User, orgMember *org_model.OrgMember, resourceOwner string) (*model.User, error) {
+	return repo.registerUser(ctx, user, nil, orgMember, resourceOwner)
+}
+
+func (repo *UserRepo) RegisterExternalUser(ctx context.Context, user *model.User, externalIDP *model.ExternalIDP, orgMember *org_model.OrgMember, resourceOwner string) (*model.User, error) {
+	return repo.registerUser(ctx, user, externalIDP, orgMember, resourceOwner)
+}
+
+func (repo *UserRepo) registerUser(ctx context.Context, registerUser *model.User, externalIDP *model.ExternalIDP, orgMember *org_model.OrgMember, resourceOwner string) (*model.User, error) {
 	policyResourceOwner := authz.GetCtxData(ctx).OrgID
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner
@@ -45,7 +54,7 @@ func (repo *UserRepo) Register(ctx context.Context, registerUser *model.User, or
 	if err != nil {
 		return nil, err
 	}
-	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, pwPolicy, orgPolicy, resourceOwner)
+	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, externalIDP, pwPolicy, orgPolicy, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -85,6 +94,42 @@ func (repo *UserRepo) ChangeMyProfile(ctx context.Context, profile *model.Profil
 		return nil, err
 	}
 	return repo.UserEvents.ChangeProfile(ctx, profile)
+}
+
+func (repo *UserRepo) SearchMyExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	sequence, seqErr := repo.View.GetLatestExternalIDPSequence()
+	logging.Log("EVENT-5Jsi8").OnError(seqErr).Warn("could not read latest user sequence")
+	request.AppendUserQuery(authz.GetCtxData(ctx).UserID)
+	externalIDPS, count, err := repo.View.SearchExternalIDPs(request)
+	if err != nil {
+		return nil, err
+	}
+	result := &model.ExternalIDPSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: count,
+		Result:      usr_view_model.ExternalIDPViewsToModel(externalIDPS),
+	}
+	if seqErr == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
+	}
+	return result, nil
+}
+
+func (repo *UserRepo) AddMyExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) (*model.ExternalIDP, error) {
+	if err := checkIDs(ctx, externalIDP.ObjectRoot); err != nil {
+		return nil, err
+	}
+	return repo.UserEvents.AddExternalIDP(ctx, externalIDP)
+}
+
+func (repo *UserRepo) RemoveMyExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) error {
+	if err := checkIDs(ctx, externalIDP.ObjectRoot); err != nil {
+		return err
+	}
+	return repo.UserEvents.RemoveExternalIDP(ctx, externalIDP)
 }
 
 func (repo *UserRepo) MyEmail(ctx context.Context) (*model.Email, error) {
@@ -333,4 +378,12 @@ func checkIDs(ctx context.Context, obj es_models.ObjectRoot) error {
 		return errors.ThrowPermissionDenied(nil, "EVENT-kFi9w", "object does not belong to user")
 	}
 	return nil
+}
+
+func (repo *UserRepo) MachineKeyByID(ctx context.Context, keyID string) (*model.MachineKeyView, error) {
+	key, err := repo.View.MachineKeyByID(keyID)
+	if err != nil {
+		return nil, err
+	}
+	return usr_view_model.MachineKeyToModel(key), nil
 }

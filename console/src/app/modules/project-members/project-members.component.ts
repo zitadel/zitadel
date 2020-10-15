@@ -103,7 +103,11 @@ export class ProjectMembersComponent {
                         this.toast.showError(error);
                     });
             }
-        }));
+        })).then(() => {
+            setTimeout(() => {
+                this.changePage();
+            }, 1000);
+        });
     }
 
     public isAllSelected(): boolean {
@@ -141,6 +145,9 @@ export class ProjectMembersComponent {
                                 user.id, roles);
                         }
                     })).then(() => {
+                        setTimeout(() => {
+                            this.changePage();
+                        }, 1000);
                         this.toast.showInfo('PROJECT.TOAST.MEMBERSADDED', true);
                     }).catch(error => {
                         this.toast.showError(error);

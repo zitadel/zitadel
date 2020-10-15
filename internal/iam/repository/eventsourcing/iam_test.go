@@ -1447,7 +1447,7 @@ func TestLoginPolicyIdpProviderRemovedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LoginPolicyIDPProviderRemovedAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.newProviderID)(tt.args.ctx)
+			agg, err := LoginPolicyIDPProviderRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existingIAM, tt.args.newProviderID)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

@@ -32,6 +32,11 @@
             </app-card>
         </div>
 
+        <app-card *ngIf="user && user.human && user.id" title="{{ 'USER.EXTERNALIDP.TITLE' | translate }}"
+                  description="{{ 'USER.EXTERNALIDP.DESC' | translate }}">
+          <app-external-idps [userId]="user.id" [service]="userService"></app-external-idps>
+        </app-card>
+
         <app-card *ngIf="user" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
             description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
             <div class="method-col">
@@ -73,7 +78,8 @@
                     <ng-template #emailEdit>
                         <mat-form-field class="name">
                             <mat-label>{{ 'USER.EMAIL' | translate }}</mat-label>
-                            <input *ngIf="user.human && user.human.email" matInput [(ngModel)]="user.human.email" />
+                            <input *ngIf="user.human && user.human.email !== undefined && user.human.email !== null"
+                                matInput [(ngModel)]="user.human.email" />
                         </mat-form-field>
                         <button (click)="emailEditState = false" mat-icon-button>
                             <mat-icon class="icon">close</mat-icon>
@@ -114,7 +120,8 @@
                     <ng-template #phoneEdit>
                         <mat-form-field class="name">
                             <mat-label>{{ 'USER.PHONE' | translate }}</mat-label>
-                            <input *ngIf="user.human && user.human.phone" matInput [(ngModel)]="user.human.phone" />
+                            <input *ngIf="user.human && user.human.phone !== undefined && user.human.phone !== null"
+                                matInput [(ngModel)]="user.human.phone" />
                         </mat-form-field>
                         <button (click)="phoneEditState = false" mat-icon-button>
                             <mat-icon class="icon">close</mat-icon>

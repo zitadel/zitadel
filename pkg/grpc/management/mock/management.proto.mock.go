@@ -1697,6 +1697,26 @@ func (mr *MockManagementServiceClientMockRecorder) RemoveApplication(arg0, arg1 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveApplication", reflect.TypeOf((*MockManagementServiceClient)(nil).RemoveApplication), varargs...)
 }
 
+// RemoveExternalIDP mocks base method
+func (m *MockManagementServiceClient) RemoveExternalIDP(arg0 context.Context, arg1 *management.ExternalIDPRemoveRequest, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RemoveExternalIDP", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemoveExternalIDP indicates an expected call of RemoveExternalIDP
+func (mr *MockManagementServiceClientMockRecorder) RemoveExternalIDP(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveExternalIDP", reflect.TypeOf((*MockManagementServiceClient)(nil).RemoveExternalIDP), varargs...)
+}
+
 // RemoveIdpConfig mocks base method
 func (m *MockManagementServiceClient) RemoveIdpConfig(arg0 context.Context, arg1 *management.IdpID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
@@ -2195,6 +2215,26 @@ func (mr *MockManagementServiceClientMockRecorder) SearchProjects(arg0, arg1 int
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchProjects", reflect.TypeOf((*MockManagementServiceClient)(nil).SearchProjects), varargs...)
+}
+
+// SearchUserExternalIDPs mocks base method
+func (m *MockManagementServiceClient) SearchUserExternalIDPs(arg0 context.Context, arg1 *management.ExternalIDPSearchRequest, arg2 ...grpc.CallOption) (*management.ExternalIDPSearchResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SearchUserExternalIDPs", varargs...)
+	ret0, _ := ret[0].(*management.ExternalIDPSearchResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SearchUserExternalIDPs indicates an expected call of SearchUserExternalIDPs
+func (mr *MockManagementServiceClientMockRecorder) SearchUserExternalIDPs(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchUserExternalIDPs", reflect.TypeOf((*MockManagementServiceClient)(nil).SearchUserExternalIDPs), varargs...)
 }
 
 // SearchUserGrants mocks base method
