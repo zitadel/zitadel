@@ -1,6 +1,7 @@
 package sql
 
 import (
+	"context"
 	"testing"
 
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
@@ -256,6 +257,75 @@ func TestCRDB_columnName(t *testing.T) {
 			db := &CRDB{}
 			if got := db.columnName(tt.args.field); got != tt.res.name {
 				t.Errorf("CRDB.operation() = %v, want %v", got, tt.res.name)
+			}
+		})
+	}
+}
+
+func TestCRDB_Push(t *testing.T) {
+	type args struct {
+		events []*repository.Event
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "push no events",
+			args: args{
+				events: []*repository.Event{},
+			},
+			wantErr: false,
+		},
+		{
+			name: "push 1 event with check previous",
+			args: args{
+				events: []*repository.Event{
+					{
+						// AggregateID:           t.Name(),
+						AggregateType:         "test",
+						CheckPreviousSequence: true,
+						EditorService:         "svc",
+						EditorUser:            "user",
+						PreviousEvent:         nil,
+						PreviousSequence:      0,
+						ResourceOwner:         "ro",
+						Type:                  "test.created",
+						Version:               "v1",
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "push 1 event with check previous wrong sequence",
+			args: args{
+				events: []*repository.Event{
+					{
+						// AggregateID:           t.Name(),
+						AggregateType:         "test",
+						CheckPreviousSequence: true,
+						EditorService:         "svc",
+						EditorUser:            "user",
+						PreviousEvent:         nil,
+						PreviousSequence:      5,
+						ResourceOwner:         "ro",
+						Type:                  "test.created",
+						Version:               "v1",
+					},
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			db := &CRDB{
+				client: testCRDBClient,
+			}
+			if err := db.Push(context.Background(), tt.args.events...); (err != nil) != tt.wantErr {
+				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

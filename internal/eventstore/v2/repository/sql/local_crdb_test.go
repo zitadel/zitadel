@@ -20,7 +20,7 @@ import (
 
 var (
 	migrationsPath = os.ExpandEnv("${GOPATH}/src/github.com/caos/zitadel/migrations/cockroach")
-	db             *sql.DB
+	testCRDBClient *sql.DB
 )
 
 func TestMain(m *testing.M) {
@@ -29,13 +29,13 @@ func TestMain(m *testing.M) {
 		logging.LogWithFields("REPOS-RvjLG", "error", err).Fatal("unable to start db")
 	}
 
-	db, err = sql.Open("postgres", ts.PGURL().String())
+	testCRDBClient, err = sql.Open("postgres", ts.PGURL().String())
 	if err != nil {
 		logging.LogWithFields("REPOS-CF6dQ", "error", err).Fatal("unable to connect to db")
 	}
 
 	defer func() {
-		db.Close()
+		testCRDBClient.Close()
 		ts.Stop()
 	}()
 
@@ -47,7 +47,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestInsert(t *testing.T) {
-	crdb := &CRDB{client: db}
+	crdb := &CRDB{client: testCRDBClient}
 	e1 := &repository.Event{
 		AggregateID:           "agg.id",
 		AggregateType:         "agg.type",
@@ -155,7 +155,7 @@ func TestInsert(t *testing.T) {
 	}
 
 	fmt.Println("====================")
-	rows, err := db.Query("select * from eventstore.events order by event_sequence")
+	rows, err := testCRDBClient.Query("select * from eventstore.events order by event_sequence")
 	defer rows.Close()
 	fmt.Println(err)
 
@@ -184,7 +184,7 @@ func TestInsert(t *testing.T) {
 		fmt.Printf("%+v\n", event)
 	}
 	fmt.Println("====================")
-	rows, err = db.Query("select max(event_sequence), count(*) from eventstore.events where aggregate_type = 'agg.type' and aggregate_id = 'agg.id'")
+	rows, err = testCRDBClient.Query("select max(event_sequence), count(*) from eventstore.events where aggregate_type = 'agg.type' and aggregate_id = 'agg.id'")
 	defer rows.Close()
 	fmt.Println(err)
 
@@ -209,10 +209,10 @@ func executeMigrations() error {
 			return err
 		}
 		transactionInMigration := strings.Contains(string(migration), "BEGIN;")
-		exec := db.Exec
+		exec := testCRDBClient.Exec
 		var tx *sql.Tx
 		if !transactionInMigration {
-			tx, err = db.Begin()
+			tx, err = testCRDBClient.Begin()
 			if err != nil {
 				return fmt.Errorf("begin file: %v || err: %w", file, err)
 			}
