@@ -1687,7 +1687,7 @@ var _ interface {
 	ErrorName() string
 } = CreateOrgRequestValidationError{}
 
-// Validate checks the field values on OrgIAMPolicy with the rules defined in
+// Validate checks the field values on OrgIamPolicy with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.
 func (m *OrgIamPolicy) Validate() error {
@@ -1727,7 +1727,7 @@ func (m *OrgIamPolicy) Validate() error {
 }
 
 // OrgIamPolicyValidationError is the validation error returned by
-// OrgIAMPolicy.Validate if the designated constraints aren't met.
+// OrgIamPolicy.Validate if the designated constraints aren't met.
 type OrgIamPolicyValidationError struct {
 	field  string
 	reason string
