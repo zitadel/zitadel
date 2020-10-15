@@ -82,14 +82,14 @@ func TestPasswordLockoutPolicyAddedAggregate(t *testing.T) {
 			if tt.res.wantErr && tt.res.errFunc(err) {
 				return
 			}
-			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+			if len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
 			}
 			for i := 0; i < tt.res.eventLen; i++ {
 				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
 					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
 				}
-				if !tt.res.wantErr && agg.Events[i].Data == nil {
+				if agg.Events[i].Data == nil {
 					t.Errorf("should have data in event")
 				}
 			}
@@ -173,14 +173,14 @@ func TestPasswordLockoutPolicyChangedAggregate(t *testing.T) {
 			if tt.res.wantErr && tt.res.errFunc(err) {
 				return
 			}
-			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+			if len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
 			}
 			for i := 0; i < tt.res.eventLen; i++ {
 				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
 					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
 				}
-				if !tt.res.wantErr && agg.Events[i].Data == nil {
+				if agg.Events[i].Data == nil {
 					t.Errorf("should have data in event")
 				}
 			}
@@ -245,11 +245,11 @@ func TestPasswordLockoutPolicyRemovedAggregate(t *testing.T) {
 			if tt.res.wantErr && tt.res.errFunc(err) {
 				return
 			}
-			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+			if len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
 			}
 			for i := 0; i < tt.res.eventLen; i++ {
-				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+				if agg.Events[i].Type != tt.res.eventTypes[i] {
 					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
 				}
 			}

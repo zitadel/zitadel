@@ -225,7 +225,7 @@ func (repo *UserRepo) ChangeMyAddress(ctx context.Context, address *model.Addres
 
 func (repo *UserRepo) ChangeMyPassword(ctx context.Context, old, new string) error {
 	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if err != nil && errors.IsNotFound(err) {
+	if errors.IsNotFound(err) {
 		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
 	}
 	if err != nil {
@@ -238,7 +238,7 @@ func (repo *UserRepo) ChangeMyPassword(ctx context.Context, old, new string) err
 
 func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new string) error {
 	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if err != nil && errors.IsNotFound(err) {
+	if errors.IsNotFound(err) {
 		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
 	}
 	if err != nil {
@@ -297,7 +297,7 @@ func (repo *UserRepo) RemoveMyMfaOTP(ctx context.Context) error {
 func (repo *UserRepo) ChangeMyUsername(ctx context.Context, username string) error {
 	ctxData := authz.GetCtxData(ctx)
 	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(ctxData.OrgID)
-	if err != nil && errors.IsNotFound(err) {
+	if errors.IsNotFound(err) {
 		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
 	}
 	if err != nil {
@@ -313,7 +313,7 @@ func (repo *UserRepo) ResendInitVerificationMail(ctx context.Context, userID str
 
 func (repo *UserRepo) VerifyInitCode(ctx context.Context, userID, code, password string) error {
 	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if err != nil && errors.IsNotFound(err) {
+	if errors.IsNotFound(err) {
 		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
 	}
 	if err != nil {
@@ -337,7 +337,7 @@ func (repo *UserRepo) RequestPasswordReset(ctx context.Context, loginname string
 
 func (repo *UserRepo) SetPassword(ctx context.Context, userID, code, password string) error {
 	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if err != nil && errors.IsNotFound(err) {
+	if errors.IsNotFound(err) {
 		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
 	}
 	if err != nil {
@@ -399,7 +399,7 @@ func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, li
 func (repo *UserRepo) ChangeUsername(ctx context.Context, userID, username string) error {
 	policyResourceOwner := authz.GetCtxData(ctx).OrgID
 	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(policyResourceOwner)
-	if err != nil && errors.IsNotFound(err) {
+	if errors.IsNotFound(err) {
 		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
 	}
 	if err != nil {

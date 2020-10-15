@@ -28,9 +28,6 @@ func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*us
 	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if caos_errs.IsNotFound(err) {
 		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
-		if err != nil {
-			return nil, err
-		}
 	}
 	if err != nil {
 		return nil, err
@@ -55,9 +52,6 @@ func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, re
 	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(policyResourceOwner)
 	if caos_errs.IsNotFound(err) {
 		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
-		if err != nil {
-			return nil, err
-		}
 	}
 	if err != nil {
 		return nil, err
@@ -67,9 +61,6 @@ func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, re
 	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(policyResourceOwner)
 	if caos_errs.IsNotFound(err) {
 		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
-		if err != nil {
-			return nil, err
-		}
 	}
 	if err != nil {
 		return nil, err

@@ -69,7 +69,7 @@ func TestIamByID(t *testing.T) {
 			if tt.res.errFunc != nil && tt.res.errFunc(err) {
 				return
 			}
-			if tt.res.errFunc == nil && result.AggregateID != tt.res.iam.AggregateID {
+			if result.AggregateID != tt.res.iam.AggregateID {
 				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.iam.AggregateID, result.AggregateID)
 			}
 		})
@@ -139,10 +139,10 @@ func TestSetUpStarted(t *testing.T) {
 			if tt.res.errFunc != nil && tt.res.errFunc(err) {
 				return
 			}
-			if tt.res.errFunc == nil && result.AggregateID == "" {
+			if result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if tt.res.errFunc == nil && result.SetUpStarted != tt.res.iam.SetUpStarted {
+			if result.SetUpStarted != tt.res.iam.SetUpStarted {
 				t.Errorf("got wrong result setupStarted: expected: %v, actual: %v ", tt.res.iam.SetUpStarted, result.SetUpStarted)
 			}
 		})
@@ -212,10 +212,10 @@ func TestSetUpDone(t *testing.T) {
 			if tt.res.errFunc != nil && tt.res.errFunc(err) {
 				return
 			}
-			if tt.res.errFunc == nil && result.AggregateID == "" {
+			if result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if tt.res.errFunc == nil && result.SetUpDone != tt.res.iam.SetUpDone {
+			if result.SetUpDone != tt.res.iam.SetUpDone {
 				t.Errorf("got wrong result SetUpDone: expected: %v, actual: %v ", tt.res.iam.SetUpDone, result.SetUpDone)
 			}
 		})
@@ -296,10 +296,10 @@ func TestSetGlobalOrg(t *testing.T) {
 			if tt.res.errFunc != nil && tt.res.errFunc(err) {
 				return
 			}
-			if tt.res.errFunc == nil && result.AggregateID == "" {
+			if result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if tt.res.errFunc == nil && result.GlobalOrgID != tt.res.iam.GlobalOrgID {
+			if result.GlobalOrgID != tt.res.iam.GlobalOrgID {
 				t.Errorf("got wrong result GlobalOrgID: expected: %v, actual: %v ", tt.res.iam.GlobalOrgID, result.GlobalOrgID)
 			}
 		})
@@ -380,10 +380,10 @@ func TestSetIamProjectID(t *testing.T) {
 			if tt.res.errFunc != nil && tt.res.errFunc(err) {
 				return
 			}
-			if tt.res.errFunc == nil && result.AggregateID == "" {
+			if result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if tt.res.errFunc == nil && result.IAMProjectID != tt.res.iam.IAMProjectID {
+			if result.IAMProjectID != tt.res.iam.IAMProjectID {
 				t.Errorf("got wrong result IAMProjectID: expected: %v, actual: %v ", tt.res.iam.IAMProjectID, result.IAMProjectID)
 			}
 		})
@@ -472,13 +472,13 @@ func TestAddIamMember(t *testing.T) {
 			if tt.res.errFunc != nil && tt.res.errFunc(err) {
 				return
 			}
-			if tt.res.errFunc == nil && result.AggregateID == "" {
+			if result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if tt.res.errFunc == nil && result.UserID != tt.res.result.UserID {
+			if result.UserID != tt.res.result.UserID {
 				t.Errorf("got wrong result userid: expected: %v, actual: %v ", tt.res.result.UserID, result.UserID)
 			}
-			if tt.res.errFunc == nil && len(result.Roles) != len(tt.res.result.Roles) {
+			if len(result.Roles) != len(tt.res.result.Roles) {
 				t.Errorf("got wrong result roles: expected: %v, actual: %v ", tt.res.result.Roles, result.Roles)
 			}
 		})
@@ -567,13 +567,13 @@ func TestChangeIamMember(t *testing.T) {
 			if tt.res.errFunc != nil && tt.res.errFunc(err) {
 				return
 			}
-			if tt.res.errFunc == nil && result.AggregateID == "" {
+			if result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if tt.res.errFunc == nil && result.UserID != tt.res.result.UserID {
+			if result.UserID != tt.res.result.UserID {
 				t.Errorf("got wrong result userid: expected: %v, actual: %v ", tt.res.result.UserID, result.UserID)
 			}
-			if tt.res.errFunc == nil && len(result.Roles) != len(tt.res.result.Roles) {
+			if len(result.Roles) != len(tt.res.result.Roles) {
 				t.Errorf("got wrong result roles: expected: %v, actual: %v ", tt.res.result.Roles, result.Roles)
 			}
 		})
@@ -757,19 +757,19 @@ func TestAddIdpConfiguration(t *testing.T) {
 			if tt.res.wantErr && tt.res.errFunc(err) {
 				return
 			}
-			if !tt.res.wantErr && result.IDPConfigID == "" {
+			if result.IDPConfigID == "" {
 				t.Errorf("result has no id")
 			}
-			if !tt.res.wantErr && result.OIDCConfig.IDPConfigID == "" {
+			if result.OIDCConfig.IDPConfigID == "" {
 				t.Errorf("result has no id")
 			}
-			if !tt.res.wantErr && result.OIDCConfig == nil && result.OIDCConfig.ClientSecret == nil {
+			if result.OIDCConfig == nil && result.OIDCConfig.ClientSecret == nil {
 				t.Errorf("result has no client secret")
 			}
-			if !tt.res.wantErr && result.Name != tt.res.result.Name {
+			if result.Name != tt.res.result.Name {
 				t.Errorf("got wrong result key: expected: %v, actual: %v ", tt.res.result.Name, result.Name)
 			}
-			if !tt.res.wantErr && result.OIDCConfig.ClientID != tt.res.result.OIDCConfig.ClientID {
+			if result.OIDCConfig.ClientID != tt.res.result.OIDCConfig.ClientID {
 				t.Errorf("got wrong result key: expected: %v, actual: %v ", tt.res.result.OIDCConfig.ClientID, result.OIDCConfig.ClientID)
 			}
 		})
@@ -877,10 +877,10 @@ func TestChangeIdpConfiguration(t *testing.T) {
 			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if !tt.res.wantErr && result.IDPConfigID != tt.res.result.IDPConfigID {
+			if result.IDPConfigID != tt.res.result.IDPConfigID {
 				t.Errorf("got wrong result AppID: expected: %v, actual: %v ", tt.res.result.IDPConfigID, result.IDPConfigID)
 			}
-			if !tt.res.wantErr && result.Name != tt.res.result.Name {
+			if result.Name != tt.res.result.Name {
 				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.result.Name, result.Name)
 			}
 		})
@@ -1067,10 +1067,10 @@ func TestDeactivateIdpConfiguration(t *testing.T) {
 			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if !tt.res.wantErr && result.IDPConfigID != tt.res.result.IDPConfigID {
+			if result.IDPConfigID != tt.res.result.IDPConfigID {
 				t.Errorf("got wrong result IDPConfigID: expected: %v, actual: %v ", tt.res.result.IDPConfigID, result.IDPConfigID)
 			}
-			if !tt.res.wantErr && result.State != tt.res.result.State {
+			if result.State != tt.res.result.State {
 				t.Errorf("got wrong result state: expected: %v, actual: %v ", tt.res.result.State, result.State)
 			}
 		})
@@ -1177,10 +1177,10 @@ func TestReactivateIdpConfiguration(t *testing.T) {
 			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if !tt.res.wantErr && result.IDPConfigID != tt.res.result.IDPConfigID {
+			if result.IDPConfigID != tt.res.result.IDPConfigID {
 				t.Errorf("got wrong result IDPConfigID: expected: %v, actual: %v ", tt.res.result.IDPConfigID, result.IDPConfigID)
 			}
-			if !tt.res.wantErr && result.State != tt.res.result.State {
+			if result.State != tt.res.result.State {
 				t.Errorf("got wrong result state: expected: %v, actual: %v ", tt.res.result.State, result.State)
 			}
 		})
@@ -1287,13 +1287,13 @@ func TestChangeOIDCIDPConfig(t *testing.T) {
 			if tt.res.wantErr && tt.res.errFunc(err) {
 				return
 			}
-			if !tt.res.wantErr && result.AggregateID == "" {
+			if result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if !tt.res.wantErr && result.IDPConfigID != tt.res.result.IDPConfigID {
+			if result.IDPConfigID != tt.res.result.IDPConfigID {
 				t.Errorf("got wrong result AppID: expected: %v, actual: %v ", tt.res.result.IDPConfigID, result.IDPConfigID)
 			}
-			if !tt.res.wantErr && result.ClientID != tt.res.result.ClientID {
+			if result.ClientID != tt.res.result.ClientID {
 				t.Errorf("got wrong result responsetype: expected: %v, actual: %v ", tt.res.result.ClientID, result.ClientID)
 			}
 		})
@@ -1373,7 +1373,7 @@ func TestAddLoginPolicy(t *testing.T) {
 			if tt.res.wantErr && tt.res.errFunc(err) {
 				return
 			}
-			if !tt.res.wantErr && result.AllowRegister != tt.res.result.AllowRegister {
+			if result.AllowRegister != tt.res.result.AllowRegister {
 				t.Errorf("got wrong result AllowRegister: expected: %v, actual: %v ", tt.res.result.AllowRegister, result.AllowRegister)
 			}
 		})
@@ -1457,13 +1457,13 @@ func TestChangeLoginPolicy(t *testing.T) {
 			if tt.res.wantErr && tt.res.errFunc(err) {
 				return
 			}
-			if !tt.res.wantErr && result.AllowRegister != tt.res.result.AllowRegister {
+			if result.AllowRegister != tt.res.result.AllowRegister {
 				t.Errorf("got wrong result AllowRegister: expected: %v, actual: %v ", tt.res.result.AllowRegister, result.AllowRegister)
 			}
-			if !tt.res.wantErr && result.AllowUsernamePassword != tt.res.result.AllowUsernamePassword {
+			if result.AllowUsernamePassword != tt.res.result.AllowUsernamePassword {
 				t.Errorf("got wrong result AllowUsernamePassword: expected: %v, actual: %v ", tt.res.result.AllowUsernamePassword, result.AllowUsernamePassword)
 			}
-			if !tt.res.wantErr && result.AllowExternalIdp != tt.res.result.AllowExternalIdp {
+			if result.AllowExternalIdp != tt.res.result.AllowExternalIdp {
 				t.Errorf("got wrong result AllowExternalIDP: expected: %v, actual: %v ", tt.res.result.AllowExternalIdp, result.AllowExternalIdp)
 			}
 		})
@@ -1558,10 +1558,10 @@ func TestAddIdpProviderToLoginPolicy(t *testing.T) {
 			if tt.res.wantErr && tt.res.errFunc(err) {
 				return
 			}
-			if !tt.res.wantErr && result.IdpConfigID != tt.res.result.IdpConfigID {
+			if result.IdpConfigID != tt.res.result.IdpConfigID {
 				t.Errorf("got wrong result IDPConfigID: expected: %v, actual: %v ", tt.res.result.IdpConfigID, result.IdpConfigID)
 			}
-			if !tt.res.wantErr && result.Type != tt.res.result.Type {
+			if result.Type != tt.res.result.Type {
 				t.Errorf("got wrong result Type: expected: %v, actual: %v ", tt.res.result.Type, result.Type)
 			}
 		})
@@ -1731,7 +1731,7 @@ func TestAddPasswordComplexityPolicy(t *testing.T) {
 			if tt.res.wantErr && tt.res.errFunc(err) {
 				return
 			}
-			if !tt.res.wantErr && result.MinLength != tt.res.result.MinLength {
+			if result.MinLength != tt.res.result.MinLength {
 				t.Errorf("got wrong result MinLength: expected: %v, actual: %v ", tt.res.result.MinLength, result.MinLength)
 			}
 		})
@@ -1812,7 +1812,7 @@ func TestChangePasswordComplexityPolicy(t *testing.T) {
 			if tt.res.wantErr && tt.res.errFunc(err) {
 				return
 			}
-			if !tt.res.wantErr && result.MinLength != tt.res.result.MinLength {
+			if result.MinLength != tt.res.result.MinLength {
 				t.Errorf("got wrong result MinLength: expected: %v, actual: %v ", tt.res.result.MinLength, result.MinLength)
 			}
 		})
@@ -1894,11 +1894,11 @@ func TestAddPasswordAgePolicy(t *testing.T) {
 			if tt.res.wantErr && tt.res.errFunc(err) {
 				return
 			}
-			if !tt.res.wantErr && result.MaxAgeDays != tt.res.result.MaxAgeDays {
+			if result.MaxAgeDays != tt.res.result.MaxAgeDays {
 				t.Errorf("got wrong result MaxAgeDays: expected: %v, actual: %v ", tt.res.result.MaxAgeDays, result.MaxAgeDays)
 			}
 
-			if !tt.res.wantErr && result.ExpireWarnDays != tt.res.result.ExpireWarnDays {
+			if result.ExpireWarnDays != tt.res.result.ExpireWarnDays {
 				t.Errorf("got wrong result.ExpireWarnDays: expected: %v, actual: %v ", tt.res.result.ExpireWarnDays, result.ExpireWarnDays)
 			}
 		})
@@ -1977,11 +1977,11 @@ func TestChangePasswordAgePolicy(t *testing.T) {
 			if tt.res.wantErr && tt.res.errFunc(err) {
 				return
 			}
-			if !tt.res.wantErr && result.MaxAgeDays != tt.res.result.MaxAgeDays {
+			if result.MaxAgeDays != tt.res.result.MaxAgeDays {
 				t.Errorf("got wrong result MaxAgeDays: expected: %v, actual: %v ", tt.res.result.MaxAgeDays, result.MaxAgeDays)
 			}
 
-			if !tt.res.wantErr && result.ExpireWarnDays != tt.res.result.ExpireWarnDays {
+			if result.ExpireWarnDays != tt.res.result.ExpireWarnDays {
 				t.Errorf("got wrong result.ExpireWarnDays: expected: %v, actual: %v ", tt.res.result.ExpireWarnDays, result.ExpireWarnDays)
 			}
 		})
@@ -2148,11 +2148,11 @@ func TestChangePasswordLockoutPolicy(t *testing.T) {
 			if tt.res.wantErr && tt.res.errFunc(err) {
 				return
 			}
-			if !tt.res.wantErr && result.MaxAttempts != tt.res.result.MaxAttempts {
+			if result.MaxAttempts != tt.res.result.MaxAttempts {
 				t.Errorf("got wrong result MaxAttempts: expected: %v, actual: %v ", tt.res.result.MaxAttempts, result.MaxAttempts)
 			}
 
-			if !tt.res.wantErr && result.ShowLockOutFailures != tt.res.result.ShowLockOutFailures {
+			if result.ShowLockOutFailures != tt.res.result.ShowLockOutFailures {
 				t.Errorf("got wrong result.ShowLockOutFailures: expected: %v, actual: %v ", tt.res.result.ShowLockOutFailures, result.ShowLockOutFailures)
 			}
 		})
@@ -2232,7 +2232,7 @@ func TestAddOrgIAMPolicy(t *testing.T) {
 			if tt.res.wantErr && tt.res.errFunc(err) {
 				return
 			}
-			if !tt.res.wantErr && result.UserLoginMustBeDomain != tt.res.result.UserLoginMustBeDomain {
+			if result.UserLoginMustBeDomain != tt.res.result.UserLoginMustBeDomain {
 				t.Errorf("got wrong result UserLoginMustBeDomain: expected: %v, actual: %v ", tt.res.result.UserLoginMustBeDomain, result.UserLoginMustBeDomain)
 			}
 		})
@@ -2311,7 +2311,7 @@ func TestChangeOrgIAMPolicy(t *testing.T) {
 			if tt.res.wantErr && tt.res.errFunc(err) {
 				return
 			}
-			if !tt.res.wantErr && result.UserLoginMustBeDomain != tt.res.result.UserLoginMustBeDomain {
+			if result.UserLoginMustBeDomain != tt.res.result.UserLoginMustBeDomain {
 				t.Errorf("got wrong result UserLoginMustBeDomain: expected: %v, actual: %v ", tt.res.result.UserLoginMustBeDomain, result.UserLoginMustBeDomain)
 			}
 		})
