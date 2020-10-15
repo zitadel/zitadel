@@ -43,6 +43,7 @@ import { GRPC_INTERCEPTORS } from './services/interceptors/grpc-interceptor';
 import { I18nInterceptor } from './services/interceptors/i18n.interceptor';
 import { OrgInterceptor } from './services/interceptors/org.interceptor';
 import { RefreshService } from './services/refresh.service';
+import { SeoService } from './services/seo.service';
 import { StatehandlerProcessorService, StatehandlerProcessorServiceImpl } from './services/statehandler-processor.service';
 import { StatehandlerService, StatehandlerServiceImpl } from './services/statehandler.service';
 import { StorageService } from './services/storage.service';
@@ -167,6 +168,7 @@ const authConfig: AuthConfig = {
             multi: true,
             useClass: OrgInterceptor,
         },
+        SeoService,
         RefreshService,
         GrpcService,
         GrpcAuthService,
