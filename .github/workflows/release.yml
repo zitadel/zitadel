@@ -1,8 +1,5 @@
 name: Release
-on: 
-  push:
-    paths-ignore:
-    - 'site/**'
+on: push
 
 env:
   GITHUB_TOKEN: ${{ secrets.CR_PAT }}
@@ -129,30 +126,6 @@ jobs:
         repository: ${{ github.repository }}
         tag_with_ref: true
         tag_with_sha: true
-  
-  container-vulnerability-scan:
-    runs-on: ubuntu-18.04
-    needs: container-prod
-    steps:
-    - name: Source checkout
-      uses: actions/checkout@v2
-    - name: Generate Short SHA Container Tag
-      id: vars
-      run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
-    - name: Check outputs
-      run: echo ${{ steps.vars.outputs.sha_short }}
-    - name: Docker Login
-      run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
-    - uses: anchore/scan-action@master
-      with:
-        image-reference: "${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.vars.outputs.sha_short }}"
-        dockerfile-path: "./build/docker/Dockerfile"
-        fail-build: false
-        acs-report-enable: true
-    - name: Upload Anchore Scan Report
-      uses: github/codeql-action/upload-sarif@v1
-      with:
-        sarif_file: results.sarif
 
   release:
     runs-on: ubuntu-18.04
