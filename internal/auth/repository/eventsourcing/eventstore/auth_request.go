@@ -273,9 +273,6 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(policyResourceOwner)
 	if errors.IsNotFound(err) {
 		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.IAMID)
-		if err != nil {
-			return err
-		}
 	}
 	if err != nil {
 		return err
