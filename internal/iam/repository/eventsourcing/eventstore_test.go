@@ -1999,16 +1999,17 @@ func TestAddPasswordLockoutPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.AddPasswordLockoutPolicy(tt.args.ctx, tt.args.policy)
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
 
-			if !tt.res.wantErr && result.MaxAttempts != tt.res.result.MaxAttempts {
+			if result.MaxAttempts != tt.res.result.MaxAttempts {
 				t.Errorf("got wrong result MaxAttempts: expected: %v, actual: %v ", tt.res.result.MaxAttempts, result.MaxAttempts)
 			}
 
-			if !tt.res.wantErr && result.ShowLockOutFailures != tt.res.result.ShowLockOutFailures {
+			if result.ShowLockOutFailures != tt.res.result.ShowLockOutFailures {
 				t.Errorf("got wrong result.ShowLockOutFailures: expected: %v, actual: %v ", tt.res.result.ShowLockOutFailures, result.ShowLockOutFailures)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
