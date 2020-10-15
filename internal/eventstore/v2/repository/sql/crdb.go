@@ -79,10 +79,8 @@ const (
 		"			    SELECT " +
 		"			        CASE " +
 		"			            WHEN NOT check_previous " +
-		"			                THEN max_event_seq " +
-		"			            WHEN previous_sequence > 0" +
-		"			                THEN previous_sequence " +
-		"			            ELSE previous_sequence " +
+		"			                THEN NULL " +
+		"			            	ELSE previous_sequence " +
 		"			        END" +
 		"			) " +
 		"		FROM input_event " +
