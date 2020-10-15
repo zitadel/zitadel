@@ -50,6 +50,7 @@
         "INFO": "Info",
         "OK": "OK",
         "VIEW": "Öffnen",
+        "SELECTIONDELETE":"Ausgewählte löschen",
         "DELETE": "Löschen",
         "REMOVE":"Entfernen",
         "VERIFY":"Verifizieren",
@@ -59,7 +60,9 @@
         "DEACTIVATE":"Deaktivieren",
         "REFRESH":"Aktualisieren",
         "LOGIN":"Einloggen",
-        "EDIT":"Bearbeiten"
+        "EDIT":"Bearbeiten",
+        "PIN":"Anpinnen",
+        "CONFIGURE":"Konfigurieren"
     },
     "ERRORS": {
         "REQUIRED": "Bitte fülle alle benötigten Felder aus.",
@@ -86,7 +89,24 @@
             "COPIED":"In die Zwischenablage kopiert.",
             "NOUSER":"Kein Benutzer",
             "REACTIVATE":"Reaktivieren",
-            "DEACTIVATE":"Deaktivieren"
+            "DEACTIVATE":"Deaktivieren",
+            "FILTER":"Filter",
+            "DELETE":"Benutzer löschen"
+        },
+        "DIALOG": {
+            "DELETE_TITLE":"User löschen",
+            "DELETE_DESCRIPTION":"Sie sind im Begriff einen Benutzer endgültig zu löschen. Wollen Sie dies wirklich tun?"
+        },
+        "TABLE":{
+            "DEACTIVATE":"Deaktivieren",
+            "ACTIVATE":"Aktivieren",
+            "FILTER": {
+                "1":"Nach Username filtern",
+                "2":"Nach Vornamen filtern",
+                "3":"Nach Nachnamen filtern",
+                "5":"Nach Display Namen filtern",
+                "6":"Nach Email filtern"
+            }
         },
         "MFA": {
             "TABLETYPE":"Typ",
@@ -120,7 +140,11 @@
           "IDPCONFIGID": "Idp Konfig ID",
           "IDPNAME": "Idp Name",
           "USERDISPLAYNAME":  "Externer Name",
-          "EXTERNALUSERID": "Externe Benutzer ID"
+          "EXTERNALUSERID": "Externe Benutzer ID",
+          "DIALOG": {
+              "REMOVE_TITLE":"Idp entfernen",
+              "REMOVE_DESCRIPTION":"Sie sind im Begriff einen Identity Provider zu entfernen. Wollen Sie dies wirklich tun?"
+          }
         },
         "CREATE": {
             "TITLE": "Neuen Benutzer erstellen",
@@ -199,6 +223,7 @@
         },
         "EMAIL": "E-Mail",
         "PHONE": "Telefonnummer",
+        "PREFERRED_LOGINNAME":"Bevorzugter Loginname",
         "LOGINMETHODS": {
             "TITLE": "Kontaktinformationen",
             "DESCRIPTION": "Die Kontaktinformationen werden benötigt, um Dir wichtige Informationen wie Verifikationsnachrichten und Links für das Zurücksetzen des Passworts per E-Mail zu senden.",
@@ -270,7 +295,8 @@
             "SELECTEDDEACTIVATED":"Selektierte Benutzer deaktiviert.",
             "SELECTEDKEYSDELETED":"Selektierte Schlüssel gelöscht.",
             "KEYADDED":"Schlüssel hinzugefügt!",
-            "MACHINEADDED":"Service User erstellt!"
+            "MACHINEADDED":"Service User erstellt!",
+            "DELETED":"Benutzer erfolgreich gelöscht!"
         },
         "MEMBERSHIPS": {
             "TITLE":"ZITADEL Manager-Rollen",
@@ -305,7 +331,12 @@
             "SEQUENCE":"Sequenz",
             "TIMESTAMP":"Zeitstempel",
             "ACTIONS":"Aktionen",
-            "CLEAR":"Aufräumen"
+            "CLEAR":"Aufräumen",
+            "CLEARED":"View wurde erfolgreich zurückgesetzt!",
+            "DIALOG": {
+                "VIEW_CLEAR_TITLE": "View zurücksetzen?",
+                "VIEW_CLEAR_DESCRIPTION":"Sie sind im Begriff eine View zu löschen. Durch das Löschen einer View wird ein Prozess gestartet, bei dem Daten für Endbenutzer möglicherweise nicht oder verzügert verfügbar sind. Sind Sie sicher?"
+            }
         },
         "FAILEDEVENTS": {
             "TITLE":"Gescheiterte Events",
@@ -318,6 +349,10 @@
             "ACTIONS":"Aktionen",
             "DELETE":"Entfernen",
             "DELETESUCCESS":"Gescheiterte Events entfernt."
+        },
+        "POLICY": {
+            "TITLE":"Standardrichtlinien für ihre Organisationen",
+            "DESCRIPTION":"Diese Einstellungen können von Organisationen erweitert und/oder verändert werden."
         },
         "TOAST":{
             "MEMBERREMOVED":"Manager entfernt.",
@@ -332,6 +367,10 @@
     },
     "ORG": {
         "PAGES": {
+            "NAME":"Name",
+            "ID":"ID",
+            "FILTER":"Filter",
+            "FILTERPLACEHOLDER":"Filtern Sie nach dem Namen",
             "LIST": "Organisationen",
             "LISTDESCRIPTION":"Wähle eine Organisation aus.",
             "ACTIVE":"Aktiv",
@@ -409,8 +448,11 @@
                 "TITLE":"Login Richtlinien",
                 "DESCRIPTION":"Definiere die Loginmethoden für Benutzer",
                 "TITLECREATE":"Definiere die Loginmethoden für Benutzer",
-                "DESCRIPTIONCREATE":"Nutzer können Sich mit den verfügbaren Idps authentifizieren."
+                "DESCRIPTIONCREATEADMIN":"Nutzer können sich mit den verfügbaren Idps authentifizieren.",
+                "DESCRIPTIONCREATEMGMT":"Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
+                "SAVED":"Erfolgreich gespeichert."
             },
+            "DEFAULTLABEL":"Die aktuelle Richtlinie entspricht der IAM-Standard Einstellung.",
             "BTN_INSTALL":"Installieren",
             "BTN_EDIT":"Modifizieren",
             "DATA": {
@@ -429,7 +471,11 @@
                 "ALLOWEXTERNALIDP":"Externer IDP erlaubt",
                 "ALLOWREGISTER":"Registrieren erlaubt"
             },
-            "DELETE":"Richtlinie entfernen/zurücksetzen"
+            "RESET":"Richtlinie zurücksetzen",
+            "TOAST":{
+                "SET":"Richtline erfolgreich gesetzt!",
+                "RESETSUCCESS":"Richtline zurückgesetzt!"
+            }
         },
         "TOAST": {
             "DEACTIVATED":"Organisation deaktiviert.",
@@ -460,6 +506,7 @@
             "USERNAME": "Benutzername",
             "FIRSTNAME": "Vorname",
             "LASTNAME": "Nachname",
+            "LOGINNAME":"Loginname",
             "EMAIL": "E-Mail",
             "ROLES": "Rollen",
             "ADD": "Mitglied hinzufügen",
@@ -633,12 +680,20 @@
     },
     "IDP":{
         "LIST": {
-            "TITLE":"Identity Providers",
+            "TITLE":"Identitäts Providers",
             "DESCRIPTION":"Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können."
         },
         "CREATE": {
-            "TITLE":"Neuer Identity Provider",
-            "DESCRIPTION":"Definieren Sie hier die Zugangsdaten des neuen Identity Providers"
+            "TITLE":"Neuer Identitäts Provider",
+            "DESCRIPTION":"Definieren Sie hier die Zugangsdaten des neuen Identitäts Providers"
+        },
+        "DETAIL": {
+          "TITLE":"Identitäts Provider",
+          "DESCRIPTION":"Generelle Konfiguration deines Identitäts Providers",
+          "OIDC": {
+            "TITLE": "OIDC Konfiguration",
+            "DESCRIPTION":"Geben Sie die korrekte OIDC Konfiguration Ihres Identity Providers an!"
+          }
         },
         "TYPES": {
             "0":"unknown",
@@ -646,10 +701,15 @@
             "2":"Organisation"
         },
         "STATES":{
-            "0":"aktiv",
-            "1":"inaktiv"
+            "1":"aktiv",
+            "2":"inaktiv"
+        },
+        "MAPPINTFIELD": {
+          "1": "Preferred Username",
+          "2": "Email"
         },
         "TYPE":"Typ",
+        "ID": "ID",
         "NAME":"Name",
         "CONFIG":"Konfiguration",
         "STATE":"Status",
@@ -658,11 +718,16 @@
         "SCOPESLIST":"Scopes List",
         "CLIENTID":"Client ID",
         "CLIENTSECRET":"Client Secret",
+        "IDPDISPLAYNAMMAPPING": "IDP Anzeigename Mapping",
+        "USERNAMEMAPPING": "Username Mapping",
         "CREATIONDATE":"Erstelldatum",
         "CHANGEDATE":"Letzte Änderung",
         "DEACTIVATE":"Deaktivieren",
         "ACTIVATE":"Aktivieren",
-        "DELETE":"Löschen"
+        "DELETE":"Löschen",
+        "TOAST": {
+            "SAVED": "Erfolgreich gespeichert."
+        }
     },
     "LOGINPOLICY": {
         "CREATE": {

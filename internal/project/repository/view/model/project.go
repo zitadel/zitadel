@@ -78,6 +78,8 @@ func (p *ProjectView) AppendEvent(event *models.Event) (err error) {
 		p.State = int32(model.ProjectStateInactive)
 	case es_model.ProjectReactivated:
 		p.State = int32(model.ProjectStateActive)
+	case es_model.ProjectRemoved:
+		p.State = int32(model.ProjectStateRemoved)
 	}
 	return err
 }

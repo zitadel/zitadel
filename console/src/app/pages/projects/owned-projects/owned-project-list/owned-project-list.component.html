@@ -1,5 +1,6 @@
-<app-owned-project-grid *ngIf="grid" [loading]="loading$ | async" (changedView)="grid = false"
-    [items]="ownedProjectList || []" (newClicked)="addProject()">
+<app-owned-project-grid [zitadelProjectId]="zitadelProjectId" *ngIf="grid && zitadelProjectId"
+    [loading]="loading$ | async" (changedView)="grid = false" [items]="ownedProjectList || []"
+    (newClicked)="addProject()">
 </app-owned-project-grid>
 
 <div *ngIf="!grid" class="view-toggle">
@@ -12,7 +13,7 @@
         [selection]="selection" [loading]="loading$ | async">
 
         <ng-template actions appHasRole [appHasRole]="['project.create']">
-            <a class="add-button" [routerLink]="[ '/projects', 'create']" color="primary" mat-raised-button>
+            <a [routerLink]="[ '/projects', 'create']" color="primary" mat-raised-button>
                 <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
             </a>
         </ng-template>
@@ -61,8 +62,18 @@
                     </td>
                 </ng-container>
 
+                <ng-container matColumnDef="actions" stickyEnd>
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let project">
+                        <button *ngIf="project.projectId !== zitadelProjectId" color="warn" mat-icon-button
+                            matTooltip="{{'ACTIONS.DELETE' | translate}}" (click)="deleteProject(project.projectId)">
+                            <i class="las la-trash"></i>
+                        </button>
+                    </td>
+                </ng-container>
+
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr class="data-row" mat-row *matRowDef="let row; columns: displayedColumns;"
+                <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"
                     [routerLink]="['/projects', row.projectId]"></tr>
 
             </table>

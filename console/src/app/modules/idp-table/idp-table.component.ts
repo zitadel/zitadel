@@ -6,7 +6,7 @@ import { RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { IdpSearchResponse as AdminIdpSearchResponse, IdpView as AdminIdpView } from 'src/app/proto/generated/admin_pb';
-import { IdpView as MgmtIdpView } from 'src/app/proto/generated/management_pb';
+import { IdpProviderType, IdpView as MgmtIdpView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -31,6 +31,7 @@ export class IdpTableComponent implements OnInit {
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     public PolicyComponentServiceType: any = PolicyComponentServiceType;
+    public IdpProviderType: any = IdpProviderType;
     @Input() public displayedColumns: string[] = ['select', 'name', 'config', 'creationDate', 'changeDate', 'state'];
 
     @Output() public changedSelection: EventEmitter<Array<AdminIdpView.AsObject | MgmtIdpView.AsObject>>
@@ -44,6 +45,9 @@ export class IdpTableComponent implements OnInit {
 
     ngOnInit(): void {
         this.getData(10, 0);
+        if (this.serviceType === PolicyComponentServiceType.MGMT) {
+            this.displayedColumns = ['select', 'name', 'config', 'creationDate', 'changeDate', 'state', 'type'];
+        }
     }
 
     public isAllSelected(): boolean {
@@ -96,9 +100,10 @@ export class IdpTableComponent implements OnInit {
         // let query: AdminIdpSearchQuery | MgmtIdpSearchQuery;
         // if (this.service instanceof AdminService) {
         //     query = new AdminIdpSearchQuery();
-        //     query.setKey(AdminIdpSearchKey.)
+        //     query.setKey(AdminIdpSearchKey.IDPSEARCHKEY_IDP_CONFIG_ID);
         // } else if (this.service instanceof ManagementService) {
-        //     return ['/org', 'idp', 'create'];
+        //     query = new MgmtIdpSearchQuery();
+        //     query.setKey(MgmtIdpSearchKey.IDPSEARCHKEY_PROVIDER_TYPE);
         // }
 
         this.service.SearchIdps(limit, offset).then(resp => {
@@ -121,6 +126,17 @@ export class IdpTableComponent implements OnInit {
             return ['/iam', 'idp', 'create'];
         } else if (this.service instanceof ManagementService) {
             return ['/org', 'idp', 'create'];
+        }
+    }
+
+    public routerLinkForRow(row: MgmtIdpView.AsObject | AdminIdpView.AsObject): any {
+        if (row.id) {
+            switch (this.serviceType) {
+                case PolicyComponentServiceType.MGMT:
+                    return ['/org', 'idp', row.id];
+                case PolicyComponentServiceType.ADMIN:
+                    return ['/iam', 'idp', row.id];
+            }
         }
     }
 }

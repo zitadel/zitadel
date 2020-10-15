@@ -104,6 +104,8 @@ func (m *IamMember) processUser(event *models.Event) (err error) {
 			m.fillUserData(member, user)
 		}
 		return m.view.PutIAMMembers(members, event.Sequence)
+	case usr_es_model.UserRemoved:
+		return m.view.DeleteIAMMembersByUserID(event.AggregateID, event.Sequence)
 	default:
 		return m.view.ProcessedIAMMemberSequence(event.Sequence)
 	}

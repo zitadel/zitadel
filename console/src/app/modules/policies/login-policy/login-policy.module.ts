@@ -8,8 +8,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
+import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { CardModule } from 'src/app/modules/card/card.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
-import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
+import { IdpTableModule } from 'src/app/modules/idp-table/idp-table.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { AddIdpDialogModule } from './add-idp-dialog/add-idp-dialog.module';
 import { LoginPolicyRoutingModule } from './login-policy-routing.module';
@@ -21,16 +24,19 @@ import { LoginPolicyComponent } from './login-policy.component';
         LoginPolicyRoutingModule,
         CommonModule,
         FormsModule,
+        CardModule,
         MatInputModule,
         MatFormFieldModule,
         MatButtonModule,
         MatSlideToggleModule,
         MatIconModule,
+        HasRoleModule,
         HasRolePipeModule,
         MatTooltipModule,
         TranslateModule,
         DetailLayoutModule,
         AddIdpDialogModule,
+        IdpTableModule,
     ],
 })
 export class LoginPolicyModule { }

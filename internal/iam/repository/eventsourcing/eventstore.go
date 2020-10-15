@@ -2,7 +2,6 @@ package eventsourcing
 
 import (
 	"context"
-
 	"github.com/caos/zitadel/internal/cache/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -60,32 +59,37 @@ func (es *IAMEventstore) IAMByID(ctx context.Context, id string) (*iam_model.IAM
 	return model.IAMToModel(iam), nil
 }
 
-func (es *IAMEventstore) StartSetup(ctx context.Context, iamID string) (*iam_model.IAM, error) {
+func (es *IAMEventstore) StartSetup(ctx context.Context, iamID string, step iam_model.Step) (*iam_model.IAM, error) {
 	iam, err := es.IAMByID(ctx, iamID)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
 
-	if iam != nil && iam.SetUpStarted {
+	if iam != nil && (iam.SetUpStarted >= step || iam.SetUpStarted != iam.SetUpDone) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9so34", "Setup already started")
 	}
 
-	repoIam := &model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: iamID}}
-	createAggregate := IAMSetupStartedAggregate(es.AggregateCreator(), repoIam)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, createAggregate)
+	repoIAM := &model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: iamID}, SetUpStarted: model.Step(step)}
+	if iam != nil {
+		repoIAM.ObjectRoot = iam.ObjectRoot
+	}
+	createAggregate := IAMSetupStartedAggregate(es.AggregateCreator(), repoIAM)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIAM.AppendEvents, createAggregate)
 	if err != nil {
 		return nil, err
 	}
 
-	es.iamCache.cacheIAM(repoIam)
-	return model.IAMToModel(repoIam), nil
+	es.iamCache.cacheIAM(repoIAM)
+	return model.IAMToModel(repoIAM), nil
 }
 
-func (es *IAMEventstore) SetupDone(ctx context.Context, iamID string) (*iam_model.IAM, error) {
+func (es *IAMEventstore) SetupDone(ctx context.Context, iamID string, step iam_model.Step) (*iam_model.IAM, error) {
 	iam, err := es.IAMByID(ctx, iamID)
 	if err != nil {
 		return nil, err
 	}
+	iam.SetUpDone = step
+
 	repoIam := model.IAMFromModel(iam)
 	createAggregate := IAMSetupDoneAggregate(es.AggregateCreator(), repoIam)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, createAggregate)
@@ -95,6 +99,15 @@ func (es *IAMEventstore) SetupDone(ctx context.Context, iamID string) (*iam_mode
 
 	es.iamCache.cacheIAM(repoIam)
 	return model.IAMToModel(repoIam), nil
+}
+
+func (es *IAMEventstore) PrepareSetupDone(ctx context.Context, iam *model.IAM, aggregate *models.Aggregate, step iam_model.Step) (*model.IAM, *models.Aggregate, func(ctx context.Context, aggregates ...*models.Aggregate) error, error) {
+	iam.SetUpDone = model.Step(step)
+	agg, err := IAMSetupDoneEvent(ctx, aggregate, iam)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	return iam, agg, es.PushAggregates, nil
 }
 
 func (es *IAMEventstore) SetGlobalOrg(ctx context.Context, iamID, globalOrg string) (*iam_model.IAM, error) {
@@ -402,20 +415,31 @@ func (es *IAMEventstore) ChangeIDPOIDCConfig(ctx context.Context, config *iam_mo
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-Sldk8", "Errors.Internal")
 }
 
-func (es *IAMEventstore) AddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
+func (es *IAMEventstore) PrepareAddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*model.IAM, *models.Aggregate, error) {
 	if policy == nil || !policy.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.IAM.LoginPolicyInvalid")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.IAM.LoginPolicyInvalid")
 	}
 	iam, err := es.IAMByID(ctx, policy.AggregateID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	repoIam := model.IAMFromModel(iam)
 	repoLoginPolicy := model.LoginPolicyFromModel(policy)
 
-	addAggregate := LoginPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoLoginPolicy)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	addAggregate, err := LoginPolicyAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoIam, repoLoginPolicy)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoIam, addAggregate, nil
+}
+
+func (es *IAMEventstore) AddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
+	repoIam, addAggregate, err := es.PrepareAddLoginPolicy(ctx, policy)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
 	if err != nil {
 		return nil, err
 	}
@@ -500,4 +524,233 @@ func (es *IAMEventstore) RemoveIDPProviderFromLoginPolicy(ctx context.Context, p
 	}
 	es.iamCache.cacheIAM(repoIam)
 	return nil
+}
+
+func (es *IAMEventstore) PrepareAddPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*model.IAM, *models.Aggregate, error) {
+	if policy == nil {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.IAM.PasswordComplexityPolicy.Empty")
+	}
+	if err := policy.IsValid(); err != nil {
+		return nil, nil, err
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoPasswordComplexityPolicy := model.PasswordComplexityPolicyFromModel(policy)
+
+	addAggregate, err := PasswordComplexityPolicyAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoIam, repoPasswordComplexityPolicy)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoIam, addAggregate, nil
+}
+
+func (es *IAMEventstore) AddPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+	repoIam, addAggregate, err := es.PrepareAddPasswordComplexityPolicy(ctx, policy)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.PasswordComplexityPolicyToModel(repoIam.DefaultPasswordComplexityPolicy), nil
+}
+
+func (es *IAMEventstore) ChangePasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+	if policy == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.IAM.PasswordComplexityPolicy.Empty")
+	}
+	if err := policy.IsValid(); err != nil {
+		return nil, err
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoPasswordComplexityPolicy := model.PasswordComplexityPolicyFromModel(policy)
+
+	addAggregate := PasswordComplexityPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoPasswordComplexityPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.PasswordComplexityPolicyToModel(repoIam.DefaultPasswordComplexityPolicy), nil
+}
+
+func (es *IAMEventstore) PrepareAddPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*model.IAM, *models.Aggregate, error) {
+	if policy == nil || policy.AggregateID == "" {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-2dGt6", "Errors.IAM.PasswordAgePolicy.Empty")
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoPasswordAgePolicy := model.PasswordAgePolicyFromModel(policy)
+
+	addAggregate, err := PasswordAgePolicyAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoIam, repoPasswordAgePolicy)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoIam, addAggregate, nil
+}
+
+func (es *IAMEventstore) AddPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
+	repoIam, addAggregate, err := es.PrepareAddPasswordAgePolicy(ctx, policy)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.PasswordAgePolicyToModel(repoIam.DefaultPasswordAgePolicy), nil
+}
+
+func (es *IAMEventstore) ChangePasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
+	if policy == nil || policy.AggregateID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-2Fgt6", "Errors.IAM.PasswordAgePolicy.Empty")
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoPasswordAgePolicy := model.PasswordAgePolicyFromModel(policy)
+
+	addAggregate := PasswordAgePolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoPasswordAgePolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.PasswordAgePolicyToModel(repoIam.DefaultPasswordAgePolicy), nil
+}
+
+func (es *IAMEventstore) PrepareAddPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*model.IAM, *models.Aggregate, error) {
+	if policy == nil || policy.AggregateID == "" {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-3R56z", "Errors.IAM.PasswordLockoutPolicy.Empty")
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoPasswordLockoutPolicy := model.PasswordLockoutPolicyFromModel(policy)
+
+	addAggregate, err := PasswordLockoutPolicyAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoIam, repoPasswordLockoutPolicy)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoIam, addAggregate, nil
+}
+
+func (es *IAMEventstore) AddPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
+	repoIam, addAggregate, err := es.PrepareAddPasswordLockoutPolicy(ctx, policy)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.PasswordLockoutPolicyToModel(repoIam.DefaultPasswordLockoutPolicy), nil
+}
+
+func (es *IAMEventstore) ChangePasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
+	if policy == nil || policy.AggregateID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-6Zsj9", "Errors.IAM.PasswordLockoutPolicy.Empty")
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoPasswordLockoutPolicy := model.PasswordLockoutPolicyFromModel(policy)
+
+	addAggregate := PasswordLockoutPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoPasswordLockoutPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.PasswordLockoutPolicyToModel(repoIam.DefaultPasswordLockoutPolicy), nil
+}
+
+func (es *IAMEventstore) GetOrgIAMPolicy(ctx context.Context, iamID string) (*iam_model.OrgIAMPolicy, error) {
+	existingIAM, err := es.IAMByID(ctx, iamID)
+	if err != nil {
+		return nil, err
+	}
+	if existingIAM.DefaultOrgIAMPolicy == nil {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2Fj8s", "Errors.IAM.OrgIAM.NotExisting")
+	}
+	return existingIAM.DefaultOrgIAMPolicy, nil
+}
+
+func (es *IAMEventstore) PrepareAddOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*model.IAM, *models.Aggregate, error) {
+	if policy == nil || policy.AggregateID == "" {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-3R56z", "Errors.IAM.OrgIAMPolicy.Empty")
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoOrgIAMPolicy := model.OrgIAMPolicyFromModel(policy)
+
+	addAggregate, err := OrgIAMPolicyAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoIam, repoOrgIAMPolicy)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoIam, addAggregate, nil
+}
+
+func (es *IAMEventstore) AddOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
+	repoIam, addAggregate, err := es.PrepareAddOrgIAMPolicy(ctx, policy)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.OrgIAMPolicyToModel(repoIam.DefaultOrgIAMPolicy), nil
+}
+
+func (es *IAMEventstore) ChangeOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
+	if policy == nil || policy.AggregateID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-6Zsj9", "Errors.IAM.OrgIAMPolicy.Empty")
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoOrgIAMPolicy := model.OrgIAMPolicyFromModel(policy)
+
+	addAggregate := OrgIAMPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoOrgIAMPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.OrgIAMPolicyToModel(repoIam.DefaultOrgIAMPolicy), nil
 }

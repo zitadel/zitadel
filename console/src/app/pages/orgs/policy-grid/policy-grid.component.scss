@@ -3,7 +3,7 @@ h1 {
 }
 
 .top-desc {
-  color: #8795a1;
+  color: var(--grey);
 }
 
 .row-lyt {
@@ -57,7 +57,7 @@ h1 {
 
     .desc {
       font-size: .9rem;
-      color: #8795a1;
+      color: var(--grey);
     }
 
     .fill-space {
@@ -70,7 +70,6 @@ h1 {
 
     button {
       margin-right: 1rem;
-      border-radius: .5rem;
     }
   }
 }

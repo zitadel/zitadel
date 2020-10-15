@@ -12,6 +12,8 @@ import { TranslateModule } from '@ngx-translate/core';
 
 import { IdpRoutingModule } from './idp-routing.module';
 import { IdpComponent } from './idp.component';
+import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
     declarations: [IdpComponent],
@@ -25,9 +27,11 @@ import { IdpComponent } from './idp.component';
         MatButtonModule,
         MatIconModule,
         MatTooltipModule,
+        MatSelectModule,
         TranslateModule,
         MatCheckboxModule,
         MatChipsModule,
+        DetailLayoutModule,
     ],
 })
 export class IdpModule { }

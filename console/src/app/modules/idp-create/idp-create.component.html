@@ -47,6 +47,24 @@
                     </mat-chip-list>
                 </mat-form-field>
             </div>
+            <div class="content">
+              <mat-form-field class="formfield" appearance="outline">
+                <mat-label>{{ 'IDP.IDPDISPLAYNAMMAPPING' | translate }}</mat-label>
+                <mat-select formControlName="idpDisplayNameMapping">
+                  <mat-option *ngFor="let field of mappingFields" [value]="field">
+                    {{ 'IDP.MAPPINTFIELD.'+field | translate }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field class="formfield" appearance="outline">
+                <mat-label>{{ 'IDP.USERNAMEMAPPING' | translate }}</mat-label>
+                <mat-select formControlName="usernameMapping">
+                  <mat-option *ngFor="let field of mappingFields" [value]="field">
+                    {{ 'IDP.MAPPINTFIELD.'+field | translate }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
         </ng-container>
 
         <button color="primary" mat-raised-button class="continue-button" [disabled]="formGroup.invalid" type="submit">

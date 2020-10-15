@@ -79,7 +79,7 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 }
 
 func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, subject, origin string) (oidc.UserInfo, error) {
-	token, err := o.repo.ValidTokenByID(ctx, tokenID)
+	token, err := o.repo.ValidTokenByID(ctx, tokenID, subject)
 	if err != nil {
 		return nil, errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}

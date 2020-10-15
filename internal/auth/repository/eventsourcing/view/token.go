@@ -1,59 +1,33 @@
 package view
 
 import (
-	"time"
-
+	usr_view "github.com/caos/zitadel/internal/user/repository/view"
+	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-
-	"github.com/caos/zitadel/internal/token/repository/view"
-	"github.com/caos/zitadel/internal/token/repository/view/model"
 )
 
 const (
 	tokenTable = "auth.tokens"
 )
 
-func (v *View) ValidTokenByID(tokenID string) (*model.Token, error) {
-	return view.ValidTokenByID(v.Db, tokenTable, tokenID)
+func (v *View) TokenByID(tokenID string) (*model.TokenView, error) {
+	return usr_view.TokenByID(v.Db, tokenTable, tokenID)
 }
 
-func (v *View) TokensByUserID(userID string) ([]*model.Token, error) {
-	return view.TokensByUserID(v.Db, tokenTable, userID)
+func (v *View) TokensByUserID(userID string) ([]*model.TokenView, error) {
+	return usr_view.TokensByUserID(v.Db, tokenTable, userID)
 }
 
-func (v *View) CreateToken(agentID, applicationID, userID, preferredLanguage string, audience, scopes []string, lifetime time.Duration) (*model.Token, error) {
-	id, err := v.idGenerator.Next()
-	if err != nil {
-		return nil, err
-	}
-	now := time.Now().UTC()
-	token := &model.Token{
-		ID:                id,
-		CreationDate:      now,
-		UserID:            userID,
-		ApplicationID:     applicationID,
-		UserAgentID:       agentID,
-		Scopes:            scopes,
-		Audience:          audience,
-		Expiration:        now.Add(lifetime),
-		PreferredLanguage: preferredLanguage,
-	}
-	if err := view.PutToken(v.Db, tokenTable, token); err != nil {
-		return nil, err
-	}
-	return token, nil
-}
-
-func (v *View) PutToken(token *model.Token) error {
-	err := view.PutToken(v.Db, tokenTable, token)
+func (v *View) PutToken(token *model.TokenView) error {
+	err := usr_view.PutToken(v.Db, tokenTable, token)
 	if err != nil {
 		return err
 	}
 	return v.ProcessedTokenSequence(token.Sequence)
 }
 
-func (v *View) PutTokens(token []*model.Token, sequence uint64) error {
-	err := view.PutTokens(v.Db, tokenTable, token...)
+func (v *View) PutTokens(token []*model.TokenView, sequence uint64) error {
+	err := usr_view.PutTokens(v.Db, tokenTable, token...)
 	if err != nil {
 		return err
 	}
@@ -61,7 +35,7 @@ func (v *View) PutTokens(token []*model.Token, sequence uint64) error {
 }
 
 func (v *View) DeleteToken(tokenID string, eventSequence uint64) error {
-	err := view.DeleteToken(v.Db, tokenTable, tokenID)
+	err := usr_view.DeleteToken(v.Db, tokenTable, tokenID)
 	if err != nil {
 		return nil
 	}
@@ -69,7 +43,7 @@ func (v *View) DeleteToken(tokenID string, eventSequence uint64) error {
 }
 
 func (v *View) DeleteSessionTokens(agentID, userID string, eventSequence uint64) error {
-	err := view.DeleteSessionTokens(v.Db, tokenTable, agentID, userID)
+	err := usr_view.DeleteSessionTokens(v.Db, tokenTable, agentID, userID)
 	if err != nil {
 		return nil
 	}
@@ -77,7 +51,7 @@ func (v *View) DeleteSessionTokens(agentID, userID string, eventSequence uint64)
 }
 
 func (v *View) DeleteUserTokens(userID string, eventSequence uint64) error {
-	err := view.DeleteUserTokens(v.Db, tokenTable, userID)
+	err := usr_view.DeleteUserTokens(v.Db, tokenTable, userID)
 	if err != nil {
 		return nil
 	}
@@ -85,7 +59,7 @@ func (v *View) DeleteUserTokens(userID string, eventSequence uint64) error {
 }
 
 func (v *View) DeleteApplicationTokens(eventSequence uint64, ids ...string) error {
-	err := view.DeleteApplicationTokens(v.Db, tokenTable, ids)
+	err := usr_view.DeleteApplicationTokens(v.Db, tokenTable, ids)
 	if err != nil {
 		return nil
 	}

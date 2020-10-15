@@ -50,6 +50,7 @@
         "INFO": "Info",
         "OK": "OK",
         "VIEW": "Show",
+        "SELECTIONDELETE":"Delete selection",
         "DELETE": "Delete",
         "REMOVE":"Remove",
         "VERIFY":"Verify",
@@ -59,7 +60,9 @@
         "DEACTIVATE":"Deactivate",
         "REFRESH":"Refresh",
         "LOGIN":"Login",
-        "EDIT":"Edit"
+        "EDIT":"Edit",
+        "PIN":"Pin / Unpin",
+        "CONFIGURE":"Configure"
     },
     "ERRORS": {
         "REQUIRED": "Some required fields are missing.",
@@ -86,7 +89,24 @@
             "COPIED":"Copied to clipboard.",
             "NOUSER":"No associated users.",
             "REACTIVATE":"Reactivate",
-            "DEACTIVATE":"Deactivate"
+            "DEACTIVATE":"Deactivate",
+            "FILTER":"Filter",
+            "DELETE":"Delete User"
+        },
+        "DIALOG": {
+            "DELETE_TITLE":"Delete User",
+            "DELETE_DESCRIPTION":"You are about to permanently delete a user. Are you sure?"
+        },
+        "TABLE":{
+            "DEACTIVATE":"Deactivate",
+            "ACTIVATE":"Activate",
+            "FILTER": {
+                "1":"Filter for Username",
+                "2":"filter for Firstname",
+                "3":"filter for Lastname",
+                "5":"filter for DisplayName",
+                "6":"filter for email"
+            }
         },
         "MFA": {
             "TABLETYPE":"Type",
@@ -120,7 +140,11 @@
           "IDPCONFIGID": "Idp Config ID",
           "IDPNAME": "Idp Name",
           "USERDISPLAYNAME":  "External Name",
-          "EXTERNALUSERID": "External User ID"
+          "EXTERNALUSERID": "External User ID",
+          "DIALOG": {
+            "REMOVE_TITLE":"Remove IDP",
+            "REMOVE_DESCRIPTION":"You are about to delete an Identity Provider from a user. Do you really want to continue?"
+        }
         },
         "CREATE": {
             "TITLE": "Create a New User",
@@ -199,6 +223,7 @@
         },
         "EMAIL": "E-mail",
         "PHONE": "Phone Number",
+        "PREFERRED_LOGINNAME":"Preferred Loginname",
         "LOGINMETHODS": {
             "TITLE": "Contact Information",
             "DESCRIPTION": "The provided information is used to send important information, like password reset e-mails to you.",
@@ -270,7 +295,8 @@
             "SELECTEDDEACTIVATED":"Selected users deactivated.",
             "SELECTEDKEYSDELETED":"Selected keys deleted.",
             "KEYADDED":"Key added!",
-            "MACHINEADDED":"Service User created!"
+            "MACHINEADDED":"Service User created!",
+            "DELETED":"User deleted successfully!"
         },
         "MEMBERSHIPS": {
             "TITLE":"ZITADEL Manager Roles",
@@ -305,7 +331,12 @@
             "SEQUENCE":"Sequence",
             "TIMESTAMP":"Timestamp",
             "ACTIONS":"Actions",
-            "CLEAR":"Clear"
+            "CLEAR":"Clear",
+            "CLEARED":"View was successfully cleared!",
+            "DIALOG": {
+                "VIEW_CLEAR_TITLE": "Clear View",
+                "VIEW_CLEAR_DESCRIPTION":"You are about to clear a view. Clearing a view creates a process during which data is possibly not available for endusers. Are you really sure?"
+            }
         },
         "FAILEDEVENTS": {
             "TITLE":"Failed Events",
@@ -318,6 +349,10 @@
             "ACTIONS":"Actions",
             "DELETE":"Remove",
             "DELETESUCCESS":"Failed events removed."
+        },
+        "POLICY": {
+            "TITLE":"Default policies for organisations",
+            "DESCRIPTION":"These settings can be enhanced and/or customized by registered organisations."
         },
         "TOAST":{
             "MEMBERREMOVED":"Manager removed.",
@@ -332,6 +367,10 @@
     },
     "ORG": {
         "PAGES": {
+            "NAME":"Name",
+            "ID":"ID",
+            "FILTER":"Filter",
+            "FILTERPLACEHOLDER":"Filter for the name",
             "LIST": "Organisations",
             "LISTDESCRIPTION":"Choose an organisation.",
             "ACTIVE":"Active",
@@ -409,8 +448,11 @@
                 "TITLE":"Login Policy",
                 "DESCRIPTION":"Define how Users can be authenticated",
                 "TITLECREATE":"Define how Users can be authenticated",
-                "DESCRIPTIONCREATE":"Users can choose from all of the available identity providers."
+                "DESCRIPTIONCREATEADMIN":"Users can choose from the available identity providers below.",
+                "DESCRIPTIONCREATEMGMT":"Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only.",
+                "SAVED":"Saved successfully!"
             },
+            "DEFAULTLABEL":"The currently set guideline corresponds to the standard setting set by the IAM Administrator.",
             "BTN_INSTALL":"Setup",
             "BTN_EDIT":"Modify",
             "DATA": {
@@ -429,7 +471,11 @@
                 "ALLOWEXTERNALIDP":"External IDP allowed",
                 "ALLOWREGISTER":"Register allowed"
             },
-            "DELETE":"Uninstall/Reset Policy"
+            "RESET":"Reset Policy",
+            "TOAST":{
+                "SET":"Policy set successfully!",
+                "RESETSUCCESS":"Policy reset successfully!"
+            }
         },
         "TOAST": {
             "DEACTIVATED":"Organisation deactivated.",
@@ -460,6 +506,7 @@
             "USERNAME": "User Name",
             "FIRSTNAME": "First Name",
             "LASTNAME": "Last Name",
+            "LOGINNAME":"Login Name",
             "EMAIL": "E-mail",
             "ROLES": "Roles",
             "ADD": "Add Member",
@@ -640,16 +687,29 @@
             "TITLE":"New Identity Provider",
             "DESCRIPTION":"Configure the Endpoint of your new service provider."
         },
+        "DETAIL": {
+          "TITLE":"Identity Provider",
+          "DESCRIPTION":"General Configuration of your identity provider.",
+          "OIDC": {
+            "TITLE": "OIDC Configuration",
+            "DESCRIPTION":"Provide the correct OIDC Configuration for your identity Provider below!"
+          }
+        },
         "TYPES": {
             "0":"unknown",
             "1":"System",
             "2":"Organisation"
         },
         "STATES":{
-            "0":"active",
-            "1":"inactive"
+            "1":"active",
+            "2":"inactive"
+        },
+        "MAPPINTFIELD": {
+          "1": "Preferred Username",
+          "2": "Email"
         },
         "TYPE":"Type",
+        "ID": "ID",
         "NAME":"Name",
         "CONFIG":"Configuration",
         "STATE":"State",
@@ -658,11 +718,16 @@
         "SCOPESLIST":"Scopes List",
         "CLIENTID":"Client ID",
         "CLIENTSECRET":"Client Secret",
+        "IDPDISPLAYNAMMAPPING": "IDP Anzeigename Mapping",
+        "USERNAMEMAPPING": "Username Mapping",
         "CREATIONDATE":"Created At",
         "CHANGEDATE":"Last Modified",
         "DEACTIVATE":"Deactivate",
         "ACTIVATE":"Activate",
-        "DELETE":"Delete"
+        "DELETE":"Delete",
+        "TOAST": {
+            "SAVED": "Successfully saved."
+        }
     },
     "LOGINPOLICY": {
         "CREATE": {

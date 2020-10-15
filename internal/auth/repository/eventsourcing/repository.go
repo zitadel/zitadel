@@ -19,7 +19,6 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	es_key "github.com/caos/zitadel/internal/key/repository/eventsourcing"
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	es_policy "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
@@ -45,7 +44,6 @@ type EsRepository struct {
 	eventstore.UserGrantRepo
 	eventstore.OrgRepository
 	eventstore.IAMRepository
-	eventstore.PolicyRepo
 }
 
 func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, authZRepo *authz_repo.EsRepository) (*EsRepository, error) {
@@ -69,16 +67,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 	if err != nil {
 		return nil, err
 	}
-	policy, err := es_policy.StartPolicy(
-		es_policy.PolicyConfig{
-			Eventstore: es,
-			Cache:      conf.Eventstore.Cache,
-		},
-		systemDefaults,
-	)
-	if err != nil {
-		return nil, err
-	}
+
 	user, err := es_user.StartUser(
 		es_user.UserConfig{
 			Eventstore: es,
@@ -128,33 +117,36 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 	return &EsRepository{
 		spool,
 		eventstore.UserRepo{
-			SearchLimit:  conf.SearchLimit,
-			Eventstore:   es,
-			UserEvents:   user,
-			OrgEvents:    org,
-			PolicyEvents: policy,
-			View:         view,
+			SearchLimit:    conf.SearchLimit,
+			Eventstore:     es,
+			UserEvents:     user,
+			OrgEvents:      org,
+			View:           view,
+			SystemDefaults: systemDefaults,
 		},
 		eventstore.AuthRequestRepo{
-			UserEvents:               user,
-			OrgEvents:                org,
-			PolicyEvents:             policy,
-			AuthRequests:             authReq,
-			View:                     view,
-			UserSessionViewProvider:  view,
-			UserViewProvider:         view,
-			UserEventProvider:        user,
-			OrgViewProvider:          view,
-			IDPProviderViewProvider:  view,
-			LoginPolicyViewProvider:  view,
-			IdGenerator:              idGenerator,
-			PasswordCheckLifeTime:    systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
-			MfaInitSkippedLifeTime:   systemDefaults.VerificationLifetimes.MfaInitSkip.Duration,
-			MfaSoftwareCheckLifeTime: systemDefaults.VerificationLifetimes.MfaSoftwareCheck.Duration,
-			MfaHardwareCheckLifeTime: systemDefaults.VerificationLifetimes.MfaHardwareCheck.Duration,
-			IAMID:                    systemDefaults.IamID,
+			UserEvents:                 user,
+			OrgEvents:                  org,
+			AuthRequests:               authReq,
+			View:                       view,
+			UserSessionViewProvider:    view,
+			UserViewProvider:           view,
+			UserEventProvider:          user,
+			OrgViewProvider:            view,
+			IDPProviderViewProvider:    view,
+			LoginPolicyViewProvider:    view,
+			IdGenerator:                idGenerator,
+			PasswordCheckLifeTime:      systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
+			ExternalLoginCheckLifeTime: systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
+			MfaInitSkippedLifeTime:     systemDefaults.VerificationLifetimes.MfaInitSkip.Duration,
+			MfaSoftwareCheckLifeTime:   systemDefaults.VerificationLifetimes.MfaSoftwareCheck.Duration,
+			MfaHardwareCheckLifeTime:   systemDefaults.VerificationLifetimes.MfaHardwareCheck.Duration,
+			IAMID:                      systemDefaults.IamID,
 		},
-		eventstore.TokenRepo{View: view},
+		eventstore.TokenRepo{
+			UserEvents: user,
+			View:       view,
+		},
 		eventstore.KeyRepository{
 			KeyEvents:          key,
 			View:               view,
@@ -176,18 +168,15 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 			AuthZRepo:   authZRepo,
 		},
 		eventstore.OrgRepository{
-			SearchLimit:      conf.SearchLimit,
-			View:             view,
-			OrgEventstore:    org,
-			PolicyEventstore: policy,
-			UserEventstore:   user,
+			SearchLimit:    conf.SearchLimit,
+			View:           view,
+			OrgEventstore:  org,
+			UserEventstore: user,
+			SystemDefaults: systemDefaults,
 		},
 		eventstore.IAMRepository{
 			IAMEvents: iam,
 			IAMID:     systemDefaults.IamID,
-		},
-		eventstore.PolicyRepo{
-			PolicyEvents: policy,
 		},
 	}, nil
 }

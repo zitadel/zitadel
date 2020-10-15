@@ -3,7 +3,7 @@
 }
 
 .sub {
-  color: #8795a1;
+  color: var(--grey);
   margin-bottom: 2rem;
 }
 
@@ -41,17 +41,22 @@
   }
 
   .verify-btn {
-    border-radius: .5rem;
     font-size: 13px;
   }
 
   .fill-space {
     flex: 1;
   }
-}
 
-.add-button {
-  border-radius: .5rem;
+  .rem-button {
+    visibility: hidden;
+  }
+
+  &:hover {
+    .rem-button {
+      visibility: visible;
+    }
+  }
 }
 
 .new-desc {

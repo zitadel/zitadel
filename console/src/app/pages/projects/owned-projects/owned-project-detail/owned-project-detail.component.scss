@@ -9,10 +9,6 @@
     flex: 1;
   }
 
-  .state-button {
-    border-radius: .5rem;
-  }
-
   a {
     display: block;
   }
@@ -35,7 +31,7 @@
 
     .desc {
       font-size: .9rem;
-      color: #8795a1;
+      color: var(--grey);
     }
 
     .zitadel-warning {

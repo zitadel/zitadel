@@ -37,20 +37,17 @@
       }
 
       .head {
-        display: flex;
-        align-items: center;
         margin-bottom: 2rem;
-        flex-wrap: wrap;
 
         h1 {
-          font-size: 1.2rem;
+          font-size: 1.5rem;
+          margin-top: 10px;
         }
 
         .desc {
-          width: 100%;
           display: block;
           font-size: .9rem;
-          color: #8795a1;
+          color: var(--grey);
         }
       }
     }

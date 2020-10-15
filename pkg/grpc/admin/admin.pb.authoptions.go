@@ -34,12 +34,22 @@ var AdminService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.admin.api.v1.AdminService/GetOrgIamPolicy": authz.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultOrgIAMPolicy": authz.Option{
 		Permission: "iam.policy.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.admin.api.v1.AdminService/CreateOrgIamPolicy": authz.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/UpdateDefaultOrgIamPolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/GetOrgIAMPolicy": authz.Option{
+		Permission: "iam.policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/CreateOrgIAMPolicy": authz.Option{
 		Permission: "iam.policy.write",
 		CheckParam: "",
 	},
@@ -49,7 +59,7 @@ var AdminService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.admin.api.v1.AdminService/DeleteOrgIamPolicy": authz.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/RemoveOrgIAMPolicy": authz.Option{
 		Permission: "iam.policy.delete",
 		CheckParam: "",
 	},
@@ -160,6 +170,36 @@ var AdminService_AuthMethods = authz.MethodMapping{
 	},
 
 	"/caos.zitadel.admin.api.v1.AdminService/RemoveIdpProviderFromDefaultLoginPolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultPasswordComplexityPolicy": authz.Option{
+		Permission: "iam.policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/UpdateDefaultPasswordComplexityPolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultPasswordAgePolicy": authz.Option{
+		Permission: "iam.policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/UpdateDefaultPasswordAgePolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultPasswordLockoutPolicy": authz.Option{
+		Permission: "iam.policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/UpdateDefaultPasswordLockoutPolicy": authz.Option{
 		Permission: "iam.policy.write",
 		CheckParam: "",
 	},

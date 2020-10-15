@@ -1,9 +1,13 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { MatInput } from '@angular/material/input';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { enterAnimations } from 'src/app/animations';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { UserView } from 'src/app/proto/generated/auth_pb';
 import { SearchMethod, UserSearchKey, UserSearchQuery, UserSearchResponse } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -15,24 +19,34 @@ import { UserType } from '../user-list.component';
     selector: 'app-user-table',
     templateUrl: './user-table.component.html',
     styleUrls: ['./user-table.component.scss'],
+    animations: [
+        enterAnimations,
+    ],
 })
 export class UserTableComponent implements OnInit {
+    public userSearchKey: UserSearchKey | undefined = undefined;
     public UserType: any = UserType;
     @Input() userType: UserType = UserType.HUMAN;
     @Input() refreshOnPreviousRoute: string = '';
     @Input() disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
+    @ViewChild('input') public filter!: MatInput;
     public dataSource: MatTableDataSource<UserView.AsObject> = new MatTableDataSource<UserView.AsObject>();
     public selection: SelectionModel<UserView.AsObject> = new SelectionModel<UserView.AsObject>(true, []);
     public userResult!: UserSearchResponse.AsObject;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-    @Input() public displayedColumns: string[] = ['select', 'firstname', 'lastname', 'username', 'email', 'state'];
+    @Input() public displayedColumns: string[] = ['select', 'displayName', 'username', 'email', 'state', 'actions'];
 
     @Output() public changedSelection: EventEmitter<Array<UserView.AsObject>> = new EventEmitter();
+    UserSearchKey: any = UserSearchKey;
 
-    constructor(public translate: TranslateService, private userService: ManagementService,
-        private toast: ToastService) {
+    constructor(
+        public translate: TranslateService,
+        private userService: ManagementService,
+        private toast: ToastService,
+        private dialog: MatDialog,
+    ) {
         this.selection.changed.subscribe(() => {
             this.changedSelection.emit(this.selection.selected);
         });
@@ -77,14 +91,22 @@ export class UserTableComponent implements OnInit {
         });
     }
 
-    private async getData(limit: number, offset: number, filterTypeValue: UserType): Promise<void> {
+    private async getData(limit: number, offset: number, filterTypeValue: UserType, filterName?: string): Promise<void> {
         this.loadingSubject.next(true);
         const query = new UserSearchQuery();
         query.setKey(UserSearchKey.USERSEARCHKEY_TYPE);
         query.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
         query.setValue(filterTypeValue);
 
-        this.userService.SearchUsers(limit, offset, [query]).then(resp => {
+        let namequery;
+        if (filterName && this.userSearchKey !== undefined) {
+            namequery = new UserSearchQuery();
+            namequery.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
+            namequery.setKey(this.userSearchKey);
+            namequery.setValue(filterName.toLowerCase());
+        }
+
+        this.userService.SearchUsers(limit, offset, namequery ? [query, namequery] : [query]).then(resp => {
             this.userResult = resp.toObject();
             this.dataSource.data = this.userResult.resultList;
             this.loadingSubject.next(false);
@@ -96,5 +118,56 @@ export class UserTableComponent implements OnInit {
 
     public refreshPage(): void {
         this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.userType);
+    }
+
+    public applyFilter(event: Event): void {
+        const filterValue = (event.target as HTMLInputElement).value;
+
+        this.getData(
+            this.paginator.pageSize,
+            this.paginator.pageIndex * this.paginator.pageSize,
+            this.userType,
+            filterValue,
+        );
+    }
+
+    public setFilter(key: UserSearchKey): void {
+        setTimeout(() => {
+            if (this.filter) {
+                (this.filter as any).nativeElement.focus();
+            }
+        }, 100);
+
+        if (this.userSearchKey !== key) {
+            this.userSearchKey = key;
+        } else {
+            this.userSearchKey = undefined;
+            this.refreshPage();
+        }
+    }
+
+    public deleteUser(user: UserView.AsObject): void {
+        const dialogRef = this.dialog.open(WarnDialogComponent, {
+            data: {
+                confirmKey: 'ACTIONS.DELETE',
+                cancelKey: 'ACTIONS.CANCEL',
+                titleKey: 'USER.DIALOG.DELETE_TITLE',
+                descriptionKey: 'USER.DIALOG.DELETE_DESCRIPTION',
+            },
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                this.userService.DeleteUser(user.id).then(() => {
+                    setTimeout(() => {
+                        this.refreshPage();
+                    }, 1000);
+                    this.toast.showInfo('USER.TOAST.DELETED', true);
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
+            }
+        });
     }
 }

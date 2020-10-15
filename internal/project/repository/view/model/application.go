@@ -135,6 +135,7 @@ func (a *ApplicationView) AppendEventIfMyApp(event *models.Event) (err error) {
 	}
 	return nil
 }
+
 func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 	a.Sequence = event.Sequence
 	a.ChangeDate = event.CreationDate

@@ -6,12 +6,19 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { OidcIdpConfigCreate } from 'src/app/proto/generated/admin_pb';
+import {
+  OidcIdpConfigCreate as AdminOidcIdpConfigCreate,
+  OIDCMappingField as authMappingFields,
+} from 'src/app/proto/generated/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
+import {
+  OidcIdpConfigCreate as MgmtOidcIdpConfigCreate,
+  OIDCMappingField as mgmtMappingFields,
+} from '../../proto/generated/management_pb';
 
 @Component({
     selector: 'app-idp-create',
@@ -22,6 +29,7 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
     public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
     private service!: ManagementService | AdminService;
     public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
+    public mappingFields: mgmtMappingFields[] | authMappingFields[] = [];
 
     private subscription?: Subscription;
     public projectId: string = '';
@@ -43,7 +51,9 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
             clientId: new FormControl('', [Validators.required]),
             clientSecret: new FormControl('', [Validators.required]),
             issuer: new FormControl('', [Validators.required]),
-            scopesList: new FormControl([], []),
+            scopesList: new FormControl(['openid', 'profile', 'email'], []),
+            idpDisplayNameMapping: new FormControl(0),
+            usernameMapping: new FormControl(0),
         });
 
         this.route.data.pipe(take(1)).subscribe(data => {
@@ -51,9 +61,15 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
                     this.service = this.injector.get(ManagementService as Type<ManagementService>);
+                    this.mappingFields = [
+                        mgmtMappingFields.OIDCMAPPINGFIELD_PREFERRED_USERNAME,
+                        mgmtMappingFields.OIDCMAPPINGFIELD_EMAIL];
                     break;
                 case PolicyComponentServiceType.ADMIN:
                     this.service = this.injector.get(AdminService as Type<AdminService>);
+                    this.mappingFields = [
+                      authMappingFields.OIDCMAPPINGFIELD_PREFERRED_USERNAME,
+                      authMappingFields.OIDCMAPPINGFIELD_EMAIL];
                     break;
             }
         });
@@ -72,7 +88,16 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
     }
 
     public addIdp(): void {
-        const req: OidcIdpConfigCreate = new OidcIdpConfigCreate();
+        let req: AdminOidcIdpConfigCreate | MgmtOidcIdpConfigCreate;
+
+        switch (this.serviceType) {
+          case PolicyComponentServiceType.MGMT:
+            req = new MgmtOidcIdpConfigCreate();
+            break;
+          case PolicyComponentServiceType.ADMIN:
+            req = new AdminOidcIdpConfigCreate();
+            break;
+        }
 
         req.setName(this.name?.value);
         req.setClientId(this.clientId?.value);
@@ -80,6 +105,8 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
         req.setIssuer(this.issuer?.value);
         req.setLogoSrc(this.logoSrc?.value);
         req.setScopesList(this.scopesList?.value);
+        req.setIdpDisplayNameMapping(this.idpDisplayNameMapping?.value);
+        req.setUsernameMapping(this.usernameMapping?.value);
 
         this.service.CreateOidcIdp(req).then((idp) => {
             this.router.navigate(['idp', idp.getId()]);
@@ -135,8 +162,16 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
     public get issuer(): AbstractControl | null {
         return this.formGroup.get('issuer');
     }
-
     public get scopesList(): AbstractControl | null {
-        return this.formGroup.get('scopesList');
+      return this.formGroup.get('scopesList');
     }
+
+    public get idpDisplayNameMapping(): AbstractControl | null {
+        return this.formGroup.get('idpDisplayNameMapping');
+    }
+
+    public get usernameMapping(): AbstractControl | null {
+      return this.formGroup.get('usernameMapping');
+    }
+
 }

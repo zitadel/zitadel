@@ -15,7 +15,7 @@
     }
 
     p {
-      color: #8795a1;
+      color: var(--grey);
       text-align: center;
       font-size: 1rem;
       margin: 0;
@@ -28,7 +28,6 @@
     }
 
     button {
-      border-radius: .5rem;
       display: block;
       padding: .5rem 4rem;
     }

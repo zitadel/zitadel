@@ -38,12 +38,17 @@ func IDPProvidersByIdpConfigID(db *gorm.DB, table string, idpConfigID string) ([
 	return providers, nil
 }
 
-func IDPProvidersByAggregateID(db *gorm.DB, table string, aggregateID string) ([]*model.IDPProviderView, error) {
+func IDPProvidersByAggregateIDAndState(db *gorm.DB, table string, aggregateID string, idpConfigState iam_model.IDPConfigState) ([]*model.IDPProviderView, error) {
 	providers := make([]*model.IDPProviderView, 0)
 	queries := []*iam_model.IDPProviderSearchQuery{
 		{
 			Key:    iam_model.IDPProviderSearchKeyAggregateID,
 			Value:  aggregateID,
+			Method: global_model.SearchMethodEquals,
+		},
+		{
+			Key:    iam_model.IDPProviderSearchKeyState,
+			Value:  int(idpConfigState),
 			Method: global_model.SearchMethodEquals,
 		},
 	}

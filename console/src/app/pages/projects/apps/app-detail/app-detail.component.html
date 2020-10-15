@@ -42,9 +42,8 @@
     </app-card>
 
     <app-card title="{{ 'APP.OIDC.TITLE' | translate }}" *ngIf="app && app.oidcConfig">
-        <div class="card-actions" card-actions
-            *ngIf="app?.oidcConfig?.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE">
-            <button mat-stroked-button
+        <div card-actions *ngIf="app?.oidcConfig?.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE">
+            <button [disabled]="!canWrite" mat-stroked-button
                 (click)="regenerateOIDCClientSecret()">{{'APP.OIDC.REGENERATESECRET' | translate}}</button>
         </div>
 
@@ -110,7 +109,7 @@
 
                 <mat-form-field class="formfield full-width" appearance="outline">
                     <mat-label>{{ 'APP.OIDC.REDIRECT' | translate }}</mat-label>
-                    <mat-chip-list #chipRedirectList>
+                    <mat-chip-list [disabled]="!canWrite" #chipRedirectList>
                         <mat-chip class="chip" *ngFor="let redirect of redirectUrisList" selected
                             [matTooltip]="!redirect.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
                             [color]="!redirect.startsWith('https://') ? 'warn': 'green'"
@@ -129,7 +128,7 @@
 
                 <mat-form-field class="formfield full-width" appearance="outline">
                     <mat-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</mat-label>
-                    <mat-chip-list #chipPostRedirectList>
+                    <mat-chip-list [disabled]="!canWrite" #chipPostRedirectList>
                         <mat-chip class="chip" *ngFor="let redirect of postLogoutRedirectUrisList" selected
                             (removed)="remove(redirect, RedirectType.POSTREDIRECT)"
                             [matTooltip]="!redirect.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
@@ -149,7 +148,7 @@
             </div>
             <div class="btn-container">
 
-                <button class="submit-button" type="submit" color="primary" [disabled]="appForm.invalid"
+                <button class="submit-button" type="submit" color="primary" [disabled]="appForm.invalid || !canWrite"
                     mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
             </div>
         </form>

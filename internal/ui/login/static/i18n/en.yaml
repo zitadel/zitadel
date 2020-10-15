@@ -226,6 +226,7 @@ Errors:
     NotActive: User is not active
     ExternalIDP:
       IDPTypeNotImplemented: IDP Type is not implemented
+      NotAllowed: External Login Provider not allowed
     GrantRequired: Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.
 
 

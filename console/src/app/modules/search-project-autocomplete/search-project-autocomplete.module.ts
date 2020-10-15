@@ -8,12 +8,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { SearchProjectAutocompleteComponent } from './search-project-autocomplete.component';
 
 @NgModule({
-    declarations: [SearchProjectAutocompleteComponent],
+    declarations: [
+        SearchProjectAutocompleteComponent,
+    ],
     imports: [
         CommonModule,
         MatAutocompleteModule,
@@ -26,6 +29,7 @@ import { SearchProjectAutocompleteComponent } from './search-project-autocomplet
         MatProgressSpinnerModule,
         FormsModule,
         TranslateModule,
+        MatSelectModule,
     ],
     exports: [
         SearchProjectAutocompleteComponent,

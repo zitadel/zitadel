@@ -80,7 +80,7 @@ func (o *OPStorage) CreateToken(ctx context.Context, req op.TokenRequest) (strin
 	if err != nil {
 		return "", time.Time{}, err
 	}
-	return resp.ID, resp.Expiration, nil
+	return resp.TokenID, resp.Expiration, nil
 }
 
 func grantsToScopes(grants []*grant_model.UserGrantView) []string {

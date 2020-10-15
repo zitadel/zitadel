@@ -21,6 +21,7 @@ const (
 	NextStepChangeUsername
 	NextStepLinkUsers
 	NextStepExternalNotFoundOption
+	NextStepExternalLogin
 	NextStepGrantRequired
 )
 
@@ -70,6 +71,14 @@ type PasswordStep struct{}
 
 func (s *PasswordStep) Type() NextStepType {
 	return NextStepPassword
+}
+
+type ExternalLoginStep struct {
+	SelectedIDPConfigID string
+}
+
+func (s *ExternalLoginStep) Type() NextStepType {
+	return NextStepExternalLogin
 }
 
 type ChangePasswordStep struct{}

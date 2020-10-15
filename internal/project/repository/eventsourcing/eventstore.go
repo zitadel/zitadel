@@ -67,6 +67,9 @@ func (es *ProjectEventstore) ProjectByID(ctx context.Context, id string) (*proj_
 	if err != nil && !(caos_errs.IsNotFound(err) && project.Sequence != 0) {
 		return nil, err
 	}
+	if project.State == int32(proj_model.ProjectStateRemoved) {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-dG8ie", "Errors.Project.NotFound")
+	}
 	es.projectCache.cacheProject(project)
 	return model.ProjectToModel(project), nil
 }

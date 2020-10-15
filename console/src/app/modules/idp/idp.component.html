@@ -1,68 +1,95 @@
-<div class="container">
-    <div class="abort-container">
-        <button (click)="close()" mat-icon-button>
-            <mat-icon>close</mat-icon>
-        </button>
-        <span class="abort">{{ 'IDP.CREATE.TITLE' | translate }}</span><span class="abort-2">Step
-            {{ currentCreateStep }} of
-            {{ createSteps }}</span>
-    </div>
-
-    <h1>{{'IDP.CREATE.TITLE' | translate}}</h1>
-    <p>{{'IDP.CREATE.DESCRIPTION' | translate}}</p>
-
-    <form (ngSubmit)="updateIdp()">
-        <ng-container [formGroup]="formGroup">
-            <div class="content">
-                <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'IDP.ID' | translate }}</mat-label>
-                    <input matInput formControlName="id" />
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'IDP.NAME' | translate }}</mat-label>
-                    <input matInput formControlName="name" />
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="formfield">
+<app-detail-layout [backRouterLink]="backroutes" [title]="'IDP.DETAIL.TITLE' | translate"
+    [description]="'IDP.DETAIL.DESCRIPTION' | translate">
+    <div class="container">
+        <form (ngSubmit)="updateIdp()">
+            <ng-container [formGroup]="idpForm">
+                <div class="content">
+                    <mat-form-field appearance="outline" class="formfield">
+                        <mat-label>{{ 'IDP.ID' | translate }}</mat-label>
+                        <input matInput formControlName="id" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="formfield">
+                        <mat-label>{{ 'IDP.NAME' | translate }}</mat-label>
+                        <input matInput formControlName="name" />
+                    </mat-form-field>
+                    <!--<mat-form-field appearance="outline" class="formfield">
                     <mat-label>{{ 'IDP.LOGOSRC' | translate }}</mat-label>
                     <input matInput formControlName="logoSrc" />
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'IDP.ISSUER' | translate }}</mat-label>
-                    <input matInput formControlName="issuer" />
-                </mat-form-field>
-            </div>
-            <div class="content">
-                <mat-checkbox class="desc" [(ngModel)]="showIdSecretSection" [ngModelOptions]="{standalone: true}">
-                    Update Client Id / Client Secret
-                </mat-checkbox>
-                <ng-container *ngIf="showIdSecretSection">
-                    <mat-form-field appearance="outline" class="formfield">
-                        <mat-label>{{ 'IDP.CLIENTID' | translate }}</mat-label>
-                        <input matInput formControlName="clientId" />
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="formfield">
-                        <mat-label>{{ 'IDP.CLIENTSECRET' | translate }}</mat-label>
-                        <input matInput formControlName="clientSecret" />
-                    </mat-form-field>
-                </ng-container>
-            </div>
-            <div class="content">
-                <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'IDP.SCOPESLIST' | translate }}</mat-label>
-                    <mat-chip-list #chipScopesList aria-label="scope selection" *ngIf="scopesList">
-                        <mat-chip class="chip" *ngFor="let scope of scopesList.value" selectable="false" removable
-                            (removed)="removeScope(scope)">
-                            {{scope}} <mat-icon matChipRemove>cancel</mat-icon>
-                        </mat-chip>
-                        <input [matChipInputFor]="chipScopesList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                            [matChipInputAddOnBlur]="true" (matChipInputTokenEnd)="addScope($event)">
-                    </mat-chip-list>
-                </mat-form-field>
-            </div>
-        </ng-container>
+                </mat-form-field>-->
+                </div>
+            </ng-container>
 
-        <button color="primary" mat-raised-button class="continue-button" [disabled]="formGroup.invalid" type="submit">
-            {{ 'ACTIONS.SAVE' | translate }}
-        </button>
-    </form>
-</div>
+            <div class="btn-wrapper">
+                <button color="primary" mat-raised-button class="continue-button" [disabled]="idpForm.invalid"
+                    type="submit">
+                    {{ 'ACTIONS.SAVE' | translate }}
+                </button>
+            </div>
+        </form>
+
+        <ng-container *ngIf="oidcConfigForm">
+            <h2>{{'IDP.DETAIL.OIDC.TITLE' | translate}}</h2>
+            <p>{{'IDP.DETAIL.OIDC.DESCRIPTION' | translate}}</p>
+
+            <form (ngSubmit)="updateOidcConfig()">
+                <ng-container [formGroup]="oidcConfigForm">
+                    <div class="content">
+                        <mat-form-field appearance="outline" class="formfield">
+                            <mat-label>{{ 'IDP.ISSUER' | translate }}</mat-label>
+                            <input matInput formControlName="issuer" />
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="formfield">
+                            <mat-label>{{ 'IDP.CLIENTID' | translate }}</mat-label>
+                            <input matInput formControlName="clientId" />
+                        </mat-form-field>
+                        <mat-checkbox class="desc" [(ngModel)]="showIdSecretSection"
+                            [ngModelOptions]="{standalone: true}">
+                            Update Client Secret
+                        </mat-checkbox>
+                        <mat-form-field appearance="outline" class="formfield" *ngIf="showIdSecretSection">
+                            <mat-label>{{ 'IDP.CLIENTSECRET' | translate }}</mat-label>
+                            <input matInput formControlName="clientSecret" />
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="formfield fullwidth">
+                            <mat-label>{{ 'IDP.SCOPESLIST' | translate }}</mat-label>
+                            <mat-chip-list #chipScopesList aria-label="scope selection">
+                                <mat-chip class="chip" *ngFor="let scope of scopesList?.value" selectable="false"
+                                    removable (removed)="removeScope(scope)">
+                                    {{scope}} <mat-icon matChipRemove>cancel</mat-icon>
+                                </mat-chip>
+                                <input [matChipInputFor]="chipScopesList"
+                                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
+                                    (matChipInputTokenEnd)="addScope($event)">
+                            </mat-chip-list>
+                        </mat-form-field>
+
+                        <mat-form-field class="formfield" appearance="outline">
+                            <mat-label>{{ 'IDP.IDPDISPLAYNAMMAPPING' | translate }}</mat-label>
+                            <mat-select formControlName="idpDisplayNameMapping">
+                                <mat-option *ngFor="let field of mappingFields" [value]="field">
+                                    {{ 'IDP.MAPPINTFIELD.'+field | translate }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field class="formfield" appearance="outline">
+                            <mat-label>{{ 'IDP.USERNAMEMAPPING' | translate }}</mat-label>
+                            <mat-select formControlName="usernameMapping">
+                                <mat-option *ngFor="let field of mappingFields" [value]="field">
+                                    {{ 'IDP.MAPPINTFIELD.'+field | translate }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </ng-container>
+
+                <div class="btn-wrapper">
+                    <button color="primary" mat-raised-button class="continue-button"
+                        [disabled]="oidcConfigForm.invalid" type="submit">
+                        {{ 'ACTIONS.SAVE' | translate }}
+                    </button>
+                </div>
+            </form>
+        </ng-container>
+    </div>
+
+</app-detail-layout>

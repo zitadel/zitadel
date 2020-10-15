@@ -30,7 +30,7 @@ type OrgRepository interface {
 
 	GetOrgMemberRoles() []string
 
-	GetMyOrgIamPolicy(ctx context.Context) (*org_model.OrgIAMPolicy, error)
+	GetMyOrgIamPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error)
 
 	SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error)
 	IDPConfigByID(ctx context.Context, id string) (*iam_model.IDPConfigView, error)
@@ -42,10 +42,29 @@ type OrgRepository interface {
 	ChangeOIDCIDPConfig(ctx context.Context, oidcConfig *iam_model.OIDCIDPConfig) (*iam_model.OIDCIDPConfig, error)
 
 	GetLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error)
+	GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error)
 	AddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error)
 	ChangeLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error)
 	RemoveLoginPolicy(ctx context.Context) error
 	SearchIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error)
 	AddIDPProviderToLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) (*iam_model.IDPProvider, error)
 	RemoveIDPProviderFromLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) error
+
+	GetPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error)
+	GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error)
+	AddPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error)
+	ChangePasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error)
+	RemovePasswordComplexityPolicy(ctx context.Context) error
+
+	GetPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error)
+	GetDefaultPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error)
+	AddPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error)
+	ChangePasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error)
+	RemovePasswordAgePolicy(ctx context.Context) error
+
+	GetPasswordLockoutPolicy(ctx context.Context) (*iam_model.PasswordLockoutPolicyView, error)
+	GetDefaultPasswordLockoutPolicy(ctx context.Context) (*iam_model.PasswordLockoutPolicyView, error)
+	AddPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error)
+	ChangePasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error)
+	RemovePasswordLockoutPolicy(ctx context.Context) error
 }

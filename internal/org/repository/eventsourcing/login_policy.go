@@ -118,7 +118,10 @@ func checkExistingLoginPolicyIDPProviderValidation(idpProvider *iam_es_model.IDP
 			switch event.Type {
 			case model.IDPConfigAdded, iam_es_model.IDPConfigAdded:
 				config := new(iam_es_model.IDPConfig)
-				config.SetData(event)
+				err := config.SetData(event)
+				if err != nil {
+					return err
+				}
 				idpConfigs = append(idpConfigs, config)
 				if event.AggregateType == model.OrgAggregate {
 					config.Type = int32(iam_model.IDPProviderTypeOrg)
@@ -127,25 +130,37 @@ func checkExistingLoginPolicyIDPProviderValidation(idpProvider *iam_es_model.IDP
 				}
 			case model.IDPConfigRemoved, iam_es_model.IDPConfigRemoved:
 				config := new(iam_es_model.IDPConfig)
-				config.SetData(event)
-				for i, p := range idpConfigs {
-					if p.IDPConfigID == config.IDPConfigID {
+				err := config.SetData(event)
+				if err != nil {
+					return err
+				}
+				for i := len(idpConfigs) - 1; i >= 0; i-- {
+					if idpConfigs[i].IDPConfigID == config.IDPConfigID {
 						idpConfigs[i] = idpConfigs[len(idpConfigs)-1]
 						idpConfigs[len(idpConfigs)-1] = nil
 						idpConfigs = idpConfigs[:len(idpConfigs)-1]
+						break
 					}
 				}
 			case model.LoginPolicyIDPProviderAdded:
 				idp := new(iam_es_model.IDPProvider)
-				idp.SetData(event)
-			case model.LoginPolicyIDPProviderRemoved:
+				err := idp.SetData(event)
+				if err != nil {
+					return err
+				}
+				idps = append(idps, idp)
+			case model.LoginPolicyIDPProviderRemoved, model.LoginPolicyIDPProviderCascadeRemoved:
 				idp := new(iam_es_model.IDPProvider)
-				idp.SetData(event)
-				for i, p := range idps {
-					if p.IDPConfigID == idp.IDPConfigID {
+				err := idp.SetData(event)
+				if err != nil {
+					return err
+				}
+				for i := len(idps) - 1; i >= 0; i-- {
+					if idps[i].IDPConfigID == idp.IDPConfigID {
 						idps[i] = idps[len(idps)-1]
 						idps[len(idps)-1] = nil
 						idps = idps[:len(idps)-1]
+						break
 					}
 				}
 			}
