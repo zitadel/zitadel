@@ -1754,7 +1754,7 @@ func TestChangeLabelPolicy(t *testing.T) {
 		{
 			name: "add login policy, ok",
 			args: args{
-				es:  GetMockManipulateIamWithLabelPolicy(ctrl),
+				es:  GetMockManipulateIAMWithLabelPolicy(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				policy: &iam_model.LabelPolicy{
 					ObjectRoot:     es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},

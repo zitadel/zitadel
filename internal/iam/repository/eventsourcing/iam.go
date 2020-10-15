@@ -280,6 +280,7 @@ func LabelPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, existin
 		return agg.AppendEvent(model.LabelPolicyChanged, changes)
 	}
 }
+
 func LoginPolicyAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.LoginPolicy) (*es_models.Aggregate, error) {
 	if policy == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Smla8", "Errors.Internal")
