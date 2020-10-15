@@ -709,12 +709,12 @@ func (es *OrgEventstore) AddLabelPolicy(ctx context.Context, policy *iam_model.L
 	if policy == nil || !policy.IsValid() {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-37rSC", "Errors.Org.LabelPolicyInvalid")
 	}
-	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	org, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
 	if err != nil {
 		return nil, err
 	}
 
-	repoOrg := model.OrgFromModel(existing)
+	repoOrg := model.OrgFromModel(org)
 	repoLabelPolicy := iam_es_model.LabelPolicyFromModel(policy)
 
 	addAggregate := LabelPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoLabelPolicy)
@@ -729,12 +729,12 @@ func (es *OrgEventstore) ChangeLabelPolicy(ctx context.Context, policy *iam_mode
 	if policy == nil || !policy.IsValid() {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-0NBIw", "Errors.Org.LabelPolicyInvalid")
 	}
-	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	org, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
 	if err != nil {
 		return nil, err
 	}
 
-	repoOrg := model.OrgFromModel(existing)
+	repoOrg := model.OrgFromModel(org)
 	repoLabelPolicy := iam_es_model.LabelPolicyFromModel(policy)
 
 	addAggregate := LabelPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoLabelPolicy)

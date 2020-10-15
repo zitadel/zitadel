@@ -2798,12 +2798,15 @@ func TestAddLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.AddLabelPolicy(tt.args.ctx, tt.args.policy)
-
-			if !tt.res.wantErr && result.PrimaryColor != tt.res.result.PrimaryColor {
-				t.Errorf("got wrong result PrimaryColor: expected: %v, actual: %v ", tt.res.result.PrimaryColor, result.PrimaryColor)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
 				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result.PrimaryColor != tt.res.result.PrimaryColor {
+				t.Errorf("got wrong result PrimaryColor: expected: %v, actual: %v ", tt.res.result.PrimaryColor, result.PrimaryColor)
 			}
 		})
 	}
@@ -2877,15 +2880,18 @@ func TestChangeLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.ChangeLabelPolicy(tt.args.ctx, tt.args.policy)
-
-			if !tt.res.wantErr && result.PrimaryColor != tt.res.result.PrimaryColor {
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result.PrimaryColor != tt.res.result.PrimaryColor {
 				t.Errorf("got wrong result PrimaryColor: expected: %v, actual: %v ", tt.res.result.PrimaryColor, result.PrimaryColor)
 			}
-			if !tt.res.wantErr && result.SecondaryColor != tt.res.result.SecondaryColor {
+			if result.SecondaryColor != tt.res.result.SecondaryColor {
 				t.Errorf("got wrong result SecondaryColor: expected: %v, actual: %v ", tt.res.result.SecondaryColor, result.SecondaryColor)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}

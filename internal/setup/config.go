@@ -49,10 +49,7 @@ type LoginPolicy struct {
 	AllowUsernamePassword bool
 	AllowExternalIdp      bool
 }
-type LabelPolicy struct {
-	PrimaryColor   string
-	SecondaryColor string
-}
+
 type User struct {
 	FirstName string
 	LastName  string
