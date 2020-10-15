@@ -1,8 +1,10 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 
 import { ExternalIDPView as AuthExternalIDPView } from '../../../../proto/generated/auth_pb';
 import {
@@ -29,9 +31,9 @@ export class ExternalIdpsComponent implements OnInit {
         = new SelectionModel<MgmtExternalIDPView.AsObject | AuthExternalIDPView.AsObject>(true, []);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-    @Input() public displayedColumns: string[] = ['idpConfigId', 'idpName', 'externalUserId', 'externalUserDisplayName'];
+    @Input() public displayedColumns: string[] = ['idpConfigId', 'idpName', 'externalUserId', 'externalUserDisplayName', 'actions'];
 
-    constructor(private toast: ToastService) { }
+    constructor(private toast: ToastService, private dialog: MatDialog) { }
 
     ngOnInit(): void {
         this.getData(10, 0);
@@ -80,19 +82,35 @@ export class ExternalIdpsComponent implements OnInit {
     }
 
     public removeExternalIdp(idp: AuthExternalIDPView.AsObject | MgmtExternalIDPView.AsObject): void {
-        let promise;
-        if (this.service instanceof ManagementService) {
-            promise = (this.service as ManagementService).RemoveExternalIDP(idp.externalUserId, idp.idpConfigId, idp.userId);
-        } else if (this.service instanceof GrpcAuthService) {
-            promise = (this.service as GrpcAuthService).RemoveExternalIDP(idp.externalUserId, idp.idpConfigId);
-        }
+        const dialogRef = this.dialog.open(WarnDialogComponent, {
+            data: {
+                confirmKey: 'ACTIONS.REMOVE',
+                cancelKey: 'ACTIONS.CANCEL',
+                titleKey: 'USER.EXTERNALIDP.DIALOG.DELETE_TITLE',
+                descriptionKey: 'USER.EXTERNALIDP.DIALOG.DELETE_DESCRIPTION',
+            },
+            width: '400px',
+        });
 
-        if (promise) {
-            promise.then(_ => {
-                this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
-            }).catch((error: any) => {
-                this.toast.showError(error);
-            });
-        }
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                let promise;
+                if (this.service instanceof ManagementService) {
+                    promise = (this.service as ManagementService)
+                        .RemoveExternalIDP(idp.externalUserId, idp.idpConfigId, idp.userId);
+                } else if (this.service instanceof GrpcAuthService) {
+                    promise = (this.service as GrpcAuthService)
+                        .RemoveExternalIDP(idp.externalUserId, idp.idpConfigId);
+                }
+
+                if (promise) {
+                    promise.then(_ => {
+                        this.refreshPage();
+                    }).catch((error: any) => {
+                        this.toast.showError(error);
+                    });
+                }
+            }
+        });
     }
 }

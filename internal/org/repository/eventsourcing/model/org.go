@@ -20,11 +20,14 @@ type Org struct {
 	Name  string `json:"name,omitempty"`
 	State int32  `json:"-"`
 
-	Domains      []*OrgDomain              `json:"-"`
-	Members      []*OrgMember              `json:"-"`
-	OrgIamPolicy *OrgIAMPolicy             `json:"-"`
-	LoginPolicy  *iam_es_model.LoginPolicy `json:"-"`
-	IDPs         []*iam_es_model.IDPConfig `json:"-"`
+	Domains                  []*OrgDomain                           `json:"-"`
+	Members                  []*OrgMember                           `json:"-"`
+	OrgIAMPolicy             *iam_es_model.OrgIAMPolicy             `json:"-"`
+	IDPs                     []*iam_es_model.IDPConfig              `json:"-"`
+	LoginPolicy              *iam_es_model.LoginPolicy              `json:"-"`
+	PasswordComplexityPolicy *iam_es_model.PasswordComplexityPolicy `json:"-"`
+	PasswordAgePolicy        *iam_es_model.PasswordAgePolicy        `json:"-"`
+	PasswordLockoutPolicy    *iam_es_model.PasswordLockoutPolicy    `json:"-"`
 }
 
 func OrgFromModel(org *org_model.Org) *Org {
@@ -40,10 +43,19 @@ func OrgFromModel(org *org_model.Org) *Org {
 		IDPs:       idps,
 	}
 	if org.OrgIamPolicy != nil {
-		converted.OrgIamPolicy = OrgIAMPolicyFromModel(org.OrgIamPolicy)
+		converted.OrgIAMPolicy = iam_es_model.OrgIAMPolicyFromModel(org.OrgIamPolicy)
 	}
 	if org.LoginPolicy != nil {
 		converted.LoginPolicy = iam_es_model.LoginPolicyFromModel(org.LoginPolicy)
+	}
+	if org.PasswordComplexityPolicy != nil {
+		converted.PasswordComplexityPolicy = iam_es_model.PasswordComplexityPolicyFromModel(org.PasswordComplexityPolicy)
+	}
+	if org.PasswordAgePolicy != nil {
+		converted.PasswordAgePolicy = iam_es_model.PasswordAgePolicyFromModel(org.PasswordAgePolicy)
+	}
+	if org.PasswordLockoutPolicy != nil {
+		converted.PasswordLockoutPolicy = iam_es_model.PasswordLockoutPolicyFromModel(org.PasswordLockoutPolicy)
 	}
 	return converted
 }
@@ -57,11 +69,20 @@ func OrgToModel(org *Org) *org_model.Org {
 		Members:    OrgMembersToModel(org.Members),
 		IDPs:       iam_es_model.IDPConfigsToModel(org.IDPs),
 	}
-	if org.OrgIamPolicy != nil {
-		converted.OrgIamPolicy = OrgIAMPolicyToModel(org.OrgIamPolicy)
+	if org.OrgIAMPolicy != nil {
+		converted.OrgIamPolicy = iam_es_model.OrgIAMPolicyToModel(org.OrgIAMPolicy)
 	}
 	if org.LoginPolicy != nil {
 		converted.LoginPolicy = iam_es_model.LoginPolicyToModel(org.LoginPolicy)
+	}
+	if org.PasswordComplexityPolicy != nil {
+		converted.PasswordComplexityPolicy = iam_es_model.PasswordComplexityPolicyToModel(org.PasswordComplexityPolicy)
+	}
+	if org.PasswordAgePolicy != nil {
+		converted.PasswordAgePolicy = iam_es_model.PasswordAgePolicyToModel(org.PasswordAgePolicy)
+	}
+	if org.PasswordLockoutPolicy != nil {
+		converted.PasswordLockoutPolicy = iam_es_model.PasswordLockoutPolicyToModel(org.PasswordLockoutPolicy)
 	}
 	return converted
 }
@@ -164,6 +185,24 @@ func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 		err = o.appendAddIdpProviderToLoginPolicyEvent(event)
 	case LoginPolicyIDPProviderRemoved:
 		err = o.appendRemoveIdpProviderFromLoginPolicyEvent(event)
+	case PasswordComplexityPolicyAdded:
+		err = o.appendAddPasswordComplexityPolicyEvent(event)
+	case PasswordComplexityPolicyChanged:
+		err = o.appendChangePasswordComplexityPolicyEvent(event)
+	case PasswordComplexityPolicyRemoved:
+		o.appendRemovePasswordComplexityPolicyEvent(event)
+	case PasswordAgePolicyAdded:
+		err = o.appendAddPasswordAgePolicyEvent(event)
+	case PasswordAgePolicyChanged:
+		err = o.appendChangePasswordAgePolicyEvent(event)
+	case PasswordAgePolicyRemoved:
+		o.appendRemovePasswordAgePolicyEvent(event)
+	case PasswordLockoutPolicyAdded:
+		err = o.appendAddPasswordLockoutPolicyEvent(event)
+	case PasswordLockoutPolicyChanged:
+		err = o.appendChangePasswordLockoutPolicyEvent(event)
+	case PasswordLockoutPolicyRemoved:
+		o.appendRemovePasswordLockoutPolicyEvent(event)
 	}
 	if err != nil {
 		return err

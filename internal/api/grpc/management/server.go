@@ -19,7 +19,6 @@ var _ management.ManagementServiceServer = (*Server)(nil)
 
 type Server struct {
 	project        repository.ProjectRepository
-	policy         repository.PolicyRepository
 	org            repository.OrgRepository
 	user           repository.UserRepository
 	usergrant      repository.UserGrantRepository
@@ -35,7 +34,6 @@ type Config struct {
 func CreateServer(repo repository.Repository, sd systemdefaults.SystemDefaults) *Server {
 	return &Server{
 		project:        repo,
-		policy:         repo,
 		org:            repo,
 		user:           repo,
 		usergrant:      repo,

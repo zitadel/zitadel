@@ -1,9 +1,8 @@
 package model
 
 import (
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"time"
-
-	policy_model "github.com/caos/zitadel/internal/policy/model"
 
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -57,7 +56,7 @@ func (u *Human) IsOTPReady() bool {
 	return u.OTP != nil && u.OTP.State == MfaStateReady
 }
 
-func (u *Human) HashPasswordIfExisting(policy *policy_model.PasswordComplexityPolicy, passwordAlg crypto.HashAlgorithm, onetime bool) error {
+func (u *Human) HashPasswordIfExisting(policy *iam_model.PasswordComplexityPolicyView, passwordAlg crypto.HashAlgorithm, onetime bool) error {
 	if u.Password != nil {
 		return u.Password.HashPasswordIfExisting(policy, passwordAlg, onetime)
 	}

@@ -167,6 +167,10 @@ func (m *UserMembership) processProject(event *models.Event) (err error) {
 		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, member.ObjectID, usr_model.MemberTypeProjectGrant, event.Sequence)
 	case proj_es_model.ProjectChanged:
 		err = m.updateProjectDisplayName(event)
+	case proj_es_model.ProjectRemoved:
+		return m.view.DeleteUserMembershipsByAggregateID(event.AggregateID, event.Sequence)
+	case proj_es_model.ProjectGrantRemoved:
+		return m.view.DeleteUserMembershipsByAggregateIDAndObjectID(event.AggregateID, member.ObjectID, event.Sequence)
 	default:
 		return m.view.ProcessedUserMembershipSequence(event.Sequence)
 	}
