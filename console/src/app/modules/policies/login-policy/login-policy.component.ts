@@ -33,7 +33,7 @@ export class LoginPolicyComponent implements OnDestroy {
 
     private sub: Subscription = new Subscription();
     public service!: ManagementService | AdminService;
-    PolicyComponentServiceType: any = PolicyComponentServiceType;
+    public PolicyComponentServiceType: any = PolicyComponentServiceType;
     public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
     public idps: MgmtIdpProviderView.AsObject[] | AdminIdpProviderView.AsObject[] = [];
     constructor(
@@ -43,7 +43,6 @@ export class LoginPolicyComponent implements OnDestroy {
         private injector: Injector,
     ) {
         this.sub = this.route.data.pipe(switchMap(data => {
-            console.log(data.serviceType);
             this.serviceType = data.serviceType;
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
@@ -56,15 +55,18 @@ export class LoginPolicyComponent implements OnDestroy {
 
             return this.route.params;
         })).subscribe(() => {
-            this.getData().then(data => {
-                if (data) {
-                    this.loginData = data.toObject();
-                }
-            });
-            this.getIdps().then(idps => {
-                console.log(idps);
-                this.idps = idps;
-            });
+            this.fetchData();
+        });
+    }
+
+    private fetchData(): void {
+        this.getData().then(data => {
+            if (data) {
+                this.loginData = data.toObject();
+            }
+        });
+        this.getIdps().then(idps => {
+            this.idps = idps;
         });
     }
 
@@ -122,6 +124,9 @@ export class LoginPolicyComponent implements OnDestroy {
     public savePolicy(): void {
         this.updateData().then(() => {
             this.toast.showInfo('ORG.POLICY.LOGIN_POLICY.SAVED', true);
+            setTimeout(() => {
+                this.fetchData();
+            }, 2000);
         }).catch(error => {
             this.toast.showError(error);
         });
@@ -132,8 +137,8 @@ export class LoginPolicyComponent implements OnDestroy {
             (this.service as ManagementService).RemoveLoginPolicy().then(() => {
                 this.toast.showInfo('ORG.POLICY.TOAST.RESETSUCCESS', true);
                 setTimeout(() => {
-                    this.getData();
-                }, 1000);
+                    this.fetchData();
+                }, 2000);
             }).catch(error => {
                 this.toast.showError(error);
             });
@@ -151,7 +156,9 @@ export class LoginPolicyComponent implements OnDestroy {
         dialogRef.afterClosed().subscribe(resp => {
             if (resp && resp.idp && resp.type) {
                 this.addIdp(resp.idp, resp.type).then(() => {
-                    this.getData();
+                    setTimeout(() => {
+                        this.fetchData();
+                    }, 2000);
                 });
             }
         });

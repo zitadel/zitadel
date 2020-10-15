@@ -20,7 +20,7 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
 export class OrgIamPolicyComponent implements OnDestroy {
     @Input() service!: AdminService;
     private managementService!: ManagementService;
-    public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+    public serviceType!: PolicyComponentServiceType;
 
     public iamData!: AdminOrgIamPolicyView.AsObject | MgmtOrgIamPolicyView.AsObject;
 
@@ -47,16 +47,20 @@ export class OrgIamPolicyComponent implements OnDestroy {
             }
             return this.route.params;
         })).subscribe(_ => {
-            this.getData().then(data => {
-                if (data) {
-                    this.iamData = data.toObject();
-                }
-            });
+            this.fetchData();
         });
     }
 
     public ngOnDestroy(): void {
         this.sub.unsubscribe();
+    }
+
+    public fetchData(): void {
+        this.getData().then(data => {
+            if (data) {
+                this.iamData = data.toObject();
+            }
+        });
     }
 
     private async getData(): Promise<AdminOrgIamPolicyView | MgmtOrgIamPolicyView | undefined> {
@@ -114,7 +118,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
             this.adminService.RemoveOrgIamPolicy(this.org.id).then(() => {
                 this.toast.showInfo('ORG.POLICY.TOAST.RESETSUCCESS', true);
                 setTimeout(() => {
-                    this.getData();
+                    this.fetchData();
                 }, 1000);
             }).catch(error => {
                 this.toast.showError(error);
