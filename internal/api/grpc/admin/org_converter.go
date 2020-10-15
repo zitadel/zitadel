@@ -2,6 +2,7 @@ package admin
 
 import (
 	"github.com/caos/logging"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/golang/protobuf/ptypes"
 
 	admin_model "github.com/caos/zitadel/internal/admin/model"
@@ -196,7 +197,7 @@ func orgQueryMethodToModel(method admin.OrgSearchMethod) model.SearchMethod {
 	}
 }
 
-func orgIamPolicyFromModel(policy *org_model.OrgIAMPolicy) *admin.OrgIamPolicy {
+func orgIAMPolicyFromModel(policy *iam_model.OrgIAMPolicy) *admin.OrgIamPolicy {
 	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
 	logging.Log("GRPC-ush36").OnError(err).Debug("unable to get timestamp from time")
 
@@ -205,20 +206,32 @@ func orgIamPolicyFromModel(policy *org_model.OrgIAMPolicy) *admin.OrgIamPolicy {
 
 	return &admin.OrgIamPolicy{
 		OrgId:                 policy.AggregateID,
-		Description:           policy.Description,
 		UserLoginMustBeDomain: policy.UserLoginMustBeDomain,
-		Default:               policy.Default,
 		CreationDate:          creationDate,
 		ChangeDate:            changeDate,
 	}
 }
 
-func orgIamPolicyRequestToModel(policy *admin.OrgIamPolicyRequest) *org_model.OrgIAMPolicy {
-	return &org_model.OrgIAMPolicy{
+func orgIAMPolicyViewFromModel(policy *iam_model.OrgIAMPolicyView) *admin.OrgIamPolicyView {
+	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
+	logging.Log("GRPC-ush36").OnError(err).Debug("unable to get timestamp from time")
+
+	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
+	logging.Log("GRPC-Ps9fW").OnError(err).Debug("unable to get timestamp from time")
+
+	return &admin.OrgIamPolicyView{
+		OrgId:                 policy.AggregateID,
+		UserLoginMustBeDomain: policy.UserLoginMustBeDomain,
+		CreationDate:          creationDate,
+		ChangeDate:            changeDate,
+	}
+}
+
+func orgIAMPolicyRequestToModel(policy *admin.OrgIamPolicyRequest) *iam_model.OrgIAMPolicy {
+	return &iam_model.OrgIAMPolicy{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: policy.OrgId,
 		},
-		Description:           policy.Description,
 		UserLoginMustBeDomain: policy.UserLoginMustBeDomain,
 	}
 }

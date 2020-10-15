@@ -89,6 +89,22 @@ Errors:
       AlreadyExists: Login Policy existiert bereits
       IdpProviderAlreadyExisting: Idp Provider existiert bereits
       IdpProviderNotExisting: Idp Provider existiert nicht
+    PasswordComplexity:
+      Empty: Passwort Komplexitäts Policy ist leer
+      NotExisting: Passwort Komplexitäts Policy existiert nicht
+      AlreadyExists: Passwort Komplexitäts Policy existiert bereits
+    PasswordLockout:
+      Empty: Passwort Lockout Policy ist leer
+      NotExisting: Passwort Lockout Policy existiert nicht
+      AlreadyExists: Passwort Lockout Policy existiert bereits
+    PasswordAge:
+      Empty: Passwort Age Policy ist leer
+      NotExisting: Passwort Age Policy existiert nicht
+      AlreadyExists: Passwort Age Policy existiert bereits
+    OrgIAM:
+      Empty: Org IAM Policy ist leer
+      NotExisting: Org IAM Policy existiert nicht
+      AlreadyExists: Org IAM Policy existiert bereits
   Project:
     ProjectIDMissing: Project Id fehlt
     AlreadyExists: Project existiert bereits auf der Organisation
@@ -141,6 +157,22 @@ Errors:
       AlreadyExists: Default Login Policy existiert bereits
       IdpProviderAlreadyExisting: Idp Provider existiert bereits
       IdpProviderNotExisting: Idp Provider existiert nicht
+    PasswordComplexityPolicy:
+      NotExisting: Default Password Complexity Policy existiert nicht
+      AlreadyExists: Default Password Complexity Policy existiert bereits
+      Empty: Default Password Complexity Policy leer
+    PasswordAgePolicy:
+      NotExisting: Default Password Age Policy existiert nicht
+      AlreadyExists: Default Password Age Policy existiert bereits
+      Empty: Default Password Age Policy leer
+    PasswordLockoutPolicy:
+      NotExisting: Default Password Lockout Policy existiert nicht
+      AlreadyExists: Default Password Lockout Policy existiert bereits
+      Empty: Default Password Lockout Policy leer
+    OrgIAM:
+      NotExisting: Default Org IAM Policy existiert nicht
+      AlreadyExists: Default Org IAM Policy existiert bereits
+      Empty: Default Org IAM Policy leer
   Policy:
     AlreadyExists: Policy existiert bereits
   UserGrant:

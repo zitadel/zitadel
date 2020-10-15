@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
-	policy_model "github.com/caos/zitadel/internal/policy/model"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -23,7 +23,7 @@ var (
 	hasSymbol          = regexp.MustCompile(SymbolRegex).MatchString
 )
 
-func (l *Login) getPasswordComplexityPolicy(r *http.Request, orgID string) (*policy_model.PasswordComplexityPolicy, string, error) {
+func (l *Login) getPasswordComplexityPolicy(r *http.Request, orgID string) (*iam_model.PasswordComplexityPolicyView, string, error) {
 	policy, err := l.authRepo.GetMyPasswordComplexityPolicy(setContext(r.Context(), orgID))
 	if err != nil {
 		return nil, err.Error(), err
@@ -32,7 +32,7 @@ func (l *Login) getPasswordComplexityPolicy(r *http.Request, orgID string) (*pol
 	return policy, description, nil
 }
 
-func (l *Login) getPasswordComplexityPolicyByUserID(r *http.Request, userID string) (*policy_model.PasswordComplexityPolicy, string, error) {
+func (l *Login) getPasswordComplexityPolicyByUserID(r *http.Request, userID string) (*iam_model.PasswordComplexityPolicyView, string, error) {
 	user, err := l.authRepo.UserByID(r.Context(), userID)
 	if err != nil {
 		return nil, "", nil
@@ -45,7 +45,7 @@ func (l *Login) getPasswordComplexityPolicyByUserID(r *http.Request, userID stri
 	return policy, description, nil
 }
 
-func (l *Login) generatePolicyDescription(r *http.Request, policy *policy_model.PasswordComplexityPolicy) (string, error) {
+func (l *Login) generatePolicyDescription(r *http.Request, policy *iam_model.PasswordComplexityPolicyView) (string, error) {
 	description := "<ul id=\"passwordcomplexity\">"
 	minLength := l.renderer.LocalizeFromRequest(r, "Password.MinLength", nil)
 	description += "<li id=\"minlength\" class=\"invalid\"><i class=\"material-icons\">clear</i>" + minLength + " " + strconv.Itoa(int(policy.MinLength)) + "</li>"

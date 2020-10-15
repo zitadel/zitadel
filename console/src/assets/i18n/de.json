@@ -61,6 +61,7 @@
         "REFRESH":"Aktualisieren",
         "LOGIN":"Einloggen",
         "EDIT":"Bearbeiten",
+        "PIN":"Anpinnen",
         "CONFIGURE":"Konfigurieren"
     },
     "ERRORS": {
@@ -139,7 +140,11 @@
           "IDPCONFIGID": "Idp Konfig ID",
           "IDPNAME": "Idp Name",
           "USERDISPLAYNAME":  "Externer Name",
-          "EXTERNALUSERID": "Externe Benutzer ID"
+          "EXTERNALUSERID": "Externe Benutzer ID",
+          "DIALOG": {
+              "REMOVE_TITLE":"Idp entfernen",
+              "REMOVE_DESCRIPTION":"Sie sind im Begriff einen Identity Provider zu entfernen. Wollen Sie dies wirklich tun?"
+          }
         },
         "CREATE": {
             "TITLE": "Neuen Benutzer erstellen",
@@ -443,9 +448,11 @@
                 "TITLE":"Login Richtlinien",
                 "DESCRIPTION":"Definiere die Loginmethoden für Benutzer",
                 "TITLECREATE":"Definiere die Loginmethoden für Benutzer",
-                "DESCRIPTIONCREATEADMIN":"Nutzer können Sich mit den verfügbaren Idps authentifizieren.",
-                "DESCRIPTIONCREATEMGMT":"Nutzer können Sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann von System-, sowie von selbsterstellten Providern Ihrer Organisation gewählt werden."
+                "DESCRIPTIONCREATEADMIN":"Nutzer können sich mit den verfügbaren Idps authentifizieren.",
+                "DESCRIPTIONCREATEMGMT":"Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
+                "SAVED":"Erfolgreich gespeichert."
             },
+            "DEFAULTLABEL":"Die aktuelle Richtlinie entspricht der IAM-Standard Einstellung.",
             "BTN_INSTALL":"Installieren",
             "BTN_EDIT":"Modifizieren",
             "DATA": {
@@ -464,7 +471,11 @@
                 "ALLOWEXTERNALIDP":"Externer IDP erlaubt",
                 "ALLOWREGISTER":"Registrieren erlaubt"
             },
-            "DELETE":"Richtlinie entfernen/zurücksetzen"
+            "RESET":"Richtlinie zurücksetzen",
+            "TOAST":{
+                "SET":"Richtline erfolgreich gesetzt!",
+                "RESETSUCCESS":"Richtline zurückgesetzt!"
+            }
         },
         "TOAST": {
             "DEACTIVATED":"Organisation deaktiviert.",

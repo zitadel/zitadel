@@ -9,7 +9,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	policy_model "github.com/caos/zitadel/internal/policy/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 )
@@ -25,7 +24,7 @@ type Step1 struct {
 	createdUsers       map[string]*usr_model.User
 	createdOrgs        map[string]*org_model.Org
 	createdProjects    map[string]*proj_model.Project
-	pwComplexityPolicy *policy_model.PasswordComplexityPolicy
+	pwComplexityPolicy *iam_model.PasswordComplexityPolicyView
 }
 
 func (s *Step1) isNil() bool {
@@ -43,51 +42,46 @@ func (step *Step1) init(setup *Setup) {
 	step.createdProjects = make(map[string]*proj_model.Project)
 }
 
-func (step *Step1) execute(ctx context.Context) (err error) {
-	err = step.loginPolicy(ctx, step.DefaultLoginPolicy)
+func (step *Step1) execute(ctx context.Context) (*iam_model.IAM, error) {
+	err := step.loginPolicy(ctx, step.DefaultLoginPolicy)
 	if err != nil {
 		logging.Log("SETUP-Hdu8S").WithError(err).Error("unable to create login policy")
-		return err
+		return nil, err
 	}
 
-	pwComplexityPolicy, err := step.setup.PolicyEvents.GetPasswordComplexityPolicy(ctx, policy_model.DefaultPolicy)
-	if err != nil {
-		logging.Log("SETUP-9osWF").WithError(err).Error("unable to read complexity policy")
-		return err
-	}
-	step.pwComplexityPolicy = pwComplexityPolicy
+	step.pwComplexityPolicy = new(iam_model.PasswordComplexityPolicyView)
 
 	err = step.orgs(ctx, step.Orgs)
 	if err != nil {
 		logging.Log("SETUP-p4oWq").WithError(err).Error("unable to set up orgs")
-		return err
+		return nil, err
 	}
 
 	ctx = setSetUpContextData(ctx, step.setup.iamID)
 	err = step.iamOwners(ctx, step.Owners)
 	if err != nil {
 		logging.Log("SETUP-WHr01").WithError(err).Error("unable to set up iam owners")
-		return err
+		return nil, err
 	}
 
 	err = step.setGlobalOrg(ctx, step.GlobalOrg)
 	if err != nil {
 		logging.Log("SETUP-0874m").WithError(err).Error("unable to set global org")
-		return err
+		return nil, err
 	}
 
 	err = step.setIamProject(ctx, step.IAMProject)
 	if err != nil {
 		logging.Log("SETUP-kaWjq").WithError(err).Error("unable to set zitadel project")
-		return err
+		return nil, err
 	}
 
-	_, err = step.setup.IamEvents.SetupDone(ctx, step.setup.iamID, step.step())
+	iam, err := step.setup.IamEvents.SetupDone(ctx, step.setup.iamID, step.step())
 	if err != nil {
 		logging.Log("SETUP-de342").WithField("step", step.step()).WithError(err).Error("unable to finish setup")
-		return err
+		return nil, err
 	}
-	return nil
+	return iam, nil
 }
 
 func (step *Step1) loginPolicy(ctx context.Context, policy LoginPolicy) error {
@@ -114,7 +108,7 @@ func (step *Step1) orgs(ctx context.Context, orgs []Org) error {
 		}
 		step.createdOrgs[iamOrg.Name] = org
 
-		var policy *org_model.OrgIAMPolicy
+		var policy *iam_model.OrgIAMPolicyView
 		if iamOrg.OrgIamPolicy {
 			policy, err = step.iamorgpolicy(ctx, org)
 			if err != nil {
@@ -122,10 +116,8 @@ func (step *Step1) orgs(ctx context.Context, orgs []Org) error {
 				return err
 			}
 		} else {
-			policy, err = step.setup.OrgEvents.GetOrgIAMPolicy(ctx, policy_model.DefaultPolicy)
-			if err != nil {
-				logging.LogWithFields("SETUP-IS8wS", "Org IAM Policy", iamOrg.Name).WithError(err).Error("unable to get default iam org policy")
-				return err
+			policy = &iam_model.OrgIAMPolicyView{
+				UserLoginMustBeDomain: true,
 			}
 		}
 
@@ -161,13 +153,20 @@ func (step *Step1) org(ctx context.Context, org Org) (*org_model.Org, error) {
 	return step.setup.OrgEvents.CreateOrg(ctx, createOrg, nil)
 }
 
-func (step *Step1) iamorgpolicy(ctx context.Context, org *org_model.Org) (*org_model.OrgIAMPolicy, error) {
+func (step *Step1) iamorgpolicy(ctx context.Context, org *org_model.Org) (*iam_model.OrgIAMPolicyView, error) {
 	ctx = setSetUpContextData(ctx, org.AggregateID)
-	policy := &org_model.OrgIAMPolicy{
+	policy := &iam_model.OrgIAMPolicy{
 		ObjectRoot:            models.ObjectRoot{AggregateID: org.AggregateID},
 		UserLoginMustBeDomain: false,
 	}
-	return step.setup.OrgEvents.AddOrgIAMPolicy(ctx, policy)
+	createdpolicy, err := step.setup.OrgEvents.AddOrgIAMPolicy(ctx, policy)
+	if err != nil {
+		return nil, err
+	}
+	return &iam_model.OrgIAMPolicyView{
+		AggregateID:           org.AggregateID,
+		UserLoginMustBeDomain: createdpolicy.UserLoginMustBeDomain,
+	}, nil
 }
 
 func (step *Step1) iamOwners(ctx context.Context, owners []string) error {
@@ -220,7 +219,7 @@ func (step *Step1) setIamProject(ctx context.Context, iamProjectName string) err
 	return nil
 }
 
-func (step *Step1) users(ctx context.Context, users []User, orgPolicy *org_model.OrgIAMPolicy) error {
+func (step *Step1) users(ctx context.Context, users []User, orgPolicy *iam_model.OrgIAMPolicyView) error {
 	for _, user := range users {
 		created, err := step.user(ctx, user, orgPolicy)
 		if err != nil {
@@ -232,7 +231,7 @@ func (step *Step1) users(ctx context.Context, users []User, orgPolicy *org_model
 	return nil
 }
 
-func (step *Step1) user(ctx context.Context, user User, orgPolicy *org_model.OrgIAMPolicy) (*usr_model.User, error) {
+func (step *Step1) user(ctx context.Context, user User, orgPolicy *iam_model.OrgIAMPolicyView) (*usr_model.User, error) {
 	createUser := &usr_model.User{
 		UserName: user.UserName,
 		Human: &usr_model.Human{

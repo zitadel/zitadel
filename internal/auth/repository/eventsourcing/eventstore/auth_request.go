@@ -7,7 +7,6 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	"time"
 
 	"github.com/caos/logging"
@@ -30,7 +29,6 @@ import (
 type AuthRequestRepo struct {
 	UserEvents   *user_event.UserEventstore
 	OrgEvents    *org_event.OrgEventstore
-	PolicyEvents *policy_event.PolicyEventstore
 	AuthRequests cache.AuthRequestCache
 	View         *view.View
 
@@ -264,15 +262,23 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner
 	}
-	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
+	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(policyResourceOwner)
+	if errors.IsNotFound(err) {
+		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.IAMID)
+	}
 	if err != nil {
 		return err
 	}
-	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, policyResourceOwner)
+	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(pwPolicy)
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(policyResourceOwner)
+	if errors.IsNotFound(err) {
+		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.IAMID)
+	}
 	if err != nil {
 		return err
 	}
-	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, externalIDP, pwPolicy, orgPolicy, resourceOwner)
+	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
+	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, externalIDP, pwPolicyView, orgPolicyView, resourceOwner)
 	if err != nil {
 		return err
 	}

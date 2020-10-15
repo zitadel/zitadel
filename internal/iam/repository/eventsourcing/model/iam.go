@@ -16,21 +16,24 @@ const (
 type Step int
 
 const (
-	Step1 = Step(model.Step1)
-	//TODO: label policy
-	// Step2     = Step(model.Step2)
+	Step1     = Step(model.Step1)
+	Step2     = Step(model.Step2)
 	StepCount = Step(model.StepCount)
 )
 
 type IAM struct {
 	es_models.ObjectRoot
-	SetUpStarted       Step         `json:"-"`
-	SetUpDone          Step         `json:"-"`
-	GlobalOrgID        string       `json:"globalOrgId,omitempty"`
-	IAMProjectID       string       `json:"iamProjectId,omitempty"`
-	Members            []*IAMMember `json:"-"`
-	IDPs               []*IDPConfig `json:"-"`
-	DefaultLoginPolicy *LoginPolicy `json:"-"`
+	SetUpStarted                    Step                      `json:"-"`
+	SetUpDone                       Step                      `json:"-"`
+	GlobalOrgID                     string                    `json:"globalOrgId,omitempty"`
+	IAMProjectID                    string                    `json:"iamProjectId,omitempty"`
+	Members                         []*IAMMember              `json:"-"`
+	IDPs                            []*IDPConfig              `json:"-"`
+	DefaultLoginPolicy              *LoginPolicy              `json:"-"`
+	DefaultOrgIAMPolicy             *OrgIAMPolicy             `json:"-"`
+	DefaultPasswordComplexityPolicy *PasswordComplexityPolicy `json:"-"`
+	DefaultPasswordAgePolicy        *PasswordAgePolicy        `json:"-"`
+	DefaultPasswordLockoutPolicy    *PasswordLockoutPolicy    `json:"-"`
 }
 
 func IAMFromModel(iam *model.IAM) *IAM {
@@ -47,6 +50,18 @@ func IAMFromModel(iam *model.IAM) *IAM {
 	}
 	if iam.DefaultLoginPolicy != nil {
 		converted.DefaultLoginPolicy = LoginPolicyFromModel(iam.DefaultLoginPolicy)
+	}
+	if iam.DefaultPasswordComplexityPolicy != nil {
+		converted.DefaultPasswordComplexityPolicy = PasswordComplexityPolicyFromModel(iam.DefaultPasswordComplexityPolicy)
+	}
+	if iam.DefaultPasswordAgePolicy != nil {
+		converted.DefaultPasswordAgePolicy = PasswordAgePolicyFromModel(iam.DefaultPasswordAgePolicy)
+	}
+	if iam.DefaultPasswordLockoutPolicy != nil {
+		converted.DefaultPasswordLockoutPolicy = PasswordLockoutPolicyFromModel(iam.DefaultPasswordLockoutPolicy)
+	}
+	if iam.DefaultOrgIAMPolicy != nil {
+		converted.DefaultOrgIAMPolicy = OrgIAMPolicyFromModel(iam.DefaultOrgIAMPolicy)
 	}
 	return converted
 }
@@ -65,6 +80,18 @@ func IAMToModel(iam *IAM) *model.IAM {
 	}
 	if iam.DefaultLoginPolicy != nil {
 		converted.DefaultLoginPolicy = LoginPolicyToModel(iam.DefaultLoginPolicy)
+	}
+	if iam.DefaultPasswordComplexityPolicy != nil {
+		converted.DefaultPasswordComplexityPolicy = PasswordComplexityPolicyToModel(iam.DefaultPasswordComplexityPolicy)
+	}
+	if iam.DefaultPasswordAgePolicy != nil {
+		converted.DefaultPasswordAgePolicy = PasswordAgePolicyToModel(iam.DefaultPasswordAgePolicy)
+	}
+	if iam.DefaultPasswordLockoutPolicy != nil {
+		converted.DefaultPasswordLockoutPolicy = PasswordLockoutPolicyToModel(iam.DefaultPasswordLockoutPolicy)
+	}
+	if iam.DefaultOrgIAMPolicy != nil {
+		converted.DefaultOrgIAMPolicy = OrgIAMPolicyToModel(iam.DefaultOrgIAMPolicy)
 	}
 	return converted
 }
@@ -134,6 +161,22 @@ func (i *IAM) AppendEvent(event *es_models.Event) (err error) {
 		return i.appendAddIDPProviderToLoginPolicyEvent(event)
 	case LoginPolicyIDPProviderRemoved:
 		return i.appendRemoveIDPProviderFromLoginPolicyEvent(event)
+	case PasswordComplexityPolicyAdded:
+		return i.appendAddPasswordComplexityPolicyEvent(event)
+	case PasswordComplexityPolicyChanged:
+		return i.appendChangePasswordComplexityPolicyEvent(event)
+	case PasswordAgePolicyAdded:
+		return i.appendAddPasswordAgePolicyEvent(event)
+	case PasswordAgePolicyChanged:
+		return i.appendChangePasswordAgePolicyEvent(event)
+	case PasswordLockoutPolicyAdded:
+		return i.appendAddPasswordLockoutPolicyEvent(event)
+	case PasswordLockoutPolicyChanged:
+		return i.appendChangePasswordLockoutPolicyEvent(event)
+	case OrgIAMPolicyAdded:
+		return i.appendAddOrgIAMPolicyEvent(event)
+	case OrgIAMPolicyChanged:
+		return i.appendChangeOrgIAMPolicyEvent(event)
 	}
 
 	return err

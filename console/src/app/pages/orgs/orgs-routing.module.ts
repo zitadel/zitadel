@@ -43,23 +43,35 @@ const routes: Routes = [
         children: [
             {
                 path: PolicyComponentType.AGE,
+                data: {
+                    serviceType: PolicyComponentServiceType.MGMT,
+                },
                 loadChildren: () => import('src/app/modules/policies/password-age-policy/password-age-policy.module')
                     .then(m => m.PasswordAgePolicyModule),
             },
             {
                 path: PolicyComponentType.LOCKOUT,
+                data: {
+                    serviceType: PolicyComponentServiceType.MGMT,
+                },
                 loadChildren: () => import('src/app/modules/policies/password-lockout-policy/password-lockout-policy.module')
                     .then(m => m.PasswordLockoutPolicyModule),
             },
             {
                 path: PolicyComponentType.COMPLEXITY,
+                data: {
+                    serviceType: PolicyComponentServiceType.MGMT,
+                },
                 loadChildren: () => import('src/app/modules/policies/password-complexity-policy/password-complexity-policy.module')
                     .then(m => m.PasswordComplexityPolicyModule),
             },
             {
                 path: PolicyComponentType.IAM,
-                loadChildren: () => import('src/app/modules/policies/password-iam-policy/password-iam-policy.module')
-                    .then(m => m.PasswordIamPolicyModule),
+                data: {
+                    serviceType: PolicyComponentServiceType.MGMT,
+                },
+                loadChildren: () => import('src/app/modules/policies/org-iam-policy/org-iam-policy.module')
+                    .then(m => m.OrgIamPolicyModule),
             },
             {
                 path: PolicyComponentType.LOGIN,

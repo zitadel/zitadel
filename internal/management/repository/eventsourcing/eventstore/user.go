@@ -5,6 +5,7 @@ import (
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 
 	"github.com/caos/logging"
@@ -15,7 +16,6 @@ import (
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	global_model "github.com/caos/zitadel/internal/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
@@ -26,7 +26,6 @@ type UserRepo struct {
 	es_int.Eventstore
 	SearchLimit     uint64
 	UserEvents      *usr_event.UserEventstore
-	PolicyEvents    *policy_event.PolicyEventstore
 	OrgEvents       *org_event.OrgEventstore
 	UserGrantEvents *usr_grant_event.UserGrantEventStore
 	View            *view.View
@@ -62,15 +61,23 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserV
 }
 
 func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
-	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if err != nil && caos_errs.IsNotFound(err) {
+		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+	}
 	if err != nil {
 		return nil, err
 	}
-	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(pwPolicy)
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if err != nil && errors.IsNotFound(err) {
+		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+	}
 	if err != nil {
 		return nil, err
 	}
-	return repo.UserEvents.CreateUser(ctx, user, pwPolicy, orgPolicy)
+	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
+	return repo.UserEvents.CreateUser(ctx, user, pwPolicyView, orgPolicyView)
 }
 
 func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*usr_model.User, error) {
@@ -78,15 +85,23 @@ func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, re
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner
 	}
-	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
+	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(policyResourceOwner)
+	if err != nil && caos_errs.IsNotFound(err) {
+		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+	}
 	if err != nil {
 		return nil, err
 	}
-	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(pwPolicy)
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if err != nil && errors.IsNotFound(err) {
+		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+	}
 	if err != nil {
 		return nil, err
 	}
-	return repo.UserEvents.RegisterUser(ctx, user, pwPolicy, orgPolicy, resourceOwner)
+	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
+	return repo.UserEvents.RegisterUser(ctx, user, pwPolicyView, orgPolicyView, resourceOwner)
 }
 
 func (repo *UserRepo) DeactivateUser(ctx context.Context, id string) (*usr_model.User, error) {
@@ -107,11 +122,15 @@ func (repo *UserRepo) UnlockUser(ctx context.Context, id string) (*usr_model.Use
 
 func (repo *UserRepo) RemoveUser(ctx context.Context, id string) error {
 	aggregates := make([]*es_models.Aggregate, 0)
-	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if err != nil && errors.IsNotFound(err) {
+		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+	}
 	if err != nil {
 		return err
 	}
-	user, agg, err := repo.UserEvents.PrepareRemoveUser(ctx, id, orgPolicy)
+	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
+	user, agg, err := repo.UserEvents.PrepareRemoveUser(ctx, id, orgPolicyView)
 	if err != nil {
 		return err
 	}
@@ -198,11 +217,15 @@ func (repo *UserRepo) UserMfas(ctx context.Context, userID string) ([]*usr_model
 }
 
 func (repo *UserRepo) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
-	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if err != nil && caos_errs.IsNotFound(err) {
+		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+	}
 	if err != nil {
 		return nil, err
 	}
-	return repo.UserEvents.SetOneTimePassword(ctx, policy, password)
+	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(policy)
+	return repo.UserEvents.SetOneTimePassword(ctx, pwPolicyView, password)
 }
 
 func (repo *UserRepo) RequestSetPassword(ctx context.Context, id string, notifyType usr_model.NotificationType) error {
@@ -291,11 +314,15 @@ func (repo *UserRepo) ChangeProfile(ctx context.Context, profile *usr_model.Prof
 }
 
 func (repo *UserRepo) ChangeUsername(ctx context.Context, userID, userName string) error {
-	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if err != nil && errors.IsNotFound(err) {
+		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+	}
 	if err != nil {
 		return err
 	}
-	return repo.UserEvents.ChangeUsername(ctx, userID, userName, orgPolicy)
+	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
+	return repo.UserEvents.ChangeUsername(ctx, userID, userName, orgPolicyView)
 }
 
 func (repo *UserRepo) EmailByID(ctx context.Context, userID string) (*usr_model.Email, error) {

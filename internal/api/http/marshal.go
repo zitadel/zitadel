@@ -7,7 +7,11 @@ import (
 	"github.com/caos/logging"
 )
 
-func MarshalJSON(w http.ResponseWriter, i interface{}) {
+func MarshalJSON(w http.ResponseWriter, i interface{}, err error, statusCode int) {
+	if err != nil {
+		http.Error(w, err.Error(), statusCode)
+		return
+	}
 	b, err := json.Marshal(i)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
