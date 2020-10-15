@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
@@ -231,7 +232,6 @@ func OIDCIDPConfigChangedAggregate(aggCreator *es_models.AggregateCreator, exist
 		return agg.AppendEvent(model.OIDCIDPConfigChanged, changes)
 	}
 }
-
 func LabelPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.LabelPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if policy == nil {
@@ -280,24 +280,6 @@ func LabelPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, existin
 		return agg.AppendEvent(model.LabelPolicyChanged, changes)
 	}
 }
-
-func LoginPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.LoginPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if policy == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Smla8", "Errors.Internal")
-		}
-		agg, err := IAMAggregate(ctx, aggCreator, existing)
-		if err != nil {
-			return nil, err
-		}
-		validationQuery := es_models.NewSearchQuery().
-			AggregateTypeFilter(model.IAMAggregate).
-			EventTypesFilter(model.LoginPolicyAdded).
-			AggregateIDFilter(existing.AggregateID)
-
-		validation := checkExistingLoginPolicyValidation()
-		agg.SetPrecondition(validationQuery, validation)
-		return agg.AppendEvent(model.LoginPolicyAdded, policy)
 func LoginPolicyAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.LoginPolicy) (*es_models.Aggregate, error) {
 	if policy == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Smla8", "Errors.Internal")
