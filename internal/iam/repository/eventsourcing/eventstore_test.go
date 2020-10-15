@@ -1677,7 +1677,7 @@ func TestAddLabelPolicy(t *testing.T) {
 		{
 			name: "add login policy, ok",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				policy: &iam_model.LabelPolicy{
 					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1694,7 +1694,7 @@ func TestAddLabelPolicy(t *testing.T) {
 		{
 			name: "invalid policy",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				policy: &iam_model.LabelPolicy{
 					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
@@ -1708,7 +1708,7 @@ func TestAddLabelPolicy(t *testing.T) {
 		{
 			name: "existing iam not found",
 			args: args{
-				es:  GetMockManipulateIamNotExisting(ctrl),
+				es:  GetMockManipulateIAMNotExisting(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				policy: &iam_model.LabelPolicy{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1754,7 +1754,7 @@ func TestChangeLabelPolicy(t *testing.T) {
 		{
 			name: "add login policy, ok",
 			args: args{
-				es:  GetMockManipulateIamWithLabelPolicy(ctrl),
+				es:  GetMockManipulateIAMWithLabelPolicy(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				policy: &iam_model.LabelPolicy{
 					ObjectRoot:     es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1773,7 +1773,7 @@ func TestChangeLabelPolicy(t *testing.T) {
 		{
 			name: "invalid policy",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				policy: &iam_model.LabelPolicy{
 					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
@@ -1787,7 +1787,7 @@ func TestChangeLabelPolicy(t *testing.T) {
 		{
 			name: "existing iam not found",
 			args: args{
-				es:  GetMockManipulateIamNotExisting(ctrl),
+				es:  GetMockManipulateIAMNotExisting(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				policy: &iam_model.LabelPolicy{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},

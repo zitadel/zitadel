@@ -184,7 +184,7 @@ func GetMockManipulateIAMNotExisting(ctrl *gomock.Controller) *IAMEventstore {
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
-func GetMockManipulateIamWithLabelPolicy(ctrl *gomock.Controller) *IAMEventstore {
+func GetMockManipulateIAMWithLabelPolicy(ctrl *gomock.Controller) *IAMEventstore {
 	policyData, _ := json.Marshal(model.LabelPolicy{PrimaryColor: "000001", SecondaryColor: "FFFFF1"})
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.IAMSetupStarted},
