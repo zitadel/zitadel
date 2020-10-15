@@ -2,6 +2,8 @@
     [title]="'ORG.POLICY.LOGIN_POLICY.TITLECREATE' | translate"
     [description]="(serviceType==PolicyComponentServiceType.MGMT ? 'ORG.POLICY.LOGIN_POLICY.DESCRIPTIONCREATEMGMT' : PolicyComponentServiceType.ADMIN ? 'ORG.POLICY.LOGIN_POLICY.DESCRIPTIONCREATEADMIN' : '') | translate">
 
+    <p class="default" *ngIf="isDefault"> {{'ORG.POLICY.DEFAULTLABEL' | translate}}</p>
+
     <ng-template appHasRole [appHasRole]="['policy.delete']">
         <button *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
             matTooltip="{{'ORG.POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()" mat-stroked-button>
