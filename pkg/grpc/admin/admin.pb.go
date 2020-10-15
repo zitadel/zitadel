@@ -2070,7 +2070,7 @@ func (x *OrgIamPolicy) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use OrgIAMPolicy.ProtoReflect.Descriptor instead.
+// Deprecated: Use OrgIamPolicy.ProtoReflect.Descriptor instead.
 func (*OrgIamPolicy) Descriptor() ([]byte, []int) {
 	return file_admin_proto_rawDescGZIP(), []int{17}
 }
@@ -6720,7 +6720,7 @@ var file_admin_proto_goTypes = []interface{}{
 	(*MachineResponse)(nil),                        // 26: caos.zitadel.admin.api.v1.MachineResponse
 	(*MachineKeyResponse)(nil),                     // 27: caos.zitadel.admin.api.v1.MachineKeyResponse
 	(*CreateOrgRequest)(nil),                       // 28: caos.zitadel.admin.api.v1.CreateOrgRequest
-	(*OrgIamPolicy)(nil),                           // 29: caos.zitadel.admin.api.v1.OrgIAMPolicy
+	(*OrgIamPolicy)(nil),                           // 29: caos.zitadel.admin.api.v1.OrgIamPolicy
 	(*OrgIamPolicyView)(nil),                       // 30: caos.zitadel.admin.api.v1.OrgIamPolicyView
 	(*OrgIamPolicyRequest)(nil),                    // 31: caos.zitadel.admin.api.v1.OrgIamPolicyRequest
 	(*OrgIamPolicyID)(nil),                         // 32: caos.zitadel.admin.api.v1.OrgIamPolicyID
@@ -6797,8 +6797,8 @@ var file_admin_proto_depIdxs = []int32{
 	5,   // 23: caos.zitadel.admin.api.v1.MachineKeyResponse.type:type_name -> caos.zitadel.admin.api.v1.MachineKeyType
 	75,  // 24: caos.zitadel.admin.api.v1.MachineKeyResponse.creation_date:type_name -> google.protobuf.Timestamp
 	75,  // 25: caos.zitadel.admin.api.v1.MachineKeyResponse.expiration_date:type_name -> google.protobuf.Timestamp
-	75,  // 26: caos.zitadel.admin.api.v1.OrgIAMPolicy.creation_date:type_name -> google.protobuf.Timestamp
-	75,  // 27: caos.zitadel.admin.api.v1.OrgIAMPolicy.change_date:type_name -> google.protobuf.Timestamp
+	75,  // 26: caos.zitadel.admin.api.v1.OrgIamPolicy.creation_date:type_name -> google.protobuf.Timestamp
+	75,  // 27: caos.zitadel.admin.api.v1.OrgIamPolicy.change_date:type_name -> google.protobuf.Timestamp
 	75,  // 28: caos.zitadel.admin.api.v1.OrgIamPolicyView.creation_date:type_name -> google.protobuf.Timestamp
 	75,  // 29: caos.zitadel.admin.api.v1.OrgIamPolicyView.change_date:type_name -> google.protobuf.Timestamp
 	75,  // 30: caos.zitadel.admin.api.v1.IamMember.change_date:type_name -> google.protobuf.Timestamp
@@ -6858,12 +6858,12 @@ var file_admin_proto_depIdxs = []int32{
 	12,  // 84: caos.zitadel.admin.api.v1.AdminService.GetOrgByID:input_type -> caos.zitadel.admin.api.v1.OrgID
 	16,  // 85: caos.zitadel.admin.api.v1.AdminService.SearchOrgs:input_type -> caos.zitadel.admin.api.v1.OrgSearchRequest
 	19,  // 86: caos.zitadel.admin.api.v1.AdminService.SetUpOrg:input_type -> caos.zitadel.admin.api.v1.OrgSetUpRequest
-	76,  // 87: caos.zitadel.admin.api.v1.AdminService.GetDefaultOrgIAMPolicy:input_type -> google.protobuf.Empty
+	76,  // 87: caos.zitadel.admin.api.v1.AdminService.GetDefaultOrgIamPolicy:input_type -> google.protobuf.Empty
 	31,  // 88: caos.zitadel.admin.api.v1.AdminService.UpdateDefaultOrgIamPolicy:input_type -> caos.zitadel.admin.api.v1.OrgIamPolicyRequest
-	32,  // 89: caos.zitadel.admin.api.v1.AdminService.GetOrgIAMPolicy:input_type -> caos.zitadel.admin.api.v1.OrgIamPolicyID
-	31,  // 90: caos.zitadel.admin.api.v1.AdminService.CreateOrgIAMPolicy:input_type -> caos.zitadel.admin.api.v1.OrgIamPolicyRequest
+	32,  // 89: caos.zitadel.admin.api.v1.AdminService.GetOrgIamPolicy:input_type -> caos.zitadel.admin.api.v1.OrgIamPolicyID
+	31,  // 90: caos.zitadel.admin.api.v1.AdminService.CreateOrgIamPolicy:input_type -> caos.zitadel.admin.api.v1.OrgIamPolicyRequest
 	31,  // 91: caos.zitadel.admin.api.v1.AdminService.UpdateOrgIamPolicy:input_type -> caos.zitadel.admin.api.v1.OrgIamPolicyRequest
-	32,  // 92: caos.zitadel.admin.api.v1.AdminService.RemoveOrgIAMPolicy:input_type -> caos.zitadel.admin.api.v1.OrgIamPolicyID
+	32,  // 92: caos.zitadel.admin.api.v1.AdminService.RemoveOrgIamPolicy:input_type -> caos.zitadel.admin.api.v1.OrgIamPolicyID
 	76,  // 93: caos.zitadel.admin.api.v1.AdminService.GetIamMemberRoles:input_type -> google.protobuf.Empty
 	35,  // 94: caos.zitadel.admin.api.v1.AdminService.AddIamMember:input_type -> caos.zitadel.admin.api.v1.AddIamMemberRequest
 	36,  // 95: caos.zitadel.admin.api.v1.AdminService.ChangeIamMember:input_type -> caos.zitadel.admin.api.v1.ChangeIamMemberRequest
@@ -6899,12 +6899,12 @@ var file_admin_proto_depIdxs = []int32{
 	15,  // 125: caos.zitadel.admin.api.v1.AdminService.GetOrgByID:output_type -> caos.zitadel.admin.api.v1.Org
 	18,  // 126: caos.zitadel.admin.api.v1.AdminService.SearchOrgs:output_type -> caos.zitadel.admin.api.v1.OrgSearchResponse
 	20,  // 127: caos.zitadel.admin.api.v1.AdminService.SetUpOrg:output_type -> caos.zitadel.admin.api.v1.OrgSetUpResponse
-	30,  // 128: caos.zitadel.admin.api.v1.AdminService.GetDefaultOrgIAMPolicy:output_type -> caos.zitadel.admin.api.v1.OrgIamPolicyView
-	29,  // 129: caos.zitadel.admin.api.v1.AdminService.UpdateDefaultOrgIamPolicy:output_type -> caos.zitadel.admin.api.v1.OrgIAMPolicy
-	30,  // 130: caos.zitadel.admin.api.v1.AdminService.GetOrgIAMPolicy:output_type -> caos.zitadel.admin.api.v1.OrgIamPolicyView
-	29,  // 131: caos.zitadel.admin.api.v1.AdminService.CreateOrgIAMPolicy:output_type -> caos.zitadel.admin.api.v1.OrgIAMPolicy
-	29,  // 132: caos.zitadel.admin.api.v1.AdminService.UpdateOrgIamPolicy:output_type -> caos.zitadel.admin.api.v1.OrgIAMPolicy
-	76,  // 133: caos.zitadel.admin.api.v1.AdminService.RemoveOrgIAMPolicy:output_type -> google.protobuf.Empty
+	30,  // 128: caos.zitadel.admin.api.v1.AdminService.GetDefaultOrgIamPolicy:output_type -> caos.zitadel.admin.api.v1.OrgIamPolicyView
+	29,  // 129: caos.zitadel.admin.api.v1.AdminService.UpdateDefaultOrgIamPolicy:output_type -> caos.zitadel.admin.api.v1.OrgIamPolicy
+	30,  // 130: caos.zitadel.admin.api.v1.AdminService.GetOrgIamPolicy:output_type -> caos.zitadel.admin.api.v1.OrgIamPolicyView
+	29,  // 131: caos.zitadel.admin.api.v1.AdminService.CreateOrgIamPolicy:output_type -> caos.zitadel.admin.api.v1.OrgIamPolicy
+	29,  // 132: caos.zitadel.admin.api.v1.AdminService.UpdateOrgIamPolicy:output_type -> caos.zitadel.admin.api.v1.OrgIamPolicy
+	76,  // 133: caos.zitadel.admin.api.v1.AdminService.RemoveOrgIamPolicy:output_type -> google.protobuf.Empty
 	33,  // 134: caos.zitadel.admin.api.v1.AdminService.GetIamMemberRoles:output_type -> caos.zitadel.admin.api.v1.IamMemberRoles
 	34,  // 135: caos.zitadel.admin.api.v1.AdminService.AddIamMember:output_type -> caos.zitadel.admin.api.v1.IamMember
 	34,  // 136: caos.zitadel.admin.api.v1.AdminService.ChangeIamMember:output_type -> caos.zitadel.admin.api.v1.IamMember
@@ -7870,7 +7870,7 @@ func (c *adminServiceClient) SetUpOrg(ctx context.Context, in *OrgSetUpRequest, 
 
 func (c *adminServiceClient) GetDefaultOrgIamPolicy(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*OrgIamPolicyView, error) {
 	out := new(OrgIamPolicyView)
-	err := c.cc.Invoke(ctx, "/caos.zitadel.admin.api.v1.AdminService/GetDefaultOrgIAMPolicy", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/caos.zitadel.admin.api.v1.AdminService/GetDefaultOrgIamPolicy", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -7888,7 +7888,7 @@ func (c *adminServiceClient) UpdateDefaultOrgIamPolicy(ctx context.Context, in *
 
 func (c *adminServiceClient) GetOrgIamPolicy(ctx context.Context, in *OrgIamPolicyID, opts ...grpc.CallOption) (*OrgIamPolicyView, error) {
 	out := new(OrgIamPolicyView)
-	err := c.cc.Invoke(ctx, "/caos.zitadel.admin.api.v1.AdminService/GetOrgIAMPolicy", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/caos.zitadel.admin.api.v1.AdminService/GetOrgIamPolicy", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -7897,7 +7897,7 @@ func (c *adminServiceClient) GetOrgIamPolicy(ctx context.Context, in *OrgIamPoli
 
 func (c *adminServiceClient) CreateOrgIamPolicy(ctx context.Context, in *OrgIamPolicyRequest, opts ...grpc.CallOption) (*OrgIamPolicy, error) {
 	out := new(OrgIamPolicy)
-	err := c.cc.Invoke(ctx, "/caos.zitadel.admin.api.v1.AdminService/CreateOrgIAMPolicy", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/caos.zitadel.admin.api.v1.AdminService/CreateOrgIamPolicy", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -7915,7 +7915,7 @@ func (c *adminServiceClient) UpdateOrgIamPolicy(ctx context.Context, in *OrgIamP
 
 func (c *adminServiceClient) RemoveOrgIamPolicy(ctx context.Context, in *OrgIamPolicyID, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
-	err := c.cc.Invoke(ctx, "/caos.zitadel.admin.api.v1.AdminService/RemoveOrgIAMPolicy", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/caos.zitadel.admin.api.v1.AdminService/RemoveOrgIamPolicy", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -8249,22 +8249,22 @@ func (*UnimplementedAdminServiceServer) SetUpOrg(context.Context, *OrgSetUpReque
 	return nil, status.Errorf(codes.Unimplemented, "method SetUpOrg not implemented")
 }
 func (*UnimplementedAdminServiceServer) GetDefaultOrgIamPolicy(context.Context, *empty.Empty) (*OrgIamPolicyView, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetDefaultOrgIAMPolicy not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method GetDefaultOrgIamPolicy not implemented")
 }
 func (*UnimplementedAdminServiceServer) UpdateDefaultOrgIamPolicy(context.Context, *OrgIamPolicyRequest) (*OrgIamPolicy, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateDefaultOrgIamPolicy not implemented")
 }
 func (*UnimplementedAdminServiceServer) GetOrgIamPolicy(context.Context, *OrgIamPolicyID) (*OrgIamPolicyView, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetOrgIAMPolicy not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method GetOrgIamPolicy not implemented")
 }
 func (*UnimplementedAdminServiceServer) CreateOrgIamPolicy(context.Context, *OrgIamPolicyRequest) (*OrgIamPolicy, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateOrgIAMPolicy not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method CreateOrgIamPolicy not implemented")
 }
 func (*UnimplementedAdminServiceServer) UpdateOrgIamPolicy(context.Context, *OrgIamPolicyRequest) (*OrgIamPolicy, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateOrgIamPolicy not implemented")
 }
 func (*UnimplementedAdminServiceServer) RemoveOrgIamPolicy(context.Context, *OrgIamPolicyID) (*empty.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RemoveOrgIAMPolicy not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveOrgIamPolicy not implemented")
 }
 func (*UnimplementedAdminServiceServer) GetIamMemberRoles(context.Context, *empty.Empty) (*IamMemberRoles, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetIamMemberRoles not implemented")
@@ -8491,7 +8491,7 @@ func _AdminService_GetDefaultOrgIamPolicy_Handler(srv interface{}, ctx context.C
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/caos.zitadel.admin.api.v1.AdminService/GetDefaultOrgIAMPolicy",
+		FullMethod: "/caos.zitadel.admin.api.v1.AdminService/GetDefaultOrgIamPolicy",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AdminServiceServer).GetDefaultOrgIamPolicy(ctx, req.(*empty.Empty))
@@ -8527,7 +8527,7 @@ func _AdminService_GetOrgIamPolicy_Handler(srv interface{}, ctx context.Context,
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/caos.zitadel.admin.api.v1.AdminService/GetOrgIAMPolicy",
+		FullMethod: "/caos.zitadel.admin.api.v1.AdminService/GetOrgIamPolicy",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AdminServiceServer).GetOrgIamPolicy(ctx, req.(*OrgIamPolicyID))
@@ -8545,7 +8545,7 @@ func _AdminService_CreateOrgIamPolicy_Handler(srv interface{}, ctx context.Conte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/caos.zitadel.admin.api.v1.AdminService/CreateOrgIAMPolicy",
+		FullMethod: "/caos.zitadel.admin.api.v1.AdminService/CreateOrgIamPolicy",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AdminServiceServer).CreateOrgIamPolicy(ctx, req.(*OrgIamPolicyRequest))
@@ -8581,7 +8581,7 @@ func _AdminService_RemoveOrgIamPolicy_Handler(srv interface{}, ctx context.Conte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/caos.zitadel.admin.api.v1.AdminService/RemoveOrgIAMPolicy",
+		FullMethod: "/caos.zitadel.admin.api.v1.AdminService/RemoveOrgIamPolicy",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AdminServiceServer).RemoveOrgIamPolicy(ctx, req.(*OrgIamPolicyID))
@@ -9126,7 +9126,7 @@ var _AdminService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _AdminService_SetUpOrg_Handler,
 		},
 		{
-			MethodName: "GetDefaultOrgIAMPolicy",
+			MethodName: "GetDefaultOrgIamPolicy",
 			Handler:    _AdminService_GetDefaultOrgIamPolicy_Handler,
 		},
 		{
@@ -9134,11 +9134,11 @@ var _AdminService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _AdminService_UpdateDefaultOrgIamPolicy_Handler,
 		},
 		{
-			MethodName: "GetOrgIAMPolicy",
+			MethodName: "GetOrgIamPolicy",
 			Handler:    _AdminService_GetOrgIamPolicy_Handler,
 		},
 		{
-			MethodName: "CreateOrgIAMPolicy",
+			MethodName: "CreateOrgIamPolicy",
 			Handler:    _AdminService_CreateOrgIamPolicy_Handler,
 		},
 		{
@@ -9146,7 +9146,7 @@ var _AdminService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _AdminService_UpdateOrgIamPolicy_Handler,
 		},
 		{
-			MethodName: "RemoveOrgIAMPolicy",
+			MethodName: "RemoveOrgIamPolicy",
 			Handler:    _AdminService_RemoveOrgIamPolicy_Handler,
 		},
 		{

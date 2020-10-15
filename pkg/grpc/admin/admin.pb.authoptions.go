@@ -34,7 +34,7 @@ var AdminService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultOrgIAMPolicy": authz.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultOrgIamPolicy": authz.Option{
 		Permission: "iam.policy.read",
 		CheckParam: "",
 	},
@@ -44,12 +44,12 @@ var AdminService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.admin.api.v1.AdminService/GetOrgIAMPolicy": authz.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/GetOrgIamPolicy": authz.Option{
 		Permission: "iam.policy.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.admin.api.v1.AdminService/CreateOrgIAMPolicy": authz.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/CreateOrgIamPolicy": authz.Option{
 		Permission: "iam.policy.write",
 		CheckParam: "",
 	},
@@ -59,7 +59,7 @@ var AdminService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.admin.api.v1.AdminService/RemoveOrgIAMPolicy": authz.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/RemoveOrgIamPolicy": authz.Option{
 		Permission: "iam.policy.delete",
 		CheckParam: "",
 	},
