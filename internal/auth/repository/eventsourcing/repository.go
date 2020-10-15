@@ -135,6 +135,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 			OrgViewProvider:            view,
 			IDPProviderViewProvider:    view,
 			LoginPolicyViewProvider:    view,
+			UserGrantProvider:          view,
 			IdGenerator:                idGenerator,
 			PasswordCheckLifeTime:      systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
 			ExternalLoginCheckLifeTime: systemDefaults.VerificationLifetimes.PasswordCheck.Duration,

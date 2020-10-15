@@ -25,6 +25,7 @@ import (
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	grant_view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
 )
 
 type AuthRequestRepo struct {
@@ -39,6 +40,7 @@ type AuthRequestRepo struct {
 	OrgViewProvider         orgViewProvider
 	LoginPolicyViewProvider loginPolicyViewProvider
 	IDPProviderViewProvider idpProviderViewProvider
+	UserGrantProvider       userGrantProvider
 
 	IdGenerator id.Generator
 
@@ -75,6 +77,11 @@ type userEventProvider interface {
 type orgViewProvider interface {
 	OrgByID(string) (*org_view_model.OrgView, error)
 	OrgByPrimaryDomain(string) (*org_view_model.OrgView, error)
+}
+
+type userGrantProvider interface {
+	ApplicationByClientID(context.Context, string) (*project_view_model.ApplicationView, error)
+	UserGrantsByProjectAndUserID(string, string) ([]*grant_view_model.UserGrantView, error)
 }
 
 func (repo *AuthRequestRepo) Health(ctx context.Context) error {
@@ -547,7 +554,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 	}
 	//PLANNED: consent step
 
-	missing, err := repo.userGrantRequired(ctx, request, user)
+	missing, err := userGrantRequired(ctx, request, user, repo.UserGrantProvider)
 	if err != nil {
 		return nil, err
 	}
@@ -616,27 +623,6 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
 		return true
 	}
 	return checkVerificationTime(user.MfaInitSkipped, repo.MfaInitSkippedLifeTime)
-}
-
-func (repo *AuthRequestRepo) userGrantRequired(ctx context.Context, request *model.AuthRequest, user *user_model.UserView) (_ bool, err error) {
-	var app *project_view_model.ApplicationView
-	switch request.Request.Type() {
-	case model.AuthRequestTypeOIDC:
-		app, err = repo.View.ApplicationByClientID(ctx, request.ApplicationID)
-		if err != nil {
-			return false, err
-		}
-	default:
-		return false, errors.ThrowPreconditionFailed(nil, "EVENT-dfrw2", "Errors.AuthRequest.RequestTypeNotSupported")
-	}
-	if !app.ProjectRoleCheck {
-		return false, nil
-	}
-	grants, err := repo.View.UserGrantsByProjectAndUserID(app.ProjectID, user.ID)
-	if err != nil {
-		return false, err
-	}
-	return len(grants) == 0, nil
 }
 
 func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (*iam_model.LoginPolicyView, error) {
@@ -814,4 +800,24 @@ func linkingIDPConfigExistingInAllowedIDPs(linkingUsers []*model.ExternalUser, i
 		}
 	}
 	return true
+}
+func userGrantRequired(ctx context.Context, request *model.AuthRequest, user *user_model.UserView, userGrantProvider userGrantProvider) (_ bool, err error) {
+	var app *project_view_model.ApplicationView
+	switch request.Request.Type() {
+	case model.AuthRequestTypeOIDC:
+		app, err = userGrantProvider.ApplicationByClientID(ctx, request.ApplicationID)
+		if err != nil {
+			return false, err
+		}
+	default:
+		return false, errors.ThrowPreconditionFailed(nil, "EVENT-dfrw2", "Errors.AuthRequest.RequestTypeNotSupported")
+	}
+	if !app.ProjectRoleCheck {
+		return false, nil
+	}
+	grants, err := userGrantProvider.UserGrantsByProjectAndUserID(app.ProjectID, user.ID)
+	if err != nil {
+		return false, err
+	}
+	return len(grants) == 0, nil
 }
