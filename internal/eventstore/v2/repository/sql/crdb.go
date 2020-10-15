@@ -80,7 +80,9 @@ const (
 		"			        CASE " +
 		"			            WHEN NOT check_previous " +
 		"			                THEN max_event_seq " +
-		"			            	ELSE previous_sequence " +
+		"			            WHEN previous_sequence > 0" +
+		"			                THEN previous_sequence " +
+		"			            ELSE previous_sequence " +
 		"			        END" +
 		"			) " +
 		"		FROM input_event " +
