@@ -121,6 +121,14 @@ func projectStateFromModel(state proj_model.ProjectState) management.ProjectStat
 	}
 }
 
+func projectCreateToModel(project *management.ProjectCreateRequest) *proj_model.Project {
+	return &proj_model.Project{
+		Name:                 project.Name,
+		ProjectRoleAssertion: project.ProjectRoleAssertion,
+		ProjectRoleCheck:     project.ProjectRoleCheck,
+	}
+}
+
 func projectUpdateToModel(project *management.ProjectUpdateRequest) *proj_model.Project {
 	return &proj_model.Project{
 		ObjectRoot: models.ObjectRoot{
