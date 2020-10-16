@@ -190,7 +190,7 @@ export class LoginPolicyComponent implements OnDestroy {
                     if (index > -1) {
                         this.idps.splice(index, 1);
                     }
-                });;
+                });
                 break;
             case PolicyComponentServiceType.ADMIN:
                 (this.service as AdminService).RemoveIdpProviderFromDefaultLoginPolicy(idp.idpConfigId).then(() => {
