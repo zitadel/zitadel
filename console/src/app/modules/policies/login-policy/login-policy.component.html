@@ -4,6 +4,9 @@
 
     <p class="default" *ngIf="isDefault"> {{'ORG.POLICY.DEFAULTLABEL' | translate}}</p>
 
+    <div class="spinner-wr">
+        <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
+    </div>
     <ng-template appHasRole [appHasRole]="['policy.delete']">
         <button *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
             matTooltip="{{'ORG.POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()" mat-stroked-button>
