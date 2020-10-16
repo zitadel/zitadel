@@ -95,15 +95,6 @@
                     </mat-select>
                 </mat-form-field>
 
-                <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'APP.OIDC.AUTHMETHOD' | translate }}</mat-label>
-                    <mat-select formControlName="authMethodType">
-                        <mat-option *ngFor="let type of oidcAuthMethodType" [value]="type">
-                            {{ 'APP.OIDC.AUTHMETHOD'+type | translate }}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
-
                 <div class="divider"></div>
 
                 <p class="full-width section-title">{{'APP.OIDC.TOKENSECTIONTITLE' | translate}}</p>
