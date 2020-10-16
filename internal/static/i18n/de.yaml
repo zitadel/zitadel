@@ -201,6 +201,8 @@ EventTypes:
       check:
         succeeded: Benutzerinitialisierung erfolgreich
         failed: Benutzerinitialisierung fehlgeschlagen
+    token:
+      added: Access Token ausgestellt
     username:
       reserved: Benutzername reserviert
       released: Benutzername freigegeben
@@ -249,6 +251,9 @@ EventTypes:
         check:
           succeeded: Passwortvalidierung erfolgreich
           failed: Passwortvalidierung fehlgeschlagen
+      externallogin:
+        check:
+          succeeded: Externer login erfolgreich durchgeführt
       externalidp:
         added: Externer IDP wurde hinzugefügt
         removed: Externer IDP wurde gelöscht
@@ -372,11 +377,24 @@ EventTypes:
           changed: SAML IDP Konfiguration geändert
     policy:
       login:
-        added: Login Policy hinzugefügt
-        changed: Login Policy geändert
+        added: Login Richtlinie hinzugefügt
+        changed: Login Richtlinie geändert
         idpprovider:
-          added: Idp Provider zu Login Policy hinzugefügt
-          removed: Idp Provider aus Login Policy gelöscht
+          added: Idp Provider zu Login Richtlinie hinzugefügt
+          removed: Idp Provider aus Login Richtlinie gelöscht
+      password:
+        complexity:
+          added: Passwort Komplexitäts Richtlinie hinzugefügt
+          changed: Passwort Komplexitäts Richtlinie geändert
+          removed: Passwort Komplexitäts Richtlinie gelöscht
+        age:
+          added: Passwort Alter Richtlinie hinzugefügt
+          changed: Passwort Alter Richtlinie geändert
+          removed: Passwort Alter Richtlinie gelöscht
+        lockout:
+          added: Passwort Sperrungs Richtlinie hinzugefügt
+          changed: Passwort Sperrungs Richtlinie geändert
+          removed: Passwort Sperrungs Richtlinie gelöscht
   project:
     added: Projekt hinzugefügt
     changed: Project geändert
