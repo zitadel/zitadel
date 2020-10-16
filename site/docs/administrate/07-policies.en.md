@@ -36,6 +36,7 @@ With this policy it is possible to define what options a user sees in the login 
 - Username Password allowed
 - Self Register allowed
 - External IDP allowed
+- List of allowed external IDPs
 
 > Screenshot here
 

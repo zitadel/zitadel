@@ -10,7 +10,7 @@ Console is the ZITADEL Graphical User Interface.
 
 - profile information
 - credentials
-- identity providers
+- external logins
 
 Users (**org owners**) who manage organisations do this also with Console.
 

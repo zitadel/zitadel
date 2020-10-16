@@ -8,17 +8,19 @@ The idea of projects is to have a vessel for all components who are closely rela
 In ZITADEL all clients located in the same project share their roles, grants and authorizations.
 From a access management perspective you manage who has what role in the project and your application consume this information.
 A project belongs to exactly one organisation.
+The attribute project role assertion defines, if the roles should be integrated in the tokens without sending corresponding scope (urn:zitadel:iam:org:project:role:{rolename})
+With the project role check you can define if a user should have a requested role to be able to logon.
 
 **Clients**
 
 Clients are described here [What are clients](administrate#What_are_clients)
-Basically these are you applications who initiate the authorization flow
+Basically these are you applications who initiate the authorization flow.
 
 **Roles**
 
-Roles (or Project Roles) is a mean of managing users access rights for a certain project.
-These roles are opaque for ZITADEL and have no weight in relation to each other.
-So if a user has two roles, admin and user in a certain project, the information will be treated additive.
+[Roles (or Project Roles)](administrate#Roles) is a mean of managing users access rights for a certain project.
+These [roles](administrate#Roles)  are opaque for ZITADEL and have no weight in relation to each other.
+So if a [user](administrate#Users) has two roles, admin and user in a certain project, the information will be treated additive.
 
 **Grants**
 

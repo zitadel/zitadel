@@ -18,7 +18,7 @@ Each **role** consist of three fields.
 
 | Field        | Description                                                                  | Example                                          |
 |:-------------|:-----------------------------------------------------------------------------|--------------------------------------------------|
-| Key          | This is the **Roles** actual name                                            | User                                             |
+| Key          | This is the **Roles** actual name which can be used to verify the users roles.                                            | User                                             |
 | Display Name | A descriptive text for the purpose of the **Role**                           | User is the default role provided to each person |
 | Group        | The group field allows to group certain roles who belong in the same context | User and Admin in the group **default**          |
 
