@@ -21,8 +21,6 @@ import { PolicyComponentServiceType } from '../../policy-component-types.enum';
 })
 export class AddIdpDialogComponent {
     public PolicyComponentServiceType: any = PolicyComponentServiceType;
-    public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
-
     public idpType!: IdpProviderType;
     public idpTypes: IdpProviderType[] = [
         IdpProviderType.IDPPROVIDERTYPE_SYSTEM,
@@ -39,33 +37,36 @@ export class AddIdpDialogComponent {
         public dialogRef: MatDialogRef<AddIdpDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
     ) {
-        if (data.serviceType) {
-            this.serviceType = data.serviceType;
-            switch (this.serviceType) {
-                case PolicyComponentServiceType.MGMT:
+        if (data.idpType) {
+            this.idpType = data.idpType;
+            switch (this.idpType) {
+                case IdpProviderType.IDPPROVIDERTYPE_ORG:
                     this.idpType = IdpProviderType.IDPPROVIDERTYPE_ORG;
                     break;
-                case PolicyComponentServiceType.ADMIN:
+                case IdpProviderType.IDPPROVIDERTYPE_SYSTEM:
                     this.idpType = IdpProviderType.IDPPROVIDERTYPE_SYSTEM;
                     break;
             }
+            this.loadIdps();
         }
 
-        this.loadIdps();
     }
 
     public loadIdps(): void {
+        console.log(this.idpType);
         this.idp = undefined;
-        if (this.serviceType === PolicyComponentServiceType.MGMT) {
+        if (this.idpType === IdpProviderType.IDPPROVIDERTYPE_ORG) {
             const query: IdpSearchQuery = new IdpSearchQuery();
             query.setKey(IdpSearchKey.IDPSEARCHKEY_PROVIDER_TYPE);
             query.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
             query.setValue(this.idpType.toString());
             this.mgmtService.SearchIdps().then(idps => {
+                console.log('mgmt', idps.toObject().resultList);
                 this.availableIdps = idps.toObject().resultList;
             });
-        } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
+        } else if (this.idpType === IdpProviderType.IDPPROVIDERTYPE_SYSTEM) {
             this.adminService.SearchIdps().then(idps => {
+                console.log('admin', idps.toObject().resultList);
                 this.availableIdps = idps.toObject().resultList;
             });
         }

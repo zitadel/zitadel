@@ -153,7 +153,8 @@ export class LoginPolicyComponent implements OnDestroy {
     public openDialog(): void {
         const dialogRef = this.dialog.open(AddIdpDialogComponent, {
             data: {
-                serviceType: this.serviceType,
+                idpType: this.serviceType === PolicyComponentServiceType.ADMIN ? IdpProviderType.IDPPROVIDERTYPE_SYSTEM :
+                    this.serviceType === PolicyComponentServiceType.MGMT ? IdpProviderType.IDPPROVIDERTYPE_ORG : undefined,
             },
             width: '400px',
         });
@@ -183,10 +184,20 @@ export class LoginPolicyComponent implements OnDestroy {
     public removeIdp(idp: AdminIdpProviderView.AsObject | MgmtIdpProviderView.AsObject): void {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                (this.service as ManagementService).RemoveIdpProviderFromLoginPolicy(idp.idpConfigId);
+                (this.service as ManagementService).RemoveIdpProviderFromLoginPolicy(idp.idpConfigId).then(() => {
+                    const index = this.idps.findIndex(temp => temp === idp);
+                    if (index > -1) {
+                        this.idps.splice(index, 1);
+                    }
+                });;
                 break;
             case PolicyComponentServiceType.ADMIN:
-                (this.service as AdminService).RemoveIdpProviderFromDefaultLoginPolicy(idp.idpConfigId);
+                (this.service as AdminService).RemoveIdpProviderFromDefaultLoginPolicy(idp.idpConfigId).then(() => {
+                    const index = this.idps.findIndex(temp => temp === idp);
+                    if (index > -1) {
+                        this.idps.splice(index, 1);
+                    }
+                });
                 break;
         }
     }
