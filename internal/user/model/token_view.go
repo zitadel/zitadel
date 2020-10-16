@@ -44,7 +44,7 @@ const (
 type TokenSearchQuery struct {
 	Key    TokenSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type TokenSearchResponse struct {

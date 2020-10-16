@@ -23,12 +23,14 @@ const (
 )
 
 type ApplicationView struct {
-	ID           string    `json:"appId" gorm:"column:id;primary_key"`
-	ProjectID    string    `json:"-" gorm:"column:project_id"`
-	Name         string    `json:"name" gorm:"column:app_name"`
-	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
-	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
-	State        int32     `json:"-" gorm:"column:app_state"`
+	ID                   string    `json:"appId" gorm:"column:id;primary_key"`
+	ProjectID            string    `json:"-" gorm:"column:project_id"`
+	Name                 string    `json:"name" gorm:"column:app_name"`
+	CreationDate         time.Time `json:"-" gorm:"column:creation_date"`
+	ChangeDate           time.Time `json:"-" gorm:"column:change_date"`
+	State                int32     `json:"-" gorm:"column:app_state"`
+	ProjectRoleAssertion bool      `json:"projectRoleAssertion" gorm:"column:project_role_assertion"`
+	ProjectRoleCheck     bool      `json:"projectRoleCheck" gorm:"column:project_role_check"`
 
 	IsOIDC                     bool           `json:"-" gorm:"column:is_oidc"`
 	OIDCVersion                int32          `json:"oidcVersion" gorm:"column:oidc_version"`
@@ -43,58 +45,24 @@ type ApplicationView struct {
 	ComplianceProblems         pq.StringArray `json:"-" gorm:"column:compliance_problems"`
 	DevMode                    bool           `json:"devMode" gorm:"column:dev_mode"`
 	OriginAllowList            pq.StringArray `json:"-" gorm:"column:origin_allow_list"`
+	AccessTokenType            int32          `json:"accessTokenType" gorm:"column:access_token_type"`
+	AccessTokenRoleAssertion   bool           `json:"accessTokenRoleAssertion" gorm:"column:access_token_role_assertion"`
+	IDTokenRoleAssertion       bool           `json:"idTokenRoleAssertion" gorm:"column:id_token_role_assertion"`
 
 	Sequence uint64 `json:"-" gorm:"sequence"`
 }
 
-func ApplicationViewFromModel(app *model.ApplicationView) *ApplicationView {
-	return &ApplicationView{
-		ID:           app.ID,
-		ProjectID:    app.ProjectID,
-		Name:         app.Name,
-		State:        int32(app.State),
-		Sequence:     app.Sequence,
-		CreationDate: app.CreationDate,
-		ChangeDate:   app.ChangeDate,
-
-		IsOIDC:                     app.IsOIDC,
-		OIDCClientID:               app.OIDCClientID,
-		OIDCRedirectUris:           app.OIDCRedirectUris,
-		OIDCResponseTypes:          OIDCResponseTypesFromModel(app.OIDCResponseTypes),
-		OIDCGrantTypes:             OIDCGrantTypesFromModel(app.OIDCGrantTypes),
-		OIDCApplicationType:        int32(app.OIDCApplicationType),
-		OIDCAuthMethodType:         int32(app.OIDCAuthMethodType),
-		OIDCPostLogoutRedirectUris: app.OIDCPostLogoutRedirectUris,
-		DevMode:                    app.DevMode,
-		OriginAllowList:            app.OriginAllowList,
-	}
-}
-
-func OIDCResponseTypesFromModel(oidctypes []model.OIDCResponseType) []int64 {
-	result := make([]int64, len(oidctypes))
-	for i, t := range oidctypes {
-		result[i] = int64(t)
-	}
-	return result
-}
-
-func OIDCGrantTypesFromModel(granttypes []model.OIDCGrantType) []int64 {
-	result := make([]int64, len(granttypes))
-	for i, t := range granttypes {
-		result[i] = int64(t)
-	}
-	return result
-}
-
 func ApplicationViewToModel(app *ApplicationView) *model.ApplicationView {
 	return &model.ApplicationView{
-		ID:           app.ID,
-		ProjectID:    app.ProjectID,
-		Name:         app.Name,
-		State:        model.AppState(app.State),
-		Sequence:     app.Sequence,
-		CreationDate: app.CreationDate,
-		ChangeDate:   app.ChangeDate,
+		ID:                   app.ID,
+		ProjectID:            app.ProjectID,
+		Name:                 app.Name,
+		State:                model.AppState(app.State),
+		Sequence:             app.Sequence,
+		CreationDate:         app.CreationDate,
+		ChangeDate:           app.ChangeDate,
+		ProjectRoleAssertion: app.ProjectRoleAssertion,
+		ProjectRoleCheck:     app.ProjectRoleCheck,
 
 		IsOIDC:                     app.IsOIDC,
 		OIDCVersion:                model.OIDCVersion(app.OIDCVersion),
@@ -109,6 +77,9 @@ func ApplicationViewToModel(app *ApplicationView) *model.ApplicationView {
 		ComplianceProblems:         app.ComplianceProblems,
 		DevMode:                    app.DevMode,
 		OriginAllowList:            app.OriginAllowList,
+		AccessTokenType:            model.OIDCTokenType(app.AccessTokenType),
+		AccessTokenRoleAssertion:   app.AccessTokenRoleAssertion,
+		IDTokenRoleAssertion:       app.IDTokenRoleAssertion,
 	}
 }
 
@@ -152,6 +123,8 @@ func (a *ApplicationView) AppendEventIfMyApp(event *models.Event) (err error) {
 		}
 	case es_model.ApplicationRemoved:
 		return view.SetData(event)
+	case es_model.ProjectChanged:
+		return a.AppendEvent(event)
 	case es_model.ProjectRemoved:
 		return a.AppendEvent(event)
 	default:
@@ -187,6 +160,8 @@ func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 		}
 		a.setCompliance()
 		return a.setOriginAllowList()
+	case es_model.ProjectChanged:
+		return a.SetData(event)
 	case es_model.ApplicationDeactivated:
 		a.State = int32(model.AppStateInactive)
 	case es_model.ApplicationReactivated:

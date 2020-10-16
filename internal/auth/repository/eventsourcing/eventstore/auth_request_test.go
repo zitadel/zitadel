@@ -15,10 +15,12 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
+	proj_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	user_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	grant_view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
 )
 
 type mockViewNoUserSession struct{}
@@ -157,6 +159,23 @@ func (m *mockViewErrOrg) OrgByPrimaryDomain(string) (*org_view_model.OrgView, er
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
 }
 
+type mockUserGrants struct {
+	roleCheck  bool
+	userGrants int
+}
+
+func (m *mockUserGrants) ApplicationByClientID(ctx context.Context, s string) (*proj_view_model.ApplicationView, error) {
+	return &proj_view_model.ApplicationView{ProjectRoleCheck: m.roleCheck}, nil
+}
+
+func (m *mockUserGrants) UserGrantsByProjectAndUserID(s string, s2 string) ([]*grant_view_model.UserGrantView, error) {
+	var grants []*grant_view_model.UserGrantView
+	if m.userGrants > 0 {
+		grants = make([]*grant_view_model.UserGrantView, m.userGrants)
+	}
+	return grants, nil
+}
+
 func TestAuthRequestRepo_nextSteps(t *testing.T) {
 	type fields struct {
 		UserEvents                 *user_event.UserEventstore
@@ -166,6 +185,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 		userViewProvider           userViewProvider
 		userEventProvider          userEventProvider
 		orgViewProvider            orgViewProvider
+		userGrantProvider          userGrantProvider
 		PasswordCheckLifeTime      time.Duration
 		ExternalLoginCheckLifeTime time.Duration
 		MfaInitSkippedLifeTime     time.Duration
@@ -424,10 +444,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userEventProvider:          &mockEventUser{},
 				orgViewProvider:            &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider:          &mockUserGrants{},
 				ExternalLoginCheckLifeTime: 10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime:   18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID"}, false},
+			args{&model.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID", Request: &model.AuthRequestOIDC{}}, false},
 			[]model.NextStep{&model.RedirectToCallbackStep{}},
 			nil,
 		},
@@ -460,10 +481,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userEventProvider:          &mockEventUser{},
 				orgViewProvider:            &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider:          &mockUserGrants{},
 				MfaSoftwareCheckLifeTime:   18 * time.Hour,
 				ExternalLoginCheckLifeTime: 10 * 24 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID"}, false},
+			args{&model.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID", Request: &model.AuthRequestOIDC{}}, false},
 			[]model.NextStep{&model.RedirectToCallbackStep{}},
 			nil,
 		},
@@ -590,10 +612,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userEventProvider:        &mockEventUser{},
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider:        &mockUserGrants{},
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{&model.AuthRequest{UserID: "UserID", Request: &model.AuthRequestOIDC{}}, false},
 			[]model.NextStep{&model.RedirectToCallbackStep{}},
 			nil,
 		},
@@ -611,10 +634,61 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userEventProvider:        &mockEventUser{},
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider:        &mockUserGrants{},
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID", Prompt: model.PromptNone}, true},
+			args{&model.AuthRequest{UserID: "UserID", Prompt: model.PromptNone, Request: &model.AuthRequestOIDC{}}, true},
+			[]model.NextStep{&model.RedirectToCallbackStep{}},
+			nil,
+		},
+		{
+			"prompt none, checkLoggedIn true, authenticated and required user grants missing, grant required step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:    time.Now().UTC().Add(-5 * time.Minute),
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+				},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider: &mockUserGrants{
+					roleCheck:  true,
+					userGrants: 0,
+				},
+				PasswordCheckLifeTime:    10 * 24 * time.Hour,
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID", Prompt: model.PromptNone, Request: &model.AuthRequestOIDC{}}, true},
+			[]model.NextStep{&model.GrantRequiredStep{}},
+			nil,
+		},
+		{
+			"prompt none, checkLoggedIn true, authenticated and required user grants exist, redirect to callback step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:    time.Now().UTC().Add(-5 * time.Minute),
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+				},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider: &mockUserGrants{
+					roleCheck:  true,
+					userGrants: 2,
+				},
+				PasswordCheckLifeTime:    10 * 24 * time.Hour,
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID", Prompt: model.PromptNone, Request: &model.AuthRequestOIDC{}}, true},
 			[]model.NextStep{&model.RedirectToCallbackStep{}},
 			nil,
 		},
@@ -679,6 +753,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				UserViewProvider:           tt.fields.userViewProvider,
 				UserEventProvider:          tt.fields.userEventProvider,
 				OrgViewProvider:            tt.fields.orgViewProvider,
+				UserGrantProvider:          tt.fields.userGrantProvider,
 				PasswordCheckLifeTime:      tt.fields.PasswordCheckLifeTime,
 				ExternalLoginCheckLifeTime: tt.fields.ExternalLoginCheckLifeTime,
 				MfaInitSkippedLifeTime:     tt.fields.MfaInitSkippedLifeTime,
