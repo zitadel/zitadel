@@ -53,7 +53,6 @@ export class AddIdpDialogComponent {
     }
 
     public loadIdps(): void {
-        console.log(this.idpType);
         this.idp = undefined;
         if (this.idpType === IdpProviderType.IDPPROVIDERTYPE_ORG) {
             const query: IdpSearchQuery = new IdpSearchQuery();
@@ -61,12 +60,10 @@ export class AddIdpDialogComponent {
             query.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
             query.setValue(this.idpType.toString());
             this.mgmtService.SearchIdps().then(idps => {
-                console.log('mgmt', idps.toObject().resultList);
                 this.availableIdps = idps.toObject().resultList;
             });
         } else if (this.idpType === IdpProviderType.IDPPROVIDERTYPE_SYSTEM) {
             this.adminService.SearchIdps().then(idps => {
-                console.log('admin', idps.toObject().resultList);
                 this.availableIdps = idps.toObject().resultList;
             });
         }
