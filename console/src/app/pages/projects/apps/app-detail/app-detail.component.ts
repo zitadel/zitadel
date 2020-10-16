@@ -17,6 +17,7 @@ import {
     OIDCConfig,
     OIDCGrantType,
     OIDCResponseType,
+    OIDCTokenType,
     ZitadelDocs,
 } from 'src/app/proto/generated/management_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -67,6 +68,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
     ];
 
+    public oidcTokenTypes: OIDCTokenType[] = [
+        OIDCTokenType.OIDCTOKENTYPE_BEARER,
+        OIDCTokenType.OIDCTOKENTYPE_JWT,
+    ];
+
     public AppState: any = AppState;
     public appNameForm!: FormGroup;
     public appForm!: FormGroup;
@@ -106,6 +112,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             grantTypesList: [{ value: [], disabled: true }],
             applicationType: [{ value: '', disabled: true }],
             authMethodType: [{ value: '', disabled: true }],
+            accessTokenType: [{ value: '', disabled: true }],
         });
     }
 
@@ -220,6 +227,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.app.oidcConfig.redirectUrisList = this.redirectUrisList;
                 this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
                 this.app.oidcConfig.devMode = this.devMode?.value;
+                this.app.oidcConfig.accessTokenType = this.accessTokenType?.value;
 
                 this.mgmtService
                     .UpdateOIDCAppConfig(this.projectId, this.app.id, this.app.oidcConfig)
@@ -279,5 +287,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     public get devMode(): AbstractControl | null {
         return this.appForm.get('devMode');
+    }
+
+    public get accessTokenType(): AbstractControl | null {
+        return this.appForm.get('accessTokenType');
     }
 }

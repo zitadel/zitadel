@@ -648,7 +648,12 @@
             "EDITDESCRIPTION": "Enter the new data for the role.",
             "DELETE":"Delete Role",
             "CREATIONDATE":"Created",
-            "SELECTGROUPTOOLTIP":"Select all Roles of the group {{group}}."
+            "SELECTGROUPTOOLTIP":"Select all Roles of the group {{group}}.",
+            "OPTIONS":"Options",
+            "ASSERTION":"Assert Roles on Authentication.",
+            "ASSERTION_DESCRIPTION":"Roleinformation is sent as Token, Userinfo endpoint or other type, depending on your applikation settings.",
+            "CHECK":"Check roles on Authentication",
+            "CHECK_DESCRIPTION":"If set, users are only allowed to authenticate if any role is assigned to their account."
         },
         "TABLE": {
             "TOTAL": "Entries total:",
