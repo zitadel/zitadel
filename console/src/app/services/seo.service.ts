@@ -4,7 +4,7 @@ import { Meta } from '@angular/platform-browser';
 import { environment } from '../../environments/environment';
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class SeoService {
     constructor(private meta: Meta) { }
