@@ -165,6 +165,8 @@ export class LoginPolicyComponent implements OnDestroy {
                     setTimeout(() => {
                         this.fetchData();
                     }, 2000);
+                }).catch(error => {
+                    this.toast.showError(error);
                 });
             }
         });
