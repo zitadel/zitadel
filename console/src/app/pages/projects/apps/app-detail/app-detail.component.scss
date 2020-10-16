@@ -60,6 +60,21 @@
     }
   }
 
+  .section-title {
+      margin-bottom: 1.5rem;
+  }
+
+  .full-width {
+      flex-basis: 100%;
+      margin-left: .5rem;
+      margin-right: .5rem;
+  }
+
+  .desc {
+      color: var(--grey);
+      font-size: 14px;
+  }
+
   .devmode {
     flex: 1 1 100%;
     margin: 1rem .5rem;
@@ -114,4 +129,11 @@
 
 .chip[color='green'] {
   background-color: #56a392 !important;
+}
+
+.divider {
+    flex-basis: 100%;
+    margin: 1.5rem .5rem;
+    height: 1px;
+    background-color: var(--grey);
 }

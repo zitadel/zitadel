@@ -767,6 +767,8 @@
         "TYPE":"Anwendungstyp",
         "GRANT":"Berechtigungstypen",
         "OIDC": {
+            "TOKENSECTIONTITLE":"AuthToken Optionen",
+            "REDIRECTSECTIONTITLE":"Weiterleitungseinstellungen",
             "PROSWITCH":"Konfigurator überspringen",
             "NAMEANDTYPESECTION":"Name und Typ",
             "TITLEFIRST":"Gebe zuerst einen Namen ein.",
@@ -812,7 +814,11 @@
             "TOKENTYPE1": "JWT",
             "UNSECUREREDIRECT":"Ich hoffe, Du weisst, was Du tust.",
             "OVERVIEWSECTION":"Übersicht",
-            "OVERVIEWTITLE":"Deine Konfiguration ist bereit. Du kannst sie hier nochmals prüfen."
+            "OVERVIEWTITLE":"Deine Konfiguration ist bereit. Du kannst sie hier nochmals prüfen.",
+            "ACCESSTOKENROLEASSERTION":"Benutzerrollen dem Access Token hinzufügen",
+            "ACCESSTOKENROLEASSERTION_DESCRIPTION":"Bei Auswahl werden dem Access Token die Rollen des Authentifizierten Benutzers hinzugefügt.",
+            "IDTOKENROLEASSERTION":"Benutzerrollen dem Id Token hinzufügen",
+            "IDTOKENROLEASSERTION_DESCRIPTION":"Bei Auswahl werden dem Id Token die Rollen des Authentifizierten Benutzers hinzugefügt."
         },
         "TOAST": {
             "REACTIVATED":"Anwendung reaktiviert.",

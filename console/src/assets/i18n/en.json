@@ -767,6 +767,8 @@
         "TYPE":"Application Type",
         "GRANT":"Grant Types",
         "OIDC": {
+            "TOKENSECTIONTITLE":"AuthToken Options",
+            "REDIRECTSECTIONTITLE":"Redirect Settings",
             "PROSWITCH":"I'm a pro. Skip this wizard.",
             "NAMEANDTYPESECTION":"Name and Type",
             "TITLEFIRST":"Insert a name first.",

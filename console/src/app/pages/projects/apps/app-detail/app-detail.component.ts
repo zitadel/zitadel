@@ -86,6 +86,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     public OIDCApplicationType: any = OIDCApplicationType;
     public OIDCAuthMethodType: any = OIDCAuthMethodType;
+    public OIDCTokenType: any = OIDCTokenType;
 
     public redirectControl: FormControl = new FormControl({ value: '', disabled: true });
     public postRedirectControl: FormControl = new FormControl({ value: '', disabled: true });
@@ -113,6 +114,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             applicationType: [{ value: '', disabled: true }],
             authMethodType: [{ value: '', disabled: true }],
             accessTokenType: [{ value: '', disabled: true }],
+            accessTokenRoleAssertion: [{ value: false, disabled: true }],
+            idTokenRoleAssertion: [{ value: false, disabled: true }],
         });
     }
 
@@ -228,6 +231,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
                 this.app.oidcConfig.devMode = this.devMode?.value;
                 this.app.oidcConfig.accessTokenType = this.accessTokenType?.value;
+                this.app.oidcConfig.accessTokenRoleAssertion = this.accessTokenRoleAssertion?.value;
+                this.app.oidcConfig.idTokenRoleAssertion = this.idTokenRoleAssertion?.value;
 
                 this.mgmtService
                     .UpdateOIDCAppConfig(this.projectId, this.app.id, this.app.oidcConfig)
@@ -291,5 +296,13 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     public get accessTokenType(): AbstractControl | null {
         return this.appForm.get('accessTokenType');
+    }
+
+    public get idTokenRoleAssertion(): AbstractControl | null {
+        return this.appForm.get('idTokenRoleAssertion');
+    }
+
+    public get accessTokenRoleAssertion(): AbstractControl | null {
+        return this.appForm.get('accessTokenRoleAssertion');
     }
 }

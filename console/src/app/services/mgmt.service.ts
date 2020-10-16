@@ -1274,6 +1274,8 @@ export class ManagementService {
         req.setApplicationType(oidcConfig.applicationType);
         req.setDevMode(oidcConfig.devMode);
         req.setAccessTokenType(oidcConfig.accessTokenType);
+        req.setAccessTokenRoleAssertion(oidcConfig.accessTokenRoleAssertion);
+        req.setIdTokenRoleAssertion(oidcConfig.idTokenRoleAssertion);
         return this.grpcService.mgmt.updateApplicationOIDCConfig(req);
     }
 }
