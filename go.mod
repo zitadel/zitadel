@@ -17,7 +17,7 @@ require (
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.12.1
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
-	github.com/cockroachdb/cockroach-go/v2 v2.0.7
+	github.com/cockroachdb/cockroach-go/v2 v2.0.8
 	github.com/envoyproxy/protoc-gen-validate v0.4.1
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
@@ -28,7 +28,7 @@ require (
 	github.com/gorilla/schema v1.2.0
 	github.com/gorilla/securecookie v1.1.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
-	github.com/grpc-ecosystem/grpc-gateway v1.14.8
+	github.com/grpc-ecosystem/grpc-gateway v1.15.2
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/inconshreveable/log15 v0.0.0-20200109203555-b30bc20e4fd1 // indirect
@@ -42,7 +42,7 @@ require (
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.1 // indirect
-	github.com/nicksnyder/go-i18n/v2 v2.0.3
+	github.com/nicksnyder/go-i18n/v2 v2.1.1
 	github.com/pquerna/otp v1.2.0
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.7.0
