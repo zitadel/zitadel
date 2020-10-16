@@ -165,6 +165,8 @@ export class LoginPolicyComponent implements OnDestroy {
                     setTimeout(() => {
                         this.fetchData();
                     }, 2000);
+                }).catch(error => {
+                    this.toast.showError(error);
                 });
             }
         });
@@ -183,10 +185,20 @@ export class LoginPolicyComponent implements OnDestroy {
     public removeIdp(idp: AdminIdpProviderView.AsObject | MgmtIdpProviderView.AsObject): void {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                (this.service as ManagementService).RemoveIdpProviderFromLoginPolicy(idp.idpConfigId);
+                (this.service as ManagementService).RemoveIdpProviderFromLoginPolicy(idp.idpConfigId).then(() => {
+                    const index = this.idps.findIndex(temp => temp === idp);
+                    if (index > -1) {
+                        this.idps.splice(index, 1);
+                    }
+                });
                 break;
             case PolicyComponentServiceType.ADMIN:
-                (this.service as AdminService).RemoveIdpProviderFromDefaultLoginPolicy(idp.idpConfigId);
+                (this.service as AdminService).RemoveIdpProviderFromDefaultLoginPolicy(idp.idpConfigId).then(() => {
+                    const index = this.idps.findIndex(temp => temp === idp);
+                    if (index > -1) {
+                        this.idps.splice(index, 1);
+                    }
+                });
                 break;
         }
     }
