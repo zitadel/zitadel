@@ -4,8 +4,8 @@
   import Icon from "./Icon.svelte";
   import manifest from '../../static/manifest.json';
   export let owner = "caos";
-  export let project = "zitadel/site";
-  export let path = "/docs";
+  export let project = "zitadel";
+  export let path = "site/docs";
   export let dir = "";
   export let edit_title = "edit this section";
   export let sections;
@@ -201,7 +201,7 @@
   }
 
   .content h2 {
-    margin-top: 8rem;
+    margin-top: 4rem;
     padding: 2rem 1.6rem 4rem 0.2rem;
     border-top: var(--border-w) solid #6767785b; /* based on --second */
     color: var(--text);
@@ -265,8 +265,8 @@
 
   .content :global(h3),
   .content :global(h3 > code) {
-    margin: 6.4rem 0 0 0;
-    padding: 2rem 1.6rem 5.6rem 0.2rem;
+    margin: 2.0rem 0 0 0;
+    padding: 2rem 1.6rem 2.0rem 0.2rem;
     color: var(--text);
     border-top: var(--border-w) solid #6767781f; /* based on --second */
     background: transparent;
@@ -292,7 +292,7 @@
     font-weight: 500;
     font-size: 2.4rem;
     color: var(--text);
-    margin: 6.4rem 0 1.6rem 0;
+    margin: 2.0rem 0 1.6rem 0;
     padding-left: 0;
     background: transparent;
     line-height: 1;
