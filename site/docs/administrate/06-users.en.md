@@ -27,9 +27,13 @@ If someone verifies a domain name within the org. ZITADEL will generate addition
 
 ### Manage Users
 
-#### Create User
+#### Search User
 
 > Screenshot here
+
+#### Create User
+
+<img src="img/console_user_list.png" alt="User list" width="1000px" height="auto">
 
 #### Set Password
 
