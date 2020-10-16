@@ -382,6 +382,19 @@ EventTypes:
         idpprovider:
           added: Idp Provider added to Login Policy
           removed: Idp Provider removed from Login Policy
+      password:
+        complexity:
+          added: Password complexity policy added
+          changed: Password complexity policy changed
+          removed: Password complexity policy removed
+        age:
+          added: Password age policy added
+          changed: Password age policy changed
+          removed: Password age policy removed
+        lockout:
+          added: Password lockout policy added
+          changed: Password lockout policy changed
+          removed: Password lockout policy removed
   project:
     added: Project added
     changed: Project changed
