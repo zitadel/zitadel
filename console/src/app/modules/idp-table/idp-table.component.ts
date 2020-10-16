@@ -97,19 +97,9 @@ export class IdpTableComponent implements OnInit {
     private async getData(limit: number, offset: number): Promise<void> {
         this.loadingSubject.next(true);
 
-        // let query: AdminIdpSearchQuery | MgmtIdpSearchQuery;
-        // if (this.service instanceof AdminService) {
-        //     query = new AdminIdpSearchQuery();
-        //     query.setKey(AdminIdpSearchKey.IDPSEARCHKEY_IDP_CONFIG_ID);
-        // } else if (this.service instanceof ManagementService) {
-        //     query = new MgmtIdpSearchQuery();
-        //     query.setKey(MgmtIdpSearchKey.IDPSEARCHKEY_PROVIDER_TYPE);
-        // }
-
         this.service.SearchIdps(limit, offset).then(resp => {
             this.idpResult = resp.toObject();
             this.dataSource.data = this.idpResult.resultList;
-            console.log(this.idpResult.resultList);
             this.loadingSubject.next(false);
         }).catch(error => {
             this.toast.showError(error);

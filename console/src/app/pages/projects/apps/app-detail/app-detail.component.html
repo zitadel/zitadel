@@ -95,11 +95,36 @@
                     </mat-select>
                 </mat-form-field>
 
+                <div class="divider"></div>
+
+                <p class="full-width section-title">{{'APP.OIDC.TOKENSECTIONTITLE' | translate}}</p>
+
+                <mat-form-field appearance="outline" class="formfield">
+                    <mat-label>{{ 'APP.OIDC.TOKENTYPE' | translate }}</mat-label>
+                    <mat-select formControlName="accessTokenType">
+                        <mat-option *ngFor="let type of oidcTokenTypes" [value]="type">
+                            {{ 'APP.OIDC.TOKENTYPE'+type | translate }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-checkbox *ngIf="accessTokenType?.value === OIDCTokenType.OIDCTOKENTYPE_JWT" class="full-width"
+                    formControlName="accessTokenRoleAssertion">
+                    {{'APP.OIDC.ACCESSTOKENROLEASSERTION' | translate}}</mat-checkbox>
+                <p class="full-width desc">{{'APP.OIDC.ACCESSTOKENROLEASSERTION_DESCRIPTION' | translate}}</p>
+                <mat-checkbox class="full-width" formControlName="idTokenRoleAssertion">
+                    {{'APP.OIDC.IDTOKENROLEASSERTION' | translate}}</mat-checkbox>
+                <p class="full-width desc">{{'APP.OIDC.IDTOKENROLEASSERTION_DESCRIPTION' | translate}}</p>
+
+                <div class="divider"></div>
+
+                <p class="full-width section-title">{{'APP.OIDC.REDIRECTSECTIONTITLE' | translate}}</p>
+
                 <mat-slide-toggle color="primary" class="devmode" formControlName="devMode" name="devMode">
                     {{ 'APP.OIDC.DEVMODE' | translate }}
                 </mat-slide-toggle>
 
-                <p class="step-description">{{'APP.OIDC.DEVMODEDESC' | translate}}</p>
+                <p class="step-description" style="margin-bottom: 2rem;">{{'APP.OIDC.DEVMODEDESC' | translate}}</p>
                 <p class="step-description"
                     *ngIf="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
                     {{'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate}}</p>

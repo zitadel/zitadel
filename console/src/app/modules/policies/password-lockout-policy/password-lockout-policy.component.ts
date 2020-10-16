@@ -58,7 +58,6 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
     }
 
     private getData(): Promise<PasswordLockoutPolicyView | DefaultPasswordLockoutPolicyView> {
-
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
                 return (this.service as ManagementService).GetPasswordLockoutPolicy();
@@ -100,6 +99,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
                 this.lockoutData.showLockoutFailure,
             ).then(() => {
                 this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                this.getData();
             }).catch(error => {
                 this.toast.showError(error);
             });
@@ -110,6 +110,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
                     this.lockoutData.showLockoutFailure,
                 ).then(() => {
                     this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                    this.getData();
                 }).catch(error => {
                     this.toast.showError(error);
                 });
@@ -119,6 +120,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
                     this.lockoutData.showLockoutFailure,
                 ).then(() => {
                     this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                    this.getData();
                 }).catch(error => {
                     this.toast.showError(error);
                 });

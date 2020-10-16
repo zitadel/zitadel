@@ -23,6 +23,8 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
 
     private sub: Subscription = new Subscription();
     public PolicyComponentServiceType: any = PolicyComponentServiceType;
+
+    public loading: boolean = false;
     constructor(
         private route: ActivatedRoute,
         private toast: ToastService,
@@ -42,11 +44,18 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
 
             return this.route.params;
         })).subscribe(() => {
-            this.getData().then(data => {
-                if (data) {
-                    this.complexityData = data.toObject();
-                }
-            });
+            this.fetchData();
+        });
+    }
+
+    public fetchData(): void {
+        this.loading = true;
+
+        this.getData().then(data => {
+            if (data) {
+                this.complexityData = data.toObject();
+                this.loading = false;
+            }
         });
     }
 
@@ -69,7 +78,7 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
             this.service.removePasswordComplexityPolicy().then(() => {
                 this.toast.showInfo('ORG.POLICY.TOAST.RESETSUCCESS', true);
                 setTimeout(() => {
-                    this.getData();
+                    this.fetchData();
                 }, 1000);
             }).catch(error => {
                 this.toast.showError(error);
