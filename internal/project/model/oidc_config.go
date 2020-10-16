@@ -21,19 +21,22 @@ const (
 
 type OIDCConfig struct {
 	es_models.ObjectRoot
-	AppID                  string
-	ClientID               string
-	ClientSecret           *crypto.CryptoValue
-	ClientSecretString     string
-	RedirectUris           []string
-	ResponseTypes          []OIDCResponseType
-	GrantTypes             []OIDCGrantType
-	ApplicationType        OIDCApplicationType
-	AuthMethodType         OIDCAuthMethodType
-	PostLogoutRedirectUris []string
-	OIDCVersion            OIDCVersion
-	Compliance             *Compliance
-	DevMode                bool
+	AppID                    string
+	ClientID                 string
+	ClientSecret             *crypto.CryptoValue
+	ClientSecretString       string
+	RedirectUris             []string
+	ResponseTypes            []OIDCResponseType
+	GrantTypes               []OIDCGrantType
+	ApplicationType          OIDCApplicationType
+	AuthMethodType           OIDCAuthMethodType
+	PostLogoutRedirectUris   []string
+	OIDCVersion              OIDCVersion
+	Compliance               *Compliance
+	DevMode                  bool
+	AccessTokenType          OIDCTokenType
+	AccessTokenRoleAssertion bool
+	IDTokenRoleAssertion     bool
 }
 
 type OIDCVersion int32
@@ -78,6 +81,13 @@ type Compliance struct {
 	NoneCompliant bool
 	Problems      []string
 }
+
+type OIDCTokenType int32
+
+const (
+	OIDCTokenTypeBearer OIDCTokenType = iota
+	OIDCTokenTypeJWT
+)
 
 func (c *OIDCConfig) IsValid() bool {
 	grantTypes := c.getRequiredGrantTypes()

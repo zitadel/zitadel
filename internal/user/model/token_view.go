@@ -6,7 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/model"
 )
 
-type Token struct {
+type TokenView struct {
 	ID                string
 	CreationDate      time.Time
 	ChangeDate        time.Time
@@ -44,7 +44,7 @@ const (
 type TokenSearchQuery struct {
 	Key    TokenSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type TokenSearchResponse struct {

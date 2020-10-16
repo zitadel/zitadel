@@ -57,6 +57,20 @@ func (p *Application) Reduce(event *models.Event) (err error) {
 			return err
 		}
 		return p.view.DeleteApplication(app.ID, event.Sequence)
+	case es_model.ProjectChanged:
+		apps, err := p.view.ApplicationsByProjectID(event.AggregateID)
+		if err != nil {
+			return err
+		}
+		if len(apps) == 0 {
+			return p.view.ProcessedApplicationSequence(event.Sequence)
+		}
+		for _, app := range apps {
+			if err := app.AppendEvent(event); err != nil {
+				return err
+			}
+		}
+		return p.view.PutApplications(apps, event.Sequence)
 	case es_model.ProjectRemoved:
 		return p.view.DeleteApplicationsByProjectID(event.AggregateID)
 	default:

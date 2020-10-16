@@ -6381,6 +6381,10 @@ func (m *ProjectCreateRequest) Validate() error {
 		}
 	}
 
+	// no validation rules for ProjectRoleAssertion
+
+	// no validation rules for ProjectRoleCheck
+
 	return nil
 }
 
@@ -6461,6 +6465,10 @@ func (m *ProjectUpdateRequest) Validate() error {
 			reason: "value length must be between 1 and 200 runes, inclusive",
 		}
 	}
+
+	// no validation rules for ProjectRoleAssertion
+
+	// no validation rules for ProjectRoleCheck
 
 	return nil
 }
@@ -6658,6 +6666,10 @@ func (m *ProjectView) Validate() error {
 	// no validation rules for ResourceOwner
 
 	// no validation rules for Sequence
+
+	// no validation rules for ProjectRoleAssertion
+
+	// no validation rules for ProjectRoleCheck
 
 	return nil
 }
@@ -6997,6 +7009,10 @@ func (m *Project) Validate() error {
 	}
 
 	// no validation rules for Sequence
+
+	// no validation rules for ProjectRoleAssertion
+
+	// no validation rules for ProjectRoleCheck
 
 	return nil
 }
@@ -8850,6 +8866,12 @@ func (m *OIDCConfig) Validate() error {
 
 	// no validation rules for DevMode
 
+	// no validation rules for AccessTokenType
+
+	// no validation rules for AccessTokenRoleAssertion
+
+	// no validation rules for IdTokenRoleAssertion
+
 	return nil
 }
 
@@ -8937,6 +8959,12 @@ func (m *OIDCApplicationCreate) Validate() error {
 
 	// no validation rules for DevMode
 
+	// no validation rules for AccessTokenType
+
+	// no validation rules for AccessTokenRoleAssertion
+
+	// no validation rules for IdTokenRoleAssertion
+
 	return nil
 }
 
@@ -9023,6 +9051,12 @@ func (m *OIDCConfigUpdate) Validate() error {
 	// no validation rules for AuthMethodType
 
 	// no validation rules for DevMode
+
+	// no validation rules for AccessTokenType
+
+	// no validation rules for AccessTokenRoleAssertion
+
+	// no validation rules for IdTokenRoleAssertion
 
 	return nil
 }

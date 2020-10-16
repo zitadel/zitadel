@@ -135,6 +135,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 			OrgViewProvider:            view,
 			IDPProviderViewProvider:    view,
 			LoginPolicyViewProvider:    view,
+			UserGrantProvider:          view,
 			IdGenerator:                idGenerator,
 			PasswordCheckLifeTime:      systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
 			ExternalLoginCheckLifeTime: systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
@@ -143,7 +144,10 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 			MfaHardwareCheckLifeTime:   systemDefaults.VerificationLifetimes.MfaHardwareCheck.Duration,
 			IAMID:                      systemDefaults.IamID,
 		},
-		eventstore.TokenRepo{View: view},
+		eventstore.TokenRepo{
+			UserEvents: user,
+			View:       view,
+		},
 		eventstore.KeyRepository{
 			KeyEvents:          key,
 			View:               view,
@@ -153,6 +157,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 			View:          view,
 			ProjectEvents: project,
 		},
+
 		eventstore.UserSessionRepo{
 			View: view,
 		},
