@@ -251,6 +251,9 @@ EventTypes:
         check:
           succeeded: Password check succeeded
           failed: Password check failed
+      externallogin:
+        check:
+          succeeded: External login succeeded
       externalidp:
         added: Externer IDP added
         removed: Externer IDP removed

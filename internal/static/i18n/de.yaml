@@ -251,6 +251,9 @@ EventTypes:
         check:
           succeeded: Passwortvalidierung erfolgreich
           failed: Passwortvalidierung fehlgeschlagen
+      externallogin:
+        check:
+          succeeded: Externer login erfolgreich durchgeführt
       externalidp:
         added: Externer IDP wurde hinzugefügt
         removed: Externer IDP wurde gelöscht
