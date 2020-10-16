@@ -211,6 +211,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderExternalNotFoundOption(w, r, authReq, err)
 	case *model.ExternalLoginStep:
 		l.handleExternalLoginStep(w, r, authReq, step.SelectedIDPConfigID)
+	case *model.GrantRequiredStep:
+		l.renderInternalError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-asb43", "Errors.User.GrantRequired"))
 	default:
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}

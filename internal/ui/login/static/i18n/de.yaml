@@ -187,6 +187,7 @@ Errors:
   AuthRequest:
     NotFound: AuthRequest konnte nicht gefunden werden
     UserAgentNotCorresponding: User Agent stimmt nicht überein
+    RequestTypeNotSupported: Requesttyp wird nicht unterstürzt
   User:
     NotFound: Benutzer konnte nicht gefunden werden
     NotMatchingUserID: User stimm nicht mit User in Auth Request überein
@@ -226,5 +227,6 @@ Errors:
     ExternalIDP:
       IDPTypeNotImplemented: IDP Typ ist nicht implementiert
       NotAllowed: Externer Login Provider ist nicht erlaubt
+    GrantRequired: Der Login an diese Applikation ist nicht möglich. Der Benutzer benötigt mindestens eine Berechtigung an der Applikation. Bitte melde dich bei deinem Administrator.
 
 optional: (optional)

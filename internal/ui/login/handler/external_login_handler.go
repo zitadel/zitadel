@@ -222,32 +222,32 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 }
 
 func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) *model.ExternalUser {
-	displayName := tokens.IDTokenClaims.PreferredUsername
-	if displayName == "" && tokens.IDTokenClaims.Email != "" {
-		displayName = tokens.IDTokenClaims.Email
+	displayName := tokens.IDTokenClaims.GetPreferredUsername()
+	if displayName == "" && tokens.IDTokenClaims.GetEmail() != "" {
+		displayName = tokens.IDTokenClaims.GetEmail()
 	}
 	switch idpConfig.OIDCIDPDisplayNameMapping {
 	case iam_model.OIDCMappingFieldEmail:
-		if tokens.IDTokenClaims.EmailVerified && tokens.IDTokenClaims.Email != "" {
-			displayName = tokens.IDTokenClaims.Email
+		if tokens.IDTokenClaims.IsEmailVerified() && tokens.IDTokenClaims.GetEmail() != "" {
+			displayName = tokens.IDTokenClaims.GetEmail()
 		}
 	}
 
 	externalUser := &model.ExternalUser{
 		IDPConfigID:       idpConfig.IDPConfigID,
-		ExternalUserID:    tokens.IDTokenClaims.Subject,
-		PreferredUsername: tokens.IDTokenClaims.PreferredUsername,
+		ExternalUserID:    tokens.IDTokenClaims.GetSubject(),
+		PreferredUsername: tokens.IDTokenClaims.GetPreferredUsername(),
 		DisplayName:       displayName,
-		FirstName:         tokens.IDTokenClaims.GivenName,
-		LastName:          tokens.IDTokenClaims.FamilyName,
-		NickName:          tokens.IDTokenClaims.Nickname,
-		Email:             tokens.IDTokenClaims.Email,
-		IsEmailVerified:   tokens.IDTokenClaims.EmailVerified,
+		FirstName:         tokens.IDTokenClaims.GetGivenName(),
+		LastName:          tokens.IDTokenClaims.GetFamilyName(),
+		NickName:          tokens.IDTokenClaims.GetNickname(),
+		Email:             tokens.IDTokenClaims.GetEmail(),
+		IsEmailVerified:   tokens.IDTokenClaims.IsEmailVerified(),
 	}
 
-	if tokens.IDTokenClaims.PhoneNumber != "" {
-		externalUser.Phone = tokens.IDTokenClaims.PhoneNumber
-		externalUser.IsPhoneVerified = tokens.IDTokenClaims.PhoneNumberVerified
+	if tokens.IDTokenClaims.GetPhoneNumber() != "" {
+		externalUser.Phone = tokens.IDTokenClaims.GetPhoneNumber()
+		externalUser.IsPhoneVerified = tokens.IDTokenClaims.IsPhoneNumberVerified()
 	}
 	return externalUser
 }

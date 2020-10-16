@@ -52,8 +52,11 @@ func (m *IamMember) processIamMember(event *models.Event) (err error) {
 	member := new(iam_model.IAMMemberView)
 	switch event.Type {
 	case model.IAMMemberAdded:
-		member.AppendEvent(event)
-		m.fillData(member)
+		err = member.AppendEvent(event)
+		if err != nil {
+			return err
+		}
+		err = m.fillData(member)
 	case model.IAMMemberChanged:
 		err := member.SetData(event)
 		if err != nil {
@@ -63,7 +66,7 @@ func (m *IamMember) processIamMember(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		member.AppendEvent(event)
+		err = member.AppendEvent(event)
 	case model.IAMMemberRemoved:
 		err := member.SetData(event)
 		if err != nil {

@@ -18,16 +18,28 @@ func (v *View) ApplicationByID(projectID, appID string) (*model.ApplicationView,
 	return view.ApplicationByID(v.Db, applicationTable, projectID, appID)
 }
 
+func (v *View) ApplicationsByProjectID(projectID string) ([]*model.ApplicationView, error) {
+	return view.ApplicationsByProjectID(v.Db, applicationTable, projectID)
+}
+
 func (v *View) SearchApplications(request *proj_model.ApplicationSearchRequest) ([]*model.ApplicationView, uint64, error) {
 	return view.SearchApplications(v.Db, applicationTable, request)
 }
 
-func (v *View) PutApplication(project *model.ApplicationView) error {
-	err := view.PutApplication(v.Db, applicationTable, project)
+func (v *View) PutApplication(app *model.ApplicationView) error {
+	err := view.PutApplication(v.Db, applicationTable, app)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedApplicationSequence(project.Sequence)
+	return v.ProcessedApplicationSequence(app.Sequence)
+}
+
+func (v *View) PutApplications(apps []*model.ApplicationView, sequence uint64) error {
+	err := view.PutApplications(v.Db, applicationTable, apps...)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedApplicationSequence(sequence)
 }
 
 func (v *View) DeleteApplication(appID string, eventSequence uint64) error {
@@ -36,6 +48,10 @@ func (v *View) DeleteApplication(appID string, eventSequence uint64) error {
 		return nil
 	}
 	return v.ProcessedApplicationSequence(eventSequence)
+}
+
+func (v *View) DeleteApplicationsByProjectID(projectID string) error {
+	return view.DeleteApplicationsByProjectID(v.Db, applicationTable, projectID)
 }
 
 func (v *View) GetLatestApplicationSequence() (*repository.CurrentSequence, error) {
@@ -55,24 +71,7 @@ func (v *View) ProcessedApplicationFailedEvent(failedEvent *repository.FailedEve
 }
 
 func (v *View) ApplicationByClientID(_ context.Context, clientID string) (*model.ApplicationView, error) {
-	req := &proj_model.ApplicationSearchRequest{
-		Limit: 1,
-		Queries: []*proj_model.ApplicationSearchQuery{
-			{
-				Key:    proj_model.AppSearchKeyOIDCClientID,
-				Method: global_model.SearchMethodEquals,
-				Value:  clientID,
-			},
-		},
-	}
-	apps, count, err := view.SearchApplications(v.Db, applicationTable, req)
-	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(err, "VIEW-sd6JQ", "cannot find client")
-	}
-	if count != 1 {
-		return nil, errors.ThrowPreconditionFailed(nil, "VIEW-dfw3as", "cannot find client")
-	}
-	return apps[0], nil
+	return view.ApplicationByOIDCClientID(v.Db, applicationTable, clientID)
 }
 
 func (v *View) AppIDsFromProjectByClientID(ctx context.Context, clientID string) ([]string, error) {
@@ -86,6 +85,30 @@ func (v *View) AppIDsFromProjectByClientID(ctx context.Context, clientID string)
 				Key:    proj_model.AppSearchKeyProjectID,
 				Method: global_model.SearchMethodEquals,
 				Value:  app.ProjectID,
+			},
+		},
+	}
+	apps, _, err := view.SearchApplications(v.Db, applicationTable, req)
+	if err != nil {
+		return nil, errors.ThrowPreconditionFailed(err, "VIEW-Gd24q", "cannot find applications")
+	}
+	ids := make([]string, 0, len(apps))
+	for _, app := range apps {
+		if !app.IsOIDC {
+			continue
+		}
+		ids = append(ids, app.OIDCClientID)
+	}
+	return ids, nil
+}
+
+func (v *View) AppIDsFromProjectID(ctx context.Context, projectID string) ([]string, error) {
+	req := &proj_model.ApplicationSearchRequest{
+		Queries: []*proj_model.ApplicationSearchQuery{
+			{
+				Key:    proj_model.AppSearchKeyProjectID,
+				Method: global_model.SearchMethodEquals,
+				Value:  projectID,
 			},
 		},
 	}
