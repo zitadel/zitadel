@@ -3,6 +3,7 @@ import { CommonModule, registerLocaleData } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -115,6 +116,7 @@ const authConfig: AuthConfig = {
         MatProgressBarModule,
         MatProgressSpinnerModule,
         MatToolbarModule,
+        ReactiveFormsModule,
         MatMenuModule,
         MatSnackBarModule,
         AvatarModule,
