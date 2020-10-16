@@ -384,9 +384,9 @@ EventTypes:
           removed: Idp Provider aus Login Richtlinie gelöscht
       password:
         complexity:
-          added: Passwort Kompläxitäts Richtlinie hinzugefügt
-          changed: Passwort Kompläxitäts Richtlinie geändert
-          removed: Passwort Kompläxitäts Richtlinie gelöscht
+          added: Passwort Komplexitäts Richtlinie hinzugefügt
+          changed: Passwort Komplexitäts Richtlinie geändert
+          removed: Passwort Komplexitäts Richtlinie gelöscht
         age:
           added: Passwort Alter Richtlinie hinzugefügt
           changed: Passwort Alter Richtlinie geändert
