@@ -42,7 +42,7 @@
 
             {{ $reqid := .AuthReqID}}
             {{range $provider := .IDPProviders}}
-                <a href="{{ externalIDPAuthURL $reqid $provider.IDPConfigID}}" class="button secondary idp-providers">
+                <a href="{{ externalIDPAuthURL $reqid $provider.IDPConfigID}}" class="button secondary idp-providers {{idpProviderClass $provider.StylingType}}">
                     {{$provider.Name}}
                 </a>
             {{end}}
