@@ -201,6 +201,8 @@ EventTypes:
       check:
         succeeded: Initialisation check succeded
         failed: Initialisation check failed
+    token:
+      added: Access Token ausgestellt
     username:
       reserved: Username reserved
       released: Username released

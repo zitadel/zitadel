@@ -201,6 +201,8 @@ EventTypes:
       check:
         succeeded: Benutzerinitialisierung erfolgreich
         failed: Benutzerinitialisierung fehlgeschlagen
+    token:
+      added: Access Token ausgestellt
     username:
       reserved: Benutzername reserviert
       released: Benutzername freigegeben
