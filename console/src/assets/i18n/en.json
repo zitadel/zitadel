@@ -651,7 +651,7 @@
             "SELECTGROUPTOOLTIP":"Select all Roles of the group {{group}}.",
             "OPTIONS":"Options",
             "ASSERTION":"Assert Roles on Authentication.",
-            "ASSERTION_DESCRIPTION":"Roleinformation is sent as Token, Userinfo endpoint or other type, depending on your applikation settings.",
+            "ASSERTION_DESCRIPTION":"Roleinformation is sent as Token, Userinfo endpoint or other type, depending on your application settings.",
             "CHECK":"Check roles on Authentication",
             "CHECK_DESCRIPTION":"If set, users are only allowed to authenticate if any role is assigned to their account."
         },
