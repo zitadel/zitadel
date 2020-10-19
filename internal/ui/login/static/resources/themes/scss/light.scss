@@ -85,7 +85,7 @@ html {
             background-color: $idpGoogleBackgroundColorLight;
 
             span.logo {
-                @include retina-background-image($idpGoogleImgLight, "png", false, 50px, 50px);
+                background-image: url($idpGoogleImg + '.png');
             }
         }
     }

@@ -189,20 +189,19 @@ button.google, .button.google {
   display: flex;
   align-items: center;
   position: relative;
-  padding: 0 8dp;
+  padding: 0 2px;
   color: #FFFFFF;
   background-color: #4285F4;
 }
 button.google span.logo, .button.google span.logo {
-  height: 48px;
-  width: 48px;
-  background-image: url("../../../images/idp/google.png");
-}
-@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-  button.google span.logo, .button.google span.logo {
-    background-image: url("../../../images/idp/google@2x.png");
-    background-size: 48px 48px;
-  }
+  height: 44px;
+  width: 44px;
+  background-color: #FFFFFF;
+  background-image: url("../../../images/idp/google2.png");
+  background-size: 25px;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 5px;
 }
 button.google span.provider-name, .button.google span.provider-name {
   position: absolute;

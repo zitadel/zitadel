@@ -129,14 +129,19 @@ button, .button {
         display: flex;
         align-items: center;
         position: relative;
-        padding: 0 8px;
+        padding: 0 2px;
         color: $idpGoogleFontColor;
         background-color: $idpGoogleBackgroundColor;
 
         span.logo {
-            height: 48px;
-            width: 48px;
-            @include retina-background-image($idpGoogleImg, "png", false, 48px, 48px);
+            height: 44px;
+            width: 44px;
+            background-color: #FFFFFF;
+            background-image: url($idpGoogleImg + '.png');
+            background-size: 25px;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 5px;
         }
 
         span.provider-name {
