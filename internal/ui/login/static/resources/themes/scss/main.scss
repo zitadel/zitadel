@@ -129,13 +129,13 @@ button, .button {
         display: flex;
         align-items: center;
         position: relative;
-        padding: 0 2px;
+        padding: 0 1px;
         color: $idpGoogleFontColor;
         background-color: $idpGoogleBackgroundColor;
 
         span.logo {
-            height: 44px;
-            width: 44px;
+            height: 46px;
+            width: 46px;
             background-color: #FFFFFF;
             background-image: url($idpGoogleImg + '.png');
             background-size: 25px;
