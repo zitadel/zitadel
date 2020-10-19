@@ -1,7 +1,6 @@
 package handler
 
 import (
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"net/http"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
@@ -72,9 +71,6 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *mod
 	funcs := map[string]interface{}{
 		"hasExternalLogin": func() bool {
 			return authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0
-		},
-		"idpProviderClass": func(stylingType iam_model.IDPStylingType) string {
-			return stylingType.GetCSSClass()
 		},
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplLogin], data, funcs)

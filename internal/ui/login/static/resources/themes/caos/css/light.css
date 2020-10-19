@@ -197,7 +197,7 @@ button.google span.logo, .button.google span.logo {
   height: 46px;
   width: 46px;
   background-color: #FFFFFF;
-  background-image: url("../../../images/idp/google2.png");
+  background-image: url("../../../images/idp/google.png");
   background-size: 25px;
   background-position: center;
   background-repeat: no-repeat;
@@ -575,7 +575,7 @@ html button.google, html .button.google {
   background-color: #FFFFFF;
 }
 html button.google span.logo, html .button.google span.logo {
-  background-image: url("../../../images/idp/google2.png");
+  background-image: url("../../../images/idp/google.png");
 }
 html input:not([type=radio]), html select {
   background-color: #FFFFFF;
