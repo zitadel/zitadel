@@ -2,6 +2,11 @@
 
 set -eux
 
+if [ "$skip_postinstall" == "yes" ]; then
+  echo "skipping grpc generate.";
+  exit 0;
+fi
+
 GEN_PATH=src/app/proto/generated
 
 echo "Remove old files"

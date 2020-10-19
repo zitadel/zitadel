@@ -18,7 +18,7 @@ jobs:
         working-directory: ./console
     steps:
     - uses: actions/checkout@v2
-    - run: npm ci --ignore-scripts
+    - run: skip_postinstall="yes" npm ci
     - run: npm run lint
 
   angular-build:
