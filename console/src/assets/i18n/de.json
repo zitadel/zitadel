@@ -731,7 +731,13 @@
         "ACTIVATE":"Aktivieren",
         "DELETE":"Löschen",
         "TOAST": {
-            "SAVED": "Erfolgreich gespeichert."
+            "SAVED": "Erfolgreich gespeichert.",
+            "REACTIVATED":"Idp reaktiviert.",
+            "DEACTIVATED":"Idp deaktiviert.",
+            "SELECTEDREACTIVATED":"Selektierte Idps reaktiviert.",
+            "SELECTEDDEACTIVATED":"Selektierte Idps deaktiviert.",
+            "SELECTEDKEYSDELETED":"Selektierte Idps gelöscht.",
+            "DELETED":"Idp erfolgreich gelöscht!"
         }
     },
     "LOGINPOLICY": {

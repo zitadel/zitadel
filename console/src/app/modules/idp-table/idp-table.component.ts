@@ -48,6 +48,10 @@ export class IdpTableComponent implements OnInit {
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
             this.displayedColumns = ['select', 'name', 'config', 'creationDate', 'changeDate', 'state', 'type'];
         }
+
+        if (!this.disabled) {
+            this.displayedColumns.push('actions');
+        }
     }
 
     public isAllSelected(): boolean {
@@ -71,8 +75,8 @@ export class IdpTableComponent implements OnInit {
         Promise.all(this.selection.selected.map(value => {
             return this.service.DeactivateIdpConfig(value.id);
         })).then(() => {
-            this.toast.showInfo('USER.TOAST.SELECTEDDEACTIVATED', true);
-            this.getData(10, 0);
+            this.toast.showInfo('IDP.TOAST.SELECTEDDEACTIVATED', true);
+            this.refreshPage();
         });
     }
 
@@ -80,8 +84,8 @@ export class IdpTableComponent implements OnInit {
         Promise.all(this.selection.selected.map(value => {
             return this.service.ReactivateIdpConfig(value.id);
         })).then(() => {
-            this.toast.showInfo('USER.TOAST.SELECTEDREACTIVATED', true);
-            this.getData(10, 0);
+            this.toast.showInfo('IDP.TOAST.SELECTEDREACTIVATED', true);
+            this.refreshPage();
         });
     }
 
@@ -89,8 +93,18 @@ export class IdpTableComponent implements OnInit {
         Promise.all(this.selection.selected.map(value => {
             return this.service.RemoveIdpConfig(value.id);
         })).then(() => {
-            this.toast.showInfo('USER.TOAST.SELECTEDDEACTIVATED', true);
-            this.getData(10, 0);
+            this.toast.showInfo('IDP.TOAST.SELECTEDDEACTIVATED', true);
+            this.refreshPage();
+
+        });
+    }
+
+    public removeIdp(idp: AdminIdpView.AsObject | MgmtIdpView.AsObject): void {
+        this.service.RemoveIdpConfig(idp.id).then(() => {
+            this.toast.showInfo('IDP.TOAST.REMOVED', true);
+            setTimeout(() => {
+                this.refreshPage();
+            }, 1000);
         });
     }
 
