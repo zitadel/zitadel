@@ -32,8 +32,8 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatTable) public table!: MatTable<UserGrantView.AsObject>;
 
-    @Input() allowWrite: boolean = false;
-    @Input() allowDelete: boolean = false;
+    @Input() disableWrite: boolean = false;
+    @Input() disableDelete: boolean = false;
 
     @Input() userId: string = '';
     @Input() projectId: string = '';
@@ -125,8 +125,9 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
     public getGrantRoleOptions(grantId: string, projectId: string): void {
         this.mgmtService.GetGrantedProjectByID(projectId, grantId).then(resp => {
-            this.loadedGrantId = projectId;
+            this.loadedGrantId = grantId;
             this.grantRoleOptions = resp.toObject().roleKeysList;
+            console.log('grant roles', this.grantRoleOptions);
         }).catch(error => {
             this.toast.showError(error);
         });
@@ -136,6 +137,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         this.mgmtService.SearchProjectRoles(projectId, 100, 0).then(resp => {
             this.loadedProjectId = projectId;
             this.projectRoleOptions = resp.toObject().resultList;
+            console.log('project roles', this.projectRoleOptions);
         });
     }
 

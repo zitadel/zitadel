@@ -3,7 +3,7 @@
         <span class="label">{{ 'USER.PROFILE.PASSWORD' | translate }}</span>
 
         <span>*********</span>
-        <div>
+        <div class="overflow">
             <ng-content select="[phoneAction]"></ng-content>
             <a [disabled]="!canWrite" [routerLink]="['password']" mat-icon-button>
                 <mat-icon class="icon">chevron_right</mat-icon>

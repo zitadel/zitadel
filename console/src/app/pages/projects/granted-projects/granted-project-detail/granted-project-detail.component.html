@@ -18,8 +18,8 @@
                 <app-user-grants *ngIf="projectId && grantId" [context]="UserGrantContext.GRANTED_PROJECT"
                     [projectId]="projectId" [grantId]="grantId"
                     [displayedColumns]="['select','user', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']"
-                    [allowWrite]="['user.grant.write$','user.grant.write:'+grantId] | hasRole | async"
-                    [allowDelete]="['user.grant.delete$','user.grant.delete:'+grantId] | hasRole | async"
+                    [disableWrite]="['user.grant.write$','user.grant.write:'+grantId] | hasRole | async"
+                    [disableDelete]="['user.grant.delete$','user.grant.delete:'+grantId] | hasRole | async"
                     refreshOnPreviousRoute="/grant-create/project/{{projectId}}/grant/{{grantId}}">
                 </app-user-grants>
             </app-card>
