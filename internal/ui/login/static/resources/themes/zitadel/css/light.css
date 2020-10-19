@@ -162,7 +162,8 @@ button, .button {
   outline: none;
   display: inline-block;
   text-align: center;
-  line-height: 40px;
+  line-height: 44px;
+  padding: 1px 6px;
 }
 button:hover, .button:hover {
   background-color: #5b8fd3;
@@ -184,6 +185,30 @@ button:disabled, .button:disabled {
 button:disabled:hover, .button:disabled:hover {
   background-color: #999999;
   border: 1px solid #999999;
+}
+button.google, .button.google {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0 8dp;
+  color: #FFFFFF;
+  background-color: #4285F4;
+}
+button.google span.logo, .button.google span.logo {
+  height: 48px;
+  width: 48px;
+  background-image: url("../../../images/idp/google.png");
+}
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+  button.google span.logo, .button.google span.logo {
+    background-image: url("../../../images/idp/google@2x.png");
+    background-size: 48px 48px;
+  }
+}
+button.google span.provider-name, .button.google span.provider-name {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 input:not([type=radio]), select {
@@ -545,6 +570,19 @@ html button.other-user:hover .other-user-image, html .button.other-user:hover .o
   html button.other-user:hover .other-user-image, html .button.other-user:hover .other-user-image {
     background-image: url("../../../images/icon-newuser-light-hover@2x.png");
     background-size: 80px 60px;
+  }
+}
+html button.google, html .button.google {
+  color: #282828;
+  background-color: #FFFFFF;
+}
+html button.google span.logo, html .button.google span.logo {
+  background-image: url("../../../images/idp/google.png");
+}
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+  html button.google span.logo, html .button.google span.logo {
+    background-image: url("../../../images/idp/google@2x.png");
+    background-size: 50px 50px;
   }
 }
 html input:not([type=radio]), html select {

@@ -97,7 +97,8 @@ button, .button {
     outline: none;
     display: inline-block;
     text-align: center;
-    line-height: 40px;
+    line-height: 44px;
+    padding: 1px 6px;
 
     &:hover {
         background-color: $primaryColorHover;
@@ -121,6 +122,27 @@ button, .button {
         &:hover {
             background-color: $inputBorderColor;
             border: 1px solid $inputBorderColor;
+        }
+    }
+
+    &.google {
+        display: flex;
+        align-items: center;
+        position: relative;
+        padding: 0 8px;
+        color: $idpGoogleFontColor;
+        background-color: $idpGoogleBackgroundColor;
+
+        span.logo {
+            height: 48px;
+            width: 48px;
+            @include retina-background-image($idpGoogleImg, "png", false, 48px, 48px);
+        }
+
+        span.provider-name {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
         }
     }
 }
