@@ -730,8 +730,18 @@
         "DEACTIVATE":"Deactivate",
         "ACTIVATE":"Activate",
         "DELETE":"Delete",
+        "DELETE_TITLE":"Delete Idp",
+        "DELETE_DESCRIPTION":"You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
+        "DELETE_SELECTION_TITLE":"Delete Idp",
+        "DELETE_SELECTION_DESCRIPTION":"You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
         "TOAST": {
-            "SAVED": "Successfully saved."
+            "SAVED": "Successfully saved.",
+            "REACTIVATED":"Idp reactivated.",
+            "DEACTIVATED":"Idp deactivated.",
+            "SELECTEDREACTIVATED":"Selected idps reactivated.",
+            "SELECTEDDEACTIVATED":"Selected idps deactivated.",
+            "SELECTEDKEYSDELETED":"Selected idps deleted.",
+            "DELETED":"Idp removed successfully!"
         }
     },
     "LOGINPOLICY": {

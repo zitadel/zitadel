@@ -730,8 +730,18 @@
         "DEACTIVATE":"Deaktivieren",
         "ACTIVATE":"Aktivieren",
         "DELETE":"Löschen",
+        "DELETE_TITLE":"Idp löschen",
+        "DELETE_DESCRIPTION":"Sie sind im Begriff einen Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
+        "DELETE_SELECTION_TITLE":"Identity Providers löschen",
+        "DELETE_SELECTION_DESCRIPTION":"Sie sind im Begriff mehrere Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
         "TOAST": {
-            "SAVED": "Erfolgreich gespeichert."
+            "SAVED": "Erfolgreich gespeichert.",
+            "REACTIVATED":"Idp reaktiviert.",
+            "DEACTIVATED":"Idp deaktiviert.",
+            "SELECTEDREACTIVATED":"Selektierte Idps reaktiviert.",
+            "SELECTEDDEACTIVATED":"Selektierte Idps deaktiviert.",
+            "SELECTEDKEYSDELETED":"Selektierte Idps gelöscht.",
+            "DELETED":"Idp erfolgreich gelöscht!"
         }
     },
     "LOGINPOLICY": {
