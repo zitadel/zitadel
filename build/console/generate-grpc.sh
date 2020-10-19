@@ -2,7 +2,11 @@
 
 set -eux
 
-if [ "$skip_postinstall" == "yes" ]; then
+assertNotEmpty() {
+    : "${!1:? exit 0}"
+}
+
+if [[assertNotEmpty skip_postinstall]]; then
   echo "skipping grpc generate.";
   exit 0;
 fi
