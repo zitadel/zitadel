@@ -6,7 +6,6 @@ import (
 	"errors"
 	"regexp"
 	"strconv"
-	"sync"
 
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -113,54 +112,42 @@ func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
 			logging.Log("SQL-3to5p").WithError(err).Warn("prepare failed")
 			return caos_errs.ThrowInternal(err, "SQL-OdXRE", "prepare failed")
 		}
-		wg := sync.WaitGroup{}
-		errs := make(chan error, len(events))
 
 		for _, event := range events {
-			wg.Add(1)
-			go func(event *repository.Event) {
-				defer wg.Done()
-				previousSequence := Sequence(event.PreviousSequence)
-				if event.PreviousEvent != nil {
-					if event.PreviousEvent.AggregateType != event.AggregateType || event.PreviousEvent.AggregateID != event.AggregateID {
-						errs <- caos_errs.ThrowPreconditionFailed(nil, "SQL-J55uR", "aggregate of linked events unequal")
-						return
-					}
-					previousSequence = Sequence(event.PreviousEvent.Sequence)
+			previousSequence := Sequence(event.PreviousSequence)
+			if event.PreviousEvent != nil {
+				if event.PreviousEvent.AggregateType != event.AggregateType || event.PreviousEvent.AggregateID != event.AggregateID {
+					return caos_errs.ThrowPreconditionFailed(nil, "SQL-J55uR", "aggregate of linked events unequal")
 				}
-				err = stmt.QueryRowContext(ctx,
-					event.Type,
-					event.AggregateType,
-					event.AggregateID,
-					event.Version,
-					&sql.NullTime{
-						Time:  event.CreationDate,
-						Valid: !event.CreationDate.IsZero(),
-					},
-					Data(event.Data),
-					event.EditorUser,
-					event.EditorService,
-					event.ResourceOwner,
-					previousSequence,
-					event.CheckPreviousSequence,
-				).Scan(&event.ID, &event.Sequence, &previousSequence, &event.CreationDate)
+				previousSequence = Sequence(event.PreviousEvent.Sequence)
+			}
+			err = stmt.QueryRowContext(ctx,
+				event.Type,
+				event.AggregateType,
+				event.AggregateID,
+				event.Version,
+				&sql.NullTime{
+					Time:  event.CreationDate,
+					Valid: !event.CreationDate.IsZero(),
+				},
+				Data(event.Data),
+				event.EditorUser,
+				event.EditorService,
+				event.ResourceOwner,
+				previousSequence,
+				event.CheckPreviousSequence,
+			).Scan(&event.ID, &event.Sequence, &previousSequence, &event.CreationDate)
 
-				event.PreviousSequence = uint64(previousSequence)
+			event.PreviousSequence = uint64(previousSequence)
 
-				if err != nil {
-					logging.LogWithFields("SQL-IP3js",
-						"aggregate", event.AggregateType,
-						"aggregateId", event.AggregateID,
-						"aggregateType", event.AggregateType,
-						"eventType", event.Type).WithError(err).Info("query failed")
-					errs <- caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")
-				}
-			}(event)
-		}
-		wg.Wait()
-		close(errs)
-		for err := range errs {
-			return err
+			if err != nil {
+				logging.LogWithFields("SQL-IP3js",
+					"aggregate", event.AggregateType,
+					"aggregateId", event.AggregateID,
+					"aggregateType", event.AggregateType,
+					"eventType", event.Type).WithError(err).Info("query failed")
+				return caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")
+			}
 		}
 
 		return nil
