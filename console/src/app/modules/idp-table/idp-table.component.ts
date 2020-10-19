@@ -1,5 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { RouterLink } from '@angular/router';
@@ -12,6 +13,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
+import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 
 @Component({
     selector: 'app-idp-table',
@@ -37,7 +39,7 @@ export class IdpTableComponent implements OnInit {
     @Output() public changedSelection: EventEmitter<Array<AdminIdpView.AsObject | MgmtIdpView.AsObject>>
         = new EventEmitter();
 
-    constructor(public translate: TranslateService, private toast: ToastService) {
+    constructor(public translate: TranslateService, private toast: ToastService, private dialog: MatDialog) {
         this.selection.changed.subscribe(() => {
             this.changedSelection.emit(this.selection.selected);
         });
@@ -72,6 +74,7 @@ export class IdpTableComponent implements OnInit {
     }
 
     public deactivateSelectedIdps(): void {
+        this.selection.clear();
         Promise.all(this.selection.selected.map(value => {
             return this.service.DeactivateIdpConfig(value.id);
         })).then(() => {
@@ -81,6 +84,7 @@ export class IdpTableComponent implements OnInit {
     }
 
     public reactivateSelectedIdps(): void {
+        this.selection.clear();
         Promise.all(this.selection.selected.map(value => {
             return this.service.ReactivateIdpConfig(value.id);
         })).then(() => {
@@ -90,21 +94,35 @@ export class IdpTableComponent implements OnInit {
     }
 
     public removeSelectedIdps(): void {
+        this.selection.clear();
         Promise.all(this.selection.selected.map(value => {
             return this.service.RemoveIdpConfig(value.id);
         })).then(() => {
             this.toast.showInfo('IDP.TOAST.SELECTEDDEACTIVATED', true);
             this.refreshPage();
-
         });
     }
 
     public removeIdp(idp: AdminIdpView.AsObject | MgmtIdpView.AsObject): void {
-        this.service.RemoveIdpConfig(idp.id).then(() => {
-            this.toast.showInfo('IDP.TOAST.REMOVED', true);
-            setTimeout(() => {
-                this.refreshPage();
-            }, 1000);
+        const dialogRef = this.dialog.open(WarnDialogComponent, {
+            data: {
+                confirmKey: 'ACTIONS.DELETE',
+                cancelKey: 'ACTIONS.CANCEL',
+                titleKey: 'IDP.DELETE_TITLE',
+                descriptionKey: 'IDP.DELETE_DESCRIPTION',
+            },
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                this.service.RemoveIdpConfig(idp.id).then(() => {
+                    this.toast.showInfo('IDP.TOAST.REMOVED', true);
+                    setTimeout(() => {
+                        this.refreshPage();
+                    }, 1000);
+                });
+            }
         });
     }
 

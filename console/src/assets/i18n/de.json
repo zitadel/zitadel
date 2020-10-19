@@ -730,6 +730,8 @@
         "DEACTIVATE":"Deaktivieren",
         "ACTIVATE":"Aktivieren",
         "DELETE":"Löschen",
+        "DELETE_TITLE":"Idp löschen",
+        "DELETE_DESCRIPTION":"Sie sind im Begriff einen Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
         "TOAST": {
             "SAVED": "Erfolgreich gespeichert.",
             "REACTIVATED":"Idp reaktiviert.",

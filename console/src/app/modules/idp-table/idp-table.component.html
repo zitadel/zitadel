@@ -2,18 +2,15 @@
     emitRefreshOnPreviousRoute="/iam/idp/create" [timestamp]="idpResult?.viewTimestamp" [selection]="selection">
     <ng-template appHasRole [appHasRole]="['iam.write']" actions>
         <button (click)="deactivateSelectedIdps()" matTooltip="{{'IDP.DEACTIVATE' | translate}}" class="icon-button"
-            mat-icon-button *ngIf="selection.hasValue() && serviceType!=PolicyComponentServiceType.MGMT"
-            [disabled]="disabled">
+            mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
             <mat-icon>block</mat-icon>
         </button>
         <button (click)="reactivateSelectedIdps()" matTooltip="{{'IDP.ACTIVATE' | translate}}" class="icon-button"
-            mat-icon-button *ngIf="selection.hasValue() && serviceType!=PolicyComponentServiceType.MGMT"
-            [disabled]="disabled">
+            mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
             <mat-icon>play_circle_outline</mat-icon>
         </button>
         <button color="warn" (click)="removeSelectedIdps()" matTooltip="{{'IDP.DELETE' | translate}}"
-            class="icon-button" mat-icon-button
-            *ngIf="selection.hasValue() && serviceType!=PolicyComponentServiceType.MGMT" [disabled]="disabled">
+            class="icon-button" mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
             <i class="las la-trash"></i>
         </button>
         <a [routerLink]="createRouterLink" color="primary" mat-raised-button [disabled]="disabled">
