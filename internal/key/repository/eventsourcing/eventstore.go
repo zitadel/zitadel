@@ -83,3 +83,7 @@ func (es *KeyEventstore) CreateKeyPair(ctx context.Context, pair *key_model.KeyP
 	}
 	return model.KeyPairToModel(repoKey), nil
 }
+
+func (es *KeyEventstore) LatestKeyEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
+	return es.FilterEvents(ctx, KeyPairQuery(sequence))
+}

@@ -22,6 +22,7 @@ type SigningKey struct {
 	ID        string
 	Algorithm string
 	Key       interface{}
+	Sequence  uint64
 }
 
 type PublicKey struct {
@@ -84,6 +85,7 @@ func SigningKeyFromKeyView(key *KeyView, alg crypto.EncryptionAlgorithm) (*Signi
 		ID:        key.ID,
 		Algorithm: key.Algorithm,
 		Key:       privateKey,
+		Sequence:  key.Sequence,
 	}, nil
 }
 
