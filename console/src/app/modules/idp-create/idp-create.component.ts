@@ -47,7 +47,6 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
     ) {
         this.formGroup = new FormGroup({
             name: new FormControl('', [Validators.required]),
-            logoSrc: new FormControl('', []),
             clientId: new FormControl('', [Validators.required]),
             clientSecret: new FormControl('', [Validators.required]),
             issuer: new FormControl('', [Validators.required]),
@@ -103,7 +102,6 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
         req.setClientId(this.clientId?.value);
         req.setClientSecret(this.clientSecret?.value);
         req.setIssuer(this.issuer?.value);
-        req.setLogoSrc(this.logoSrc?.value);
         req.setScopesList(this.scopesList?.value);
         req.setIdpDisplayNameMapping(this.idpDisplayNameMapping?.value);
         req.setUsernameMapping(this.usernameMapping?.value);
@@ -151,10 +149,6 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
 
     public get name(): AbstractControl | null {
         return this.formGroup.get('name');
-    }
-
-    public get logoSrc(): AbstractControl | null {
-        return this.formGroup.get('logoSrc');
     }
 
     public get clientId(): AbstractControl | null {

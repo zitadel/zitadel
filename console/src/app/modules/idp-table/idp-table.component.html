@@ -32,8 +32,6 @@
                     <mat-checkbox color="primary" (click)="$event.stopPropagation()"
                         [disabled]="serviceType==PolicyComponentServiceType.MGMT && idp?.providerType == IdpProviderType.IDPPROVIDERTYPE_SYSTEM"
                         (change)="$event ? selection.toggle(idp) : null" [checked]="selection.isSelected(idp)">
-                        <img *ngIf="idp?.logoSrc?.startsWith('https://'); else genAvatar" [src]="idp.logoSrc"
-                            alt="ipp logo {{idp?.name}}" />
                         <ng-template #genAvatar>
                             <div class="avatar">
                                 <span>{{idp.name.charAt(0)}}</span>

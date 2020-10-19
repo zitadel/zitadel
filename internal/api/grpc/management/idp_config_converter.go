@@ -9,9 +9,9 @@ import (
 
 func createOidcIdpToModel(idp *management.OidcIdpConfigCreate) *iam_model.IDPConfig {
 	return &iam_model.IDPConfig{
-		Name:    idp.Name,
-		LogoSrc: idp.LogoSrc,
-		Type:    iam_model.IDPConfigTypeOIDC,
+		Name:        idp.Name,
+		StylingType: idpConfigStylingTypeToModel(idp.StylingType),
+		Type:        iam_model.IDPConfigTypeOIDC,
 		OIDCConfig: &iam_model.OIDCIDPConfig{
 			ClientID:              idp.ClientId,
 			ClientSecretString:    idp.ClientSecret,
@@ -27,7 +27,7 @@ func updateIdpToModel(idp *management.IdpUpdate) *iam_model.IDPConfig {
 	return &iam_model.IDPConfig{
 		IDPConfigID: idp.Id,
 		Name:        idp.Name,
-		LogoSrc:     idp.LogoSrc,
+		StylingType: idpConfigStylingTypeToModel(idp.StylingType),
 	}
 }
 
@@ -56,7 +56,7 @@ func idpFromModel(idp *iam_model.IDPConfig) *management.Idp {
 		ChangeDate:   changeDate,
 		Sequence:     idp.Sequence,
 		Name:         idp.Name,
-		LogoSrc:      idp.LogoSrc,
+		StylingType:  idpConfigStylingTypeFromModel(idp.StylingType),
 		State:        idpConfigStateFromModel(idp.State),
 		IdpConfig:    idpConfigFromModel(idp),
 	}
@@ -76,7 +76,7 @@ func idpViewFromModel(idp *iam_model.IDPConfigView) *management.IdpView {
 		Sequence:      idp.Sequence,
 		ProviderType:  idpProviderTypeFromModel(idp.IDPProviderType),
 		Name:          idp.Name,
-		LogoSrc:       idp.LogoSrc,
+		StylingType:   idpConfigStylingTypeFromModel(idp.StylingType),
 		State:         idpConfigStateFromModel(idp.State),
 		IdpConfigView: idpConfigViewFromModel(idp),
 	}
@@ -209,5 +209,23 @@ func oidcMappingFieldToModel(field management.OIDCMappingField) iam_model.OIDCMa
 		return iam_model.OIDCMappingFieldEmail
 	default:
 		return iam_model.OIDCMappingFieldUnspecified
+	}
+}
+
+func idpConfigStylingTypeFromModel(stylingType iam_model.IDPStylingType) management.IdpStylingType {
+	switch stylingType {
+	case iam_model.IDPStylingTypeGoogle:
+		return management.IdpStylingType_IDPSTYLINGTYPE_GOOGLE
+	default:
+		return management.IdpStylingType_IDPSTYLINGTYPE_UNSPECIFIED
+	}
+}
+
+func idpConfigStylingTypeToModel(stylingType management.IdpStylingType) iam_model.IDPStylingType {
+	switch stylingType {
+	case management.IdpStylingType_IDPSTYLINGTYPE_GOOGLE:
+		return iam_model.IDPStylingTypeGoogle
+	default:
+		return iam_model.IDPStylingTypeUnspecified
 	}
 }
