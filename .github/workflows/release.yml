@@ -18,14 +18,7 @@ jobs:
         working-directory: ./console
     steps:
     - uses: actions/checkout@v2
-    - name: Install Protoc
-      uses: arduino/setup-protoc@master
-      with:
-        version: '3.x'
-    - run: wget -O protoc-gen-grpc-web https://github.com/grpc/grpc-web/releases/download/1.2.0/protoc-gen-grpc-web-1.2.0-linux-x86_64
-    - run: sudo mv protoc-gen-grpc-web /usr/local/bin/protoc-gen-grpc-web
-    - run: sudo chmod +x /usr/local/bin/protoc-gen-grpc-web
-    - run: npm ci
+    - run: npm ci --ignore-scripts
     - run: npm run lint
 
   angular-build:
