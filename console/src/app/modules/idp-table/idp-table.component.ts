@@ -94,7 +94,6 @@ export class IdpTableComponent implements OnInit {
     }
 
     public removeSelectedIdps(): void {
-        this.selection.clear();
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
                 confirmKey: 'ACTIONS.DELETE',
@@ -107,6 +106,8 @@ export class IdpTableComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
+                this.selection.clear();
+
                 Promise.all(this.selection.selected.map(value => {
                     return this.service.RemoveIdpConfig(value.id);
                 })).then(() => {
