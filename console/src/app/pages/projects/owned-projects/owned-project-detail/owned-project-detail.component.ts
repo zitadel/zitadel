@@ -191,7 +191,8 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     }
 
     public saveProject(): void {
-        this.mgmtService.UpdateProject(this.project.projectId, this.project.name).then(() => {
+        console.log(this.project);
+        this.mgmtService.UpdateProject(this.project.projectId, this.project).then(() => {
             this.toast.showInfo('PROJECT.TOAST.UPDATED', true);
         }).catch(error => {
             this.toast.showError(error);

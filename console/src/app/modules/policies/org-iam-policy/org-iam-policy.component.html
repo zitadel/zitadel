@@ -4,8 +4,8 @@
     <p class="default" *ngIf="isDefault"> {{'ORG.POLICY.DEFAULTLABEL' | translate}}</p>
 
     <ng-template appHasRole [appHasRole]="['iam.policy.delete']">
-        <button *ngIf="serviceType === PolicyComponentServiceType.MGMT" matTooltip="{{'ORG.POLICY.RESET' | translate}}"
-            color="warn" (click)="removePolicy()" mat-stroked-button>
+        <button *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
+            matTooltip="{{'ORG.POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()" mat-stroked-button>
             {{'ORG.POLICY.RESET' | translate}}
         </button>
     </ng-template>

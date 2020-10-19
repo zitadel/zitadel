@@ -20,17 +20,17 @@
 
             <mat-menu class="menu" #menu="matMenu">
                 <div class="spinner-w">
-                    <mat-spinner diameter="20" *ngIf="orgLoading" color="accent">
+                    <mat-spinner diameter="20" *ngIf="orgLoading$ | async" color="accent">
                     </mat-spinner>
                 </div>
 
                 <mat-form-field class="filter-form" appearance="fill">
-                    <input autocomplete="off" matInput (click)="$event.stopPropagation()" (keyup)="applyFilter($event)"
+                    <input matInput [formControl]="filterControl" autocomplete="off" (click)="$event.stopPropagation()"
                         placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}" #input>
                 </mat-form-field>
 
                 <button [ngClass]="{'active': temporg.id === org?.id}" [disabled]="!temporg.id"
-                    *ngFor="let temporg of orgs" mat-menu-item (click)="setActiveOrg(temporg)">
+                    *ngFor="let temporg of orgs$ | async" mat-menu-item (click)="setActiveOrg(temporg)">
                     {{temporg?.name ? temporg.name : 'NO NAME'}}
                 </button>
 

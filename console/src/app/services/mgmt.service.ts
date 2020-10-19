@@ -975,10 +975,12 @@ export class ManagementService {
         return this.grpcService.mgmt.createProject(req);
     }
 
-    public UpdateProject(id: string, name: string): Promise<Project> {
+    public UpdateProject(id: string, projectView: ProjectView.AsObject): Promise<Project> {
         const req = new ProjectUpdateRequest();
-        req.setName(name);
         req.setId(id);
+        req.setName(projectView.name);
+        req.setProjectRoleAssertion(projectView.projectRoleAssertion);
+        req.setProjectRoleCheck(projectView.projectRoleCheck);
         return this.grpcService.mgmt.updateProject(req);
     }
 
@@ -1271,6 +1273,9 @@ export class ManagementService {
         req.setGrantTypesList(oidcConfig.grantTypesList);
         req.setApplicationType(oidcConfig.applicationType);
         req.setDevMode(oidcConfig.devMode);
+        req.setAccessTokenType(oidcConfig.accessTokenType);
+        req.setAccessTokenRoleAssertion(oidcConfig.accessTokenRoleAssertion);
+        req.setIdTokenRoleAssertion(oidcConfig.idTokenRoleAssertion);
         return this.grpcService.mgmt.updateApplicationOIDCConfig(req);
     }
 }

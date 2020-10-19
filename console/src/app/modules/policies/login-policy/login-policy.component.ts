@@ -33,9 +33,11 @@ export class LoginPolicyComponent implements OnDestroy {
 
     private sub: Subscription = new Subscription();
     public service!: ManagementService | AdminService;
-    PolicyComponentServiceType: any = PolicyComponentServiceType;
+    public PolicyComponentServiceType: any = PolicyComponentServiceType;
     public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
     public idps: MgmtIdpProviderView.AsObject[] | AdminIdpProviderView.AsObject[] = [];
+
+    public loading: boolean = false;
     constructor(
         private route: ActivatedRoute,
         private toast: ToastService,
@@ -43,7 +45,6 @@ export class LoginPolicyComponent implements OnDestroy {
         private injector: Injector,
     ) {
         this.sub = this.route.data.pipe(switchMap(data => {
-            console.log(data.serviceType);
             this.serviceType = data.serviceType;
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
@@ -56,15 +57,19 @@ export class LoginPolicyComponent implements OnDestroy {
 
             return this.route.params;
         })).subscribe(() => {
-            this.getData().then(data => {
-                if (data) {
-                    this.loginData = data.toObject();
-                }
-            });
-            this.getIdps().then(idps => {
-                console.log(idps);
-                this.idps = idps;
-            });
+            this.fetchData();
+        });
+    }
+
+    private fetchData(): void {
+        this.getData().then(data => {
+            if (data) {
+                this.loginData = data.toObject();
+                this.loading = false;
+            }
+        });
+        this.getIdps().then(idps => {
+            this.idps = idps;
         });
     }
 
@@ -122,6 +127,10 @@ export class LoginPolicyComponent implements OnDestroy {
     public savePolicy(): void {
         this.updateData().then(() => {
             this.toast.showInfo('ORG.POLICY.LOGIN_POLICY.SAVED', true);
+            this.loading = true;
+            setTimeout(() => {
+                this.fetchData();
+            }, 2000);
         }).catch(error => {
             this.toast.showError(error);
         });
@@ -131,9 +140,10 @@ export class LoginPolicyComponent implements OnDestroy {
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
             (this.service as ManagementService).RemoveLoginPolicy().then(() => {
                 this.toast.showInfo('ORG.POLICY.TOAST.RESETSUCCESS', true);
+                this.loading = true;
                 setTimeout(() => {
-                    this.getData();
-                }, 1000);
+                    this.fetchData();
+                }, 2000);
             }).catch(error => {
                 this.toast.showError(error);
             });
@@ -151,7 +161,12 @@ export class LoginPolicyComponent implements OnDestroy {
         dialogRef.afterClosed().subscribe(resp => {
             if (resp && resp.idp && resp.type) {
                 this.addIdp(resp.idp, resp.type).then(() => {
-                    this.getData();
+                    this.loading = true;
+                    setTimeout(() => {
+                        this.fetchData();
+                    }, 2000);
+                }).catch(error => {
+                    this.toast.showError(error);
                 });
             }
         });
@@ -170,10 +185,20 @@ export class LoginPolicyComponent implements OnDestroy {
     public removeIdp(idp: AdminIdpProviderView.AsObject | MgmtIdpProviderView.AsObject): void {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                (this.service as ManagementService).RemoveIdpProviderFromLoginPolicy(idp.idpConfigId);
+                (this.service as ManagementService).RemoveIdpProviderFromLoginPolicy(idp.idpConfigId).then(() => {
+                    const index = this.idps.findIndex(temp => temp === idp);
+                    if (index > -1) {
+                        this.idps.splice(index, 1);
+                    }
+                });
                 break;
             case PolicyComponentServiceType.ADMIN:
-                (this.service as AdminService).RemoveIdpProviderFromDefaultLoginPolicy(idp.idpConfigId);
+                (this.service as AdminService).RemoveIdpProviderFromDefaultLoginPolicy(idp.idpConfigId).then(() => {
+                    const index = this.idps.findIndex(temp => temp === idp);
+                    if (index > -1) {
+                        this.idps.splice(index, 1);
+                    }
+                });
                 break;
         }
     }

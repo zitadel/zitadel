@@ -201,6 +201,8 @@ EventTypes:
       check:
         succeeded: Initialisation check succeded
         failed: Initialisation check failed
+    token:
+      added: Access Token ausgestellt
     username:
       reserved: Username reserved
       released: Username released
@@ -249,6 +251,9 @@ EventTypes:
         check:
           succeeded: Password check succeeded
           failed: Password check failed
+      externallogin:
+        check:
+          succeeded: External login succeeded
       externalidp:
         added: Externer IDP added
         removed: Externer IDP removed
@@ -377,6 +382,19 @@ EventTypes:
         idpprovider:
           added: Idp Provider added to Login Policy
           removed: Idp Provider removed from Login Policy
+      password:
+        complexity:
+          added: Password complexity policy added
+          changed: Password complexity policy changed
+          removed: Password complexity policy removed
+        age:
+          added: Password age policy added
+          changed: Password age policy changed
+          removed: Password age policy removed
+        lockout:
+          added: Password lockout policy added
+          changed: Password lockout policy changed
+          removed: Password lockout policy removed
   project:
     added: Project added
     changed: Project changed

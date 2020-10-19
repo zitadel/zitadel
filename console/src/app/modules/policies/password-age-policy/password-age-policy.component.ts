@@ -110,14 +110,18 @@ export class PasswordAgePolicyComponent implements OnDestroy {
                     (this.service as ManagementService).CreatePasswordAgePolicy(
                         this.ageData.maxAgeDays,
                         this.ageData.expireWarnDays,
-                    ).catch(error => {
+                    ).then(() => {
+                        this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                    }).catch(error => {
                         this.toast.showError(error);
                     });
                 } else {
                     (this.service as ManagementService).UpdatePasswordAgePolicy(
                         this.ageData.maxAgeDays,
                         this.ageData.expireWarnDays,
-                    ).catch(error => {
+                    ).then(() => {
+                        this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                    }).catch(error => {
                         this.toast.showError(error);
                     });
                 }
@@ -126,11 +130,20 @@ export class PasswordAgePolicyComponent implements OnDestroy {
                 (this.service as AdminService).UpdateDefaultPasswordAgePolicy(
                     this.ageData.maxAgeDays,
                     this.ageData.expireWarnDays,
-                ).catch(error => {
+                ).then(() => {
+                    this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                }).catch(error => {
                     this.toast.showError(error);
                 });
                 break;
         }
+    }
 
+    public get isDefault(): boolean {
+        if (this.ageData && this.serviceType === PolicyComponentServiceType.MGMT) {
+            return (this.ageData as PasswordAgePolicyView.AsObject).pb_default;
+        } else {
+            return false;
+        }
     }
 }
