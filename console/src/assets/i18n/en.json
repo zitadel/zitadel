@@ -718,7 +718,6 @@
         "NAME":"Name",
         "CONFIG":"Configuration",
         "STATE":"State",
-        "LOGOSRC":"Logo Src",
         "ISSUER":"Issuer",
         "SCOPESLIST":"Scopes List",
         "CLIENTID":"Client ID",

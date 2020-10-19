@@ -190,13 +190,13 @@ button.google, .button.google {
   display: flex;
   align-items: center;
   position: relative;
-  padding: 0 2px;
+  padding: 0 1px;
   color: #FFFFFF;
   background-color: #4285F4;
 }
 button.google span.logo, .button.google span.logo {
-  height: 44px;
-  width: 44px;
+  height: 46px;
+  width: 46px;
   background-color: #FFFFFF;
   background-image: url("../../../images/idp/google2.png");
   background-size: 25px;

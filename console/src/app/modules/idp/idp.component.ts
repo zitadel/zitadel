@@ -50,7 +50,6 @@ export class IdpComponent implements OnInit, OnDestroy {
         this.idpForm = new FormGroup({
             id: new FormControl({ disabled: true, value: '' }, [Validators.required]),
             name: new FormControl('', [Validators.required]),
-            logoSrc: new FormControl({ disabled: true, value: '' }, [Validators.required]),
         });
 
         this.oidcConfigForm = new FormGroup({
@@ -121,7 +120,6 @@ export class IdpComponent implements OnInit, OnDestroy {
 
         req.setId(this.id?.value);
         req.setName(this.name?.value);
-        req.setLogoSrc(this.logoSrc?.value);
 
         this.service.UpdateIdp(req).then((idp) => {
           this.toast.showInfo('IDP.TOAST.SAVED', true);
@@ -204,10 +202,6 @@ export class IdpComponent implements OnInit, OnDestroy {
 
     public get name(): AbstractControl | null {
         return this.idpForm.get('name');
-    }
-
-    public get logoSrc(): AbstractControl | null {
-      return this.idpForm.get('logoSrc');
     }
 
     public get clientId(): AbstractControl | null {
