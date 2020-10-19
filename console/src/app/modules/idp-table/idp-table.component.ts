@@ -95,11 +95,25 @@ export class IdpTableComponent implements OnInit {
 
     public removeSelectedIdps(): void {
         this.selection.clear();
-        Promise.all(this.selection.selected.map(value => {
-            return this.service.RemoveIdpConfig(value.id);
-        })).then(() => {
-            this.toast.showInfo('IDP.TOAST.SELECTEDDEACTIVATED', true);
-            this.refreshPage();
+        const dialogRef = this.dialog.open(WarnDialogComponent, {
+            data: {
+                confirmKey: 'ACTIONS.DELETE',
+                cancelKey: 'ACTIONS.CANCEL',
+                titleKey: 'IDP.DELETE_SELECTION_TITLE',
+                descriptionKey: 'IDP.DELETE_SELECTION_DESCRIPTION',
+            },
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                Promise.all(this.selection.selected.map(value => {
+                    return this.service.RemoveIdpConfig(value.id);
+                })).then(() => {
+                    this.toast.showInfo('IDP.TOAST.SELECTEDDEACTIVATED', true);
+                    this.refreshPage();
+                });
+            }
         });
     }
 
