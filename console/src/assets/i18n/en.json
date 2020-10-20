@@ -469,7 +469,10 @@
                 "USERLOGINMUSTBEDOMAIN":"User Login must be Domain",
                 "ALLOWUSERNAMEPASSWORD":"Username Password allowed",
                 "ALLOWEXTERNALIDP":"External IDP allowed",
-                "ALLOWREGISTER":"Register allowed"
+                "ALLOWREGISTER":"Register allowed",
+                "ALLOWUSERNAMEPASSWORD_DESC":"The conventional login with user name and password is allowed.",
+                "ALLOWEXTERNALIDP_DESC":"The login is allowed for the underlying identity providers",
+                "ALLOWREGISTER_DESC":"If the option is selected, an additional step for registering a user appears in the login."
             },
             "RESET":"Reset Policy",
             "TOAST":{

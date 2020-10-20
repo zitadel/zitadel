@@ -16,24 +16,25 @@
 
     <div class="content" *ngIf="loginData">
         <div class="row">
-            <span class="left-desc">{{'ORG.POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate}}</span>
-            <span class="fill-space"></span>
-            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+            <mat-slide-toggle class="toggle" color="primary" name="hasNumber" ngDefaultControl
                 [(ngModel)]="loginData.allowUsernamePassword">
+                {{'ORG.POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate}}
             </mat-slide-toggle>
+            <p>{{'ORG.POLICY.DATA.ALLOWUSERNAMEPASSWORD_DESC' | translate}}</p>
         </div>
         <div class="row">
-            <span class="left-desc">{{'ORG.POLICY.DATA.ALLOWREGISTER' | translate}}</span>
-            <span class="fill-space"></span>
-            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="loginData.allowRegister">
+            <mat-slide-toggle class="toggle" color="primary" name="hasNumber" ngDefaultControl
+                [(ngModel)]="loginData.allowRegister">
+                {{'ORG.POLICY.DATA.ALLOWREGISTER' | translate}}
             </mat-slide-toggle>
+            <p> {{'ORG.POLICY.DATA.ALLOWREGISTER_DESC' | translate}} </p>
         </div>
         <div class="row">
-            <span class="left-desc">{{'ORG.POLICY.DATA.ALLOWEXTERNALIDP' | translate}}</span>
-            <span class="fill-space"></span>
-            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+            <mat-slide-toggle class="toggle" color="primary" name="hasNumber" ngDefaultControl
                 [(ngModel)]="loginData.allowExternalIdp">
+                {{'ORG.POLICY.DATA.ALLOWEXTERNALIDP' | translate}}
             </mat-slide-toggle>
+            <p> {{'ORG.POLICY.DATA.ALLOWEXTERNALIDP_DESC' | translate}} </p>
         </div>
     </div>
 
@@ -52,18 +53,14 @@
         </div>
     </div>
 
-    <div class="btn-container">
-        <button (click)="savePolicy()" color="primary" type="submit"
-            mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
-    </div>
-
+    <button class="save-button" (click)="savePolicy()" color="primary" type="submit"
+        mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
 
     <ng-template appHasRole [appHasRole]="['org.idp.read']">
-        <app-card class="idp-table-card" title="{{ 'IDP.LIST.TITLE' | translate }}"
-            description="{{ 'IDP.LIST.DESCRIPTION' | translate }}">
-            <app-idp-table [service]="service" [serviceType]="serviceType"
-                [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false">
-            </app-idp-table>
-        </app-card>
+        <h2>{{ 'IDP.LIST.TITLE' | translate }}</h2>
+        <p>{{ 'IDP.LIST.DESCRIPTION' | translate }}</p>
+        <app-idp-table [service]="service" [serviceType]="serviceType"
+            [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false">
+        </app-idp-table>
     </ng-template>
 </app-detail-layout>
