@@ -170,7 +170,13 @@ export class IdpTableComponent implements OnInit {
         if (row.id) {
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
-                    return ['/org', 'idp', row.id];
+                    switch ((row as MgmtIdpView.AsObject).providerType) {
+                        case IdpProviderType.IDPPROVIDERTYPE_SYSTEM:
+                            return ['/iam', 'idp', row.id];
+                        case IdpProviderType.IDPPROVIDERTYPE_ORG:
+                            return ['/org', 'idp', row.id];
+                    }
+                    break;
                 case PolicyComponentServiceType.ADMIN:
                     return ['/iam', 'idp', row.id];
             }

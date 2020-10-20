@@ -29,7 +29,7 @@ tr {
   outline: none;
 
   &.disabled * {
-    color: var(--grey);
+    opacity: .8;
   }
 
   button {
