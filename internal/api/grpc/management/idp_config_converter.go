@@ -165,17 +165,14 @@ func idpConfigSearchQueryToModel(query *management.IdpSearchQuery) (*iam_model.I
 		Method: searchMethodToModel(query.Method),
 		Value:  query.Value,
 	}
-	if query.Key == management.IdpSearchKey_IDPSEARCHKEY_PROVIDER_TYPE {
-		i64, err := strconv.Atoi(query.Value)
-		if err != nil {
-			return nil, caos_errors.ThrowPreconditionFailed(err, "MGMT-6is9f", "Errors.IDP.InvalidSearchQuery")
-		}
-		if i64 != 1 && i64 != 2 {
-			return nil, caos_errors.ThrowPreconditionFailed(err, "MGMT-6is9f", "Errors.IDP.InvalidSearchQuery")
-		}
-		providerType := management.IdpProviderType(int32(i64))
-		converted.Value = idpProviderTypeToModel(providerType)
+	if query.Key != management.IdpSearchKey_IDPSEARCHKEY_PROVIDER_TYPE {
+		return converted, nil
 	}
+	value, err := idpProviderTypeStringToModel(query.Value)
+	if err != nil {
+		return nil, err
+	}
+	converted.Value = value
 	return converted, nil
 }
 
@@ -250,5 +247,17 @@ func idpConfigStylingTypeToModel(stylingType management.IdpStylingType) iam_mode
 		return iam_model.IDPStylingTypeGoogle
 	default:
 		return iam_model.IDPStylingTypeUnspecified
+	}
+}
+
+func idpProviderTypeStringToModel(providerType string) (iam_model.IDPProviderType, error) {
+	i, _ := strconv.Atoi(providerType)
+	switch management.IdpProviderType(i) {
+	case management.IdpProviderType_IDPPROVIDERTYPE_SYSTEM:
+		return iam_model.IDPProviderTypeSystem, nil
+	case management.IdpProviderType_IDPPROVIDERTYPE_ORG:
+		return iam_model.IDPProviderTypeOrg, nil
+	default:
+		return 0, caos_errors.ThrowPreconditionFailed(nil, "MGMT-6is9f", "Errors.Org..IDP.InvalidSearchQuery")
 	}
 }
