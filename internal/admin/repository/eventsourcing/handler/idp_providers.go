@@ -66,13 +66,17 @@ func (m *IDPProvider) processIdpProvider(event *models.Event) (err error) {
 		}
 		return m.view.DeleteIDPProvider(event.AggregateID, provider.IDPConfigID, event.Sequence)
 	case model.IDPConfigChanged, org_es_model.IDPConfigChanged:
-		config := new(iam_model.IDPConfig)
-		config.AppendEvent(event)
-		providers, err := m.view.IDPProvidersByIdpConfigID(config.IDPConfigID)
+		esConfig := new(iam_view_model.IDPConfigView)
+		providerType := iam_model.IDPProviderTypeSystem
+		if event.AggregateID != m.systemDefaults.IamID {
+			providerType = iam_model.IDPProviderTypeOrg
+		}
+		esConfig.AppendEvent(providerType, event)
+		providers, err := m.view.IDPProvidersByIdpConfigID(esConfig.IDPConfigID)
 		if err != nil {
 			return err
 		}
-		config, err = m.iamEvents.GetIDPConfig(context.Background(), provider.AggregateID, config.IDPConfigID)
+		config, err := m.iamEvents.GetIDPConfig(context.Background(), event.AggregateID, esConfig.IDPConfigID)
 		if err != nil {
 			return err
 		}

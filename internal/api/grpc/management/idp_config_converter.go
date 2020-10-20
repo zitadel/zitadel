@@ -2,9 +2,11 @@ package management
 
 import (
 	"github.com/caos/logging"
+	caos_errors "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/golang/protobuf/ptypes"
+	"strconv"
 )
 
 func createOidcIdpToModel(idp *management.OidcIdpConfigCreate) *iam_model.IDPConfig {
@@ -131,29 +133,47 @@ func idpConfigStateFromModel(state iam_model.IDPConfigState) management.IdpState
 	}
 }
 
-func idpConfigSearchRequestToModel(request *management.IdpSearchRequest) *iam_model.IDPConfigSearchRequest {
-	return &iam_model.IDPConfigSearchRequest{
-		Limit:   request.Limit,
-		Offset:  request.Offset,
-		Queries: idpConfigSearchQueriesToModel(request.Queries),
+func idpConfigSearchRequestToModel(request *management.IdpSearchRequest) (*iam_model.IDPConfigSearchRequest, error) {
+	convertedSearchRequest := &iam_model.IDPConfigSearchRequest{
+		Limit:  request.Limit,
+		Offset: request.Offset,
 	}
+	convertedQueries, err := idpConfigSearchQueriesToModel(request.Queries)
+	if err != nil {
+		return nil, err
+	}
+	convertedSearchRequest.Queries = convertedQueries
+	return convertedSearchRequest, nil
 }
 
-func idpConfigSearchQueriesToModel(queries []*management.IdpSearchQuery) []*iam_model.IDPConfigSearchQuery {
+func idpConfigSearchQueriesToModel(queries []*management.IdpSearchQuery) ([]*iam_model.IDPConfigSearchQuery, error) {
 	modelQueries := make([]*iam_model.IDPConfigSearchQuery, len(queries))
 	for i, query := range queries {
-		modelQueries[i] = idpConfigSearchQueryToModel(query)
+		converted, err := idpConfigSearchQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
+		modelQueries[i] = converted
 	}
 
-	return modelQueries
+	return modelQueries, nil
 }
 
-func idpConfigSearchQueryToModel(query *management.IdpSearchQuery) *iam_model.IDPConfigSearchQuery {
-	return &iam_model.IDPConfigSearchQuery{
+func idpConfigSearchQueryToModel(query *management.IdpSearchQuery) (*iam_model.IDPConfigSearchQuery, error) {
+	converted := &iam_model.IDPConfigSearchQuery{
 		Key:    idpConfigSearchKeyToModel(query.Key),
 		Method: searchMethodToModel(query.Method),
 		Value:  query.Value,
 	}
+	if query.Key != management.IdpSearchKey_IDPSEARCHKEY_PROVIDER_TYPE {
+		return converted, nil
+	}
+	value, err := idpProviderTypeStringToModel(query.Value)
+	if err != nil {
+		return nil, err
+	}
+	converted.Value = value
+	return converted, nil
 }
 
 func idpConfigSearchKeyToModel(key management.IdpSearchKey) iam_model.IDPConfigSearchKey {
@@ -227,5 +247,17 @@ func idpConfigStylingTypeToModel(stylingType management.IdpStylingType) iam_mode
 		return iam_model.IDPStylingTypeGoogle
 	default:
 		return iam_model.IDPStylingTypeUnspecified
+	}
+}
+
+func idpProviderTypeStringToModel(providerType string) (iam_model.IDPProviderType, error) {
+	i, _ := strconv.Atoi(providerType)
+	switch management.IdpProviderType(i) {
+	case management.IdpProviderType_IDPPROVIDERTYPE_SYSTEM:
+		return iam_model.IDPProviderTypeSystem, nil
+	case management.IdpProviderType_IDPPROVIDERTYPE_ORG:
+		return iam_model.IDPProviderTypeOrg, nil
+	default:
+		return 0, caos_errors.ThrowPreconditionFailed(nil, "MGMT-6is9f", "Errors.Org.IDP.InvalidSearchQuery")
 	}
 }

@@ -83,6 +83,8 @@ Errors:
     IdpNotExisting: IDP Konfiguration existiert nicht
     OIDCConfigInvalid: OIDC IDP Konfiguration ist ungültig
     IdpIsNotOIDC: IDP Konfiguration ist nicht vom Typ OIDC
+    IDP:
+      InvalidSearchQuery: Ungültiger Suchparameter
     LoginPolicy:
       Invalid: Login Policy ist ungültig
       NotExisting: Login Policy existiert nicht auf dieser Organisation
