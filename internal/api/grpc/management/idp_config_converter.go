@@ -2,6 +2,7 @@ package management
 
 import (
 	"github.com/caos/logging"
+	caos_errors "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/golang/protobuf/ptypes"
@@ -132,24 +133,33 @@ func idpConfigStateFromModel(state iam_model.IDPConfigState) management.IdpState
 	}
 }
 
-func idpConfigSearchRequestToModel(request *management.IdpSearchRequest) *iam_model.IDPConfigSearchRequest {
-	return &iam_model.IDPConfigSearchRequest{
-		Limit:   request.Limit,
-		Offset:  request.Offset,
-		Queries: idpConfigSearchQueriesToModel(request.Queries),
+func idpConfigSearchRequestToModel(request *management.IdpSearchRequest) (*iam_model.IDPConfigSearchRequest, error) {
+	convertedSearchRequest := &iam_model.IDPConfigSearchRequest{
+		Limit:  request.Limit,
+		Offset: request.Offset,
 	}
+	convertedQueries, err := idpConfigSearchQueriesToModel(request.Queries)
+	if err != nil {
+		return nil, err
+	}
+	convertedSearchRequest.Queries = convertedQueries
+	return convertedSearchRequest, nil
 }
 
-func idpConfigSearchQueriesToModel(queries []*management.IdpSearchQuery) []*iam_model.IDPConfigSearchQuery {
+func idpConfigSearchQueriesToModel(queries []*management.IdpSearchQuery) ([]*iam_model.IDPConfigSearchQuery, error) {
 	modelQueries := make([]*iam_model.IDPConfigSearchQuery, len(queries))
 	for i, query := range queries {
-		modelQueries[i] = idpConfigSearchQueryToModel(query)
+		converted, err := idpConfigSearchQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
+		modelQueries[i] = converted
 	}
 
-	return modelQueries
+	return modelQueries, nil
 }
 
-func idpConfigSearchQueryToModel(query *management.IdpSearchQuery) *iam_model.IDPConfigSearchQuery {
+func idpConfigSearchQueryToModel(query *management.IdpSearchQuery) (*iam_model.IDPConfigSearchQuery, error) {
 	converted := &iam_model.IDPConfigSearchQuery{
 		Key:    idpConfigSearchKeyToModel(query.Key),
 		Method: searchMethodToModel(query.Method),
@@ -158,12 +168,15 @@ func idpConfigSearchQueryToModel(query *management.IdpSearchQuery) *iam_model.ID
 	if query.Key == management.IdpSearchKey_IDPSEARCHKEY_PROVIDER_TYPE {
 		i64, err := strconv.Atoi(query.Value)
 		if err != nil {
-			return converted
+			return nil, caos_errors.ThrowPreconditionFailed(err, "MGMT-6is9f", "Errors.IDP.InvalidSearchQuery")
+		}
+		if i64 != 1 && i64 != 2 {
+			return nil, caos_errors.ThrowPreconditionFailed(err, "MGMT-6is9f", "Errors.IDP.InvalidSearchQuery")
 		}
 		providerType := management.IdpProviderType(int32(i64))
 		converted.Value = idpProviderTypeToModel(providerType)
 	}
-	return converted
+	return converted, nil
 }
 
 func idpConfigSearchKeyToModel(key management.IdpSearchKey) iam_model.IDPConfigSearchKey {
