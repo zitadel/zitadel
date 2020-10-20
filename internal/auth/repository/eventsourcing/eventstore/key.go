@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"os"
 	"time"
 
 	"github.com/caos/logging"
@@ -11,22 +12,28 @@ import (
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/spooler"
+	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/key/model"
 	key_event "github.com/caos/zitadel/internal/key/repository/eventsourcing"
-	view_model "github.com/caos/zitadel/internal/key/repository/view/model"
-	"github.com/caos/zitadel/internal/view/repository"
 )
 
 const (
 	oidcUser = "OIDC"
 	iamOrg   = "IAM"
+
+	signingKey = "signing_key"
 )
 
 type KeyRepository struct {
-	KeyEvents          *key_event.KeyEventstore
-	View               *view.View
-	SigningKeyRotation time.Duration
-	KeyAlgorithm       crypto.EncryptionAlgorithm
+	KeyEvents            *key_event.KeyEventstore
+	View                 *view.View
+	SigningKeyRotation   time.Duration
+	KeyAlgorithm         crypto.EncryptionAlgorithm
+	Locker               spooler.Locker
+	lockID               string
+	currentKeyID         string
+	currentKeyExpiration time.Time
 }
 
 func (k *KeyRepository) GenerateSigningKeyPair(ctx context.Context, algorithm string) error {
@@ -35,19 +42,17 @@ func (k *KeyRepository) GenerateSigningKeyPair(ctx context.Context, algorithm st
 	return err
 }
 
-func (k *KeyRepository) GetSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey, errCh chan<- error, renewTimer <-chan time.Time) {
+func (k *KeyRepository) GetSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey, algorithm string) {
+	renewTimer := time.After(0)
 	go func() {
 		for {
 			select {
 			case <-ctx.Done():
 				return
 			case <-renewTimer:
-				send, err := k.refreshSigningKey(ctx, keyCh)
-				if send {
-					errCh <- err
-				}
+				shortRefresh, _ := k.refreshSigningKey(ctx, keyCh, algorithm)
 				d := k.SigningKeyRotation
-				if err != nil {
+				if shortRefresh {
 					d = d / 2
 				}
 				renewTimer = time.After(d)
@@ -68,55 +73,68 @@ func (k *KeyRepository) GetKeySet(ctx context.Context) (*jose.JSONWebKeySet, err
 	return &jose.JSONWebKeySet{Keys: webKeys}, nil
 }
 
-func (k *KeyRepository) refreshSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey) (sendErr bool, err error) {
-	key, errView := k.View.GetSigningKey()
+func (k *KeyRepository) refreshSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey, algorithm string) (shortRefresh bool, err error) {
+	key, expiration, errView := k.View.GetSigningKey(time.Now().UTC().Add(time.Duration(2) * k.SigningKeyRotation))
 	if errView != nil && !errors.IsNotFound(errView) {
 		logging.Log("EVENT-GEd4h").WithError(errView).Warn("could not get signing key")
-		return false, errView
-	}
-	var sequence *repository.CurrentSequence
-	if key == nil {
-		key = new(model.SigningKey)
-		sequence, err = k.View.GetLatestKeySequence()
-		if err != nil {
-			return true, err
-		}
-		key.Sequence = sequence.CurrentSequence
-	}
-	events, err := k.KeyEvents.LatestKeyEvents(ctx, key.Sequence)
-	if err != nil {
-		logging.Log("EVENT-der5g").Warn("error retrieving new events")
-		return true, err
-	}
-	var newKey *view_model.KeyView
-	for _, event := range events {
-		privateKey, publicKey, err := view_model.KeysFromPairEvent(event)
-		if err != nil {
-			return true, err
-		}
-		if privateKey.Expiry.Before(time.Now()) && publicKey.Expiry.Before(time.Now()) {
-			continue
-		}
-		newKey = privateKey
-	}
-	if errView != nil && newKey == nil {
-		keyCh <- jose.SigningKey{}
 		return true, errView
 	}
-	if newKey != nil {
-		key, err = model.SigningKeyFromKeyView(view_model.KeyViewToModel(newKey), k.KeyAlgorithm)
-		if err != nil {
-			return true, err
+	if key != nil {
+		if k.currentKeyID == key.ID {
+			return false, nil
+		}
+		k.currentKeyID = key.ID
+		k.currentKeyExpiration = expiration
+		keyCh <- jose.SigningKey{
+			Algorithm: jose.SignatureAlgorithm(key.Algorithm),
+			Key: jose.JSONWebKey{
+				KeyID: key.ID,
+				Key:   key.Key,
+			},
+		}
+		return false, nil
+	}
+	if k.currentKeyExpiration.Before(time.Now().UTC()) {
+		keyCh <- jose.SigningKey{}
+	}
+	sequence, err := k.View.GetLatestKeySequence()
+	if err != nil {
+		return true, err
+	}
+	events, err := k.KeyEvents.LatestKeyEvents(ctx, sequence.CurrentSequence)
+	if err != nil {
+		logging.Log("EVENT-der5g").WithError(err).Warn("error retrieving new events")
+		return true, err
+	}
+	if len(events) > 0 {
+		logging.Log("EVENT-GBD23").Warn("view not up to date, retrying later")
+		return true, nil
+	}
+
+	// try create new, short rotation
+	err = k.lockAndGenerateSigningKeyPair(ctx, algorithm)
+	logging.Log("EVENT-B4d21").OnError(err).Warn("could not create signing key")
+	return true, err
+}
+
+func (k *KeyRepository) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm string) error {
+	err := k.Locker.Renew(k.lockerID(), signingKey, k.SigningKeyRotation/2)
+	if err != nil {
+		return err
+	}
+	return k.GenerateSigningKeyPair(ctx, algorithm)
+}
+
+func (k *KeyRepository) lockerID() string {
+	if k.lockID == "" {
+		var err error
+		k.lockID, err = os.Hostname()
+		if err != nil || k.lockID == "" {
+			k.lockID, err = id.SonyFlakeGenerator.Next()
+			logging.Log("EVENT-bsdf6").OnError(err).Panic("unable to generate lockID")
 		}
 	}
-	keyCh <- jose.SigningKey{
-		Algorithm: jose.SignatureAlgorithm(key.Algorithm),
-		Key: jose.JSONWebKey{
-			KeyID: key.ID,
-			Key:   key.Key,
-		},
-	}
-	return true, nil
+	return k.lockID
 }
 
 func setOIDCCtx(ctx context.Context) context.Context {

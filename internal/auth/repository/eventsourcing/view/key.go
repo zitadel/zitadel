@@ -1,6 +1,8 @@
 package view
 
 import (
+	"time"
+
 	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/key/repository/view"
 	"github.com/caos/zitadel/internal/key/repository/view/model"
@@ -15,12 +17,13 @@ func (v *View) KeyByIDAndType(keyID string, private bool) (*model.KeyView, error
 	return view.KeyByIDAndType(v.Db, keyTable, keyID, private)
 }
 
-func (v *View) GetSigningKey() (*key_model.SigningKey, error) {
-	key, err := view.GetSigningKey(v.Db, keyTable)
+func (v *View) GetSigningKey(expiry time.Time) (*key_model.SigningKey, time.Time, error) {
+	key, err := view.GetSigningKey(v.Db, keyTable, expiry)
 	if err != nil {
-		return nil, err
+		return nil, time.Time{}, err
 	}
-	return key_model.SigningKeyFromKeyView(model.KeyViewToModel(key), v.keyAlgorithm)
+	signingKey, err := key_model.SigningKeyFromKeyView(model.KeyViewToModel(key), v.keyAlgorithm)
+	return signingKey, key.Expiry, err
 }
 
 func (v *View) GetActiveKeySet() ([]*key_model.PublicKey, error) {

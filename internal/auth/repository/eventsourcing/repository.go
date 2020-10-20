@@ -114,6 +114,8 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 	repos := handler.EventstoreRepos{UserEvents: user, ProjectEvents: project, OrgEvents: org, IamEvents: iam}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos, systemDefaults)
 
+	locker := spooler.NewLocker(sqlClient)
+
 	return &EsRepository{
 		spool,
 		eventstore.UserRepo{
@@ -153,6 +155,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 			View:               view,
 			SigningKeyRotation: conf.KeyConfig.SigningKeyRotation.Duration,
 			KeyAlgorithm:       keyAlgorithm,
+			Locker:             locker,
 		},
 		eventstore.ApplicationRepo{
 			View:          view,
