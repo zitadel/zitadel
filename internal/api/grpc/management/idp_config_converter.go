@@ -258,6 +258,6 @@ func idpProviderTypeStringToModel(providerType string) (iam_model.IDPProviderTyp
 	case management.IdpProviderType_IDPPROVIDERTYPE_ORG:
 		return iam_model.IDPProviderTypeOrg, nil
 	default:
-		return 0, caos_errors.ThrowPreconditionFailed(nil, "MGMT-6is9f", "Errors.Org..IDP.InvalidSearchQuery")
+		return 0, caos_errors.ThrowPreconditionFailed(nil, "MGMT-6is9f", "Errors.Org.IDP.InvalidSearchQuery")
 	}
 }
