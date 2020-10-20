@@ -713,10 +713,15 @@
             "1":"aktiv",
             "2":"inaktiv"
         },
-        "MAPPINTFIELD": {
+        "MAPPINGFIELD": {
           "1": "Preferred Username",
           "2": "Email"
         },
+        "STYLE":"Style",
+        "STYLEFIELD": {
+            "0": "kein Styling",
+            "1": "Google"
+          },
         "TYPE":"Typ",
         "ID": "ID",
         "NAME":"Name",

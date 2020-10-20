@@ -717,6 +717,11 @@
           "1": "Preferred Username",
           "2": "Email"
         },
+        "STYLE":"Style",
+        "STYLEFIELD": {
+            "0": "No Styling",
+            "1": "Google"
+          },
         "TYPE":"Type",
         "ID": "ID",
         "NAME":"Name",
