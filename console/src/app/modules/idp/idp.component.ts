@@ -66,7 +66,6 @@ export class IdpComponent implements OnInit, OnDestroy {
         });
 
         this.route.data.pipe(switchMap(data => {
-            console.log(data.serviceType);
             this.serviceType = data.serviceType;
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
