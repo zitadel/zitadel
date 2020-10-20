@@ -29,10 +29,8 @@
     }
 
     .detail-right {
-    //   position: relative;
+      flex: 1;
       padding-left: 1rem;
-      width: 100%;
-
       @media only screen and (max-width: 500px) {
         flex-basis: 100%;
       }

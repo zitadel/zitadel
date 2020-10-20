@@ -1,7 +1,6 @@
 <app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam' : '/org']"
     [title]="'ORG.POLICY.LOGIN_POLICY.TITLECREATE' | translate"
     [description]="(serviceType==PolicyComponentServiceType.MGMT ? 'ORG.POLICY.LOGIN_POLICY.DESCRIPTIONCREATEMGMT' : PolicyComponentServiceType.ADMIN ? 'ORG.POLICY.LOGIN_POLICY.DESCRIPTIONCREATEADMIN' : '') | translate">
-
     <p class="default" *ngIf="isDefault"> {{'ORG.POLICY.DEFAULTLABEL' | translate}}</p>
 
     <div class="spinner-wr">
@@ -11,6 +10,14 @@
         <button *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
             matTooltip="{{'ORG.POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()" mat-stroked-button>
             {{'ORG.POLICY.RESET' | translate}}
+        </button>
+    </ng-template>
+
+    <ng-template appHasRole [appHasRole]="['policy.write']">
+        <button *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
+            matTooltip="{{'ORG.POLICY.CREATECUSTOM' | translate}}" color="warn" (click)="removePolicy()"
+            mat-stroked-button>
+            {{'ORG.POLICY.CREATECUSTOM' | translate}}
         </button>
     </ng-template>
 
