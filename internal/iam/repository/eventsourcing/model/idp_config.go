@@ -38,7 +38,7 @@ func (c *IDPConfig) Changes(changed *IDPConfig) map[string]interface{} {
 	if changed.Name != "" && c.Name != changed.Name {
 		changes["name"] = changed.Name
 	}
-	if changed.StylingType != changed.StylingType {
+	if c.StylingType != changed.StylingType {
 		changes["stylingType"] = changed.StylingType
 	}
 	return changes
