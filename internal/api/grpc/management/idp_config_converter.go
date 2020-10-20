@@ -5,6 +5,7 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/golang/protobuf/ptypes"
+	"strconv"
 )
 
 func createOidcIdpToModel(idp *management.OidcIdpConfigCreate) *iam_model.IDPConfig {
@@ -149,11 +150,20 @@ func idpConfigSearchQueriesToModel(queries []*management.IdpSearchQuery) []*iam_
 }
 
 func idpConfigSearchQueryToModel(query *management.IdpSearchQuery) *iam_model.IDPConfigSearchQuery {
-	return &iam_model.IDPConfigSearchQuery{
+	converted := &iam_model.IDPConfigSearchQuery{
 		Key:    idpConfigSearchKeyToModel(query.Key),
 		Method: searchMethodToModel(query.Method),
 		Value:  query.Value,
 	}
+	if query.Key == management.IdpSearchKey_IDPSEARCHKEY_PROVIDER_TYPE {
+		i64, err := strconv.Atoi(query.Value)
+		if err != nil {
+			return converted
+		}
+		providerType := management.IdpProviderType(int32(i64))
+		converted.Value = idpProviderTypeToModel(providerType)
+	}
+	return converted
 }
 
 func idpConfigSearchKeyToModel(key management.IdpSearchKey) iam_model.IDPConfigSearchKey {
