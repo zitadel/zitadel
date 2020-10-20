@@ -118,8 +118,12 @@ export class SearchUserAutocompleteComponent {
                 } else {
                     this.users = [this.filteredUsers[index]];
                 }
-                this.selectionChanged.emit(this.users);
 
+                if (this.singleOutput) {
+                    this.selectionChanged.emit(this.users[0]);
+                } else {
+                    this.selectionChanged.emit(this.users);
+                }
                 this.usernameInput.nativeElement.value = '';
                 this.myControl.setValue(null);
             }
@@ -140,7 +144,11 @@ export class SearchUserAutocompleteComponent {
     public getGlobalUser(): void {
         this.userService.GetUserByLoginNameGlobal(this.globalLoginNameControl.value).then(user => {
             this.users = [user.toObject()];
-            this.selectionChanged.emit(this.users);
+            if (this.singleOutput) {
+                this.selectionChanged.emit(this.users[0]);
+            } else {
+                this.selectionChanged.emit(this.users);
+            }
         }).catch(error => {
             this.toast.showError(error);
         });

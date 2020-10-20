@@ -140,6 +140,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		"hasExternalLogin": func() bool {
 			return false
 		},
+		"idpProviderClass": func(stylingType iam_model.IDPStylingType) string {
+			return stylingType.GetCSSClass()
+		},
 	}
 	var err error
 	r.Renderer, err = renderer.NewRenderer(
