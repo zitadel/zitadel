@@ -38,6 +38,7 @@ export class LoginPolicyComponent implements OnDestroy {
     public idps: MgmtIdpProviderView.AsObject[] | AdminIdpProviderView.AsObject[] = [];
 
     public loading: boolean = false;
+    public disabled: boolean = true;
     constructor(
         private route: ActivatedRoute,
         private toast: ToastService,
@@ -66,6 +67,7 @@ export class LoginPolicyComponent implements OnDestroy {
             if (data) {
                 this.loginData = data.toObject();
                 this.loading = false;
+                this.disabled = ((this.loginData as LoginPolicyView.AsObject)?.pb_default) ?? false;
             }
         });
         this.getIdps().then(idps => {

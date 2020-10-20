@@ -475,6 +475,7 @@
                 "ALLOWREGISTER_DESC":"Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers."
             },
             "RESET":"Richtlinie zurücksetzen",
+            "CREATECUSTOM":"Benutzerdefinierte Richtlinie erstellen",
             "TOAST":{
                 "SET":"Richtline erfolgreich gesetzt!",
                 "RESETSUCCESS":"Richtline zurückgesetzt!"

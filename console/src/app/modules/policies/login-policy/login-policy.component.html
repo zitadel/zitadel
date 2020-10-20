@@ -6,38 +6,39 @@
     <div class="spinner-wr">
         <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
     </div>
-    <ng-template appHasRole [appHasRole]="['policy.delete']">
-        <button *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
-            matTooltip="{{'ORG.POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()" mat-stroked-button>
-            {{'ORG.POLICY.RESET' | translate}}
-        </button>
-    </ng-template>
+    <ng-container *ngIf="serviceType === PolicyComponentServiceType.MGMT">
+        <ng-template appHasRole [appHasRole]="['policy.delete']">
+            <button *ngIf="!isDefault" matTooltip="{{'ORG.POLICY.RESET' | translate}}" color="warn"
+                (click)="removePolicy()" mat-stroked-button>
+                {{'ORG.POLICY.RESET' | translate}}
+            </button>
+        </ng-template>
 
-    <ng-template appHasRole [appHasRole]="['policy.write']">
-        <button *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
-            matTooltip="{{'ORG.POLICY.CREATECUSTOM' | translate}}" color="warn" (click)="removePolicy()"
-            mat-stroked-button>
-            {{'ORG.POLICY.CREATECUSTOM' | translate}}
-        </button>
-    </ng-template>
+        <ng-template appHasRole [appHasRole]="['policy.write']">
+            <button *ngIf="isDefault" matTooltip="{{'ORG.POLICY.CREATECUSTOM' | translate}}" (click)="savePolicy()"
+                mat-raised-button>
+                {{'ORG.POLICY.CREATECUSTOM' | translate}}
+            </button>
+        </ng-template>
+    </ng-container>
 
     <div class="content" *ngIf="loginData">
         <div class="row">
-            <mat-slide-toggle class="toggle" color="primary" name="hasNumber" ngDefaultControl
+            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
                 [(ngModel)]="loginData.allowUsernamePassword">
                 {{'ORG.POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate}}
             </mat-slide-toggle>
             <p>{{'ORG.POLICY.DATA.ALLOWUSERNAMEPASSWORD_DESC' | translate}}</p>
         </div>
         <div class="row">
-            <mat-slide-toggle class="toggle" color="primary" name="hasNumber" ngDefaultControl
+            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
                 [(ngModel)]="loginData.allowRegister">
                 {{'ORG.POLICY.DATA.ALLOWREGISTER' | translate}}
             </mat-slide-toggle>
             <p> {{'ORG.POLICY.DATA.ALLOWREGISTER_DESC' | translate}} </p>
         </div>
         <div class="row">
-            <mat-slide-toggle class="toggle" color="primary" name="hasNumber" ngDefaultControl
+            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
                 [(ngModel)]="loginData.allowExternalIdp">
                 {{'ORG.POLICY.DATA.ALLOWEXTERNALIDP' | translate}}
             </mat-slide-toggle>
@@ -48,14 +49,16 @@
     <h3 class="subheader">{{'LOGINPOLICY.IDPS' | translate}}</h3>
 
     <div class="idps">
-        <div class="idp" *ngFor="let idp of idps">
-            <mat-icon (click)="removeIdp(idp)" class="rm">
-                remove_circle</mat-icon>
-            <span>{{idp.name}}</span>
+        <div class="idp" [ngClass]="{'disabled': disabled}" *ngFor="let idp of idps">
+            <button [disabled]="disabled" mat-icon-button (click)="removeIdp(idp)" class="rm">
+                <mat-icon matTooltip="{{'ACTIONS.REMOVE' | translate}}">
+                    remove_circle</mat-icon>
+            </button>
+            <span class="name">{{idp.name}}</span>
             <span class="meta">{{ 'IDP.TYPE' | translate }}: {{ 'IDP.TYPES.'+idp.type | translate }}</span>
             <span class="meta">{{ 'IDP.ID' | translate }}: {{idp.idpConfigId}}</span>
         </div>
-        <div class="new-idp" (click)="openDialog()">
+        <div *ngIf="!disabled" class="new-idp" (click)="openDialog()">
             <mat-icon>add</mat-icon>
         </div>
     </div>

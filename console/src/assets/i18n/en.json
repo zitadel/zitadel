@@ -475,6 +475,7 @@
                 "ALLOWREGISTER_DESC":"If the option is selected, an additional step for registering a user appears in the login."
             },
             "RESET":"Reset Policy",
+            "CREATECUSTOM":"Create Custom Policy",
             "TOAST":{
                 "SET":"Policy set successfully!",
                 "RESETSUCCESS":"Policy reset successfully!"
