@@ -1657,6 +1657,170 @@ func TestRemoveIdpProviderFromLoginPolicy(t *testing.T) {
 	}
 }
 
+func TestAddLabelPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IAMEventstore
+		ctx    context.Context
+		policy *iam_model.LabelPolicy
+	}
+	type res struct {
+		result  *iam_model.LabelPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add label policy, ok",
+			args: args{
+				es:  GetMockManipulateIAM(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.LabelPolicy{
+					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					PrimaryColor: "000000",
+				},
+			},
+			res: res{
+				result: &iam_model.LabelPolicy{
+					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					PrimaryColor: "000000",
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockManipulateIAM(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.LabelPolicy{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIAMNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.LabelPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddLabelPolicy(tt.args.ctx, tt.args.policy)
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result.PrimaryColor != tt.res.result.PrimaryColor {
+				t.Errorf("got wrong result PrimaryColor: expected: %v, actual: %v ", tt.res.result.PrimaryColor, result.PrimaryColor)
+			}
+		})
+	}
+}
+
+func TestChangeLabelPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IAMEventstore
+		ctx    context.Context
+		policy *iam_model.LabelPolicy
+	}
+	type res struct {
+		result  *iam_model.LabelPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change label policy, ok",
+			args: args{
+				es:  GetMockManipulateIAMWithLabelPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.LabelPolicy{
+					ObjectRoot:     es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					PrimaryColor:   "000000",
+					SecondaryColor: "FFFFFF",
+				},
+			},
+			res: res{
+				result: &iam_model.LabelPolicy{
+					ObjectRoot:     es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					PrimaryColor:   "000000",
+					SecondaryColor: "FFFFFF",
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockManipulateIAM(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.LabelPolicy{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIAMNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.LabelPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeLabelPolicy(tt.args.ctx, tt.args.policy)
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result.PrimaryColor != tt.res.result.PrimaryColor {
+				t.Errorf("got wrong result PrimaryColor: expected: %v, actual: %v ", tt.res.result.PrimaryColor, result.PrimaryColor)
+			}
+			if result.SecondaryColor != tt.res.result.SecondaryColor {
+				t.Errorf("got wrong result SecondaryColor: expected: %v, actual: %v ", tt.res.result.SecondaryColor, result.SecondaryColor)
+			}
+		})
+	}
+}
 func TestAddPasswordComplexityPolicy(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {

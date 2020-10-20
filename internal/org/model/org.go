@@ -1,10 +1,11 @@
 package model
 
 import (
+	"strings"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/golang/protobuf/ptypes/timestamp"
-	"strings"
 )
 
 type Org struct {
@@ -17,6 +18,7 @@ type Org struct {
 	Members                  []*OrgMember
 	OrgIamPolicy             *iam_model.OrgIAMPolicy
 	LoginPolicy              *iam_model.LoginPolicy
+	LabelPolicy              *iam_model.LabelPolicy
 	PasswordComplexityPolicy *iam_model.PasswordComplexityPolicy
 	PasswordAgePolicy        *iam_model.PasswordAgePolicy
 	PasswordLockoutPolicy    *iam_model.PasswordLockoutPolicy

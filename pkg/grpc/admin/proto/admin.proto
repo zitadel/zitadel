@@ -342,6 +342,27 @@ service AdminService {
         };
     }
 
+    rpc GetDefaultLabelPolicy(google.protobuf.Empty) returns (DefaultLabelPolicyView) {
+        option (google.api.http) = {
+            get: "/policies/label"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc UpdateDefaultLabelPolicy(DefaultLabelPolicyUpdate) returns (DefaultLabelPolicy) {
+        option (google.api.http) = {
+            put: "/policies/label"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
     rpc GetDefaultLoginPolicy(google.protobuf.Empty) returns (DefaultLoginPolicyView) {
         option (google.api.http) = {
             get: "/policies/login"
@@ -901,6 +922,25 @@ enum IdpSearchKey {
     IDPSEARCHKEY_UNSPECIFIED = 0;
     IDPSEARCHKEY_IDP_CONFIG_ID = 1;
     IDPSEARCHKEY_NAME = 2;
+}
+
+message DefaultLabelPolicy {
+    string primary_color = 1;
+    string secondary_color = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
+}
+
+message DefaultLabelPolicyUpdate {
+    string primary_color = 1;
+    string secondary_color = 2;
+}
+
+message DefaultLabelPolicyView {
+    string primary_color = 1;
+    string secondary_color = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
 }
 
 message DefaultLoginPolicy {

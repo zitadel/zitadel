@@ -2,6 +2,8 @@ package eventstore
 
 import (
 	"context"
+	"strings"
+
 	"github.com/caos/logging"
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -11,7 +13,6 @@ import (
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	"strings"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
@@ -171,6 +172,24 @@ func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_mo
 		result.Timestamp = sequence.CurrentTimestamp
 	}
 	return result, nil
+}
+
+func (repo *IAMRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
+	policy, err := repo.View.LabelPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.LabelPolicyViewToModel(policy), err
+}
+
+func (repo *IAMRepository) AddDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.AddLabelPolicy(ctx, policy)
+}
+
+func (repo *IAMRepository) ChangeDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.ChangeLabelPolicy(ctx, policy)
 }
 
 func (repo *IAMRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {

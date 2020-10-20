@@ -845,6 +845,58 @@
         ]
       }
     },
+    "/policies/label": {
+      "get": {
+        "operationId": "AdminService_GetDefaultLabelPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultLabelPolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "operationId": "AdminService_UpdateDefaultLabelPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultLabelPolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DefaultLabelPolicyUpdate"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/policies/login": {
       "get": {
         "operationId": "AdminService_GetDefaultLoginPolicy",
@@ -1409,6 +1461,55 @@
         },
         "machine": {
           "$ref": "#/definitions/v1CreateMachineRequest"
+        }
+      }
+    },
+    "v1DefaultLabelPolicy": {
+      "type": "object",
+      "properties": {
+        "primary_color": {
+          "type": "string"
+        },
+        "secondary_color": {
+          "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultLabelPolicyUpdate": {
+      "type": "object",
+      "properties": {
+        "primary_color": {
+          "type": "string"
+        },
+        "secondary_color": {
+          "type": "string"
+        }
+      }
+    },
+    "v1DefaultLabelPolicyView": {
+      "type": "object",
+      "properties": {
+        "primary_color": {
+          "type": "string"
+        },
+        "secondary_color": {
+          "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

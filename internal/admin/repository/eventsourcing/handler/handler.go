@@ -1,9 +1,10 @@
 package handler
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-	"time"
 
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/types"
@@ -38,6 +39,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 		&IamMember{handler: handler{view, bulkLimit, configs.cycleDuration("IamMember"), errorCount},
 			userEvents: repos.UserEvents},
 		&IDPConfig{handler: handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount}},
+		&LabelPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount}},
 		&LoginPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount}},
 		&IDPProvider{handler: handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount},
 			systemDefaults: defaults, iamEvents: repos.IamEvents, orgEvents: repos.OrgEvents},

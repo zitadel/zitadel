@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/id"
 
@@ -176,6 +177,19 @@ func GetMockManipulateIAMWithOrgIAMPolicy(ctrl *gomock.Controller) *IAMEventstor
 
 func GetMockManipulateIAMNotExisting(ctrl *gomock.Controller) *IAMEventstore {
 	events := []*es_models.Event{}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
+func GetMockManipulateIAMWithLabelPolicy(ctrl *gomock.Controller) *IAMEventstore {
+	policyData, _ := json.Marshal(model.LabelPolicy{PrimaryColor: "000001", SecondaryColor: "FFFFF1"})
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.IAMSetupStarted},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.LabelPolicyAdded, Data: policyData},
+	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
 	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))

@@ -705,6 +705,46 @@ func (es *OrgEventstore) ChangeIDPOIDCConfig(ctx context.Context, config *iam_mo
 	return nil, errors.ThrowInternal(nil, "EVENT-Sldk8", "Errors.Internal")
 }
 
+func (es *OrgEventstore) AddLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
+	if policy == nil || !policy.IsValid() {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-37rSC", "Errors.Org.LabelPolicyInvalid")
+	}
+	org, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	if err != nil {
+		return nil, err
+	}
+
+	repoOrg := model.OrgFromModel(org)
+	repoLabelPolicy := iam_es_model.LabelPolicyFromModel(policy)
+
+	addAggregate := LabelPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoLabelPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.LabelPolicyToModel(repoOrg.LabelPolicy), nil
+}
+
+func (es *OrgEventstore) ChangeLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
+	if policy == nil || !policy.IsValid() {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-0NBIw", "Errors.Org.LabelPolicyInvalid")
+	}
+	org, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	if err != nil {
+		return nil, err
+	}
+
+	repoOrg := model.OrgFromModel(org)
+	repoLabelPolicy := iam_es_model.LabelPolicyFromModel(policy)
+
+	addAggregate := LabelPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoLabelPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.LabelPolicyToModel(repoOrg.LabelPolicy), nil
+}
+
 func (es *OrgEventstore) AddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
 	if policy == nil || !policy.IsValid() {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sjkl9", "Errors.Org.LoginPolicy.Invalid")

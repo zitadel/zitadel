@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/cache/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -413,6 +414,68 @@ func (es *IAMEventstore) ChangeIDPOIDCConfig(ctx context.Context, config *iam_mo
 		return model.OIDCIDPConfigToModel(idpConfig.OIDCIDPConfig), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-Sldk8", "Errors.Internal")
+}
+
+func (es *IAMEventstore) PrepareAddLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*model.IAM, *models.Aggregate, error) {
+	if policy == nil || policy.AggregateID == "" {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-VwlDv", "Errors.IAM.LabelPolicy.Empty")
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	labelPolicy := model.LabelPolicyFromModel(policy)
+
+	addAggregate := LabelPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, labelPolicy)
+	aggregate, err := addAggregate(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoIam, aggregate, nil
+}
+
+func (es *IAMEventstore) AddLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
+	if policy == nil || !policy.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-aAPWI", "Errors.IAM.LabelPolicyInvalid")
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoLabelPolicy := model.LabelPolicyFromModel(policy)
+
+	addAggregate := LabelPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoLabelPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.LabelPolicyToModel(repoIam.DefaultLabelPolicy), nil
+}
+
+func (es *IAMEventstore) ChangeLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
+	if policy == nil || !policy.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-vRqjg", "Errors.IAM.LabelPolicyInvalid")
+	}
+	iam, err := es.IAMByID(ctx, policy.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoLabelPolicy := model.LabelPolicyFromModel(policy)
+
+	addAggregate := LabelPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoLabelPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.LabelPolicyToModel(repoIam.DefaultLabelPolicy), nil
 }
 
 func (es *IAMEventstore) PrepareAddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*model.IAM, *models.Aggregate, error) {
