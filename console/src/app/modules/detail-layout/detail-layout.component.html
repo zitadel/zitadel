@@ -1,14 +1,16 @@
-<div class="max-width-container detail-container">
-    <div class="detail-left">
-        <a *ngIf="backRouterLink" [routerLink]="backRouterLink" mat-icon-button>
-            <mat-icon class="icon">arrow_back</mat-icon>
-        </a>
-    </div>
-    <div class="detail-right">
-        <div class="head">
-            <h1>{{ title }}</h1>
-            <p class="desc">{{ description }}</p>
-            <ng-content></ng-content>
+<div class="max-width-container">
+    <div class="detail-container">
+        <div class="detail-left">
+            <a *ngIf="backRouterLink" [routerLink]="backRouterLink" mat-icon-button>
+                <mat-icon class="icon">arrow_back</mat-icon>
+            </a>
+        </div>
+        <div class="detail-right">
+            <div class="head">
+                <h1>{{ title }}</h1>
+                <p class="desc">{{ description }}</p>
+                <ng-content></ng-content>
+            </div>
         </div>
     </div>
 </div>

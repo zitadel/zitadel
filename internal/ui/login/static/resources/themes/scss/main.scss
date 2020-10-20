@@ -97,7 +97,8 @@ button, .button {
     outline: none;
     display: inline-block;
     text-align: center;
-    line-height: 40px;
+    line-height: 44px;
+    padding: 1px 6px;
 
     &:hover {
         background-color: $primaryColorHover;
@@ -121,6 +122,32 @@ button, .button {
         &:hover {
             background-color: $inputBorderColor;
             border: 1px solid $inputBorderColor;
+        }
+    }
+
+    &.google {
+        display: flex;
+        align-items: center;
+        position: relative;
+        padding: 0 1px;
+        color: $idpGoogleFontColor;
+        background-color: $idpGoogleBackgroundColor;
+
+        span.logo {
+            height: 46px;
+            width: 46px;
+            background-color: #FFFFFF;
+            background-image: url($idpGoogleImg + '.png');
+            background-size: 25px;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 5px;
+        }
+
+        span.provider-name {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
         }
     }
 }

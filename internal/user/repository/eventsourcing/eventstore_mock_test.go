@@ -472,8 +472,8 @@ func GetMockManipulateUserWithExternalIDP(ctrl *gomock.Controller) *UserEventsto
 	dataUser, _ := json.Marshal(user)
 	dataIDP, _ := json.Marshal(externalIDP)
 	events := []*es_models.Event{
-		{AggregateID: "AggregateID", AggregateVersion: "v1", Sequence: 1, Type: model.UserAdded, Data: dataUser},
-		{AggregateID: "AggregateID", AggregateVersion: "v1", Sequence: 1, Type: model.HumanExternalIDPAdded, Data: dataIDP},
+		{AggregateID: "AggregateID", AggregateVersion: "v1", Sequence: 1, Type: model.UserAdded, Data: dataUser, ResourceOwner: "ResourceOwner"},
+		{AggregateID: "AggregateID", AggregateVersion: "v1", Sequence: 1, Type: model.HumanExternalIDPAdded, Data: dataIDP, ResourceOwner: "ResourceOwner"},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)

@@ -9,35 +9,24 @@
 
 .content {
   padding-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
 
   .row {
-    display: flex;
-    align-items: center;
-    padding: .3rem 0;
-
-    .left-desc {
-      font-size: .9rem;
+    .toggle {
+      margin: .3rem 0;
     }
 
-    .fill-space {
-      flex: 1;
+    p {
+      margin-top: .5rem;
+      font-size: 14px;
+      color: var(--grey);
     }
   }
 }
 
-.btn-container {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-
-  button {
-    margin-top: 3rem;
-    display: block;
-    padding: .5rem 4rem;
-  }
+.save-button {
+  margin-top: 3rem;
+  display: block;
+  padding: .5rem 4rem;
 }
 
 .idp-table-card {
@@ -63,6 +52,12 @@
     border-radius: .5rem;
     cursor: pointer;
     position: relative;
+    min-height: 70px;
+    min-width: 150px;
+
+    .name {
+      font-weight: 700;
+    }
 
     span {
       padding: 2px;
@@ -70,6 +65,7 @@
 
     .meta {
       font-size: 12px;
+      color: var(--grey);
     }
 
     .rm {
@@ -78,10 +74,16 @@
       left: 0;
       transform: translateX(-50%) translateY(-50%);
       cursor: pointer;
+
+      &[disabled] {
+        display: none;
+      }
     }
 
-    &:hover {
-      background-color: #ffffff10;
+    &:not(.disabled) {
+      &:hover {
+        background-color: #ffffff10;
+      }
     }
 
     img {

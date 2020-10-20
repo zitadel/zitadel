@@ -11,6 +11,8 @@
     <h1>{{'IDP.CREATE.TITLE' | translate}}</h1>
     <p>{{'IDP.CREATE.DESCRIPTION' | translate}}</p>
 
+    <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
+
     <form (ngSubmit)="addIdp()">
         <ng-container [formGroup]="formGroup">
             <div class="content">
@@ -48,22 +50,22 @@
                 </mat-form-field>
             </div>
             <div class="content">
-              <mat-form-field class="formfield" appearance="outline">
-                <mat-label>{{ 'IDP.IDPDISPLAYNAMMAPPING' | translate }}</mat-label>
-                <mat-select formControlName="idpDisplayNameMapping">
-                  <mat-option *ngFor="let field of mappingFields" [value]="field">
-                    {{ 'IDP.MAPPINTFIELD.'+field | translate }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-              <mat-form-field class="formfield" appearance="outline">
-                <mat-label>{{ 'IDP.USERNAMEMAPPING' | translate }}</mat-label>
-                <mat-select formControlName="usernameMapping">
-                  <mat-option *ngFor="let field of mappingFields" [value]="field">
-                    {{ 'IDP.MAPPINTFIELD.'+field | translate }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
+                <mat-form-field class="formfield" appearance="outline">
+                    <mat-label>{{ 'IDP.IDPDISPLAYNAMMAPPING' | translate }}</mat-label>
+                    <mat-select formControlName="idpDisplayNameMapping">
+                        <mat-option *ngFor="let field of mappingFields" [value]="field">
+                            {{ 'IDP.MAPPINTFIELD.'+field | translate }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field class="formfield" appearance="outline">
+                    <mat-label>{{ 'IDP.USERNAMEMAPPING' | translate }}</mat-label>
+                    <mat-select formControlName="usernameMapping">
+                        <mat-option *ngFor="let field of mappingFields" [value]="field">
+                            {{ 'IDP.MAPPINTFIELD.'+field | translate }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
             </div>
         </ng-container>
 

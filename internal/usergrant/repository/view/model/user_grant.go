@@ -66,6 +66,7 @@ func UserGrantToModel(grant *UserGrantView) *model.UserGrantView {
 		OrgPrimaryDomain: grant.OrgPrimaryDomain,
 		RoleKeys:         grant.RoleKeys,
 		Sequence:         grant.Sequence,
+		GrantID:          grant.GrantID,
 	}
 }
 

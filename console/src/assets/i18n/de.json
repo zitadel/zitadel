@@ -469,9 +469,13 @@
                 "USERLOGINMUSTBEDOMAIN":"Benutzer-Login muss eine Domain sein",
                 "ALLOWUSERNAMEPASSWORD":"Benutzername Password erlaubt",
                 "ALLOWEXTERNALIDP":"Externer IDP erlaubt",
-                "ALLOWREGISTER":"Registrieren erlaubt"
+                "ALLOWREGISTER":"Registrieren erlaubt",
+                "ALLOWUSERNAMEPASSWORD_DESC":"Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
+                "ALLOWEXTERNALIDP_DESC":"Der Login wird für die darunter liegenden Identity Provider erlaubt.",
+                "ALLOWREGISTER_DESC":"Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers."
             },
             "RESET":"Richtlinie zurücksetzen",
+            "CREATECUSTOM":"Benutzerdefinierte Richtlinie erstellen",
             "TOAST":{
                 "SET":"Richtline erfolgreich gesetzt!",
                 "RESETSUCCESS":"Richtline zurückgesetzt!"
@@ -709,16 +713,20 @@
             "1":"aktiv",
             "2":"inaktiv"
         },
-        "MAPPINTFIELD": {
+        "MAPPINGFIELD": {
           "1": "Preferred Username",
           "2": "Email"
         },
+        "STYLE":"Style",
+        "STYLEFIELD": {
+            "0": "kein Styling",
+            "1": "Google"
+          },
         "TYPE":"Typ",
         "ID": "ID",
         "NAME":"Name",
         "CONFIG":"Konfiguration",
         "STATE":"Status",
-        "LOGOSRC":"Logo Src",
         "ISSUER":"Issuer",
         "SCOPESLIST":"Scopes List",
         "CLIENTID":"Client ID",
@@ -730,8 +738,18 @@
         "DEACTIVATE":"Deaktivieren",
         "ACTIVATE":"Aktivieren",
         "DELETE":"Löschen",
+        "DELETE_TITLE":"Idp löschen",
+        "DELETE_DESCRIPTION":"Sie sind im Begriff einen Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
+        "DELETE_SELECTION_TITLE":"Identity Providers löschen",
+        "DELETE_SELECTION_DESCRIPTION":"Sie sind im Begriff mehrere Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
         "TOAST": {
-            "SAVED": "Erfolgreich gespeichert."
+            "SAVED": "Erfolgreich gespeichert.",
+            "REACTIVATED":"Idp reaktiviert.",
+            "DEACTIVATED":"Idp deaktiviert.",
+            "SELECTEDREACTIVATED":"Selektierte Idps reaktiviert.",
+            "SELECTEDDEACTIVATED":"Selektierte Idps deaktiviert.",
+            "SELECTEDKEYSDELETED":"Selektierte Idps gelöscht.",
+            "DELETED":"Idp erfolgreich gelöscht!"
         }
     },
     "LOGINPOLICY": {

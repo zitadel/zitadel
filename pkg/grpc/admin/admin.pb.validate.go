@@ -3342,7 +3342,7 @@ func (m *Idp) Validate() error {
 
 	// no validation rules for Name
 
-	// no validation rules for LogoSrc
+	// no validation rules for StylingType
 
 	// no validation rules for Sequence
 
@@ -3435,7 +3435,7 @@ func (m *IdpUpdate) Validate() error {
 
 	// no validation rules for Name
 
-	// no validation rules for LogoSrc
+	// no validation rules for StylingType
 
 	return nil
 }
@@ -3580,7 +3580,7 @@ func (m *OidcIdpConfigCreate) Validate() error {
 		}
 	}
 
-	// no validation rules for LogoSrc
+	// no validation rules for StylingType
 
 	if l := utf8.RuneCountInString(m.GetClientId()); l < 1 || l > 200 {
 		return OidcIdpConfigCreateValidationError{
@@ -3893,7 +3893,7 @@ func (m *IdpView) Validate() error {
 
 	// no validation rules for Name
 
-	// no validation rules for LogoSrc
+	// no validation rules for StylingType
 
 	// no validation rules for Sequence
 

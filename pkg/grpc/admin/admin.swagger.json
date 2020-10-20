@@ -1755,9 +1755,8 @@
         "name": {
           "type": "string"
         },
-        "logo_src": {
-          "type": "string",
-          "format": "byte"
+        "styling_type": {
+          "$ref": "#/definitions/v1IdpStylingType"
         },
         "oidc_config": {
           "$ref": "#/definitions/v1OidcIdpConfig"
@@ -1924,6 +1923,14 @@
       ],
       "default": "IDPCONFIGSTATE_UNSPECIFIED"
     },
+    "v1IdpStylingType": {
+      "type": "string",
+      "enum": [
+        "IDPSTYLINGTYPE_UNSPECIFIED",
+        "IDPSTYLINGTYPE_GOOGLE"
+      ],
+      "default": "IDPSTYLINGTYPE_UNSPECIFIED"
+    },
     "v1IdpType": {
       "type": "string",
       "enum": [
@@ -1942,9 +1949,8 @@
         "name": {
           "type": "string"
         },
-        "logo_src": {
-          "type": "string",
-          "format": "byte"
+        "styling_type": {
+          "$ref": "#/definitions/v1IdpStylingType"
         }
       }
     },
@@ -1968,9 +1974,8 @@
         "name": {
           "type": "string"
         },
-        "logo_src": {
-          "type": "string",
-          "format": "byte"
+        "styling_type": {
+          "$ref": "#/definitions/v1IdpStylingType"
         },
         "oidc_config": {
           "$ref": "#/definitions/v1OidcIdpConfigView"
@@ -2064,9 +2069,8 @@
         "name": {
           "type": "string"
         },
-        "logo_src": {
-          "type": "string",
-          "format": "byte"
+        "styling_type": {
+          "$ref": "#/definitions/v1IdpStylingType"
         },
         "client_id": {
           "type": "string"
