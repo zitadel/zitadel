@@ -63,7 +63,7 @@
         </div>
     </div>
 
-    <button class="save-button" (click)="savePolicy()" color="primary" type="submit"
+    <button [disabled]="disabled" class="save-button" (click)="savePolicy()" color="primary" type="submit"
         mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
 
     <ng-template appHasRole [appHasRole]="['org.idp.read']">
