@@ -163,6 +163,8 @@ func checkExistingLoginPolicyIDPProviderValidation(idpProvider *iam_es_model.IDP
 						break
 					}
 				}
+			case model.LoginPolicyRemoved:
+				idps = make([]*iam_es_model.IDPProvider, 0)
 			}
 		}
 		exists := false
