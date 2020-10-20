@@ -63,7 +63,7 @@
                             <mat-label>{{ 'IDP.IDPDISPLAYNAMMAPPING' | translate }}</mat-label>
                             <mat-select formControlName="idpDisplayNameMapping">
                                 <mat-option *ngFor="let field of mappingFields" [value]="field">
-                                    {{ 'IDP.MAPPINTFIELD.'+field | translate }}
+                                    {{ 'IDP.MAPPINGFIELD.'+field | translate }}
                                 </mat-option>
                             </mat-select>
                         </mat-form-field>
@@ -71,7 +71,15 @@
                             <mat-label>{{ 'IDP.USERNAMEMAPPING' | translate }}</mat-label>
                             <mat-select formControlName="usernameMapping">
                                 <mat-option *ngFor="let field of mappingFields" [value]="field">
-                                    {{ 'IDP.MAPPINTFIELD.'+field | translate }}
+                                    {{ 'IDP.MAPPINGFIELD.'+field | translate }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field class="formfield" appearance="outline">
+                            <mat-label>{{ 'IDP.STYLE' | translate }}</mat-label>
+                            <mat-select formControlName="usernameMapping">
+                                <mat-option *ngFor="let field of styleFields" [value]="field">
+                                    {{ 'IDP.STYLEFIELD.'+field | translate }}
                                 </mat-option>
                             </mat-select>
                         </mat-form-field>
