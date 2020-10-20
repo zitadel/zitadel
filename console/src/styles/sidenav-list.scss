@@ -7,17 +7,8 @@
   $primary-color: mat-color($primary, 500);
   $accent-color: mat-color($accent, 500);
   $primary-dark: mat-color($primary, A900);
-  $inverse-color: mat-color($primary, A600);
   $sec-dark: mat-color($primary, A800);
   /* stylelint-enable */
-
-  .mat-menu-item {
-    &.show-all {
-      height: 2rem;
-      line-height: 2rem;
-      color: mat-color($primary, a700);
-    }
-  }
 
   .nav-item {
     color: inherit;
@@ -59,7 +50,7 @@
   .root-header {
     box-shadow: 0 5px 10px rgba(0, 0, 0, .12);
     background-color: $primary-dark !important;
-    transition: background-color .4s ease-in-out;
+    transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
   }
 
   .admin-line {
@@ -77,7 +68,7 @@
       left: 0;
       border-bottom: 20px solid $primary-dark;
       border-right: 20px solid transparent;
-      transition: border-color .4s ease-in-out;
+      transition: border-color .3s cubic-bezier(.645, .045, .355, 1);
     }
   }
 }

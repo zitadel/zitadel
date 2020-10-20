@@ -7,24 +7,21 @@ import (
 
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
-
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/id"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	policy_model "github.com/caos/zitadel/internal/policy/model"
-	"github.com/caos/zitadel/internal/tracing"
-
 	"github.com/pquerna/otp/totp"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/cache/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/id"
 	global_model "github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
@@ -105,6 +102,9 @@ func (es *UserEventstore) UserByID(ctx context.Context, id string) (*usr_model.U
 	if err != nil && caos_errs.IsNotFound(err) && user.Sequence == 0 {
 		return nil, err
 	}
+	if user.State == int32(usr_model.UserStateDeleted) {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-6hsK9", "Errors.User.NotFound")
+	}
 	es.userCache.cacheUser(user)
 	return model.UserToModel(user), nil
 }
@@ -117,7 +117,7 @@ func (es *UserEventstore) UserEventsByID(ctx context.Context, id string, sequenc
 	return es.FilterEvents(ctx, query)
 }
 
-func (es *UserEventstore) prepareCreateMachine(ctx context.Context, user *usr_model.User, orgIamPolicy *org_model.OrgIAMPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
+func (es *UserEventstore) prepareCreateMachine(ctx context.Context, user *usr_model.User, orgIamPolicy *iam_model.OrgIAMPolicyView, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	machine := model.UserFromModel(user)
 
 	if !orgIamPolicy.UserLoginMustBeDomain {
@@ -129,7 +129,7 @@ func (es *UserEventstore) prepareCreateMachine(ctx context.Context, user *usr_mo
 	return machine, createAggregates, err
 }
 
-func (es *UserEventstore) prepareCreateHuman(ctx context.Context, user *usr_model.User, pwPolicy *policy_model.PasswordComplexityPolicy, orgIAMPolicy *org_model.OrgIAMPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
+func (es *UserEventstore) prepareCreateHuman(ctx context.Context, user *usr_model.User, pwPolicy *iam_model.PasswordComplexityPolicyView, orgIAMPolicy *iam_model.OrgIAMPolicyView, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	err := user.CheckOrgIAMPolicy(orgIAMPolicy)
 	if err != nil {
 		return nil, nil, err
@@ -161,7 +161,7 @@ func (es *UserEventstore) prepareCreateHuman(ctx context.Context, user *usr_mode
 	return repoUser, createAggregates, err
 }
 
-func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, pwPolicy *policy_model.PasswordComplexityPolicy, orgIAMPolicy *org_model.OrgIAMPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
+func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, pwPolicy *iam_model.PasswordComplexityPolicyView, orgIAMPolicy *iam_model.OrgIAMPolicyView, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
@@ -176,7 +176,7 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 	return nil, nil, errors.ThrowInvalidArgument(nil, "EVENT-Q29tp", "Errors.User.TypeUndefined")
 }
 
-func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, pwPolicy *policy_model.PasswordComplexityPolicy, orgIAMPolicy *org_model.OrgIAMPolicy) (*usr_model.User, error) {
+func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, pwPolicy *iam_model.PasswordComplexityPolicyView, orgIAMPolicy *iam_model.OrgIAMPolicyView) (*usr_model.User, error) {
 	repoUser, aggregates, err := es.PrepareCreateUser(ctx, user, pwPolicy, orgIAMPolicy, "")
 	if err != nil {
 		return nil, err
@@ -191,7 +191,7 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, 
 	return model.UserToModel(repoUser), nil
 }
 
-func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, externalIDP *usr_model.ExternalIDP, policy *policy_model.PasswordComplexityPolicy, orgIAMPolicy *org_model.OrgIAMPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
+func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, externalIDP *usr_model.ExternalIDP, policy *iam_model.PasswordComplexityPolicyView, orgIAMPolicy *iam_model.OrgIAMPolicyView, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	if user.Human == nil {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-ht8Ux", "Errors.User.Invalid")
 	}
@@ -233,7 +233,7 @@ func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_mod
 	return repoUser, aggregates, err
 }
 
-func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User, pwPolicy *policy_model.PasswordComplexityPolicy, orgIAMPolicy *org_model.OrgIAMPolicy, resourceOwner string) (*usr_model.User, error) {
+func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User, pwPolicy *iam_model.PasswordComplexityPolicyView, orgIAMPolicy *iam_model.OrgIAMPolicyView, resourceOwner string) (*usr_model.User, error) {
 	repoUser, createAggregates, err := es.PrepareRegisterUser(ctx, user, nil, pwPolicy, orgIAMPolicy, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -322,6 +322,28 @@ func (es *UserEventstore) UnlockUser(ctx context.Context, id string) (*usr_model
 	}
 	es.userCache.cacheUser(repoUser)
 	return model.UserToModel(repoUser), nil
+}
+
+func (es *UserEventstore) PrepareRemoveUser(ctx context.Context, id string, orgIamPolicy *iam_model.OrgIAMPolicyView) (*model.User, []*es_models.Aggregate, error) {
+	user, err := es.UserByID(ctx, id)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	repoUser := model.UserFromModel(user)
+	aggregate, err := UserRemoveAggregate(ctx, es.AggregateCreator(), repoUser, orgIamPolicy.UserLoginMustBeDomain)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoUser, aggregate, nil
+}
+
+func (es *UserEventstore) RemoveUser(ctx context.Context, id string, orgIamPolicy *iam_model.OrgIAMPolicyView) error {
+	repoUser, aggregate, err := es.PrepareRemoveUser(ctx, id, orgIamPolicy)
+	if err != nil {
+		return err
+	}
+	return es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, aggregate...)
 }
 
 func (es *UserEventstore) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*usr_model.UserChanges, error) {
@@ -451,7 +473,7 @@ func (es *UserEventstore) InitCodeSent(ctx context.Context, userID string) error
 	return nil
 }
 
-func (es *UserEventstore) VerifyInitCode(ctx context.Context, policy *policy_model.PasswordComplexityPolicy, userID, verificationCode, password string) error {
+func (es *UserEventstore) VerifyInitCode(ctx context.Context, policy *iam_model.PasswordComplexityPolicyView, userID, verificationCode, password string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9fd", "Errors.User.UserIDMissing")
 	}
@@ -571,7 +593,7 @@ func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_
 	return nil
 }
 
-func (es *UserEventstore) SetOneTimePassword(ctx context.Context, policy *policy_model.PasswordComplexityPolicy, password *usr_model.Password) (*usr_model.Password, error) {
+func (es *UserEventstore) SetOneTimePassword(ctx context.Context, policy *iam_model.PasswordComplexityPolicyView, password *usr_model.Password) (*usr_model.Password, error) {
 	user, err := es.UserByID(ctx, password.AggregateID)
 	if err != nil {
 		return nil, err
@@ -582,7 +604,7 @@ func (es *UserEventstore) SetOneTimePassword(ctx context.Context, policy *policy
 	return es.changedPassword(ctx, user, policy, password.SecretString, true)
 }
 
-func (es *UserEventstore) SetPassword(ctx context.Context, policy *policy_model.PasswordComplexityPolicy, userID, code, password string) error {
+func (es *UserEventstore) SetPassword(ctx context.Context, policy *iam_model.PasswordComplexityPolicyView, userID, code, password string) error {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
@@ -598,6 +620,46 @@ func (es *UserEventstore) SetPassword(ctx context.Context, policy *policy_model.
 	}
 	_, err = es.changedPassword(ctx, user, policy, password, false)
 	return err
+}
+
+func (es *UserEventstore) ExternalLoginChecked(ctx context.Context, userID string, authRequest *req_model.AuthRequest) error {
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if user.Human == nil {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Gns8i", "Errors.User.NotHuman")
+	}
+	repoUser := model.UserFromModel(user)
+	repoAuthRequest := model.AuthRequestFromModel(authRequest)
+	agg := ExternalLoginCheckSucceededAggregate(es.AggregateCreator(), repoUser, repoAuthRequest)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
+func (es *UserEventstore) TokenAdded(ctx context.Context, token *usr_model.Token) (*usr_model.Token, error) {
+	user, err := es.UserByID(ctx, token.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	id, err := es.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+	token.TokenID = id
+	repoUser := model.UserFromModel(user)
+	repoToken := model.TokenFromModel(token)
+	agg := TokenAddedAggregate(es.AggregateCreator(), repoUser, repoToken)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoToken.AppendEvents, agg)
+	if err != nil {
+		return nil, err
+	}
+	es.userCache.cacheUser(repoUser)
+	return model.TokenToModel(repoToken), nil
 }
 
 func (es *UserEventstore) ChangeMachine(ctx context.Context, machine *usr_model.Machine) (*usr_model.Machine, error) {
@@ -622,7 +684,7 @@ func (es *UserEventstore) ChangeMachine(ctx context.Context, machine *usr_model.
 	return model.MachineToModel(repoUser.Machine), nil
 }
 
-func (es *UserEventstore) ChangePassword(ctx context.Context, policy *policy_model.PasswordComplexityPolicy, userID, old, new string) (_ *usr_model.Password, err error) {
+func (es *UserEventstore) ChangePassword(ctx context.Context, policy *iam_model.PasswordComplexityPolicyView, userID, old, new string) (_ *usr_model.Password, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	user, err := es.UserByID(ctx, userID)
@@ -644,7 +706,7 @@ func (es *UserEventstore) ChangePassword(ctx context.Context, policy *policy_mod
 	return es.changedPassword(ctx, user, policy, new, false)
 }
 
-func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, password string, onetime bool) (_ *usr_model.Password, err error) {
+func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.User, policy *iam_model.PasswordComplexityPolicyView, password string, onetime bool) (_ *usr_model.Password, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	pw := &usr_model.Password{SecretString: password}
@@ -1400,7 +1462,7 @@ func (es *UserEventstore) DomainClaimedSent(ctx context.Context, userID string) 
 	return nil
 }
 
-func (es *UserEventstore) ChangeUsername(ctx context.Context, userID, username string, orgIamPolicy *org_model.OrgIAMPolicy) error {
+func (es *UserEventstore) ChangeUsername(ctx context.Context, userID, username string, orgIamPolicy *iam_model.OrgIAMPolicyView) error {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err

@@ -33,9 +33,13 @@ $inputBackgroundColor: #252525;
 $buttonBackgroundColorHover: $inputBackgroundColor;
 $profileImgDark: "../../../images/icon-user-dark";
 $otherUserImgDark: "../../../images/icon-newuser-dark";
+$idpGoogleImg: "../../../images/idp/google";
+$idpGoogleFontColor: #FFFFFF;
+$idpGoogleBackgroundColor: #4285F4;
 $nokColor: #F20D6B;
 $okColor: #0DF279;
 $errorColor: red;
+
 
 
 // ----- LIGHT-THEME --------
@@ -47,5 +51,8 @@ $inputBackgroundColorLight: #FFFFFF;
 $buttonBackgroundColorHoverLight: $inputBackgroundColorLight;
 $profileImgLight: "../../../images/icon-user-light";
 $otherUserImgLight: "../../../images/icon-newuser-light";
+$idpGoogleImgLight: "../../../images/idp/google";
+$idpGoogleFontColorLight: #8b8d8d;
+$idpGoogleBackgroundColorLight: #FFFFFF;
 $nokColorLight: #F20D6B;
 $okColorLight: #50CA3D;

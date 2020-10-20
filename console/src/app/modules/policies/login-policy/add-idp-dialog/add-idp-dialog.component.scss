@@ -3,7 +3,7 @@
 }
 
 .desc {
-  color: #8795a1;
+  color: var(--grey);
   font-size: .9rem;
 }
 
@@ -17,9 +17,5 @@
 
   .ok-button {
     margin-left: .5rem;
-  }
-
-  button {
-    border-radius: .5rem;
   }
 }

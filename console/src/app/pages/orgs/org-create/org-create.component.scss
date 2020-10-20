@@ -39,7 +39,7 @@ h1 {
   }
 
   .desc {
-    color: #8795a1;
+    color: var(--grey);
     font-size: .9rem;
     margin: 1rem 0;
   }
@@ -70,7 +70,7 @@ h1 {
       width: 100%;
       display: block;
       font-size: .9rem;
-      color: #8795a1;
+      color: var(--grey);
     }
   }
 
@@ -85,7 +85,6 @@ h1 {
         margin-top: 3rem;
         display: block;
         padding: .5rem 4rem;
-        border-radius: .5rem;
       }
     }
 
@@ -98,7 +97,7 @@ h1 {
       .section {
         padding: .5rem;
         flex-basis: 100%;
-        color: #8795a1;
+        color: var(--grey);
         font-size: .9rem;
       }
 
@@ -138,7 +137,6 @@ h1 {
 
   .small-button {
     display: block;
-    border-radius: .5rem;
   }
 
   .fill-space {
@@ -148,7 +146,6 @@ h1 {
   .big-button {
     display: block;
     padding: .5rem 4rem;
-    border-radius: .5rem;
   }
 }
 

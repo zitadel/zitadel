@@ -5,8 +5,8 @@
         (click)="deleteGrantSelection()" *ngIf="selection.hasValue() && allowDelete">
         <i class="las la-trash"></i>
     </button>
-    <a *ngIf="allowCreate && context !== UserGrantContext.USER" matTooltip="{{'GRANTS.ADD' | translate}}" actions
-        color="primary" class="add-button" color="primary" mat-raised-button [routerLink]="routerLink">
+    <a *ngIf="allowWrite && context !== UserGrantContext.USER" matTooltip="{{'GRANTS.ADD' | translate}}" actions
+        color="primary" color="primary" mat-raised-button [routerLink]="routerLink">
         <mat-icon class="icon">add</mat-icon>{{ 'GRANTS.ADD_BTN' | translate }}
     </a>
 
@@ -14,13 +14,13 @@
         <table mat-table multiTemplateDataRows class="table" aria-label="Elements" [dataSource]="dataSource">
             <ng-container matColumnDef="select">
                 <th class="selection" mat-header-cell *matHeaderCellDef>
-                    <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
-                        [checked]="selection.hasValue() && isAllSelected()"
+                    <mat-checkbox [disabled]="allowWrite == false" color="primary"
+                        (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
                         [indeterminate]="selection.hasValue() && !isAllSelected()">
                     </mat-checkbox>
                 </th>
                 <td class="selection" mat-cell *matCellDef="let row">
-                    <mat-checkbox color="primary" (click)="$event.stopPropagation()"
+                    <mat-checkbox [disabled]="allowWrite == false" color="primary" (click)="$event.stopPropagation()"
                         (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
                         <app-avatar *ngIf="row && row?.displayName && row.firstName && row.lastName" class="avatar"
                             [name]="row.displayName" [size]="32">
@@ -82,7 +82,7 @@
                         <mat-form-field class="form-field" appearance="outline"
                             *ngIf="loadedProjectId === grant.projectId">
                             <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
-                            <mat-select [(ngModel)]="grant.roleKeysList" multiple [disabled]="allowCreate == false"
+                            <mat-select [(ngModel)]="grant.roleKeysList" multiple [disabled]="allowWrite == false"
                                 (selectionChange)="updateRoles(grant, $event)">
                                 <mat-option *ngFor="let role of projectRoleOptions" [value]="role.key">
                                     {{role.key}}
@@ -94,7 +94,7 @@
                     <ng-container *ngIf="context === UserGrantContext.GRANTED_PROJECT">
                         <mat-form-field class="form-field" appearance="outline">
                             <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
-                            <mat-select [(ngModel)]="grant.roleKeysList" multiple [disabled]="allowCreate == false"
+                            <mat-select [(ngModel)]="grant.roleKeysList" multiple [disabled]="allowWrite == false"
                                 (selectionChange)="updateRoles(grant, $event)">
                                 <mat-option *ngFor="let role of grantRoleOptions" [value]="role">
                                     {{role}}
@@ -106,7 +106,7 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="element-row">
+            <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;">
             </tr>
         </table>
 

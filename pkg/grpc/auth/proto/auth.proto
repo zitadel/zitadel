@@ -751,7 +751,6 @@ message ExternalIDPRemoveRequest {
 message ExternalIDPSearchRequest {
   uint64 offset = 1;
   uint64 limit = 2;
-  string user_id = 3;
 }
 
 message ExternalIDPSearchResponse {

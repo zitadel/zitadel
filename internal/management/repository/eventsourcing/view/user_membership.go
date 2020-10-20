@@ -32,7 +32,7 @@ func (v *View) PutUserMembership(membership *model.UserMembershipView, sequence 
 }
 
 func (v *View) BulkPutUserMemberships(memberships []*model.UserMembershipView, sequence uint64) error {
-	err := view.PutUserMemberships(v.Db, userTable, memberships...)
+	err := view.PutUserMemberships(v.Db, userMembershipTable, memberships...)
 	if err != nil {
 		return err
 	}
@@ -41,6 +41,30 @@ func (v *View) BulkPutUserMemberships(memberships []*model.UserMembershipView, s
 
 func (v *View) DeleteUserMembership(userID, aggregateID, objectID string, memberType usr_model.MemberType, eventSequence uint64) error {
 	err := view.DeleteUserMembership(v.Db, userMembershipTable, userID, aggregateID, objectID, memberType)
+	if err != nil {
+		return nil
+	}
+	return v.ProcessedUserMembershipSequence(eventSequence)
+}
+
+func (v *View) DeleteUserMembershipsByUserID(userID string, eventSequence uint64) error {
+	err := view.DeleteUserMembershipsByUserID(v.Db, userMembershipTable, userID)
+	if err != nil {
+		return nil
+	}
+	return v.ProcessedUserMembershipSequence(eventSequence)
+}
+
+func (v *View) DeleteUserMembershipsByAggregateID(aggregateID string, eventSequence uint64) error {
+	err := view.DeleteUserMembershipsByAggregateID(v.Db, userMembershipTable, aggregateID)
+	if err != nil {
+		return nil
+	}
+	return v.ProcessedUserMembershipSequence(eventSequence)
+}
+
+func (v *View) DeleteUserMembershipsByAggregateIDAndObjectID(aggregateID, objectID string, eventSequence uint64) error {
+	err := view.DeleteUserMembershipsByAggregateIDAndObjectID(v.Db, userMembershipTable, aggregateID, objectID)
 	if err != nil {
 		return nil
 	}

@@ -31,7 +31,7 @@ func TestIamByID(t *testing.T) {
 		{
 			name: "iam from events, ok",
 			args: args{
-				es:  GetMockIamByIDOK(ctrl),
+				es:  GetMockIAMByIDOK(ctrl),
 				iam: &model.IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
@@ -62,12 +62,15 @@ func TestIamByID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.IAMByID(nil, tt.args.iam.AggregateID)
-
-			if tt.res.errFunc == nil && result.AggregateID != tt.res.iam.AggregateID {
-				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.iam.AggregateID, result.AggregateID)
-			}
-			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+			if (tt.res.errFunc != nil && !tt.res.errFunc(err)) || (err != nil && tt.res.errFunc == nil) {
 				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.errFunc != nil && tt.res.errFunc(err) {
+				return
+			}
+			if result.AggregateID != tt.res.iam.AggregateID {
+				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.iam.AggregateID, result.AggregateID)
 			}
 		})
 	}
@@ -79,9 +82,10 @@ func TestSetUpStarted(t *testing.T) {
 		es    *IAMEventstore
 		ctx   context.Context
 		iamID string
+		step  iam_model.Step
 	}
 	type res struct {
-		iam     *model.IAM
+		iam     *iam_model.IAM
 		errFunc func(err error) bool
 	}
 	tests := []struct {
@@ -92,20 +96,22 @@ func TestSetUpStarted(t *testing.T) {
 		{
 			name: "setup started iam, ok",
 			args: args{
-				es:    GetMockManipulateIamNotExisting(ctrl),
+				es:    GetMockManipulateIAMNotExisting(ctrl),
 				ctx:   authz.NewMockContext("orgID", "userID"),
 				iamID: "iamID",
+				step:  iam_model.Step1,
 			},
 			res: res{
-				iam: &model.IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "iamID", Sequence: 1}, SetUpStarted: true},
+				iam: &iam_model.IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "iamID", Sequence: 1}, SetUpStarted: iam_model.Step1},
 			},
 		},
 		{
 			name: "setup already started",
 			args: args{
-				es:    GetMockManipulateIam(ctrl),
+				es:    GetMockManipulateIAM(ctrl),
 				ctx:   authz.NewMockContext("orgID", "userID"),
 				iamID: "iamID",
+				step:  iam_model.Step1,
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -114,8 +120,9 @@ func TestSetUpStarted(t *testing.T) {
 		{
 			name: "setup iam no id",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
-				ctx: authz.NewMockContext("orgID", "userID"),
+				es:   GetMockManipulateIAM(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				step: iam_model.Step1,
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -124,16 +131,19 @@ func TestSetUpStarted(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.StartSetup(tt.args.ctx, tt.args.iamID)
-
-			if tt.res.errFunc == nil && result.AggregateID == "" {
+			result, err := tt.args.es.StartSetup(tt.args.ctx, tt.args.iamID, tt.args.step)
+			if (tt.res.errFunc != nil && !tt.res.errFunc(err)) || (err != nil && tt.res.errFunc == nil) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.errFunc != nil && tt.res.errFunc(err) {
+				return
+			}
+			if result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if tt.res.errFunc == nil && result.SetUpStarted != tt.res.iam.SetUpStarted {
+			if result.SetUpStarted != tt.res.iam.SetUpStarted {
 				t.Errorf("got wrong result setupStarted: expected: %v, actual: %v ", tt.res.iam.SetUpStarted, result.SetUpStarted)
-			}
-			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -145,9 +155,10 @@ func TestSetUpDone(t *testing.T) {
 		es    *IAMEventstore
 		ctx   context.Context
 		iamID string
+		step  iam_model.Step
 	}
 	type res struct {
-		iam     *model.IAM
+		iam     *iam_model.IAM
 		errFunc func(err error) bool
 	}
 	tests := []struct {
@@ -158,19 +169,21 @@ func TestSetUpDone(t *testing.T) {
 		{
 			name: "setup done iam, ok",
 			args: args{
-				es:    GetMockManipulateIam(ctrl),
+				es:    GetMockManipulateIAM(ctrl),
 				ctx:   authz.NewMockContext("orgID", "userID"),
 				iamID: "iamID",
+				step:  iam_model.Step1,
 			},
 			res: res{
-				iam: &model.IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "iamID", Sequence: 1}, SetUpStarted: true, SetUpDone: true},
+				iam: &iam_model.IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "iamID", Sequence: 1}, SetUpStarted: iam_model.Step1, SetUpDone: iam_model.Step1},
 			},
 		},
 		{
 			name: "setup iam no id",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
-				ctx: authz.NewMockContext("orgID", "userID"),
+				es:   GetMockManipulateIAM(ctrl),
+				ctx:  authz.NewMockContext("orgID", "userID"),
+				step: iam_model.Step1,
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -179,9 +192,10 @@ func TestSetUpDone(t *testing.T) {
 		{
 			name: "iam not found",
 			args: args{
-				es:    GetMockManipulateIamNotExisting(ctrl),
+				es:    GetMockManipulateIAMNotExisting(ctrl),
 				ctx:   authz.NewMockContext("orgID", "userID"),
 				iamID: "iamID",
+				step:  iam_model.Step1,
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -190,16 +204,19 @@ func TestSetUpDone(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.SetupDone(tt.args.ctx, tt.args.iamID)
-
-			if tt.res.errFunc == nil && result.AggregateID == "" {
+			result, err := tt.args.es.SetupDone(tt.args.ctx, tt.args.iamID, tt.args.step)
+			if (tt.res.errFunc != nil && !tt.res.errFunc(err)) || (err != nil && tt.res.errFunc == nil) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.errFunc != nil && tt.res.errFunc(err) {
+				return
+			}
+			if result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if tt.res.errFunc == nil && result.SetUpDone != tt.res.iam.SetUpDone {
+			if result.SetUpDone != tt.res.iam.SetUpDone {
 				t.Errorf("got wrong result SetUpDone: expected: %v, actual: %v ", tt.res.iam.SetUpDone, result.SetUpDone)
-			}
-			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -225,19 +242,19 @@ func TestSetGlobalOrg(t *testing.T) {
 		{
 			name: "global org set, ok",
 			args: args{
-				es:        GetMockManipulateIam(ctrl),
+				es:        GetMockManipulateIAM(ctrl),
 				ctx:       authz.NewMockContext("orgID", "userID"),
 				iamID:     "iamID",
 				globalOrg: "globalOrg",
 			},
 			res: res{
-				iam: &model.IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "iamID", Sequence: 1}, SetUpStarted: true, GlobalOrgID: "globalOrg"},
+				iam: &model.IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "iamID", Sequence: 1}, SetUpStarted: model.Step1, GlobalOrgID: "globalOrg"},
 			},
 		},
 		{
 			name: "no iam id",
 			args: args{
-				es:        GetMockManipulateIam(ctrl),
+				es:        GetMockManipulateIAM(ctrl),
 				ctx:       authz.NewMockContext("orgID", "userID"),
 				globalOrg: "",
 			},
@@ -248,7 +265,7 @@ func TestSetGlobalOrg(t *testing.T) {
 		{
 			name: "no global org",
 			args: args{
-				es:    GetMockManipulateIam(ctrl),
+				es:    GetMockManipulateIAM(ctrl),
 				ctx:   authz.NewMockContext("orgID", "userID"),
 				iamID: "iamID",
 			},
@@ -259,7 +276,7 @@ func TestSetGlobalOrg(t *testing.T) {
 		{
 			name: "iam not found",
 			args: args{
-				es:        GetMockManipulateIamNotExisting(ctrl),
+				es:        GetMockManipulateIAMNotExisting(ctrl),
 				ctx:       authz.NewMockContext("orgID", "userID"),
 				iamID:     "iamID",
 				globalOrg: "globalOrg",
@@ -272,15 +289,18 @@ func TestSetGlobalOrg(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.SetGlobalOrg(tt.args.ctx, tt.args.iamID, tt.args.globalOrg)
-
-			if tt.res.errFunc == nil && result.AggregateID == "" {
+			if (tt.res.errFunc != nil && !tt.res.errFunc(err)) || (err != nil && tt.res.errFunc == nil) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.errFunc != nil && tt.res.errFunc(err) {
+				return
+			}
+			if result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if tt.res.errFunc == nil && result.GlobalOrgID != tt.res.iam.GlobalOrgID {
+			if result.GlobalOrgID != tt.res.iam.GlobalOrgID {
 				t.Errorf("got wrong result GlobalOrgID: expected: %v, actual: %v ", tt.res.iam.GlobalOrgID, result.GlobalOrgID)
-			}
-			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -306,19 +326,19 @@ func TestSetIamProjectID(t *testing.T) {
 		{
 			name: "iam project set, ok",
 			args: args{
-				es:           GetMockManipulateIam(ctrl),
+				es:           GetMockManipulateIAM(ctrl),
 				ctx:          authz.NewMockContext("orgID", "userID"),
 				iamID:        "iamID",
 				iamProjectID: "iamProjectID",
 			},
 			res: res{
-				iam: &model.IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "iamID", Sequence: 1}, SetUpStarted: true, IAMProjectID: "iamProjectID"},
+				iam: &model.IAM{ObjectRoot: es_models.ObjectRoot{AggregateID: "iamID", Sequence: 1}, SetUpStarted: model.Step1, IAMProjectID: "iamProjectID"},
 			},
 		},
 		{
 			name: "no iam id",
 			args: args{
-				es:           GetMockManipulateIam(ctrl),
+				es:           GetMockManipulateIAM(ctrl),
 				ctx:          authz.NewMockContext("orgID", "userID"),
 				iamProjectID: "",
 			},
@@ -329,7 +349,7 @@ func TestSetIamProjectID(t *testing.T) {
 		{
 			name: "no global org",
 			args: args{
-				es:    GetMockManipulateIam(ctrl),
+				es:    GetMockManipulateIAM(ctrl),
 				ctx:   authz.NewMockContext("orgID", "userID"),
 				iamID: "iamID",
 			},
@@ -340,7 +360,7 @@ func TestSetIamProjectID(t *testing.T) {
 		{
 			name: "iam not found",
 			args: args{
-				es:           GetMockManipulateIamNotExisting(ctrl),
+				es:           GetMockManipulateIAMNotExisting(ctrl),
 				ctx:          authz.NewMockContext("orgID", "userID"),
 				iamID:        "iamID",
 				iamProjectID: "iamProjectID",
@@ -353,15 +373,18 @@ func TestSetIamProjectID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.SetIAMProject(tt.args.ctx, tt.args.iamID, tt.args.iamProjectID)
-
-			if tt.res.errFunc == nil && result.AggregateID == "" {
+			if (tt.res.errFunc != nil && !tt.res.errFunc(err)) || (err != nil && tt.res.errFunc == nil) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.errFunc != nil && tt.res.errFunc(err) {
+				return
+			}
+			if result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if tt.res.errFunc == nil && result.IAMProjectID != tt.res.iam.IAMProjectID {
+			if result.IAMProjectID != tt.res.iam.IAMProjectID {
 				t.Errorf("got wrong result IAMProjectID: expected: %v, actual: %v ", tt.res.iam.IAMProjectID, result.IAMProjectID)
-			}
-			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -386,7 +409,7 @@ func TestAddIamMember(t *testing.T) {
 		{
 			name: "add iam member, ok",
 			args: args{
-				es:     GetMockManipulateIam(ctrl),
+				es:     GetMockManipulateIAM(ctrl),
 				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IAMMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
@@ -397,7 +420,7 @@ func TestAddIamMember(t *testing.T) {
 		{
 			name: "no userid",
 			args: args{
-				es:     GetMockManipulateIam(ctrl),
+				es:     GetMockManipulateIAM(ctrl),
 				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IAMMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Roles: []string{"Roles"}},
 			},
@@ -408,7 +431,7 @@ func TestAddIamMember(t *testing.T) {
 		{
 			name: "no roles",
 			args: args{
-				es:     GetMockManipulateIam(ctrl),
+				es:     GetMockManipulateIAM(ctrl),
 				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IAMMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID"},
 			},
@@ -419,7 +442,7 @@ func TestAddIamMember(t *testing.T) {
 		{
 			name: "member already existing",
 			args: args{
-				es:     GetMockManipulateIamWithMember(ctrl),
+				es:     GetMockManipulateIAMWithMember(ctrl),
 				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IAMMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
@@ -430,7 +453,7 @@ func TestAddIamMember(t *testing.T) {
 		{
 			name: "existing iam not found",
 			args: args{
-				es:     GetMockManipulateIamNotExisting(ctrl),
+				es:     GetMockManipulateIAMNotExisting(ctrl),
 				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IAMMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
@@ -442,18 +465,21 @@ func TestAddIamMember(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.AddIAMMember(tt.args.ctx, tt.args.member)
-
-			if tt.res.errFunc == nil && result.AggregateID == "" {
+			if (tt.res.errFunc != nil && !tt.res.errFunc(err)) || (err != nil && tt.res.errFunc == nil) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.errFunc != nil && tt.res.errFunc(err) {
+				return
+			}
+			if result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if tt.res.errFunc == nil && result.UserID != tt.res.result.UserID {
+			if result.UserID != tt.res.result.UserID {
 				t.Errorf("got wrong result userid: expected: %v, actual: %v ", tt.res.result.UserID, result.UserID)
 			}
-			if tt.res.errFunc == nil && len(result.Roles) != len(tt.res.result.Roles) {
+			if len(result.Roles) != len(tt.res.result.Roles) {
 				t.Errorf("got wrong result roles: expected: %v, actual: %v ", tt.res.result.Roles, result.Roles)
-			}
-			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -478,7 +504,7 @@ func TestChangeIamMember(t *testing.T) {
 		{
 			name: "add iam member, ok",
 			args: args{
-				es:     GetMockManipulateIamWithMember(ctrl),
+				es:     GetMockManipulateIAMWithMember(ctrl),
 				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IAMMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
 			},
@@ -489,7 +515,7 @@ func TestChangeIamMember(t *testing.T) {
 		{
 			name: "no userid",
 			args: args{
-				es:     GetMockManipulateIam(ctrl),
+				es:     GetMockManipulateIAM(ctrl),
 				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IAMMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Roles: []string{"ChangeRoles"}},
 			},
@@ -500,7 +526,7 @@ func TestChangeIamMember(t *testing.T) {
 		{
 			name: "no roles",
 			args: args{
-				es:     GetMockManipulateIam(ctrl),
+				es:     GetMockManipulateIAM(ctrl),
 				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IAMMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID"},
 			},
@@ -511,7 +537,7 @@ func TestChangeIamMember(t *testing.T) {
 		{
 			name: "member not existing",
 			args: args{
-				es:     GetMockManipulateIam(ctrl),
+				es:     GetMockManipulateIAM(ctrl),
 				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IAMMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
@@ -522,7 +548,7 @@ func TestChangeIamMember(t *testing.T) {
 		{
 			name: "existing not found",
 			args: args{
-				es:     GetMockManipulateIamNotExisting(ctrl),
+				es:     GetMockManipulateIAMNotExisting(ctrl),
 				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IAMMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
 			},
@@ -534,18 +560,21 @@ func TestChangeIamMember(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.ChangeIAMMember(tt.args.ctx, tt.args.member)
-
-			if tt.res.errFunc == nil && result.AggregateID == "" {
+			if (tt.res.errFunc != nil && !tt.res.errFunc(err)) || (err != nil && tt.res.errFunc == nil) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.errFunc != nil && tt.res.errFunc(err) {
+				return
+			}
+			if result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if tt.res.errFunc == nil && result.UserID != tt.res.result.UserID {
+			if result.UserID != tt.res.result.UserID {
 				t.Errorf("got wrong result userid: expected: %v, actual: %v ", tt.res.result.UserID, result.UserID)
 			}
-			if tt.res.errFunc == nil && len(result.Roles) != len(tt.res.result.Roles) {
+			if len(result.Roles) != len(tt.res.result.Roles) {
 				t.Errorf("got wrong result roles: expected: %v, actual: %v ", tt.res.result.Roles, result.Roles)
-			}
-			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -571,7 +600,7 @@ func TestRemoveIamMember(t *testing.T) {
 		{
 			name: "remove iam member, ok",
 			args: args{
-				es:  GetMockManipulateIamWithMember(ctrl),
+				es:  GetMockManipulateIAMWithMember(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				existingIAM: &model.IAM{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
@@ -586,7 +615,7 @@ func TestRemoveIamMember(t *testing.T) {
 		{
 			name: "no userid",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				existingIAM: &model.IAM{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
@@ -601,7 +630,7 @@ func TestRemoveIamMember(t *testing.T) {
 		{
 			name: "member not existing",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				existingIAM: &model.IAM{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
@@ -615,7 +644,7 @@ func TestRemoveIamMember(t *testing.T) {
 		{
 			name: "existing not found",
 			args: args{
-				es:     GetMockManipulateIamNotExisting(ctrl),
+				es:     GetMockManipulateIAMNotExisting(ctrl),
 				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IAMMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
 			},
@@ -658,7 +687,7 @@ func TestAddIdpConfiguration(t *testing.T) {
 		{
 			name: "add idp, ok",
 			args: args{
-				es:  GetMockManipulateIamWithCrypto(ctrl),
+				es:  GetMockManipulateIAMWithCrypto(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					IDPConfigID: "IDPConfigID",
@@ -687,7 +716,7 @@ func TestAddIdpConfiguration(t *testing.T) {
 		{
 			name: "invalid idp config",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
@@ -699,7 +728,7 @@ func TestAddIdpConfiguration(t *testing.T) {
 		{
 			name: "existing iam not found",
 			args: args{
-				es:  GetMockManipulateIamNotExisting(ctrl),
+				es:  GetMockManipulateIAMNotExisting(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					IDPConfigID: "IDPConfigID",
@@ -721,24 +750,27 @@ func TestAddIdpConfiguration(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.AddIDPConfig(tt.args.ctx, tt.args.idp)
-
-			if !tt.res.wantErr && result.IDPConfigID == "" {
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result.IDPConfigID == "" {
 				t.Errorf("result has no id")
 			}
-			if !tt.res.wantErr && result.OIDCConfig.IDPConfigID == "" {
+			if result.OIDCConfig.IDPConfigID == "" {
 				t.Errorf("result has no id")
 			}
-			if !tt.res.wantErr && result.OIDCConfig == nil && result.OIDCConfig.ClientSecret == nil {
+			if result.OIDCConfig == nil && result.OIDCConfig.ClientSecret == nil {
 				t.Errorf("result has no client secret")
 			}
-			if !tt.res.wantErr && result.Name != tt.res.result.Name {
+			if result.Name != tt.res.result.Name {
 				t.Errorf("got wrong result key: expected: %v, actual: %v ", tt.res.result.Name, result.Name)
 			}
-			if !tt.res.wantErr && result.OIDCConfig.ClientID != tt.res.result.OIDCConfig.ClientID {
+			if result.OIDCConfig.ClientID != tt.res.result.OIDCConfig.ClientID {
 				t.Errorf("got wrong result key: expected: %v, actual: %v ", tt.res.result.OIDCConfig.ClientID, result.OIDCConfig.ClientID)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -764,7 +796,7 @@ func TestChangeIdpConfiguration(t *testing.T) {
 		{
 			name: "change idp, ok",
 			args: args{
-				es:  GetMockManipulateIamWithOIDCIdp(ctrl),
+				es:  GetMockManipulateIAMWithOIDCIdp(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					IDPConfigID: "IDPConfigID",
@@ -784,7 +816,7 @@ func TestChangeIdpConfiguration(t *testing.T) {
 		{
 			name: "invalid idp",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					IDPConfigID: "IDPConfigID",
@@ -798,7 +830,7 @@ func TestChangeIdpConfiguration(t *testing.T) {
 		{
 			name: "idp not existing",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					IDPConfigID: "IDPConfigID",
@@ -816,7 +848,7 @@ func TestChangeIdpConfiguration(t *testing.T) {
 		{
 			name: "existing project not found",
 			args: args{
-				es:  GetMockManipulateIamNotExisting(ctrl),
+				es:  GetMockManipulateIAMNotExisting(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					IDPConfigID: "IDPConfigID",
@@ -835,18 +867,21 @@ func TestChangeIdpConfiguration(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.ChangeIDPConfig(tt.args.ctx, tt.args.idp)
-
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if !tt.res.wantErr && result.IDPConfigID != tt.res.result.IDPConfigID {
+			if result.IDPConfigID != tt.res.result.IDPConfigID {
 				t.Errorf("got wrong result AppID: expected: %v, actual: %v ", tt.res.result.IDPConfigID, result.IDPConfigID)
 			}
-			if !tt.res.wantErr && result.Name != tt.res.result.Name {
+			if result.Name != tt.res.result.Name {
 				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.result.Name, result.Name)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -871,7 +906,7 @@ func TestRemoveIdpConfiguration(t *testing.T) {
 		{
 			name: "remove idp, ok",
 			args: args{
-				es:  GetMockManipulateIamWithOIDCIdp(ctrl),
+				es:  GetMockManipulateIAMWithOIDCIdp(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					IDPConfigID: "IDPConfigID",
@@ -881,7 +916,7 @@ func TestRemoveIdpConfiguration(t *testing.T) {
 		{
 			name: "no IDPConfigID",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
@@ -893,7 +928,7 @@ func TestRemoveIdpConfiguration(t *testing.T) {
 		{
 			name: "idp not existing",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					IDPConfigID: "IDPConfigID",
@@ -907,7 +942,7 @@ func TestRemoveIdpConfiguration(t *testing.T) {
 		{
 			name: "existing idp not found",
 			args: args{
-				es:  GetMockManipulateIamNotExisting(ctrl),
+				es:  GetMockManipulateIAMNotExisting(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					IDPConfigID: "IDPConfigID",
@@ -952,7 +987,7 @@ func TestDeactivateIdpConfiguration(t *testing.T) {
 		{
 			name: "deactivate, ok",
 			args: args{
-				es:  GetMockManipulateIamWithOIDCIdp(ctrl),
+				es:  GetMockManipulateIAMWithOIDCIdp(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					IDPConfigID: "IDPConfigID",
@@ -973,7 +1008,7 @@ func TestDeactivateIdpConfiguration(t *testing.T) {
 		{
 			name: "no idp id",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
@@ -985,7 +1020,7 @@ func TestDeactivateIdpConfiguration(t *testing.T) {
 		{
 			name: "idp not existing",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					IDPConfigID: "IDPConfigID",
@@ -1003,7 +1038,7 @@ func TestDeactivateIdpConfiguration(t *testing.T) {
 		{
 			name: "existing iam not found",
 			args: args{
-				es:  GetMockManipulateIamNotExisting(ctrl),
+				es:  GetMockManipulateIAMNotExisting(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					IDPConfigID: "IDPConfigID",
@@ -1022,18 +1057,21 @@ func TestDeactivateIdpConfiguration(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.DeactivateIDPConfig(tt.args.ctx, tt.args.idp.AggregateID, tt.args.idp.IDPConfigID)
-
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if !tt.res.wantErr && result.IDPConfigID != tt.res.result.IDPConfigID {
+			if result.IDPConfigID != tt.res.result.IDPConfigID {
 				t.Errorf("got wrong result IDPConfigID: expected: %v, actual: %v ", tt.res.result.IDPConfigID, result.IDPConfigID)
 			}
-			if !tt.res.wantErr && result.State != tt.res.result.State {
+			if result.State != tt.res.result.State {
 				t.Errorf("got wrong result state: expected: %v, actual: %v ", tt.res.result.State, result.State)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -1059,7 +1097,7 @@ func TestReactivateIdpConfiguration(t *testing.T) {
 		{
 			name: "reactivate, ok",
 			args: args{
-				es:  GetMockManipulateIamWithOIDCIdp(ctrl),
+				es:  GetMockManipulateIAMWithOIDCIdp(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					IDPConfigID: "IDPConfigID",
@@ -1080,7 +1118,7 @@ func TestReactivateIdpConfiguration(t *testing.T) {
 		{
 			name: "no idp id",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
@@ -1092,7 +1130,7 @@ func TestReactivateIdpConfiguration(t *testing.T) {
 		{
 			name: "idp not existing",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					IDPConfigID: "IDPConfigID",
@@ -1110,7 +1148,7 @@ func TestReactivateIdpConfiguration(t *testing.T) {
 		{
 			name: "existing iam not found",
 			args: args{
-				es:  GetMockManipulateIamNotExisting(ctrl),
+				es:  GetMockManipulateIAMNotExisting(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					IDPConfigID: "IDPConfigID",
@@ -1129,18 +1167,21 @@ func TestReactivateIdpConfiguration(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.ReactivateIDPConfig(tt.args.ctx, tt.args.idp.AggregateID, tt.args.idp.IDPConfigID)
-
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
 			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if !tt.res.wantErr && result.IDPConfigID != tt.res.result.IDPConfigID {
+			if result.IDPConfigID != tt.res.result.IDPConfigID {
 				t.Errorf("got wrong result IDPConfigID: expected: %v, actual: %v ", tt.res.result.IDPConfigID, result.IDPConfigID)
 			}
-			if !tt.res.wantErr && result.State != tt.res.result.State {
+			if result.State != tt.res.result.State {
 				t.Errorf("got wrong result state: expected: %v, actual: %v ", tt.res.result.State, result.State)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -1166,7 +1207,7 @@ func TestChangeOIDCIDPConfig(t *testing.T) {
 		{
 			name: "change oidc config, ok",
 			args: args{
-				es:  GetMockManipulateIamWithOIDCIdp(ctrl),
+				es:  GetMockManipulateIAMWithOIDCIdp(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				config: &iam_model.OIDCIDPConfig{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1187,7 +1228,7 @@ func TestChangeOIDCIDPConfig(t *testing.T) {
 		{
 			name: "invalid config",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				config: &iam_model.OIDCIDPConfig{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1202,7 +1243,7 @@ func TestChangeOIDCIDPConfig(t *testing.T) {
 		{
 			name: "idp not existing",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				config: &iam_model.OIDCIDPConfig{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1220,7 +1261,7 @@ func TestChangeOIDCIDPConfig(t *testing.T) {
 		{
 			name: "existing iam not found",
 			args: args{
-				es:  GetMockManipulateIamNotExisting(ctrl),
+				es:  GetMockManipulateIAMNotExisting(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				config: &iam_model.OIDCIDPConfig{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1239,18 +1280,21 @@ func TestChangeOIDCIDPConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.ChangeIDPOIDCConfig(tt.args.ctx, tt.args.config)
-
-			if !tt.res.wantErr && result.AggregateID == "" {
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if !tt.res.wantErr && result.IDPConfigID != tt.res.result.IDPConfigID {
+			if result.IDPConfigID != tt.res.result.IDPConfigID {
 				t.Errorf("got wrong result AppID: expected: %v, actual: %v ", tt.res.result.IDPConfigID, result.IDPConfigID)
 			}
-			if !tt.res.wantErr && result.ClientID != tt.res.result.ClientID {
+			if result.ClientID != tt.res.result.ClientID {
 				t.Errorf("got wrong result responsetype: expected: %v, actual: %v ", tt.res.result.ClientID, result.ClientID)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -1276,7 +1320,7 @@ func TestAddLoginPolicy(t *testing.T) {
 		{
 			name: "add login policy, ok",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				policy: &iam_model.LoginPolicy{
 					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1293,7 +1337,7 @@ func TestAddLoginPolicy(t *testing.T) {
 		{
 			name: "invalid policy",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				policy: &iam_model.LoginPolicy{
 					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
@@ -1307,7 +1351,7 @@ func TestAddLoginPolicy(t *testing.T) {
 		{
 			name: "existing iam not found",
 			args: args{
-				es:  GetMockManipulateIamNotExisting(ctrl),
+				es:  GetMockManipulateIAMNotExisting(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				policy: &iam_model.LoginPolicy{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1322,12 +1366,15 @@ func TestAddLoginPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.AddLoginPolicy(tt.args.ctx, tt.args.policy)
-
-			if !tt.res.wantErr && result.AllowRegister != tt.res.result.AllowRegister {
-				t.Errorf("got wrong result AllowRegister: expected: %v, actual: %v ", tt.res.result.AllowRegister, result.AllowRegister)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
 				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result.AllowRegister != tt.res.result.AllowRegister {
+				t.Errorf("got wrong result AllowRegister: expected: %v, actual: %v ", tt.res.result.AllowRegister, result.AllowRegister)
 			}
 		})
 	}
@@ -1353,7 +1400,7 @@ func TestChangeLoginPolicy(t *testing.T) {
 		{
 			name: "add login policy, ok",
 			args: args{
-				es:  GetMockManipulateIamWithLoginPolicy(ctrl),
+				es:  GetMockManipulateIAMWithLoginPolicy(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				policy: &iam_model.LoginPolicy{
 					ObjectRoot:            es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1374,7 +1421,7 @@ func TestChangeLoginPolicy(t *testing.T) {
 		{
 			name: "invalid policy",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				policy: &iam_model.LoginPolicy{
 					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
@@ -1388,7 +1435,7 @@ func TestChangeLoginPolicy(t *testing.T) {
 		{
 			name: "existing iam not found",
 			args: args{
-				es:  GetMockManipulateIamNotExisting(ctrl),
+				es:  GetMockManipulateIAMNotExisting(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				policy: &iam_model.LoginPolicy{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1403,18 +1450,21 @@ func TestChangeLoginPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.ChangeLoginPolicy(tt.args.ctx, tt.args.policy)
-
-			if !tt.res.wantErr && result.AllowRegister != tt.res.result.AllowRegister {
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result.AllowRegister != tt.res.result.AllowRegister {
 				t.Errorf("got wrong result AllowRegister: expected: %v, actual: %v ", tt.res.result.AllowRegister, result.AllowRegister)
 			}
-			if !tt.res.wantErr && result.AllowUsernamePassword != tt.res.result.AllowUsernamePassword {
+			if result.AllowUsernamePassword != tt.res.result.AllowUsernamePassword {
 				t.Errorf("got wrong result AllowUsernamePassword: expected: %v, actual: %v ", tt.res.result.AllowUsernamePassword, result.AllowUsernamePassword)
 			}
-			if !tt.res.wantErr && result.AllowExternalIdp != tt.res.result.AllowExternalIdp {
+			if result.AllowExternalIdp != tt.res.result.AllowExternalIdp {
 				t.Errorf("got wrong result AllowExternalIDP: expected: %v, actual: %v ", tt.res.result.AllowExternalIdp, result.AllowExternalIdp)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -1440,7 +1490,7 @@ func TestAddIdpProviderToLoginPolicy(t *testing.T) {
 		{
 			name: "add idp to login policy, ok",
 			args: args{
-				es:  GetMockManipulateIamWithLoginPolicy(ctrl),
+				es:  GetMockManipulateIAMWithLoginPolicy(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				provider: &iam_model.IDPProvider{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1455,7 +1505,7 @@ func TestAddIdpProviderToLoginPolicy(t *testing.T) {
 		{
 			name: "add idp to login policy, already existing",
 			args: args{
-				es:  GetMockManipulateIamWithLoginPolicy(ctrl),
+				es:  GetMockManipulateIAMWithLoginPolicy(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				provider: &iam_model.IDPProvider{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1471,7 +1521,7 @@ func TestAddIdpProviderToLoginPolicy(t *testing.T) {
 		{
 			name: "invalid provider",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				provider: &iam_model.IDPProvider{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1485,7 +1535,7 @@ func TestAddIdpProviderToLoginPolicy(t *testing.T) {
 		{
 			name: "existing iam not found",
 			args: args{
-				es:  GetMockManipulateIamNotExisting(ctrl),
+				es:  GetMockManipulateIAMNotExisting(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				provider: &iam_model.IDPProvider{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1501,15 +1551,18 @@ func TestAddIdpProviderToLoginPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.AddIDPProviderToLoginPolicy(tt.args.ctx, tt.args.provider)
-
-			if !tt.res.wantErr && result.IdpConfigID != tt.res.result.IdpConfigID {
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result.IdpConfigID != tt.res.result.IdpConfigID {
 				t.Errorf("got wrong result IDPConfigID: expected: %v, actual: %v ", tt.res.result.IdpConfigID, result.IdpConfigID)
 			}
-			if !tt.res.wantErr && result.Type != tt.res.result.Type {
+			if result.Type != tt.res.result.Type {
 				t.Errorf("got wrong result Type: expected: %v, actual: %v ", tt.res.result.Type, result.Type)
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -1534,7 +1587,7 @@ func TestRemoveIdpProviderFromLoginPolicy(t *testing.T) {
 		{
 			name: "remove idp to login policy, ok",
 			args: args{
-				es:  GetMockManipulateIamWithLoginPolicy(ctrl),
+				es:  GetMockManipulateIAMWithLoginPolicy(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				provider: &iam_model.IDPProvider{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1547,7 +1600,7 @@ func TestRemoveIdpProviderFromLoginPolicy(t *testing.T) {
 		{
 			name: "remove idp to login policy, not existing",
 			args: args{
-				es:  GetMockManipulateIamWithLoginPolicy(ctrl),
+				es:  GetMockManipulateIAMWithLoginPolicy(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				provider: &iam_model.IDPProvider{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1563,7 +1616,7 @@ func TestRemoveIdpProviderFromLoginPolicy(t *testing.T) {
 		{
 			name: "invalid provider",
 			args: args{
-				es:  GetMockManipulateIam(ctrl),
+				es:  GetMockManipulateIAM(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				provider: &iam_model.IDPProvider{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1577,7 +1630,7 @@ func TestRemoveIdpProviderFromLoginPolicy(t *testing.T) {
 		{
 			name: "existing iam not found",
 			args: args{
-				es:  GetMockManipulateIamNotExisting(ctrl),
+				es:  GetMockManipulateIAMNotExisting(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				provider: &iam_model.IDPProvider{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
@@ -1599,6 +1652,667 @@ func TestRemoveIdpProviderFromLoginPolicy(t *testing.T) {
 			}
 			if tt.res.wantErr && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestAddPasswordComplexityPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IAMEventstore
+		ctx    context.Context
+		policy *iam_model.PasswordComplexityPolicy
+	}
+	type res struct {
+		result  *iam_model.PasswordComplexityPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add password complexity policy, ok",
+			args: args{
+				es:  GetMockManipulateIAM(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MinLength:  10,
+				},
+			},
+			res: res{
+				result: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MinLength:  10,
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockManipulateIAM(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIAMNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MinLength:  10,
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddPasswordComplexityPolicy(tt.args.ctx, tt.args.policy)
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result.MinLength != tt.res.result.MinLength {
+				t.Errorf("got wrong result MinLength: expected: %v, actual: %v ", tt.res.result.MinLength, result.MinLength)
+			}
+		})
+	}
+}
+
+func TestChangePasswordComplexityPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IAMEventstore
+		ctx    context.Context
+		policy *iam_model.PasswordComplexityPolicy
+	}
+	type res struct {
+		result  *iam_model.PasswordComplexityPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change password complexity policy, ok",
+			args: args{
+				es:  GetMockManipulateIAMWithPasswodComplexityPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MinLength:  5,
+				},
+			},
+			res: res{
+				result: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MinLength:  5,
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockManipulateIAM(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIAMNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordComplexityPolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MinLength:  10,
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangePasswordComplexityPolicy(tt.args.ctx, tt.args.policy)
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result.MinLength != tt.res.result.MinLength {
+				t.Errorf("got wrong result MinLength: expected: %v, actual: %v ", tt.res.result.MinLength, result.MinLength)
+			}
+		})
+	}
+}
+
+func TestAddPasswordAgePolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IAMEventstore
+		ctx    context.Context
+		policy *iam_model.PasswordAgePolicy
+	}
+	type res struct {
+		result  *iam_model.PasswordAgePolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add password age policy, ok",
+			args: args{
+				es:  GetMockManipulateIAM(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordAgePolicy{
+					ObjectRoot:     es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAgeDays:     10,
+					ExpireWarnDays: 10,
+				},
+			},
+			res: res{
+				result: &iam_model.PasswordAgePolicy{
+					ObjectRoot:     es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAgeDays:     10,
+					ExpireWarnDays: 10,
+				},
+			},
+		},
+		{
+			name: "empty policy",
+			args: args{
+				es:     GetMockManipulateIAM(ctrl),
+				ctx:    authz.NewMockContext("orgID", "userID"),
+				policy: nil,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIAMNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordAgePolicy{
+					ObjectRoot:     es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAgeDays:     10,
+					ExpireWarnDays: 10,
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddPasswordAgePolicy(tt.args.ctx, tt.args.policy)
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result.MaxAgeDays != tt.res.result.MaxAgeDays {
+				t.Errorf("got wrong result MaxAgeDays: expected: %v, actual: %v ", tt.res.result.MaxAgeDays, result.MaxAgeDays)
+			}
+
+			if result.ExpireWarnDays != tt.res.result.ExpireWarnDays {
+				t.Errorf("got wrong result.ExpireWarnDays: expected: %v, actual: %v ", tt.res.result.ExpireWarnDays, result.ExpireWarnDays)
+			}
+		})
+	}
+}
+
+func TestChangePasswordAgePolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IAMEventstore
+		ctx    context.Context
+		policy *iam_model.PasswordAgePolicy
+	}
+	type res struct {
+		result  *iam_model.PasswordAgePolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change password age policy, ok",
+			args: args{
+				es:  GetMockManipulateIAMWithPasswordAgePolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordAgePolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAgeDays: 5,
+				},
+			},
+			res: res{
+				result: &iam_model.PasswordAgePolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAgeDays: 5,
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:     GetMockManipulateIAM(ctrl),
+				ctx:    authz.NewMockContext("orgID", "userID"),
+				policy: nil,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIAMNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordAgePolicy{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAgeDays: 10,
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangePasswordAgePolicy(tt.args.ctx, tt.args.policy)
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result.MaxAgeDays != tt.res.result.MaxAgeDays {
+				t.Errorf("got wrong result MaxAgeDays: expected: %v, actual: %v ", tt.res.result.MaxAgeDays, result.MaxAgeDays)
+			}
+
+			if result.ExpireWarnDays != tt.res.result.ExpireWarnDays {
+				t.Errorf("got wrong result.ExpireWarnDays: expected: %v, actual: %v ", tt.res.result.ExpireWarnDays, result.ExpireWarnDays)
+			}
+		})
+	}
+}
+
+func TestAddPasswordLockoutPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IAMEventstore
+		ctx    context.Context
+		policy *iam_model.PasswordLockoutPolicy
+	}
+	type res struct {
+		result  *iam_model.PasswordLockoutPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add password lockout policy, ok",
+			args: args{
+				es:  GetMockManipulateIAM(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordLockoutPolicy{
+					ObjectRoot:          es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAttempts:         10,
+					ShowLockOutFailures: true,
+				},
+			},
+			res: res{
+				result: &iam_model.PasswordLockoutPolicy{
+					ObjectRoot:          es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAttempts:         10,
+					ShowLockOutFailures: true,
+				},
+			},
+		},
+		{
+			name: "empty policy",
+			args: args{
+				es:     GetMockManipulateIAM(ctrl),
+				ctx:    authz.NewMockContext("orgID", "userID"),
+				policy: nil,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIAMNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordLockoutPolicy{
+					ObjectRoot:          es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAttempts:         10,
+					ShowLockOutFailures: true,
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddPasswordLockoutPolicy(tt.args.ctx, tt.args.policy)
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+
+			if result.MaxAttempts != tt.res.result.MaxAttempts {
+				t.Errorf("got wrong result MaxAttempts: expected: %v, actual: %v ", tt.res.result.MaxAttempts, result.MaxAttempts)
+			}
+
+			if result.ShowLockOutFailures != tt.res.result.ShowLockOutFailures {
+				t.Errorf("got wrong result.ShowLockOutFailures: expected: %v, actual: %v ", tt.res.result.ShowLockOutFailures, result.ShowLockOutFailures)
+			}
+		})
+	}
+}
+
+func TestChangePasswordLockoutPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IAMEventstore
+		ctx    context.Context
+		policy *iam_model.PasswordLockoutPolicy
+	}
+	type res struct {
+		result  *iam_model.PasswordLockoutPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change password lockout policy, ok",
+			args: args{
+				es:  GetMockManipulateIAMWithPasswordLockoutPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordLockoutPolicy{
+					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAttempts: 5,
+				},
+			},
+			res: res{
+				result: &iam_model.PasswordLockoutPolicy{
+					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAttempts: 5,
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:     GetMockManipulateIAM(ctrl),
+				ctx:    authz.NewMockContext("orgID", "userID"),
+				policy: nil,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIAMNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.PasswordLockoutPolicy{
+					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MaxAttempts: 10,
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangePasswordLockoutPolicy(tt.args.ctx, tt.args.policy)
+
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result.MaxAttempts != tt.res.result.MaxAttempts {
+				t.Errorf("got wrong result MaxAttempts: expected: %v, actual: %v ", tt.res.result.MaxAttempts, result.MaxAttempts)
+			}
+
+			if result.ShowLockOutFailures != tt.res.result.ShowLockOutFailures {
+				t.Errorf("got wrong result.ShowLockOutFailures: expected: %v, actual: %v ", tt.res.result.ShowLockOutFailures, result.ShowLockOutFailures)
+			}
+		})
+	}
+}
+
+func TestAddOrgIAMPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IAMEventstore
+		ctx    context.Context
+		policy *iam_model.OrgIAMPolicy
+	}
+	type res struct {
+		result  *iam_model.OrgIAMPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add org iam policy, ok",
+			args: args{
+				es:  GetMockManipulateIAM(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.OrgIAMPolicy{
+					ObjectRoot:            es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					UserLoginMustBeDomain: true,
+				},
+			},
+			res: res{
+				result: &iam_model.OrgIAMPolicy{
+					ObjectRoot:            es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					UserLoginMustBeDomain: true,
+				},
+			},
+		},
+		{
+			name: "empty policy",
+			args: args{
+				es:     GetMockManipulateIAM(ctrl),
+				ctx:    authz.NewMockContext("orgID", "userID"),
+				policy: nil,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIAMNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.OrgIAMPolicy{
+					ObjectRoot:            es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					UserLoginMustBeDomain: true,
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddOrgIAMPolicy(tt.args.ctx, tt.args.policy)
+
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result.UserLoginMustBeDomain != tt.res.result.UserLoginMustBeDomain {
+				t.Errorf("got wrong result UserLoginMustBeDomain: expected: %v, actual: %v ", tt.res.result.UserLoginMustBeDomain, result.UserLoginMustBeDomain)
+			}
+		})
+	}
+}
+
+func TestChangeOrgIAMPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IAMEventstore
+		ctx    context.Context
+		policy *iam_model.OrgIAMPolicy
+	}
+	type res struct {
+		result  *iam_model.OrgIAMPolicy
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change org iam policy, ok",
+			args: args{
+				es:  GetMockManipulateIAMWithOrgIAMPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.OrgIAMPolicy{
+					ObjectRoot:            es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					UserLoginMustBeDomain: false,
+				},
+			},
+			res: res{
+				result: &iam_model.OrgIAMPolicy{
+					ObjectRoot:            es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					UserLoginMustBeDomain: false,
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:     GetMockManipulateIAM(ctrl),
+				ctx:    authz.NewMockContext("orgID", "userID"),
+				policy: nil,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIAMNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.OrgIAMPolicy{
+					ObjectRoot:            es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					UserLoginMustBeDomain: true,
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeOrgIAMPolicy(tt.args.ctx, tt.args.policy)
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result.UserLoginMustBeDomain != tt.res.result.UserLoginMustBeDomain {
+				t.Errorf("got wrong result UserLoginMustBeDomain: expected: %v, actual: %v ", tt.res.result.UserLoginMustBeDomain, result.UserLoginMustBeDomain)
 			}
 		})
 	}

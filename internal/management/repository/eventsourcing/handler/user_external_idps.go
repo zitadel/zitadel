@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing"
+	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -68,6 +69,8 @@ func (m *ExternalIDP) processUser(event *models.Event) (err error) {
 			return err
 		}
 		return m.view.DeleteExternalIDP(externalIDP.ExternalUserID, externalIDP.IDPConfigID, event.Sequence)
+	case model.UserRemoved:
+		return m.view.DeleteExternalIDPsByUserID(event.AggregateID, event.Sequence)
 	default:
 		return m.view.ProcessedExternalIDPSequence(event.Sequence)
 	}
@@ -80,16 +83,21 @@ func (m *ExternalIDP) processUser(event *models.Event) (err error) {
 func (m *ExternalIDP) processIdpConfig(event *models.Event) (err error) {
 	switch event.Type {
 	case iam_es_model.IDPConfigChanged, org_es_model.IDPConfigChanged:
+		configView := new(iam_view_model.IDPConfigView)
 		config := new(iam_model.IDPConfig)
-		config.AppendEvent(event)
-		exterinalIDPs, err := m.view.ExternalIDPsByIDPConfigID(config.IDPConfigID)
+		if event.Type == iam_es_model.IDPConfigChanged {
+			configView.AppendEvent(iam_model.IDPProviderTypeSystem, event)
+		} else {
+			configView.AppendEvent(iam_model.IDPProviderTypeOrg, event)
+		}
+		exterinalIDPs, err := m.view.ExternalIDPsByIDPConfigID(configView.IDPConfigID)
 		if err != nil {
 			return err
 		}
 		if event.AggregateType == iam_es_model.IAMAggregate {
-			config, err = m.iamEvents.GetIDPConfig(context.Background(), config.AggregateID, config.IDPConfigID)
+			config, err = m.iamEvents.GetIDPConfig(context.Background(), event.AggregateID, configView.IDPConfigID)
 		} else {
-			config, err = m.orgEvents.GetIDPConfig(context.Background(), config.AggregateID, config.IDPConfigID)
+			config, err = m.orgEvents.GetIDPConfig(context.Background(), event.AggregateID, configView.IDPConfigID)
 		}
 		if err != nil {
 			return err

@@ -19,6 +19,16 @@ func OrgByID(db *gorm.DB, table, orgID string) (*model.OrgView, error) {
 	return org, err
 }
 
+func OrgByPrimaryDomain(db *gorm.DB, table, primaryDomain string) (*model.OrgView, error) {
+	org := new(model.OrgView)
+	query := repository.PrepareGetByKey(table, model.OrgSearchKey(org_model.OrgSearchKeyOrgDomain), primaryDomain)
+	err := query(db, org)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-GEwea", "Errors.Org.NotFound")
+	}
+	return org, err
+}
+
 func SearchOrgs(db *gorm.DB, table string, req *org_model.OrgSearchRequest) ([]*model.OrgView, uint64, error) {
 	orgs := make([]*model.OrgView, 0)
 	query := repository.PrepareSearchQuery(table, model.OrgSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})

@@ -3,7 +3,7 @@ h1 {
 }
 
 .sub {
-  color: #8795a1;
+  color: var(--grey);
   margin-bottom: 2rem;
 }
 
@@ -38,14 +38,6 @@ h1 {
 
       &:last-child {
         padding-right: 0;
-      }
-    }
-
-    .data-row {
-      cursor: pointer;
-
-      &:hover {
-        background-color: #ffffff05;
       }
     }
 

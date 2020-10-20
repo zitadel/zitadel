@@ -22,12 +22,14 @@ func projectFromModel(project *proj_model.Project) *management.Project {
 	logging.Log("GRPC-di7rw").OnError(err).Debug("unable to parse timestamp")
 
 	return &management.Project{
-		Id:           project.AggregateID,
-		State:        projectStateFromModel(project.State),
-		CreationDate: creationDate,
-		ChangeDate:   changeDate,
-		Name:         project.Name,
-		Sequence:     project.Sequence,
+		Id:                   project.AggregateID,
+		State:                projectStateFromModel(project.State),
+		CreationDate:         creationDate,
+		ChangeDate:           changeDate,
+		Name:                 project.Name,
+		Sequence:             project.Sequence,
+		ProjectRoleAssertion: project.ProjectRoleAssertion,
+		ProjectRoleCheck:     project.ProjectRoleCheck,
 	}
 }
 
@@ -60,13 +62,15 @@ func projectViewFromModel(project *proj_model.ProjectView) *management.ProjectVi
 	logging.Log("GRPC-sope3").OnError(err).Debug("unable to parse timestamp")
 
 	return &management.ProjectView{
-		ProjectId:     project.ProjectID,
-		State:         projectStateFromModel(project.State),
-		CreationDate:  creationDate,
-		ChangeDate:    changeDate,
-		Name:          project.Name,
-		Sequence:      project.Sequence,
-		ResourceOwner: project.ResourceOwner,
+		ProjectId:            project.ProjectID,
+		State:                projectStateFromModel(project.State),
+		CreationDate:         creationDate,
+		ChangeDate:           changeDate,
+		Name:                 project.Name,
+		Sequence:             project.Sequence,
+		ResourceOwner:        project.ResourceOwner,
+		ProjectRoleAssertion: project.ProjectRoleAssertion,
+		ProjectRoleCheck:     project.ProjectRoleCheck,
 	}
 }
 
@@ -117,12 +121,22 @@ func projectStateFromModel(state proj_model.ProjectState) management.ProjectStat
 	}
 }
 
+func projectCreateToModel(project *management.ProjectCreateRequest) *proj_model.Project {
+	return &proj_model.Project{
+		Name:                 project.Name,
+		ProjectRoleAssertion: project.ProjectRoleAssertion,
+		ProjectRoleCheck:     project.ProjectRoleCheck,
+	}
+}
+
 func projectUpdateToModel(project *management.ProjectUpdateRequest) *proj_model.Project {
 	return &proj_model.Project{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: project.Id,
 		},
-		Name: project.Name,
+		Name:                 project.Name,
+		ProjectRoleAssertion: project.ProjectRoleAssertion,
+		ProjectRoleCheck:     project.ProjectRoleCheck,
 	}
 }
 

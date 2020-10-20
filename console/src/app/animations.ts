@@ -77,6 +77,38 @@ export const navAnimations: Array<AnimationTriggerMetadata> = [
     ]),
 ];
 
+
+export const enterAnimations: Array<AnimationTriggerMetadata> = [
+    trigger('appearfade', [
+        transition(':enter', [
+            style({
+                transform: 'scale(.9) translateY(-10%)',
+                opacity: 0,
+            }),
+            animate(
+                '100ms ease-in-out',
+                style({
+                    transform: 'scale(1) translateY(0%)',
+                    opacity: 1,
+                }),
+            ),
+        ]),
+        transition(':leave', [
+            style({
+                transform: 'scale(1) translateY(0%)',
+                opacity: 1,
+            }),
+            animate(
+                '100ms ease-in-out',
+                style({
+                    transform: 'scale(.9) translateY(-10%)',
+                    opacity: 0,
+                }),
+            ),
+        ]),
+    ]),
+];
+
 export const routeAnimations: AnimationTriggerMetadata = trigger('routeAnimations', [
     transition('HomePage => AddPage', [
         style({ transform: 'translateX(100%)', opacity: 0.5 }),

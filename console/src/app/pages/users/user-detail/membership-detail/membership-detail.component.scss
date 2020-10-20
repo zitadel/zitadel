@@ -1,7 +1,3 @@
-.add-button {
-  border-radius: .5rem;
-}
-
 .refresh-table {
   width: 100%;
 }
@@ -30,12 +26,6 @@
 
     .action {
       width: 40px;
-    }
-
-    .data-row {
-      &:hover {
-        background-color: #ffffff05;
-      }
     }
 
     .selection {

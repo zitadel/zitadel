@@ -1,9 +1,9 @@
 package oidc
 
 import (
-	"github.com/caos/oidc/pkg/oidc"
 	"time"
 
+	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -15,13 +15,20 @@ type Client struct {
 	defaultLoginURL            string
 	defaultAccessTokenLifetime time.Duration
 	defaultIdTokenLifetime     time.Duration
+	allowedScopes              []string
 }
 
-func ClientFromBusiness(app *model.ApplicationView, defaultLoginURL string, defaultAccessTokenLifetime, defaultIdTokenLifetime time.Duration) (op.Client, error) {
+func ClientFromBusiness(app *model.ApplicationView, defaultLoginURL string, defaultAccessTokenLifetime, defaultIdTokenLifetime time.Duration, allowedScopes []string) (op.Client, error) {
 	if !app.IsOIDC {
 		return nil, errors.ThrowInvalidArgument(nil, "OIDC-d5bhD", "client is not a proper oidc application")
 	}
-	return &Client{ApplicationView: app, defaultLoginURL: defaultLoginURL, defaultAccessTokenLifetime: defaultAccessTokenLifetime, defaultIdTokenLifetime: defaultIdTokenLifetime}, nil
+	return &Client{
+			ApplicationView:            app,
+			defaultLoginURL:            defaultLoginURL,
+			defaultAccessTokenLifetime: defaultAccessTokenLifetime,
+			defaultIdTokenLifetime:     defaultIdTokenLifetime,
+			allowedScopes:              allowedScopes},
+		nil
 }
 
 func (c *Client) ApplicationType() op.ApplicationType {
@@ -56,6 +63,18 @@ func (c *Client) DevMode() bool {
 	return c.ApplicationView.DevMode
 }
 
+func (c *Client) AllowedScopes() []string {
+	return c.allowedScopes
+}
+
+func (c *Client) AssertAdditionalIdTokenScopes() bool {
+	return c.IDTokenRoleAssertion
+}
+
+func (c *Client) AssertAdditionalAccessTokenScopes() bool {
+	return c.AccessTokenRoleAssertion
+}
+
 func (c *Client) AccessTokenLifetime() time.Duration {
 	return c.defaultAccessTokenLifetime //PLANNED: impl from real client
 }
@@ -65,7 +84,18 @@ func (c *Client) IDTokenLifetime() time.Duration {
 }
 
 func (c *Client) AccessTokenType() op.AccessTokenType {
-	return op.AccessTokenTypeBearer //PLANNED: impl from real client
+	return accessTokenTypeToOIDC(c.ApplicationView.AccessTokenType)
+}
+
+func accessTokenTypeToOIDC(tokenType model.OIDCTokenType) op.AccessTokenType {
+	switch tokenType {
+	case model.OIDCTokenTypeBearer:
+		return op.AccessTokenTypeBearer
+	case model.OIDCTokenTypeJWT:
+		return op.AccessTokenTypeJWT
+	default:
+		return op.AccessTokenTypeBearer
+	}
 }
 
 func authMethodToOIDC(authType model.OIDCAuthMethodType) op.AuthMethod {

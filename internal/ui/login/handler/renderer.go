@@ -137,6 +137,12 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		"selectedGender": func(g int32) bool {
 			return false
 		},
+		"hasExternalLogin": func() bool {
+			return false
+		},
+		"idpProviderClass": func(stylingType iam_model.IDPStylingType) string {
+			return stylingType.GetCSSClass()
+		},
 	}
 	var err error
 	r.Renderer, err = renderer.NewRenderer(
@@ -153,6 +159,7 @@ func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID, userAgentID)
 	if err != nil {
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-sio0W", "could not get authreq"))
+		return
 	}
 	if len(authReq.PossibleSteps) == 0 {
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-9sdp4", "no possible steps"))
@@ -205,6 +212,10 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.linkUsers(w, r, authReq, err)
 	case *model.ExternalNotFoundOptionStep:
 		l.renderExternalNotFoundOption(w, r, authReq, err)
+	case *model.ExternalLoginStep:
+		l.handleExternalLoginStep(w, r, authReq, step.SelectedIDPConfigID)
+	case *model.GrantRequiredStep:
+		l.renderInternalError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-asb43", "Errors.User.GrantRequired"))
 	default:
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}
@@ -220,11 +231,14 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 }
 
 func (l *Login) getUserData(r *http.Request, authReq *model.AuthRequest, title string, errType, errMessage string) userData {
-	return userData{
+	userData := userData{
 		baseData:    l.getBaseData(r, authReq, title, errType, errMessage),
 		profileData: l.getProfileData(authReq),
-		Linking:     len(authReq.LinkingUsers) > 0,
 	}
+	if authReq != nil && authReq.LinkingUsers != nil {
+		userData.Linking = len(authReq.LinkingUsers) > 0
+	}
+	return userData
 }
 
 func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title string, errType, errMessage string) baseData {
@@ -289,7 +303,14 @@ func (l *Login) getOrgID(authReq *model.AuthRequest) string {
 	if authReq.Request == nil {
 		return ""
 	}
-	return authReq.GetScopeOrgID()
+	primaryDomain := authReq.GetScopeOrgPrimaryDomain()
+	if primaryDomain != "" {
+		org, _ := l.authRepo.GetOrgByPrimaryDomain(primaryDomain)
+		if org != nil {
+			return org.ID
+		}
+	}
+	return ""
 }
 
 func getRequestID(authReq *model.AuthRequest, r *http.Request) string {

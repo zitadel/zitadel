@@ -11,7 +11,6 @@ export class RefreshService {
         router.events
             .pipe(filter(event => event instanceof NavigationEnd))
             .subscribe((event: Event | any) => {
-                console.log('prev:', event.url);
                 this.moveInto(event.url);
             });
     }

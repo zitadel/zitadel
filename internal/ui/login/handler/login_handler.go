@@ -68,5 +68,10 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *mod
 		errMessage = l.getErrorMessage(r, err)
 	}
 	data := l.getUserData(r, authReq, "Login", errType, errMessage)
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplLogin], data, nil)
+	funcs := map[string]interface{}{
+		"hasExternalLogin": func() bool {
+			return authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0
+		},
+	}
+	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplLogin], data, funcs)
 }

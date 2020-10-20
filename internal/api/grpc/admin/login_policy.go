@@ -14,7 +14,7 @@ func (s *Server) GetDefaultLoginPolicy(ctx context.Context, _ *empty.Empty) (*ad
 	return loginPolicyViewFromModel(result), nil
 }
 
-func (s *Server) UpdateDefaultLoginPolicy(ctx context.Context, policy *admin.DefaultLoginPolicy) (*admin.DefaultLoginPolicy, error) {
+func (s *Server) UpdateDefaultLoginPolicy(ctx context.Context, policy *admin.DefaultLoginPolicyRequest) (*admin.DefaultLoginPolicy, error) {
 	result, err := s.iam.ChangeDefaultLoginPolicy(ctx, loginPolicyToModel(policy))
 	if err != nil {
 		return nil, err

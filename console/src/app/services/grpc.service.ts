@@ -1,6 +1,7 @@
 import { PlatformLocation } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { AuthConfig } from 'angular-oauth2-oidc';
 
 import { AdminServicePromiseClient } from '../proto/generated/admin_grpc_web_pb';
@@ -8,6 +9,7 @@ import { AuthServicePromiseClient } from '../proto/generated/auth_grpc_web_pb';
 import { ManagementServicePromiseClient } from '../proto/generated/management_grpc_web_pb';
 import { AuthenticationService } from './authentication.service';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { I18nInterceptor } from './interceptors/i18n.interceptor';
 import { OrgInterceptor } from './interceptors/org.interceptor';
 import { StorageService } from './storage.service';
 
@@ -24,6 +26,8 @@ export class GrpcService {
         private platformLocation: PlatformLocation,
         private authenticationService: AuthenticationService,
         private storageService: StorageService,
+        private dialog: MatDialog,
+        // private toast: ToastService,
     ) { }
 
     public async loadAppEnvironment(): Promise<any> {
@@ -31,9 +35,10 @@ export class GrpcService {
             .toPromise().then((data: any) => {
                 if (data && data.authServiceUrl && data.mgmtServiceUrl && data.issuer) {
                     const interceptors = {
-                        'unaryInterceptors': [
-                            new AuthInterceptor(this.authenticationService, this.storageService),
+                        unaryInterceptors: [
                             new OrgInterceptor(this.storageService),
+                            new AuthInterceptor(this.authenticationService, this.storageService, this.dialog),
+                            new I18nInterceptor(),
                         ],
                     };
 

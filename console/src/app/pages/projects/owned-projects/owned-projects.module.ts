@@ -20,9 +20,10 @@ import { CardModule } from 'src/app/modules/card/card.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
-import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
-import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
-import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
+import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
+import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
+import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
 import { OwnedProjectGridComponent } from './owned-project-list/owned-project-grid/owned-project-grid.component';
 import { OwnedProjectListComponent } from './owned-project-list/owned-project-list.component';
@@ -51,6 +52,7 @@ import { OwnedProjectsComponent } from './owned-projects.component';
         MatInputModule,
         MatChipsModule,
         MatIconModule,
+        WarnDialogModule,
         MatButtonModule,
         MatProgressSpinnerModule,
         MatProgressBarModule,

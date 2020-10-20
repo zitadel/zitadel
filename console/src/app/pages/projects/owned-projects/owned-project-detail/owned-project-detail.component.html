@@ -22,12 +22,12 @@
             <span class="fill-space"></span>
 
             <button mat-stroked-button color="warn"
-                [disabled]="isZitadel || (['project.write', 'project.write:'+ project.projectId]| hasRole | async) == false"
-                *ngIf="project?.state === ProjectState.PROJECTSTATE_ACTIVE" class="state-button"
+                [disabled]="isZitadel || (['project.write$', 'project.write:'+ project.projectId]| hasRole | async) == false"
+                *ngIf="project?.state === ProjectState.PROJECTSTATE_ACTIVE"
                 (click)="changeState(ProjectState.PROJECTSTATE_INACTIVE)">{{'PROJECT.TABLE.DEACTIVATE' | translate}}</button>
             <button mat-stroked-button color="warn"
-                [disabled]="isZitadel || (['project.write', 'project.write:'+ project.projectId]| hasRole | async) == false"
-                *ngIf="project?.state === ProjectState.PROJECTSTATE_INACTIVE" class="state-button"
+                [disabled]="isZitadel || (['project.write$', 'project.write:'+ project.projectId]| hasRole | async) == false"
+                *ngIf="project?.state === ProjectState.PROJECTSTATE_INACTIVE"
                 (click)="changeState(ProjectState.PROJECTSTATE_ACTIVE)">{{'PROJECT.TABLE.ACTIVATE' | translate}}</button>
 
             <div class="full-width">
@@ -69,7 +69,7 @@
                     <app-card title="{{ 'PROJECT.GRANT.TITLE' | translate }}"
                         description="{{ 'PROJECT.GRANT.DESCRIPTION' | translate }}">
                         <app-project-grants refreshOnPreviousRoute="/projects/{{projectId}}/grants/create"
-                            [disabled]="((['project.grant.write', 'project.grant.write:'+ project.projectId]| hasRole | async) && (['org.global.read']| hasRole | async))== false"
+                            [disabled]="((['project.grant.write$', 'project.grant.write:'+ project.projectId]| hasRole | async))== false"
                             [projectId]="projectId">
                         </app-project-grants>
                     </app-card>
@@ -78,8 +78,16 @@
                 <ng-template appHasRole [appHasRole]="['project.role.read:' + project.projectId, 'project.role.read']">
                     <app-card title="{{ 'PROJECT.ROLE.TITLE' | translate }}"
                         description="{{ 'PROJECT.ROLE.DESCRIPTION' | translate }}">
+                        <p>{{'PROJECT.ROLE.OPTIONS' | translate}}</p>
+                        <mat-checkbox [(ngModel)]="project.projectRoleAssertion" (change)="saveProject()">
+                            {{'PROJECT.ROLE.ASSERTION' | translate}}</mat-checkbox>
+                        <p class="desc">{{'PROJECT.ROLE.ASSERTION_DESCRIPTION' | translate}}</p>
+                        <mat-checkbox [(ngModel)]="project.projectRoleCheck" (change)="saveProject()">
+                            {{'PROJECT.ROLE.CHECK' | translate}}</mat-checkbox>
+                        <p class="desc">{{'PROJECT.ROLE.CHECK_DESCRIPTION' | translate}}</p>
+                        <div class="divider"></div>
                         <app-project-roles
-                            [disabled]="(['project.role.write', 'project.role.write:'+ project.projectId]| hasRole | async) == false"
+                            [disabled]="(['project.role.write$', 'project.role.write:'+ project.projectId]| hasRole | async) == false"
                             [actionsVisible]="true" [projectId]="projectId">
                         </app-project-roles>
                     </app-card>
@@ -90,8 +98,8 @@
                         description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
                         <app-user-grants [context]="UserGrantContext.OWNED_PROJECT" [projectId]="projectId"
                             refreshOnPreviousRoute="/grant-create/project/{{projectId}}"
-                            [allowCreate]="(['user.grant.write', 'user.grant.write:'+projectId] | hasRole) | async"
-                            [allowDelete]="(['user.grant.delete','user.grant.delete:'+projectId] | hasRole) | async">
+                            [allowWrite]="(['user.grant.write$', 'user.grant.write:'+projectId] | hasRole) | async"
+                            [allowDelete]="(['user.grant.delete$','user.grant.delete:'+projectId] | hasRole) | async">
                         </app-user-grants>
                     </app-card>
                 </ng-template>
@@ -113,7 +121,7 @@
                     [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
                     description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
                     (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()"
-                    [disabled]="(['project.member.write', 'project.member.write:'+ project.projectId]| hasRole | async) == false">
+                    [disabled]="(['project.member.write$', 'project.member.write:'+ project.projectId]| hasRole | async) == false">
                 </app-contributors>
             </mat-tab>
             <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="flex-col">

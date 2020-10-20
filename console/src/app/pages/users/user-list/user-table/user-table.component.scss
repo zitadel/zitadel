@@ -1,4 +1,3 @@
-
 .table-wrapper {
   overflow: auto;
 
@@ -8,7 +7,8 @@
 
     td,
     th {
-      padding: 0 1rem;
+      padding: .5rem;
+      outline: none;
 
       &:first-child {
         padding-left: 0;
@@ -20,20 +20,48 @@
       }
     }
 
-    .data-row {
-      cursor: pointer;
-
-      &:hover {
-        background-color: #ffffff05;
-      }
+    .selection {
+      width: 50px;
+      max-width: 50px;
     }
   }
 }
 
 tr {
-  outline: none;
+  button {
+    visibility: hidden;
+  }
+
+  &:hover {
+    button {
+      visibility: visible;
+    }
+  }
 }
 
-.add-button {
-  border-radius: .5rem;
+th {
+  .search-button {
+    visibility: hidden;
+  }
+
+  &:hover,
+  &.search-active {
+    .search-button {
+      visibility: visible;
+    }
+  }
+}
+
+.filtername {
+  margin: 0 1rem;
+}
+
+.sa-icon {
+  display: block;
+  width: 32px;
+  margin: 0 .5rem;
+
+  i {
+    margin: auto;
+  }
 }

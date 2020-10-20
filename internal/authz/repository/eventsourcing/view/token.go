@@ -1,11 +1,8 @@
 package view
 
 import (
-	"context"
-
-	"github.com/caos/zitadel/internal/token/repository/view"
-	"github.com/caos/zitadel/internal/token/repository/view/model"
-	"github.com/caos/zitadel/internal/tracing"
+	usr_view "github.com/caos/zitadel/internal/user/repository/view"
+	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
@@ -13,18 +10,12 @@ const (
 	tokenTable = "auth.tokens"
 )
 
-func (v *View) TokenByID(ctx context.Context, tokenID string) (_ *model.Token, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-	return view.TokenByID(v.Db, tokenTable, tokenID)
+func (v *View) TokenByID(tokenID string) (*usr_view_model.TokenView, error) {
+	return usr_view.TokenByID(v.Db, tokenTable, tokenID)
 }
 
-func (v *View) IsTokenValid(tokenID string) (bool, error) {
-	return view.IsTokenValid(v.Db, tokenTable, tokenID)
-}
-
-func (v *View) PutToken(token *model.Token) error {
-	err := view.PutToken(v.Db, tokenTable, token)
+func (v *View) PutToken(token *usr_view_model.TokenView) error {
+	err := usr_view.PutToken(v.Db, tokenTable, token)
 	if err != nil {
 		return err
 	}
@@ -32,7 +23,7 @@ func (v *View) PutToken(token *model.Token) error {
 }
 
 func (v *View) DeleteToken(tokenID string, eventSequence uint64) error {
-	err := view.DeleteToken(v.Db, tokenTable, tokenID)
+	err := usr_view.DeleteToken(v.Db, tokenTable, tokenID)
 	if err != nil {
 		return nil
 	}
@@ -40,7 +31,7 @@ func (v *View) DeleteToken(tokenID string, eventSequence uint64) error {
 }
 
 func (v *View) DeleteSessionTokens(agentID, userID string, eventSequence uint64) error {
-	err := view.DeleteSessionTokens(v.Db, tokenTable, agentID, userID)
+	err := usr_view.DeleteSessionTokens(v.Db, tokenTable, agentID, userID)
 	if err != nil {
 		return nil
 	}

@@ -31,7 +31,10 @@ func NewRenderer(dir http.FileSystem, tmplMapping map[string]string, funcs map[s
 	if err != nil {
 		return nil, err
 	}
-	r.loadTemplates(dir, tmplMapping, funcs)
+	err = r.loadTemplates(dir, tmplMapping, funcs)
+	if err != nil {
+		return nil, err
+	}
 	return r, nil
 }
 

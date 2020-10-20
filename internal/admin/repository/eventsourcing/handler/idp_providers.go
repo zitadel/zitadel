@@ -105,7 +105,9 @@ func (m *IDPProvider) fillData(provider *iam_view_model.IDPProviderView) (err er
 
 func (m *IDPProvider) fillConfigData(provider *iam_view_model.IDPProviderView, config *iam_model.IDPConfig) {
 	provider.Name = config.Name
+	provider.StylingType = int32(config.StylingType)
 	provider.IDPConfigType = int32(config.Type)
+	provider.IDPState = int32(config.State)
 }
 
 func (m *IDPProvider) OnError(event *models.Event, err error) error {

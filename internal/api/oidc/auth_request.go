@@ -3,6 +3,7 @@ package oidc
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/caos/oidc/pkg/oidc"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/errors"
+	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/tracing"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 )
@@ -21,6 +23,14 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
+	}
+	app, err := o.repo.ApplicationByClientID(ctx, req.ClientID)
+	if err != nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
+	}
+	req.Scopes, err = o.assertProjectRoleScopes(app, req.Scopes)
+	if err != nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-Gqrfg", "Errors.Internal")
 	}
 	authRequest := CreateAuthRequestToBusiness(ctx, req, userAgentID, userID)
 	resp, err := o.repo.CreateAuthRequest(ctx, authRequest)
@@ -83,7 +93,7 @@ func (o *OPStorage) CreateToken(ctx context.Context, req op.TokenRequest) (_ str
 	if err != nil {
 		return "", time.Time{}, err
 	}
-	return resp.ID, resp.Expiration, nil
+	return resp.TokenID, resp.Expiration, nil
 }
 
 func grantsToScopes(grants []*grant_model.UserGrantView) []string {
@@ -118,4 +128,23 @@ func (o *OPStorage) GetKeySet(ctx context.Context) (_ *jose.JSONWebKeySet, err e
 
 func (o *OPStorage) SaveNewKeyPair(ctx context.Context) error {
 	return o.repo.GenerateSigningKeyPair(ctx, o.signingKeyAlgorithm)
+}
+
+func (o *OPStorage) assertProjectRoleScopes(app *proj_model.ApplicationView, scopes []string) ([]string, error) {
+	if !app.ProjectRoleAssertion {
+		return scopes, nil
+	}
+	for _, scope := range scopes {
+		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
+			return scopes, nil
+		}
+	}
+	roles, err := o.repo.ProjectRolesByProjectID(app.ProjectID)
+	if err != nil {
+		return nil, err
+	}
+	for _, role := range roles {
+		scopes = append(scopes, ScopeProjectRolePrefix+role.Key)
+	}
+	return scopes, nil
 }

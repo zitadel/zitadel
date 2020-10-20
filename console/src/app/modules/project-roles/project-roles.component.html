@@ -9,8 +9,8 @@
         </button>
     </ng-template>
     <ng-template appHasRole [appHasRole]="['project.role.write:' + projectId, 'project.role.write']" actions>
-        <a *ngIf="actionsVisible" [disabled]="disabled" class="rounded-button"
-            [routerLink]="[ '/projects', projectId, 'roles', 'create']" color="primary" mat-raised-button>
+        <a *ngIf="actionsVisible" [disabled]="disabled" [routerLink]="[ '/projects', projectId, 'roles', 'create']"
+            color="primary" mat-raised-button>
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
     </ng-template>
@@ -19,13 +19,13 @@
         <table [dataSource]="dataSource" mat-table class="table" matSort aria-label="Elements">
             <ng-container matColumnDef="select">
                 <th class="selection" mat-header-cell *matHeaderCellDef>
-                    <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
+                    <mat-checkbox [disabled]="disabled" color="primary" (change)="$event ? masterToggle() : null"
                         [checked]="selection.hasValue() && isAllSelected()"
                         [indeterminate]="selection.hasValue() && !isAllSelected()">
                     </mat-checkbox>
                 </th>
                 <td class="selection" mat-cell *matCellDef="let row">
-                    <mat-checkbox color="primary" (click)="$event.stopPropagation()"
+                    <mat-checkbox color="primary" [disabled]="disabled" (click)="$event.stopPropagation()"
                         (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
                     </mat-checkbox>
                 </td>
@@ -57,7 +57,7 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
 
         <mat-paginator #paginator [length]="dataSource.totalResult" [pageSize]="50"

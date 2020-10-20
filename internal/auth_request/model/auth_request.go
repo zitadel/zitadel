@@ -126,12 +126,12 @@ func (a *AuthRequest) SetUserInfo(userID, loginName, displayName, userOrgID stri
 	a.UserOrgID = userOrgID
 }
 
-func (a *AuthRequest) GetScopeOrgID() string {
+func (a *AuthRequest) GetScopeOrgPrimaryDomain() string {
 	switch request := a.Request.(type) {
 	case *AuthRequestOIDC:
 		for _, scope := range request.Scopes {
-			if strings.HasPrefix(scope, OrgIDScope) {
-				strings.TrimPrefix(scope, OrgIDScope)
+			if strings.HasPrefix(scope, OrgDomainPrimaryScope) {
+				return strings.TrimPrefix(scope, OrgDomainPrimaryScope)
 			}
 		}
 	}

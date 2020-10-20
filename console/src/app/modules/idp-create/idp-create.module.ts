@@ -6,6 +6,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -22,10 +24,12 @@ import { IdpCreateComponent } from './idp-create.component';
         MatInputModule,
         MatFormFieldModule,
         MatButtonModule,
+        MatSelectModule,
         MatIconModule,
         MatChipsModule,
         MatTooltipModule,
         TranslateModule,
+        MatProgressBarModule,
     ],
 })
 export class IdpCreateModule { }

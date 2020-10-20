@@ -69,6 +69,15 @@ func PutApplication(db *gorm.DB, table string, app *model.ApplicationView) error
 	return save(db, app)
 }
 
+func PutApplications(db *gorm.DB, table string, apps ...*model.ApplicationView) error {
+	save := repository.PrepareBulkSave(table)
+	s := make([]interface{}, len(apps))
+	for i, app := range apps {
+		s[i] = app
+	}
+	return save(db, s...)
+}
+
 func DeleteApplication(db *gorm.DB, table, appID string) error {
 	delete := repository.PrepareDeleteByKey(table, model.ApplicationSearchKey(proj_model.AppSearchKeyAppID), appID)
 	return delete(db)
