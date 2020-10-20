@@ -76,8 +76,7 @@ func (m *IDPProvider) processIdpProvider(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		config := new(iam_model.IDPConfig)
-		config, err = m.iamEvents.GetIDPConfig(context.Background(), event.AggregateID, esConfig.IDPConfigID)
+		config, err := m.iamEvents.GetIDPConfig(context.Background(), event.AggregateID, esConfig.IDPConfigID)
 		if err != nil {
 			return err
 		}
