@@ -1,11 +1,14 @@
 package sql
 
 import (
+	"context"
 	"database/sql"
+	"database/sql/driver"
 	"reflect"
 	"testing"
 	"time"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/lib/pq"
@@ -295,24 +298,263 @@ func Test_prepareCondition(t *testing.T) {
 	}
 }
 
-func Test_buildQuery(t *testing.T) {
+func Test_query_events_with_crdb(t *testing.T) {
 	type args struct {
-		query *repository.SearchQuery
+		searchQuery *repository.SearchQuery
+	}
+	type fields struct {
+		existingEvents []*repository.Event
+		client         *sql.DB
 	}
 	type res struct {
-		query      string
-		values     []interface{}
-		rowScanner bool
+		eventCount int
 	}
 	tests := []struct {
-		name string
-		args args
-		res  res
+		name    string
+		fields  fields
+		args    args
+		res     res
+		wantErr bool
+	}{
+		{
+			name: "aggregate type filter no events",
+			args: args{
+				searchQuery: &repository.SearchQuery{
+					Columns: repository.ColumnsEvent,
+					Filters: []*repository.Filter{
+						repository.NewFilter(repository.FieldAggregateType, "not found", repository.OperationEquals),
+					},
+				},
+			},
+			fields: fields{
+				client: testCRDBClient,
+				existingEvents: []*repository.Event{
+					generateEvent(t, "300", false, 0),
+					generateEvent(t, "300", false, 0),
+					generateEvent(t, "300", false, 0),
+				},
+			},
+			res: res{
+				eventCount: 0,
+			},
+			wantErr: false,
+		},
+		{
+			name: "aggregate type filter events found",
+			args: args{
+				searchQuery: &repository.SearchQuery{
+					Columns: repository.ColumnsEvent,
+					Filters: []*repository.Filter{
+						repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
+					},
+				},
+			},
+			fields: fields{
+				client: testCRDBClient,
+				existingEvents: []*repository.Event{
+					generateEvent(t, "301", false, 0),
+					generateEvent(t, "302", false, 0),
+					generateEvent(t, "302", false, 0),
+					generateEvent(t, "303", false, 0, func(e *repository.Event) { e.AggregateType = "not in list" }),
+				},
+			},
+			res: res{
+				eventCount: 3,
+			},
+			wantErr: false,
+		},
+		{
+			name: "aggregate type and id filter events found",
+			args: args{
+				searchQuery: &repository.SearchQuery{
+					Columns: repository.ColumnsEvent,
+					Filters: []*repository.Filter{
+						repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
+						repository.NewFilter(repository.FieldAggregateID, "303", repository.OperationEquals),
+					},
+				},
+			},
+			fields: fields{
+				client: testCRDBClient,
+				existingEvents: []*repository.Event{
+					generateEvent(t, "303", false, 0),
+					generateEvent(t, "303", false, 0),
+					generateEvent(t, "303", false, 0),
+					generateEvent(t, "304", false, 0, func(e *repository.Event) { e.AggregateType = "not in list" }),
+					generateEvent(t, "305", false, 0),
+				},
+			},
+			res: res{
+				eventCount: 3,
+			},
+			wantErr: false,
+		},
+		{
+			name: "resource owner filter events found",
+			args: args{
+				searchQuery: &repository.SearchQuery{
+					Columns: repository.ColumnsEvent,
+					Filters: []*repository.Filter{
+						repository.NewFilter(repository.FieldResourceOwner, "caos", repository.OperationEquals),
+					},
+				},
+			},
+			fields: fields{
+				client: testCRDBClient,
+				existingEvents: []*repository.Event{
+					generateEvent(t, "306", false, 0, func(e *repository.Event) { e.ResourceOwner = "caos" }),
+					generateEvent(t, "307", false, 0, func(e *repository.Event) { e.ResourceOwner = "caos" }),
+					generateEvent(t, "308", false, 0, func(e *repository.Event) { e.ResourceOwner = "caos" }),
+					generateEvent(t, "309", false, 0, func(e *repository.Event) { e.ResourceOwner = "orgID" }),
+					generateEvent(t, "309", false, 0, func(e *repository.Event) { e.ResourceOwner = "orgID" }),
+				},
+			},
+			res: res{
+				eventCount: 3,
+			},
+			wantErr: false,
+		},
+		{
+			name: "editor service filter events found",
+			args: args{
+				searchQuery: &repository.SearchQuery{
+					Columns: repository.ColumnsEvent,
+					Filters: []*repository.Filter{
+						repository.NewFilter(repository.FieldEditorService, "MANAGEMENT-API", repository.OperationEquals),
+						repository.NewFilter(repository.FieldEditorService, "ADMIN-API", repository.OperationEquals),
+					},
+				},
+			},
+			fields: fields{
+				client: testCRDBClient,
+				existingEvents: []*repository.Event{
+					generateEvent(t, "307", false, 0, func(e *repository.Event) { e.EditorService = "MANAGEMENT-API" }),
+					generateEvent(t, "307", false, 0, func(e *repository.Event) { e.EditorService = "MANAGEMENT-API" }),
+					generateEvent(t, "308", false, 0, func(e *repository.Event) { e.EditorService = "ADMIN-API" }),
+					generateEvent(t, "309", false, 0, func(e *repository.Event) { e.EditorService = "AUTHAPI" }),
+					generateEvent(t, "309", false, 0, func(e *repository.Event) { e.EditorService = "AUTHAPI" }),
+				},
+			},
+			res: res{
+				eventCount: 3,
+			},
+			wantErr: false,
+		},
+		{
+			name: "editor user filter events found",
+			args: args{
+				searchQuery: &repository.SearchQuery{
+					Columns: repository.ColumnsEvent,
+					Filters: []*repository.Filter{
+						repository.NewFilter(repository.FieldEditorUser, "adlerhurst", repository.OperationEquals),
+						repository.NewFilter(repository.FieldEditorUser, "nobody", repository.OperationEquals),
+						repository.NewFilter(repository.FieldEditorUser, "", repository.OperationEquals),
+					},
+				},
+			},
+			fields: fields{
+				client: testCRDBClient,
+				existingEvents: []*repository.Event{
+					generateEvent(t, "310", false, 0, func(e *repository.Event) { e.EditorUser = "adlerhurst" }),
+					generateEvent(t, "310", false, 0, func(e *repository.Event) { e.EditorUser = "adlerhurst" }),
+					generateEvent(t, "310", false, 0, func(e *repository.Event) { e.EditorUser = "nobody" }),
+					generateEvent(t, "311", false, 0, func(e *repository.Event) { e.EditorUser = "" }),
+					generateEvent(t, "311", false, 0, func(e *repository.Event) { e.EditorUser = "" }),
+					generateEvent(t, "312", false, 0, func(e *repository.Event) { e.EditorUser = "fforootd" }),
+					generateEvent(t, "312", false, 0, func(e *repository.Event) { e.EditorUser = "fforootd" }),
+				},
+			},
+			res: res{
+				eventCount: 5,
+			},
+			wantErr: false,
+		},
+		{
+			name: "event type filter events found",
+			args: args{
+				searchQuery: &repository.SearchQuery{
+					Columns: repository.ColumnsEvent,
+					Filters: []*repository.Filter{
+						repository.NewFilter(repository.FieldEventType, repository.EventType("user.created"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldEventType, repository.EventType("user.updated"), repository.OperationEquals),
+					},
+				},
+			},
+			fields: fields{
+				client: testCRDBClient,
+				existingEvents: []*repository.Event{
+					generateEvent(t, "311", false, 0, func(e *repository.Event) { e.Type = "user.created" }),
+					generateEvent(t, "311", false, 0, func(e *repository.Event) { e.Type = "user.updated" }),
+					generateEvent(t, "311", false, 0, func(e *repository.Event) { e.Type = "user.deactivated" }),
+					generateEvent(t, "311", false, 0, func(e *repository.Event) { e.Type = "user.locked" }),
+					generateEvent(t, "312", false, 0, func(e *repository.Event) { e.Type = "user.created" }),
+					generateEvent(t, "312", false, 0, func(e *repository.Event) { e.Type = "user.updated" }),
+					generateEvent(t, "312", false, 0, func(e *repository.Event) { e.Type = "user.deactivated" }),
+					generateEvent(t, "312", false, 0, func(e *repository.Event) { e.Type = "user.reactivated" }),
+					generateEvent(t, "313", false, 0, func(e *repository.Event) { e.Type = "user.locked" }),
+				},
+			},
+			res: res{
+				eventCount: 7,
+			},
+			wantErr: false,
+		},
+		{
+			name: "fail because no filter",
+			args: args{
+				searchQuery: &repository.SearchQuery{},
+			},
+			fields: fields{
+				client:         testCRDBClient,
+				existingEvents: []*repository.Event{},
+			},
+			res: res{
+				eventCount: 0,
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			db := &CRDB{
+				client: tt.fields.client,
+			}
+
+			// setup initial data for query
+			if err := db.Push(context.Background(), tt.fields.existingEvents...); err != nil {
+				t.Errorf("error in setup = %v", err)
+				return
+			}
+
+			events := []*repository.Event{}
+			if err := query(context.Background(), db, tt.args.searchQuery, &events); (err != nil) != tt.wantErr {
+				t.Errorf("CRDB.query() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_query_events_mocked(t *testing.T) {
+	type args struct {
+		query *repository.SearchQuery
+		dest  interface{}
+	}
+	type res struct {
+		wantErr bool
+	}
+	type fields struct {
+		mock *dbMock
+	}
+	tests := []struct {
+		name   string
+		args   args
+		fields fields
+		res    res
 	}{
 		{
 			name: "with order by desc",
 			args: args{
-				//  NewSearchQueryFactory("user").OrderDesc()
+				dest: &[]*repository.Event{},
 				query: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
 					Desc:    true,
@@ -325,15 +567,20 @@ func Test_buildQuery(t *testing.T) {
 					},
 				},
 			},
+			fields: fields{
+				mock: newMockClient(t).expectQuery(t,
+					`SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = \$1 ORDER BY event_sequence DESC`,
+					[]driver.Value{repository.AggregateType("user")},
+				),
+			},
 			res: res{
-				query:      "SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC",
-				rowScanner: true,
-				values:     []interface{}{repository.AggregateType("user")},
+				wantErr: false,
 			},
 		},
 		{
 			name: "with limit",
 			args: args{
+				dest: &[]*repository.Event{},
 				query: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
 					Desc:    false,
@@ -347,15 +594,20 @@ func Test_buildQuery(t *testing.T) {
 					},
 				},
 			},
+			fields: fields{
+				mock: newMockClient(t).expectQuery(t,
+					`SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = \$1 ORDER BY event_sequence LIMIT \$2`,
+					[]driver.Value{repository.AggregateType("user"), uint64(5)},
+				),
+			},
 			res: res{
-				query:      "SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence LIMIT $2",
-				rowScanner: true,
-				values:     []interface{}{repository.AggregateType("user"), uint64(5)},
+				wantErr: false,
 			},
 		},
 		{
 			name: "with limit and order by desc",
 			args: args{
+				dest: &[]*repository.Event{},
 				query: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
 					Desc:    true,
@@ -369,10 +621,68 @@ func Test_buildQuery(t *testing.T) {
 					},
 				},
 			},
+			fields: fields{
+				mock: newMockClient(t).expectQuery(t,
+					`SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = \$1 ORDER BY event_sequence DESC LIMIT \$2`,
+					[]driver.Value{repository.AggregateType("user"), uint64(5)},
+				),
+			},
 			res: res{
-				query:      "SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC LIMIT $2",
-				rowScanner: true,
-				values:     []interface{}{repository.AggregateType("user"), uint64(5)},
+				wantErr: false,
+			},
+		},
+		{
+			name: "error sql conn closed",
+			args: args{
+				dest: &[]*repository.Event{},
+				query: &repository.SearchQuery{
+					Columns: repository.ColumnsEvent,
+					Desc:    true,
+					Limit:   0,
+					Filters: []*repository.Filter{
+						{
+							Field:     repository.FieldAggregateType,
+							Value:     repository.AggregateType("user"),
+							Operation: repository.OperationEquals,
+						},
+					},
+				},
+			},
+			fields: fields{
+				mock: newMockClient(t).expectQueryErr(t,
+					`SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = \$1 ORDER BY event_sequence DESC`,
+					[]driver.Value{repository.AggregateType("user")},
+					sql.ErrConnDone),
+			},
+			res: res{
+				wantErr: true,
+			},
+		},
+		{
+			name: "error unexpected dest",
+			args: args{
+				dest: nil,
+				query: &repository.SearchQuery{
+					Columns: repository.ColumnsEvent,
+					Desc:    true,
+					Limit:   0,
+					Filters: []*repository.Filter{
+						{
+							Field:     repository.FieldAggregateType,
+							Value:     repository.AggregateType("user"),
+							Operation: repository.OperationEquals,
+						},
+					},
+				},
+			},
+			fields: fields{
+				mock: newMockClient(t).expectQuery(t,
+					`SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = \$1 ORDER BY event_sequence DESC`,
+					[]driver.Value{repository.AggregateType("user")},
+					&repository.Event{Sequence: 100}),
+			},
+			res: res{
+				wantErr: true,
 			},
 		},
 		{
@@ -383,9 +693,7 @@ func Test_buildQuery(t *testing.T) {
 				},
 			},
 			res: res{
-				query:      "",
-				rowScanner: false,
-				values:     []interface{}(nil),
+				wantErr: true,
 			},
 		},
 		{
@@ -399,29 +707,64 @@ func Test_buildQuery(t *testing.T) {
 				},
 			},
 			res: res{
-				query:      "",
-				rowScanner: false,
-				values:     []interface{}(nil),
+				wantErr: true,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			crdb := &CRDB{}
-			gotQuery, gotValues, gotRowScanner := buildQuery(crdb, tt.args.query)
-			if gotQuery != tt.res.query {
-				t.Errorf("buildQuery() gotQuery = %v, want %v", gotQuery, tt.res.query)
+			if tt.fields.mock != nil {
+				crdb.client = tt.fields.mock.client
 			}
-			if len(gotValues) != len(tt.res.values) {
-				t.Errorf("wrong length of gotten values got = %d, want %d", len(gotValues), len(tt.res.values))
+
+			err := query(context.Background(), crdb, tt.args.query, tt.args.dest)
+			if (err != nil) != tt.res.wantErr {
+				t.Errorf("query() error = %v, wantErr %v", err, tt.res.wantErr)
+			}
+
+			if tt.fields.mock == nil {
 				return
 			}
-			if !reflect.DeepEqual(gotValues, tt.res.values) {
-				t.Errorf("prepareCondition() gotValues = %T: %v, want %T: %v", gotValues, gotValues, tt.res.values, tt.res.values)
-			}
-			if (tt.res.rowScanner && gotRowScanner == nil) || (!tt.res.rowScanner && gotRowScanner != nil) {
-				t.Errorf("rowScanner should be nil==%v got nil==%v", tt.res.rowScanner, gotRowScanner == nil)
+
+			if err := tt.fields.mock.mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("not all expectaions met: %v", err)
 			}
 		})
+	}
+}
+
+type dbMock struct {
+	mock   sqlmock.Sqlmock
+	client *sql.DB
+}
+
+func (m *dbMock) expectQuery(t *testing.T, expectedQuery string, args []driver.Value, events ...*repository.Event) *dbMock {
+	query := m.mock.ExpectQuery(expectedQuery).WithArgs(args...)
+	rows := sqlmock.NewRows([]string{"event_sequence"})
+	for _, event := range events {
+		rows = rows.AddRow(event.Sequence)
+	}
+	query.WillReturnRows(rows).RowsWillBeClosed()
+	return m
+}
+
+func (m *dbMock) expectQueryErr(t *testing.T, expectedQuery string, args []driver.Value, err error) *dbMock {
+	m.mock.ExpectQuery(expectedQuery).WithArgs(args...).WillReturnError(err)
+	return m
+}
+
+func newMockClient(t *testing.T) *dbMock {
+	t.Helper()
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Errorf("unable to create mock client: %v", err)
+		t.FailNow()
+		return nil
+	}
+
+	return &dbMock{
+		mock:   mock,
+		client: db,
 	}
 }

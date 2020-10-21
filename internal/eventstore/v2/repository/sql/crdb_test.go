@@ -821,7 +821,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 	}
 }
 
-func TestCRDB_query_events(t *testing.T) {
+func TestCRDB_Filter(t *testing.T) {
 	type args struct {
 		searchQuery *repository.SearchQuery
 	}
@@ -861,29 +861,6 @@ func TestCRDB_query_events(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "aggregate type filter events found",
-			args: args{
-				searchQuery: &repository.SearchQuery{
-					Columns: repository.ColumnsEvent,
-					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
-					},
-				},
-			},
-			fields: fields{
-				existingEvents: []*repository.Event{
-					generateEvent(t, "301", false, 0),
-					generateEvent(t, "302", false, 0),
-					generateEvent(t, "302", false, 0),
-					generateEventForAggregate("not in list", "303", false, 0),
-				},
-			},
-			res: res{
-				eventCount: 3,
-			},
-			wantErr: false,
-		},
-		{
 			name: "aggregate type and id filter events found",
 			args: args{
 				searchQuery: &repository.SearchQuery{
@@ -899,7 +876,6 @@ func TestCRDB_query_events(t *testing.T) {
 					generateEvent(t, "303", false, 0),
 					generateEvent(t, "303", false, 0),
 					generateEvent(t, "303", false, 0),
-					generateEventForAggregate("not in list", "304", false, 0),
 					generateEvent(t, "305", false, 0),
 				},
 			},
@@ -908,84 +884,6 @@ func TestCRDB_query_events(t *testing.T) {
 			},
 			wantErr: false,
 		},
-		{
-			name: "sequence filter events found",
-			args: args{
-				searchQuery: &repository.SearchQuery{},
-			},
-			fields: fields{
-				existingEvents: []*repository.Event{},
-			},
-			res: res{
-				events: []*repository.Event{},
-			},
-			wantErr: false,
-		},
-		// {
-		// 	name: "resource owner filter events found",
-		// 	args: args{
-		// 		searchQuery: &repository.SearchQuery{},
-		// 	},
-		// 	fields: fields{
-		// 		existingEvents: []*repository.Event{},
-		// 	},
-		// 	res: res{
-		// 		events: []*repository.Event{},
-		// 	},
-		// 	wantErr: false,
-		// },
-		// {
-		// 	name: "editor service filter events found",
-		// 	args: args{
-		// 		searchQuery: &repository.SearchQuery{},
-		// 	},
-		// 	fields: fields{
-		// 		existingEvents: []*repository.Event{},
-		// 	},
-		// 	res: res{
-		// 		events: []*repository.Event{},
-		// 	},
-		// 	wantErr: false,
-		// },
-		// {
-		// 	name: "editor user filter events found",
-		// 	args: args{
-		// 		searchQuery: &repository.SearchQuery{},
-		// 	},
-		// 	fields: fields{
-		// 		existingEvents: []*repository.Event{},
-		// 	},
-		// 	res: res{
-		// 		events: []*repository.Event{},
-		// 	},
-		// 	wantErr: false,
-		// },
-		// {
-		// 	name: "event type filter events found",
-		// 	args: args{
-		// 		searchQuery: &repository.SearchQuery{},
-		// 	},
-		// 	fields: fields{
-		// 		existingEvents: []*repository.Event{},
-		// 	},
-		// 	res: res{
-		// 		events: []*repository.Event{},
-		// 	},
-		// 	wantErr: false,
-		// },
-		// {
-		// 	name: "no filter events found",
-		// 	args: args{
-		// 		searchQuery: &repository.SearchQuery{},
-		// 	},
-		// 	fields: fields{
-		// 		existingEvents: []*repository.Event{},
-		// 	},
-		// 	res: res{
-		// 		events: []*repository.Event{},
-		// 	},
-		// 	wantErr: false,
-		// },
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -999,9 +897,99 @@ func TestCRDB_query_events(t *testing.T) {
 				return
 			}
 
-			events := []*repository.Event{}
-			if err := db.query(tt.args.searchQuery, &events); (err != nil) != tt.wantErr {
+			events, err := db.Filter(context.Background(), tt.args.searchQuery)
+			if (err != nil) != tt.wantErr {
 				t.Errorf("CRDB.query() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if len(events) != tt.res.eventCount {
+				t.Errorf("CRDB.query() expected event count: %d got %d", tt.res.eventCount, len(events))
+			}
+		})
+	}
+}
+
+func TestCRDB_LatestSequence(t *testing.T) {
+	type args struct {
+		searchQuery *repository.SearchQuery
+	}
+	type fields struct {
+		existingEvents []*repository.Event
+	}
+	type res struct {
+		sequence uint64
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		res     res
+		wantErr bool
+	}{
+		{
+			name: "aggregate type filter no sequence",
+			args: args{
+				searchQuery: &repository.SearchQuery{
+					Columns: repository.ColumnsMaxSequence,
+					Filters: []*repository.Filter{
+						repository.NewFilter(repository.FieldAggregateType, "not found", repository.OperationEquals),
+					},
+				},
+			},
+			fields: fields{
+				existingEvents: []*repository.Event{
+					generateEvent(t, "400", false, 0),
+					generateEvent(t, "400", false, 0),
+					generateEvent(t, "400", false, 0),
+				},
+			},
+			res: res{
+				sequence: 0,
+			},
+			wantErr: false,
+		},
+		{
+			name: "aggregate type filter sequence",
+			args: args{
+				searchQuery: &repository.SearchQuery{
+					Columns: repository.ColumnsMaxSequence,
+					Filters: []*repository.Filter{
+						repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
+					},
+				},
+			},
+			fields: fields{
+				existingEvents: []*repository.Event{
+					generateEvent(t, "401", false, 0),
+					generateEvent(t, "401", false, 0),
+					generateEvent(t, "401", false, 0),
+				},
+			},
+			res: res{
+				sequence: 3,
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			db := &CRDB{
+				client: testCRDBClient,
+			}
+
+			// setup initial data for query
+			if err := db.Push(context.Background(), tt.fields.existingEvents...); err != nil {
+				t.Errorf("error in setup = %v", err)
+				return
+			}
+
+			sequence, err := db.LatestSequence(context.Background(), tt.args.searchQuery)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("CRDB.query() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if sequence < tt.res.sequence {
+				t.Errorf("CRDB.query() expected sequence: %d got %d", tt.res.sequence, sequence)
 			}
 		})
 	}
@@ -1028,24 +1016,9 @@ func linkEvents(events ...*repository.Event) []*repository.Event {
 	return events
 }
 
-func generateEventForAggregate(aggregateType repository.AggregateType, aggregateID string, checkPrevious bool, previousSeq uint64) *repository.Event {
-	return &repository.Event{
-		AggregateID:           aggregateID,
-		AggregateType:         aggregateType,
-		CheckPreviousSequence: checkPrevious,
-		EditorService:         "svc",
-		EditorUser:            "user",
-		PreviousEvent:         nil,
-		PreviousSequence:      previousSeq,
-		ResourceOwner:         "ro",
-		Type:                  "test.created",
-		Version:               "v1",
-	}
-}
-
-func generateEvent(t *testing.T, aggregateID string, checkPrevious bool, previousSeq uint64) *repository.Event {
+func generateEvent(t *testing.T, aggregateID string, checkPrevious bool, previousSeq uint64, opts ...func(*repository.Event)) *repository.Event {
 	t.Helper()
-	return &repository.Event{
+	e := &repository.Event{
 		AggregateID:           aggregateID,
 		AggregateType:         repository.AggregateType(t.Name()),
 		CheckPreviousSequence: checkPrevious,
@@ -1057,6 +1030,12 @@ func generateEvent(t *testing.T, aggregateID string, checkPrevious bool, previou
 		Type:                  "test.created",
 		Version:               "v1",
 	}
+
+	for _, opt := range opts {
+		opt(e)
+	}
+
+	return e
 }
 
 func generateEventWithData(t *testing.T, aggregateID string, checkPrevious bool, previousSeq uint64, data []byte) *repository.Event {

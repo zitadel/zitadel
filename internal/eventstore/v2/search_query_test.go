@@ -460,6 +460,16 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "column invalid",
+			args: args{
+				columns:        Columns(-1),
+				aggregateTypes: []AggregateType{"user"},
+			},
+			res: res{
+				isErr: errors.IsPreconditionFailed,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -469,7 +479,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			}
 			query, err := factory.build()
 			if tt.res.isErr != nil && !tt.res.isErr(err) {
-				t.Errorf("wrong error: %v", err)
+				t.Errorf("wrong error(%T): %v", err, err)
 				return
 			}
 			if err != nil && tt.res.isErr == nil {
@@ -478,7 +488,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			}
 
 			if !reflect.DeepEqual(query, tt.res.query) {
-				t.Errorf("NewSearchQueryFactory() = %v, want %v", factory, tt.res)
+				t.Errorf("NewSearchQueryFactory() = %+v, want %+v", factory, tt.res)
 			}
 		})
 	}

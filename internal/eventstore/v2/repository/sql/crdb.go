@@ -162,7 +162,7 @@ func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
 // Filter returns all events matching the given search query
 func (db *CRDB) Filter(ctx context.Context, searchQuery *repository.SearchQuery) (events []*repository.Event, err error) {
 	events = []*repository.Event{}
-	err = db.query(searchQuery, &events)
+	err = query(ctx, db, searchQuery, &events)
 	if err != nil {
 		return nil, err
 	}
@@ -173,34 +173,23 @@ func (db *CRDB) Filter(ctx context.Context, searchQuery *repository.SearchQuery)
 //LatestSequence returns the latests sequence found by the the search query
 func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *repository.SearchQuery) (uint64, error) {
 	var seq Sequence
-	err := db.query(searchQuery, &seq)
+	err := query(ctx, db, searchQuery, &seq)
 	if err != nil {
 		return 0, err
 	}
 	return uint64(seq), nil
 }
 
-func (db *CRDB) query(searchQuery *repository.SearchQuery, dest interface{}) error {
-	query, values, rowScanner := buildQuery(db, searchQuery)
-	if query == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
+func (db *CRDB) db() *sql.DB {
+	return db.client
+}
+
+func (db *CRDB) orderByEventSequence(desc bool) string {
+	if desc {
+		return " ORDER BY event_sequence DESC"
 	}
 
-	rows, err := db.client.Query(query, values...)
-	if err != nil {
-		logging.Log("SQL-HP3Uk").WithError(err).Info("query failed")
-		return caos_errs.ThrowInternal(err, "SQL-IJuyR", "unable to filter events")
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		err = rowScanner(rows.Scan, dest)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return " ORDER BY event_sequence"
 }
 
 func (db *CRDB) eventQuery() string {

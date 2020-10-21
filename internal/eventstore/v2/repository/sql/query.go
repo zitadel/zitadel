@@ -1,12 +1,14 @@
 package sql
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/caos/logging"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	z_errors "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/lib/pq"
@@ -19,24 +21,23 @@ type querier interface {
 	placeholder(query string) string
 	eventQuery() string
 	maxSequenceQuery() string
+	db() *sql.DB
+	orderByEventSequence(desc bool) string
 }
 
 type rowScan func(scan, interface{}) error
 type scan func(dest ...interface{}) error
 
-func buildQuery(criteria querier, searchQuery *repository.SearchQuery) (query string, values []interface{}, rowScanner rowScan) {
-	query, rowScanner = prepareColumns(criteria, searchQuery.Columns)
+func query(ctx context.Context, criteria querier, searchQuery *repository.SearchQuery, dest interface{}) error {
+	query, rowScanner := prepareColumns(criteria, searchQuery.Columns)
 	where, values := prepareCondition(criteria, searchQuery.Filters)
 	if where == "" || query == "" {
-		return "", nil, nil
+		return caos_errs.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
 	query += where
 
 	if searchQuery.Columns != repository.ColumnsMaxSequence {
-		query += " ORDER BY event_sequence"
-		if searchQuery.Desc {
-			query += " DESC"
-		}
+		query += criteria.orderByEventSequence(searchQuery.Desc)
 	}
 
 	if searchQuery.Limit > 0 {
@@ -46,7 +47,21 @@ func buildQuery(criteria querier, searchQuery *repository.SearchQuery) (query st
 
 	query = criteria.placeholder(query)
 
-	return query, values, rowScanner
+	rows, err := criteria.db().QueryContext(ctx, query, values...)
+	if err != nil {
+		logging.Log("SQL-HP3Uk").WithError(err).Info("query failed")
+		return caos_errs.ThrowInternal(err, "SQL-IJuyR", "unable to filter events")
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rowScanner(rows.Scan, dest)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func prepareColumns(criteria querier, columns repository.Columns) (string, func(s scan, dest interface{}) error) {
