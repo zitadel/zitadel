@@ -6,6 +6,7 @@ $headerFont: Lato;
 $inputHeight: 50px;
 $headerSize: 40px;
 $header2Size: 30px;
+$header3Size: 26px;
 $retina: "only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx)";
 
 @mixin retina-background-image($file, $type, $hover, $width, $height) {
@@ -27,13 +28,18 @@ $fontColor: #BBBBC8;
 $primaryColor: #3574C6;
 $primaryColorHover: lighten($primaryColor, 10%);
 $labelColor: #898989;
-$inputBorderColor: #505050;
+$inputBorderColor: #999999;
 $inputBackgroundColor: #252525;
 $buttonBackgroundColorHover: $inputBackgroundColor;
 $profileImgDark: "../../../images/icon-user-dark";
 $otherUserImgDark: "../../../images/icon-newuser-dark";
+$idpGoogleImg: "../../../images/idp/google";
+$idpGoogleFontColor: #FFFFFF;
+$idpGoogleBackgroundColor: #4285F4;
 $nokColor: #F20D6B;
 $okColor: #0DF279;
+$errorColor: red;
+
 
 
 // ----- LIGHT-THEME --------
@@ -45,3 +51,8 @@ $inputBackgroundColorLight: #FFFFFF;
 $buttonBackgroundColorHoverLight: $inputBackgroundColorLight;
 $profileImgLight: "../../../images/icon-user-light";
 $otherUserImgLight: "../../../images/icon-newuser-light";
+$idpGoogleImgLight: "../../../images/idp/google";
+$idpGoogleFontColorLight: #8b8d8d;
+$idpGoogleBackgroundColorLight: #FFFFFF;
+$nokColorLight: #F20D6B;
+$okColorLight: #50CA3D;

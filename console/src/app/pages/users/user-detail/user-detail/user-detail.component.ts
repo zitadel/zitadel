@@ -1,9 +1,11 @@
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
     Gender,
     MachineResponse,
@@ -29,8 +31,6 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     public languages: string[] = ['de', 'en'];
 
     private subscription: Subscription = new Subscription();
-    public emailEditState: boolean = false;
-    public phoneEditState: boolean = false;
 
     public ChangeType: any = ChangeType;
     public loading: boolean = false;
@@ -42,9 +42,9 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         public translate: TranslateService,
         private route: ActivatedRoute,
         private toast: ToastService,
-        private mgmtUserService: ManagementService,
+        public mgmtUserService: ManagementService,
         private _location: Location,
-        public mgmtService: ManagementService,
+        private dialog: MatDialog,
     ) { }
 
     public ngOnInit(): void {
@@ -125,7 +125,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         }
     }
 
-    public resendVerification(): void {
+    public resendEmailVerification(): void {
         this.mgmtUserService.ResendEmailVerification(this.user.id).then(() => {
             this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
         }).catch(error => {
@@ -134,6 +134,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     }
 
     public resendPhoneVerification(): void {
+        console.log('resend phone ver', this.user.id);
         this.mgmtUserService.ResendPhoneVerification(this.user.id).then(() => {
             this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
         }).catch(error => {
@@ -147,37 +148,32 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             if (this.user.human) {
                 this.user.human.phone = '';
             }
-            this.phoneEditState = false;
         }).catch(error => {
             this.toast.showError(error);
         });
     }
 
-    public saveEmail(): void {
-        this.emailEditState = false;
-        if (this.user && this.user.human?.phone) {
-            this.mgmtUserService
-                .SaveUserEmail(this.user.id, this.user.human.email).then((data: UserEmail) => {
-                    this.toast.showInfo('USER.TOAST.EMAILSENT', true);
-                    if (this.user.human) {
-                        this.user.human.email = data.toObject().email;
-                    }
-                }).catch(error => {
-                    this.toast.showError(error);
-                });
+    public saveEmail(email: string): void {
+        if (this.user.id && email) {
+            this.mgmtUserService.SaveUserEmail(this.user.id, email).then((data: UserEmail) => {
+                this.toast.showInfo('USER.TOAST.EMAILSENT', true);
+                if (this.user.human) {
+                    this.user.human.email = data.toObject().email;
+                }
+            }).catch(error => {
+                this.toast.showError(error);
+            });
         }
     }
 
-    public savePhone(): void {
-        this.phoneEditState = false;
-        if (this.user && this.user.human?.phone) {
+    public savePhone(phone: string): void {
+        if (this.user.id && phone) {
             this.mgmtUserService
-                .SaveUserPhone(this.user.id, this.user.human.phone).then((data: UserPhone) => {
+                .SaveUserPhone(this.user.id, phone).then((data: UserPhone) => {
                     this.toast.showInfo('USER.TOAST.PHONESAVED', true);
                     if (this.user.human) {
                         this.user.human.phone = data.toObject().phone;
                     }
-                    this.phoneEditState = false;
                 }).catch(error => {
                     this.toast.showError(error);
                 });
@@ -195,5 +191,28 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             }).catch(error => {
                 this.toast.showError(error);
             });
+    }
+
+    public deleteUser(): void {
+        const dialogRef = this.dialog.open(WarnDialogComponent, {
+            data: {
+                confirmKey: 'ACTIONS.DELETE',
+                cancelKey: 'ACTIONS.CANCEL',
+                titleKey: 'USER.DIALOG.DELETE_TITLE',
+                descriptionKey: 'USER.DIALOG.DELETE_DESCRIPTION',
+            },
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                this.mgmtUserService.DeleteUser(this.user.id).then(() => {
+                    this.navigateBack();
+                    this.toast.showInfo('USER.TOAST.DELETED', true);
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
+            }
+        });
     }
 }

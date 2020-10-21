@@ -10,18 +10,20 @@ type IDPConfigView struct {
 	AggregateID     string
 	IDPConfigID     string
 	Name            string
-	LogoSrc         []byte
+	StylingType     IDPStylingType
 	State           IDPConfigState
 	CreationDate    time.Time
 	ChangeDate      time.Time
 	Sequence        uint64
 	IDPProviderType IDPProviderType
 
-	IsOIDC           bool
-	OIDCClientID     string
-	OIDCClientSecret *crypto.CryptoValue
-	OIDCIssuer       string
-	OIDCScopes       []string
+	IsOIDC                    bool
+	OIDCClientID              string
+	OIDCClientSecret          *crypto.CryptoValue
+	OIDCIssuer                string
+	OIDCScopes                []string
+	OIDCIDPDisplayNameMapping OIDCMappingField
+	OIDCUsernameMapping       OIDCMappingField
 }
 
 type IDPConfigSearchRequest struct {

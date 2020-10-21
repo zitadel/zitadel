@@ -1,9 +1,8 @@
 package handler
 
 import (
-	"net/http"
-
 	auth_model "github.com/caos/zitadel/internal/auth/model"
+	"net/http"
 
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -16,13 +15,14 @@ const (
 )
 
 type registerOrgFormData struct {
-	OrgName   string `schema:"orgname"`
-	Email     string `schema:"email"`
-	Username  string `schema:"username"`
-	Firstname string `schema:"firstname"`
-	Lastname  string `schema:"lastname"`
-	Password  string `schema:"register-password"`
-	Password2 string `schema:"register-password-confirmation"`
+	OrgName      string `schema:"orgname"`
+	Email        string `schema:"email"`
+	Username     string `schema:"username"`
+	Firstname    string `schema:"firstname"`
+	Lastname     string `schema:"lastname"`
+	Password     string `schema:"register-password"`
+	Password2    string `schema:"register-password-confirmation"`
+	TermsConfirm bool   `schema:"terms-confirm"`
 }
 
 type registerOrgData struct {
@@ -91,7 +91,6 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 		baseData:            l.getBaseData(r, authRequest, "Register", errType, errMessage),
 		registerOrgFormData: *formData,
 	}
-
 	pwPolicy, description, _ := l.getPasswordComplexityPolicy(r, "0")
 	if pwPolicy != nil {
 		data.PasswordPolicyDescription = description
@@ -109,10 +108,10 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 			data.HasNumber = NumberRegex
 		}
 	}
-	orgPolicy, err := l.getOrgIamPolicy(r, "0")
+	orgPolicy, err := l.getDefaultOrgIamPolicy(r)
 	if orgPolicy != nil {
 		data.UserLoginMustBeDomain = orgPolicy.UserLoginMustBeDomain
-		data.IamDomain = orgPolicy.IamDomain
+		data.IamDomain = orgPolicy.IAMDomain
 	}
 
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplRegisterOrg], data, nil)

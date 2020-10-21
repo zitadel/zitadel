@@ -43,6 +43,7 @@ func mapRoleToPerm(requiredPerm, actualRole string, authConfig Config, requestPe
 			allPermissions = append(allPermissions, permWithCtx)
 		}
 
+		p, _ = SplitPermission(p)
 		if p == requiredPerm {
 			if !ExistsPerm(requestPermissions, permWithCtx) {
 				requestPermissions = append(requestPermissions, permWithCtx)

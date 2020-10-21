@@ -41,9 +41,11 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    border-top: 1px solid #ffffff30;
-    border-bottom: 1px solid #ffffff30;
     padding: .5rem 0;
+    max-height: 310px;
+    overflow-y: auto;
+    border-top: 1px solid rgba(#8795a1, .3);
+    border-bottom: 1px solid rgba(#8795a1, .3);
 
     .row {
       padding: .5rem;
@@ -84,7 +86,7 @@
         display: flex;
         flex-direction: column;
 
-        .title {
+        .user-title {
           font-weight: 500;
           font-size: .9rem;
           line-height: 1rem;
@@ -92,7 +94,7 @@
 
         .email,
         .loginname {
-          color: #8795a1;
+          color: var(--grey);
           font-size: .8rem;
           line-height: 1rem;
         }

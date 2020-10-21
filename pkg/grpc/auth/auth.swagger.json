@@ -341,6 +341,63 @@
         ]
       }
     },
+    "/users/me/externalidps/_search": {
+      "post": {
+        "summary": "ExternalIDP",
+        "operationId": "SearchMyExternalIDPs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ExternalIDPSearchResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ExternalIDPSearchRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/externalidps/{idp_config_id}/{external_user_id}": {
+      "delete": {
+        "operationId": "RemoveMyExternalIDP",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "idp_config_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "external_user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
     "/users/me/mfas": {
       "get": {
         "operationId": "GetMyMfas",
@@ -715,6 +772,78 @@
         "limit": {
           "type": "string",
           "format": "uint64"
+        }
+      }
+    },
+    "v1ExternalIDPSearchRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1ExternalIDPSearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ExternalIDPView"
+          }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1ExternalIDPView": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "idp_config_id": {
+          "type": "string"
+        },
+        "external_user_id": {
+          "type": "string"
+        },
+        "idp_name": {
+          "type": "string"
+        },
+        "external_user_display_name": {
+          "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

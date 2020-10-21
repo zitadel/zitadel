@@ -1,10 +1,21 @@
-.h1 {
-  margin-top: 0;
-}
-
-.sub {
-  color: #8795a1;
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
+
+  .h1 {
+    margin-top: 0;
+  }
+
+  .sub {
+    color: var(--grey);
+  }
+
+  .theme {
+    min-width: 250px;
+  }
 }
 
 .login-name-row {
@@ -42,63 +53,6 @@
   }
 }
 
-.method-col {
-  display: flex;
-  flex-direction: column;
-  margin: -.5rem;
-
-  .method-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    padding: .5rem;
-    border-bottom: 1px solid #ffffff20;
-    flex-wrap: wrap;
-
-    .label,
-    .name {
-      margin-right: 1rem;
-    }
-
-    .actions {
-      flex: 1;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-    }
-
-    .label {
-      flex: 1;
-      font-size: .9rem;
-      color: #8795a1;
-    }
-
-    .icon {
-      margin-right: .5rem;
-    }
-
-    .submit-button {
-      border-radius: .5rem;
-    }
-
-    .verify {
-      text-decoration: none;
-      font-size: .8rem;
-      color: #8795a1;
-      border-radius: .5rem;
-      cursor: pointer;
-      word-wrap: none;
-      white-space: nowrap;
-      margin-right: 1rem;
-
-      &:hover {
-        color: white;
-        text-decoration: underline;
-      }
-    }
-  }
-}
-
 .col {
   display: flex;
   flex-wrap: wrap;
@@ -108,14 +62,6 @@
   .app-card {
     flex: 1;
     margin: .5rem;
-  }
-
-  .theme-card {
-    max-width: 300px;
-
-    @media only screen and (max-width: 450px) {
-      max-width: none;
-    }
   }
 }
 

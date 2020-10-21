@@ -7,20 +7,20 @@ import (
 )
 
 type UserGrantView struct {
-	ID            string
-	ResourceOwner string
-	UserID        string
-	ProjectID     string
-	GrantID       string
-	UserName      string
-	FirstName     string
-	LastName      string
-	DisplayName   string
-	Email         string
-	ProjectName   string
-	OrgName       string
-	OrgDomain     string
-	RoleKeys      []string
+	ID               string
+	ResourceOwner    string
+	UserID           string
+	ProjectID        string
+	GrantID          string
+	UserName         string
+	FirstName        string
+	LastName         string
+	DisplayName      string
+	Email            string
+	ProjectName      string
+	OrgName          string
+	OrgPrimaryDomain string
+	RoleKeys         []string
 
 	CreationDate time.Time
 	ChangeDate   time.Time
@@ -48,6 +48,7 @@ const (
 	UserGrantSearchKeyGrantID
 	UserGrantSearchKeyOrgName
 	UserGrantSearchKeyRoleKey
+	UserGrantSearchKeyID
 )
 
 type UserGrantSearchQuery struct {

@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"time"
 
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -169,7 +170,7 @@ func (u *UserView) GenerateLoginName(domain string, appendDomain bool) string {
 	return u.UserName + "@" + domain
 }
 
-func (u *UserView) SetLoginNames(policy *org_model.OrgIAMPolicy, domains []*org_model.OrgDomain) {
+func (u *UserView) SetLoginNames(policy *iam_model.OrgIAMPolicy, domains []*org_model.OrgDomain) {
 	loginNames := make([]string, 0)
 	for _, d := range domains {
 		if d.Verified {
@@ -206,6 +207,8 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 			return err
 		}
 		err = u.setPasswordData(event)
+	case es_model.UserRemoved:
+		u.State = int32(model.UserStateDeleted)
 	case es_model.UserPasswordChanged,
 		es_model.HumanPasswordChanged:
 		err = u.setPasswordData(event)
@@ -257,7 +260,7 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		es_model.HumanMFAOTPRemoved:
 		u.OTPState = int32(model.MfaStateUnspecified)
 	case es_model.MFAInitSkipped,
-		es_model.HumanMfaInitSkipped:
+		es_model.HumanMFAInitSkipped:
 		u.MfaInitSkipped = event.CreationDate
 	case es_model.InitializedUserCodeAdded,
 		es_model.InitializedHumanCodeAdded:
@@ -296,7 +299,7 @@ func (u *UserView) setPasswordData(event *models.Event) error {
 }
 
 func (u *UserView) ComputeObject() {
-	if u.MachineView != nil {
+	if !u.MachineView.IsZero() {
 		if u.State == int32(model.UserStateUnspecified) {
 			u.State = int32(model.UserStateActive)
 		}

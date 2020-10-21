@@ -4,13 +4,12 @@
 
   button {
     margin: 1rem .5rem;
-    border-radius: .5rem;
     display: block;
   }
 }
 
 .desc {
-  color: #8795a1;
+  color: var(--grey);
   font-size: .9rem;
 
   &.warn {
@@ -33,9 +32,5 @@
 
   .ok-button {
     margin-left: .5rem;
-  }
-
-  button {
-    border-radius: .5rem;
   }
 }

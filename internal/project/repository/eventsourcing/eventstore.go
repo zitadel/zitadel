@@ -23,7 +23,8 @@ import (
 )
 
 const (
-	projectOwnerRole = "PROJECT_OWNER"
+	projectOwnerRole       = "PROJECT_OWNER"
+	projectOwnerGlobalRole = "PROJECT_OWNER_GLOBAL"
 )
 
 type ProjectEventstore struct {
@@ -66,6 +67,9 @@ func (es *ProjectEventstore) ProjectByID(ctx context.Context, id string) (*proj_
 	if err != nil && !(caos_errs.IsNotFound(err) && project.Sequence != 0) {
 		return nil, err
 	}
+	if project.State == int32(proj_model.ProjectStateRemoved) {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-dG8ie", "Errors.Project.NotFound")
+	}
 	es.projectCache.cacheProject(project)
 	return model.ProjectToModel(project), nil
 }
@@ -78,7 +82,7 @@ func (es *ProjectEventstore) ProjectEventsByID(ctx context.Context, id string, s
 	return es.FilterEvents(ctx, query)
 }
 
-func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
+func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_model.Project, global bool) (*proj_model.Project, error) {
 	if !project.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-IOVCC", "Errors.Project.Invalid")
 	}
@@ -89,9 +93,13 @@ func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_mo
 	project.AggregateID = id
 	project.State = proj_model.ProjectStateActive
 	repoProject := model.ProjectFromModel(project)
+	projectRole := projectOwnerRole
+	if global {
+		projectRole = projectOwnerGlobalRole
+	}
 	member := &model.ProjectMember{
 		UserID: authz.GetCtxData(ctx).UserID,
-		Roles:  []string{projectOwnerRole},
+		Roles:  []string{projectRole},
 	}
 
 	createAggregate := ProjectCreateAggregate(es.AggregateCreator(), repoProject, member)
@@ -313,7 +321,7 @@ func (es *ProjectEventstore) AddProjectRoles(ctx context.Context, roles ...*proj
 	}
 	for _, role := range roles {
 		if !role.IsValid() {
-			return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-idue3", "Errors.Project.MemberInvalid")
+			return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-iduG4", "Errors.Project.RoleInvalid")
 		}
 	}
 	existingProject, err := es.ProjectByID(ctx, roles[0].AggregateID)
@@ -834,14 +842,14 @@ func (es *ProjectEventstore) AddProjectGrant(ctx context.Context, grant *proj_mo
 	if grant == nil || !grant.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-37dhs", "Errors.Project.GrantInvalid")
 	}
-	existingProject, err := es.ProjectByID(ctx, grant.AggregateID)
+	project, err := es.ProjectByID(ctx, grant.AggregateID)
 	if err != nil {
 		return nil, err
 	}
-	if existingProject.ContainsGrantForOrg(grant.GrantedOrgID) {
+	if project.ContainsGrantForOrg(grant.GrantedOrgID) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-7ug4g", "Errors.Project.GrantAlreadyExists")
 	}
-	if !existingProject.ContainsRoles(grant.RoleKeys) {
+	if !project.ContainsRoles(grant.RoleKeys) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83d", "Errors.Project.GrantHasNotExistingRole")
 	}
 	id, err := es.idGenerator.Next()
@@ -850,7 +858,7 @@ func (es *ProjectEventstore) AddProjectGrant(ctx context.Context, grant *proj_mo
 	}
 	grant.GrantID = id
 
-	repoProject := model.ProjectFromModel(existingProject)
+	repoProject := model.ProjectFromModel(project)
 	repoGrant := model.GrantFromModel(grant)
 
 	addAggregate := ProjectGrantAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoGrant)

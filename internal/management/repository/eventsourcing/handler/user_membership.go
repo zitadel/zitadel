@@ -7,6 +7,7 @@ import (
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 
 	"github.com/caos/logging"
 
@@ -38,7 +39,7 @@ func (m *UserMembership) EventQuery() (*models.SearchQuery, error) {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(iam_es_model.IAMAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate).
+		AggregateTypeFilter(iam_es_model.IAMAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate, model.UserAggregate).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
@@ -50,6 +51,8 @@ func (m *UserMembership) Reduce(event *models.Event) (err error) {
 		err = m.processOrg(event)
 	case proj_es_model.ProjectAggregate:
 		err = m.processProject(event)
+	case model.UserAggregate:
+		err = m.processUser(event)
 	}
 	return err
 }
@@ -102,7 +105,7 @@ func (m *UserMembership) processOrg(event *models.Event) (err error) {
 	case org_es_model.OrgMemberRemoved:
 		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeOrganisation, event.Sequence)
 	case org_es_model.OrgChanged:
-		err = m.updateOrgDisplayName(event)
+		return m.updateOrgDisplayName(event)
 	default:
 		return m.view.ProcessedUserMembershipSequence(event.Sequence)
 	}
@@ -163,7 +166,11 @@ func (m *UserMembership) processProject(event *models.Event) (err error) {
 	case proj_es_model.ProjectGrantMemberRemoved:
 		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, member.ObjectID, usr_model.MemberTypeProjectGrant, event.Sequence)
 	case proj_es_model.ProjectChanged:
-		err = m.updateProjectDisplayName(event)
+		return m.updateProjectDisplayName(event)
+	case proj_es_model.ProjectRemoved:
+		return m.view.DeleteUserMembershipsByAggregateID(event.AggregateID, event.Sequence)
+	case proj_es_model.ProjectGrantRemoved:
+		return m.view.DeleteUserMembershipsByAggregateIDAndObjectID(event.AggregateID, member.ObjectID, event.Sequence)
 	default:
 		return m.view.ProcessedUserMembershipSequence(event.Sequence)
 	}
@@ -198,7 +205,16 @@ func (m *UserMembership) updateProjectDisplayName(event *models.Event) error {
 	return m.view.BulkPutUserMemberships(memberships, event.Sequence)
 }
 
+func (m *UserMembership) processUser(event *models.Event) (err error) {
+	switch event.Type {
+	case model.UserRemoved:
+		return m.view.DeleteUserMembershipsByUserID(event.AggregateID, event.Sequence)
+	default:
+		return m.view.ProcessedUserMembershipSequence(event.Sequence)
+	}
+}
+
 func (m *UserMembership) OnError(event *models.Event, err error) error {
-	logging.LogWithFields("SPOOL-Ms3fj", "id", event.AggregateID).WithError(err).Warn("something went wrong in orgmember handler")
+	logging.LogWithFields("SPOOL-Fwer2", "id", event.AggregateID).WithError(err).Warn("something went wrong in user membership handler")
 	return spooler.HandleError(event, err, m.view.GetLatestUserMembershipFailedEvent, m.view.ProcessedUserMembershipFailedEvent, m.view.ProcessedUserMembershipSequence, m.errorCountUntilSkip)
 }

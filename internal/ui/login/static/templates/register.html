@@ -1,7 +1,10 @@
 {{template "main-top" .}}
 
-<h1>{{t "Registration.Title"}}</h1>
-<p>{{t "Registration.Description"}}</p>
+<div class="head">
+    <h1>{{t "Registration.Title"}}</h1>
+    <p>{{t "Registration.Description"}}</p>
+</div>
+
 
 <form action="{{ registrationUrl }}" method="POST">
 
@@ -56,14 +59,24 @@
             <label class="label" for="register-password-confirmation">{{t "Registration.Password2"}}</label>
             <input class="input" type="password" id="register-password-confirmation" name="register-password-confirmation" autocomplete="new-password" required>
         </div>
+        <div class="field">
+            <label class="label" for="register-term-confirmation">{{t "Registration.Tos"}}</label>
+            <div class="field check-box">
+                <input class="input" type="checkbox" id="register-term-confirmation" name="register-term-confirmation" required>
+                <label for="register-term-confirmation">
+                    {{t "Registration.TosConfirm"}}
+                    <a class="tos-link" target="_blank" href="{{t "Registration.TosLink"}}">{{t "Registration.TosLinkText"}}</a>
+                </label>
+            </div>
+        </div>
     </div>
 
     {{template "error-message" .}}
 
     <div class="actions">
         <button class="primary right" id="register-button" type="submit">{{t "Actions.Next"}}</button>
-        <a href="{{ loginNameChangeUrl .AuthReqID }}">
-            <button class="secondary" type="button">{{t "Actions.Back"}}</button>
+        <a class="button secondary" href="{{ loginNameChangeUrl .AuthReqID }}">
+            {{t "Actions.Back"}}
         </a>
     </div>
 </form>

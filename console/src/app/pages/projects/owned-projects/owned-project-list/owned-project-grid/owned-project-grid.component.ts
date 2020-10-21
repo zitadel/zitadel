@@ -1,11 +1,14 @@
 import { animate, animateChild, keyframes, query, stagger, style, transition, trigger } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Org } from 'src/app/proto/generated/auth_pb';
 import { ProjectState, ProjectType, ProjectView } from 'src/app/proto/generated/management_pb';
-import { AuthenticationService } from 'src/app/services/authentication.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageKey, StorageService } from 'src/app/services/storage.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
     selector: 'app-owned-project-grid',
@@ -48,8 +51,14 @@ export class OwnedProjectGridComponent implements OnChanges {
     public showNewProject: boolean = false;
     public ProjectState: any = ProjectState;
     public ProjectType: any = ProjectType;
-
-    constructor(private router: Router, private authService: AuthenticationService, private storage: StorageService) {
+    @Input() public zitadelProjectId: string = '';
+    constructor(
+        private router: Router,
+        private dialog: MatDialog,
+        private storage: StorageService,
+        private mgmtService: ManagementService,
+        private toast: ToastService,
+    ) {
         this.selection.changed.subscribe(selection => {
             this.setPrefixedItem('pinned-projects', JSON.stringify(
                 this.selection.selected.map(item => item.projectId),
@@ -122,5 +131,31 @@ export class OwnedProjectGridComponent implements OnChanges {
 
     public closeGridView(): void {
         this.changedView.emit(true);
+    }
+
+    public deleteProject(item: ProjectView.AsObject): void {
+        const dialogRef = this.dialog.open(WarnDialogComponent, {
+            data: {
+                confirmKey: 'ACTIONS.DELETE',
+                cancelKey: 'ACTIONS.CANCEL',
+                titleKey: 'PROJECT.PAGES.DIALOG.DELETE.TITLE',
+                descriptionKey: 'PROJECT.PAGES.DIALOG.DELETE.DESCRIPTION',
+            },
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp && item.projectId !== this.zitadelProjectId) {
+                this.mgmtService.RemoveProject(item.projectId).then(() => {
+                    this.toast.showInfo('PROJECT.TOAST.DELETED', true);
+                    const index = this.items.findIndex(iter => iter.projectId === item.projectId);
+                    if (index > -1) {
+                        this.items.splice(index, 1);
+                    }
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
+            }
+        });
     }
 }

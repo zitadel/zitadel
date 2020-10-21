@@ -1,10 +1,7 @@
-import { SelectionModel } from '@angular/cdk/collections';
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { Component, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
+import { PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
-import { MatTable } from '@angular/material/table';
-import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { IamMember, IamMemberView } from 'src/app/proto/generated/admin_pb';
 import { ProjectMember, ProjectType, UserView } from 'src/app/proto/generated/management_pb';
@@ -18,17 +15,15 @@ import { IamMembersDataSource } from './iam-members-datasource';
     templateUrl: './iam-members.component.html',
     styleUrls: ['./iam-members.component.scss'],
 })
-export class IamMembersComponent implements AfterViewInit {
+export class IamMembersComponent {
+    public INITIALPAGESIZE: number = 25;
     public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
-    public disabled: boolean = false;
-    @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    @ViewChild(MatTable) public table!: MatTable<IamMemberView.AsObject>;
     public dataSource!: IamMembersDataSource;
-    public selection: SelectionModel<IamMemberView.AsObject> = new SelectionModel<IamMemberView.AsObject>(true, []);
 
     public memberRoleOptions: string[] = [];
-    /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-    public displayedColumns: string[] = ['select', 'firstname', 'lastname', 'username', 'email', 'roles'];
+    public changePageFactory!: Function;
+    public changePage: EventEmitter<void> = new EventEmitter();
+    public selection: Array<IamMemberView.AsObject> = [];
 
     constructor(private adminService: AdminService,
         private dialog: MatDialog,
@@ -37,21 +32,13 @@ export class IamMembersComponent implements AfterViewInit {
         this.dataSource = new IamMembersDataSource(this.adminService);
         this.dataSource.loadMembers(0, 25);
         this.getRoleOptions();
-    }
 
-    public ngAfterViewInit(): void {
-        this.paginator.page
-            .pipe(
-                tap(() => this.loadMembersPage()),
-            )
-            .subscribe();
-    }
-
-    private loadMembersPage(): void {
-        this.dataSource.loadMembers(
-            this.paginator.pageIndex,
-            this.paginator.pageSize,
-        );
+        this.changePageFactory = (event?: PageEvent) => {
+            return this.dataSource.loadMembers(
+                event?.pageIndex ?? 0,
+                event?.pageSize ?? this.INITIALPAGESIZE,
+            );
+        };
     }
 
     public getRoleOptions(): void {
@@ -71,11 +58,12 @@ export class IamMembersComponent implements AfterViewInit {
             });
     }
 
-
-    public removeProjectMemberSelection(): void {
-        Promise.all(this.selection.selected.map(member => {
+    public removeMemberSelection(): void {
+        console.log(this.selection);
+        Promise.all(this.selection.map(member => {
             return this.adminService.RemoveIamMember(member.userId).then(() => {
                 this.toast.showInfo('IAM.TOAST.MEMBERREMOVED', true);
+                this.changePage.emit();
             }).catch(error => {
                 this.toast.showError(error);
             });
@@ -85,21 +73,12 @@ export class IamMembersComponent implements AfterViewInit {
     public removeMember(member: ProjectMember.AsObject): void {
         this.adminService.RemoveIamMember(member.userId).then(() => {
             this.toast.showInfo('IAM.TOAST.MEMBERREMOVED', true);
+            setTimeout(() => {
+                this.changePage.emit();
+            }, 1000);
         }).catch(error => {
             this.toast.showError(error);
         });
-    }
-
-    public isAllSelected(): boolean {
-        const numSelected = this.selection.selected.length;
-        const numRows = this.dataSource.membersSubject.value.length;
-        return numSelected === numRows;
-    }
-
-    public masterToggle(): void {
-        this.isAllSelected() ?
-            this.selection.clear() :
-            this.dataSource.membersSubject.value.forEach(row => this.selection.select(row));
     }
 
     public openAddMember(): void {
@@ -120,16 +99,14 @@ export class IamMembersComponent implements AfterViewInit {
                         return this.adminService.AddIamMember(user.id, roles);
                     })).then(() => {
                         this.toast.showInfo('IAM.TOAST.MEMBERADDED', true);
+                        setTimeout(() => {
+                            this.changePage.emit();
+                        }, 1000);
                     }).catch(error => {
                         this.toast.showError(error);
                     });
                 }
             }
         });
-    }
-
-    public refreshPage(): void {
-        this.selection.clear();
-        this.dataSource.loadMembers(this.paginator.pageIndex, this.paginator.pageSize);
     }
 }

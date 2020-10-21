@@ -458,6 +458,30 @@ func GetMockManipulateUserWithOTP(ctrl *gomock.Controller, decrypt, verified boo
 	return es
 }
 
+func GetMockManipulateUserWithExternalIDP(ctrl *gomock.Controller) *UserEventstore {
+	user := model.Human{
+		Profile: &model.Profile{
+			DisplayName: "DisplayName",
+		},
+	}
+	externalIDP := model.ExternalIDP{
+		IDPConfigID: "IDPConfigID",
+		UserID:      "UserID",
+		DisplayName: "DisplayName",
+	}
+	dataUser, _ := json.Marshal(user)
+	dataIDP, _ := json.Marshal(externalIDP)
+	events := []*es_models.Event{
+		{AggregateID: "AggregateID", AggregateVersion: "v1", Sequence: 1, Type: model.UserAdded, Data: dataUser, ResourceOwner: "ResourceOwner"},
+		{AggregateID: "AggregateID", AggregateVersion: "v1", Sequence: 1, Type: model.HumanExternalIDPAdded, Data: dataIDP, ResourceOwner: "ResourceOwner"},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
 func GetMockManipulateUserNoEvents(ctrl *gomock.Controller) *UserEventstore {
 	events := []*es_models.Event{}
 	mockEs := mock.NewMockEventstore(ctrl)

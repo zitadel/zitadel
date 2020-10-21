@@ -5,13 +5,13 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_events "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -71,7 +71,7 @@ func (u *UserGrant) Reduce(event *models.Event) (err error) {
 	case proj_es_model.ProjectAggregate:
 		err = u.processProject(event)
 	case iam_es_model.IAMAggregate:
-		err = u.processIamMember(event, "IAM", false)
+		err = u.processIAMMember(event, "IAM", false)
 	case org_es_model.OrgAggregate:
 		return u.processOrg(event)
 	}
@@ -132,7 +132,6 @@ func (u *UserGrant) processUser(event *models.Event) (err error) {
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
 	}
-	return nil
 }
 
 func (u *UserGrant) processProject(event *models.Event) (err error) {
@@ -161,7 +160,6 @@ func (u *UserGrant) processProject(event *models.Event) (err error) {
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
 	}
-	return nil
 }
 
 func (u *UserGrant) processOrg(event *models.Event) (err error) {
@@ -175,7 +173,7 @@ func (u *UserGrant) processOrg(event *models.Event) (err error) {
 	}
 }
 
-func (u *UserGrant) processIamMember(event *models.Event, rolePrefix string, suffix bool) error {
+func (u *UserGrant) processIAMMember(event *models.Event, rolePrefix string, suffix bool) error {
 	member := new(iam_es_model.IAMMember)
 
 	switch event.Type {
@@ -260,10 +258,20 @@ func (u *UserGrant) processMember(event *models.Event, rolePrefix, roleSuffix st
 		proj_es_model.ProjectGrantMemberRemoved:
 
 		grant, err := u.view.UserGrantByIDs(event.ResourceOwner, u.iamProjectID, userID)
-		if err != nil {
+		if err != nil && !errors.IsNotFound(err) {
 			return err
 		}
-		return u.view.DeleteUserGrant(grant.ID, event.Sequence)
+		if errors.IsNotFound(err) {
+			return u.view.ProcessedUserGrantSequence(event.Sequence)
+		}
+		if roleSuffix != "" {
+			roleKeys = suffixRoles(roleSuffix, roleKeys)
+		}
+		if grant.RoleKeys == nil {
+			return u.view.ProcessedUserGrantSequence(event.Sequence)
+		}
+		grant.RoleKeys = mergeExistingRoles(rolePrefix, roleSuffix, grant.RoleKeys, nil)
+		return u.view.PutUserGrant(grant, event.Sequence)
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
 	}
@@ -299,7 +307,8 @@ func (u *UserGrant) setIamProjectID() error {
 	if err != nil {
 		return err
 	}
-	if !iam.SetUpDone {
+
+	if iam.SetUpDone < iam_model.StepCount-1 {
 		return caos_errs.ThrowPreconditionFailed(nil, "HANDL-s5DTs", "Setup not done")
 	}
 	u.iamProjectID = iam.IAMProjectID
@@ -345,6 +354,12 @@ func (u *UserGrant) fillProjectData(grant *view_model.UserGrantView, project *pr
 
 func (u *UserGrant) fillOrgData(grant *view_model.UserGrantView, org *org_model.Org) {
 	grant.OrgName = org.Name
+	for _, domain := range org.Domains {
+		if domain.Primary {
+			grant.OrgPrimaryDomain = domain.Domain
+			break
+		}
+	}
 }
 
 func (u *UserGrant) OnError(event *models.Event, err error) error {

@@ -48,9 +48,10 @@
     border-radius: .5rem;
     box-sizing: border-box;
     min-height: 166px;
+    transition: box-shadow .1s ease-in;
 
     &.inactive {
-      color: #8795a1;
+      color: var(--grey);
     }
 
     img {
@@ -70,7 +71,7 @@
         font-size: .8rem;
         margin-bottom: 0;
         margin-top: .5rem;
-        color: #8795a1;
+        color: var(--grey);
       }
 
       .name {
@@ -85,7 +86,7 @@
 
       .created {
         font-size: .8rem;
-        color: #8795a1;
+        color: var(--grey);
       }
 
       .organization {
@@ -111,6 +112,20 @@
       }
     }
 
+    .delete-button {
+      opacity: 0;
+      user-select: none;
+      position: absolute;
+      bottom: 0;
+      right: 30px;
+      margin: 0;
+      margin-bottom: .25rem;
+
+      &:not(:hover) {
+        color: #8795a1;
+      }
+    }
+
     .edit-button {
       opacity: 0;
       user-select: none;
@@ -119,7 +134,7 @@
       right: 0;
       margin: 0;
       margin-bottom: .25rem;
-      color: #8795a1;
+      color: var(--grey);
 
       &.selected {
         opacity: 1;
@@ -127,24 +142,16 @@
     }
 
     &:hover {
+      box-shadow: 0 5px 10px rgba(0, 0, 0, .12);
+
+      .delete-button,
       .edit-button {
         opacity: 1;
-      }
-
-      .text-part {
-        .icons {
-          opacity: 1;
-        }
       }
     }
 
     &.selected {
-      .text-part {
-        .icons {
-          opacity: 1;
-        }
-      }
-
+      .delete-button,
       .edit-button {
         opacity: 1;
       }
@@ -171,6 +178,7 @@
     border-radius: .5rem;
     margin: 1rem;
     box-sizing: border-box;
+    transition: box-shadow .1s ease-in;
 
     .icon {
       display: flex;
@@ -183,7 +191,7 @@
     }
 
     &:hover {
-      background-color: #ffffff25;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, .12);
 
       .icon,
       span {
@@ -202,6 +210,6 @@
 .n-items {
   padding: 0 1rem;
   font-size: .8rem;
-  color: #8795a1;
+  color: var(--grey);
   flex-basis: 100%;
 }

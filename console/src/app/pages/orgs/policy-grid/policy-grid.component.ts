@@ -1,15 +1,13 @@
 import { Component } from '@angular/core';
+import { PolicyComponentType } from 'src/app/modules/policies/policy-component-types.enum';
 import {
-    OrgIamPolicy,
-    PasswordAgePolicy,
-    PasswordComplexityPolicy,
-    PasswordLockoutPolicy,
+    LoginPolicyView,
+    OrgIamPolicyView,
+    PasswordComplexityPolicyView,
     PolicyState,
 } from 'src/app/proto/generated/management_pb';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-
-import { PolicyComponentType } from '../password-policy/password-policy.component';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
     selector: 'app-policy-grid',
@@ -17,23 +15,27 @@ import { PolicyComponentType } from '../password-policy/password-policy.componen
     styleUrls: ['./policy-grid.component.scss'],
 })
 export class PolicyGridComponent {
-    public lockoutPolicy!: PasswordLockoutPolicy.AsObject;
-    public agePolicy!: PasswordAgePolicy.AsObject;
-    public complexityPolicy!: PasswordComplexityPolicy.AsObject;
-    public iamPolicy!: OrgIamPolicy.AsObject;
+    public complexityPolicy!: PasswordComplexityPolicyView.AsObject;
+    public iamPolicy!: OrgIamPolicyView.AsObject;
+    public loginPolicy!: LoginPolicyView.AsObject;
 
     public PolicyState: any = PolicyState;
     public PolicyComponentType: any = PolicyComponentType;
 
     constructor(
-        private mgmtService: ManagementService,
-        public authUserService: GrpcAuthService,
+        public mgmtService: ManagementService,
+        private toast: ToastService,
     ) {
         this.getData();
     }
 
     private getData(): void {
-        this.mgmtService.GetPasswordComplexityPolicy().then(data => this.complexityPolicy = data.toObject());
+        this.mgmtService.GetPasswordComplexityPolicy().then(data => this.complexityPolicy = data.toObject()).catch(error => {
+            this.toast.showError(error);
+        });
         this.mgmtService.GetMyOrgIamPolicy().then(data => this.iamPolicy = data.toObject());
+        this.mgmtService.GetLoginPolicy().then(data => {
+            this.loginPolicy = data.toObject();
+        });
     }
 }

@@ -4,8 +4,9 @@ import "github.com/caos/zitadel/internal/eventstore/models"
 
 //aggregates
 const (
-	UserAggregate         models.AggregateType = "user"
-	UserUserNameAggregate models.AggregateType = "user.username"
+	UserAggregate            models.AggregateType = "user"
+	UserUserNameAggregate    models.AggregateType = "user.username"
+	UserExternalIDPAggregate models.AggregateType = "user.human.externalidp"
 )
 
 // the following consts are for user v1 events
@@ -46,8 +47,8 @@ const (
 	MFAOTPAdded          models.EventType = "user.mfa.otp.added"
 	MFAOTPVerified       models.EventType = "user.mfa.otp.verified"
 	MFAOTPRemoved        models.EventType = "user.mfa.otp.removed"
-	MfaOtpCheckSucceeded models.EventType = "user.mfa.otp.check.succeeded"
-	MfaOtpCheckFailed    models.EventType = "user.mfa.otp.check.failed"
+	MFAOTPCheckSucceeded models.EventType = "user.mfa.otp.check.succeeded"
+	MFAOTPCheckFailed    models.EventType = "user.mfa.otp.check.failed"
 	MFAInitSkipped       models.EventType = "user.mfa.init.skipped"
 
 	SignedOut models.EventType = "user.signed.out"
@@ -66,6 +67,8 @@ const (
 	UserDeactivated models.EventType = "user.deactivated"
 	UserReactivated models.EventType = "user.reactivated"
 	UserRemoved     models.EventType = "user.removed"
+
+	UserTokenAdded models.EventType = "user.token.added"
 )
 
 // the following consts are for user(v2).human
@@ -82,6 +85,15 @@ const (
 	HumanPasswordCodeSent       models.EventType = "user.human.password.code.sent"
 	HumanPasswordCheckSucceeded models.EventType = "user.human.password.check.succeeded"
 	HumanPasswordCheckFailed    models.EventType = "user.human.password.check.failed"
+
+	HumanExternalLoginCheckSucceeded models.EventType = "user.human.externallogin.check.succeeded"
+
+	HumanExternalIDPReserved models.EventType = "user.human.externalidp.reserved"
+	HumanExternalIDPReleased models.EventType = "user.human.externalidp.released"
+
+	HumanExternalIDPAdded          models.EventType = "user.human.externalidp.added"
+	HumanExternalIDPRemoved        models.EventType = "user.human.externalidp.removed"
+	HumanExternalIDPCascadeRemoved models.EventType = "user.human.externalidp.cascade.removed"
 
 	HumanEmailChanged            models.EventType = "user.human.email.changed"
 	HumanEmailVerified           models.EventType = "user.human.email.verified"
@@ -102,9 +114,9 @@ const (
 	HumanMFAOTPAdded          models.EventType = "user.human.mfa.otp.added"
 	HumanMFAOTPVerified       models.EventType = "user.human.mfa.otp.verified"
 	HumanMFAOTPRemoved        models.EventType = "user.human.mfa.otp.removed"
-	HumanMfaOtpCheckSucceeded models.EventType = "user.human.mfa.otp.check.succeeded"
-	HumanMfaOtpCheckFailed    models.EventType = "user.human.mfa.otp.check.failed"
-	HumanMfaInitSkipped       models.EventType = "user.human.mfa.init.skipped"
+	HumanMFAOTPCheckSucceeded models.EventType = "user.human.mfa.otp.check.succeeded"
+	HumanMFAOTPCheckFailed    models.EventType = "user.human.mfa.otp.check.failed"
+	HumanMFAInitSkipped       models.EventType = "user.human.mfa.init.skipped"
 
 	HumanSignedOut models.EventType = "user.human.signed.out"
 )

@@ -10,7 +10,9 @@ type IDPProviderView struct {
 	IDPConfigID     string
 	IDPProviderType IDPProviderType
 	Name            string
+	StylingType     IDPStylingType
 	IDPConfigType   IdpConfigType
+	IDPState        IDPConfigState
 
 	CreationDate time.Time
 	ChangeDate   time.Time
@@ -31,6 +33,7 @@ const (
 	IDPProviderSearchKeyUnspecified IDPProviderSearchKey = iota
 	IDPProviderSearchKeyAggregateID
 	IDPProviderSearchKeyIdpConfigID
+	IDPProviderSearchKeyState
 )
 
 type IDPProviderSearchQuery struct {

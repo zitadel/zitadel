@@ -2,6 +2,8 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 
 	"github.com/caos/logging"
 
@@ -13,7 +15,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/sdk"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -21,31 +22,48 @@ import (
 )
 
 type UserRepo struct {
-	Eventstore   eventstore.Eventstore
-	UserEvents   *user_event.UserEventstore
-	OrgEvents    *org_event.OrgEventstore
-	PolicyEvents *policy_event.PolicyEventstore
-	View         *view.View
+	SearchLimit    uint64
+	Eventstore     eventstore.Eventstore
+	UserEvents     *user_event.UserEventstore
+	OrgEvents      *org_event.OrgEventstore
+	View           *view.View
+	SystemDefaults systemdefaults.SystemDefaults
 }
 
 func (repo *UserRepo) Health(ctx context.Context) error {
 	return repo.UserEvents.Health(ctx)
 }
 
-func (repo *UserRepo) Register(ctx context.Context, registerUser *model.User, orgMember *org_model.OrgMember, resourceOwner string) (*model.User, error) {
+func (repo *UserRepo) Register(ctx context.Context, user *model.User, orgMember *org_model.OrgMember, resourceOwner string) (*model.User, error) {
+	return repo.registerUser(ctx, user, nil, orgMember, resourceOwner)
+}
+
+func (repo *UserRepo) RegisterExternalUser(ctx context.Context, user *model.User, externalIDP *model.ExternalIDP, orgMember *org_model.OrgMember, resourceOwner string) (*model.User, error) {
+	return repo.registerUser(ctx, user, externalIDP, orgMember, resourceOwner)
+}
+
+func (repo *UserRepo) registerUser(ctx context.Context, registerUser *model.User, externalIDP *model.ExternalIDP, orgMember *org_model.OrgMember, resourceOwner string) (*model.User, error) {
 	policyResourceOwner := authz.GetCtxData(ctx).OrgID
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner
 	}
-	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
+	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(policyResourceOwner)
+	if errors.IsNotFound(err) {
+		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+	}
 	if err != nil {
 		return nil, err
 	}
-	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, policyResourceOwner)
+	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(pwPolicy)
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(policyResourceOwner)
+	if errors.IsNotFound(err) {
+		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+	}
 	if err != nil {
 		return nil, err
 	}
-	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, pwPolicy, orgPolicy, resourceOwner)
+	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
+	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, externalIDP, pwPolicyView, orgPolicyView, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -85,6 +103,42 @@ func (repo *UserRepo) ChangeMyProfile(ctx context.Context, profile *model.Profil
 		return nil, err
 	}
 	return repo.UserEvents.ChangeProfile(ctx, profile)
+}
+
+func (repo *UserRepo) SearchMyExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	sequence, seqErr := repo.View.GetLatestExternalIDPSequence()
+	logging.Log("EVENT-5Jsi8").OnError(seqErr).Warn("could not read latest user sequence")
+	request.AppendUserQuery(authz.GetCtxData(ctx).UserID)
+	externalIDPS, count, err := repo.View.SearchExternalIDPs(request)
+	if err != nil {
+		return nil, err
+	}
+	result := &model.ExternalIDPSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: count,
+		Result:      usr_view_model.ExternalIDPViewsToModel(externalIDPS),
+	}
+	if seqErr == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
+	}
+	return result, nil
+}
+
+func (repo *UserRepo) AddMyExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) (*model.ExternalIDP, error) {
+	if err := checkIDs(ctx, externalIDP.ObjectRoot); err != nil {
+		return nil, err
+	}
+	return repo.UserEvents.AddExternalIDP(ctx, externalIDP)
+}
+
+func (repo *UserRepo) RemoveMyExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) error {
+	if err := checkIDs(ctx, externalIDP.ObjectRoot); err != nil {
+		return err
+	}
+	return repo.UserEvents.RemoveExternalIDP(ctx, externalIDP)
 }
 
 func (repo *UserRepo) MyEmail(ctx context.Context) (*model.Email, error) {
@@ -170,20 +224,28 @@ func (repo *UserRepo) ChangeMyAddress(ctx context.Context, address *model.Addres
 }
 
 func (repo *UserRepo) ChangeMyPassword(ctx context.Context, old, new string) error {
-	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if errors.IsNotFound(err) {
+		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+	}
 	if err != nil {
 		return err
 	}
-	_, err = repo.UserEvents.ChangePassword(ctx, policy, authz.GetCtxData(ctx).UserID, old, new)
+	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(policy)
+	_, err = repo.UserEvents.ChangePassword(ctx, pwPolicyView, authz.GetCtxData(ctx).UserID, old, new)
 	return err
 }
 
 func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new string) error {
-	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if errors.IsNotFound(err) {
+		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+	}
 	if err != nil {
 		return err
 	}
-	_, err = repo.UserEvents.ChangePassword(ctx, policy, userID, old, new)
+	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(policy)
+	_, err = repo.UserEvents.ChangePassword(ctx, pwPolicyView, userID, old, new)
 	return err
 }
 
@@ -234,11 +296,15 @@ func (repo *UserRepo) RemoveMyMfaOTP(ctx context.Context) error {
 
 func (repo *UserRepo) ChangeMyUsername(ctx context.Context, username string) error {
 	ctxData := authz.GetCtxData(ctx)
-	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, ctxData.OrgID)
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(ctxData.OrgID)
+	if errors.IsNotFound(err) {
+		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+	}
 	if err != nil {
 		return err
 	}
-	return repo.UserEvents.ChangeUsername(ctx, ctxData.UserID, username, orgPolicy)
+	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
+	return repo.UserEvents.ChangeUsername(ctx, ctxData.UserID, username, orgPolicyView)
 }
 func (repo *UserRepo) ResendInitVerificationMail(ctx context.Context, userID string) error {
 	_, err := repo.UserEvents.CreateInitializeUserCodeByID(ctx, userID)
@@ -246,11 +312,15 @@ func (repo *UserRepo) ResendInitVerificationMail(ctx context.Context, userID str
 }
 
 func (repo *UserRepo) VerifyInitCode(ctx context.Context, userID, code, password string) error {
-	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if errors.IsNotFound(err) {
+		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+	}
 	if err != nil {
 		return err
 	}
-	return repo.UserEvents.VerifyInitCode(ctx, policy, userID, code, password)
+	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(policy)
+	return repo.UserEvents.VerifyInitCode(ctx, pwPolicyView, userID, code, password)
 }
 
 func (repo *UserRepo) SkipMfaInit(ctx context.Context, userID string) error {
@@ -266,11 +336,15 @@ func (repo *UserRepo) RequestPasswordReset(ctx context.Context, loginname string
 }
 
 func (repo *UserRepo) SetPassword(ctx context.Context, userID, code, password string) error {
-	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if errors.IsNotFound(err) {
+		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+	}
 	if err != nil {
 		return err
 	}
-	return repo.UserEvents.SetPassword(ctx, policy, userID, code, password)
+	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(policy)
+	return repo.UserEvents.SetPassword(ctx, pwPolicyView, userID, code, password)
 }
 
 func (repo *UserRepo) SignOut(ctx context.Context, agentID string) error {
@@ -301,6 +375,9 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*model.UserView,
 			return usr_view_model.UserToModel(user), nil
 		}
 	}
+	if userCopy.State == int32(model.UserStateDeleted) {
+		return nil, errors.ThrowNotFound(nil, "EVENT-vZ8us", "Errors.User.NotFound")
+	}
 	return usr_view_model.UserToModel(&userCopy), nil
 }
 
@@ -321,11 +398,15 @@ func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, li
 
 func (repo *UserRepo) ChangeUsername(ctx context.Context, userID, username string) error {
 	policyResourceOwner := authz.GetCtxData(ctx).OrgID
-	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, policyResourceOwner)
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(policyResourceOwner)
+	if errors.IsNotFound(err) {
+		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+	}
 	if err != nil {
 		return err
 	}
-	return repo.UserEvents.ChangeUsername(ctx, userID, username, orgPolicy)
+	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
+	return repo.UserEvents.ChangeUsername(ctx, userID, username, orgPolicyView)
 }
 
 func checkIDs(ctx context.Context, obj es_models.ObjectRoot) error {
@@ -333,4 +414,12 @@ func checkIDs(ctx context.Context, obj es_models.ObjectRoot) error {
 		return errors.ThrowPermissionDenied(nil, "EVENT-kFi9w", "object does not belong to user")
 	}
 	return nil
+}
+
+func (repo *UserRepo) MachineKeyByID(ctx context.Context, keyID string) (*model.MachineKeyView, error) {
+	key, err := repo.View.MachineKeyByID(keyID)
+	if err != nil {
+		return nil, err
+	}
+	return usr_view_model.MachineKeyToModel(key), nil
 }

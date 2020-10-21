@@ -15,10 +15,12 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
+	proj_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	user_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	grant_view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
 )
 
 type mockViewNoUserSession struct{}
@@ -42,9 +44,10 @@ func (m *mockViewErrUserSession) UserSessionsByAgentID(string) ([]*user_view_mod
 }
 
 type mockViewUserSession struct {
-	PasswordVerification    time.Time
-	MfaSoftwareVerification time.Time
-	Users                   []mockUser
+	ExternalLoginVerification time.Time
+	PasswordVerification      time.Time
+	MfaSoftwareVerification   time.Time
+	Users                     []mockUser
 }
 
 type mockUser struct {
@@ -54,8 +57,9 @@ type mockUser struct {
 
 func (m *mockViewUserSession) UserSessionByIDs(string, string) (*user_view_model.UserSessionView, error) {
 	return &user_view_model.UserSessionView{
-		PasswordVerification:    m.PasswordVerification,
-		MfaSoftwareVerification: m.MfaSoftwareVerification,
+		ExternalLoginVerification: m.ExternalLoginVerification,
+		PasswordVerification:      m.PasswordVerification,
+		MfaSoftwareVerification:   m.MfaSoftwareVerification,
 	}, nil
 }
 
@@ -88,10 +92,18 @@ func (m *mockEventUser) UserEventsByID(ctx context.Context, id string, sequence 
 	return events, nil
 }
 
+func (m *mockEventUser) BulkAddExternalIDPs(ctx context.Context, userID string, externalIDPs []*user_model.ExternalIDP) error {
+	return nil
+}
+
 type mockEventErrUser struct{}
 
 func (m *mockEventErrUser) UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
+}
+
+func (m *mockEventErrUser) BulkAddExternalIDPs(ctx context.Context, userID string, externalIDPs []*user_model.ExternalIDP) error {
+	return errors.ThrowInternal(nil, "id", "internal error")
 }
 
 type mockViewUser struct {
@@ -107,9 +119,9 @@ type mockViewUser struct {
 func (m *mockViewUser) UserByID(string) (*user_view_model.UserView, error) {
 	return &user_view_model.UserView{
 		State:    int32(user_model.UserStateActive),
-		UserName: "schofseckel",
+		UserName: "UserName",
 		HumanView: &user_view_model.HumanView{
-			FirstName:              "schof",
+			FirstName:              "FirstName",
 			InitRequired:           m.InitRequired,
 			PasswordSet:            m.PasswordSet,
 			PasswordChangeRequired: m.PasswordChangeRequired,
@@ -131,25 +143,54 @@ func (m *mockViewOrg) OrgByID(string) (*org_view_model.OrgView, error) {
 	}, nil
 }
 
+func (m *mockViewOrg) OrgByPrimaryDomain(string) (*org_view_model.OrgView, error) {
+	return &org_view_model.OrgView{
+		State: int32(m.State),
+	}, nil
+}
+
 type mockViewErrOrg struct{}
 
 func (m *mockViewErrOrg) OrgByID(string) (*org_view_model.OrgView, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
 }
 
+func (m *mockViewErrOrg) OrgByPrimaryDomain(string) (*org_view_model.OrgView, error) {
+	return nil, errors.ThrowInternal(nil, "id", "internal error")
+}
+
+type mockUserGrants struct {
+	roleCheck  bool
+	userGrants int
+}
+
+func (m *mockUserGrants) ApplicationByClientID(ctx context.Context, s string) (*proj_view_model.ApplicationView, error) {
+	return &proj_view_model.ApplicationView{ProjectRoleCheck: m.roleCheck}, nil
+}
+
+func (m *mockUserGrants) UserGrantsByProjectAndUserID(s string, s2 string) ([]*grant_view_model.UserGrantView, error) {
+	var grants []*grant_view_model.UserGrantView
+	if m.userGrants > 0 {
+		grants = make([]*grant_view_model.UserGrantView, m.userGrants)
+	}
+	return grants, nil
+}
+
 func TestAuthRequestRepo_nextSteps(t *testing.T) {
 	type fields struct {
-		UserEvents               *user_event.UserEventstore
-		AuthRequests             *cache.AuthRequestCache
-		View                     *view.View
-		userSessionViewProvider  userSessionViewProvider
-		userViewProvider         userViewProvider
-		userEventProvider        userEventProvider
-		orgViewProvider          orgViewProvider
-		PasswordCheckLifeTime    time.Duration
-		MfaInitSkippedLifeTime   time.Duration
-		MfaSoftwareCheckLifeTime time.Duration
-		MfaHardwareCheckLifeTime time.Duration
+		UserEvents                 *user_event.UserEventstore
+		AuthRequests               *cache.AuthRequestCache
+		View                       *view.View
+		userSessionViewProvider    userSessionViewProvider
+		userViewProvider           userViewProvider
+		userEventProvider          userEventProvider
+		orgViewProvider            orgViewProvider
+		userGrantProvider          userGrantProvider
+		PasswordCheckLifeTime      time.Duration
+		ExternalLoginCheckLifeTime time.Duration
+		MfaInitSkippedLifeTime     time.Duration
+		MfaSoftwareCheckLifeTime   time.Duration
+		MfaHardwareCheckLifeTime   time.Duration
 	}
 	type args struct {
 		request       *model.AuthRequest
@@ -183,6 +224,15 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&model.AuthRequest{}, false},
 			[]model.NextStep{&model.LoginStep{}},
+			nil,
+		},
+		{
+			"user not set no active session, linking users, external user not found option",
+			fields{
+				userSessionViewProvider: &mockViewNoUserSession{},
+			},
+			args{&model.AuthRequest{LinkingUsers: []*model.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "ExternalUserID"}}}, false},
+			[]model.NextStep{&model.ExternalNotFoundOptionStep{}},
 			nil,
 		},
 		{
@@ -364,6 +414,45 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
+			"external user (no external verification), external login step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+				},
+				userEventProvider:        &mockEventUser{},
+				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID"}, false},
+			[]model.NextStep{&model.ExternalLoginStep{}},
+			nil,
+		},
+		{
+			"external user (external verification set), callback",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					ExternalLoginVerification: time.Now().UTC().Add(-5 * time.Minute),
+					MfaSoftwareVerification:   time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+				},
+				userEventProvider:          &mockEventUser{},
+				orgViewProvider:            &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider:          &mockUserGrants{},
+				ExternalLoginCheckLifeTime: 10 * 24 * time.Hour,
+				MfaSoftwareCheckLifeTime:   18 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID", Request: &model.AuthRequestOIDC{}}, false},
+			[]model.NextStep{&model.RedirectToCallbackStep{}},
+			nil,
+		},
+		{
 			"password not verified, password check step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{},
@@ -376,6 +465,28 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&model.AuthRequest{UserID: "UserID"}, false},
 			[]model.NextStep{&model.PasswordStep{}},
+			nil,
+		},
+		{
+			"external user (no password check needed), callback",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					MfaSoftwareVerification:   time.Now().UTC().Add(-5 * time.Minute),
+					ExternalLoginVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+				},
+				userEventProvider:          &mockEventUser{},
+				orgViewProvider:            &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider:          &mockUserGrants{},
+				MfaSoftwareCheckLifeTime:   18 * time.Hour,
+				ExternalLoginCheckLifeTime: 10 * 24 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID", Request: &model.AuthRequestOIDC{}}, false},
+			[]model.NextStep{&model.RedirectToCallbackStep{}},
 			nil,
 		},
 		{
@@ -395,6 +506,30 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
 			args{&model.AuthRequest{UserID: "UserID"}, false},
+			[]model.NextStep{&model.MfaVerificationStep{
+				MfaProviders: []model.MfaType{model.MfaTypeOTP},
+			}},
+			nil,
+		},
+		{
+			"external user, mfa not verified, mfa check step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:      time.Now().UTC().Add(-5 * time.Minute),
+					ExternalLoginVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet: true,
+					OTPState:    int32(user_model.MfaStateReady),
+					MfaMaxSetUp: int32(model.MfaLevelSoftware),
+				},
+				userEventProvider:          &mockEventUser{},
+				orgViewProvider:            &mockViewOrg{State: org_model.OrgStateActive},
+				PasswordCheckLifeTime:      10 * 24 * time.Hour,
+				ExternalLoginCheckLifeTime: 10 * 24 * time.Hour,
+				MfaSoftwareCheckLifeTime:   18 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID"}, false},
 			[]model.NextStep{&model.MfaVerificationStep{
 				MfaProviders: []model.MfaType{model.MfaTypeOTP},
 			}},
@@ -477,10 +612,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userEventProvider:        &mockEventUser{},
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider:        &mockUserGrants{},
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{&model.AuthRequest{UserID: "UserID", Request: &model.AuthRequestOIDC{}}, false},
 			[]model.NextStep{&model.RedirectToCallbackStep{}},
 			nil,
 		},
@@ -498,28 +634,131 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userEventProvider:        &mockEventUser{},
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider:        &mockUserGrants{},
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID", Prompt: model.PromptNone}, true},
+			args{&model.AuthRequest{UserID: "UserID", Prompt: model.PromptNone, Request: &model.AuthRequestOIDC{}}, true},
 			[]model.NextStep{&model.RedirectToCallbackStep{}},
+			nil,
+		},
+		{
+			"prompt none, checkLoggedIn true, authenticated and required user grants missing, grant required step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:    time.Now().UTC().Add(-5 * time.Minute),
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+				},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider: &mockUserGrants{
+					roleCheck:  true,
+					userGrants: 0,
+				},
+				PasswordCheckLifeTime:    10 * 24 * time.Hour,
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID", Prompt: model.PromptNone, Request: &model.AuthRequestOIDC{}}, true},
+			[]model.NextStep{&model.GrantRequiredStep{}},
+			nil,
+		},
+		{
+			"prompt none, checkLoggedIn true, authenticated and required user grants exist, redirect to callback step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:    time.Now().UTC().Add(-5 * time.Minute),
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+				},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider: &mockUserGrants{
+					roleCheck:  true,
+					userGrants: 2,
+				},
+				PasswordCheckLifeTime:    10 * 24 * time.Hour,
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID", Prompt: model.PromptNone, Request: &model.AuthRequestOIDC{}}, true},
+			[]model.NextStep{&model.RedirectToCallbackStep{}},
+			nil,
+		},
+		{
+			"linking users, password step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+				},
+				userEventProvider:        &mockEventUser{},
+				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{
+				&model.AuthRequest{
+					UserID:              "UserID",
+					SelectedIDPConfigID: "IDPConfigID",
+					LinkingUsers:        []*model.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "UserID", DisplayName: "DisplayName"}},
+				}, false},
+			[]model.NextStep{&model.PasswordStep{}},
+			nil,
+		},
+		{
+			"linking users, linking step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:    time.Now().UTC().Add(-5 * time.Minute),
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+				},
+				userEventProvider:        &mockEventUser{},
+				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+				PasswordCheckLifeTime:    10 * 24 * time.Hour,
+			},
+			args{
+				&model.AuthRequest{
+					UserID:              "UserID",
+					SelectedIDPConfigID: "IDPConfigID",
+					LinkingUsers:        []*model.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "UserID", DisplayName: "DisplayName"}},
+				}, false},
+			[]model.NextStep{&model.LinkUsersStep{}},
 			nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			repo := &AuthRequestRepo{
-				UserEvents:               tt.fields.UserEvents,
-				AuthRequests:             tt.fields.AuthRequests,
-				View:                     tt.fields.View,
-				UserSessionViewProvider:  tt.fields.userSessionViewProvider,
-				UserViewProvider:         tt.fields.userViewProvider,
-				UserEventProvider:        tt.fields.userEventProvider,
-				OrgViewProvider:          tt.fields.orgViewProvider,
-				PasswordCheckLifeTime:    tt.fields.PasswordCheckLifeTime,
-				MfaInitSkippedLifeTime:   tt.fields.MfaInitSkippedLifeTime,
-				MfaSoftwareCheckLifeTime: tt.fields.MfaSoftwareCheckLifeTime,
-				MfaHardwareCheckLifeTime: tt.fields.MfaHardwareCheckLifeTime,
+				UserEvents:                 tt.fields.UserEvents,
+				AuthRequests:               tt.fields.AuthRequests,
+				View:                       tt.fields.View,
+				UserSessionViewProvider:    tt.fields.userSessionViewProvider,
+				UserViewProvider:           tt.fields.userViewProvider,
+				UserEventProvider:          tt.fields.userEventProvider,
+				OrgViewProvider:            tt.fields.orgViewProvider,
+				UserGrantProvider:          tt.fields.userGrantProvider,
+				PasswordCheckLifeTime:      tt.fields.PasswordCheckLifeTime,
+				ExternalLoginCheckLifeTime: tt.fields.ExternalLoginCheckLifeTime,
+				MfaInitSkippedLifeTime:     tt.fields.MfaInitSkippedLifeTime,
+				MfaSoftwareCheckLifeTime:   tt.fields.MfaSoftwareCheckLifeTime,
+				MfaHardwareCheckLifeTime:   tt.fields.MfaHardwareCheckLifeTime,
 			}
 			got, err := repo.nextSteps(context.Background(), tt.args.request, tt.args.checkLoggedIn)
 			if (err != nil && tt.wantErr == nil) || (tt.wantErr != nil && !tt.wantErr(err)) {
@@ -753,7 +992,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				userProvider: &mockViewUserSession{
 					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
 				},
-				user:          &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "schof"}},
+				user:          &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
 				eventProvider: &mockEventErrUser{},
 			},
 			&user_model.UserSessionView{
@@ -770,11 +1009,11 @@ func Test_userSessionByIDs(t *testing.T) {
 					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
 				},
 				agentID: "agentID",
-				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "schof"}},
+				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
 				eventProvider: &mockEventUser{
 					&es_models.Event{
 						AggregateType: user_es_model.UserAggregate,
-						Type:          user_es_model.MfaOtpCheckSucceeded,
+						Type:          user_es_model.MFAOTPCheckSucceeded,
 						CreationDate:  time.Now().UTC().Round(1 * time.Second),
 					},
 				},
@@ -797,7 +1036,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				eventProvider: &mockEventUser{
 					&es_models.Event{
 						AggregateType: user_es_model.UserAggregate,
-						Type:          user_es_model.MfaOtpCheckSucceeded,
+						Type:          user_es_model.MFAOTPCheckSucceeded,
 						CreationDate:  time.Now().UTC().Round(1 * time.Second),
 						Data: func() []byte {
 							data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "otherID"})
@@ -820,11 +1059,11 @@ func Test_userSessionByIDs(t *testing.T) {
 					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
 				},
 				agentID: "agentID",
-				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "schof"}},
+				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
 				eventProvider: &mockEventUser{
 					&es_models.Event{
 						AggregateType: user_es_model.UserAggregate,
-						Type:          user_es_model.MfaOtpCheckSucceeded,
+						Type:          user_es_model.MFAOTPCheckSucceeded,
 						CreationDate:  time.Now().UTC().Round(1 * time.Second),
 						Data: func() []byte {
 							data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})
@@ -888,7 +1127,9 @@ func Test_userByID(t *testing.T) {
 		{
 			"not found, not found error",
 			args{
-				viewProvider: &mockViewNoUser{},
+				userID:        "userID",
+				viewProvider:  &mockViewNoUser{},
+				eventProvider: &mockEventUser{},
 			},
 			nil,
 			errors.IsNotFound,
@@ -903,10 +1144,10 @@ func Test_userByID(t *testing.T) {
 			},
 			&user_model.UserView{
 				State:    user_model.UserStateActive,
-				UserName: "schofseckel",
+				UserName: "UserName",
 				HumanView: &user_model.HumanView{
 					PasswordChangeRequired: true,
-					FirstName:              "schof",
+					FirstName:              "FirstName",
 				},
 			},
 			nil,
@@ -928,10 +1169,10 @@ func Test_userByID(t *testing.T) {
 			},
 			&user_model.UserView{
 				State:    user_model.UserStateActive,
-				UserName: "schofseckel",
+				UserName: "UserName",
 				HumanView: &user_model.HumanView{
 					PasswordChangeRequired: true,
-					FirstName:              "schof",
+					FirstName:              "FirstName",
 				},
 			},
 			nil,
@@ -957,11 +1198,11 @@ func Test_userByID(t *testing.T) {
 			&user_model.UserView{
 				ChangeDate: time.Now().UTC().Round(1 * time.Second),
 				State:      user_model.UserStateActive,
-				UserName:   "schofseckel",
+				UserName:   "UserName",
 				HumanView: &user_model.HumanView{
 					PasswordChangeRequired: false,
 					PasswordChanged:        time.Now().UTC().Round(1 * time.Second),
-					FirstName:              "schof",
+					FirstName:              "FirstName",
 				},
 			},
 			nil,

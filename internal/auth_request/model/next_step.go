@@ -19,6 +19,10 @@ const (
 	NextStepMfaVerify
 	NextStepRedirectToCallback
 	NextStepChangeUsername
+	NextStepLinkUsers
+	NextStepExternalNotFoundOption
+	NextStepExternalLogin
+	NextStepGrantRequired
 )
 
 type UserSessionState int32
@@ -53,6 +57,12 @@ type InitUserStep struct {
 	PasswordSet bool
 }
 
+type ExternalNotFoundOptionStep struct{}
+
+func (s *ExternalNotFoundOptionStep) Type() NextStepType {
+	return NextStepExternalNotFoundOption
+}
+
 func (s *InitUserStep) Type() NextStepType {
 	return NextStepInitUser
 }
@@ -61,6 +71,14 @@ type PasswordStep struct{}
 
 func (s *PasswordStep) Type() NextStepType {
 	return NextStepPassword
+}
+
+type ExternalLoginStep struct {
+	SelectedIDPConfigID string
+}
+
+func (s *ExternalLoginStep) Type() NextStepType {
+	return NextStepExternalLogin
 }
 
 type ChangePasswordStep struct{}
@@ -102,6 +120,18 @@ type MfaVerificationStep struct {
 
 func (s *MfaVerificationStep) Type() NextStepType {
 	return NextStepMfaVerify
+}
+
+type LinkUsersStep struct{}
+
+func (s *LinkUsersStep) Type() NextStepType {
+	return NextStepLinkUsers
+}
+
+type GrantRequiredStep struct{}
+
+func (s *GrantRequiredStep) Type() NextStepType {
+	return NextStepGrantRequired
 }
 
 type RedirectToCallbackStep struct{}

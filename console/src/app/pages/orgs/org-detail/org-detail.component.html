@@ -2,7 +2,7 @@
     <div class="enlarged-container">
         <h1 class="h1">{{org?.name}}</h1>
         <p class="sub">{{'ORG_DETAIL.DESCRIPTION' | translate}}</p>
-        <ng-container *ngIf="(['org.write'] | hasRole) as canwrite$">
+        <ng-container *ngIf="(['org.write$'] | hasRole) as canwrite$">
             <app-card title="{{ 'ORG.DOMAINS.TITLE' | translate }}"
                 description="{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}">
 
@@ -13,14 +13,17 @@
 
                     <i matTooltip="verified" *ngIf="domain.verified" class="verified las la-check-circle"></i>
                     <i matTooltip="primary" *ngIf="domain.primary" class="primary las la-star"></i>
+                    <a *ngIf="!domain.primary && (canwrite$ | async)" class="primaryset"
+                        (click)="setPrimary(domain)">{{'ORG.DOMAINS.SETPRIMARY' | translate}}</a>
 
                     <span class="fill-space"></span>
-                    <button [disabled]="(canwrite$ | async) == false" matTooltip="Remove domain" color="warn"
-                        mat-icon-button (click)="removeDomain(domain.domain)"><i class="las la-trash"></i></button>
+                    <button class="rem-button" [disabled]="(canwrite$ | async) == false" matTooltip="Remove domain"
+                        color="warn" mat-icon-button (click)="removeDomain(domain.domain)"><i
+                            class="las la-trash"></i></button>
                 </div>
                 <p class="new-desc">{{'ORG.PAGES.ORGDOMAIN_VERIFICATION' | translate}}</p>
-                <button [disabled]="(canwrite$ | async) == false" class="add-button" matTooltip="Add domain"
-                    mat-raised-button color="primary" (click)="addNewDomain()">{{'ORG.DOMAINS.NEW' | translate}}
+                <button [disabled]="(canwrite$ | async) == false" matTooltip="Add domain" mat-raised-button
+                    color="primary" (click)="addNewDomain()">{{'ORG.DOMAINS.NEW' | translate}}
                 </button>
             </app-card>
         </ng-container>

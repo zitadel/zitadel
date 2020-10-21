@@ -2,9 +2,7 @@ package management
 
 import (
 	"context"
-
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/golang/protobuf/ptypes/empty"
 )
@@ -92,7 +90,8 @@ func (s *Server) UnlockUser(ctx context.Context, in *management.UserID) (*manage
 }
 
 func (s *Server) DeleteUser(ctx context.Context, in *management.UserID) (*empty.Empty, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-as4fg", "Not implemented")
+	err := s.user.RemoveUser(ctx, in.Id)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) UpdateUserMachine(ctx context.Context, in *management.UpdateMachineRequest) (*management.MachineResponse, error) {
@@ -193,6 +192,19 @@ func (s *Server) SendSetPasswordNotification(ctx context.Context, request *manag
 
 func (s *Server) SetInitialPassword(ctx context.Context, request *management.PasswordRequest) (*empty.Empty, error) {
 	_, err := s.user.SetOneTimePassword(ctx, passwordRequestToModel(request))
+	return &empty.Empty{}, err
+}
+
+func (s *Server) SearchUserExternalIDPs(ctx context.Context, request *management.ExternalIDPSearchRequest) (*management.ExternalIDPSearchResponse, error) {
+	externalIDP, err := s.user.SearchExternalIDPs(ctx, externalIDPSearchRequestToModel(request))
+	if err != nil {
+		return nil, err
+	}
+	return externalIDPSearchResponseFromModel(externalIDP), nil
+}
+
+func (s *Server) RemoveExternalIDP(ctx context.Context, request *management.ExternalIDPRemoveRequest) (*empty.Empty, error) {
+	err := s.user.RemoveExternalIDP(ctx, externalIDPRemoveToModel(request))
 	return &empty.Empty{}, err
 }
 

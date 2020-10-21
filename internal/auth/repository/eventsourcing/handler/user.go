@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -21,6 +22,8 @@ type User struct {
 	handler
 	eventstore eventstore.Eventstore
 	orgEvents  *org_events.OrgEventstore
+	iamEvents  *iam_es.IAMEventstore
+	iamID      string
 }
 
 const (
@@ -91,7 +94,7 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 		es_model.HumanMFAOTPAdded,
 		es_model.HumanMFAOTPVerified,
 		es_model.HumanMFAOTPRemoved,
-		es_model.HumanMfaInitSkipped,
+		es_model.HumanMFAInitSkipped,
 		es_model.MachineChanged,
 		es_model.HumanPasswordChanged:
 		user, err = u.view.UserByID(event.AggregateID)
@@ -111,7 +114,7 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 		}
 		err = u.fillLoginNames(user)
 	case es_model.UserRemoved:
-		err = u.view.DeleteUser(event.AggregateID, event.Sequence)
+		return u.view.DeleteUser(event.AggregateID, event.Sequence)
 	default:
 		return u.view.ProcessedUserSequence(event.Sequence)
 	}
@@ -126,9 +129,12 @@ func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
 	if err != nil {
 		return err
 	}
-	policy, err := u.orgEvents.GetOrgIAMPolicy(context.Background(), user.ResourceOwner)
-	if err != nil {
-		return err
+	policy := org.OrgIamPolicy
+	if policy == nil {
+		policy, err = u.iamEvents.GetOrgIAMPolicy(context.Background(), u.iamID)
+		if err != nil {
+			return err
+		}
 	}
 	user.SetLoginNames(policy, org.Domains)
 	user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
@@ -155,9 +161,12 @@ func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
 	if err != nil {
 		return err
 	}
-	policy, err := u.orgEvents.GetOrgIAMPolicy(context.Background(), event.ResourceOwner)
-	if err != nil {
-		return err
+	policy := org.OrgIamPolicy
+	if policy == nil {
+		policy, err = u.iamEvents.GetOrgIAMPolicy(context.Background(), u.iamID)
+		if err != nil {
+			return err
+		}
 	}
 	users, err := u.view.UsersByOrgID(event.AggregateID)
 	if err != nil {
@@ -174,9 +183,12 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
 	if err != nil {
 		return err
 	}
-	policy, err := u.orgEvents.GetOrgIAMPolicy(context.Background(), event.ResourceOwner)
-	if err != nil {
-		return err
+	policy := org.OrgIamPolicy
+	if policy == nil {
+		policy, err = u.iamEvents.GetOrgIAMPolicy(context.Background(), u.iamID)
+		if err != nil {
+			return err
+		}
 	}
 	if !policy.UserLoginMustBeDomain {
 		return nil

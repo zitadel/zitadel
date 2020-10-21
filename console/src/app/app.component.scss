@@ -1,3 +1,4 @@
+@import '~@angular/material/theming';
 
 .root-header {
   position: fixed;
@@ -127,6 +128,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-size: .9rem;
 
             .count {
               font-size: 12px;
@@ -158,13 +160,6 @@
         margin-bottom: 1rem;
       }
     }
-
-    .primary-button {
-      margin: 1rem;
-      border-radius: 1.5rem;
-      height: 2.5rem;
-      padding: 0 1rem;
-    }
   }
 
   .content {
@@ -173,7 +168,7 @@
 
     .router {
       height: 100%;
-      overflow: auto;
+      overflow-y: auto;
     }
   }
 
@@ -213,18 +208,50 @@
   margin: .5rem 0;
 
   span {
-    border: 1px solid #ffffff10;
+    border: 1px solid #81868a40;
     padding: 2px 1rem;
     border-radius: 50vw;
-    color: #8795a1;
+    color: var(--grey);
     font-size: 12px;
   }
 
   .line {
     display: block;
-    background-color: #ffffff10;
+    background-color: #81868a40;
     height: 1px;
     margin: .5rem 0;
     flex: 1;
+  }
+}
+
+@mixin textvar($theme) {
+  .filter-form {
+    margin: 0 .5rem;
+    /* stylelint-disable */
+
+    $foreground: map-get($theme, foreground);
+    color: mat-color($foreground, text) !important;
+  }
+
+  .show-all {
+    $primary: map-get($theme, primary);
+    color: mat-color($primary, 300) !important;
+    border-bottom: 2px solid var(--grey);
+    margin-bottom: .5rem;
+  }
+  /* stylelint-enable */
+}
+
+.menu {
+  position: relative;
+
+  .spinner-w {
+    top: 1rem;
+    left: 0;
+    right: 0;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }

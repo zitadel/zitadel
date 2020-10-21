@@ -11,6 +11,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AddKeyDialogComponent } from './add-key-dialog/add-key-dialog.component';
+import { ShowKeyDialogComponent } from './show-key-dialog/show-key-dialog.component';
 
 @Component({
     selector: 'app-machine-keys',
@@ -59,12 +60,15 @@ export class MachineKeysComponent implements OnInit {
     }
 
     public deleteSelectedKeys(): void {
-        Promise.all(this.selection.selected.map(value => {
+        const mappedDeletions = this.selection.selected.map(value => {
             return this.userService.DeleteMachineKey(value.id, this.userId);
-        })).then(() => {
+        });
+        Promise.all(mappedDeletions).then(() => {
             this.selection.clear();
             this.toast.showInfo('USER.TOAST.SELECTEDKEYSDELETED', true);
             this.getData(10, 0);
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 
@@ -94,8 +98,19 @@ export class MachineKeysComponent implements OnInit {
 
                 if (type) {
                     console.log(this.userId, type, date);
-                    return this.userService.AddMachineKey(this.userId, type, date).then(() => {
-                        this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
+                    return this.userService.AddMachineKey(this.userId, type, date).then((response) => {
+                        if (response) {
+                            setTimeout(() => {
+                                this.refreshPage();
+                            }, 1000);
+
+                            this.dialog.open(ShowKeyDialogComponent, {
+                                data: {
+                                    key: response.toObject(),
+                                },
+                                width: '400px',
+                            });
+                        }
                     }).catch((error: any) => {
                         this.toast.showError(error);
                     });

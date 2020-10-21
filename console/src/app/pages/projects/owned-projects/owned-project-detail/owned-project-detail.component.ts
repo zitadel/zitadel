@@ -65,7 +65,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     public isZitadel: boolean = false;
 
     public userGrantSearchKey: UserGrantSearchKey = UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID;
-    public userGrantContext: UserGrantContext = UserGrantContext.OWNED_PROJECT;
+    public UserGrantContext: any = UserGrantContext;
 
     // members
     public totalMemberResult: number = 0;
@@ -191,7 +191,8 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     }
 
     public saveProject(): void {
-        this.mgmtService.UpdateProject(this.project.projectId, this.project.name).then(() => {
+        console.log(this.project);
+        this.mgmtService.UpdateProject(this.project.projectId, this.project).then(() => {
             this.toast.showInfo('PROJECT.TOAST.UPDATED', true);
         }).catch(error => {
             this.toast.showError(error);
@@ -226,6 +227,9 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
                         return this.mgmtService.AddProjectMember(this.projectId, user.id, roles)
                             .then(() => {
                                 this.toast.showInfo('PROJECT.TOAST.MEMBERADDED', true);
+                                setTimeout(() => {
+                                    this.loadMembers();
+                                }, 1000);
                             }).catch(error => {
                                 this.toast.showError(error);
                             });

@@ -1,9 +1,8 @@
 package model
 
 import (
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"time"
-
-	policy_model "github.com/caos/zitadel/internal/policy/model"
 
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -15,6 +14,7 @@ type Human struct {
 	*Email
 	*Phone
 	*Address
+	ExternalIDPs []*ExternalIDP
 	InitCode     *InitUserCode
 	EmailCode    *EmailCode
 	PhoneCode    *PhoneCode
@@ -45,18 +45,18 @@ func (u *Human) SetNamesAsDisplayname() {
 }
 
 func (u *Human) IsValid() bool {
-	return u.Profile != nil && u.FirstName != "" && u.LastName != "" && u.Email != nil && u.Email.IsValid() && u.Phone == nil || (u.Phone != nil && u.Phone.IsValid())
+	return u.Profile != nil && u.FirstName != "" && u.LastName != "" && u.Email != nil && u.Email.IsValid() && u.Phone == nil || (u.Phone != nil && u.Phone.PhoneNumber != "" && u.Phone.IsValid())
 }
 
 func (u *Human) IsInitialState() bool {
-	return u.Email == nil || !u.IsEmailVerified || u.Password == nil || u.SecretString == ""
+	return u.Email == nil || !u.IsEmailVerified || (u.ExternalIDPs == nil || len(u.ExternalIDPs) == 0) && (u.Password == nil || u.SecretString == "")
 }
 
 func (u *Human) IsOTPReady() bool {
 	return u.OTP != nil && u.OTP.State == MfaStateReady
 }
 
-func (u *Human) HashPasswordIfExisting(policy *policy_model.PasswordComplexityPolicy, passwordAlg crypto.HashAlgorithm, onetime bool) error {
+func (u *Human) HashPasswordIfExisting(policy *iam_model.PasswordComplexityPolicyView, passwordAlg crypto.HashAlgorithm, onetime bool) error {
 	if u.Password != nil {
 		return u.Password.HashPasswordIfExisting(policy, passwordAlg, onetime)
 	}
@@ -95,4 +95,13 @@ func (init *InitUserCode) GenerateInitUserCode(generator crypto.Generator) error
 	init.Code = initCodeCrypto
 	init.Expiry = generator.Expiry()
 	return nil
+}
+
+func (u *Human) GetExternalIDP(externalIDP *ExternalIDP) (int, *ExternalIDP) {
+	for i, idp := range u.ExternalIDPs {
+		if idp.UserID == externalIDP.UserID {
+			return i, idp
+		}
+	}
+	return -1, nil
 }

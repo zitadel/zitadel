@@ -1,5 +1,6 @@
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
+
 @import '~@angular/material/theming';
 @import './component-themes';
 
@@ -14,6 +15,11 @@
   font-family: ailerons;
   font-display: auto;
   src: url(assets/ailerons.otf) format('opentype');
+}
+
+:root {
+  --grey: #8795a1;
+  --table-row-back: #363738;
 }
 
 $caos-dark-brand: (
@@ -151,7 +157,9 @@ $custom-typography:
 @include component-themes($dark-theme);
 @include angular-material-theme($dark-theme);
 
-.mat-dialog-container {
+.mat-dialog-container,
+.mat-raised-button,
+.mat-stroked-button {
   border-radius: .5rem !important;
 }
 
@@ -159,13 +167,13 @@ $custom-typography:
   @include component-themes($light-theme);
   @include angular-material-theme($light-theme);
 
-  color: #202124;
+  --table-row-back: #eceef1;
 
   .sidenav,
   .main-container,
   .mat-dialog-container {
     background-color: #fafafa;
-    transition: background-color .4s ease-in-out;
+    transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
   }
 
   ::-webkit-scrollbar-track {
@@ -192,11 +200,13 @@ $custom-typography:
   @include component-themes($dark-theme);
   @include angular-material-theme($dark-theme);
 
+  --table-row-back: #363738;
+
   .sidenav,
   .main-container,
   .mat-dialog-container {
     background-color: #212224;
-    transition: background-color .4s ease-in-out;
+    transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
   }
 
   ::-webkit-scrollbar-track {

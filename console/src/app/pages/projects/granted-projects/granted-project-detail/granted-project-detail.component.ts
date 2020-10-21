@@ -63,7 +63,7 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
 
     public isZitadel: boolean = false;
 
-    public userGrantContext: UserGrantContext = UserGrantContext.GRANTED_PROJECT;
+    UserGrantContext: any = UserGrantContext;
     public userGrantSearchKey: UserGrantSearchKey = UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID;
 
     // members
@@ -152,6 +152,9 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
                             roles,
                         ).then(() => {
                             this.toast.showInfo('PROJECT.TOAST.MEMBERADDED', true);
+                            setTimeout(() => {
+                                this.loadMembers();
+                            }, 1000);
                         }).catch(error => {
                             this.toast.showError(error);
                         });

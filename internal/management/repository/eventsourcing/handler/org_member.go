@@ -104,6 +104,8 @@ func (m *OrgMember) processUser(event *models.Event) (err error) {
 			m.fillUserData(member, user)
 		}
 		return m.view.PutOrgMembers(members, event.Sequence)
+	case usr_es_model.UserRemoved:
+		return m.view.DeleteOrgMembersByUserID(event.AggregateID, event.Sequence)
 	default:
 		return m.view.ProcessedOrgMemberSequence(event.Sequence)
 	}

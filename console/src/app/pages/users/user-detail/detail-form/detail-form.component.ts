@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { Gender as authGender, UserProfile as authUP, UserView as authUV } from 'src/app/proto/generated/auth_pb';
@@ -10,7 +10,7 @@ import { Gender as mgmtGender, UserProfile as mgmtUP, UserView as mgmtUV } from 
     templateUrl: './detail-form.component.html',
     styleUrls: ['./detail-form.component.scss'],
 })
-export class DetailFormComponent implements OnInit, OnDestroy {
+export class DetailFormComponent implements OnDestroy, OnChanges {
     @Input() public username!: string;
     @Input() public user!: mgmtUV | authUV;
     @Input() public disabled: boolean = false;
@@ -31,12 +31,23 @@ export class DetailFormComponent implements OnInit, OnDestroy {
             firstName: [{ value: '', disabled: this.disabled }, Validators.required],
             lastName: [{ value: '', disabled: this.disabled }, Validators.required],
             nickName: [{ value: '', disabled: this.disabled }],
-            gender: [{ value: 0 }, { disabled: this.disabled }],
+            gender: [{ value: 0, disabled: this.disabled }],
             preferredLanguage: [{ value: '', disabled: this.disabled }],
         });
     }
 
-    public ngOnInit(): void {
+    public ngOnChanges(): void {
+        this.profileForm = this.fb.group({
+            userName: [{ value: '', disabled: true }, [
+                Validators.required,
+            ]],
+            firstName: [{ value: '', disabled: this.disabled }, Validators.required],
+            lastName: [{ value: '', disabled: this.disabled }, Validators.required],
+            nickName: [{ value: '', disabled: this.disabled }],
+            gender: [{ value: 0, disabled: this.disabled }],
+            preferredLanguage: [{ value: '', disabled: this.disabled }],
+        });
+
         this.profileForm.patchValue({ userName: this.username, ...this.user });
 
         if (this.preferredLanguage) {

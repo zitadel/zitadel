@@ -159,6 +159,16 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/SearchUserExternalIDPs": authz.Option{
+		Permission: "user.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveExternalIDP": authz.Option{
+		Permission: "user.write",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/GetUserMfas": authz.Option{
 		Permission: "user.read",
 		CheckParam: "",
@@ -176,71 +186,6 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 
 	"/caos.zitadel.management.api.v1.ManagementService/SearchUserMemberships": authz.Option{
 		Permission: "user.membership.read",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/GetPasswordComplexityPolicy": authz.Option{
-		Permission: "policy.read",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/GetDefaultPasswordComplexityPolicy": authz.Option{
-		Permission: "policy.read",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/CreatePasswordComplexityPolicy": authz.Option{
-		Permission: "policy.write",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/UpdatePasswordComplexityPolicy": authz.Option{
-		Permission: "policy.write",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/DeletePasswordComplexityPolicy": authz.Option{
-		Permission: "policy.delete",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/GetPasswordAgePolicy": authz.Option{
-		Permission: "policy.read",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/CreatePasswordAgePolicy": authz.Option{
-		Permission: "policy.write",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/UpdatePasswordAgePolicy": authz.Option{
-		Permission: "policy.write",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/DeletePasswordAgePolicy": authz.Option{
-		Permission: "policy.delete",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/GetPasswordLockoutPolicy": authz.Option{
-		Permission: "policy.read",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/CreatePasswordLockoutPolicy": authz.Option{
-		Permission: "policy.write",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/UpdatePasswordLockoutPolicy": authz.Option{
-		Permission: "policy.write",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/DeletePasswordLockoutPolicy": authz.Option{
-		Permission: "policy.delete",
 		CheckParam: "",
 	},
 
@@ -629,6 +574,11 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/GetDefaultLoginPolicy": authz.Option{
+		Permission: "policy.read",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/CreateLoginPolicy": authz.Option{
 		Permission: "policy.write",
 		CheckParam: "",
@@ -656,6 +606,81 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 
 	"/caos.zitadel.management.api.v1.ManagementService/RemoveIdpProviderFromLoginPolicy": authz.Option{
 		Permission: "policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GetPasswordComplexityPolicy": authz.Option{
+		Permission: "policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GetDefaultPasswordComplexityPolicy": authz.Option{
+		Permission: "policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/CreatePasswordComplexityPolicy": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/UpdatePasswordComplexityPolicy": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/RemovePasswordComplexityPolicy": authz.Option{
+		Permission: "policy.delete",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GetPasswordAgePolicy": authz.Option{
+		Permission: "policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GetDefaultPasswordAgePolicy": authz.Option{
+		Permission: "policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/CreatePasswordAgePolicy": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/UpdatePasswordAgePolicy": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/RemovePasswordAgePolicy": authz.Option{
+		Permission: "policy.delete",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GetPasswordLockoutPolicy": authz.Option{
+		Permission: "policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GetDefaultPasswordLockoutPolicy": authz.Option{
+		Permission: "policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/CreatePasswordLockoutPolicy": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/UpdatePasswordLockoutPolicy": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/RemovePasswordLockoutPolicy": authz.Option{
+		Permission: "policy.delete",
 		CheckParam: "",
 	},
 }

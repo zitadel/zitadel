@@ -1,0 +1,41 @@
+
+{{template "main-top" .}}
+
+<div class="head">
+    <h1>{{t "RegisterOption.Title"}}</h1>
+    <p>{{t "RegisterOption.Description"}}</p>
+</div>
+
+<form action="{{ registerOptionUrl }}" method="POST">
+
+    {{ .CSRF }}
+
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+
+    <div class="actions">
+        {{if .LoginPolicy.AllowUsernamePassword }}
+            <button class="secondary right" name="usernamepassword" value="true" formnovalidate>{{t "RegisterOption.RegisterUsernamePassword"}}</button>
+        {{end}}
+        {{if .LoginPolicy.AllowExternalIDP}}
+            {{ $reqid := .AuthReqID}}
+            {{range $provider := .IDPProviders}}
+                <a href="{{ externalIDPRegisterURL $reqid $provider.IDPConfigID}}" class="button secondary idp-provider {{idpProviderClass $provider.StylingType}}">
+                    <span class="logo"></span>
+                    <span class="provider-name">{{$provider.Name}}</span>
+                </a>
+            {{end}}
+        {{end}}
+        <a class="button secondary" href="{{ loginNameChangeUrl .AuthReqID }}">
+            {{t "Actions.Back"}}
+        </a>
+    </div>
+
+    {{template "error-message" .}}
+</form>
+
+
+<script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
+<script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
+
+{{template "main-bottom" .}}
+ 

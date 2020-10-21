@@ -6,14 +6,14 @@
             mat-icon-button *ngIf="selection.hasValue()">
             <i class="las la-trash"></i>
         </button>
-        <a class="add-button" [disabled]="([('user.write:' + userId), 'user.write'] | hasRole | async) == false"
-            color="primary" mat-raised-button (click)="openAddKey()">
+        <a [disabled]="([('user.write:' + userId), 'user.write'] | hasRole | async) == false" color="primary"
+            mat-raised-button (click)="openAddKey()">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
     </ng-template>
 
     <div class="table-wrapper">
-        <table class="table background-style" mat-table [dataSource]="dataSource">
+        <table class="table" mat-table [dataSource]="dataSource">
             <ng-container matColumnDef="select">
                 <th mat-header-cell *matHeaderCellDef>
                     <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
@@ -46,7 +46,7 @@
             </ng-container>
 
             <ng-container matColumnDef="expirationDate">
-                <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.EXPIRYDATE' | translate }} </th>
+                <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.EXPIRATIONDATE' | translate }} </th>
                 <td mat-cell *matCellDef="let key">
                     {{key.expirationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}
                 </td>
@@ -54,12 +54,12 @@
 
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr class="data-row" mat-row *matRowDef="let row; columns: displayedColumns;"
+            <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"
                 [routerLink]="row.id ? ['/users', row.id ]: null">
             </tr>
 
         </table>
-        <mat-paginator #paginator class="paginator background-style" [length]="keyResult?.totalResult || 0"
-            [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
+        <mat-paginator #paginator class="paginator" [length]="keyResult?.totalResult || 0" [pageSize]="10"
+            [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
     </div>
 </app-refresh-table>

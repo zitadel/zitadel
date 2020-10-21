@@ -2,6 +2,8 @@ package eventstore
 
 import (
 	"context"
+	"strings"
+
 	"github.com/caos/logging"
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -9,7 +11,8 @@ import (
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	"strings"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
@@ -19,6 +22,7 @@ type IAMRepository struct {
 	SearchLimit uint64
 	*iam_es.IAMEventstore
 	OrgEvents      *org_es.OrgEventstore
+	UserEvents     *usr_es.UserEventstore
 	View           *admin_view.View
 	SystemDefaults systemdefaults.SystemDefaults
 	Roles          []string
@@ -83,7 +87,7 @@ func (repo *IAMRepository) IDPConfigByID(ctx context.Context, idpConfigID string
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.IdpConfigViewToModel(idp), nil
+	return iam_es_model.IDPConfigViewToModel(idp), nil
 }
 func (repo *IAMRepository) AddOIDCIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
 	idp.AggregateID = repo.SystemDefaults.IamID
@@ -128,7 +132,19 @@ func (repo *IAMRepository) RemoveIDPConfig(ctx context.Context, idpConfigID stri
 		}
 		aggregates = append(aggregates, providerAgg)
 	}
-
+	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(idpConfigID)
+	if err != nil {
+		return err
+	}
+	for _, externalIDP := range externalIDPs {
+		idpRemove := &usr_model.ExternalIDP{ObjectRoot: es_models.ObjectRoot{AggregateID: externalIDP.UserID}, IDPConfigID: externalIDP.IDPConfigID, UserID: externalIDP.ExternalUserID}
+		idpAgg := make([]*es_models.Aggregate, 0)
+		_, idpAgg, err = repo.UserEvents.PrepareRemoveExternalIDP(ctx, idpRemove, true)
+		if err != nil {
+			return err
+		}
+		aggregates = append(aggregates, idpAgg...)
+	}
 	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
 }
 
@@ -148,7 +164,7 @@ func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_mo
 	result := &iam_model.IDPConfigSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
-		TotalResult: uint64(count),
+		TotalResult: count,
 		Result:      iam_es_model.IdpConfigViewsToModel(idps),
 	}
 	if err == nil {
@@ -156,6 +172,24 @@ func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_mo
 		result.Timestamp = sequence.CurrentTimestamp
 	}
 	return result, nil
+}
+
+func (repo *IAMRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
+	policy, err := repo.View.LabelPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.LabelPolicyViewToModel(policy), err
+}
+
+func (repo *IAMRepository) AddDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.AddLabelPolicy(ctx, policy)
+}
+
+func (repo *IAMRepository) ChangeDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.ChangeLabelPolicy(ctx, policy)
 }
 
 func (repo *IAMRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
@@ -203,7 +237,99 @@ func (repo *IAMRepository) AddIDPProviderToLoginPolicy(ctx context.Context, prov
 	return repo.IAMEventstore.AddIDPProviderToLoginPolicy(ctx, provider)
 }
 
-func (repo *IAMRepository) RemoveIdpProviderFromIdpProvider(ctx context.Context, provider *iam_model.IDPProvider) error {
+func (repo *IAMRepository) RemoveIDPProviderFromLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) error {
+	aggregates := make([]*es_models.Aggregate, 0)
 	provider.AggregateID = repo.SystemDefaults.IamID
-	return repo.IAMEventstore.RemoveIDPProviderFromLoginPolicy(ctx, provider)
+	_, removeAgg, err := repo.IAMEventstore.PrepareRemoveIDPProviderFromLoginPolicy(ctx, provider)
+	if err != nil {
+		return err
+	}
+	aggregates = append(aggregates, removeAgg)
+
+	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(provider.IdpConfigID)
+	if err != nil {
+		return err
+	}
+	for _, externalIDP := range externalIDPs {
+		idpRemove := &usr_model.ExternalIDP{ObjectRoot: es_models.ObjectRoot{AggregateID: externalIDP.UserID}, IDPConfigID: externalIDP.IDPConfigID, UserID: externalIDP.ExternalUserID}
+		idpAgg := make([]*es_models.Aggregate, 0)
+		_, idpAgg, err = repo.UserEvents.PrepareRemoveExternalIDP(ctx, idpRemove, true)
+		if err != nil {
+			return err
+		}
+		aggregates = append(aggregates, idpAgg...)
+	}
+	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
+}
+
+func (repo *IAMRepository) GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error) {
+	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.PasswordComplexityViewToModel(policy), nil
+}
+
+func (repo *IAMRepository) AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.AddPasswordComplexityPolicy(ctx, policy)
+}
+
+func (repo *IAMRepository) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.ChangePasswordComplexityPolicy(ctx, policy)
+}
+
+func (repo *IAMRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error) {
+	policy, err := repo.View.PasswordAgePolicyByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.PasswordAgeViewToModel(policy), nil
+}
+
+func (repo *IAMRepository) AddDefaultPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.AddPasswordAgePolicy(ctx, policy)
+}
+
+func (repo *IAMRepository) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.ChangePasswordAgePolicy(ctx, policy)
+}
+
+func (repo *IAMRepository) GetDefaultPasswordLockoutPolicy(ctx context.Context) (*iam_model.PasswordLockoutPolicyView, error) {
+	policy, err := repo.View.PasswordLockoutPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.PasswordLockoutViewToModel(policy), nil
+}
+
+func (repo *IAMRepository) AddDefaultPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.AddPasswordLockoutPolicy(ctx, policy)
+}
+
+func (repo *IAMRepository) ChangeDefaultPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.ChangePasswordLockoutPolicy(ctx, policy)
+}
+
+func (repo *IAMRepository) GetOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
+	policy, err := repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.OrgIAMViewToModel(policy), nil
+}
+
+func (repo *IAMRepository) AddDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.AddOrgIAMPolicy(ctx, policy)
+}
+
+func (repo *IAMRepository) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.ChangeOrgIAMPolicy(ctx, policy)
 }

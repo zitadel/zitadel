@@ -1158,7 +1158,7 @@ func TestLoginPolicyAddedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LoginPolicyAddedAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.newPolicy)(tt.args.ctx)
+			agg, err := LoginPolicyAddedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existingIAM, tt.args.newPolicy)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -1447,7 +1447,783 @@ func TestLoginPolicyIdpProviderRemovedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LoginPolicyIDPProviderRemovedAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.newProviderID)(tt.args.ctx)
+			agg, err := LoginPolicyIDPProviderRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existingIAM, tt.args.newProviderID)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+			}
+
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestPasswordComplexityPolicyAddedAggregate(t *testing.T) {
+	type args struct {
+		ctx         context.Context
+		existingIAM *model.IAM
+		newPolicy   *model.PasswordComplexityPolicy
+		aggCreator  *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add password complexity policy",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{
+					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
+					IAMProjectID: "IAMProjectID"},
+				newPolicy: &model.PasswordComplexityPolicy{
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
+					MinLength:  10,
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.PasswordComplexityPolicyAdded},
+			},
+		},
+		{
+			name: "existing iam nil",
+			args: args{
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "complexity policy config nil",
+			args: args{
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, IAMProjectID: "IAMProjectID"},
+				newPolicy:   nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := PasswordComplexityPolicyAddedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existingIAM, tt.args.newPolicy)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+			}
+
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestPasswordComplexityPolicyChangedAggregate(t *testing.T) {
+	type args struct {
+		ctx         context.Context
+		existingIAM *model.IAM
+		newPolicy   *model.PasswordComplexityPolicy
+		aggCreator  *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change password complexity policy",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{
+					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
+					IAMProjectID: "IAMProjectID",
+					DefaultPasswordComplexityPolicy: &model.PasswordComplexityPolicy{
+						MinLength: 10,
+					}},
+				newPolicy: &model.PasswordComplexityPolicy{
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
+					MinLength:  5,
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.PasswordComplexityPolicyChanged},
+			},
+		},
+		{
+			name: "no changes",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{
+					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
+					IAMProjectID: "IAMProjectID",
+					DefaultPasswordComplexityPolicy: &model.PasswordComplexityPolicy{
+						MinLength: 10,
+					}},
+				newPolicy: &model.PasswordComplexityPolicy{
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
+					MinLength:  10,
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam nil",
+			args: args{
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "complexity policy config nil",
+			args: args{
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, IAMProjectID: "IAMProjectID"},
+				newPolicy:   nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := PasswordComplexityPolicyChangedAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.newPolicy)(tt.args.ctx)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+			}
+
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestPasswordAgePolicyAddedAggregate(t *testing.T) {
+	type args struct {
+		ctx         context.Context
+		existingIAM *model.IAM
+		newPolicy   *model.PasswordAgePolicy
+		aggCreator  *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add password age policy",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{
+					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
+					IAMProjectID: "IAMProjectID"},
+				newPolicy: &model.PasswordAgePolicy{
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
+					MaxAgeDays: 10,
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.PasswordAgePolicyAdded},
+			},
+		},
+		{
+			name: "existing iam nil",
+			args: args{
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "age policy config nil",
+			args: args{
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, IAMProjectID: "IAMProjectID"},
+				newPolicy:   nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := PasswordAgePolicyAddedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existingIAM, tt.args.newPolicy)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+			}
+
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestPasswordAgePolicyChangedAggregate(t *testing.T) {
+	type args struct {
+		ctx         context.Context
+		existingIAM *model.IAM
+		newPolicy   *model.PasswordAgePolicy
+		aggCreator  *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change password age policy",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{
+					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
+					IAMProjectID: "IAMProjectID",
+					DefaultPasswordAgePolicy: &model.PasswordAgePolicy{
+						MaxAgeDays: 10,
+					}},
+				newPolicy: &model.PasswordAgePolicy{
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
+					MaxAgeDays: 5,
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.PasswordAgePolicyChanged},
+			},
+		},
+		{
+			name: "no changes",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{
+					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
+					IAMProjectID: "IAMProjectID",
+					DefaultPasswordAgePolicy: &model.PasswordAgePolicy{
+						MaxAgeDays: 10,
+					}},
+				newPolicy: &model.PasswordAgePolicy{
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
+					MaxAgeDays: 10,
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam nil",
+			args: args{
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "age policy config nil",
+			args: args{
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, IAMProjectID: "IAMProjectID"},
+				newPolicy:   nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := PasswordAgePolicyChangedAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.newPolicy)(tt.args.ctx)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+			}
+
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestPasswordLockoutPolicyAddedAggregate(t *testing.T) {
+	type args struct {
+		ctx         context.Context
+		existingIAM *model.IAM
+		newPolicy   *model.PasswordLockoutPolicy
+		aggCreator  *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add password lockout policy",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{
+					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
+					IAMProjectID: "IAMProjectID"},
+				newPolicy: &model.PasswordLockoutPolicy{
+					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
+					MaxAttempts: 10,
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.PasswordLockoutPolicyAdded},
+			},
+		},
+		{
+			name: "existing iam nil",
+			args: args{
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "lockout policy config nil",
+			args: args{
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, IAMProjectID: "IAMProjectID"},
+				newPolicy:   nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := PasswordLockoutPolicyAddedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existingIAM, tt.args.newPolicy)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+			}
+
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestPasswordLockoutPolicyChangedAggregate(t *testing.T) {
+	type args struct {
+		ctx         context.Context
+		existingIAM *model.IAM
+		newPolicy   *model.PasswordLockoutPolicy
+		aggCreator  *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change password lockout policy",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{
+					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
+					IAMProjectID: "IAMProjectID",
+					DefaultPasswordLockoutPolicy: &model.PasswordLockoutPolicy{
+						MaxAttempts: 10,
+					}},
+				newPolicy: &model.PasswordLockoutPolicy{
+					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
+					MaxAttempts: 5,
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.PasswordLockoutPolicyChanged},
+			},
+		},
+		{
+			name: "no changes",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{
+					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
+					IAMProjectID: "IAMProjectID",
+					DefaultPasswordLockoutPolicy: &model.PasswordLockoutPolicy{
+						MaxAttempts: 10,
+					}},
+				newPolicy: &model.PasswordLockoutPolicy{
+					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
+					MaxAttempts: 10,
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam nil",
+			args: args{
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "lockout policy config nil",
+			args: args{
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, IAMProjectID: "IAMProjectID"},
+				newPolicy:   nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := PasswordLockoutPolicyChangedAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.newPolicy)(tt.args.ctx)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+			}
+
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestOrgIAMPolicyAddedAggregate(t *testing.T) {
+	type args struct {
+		ctx         context.Context
+		existingIAM *model.IAM
+		newPolicy   *model.OrgIAMPolicy
+		aggCreator  *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add org iam policy",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{
+					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
+					IAMProjectID: "IAMProjectID"},
+				newPolicy: &model.OrgIAMPolicy{
+					ObjectRoot:            models.ObjectRoot{AggregateID: "AggregateID"},
+					UserLoginMustBeDomain: true,
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.OrgIAMPolicyAdded},
+			},
+		},
+		{
+			name: "existing iam nil",
+			args: args{
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "lockout policy config nil",
+			args: args{
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, IAMProjectID: "IAMProjectID"},
+				newPolicy:   nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := OrgIAMPolicyAddedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existingIAM, tt.args.newPolicy)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+			}
+
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestOrgIAMPolicyChangedAggregate(t *testing.T) {
+	type args struct {
+		ctx         context.Context
+		existingIAM *model.IAM
+		newPolicy   *model.OrgIAMPolicy
+		aggCreator  *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change org iam policy",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{
+					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
+					IAMProjectID: "IAMProjectID",
+					DefaultOrgIAMPolicy: &model.OrgIAMPolicy{
+						UserLoginMustBeDomain: true,
+					}},
+				newPolicy: &model.OrgIAMPolicy{
+					ObjectRoot:            models.ObjectRoot{AggregateID: "AggregateID"},
+					UserLoginMustBeDomain: false,
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.OrgIAMPolicyChanged},
+			},
+		},
+		{
+			name: "no changes",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{
+					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
+					IAMProjectID: "IAMProjectID",
+					DefaultOrgIAMPolicy: &model.OrgIAMPolicy{
+						UserLoginMustBeDomain: true,
+					}},
+				newPolicy: &model.OrgIAMPolicy{
+					ObjectRoot:            models.ObjectRoot{AggregateID: "AggregateID"},
+					UserLoginMustBeDomain: true,
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam nil",
+			args: args{
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "org iam policy config nil",
+			args: args{
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				existingIAM: &model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, IAMProjectID: "IAMProjectID"},
+				newPolicy:   nil,
+				aggCreator:  models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := OrgIAMPolicyChangedAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.newPolicy)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

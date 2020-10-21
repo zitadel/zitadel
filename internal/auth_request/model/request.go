@@ -18,6 +18,10 @@ const (
 	AuthRequestTypeSAML
 )
 
+const (
+	OrgDomainPrimaryScope = "urn:zitadel:org:domain:primary:"
+)
+
 type AuthRequestOIDC struct {
 	Scopes        []string
 	ResponseType  OIDCResponseType

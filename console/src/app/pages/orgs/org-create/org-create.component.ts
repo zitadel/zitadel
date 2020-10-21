@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
 import { CreateHumanRequest, CreateOrgRequest, Gender, OrgSetUpResponse } from 'src/app/proto/generated/admin_pb';
-import { PasswordComplexityPolicy } from 'src/app/proto/generated/auth_pb';
+import { PasswordComplexityPolicy as MgmtPasswordComplexityPolicy } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -57,10 +57,11 @@ export class OrgCreateComponent {
     public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
     public languages: string[] = ['de', 'en'];
 
-    public policy!: PasswordComplexityPolicy.AsObject;
+    public policy!: MgmtPasswordComplexityPolicy.AsObject;
     public usePassword: boolean = false;
 
     public forSelf: boolean = true;
+
     constructor(
         private router: Router,
         private toast: ToastService,
@@ -157,14 +158,12 @@ export class OrgCreateComponent {
                     validators.push(symbolValidator);
                 }
 
-                // this.initForm(validators);
                 const pwdValidators = [...validators] as ValidatorFn[];
                 const confirmPwdValidators = [...validators, passwordConfirmValidator] as ValidatorFn[];
                 this.pwdForm = this.fb.group({
                     password: ['', pwdValidators],
                     confirmPassword: ['', confirmPwdValidators],
                 });
-
             });
         } else {
             this.pwdForm = this.fb.group({

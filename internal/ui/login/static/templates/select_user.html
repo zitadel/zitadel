@@ -1,8 +1,15 @@
 {{template "main-top" .}}
 
+<div class="head">
+    {{if .Linking}}
+        <h1>{{t "UserSelection.TitleLinking"}}</h1>
+        <p>{{t "UserSelection.DescriptionLinking"}}</p>
+    {{else}}
+        <h1>{{t "UserSelection.Title"}}</h1>
+        <p>{{t "UserSelection.Description"}}</p>
+    {{end}}
+</div>
 
-<h1>{{t "UserSelection.Title"}}</h1>
-<p>{{t "UserSelection.Description"}}</p>
 
 <form action="{{ userSelectionUrl }}" method="POST">
 

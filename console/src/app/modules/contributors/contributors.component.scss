@@ -9,7 +9,7 @@
 
   .sub-header {
     font-size: .8rem;
-    color: #8795a1;
+    color: var(--grey);
   }
 
   .people {
@@ -64,6 +64,17 @@
 
         .avatar {
           pointer-events: none;
+        }
+
+        .sa-icon {
+          display: block;
+          width: 32px;
+          margin: 0 .5rem;
+
+          i {
+            margin: auto;
+            font-size: 1.2rem;
+          }
         }
       }
 

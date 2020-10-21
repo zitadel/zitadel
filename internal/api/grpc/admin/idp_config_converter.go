@@ -9,14 +9,16 @@ import (
 
 func createOidcIdpToModel(idp *admin.OidcIdpConfigCreate) *iam_model.IDPConfig {
 	return &iam_model.IDPConfig{
-		Name:    idp.Name,
-		LogoSrc: idp.LogoSrc,
-		Type:    iam_model.IDPConfigTypeOIDC,
+		Name:        idp.Name,
+		StylingType: idpConfigStylingTypeToModel(idp.StylingType),
+		Type:        iam_model.IDPConfigTypeOIDC,
 		OIDCConfig: &iam_model.OIDCIDPConfig{
-			ClientID:           idp.ClientId,
-			ClientSecretString: idp.ClientSecret,
-			Issuer:             idp.Issuer,
-			Scopes:             idp.Scopes,
+			ClientID:              idp.ClientId,
+			ClientSecretString:    idp.ClientSecret,
+			Issuer:                idp.Issuer,
+			Scopes:                idp.Scopes,
+			IDPDisplayNameMapping: oidcMappingFieldToModel(idp.IdpDisplayNameMapping),
+			UsernameMapping:       oidcMappingFieldToModel(idp.UsernameMapping),
 		},
 	}
 }
@@ -25,17 +27,19 @@ func updateIdpToModel(idp *admin.IdpUpdate) *iam_model.IDPConfig {
 	return &iam_model.IDPConfig{
 		IDPConfigID: idp.Id,
 		Name:        idp.Name,
-		LogoSrc:     idp.LogoSrc,
+		StylingType: idpConfigStylingTypeToModel(idp.StylingType),
 	}
 }
 
 func updateOidcIdpToModel(idp *admin.OidcIdpConfigUpdate) *iam_model.OIDCIDPConfig {
 	return &iam_model.OIDCIDPConfig{
-		IDPConfigID:        idp.IdpId,
-		ClientID:           idp.ClientId,
-		ClientSecretString: idp.ClientSecret,
-		Issuer:             idp.Issuer,
-		Scopes:             idp.Scopes,
+		IDPConfigID:           idp.IdpId,
+		ClientID:              idp.ClientId,
+		ClientSecretString:    idp.ClientSecret,
+		Issuer:                idp.Issuer,
+		Scopes:                idp.Scopes,
+		IDPDisplayNameMapping: oidcMappingFieldToModel(idp.IdpDisplayNameMapping),
+		UsernameMapping:       oidcMappingFieldToModel(idp.UsernameMapping),
 	}
 }
 
@@ -52,7 +56,7 @@ func idpFromModel(idp *iam_model.IDPConfig) *admin.Idp {
 		ChangeDate:   changeDate,
 		Sequence:     idp.Sequence,
 		Name:         idp.Name,
-		LogoSrc:      idp.LogoSrc,
+		StylingType:  idpConfigStylingTypeFromModel(idp.StylingType),
 		State:        idpConfigStateFromModel(idp.State),
 		IdpConfig:    idpConfigFromModel(idp),
 	}
@@ -71,7 +75,7 @@ func idpViewFromModel(idp *iam_model.IDPConfigView) *admin.IdpView {
 		ChangeDate:    changeDate,
 		Sequence:      idp.Sequence,
 		Name:          idp.Name,
-		LogoSrc:       idp.LogoSrc,
+		StylingType:   idpConfigStylingTypeFromModel(idp.StylingType),
 		State:         idpConfigStateFromModel(idp.State),
 		IdpConfigView: idpConfigViewFromModel(idp),
 	}
@@ -105,9 +109,11 @@ func idpConfigViewFromModel(idp *iam_model.IDPConfigView) *admin.IdpView_OidcCon
 
 func oidcIdpConfigViewFromModel(idp *iam_model.IDPConfigView) *admin.OidcIdpConfigView {
 	return &admin.OidcIdpConfigView{
-		ClientId: idp.OIDCClientID,
-		Issuer:   idp.OIDCIssuer,
-		Scopes:   idp.OIDCScopes,
+		ClientId:              idp.OIDCClientID,
+		Issuer:                idp.OIDCIssuer,
+		Scopes:                idp.OIDCScopes,
+		IdpDisplayNameMapping: oidcMappingFieldFromModel(idp.OIDCIDPDisplayNameMapping),
+		UsernameMapping:       oidcMappingFieldFromModel(idp.OIDCUsernameMapping),
 	}
 }
 
@@ -119,6 +125,28 @@ func idpConfigStateFromModel(state iam_model.IDPConfigState) admin.IdpState {
 		return admin.IdpState_IDPCONFIGSTATE_INACTIVE
 	default:
 		return admin.IdpState_IDPCONFIGSTATE_UNSPECIFIED
+	}
+}
+
+func oidcMappingFieldFromModel(field iam_model.OIDCMappingField) admin.OIDCMappingField {
+	switch field {
+	case iam_model.OIDCMappingFieldPreferredLoginName:
+		return admin.OIDCMappingField_OIDCMAPPINGFIELD_PREFERRED_USERNAME
+	case iam_model.OIDCMappingFieldEmail:
+		return admin.OIDCMappingField_OIDCMAPPINGFIELD_EMAIL
+	default:
+		return admin.OIDCMappingField_OIDCMAPPINGFIELD_UNSPECIFIED
+	}
+}
+
+func oidcMappingFieldToModel(field admin.OIDCMappingField) iam_model.OIDCMappingField {
+	switch field {
+	case admin.OIDCMappingField_OIDCMAPPINGFIELD_PREFERRED_USERNAME:
+		return iam_model.OIDCMappingFieldPreferredLoginName
+	case admin.OIDCMappingField_OIDCMAPPINGFIELD_EMAIL:
+		return iam_model.OIDCMappingFieldEmail
+	default:
+		return iam_model.OIDCMappingFieldUnspecified
 	}
 }
 
@@ -177,4 +205,22 @@ func idpConfigsFromView(viewIdps []*iam_model.IDPConfigView) []*admin.IdpView {
 		idps[i] = idpViewFromModel(idp)
 	}
 	return idps
+}
+
+func idpConfigStylingTypeFromModel(stylingType iam_model.IDPStylingType) admin.IdpStylingType {
+	switch stylingType {
+	case iam_model.IDPStylingTypeGoogle:
+		return admin.IdpStylingType_IDPSTYLINGTYPE_GOOGLE
+	default:
+		return admin.IdpStylingType_IDPSTYLINGTYPE_UNSPECIFIED
+	}
+}
+
+func idpConfigStylingTypeToModel(stylingType admin.IdpStylingType) iam_model.IDPStylingType {
+	switch stylingType {
+	case admin.IdpStylingType_IDPSTYLINGTYPE_GOOGLE:
+		return iam_model.IDPStylingTypeGoogle
+	default:
+		return iam_model.IDPStylingTypeUnspecified
+	}
 }

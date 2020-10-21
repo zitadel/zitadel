@@ -3,6 +3,7 @@ package oidc
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/caos/oidc/pkg/oidc"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/errors"
+	proj_model "github.com/caos/zitadel/internal/project/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 )
 
@@ -18,6 +20,14 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
+	}
+	app, err := o.repo.ApplicationByClientID(ctx, req.ClientID)
+	if err != nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
+	}
+	req.Scopes, err = o.assertProjectRoleScopes(app, req.Scopes)
+	if err != nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-Gqrfg", "Errors.Internal")
 	}
 	authRequest := CreateAuthRequestToBusiness(ctx, req, userAgentID, userID)
 	resp, err := o.repo.CreateAuthRequest(ctx, authRequest)
@@ -59,19 +69,18 @@ func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) error {
 	return o.repo.DeleteAuthRequest(ctx, id)
 }
 
-func (o *OPStorage) CreateToken(ctx context.Context, authReq op.AuthRequest) (string, time.Time, error) {
-	app, err := o.repo.ApplicationByClientID(ctx, authReq.GetClientID())
+func (o *OPStorage) CreateToken(ctx context.Context, req op.TokenRequest) (string, time.Time, error) {
+	var userAgentID, applicationID string
+	authReq, ok := req.(*AuthRequest)
+	if ok {
+		userAgentID = authReq.AgentID
+		applicationID = authReq.ApplicationID
+	}
+	resp, err := o.repo.CreateToken(ctx, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
 	if err != nil {
 		return "", time.Time{}, err
 	}
-	grants, err := o.repo.UserGrantsByProjectAndUserID(app.ProjectID, authReq.GetSubject())
-	scopes := append(authReq.GetScopes(), grantsToScopes(grants)...)
-	req, _ := authReq.(*AuthRequest)
-	resp, err := o.repo.CreateToken(ctx, req.AgentID, req.ApplicationID, req.UserID, req.Audience, scopes, o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
-	if err != nil {
-		return "", time.Time{}, err
-	}
-	return resp.ID, resp.Expiration, nil
+	return resp.TokenID, resp.Expiration, nil
 }
 
 func grantsToScopes(grants []*grant_model.UserGrantView) []string {
@@ -102,4 +111,23 @@ func (o *OPStorage) GetKeySet(ctx context.Context) (*jose.JSONWebKeySet, error) 
 
 func (o *OPStorage) SaveNewKeyPair(ctx context.Context) error {
 	return o.repo.GenerateSigningKeyPair(ctx, o.signingKeyAlgorithm)
+}
+
+func (o *OPStorage) assertProjectRoleScopes(app *proj_model.ApplicationView, scopes []string) ([]string, error) {
+	if !app.ProjectRoleAssertion {
+		return scopes, nil
+	}
+	for _, scope := range scopes {
+		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
+			return scopes, nil
+		}
+	}
+	roles, err := o.repo.ProjectRolesByProjectID(app.ProjectID)
+	if err != nil {
+		return nil, err
+	}
+	for _, role := range roles {
+		scopes = append(scopes, ScopeProjectRolePrefix+role.Key)
+	}
+	return scopes, nil
 }

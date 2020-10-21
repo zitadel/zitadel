@@ -1,8 +1,3 @@
-
-.add-button {
-  border-radius: .5rem;
-}
-
 .table-wrapper {
   overflow: auto;
 
@@ -45,5 +40,5 @@
 
 .no-roles {
   font-size: 14px;
-  color: #8795a1;
+  color: var(--grey);
 }

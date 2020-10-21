@@ -1,9 +1,8 @@
 package handler
 
 import (
-	"net/http"
-
 	"golang.org/x/text/language"
+	"net/http"
 
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -18,13 +17,14 @@ const (
 )
 
 type registerFormData struct {
-	Email     string `schema:"email"`
-	Firstname string `schema:"firstname"`
-	Lastname  string `schema:"lastname"`
-	Language  string `schema:"language"`
-	Gender    int32  `schema:"gender"`
-	Password  string `schema:"register-password"`
-	Password2 string `schema:"register-password-confirmation"`
+	Email        string `schema:"email"`
+	Firstname    string `schema:"firstname"`
+	Lastname     string `schema:"lastname"`
+	Language     string `schema:"language"`
+	Gender       int32  `schema:"gender"`
+	Password     string `schema:"register-password"`
+	Password2    string `schema:"register-password-confirmation"`
+	TermsConfirm bool   `schema:"terms-confirm"`
 }
 
 type registerData struct {
@@ -66,11 +66,24 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	resourceOwner := iam.GlobalOrgID
 	member := &org_model.OrgMember{
 		ObjectRoot: models.ObjectRoot{AggregateID: iam.GlobalOrgID},
 		Roles:      []string{orgProjectCreatorRole},
 	}
-	user, err := l.authRepo.Register(setContext(r.Context(), iam.GlobalOrgID), data.toUserModel(), member, iam.GlobalOrgID)
+	if authRequest.GetScopeOrgPrimaryDomain() != "" {
+		primaryDomain := authRequest.GetScopeOrgPrimaryDomain()
+		org, err := l.authRepo.GetOrgByPrimaryDomain(primaryDomain)
+		if err != nil {
+			l.renderRegisterOption(w, r, authRequest, err)
+			return
+		}
+		if org.ID != iam.GlobalOrgID {
+			member = nil
+			resourceOwner = org.ID
+		}
+	}
+	user, err := l.authRepo.Register(setContext(r.Context(), resourceOwner), data.toUserModel(), member, resourceOwner)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
@@ -94,7 +107,6 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	if formData.Language == "" {
 		formData.Language = l.renderer.Lang(r).String()
 	}
-
 	data := registerData{
 		baseData:         l.getBaseData(r, authRequest, "Register", errType, errMessage),
 		registerFormData: *formData,

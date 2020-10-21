@@ -24,7 +24,7 @@
   }
 
   .desc {
-    color: #8795a1;
+    color: var(--grey);
   }
 }
 
@@ -57,12 +57,10 @@
 
   .small-button {
     display: block;
-    border-radius: .5rem;
   }
 
   .big-button {
     display: block;
     padding: .5rem 4rem;
-    border-radius: .5rem;
   }
 }

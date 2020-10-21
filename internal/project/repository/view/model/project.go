@@ -2,12 +2,14 @@ package model
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"time"
 )
 
 const (
@@ -17,36 +19,42 @@ const (
 )
 
 type ProjectView struct {
-	ProjectID     string    `json:"-" gorm:"column:project_id;primary_key"`
-	Name          string    `json:"name" gorm:"column:project_name"`
-	CreationDate  time.Time `json:"-" gorm:"column:creation_date"`
-	ChangeDate    time.Time `json:"-" gorm:"column:change_date"`
-	State         int32     `json:"-" gorm:"column:project_state"`
-	ResourceOwner string    `json:"-" gorm:"column:resource_owner"`
-	Sequence      uint64    `json:"-" gorm:"column:sequence"`
+	ProjectID            string    `json:"-" gorm:"column:project_id;primary_key"`
+	Name                 string    `json:"name" gorm:"column:project_name"`
+	CreationDate         time.Time `json:"-" gorm:"column:creation_date"`
+	ChangeDate           time.Time `json:"-" gorm:"column:change_date"`
+	State                int32     `json:"-" gorm:"column:project_state"`
+	ResourceOwner        string    `json:"-" gorm:"column:resource_owner"`
+	ProjectRoleAssertion bool      `json:"projectRoleAssertion" gorm:"column:project_role_assertion"`
+	ProjectRoleCheck     bool      `json:"projectRoleCheck" gorm:"column:project_role_check"`
+	Sequence             uint64    `json:"-" gorm:"column:sequence"`
 }
 
 func ProjectFromModel(project *model.ProjectView) *ProjectView {
 	return &ProjectView{
-		ProjectID:     project.ProjectID,
-		Name:          project.Name,
-		ChangeDate:    project.ChangeDate,
-		CreationDate:  project.CreationDate,
-		State:         int32(project.State),
-		ResourceOwner: project.ResourceOwner,
-		Sequence:      project.Sequence,
+		ProjectID:            project.ProjectID,
+		Name:                 project.Name,
+		ChangeDate:           project.ChangeDate,
+		CreationDate:         project.CreationDate,
+		State:                int32(project.State),
+		ResourceOwner:        project.ResourceOwner,
+		ProjectRoleAssertion: project.ProjectRoleAssertion,
+		ProjectRoleCheck:     project.ProjectRoleCheck,
+		Sequence:             project.Sequence,
 	}
 }
 
 func ProjectToModel(project *ProjectView) *model.ProjectView {
 	return &model.ProjectView{
-		ProjectID:     project.ProjectID,
-		Name:          project.Name,
-		ChangeDate:    project.ChangeDate,
-		CreationDate:  project.CreationDate,
-		State:         model.ProjectState(project.State),
-		ResourceOwner: project.ResourceOwner,
-		Sequence:      project.Sequence,
+		ProjectID:            project.ProjectID,
+		Name:                 project.Name,
+		ChangeDate:           project.ChangeDate,
+		CreationDate:         project.CreationDate,
+		State:                model.ProjectState(project.State),
+		ResourceOwner:        project.ResourceOwner,
+		ProjectRoleAssertion: project.ProjectRoleAssertion,
+		ProjectRoleCheck:     project.ProjectRoleCheck,
+		Sequence:             project.Sequence,
 	}
 }
 
@@ -73,6 +81,8 @@ func (p *ProjectView) AppendEvent(event *models.Event) (err error) {
 		p.State = int32(model.ProjectStateInactive)
 	case es_model.ProjectReactivated:
 		p.State = int32(model.ProjectStateActive)
+	case es_model.ProjectRemoved:
+		p.State = int32(model.ProjectStateRemoved)
 	}
 	return err
 }

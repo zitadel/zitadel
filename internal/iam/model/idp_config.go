@@ -10,19 +10,21 @@ type IDPConfig struct {
 	IDPConfigID string
 	Type        IdpConfigType
 	Name        string
-	LogoSrc     []byte
+	StylingType IDPStylingType
 	State       IDPConfigState
 	OIDCConfig  *OIDCIDPConfig
 }
 
 type OIDCIDPConfig struct {
 	es_models.ObjectRoot
-	IDPConfigID        string
-	ClientID           string
-	ClientSecret       *crypto.CryptoValue
-	ClientSecretString string
-	Issuer             string
-	Scopes             []string
+	IDPConfigID           string
+	ClientID              string
+	ClientSecret          *crypto.CryptoValue
+	ClientSecretString    string
+	Issuer                string
+	Scopes                []string
+	IDPDisplayNameMapping OIDCMappingField
+	UsernameMapping       OIDCMappingField
 }
 
 type IdpConfigType int32
@@ -38,6 +40,21 @@ const (
 	IDPConfigStateActive IDPConfigState = iota
 	IDPConfigStateInactive
 	IDPConfigStateRemoved
+)
+
+type IDPStylingType int32
+
+const (
+	IDPStylingTypeUnspecified IDPStylingType = iota
+	IDPStylingTypeGoogle
+)
+
+type OIDCMappingField int32
+
+const (
+	OIDCMappingFieldUnspecified OIDCMappingField = iota
+	OIDCMappingFieldPreferredLoginName
+	OIDCMappingFieldEmail
 )
 
 func NewIDPConfig(iamID, idpID string) *IDPConfig {
@@ -71,4 +88,13 @@ func (oi *OIDCIDPConfig) CryptSecret(crypt crypto.Crypto) error {
 	}
 	oi.ClientSecret = cryptedSecret
 	return nil
+}
+
+func (st IDPStylingType) GetCSSClass() string {
+	switch st {
+	case IDPStylingTypeGoogle:
+		return "google"
+	default:
+		return ""
+	}
 }

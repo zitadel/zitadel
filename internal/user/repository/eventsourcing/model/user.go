@@ -94,6 +94,8 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 		u.appendLockedEvent()
 	case UserUnlocked:
 		u.appendUnlockedEvent()
+	case UserRemoved:
+		u.appendRemovedEvent()
 	}
 
 	if u.Human != nil {
@@ -137,4 +139,8 @@ func (u *User) appendLockedEvent() {
 
 func (u *User) appendUnlockedEvent() {
 	u.State = int32(model.UserStateActive)
+}
+
+func (u *User) appendRemovedEvent() {
+	u.State = int32(model.UserStateDeleted)
 }

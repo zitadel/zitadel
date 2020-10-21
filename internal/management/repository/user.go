@@ -14,6 +14,7 @@ type UserRepository interface {
 	ReactivateUser(ctx context.Context, id string) (*model.User, error)
 	LockUser(ctx context.Context, id string) (*model.User, error)
 	UnlockUser(ctx context.Context, id string) (*model.User, error)
+	RemoveUser(ctx context.Context, id string) error
 	SearchUsers(ctx context.Context, request *model.UserSearchRequest) (*model.UserSearchResponse, error)
 
 	GetUserByLoginNameGlobal(ctx context.Context, email string) (*model.UserView, error)
@@ -30,6 +31,9 @@ type UserRepository interface {
 	ChangeProfile(ctx context.Context, profile *model.Profile) (*model.Profile, error)
 
 	UserMfas(ctx context.Context, userID string) ([]*model.MultiFactor, error)
+
+	SearchExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error)
+	RemoveExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) error
 
 	SearchMachineKeys(ctx context.Context, request *model.MachineKeySearchRequest) (*model.MachineKeySearchResponse, error)
 	GetMachineKey(ctx context.Context, userID, keyID string) (*model.MachineKeyView, error)

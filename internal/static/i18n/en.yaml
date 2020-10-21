@@ -26,6 +26,9 @@ Errors:
     AddressNotFound: Address not found
     NotHuman: The User must be personal
     NotMachine: The User must be technical
+    NotAllowedToLink: User is not allowed to link with external login provider
+    Username:
+      Reservied: Username is already taken
     Code:
       Empty: Code is empty
       NotFound: Code not found
@@ -43,6 +46,11 @@ Errors:
       HasUpper: Password must contain upper case
       HasNumber: Password must contain number
       HasSymbol: Password must contain symbol
+    ExternalIDP:
+      Invalid: Externer IDP invalid
+      IDPConfigNotExisting: IDP provider invalid for this organisation
+      NotAllowed: External IDP not allowed on this organisation
+      MinimumExternalIDPNeeded: At least one IDP must be added
     Mfa:
       Otp:
         AlreadyReady: Multifactor OTP (OneTimePassword) is already set up
@@ -75,11 +83,22 @@ Errors:
     IdpNotExisting: IDP configuration does not exist
     OIDCConfigInvalid: OIDC IDP configuration is invalid
     IdpIsNotOIDC: IDP configuration is not of type oidc
+    IDP:
+      InvalidSearchQuery: Ungültiger Suchparameter
     LoginPolicy:
+      Invalid: Login Policy is invalid
       NotExisting: Login Policy not existig
       AlreadyExists: Login Policy already exists
       IdpProviderAlreadyExisting: Idp Provider already existing
       IdpProviderNotExisting: Idp Provider not existing
+    PasswordComplexity:
+      Empty: Passwort Complexity Policy is empty
+      NotExisting: Passwort Complexity Policy doesn't exist
+      AlreadyExists: Passwort Complexity Policy already exists
+    OrgIAM:
+      Empty: Org IAM Policy is empty
+      NotExisting: Org IAM Policy doesn't exist
+      AlreadyExists: Org IAM Policy already exists
   Project:
     ProjectIDMissing: Project Id missing
     AlreadyExists: Project already exists on organisation
@@ -95,7 +114,7 @@ Errors:
     MemberInvalid: Project member is invalid
     MemberAlreadyExists: Project member already exists
     MemberNotExisting: Project member doesn't exist
-    MinimumOneRoleNeeded: At least one role should be added
+    MinimumOneRoleNeeded: At least one role must be added
     RoleAlreadyExists: Role already exists
     RoleInvalid: Role is invalid
     RoleNotExisting: Role doesn't exist
@@ -125,12 +144,37 @@ Errors:
     OIDCConfigInvalid: OIDC IDP configuration is invalid
     IdpIsNotOIDC: IDP configuration is not of type oidc
     LoginPolicyInvalid: Login Policy is invalid
+    LoginPolicyNotExisting: Login Policy doesn't exist
     IdpProviderInvalid: Idp Provider is invalid
     LoginPolicy:
       NotExisting: Default Login Policy not existig
       AlreadyExists: Default Login Policy already exists
       IdpProviderAlreadyExisting: Idp Provider already existing
       IdpProviderNotExisting: Idp Provider not existing
+    PasswordComplexityPolicy:
+      NotExisting: Default Password Complexity Policy not existing
+      AlreadyExists: Default Password Complexity Policy already existing
+      Empty: Default Password Complexity Policy empty
+    PasswordAgePolicy:
+      NotExisting: Default Password Age Policy not existing
+      AlreadyExists: Default Password Age Policy already existing
+      Empty: Default Password Age Policy empty
+    PasswordLockoutPolicy:
+      NotExisting: Default Password Lockout Policy not existing
+      AlreadyExists: Default Password Lockout Policy already existing
+      Empty: Default Password Lockout Policy empty
+    PasswordLockout:
+      Empty: Passwort Lockout Policy is empty
+      NotExisting: Passwort Lockout Policy not existing
+      AlreadyExists: Passwort Lockout Policy already exists
+    PasswordAge:
+      Empty: Passwort Age Policy is empty
+      NotExisting: Passwort Age Policy not existing
+      AlreadyExists: Passwort Age Policy already exists
+    OrgIAM:
+      Empty: Org IAM Policy is empty
+      NotExisting: Org IAM Policy not existing
+      AlreadyExists: Org IAM Policy already exists
   Policy:
     AlreadyExists: Policy already exists
   UserGrant:
@@ -159,6 +203,8 @@ EventTypes:
       check:
         succeeded: Initialisation check succeded
         failed: Initialisation check failed
+    token:
+      added: Access Token ausgestellt
     username:
       reserved: Username reserved
       released: Username released
@@ -173,12 +219,11 @@ EventTypes:
         added: Email address verification code generated
         sent: Email address verification code sent
     machine:
-      machine:
-        added: Technical user added
-        changed: Technical user changed
-        key:
-          added: Key added
-          removed: Key removed
+      added: Technical user added
+      changed: Technical user changed
+      key:
+        added: Key added
+        removed: Key removed
     human:
       added: Person added
       selfregistered: Person registered himself
@@ -208,6 +253,14 @@ EventTypes:
         check:
           succeeded: Password check succeeded
           failed: Password check failed
+      externallogin:
+        check:
+          succeeded: External login succeeded
+      externalidp:
+        added: Externer IDP added
+        removed: Externer IDP removed
+        cascade:
+          removed: Externer IDP cascade removed
       phone:
         changed: Phone number changed
         verified: Phone number verified
@@ -331,6 +384,19 @@ EventTypes:
         idpprovider:
           added: Idp Provider added to Login Policy
           removed: Idp Provider removed from Login Policy
+      password:
+        complexity:
+          added: Password complexity policy added
+          changed: Password complexity policy changed
+          removed: Password complexity policy removed
+        age:
+          added: Password age policy added
+          changed: Password age policy changed
+          removed: Password age policy removed
+        lockout:
+          added: Password lockout policy added
+          changed: Password lockout policy changed
+          removed: Password lockout policy removed
   project:
     added: Project added
     changed: Project changed
