@@ -1,11 +1,13 @@
 package admin
 
 import (
+	"github.com/caos/logging"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/pkg/grpc/admin"
+	"github.com/golang/protobuf/ptypes"
 )
 
-func loginPolicyToModel(policy *admin.DefaultLoginPolicy) *iam_model.LoginPolicy {
+func loginPolicyToModel(policy *admin.DefaultLoginPolicyRequest) *iam_model.LoginPolicy {
 	return &iam_model.LoginPolicy{
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		AllowExternalIdp:      policy.AllowExternalIdp,
@@ -14,18 +16,34 @@ func loginPolicyToModel(policy *admin.DefaultLoginPolicy) *iam_model.LoginPolicy
 }
 
 func loginPolicyFromModel(policy *iam_model.LoginPolicy) *admin.DefaultLoginPolicy {
+	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
+	logging.Log("GRPC-3Fsm9").OnError(err).Debug("date parse failed")
+
+	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
+	logging.Log("GRPC-5Gsko").OnError(err).Debug("date parse failed")
+
 	return &admin.DefaultLoginPolicy{
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		AllowRegister:         policy.AllowRegister,
+		CreationDate:          creationDate,
+		ChangeDate:            changeDate,
 	}
 }
 
 func loginPolicyViewFromModel(policy *iam_model.LoginPolicyView) *admin.DefaultLoginPolicyView {
+	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
+	logging.Log("GRPC-3Gk9s").OnError(err).Debug("date parse failed")
+
+	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
+	logging.Log("GRPC-6Jlos").OnError(err).Debug("date parse failed")
+
 	return &admin.DefaultLoginPolicyView{
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		AllowExternalIdp:      policy.AllowExternalIDP,
 		AllowRegister:         policy.AllowRegister,
+		CreationDate:          creationDate,
+		ChangeDate:            changeDate,
 	}
 }
 

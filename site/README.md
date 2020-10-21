@@ -1,7 +1,7 @@
-## Getting started
+# Getting started
 
-Caos Site is a github action that generates a static page out of markdown files. It uses marked.js in combination with highlight.js to compile and style markdown.
-The documentiation is built according to the structure of a docs `folder`[Folder](https://github.com/caos/site/tree/master/docs) located at root of the targeted repository.
+CAOS Site is a github action that generates a static page out of markdown files. It uses marked.js in combination with highlight.js to compile and style markdown.
+The documentation is built according to the structure of a docs `folder`[Folder](https://github.com/caos/site/tree/master/site/docs) located at root of the targeted repository.
 
 ## Running locally
 

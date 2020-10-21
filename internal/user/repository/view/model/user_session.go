@@ -114,6 +114,7 @@ func (v *UserSessionView) AppendEvent(event *models.Event) {
 		es_model.UserDeactivated:
 		v.PasswordVerification = time.Time{}
 		v.MfaSoftwareVerification = time.Time{}
+		v.ExternalLoginVerification = time.Time{}
 		v.State = int32(req_model.UserSessionStateTerminated)
 	}
 }

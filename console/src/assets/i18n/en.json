@@ -61,6 +61,7 @@
         "REFRESH":"Refresh",
         "LOGIN":"Login",
         "EDIT":"Edit",
+        "PIN":"Pin / Unpin",
         "CONFIGURE":"Configure"
     },
     "ERRORS": {
@@ -139,7 +140,11 @@
           "IDPCONFIGID": "Idp Config ID",
           "IDPNAME": "Idp Name",
           "USERDISPLAYNAME":  "External Name",
-          "EXTERNALUSERID": "External User ID"
+          "EXTERNALUSERID": "External User ID",
+          "DIALOG": {
+            "REMOVE_TITLE":"Remove IDP",
+            "REMOVE_DESCRIPTION":"You are about to delete an Identity Provider from a user. Do you really want to continue?"
+        }
         },
         "CREATE": {
             "TITLE": "Create a New User",
@@ -452,8 +457,10 @@
                 "DESCRIPTION":"Define how Users can be authenticated",
                 "TITLECREATE":"Define how Users can be authenticated",
                 "DESCRIPTIONCREATEADMIN":"Users can choose from the available identity providers below.",
-                "DESCRIPTIONCREATEMGMT":"Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only."
+                "DESCRIPTIONCREATEMGMT":"Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only.",
+                "SAVED":"Saved successfully!"
             },
+            "DEFAULTLABEL":"The currently set guideline corresponds to the standard setting set by the IAM Administrator.",
             "BTN_INSTALL":"Setup",
             "BTN_EDIT":"Modify",
             "DATA": {
@@ -470,9 +477,17 @@
                 "USERLOGINMUSTBEDOMAIN":"User Login must be Domain",
                 "ALLOWUSERNAMEPASSWORD":"Username Password allowed",
                 "ALLOWEXTERNALIDP":"External IDP allowed",
-                "ALLOWREGISTER":"Register allowed"
+                "ALLOWREGISTER":"Register allowed",
+                "ALLOWUSERNAMEPASSWORD_DESC":"The conventional login with user name and password is allowed.",
+                "ALLOWEXTERNALIDP_DESC":"The login is allowed for the underlying identity providers",
+                "ALLOWREGISTER_DESC":"If the option is selected, an additional step for registering a user appears in the login."
             },
-            "DELETE":"Uninstall/Reset Policy"
+            "RESET":"Reset Policy",
+            "CREATECUSTOM":"Create Custom Policy",
+            "TOAST":{
+                "SET":"Policy set successfully!",
+                "RESETSUCCESS":"Policy reset successfully!"
+            }
         },
         "TOAST": {
             "DEACTIVATED":"Organisation deactivated.",
@@ -645,7 +660,12 @@
             "EDITDESCRIPTION": "Enter the new data for the role.",
             "DELETE":"Delete Role",
             "CREATIONDATE":"Created",
-            "SELECTGROUPTOOLTIP":"Select all Roles of the group {{group}}."
+            "SELECTGROUPTOOLTIP":"Select all Roles of the group {{group}}.",
+            "OPTIONS":"Options",
+            "ASSERTION":"Assert Roles on Authentication.",
+            "ASSERTION_DESCRIPTION":"Roleinformation is sent as Token, Userinfo endpoint or other type, depending on your application settings.",
+            "CHECK":"Check roles on Authentication",
+            "CHECK_DESCRIPTION":"If set, users are only allowed to authenticate if any role is assigned to their account."
         },
         "TABLE": {
             "TOTAL": "Entries total:",
@@ -705,12 +725,16 @@
           "1": "Preferred Username",
           "2": "Email"
         },
+        "STYLE":"Style",
+        "STYLEFIELD": {
+            "0": "No Styling",
+            "1": "Google"
+          },
         "TYPE":"Type",
         "ID": "ID",
         "NAME":"Name",
         "CONFIG":"Configuration",
         "STATE":"State",
-        "LOGOSRC":"Logo Src",
         "ISSUER":"Issuer",
         "SCOPESLIST":"Scopes List",
         "CLIENTID":"Client ID",
@@ -722,8 +746,18 @@
         "DEACTIVATE":"Deactivate",
         "ACTIVATE":"Activate",
         "DELETE":"Delete",
+        "DELETE_TITLE":"Delete Idp",
+        "DELETE_DESCRIPTION":"You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
+        "DELETE_SELECTION_TITLE":"Delete Idp",
+        "DELETE_SELECTION_DESCRIPTION":"You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
         "TOAST": {
-            "SAVED": "Successfully saved."
+            "SAVED": "Successfully saved.",
+            "REACTIVATED":"Idp reactivated.",
+            "DEACTIVATED":"Idp deactivated.",
+            "SELECTEDREACTIVATED":"Selected idps reactivated.",
+            "SELECTEDDEACTIVATED":"Selected idps deactivated.",
+            "SELECTEDKEYSDELETED":"Selected idps deleted.",
+            "DELETED":"Idp removed successfully!"
         }
     },
     "LOGINPOLICY": {
@@ -759,6 +793,8 @@
         "TYPE":"Application Type",
         "GRANT":"Grant Types",
         "OIDC": {
+            "TOKENSECTIONTITLE":"AuthToken Options",
+            "REDIRECTSECTIONTITLE":"Redirect Settings",
             "PROSWITCH":"I'm a pro. Skip this wizard.",
             "NAMEANDTYPESECTION":"Name and Type",
             "TITLEFIRST":"Insert a name first.",
@@ -799,9 +835,16 @@
             "AUTHMETHOD0":"Basic",
             "AUTHMETHOD1":"Post",
             "AUTHMETHOD2":"None",
+            "TOKENTYPE":"Auth Token Type",
+            "TOKENTYPE0": "Bearer Token",
+            "TOKENTYPE1": "JWT",
             "UNSECUREREDIRECT":"I sure hope you know what you are doing.",
             "OVERVIEWSECTION":"Overview",
-            "OVERVIEWTITLE":"You are now done. Review your configuration."
+            "OVERVIEWTITLE":"You are now done. Review your configuration.",
+            "ACCESSTOKENROLEASSERTION":"Add user roles to the access token",
+            "ACCESSTOKENROLEASSERTION_DESCRIPTION":"If selected, the roles of the authenticated user are added to the access token.",
+            "IDTOKENROLEASSERTION":"Add user roles to the id token",
+            "IDTOKENROLEASSERTION_DESCRIPTION":"If selected, the roles of the authenticated user are added to the id token."
         },
         "TOAST": {
             "REACTIVATED":"Application reactivated.",

@@ -1,7 +1,13 @@
 import { Component } from '@angular/core';
 import { PolicyComponentType } from 'src/app/modules/policies/policy-component-types.enum';
-import { LoginPolicy, OrgIamPolicy, PasswordComplexityPolicy, PolicyState } from 'src/app/proto/generated/management_pb';
+import {
+    LoginPolicyView,
+    OrgIamPolicyView,
+    PasswordComplexityPolicyView,
+    PolicyState,
+} from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
     selector: 'app-policy-grid',
@@ -9,21 +15,24 @@ import { ManagementService } from 'src/app/services/mgmt.service';
     styleUrls: ['./policy-grid.component.scss'],
 })
 export class PolicyGridComponent {
-    public complexityPolicy!: PasswordComplexityPolicy.AsObject;
-    public iamPolicy!: OrgIamPolicy.AsObject;
-    public loginPolicy!: LoginPolicy.AsObject;
+    public complexityPolicy!: PasswordComplexityPolicyView.AsObject;
+    public iamPolicy!: OrgIamPolicyView.AsObject;
+    public loginPolicy!: LoginPolicyView.AsObject;
 
     public PolicyState: any = PolicyState;
     public PolicyComponentType: any = PolicyComponentType;
 
     constructor(
-        private mgmtService: ManagementService,
+        public mgmtService: ManagementService,
+        private toast: ToastService,
     ) {
         this.getData();
     }
 
     private getData(): void {
-        this.mgmtService.GetPasswordComplexityPolicy().then(data => this.complexityPolicy = data.toObject());
+        this.mgmtService.GetPasswordComplexityPolicy().then(data => this.complexityPolicy = data.toObject()).catch(error => {
+            this.toast.showError(error);
+        });
         this.mgmtService.GetMyOrgIamPolicy().then(data => this.iamPolicy = data.toObject());
         this.mgmtService.GetLoginPolicy().then(data => {
             this.loginPolicy = data.toObject();

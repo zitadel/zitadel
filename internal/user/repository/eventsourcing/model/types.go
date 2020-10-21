@@ -67,6 +67,8 @@ const (
 	UserDeactivated models.EventType = "user.deactivated"
 	UserReactivated models.EventType = "user.reactivated"
 	UserRemoved     models.EventType = "user.removed"
+
+	UserTokenAdded models.EventType = "user.token.added"
 )
 
 // the following consts are for user(v2).human

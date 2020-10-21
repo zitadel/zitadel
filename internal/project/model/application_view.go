@@ -7,12 +7,14 @@ import (
 )
 
 type ApplicationView struct {
-	ID           string
-	ProjectID    string
-	Name         string
-	CreationDate time.Time
-	ChangeDate   time.Time
-	State        AppState
+	ID                   string
+	ProjectID            string
+	Name                 string
+	CreationDate         time.Time
+	ChangeDate           time.Time
+	State                AppState
+	ProjectRoleAssertion bool
+	ProjectRoleCheck     bool
 
 	IsOIDC                     bool
 	OIDCVersion                OIDCVersion
@@ -27,6 +29,9 @@ type ApplicationView struct {
 	ComplianceProblems         []string
 	DevMode                    bool
 	OriginAllowList            []string
+	AccessTokenType            OIDCTokenType
+	IDTokenRoleAssertion       bool
+	AccessTokenRoleAssertion   bool
 
 	Sequence uint64
 }

@@ -15,20 +15,28 @@ func (v *View) ApplicationByID(projectID, appID string) (*model.ApplicationView,
 	return view.ApplicationByID(v.Db, applicationTable, projectID, appID)
 }
 
-func (v *View) ApplicationsByProjectID(ProjectID string) ([]*model.ApplicationView, error) {
-	return view.ApplicationsByProjectID(v.Db, applicationTable, ProjectID)
+func (v *View) ApplicationsByProjectID(projectID string) ([]*model.ApplicationView, error) {
+	return view.ApplicationsByProjectID(v.Db, applicationTable, projectID)
 }
 
 func (v *View) SearchApplications(request *proj_model.ApplicationSearchRequest) ([]*model.ApplicationView, uint64, error) {
 	return view.SearchApplications(v.Db, applicationTable, request)
 }
 
-func (v *View) PutApplication(project *model.ApplicationView) error {
-	err := view.PutApplication(v.Db, applicationTable, project)
+func (v *View) PutApplication(app *model.ApplicationView) error {
+	err := view.PutApplication(v.Db, applicationTable, app)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedApplicationSequence(project.Sequence)
+	return v.ProcessedApplicationSequence(app.Sequence)
+}
+
+func (v *View) PutApplications(apps []*model.ApplicationView, sequence uint64) error {
+	err := view.PutApplications(v.Db, applicationTable, apps...)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedApplicationSequence(sequence)
 }
 
 func (v *View) DeleteApplication(appID string, eventSequence uint64) error {
@@ -39,8 +47,8 @@ func (v *View) DeleteApplication(appID string, eventSequence uint64) error {
 	return v.ProcessedApplicationSequence(eventSequence)
 }
 
-func (v *View) DeleteApplicationsByProjectID(ProjectID string) error {
-	return view.DeleteApplicationsByProjectID(v.Db, applicationTable, ProjectID)
+func (v *View) DeleteApplicationsByProjectID(projectID string) error {
+	return view.DeleteApplicationsByProjectID(v.Db, applicationTable, projectID)
 }
 
 func (v *View) GetLatestApplicationSequence() (*repository.CurrentSequence, error) {

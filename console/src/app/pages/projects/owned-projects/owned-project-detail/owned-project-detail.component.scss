@@ -76,3 +76,15 @@
     flex-direction: column;
   }
 }
+
+.desc {
+  color: var(--grey);
+  font-size: 14px;
+  margin-bottom: 1.5rem;
+}
+
+.divider {
+  height: 1px;
+  background-color: var(--grey);
+  margin-bottom: 1.5rem;
+}

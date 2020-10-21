@@ -12,7 +12,7 @@ import (
 )
 
 func (s *Server) CreateProject(ctx context.Context, in *management.ProjectCreateRequest) (*management.Project, error) {
-	project, err := s.project.CreateProject(ctx, in.Name)
+	project, err := s.project.CreateProject(ctx, projectCreateToModel(in))
 	if err != nil {
 		return nil, err
 	}

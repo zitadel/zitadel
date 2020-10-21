@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/i18n"
+	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/view"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
@@ -31,6 +32,7 @@ type handler struct {
 type EventstoreRepos struct {
 	UserEvents *usr_event.UserEventstore
 	OrgEvents  *org_event.OrgEventstore
+	IAMEvents  *iam_es.IAMEventstore
 }
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults, i18n *i18n.Translator, dir http.FileSystem) []query.Handler {
@@ -42,6 +44,8 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 		&NotifyUser{
 			handler:   handler{view, bulkLimit, configs.cycleDuration("User"), errorCount},
 			orgEvents: repos.OrgEvents,
+			iamEvents: repos.IAMEvents,
+			iamID:     systemDefaults.IamID,
 		},
 		&Notification{
 			handler:        handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount},

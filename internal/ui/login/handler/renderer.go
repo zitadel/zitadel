@@ -140,6 +140,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		"hasExternalLogin": func() bool {
 			return false
 		},
+		"idpProviderClass": func(stylingType iam_model.IDPStylingType) string {
+			return stylingType.GetCSSClass()
+		},
 	}
 	var err error
 	r.Renderer, err = renderer.NewRenderer(
@@ -211,6 +214,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderExternalNotFoundOption(w, r, authReq, err)
 	case *model.ExternalLoginStep:
 		l.handleExternalLoginStep(w, r, authReq, step.SelectedIDPConfigID)
+	case *model.GrantRequiredStep:
+		l.renderInternalError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-asb43", "Errors.User.GrantRequired"))
 	default:
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}

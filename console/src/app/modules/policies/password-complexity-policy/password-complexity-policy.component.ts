@@ -1,17 +1,14 @@
-import { Component, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, Injector, OnDestroy, Type } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import {
-    OrgIamPolicy,
-    PasswordAgePolicy,
-    PasswordComplexityPolicy,
-    PasswordLockoutPolicy,
-} from 'src/app/proto/generated/management_pb';
+import { DefaultPasswordComplexityPolicy } from 'src/app/proto/generated/admin_pb';
+import { PasswordComplexityPolicyView } from 'src/app/proto/generated/management_pb';
+import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { PolicyComponentAction } from '../policy-component-action.enum';
+import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
     selector: 'app-password-policy',
@@ -19,36 +16,45 @@ import { PolicyComponentAction } from '../policy-component-action.enum';
     styleUrls: ['./password-complexity-policy.component.scss'],
 })
 export class PasswordComplexityPolicyComponent implements OnDestroy {
-    public title: string = '';
-    public desc: string = '';
+    public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+    public service!: ManagementService | AdminService;
 
-    componentAction: PolicyComponentAction = PolicyComponentAction.CREATE;
-
-    public PolicyComponentAction: any = PolicyComponentAction;
-
-    public complexityData!: PasswordComplexityPolicy.AsObject;
+    public complexityData!: PasswordComplexityPolicyView.AsObject | DefaultPasswordComplexityPolicy.AsObject;
 
     private sub: Subscription = new Subscription();
+    public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
+    public loading: boolean = false;
     constructor(
         private route: ActivatedRoute,
-        private mgmtService: ManagementService,
-        private router: Router,
         private toast: ToastService,
+        private injector: Injector,
     ) {
         this.sub = this.route.data.pipe(switchMap(data => {
-            this.componentAction = data.action;
-            return this.route.params;
-        })).subscribe(params => {
-            this.title = 'ORG.POLICY.PWD_COMPLEXITY.TITLECREATE';
-            this.desc = 'ORG.POLICY.PWD_COMPLEXITY.DESCRIPTIONCREATE';
+            this.serviceType = data.serviceType;
 
-            if (this.componentAction === PolicyComponentAction.MODIFY) {
-                this.getData(params).then(data => {
-                    if (data) {
-                        this.complexityData = data.toObject() as PasswordComplexityPolicy.AsObject;
-                    }
-                });
+            switch (this.serviceType) {
+                case PolicyComponentServiceType.MGMT:
+                    this.service = this.injector.get(ManagementService as Type<ManagementService>);
+                    break;
+                case PolicyComponentServiceType.ADMIN:
+                    this.service = this.injector.get(AdminService as Type<AdminService>);
+                    break;
+            }
+
+            return this.route.params;
+        })).subscribe(() => {
+            this.fetchData();
+        });
+    }
+
+    public fetchData(): void {
+        this.loading = true;
+
+        this.getData().then(data => {
+            if (data) {
+                this.complexityData = data.toObject();
+                this.loading = false;
             }
         });
     }
@@ -57,19 +63,27 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
         this.sub.unsubscribe();
     }
 
-    private async getData(params: any):
-        Promise<PasswordLockoutPolicy | PasswordAgePolicy | PasswordComplexityPolicy | OrgIamPolicy | undefined> {
-        this.title = 'ORG.POLICY.PWD_COMPLEXITY.TITLE';
-        this.desc = 'ORG.POLICY.PWD_COMPLEXITY.DESCRIPTION';
-        return this.mgmtService.GetPasswordComplexityPolicy();
+    private async getData():
+        Promise<PasswordComplexityPolicyView | DefaultPasswordComplexityPolicy> {
+        switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+                return (this.service as ManagementService).GetPasswordComplexityPolicy();
+            case PolicyComponentServiceType.ADMIN:
+                return (this.service as AdminService).GetDefaultPasswordComplexityPolicy();
+        }
     }
 
-    public deletePolicy(): void {
-        this.mgmtService.DeletePasswordComplexityPolicy(this.complexityData.id).then(() => {
-            this.toast.showInfo('Successfully deleted');
-        }).catch(error => {
-            this.toast.showError(error);
-        });
+    public removePolicy(): void {
+        if (this.service instanceof ManagementService) {
+            this.service.removePasswordComplexityPolicy().then(() => {
+                this.toast.showInfo('ORG.POLICY.TOAST.RESETSUCCESS', true);
+                setTimeout(() => {
+                    this.fetchData();
+                }, 1000);
+            }).catch(error => {
+                this.toast.showError(error);
+            });
+        }
     }
 
     public incrementLength(): void {
@@ -85,35 +99,56 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
     }
 
     public savePolicy(): void {
-        if (this.componentAction === PolicyComponentAction.CREATE) {
+        switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+                if ((this.complexityData as PasswordComplexityPolicyView.AsObject).pb_default) {
+                    (this.service as ManagementService).CreatePasswordComplexityPolicy(
 
-            this.mgmtService.CreatePasswordComplexityPolicy(
-                this.complexityData.description,
-                this.complexityData.hasLowercase,
-                this.complexityData.hasUppercase,
-                this.complexityData.hasNumber,
-                this.complexityData.hasSymbol,
-                this.complexityData.minLength,
-            ).then(() => {
-                this.router.navigate(['org']);
-            }).catch(error => {
-                this.toast.showError(error);
-            });
+                        this.complexityData.hasLowercase,
+                        this.complexityData.hasUppercase,
+                        this.complexityData.hasNumber,
+                        this.complexityData.hasSymbol,
+                        this.complexityData.minLength,
+                    ).then(() => {
+                        this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
+                } else {
+                    (this.service as ManagementService).UpdatePasswordComplexityPolicy(
+                        this.complexityData.hasLowercase,
+                        this.complexityData.hasUppercase,
+                        this.complexityData.hasNumber,
+                        this.complexityData.hasSymbol,
+                        this.complexityData.minLength,
+                    ).then(() => {
+                        this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
+                }
+                break;
+            case PolicyComponentServiceType.ADMIN:
+                (this.service as AdminService).UpdateDefaultPasswordComplexityPolicy(
+                    this.complexityData.hasLowercase,
+                    this.complexityData.hasUppercase,
+                    this.complexityData.hasNumber,
+                    this.complexityData.hasSymbol,
+                    this.complexityData.minLength,
+                ).then(() => {
+                    this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
+                break;
+        }
+    }
 
-        } else if (this.componentAction === PolicyComponentAction.MODIFY) {
-
-            this.mgmtService.UpdatePasswordComplexityPolicy(
-                this.complexityData.description,
-                this.complexityData.hasLowercase,
-                this.complexityData.hasUppercase,
-                this.complexityData.hasNumber,
-                this.complexityData.hasSymbol,
-                this.complexityData.minLength,
-            ).then(() => {
-                this.router.navigate(['org']);
-            }).catch(error => {
-                this.toast.showError(error);
-            });
+    public get isDefault(): boolean {
+        if (this.complexityData && this.serviceType === PolicyComponentServiceType.MGMT) {
+            return (this.complexityData as PasswordComplexityPolicyView.AsObject).pb_default;
+        } else {
+            return false;
         }
     }
 }

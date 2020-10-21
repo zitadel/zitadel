@@ -2,35 +2,36 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/eventstore/sdk"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	"time"
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	cache "github.com/caos/zitadel/internal/auth_request/repository"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/id"
 	org_model "github.com/caos/zitadel/internal/org/model"
+	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
+	project_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
+	"github.com/caos/zitadel/internal/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	grant_view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
 )
 
 type AuthRequestRepo struct {
 	UserEvents   *user_event.UserEventstore
 	OrgEvents    *org_event.OrgEventstore
-	PolicyEvents *policy_event.PolicyEventstore
 	AuthRequests cache.AuthRequestCache
 	View         *view.View
 
@@ -40,6 +41,7 @@ type AuthRequestRepo struct {
 	OrgViewProvider         orgViewProvider
 	LoginPolicyViewProvider loginPolicyViewProvider
 	IDPProviderViewProvider idpProviderViewProvider
+	UserGrantProvider       userGrantProvider
 
 	IdGenerator id.Generator
 
@@ -78,6 +80,11 @@ type orgViewProvider interface {
 	OrgByPrimaryDomain(string) (*org_view_model.OrgView, error)
 }
 
+type userGrantProvider interface {
+	ApplicationByClientID(context.Context, string) (*project_view_model.ApplicationView, error)
+	UserGrantsByProjectAndUserID(string, string) ([]*grant_view_model.UserGrantView, error)
+}
+
 func (repo *AuthRequestRepo) Health(ctx context.Context) error {
 	if err := repo.UserEvents.Health(ctx); err != nil {
 		return err
@@ -85,20 +92,26 @@ func (repo *AuthRequestRepo) Health(ctx context.Context) error {
 	return repo.AuthRequests.Health(ctx)
 }
 
-func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *model.AuthRequest) (*model.AuthRequest, error) {
+func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *model.AuthRequest) (_ *model.AuthRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	reqID, err := repo.IdGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
 	request.ID = reqID
-	ids, err := repo.View.AppIDsFromProjectByClientID(ctx, request.ApplicationID)
+	app, err := repo.View.ApplicationByClientID(ctx, request.ApplicationID)
 	if err != nil {
 		return nil, err
 	}
-	request.Audience = ids
+	appIDs, err := repo.View.AppIDsFromProjectID(ctx, app.ProjectID)
+	if err != nil {
+		return nil, err
+	}
+	request.Audience = appIDs
 	if request.LoginHint != "" {
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
-		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID).Debug("login hint invalid")
+		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID).OnError(err).Debug("login hint invalid")
 	}
 	err = repo.AuthRequests.SaveAuthRequest(ctx, request)
 	if err != nil {
@@ -107,15 +120,21 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 	return request, nil
 }
 
-func (repo *AuthRequestRepo) AuthRequestByID(ctx context.Context, id, userAgentID string) (*model.AuthRequest, error) {
+func (repo *AuthRequestRepo) AuthRequestByID(ctx context.Context, id, userAgentID string) (_ *model.AuthRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	return repo.getAuthRequestNextSteps(ctx, id, userAgentID, false)
 }
 
-func (repo *AuthRequestRepo) AuthRequestByIDCheckLoggedIn(ctx context.Context, id, userAgentID string) (*model.AuthRequest, error) {
+func (repo *AuthRequestRepo) AuthRequestByIDCheckLoggedIn(ctx context.Context, id, userAgentID string) (_ *model.AuthRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	return repo.getAuthRequestNextSteps(ctx, id, userAgentID, true)
 }
 
-func (repo *AuthRequestRepo) SaveAuthCode(ctx context.Context, id, code, userAgentID string) error {
+func (repo *AuthRequestRepo) SaveAuthCode(ctx context.Context, id, code, userAgentID string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, id, userAgentID)
 	if err != nil {
 		return err
@@ -124,7 +143,9 @@ func (repo *AuthRequestRepo) SaveAuthCode(ctx context.Context, id, code, userAge
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) AuthRequestByCode(ctx context.Context, code string) (*model.AuthRequest, error) {
+func (repo *AuthRequestRepo) AuthRequestByCode(ctx context.Context, code string) (_ *model.AuthRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	request, err := repo.AuthRequests.GetAuthRequestByCode(ctx, code)
 	if err != nil {
 		return nil, err
@@ -137,11 +158,15 @@ func (repo *AuthRequestRepo) AuthRequestByCode(ctx context.Context, code string)
 	return request, nil
 }
 
-func (repo *AuthRequestRepo) DeleteAuthRequest(ctx context.Context, id string) error {
+func (repo *AuthRequestRepo) DeleteAuthRequest(ctx context.Context, id string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	return repo.AuthRequests.DeleteAuthRequest(ctx, id)
 }
 
-func (repo *AuthRequestRepo) CheckLoginName(ctx context.Context, id, loginName, userAgentID string) error {
+func (repo *AuthRequestRepo) CheckLoginName(ctx context.Context, id, loginName, userAgentID string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, id, userAgentID)
 	if err != nil {
 		return err
@@ -153,7 +178,9 @@ func (repo *AuthRequestRepo) CheckLoginName(ctx context.Context, id, loginName, 
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) SelectExternalIDP(ctx context.Context, authReqID, idpConfigID, userAgentID string) error {
+func (repo *AuthRequestRepo) SelectExternalIDP(ctx context.Context, authReqID, idpConfigID, userAgentID string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
@@ -165,7 +192,9 @@ func (repo *AuthRequestRepo) SelectExternalIDP(ctx context.Context, authReqID, i
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReqID, userAgentID string, externalUser *model.ExternalUser, info *model.BrowserInfo) error {
+func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReqID, userAgentID string, externalUser *model.ExternalUser, info *model.BrowserInfo) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
@@ -193,7 +222,9 @@ func (repo *AuthRequestRepo) setLinkingUser(ctx context.Context, request *model.
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAgentID string) error {
+func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAgentID string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, id, userAgentID)
 	if err != nil {
 		return err
@@ -206,7 +237,9 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, password, userAgentID string, info *model.BrowserInfo) error {
+func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, password, userAgentID string, info *model.BrowserInfo) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, id, userAgentID)
 	if err != nil {
 		return err
@@ -217,7 +250,9 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, pas
 	return repo.UserEvents.CheckPassword(ctx, userID, password, request.WithCurrentInfo(info))
 }
 
-func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, userID, code, userAgentID string, info *model.BrowserInfo) error {
+func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, userID, code, userAgentID string, info *model.BrowserInfo) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authRequestID, userAgentID)
 	if err != nil {
 		return err
@@ -228,7 +263,9 @@ func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, us
 	return repo.UserEvents.CheckMfaOTP(ctx, userID, code, request.WithCurrentInfo(info))
 }
 
-func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, userAgentID string, info *model.BrowserInfo) error {
+func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, userAgentID string, info *model.BrowserInfo) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
@@ -255,7 +292,9 @@ func (repo *AuthRequestRepo) ResetLinkingUsers(ctx context.Context, authReqID, u
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, registerUser *user_model.User, externalIDP *user_model.ExternalIDP, orgMember *org_model.OrgMember, authReqID, userAgentID, resourceOwner string, info *model.BrowserInfo) error {
+func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, registerUser *user_model.User, externalIDP *user_model.ExternalIDP, orgMember *org_model.OrgMember, authReqID, userAgentID, resourceOwner string, info *model.BrowserInfo) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
@@ -264,15 +303,23 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner
 	}
-	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
+	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(policyResourceOwner)
+	if errors.IsNotFound(err) {
+		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.IAMID)
+	}
 	if err != nil {
 		return err
 	}
-	orgPolicy, err := repo.OrgEvents.GetOrgIAMPolicy(ctx, policyResourceOwner)
+	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(pwPolicy)
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(policyResourceOwner)
+	if errors.IsNotFound(err) {
+		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.IAMID)
+	}
 	if err != nil {
 		return err
 	}
-	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, externalIDP, pwPolicy, orgPolicy, resourceOwner)
+	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
+	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, externalIDP, pwPolicyView, orgPolicyView, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -535,6 +582,15 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 
 	}
 	//PLANNED: consent step
+
+	missing, err := userGrantRequired(ctx, request, user, repo.UserGrantProvider)
+	if err != nil {
+		return nil, err
+	}
+	if missing {
+		return append(steps, &model.GrantRequiredStep{}), nil
+	}
+
 	return append(steps, &model.RedirectToCallbackStep{}), nil
 }
 
@@ -773,4 +829,24 @@ func linkingIDPConfigExistingInAllowedIDPs(linkingUsers []*model.ExternalUser, i
 		}
 	}
 	return true
+}
+func userGrantRequired(ctx context.Context, request *model.AuthRequest, user *user_model.UserView, userGrantProvider userGrantProvider) (_ bool, err error) {
+	var app *project_view_model.ApplicationView
+	switch request.Request.Type() {
+	case model.AuthRequestTypeOIDC:
+		app, err = userGrantProvider.ApplicationByClientID(ctx, request.ApplicationID)
+		if err != nil {
+			return false, err
+		}
+	default:
+		return false, errors.ThrowPreconditionFailed(nil, "EVENT-dfrw2", "Errors.AuthRequest.RequestTypeNotSupported")
+	}
+	if !app.ProjectRoleCheck {
+		return false, nil
+	}
+	grants, err := userGrantProvider.UserGrantsByProjectAndUserID(app.ProjectID, user.ID)
+	if err != nil {
+		return false, err
+	}
+	return len(grants) == 0, nil
 }

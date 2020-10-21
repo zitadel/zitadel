@@ -1,6 +1,7 @@
 package eventsourcing
 
 import (
+	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"net/http"
 
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
@@ -56,7 +57,14 @@ func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults) (
 	if err != nil {
 		return nil, err
 	}
-	eventstoreRepos := handler.EventstoreRepos{UserEvents: user, OrgEvents: org}
+	iam, err := es_iam.StartIAM(es_iam.IAMConfig{
+		Eventstore: es,
+		Cache:      conf.Eventstore.Cache,
+	}, systemDefaults)
+	if err != nil {
+		return nil, err
+	}
+	eventstoreRepos := handler.EventstoreRepos{UserEvents: user, OrgEvents: org, IAMEvents: iam}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos, systemDefaults, translator, dir)
 
 	return &EsRepository{

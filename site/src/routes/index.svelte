@@ -39,7 +39,7 @@
 
 <svelte:head>
   <title>
-    Caos • Documentation
+    ZITADEL • Documentation
   </title>
 </svelte:head>
 
@@ -51,7 +51,15 @@
             <p>{$_('description')}</p>
             <p>{$_('description2')}</p>
             <p>{$_('description3')}</p>
-
-            <a href="/get_started" >{$_('button')}</a>
+            
+            <ul style="list-style-type: none;">
+            <li><a href="/start" >{$_('startlink')}</a></li>
+            <li><a href="/integrate" >{$_('integratelink')}</a></li>
+            <li><a href="/administrate" >{$_('administratelink')}</a></li>
+            <li><a href="/develop" >{$_('developlink')}</a></li>
+            <li><a href="/documentation" >{$_('docslink')}</a></li>
+            <li><a href="/use" >{$_('uselink')}</a></li>
+            </ul>
+            
         </div>
     </Section>

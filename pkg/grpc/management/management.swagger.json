@@ -22,12 +22,18 @@
     "/global/orgs/_bydomain": {
       "get": {
         "summary": "search a organisation by its domain overall organisations",
-        "operationId": "GetOrgByDomainGlobal",
+        "operationId": "ManagementService_GetOrgByDomainGlobal",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1OrgView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -44,21 +50,27 @@
         ]
       }
     },
-    "/global/users/_byemail": {
+    "/global/users/_byloginname": {
       "get": {
-        "summary": "GetUserByEmailGlobal returns User, global search is overall organisations",
-        "operationId": "GetUserByEmailGlobal",
+        "summary": "GetUserByLoginNameGlobal returns User, global search is overall organisations",
+        "operationId": "ManagementService_GetUserByLoginNameGlobal",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UserView"
             }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
           }
         },
         "parameters": [
           {
-            "name": "email",
+            "name": "login_name",
             "in": "query",
             "required": false,
             "type": "string"
@@ -72,12 +84,18 @@
     "/grantedprojects/_search": {
       "post": {
         "summary": "returns all projects my organisation got granted from another organisation",
-        "operationId": "SearchGrantedProjects",
+        "operationId": "ManagementService_SearchGrantedProjects",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectGrantSearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -99,12 +117,18 @@
     "/grantedprojects/{project_id}/grants/{id}": {
       "get": {
         "summary": "returns a project my organisation got granted from another organisation",
-        "operationId": "GetGrantedProjectByID",
+        "operationId": "ManagementService_GetGrantedProjectByID",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectGrantView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -130,12 +154,18 @@
     "/healthz": {
       "get": {
         "summary": "READINESS",
-        "operationId": "Healthz",
+        "operationId": "ManagementService_Healthz",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -147,12 +177,138 @@
     "/iam": {
       "get": {
         "summary": "GetIam returns some needed settings of the iam (Global Organisation ID, Zitadel Project ID)",
-        "operationId": "GetIam",
+        "operationId": "ManagementService_GetIam",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1Iam"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs": {
+      "post": {
+        "operationId": "ManagementService_CreateOrg",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Org"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1OrgCreateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/default/policies/login": {
+      "get": {
+        "operationId": "ManagementService_GetDefaultLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1LoginPolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/default/policies/password/age": {
+      "get": {
+        "operationId": "ManagementService_GetDefaultPasswordAgePolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PasswordAgePolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/default/policies/password/complexity": {
+      "get": {
+        "operationId": "ManagementService_GetDefaultPasswordComplexityPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PasswordComplexityPolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/default/policies/password/lockout": {
+      "get": {
+        "operationId": "ManagementService_GetDefaultPasswordLockoutPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PasswordLockoutPolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -163,12 +319,18 @@
     },
     "/orgs/me": {
       "get": {
-        "operationId": "GetMyOrg",
+        "operationId": "ManagementService_GetMyOrg",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1OrgView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -179,12 +341,18 @@
     },
     "/orgs/me/_deactivate": {
       "put": {
-        "operationId": "DeactivateMyOrg",
+        "operationId": "ManagementService_DeactivateMyOrg",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1Org"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -205,12 +373,18 @@
     },
     "/orgs/me/_reactivate": {
       "put": {
-        "operationId": "ReactivateMyOrg",
+        "operationId": "ManagementService_ReactivateMyOrg",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1Org"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -231,12 +405,18 @@
     },
     "/orgs/me/domains": {
       "post": {
-        "operationId": "AddMyOrgDomain",
+        "operationId": "ManagementService_AddMyOrgDomain",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1OrgDomain"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -257,12 +437,18 @@
     },
     "/orgs/me/domains/_search": {
       "post": {
-        "operationId": "SearchMyOrgDomains",
+        "operationId": "ManagementService_SearchMyOrgDomains",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1OrgDomainSearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -283,12 +469,18 @@
     },
     "/orgs/me/domains/{domain}": {
       "delete": {
-        "operationId": "RemoveMyOrgDomain",
+        "operationId": "ManagementService_RemoveMyOrgDomain",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -305,14 +497,126 @@
         ]
       }
     },
-    "/orgs/me/iampolicy": {
-      "get": {
-        "operationId": "GetMyOrgIamPolicy",
+    "/orgs/me/domains/{domain}/_primary": {
+      "post": {
+        "operationId": "ManagementService_SetMyPrimaryOrgDomain",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1OrgIamPolicy"
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "domain",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/domains/{domain}/validation/check": {
+      "post": {
+        "operationId": "ManagementService_ValidateMyOrgDomain",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "domain",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ValidateOrgDomainRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/domains/{domain}/validation/create": {
+      "post": {
+        "operationId": "ManagementService_GenerateMyOrgDomainValidation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OrgDomainValidationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "domain",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1OrgDomainValidationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/iampolicy": {
+      "get": {
+        "operationId": "ManagementService_GetMyOrgIamPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OrgIamPolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -321,14 +625,292 @@
         ]
       }
     },
+    "/orgs/me/idps/_search": {
+      "post": {
+        "operationId": "ManagementService_SearchIdps",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IdpSearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1IdpSearchRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/idps/oidc": {
+      "post": {
+        "operationId": "ManagementService_CreateOidcIdp",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Idp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1OidcIdpConfigCreate"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/idps/{idp_id}/oidcconfig": {
+      "put": {
+        "operationId": "ManagementService_UpdateOidcIdpConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OidcIdpConfig"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "idp_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1OidcIdpConfigUpdate"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/idps/{id}": {
+      "get": {
+        "operationId": "ManagementService_IdpByID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IdpView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "delete": {
+        "operationId": "ManagementService_RemoveIdpConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "put": {
+        "operationId": "ManagementService_UpdateIdpConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Idp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1IdpUpdate"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/idps/{id}/_deactivate": {
+      "put": {
+        "operationId": "ManagementService_DeactivateIdpConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Idp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1IdpID"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/idps/{id}/_reactivate": {
+      "put": {
+        "operationId": "ManagementService_ReactivateIdpConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Idp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1IdpID"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/orgs/me/members": {
       "post": {
-        "operationId": "AddMyOrgMember",
+        "operationId": "ManagementService_AddMyOrgMember",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1OrgMember"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -349,12 +931,18 @@
     },
     "/orgs/me/members/_search": {
       "post": {
-        "operationId": "SearchMyOrgMembers",
+        "operationId": "ManagementService_SearchMyOrgMembers",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1OrgMemberSearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -375,12 +963,18 @@
     },
     "/orgs/me/members/{user_id}": {
       "delete": {
-        "operationId": "RemoveMyOrgMember",
+        "operationId": "ManagementService_RemoveMyOrgMember",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -397,12 +991,18 @@
         ]
       },
       "put": {
-        "operationId": "ChangeMyOrgMember",
+        "operationId": "ManagementService_ChangeMyOrgMember",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1OrgMember"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -427,14 +1027,522 @@
         ]
       }
     },
+    "/orgs/me/policies/login": {
+      "get": {
+        "operationId": "ManagementService_GetLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1LoginPolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "delete": {
+        "operationId": "ManagementService_RemoveLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "post": {
+        "operationId": "ManagementService_CreateLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1LoginPolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1LoginPolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "put": {
+        "operationId": "ManagementService_UpdateLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1LoginPolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1LoginPolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/policies/login/idpproviders": {
+      "post": {
+        "operationId": "ManagementService_AddIdpProviderToLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IdpProvider"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1IdpProviderAdd"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/policies/login/idpproviders/_search": {
+      "post": {
+        "operationId": "ManagementService_GetLoginPolicyIdpProviders",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IdpProviderSearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1IdpProviderSearchRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/policies/login/idpproviders/{idp_config_id}": {
+      "delete": {
+        "operationId": "ManagementService_RemoveIdpProviderFromLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "idp_config_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/policies/password/age": {
+      "get": {
+        "operationId": "ManagementService_GetPasswordAgePolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PasswordAgePolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "delete": {
+        "operationId": "ManagementService_RemovePasswordAgePolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "post": {
+        "operationId": "ManagementService_CreatePasswordAgePolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PasswordAgePolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1PasswordAgePolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "put": {
+        "operationId": "ManagementService_UpdatePasswordAgePolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PasswordAgePolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1PasswordAgePolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/policies/password/complexity": {
+      "get": {
+        "operationId": "ManagementService_GetPasswordComplexityPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PasswordComplexityPolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "delete": {
+        "operationId": "ManagementService_RemovePasswordComplexityPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "post": {
+        "operationId": "ManagementService_CreatePasswordComplexityPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PasswordComplexityPolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1PasswordComplexityPolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "put": {
+        "operationId": "ManagementService_UpdatePasswordComplexityPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PasswordComplexityPolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1PasswordComplexityPolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/policies/password/lockout": {
+      "get": {
+        "operationId": "ManagementService_GetPasswordLockoutPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PasswordLockoutPolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "delete": {
+        "operationId": "ManagementService_RemovePasswordLockoutPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "post": {
+        "operationId": "ManagementService_CreatePasswordLockoutPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PasswordLockoutPolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1PasswordLockoutPolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "put": {
+        "operationId": "ManagementService_UpdatePasswordLockoutPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PasswordLockoutPolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1PasswordLockoutPolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/orgs/members/roles": {
       "get": {
-        "operationId": "GetOrgMemberRoles",
+        "operationId": "ManagementService_GetOrgMemberRoles",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1OrgMemberRoles"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -446,12 +1554,18 @@
     "/orgs/{id}/changes": {
       "get": {
         "summary": "OrgChanges returns the event stream of the org object",
-        "operationId": "OrgChanges",
+        "operationId": "ManagementService_OrgChanges",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1Changes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -486,511 +1600,7 @@
             "name": "asc",
             "in": "query",
             "required": false,
-            "type": "boolean",
-            "format": "boolean"
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/policies/passwords/age": {
-      "get": {
-        "summary": "returns default if nothing other set on organisation",
-        "operationId": "GetPasswordAgePolicy",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1PasswordAgePolicy"
-            }
-          }
-        },
-        "tags": [
-          "ManagementService"
-        ]
-      },
-      "delete": {
-        "operationId": "DeletePasswordAgePolicy",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      },
-      "post": {
-        "operationId": "CreatePasswordAgePolicy",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1PasswordAgePolicy"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1PasswordAgePolicyCreate"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      },
-      "put": {
-        "operationId": "UpdatePasswordAgePolicy",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1PasswordAgePolicy"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1PasswordAgePolicyUpdate"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/policies/passwords/complexity": {
-      "get": {
-        "summary": "returns default policy if nothing other set on organisation",
-        "operationId": "GetPasswordComplexityPolicy",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1PasswordComplexityPolicy"
-            }
-          }
-        },
-        "tags": [
-          "ManagementService"
-        ]
-      },
-      "delete": {
-        "operationId": "DeletePasswordComplexityPolicy",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      },
-      "post": {
-        "operationId": "CreatePasswordComplexityPolicy",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1PasswordComplexityPolicy"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1PasswordComplexityPolicyCreate"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      },
-      "put": {
-        "operationId": "UpdatePasswordComplexityPolicy",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1PasswordComplexityPolicy"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1PasswordComplexityPolicyUpdate"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/policies/passwords/lockout": {
-      "get": {
-        "summary": "returns default if nothing other set on organisation",
-        "operationId": "GetPasswordLockoutPolicy",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1PasswordLockoutPolicy"
-            }
-          }
-        },
-        "tags": [
-          "ManagementService"
-        ]
-      },
-      "delete": {
-        "operationId": "DeletePasswordLockoutPolicy",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      },
-      "post": {
-        "operationId": "CreatePasswordLockoutPolicy",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1PasswordLockoutPolicy"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1PasswordLockoutPolicyCreate"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      },
-      "put": {
-        "operationId": "UpdatePasswordLockoutPolicy",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1PasswordLockoutPolicy"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1PasswordLockoutPolicyUpdate"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/projectgrants/{project_grant_id}/users/grants/_search": {
-      "post": {
-        "summary": "search user grants based on a projectgrant\nThis request is required that the user authorizations of zitadel can be differentiated",
-        "operationId": "SearchProjectGrantUserGrants",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1UserGrantSearchResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "project_grant_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1ProjectGrantUserGrantSearchRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/projectgrants/{project_grant_id}/users/{user_id}/grants": {
-      "post": {
-        "summary": "create user grant based on a projectgrant\nThis request is required that the user authorizations of zitadel can be differentiated",
-        "operationId": "CreateProjectGrantUserGrant",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1UserGrant"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "project_grant_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1ProjectGrantUserGrantCreate"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}": {
-      "get": {
-        "summary": "get user grant based on a projectgrant\nThis request is required that the user authorizations of zitadel can be differentiated",
-        "operationId": "ProjectGrantUserGrantByID",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1UserGrantView"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "project_grant_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      },
-      "put": {
-        "summary": "update user grant based on a projectgrant\nThis request is required that the user authorizations of zitadel can be differentiated",
-        "operationId": "UpdateProjectGrantUserGrant",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1UserGrant"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "project_grant_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1ProjectGrantUserGrantUpdate"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}/_deactivate": {
-      "put": {
-        "summary": "deactivate user grant based on a projectgrant\nThis request is required that the user authorizations of zitadel can be differentiated",
-        "operationId": "DeactivateProjectGrantUserGrant",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1UserGrant"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "project_grant_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1ProjectGrantUserGrantID"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}/_reactivate": {
-      "put": {
-        "summary": "reactivate user grant based on a projectgrant\nThis request is required that the user authorizations of zitadel can be differentiated",
-        "operationId": "ReactivateProjectGrantUserGrant",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1UserGrant"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "project_grant_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1ProjectGrantUserGrantID"
-            }
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -1000,12 +1610,18 @@
     },
     "/projects": {
       "post": {
-        "operationId": "CreateProject",
+        "operationId": "ManagementService_CreateProject",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1Project"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1026,12 +1642,18 @@
     },
     "/projects/_search": {
       "post": {
-        "operationId": "SearchProjects",
+        "operationId": "ManagementService_SearchProjects",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectSearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1052,12 +1674,18 @@
     },
     "/projects/grants/members/roles": {
       "get": {
-        "operationId": "GetProjectGrantMemberRoles",
+        "operationId": "ManagementService_GetProjectGrantMemberRoles",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectGrantMemberRoles"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1068,12 +1696,18 @@
     },
     "/projects/members/roles": {
       "get": {
-        "operationId": "GetProjectMemberRoles",
+        "operationId": "ManagementService_GetProjectMemberRoles",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectMemberRoles"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1084,12 +1718,46 @@
     },
     "/projects/{id}": {
       "get": {
-        "operationId": "ProjectByID",
+        "operationId": "ManagementService_ProjectByID",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "delete": {
+        "operationId": "ManagementService_RemoveProject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1106,12 +1774,18 @@
         ]
       },
       "put": {
-        "operationId": "UpdateProject",
+        "operationId": "ManagementService_UpdateProject",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1Project"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1138,12 +1812,18 @@
     },
     "/projects/{id}/_deactivate": {
       "put": {
-        "operationId": "DeactivateProject",
+        "operationId": "ManagementService_DeactivateProject",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1Project"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1170,12 +1850,18 @@
     },
     "/projects/{id}/_reactivate": {
       "put": {
-        "operationId": "ReactivateProject",
+        "operationId": "ManagementService_ReactivateProject",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1Project"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1203,12 +1889,18 @@
     "/projects/{id}/applications/{sec_id}/changes": {
       "get": {
         "summary": "ApplicationChanges returns the event stream of the application object",
-        "operationId": "ApplicationChanges",
+        "operationId": "ManagementService_ApplicationChanges",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1Changes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1243,8 +1935,7 @@
             "name": "asc",
             "in": "query",
             "required": false,
-            "type": "boolean",
-            "format": "boolean"
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -1255,12 +1946,18 @@
     "/projects/{id}/changes": {
       "get": {
         "summary": "ProjectChanges returns the event stream of the project object",
-        "operationId": "ProjectChanges",
+        "operationId": "ManagementService_ProjectChanges",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1Changes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1295,8 +1992,7 @@
             "name": "asc",
             "in": "query",
             "required": false,
-            "type": "boolean",
-            "format": "boolean"
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -1306,12 +2002,18 @@
     },
     "/projects/{id}/members": {
       "post": {
-        "operationId": "AddProjectMember",
+        "operationId": "ManagementService_AddProjectMember",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectMember"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1338,12 +2040,18 @@
     },
     "/projects/{id}/members/{user_id}": {
       "delete": {
-        "operationId": "RemoveProjectMember",
+        "operationId": "ManagementService_RemoveProjectMember",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1366,12 +2074,18 @@
         ]
       },
       "put": {
-        "operationId": "ChangeProjectMember",
+        "operationId": "ManagementService_ChangeProjectMember",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectMember"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1404,12 +2118,18 @@
     },
     "/projects/{id}/roles": {
       "post": {
-        "operationId": "AddProjectRole",
+        "operationId": "ManagementService_AddProjectRole",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectRole"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1437,12 +2157,18 @@
     "/projects/{id}/roles/_bulk": {
       "post": {
         "summary": "add a list of project roles in one request",
-        "operationId": "BulkAddProjectRole",
+        "operationId": "ManagementService_BulkAddProjectRole",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1470,12 +2196,18 @@
     "/projects/{id}/roles/{key}": {
       "delete": {
         "summary": "RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project",
-        "operationId": "RemoveProjectRole",
+        "operationId": "ManagementService_RemoveProjectRole",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1498,12 +2230,18 @@
         ]
       },
       "put": {
-        "operationId": "ChangeProjectRole",
+        "operationId": "ManagementService_ChangeProjectRole",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectRole"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1536,12 +2274,18 @@
     },
     "/projects/{project_id}/applications/_search": {
       "post": {
-        "operationId": "SearchApplications",
+        "operationId": "ManagementService_SearchApplications",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ApplicationSearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1566,14 +2310,58 @@
         ]
       }
     },
+    "/projects/{project_id}/applications/oidc": {
+      "post": {
+        "operationId": "ManagementService_CreateOIDCApplication",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Application"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1OIDCApplicationCreate"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/projects/{project_id}/applications/{application_id}/oidcconfig": {
       "put": {
-        "operationId": "UpdateApplicationOIDCConfig",
+        "operationId": "ManagementService_UpdateApplicationOIDCConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1OIDCConfig"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1606,12 +2394,18 @@
     },
     "/projects/{project_id}/applications/{id}": {
       "get": {
-        "operationId": "ApplicationByID",
+        "operationId": "ManagementService_ApplicationByID",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ApplicationView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1634,12 +2428,18 @@
         ]
       },
       "delete": {
-        "operationId": "RemoveApplication",
+        "operationId": "ManagementService_RemoveApplication",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1662,12 +2462,18 @@
         ]
       },
       "put": {
-        "operationId": "UpdateApplication",
+        "operationId": "ManagementService_UpdateApplication",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1Application"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1700,12 +2506,18 @@
     },
     "/projects/{project_id}/applications/{id}/_deactivate": {
       "put": {
-        "operationId": "DeactivateApplication",
+        "operationId": "ManagementService_DeactivateApplication",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1Application"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1738,12 +2550,18 @@
     },
     "/projects/{project_id}/applications/{id}/_reactivate": {
       "put": {
-        "operationId": "ReactivateApplication",
+        "operationId": "ManagementService_ReactivateApplication",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1Application"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1776,12 +2594,18 @@
     },
     "/projects/{project_id}/applications/{id}/oidcconfig/_changeclientsecret": {
       "put": {
-        "operationId": "RegenerateOIDCClientSecret",
+        "operationId": "ManagementService_RegenerateOIDCClientSecret",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ClientSecret"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1814,12 +2638,18 @@
     },
     "/projects/{project_id}/grants": {
       "post": {
-        "operationId": "CreateProjectGrant",
+        "operationId": "ManagementService_CreateProjectGrant",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectGrant"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1846,12 +2676,18 @@
     },
     "/projects/{project_id}/grants/_search": {
       "post": {
-        "operationId": "SearchProjectGrants",
+        "operationId": "ManagementService_SearchProjectGrants",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectGrantSearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1878,12 +2714,18 @@
     },
     "/projects/{project_id}/grants/{grant_id}/members": {
       "post": {
-        "operationId": "AddProjectGrantMember",
+        "operationId": "ManagementService_AddProjectGrantMember",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectGrantMember"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1916,12 +2758,18 @@
     },
     "/projects/{project_id}/grants/{grant_id}/members/_search": {
       "post": {
-        "operationId": "SearchProjectGrantMembers",
+        "operationId": "ManagementService_SearchProjectGrantMembers",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectGrantMemberSearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1954,12 +2802,18 @@
     },
     "/projects/{project_id}/grants/{grant_id}/members/{user_id}": {
       "delete": {
-        "operationId": "RemoveProjectGrantMember",
+        "operationId": "ManagementService_RemoveProjectGrantMember",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -1988,12 +2842,18 @@
         ]
       },
       "put": {
-        "operationId": "ChangeProjectGrantMember",
+        "operationId": "ManagementService_ChangeProjectGrantMember",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectGrantMember"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2032,12 +2892,18 @@
     },
     "/projects/{project_id}/grants/{id}": {
       "get": {
-        "operationId": "ProjectGrantByID",
+        "operationId": "ManagementService_ProjectGrantByID",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectGrantView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2061,12 +2927,18 @@
       },
       "delete": {
         "summary": "RemoveProjectGrant removes project grant and all user grants for this project grant",
-        "operationId": "RemoveProjectGrant",
+        "operationId": "ManagementService_RemoveProjectGrant",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2089,12 +2961,18 @@
         ]
       },
       "put": {
-        "operationId": "UpdateProjectGrant",
+        "operationId": "ManagementService_UpdateProjectGrant",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectGrant"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2127,12 +3005,18 @@
     },
     "/projects/{project_id}/grants/{id}/_deactivate": {
       "put": {
-        "operationId": "DeactivateProjectGrant",
+        "operationId": "ManagementService_DeactivateProjectGrant",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectGrant"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2165,12 +3049,18 @@
     },
     "/projects/{project_id}/grants/{id}/_reactivate": {
       "put": {
-        "operationId": "ReactivateProjectGrant",
+        "operationId": "ManagementService_ReactivateProjectGrant",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectGrant"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2203,12 +3093,18 @@
     },
     "/projects/{project_id}/members/_search": {
       "post": {
-        "operationId": "SearchProjectMembers",
+        "operationId": "ManagementService_SearchProjectMembers",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectMemberSearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2233,46 +3129,20 @@
         ]
       }
     },
-    "/projects/{project_id}/oidcapplications": {
-      "post": {
-        "operationId": "CreateOIDCApplication",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1Application"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "project_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1OIDCApplicationCreate"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
     "/projects/{project_id}/roles/_search": {
       "post": {
-        "operationId": "SearchProjectRoles",
+        "operationId": "ManagementService_SearchProjectRoles",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectRoleSearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2297,311 +3167,23 @@
         ]
       }
     },
-    "/projects/{project_id}/users/grants/_search": {
-      "post": {
-        "summary": "search user grants based on a project\nThis request is required that the user authorizations of zitadel can be differentiated",
-        "operationId": "SearchProjectUserGrants",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1UserGrantSearchResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "project_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1ProjectUserGrantSearchRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/projects/{project_id}/users/{user_id}/grants": {
-      "post": {
-        "summary": "create user grant based on a project\nThis request is required that the user authorizations of zitadel can be differentiated",
-        "operationId": "CreateProjectUserGrant",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1UserGrant"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "project_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1UserGrantCreate"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/projects/{project_id}/users/{user_id}/grants/{id}": {
-      "get": {
-        "summary": "get user grant based on a project\nThis request is required that the user authorizations of zitadel can be differentiated",
-        "operationId": "ProjectUserGrantByID",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1UserGrantView"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "project_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      },
-      "put": {
-        "summary": "update user grant based on a project\nThis request is required that the user authorizations of zitadel can be differentiated",
-        "operationId": "UpdateProjectUserGrant",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1UserGrant"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "project_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1ProjectUserGrantUpdate"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/projects/{project_id}/users/{user_id}/grants/{id}/_deactivate": {
-      "put": {
-        "summary": "deactivate user grant based on a project\nThis request is required that the user authorizations of zitadel can be differentiated",
-        "operationId": "DeactivateProjectUserGrant",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1UserGrant"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "project_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1ProjectUserGrantID"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/projects/{project_id}/users/{user_id}/grants/{id}/_reactivate": {
-      "put": {
-        "summary": "reactivate user grant based on a project\nThis request is required that the user authorizations of zitadel can be differentiated",
-        "operationId": "ReactivateProjectUserGrant",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1UserGrant"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "project_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1ProjectUserGrantID"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
     "/ready": {
       "get": {
-        "operationId": "Ready",
+        "operationId": "ManagementService_Ready",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
             }
-          }
-        },
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/usergrants/_bulk": {
-      "post": {
-        "summary": "add a list of user grants in one request",
-        "operationId": "BulkCreateUserGrant",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
+          },
+          "default": {
+            "description": "An unexpected error response.",
             "schema": {
-              "properties": {}
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1UserGrantCreateBulk"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      },
-      "put": {
-        "summary": "update a list of user grants in one request",
-        "operationId": "BulkUpdateUserGrant",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1UserGrantUpdateBulk"
-            }
-          }
-        ],
         "tags": [
           "ManagementService"
         ]
@@ -2609,12 +3191,18 @@
     },
     "/users": {
       "post": {
-        "operationId": "CreateUser",
+        "operationId": "ManagementService_CreateUser",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1User"
+              "$ref": "#/definitions/v1UserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2635,12 +3223,18 @@
     },
     "/users/_isunique": {
       "get": {
-        "operationId": "IsUserUnique",
+        "operationId": "ManagementService_IsUserUnique",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UniqueUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2666,12 +3260,18 @@
     "/users/_search": {
       "post": {
         "summary": "Limit should always be set, there is a default limit set by the service",
-        "operationId": "SearchUsers",
+        "operationId": "ManagementService_SearchUsers",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UserSearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2692,12 +3292,18 @@
     },
     "/users/grants/_search": {
       "post": {
-        "operationId": "SearchUserGrants",
+        "operationId": "ManagementService_SearchUserGrants",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UserGrantSearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2718,12 +3324,18 @@
     },
     "/users/{id}": {
       "get": {
-        "operationId": "GetUserByID",
+        "operationId": "ManagementService_GetUserByID",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UserView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2740,12 +3352,18 @@
         ]
       },
       "delete": {
-        "operationId": "DeleteUser",
+        "operationId": "ManagementService_DeleteUser",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2764,12 +3382,18 @@
     },
     "/users/{id}/_deactivate": {
       "put": {
-        "operationId": "DeactivateUser",
+        "operationId": "ManagementService_DeactivateUser",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1User"
+              "$ref": "#/definitions/v1UserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2796,12 +3420,18 @@
     },
     "/users/{id}/_lock": {
       "put": {
-        "operationId": "LockUser",
+        "operationId": "ManagementService_LockUser",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1User"
+              "$ref": "#/definitions/v1UserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2828,12 +3458,18 @@
     },
     "/users/{id}/_reactivate": {
       "put": {
-        "operationId": "ReactivateUser",
+        "operationId": "ManagementService_ReactivateUser",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1User"
+              "$ref": "#/definitions/v1UserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2860,12 +3496,18 @@
     },
     "/users/{id}/_unlock": {
       "put": {
-        "operationId": "UnlockUser",
+        "operationId": "ManagementService_UnlockUser",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1User"
+              "$ref": "#/definitions/v1UserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2892,12 +3534,18 @@
     },
     "/users/{id}/address": {
       "get": {
-        "operationId": "GetUserAddress",
+        "operationId": "ManagementService_GetUserAddress",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UserAddressView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2914,12 +3562,18 @@
         ]
       },
       "put": {
-        "operationId": "UpdateUserAddress",
+        "operationId": "ManagementService_UpdateUserAddress",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UserAddress"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2947,12 +3601,18 @@
     "/users/{id}/changes": {
       "get": {
         "summary": "UserChanges returns the event stream of the user object",
-        "operationId": "UserChanges",
+        "operationId": "ManagementService_UserChanges",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1Changes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -2987,8 +3647,7 @@
             "name": "asc",
             "in": "query",
             "required": false,
-            "type": "boolean",
-            "format": "boolean"
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -2998,12 +3657,18 @@
     },
     "/users/{id}/email": {
       "get": {
-        "operationId": "GetUserEmail",
+        "operationId": "ManagementService_GetUserEmail",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UserEmailView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3020,12 +3685,18 @@
         ]
       },
       "put": {
-        "operationId": "ChangeUserEmail",
+        "operationId": "ManagementService_ChangeUserEmail",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UserEmail"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3052,12 +3723,18 @@
     },
     "/users/{id}/email/_resendverification": {
       "post": {
-        "operationId": "ResendEmailVerificationMail",
+        "operationId": "ManagementService_ResendEmailVerificationMail",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3082,14 +3759,58 @@
         ]
       }
     },
+    "/users/{id}/machine": {
+      "put": {
+        "operationId": "ManagementService_UpdateUserMachine",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MachineResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdateMachineRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/users/{id}/mfas": {
       "get": {
-        "operationId": "GetUserMfas",
+        "operationId": "ManagementService_GetUserMfas",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1MultiFactors"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3109,12 +3830,18 @@
     "/users/{id}/password/_initialize": {
       "post": {
         "summary": "A Manager is only allowed to set an initial password, on the next login the user has to change his password",
-        "operationId": "SetInitialPassword",
+        "operationId": "ManagementService_SetInitialPassword",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3142,12 +3869,18 @@
     "/users/{id}/password/_sendsetnotification": {
       "post": {
         "summary": "Sends an Notification (Email/SMS) with a password reset Link",
-        "operationId": "SendSetPasswordNotification",
+        "operationId": "ManagementService_SendSetPasswordNotification",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3174,12 +3907,18 @@
     },
     "/users/{id}/phone": {
       "get": {
-        "operationId": "GetUserPhone",
+        "operationId": "ManagementService_GetUserPhone",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UserPhoneView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3196,12 +3935,18 @@
         ]
       },
       "delete": {
-        "operationId": "RemoveUserPhone",
+        "operationId": "ManagementService_RemoveUserPhone",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3218,12 +3963,18 @@
         ]
       },
       "put": {
-        "operationId": "ChangeUserPhone",
+        "operationId": "ManagementService_ChangeUserPhone",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UserPhone"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3250,12 +4001,18 @@
     },
     "/users/{id}/phone/_resendverification": {
       "post": {
-        "operationId": "ResendPhoneVerificationCode",
+        "operationId": "ManagementService_ResendPhoneVerificationCode",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3282,12 +4039,18 @@
     },
     "/users/{id}/profile": {
       "get": {
-        "operationId": "GetUserProfile",
+        "operationId": "ManagementService_GetUserProfile",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UserProfileView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3304,12 +4067,18 @@
         ]
       },
       "put": {
-        "operationId": "UpdateUserProfile",
+        "operationId": "ManagementService_UpdateUserProfile",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UserProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3334,14 +4103,136 @@
         ]
       }
     },
+    "/users/{id}/username": {
+      "get": {
+        "operationId": "ManagementService_ChangeUserUserName",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/users/{user_id}/externalidps/_search": {
+      "post": {
+        "operationId": "ManagementService_SearchUserExternalIDPs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ExternalIDPSearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ExternalIDPSearchRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/users/{user_id}/externalidps/{idp_config_id}/{external_user_id}": {
+      "delete": {
+        "operationId": "ManagementService_RemoveExternalIDP",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "idp_config_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "external_user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/users/{user_id}/grants": {
       "post": {
-        "operationId": "CreateUserGrant",
+        "operationId": "ManagementService_CreateUserGrant",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UserGrant"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3368,12 +4259,18 @@
     },
     "/users/{user_id}/grants/{id}": {
       "get": {
-        "operationId": "UserGrantByID",
+        "operationId": "ManagementService_UserGrantByID",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UserGrantView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3396,12 +4293,18 @@
         ]
       },
       "delete": {
-        "operationId": "RemoveUserGrant",
+        "operationId": "ManagementService_RemoveUserGrant",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3424,12 +4327,18 @@
         ]
       },
       "put": {
-        "operationId": "UpdateUserGrant",
+        "operationId": "ManagementService_UpdateUserGrant",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UserGrant"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3462,12 +4371,18 @@
     },
     "/users/{user_id}/grants/{id}/_deactivate": {
       "put": {
-        "operationId": "DeactivateUserGrant",
+        "operationId": "ManagementService_DeactivateUserGrant",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UserGrant"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3500,12 +4415,18 @@
     },
     "/users/{user_id}/grants/{id}/_reactivate": {
       "put": {
-        "operationId": "ReactivateUserGrant",
+        "operationId": "ManagementService_ReactivateUserGrant",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UserGrant"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3536,15 +4457,205 @@
         ]
       }
     },
-    "/usersgrants/_bulk": {
+    "/users/{user_id}/keys": {
+      "post": {
+        "operationId": "ManagementService_AddMachineKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AddMachineKeyResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1AddMachineKeyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/users/{user_id}/keys/_search": {
+      "post": {
+        "operationId": "ManagementService_SearchMachineKeys",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MachineKeySearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1MachineKeySearchRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/users/{user_id}/keys/{key_id}": {
+      "get": {
+        "operationId": "ManagementService_GetMachineKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MachineKeyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "key_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
       "delete": {
-        "summary": "remove a list of user grants in one request",
-        "operationId": "BulkRemoveUserGrant",
+        "operationId": "ManagementService_DeleteMachineKey",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "key_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/users/{user_id}/memberships/_search": {
+      "post": {
+        "operationId": "ManagementService_SearchUserMemberships",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserMembershipSearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UserMembershipSearchRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/usersgrants/_bulk": {
+      "delete": {
+        "summary": "remove a list of user grants in one request",
+        "operationId": "ManagementService_BulkRemoveUserGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3565,12 +4676,40 @@
     },
     "/validate": {
       "get": {
-        "operationId": "Validate",
+        "operationId": "ManagementService_Validate",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protobufStruct"
+              "type": "object"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/zitadel/docs": {
+      "get": {
+        "operationId": "ManagementService_GetZitadelDocs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ZitadelDocs"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -3581,18 +4720,20 @@
     }
   },
   "definitions": {
-    "protobufListValue": {
+    "protobufAny": {
       "type": "object",
       "properties": {
-        "values": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protobufValue"
-          },
-          "description": "Repeated field of dynamically typed values."
+        "type_url": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        },
+        "value": {
+          "type": "string",
+          "format": "byte",
+          "description": "Must be a valid serialized protocol buffer of the above specified type."
         }
       },
-      "description": "`ListValue` is a wrapper around a repeated field of values.\n\nThe JSON representation for `ListValue` is JSON array."
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := ptypes.MarshalAny(foo)\n     ...\n     foo := \u0026pb.Foo{}\n     if err := ptypes.UnmarshalAny(any, foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
     },
     "protobufNullValue": {
       "type": "string",
@@ -3602,50 +4743,68 @@
       "default": "NULL_VALUE",
       "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
-    "protobufStruct": {
+    "runtimeError": {
       "type": "object",
       "properties": {
-        "fields": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/protobufValue"
-          },
-          "description": "Unordered map of dynamically typed values."
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
         }
-      },
-      "description": "`Struct` represents a structured data value, consisting of fields\nwhich map to dynamically typed values. In some languages, `Struct`\nmight be supported by a native representation. For example, in\nscripting languages like JS a struct is represented as an\nobject. The details of that representation are described together\nwith the proto support for the language.\n\nThe JSON representation for `Struct` is JSON object."
+      }
     },
-    "protobufValue": {
+    "v1AddMachineKeyRequest": {
       "type": "object",
       "properties": {
-        "null_value": {
-          "$ref": "#/definitions/protobufNullValue",
-          "description": "Represents a null value."
+        "user_id": {
+          "type": "string"
         },
-        "number_value": {
-          "type": "number",
-          "format": "double",
-          "description": "Represents a double value."
+        "type": {
+          "$ref": "#/definitions/v1MachineKeyType"
         },
-        "string_value": {
+        "expiration_date": {
           "type": "string",
-          "description": "Represents a string value."
-        },
-        "bool_value": {
-          "type": "boolean",
-          "format": "boolean",
-          "description": "Represents a boolean value."
-        },
-        "struct_value": {
-          "$ref": "#/definitions/protobufStruct",
-          "description": "Represents a structured value."
-        },
-        "list_value": {
-          "$ref": "#/definitions/protobufListValue",
-          "description": "Represents a repeated `Value`."
+          "format": "date-time"
         }
-      },
-      "description": "`Value` represents a dynamically typed value which can be either\nnull, a number, a string, a boolean, a recursive struct value, or a\nlist of values. A producer of value is expected to set one of that\nvariants, absence of any variant indicates an error.\n\nThe JSON representation for `Value` is JSON value."
+      }
+    },
+    "v1AddMachineKeyResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "type": {
+          "$ref": "#/definitions/v1MachineKeyType"
+        },
+        "expiration_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "key_details": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
     },
     "v1AddOrgDomainRequest": {
       "type": "object",
@@ -3782,6 +4941,14 @@
           "items": {
             "$ref": "#/definitions/v1ApplicationView"
           }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -3849,7 +5016,7 @@
           "type": "string"
         },
         "data": {
-          "$ref": "#/definitions/protobufStruct"
+          "type": "object"
         }
       }
     },
@@ -3894,12 +5061,9 @@
         }
       }
     },
-    "v1CreateUserRequest": {
+    "v1CreateHumanRequest": {
       "type": "object",
       "properties": {
-        "user_name": {
-          "type": "string"
-        },
         "first_name": {
           "type": "string"
         },
@@ -3919,15 +5083,13 @@
           "type": "string"
         },
         "is_email_verified": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "phone": {
           "type": "string"
         },
         "is_phone_verified": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "country": {
           "type": "string"
@@ -3946,6 +5108,106 @@
         },
         "password": {
           "type": "string"
+        }
+      }
+    },
+    "v1CreateMachineRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateUserRequest": {
+      "type": "object",
+      "properties": {
+        "user_name": {
+          "type": "string"
+        },
+        "human": {
+          "$ref": "#/definitions/v1CreateHumanRequest"
+        },
+        "machine": {
+          "$ref": "#/definitions/v1CreateMachineRequest"
+        }
+      }
+    },
+    "v1ExternalIDPSearchRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "user_id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ExternalIDPSearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ExternalIDPView"
+          }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1ExternalIDPView": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "idp_config_id": {
+          "type": "string"
+        },
+        "external_user_id": {
+          "type": "string"
+        },
+        "idp_name": {
+          "type": "string"
+        },
+        "external_user_display_name": {
+          "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -3978,6 +5240,110 @@
         }
       }
     },
+    "v1HumanResponse": {
+      "type": "object",
+      "properties": {
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "nick_name": {
+          "type": "string"
+        },
+        "preferred_language": {
+          "type": "string"
+        },
+        "gender": {
+          "$ref": "#/definitions/v1Gender"
+        },
+        "email": {
+          "type": "string"
+        },
+        "is_email_verified": {
+          "type": "boolean"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "is_phone_verified": {
+          "type": "boolean"
+        },
+        "country": {
+          "type": "string"
+        },
+        "locality": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "street_address": {
+          "type": "string"
+        }
+      }
+    },
+    "v1HumanView": {
+      "type": "object",
+      "properties": {
+        "password_changed": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "nick_name": {
+          "type": "string"
+        },
+        "preferred_language": {
+          "type": "string"
+        },
+        "gender": {
+          "$ref": "#/definitions/v1Gender"
+        },
+        "email": {
+          "type": "string"
+        },
+        "is_email_verified": {
+          "type": "boolean"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "is_phone_verified": {
+          "type": "boolean"
+        },
+        "country": {
+          "type": "string"
+        },
+        "locality": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "street_address": {
+          "type": "string"
+        }
+      }
+    },
     "v1Iam": {
       "type": "object",
       "properties": {
@@ -3988,12 +5354,297 @@
           "type": "string"
         },
         "set_up_done": {
-          "type": "boolean",
-          "format": "boolean"
+          "$ref": "#/definitions/v1IamSetupStep"
         },
         "set_up_started": {
-          "type": "boolean",
-          "format": "boolean"
+          "$ref": "#/definitions/v1IamSetupStep"
+        }
+      }
+    },
+    "v1IamSetupStep": {
+      "type": "string",
+      "enum": [
+        "iam_setup_step_UNDEFINED",
+        "iam_setup_step_1",
+        "iam_setup_step_2"
+      ],
+      "default": "iam_setup_step_UNDEFINED"
+    },
+    "v1Idp": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/definitions/v1IdpState"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "name": {
+          "type": "string"
+        },
+        "styling_type": {
+          "$ref": "#/definitions/v1IdpStylingType"
+        },
+        "oidc_config": {
+          "$ref": "#/definitions/v1OidcIdpConfig"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1IdpID": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1IdpProvider": {
+      "type": "object",
+      "properties": {
+        "idp_config_id": {
+          "type": "string"
+        },
+        "idp_provider_Type": {
+          "$ref": "#/definitions/v1IdpProviderType"
+        }
+      }
+    },
+    "v1IdpProviderAdd": {
+      "type": "object",
+      "properties": {
+        "idp_config_id": {
+          "type": "string"
+        },
+        "idp_provider_type": {
+          "$ref": "#/definitions/v1IdpProviderType"
+        }
+      }
+    },
+    "v1IdpProviderSearchRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1IdpProviderSearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1IdpProviderView"
+          }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1IdpProviderType": {
+      "type": "string",
+      "enum": [
+        "IDPPROVIDERTYPE_UNSPECIFIED",
+        "IDPPROVIDERTYPE_SYSTEM",
+        "IDPPROVIDERTYPE_ORG"
+      ],
+      "default": "IDPPROVIDERTYPE_UNSPECIFIED"
+    },
+    "v1IdpProviderView": {
+      "type": "object",
+      "properties": {
+        "idp_config_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1IdpType"
+        }
+      }
+    },
+    "v1IdpSearchKey": {
+      "type": "string",
+      "enum": [
+        "IDPSEARCHKEY_UNSPECIFIED",
+        "IDPSEARCHKEY_IDP_CONFIG_ID",
+        "IDPSEARCHKEY_NAME",
+        "IDPSEARCHKEY_PROVIDER_TYPE"
+      ],
+      "default": "IDPSEARCHKEY_UNSPECIFIED"
+    },
+    "v1IdpSearchQuery": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/v1IdpSearchKey"
+        },
+        "method": {
+          "$ref": "#/definitions/v1SearchMethod"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1IdpSearchRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1IdpSearchQuery"
+          }
+        }
+      }
+    },
+    "v1IdpSearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1IdpView"
+          }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1IdpState": {
+      "type": "string",
+      "enum": [
+        "IDPCONFIGSTATE_UNSPECIFIED",
+        "IDPCONFIGSTATE_ACTIVE",
+        "IDPCONFIGSTATE_INACTIVE"
+      ],
+      "default": "IDPCONFIGSTATE_UNSPECIFIED"
+    },
+    "v1IdpStylingType": {
+      "type": "string",
+      "enum": [
+        "IDPSTYLINGTYPE_UNSPECIFIED",
+        "IDPSTYLINGTYPE_GOOGLE"
+      ],
+      "default": "IDPSTYLINGTYPE_UNSPECIFIED"
+    },
+    "v1IdpType": {
+      "type": "string",
+      "enum": [
+        "IDPTYPE_UNSPECIFIED",
+        "IDPTYPE_OIDC",
+        "IDPTYPE_SAML"
+      ],
+      "default": "IDPTYPE_UNSPECIFIED"
+    },
+    "v1IdpUpdate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "styling_type": {
+          "$ref": "#/definitions/v1IdpStylingType"
+        }
+      }
+    },
+    "v1IdpView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/definitions/v1IdpState"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "name": {
+          "type": "string"
+        },
+        "styling_type": {
+          "$ref": "#/definitions/v1IdpStylingType"
+        },
+        "provider_type": {
+          "$ref": "#/definitions/v1IdpProviderType"
+        },
+        "oidc_config": {
+          "$ref": "#/definitions/v1OidcIdpConfigView"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -4008,6 +5659,67 @@
         }
       }
     },
+    "v1LoginPolicy": {
+      "type": "object",
+      "properties": {
+        "allow_username_password": {
+          "type": "boolean"
+        },
+        "allow_register": {
+          "type": "boolean"
+        },
+        "allow_external_idp": {
+          "type": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1LoginPolicyRequest": {
+      "type": "object",
+      "properties": {
+        "allow_username_password": {
+          "type": "boolean"
+        },
+        "allow_register": {
+          "type": "boolean"
+        },
+        "allow_external_idp": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1LoginPolicyView": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "boolean"
+        },
+        "allow_username_password": {
+          "type": "boolean"
+        },
+        "allow_register": {
+          "type": "boolean"
+        },
+        "allow_external_idp": {
+          "type": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "v1MFAState": {
       "type": "string",
       "enum": [
@@ -4017,6 +5729,123 @@
         "MFASTATE_REMOVED"
       ],
       "default": "MFASTATE_UNSPECIFIED"
+    },
+    "v1MachineKeySearchRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "asc": {
+          "type": "boolean"
+        },
+        "user_id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1MachineKeySearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1MachineKeyView"
+          }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1MachineKeyType": {
+      "type": "string",
+      "enum": [
+        "MACHINEKEY_UNSPECIFIED",
+        "MACHINEKEY_JSON"
+      ],
+      "default": "MACHINEKEY_UNSPECIFIED"
+    },
+    "v1MachineKeyView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1MachineKeyType"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiration_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1MachineResponse": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "v1MachineView": {
+      "type": "object",
+      "properties": {
+        "last_key_added": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "v1MemberType": {
+      "type": "string",
+      "enum": [
+        "MEMBERTYPE_UNSPECIFIED",
+        "MEMBERTYPE_ORGANISATION",
+        "MEMBERTYPE_PROJECT",
+        "MEMBERTYPE_PROJECT_GRANT"
+      ],
+      "default": "MEMBERTYPE_UNSPECIFIED"
     },
     "v1MfaType": {
       "type": "string",
@@ -4095,6 +5924,21 @@
           "items": {
             "type": "string"
           }
+        },
+        "version": {
+          "$ref": "#/definitions/v1OIDCVersion"
+        },
+        "dev_mode": {
+          "type": "boolean"
+        },
+        "access_token_type": {
+          "$ref": "#/definitions/v1OIDCTokenType"
+        },
+        "access_token_role_assertion": {
+          "type": "boolean"
+        },
+        "id_token_role_assertion": {
+          "type": "boolean"
         }
       }
     },
@@ -4154,6 +5998,30 @@
           "items": {
             "type": "string"
           }
+        },
+        "version": {
+          "$ref": "#/definitions/v1OIDCVersion"
+        },
+        "none_compliant": {
+          "type": "boolean"
+        },
+        "compliance_problems": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1LocalizedMessage"
+          }
+        },
+        "dev_mode": {
+          "type": "boolean"
+        },
+        "access_token_type": {
+          "$ref": "#/definitions/v1OIDCTokenType"
+        },
+        "access_token_role_assertion": {
+          "type": "boolean"
+        },
+        "id_token_role_assertion": {
+          "type": "boolean"
         }
       }
     },
@@ -4195,6 +6063,18 @@
           "items": {
             "type": "string"
           }
+        },
+        "dev_mode": {
+          "type": "boolean"
+        },
+        "access_token_type": {
+          "$ref": "#/definitions/v1OIDCTokenType"
+        },
+        "access_token_role_assertion": {
+          "type": "boolean"
+        },
+        "id_token_role_assertion": {
+          "type": "boolean"
         }
       }
     },
@@ -4207,14 +6087,148 @@
       ],
       "default": "OIDCGRANTTYPE_AUTHORIZATION_CODE"
     },
+    "v1OIDCMappingField": {
+      "type": "string",
+      "enum": [
+        "OIDCMAPPINGFIELD_UNSPECIFIED",
+        "OIDCMAPPINGFIELD_PREFERRED_USERNAME",
+        "OIDCMAPPINGFIELD_EMAIL"
+      ],
+      "default": "OIDCMAPPINGFIELD_UNSPECIFIED"
+    },
     "v1OIDCResponseType": {
       "type": "string",
       "enum": [
         "OIDCRESPONSETYPE_CODE",
         "OIDCRESPONSETYPE_ID_TOKEN",
-        "OIDCRESPONSETYPE_TOKEN"
+        "OIDCRESPONSETYPE_ID_TOKEN_TOKEN"
       ],
       "default": "OIDCRESPONSETYPE_CODE"
+    },
+    "v1OIDCTokenType": {
+      "type": "string",
+      "enum": [
+        "OIDCTokenType_Bearer",
+        "OIDCTokenType_JWT"
+      ],
+      "default": "OIDCTokenType_Bearer"
+    },
+    "v1OIDCVersion": {
+      "type": "string",
+      "enum": [
+        "OIDCV1_0"
+      ],
+      "default": "OIDCV1_0"
+    },
+    "v1OidcIdpConfig": {
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "type": "string"
+        },
+        "client_secret": {
+          "type": "string"
+        },
+        "issuer": {
+          "type": "string"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "idp_display_name_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
+        },
+        "username_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
+        }
+      }
+    },
+    "v1OidcIdpConfigCreate": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "styling_type": {
+          "$ref": "#/definitions/v1IdpStylingType"
+        },
+        "client_id": {
+          "type": "string"
+        },
+        "client_secret": {
+          "type": "string"
+        },
+        "issuer": {
+          "type": "string"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "idp_display_name_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
+        },
+        "username_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
+        }
+      }
+    },
+    "v1OidcIdpConfigUpdate": {
+      "type": "object",
+      "properties": {
+        "idp_id": {
+          "type": "string"
+        },
+        "client_id": {
+          "type": "string"
+        },
+        "client_secret": {
+          "type": "string"
+        },
+        "issuer": {
+          "type": "string"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "idp_display_name_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
+        },
+        "username_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
+        }
+      }
+    },
+    "v1OidcIdpConfigView": {
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "type": "string"
+        },
+        "issuer": {
+          "type": "string"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "idp_display_name_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
+        },
+        "username_mapping": {
+          "$ref": "#/definitions/v1OIDCMappingField"
+        }
+      }
     },
     "v1Org": {
       "type": "object",
@@ -4242,6 +6256,14 @@
         }
       }
     },
+    "v1OrgCreateRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
     "v1OrgDomain": {
       "type": "object",
       "properties": {
@@ -4260,12 +6282,10 @@
           "type": "string"
         },
         "verified": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "primary": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -4334,8 +6354,47 @@
           "items": {
             "$ref": "#/definitions/v1OrgDomainView"
           }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
         }
       }
+    },
+    "v1OrgDomainValidationRequest": {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1OrgDomainValidationType"
+        }
+      }
+    },
+    "v1OrgDomainValidationResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "v1OrgDomainValidationType": {
+      "type": "string",
+      "enum": [
+        "ORGDOMAINVALIDATIONTYPE_UNSPECIFIED",
+        "ORGDOMAINVALIDATIONTYPE_HTTP",
+        "ORGDOMAINVALIDATIONTYPE_DNS"
+      ],
+      "default": "ORGDOMAINVALIDATIONTYPE_UNSPECIFIED"
     },
     "v1OrgDomainView": {
       "type": "object",
@@ -4355,35 +6414,28 @@
           "type": "string"
         },
         "verified": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "primary": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "validation_type": {
+          "$ref": "#/definitions/v1OrgDomainValidationType"
         }
       }
     },
-    "v1OrgIamPolicy": {
+    "v1OrgIamPolicyView": {
       "type": "object",
       "properties": {
-        "org_id": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
         "user_login_must_be_domain": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "default": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -4488,6 +6540,14 @@
           "items": {
             "$ref": "#/definitions/v1OrgMemberView"
           }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -4525,6 +6585,9 @@
           "type": "string"
         },
         "last_name": {
+          "type": "string"
+        },
+        "display_name": {
           "type": "string"
         }
       }
@@ -4567,14 +6630,17 @@
     "v1PasswordAgePolicy": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
+        "max_age_days": {
+          "type": "string",
+          "format": "uint64"
         },
-        "description": {
-          "type": "string"
+        "expire_warn_days": {
+          "type": "string",
+          "format": "uint64"
         },
-        "state": {
-          "$ref": "#/definitions/v1PolicyState"
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         },
         "creation_date": {
           "type": "string",
@@ -4583,6 +6649,27 @@
         "change_date": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "v1PasswordAgePolicyRequest": {
+      "type": "object",
+      "properties": {
+        "max_age_days": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "expire_warn_days": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1PasswordAgePolicyView": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "boolean"
         },
         "max_age_days": {
           "type": "string",
@@ -4596,58 +6683,38 @@
           "type": "string",
           "format": "uint64"
         },
-        "is_default": {
-          "type": "boolean",
-          "format": "boolean"
-        }
-      }
-    },
-    "v1PasswordAgePolicyCreate": {
-      "type": "object",
-      "properties": {
-        "description": {
-          "type": "string"
-        },
-        "max_age_days": {
+        "creation_date": {
           "type": "string",
-          "format": "uint64"
+          "format": "date-time"
         },
-        "expire_warn_days": {
+        "change_date": {
           "type": "string",
-          "format": "uint64"
-        }
-      }
-    },
-    "v1PasswordAgePolicyUpdate": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "max_age_days": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "expire_warn_days": {
-          "type": "string",
-          "format": "uint64"
+          "format": "date-time"
         }
       }
     },
     "v1PasswordComplexityPolicy": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
+        "min_length": {
+          "type": "string",
+          "format": "uint64"
         },
-        "description": {
-          "type": "string"
+        "has_lowercase": {
+          "type": "boolean"
         },
-        "state": {
-          "$ref": "#/definitions/v1PolicyState"
+        "has_uppercase": {
+          "type": "boolean"
+        },
+        "has_number": {
+          "type": "boolean"
+        },
+        "has_symbol": {
+          "type": "boolean"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         },
         "creation_date": {
           "type": "string",
@@ -4656,107 +6723,79 @@
         "change_date": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "v1PasswordComplexityPolicyRequest": {
+      "type": "object",
+      "properties": {
+        "min_length": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "has_lowercase": {
+          "type": "boolean"
+        },
+        "has_uppercase": {
+          "type": "boolean"
+        },
+        "has_number": {
+          "type": "boolean"
+        },
+        "has_symbol": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1PasswordComplexityPolicyView": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "boolean"
         },
         "min_length": {
           "type": "string",
           "format": "uint64"
         },
         "has_lowercase": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "has_uppercase": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "has_number": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "has_symbol": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "sequence": {
           "type": "string",
           "format": "uint64"
         },
-        "is_default": {
-          "type": "boolean",
-          "format": "boolean"
-        }
-      }
-    },
-    "v1PasswordComplexityPolicyCreate": {
-      "type": "object",
-      "properties": {
-        "description": {
-          "type": "string"
-        },
-        "min_length": {
+        "creation_date": {
           "type": "string",
-          "format": "uint64"
+          "format": "date-time"
         },
-        "has_lowercase": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "has_uppercase": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "has_number": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "has_symbol": {
-          "type": "boolean",
-          "format": "boolean"
-        }
-      }
-    },
-    "v1PasswordComplexityPolicyUpdate": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "min_length": {
+        "change_date": {
           "type": "string",
-          "format": "uint64"
-        },
-        "has_lowercase": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "has_uppercase": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "has_number": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "has_symbol": {
-          "type": "boolean",
-          "format": "boolean"
+          "format": "date-time"
         }
       }
     },
     "v1PasswordLockoutPolicy": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
+        "max_attempts": {
+          "type": "string",
+          "format": "uint64"
         },
-        "description": {
-          "type": "string"
+        "show_lockout_failure": {
+          "type": "boolean"
         },
-        "state": {
-          "$ref": "#/definitions/v1PolicyState"
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         },
         "creation_date": {
           "type": "string",
@@ -4765,57 +6804,45 @@
         "change_date": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "v1PasswordLockoutPolicyRequest": {
+      "type": "object",
+      "properties": {
+        "max_attempts": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "show_lockout_failure": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1PasswordLockoutPolicyView": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "boolean"
         },
         "max_attempts": {
           "type": "string",
           "format": "uint64"
         },
-        "show_lock_out_failures": {
-          "type": "boolean",
-          "format": "boolean"
+        "show_lockout_failure": {
+          "type": "boolean"
         },
         "sequence": {
           "type": "string",
           "format": "uint64"
         },
-        "is_default": {
-          "type": "boolean",
-          "format": "boolean"
-        }
-      }
-    },
-    "v1PasswordLockoutPolicyCreate": {
-      "type": "object",
-      "properties": {
-        "description": {
-          "type": "string"
-        },
-        "max_attempts": {
+        "creation_date": {
           "type": "string",
-          "format": "uint64"
+          "format": "date-time"
         },
-        "show_lock_out_failures": {
-          "type": "boolean",
-          "format": "boolean"
-        }
-      }
-    },
-    "v1PasswordLockoutPolicyUpdate": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "max_attempts": {
+        "change_date": {
           "type": "string",
-          "format": "uint64"
-        },
-        "show_lock_out_failures": {
-          "type": "boolean",
-          "format": "boolean"
+          "format": "date-time"
         }
       }
     },
@@ -4829,16 +6856,6 @@
           "type": "string"
         }
       }
-    },
-    "v1PolicyState": {
-      "type": "string",
-      "enum": [
-        "POLICYSTATE_UNSPECIFIED",
-        "POLICYSTATE_ACTIVE",
-        "POLICYSTATE_INACTIVE",
-        "POLICYSTATE_DELETED"
-      ],
-      "default": "POLICYSTATE_UNSPECIFIED"
     },
     "v1Project": {
       "type": "object",
@@ -4863,6 +6880,12 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "project_role_assertion": {
+          "type": "boolean"
+        },
+        "project_role_check": {
+          "type": "boolean"
         }
       }
     },
@@ -4871,6 +6894,12 @@
       "properties": {
         "name": {
           "type": "string"
+        },
+        "project_role_assertion": {
+          "type": "boolean"
+        },
+        "project_role_check": {
+          "type": "boolean"
         }
       }
     },
@@ -5085,6 +7114,14 @@
           "items": {
             "$ref": "#/definitions/v1ProjectGrantMemberView"
           }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -5123,6 +7160,9 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "display_name": {
+          "type": "string"
         }
       }
     },
@@ -5191,6 +7231,14 @@
           "items": {
             "$ref": "#/definitions/v1ProjectGrantView"
           }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -5207,82 +7255,6 @@
       "type": "object",
       "properties": {
         "project_id": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "role_keys": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "v1ProjectGrantUserGrantCreate": {
-      "type": "object",
-      "properties": {
-        "user_id": {
-          "type": "string"
-        },
-        "project_grant_id": {
-          "type": "string"
-        },
-        "project_id": {
-          "type": "string"
-        },
-        "role_keys": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "v1ProjectGrantUserGrantID": {
-      "type": "object",
-      "properties": {
-        "project_grant_id": {
-          "type": "string"
-        },
-        "user_id": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        }
-      }
-    },
-    "v1ProjectGrantUserGrantSearchRequest": {
-      "type": "object",
-      "properties": {
-        "project_grant_id": {
-          "type": "string"
-        },
-        "offset": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "limit": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "queries": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1UserGrantSearchQuery"
-          }
-        }
-      }
-    },
-    "v1ProjectGrantUserGrantUpdate": {
-      "type": "object",
-      "properties": {
-        "project_grant_id": {
-          "type": "string"
-        },
-        "user_id": {
           "type": "string"
         },
         "id": {
@@ -5490,6 +7462,14 @@
           "items": {
             "$ref": "#/definitions/v1ProjectMemberView"
           }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -5528,6 +7508,9 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "display_name": {
+          "type": "string"
         }
       }
     },
@@ -5673,6 +7656,14 @@
           "items": {
             "$ref": "#/definitions/v1ProjectRoleView"
           }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -5762,6 +7753,14 @@
           "items": {
             "$ref": "#/definitions/v1ProjectView"
           }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -5782,62 +7781,12 @@
         },
         "name": {
           "type": "string"
-        }
-      }
-    },
-    "v1ProjectUserGrantID": {
-      "type": "object",
-      "properties": {
-        "project_id": {
-          "type": "string"
         },
-        "user_id": {
-          "type": "string"
+        "project_role_assertion": {
+          "type": "boolean"
         },
-        "id": {
-          "type": "string"
-        }
-      }
-    },
-    "v1ProjectUserGrantSearchRequest": {
-      "type": "object",
-      "properties": {
-        "project_id": {
-          "type": "string"
-        },
-        "offset": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "limit": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "queries": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1UserGrantSearchQuery"
-          }
-        }
-      }
-    },
-    "v1ProjectUserGrantUpdate": {
-      "type": "object",
-      "properties": {
-        "project_id": {
-          "type": "string"
-        },
-        "user_id": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "role_keys": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+        "project_role_check": {
+          "type": "boolean"
         }
       }
     },
@@ -5867,6 +7816,12 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "project_role_assertion": {
+          "type": "boolean"
+        },
+        "project_role_check": {
+          "type": "boolean"
         }
       }
     },
@@ -5902,8 +7857,18 @@
       "type": "object",
       "properties": {
         "is_unique": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
+        }
+      }
+    },
+    "v1UpdateMachineRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
         }
       }
     },
@@ -5940,8 +7905,7 @@
           "type": "string"
         },
         "is_email_verified": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -5955,8 +7919,7 @@
           "type": "string"
         },
         "is_phone_verified": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -5980,79 +7943,6 @@
         },
         "gender": {
           "$ref": "#/definitions/v1Gender"
-        }
-      }
-    },
-    "v1User": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "state": {
-          "$ref": "#/definitions/v1UserState"
-        },
-        "creation_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "change_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "user_name": {
-          "type": "string"
-        },
-        "first_name": {
-          "type": "string"
-        },
-        "last_name": {
-          "type": "string"
-        },
-        "display_name": {
-          "type": "string"
-        },
-        "nick_name": {
-          "type": "string"
-        },
-        "preferred_language": {
-          "type": "string"
-        },
-        "gender": {
-          "$ref": "#/definitions/v1Gender"
-        },
-        "email": {
-          "type": "string"
-        },
-        "is_email_verified": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "phone": {
-          "type": "string"
-        },
-        "is_phone_verified": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "country": {
-          "type": "string"
-        },
-        "locality": {
-          "type": "string"
-        },
-        "postal_code": {
-          "type": "string"
-        },
-        "region": {
-          "type": "string"
-        },
-        "street_address": {
-          "type": "string"
-        },
-        "sequence": {
-          "type": "string",
-          "format": "uint64"
         }
       }
     },
@@ -6136,8 +8026,7 @@
           "type": "string"
         },
         "is_email_verified": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -6163,8 +8052,7 @@
           "type": "string"
         },
         "is_email_verified": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -6215,6 +8103,9 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "grant_id": {
+          "type": "string"
         }
       }
     },
@@ -6232,17 +8123,9 @@
           "items": {
             "type": "string"
           }
-        }
-      }
-    },
-    "v1UserGrantCreateBulk": {
-      "type": "object",
-      "properties": {
-        "user_grants": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1UserGrantCreate"
-          }
+        },
+        "grant_id": {
+          "type": "string"
         }
       }
     },
@@ -6275,7 +8158,8 @@
         "USERGRANTSEARCHKEY_PROJECT_ID",
         "USERGRANTSEARCHKEY_USER_ID",
         "USERGRANTSEARCHKEY_ORG_ID",
-        "USERGRANTSEARCHKEY_ROLE_KEY"
+        "USERGRANTSEARCHKEY_ROLE_KEY",
+        "USERGRANTSEARCHKEY_GRANT_ID"
       ],
       "default": "USERGRANTSEARCHKEY_UNSPECIFIED"
     },
@@ -6332,6 +8216,14 @@
           "items": {
             "$ref": "#/definitions/v1UserGrantView"
           }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -6357,17 +8249,6 @@
           "type": "array",
           "items": {
             "type": "string"
-          }
-        }
-      }
-    },
-    "v1UserGrantUpdateBulk": {
-      "type": "object",
-      "properties": {
-        "user_grants": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1UserGrantUpdate"
           }
         }
       }
@@ -6434,6 +8315,9 @@
         },
         "display_name": {
           "type": "string"
+        },
+        "grant_id": {
+          "type": "string"
         }
       }
     },
@@ -6441,6 +8325,123 @@
       "type": "object",
       "properties": {
         "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UserMembershipSearchKey": {
+      "type": "string",
+      "enum": [
+        "USERMEMBERSHIPSEARCHKEY_UNSPECIFIED",
+        "USERMEMBERSHIPSEARCHKEY_TYPE",
+        "USERMEMBERSHIPSEARCHKEY_OBJECT_ID"
+      ],
+      "default": "USERMEMBERSHIPSEARCHKEY_UNSPECIFIED"
+    },
+    "v1UserMembershipSearchQuery": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/v1UserMembershipSearchKey"
+        },
+        "method": {
+          "$ref": "#/definitions/v1SearchMethod"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UserMembershipSearchRequest": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserMembershipSearchQuery"
+          }
+        }
+      }
+    },
+    "v1UserMembershipSearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserMembershipView"
+          }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1UserMembershipView": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "member_type": {
+          "$ref": "#/definitions/v1MemberType"
+        },
+        "aggregate_id": {
+          "type": "string"
+        },
+        "object_id": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "resource_owner": {
           "type": "string"
         }
       }
@@ -6455,8 +8456,7 @@
           "type": "string"
         },
         "is_phone_verified": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -6482,8 +8482,7 @@
           "type": "string"
         },
         "is_phone_verified": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -6523,9 +8522,6 @@
         "gender": {
           "$ref": "#/definitions/v1Gender"
         },
-        "user_name": {
-          "type": "string"
-        },
         "sequence": {
           "type": "string",
           "format": "uint64"
@@ -6564,9 +8560,6 @@
         "gender": {
           "$ref": "#/definitions/v1Gender"
         },
-        "user_name": {
-          "type": "string"
-        },
         "sequence": {
           "type": "string",
           "format": "uint64"
@@ -6590,6 +8583,38 @@
         }
       }
     },
+    "v1UserResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/definitions/v1UserState"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "human": {
+          "$ref": "#/definitions/v1HumanResponse"
+        },
+        "machine": {
+          "$ref": "#/definitions/v1MachineResponse"
+        }
+      }
+    },
     "v1UserSearchKey": {
       "type": "string",
       "enum": [
@@ -6600,7 +8625,8 @@
         "USERSEARCHKEY_NICK_NAME",
         "USERSEARCHKEY_DISPLAY_NAME",
         "USERSEARCHKEY_EMAIL",
-        "USERSEARCHKEY_STATE"
+        "USERSEARCHKEY_STATE",
+        "USERSEARCHKEY_TYPE"
       ],
       "default": "USERSEARCHKEY_UNSPECIFIED"
     },
@@ -6633,8 +8659,7 @@
           "$ref": "#/definitions/v1UserSearchKey"
         },
         "asc": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "queries": {
           "type": "array",
@@ -6664,6 +8689,14 @@
           "items": {
             "$ref": "#/definitions/v1UserView"
           }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -6697,70 +8730,9 @@
           "type": "string",
           "format": "date-time"
         },
-        "last_login": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "password_changed": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "user_name": {
-          "type": "string"
-        },
-        "first_name": {
-          "type": "string"
-        },
-        "last_name": {
-          "type": "string"
-        },
-        "display_name": {
-          "type": "string"
-        },
-        "nick_name": {
-          "type": "string"
-        },
-        "preferred_language": {
-          "type": "string"
-        },
-        "gender": {
-          "$ref": "#/definitions/v1Gender"
-        },
-        "email": {
-          "type": "string"
-        },
-        "is_email_verified": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "phone": {
-          "type": "string"
-        },
-        "is_phone_verified": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "country": {
-          "type": "string"
-        },
-        "locality": {
-          "type": "string"
-        },
-        "postal_code": {
-          "type": "string"
-        },
-        "region": {
-          "type": "string"
-        },
-        "street_address": {
-          "type": "string"
-        },
         "sequence": {
           "type": "string",
           "format": "uint64"
-        },
-        "resource_owner": {
-          "type": "string"
         },
         "login_names": {
           "type": "array",
@@ -6769,6 +8741,41 @@
           }
         },
         "preferred_login_name": {
+          "type": "string"
+        },
+        "last_login": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "resource_owner": {
+          "type": "string"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "human": {
+          "$ref": "#/definitions/v1HumanView"
+        },
+        "machine": {
+          "$ref": "#/definitions/v1MachineView"
+        }
+      }
+    },
+    "v1ValidateOrgDomainRequest": {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ZitadelDocs": {
+      "type": "object",
+      "properties": {
+        "issuer": {
+          "type": "string"
+        },
+        "discovery_endpoint": {
           "type": "string"
         }
       }

@@ -1,0 +1,32 @@
+<mjml>
+  <mj-head>
+    <mj-attributes>
+      <mj-text align="center" color="#555" font-family="Lato" />
+      <mj-section full-width="full-width" />
+      <mj-body />
+      <mj-image padding="0" />
+      <mj-column />
+      <mj-class name="left" align="left" position="absolute" width="50%" />
+      <mj-class name="right" align="right" />
+      <mj-class name="position" position="absolute" />
+      <mj-class name="body" background-image="url('https://static.zitadel.ch/logo-gsuite-light.png')" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body mj-class="body">
+    <mj-section background-url="https://static.zitadel.ch/zitadel-logo-outline-dark.png" border="0" background-repeat="no-repeat">
+      <mj-group>
+        <mj-column>
+          <mj-image src="https://static.zitadel.ch/zitadel-logo-dark.png" width="100px" padding="0" mj-class="left" />
+          <mj-image src="https://static.zitadel.ch/flavor-spikes-small-opacity40.png" mj-class="left position" />
+            <mj-text font-size="2rem" font-weight="light">{{.Greeting}}</mj-text>
+            <mj-text font-size="1.25rem" font-weight="light">{{.Text}}</mj-text>
+            <mj-button href="{{.URL}}" background-color="#5282C1" font-size="16px">{{.ButtonText}}</mj-button>
+            <mj-text>
+              <a href="http://www.caos.ch" style="color:#e91e63; text-decoration: none;" target="_blank"> CAOS AG </a> | Teufener Strasse 19 | CH-9000 St. Gallen </mj-text>
+          <mj-image src="https://static.zitadel.ch/flavor-spikes-big-opacity40.png" width="50%" mj-class="right position" />
+          <mj-image src="https://static.zitadel.ch/logo-gsuite-light.png" width="100px" padding="0" mj-class="right" />
+        </mj-column>
+      </mj-group>
+    </mj-section>
+  </mj-body>
+</mjml>

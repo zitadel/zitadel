@@ -59,6 +59,7 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, repo repository.Re
 		config.OPConfig,
 		newStorage(config.StorageConfig, repo),
 		op.WithHttpInterceptors(
+			middleware.TraceHandler(),
 			middleware.NoCacheInterceptor,
 			cookieHandler,
 			http_utils.CopyHeadersToContext,

@@ -8,9 +8,7 @@ import (
 	"go.opencensus.io/trace"
 )
 
-func TraceHandler(handler http.Handler, ignoredMethods ...string) http.Handler {
-	healthEndpoints := strings.Join(ignoredMethods, ";;")
-
+func TraceHandler(handler http.Handler, ignoredEndpoints ...string) http.Handler {
 	return &ochttp.Handler{
 		Handler: handler,
 		FormatSpanName: func(r *http.Request) string {
@@ -23,8 +21,12 @@ func TraceHandler(handler http.Handler, ignoredMethods ...string) http.Handler {
 
 		StartOptions: trace.StartOptions{Sampler: Sampler()},
 		IsHealthEndpoint: func(r *http.Request) bool {
-			n := strings.Contains(healthEndpoints, r.URL.RequestURI())
-			return n
+			for _, endpoint := range ignoredEndpoints {
+				if strings.HasPrefix(r.URL.RequestURI(), endpoint) {
+					return true
+				}
+			}
+			return false
 		},
 	}
 }

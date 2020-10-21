@@ -2,13 +2,13 @@ package auth
 
 import (
 	"github.com/caos/logging"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/golang/protobuf/ptypes"
 
-	"github.com/caos/zitadel/internal/policy/model"
 	"github.com/caos/zitadel/pkg/grpc/auth"
 )
 
-func passwordComplexityPolicyFromModel(policy *model.PasswordComplexityPolicy) *auth.PasswordComplexityPolicy {
+func passwordComplexityPolicyFromModel(policy *iam_model.PasswordComplexityPolicyView) *auth.PasswordComplexityPolicy {
 	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
 	logging.Log("GRPC-Lsi3d").OnError(err).Debug("unable to parse timestamp")
 
@@ -19,7 +19,6 @@ func passwordComplexityPolicyFromModel(policy *model.PasswordComplexityPolicy) *
 		Id:           policy.AggregateID,
 		CreationDate: creationDate,
 		ChangeDate:   changeDate,
-		Description:  policy.Description,
 		Sequence:     policy.Sequence,
 		MinLength:    policy.MinLength,
 		HasLowercase: policy.HasLowercase,

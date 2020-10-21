@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	"testing"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -20,7 +21,7 @@ func TestOrgIamPolicyAddedAggregates(t *testing.T) {
 		ctx        context.Context
 		aggCreator *es_models.AggregateCreator
 		org        *model.Org
-		policy     *model.OrgIAMPolicy
+		policy     *iam_es_model.OrgIAMPolicy
 	}
 	tests := []struct {
 		name string
@@ -48,8 +49,7 @@ func TestOrgIamPolicyAddedAggregates(t *testing.T) {
 						Sequence:    5,
 					},
 				},
-				policy: &model.OrgIAMPolicy{
-					Description:           "description",
+				policy: &iam_es_model.OrgIAMPolicy{
 					UserLoginMustBeDomain: true,
 				},
 			},
@@ -90,7 +90,7 @@ func TestOrgIamPolicyChangedAggregates(t *testing.T) {
 		ctx        context.Context
 		aggCreator *es_models.AggregateCreator
 		org        *model.Org
-		policy     *model.OrgIAMPolicy
+		policy     *iam_es_model.OrgIAMPolicy
 	}
 	tests := []struct {
 		name string
@@ -117,13 +117,11 @@ func TestOrgIamPolicyChangedAggregates(t *testing.T) {
 						AggregateID: "sdaf",
 						Sequence:    5,
 					},
-					OrgIamPolicy: &model.OrgIAMPolicy{
-						Description:           "description",
+					OrgIAMPolicy: &iam_es_model.OrgIAMPolicy{
 						UserLoginMustBeDomain: true,
 					},
 				},
-				policy: &model.OrgIAMPolicy{
-					Description:           "description",
+				policy: &iam_es_model.OrgIAMPolicy{
 					UserLoginMustBeDomain: false,
 				},
 			},
@@ -143,13 +141,11 @@ func TestOrgIamPolicyChangedAggregates(t *testing.T) {
 						AggregateID: "sdaf",
 						Sequence:    5,
 					},
-					OrgIamPolicy: &model.OrgIAMPolicy{
-						Description:           "description",
+					OrgIAMPolicy: &iam_es_model.OrgIAMPolicy{
 						UserLoginMustBeDomain: true,
 					},
 				},
-				policy: &model.OrgIAMPolicy{
-					Description:           "description",
+				policy: &iam_es_model.OrgIAMPolicy{
 					UserLoginMustBeDomain: true,
 				},
 			},
@@ -204,8 +200,7 @@ func TestOrgIamPolicyRemovedAggregates(t *testing.T) {
 						AggregateID: "sdaf",
 						Sequence:    5,
 					},
-					OrgIamPolicy: &model.OrgIAMPolicy{
-						Description:           "description",
+					OrgIAMPolicy: &iam_es_model.OrgIAMPolicy{
 						UserLoginMustBeDomain: true,
 					},
 				},

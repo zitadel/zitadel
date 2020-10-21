@@ -10,10 +10,10 @@ type Repository interface {
 	AuthRequestRepository
 	TokenRepository
 	ApplicationRepository
+	ProjectRepository
 	KeyRepository
 	UserSessionRepository
 	UserGrantRepository
-	PolicyRepository
 	OrgRepository
 	IAMRepository
 }

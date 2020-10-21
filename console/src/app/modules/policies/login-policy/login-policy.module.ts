@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
@@ -37,6 +38,7 @@ import { LoginPolicyComponent } from './login-policy.component';
         DetailLayoutModule,
         AddIdpDialogModule,
         IdpTableModule,
+        MatProgressSpinnerModule,
     ],
 })
 export class LoginPolicyModule { }

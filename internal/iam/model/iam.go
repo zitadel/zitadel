@@ -8,21 +8,29 @@ type Step int
 
 const (
 	Step1 Step = iota + 1
-	//TODO: label policy
-	// Step2
+	Step2
+	Step3
+	Step4
+	Step5
+	Step6
 	//StepCount marks the the length of possible steps (StepCount-1 == last possible step)
 	StepCount
 )
 
 type IAM struct {
 	es_models.ObjectRoot
-	GlobalOrgID        string
-	IAMProjectID       string
-	SetUpDone          Step
-	SetUpStarted       Step
-	Members            []*IAMMember
-	IDPs               []*IDPConfig
-	DefaultLoginPolicy *LoginPolicy
+	GlobalOrgID                     string
+	IAMProjectID                    string
+	SetUpDone                       Step
+	SetUpStarted                    Step
+	Members                         []*IAMMember
+	IDPs                            []*IDPConfig
+	DefaultLoginPolicy              *LoginPolicy
+	DefaultLabelPolicy              *LabelPolicy
+	DefaultOrgIAMPolicy             *OrgIAMPolicy
+	DefaultPasswordComplexityPolicy *PasswordComplexityPolicy
+	DefaultPasswordAgePolicy        *PasswordAgePolicy
+	DefaultPasswordLockoutPolicy    *PasswordLockoutPolicy
 }
 
 func (iam *IAM) GetMember(userID string) (int, *IAMMember) {

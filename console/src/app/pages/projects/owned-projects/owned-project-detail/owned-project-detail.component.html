@@ -78,6 +78,14 @@
                 <ng-template appHasRole [appHasRole]="['project.role.read:' + project.projectId, 'project.role.read']">
                     <app-card title="{{ 'PROJECT.ROLE.TITLE' | translate }}"
                         description="{{ 'PROJECT.ROLE.DESCRIPTION' | translate }}">
+                        <p>{{'PROJECT.ROLE.OPTIONS' | translate}}</p>
+                        <mat-checkbox [(ngModel)]="project.projectRoleAssertion" (change)="saveProject()">
+                            {{'PROJECT.ROLE.ASSERTION' | translate}}</mat-checkbox>
+                        <p class="desc">{{'PROJECT.ROLE.ASSERTION_DESCRIPTION' | translate}}</p>
+                        <mat-checkbox [(ngModel)]="project.projectRoleCheck" (change)="saveProject()">
+                            {{'PROJECT.ROLE.CHECK' | translate}}</mat-checkbox>
+                        <p class="desc">{{'PROJECT.ROLE.CHECK_DESCRIPTION' | translate}}</p>
+                        <div class="divider"></div>
                         <app-project-roles
                             [disabled]="(['project.role.write$', 'project.role.write:'+ project.projectId]| hasRole | async) == false"
                             [actionsVisible]="true" [projectId]="projectId">

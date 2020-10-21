@@ -30,7 +30,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -52,7 +52,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -96,7 +96,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -118,7 +118,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -150,7 +150,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -182,7 +182,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -220,7 +220,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -248,7 +248,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -276,7 +276,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -314,7 +314,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -352,7 +352,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -390,7 +390,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -422,7 +422,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -454,7 +454,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -476,7 +476,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -504,7 +504,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -543,7 +543,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -579,7 +579,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -611,7 +611,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -632,6 +632,59 @@
         ]
       }
     },
+    "/orgs/default/policies/orgiam": {
+      "get": {
+        "summary": "ORG_IAM_POLICY",
+        "operationId": "AdminService_GetDefaultOrgIamPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OrgIamPolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "operationId": "AdminService_UpdateDefaultOrgIamPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OrgIamPolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1OrgIamPolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/orgs/{id}": {
       "get": {
         "operationId": "AdminService_GetOrgByID",
@@ -643,7 +696,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -662,19 +715,18 @@
         ]
       }
     },
-    "/orgs/{org_id}/iampolicy": {
+    "/orgs/{org_id}/policies/orgiam": {
       "get": {
-        "summary": "ORG_IAM_POLICY",
         "operationId": "AdminService_GetOrgIamPolicy",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1OrgIamPolicy"
+              "$ref": "#/definitions/v1OrgIamPolicyView"
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -693,7 +745,7 @@
         ]
       },
       "delete": {
-        "operationId": "AdminService_DeleteOrgIamPolicy",
+        "operationId": "AdminService_RemoveOrgIamPolicy",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -702,7 +754,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -730,7 +782,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -766,7 +818,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -793,6 +845,58 @@
         ]
       }
     },
+    "/policies/label": {
+      "get": {
+        "operationId": "AdminService_GetDefaultLabelPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultLabelPolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "operationId": "AdminService_UpdateDefaultLabelPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultLabelPolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DefaultLabelPolicyUpdate"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/policies/login": {
       "get": {
         "operationId": "AdminService_GetDefaultLoginPolicy",
@@ -804,7 +908,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -824,7 +928,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -836,7 +940,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1DefaultLoginPolicy"
+              "$ref": "#/definitions/v1DefaultLoginPolicyRequest"
             }
           }
         ],
@@ -856,7 +960,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -888,7 +992,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -920,7 +1024,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -932,6 +1036,162 @@
             "in": "path",
             "required": true,
             "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/password/age": {
+      "get": {
+        "operationId": "AdminService_GetDefaultPasswordAgePolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordAgePolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "operationId": "AdminService_UpdateDefaultPasswordAgePolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordAgePolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordAgePolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/password/complexity": {
+      "get": {
+        "operationId": "AdminService_GetDefaultPasswordComplexityPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordComplexityPolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "operationId": "AdminService_UpdateDefaultPasswordComplexityPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordComplexityPolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordComplexityPolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/password/lockout": {
+      "get": {
+        "operationId": "AdminService_GetDefaultPasswordLockoutPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordLockoutPolicyView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "operationId": "AdminService_UpdateDefaultPasswordLockoutPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordLockoutPolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DefaultPasswordLockoutPolicyRequest"
+            }
           }
         ],
         "tags": [
@@ -951,7 +1211,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -973,7 +1233,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -995,7 +1255,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1017,7 +1277,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1138,15 +1398,13 @@
           "type": "string"
         },
         "is_email_verified": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "phone": {
           "type": "string"
         },
         "is_phone_verified": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "country": {
           "type": "string"
@@ -1204,20 +1462,88 @@
         }
       }
     },
+    "v1DefaultLabelPolicy": {
+      "type": "object",
+      "properties": {
+        "primary_color": {
+          "type": "string"
+        },
+        "secondary_color": {
+          "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultLabelPolicyUpdate": {
+      "type": "object",
+      "properties": {
+        "primary_color": {
+          "type": "string"
+        },
+        "secondary_color": {
+          "type": "string"
+        }
+      }
+    },
+    "v1DefaultLabelPolicyView": {
+      "type": "object",
+      "properties": {
+        "primary_color": {
+          "type": "string"
+        },
+        "secondary_color": {
+          "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "v1DefaultLoginPolicy": {
       "type": "object",
       "properties": {
         "allow_username_password": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "allow_register": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "allow_external_idp": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultLoginPolicyRequest": {
+      "type": "object",
+      "properties": {
+        "allow_username_password": {
+          "type": "boolean"
+        },
+        "allow_register": {
+          "type": "boolean"
+        },
+        "allow_external_idp": {
+          "type": "boolean"
         }
       }
     },
@@ -1225,16 +1551,207 @@
       "type": "object",
       "properties": {
         "allow_username_password": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "allow_register": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "allow_external_idp": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultPasswordAgePolicy": {
+      "type": "object",
+      "properties": {
+        "max_age_days": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "expire_warn_days": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultPasswordAgePolicyRequest": {
+      "type": "object",
+      "properties": {
+        "max_age_days": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "expire_warn_days": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1DefaultPasswordAgePolicyView": {
+      "type": "object",
+      "properties": {
+        "max_age_days": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "expire_warn_days": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultPasswordComplexityPolicy": {
+      "type": "object",
+      "properties": {
+        "min_length": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "has_uppercase": {
+          "type": "boolean"
+        },
+        "has_lowercase": {
+          "type": "boolean"
+        },
+        "has_number": {
+          "type": "boolean"
+        },
+        "has_symbol": {
+          "type": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultPasswordComplexityPolicyRequest": {
+      "type": "object",
+      "properties": {
+        "min_length": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "has_uppercase": {
+          "type": "boolean"
+        },
+        "has_lowercase": {
+          "type": "boolean"
+        },
+        "has_number": {
+          "type": "boolean"
+        },
+        "has_symbol": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1DefaultPasswordComplexityPolicyView": {
+      "type": "object",
+      "properties": {
+        "min_length": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "has_uppercase": {
+          "type": "boolean"
+        },
+        "has_lowercase": {
+          "type": "boolean"
+        },
+        "has_number": {
+          "type": "boolean"
+        },
+        "has_symbol": {
+          "type": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultPasswordLockoutPolicy": {
+      "type": "object",
+      "properties": {
+        "max_attempts": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "show_lockout_failure": {
+          "type": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultPasswordLockoutPolicyRequest": {
+      "type": "object",
+      "properties": {
+        "max_attempts": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "show_lockout_failure": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1DefaultPasswordLockoutPolicyView": {
+      "type": "object",
+      "properties": {
+        "max_attempts": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "show_lockout_failure": {
+          "type": "boolean"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -1306,15 +1823,13 @@
           "type": "string"
         },
         "is_email_verified": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "phone": {
           "type": "string"
         },
         "is_phone_verified": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "country": {
           "type": "string"
@@ -1506,9 +2021,8 @@
         "name": {
           "type": "string"
         },
-        "logo_src": {
-          "type": "string",
-          "format": "byte"
+        "styling_type": {
+          "$ref": "#/definitions/v1IdpStylingType"
         },
         "oidc_config": {
           "$ref": "#/definitions/v1OidcIdpConfig"
@@ -1675,6 +2189,14 @@
       ],
       "default": "IDPCONFIGSTATE_UNSPECIFIED"
     },
+    "v1IdpStylingType": {
+      "type": "string",
+      "enum": [
+        "IDPSTYLINGTYPE_UNSPECIFIED",
+        "IDPSTYLINGTYPE_GOOGLE"
+      ],
+      "default": "IDPSTYLINGTYPE_UNSPECIFIED"
+    },
     "v1IdpType": {
       "type": "string",
       "enum": [
@@ -1693,9 +2215,8 @@
         "name": {
           "type": "string"
         },
-        "logo_src": {
-          "type": "string",
-          "format": "byte"
+        "styling_type": {
+          "$ref": "#/definitions/v1IdpStylingType"
         }
       }
     },
@@ -1719,9 +2240,8 @@
         "name": {
           "type": "string"
         },
-        "logo_src": {
-          "type": "string",
-          "format": "byte"
+        "styling_type": {
+          "$ref": "#/definitions/v1IdpStylingType"
         },
         "oidc_config": {
           "$ref": "#/definitions/v1OidcIdpConfigView"
@@ -1815,9 +2335,8 @@
         "name": {
           "type": "string"
         },
-        "logo_src": {
-          "type": "string",
-          "format": "byte"
+        "styling_type": {
+          "$ref": "#/definitions/v1IdpStylingType"
         },
         "client_id": {
           "type": "string"
@@ -1925,16 +2444,11 @@
         "org_id": {
           "type": "string"
         },
-        "description": {
-          "type": "string"
-        },
         "user_login_must_be_domain": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "default": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -1960,8 +2474,33 @@
           "type": "string"
         },
         "user_login_must_be_domain": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
+        }
+      }
+    },
+    "v1OrgIamPolicyView": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "type": "string"
+        },
+        "user_login_must_be_domain": {
+          "type": "boolean"
+        },
+        "default": {
+          "type": "boolean"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -2013,8 +2552,7 @@
           "$ref": "#/definitions/v1OrgSearchKey"
         },
         "asc": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "queries": {
           "type": "array",
@@ -2107,8 +2645,7 @@
       "type": "object",
       "properties": {
         "is_unique": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },

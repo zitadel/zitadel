@@ -1,9 +1,10 @@
 package handler
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-	"time"
 
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/types"
@@ -38,11 +39,16 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 		&IamMember{handler: handler{view, bulkLimit, configs.cycleDuration("IamMember"), errorCount},
 			userEvents: repos.UserEvents},
 		&IDPConfig{handler: handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount}},
+		&LabelPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount}},
 		&LoginPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount}},
 		&IDPProvider{handler: handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount},
 			systemDefaults: defaults, iamEvents: repos.IamEvents, orgEvents: repos.OrgEvents},
 		&User{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount},
-			eventstore: eventstore, orgEvents: repos.OrgEvents},
+			eventstore: eventstore, orgEvents: repos.OrgEvents, iamEvents: repos.IamEvents, systemDefaults: defaults},
+		&PasswordComplexityPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("PasswordComplexityPolicy"), errorCount}},
+		&PasswordAgePolicy{handler: handler{view, bulkLimit, configs.cycleDuration("PasswordAgePolicy"), errorCount}},
+		&PasswordLockoutPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("PasswordLockoutPolicy"), errorCount}},
+		&OrgIAMPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("OrgIAMPolicy"), errorCount}},
 		&ExternalIDP{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount},
 			orgEvents: repos.OrgEvents, iamEvents: repos.IamEvents, systemDefaults: defaults},
 	}

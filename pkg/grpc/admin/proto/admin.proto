@@ -100,9 +100,30 @@ service AdminService {
     }
 
     //ORG_IAM_POLICY
-    rpc GetOrgIamPolicy(OrgIamPolicyID) returns (OrgIamPolicy) {
+    rpc GetDefaultOrgIamPolicy(google.protobuf.Empty) returns (OrgIamPolicyView) {
         option (google.api.http) = {
-            get: "/orgs/{org_id}/iampolicy"
+            get: "/orgs/default/policies/orgiam"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc UpdateDefaultOrgIamPolicy(OrgIamPolicyRequest) returns (OrgIamPolicy) {
+        option (google.api.http) = {
+            put: "/orgs/default/policies/orgiam"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc GetOrgIamPolicy(OrgIamPolicyID) returns (OrgIamPolicyView) {
+        option (google.api.http) = {
+            get: "/orgs/{org_id}/policies/orgiam"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -112,7 +133,7 @@ service AdminService {
 
     rpc CreateOrgIamPolicy(OrgIamPolicyRequest) returns (OrgIamPolicy) {
         option (google.api.http) = {
-            post: "/orgs/{org_id}/iampolicy"
+            post: "/orgs/{org_id}/policies/orgiam"
             body: "*"
         };
 
@@ -123,7 +144,7 @@ service AdminService {
 
     rpc UpdateOrgIamPolicy(OrgIamPolicyRequest) returns (OrgIamPolicy) {
         option (google.api.http) = {
-            put: "/orgs/{org_id}/iampolicy"
+            put: "/orgs/{org_id}/policies/orgiam"
             body: "*"
         };
 
@@ -132,9 +153,9 @@ service AdminService {
         };
     }
 
-    rpc DeleteOrgIamPolicy(OrgIamPolicyID) returns (google.protobuf.Empty) {
+    rpc RemoveOrgIamPolicy(OrgIamPolicyID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/orgs/{org_id}/iampolicy"
+            delete: "/orgs/{org_id}/policies/orgiam"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -321,6 +342,27 @@ service AdminService {
         };
     }
 
+    rpc GetDefaultLabelPolicy(google.protobuf.Empty) returns (DefaultLabelPolicyView) {
+        option (google.api.http) = {
+            get: "/policies/label"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc UpdateDefaultLabelPolicy(DefaultLabelPolicyUpdate) returns (DefaultLabelPolicy) {
+        option (google.api.http) = {
+            put: "/policies/label"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
     rpc GetDefaultLoginPolicy(google.protobuf.Empty) returns (DefaultLoginPolicyView) {
         option (google.api.http) = {
             get: "/policies/login"
@@ -331,7 +373,7 @@ service AdminService {
         };
     }
 
-    rpc UpdateDefaultLoginPolicy(DefaultLoginPolicy) returns (DefaultLoginPolicy) {
+    rpc UpdateDefaultLoginPolicy(DefaultLoginPolicyRequest) returns (DefaultLoginPolicy) {
         option (google.api.http) = {
             put: "/policies/login"
             body: "*"
@@ -367,6 +409,69 @@ service AdminService {
     rpc RemoveIdpProviderFromDefaultLoginPolicy(IdpProviderID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             delete: "/policies/login/idpproviders/{idp_config_id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc GetDefaultPasswordComplexityPolicy(google.protobuf.Empty) returns (DefaultPasswordComplexityPolicyView) {
+        option (google.api.http) = {
+            get: "/policies/password/complexity"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc UpdateDefaultPasswordComplexityPolicy(DefaultPasswordComplexityPolicyRequest) returns (DefaultPasswordComplexityPolicy) {
+        option (google.api.http) = {
+            put: "/policies/password/complexity"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc GetDefaultPasswordAgePolicy(google.protobuf.Empty) returns (DefaultPasswordAgePolicyView) {
+        option (google.api.http) = {
+            get: "/policies/password/age"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc UpdateDefaultPasswordAgePolicy(DefaultPasswordAgePolicyRequest) returns (DefaultPasswordAgePolicy) {
+        option (google.api.http) = {
+            put: "/policies/password/age"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc GetDefaultPasswordLockoutPolicy(google.protobuf.Empty) returns (DefaultPasswordLockoutPolicyView) {
+        option (google.api.http) = {
+            get: "/policies/password/lockout"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc UpdateDefaultPasswordLockoutPolicy(DefaultPasswordLockoutPolicyRequest) returns (DefaultPasswordLockoutPolicy) {
+        option (google.api.http) = {
+            put: "/policies/password/lockout"
+            body: "*"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -561,12 +666,20 @@ message CreateOrgRequest {
 
 message OrgIamPolicy {
     string org_id = 1;
-    string description = 2;
-    bool user_login_must_be_domain = 3;
-    bool default = 4;
-    uint64 sequence = 5;
-    google.protobuf.Timestamp creation_date = 6;
-    google.protobuf.Timestamp change_date = 7;
+    bool user_login_must_be_domain = 2;
+    bool default = 3;
+    uint64 sequence = 4;
+    google.protobuf.Timestamp creation_date = 5;
+    google.protobuf.Timestamp change_date = 6;
+}
+
+message OrgIamPolicyView {
+    string org_id = 1;
+    bool user_login_must_be_domain = 2;
+    bool default = 3;
+    uint64 sequence = 4;
+    google.protobuf.Timestamp creation_date = 5;
+    google.protobuf.Timestamp change_date = 6;
 }
 
 message OrgIamPolicyRequest {
@@ -705,7 +818,7 @@ message Idp {
     google.protobuf.Timestamp creation_date = 3;
     google.protobuf.Timestamp change_date = 4;
     string name = 5;
-    bytes logo_src = 6;
+    IdpStylingType styling_type = 6;
     oneof idp_config {
         OidcIdpConfig oidc_config = 7;
     }
@@ -715,7 +828,7 @@ message Idp {
 message IdpUpdate {
     string id = 1 [(validate.rules).string = {min_len: 1}];
     string name = 2;
-    bytes logo_src = 3;
+    IdpStylingType styling_type = 3;
 }
 
 message OidcIdpConfig {
@@ -723,6 +836,11 @@ message OidcIdpConfig {
     string client_secret = 2;
     string issuer = 3;
     repeated string scopes = 4;
+}
+
+enum IdpStylingType {
+    IDPSTYLINGTYPE_UNSPECIFIED = 0;
+    IDPSTYLINGTYPE_GOOGLE = 1;
 }
 
 enum IdpState {
@@ -739,7 +857,7 @@ enum OIDCMappingField {
 
 message OidcIdpConfigCreate {
     string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    bytes logo_src = 2;
+    IdpStylingType styling_type = 2;
     string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string issuer = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -773,7 +891,7 @@ message IdpView {
     google.protobuf.Timestamp creation_date = 3;
     google.protobuf.Timestamp change_date = 4;
     string name = 5;
-    bytes logo_src = 6;
+    IdpStylingType styling_type = 6;
     oneof idp_config_view {
         OidcIdpConfigView oidc_config = 7;
     }
@@ -806,7 +924,34 @@ enum IdpSearchKey {
     IDPSEARCHKEY_NAME = 2;
 }
 
+message DefaultLabelPolicy {
+    string primary_color = 1;
+    string secondary_color = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
+}
+
+message DefaultLabelPolicyUpdate {
+    string primary_color = 1;
+    string secondary_color = 2;
+}
+
+message DefaultLabelPolicyView {
+    string primary_color = 1;
+    string secondary_color = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
+}
+
 message DefaultLoginPolicy {
+    bool allow_username_password = 1;
+    bool allow_register = 2;
+    bool allow_external_idp = 3;
+    google.protobuf.Timestamp creation_date = 4;
+    google.protobuf.Timestamp change_date = 5;
+}
+
+message DefaultLoginPolicyRequest {
     bool allow_username_password = 1;
     bool allow_register = 2;
     bool allow_external_idp = 3;
@@ -820,6 +965,8 @@ message DefaultLoginPolicyView {
     bool allow_username_password = 1;
     bool allow_register = 2;
     bool allow_external_idp = 3;
+    google.protobuf.Timestamp creation_date = 4;
+    google.protobuf.Timestamp change_date = 5;
 }
 
 message IdpProviderView {
@@ -846,4 +993,70 @@ message IdpProviderSearchResponse {
 message IdpProviderSearchRequest {
     uint64 offset = 1;
     uint64 limit = 2;
+}
+
+message DefaultPasswordComplexityPolicy {
+    uint64 min_length = 1;
+    bool has_uppercase = 2;
+    bool has_lowercase = 3;
+    bool has_number = 4;
+    bool has_symbol = 5;
+    google.protobuf.Timestamp creation_date = 6;
+    google.protobuf.Timestamp change_date = 7;
+}
+
+message DefaultPasswordComplexityPolicyRequest {
+    uint64 min_length = 1;
+    bool has_uppercase = 2;
+    bool has_lowercase = 3;
+    bool has_number = 4;
+    bool has_symbol = 5;
+}
+
+message DefaultPasswordComplexityPolicyView {
+    uint64 min_length = 1;
+    bool has_uppercase = 2;
+    bool has_lowercase = 3;
+    bool has_number = 4;
+    bool has_symbol = 5;
+    google.protobuf.Timestamp creation_date = 6;
+    google.protobuf.Timestamp change_date = 7;
+}
+
+message DefaultPasswordAgePolicy {
+    uint64 max_age_days = 1;
+    uint64 expire_warn_days = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
+}
+
+message DefaultPasswordAgePolicyRequest {
+    uint64 max_age_days = 1;
+    uint64 expire_warn_days = 2;
+}
+
+message DefaultPasswordAgePolicyView {
+    uint64 max_age_days = 1;
+    uint64 expire_warn_days = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
+}
+
+message DefaultPasswordLockoutPolicy {
+    uint64 max_attempts = 1;
+    bool show_lockout_failure = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
+}
+
+message DefaultPasswordLockoutPolicyRequest {
+    uint64 max_attempts = 1;
+    bool show_lockout_failure = 2;
+}
+
+message DefaultPasswordLockoutPolicyView {
+    uint64 max_attempts = 1;
+    bool show_lockout_failure = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
 }
