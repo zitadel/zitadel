@@ -1,9 +1,12 @@
 package view
 
 import (
+	"context"
+
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
+	"github.com/caos/zitadel/internal/tracing"
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
@@ -19,7 +22,10 @@ func (v *View) ApplicationByOIDCClientID(clientID string) (*model.ApplicationVie
 	return view.ApplicationByOIDCClientID(v.Db, applicationTable, clientID)
 }
 
-func (v *View) ApplicationByProjecIDAndAppName(projectID, appName string) (*model.ApplicationView, error) {
+func (v *View) ApplicationByProjecIDAndAppName(ctx context.Context, projectID, appName string) (_ *model.ApplicationView, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	return view.ApplicationByProjectIDAndAppName(v.Db, applicationTable, projectID, appName)
 }
 

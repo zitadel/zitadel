@@ -1,11 +1,12 @@
 package view
 
 import (
+	"github.com/jinzhu/gorm"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"github.com/jinzhu/gorm"
 )
 
 func OrgByID(db *gorm.DB, table, orgID string) (*model.OrgView, error) {

@@ -4,9 +4,13 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/tracing"
 )
 
-func getUserMethodPermissions(ctx context.Context, t *TokenVerifier, requiredPerm string, authConfig Config) (context.Context, []string, error) {
+func getUserMethodPermissions(ctx context.Context, t *TokenVerifier, requiredPerm string, authConfig Config) (_ context.Context, _ []string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	ctxData := GetCtxData(ctx)
 	if ctxData.IsZero() {
 		return nil, nil, errors.ThrowUnauthenticated(nil, "AUTH-rKLWEH", "context missing")

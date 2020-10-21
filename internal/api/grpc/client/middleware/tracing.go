@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/stats"
 
-	"github.com/caos/zitadel/internal/api/http"
+	grpc_utils "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/tracing"
 )
 
@@ -29,7 +29,7 @@ func TracingStatsClient(ignoredMethods ...GRPCMethod) grpc.DialOption {
 }
 
 func DefaultTracingStatsClient() grpc.DialOption {
-	return TracingStatsClient(http.Healthz, http.Readiness, http.Validation)
+	return TracingStatsClient(grpc_utils.Healthz, grpc_utils.Readiness, grpc_utils.Validation)
 }
 
 type tracingClientHandler struct {

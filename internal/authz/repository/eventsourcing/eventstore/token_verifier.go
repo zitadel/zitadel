@@ -14,6 +14,7 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/tracing"
 )
 
 type TokenVerifierRepo struct {
@@ -59,6 +60,8 @@ func (repo *TokenVerifierRepo) TokenByID(ctx context.Context, tokenID, userID st
 }
 
 func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenString, clientID string) (userID string, agentID string, prefLang string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	//TODO: use real key
 	tokenIDSubject, err := crypto.DecryptAESString(tokenString, string(repo.TokenVerificationKey[:32]))
 	if err != nil {
@@ -98,12 +101,15 @@ func (repo *TokenVerifierRepo) ExistsOrg(ctx context.Context, orgID string) erro
 	return err
 }
 
-func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName string) (string, error) {
+func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName string) (_ string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	iam, err := repo.IAMEvents.IAMByID(ctx, repo.IAMID)
 	if err != nil {
 		return "", err
 	}
-	app, err := repo.View.ApplicationByProjecIDAndAppName(iam.IAMProjectID, appName)
+	app, err := repo.View.ApplicationByProjecIDAndAppName(ctx, iam.IAMProjectID, appName)
 	if err != nil {
 		return "", err
 	}

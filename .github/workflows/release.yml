@@ -5,7 +5,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.CR_PAT }}
   REGISTRY: ghcr.io
   NODE_VERSION: '12'
-  GO_VERSION: '1.14'
+  GO_VERSION: '1.15'
 
 jobs:
 

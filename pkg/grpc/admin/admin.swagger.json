@@ -30,7 +30,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -52,7 +52,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -96,7 +96,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -118,7 +118,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -150,7 +150,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -182,7 +182,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -220,7 +220,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -248,7 +248,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -276,7 +276,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -314,7 +314,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -352,7 +352,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -390,7 +390,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -422,7 +422,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -454,7 +454,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -476,7 +476,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -504,7 +504,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -543,7 +543,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -579,7 +579,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -611,7 +611,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -644,7 +644,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -664,7 +664,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -696,7 +696,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -726,7 +726,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -754,7 +754,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -782,7 +782,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -818,7 +818,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -856,7 +856,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -876,7 +876,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -908,7 +908,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -928,7 +928,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -960,7 +960,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -992,7 +992,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1024,7 +1024,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1054,7 +1054,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1074,7 +1074,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1106,7 +1106,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1126,7 +1126,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1158,7 +1158,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1178,7 +1178,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1211,7 +1211,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1233,7 +1233,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1255,7 +1255,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1277,7 +1277,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1398,15 +1398,13 @@
           "type": "string"
         },
         "is_email_verified": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "phone": {
           "type": "string"
         },
         "is_phone_verified": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "country": {
           "type": "string"
@@ -1517,16 +1515,13 @@
       "type": "object",
       "properties": {
         "allow_username_password": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "allow_register": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "allow_external_idp": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "creation_date": {
           "type": "string",
@@ -1542,16 +1537,13 @@
       "type": "object",
       "properties": {
         "allow_username_password": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "allow_register": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "allow_external_idp": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -1559,16 +1551,13 @@
       "type": "object",
       "properties": {
         "allow_username_password": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "allow_register": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "allow_external_idp": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "creation_date": {
           "type": "string",
@@ -1643,20 +1632,16 @@
           "format": "uint64"
         },
         "has_uppercase": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "has_lowercase": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "has_number": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "has_symbol": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "creation_date": {
           "type": "string",
@@ -1676,20 +1661,16 @@
           "format": "uint64"
         },
         "has_uppercase": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "has_lowercase": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "has_number": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "has_symbol": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -1701,20 +1682,16 @@
           "format": "uint64"
         },
         "has_uppercase": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "has_lowercase": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "has_number": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "has_symbol": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "creation_date": {
           "type": "string",
@@ -1734,8 +1711,7 @@
           "format": "uint64"
         },
         "show_lockout_failure": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "creation_date": {
           "type": "string",
@@ -1755,8 +1731,7 @@
           "format": "uint64"
         },
         "show_lockout_failure": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -1768,8 +1743,7 @@
           "format": "uint64"
         },
         "show_lockout_failure": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "creation_date": {
           "type": "string",
@@ -1849,15 +1823,13 @@
           "type": "string"
         },
         "is_email_verified": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "phone": {
           "type": "string"
         },
         "is_phone_verified": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "country": {
           "type": "string"
@@ -2473,12 +2445,10 @@
           "type": "string"
         },
         "user_login_must_be_domain": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "default": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -2504,8 +2474,7 @@
           "type": "string"
         },
         "user_login_must_be_domain": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -2516,12 +2485,10 @@
           "type": "string"
         },
         "user_login_must_be_domain": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "default": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -2585,8 +2552,7 @@
           "$ref": "#/definitions/v1OrgSearchKey"
         },
         "asc": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "queries": {
           "type": "array",
@@ -2679,8 +2645,7 @@
       "type": "object",
       "properties": {
         "is_unique": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
