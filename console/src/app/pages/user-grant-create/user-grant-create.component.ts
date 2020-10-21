@@ -2,6 +2,7 @@ import { Location } from '@angular/common';
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { UserTarget } from 'src/app/modules/search-user-autocomplete/search-user-autocomplete.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { Org } from 'src/app/proto/generated/auth_pb';
 import { ProjectGrantView, ProjectRole, ProjectView, UserGrant, UserView } from 'src/app/proto/generated/management_pb';
@@ -33,6 +34,9 @@ export class UserGrantCreateComponent implements OnDestroy {
     public UserGrantContext: any = UserGrantContext;
 
     public grantRolesKeyList: string[] = [];
+
+    public user!: UserView.AsObject;
+    public UserTarget: any = UserTarget;
     constructor(
         private userService: ManagementService,
         private toast: ToastService,
@@ -55,6 +59,14 @@ export class UserGrantCreateComponent implements OnDestroy {
                 this.context = UserGrantContext.GRANTED_PROJECT;
                 this.mgmtService.GetGrantedProjectByID(this.projectId, this.grantId).then(resp => {
                     this.grantRolesKeyList = resp.toObject().roleKeysList;
+                }).catch((error: any) => {
+                    this.toast.showError(error);
+                });
+            } else if (this.userId) {
+                this.context = UserGrantContext.USER;
+                this.mgmtService.GetUserByID(this.userId).then(resp => {
+                    this.user = resp.toObject();
+                    console.log(this.user);
                 }).catch((error: any) => {
                     this.toast.showError(error);
                 });

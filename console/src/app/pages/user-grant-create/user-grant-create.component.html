@@ -16,20 +16,20 @@
             {{'PROJECT.GRANT.CREATE.ORG_DESCRIPTION_DESC' | translate}}
         </p>
 
+        <ng-container *ngIf="context && user">
+            <h1>{{'PROJECT.GRANT.CREATE.SEL_USER' | translate}}</h1>
+
+            <app-search-user-autocomplete class="block" singleOutput="true" [users]="user ? [user] : []"
+                (selectionChanged)="selectUser($event)">
+            </app-search-user-autocomplete>
+        </ng-container>
+
         <ng-container *ngIf="context && context == UserGrantContext.USER">
             <h1>{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</h1>
 
-            <app-search-project-autocomplete class="block" singleOutput="true"
+            <app-search-project-autocomplete class="block" singleOutput="true" target="UserTarget.EXTERNAL"
                 (selectionChanged)="selectProject($event)">
             </app-search-project-autocomplete>
-        </ng-container>
-
-        <ng-container
-            *ngIf="context && (context == UserGrantContext.GRANTED_PROJECT || context == UserGrantContext.OWNED_PROJECT)">
-            <h1>{{'PROJECT.GRANT.CREATE.SEL_USER' | translate}}</h1>
-
-            <app-search-user-autocomplete class="block" singleOutput="true" (selectionChanged)="selectUser($event)">
-            </app-search-user-autocomplete>
         </ng-container>
     </ng-container>
 
