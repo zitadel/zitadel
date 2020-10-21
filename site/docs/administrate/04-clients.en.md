@@ -13,7 +13,7 @@ Clients might use different protocols for integrating with an IAM. With ZITADEL 
 
 #### OIDC Configuration
 
-Type 
+> Document Settings
 
 ### Create a client
 
@@ -28,14 +28,14 @@ To create a new client start by browsing to your [project](administrate#Projects
 
 Click the **New** button and a wizard will appear which will guide you through the process.
 
-<img src="img/console_clients_my_first_spa_wizard_1.png.png" alt="Client Wizard" width="1000px" height="auto">
+<img src="img/console_clients_my_first_spa_wizard_1.png" alt="Client Wizard" width="1000px" height="auto">
 
-<img src="img/console_clients_my_first_spa_wizard_2.png.png" alt="Client Wizard" width="1000px" height="auto">
+<img src="img/console_clients_my_first_spa_wizard_2.png" alt="Client Wizard" width="1000px" height="auto">
 
-<img src="img/console_clients_my_first_spa_wizard_3.png.png" alt="Client Wizard" width="1000px" height="auto">
+<img src="img/console_clients_my_first_spa_wizard_3.png" alt="Client Wizard" width="1000px" height="auto">
 
-<img src="img/console_clients_my_first_spa_wizard_4.png.png" alt="Client Wizard" width="1000px" height="auto">
+<img src="img/console_clients_my_first_spa_wizard_4.png" alt="Client Wizard" width="1000px" height="auto">
 
 When the wizard is complete, the clients configuration will be displayed and you can now use this client.
 
-<img src="img/console_clients_my_first_spa_config.png.png" alt="Client Wizard" width="1000px" height="auto">
+<img src="img/console_clients_my_first_spa_config.png" alt="Client Wizard" width="1000px" height="auto">
