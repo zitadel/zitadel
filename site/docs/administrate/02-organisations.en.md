@@ -50,7 +50,7 @@ To start the domain verification click the domain name and a dialog will appear,
 For example, create a TXT record with your DNS provider for the used domain an click verify. **ZITADEL** will then proceed an check your DNS.
 <img src="img/console_org_domain_verify_dns.png" alt="Organisation Domain Verify DNS" width="1000px" height="auto">
 
-> Do not delete the verification code **ZTIADEL** will recheck the ownership from time to time
+> Do not delete the verification code **ZITADEL** will recheck the ownership from time to time
 
 When the verification is successful you have the option to activate the domain by clicking **Set as primary**
 <img src="img/console_org_domain_verified.png" alt="Organisation Domain Verified" width="1000px" height="auto">

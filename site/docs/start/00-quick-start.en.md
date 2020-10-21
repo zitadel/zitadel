@@ -24,13 +24,13 @@ The verification process is documented [here](administrate#Verify_a_domain_name)
 
 #### Add Users to your organisation
 
-To add new user just follow [this guide](administrate#Create_User)
+To add new user just follow [this guide](administrate#Create_Users)
 
 #### Setup an application
 
 First [create a project](administrate#Create_a_project)
 
-Then create within this [project](administrate#Projects) a [new client](administrate#Manage_clients)
+Then create within this [project](administrate#Projects) a [new client](administrate#Create_a_client)
 
 The wizard should provide some guidance what client is the proper for you. If you are still unsure consult our [Integration Guide](integrate#Overview)
 
