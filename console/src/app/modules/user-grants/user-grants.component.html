@@ -5,8 +5,8 @@
         (click)="deleteGrantSelection()" *ngIf="selection.hasValue() && disableDelete == false">
         <i class="las la-trash"></i>
     </button>
-    <a *ngIf="disableWrite == false && context !== UserGrantContext.USER" matTooltip="{{'GRANTS.ADD' | translate}}"
-        actions color="primary" color="primary" mat-raised-button [routerLink]="routerLink">
+    <a *ngIf="disableWrite == false" matTooltip="{{'GRANTS.ADD' | translate}}" actions color="primary" color="primary"
+        mat-raised-button [routerLink]="routerLink">
         <mat-icon class="icon">add</mat-icon>{{ 'GRANTS.ADD_BTN' | translate }}
     </a>
 

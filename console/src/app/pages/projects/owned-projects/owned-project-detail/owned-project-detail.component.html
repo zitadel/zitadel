@@ -98,8 +98,8 @@
                         description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
                         <app-user-grants [context]="UserGrantContext.OWNED_PROJECT" [projectId]="projectId"
                             refreshOnPreviousRoute="/grant-create/project/{{projectId}}"
-                            [disableWrite]="(['user.grant.write$', 'user.grant.write:'+projectId] | hasRole) | async"
-                            [disableDelete]="(['user.grant.delete$','user.grant.delete:'+projectId] | hasRole) | async">
+                            [disableWrite]="((['user.grant.write$', 'user.grant.write:'+projectId] | hasRole) | async) == false"
+                            [disableDelete]="((['user.grant.delete$','user.grant.delete:'+projectId] | hasRole) | async) == false">
                         </app-user-grants>
                     </app-card>
                 </ng-template>

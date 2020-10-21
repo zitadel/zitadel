@@ -47,6 +47,15 @@
         </app-card>
 
         <app-auth-user-mfa *ngIf="user" #mfaComponent></app-auth-user-mfa>
+
+        <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
+            description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
+            <app-user-grants [userId]="user.id"
+                [displayedColumns]="['select', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']"
+                [disableWrite]="((['user.grant.write$'] | hasRole) | async) == false"
+                [disableDelete]="((['user.grant.delete$'] | hasRole) | async) == false">
+            </app-user-grants>
+        </app-card>
     </div>
 
     <div *ngIf="user" class="side" metainfo>

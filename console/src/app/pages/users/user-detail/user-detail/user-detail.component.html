@@ -84,7 +84,9 @@
         <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
             description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
             <app-user-grants [userId]="user.id"
-                [displayedColumns]="['select', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']">
+                [displayedColumns]="['select', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']"
+                [disableWrite]="((['user.grant.write$'] | hasRole) | async) == false"
+                [disableDelete]="((['user.grant.delete$'] | hasRole) | async) == false">
             </app-user-grants>
         </app-card>
     </div>
