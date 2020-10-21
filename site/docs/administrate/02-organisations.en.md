@@ -34,7 +34,33 @@ Once you created your organisation you will receive a generated domain name from
 After the domain is verified your users can use both domain names to log-in. The user "coyote" can now use "coyote@acme.zitadel.ch" and "coyote@acme.ch".
 An organisation can have multiple domain names, but only one of it can be primary. The primary domain defines which login name ZITADEL displays to the user, and also what information gets asserted in access_tokens (preferred_username).
 
-> Screenshot here
+Browse to your [organisation](administrate#Organisations) by visiting [https://console.zitadel.ch/org](https://console.zitadel.ch/org).
+
+Add the domain to your [organisation](administrate#Organisations) by clicking the button **Add Domain**.
+<img src="img/console_org_domain_default.png" alt="Organisation Overview" width="1000px" height="auto">
+
+Input the domain in the input field and click **Add**
+<img src="img/console_org_domain_add.png" alt="Organisation Add Domain" width="1000px" height="auto">
+
+<img src="img/console_org_domain_added.png" alt="Organisation Domain Added" width="1000px" height="auto">
+
+To start the domain verification click the domain name and a dialog will appear, where you can choose between DNS or HTTP challenge methods.
+<img src="img/console_org_domain_verify.png" alt="Organisation Domain Verify" width="1000px" height="auto">
+
+For example, create a TXT record with your DNS provider for the used domain an click verify. **ZITADEL** will then proceed an check your DNS.
+<img src="img/console_org_domain_verify_dns.png" alt="Organisation Domain Verify DNS" width="1000px" height="auto">
+
+> Do not delete the verification code **ZTIADEL** will recheck the ownership from time to time
+
+When the verification is successful you have the option to activate the domain by clicking **Set as primary**
+<img src="img/console_org_domain_verified.png" alt="Organisation Domain Verified" width="1000px" height="auto">
+
+> This changes the **preferred loginnames** of your [users](administrate#Users) as indicated [here](administrate#How_ZITADEL_handles_usernames).
+
+Gratulations your are done! You can check this by visiting [https://console.zitadel.ch/users/me](https://console.zitadel.ch/users/me)
+<img src="img/console_user_personal_info.png" alt="User Personal Information" width="1000px" height="auto">
+
+> This only works when the [user](administrate#Users) is member of this [organisation](administrate#Organisations)
 
 ### Audit organisation changes
 

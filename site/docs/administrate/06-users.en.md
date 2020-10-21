@@ -27,13 +27,13 @@ If someone verifies a domain name within the organisation **ZITADEL** will gener
 
 ### Manage Users
 
-#### Search User
+#### Search Users
 
 <img src="img/console_user_list_search.png" alt="User list Search" width="1000px" height="auto">
 
 Image 1: User List Search
 
-#### Create User
+#### Create Users
 
 <img src="img/console_user_list.png" alt="User list" width="1000px" height="auto">
 
