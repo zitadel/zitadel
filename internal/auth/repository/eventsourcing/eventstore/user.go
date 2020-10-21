@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 
@@ -15,6 +16,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/sdk"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/tracing"
 	"github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -236,7 +238,9 @@ func (repo *UserRepo) ChangeMyPassword(ctx context.Context, old, new string) err
 	return err
 }
 
-func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new string) error {
+func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if errors.IsNotFound(err) {
 		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)

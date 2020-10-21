@@ -13,6 +13,7 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/id"
+	"github.com/caos/zitadel/internal/tracing"
 )
 
 type IAMEventstore struct {
@@ -45,7 +46,10 @@ func StartIAM(conf IAMConfig, systemDefaults sd.SystemDefaults) (*IAMEventstore,
 	}, nil
 }
 
-func (es *IAMEventstore) IAMByID(ctx context.Context, id string) (*iam_model.IAM, error) {
+func (es *IAMEventstore) IAMByID(ctx context.Context, id string) (_ *iam_model.IAM, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	iam := es.iamCache.getIAM(id)
 
 	query, err := IAMByIDQuery(iam.AggregateID, iam.Sequence)

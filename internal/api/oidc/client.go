@@ -15,6 +15,7 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 )
@@ -32,7 +33,9 @@ const (
 	oidcCtx = "oidc"
 )
 
-func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (op.Client, error) {
+func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Client, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	client, err := o.repo.ApplicationByClientID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -51,7 +54,9 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (op.Clie
 	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime, allowedScopes)
 }
 
-func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID string) (*jose.JSONWebKey, error) {
+func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID string) (_ *jose.JSONWebKey, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	key, err := o.repo.MachineKeyByID(ctx, keyID)
 	if err != nil {
 		return nil, err
@@ -70,7 +75,9 @@ func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID strin
 	}, nil
 }
 
-func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secret string) error {
+func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secret string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	ctx = authz.SetCtxData(ctx, authz.CtxData{
 		UserID: oidcCtx,
 		OrgID:  oidcCtx,
@@ -78,7 +85,9 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 	return o.repo.AuthorizeOIDCApplication(ctx, id, secret)
 }
 
-func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, subject, origin string) (oidc.UserInfo, error) {
+func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, subject, origin string) (_ oidc.UserInfo, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	token, err := o.repo.TokenByID(ctx, subject, tokenID)
 	if err != nil {
 		return nil, errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
@@ -95,7 +104,9 @@ func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, subject, 
 	return o.GetUserinfoFromScopes(ctx, token.UserID, token.ApplicationID, token.Scopes)
 }
 
-func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID, applicationID string, scopes []string) (oidc.UserInfo, error) {
+func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID, applicationID string, scopes []string) (_ oidc.UserInfo, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	user, err := o.repo.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err

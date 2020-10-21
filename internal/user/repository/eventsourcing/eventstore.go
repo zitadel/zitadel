@@ -3,25 +3,25 @@ package eventsourcing
 import (
 	"context"
 	"fmt"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"time"
 
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
-
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/id"
 	"github.com/pquerna/otp/totp"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/cache/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/id"
 	global_model "github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
@@ -554,7 +554,9 @@ func (es *UserEventstore) UserPasswordByID(ctx context.Context, userID string) (
 	return nil, caos_errs.ThrowNotFound(nil, "EVENT-d8e2", "Errors.User.Password.NotFound")
 }
 
-func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password string, authRequest *req_model.AuthRequest) error {
+func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password string, authRequest *req_model.AuthRequest) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
@@ -565,7 +567,10 @@ func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password st
 	if user.Password == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-s35Fa", "Errors.User.Password.Empty")
 	}
-	if err := crypto.CompareHash(user.Password.SecretCrypto, []byte(password), es.PasswordAlg); err == nil {
+	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
+	err = crypto.CompareHash(user.Password.SecretCrypto, []byte(password), es.PasswordAlg)
+	spanPasswordComparison.EndWithError(err)
+	if err == nil {
 		return es.setPasswordCheckResult(ctx, user, authRequest, PasswordCheckSucceededAggregate)
 	}
 	if err := es.setPasswordCheckResult(ctx, user, authRequest, PasswordCheckFailedAggregate); err != nil {
@@ -574,11 +579,13 @@ func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password st
 	return caos_errs.ThrowInvalidArgument(nil, "EVENT-452ad", "Errors.User.Password.Invalid")
 }
 
-func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_model.User, authRequest *req_model.AuthRequest, check func(*es_models.AggregateCreator, *model.User, *model.AuthRequest) es_sdk.AggregateFunc) error {
+func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_model.User, authRequest *req_model.AuthRequest, check func(*es_models.AggregateCreator, *model.User, *model.AuthRequest) es_sdk.AggregateFunc) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	repoUser := model.UserFromModel(user)
 	repoAuthRequest := model.AuthRequestFromModel(authRequest)
 	agg := check(es.AggregateCreator(), repoUser, repoAuthRequest)
-	err := es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
 	if err != nil {
 		return err
 	}
@@ -677,7 +684,9 @@ func (es *UserEventstore) ChangeMachine(ctx context.Context, machine *usr_model.
 	return model.MachineToModel(repoUser.Machine), nil
 }
 
-func (es *UserEventstore) ChangePassword(ctx context.Context, policy *iam_model.PasswordComplexityPolicyView, userID, old, new string) (*usr_model.Password, error) {
+func (es *UserEventstore) ChangePassword(ctx context.Context, policy *iam_model.PasswordComplexityPolicyView, userID, old, new string) (_ *usr_model.Password, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -688,15 +697,20 @@ func (es *UserEventstore) ChangePassword(ctx context.Context, policy *iam_model.
 	if user.Password == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Fds3s", "Errors.User.Password.Empty")
 	}
-	if err := crypto.CompareHash(user.Password.SecretCrypto, []byte(old), es.PasswordAlg); err != nil {
+	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
+	err = crypto.CompareHash(user.Password.SecretCrypto, []byte(old), es.PasswordAlg)
+	spanPasswordComparison.EndWithError(err)
+	if err != nil {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-s56a3", "Errors.User.Password.Invalid")
 	}
 	return es.changedPassword(ctx, user, policy, new, false)
 }
 
-func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.User, policy *iam_model.PasswordComplexityPolicyView, password string, onetime bool) (*usr_model.Password, error) {
+func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.User, policy *iam_model.PasswordComplexityPolicyView, password string, onetime bool) (_ *usr_model.Password, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	pw := &usr_model.Password{SecretString: password}
-	err := pw.HashPasswordIfExisting(policy, es.PasswordAlg, onetime)
+	err = pw.HashPasswordIfExisting(policy, es.PasswordAlg, onetime)
 	if err != nil {
 		return nil, err
 	}
