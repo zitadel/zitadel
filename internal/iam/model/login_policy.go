@@ -13,6 +13,9 @@ type LoginPolicy struct {
 	AllowRegister         bool
 	AllowExternalIdp      bool
 	IDPProviders          []*IDPProvider
+	ForceMFA              bool
+	SoftwareMFAs          []SoftwareMFAType
+	HardwareMFAs          []HardwareMFAType
 }
 
 type IDPProvider struct {
@@ -33,6 +36,20 @@ type IDPProviderType int32
 const (
 	IDPProviderTypeSystem IDPProviderType = iota
 	IDPProviderTypeOrg
+)
+
+type SoftwareMFAType int32
+
+const (
+	SoftwareMFATypeUnspecified SoftwareMFAType = iota
+	SoftwareMFATypeOTP
+)
+
+type HardwareMFAType int32
+
+const (
+	HardwareMfaTypeUnspecified HardwareMFAType = iota
+	HardwareMfaTypeU2F
 )
 
 func (p *LoginPolicy) IsValid() bool {

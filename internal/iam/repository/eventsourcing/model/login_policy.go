@@ -14,6 +14,7 @@ type LoginPolicy struct {
 	AllowUsernamePassword bool           `json:"allowUsernamePassword"`
 	AllowRegister         bool           `json:"allowRegister"`
 	AllowExternalIdp      bool           `json:"allowExternalIdp"`
+	ForceMFA              bool           `json:"forceMFA"`
 	IDPProviders          []*IDPProvider `json:"-"`
 }
 
@@ -45,6 +46,7 @@ func LoginPolicyToModel(policy *LoginPolicy) *iam_model.LoginPolicy {
 		AllowRegister:         policy.AllowRegister,
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		IDPProviders:          idps,
+		ForceMFA:              policy.ForceMFA,
 	}
 }
 
@@ -57,6 +59,7 @@ func LoginPolicyFromModel(policy *iam_model.LoginPolicy) *LoginPolicy {
 		AllowRegister:         policy.AllowRegister,
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		IDPProviders:          idps,
+		ForceMFA:              policy.ForceMFA,
 	}
 }
 
@@ -104,7 +107,9 @@ func (p *LoginPolicy) Changes(changed *LoginPolicy) map[string]interface{} {
 	if changed.AllowExternalIdp != p.AllowExternalIdp {
 		changes["allowExternalIdp"] = changed.AllowExternalIdp
 	}
-
+	if changed.ForceMFA != p.ForceMFA {
+		changes["forceMFA"] = changed.ForceMFA
+	}
 	return changes
 }
 
