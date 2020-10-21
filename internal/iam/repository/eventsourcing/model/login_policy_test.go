@@ -251,3 +251,56 @@ func TestRemoveAddIdpToPolicyEvent(t *testing.T) {
 		})
 	}
 }
+
+func TestAppendAddSoftwareMFAToPolicyEvent(t *testing.T) {
+	type args struct {
+		iam   *IAM
+		mfa   *MFA
+		event *es_models.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result *IAM
+	}{
+		{
+			name: "append add software mfa to login policy event",
+			args: args{
+				iam:   &IAM{DefaultLoginPolicy: &LoginPolicy{AllowExternalIdp: true, AllowRegister: true, AllowUsernamePassword: true}},
+				mfa:   &MFA{MfaType: int32(model.SoftwareMFATypeOTP)},
+				event: &es_models.Event{},
+			},
+			result: &IAM{DefaultLoginPolicy: &LoginPolicy{
+				AllowExternalIdp:      true,
+				AllowRegister:         true,
+				AllowUsernamePassword: true,
+				SoftwareMFAs: []int32{
+					int32(model.SoftwareMFATypeOTP),
+				}}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.mfa != nil {
+				data, _ := json.Marshal(tt.args.mfa)
+				tt.args.event.Data = data
+			}
+			tt.args.iam.appendAddSoftwareMFAToLoginPolicyEvent(tt.args.event)
+			if tt.result.DefaultLoginPolicy.AllowUsernamePassword != tt.args.iam.DefaultLoginPolicy.AllowUsernamePassword {
+				t.Errorf("got wrong result AllowUsernamePassword: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.AllowUsernamePassword, tt.args.iam.DefaultLoginPolicy.AllowUsernamePassword)
+			}
+			if tt.result.DefaultLoginPolicy.AllowRegister != tt.args.iam.DefaultLoginPolicy.AllowRegister {
+				t.Errorf("got wrong result AllowRegister: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.AllowRegister, tt.args.iam.DefaultLoginPolicy.AllowRegister)
+			}
+			if tt.result.DefaultLoginPolicy.AllowExternalIdp != tt.args.iam.DefaultLoginPolicy.AllowExternalIdp {
+				t.Errorf("got wrong result AllowExternalIDP: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.AllowExternalIdp, tt.args.iam.DefaultLoginPolicy.AllowExternalIdp)
+			}
+			if len(tt.result.DefaultLoginPolicy.SoftwareMFAs) != len(tt.args.iam.DefaultLoginPolicy.SoftwareMFAs) {
+				t.Errorf("got wrong software mfas len: expected: %v, actual: %v ", len(tt.result.DefaultLoginPolicy.SoftwareMFAs), len(tt.args.iam.DefaultLoginPolicy.SoftwareMFAs))
+			}
+			if tt.result.DefaultLoginPolicy.SoftwareMFAs[0] != tt.args.mfa.MfaType {
+				t.Errorf("got wrong software mfa: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.SoftwareMFAs[0], tt.args.mfa)
+			}
+		})
+	}
+}

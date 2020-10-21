@@ -16,6 +16,8 @@ type LoginPolicy struct {
 	AllowExternalIdp      bool           `json:"allowExternalIdp"`
 	ForceMFA              bool           `json:"forceMFA"`
 	IDPProviders          []*IDPProvider `json:"-"`
+	SoftwareMFAs          []int32        `json:"-"`
+	HardwareMFAs          []int32        `json:"-"`
 }
 
 type IDPProvider struct {
@@ -28,6 +30,10 @@ type IDPProviderID struct {
 	IDPConfigID string `json:"idpConfigId"`
 }
 
+type MFA struct {
+	MfaType int32 `json:"mfaType"`
+}
+
 func GetIDPProvider(providers []*IDPProvider, id string) (int, *IDPProvider) {
 	for i, p := range providers {
 		if p.IDPConfigID == id {
@@ -37,8 +43,18 @@ func GetIDPProvider(providers []*IDPProvider, id string) (int, *IDPProvider) {
 	return -1, nil
 }
 
+func GetMFA(mfas []int32, mfaType int32) (int, int32) {
+	for i, m := range mfas {
+		if m == mfaType {
+			return i, m
+		}
+	}
+	return -1, 0
+}
 func LoginPolicyToModel(policy *LoginPolicy) *iam_model.LoginPolicy {
 	idps := IDPProvidersToModel(policy.IDPProviders)
+	softwareMFAs := SoftwareMFAsToModel(policy.SoftwareMFAs)
+	hardwareMFAs := HardwareMFAsToModel(policy.HardwareMFAs)
 	return &iam_model.LoginPolicy{
 		ObjectRoot:            policy.ObjectRoot,
 		State:                 iam_model.PolicyState(policy.State),
@@ -47,11 +63,15 @@ func LoginPolicyToModel(policy *LoginPolicy) *iam_model.LoginPolicy {
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		IDPProviders:          idps,
 		ForceMFA:              policy.ForceMFA,
+		SoftwareMFAs:          softwareMFAs,
+		HardwareMFAs:          hardwareMFAs,
 	}
 }
 
 func LoginPolicyFromModel(policy *iam_model.LoginPolicy) *LoginPolicy {
 	idps := IDOProvidersFromModel(policy.IDPProviders)
+	softwareMFAs := SoftwareMFAsFromModel(policy.SoftwareMFAs)
+	hardwareMFAs := HardwareMFAsFromModel(policy.HardwareMFAs)
 	return &LoginPolicy{
 		ObjectRoot:            policy.ObjectRoot,
 		State:                 int32(policy.State),
@@ -60,6 +80,8 @@ func LoginPolicyFromModel(policy *iam_model.LoginPolicy) *LoginPolicy {
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		IDPProviders:          idps,
 		ForceMFA:              policy.ForceMFA,
+		SoftwareMFAs:          softwareMFAs,
+		HardwareMFAs:          hardwareMFAs,
 	}
 }
 
@@ -93,6 +115,38 @@ func IDPProviderFromModel(provider *iam_model.IDPProvider) *IDPProvider {
 		Type:        int32(provider.Type),
 		IDPConfigID: provider.IdpConfigID,
 	}
+}
+
+func SoftwareMFAsFromModel(mfas []iam_model.SoftwareMFAType) []int32 {
+	convertedMFAs := make([]int32, len(mfas))
+	for i, mfa := range mfas {
+		convertedMFAs[i] = int32(mfa)
+	}
+	return convertedMFAs
+}
+
+func SoftwareMFAsToModel(mfas []int32) []iam_model.SoftwareMFAType {
+	convertedMFAs := make([]iam_model.SoftwareMFAType, len(mfas))
+	for i, mfa := range mfas {
+		convertedMFAs[i] = iam_model.SoftwareMFAType(mfa)
+	}
+	return convertedMFAs
+}
+
+func HardwareMFAsFromModel(mfas []iam_model.HardwareMFAType) []int32 {
+	convertedMFAs := make([]int32, len(mfas))
+	for i, mfa := range mfas {
+		convertedMFAs[i] = int32(mfa)
+	}
+	return convertedMFAs
+}
+
+func HardwareMFAsToModel(mfas []int32) []iam_model.HardwareMFAType {
+	convertedMFAs := make([]iam_model.HardwareMFAType, len(mfas))
+	for i, mfa := range mfas {
+		convertedMFAs[i] = iam_model.HardwareMFAType(mfa)
+	}
+	return convertedMFAs
 }
 
 func (p *LoginPolicy) Changes(changed *LoginPolicy) map[string]interface{} {
@@ -148,6 +202,57 @@ func (iam *IAM) appendRemoveIDPProviderFromLoginPolicyEvent(event *es_models.Eve
 		iam.DefaultLoginPolicy.IDPProviders[i] = iam.DefaultLoginPolicy.IDPProviders[len(iam.DefaultLoginPolicy.IDPProviders)-1]
 		iam.DefaultLoginPolicy.IDPProviders[len(iam.DefaultLoginPolicy.IDPProviders)-1] = nil
 		iam.DefaultLoginPolicy.IDPProviders = iam.DefaultLoginPolicy.IDPProviders[:len(iam.DefaultLoginPolicy.IDPProviders)-1]
+		return nil
+	}
+	return nil
+}
+
+func (iam *IAM) appendAddSoftwareMFAToLoginPolicyEvent(event *es_models.Event) error {
+	mfa := new(MFA)
+	err := mfa.SetData(event)
+	if err != nil {
+		return err
+	}
+	iam.DefaultLoginPolicy.SoftwareMFAs = append(iam.DefaultLoginPolicy.SoftwareMFAs, mfa.MfaType)
+	return nil
+}
+
+func (iam *IAM) appendRemoveSoftwareMfaFromLoginPolicyEvent(event *es_models.Event) error {
+	mfa := new(MFA)
+	err := mfa.SetData(event)
+	if err != nil {
+		return err
+	}
+	if i, m := GetMFA(iam.DefaultLoginPolicy.SoftwareMFAs, mfa.MfaType); m != 0 {
+		iam.DefaultLoginPolicy.SoftwareMFAs[i] = iam.DefaultLoginPolicy.SoftwareMFAs[len(iam.DefaultLoginPolicy.SoftwareMFAs)-1]
+		iam.DefaultLoginPolicy.SoftwareMFAs[len(iam.DefaultLoginPolicy.SoftwareMFAs)-1] = 0
+		iam.DefaultLoginPolicy.SoftwareMFAs = iam.DefaultLoginPolicy.SoftwareMFAs[:len(iam.DefaultLoginPolicy.SoftwareMFAs)-1]
+		return nil
+	}
+	return nil
+}
+
+func (iam *IAM) appendAddHardwareMFAToLoginPolicyEvent(event *es_models.Event) error {
+	mfa := new(MFA)
+	err := mfa.SetData(event)
+	if err != nil {
+		return err
+	}
+	iam.DefaultLoginPolicy.HardwareMFAs = append(iam.DefaultLoginPolicy.HardwareMFAs, mfa.MfaType)
+	return nil
+}
+
+func (iam *IAM) appendRemoveHardwareMfaFromLoginPolicyEvent(event *es_models.Event) error {
+	mfa := new(MFA)
+	err := mfa.SetData(event)
+	if err != nil {
+		return err
+	}
+	if i, m := GetMFA(iam.DefaultLoginPolicy.HardwareMFAs, mfa.MfaType); m != 0 {
+		iam.DefaultLoginPolicy.HardwareMFAs[i] = iam.DefaultLoginPolicy.HardwareMFAs[len(iam.DefaultLoginPolicy.HardwareMFAs)-1]
+		iam.DefaultLoginPolicy.HardwareMFAs[len(iam.DefaultLoginPolicy.HardwareMFAs)-1] = 0
+		iam.DefaultLoginPolicy.HardwareMFAs = iam.DefaultLoginPolicy.HardwareMFAs[:len(iam.DefaultLoginPolicy.HardwareMFAs)-1]
+		return nil
 	}
 	return nil
 }
@@ -164,6 +269,14 @@ func (p *IDPProvider) SetData(event *es_models.Event) error {
 	err := json.Unmarshal(event.Data, p)
 	if err != nil {
 		return errors.ThrowInternal(err, "EVENT-ldos9", "unable to unmarshal data")
+	}
+	return nil
+}
+
+func (m *MFA) SetData(event *es_models.Event) error {
+	err := json.Unmarshal(event.Data, m)
+	if err != nil {
+		return errors.ThrowInternal(err, "EVENT-4G9os", "unable to unmarshal data")
 	}
 	return nil
 }
