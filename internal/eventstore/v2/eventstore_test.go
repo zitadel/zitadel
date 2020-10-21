@@ -1076,6 +1076,198 @@ func TestEventstore_LatestSequence(t *testing.T) {
 	}
 }
 
+type testReducer struct {
+	t              *testing.T
+	events         []Event
+	expectedLength int
+	err            error
+}
+
+func (r *testReducer) Reduce() error {
+	r.t.Helper()
+	if len(r.events) != r.expectedLength {
+		r.t.Errorf("wrong amount of append events wanted: %d, got %d", r.expectedLength, len(r.events))
+	}
+	if r.err != nil {
+		return r.err
+	}
+	return nil
+}
+
+func (r *testReducer) AppendEvents(e ...Event) error {
+	if r.err != nil {
+		return r.err
+	}
+	r.events = append(r.events, e...)
+	return nil
+}
+
+func TestEventstore_FilterToReducer(t *testing.T) {
+	type args struct {
+		query     *SearchQueryFactory
+		readModel reducer
+	}
+	type fields struct {
+		repo        *testRepo
+		eventMapper map[EventType]func(*repository.Event) (Event, error)
+	}
+	type res struct {
+		wantErr bool
+	}
+	tests := []struct {
+		name   string
+		args   args
+		fields fields
+		res    res
+	}{
+		{
+			name: "invalid factory",
+			args: args{
+				query: nil,
+			},
+			res: res{
+				wantErr: true,
+			},
+		},
+		{
+			name: "no events",
+			args: args{
+				query: &SearchQueryFactory{
+					aggregateTypes: []AggregateType{"no.aggregates"},
+					columns:        repository.ColumnsEvent,
+				},
+				readModel: &testReducer{
+					t:              t,
+					expectedLength: 0,
+				},
+			},
+			fields: fields{
+				repo: &testRepo{
+					events: []*repository.Event{},
+					t:      t,
+				},
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
+						return &testEvent{}, nil
+					},
+				},
+			},
+			res: res{
+				wantErr: false,
+			},
+		},
+		{
+			name: "repo error",
+			args: args{
+				query: &SearchQueryFactory{
+					aggregateTypes: []AggregateType{"no.aggregates"},
+					columns:        repository.ColumnsEvent,
+				},
+				readModel: &testReducer{
+					t:              t,
+					expectedLength: 0,
+				},
+			},
+			fields: fields{
+				repo: &testRepo{
+					t:   t,
+					err: errors.ThrowInternal(nil, "V2-RfkBa", "test err"),
+				},
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
+						return &testEvent{}, nil
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+			},
+		},
+		{
+			name: "found events",
+			args: args{
+				query: &SearchQueryFactory{
+					aggregateTypes: []AggregateType{"test.aggregate"},
+					columns:        repository.ColumnsEvent,
+				},
+				readModel: &testReducer{
+					t:              t,
+					expectedLength: 1,
+				},
+			},
+			fields: fields{
+				repo: &testRepo{
+					events: []*repository.Event{
+						{
+							AggregateID: "test.aggregate",
+							Type:        "test.event",
+						},
+					},
+					t: t,
+				},
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
+						return &testEvent{}, nil
+					},
+				},
+			},
+		},
+		{
+			name: "append in reducer fails",
+			args: args{
+				query: &SearchQueryFactory{
+					aggregateTypes: []AggregateType{"test.aggregate"},
+					columns:        repository.ColumnsEvent,
+				},
+				readModel: &testReducer{
+					t:   t,
+					err: errors.ThrowInvalidArgument(nil, "V2-W06TG", "test err"),
+				},
+			},
+			fields: fields{
+				repo: &testRepo{
+					events: []*repository.Event{
+						{
+							AggregateID: "test.aggregate",
+							Type:        "test.event",
+						},
+					},
+					t: t,
+				},
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
+						return &testEvent{}, nil
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			es := &Eventstore{
+				repo:             tt.fields.repo,
+				interceptorMutex: sync.Mutex{},
+				eventMapper:      map[EventType]eventTypeInterceptors{},
+			}
+			for eventType, mapper := range tt.fields.eventMapper {
+				err := es.RegisterFilterEventMapper(eventType, mapper)
+				if err != nil {
+					t.Errorf("register event mapper failed: %v", err)
+					t.FailNow()
+				}
+			}
+
+			err := es.FilterToReducer(context.Background(), tt.args.query, tt.args.readModel)
+			if (err != nil) != tt.res.wantErr {
+				t.Errorf("Eventstore.aggregatesToEvents() error = %v, wantErr %v", err, tt.res.wantErr)
+			}
+		})
+	}
+}
+
 func combineEventLists(lists ...[]*repository.Event) []*repository.Event {
 	events := []*repository.Event{}
 	for _, list := range lists {
