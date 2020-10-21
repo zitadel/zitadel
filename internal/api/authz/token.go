@@ -75,7 +75,6 @@ func (v *TokenVerifier) clientIDFromMethod(ctx context.Context, method string) (
 	if !ok {
 		return "", caos_errs.ThrowPermissionDenied(nil, "AUTHZ-G2qrh", "Errors.Internal")
 	}
-	//var err error
 	c := app.(*client)
 	if c.id != "" {
 		return c.id, nil
