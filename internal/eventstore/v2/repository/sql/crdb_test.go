@@ -829,7 +829,7 @@ func TestCRDB_query_events(t *testing.T) {
 		existingEvents []*repository.Event
 	}
 	type res struct {
-		events []*repository.Event
+		eventCount int
 	}
 	tests := []struct {
 		name    string
@@ -841,6 +841,76 @@ func TestCRDB_query_events(t *testing.T) {
 		{
 			name: "aggregate type filter no events",
 			args: args{
+				searchQuery: &repository.SearchQuery{
+					Columns: repository.ColumnsEvent,
+					Filters: []*repository.Filter{
+						repository.NewFilter(repository.FieldAggregateType, "not found", repository.OperationEquals),
+					},
+				},
+			},
+			fields: fields{
+				existingEvents: []*repository.Event{
+					generateEvent(t, "300", false, 0),
+					generateEvent(t, "300", false, 0),
+					generateEvent(t, "300", false, 0),
+				},
+			},
+			res: res{
+				eventCount: 0,
+			},
+			wantErr: false,
+		},
+		{
+			name: "aggregate type filter events found",
+			args: args{
+				searchQuery: &repository.SearchQuery{
+					Columns: repository.ColumnsEvent,
+					Filters: []*repository.Filter{
+						repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
+					},
+				},
+			},
+			fields: fields{
+				existingEvents: []*repository.Event{
+					generateEvent(t, "301", false, 0),
+					generateEvent(t, "302", false, 0),
+					generateEvent(t, "302", false, 0),
+					generateEventForAggregate("not in list", "303", false, 0),
+				},
+			},
+			res: res{
+				eventCount: 3,
+			},
+			wantErr: false,
+		},
+		{
+			name: "aggregate type and id filter events found",
+			args: args{
+				searchQuery: &repository.SearchQuery{
+					Columns: repository.ColumnsEvent,
+					Filters: []*repository.Filter{
+						repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
+						repository.NewFilter(repository.FieldAggregateID, "303", repository.OperationEquals),
+					},
+				},
+			},
+			fields: fields{
+				existingEvents: []*repository.Event{
+					generateEvent(t, "303", false, 0),
+					generateEvent(t, "303", false, 0),
+					generateEvent(t, "303", false, 0),
+					generateEventForAggregate("not in list", "304", false, 0),
+					generateEvent(t, "305", false, 0),
+				},
+			},
+			res: res{
+				eventCount: 3,
+			},
+			wantErr: false,
+		},
+		{
+			name: "sequence filter events found",
+			args: args{
 				searchQuery: &repository.SearchQuery{},
 			},
 			fields: fields{
@@ -851,45 +921,6 @@ func TestCRDB_query_events(t *testing.T) {
 			},
 			wantErr: false,
 		},
-		// {
-		// 	name: "aggregate type filter events found",
-		// 	args: args{
-		// 		searchQuery: &repository.SearchQuery{},
-		// 	},
-		// 	fields: fields{
-		// 		existingEvents: []*repository.Event{},
-		// 	},
-		// 	res: res{
-		// 		events: []*repository.Event{},
-		// 	},
-		// 	wantErr: false,
-		// },
-		// {
-		// 	name: "aggregate type and id filter events found",
-		// 	args: args{
-		// 		searchQuery: &repository.SearchQuery{},
-		// 	},
-		// 	fields: fields{
-		// 		existingEvents: []*repository.Event{},
-		// 	},
-		// 	res: res{
-		// 		events: []*repository.Event{},
-		// 	},
-		// 	wantErr: false,
-		// },
-		// {
-		// 	name: "sequence filter events found",
-		// 	args: args{
-		// 		searchQuery: &repository.SearchQuery{},
-		// 	},
-		// 	fields: fields{
-		// 		existingEvents: []*repository.Event{},
-		// 	},
-		// 	res: res{
-		// 		events: []*repository.Event{},
-		// 	},
-		// 	wantErr: false,
-		// },
 		// {
 		// 	name: "resource owner filter events found",
 		// 	args: args{
