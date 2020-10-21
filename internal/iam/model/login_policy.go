@@ -48,8 +48,8 @@ const (
 type HardwareMFAType int32
 
 const (
-	HardwareMfaTypeUnspecified HardwareMFAType = iota
-	HardwareMfaTypeU2F
+	HardwareMFATypeUnspecified HardwareMFAType = iota
+	HardwareMFATypeU2F
 )
 
 func (p *LoginPolicy) IsValid() bool {
@@ -67,4 +67,22 @@ func (p *LoginPolicy) GetIdpProvider(id string) (int, *IDPProvider) {
 		}
 	}
 	return -1, nil
+}
+
+func (p *LoginPolicy) GetSoftwareMFA(mfaType SoftwareMFAType) (int, SoftwareMFAType) {
+	for i, m := range p.SoftwareMFAs {
+		if m == mfaType {
+			return i, m
+		}
+	}
+	return -1, 0
+}
+
+func (p *LoginPolicy) GetHardwareMFA(mfaType HardwareMFAType) (int, HardwareMFAType) {
+	for i, m := range p.HardwareMFAs {
+		if m == mfaType {
+			return i, m
+		}
+	}
+	return -1, 0
 }

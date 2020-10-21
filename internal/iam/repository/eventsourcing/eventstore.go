@@ -593,6 +593,104 @@ func (es *IAMEventstore) RemoveIDPProviderFromLoginPolicy(ctx context.Context, p
 	return nil
 }
 
+func (es *IAMEventstore) AddSoftwareMFAToLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.SoftwareMFAType) (iam_model.SoftwareMFAType, error) {
+	if mfa == iam_model.SoftwareMFATypeUnspecified {
+		return 0, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.IAM.LoginPolicy.MFA.Unspecified")
+	}
+	iam, err := es.IAMByID(ctx, aggregateID)
+	if err != nil {
+		return 0, err
+	}
+	if _, m := iam.DefaultLoginPolicy.GetSoftwareMFA(mfa); m != 0 {
+		return 0, caos_errs.ThrowAlreadyExists(nil, "EVENT-4Rk09", "Errors.IAM.LoginPolicy.MFA.AlreadyExists")
+	}
+	repoIam := model.IAMFromModel(iam)
+	repoMFA := model.SoftwareMFAFromModel(mfa)
+
+	addAggregate := LoginPolicySoftwareMFAAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoMFA)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return 0, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	if _, m := model.GetMFA(repoIam.DefaultLoginPolicy.SoftwareMFAs, int32(mfa)); m != 0 {
+		return iam_model.SoftwareMFAType(m), nil
+	}
+	return 0, caos_errs.ThrowInternal(nil, "EVENT-5N9so", "Errors.Internal")
+}
+
+func (es *IAMEventstore) RemoveSoftwareMFAFromLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.SoftwareMFAType) error {
+	if mfa == iam_model.SoftwareMFATypeUnspecified {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-4gJ9s", "Errors.IAM.LoginPolicy.MFA.Unspecified")
+	}
+	iam, err := es.IAMByID(ctx, aggregateID)
+	if err != nil {
+		return err
+	}
+	if _, m := iam.DefaultLoginPolicy.GetSoftwareMFA(mfa); m == 0 {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-gBm9s", "Errors.IAM.LoginPolicy.MFA.NotExisting")
+	}
+	repoIam := model.IAMFromModel(iam)
+	repoMFA := model.SoftwareMFAFromModel(mfa)
+
+	removeAgg := LoginPolicySoftwareMFARemovedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoMFA)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, removeAgg)
+	if err != nil {
+		return err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return nil
+}
+
+func (es *IAMEventstore) AddHardwareMFAToLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.HardwareMFAType) (iam_model.HardwareMFAType, error) {
+	if mfa == iam_model.HardwareMFATypeUnspecified {
+		return 0, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.IAM.LoginPolicy.MFA.Unspecified")
+	}
+	iam, err := es.IAMByID(ctx, aggregateID)
+	if err != nil {
+		return 0, err
+	}
+	if _, m := iam.DefaultLoginPolicy.GetHardwareMFA(mfa); m != 0 {
+		return 0, caos_errs.ThrowAlreadyExists(nil, "EVENT-4Rk09", "Errors.IAM.LoginPolicy.MFA.AlreadyExists")
+	}
+	repoIam := model.IAMFromModel(iam)
+	repoMFA := model.HardwareMFAFromModel(mfa)
+
+	addAggregate := LoginPolicyHardwareMFAAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoMFA)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return 0, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	if _, m := model.GetMFA(repoIam.DefaultLoginPolicy.HardwareMFAs, int32(mfa)); m != 0 {
+		return iam_model.HardwareMFAType(m), nil
+	}
+	return 0, caos_errs.ThrowInternal(nil, "EVENT-5N9so", "Errors.Internal")
+}
+
+func (es *IAMEventstore) RemoveHardwareMFAFromLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.HardwareMFAType) error {
+	if mfa == iam_model.HardwareMFATypeUnspecified {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-4gJ9s", "Errors.IAM.LoginPolicy.MFA.Unspecified")
+	}
+	iam, err := es.IAMByID(ctx, aggregateID)
+	if err != nil {
+		return err
+	}
+	if _, m := iam.DefaultLoginPolicy.GetHardwareMFA(mfa); m != 0 {
+		return caos_errs.ThrowAlreadyExists(nil, "EVENT-gBm9s", "Errors.IAM.LoginPolicy.MFA.AlreadyExists")
+	}
+	repoIam := model.IAMFromModel(iam)
+	repoMFA := model.HardwareMFAFromModel(mfa)
+
+	removeAgg := LoginPolicyHardwareMFARemovedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoMFA)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, removeAgg)
+	if err != nil {
+		return err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return nil
+}
+
 func (es *IAMEventstore) PrepareAddPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*model.IAM, *models.Aggregate, error) {
 	if policy == nil {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.IAM.PasswordComplexityPolicy.Empty")

@@ -125,6 +125,10 @@ func SoftwareMFAsFromModel(mfas []iam_model.SoftwareMFAType) []int32 {
 	return convertedMFAs
 }
 
+func SoftwareMFAFromModel(mfa iam_model.SoftwareMFAType) *MFA {
+	return &MFA{MfaType: int32(mfa)}
+}
+
 func SoftwareMFAsToModel(mfas []int32) []iam_model.SoftwareMFAType {
 	convertedMFAs := make([]iam_model.SoftwareMFAType, len(mfas))
 	for i, mfa := range mfas {
@@ -139,6 +143,10 @@ func HardwareMFAsFromModel(mfas []iam_model.HardwareMFAType) []int32 {
 		convertedMFAs[i] = int32(mfa)
 	}
 	return convertedMFAs
+}
+
+func HardwareMFAFromModel(mfa iam_model.HardwareMFAType) *MFA {
+	return &MFA{MfaType: int32(mfa)}
 }
 
 func HardwareMFAsToModel(mfas []int32) []iam_model.HardwareMFAType {
@@ -217,7 +225,7 @@ func (iam *IAM) appendAddSoftwareMFAToLoginPolicyEvent(event *es_models.Event) e
 	return nil
 }
 
-func (iam *IAM) appendRemoveSoftwareMfaFromLoginPolicyEvent(event *es_models.Event) error {
+func (iam *IAM) appendRemoveSoftwareMFAFromLoginPolicyEvent(event *es_models.Event) error {
 	mfa := new(MFA)
 	err := mfa.SetData(event)
 	if err != nil {
@@ -242,7 +250,7 @@ func (iam *IAM) appendAddHardwareMFAToLoginPolicyEvent(event *es_models.Event) e
 	return nil
 }
 
-func (iam *IAM) appendRemoveHardwareMfaFromLoginPolicyEvent(event *es_models.Event) error {
+func (iam *IAM) appendRemoveHardwareMFAFromLoginPolicyEvent(event *es_models.Event) error {
 	mfa := new(MFA)
 	err := mfa.SetData(event)
 	if err != nil {

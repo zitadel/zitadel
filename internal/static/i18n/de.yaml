@@ -91,6 +91,8 @@ Errors:
       AlreadyExists: Login Policy existiert bereits
       IdpProviderAlreadyExisting: Idp Provider existiert bereits
       IdpProviderNotExisting: Idp Provider existiert nicht
+      MFA:
+        AlreadyExists: Multi Faktor existiert bereits
     PasswordComplexity:
       Empty: Passwort Komplexitäts Policy ist leer
       NotExisting: Passwort Komplexitäts Policy existiert nicht
@@ -159,6 +161,10 @@ Errors:
       AlreadyExists: Default Login Policy existiert bereits
       IdpProviderAlreadyExisting: Idp Provider existiert bereits
       IdpProviderNotExisting: Idp Provider existiert nicht
+      MFA:
+        AlreadyExists: Multi-Faktor existiert bereits
+        NotExisting: Multi-Faktor existiert nicht
+        Unspecified: Multifaktor ungültig
     PasswordComplexityPolicy:
       NotExisting: Default Password Complexity Policy existiert nicht
       AlreadyExists: Default Password Complexity Policy existiert bereits
