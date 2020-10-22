@@ -31,25 +31,46 @@ const (
 		"    check_previous, " +
 		// variables below are calculated
 		"    max_event_seq " +
-		") " +
-		"	AS( " +
-		"		SELECT " +
-		"			$1::VARCHAR," +
-		"			$2::VARCHAR," +
-		"			$3::VARCHAR," +
-		"			$4::VARCHAR," +
-		"			COALESCE($5::TIMESTAMPTZ, NOW()), " +
-		"			$6::JSONB, " +
-		"			$7::VARCHAR, " +
-		"			$8::VARCHAR, " +
-		"			$9::VARCHAR, " +
-		"			$10::BIGINT, " +
-		"			$11::BOOLEAN," +
-		"			MAX(event_sequence) AS max_event_seq " +
-		"	FROM eventstore.events " +
-		"	WHERE " +
-		"		aggregate_type = $2::VARCHAR " +
-		"		AND aggregate_id = $3::VARCHAR " +
+		") AS ( " +
+		"		( " +
+		//the following select will return no row if no previous event defined
+		"			SELECT " +
+		"				$1::VARCHAR, " +
+		"				$2::VARCHAR, " +
+		"				$3::VARCHAR, " +
+		"				$4::VARCHAR, " +
+		"				COALESCE($5::TIMESTAMPTZ, NOW()), " +
+		"				$6::JSONB, " +
+		"				$7::VARCHAR, " +
+		"				$8::VARCHAR, " +
+		"				resource_owner, " +
+		"				$10::BIGINT, " +
+		"				$11::BOOLEAN," +
+		"				MAX(event_sequence) AS max_event_seq " +
+		"			FROM eventstore.events " +
+		"			WHERE " +
+		"				aggregate_type = $2::VARCHAR " +
+		"				AND aggregate_id = $3::VARCHAR " +
+		"			GROUP BY resource_owner " +
+		"		) UNION ALL (" +
+		// if no previous event we use the given data
+		"			VALUES (" +
+		"				$1::VARCHAR, " +
+		"				$2::VARCHAR, " +
+		"				$3::VARCHAR, " +
+		"				$4::VARCHAR, " +
+		"				COALESCE($5::TIMESTAMPTZ, NOW()), " +
+		"				$6::JSONB, " +
+		"				$7::VARCHAR, " +
+		"				$8::VARCHAR, " +
+		"				$9::VARCHAR, " +
+		"				$10::BIGINT, " +
+		"				$11::BOOLEAN, " +
+		"				NULL::BIGINT " +
+		"			) " +
+		"		) " +
+		// ensure only 1 row in input_event
+		"		LIMIT 1 " +
 		") " +
 		"INSERT INTO eventstore.events " +
 		"	( " +
@@ -94,7 +115,7 @@ const (
 		"		            ) " +
 		"		        END " +
 		"	) " +
-		"RETURNING id, event_sequence, previous_sequence, creation_date "
+		"RETURNING id, event_sequence, previous_sequence, creation_date, resource_owner "
 )
 
 type CRDB struct {
@@ -136,7 +157,7 @@ func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
 				event.ResourceOwner,
 				previousSequence,
 				event.CheckPreviousSequence,
-			).Scan(&event.ID, &event.Sequence, &previousSequence, &event.CreationDate)
+			).Scan(&event.ID, &event.Sequence, &previousSequence, &event.CreationDate, &event.ResourceOwner)
 
 			event.PreviousSequence = uint64(previousSequence)
 
