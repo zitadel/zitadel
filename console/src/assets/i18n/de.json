@@ -434,8 +434,6 @@
         "PWD_COMPLEXITY": {
             "TITLE":"Passwortkomplexität",
             "DESCRIPTION":"Stellt sicher, dass alle festgelegten Passwörter einem bestimmten Muster entsprechen.",
-            "TITLECREATE":"Passwortkomplexitätsrichtlinie erstellen",
-            "DESCRIPTIONCREATE":"Stellt sicher, dass alle festgelegten Passwörter einem bestimmten Muster entsprechen.",
             "SYMBOLANDNUMBERERROR":"Das Password muss ein Symbol/Satzzeichen und eine Ziffer beinhalten.",
             "SYMBOLERROR":"Das Password muss ein Symbol/Satzzeichen beinhalten.",
             "NUMBERERROR":"Das Password muss eine Ziffer beinhalten.",
@@ -443,26 +441,19 @@
         },
         "PWD_AGE": {
             "TITLE":"Gültigkeitsdauer für Passwörter",
-            "DESCRIPTION":"Du kannst eine Richtlinie für die maximale Gültigkeitsdauer von Passwörtern festlegen. Diese Richtlinie löst eine Warnung nach Ablauf einer festgelegten Gültigkeitsdauer aus.",
-            "TITLECREATE":"Richtlinie für Gültigkeitsdauer von Passwörtern festlegen",
-            "DESCRIPTIONCREATE":"Du kannst eine Richtlinie für die Gültigkeitsdauer von Passwörtern  festlegen. Diese Richtlinie löst eine Warnung nach Ablauf einer festgelegten Gültigkeitsdauer aus."
+            "DESCRIPTION":"Du kannst eine Richtlinie für die maximale Gültigkeitsdauer von Passwörtern festlegen. Diese Richtlinie löst eine Warnung nach Ablauf einer festgelegten Gültigkeitsdauer aus."
         },
         "PWD_LOCKOUT": {
             "TITLE":"Passwortsperre",
-            "DESCRIPTION":"Standardmässig sind die Passwortwiederholungen bei Falscheingabe nicht begrenzt. Du musst diese Richtlinie installieren, wenn Du Wiederholungsversuche anzeigen, oder eine maximale Anzahl von wiederholten Passworteingaben festlegen möchtest.",
-            "TITLECREATE":"Richtline zur Passwortsperre festlegen",
-            "DESCRIPTIONCREATE":"Standardmässig sind die Passwortwiederholungen bei Falscheingabe nicht begrenzt. Du musst diese Richtlinie anwenden, wenn Du Wiederholungsversuche anzeigen, oder eine maximale Anzahl von wiederholten Passworteingaben festlegen möchtest."
+            "DESCRIPTION":"Standardmässig sind die Passwortwiederholungen bei Falscheingabe nicht begrenzt. Du musst diese Richtlinie installieren, wenn Du Wiederholungsversuche anzeigen, oder eine maximale Anzahl von wiederholten Passworteingaben festlegen möchtest."
         },
         "IAM_POLICY": {
             "TITLE":"Zugangseinstellungen IAM",
-            "DESCRIPTION":"Definiere die Zugangseistellungen für Benutzer.",
-            "TITLECREATE":"Zugangseinstellungen für IAM festlegen",
-            "DESCRIPTIONCREATE":"E-Mails als Benutzernamen sind nicht erlaubt, wenn die Eigenschaft \"UserLoginMustBeDomain\" gesetzt ist."
+            "DESCRIPTION":"Definiere die Zugangseistellungen für Benutzer."
         },
         "LOGIN_POLICY": {
             "TITLE":"Login Richtlinien",
             "DESCRIPTION":"Definiere die Loginmethoden für Benutzer",
-            "TITLECREATE":"Definiere die Loginmethoden für Benutzer",
             "DESCRIPTIONCREATEADMIN":"Nutzer können sich mit den verfügbaren Idps authentifizieren.",
             "DESCRIPTIONCREATEMGMT":"Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
             "SAVED":"Erfolgreich gespeichert."
