@@ -469,7 +469,7 @@
         },
         "LABEL": {
             "TITLE":"Email Labelling Einstellungen",
-            "DESCRIPTION":"Definieren Sie das Erscheinungsbild von gesendeten Mails",
+            "DESCRIPTION":"Definieren Sie das Erscheinungsbild Ihrer Benachrichtigungs-Mails",
             "PRIMARYCOLOR":"Hintergrundfarbe",
             "SECONDARYCOLOR":"Schriftfarbe",
             "SAVED":"Erfolgreich gespeichert."
