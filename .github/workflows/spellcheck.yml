@@ -1,4 +1,4 @@
-name: spellcheck
+name: Spellcheck
 
 on:
   push:

@@ -44,7 +44,7 @@ These keys are randomly generated within ZITADEL and are rotated on a regular ba
 > Signing keys are stored with AES256 encryption
 
 **TLS**
-Under normal operations ZITADEL's API nodes are located behind a reverse proxy. So the TLS Key handlings are out of context in this regard.
+Under normal operations ZITADEL's API nodes are located behind a reverse proxy. So the TLS Key handling are out of context in this regard.
 However ZITADEL can use TLS keys at runtime level.
 
 > TODO Document TLS config
