@@ -1,6 +1,11 @@
 import { Component } from '@angular/core';
 import { PolicyComponentType } from 'src/app/modules/policies/policy-component-types.enum';
-import { DefaultLoginPolicy, DefaultPasswordComplexityPolicyView, OrgIamPolicyView } from 'src/app/proto/generated/admin_pb';
+import {
+    DefaultLabelPolicyView,
+    DefaultLoginPolicy,
+    DefaultPasswordComplexityPolicyView,
+    OrgIamPolicyView,
+} from 'src/app/proto/generated/admin_pb';
 import { PolicyState } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -14,6 +19,7 @@ export class IamPolicyGridComponent {
     public complexityPolicy!: DefaultPasswordComplexityPolicyView.AsObject;
     public loginPolicy!: DefaultLoginPolicy.AsObject;
     public iamPolicy!: OrgIamPolicyView.AsObject;
+    public labelPolicy!: DefaultLabelPolicyView.AsObject;
 
     public PolicyState: any = PolicyState;
     public PolicyComponentType: any = PolicyComponentType;
@@ -37,6 +43,7 @@ export class IamPolicyGridComponent {
         this.authService.isAllowed(['iam.policy.read']).subscribe(allowed => {
             if (allowed) {
                 this.adminService.GetDefaultOrgIamPolicy().then(data => this.iamPolicy = data.toObject());
+                this.adminService.GetDefaultLabelPolicy().then(data => this.labelPolicy = data.toObject());
             }
         });
     }

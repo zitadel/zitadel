@@ -1,28 +1,13 @@
 .content {
   padding-top: 1rem;
   display: flex;
-  flex-direction: column;
-  width: 100%;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 0 -.5rem;
 
-  .row {
-    display: flex;
-    align-items: center;
-    padding: .3rem 0;
-
-    .left-desc {
-      color: var(--grey);
-      font-size: .9rem;
-    }
-
-    .fill-space {
+  .form-field {
       flex: 1;
-    }
-
-    .length-wrapper {
-      display: flex;
-      align-items: center;
-      margin-right: -.6rem;
-    }
+    margin: 0 .5rem;
   }
 }
 

@@ -54,7 +54,7 @@
     <ng-template appHasRole [appHasRole]="['policy.read']">
         <div class="p-item card">
             <div class="avatar">
-                <i class="icon las la-gem"></i>
+                <i class="icon las la-sign-in-alt"></i>
             </div>
             <div class="title">
                 <span>{{'ORG.POLICY.LOGIN_POLICY.TITLE' | translate}}</span>
@@ -71,6 +71,31 @@
                 <ng-template appHasRole [appHasRole]="['iam.policy.write']">
                     <button [disabled]="!loginPolicy" [routerLink]="[ 'policy', PolicyComponentType.LOGIN ]"
                         mat-stroked-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
+                </ng-template>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template appHasRole [appHasRole]="['iam.policy.read']">
+        <div class="p-item card">
+            <div class="avatar">
+                <i class="icon las la-envelope"></i>
+            </div>
+            <div class="title">
+                <span>{{'IAM.POLICY.LABEL.TITLE' | translate}}</span>
+                <button mat-icon-button disabled>
+                    <i *ngIf="loginPolicy" class="icon las la-check-circle"></i>
+                </button>
+            </div>
+
+            <p class="desc">
+                {{'IAM.POLICY.LABEL.DESCRIPTION' | translate}}</p>
+
+            <span class="fill-space"></span>
+            <div class="btn-wrapper">
+                <ng-template appHasRole [appHasRole]="['iam.policy.write']">
+                    <button [disabled]="!labelPolicy" [routerLink]="[ 'policy', PolicyComponentType.LABEL ]"
+                        mat-stroked-button>{{'IAM.POLICY.BTN_EDIT' | translate}}</button>
                 </ng-template>
             </div>
         </div>

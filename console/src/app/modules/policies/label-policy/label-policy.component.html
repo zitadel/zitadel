@@ -2,23 +2,15 @@
     [description]="'IAM.POLICY.LABEL.DESCRIPTION' | translate">
 
     <div class="content" *ngIf="labelData">
-        <div class="row">
-            <span class="left-desc">{{'IAM.POLICY.LABEL.PRIMARYCOLOR' | translate}}</span>
-            <span class="fill-space"></span>
-            <div class="length-wrapper">
-                primarycolor
-                <span>{{labelData?.primaryColor}}</span>
-            </div>
-        </div>
+        <mat-form-field class="form-field" appearance="outline">
+            <mat-label>{{'IAM.POLICY.LABEL.PRIMARYCOLOR' | translate}}</mat-label>
+            <input [(ngModel)]="labelData.primaryColor" matInput />
+        </mat-form-field>
 
-        <div class="row">
-            <span class="left-desc">{{'IAM.POLICY.LABEL.SECONDARYCOLOR' | translate}}</span>
-            <span class="fill-space"></span>
-            <div class="length-wrapper">
-                secondaryColor
-                <span>{{labelData?.secondaryColor}}</span>
-            </div>
-        </div>
+        <mat-form-field class="form-field" appearance="outline">
+            <mat-label>{{'IAM.POLICY.LABEL.SECONDARYCOLOR' | translate}}</mat-label>
+            <input [(ngModel)]="labelData.secondaryColor" matInput />
+        </mat-form-field>
     </div>
 
     <div class="btn-container">

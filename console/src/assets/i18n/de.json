@@ -352,7 +352,15 @@
         },
         "POLICY": {
             "TITLE":"Standardrichtlinien für ihre Organisationen",
-            "DESCRIPTION":"Diese Einstellungen können von Organisationen erweitert und/oder verändert werden."
+            "DESCRIPTION":"Diese Einstellungen können von Organisationen erweitert und/oder verändert werden.",
+            "LABEL": {
+                "TITLE":"Email Labelling Einstellungen",
+                "DESCRIPTION":"Definieren Sie das Erscheinungsbild von gesendeten Mails",
+                "PRIMARYCOLOR":"Hintergrundfarbe",
+                "SECONDARYCOLOR":"Schriftfarbe",
+                "SAVED":"Erfolgreich gespeichert."
+            },
+            "BTN_EDIT":"Modifizieren"
         },
         "TOAST":{
             "MEMBERREMOVED":"Manager entfernt.",
