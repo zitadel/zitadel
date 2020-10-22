@@ -426,7 +426,7 @@ rpc GetUserByID(UserID) returns (UserView) {
 
   rpc ResendInitialMail(InitialMailRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/users/{id}/_initialize"
+      post: "/users/{id}/_resendinitialisation"
       body: "*"
     };
 

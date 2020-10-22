@@ -3418,44 +3418,6 @@
         ]
       }
     },
-    "/users/{id}/_initialize": {
-      "post": {
-        "operationId": "ManagementService_ResendInitialMail",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1InitialMailRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
     "/users/{id}/_lock": {
       "put": {
         "operationId": "ManagementService_LockUser",
@@ -3524,6 +3486,44 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/v1UserID"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/users/{id}/_resendinitialisation": {
+      "post": {
+        "operationId": "ManagementService_ResendInitialMail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1InitialMailRequest"
             }
           }
         ],

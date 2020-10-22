@@ -13958,7 +13958,7 @@ var (
 
 	pattern_ManagementService_SetInitialPassword_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"users", "id", "password", "_initialize"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ManagementService_ResendInitialMail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "_initialize"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ResendInitialMail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "_resendinitialisation"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_ManagementService_SearchUserMemberships_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"users", "user_id", "memberships", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
 

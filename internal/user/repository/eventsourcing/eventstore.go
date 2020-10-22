@@ -777,7 +777,7 @@ func (es *UserEventstore) ResendInitialMail(ctx context.Context, userID, email s
 	}
 
 	repoUser := model.UserFromModel(user)
-	agg := ResendInitialPasswordAggregate(es.AggregateCreator(), repoUser, email)
+	agg := ResendInitialPasswordAggregate(es.AggregateCreator(), repoUser, user.InitCode, email)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
 	if err != nil {
 		return err

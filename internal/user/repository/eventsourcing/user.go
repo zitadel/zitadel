@@ -5,12 +5,12 @@ import (
 	"strings"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
@@ -455,8 +455,11 @@ func RequestSetPassword(aggCreator *es_models.AggregateCreator, user *model.User
 	}
 }
 
-func ResendInitialPasswordAggregate(aggCreator *es_models.AggregateCreator, user *model.User, email string) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ResendInitialPasswordAggregate(aggCreator *es_models.AggregateCreator, user *model.User, code *usr_model.InitUserCode, email string) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if code == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dfs3q", "Errors.Internal")
+		}
 		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
@@ -467,7 +470,7 @@ func ResendInitialPasswordAggregate(aggCreator *es_models.AggregateCreator, user
 				return nil, err
 			}
 		}
-		return agg.AppendEvent(model.InitializedHumanCodeAdded, user.InitCode)
+		return agg.AppendEvent(model.InitializedHumanCodeAdded, code)
 	}
 }
 
