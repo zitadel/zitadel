@@ -29,10 +29,10 @@ type IAMRepository interface {
 	SearchDefaultIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error)
 	AddIDPProviderToLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) (*iam_model.IDPProvider, error)
 	RemoveIDPProviderFromLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) error
-	SearchDefaultSoftwareMFAs(ctx context.Context, request *iam_model.SoftwareMFASearchRequest) (*iam_model.SoftwareMFASearchResponse, error)
+	SearchDefaultSoftwareMFAs(ctx context.Context) (*iam_model.SoftwareMFASearchResponse, error)
 	AddSoftwareMFAToLoginPolicy(ctx context.Context, mfa iam_model.SoftwareMFAType) (iam_model.SoftwareMFAType, error)
 	RemoveSoftwareMFAFromLoginPolicy(ctx context.Context, mfa iam_model.SoftwareMFAType) error
-	SearchDefaultHardwareMFAs(ctx context.Context, request *iam_model.HardwareMFASearchRequest) (*iam_model.HardwareMFASearchResponse, error)
+	SearchDefaultHardwareMFAs(ctx context.Context) (*iam_model.HardwareMFASearchResponse, error)
 	AddHardwareMFAToLoginPolicy(ctx context.Context, mfa iam_model.HardwareMFAType) (iam_model.HardwareMFAType, error)
 	RemoveHardwareMFAFromLoginPolicy(ctx context.Context, mfa iam_model.HardwareMFAType) error
 

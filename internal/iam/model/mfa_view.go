@@ -2,25 +2,9 @@ package model
 
 import (
 	"github.com/caos/zitadel/internal/model"
-	"time"
 )
 
-type SoftwareMFAView struct {
-	AggregateID     string
-	IDPProviderType SoftwareMFAType
-	Sequence        uint64
-}
-
-type HardwareMFAView struct {
-	AggregateID     string
-	IDPProviderType SoftwareMFAType
-	Sequence        uint64
-}
-
 type SoftwareMFASearchRequest struct {
-	Offset  uint64
-	Limit   uint64
-	Asc     bool
 	Queries []*MFASearchQuery
 }
 
@@ -45,33 +29,13 @@ const (
 )
 
 type SoftwareMFASearchResponse struct {
-	Offset      uint64
-	Limit       uint64
 	TotalResult uint64
-	Result      []*SoftwareMFAView
-	Sequence    uint64
-	Timestamp   time.Time
+	Result      []SoftwareMFAType
 }
 
 type HardwareMFASearchResponse struct {
-	Offset      uint64
-	Limit       uint64
 	TotalResult uint64
-	Result      []*HardwareMFAView
-	Sequence    uint64
-	Timestamp   time.Time
-}
-
-func (r *SoftwareMFASearchRequest) EnsureLimit(limit uint64) {
-	if r.Limit == 0 || r.Limit > limit {
-		r.Limit = limit
-	}
-}
-
-func (r *HardwareMFASearchRequest) EnsureLimit(limit uint64) {
-	if r.Limit == 0 || r.Limit > limit {
-		r.Limit = limit
-	}
+	Result      []HardwareMFAType
 }
 
 func (r *SoftwareMFASearchRequest) AppendAggregateIDQuery(aggregateID string) {

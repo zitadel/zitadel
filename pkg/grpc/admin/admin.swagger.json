@@ -30,7 +30,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -52,7 +52,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -96,7 +96,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -118,7 +118,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -150,7 +150,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -182,7 +182,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -220,7 +220,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -248,7 +248,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -276,7 +276,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -314,7 +314,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -352,7 +352,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -390,7 +390,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -422,7 +422,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -454,7 +454,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -476,7 +476,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -504,7 +504,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -543,7 +543,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -579,7 +579,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -611,7 +611,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -644,7 +644,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -664,7 +664,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -696,7 +696,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -726,7 +726,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -754,7 +754,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -782,7 +782,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -818,7 +818,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -856,7 +856,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -876,7 +876,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -908,7 +908,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -928,7 +928,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -960,7 +960,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -992,7 +992,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1024,7 +1024,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1043,6 +1043,182 @@
         ]
       }
     },
+    "/policies/login/mfas/hardware": {
+      "post": {
+        "operationId": "AdminService_AddHardwareMFAToDefaultLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1HardwareMFA"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1HardwareMFA"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/login/mfas/hardware/_search": {
+      "get": {
+        "operationId": "AdminService_GetDefaultLoginPolicyHardwareMFAs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1HardwareMFAResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/login/mfas/hardware/{mfa}": {
+      "delete": {
+        "operationId": "AdminService_RemoveHardwareMFAFromDefaultLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "mfa",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "HARDWAREMFATYPE_UNSPECIFIED",
+              "HARDWAREMFATYPE_U2F"
+            ]
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/login/mfas/software": {
+      "post": {
+        "operationId": "AdminService_AddSoftwareMFAToDefaultLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SoftwareMFA"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SoftwareMFA"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/login/mfas/software/_search": {
+      "get": {
+        "operationId": "AdminService_GetDefaultLoginPolicySoftwareMFAs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SoftwareMFAResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/login/mfas/software/{mfa}": {
+      "delete": {
+        "operationId": "AdminService_RemoveSoftwareMFAFromDefaultLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "mfa",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "SOFTWAREMFATYPE_UNSPECIFIED",
+              "SOFTWAREMFATYPE_OTP"
+            ]
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/policies/password/age": {
       "get": {
         "operationId": "AdminService_GetDefaultPasswordAgePolicy",
@@ -1054,7 +1230,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1074,7 +1250,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1106,7 +1282,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1126,7 +1302,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1158,7 +1334,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1178,7 +1354,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1211,7 +1387,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1233,7 +1409,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1255,7 +1431,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1277,7 +1453,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1398,13 +1574,15 @@
           "type": "string"
         },
         "is_email_verified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "phone": {
           "type": "string"
         },
         "is_phone_verified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "country": {
           "type": "string"
@@ -1515,13 +1693,16 @@
       "type": "object",
       "properties": {
         "allow_username_password": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "allow_register": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "allow_external_idp": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "creation_date": {
           "type": "string",
@@ -1530,6 +1711,10 @@
         "change_date": {
           "type": "string",
           "format": "date-time"
+        },
+        "force_mfa": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -1537,13 +1722,20 @@
       "type": "object",
       "properties": {
         "allow_username_password": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "allow_register": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "allow_external_idp": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "force_mfa": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -1551,13 +1743,16 @@
       "type": "object",
       "properties": {
         "allow_username_password": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "allow_register": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "allow_external_idp": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "creation_date": {
           "type": "string",
@@ -1566,6 +1761,10 @@
         "change_date": {
           "type": "string",
           "format": "date-time"
+        },
+        "force_mfa": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -1632,16 +1831,20 @@
           "format": "uint64"
         },
         "has_uppercase": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_lowercase": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_number": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_symbol": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "creation_date": {
           "type": "string",
@@ -1661,16 +1864,20 @@
           "format": "uint64"
         },
         "has_uppercase": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_lowercase": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_number": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_symbol": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -1682,16 +1889,20 @@
           "format": "uint64"
         },
         "has_uppercase": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_lowercase": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_number": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_symbol": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "creation_date": {
           "type": "string",
@@ -1711,7 +1922,8 @@
           "format": "uint64"
         },
         "show_lockout_failure": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "creation_date": {
           "type": "string",
@@ -1731,7 +1943,8 @@
           "format": "uint64"
         },
         "show_lockout_failure": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -1743,7 +1956,8 @@
           "format": "uint64"
         },
         "show_lockout_failure": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "creation_date": {
           "type": "string",
@@ -1798,6 +2012,33 @@
       ],
       "default": "GENDER_UNSPECIFIED"
     },
+    "v1HardwareMFA": {
+      "type": "object",
+      "properties": {
+        "mfa": {
+          "$ref": "#/definitions/v1HardwareMFAType"
+        }
+      }
+    },
+    "v1HardwareMFAResult": {
+      "type": "object",
+      "properties": {
+        "mfas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1HardwareMFAType"
+          }
+        }
+      }
+    },
+    "v1HardwareMFAType": {
+      "type": "string",
+      "enum": [
+        "HARDWAREMFATYPE_UNSPECIFIED",
+        "HARDWAREMFATYPE_U2F"
+      ],
+      "default": "HARDWAREMFATYPE_UNSPECIFIED"
+    },
     "v1HumanResponse": {
       "type": "object",
       "properties": {
@@ -1823,13 +2064,15 @@
           "type": "string"
         },
         "is_email_verified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "phone": {
           "type": "string"
         },
         "is_phone_verified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "country": {
           "type": "string"
@@ -2445,10 +2688,12 @@
           "type": "string"
         },
         "user_login_must_be_domain": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "default": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -2474,7 +2719,8 @@
           "type": "string"
         },
         "user_login_must_be_domain": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -2485,10 +2731,12 @@
           "type": "string"
         },
         "user_login_must_be_domain": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "default": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -2552,7 +2800,8 @@
           "$ref": "#/definitions/v1OrgSearchKey"
         },
         "asc": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "queries": {
           "type": "array",
@@ -2641,11 +2890,39 @@
       ],
       "default": "SEARCHMETHOD_EQUALS"
     },
+    "v1SoftwareMFA": {
+      "type": "object",
+      "properties": {
+        "mfa": {
+          "$ref": "#/definitions/v1SoftwareMFAType"
+        }
+      }
+    },
+    "v1SoftwareMFAResult": {
+      "type": "object",
+      "properties": {
+        "mfas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1SoftwareMFAType"
+          }
+        }
+      }
+    },
+    "v1SoftwareMFAType": {
+      "type": "string",
+      "enum": [
+        "SOFTWAREMFATYPE_UNSPECIFIED",
+        "SOFTWAREMFATYPE_OTP"
+      ],
+      "default": "SOFTWAREMFATYPE_UNSPECIFIED"
+    },
     "v1UniqueOrgResponse": {
       "type": "object",
       "properties": {
         "is_unique": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },

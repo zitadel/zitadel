@@ -184,6 +184,36 @@ var AdminService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultLoginPolicySoftwareMFAs": authz.Option{
+		Permission: "iam.policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/AddSoftwareMFAToDefaultLoginPolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/RemoveSoftwareMFAFromDefaultLoginPolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultLoginPolicyHardwareMFAs": authz.Option{
+		Permission: "iam.policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/AddHardwareMFAToDefaultLoginPolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/RemoveHardwareMFAFromDefaultLoginPolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultPasswordComplexityPolicy": authz.Option{
 		Permission: "iam.policy.read",
 		CheckParam: "",

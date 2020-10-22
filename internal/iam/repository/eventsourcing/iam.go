@@ -720,14 +720,14 @@ func checkExistingLoginPolicyHardwareMFAValidation(mfaType int32) func(...*es_mo
 		mfas := make([]int32, 0)
 		for _, event := range events {
 			switch event.Type {
-			case model.LoginPolicySoftwareMFAAdded:
+			case model.LoginPolicyHardwareMFAAdded:
 				idp := new(model.MFA)
 				err := idp.SetData(event)
 				if err != nil {
 					return err
 				}
 				mfas = append(mfas, idp.MfaType)
-			case model.LoginPolicySoftwareMFARemoved:
+			case model.LoginPolicyHardwareMFARemoved:
 				mfa := new(model.MFA)
 				err := mfa.SetData(event)
 				if err != nil {

@@ -297,8 +297,15 @@ func (repo *IAMRepository) RemoveIDPProviderFromLoginPolicy(ctx context.Context,
 	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
 }
 
-func (repo *IAMRepository) SearchDefaultSoftwareMFAs(ctx context.Context, request *iam_model.SoftwareMFASearchRequest) (*iam_model.SoftwareMFASearchResponse, error) {
-	return nil, nil
+func (repo *IAMRepository) SearchDefaultSoftwareMFAs(ctx context.Context) (*iam_model.SoftwareMFASearchResponse, error) {
+	policy, err := repo.GetDefaultLoginPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &iam_model.SoftwareMFASearchResponse{
+		TotalResult: uint64(len(policy.SoftwareMFAs)),
+		Result:      policy.SoftwareMFAs,
+	}, nil
 }
 
 func (repo *IAMRepository) AddSoftwareMFAToLoginPolicy(ctx context.Context, mfa iam_model.SoftwareMFAType) (iam_model.SoftwareMFAType, error) {
@@ -309,8 +316,15 @@ func (repo *IAMRepository) RemoveSoftwareMFAFromLoginPolicy(ctx context.Context,
 	return repo.IAMEventstore.RemoveSoftwareMFAFromLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
 }
 
-func (repo *IAMRepository) SearchDefaultHardwareMFAs(ctx context.Context, request *iam_model.HardwareMFASearchRequest) (*iam_model.HardwareMFASearchResponse, error) {
-	return nil, nil
+func (repo *IAMRepository) SearchDefaultHardwareMFAs(ctx context.Context) (*iam_model.HardwareMFASearchResponse, error) {
+	policy, err := repo.GetDefaultLoginPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &iam_model.HardwareMFASearchResponse{
+		TotalResult: uint64(len(policy.HardwareMFAs)),
+		Result:      policy.HardwareMFAs,
+	}, nil
 }
 
 func (repo *IAMRepository) AddHardwareMFAToLoginPolicy(ctx context.Context, mfa iam_model.HardwareMFAType) (iam_model.HardwareMFAType, error) {
