@@ -7,8 +7,6 @@ import (
 	"testing"
 	"time"
 
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-
 	"github.com/golang/mock/gomock"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -16,6 +14,7 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/user/model"
 	repo_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )

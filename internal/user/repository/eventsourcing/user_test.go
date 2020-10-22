@@ -5,12 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/caos/zitadel/internal/crypto"
-	usr_model "github.com/caos/zitadel/internal/user/model"
-
 	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
