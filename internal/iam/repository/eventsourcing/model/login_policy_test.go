@@ -23,18 +23,18 @@ func TestLoginPolicyChanges(t *testing.T) {
 		{
 			name: "loginpolicy all attributes change",
 			args: args{
-				existing: &LoginPolicy{AllowUsernamePassword: false, AllowRegister: false, AllowExternalIdp: false},
-				new:      &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true},
+				existing: &LoginPolicy{AllowUsernamePassword: false, AllowRegister: false, AllowExternalIdp: false, ForceMFA: false},
+				new:      &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true, ForceMFA: true},
 			},
 			res: res{
-				changesLen: 3,
+				changesLen: 4,
 			},
 		},
 		{
 			name: "no changes",
 			args: args{
-				existing: &LoginPolicy{AllowUsernamePassword: false, AllowRegister: false, AllowExternalIdp: false},
-				new:      &LoginPolicy{AllowUsernamePassword: false, AllowRegister: false, AllowExternalIdp: false},
+				existing: &LoginPolicy{AllowUsernamePassword: false, AllowRegister: false, AllowExternalIdp: false, ForceMFA: false},
+				new:      &LoginPolicy{AllowUsernamePassword: false, AllowRegister: false, AllowExternalIdp: false, ForceMFA: false},
 			},
 			res: res{
 				changesLen: 0,
@@ -66,10 +66,10 @@ func TestAppendAddLoginPolicyEvent(t *testing.T) {
 			name: "append add login policy event",
 			args: args{
 				iam:    new(IAM),
-				policy: &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true},
+				policy: &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true, ForceMFA: true},
 				event:  new(es_models.Event),
 			},
-			result: &IAM{DefaultLoginPolicy: &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true}},
+			result: &IAM{DefaultLoginPolicy: &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true, ForceMFA: true}},
 		},
 	}
 	for _, tt := range tests {
@@ -87,6 +87,9 @@ func TestAppendAddLoginPolicyEvent(t *testing.T) {
 			}
 			if tt.result.DefaultLoginPolicy.AllowExternalIdp != tt.args.iam.DefaultLoginPolicy.AllowExternalIdp {
 				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.AllowExternalIdp, tt.args.iam.DefaultLoginPolicy.AllowExternalIdp)
+			}
+			if tt.result.DefaultLoginPolicy.ForceMFA != tt.args.iam.DefaultLoginPolicy.ForceMFA {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.ForceMFA, tt.args.iam.DefaultLoginPolicy.ForceMFA)
 			}
 		})
 	}
@@ -110,14 +113,16 @@ func TestAppendChangeLoginPolicyEvent(t *testing.T) {
 					AllowExternalIdp:      false,
 					AllowRegister:         false,
 					AllowUsernamePassword: false,
+					ForceMFA:              false,
 				}},
-				policy: &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true},
+				policy: &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true, ForceMFA: true},
 				event:  &es_models.Event{},
 			},
 			result: &IAM{DefaultLoginPolicy: &LoginPolicy{
 				AllowExternalIdp:      true,
 				AllowRegister:         true,
 				AllowUsernamePassword: true,
+				ForceMFA:              true,
 			}},
 		},
 	}
@@ -136,6 +141,9 @@ func TestAppendChangeLoginPolicyEvent(t *testing.T) {
 			}
 			if tt.result.DefaultLoginPolicy.AllowExternalIdp != tt.args.iam.DefaultLoginPolicy.AllowExternalIdp {
 				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.AllowExternalIdp, tt.args.iam.DefaultLoginPolicy.AllowExternalIdp)
+			}
+			if tt.result.DefaultLoginPolicy.ForceMFA != tt.args.iam.DefaultLoginPolicy.ForceMFA {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.ForceMFA, tt.args.iam.DefaultLoginPolicy.ForceMFA)
 			}
 		})
 	}
@@ -412,7 +420,7 @@ func TestRemoveHardwareMFAToPolicyEvent(t *testing.T) {
 				data, _ := json.Marshal(tt.args.mfa)
 				tt.args.event.Data = data
 			}
-			tt.args.iam.appendRemoveHardwareMfaFromLoginPolicyEvent(tt.args.event)
+			tt.args.iam.appendRemoveHardwareMFAFromLoginPolicyEvent(tt.args.event)
 			if len(tt.result.DefaultLoginPolicy.HardwareMFAs) != len(tt.args.iam.DefaultLoginPolicy.HardwareMFAs) {
 				t.Errorf("got wrong hardware mfa len: expected: %v, actual: %v ", len(tt.result.DefaultLoginPolicy.HardwareMFAs), len(tt.args.iam.DefaultLoginPolicy.HardwareMFAs))
 			}

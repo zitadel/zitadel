@@ -676,8 +676,8 @@ func (es *IAMEventstore) RemoveHardwareMFAFromLoginPolicy(ctx context.Context, a
 	if err != nil {
 		return err
 	}
-	if _, m := iam.DefaultLoginPolicy.GetHardwareMFA(mfa); m != 0 {
-		return caos_errs.ThrowAlreadyExists(nil, "EVENT-gBm9s", "Errors.IAM.LoginPolicy.MFA.AlreadyExists")
+	if _, m := iam.DefaultLoginPolicy.GetHardwareMFA(mfa); m == 0 {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-gBm9s", "Errors.IAM.LoginPolicy.MFA.NotExisting")
 	}
 	repoIam := model.IAMFromModel(iam)
 	repoMFA := model.HardwareMFAFromModel(mfa)
