@@ -1,27 +1,28 @@
-<h1>{{'ORG.POLICY.TITLE' | translate}}</h1>
+<h1>{{'POLICY.TITLE' | translate}}</h1>
 
-<p class="top-desc">{{'ORG.POLICY.DESCRIPTION' | translate}}</p>
+<p class="top-desc">{{'POLICY.DESCRIPTION' | translate}}</p>
 
-<div class="row-lyt" *ngIf="type === PolicyGridType.ORG">
-    <ng-template appHasRole [appHasRole]="['iam.policy.read']">
+<div class="row-lyt">
+    <ng-template appHasRole
+        [appHasRole]="PolicyGridType.IAM ? ['iam.policy.read'] : PolicyGridType.ORG ?  ['policy.read'] : []">
         <div class="p-item card">
             <div class="avatar">
                 <mat-icon class="icon" svgIcon="mdi_textbox_password"></mat-icon>
             </div>
             <div class="title">
-                <span>{{'ORG.POLICY.PWD_COMPLEXITY.TITLE' | translate}}</span>
+                <span>{{'POLICY.PWD_COMPLEXITY.TITLE' | translate}}</span>
                 <button mat-icon-button disabled>
                     <i class="icon las la-check-circle"></i>
                 </button>
             </div>
 
             <p class="desc">
-                {{'ORG.POLICY.PWD_COMPLEXITY.DESCRIPTION' | translate}}</p>
+                {{'POLICY.PWD_COMPLEXITY.DESCRIPTION' | translate}}</p>
 
             <span class="fill-space"></span>
             <div class="btn-wrapper">
                 <button [routerLink]="[ 'policy', PolicyComponentType.COMPLEXITY ]"
-                    mat-stroked-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
+                    mat-stroked-button>{{'POLICY.BTN_EDIT' | translate}}</button>
             </div>
         </div>
     </ng-template>
@@ -32,32 +33,33 @@
                 <i class="icon las la-gem"></i>
             </div>
             <div class="title">
-                <span>{{'ORG.POLICY.IAM_POLICY.TITLE' | translate}}</span>
+                <span>{{'POLICY.IAM_POLICY.TITLE' | translate}}</span>
                 <button mat-icon-button disabled>
                     <i class="icon las la-check-circle"></i>
                 </button>
             </div>
 
             <p class="desc">
-                {{'ORG.POLICY.IAM_POLICY.DESCRIPTION' | translate}}</p>
+                {{'POLICY.IAM_POLICY.DESCRIPTION' | translate}}</p>
 
             <span class="fill-space"></span>
             <div class="btn-wrapper">
                 <ng-template appHasRole [appHasRole]="['iam.policy.write']">
                     <button [routerLink]="[ 'policy', PolicyComponentType.IAM ]"
-                        mat-stroked-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
+                        mat-stroked-button>{{'POLICY.BTN_EDIT' | translate}}</button>
                 </ng-template>
             </div>
         </div>
     </ng-template>
 
-    <ng-template appHasRole [appHasRole]="['policy.read']">
+    <ng-template appHasRole
+        [appHasRole]="PolicyGridType.IAM ? ['iam.policy.read'] : PolicyGridType.ORG ?  ['policy.read'] : []">
         <div class="p-item card">
             <div class="avatar">
                 <i class="icon las la-sign-in-alt"></i>
             </div>
             <div class="title">
-                <span>{{'ORG.POLICY.LOGIN_POLICY.TITLE' | translate}}</span>
+                <span>{{'POLICY.LOGIN_POLICY.TITLE' | translate}}</span>
                 <button mat-icon-button disabled>
                     <i class="icon las la-check-circle"></i>
                 </button>
@@ -65,116 +67,43 @@
 
             <ng-template #showDescIAM>
                 <p class="desc">
-                    {{'ORG.POLICY.LOGIN_POLICY.DESCRIPTION' | translate}}</p>
+                    {{'POLICY.LOGIN_POLICY.DESCRIPTION' | translate}}</p>
             </ng-template>
 
             <span class="fill-space"></span>
             <div class="btn-wrapper">
                 <ng-template appHasRole [appHasRole]="['policy.write']">
                     <button [routerLink]="[ 'policy', PolicyComponentType.LOGIN ]"
-                        mat-stroked-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
-                </ng-template>
-            </div>
-        </div>
-    </ng-template>
-</div>
-
-<div class="row-lyt" *ngIf="type === PolicyGridType.IAM">
-    <ng-template appHasRole [appHasRole]="['iam.policy.read']">
-        <div class="p-item card">
-            <div class="avatar">
-                <mat-icon class="icon" svgIcon="mdi_textbox_password"></mat-icon>
-            </div>
-            <div class="title">
-                <span>{{'ORG.POLICY.PWD_COMPLEXITY.TITLE' | translate}}</span>
-                <button mat-icon-button disabled>
-                    <i class="icon las la-check-circle"></i>
-                </button>
-            </div>
-
-            <p class="desc">
-                {{'ORG.POLICY.PWD_COMPLEXITY.DESCRIPTION' | translate}}</p>
-
-            <span class="fill-space"></span>
-            <div class="btn-wrapper">
-                <button [routerLink]="[ 'policy', PolicyComponentType.COMPLEXITY ]"
-                    mat-stroked-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
-            </div>
-        </div>
-    </ng-template>
-
-    <ng-template appHasRole [appHasRole]="['iam.policy.read']">
-        <div class="p-item card">
-            <div class="avatar">
-                <i class="icon las la-gem"></i>
-            </div>
-            <div class="title">
-                <span>{{'ORG.POLICY.IAM_POLICY.TITLE' | translate}}</span>
-                <button mat-icon-button disabled>
-                    <i class="icon las la-check-circle"></i>
-                </button>
-            </div>
-
-            <p class="desc">
-                {{'ORG.POLICY.IAM_POLICY.DESCRIPTION' | translate}}</p>
-
-            <span class="fill-space"></span>
-            <div class="btn-wrapper">
-                <ng-template appHasRole [appHasRole]="['iam.policy.write']">
-                    <button [routerLink]="[ 'policy', PolicyComponentType.IAM ]"
-                        mat-stroked-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
+                        mat-stroked-button>{{'POLICY.BTN_EDIT' | translate}}</button>
                 </ng-template>
             </div>
         </div>
     </ng-template>
 
-    <ng-template appHasRole [appHasRole]="['policy.read']">
-        <div class="p-item card">
-            <div class="avatar">
-                <i class="icon las la-sign-in-alt"></i>
-            </div>
-            <div class="title">
-                <span>{{'ORG.POLICY.LOGIN_POLICY.TITLE' | translate}}</span>
-                <button mat-icon-button disabled>
-                    <i class="icon las la-check-circle"></i>
-                </button>
-            </div>
+    <ng-container *ngIf="type === PolicyGridType.IAM">
+        <ng-template appHasRole [appHasRole]="['iam.policy.read']">
+            <div class="p-item card">
+                <div class="avatar">
+                    <i class="icon las la-envelope"></i>
+                </div>
+                <div class="title">
+                    <span>{{'POLICY.LABEL.TITLE' | translate}}</span>
+                    <button mat-icon-button disabled>
+                        <i class="icon las la-check-circle"></i>
+                    </button>
+                </div>
 
-            <p class="desc">
-                {{'ORG.POLICY.LOGIN_POLICY.DESCRIPTION' | translate}}</p>
+                <p class="desc">
+                    {{'POLICY.LABEL.DESCRIPTION' | translate}}</p>
 
-            <span class="fill-space"></span>
-            <div class="btn-wrapper">
-                <ng-template appHasRole [appHasRole]="['iam.policy.write']">
-                    <button [routerLink]="[ 'policy', PolicyComponentType.LOGIN ]"
-                        mat-stroked-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
-                </ng-template>
+                <span class="fill-space"></span>
+                <div class="btn-wrapper">
+                    <ng-template appHasRole [appHasRole]="['iam.policy.write']">
+                        <button [routerLink]="[ 'policy', PolicyComponentType.LABEL ]"
+                            mat-stroked-button>{{'POLICY.BTN_EDIT' | translate}}</button>
+                    </ng-template>
+                </div>
             </div>
-        </div>
-    </ng-template>
-
-    <ng-template appHasRole [appHasRole]="['iam.policy.read']">
-        <div class="p-item card">
-            <div class="avatar">
-                <i class="icon las la-envelope"></i>
-            </div>
-            <div class="title">
-                <span>{{'IAM.POLICY.LABEL.TITLE' | translate}}</span>
-                <button mat-icon-button disabled>
-                    <i class="icon las la-check-circle"></i>
-                </button>
-            </div>
-
-            <p class="desc">
-                {{'IAM.POLICY.LABEL.DESCRIPTION' | translate}}</p>
-
-            <span class="fill-space"></span>
-            <div class="btn-wrapper">
-                <ng-template appHasRole [appHasRole]="['iam.policy.write']">
-                    <button [routerLink]="[ 'policy', PolicyComponentType.LABEL ]"
-                        mat-stroked-button>{{'IAM.POLICY.BTN_EDIT' | translate}}</button>
-                </ng-template>
-            </div>
-        </div>
-    </ng-template>
+        </ng-template>
+    </ng-container>
 </div>

@@ -1,14 +1,14 @@
-<app-detail-layout [backRouterLink]="['/iam']" [title]="'IAM.POLICY.LABEL.TITLE' | translate"
-    [description]="'IAM.POLICY.LABEL.DESCRIPTION' | translate">
+<app-detail-layout [backRouterLink]="['/iam']" [title]="'POLICY.LABEL.TITLE' | translate"
+    [description]="'POLICY.LABEL.DESCRIPTION' | translate">
 
     <div class="content" *ngIf="labelData">
         <mat-form-field class="form-field" appearance="outline">
-            <mat-label>{{'IAM.POLICY.LABEL.PRIMARYCOLOR' | translate}}</mat-label>
+            <mat-label>{{'POLICY.LABEL.PRIMARYCOLOR' | translate}}</mat-label>
             <input [(ngModel)]="labelData.primaryColor" matInput />
         </mat-form-field>
 
         <mat-form-field class="form-field" appearance="outline">
-            <mat-label>{{'IAM.POLICY.LABEL.SECONDARYCOLOR' | translate}}</mat-label>
+            <mat-label>{{'POLICY.LABEL.SECONDARYCOLOR' | translate}}</mat-label>
             <input [(ngModel)]="labelData.secondaryColor" matInput />
         </mat-form-field>
     </div>

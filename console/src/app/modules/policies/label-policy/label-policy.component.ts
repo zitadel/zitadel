@@ -46,7 +46,7 @@ export class LabelPolicyComponent implements OnDestroy {
         req.setPrimaryColor(this.labelData.primaryColor);
         req.setSecondaryColor(this.labelData.secondaryColor);
         this.adminService.UpdateDefaultLabelPolicy(req).then(() => {
-            this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+            this.toast.showInfo('POLICY.TOAST.SET', true);
         }).catch(error => {
             this.toast.showError(error);
         });
