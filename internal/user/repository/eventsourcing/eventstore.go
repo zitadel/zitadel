@@ -737,6 +737,9 @@ func (es *UserEventstore) RequestSetPassword(ctx context.Context, userID string,
 	if user.Human == nil {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-33ywz", "Errors.User.NotHuman")
 	}
+	if user.State == usr_model.UserStateInitial {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Hs11s", "Errors.User.NotInitialised")
+	}
 
 	passwordCode := new(model.PasswordCode)
 	err = es.generatePasswordCode(passwordCode, notifyType)
@@ -975,6 +978,9 @@ func (es *UserEventstore) ChangeEmail(ctx context.Context, email *usr_model.Emai
 	if user.Human == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-tgBdL", "Errors.User.NotHuman")
 	}
+	if user.State == usr_model.UserStateInitial {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-3H4q", "Errors.User.NotInitialised")
+	}
 
 	emailCode, err := email.GenerateEmailCodeIfNeeded(es.EmailVerificationCode)
 	if err != nil {
@@ -1046,6 +1052,9 @@ func (es *UserEventstore) CreateEmailVerificationCode(ctx context.Context, userI
 	}
 	if user.Human == nil {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-hqUZP", "Errors.User.NotHuman")
+	}
+	if user.State == usr_model.UserStateInitial {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-E3fbw", "Errors.User.NotInitialised")
 	}
 	if user.Email == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-pdo9s", "Errors.User.EmailNotFound")
