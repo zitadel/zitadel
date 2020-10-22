@@ -754,6 +754,35 @@ func (es *UserEventstore) RequestSetPassword(ctx context.Context, userID string,
 	return nil
 }
 
+func (es *UserEventstore) ResendInitialMail(ctx context.Context, userID, email string) error {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-G4bmn", "Errors.User.UserIDMissing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if user.Human == nil {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Hfsww", "Errors.User.NotHuman")
+	}
+	if user.State != usr_model.UserStateInitial {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-BGbbe", "Errors.User.AlreadyInitialised")
+	}
+	err = user.GenerateInitCodeIfNeeded(es.InitializeUserCode)
+	if err != nil {
+		return err
+	}
+
+	repoUser := model.UserFromModel(user)
+	agg := ResendInitialPasswordAggregate(es.AggregateCreator(), repoUser, email)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
 func (es *UserEventstore) PasswordCodeSent(ctx context.Context, userID string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-s09ow", "Errors.User.UserIDMissing")

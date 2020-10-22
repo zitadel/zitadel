@@ -195,6 +195,11 @@ func (s *Server) SetInitialPassword(ctx context.Context, request *management.Pas
 	return &empty.Empty{}, err
 }
 
+func (s *Server) ResendInitialMail(ctx context.Context, request *management.InitialMailRequest) (*empty.Empty, error) {
+	err := s.user.ResendInitialMail(ctx, request.Id, request.Email)
+	return &empty.Empty{}, err
+}
+
 func (s *Server) SearchUserExternalIDPs(ctx context.Context, request *management.ExternalIDPSearchRequest) (*management.ExternalIDPSearchResponse, error) {
 	externalIDP, err := s.user.SearchExternalIDPs(ctx, externalIDPSearchRequestToModel(request))
 	if err != nil {

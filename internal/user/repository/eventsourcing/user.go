@@ -2,9 +2,10 @@ package eventsourcing
 
 import (
 	"context"
+	"strings"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-	"strings"
 
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -451,6 +452,22 @@ func RequestSetPassword(aggCreator *es_models.AggregateCreator, user *model.User
 			return nil, err
 		}
 		return agg.AppendEvent(model.HumanPasswordCodeAdded, request)
+	}
+}
+
+func ResendInitialPasswordAggregate(aggCreator *es_models.AggregateCreator, user *model.User, email string) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, user)
+		if err != nil {
+			return nil, err
+		}
+		if email != "" && email != user.Email.EmailAddress {
+			agg, err = agg.AppendEvent(model.HumanEmailChanged, map[string]interface{}{"email": email})
+			if err != nil {
+				return nil, err
+			}
+		}
+		return agg.AppendEvent(model.InitializedHumanCodeAdded, user.InitCode)
 	}
 }
 

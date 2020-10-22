@@ -424,6 +424,17 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
+  rpc ResendInitialMail(InitialMailRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/users/{id}/_initialize"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.write"
+    };
+  }
+
   rpc SearchUserMemberships(UserMembershipSearchRequest) returns (UserMembershipSearchResponse) {
     option (google.api.http) = {
       post: "/users/{user_id}/memberships/_search"
@@ -1985,6 +1996,11 @@ message SetPasswordNotificationRequest {
 enum NotificationType {
   NOTIFICATIONTYPE_EMAIL = 0;
   NOTIFICATIONTYPE_SMS = 1;
+}
+
+message InitialMailRequest {
+  string id = 1 [(validate.rules).string.min_len = 1];
+  string email = 2;
 }
 
 enum PolicyState {

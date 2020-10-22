@@ -2037,6 +2037,26 @@ func (mr *MockManagementServiceClientMockRecorder) ResendEmailVerificationMail(a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResendEmailVerificationMail", reflect.TypeOf((*MockManagementServiceClient)(nil).ResendEmailVerificationMail), varargs...)
 }
 
+// ResendInitialMail mocks base method
+func (m *MockManagementServiceClient) ResendInitialMail(arg0 context.Context, arg1 *management.InitialMailRequest, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ResendInitialMail", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ResendInitialMail indicates an expected call of ResendInitialMail
+func (mr *MockManagementServiceClientMockRecorder) ResendInitialMail(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResendInitialMail", reflect.TypeOf((*MockManagementServiceClient)(nil).ResendInitialMail), varargs...)
+}
+
 // ResendPhoneVerificationCode mocks base method
 func (m *MockManagementServiceClient) ResendPhoneVerificationCode(arg0 context.Context, arg1 *management.UserID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
