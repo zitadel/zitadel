@@ -105,6 +105,26 @@ func GetMockChangesOrgWithLoginPolicy(ctrl *gomock.Controller) *OrgEventstore {
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
+func GetMockChangesOrgWithLoginPolicyWithMFA(ctrl *gomock.Controller) *OrgEventstore {
+	orgData, _ := json.Marshal(model.Org{Name: "MusterOrg"})
+	loginPolicy, _ := json.Marshal(iam_es_model.LoginPolicy{AllowRegister: true, AllowExternalIdp: true, AllowUsernamePassword: true})
+	idpData, _ := json.Marshal(iam_es_model.IDPProvider{IDPConfigID: "IDPConfigID", Type: int32(iam_model.IDPProviderTypeSystem)})
+	softwareMFA, _ := json.Marshal(iam_es_model.MFA{MfaType: int32(iam_model.SoftwareMFATypeOTP)})
+	hardwareMFA, _ := json.Marshal(iam_es_model.MFA{MfaType: int32(iam_model.HardwareMFATypeU2F)})
+	events := []*es_models.Event{
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.OrgAdded, Data: orgData},
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyAdded, Data: loginPolicy},
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyIDPProviderAdded, Data: idpData},
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicySoftwareMFAAdded, Data: softwareMFA},
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyHardwareMFAAdded, Data: hardwareMFA},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
 func GetMockChangesOrgWithPasswordComplexityPolicy(ctrl *gomock.Controller) *OrgEventstore {
 	orgData, _ := json.Marshal(model.Org{Name: "MusterOrg"})
 	passwordComplexityPolicy, _ := json.Marshal(iam_es_model.PasswordComplexityPolicy{

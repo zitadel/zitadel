@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"strings"
 
 	"github.com/caos/logging"
@@ -179,7 +180,7 @@ func (repo *IAMRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_mode
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.LabelPolicyViewToModel(policy), err
+	return iam_es_model.LabelPolicyViewToModel(policy), nil
 }
 
 func (repo *IAMRepository) AddDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
@@ -193,11 +194,28 @@ func (repo *IAMRepository) ChangeDefaultLabelPolicy(ctx context.Context, policy 
 }
 
 func (repo *IAMRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
-	policy, err := repo.View.LoginPolicyByAggregateID(repo.SystemDefaults.IamID)
-	if err != nil {
-		return nil, err
+	policy, viewErr := repo.View.LoginPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
+		return nil, viewErr
 	}
-	return iam_es_model.LoginPolicyViewToModel(policy), err
+	if caos_errs.IsNotFound(viewErr) {
+		policy = new(iam_es_model.LoginPolicyView)
+	}
+	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-cmO9s", "Errors.IAM.LoginPolicy.NotFound")
+	}
+	if esErr != nil {
+		logging.Log("EVENT-2Mi8s").WithError(esErr).Debug("error retrieving new events")
+		return iam_es_model.LoginPolicyViewToModel(policy), nil
+	}
+	policyCopy := *policy
+	for _, event := range events {
+		if err := policyCopy.AppendEvent(event); err != nil {
+			return iam_es_model.LoginPolicyViewToModel(policy), nil
+		}
+	}
+	return iam_es_model.LoginPolicyViewToModel(policy), nil
 }
 
 func (repo *IAMRepository) AddDefaultLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
@@ -260,6 +278,30 @@ func (repo *IAMRepository) RemoveIDPProviderFromLoginPolicy(ctx context.Context,
 		aggregates = append(aggregates, idpAgg...)
 	}
 	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
+}
+
+func (repo *IAMRepository) SearchDefaultSoftwareMFAs(ctx context.Context, request *iam_model.SoftwareMFASearchRequest) (*iam_model.SoftwareMFASearchResponse, error) {
+	return nil, nil
+}
+
+func (repo *IAMRepository) AddSoftwareMFAToLoginPolicy(ctx context.Context, mfa iam_model.SoftwareMFAType) (iam_model.SoftwareMFAType, error) {
+	return repo.IAMEventstore.AddSoftwareMFAToLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
+}
+
+func (repo *IAMRepository) RemoveSoftwareMFAFromLoginPolicy(ctx context.Context, mfa iam_model.SoftwareMFAType) error {
+	return repo.IAMEventstore.RemoveSoftwareMFAFromLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
+}
+
+func (repo *IAMRepository) SearchDefaultHardwareMFAs(ctx context.Context, request *iam_model.HardwareMFASearchRequest) (*iam_model.HardwareMFASearchResponse, error) {
+	return nil, nil
+}
+
+func (repo *IAMRepository) AddHardwareMFAToLoginPolicy(ctx context.Context, mfa iam_model.HardwareMFAType) (iam_model.HardwareMFAType, error) {
+	return repo.IAMEventstore.AddHardwareMFAToLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
+}
+
+func (repo *IAMRepository) RemoveHardwareMFAFromLoginPolicy(ctx context.Context, mfa iam_model.HardwareMFAType) error {
+	return repo.IAMEventstore.RemoveHardwareMFAFromLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
 }
 
 func (repo *IAMRepository) GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error) {

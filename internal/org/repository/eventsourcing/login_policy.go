@@ -111,15 +111,17 @@ func LoginPolicySoftwareMFAAddedAggregate(aggCreator *es_models.AggregateCreator
 	}
 }
 
-func LoginPolicySoftwareMFARemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, org *model.Org, mfa *iam_es_model.MFA) (*es_models.Aggregate, error) {
-	if mfa == nil || org == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sml9d", "Errors.Internal")
+func LoginPolicySoftwareMFARemovedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org, mfa *iam_es_model.MFA) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if mfa == nil || org == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sml9d", "Errors.Internal")
+		}
+		agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.LoginPolicySoftwareMFARemoved, mfa)
 	}
-	agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
-	if err != nil {
-		return nil, err
-	}
-	return agg.AppendEvent(model.LoginPolicySoftwareMFARemoved, mfa)
 }
 
 func LoginPolicyHardwareMFAAddedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org, mfa *iam_es_model.MFA, iamID string) func(ctx context.Context) (*es_models.Aggregate, error) {
@@ -141,15 +143,18 @@ func LoginPolicyHardwareMFAAddedAggregate(aggCreator *es_models.AggregateCreator
 	}
 }
 
-func LoginPolicyHardwareMFARemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, org *model.Org, mfa *iam_es_model.MFA) (*es_models.Aggregate, error) {
-	if mfa == nil || org == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-6Nm9s", "Errors.Internal")
+func LoginPolicyHardwareMFARemovedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org, mfa *iam_es_model.MFA) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if mfa == nil || org == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-6Nm9s", "Errors.Internal")
+		}
+
+		agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.LoginPolicyHardwareMFARemoved, mfa)
 	}
-	agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
-	if err != nil {
-		return nil, err
-	}
-	return agg.AppendEvent(model.LoginPolicyHardwareMFARemoved, mfa)
 }
 
 func checkExistingLoginPolicyValidation() func(...*es_models.Event) error {

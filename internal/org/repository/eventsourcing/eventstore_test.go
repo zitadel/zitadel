@@ -2732,6 +2732,344 @@ func TestRemoveIdpProviderFromLoginPolicy(t *testing.T) {
 	}
 }
 
+func TestAddSoftwareMFAToLoginPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es          *OrgEventstore
+		ctx         context.Context
+		aggregateID string
+		mfa         iam_model.SoftwareMFAType
+	}
+	type res struct {
+		result  iam_model.SoftwareMFAType
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add software mfa to login policy, ok",
+			args: args{
+				es:          GetMockChangesOrgWithLoginPolicy(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.SoftwareMFATypeOTP,
+			},
+			res: res{
+				result: iam_model.SoftwareMFATypeOTP,
+			},
+		},
+		{
+			name: "add software mfa to login policy, already existing",
+			args: args{
+				es:          GetMockChangesOrgWithLoginPolicyWithMFA(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.SoftwareMFATypeOTP,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsErrorAlreadyExists,
+			},
+		},
+		{
+			name: "invalid mfa",
+			args: args{
+				es:          GetMockChangesOrgOK(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.SoftwareMFATypeUnspecified,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:          GetMockChangesOrgNoEvents(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "Test",
+				mfa:         iam_model.SoftwareMFATypeOTP,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddSoftwareMFAToLoginPolicy(tt.args.ctx, tt.args.aggregateID, tt.args.mfa)
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result != tt.res.result {
+				t.Errorf("got wrong result : expected: %v, actual: %v ", tt.res.result, result)
+			}
+		})
+	}
+}
+
+func TestRemoveSoftwareMFAFromLoginPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es          *OrgEventstore
+		ctx         context.Context
+		aggregateID string
+		mfa         iam_model.SoftwareMFAType
+	}
+	type res struct {
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove software mfa from login policy, ok",
+			args: args{
+				es:          GetMockChangesOrgWithLoginPolicyWithMFA(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.SoftwareMFATypeOTP,
+			},
+			res: res{},
+		},
+		{
+			name: "remove software mfa from  login policy, not existing",
+			args: args{
+				es:  GetMockChangesOrgWithLoginPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+
+				aggregateID: "AggregateID",
+				mfa:         iam_model.SoftwareMFATypeOTP,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "invalid provider",
+			args: args{
+				es:          GetMockChangesOrgOK(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.SoftwareMFATypeUnspecified,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:          GetMockChangesOrgNoEvents(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "Test",
+				mfa:         iam_model.SoftwareMFATypeOTP,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemoveSoftwareMFAFromLoginPolicy(tt.args.ctx, tt.args.aggregateID, tt.args.mfa)
+
+			if !tt.res.wantErr && err != nil {
+				t.Errorf("should not get err: %v ", err)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestAddHardwareMFAToLoginPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es          *OrgEventstore
+		ctx         context.Context
+		aggregateID string
+		mfa         iam_model.HardwareMFAType
+	}
+	type res struct {
+		result  iam_model.HardwareMFAType
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add hardware mfa to login policy, ok",
+			args: args{
+				es:          GetMockChangesOrgWithLoginPolicy(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.HardwareMFATypeU2F,
+			},
+			res: res{
+				result: iam_model.HardwareMFATypeU2F,
+			},
+		},
+		{
+			name: "add hardware mfa to login policy, already existing",
+			args: args{
+				es:          GetMockChangesOrgWithLoginPolicyWithMFA(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.HardwareMFATypeU2F,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsErrorAlreadyExists,
+			},
+		},
+		{
+			name: "invalid mfa",
+			args: args{
+				es:          GetMockChangesOrgOK(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.HardwareMFATypeUnspecified,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:          GetMockChangesOrgNoEvents(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "Test",
+				mfa:         iam_model.HardwareMFATypeU2F,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddHardwareMFAToLoginPolicy(tt.args.ctx, tt.args.aggregateID, tt.args.mfa)
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result != tt.res.result {
+				t.Errorf("got wrong result : expected: %v, actual: %v ", tt.res.result, result)
+			}
+		})
+	}
+}
+
+func TestRemoveHardwareMFAFromLoginPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es          *OrgEventstore
+		ctx         context.Context
+		aggregateID string
+		mfa         iam_model.HardwareMFAType
+	}
+	type res struct {
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove hardware mfa from login policy, ok",
+			args: args{
+				es:          GetMockChangesOrgWithLoginPolicyWithMFA(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.HardwareMFATypeU2F,
+			},
+			res: res{},
+		},
+		{
+			name: "remove hardware mfa from  login policy, not existing",
+			args: args{
+				es:  GetMockChangesOrgWithLoginPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+
+				aggregateID: "AggregateID",
+				mfa:         iam_model.HardwareMFATypeU2F,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "invalid provider",
+			args: args{
+				es:          GetMockChangesOrgOK(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.HardwareMFATypeUnspecified,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:          GetMockChangesOrgNoEvents(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "Test",
+				mfa:         iam_model.HardwareMFATypeU2F,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemoveHardwareMFAFromLoginPolicy(tt.args.ctx, tt.args.aggregateID, tt.args.mfa)
+
+			if !tt.res.wantErr && err != nil {
+				t.Errorf("should not get err: %v ", err)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
 func TestAddLabelPolicy(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {

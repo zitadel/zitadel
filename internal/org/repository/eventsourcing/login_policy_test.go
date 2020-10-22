@@ -599,7 +599,7 @@ func TestLoginPolicySoftwareMFARemovedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LoginPolicySoftwareMFARemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.new)
+			agg, err := LoginPolicySoftwareMFARemovedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
 			if tt.res.wantErr && !tt.res.errFunc(err) || (err != nil && !tt.res.wantErr) {
 				t.Errorf("got wrong err: %v ", err)
 				return
@@ -772,7 +772,7 @@ func TestLoginPolicyHardwareMFARemovedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LoginPolicyHardwareMFARemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.new)
+			agg, err := LoginPolicyHardwareMFARemovedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
 			if tt.res.wantErr && !tt.res.errFunc(err) || (err != nil && !tt.res.wantErr) {
 				t.Errorf("got wrong err: %v ", err)
 				return
