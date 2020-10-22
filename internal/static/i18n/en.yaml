@@ -93,6 +93,8 @@ Errors:
       IdpProviderNotExisting: Idp Provider not existing
       MFA:
         AlreadyExists: Multifactor already exists
+        NotExisting: Multifactor not existing
+        Unspecified: Multifactor invalid
     PasswordComplexity:
       Empty: Passwort Complexity Policy is empty
       NotExisting: Passwort Complexity Policy doesn't exist

@@ -199,6 +199,14 @@ func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 		err = o.appendAddIdpProviderToLoginPolicyEvent(event)
 	case LoginPolicyIDPProviderRemoved:
 		err = o.appendRemoveIdpProviderFromLoginPolicyEvent(event)
+	case LoginPolicySoftwareMFAAdded:
+		err = o.appendAddSoftwareMFAToLoginPolicyEvent(event)
+	case LoginPolicySoftwareMFARemoved:
+		err = o.appendRemoveSoftwareMFAFromLoginPolicyEvent(event)
+	case LoginPolicyHardwareMFAAdded:
+		err = o.appendAddHardwareMFAToLoginPolicyEvent(event)
+	case LoginPolicyHardwareMFARemoved:
+		err = o.appendRemoveHardwareMFAFromLoginPolicyEvent(event)
 	case PasswordComplexityPolicyAdded:
 		err = o.appendAddPasswordComplexityPolicyEvent(event)
 	case PasswordComplexityPolicyChanged:

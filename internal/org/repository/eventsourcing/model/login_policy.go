@@ -44,6 +44,57 @@ func (o *Org) appendRemoveIdpProviderFromLoginPolicyEvent(event *es_models.Event
 		o.LoginPolicy.IDPProviders[i] = o.LoginPolicy.IDPProviders[len(o.LoginPolicy.IDPProviders)-1]
 		o.LoginPolicy.IDPProviders[len(o.LoginPolicy.IDPProviders)-1] = nil
 		o.LoginPolicy.IDPProviders = o.LoginPolicy.IDPProviders[:len(o.LoginPolicy.IDPProviders)-1]
+		return nil
+	}
+	return nil
+}
+
+func (o *Org) appendAddSoftwareMFAToLoginPolicyEvent(event *es_models.Event) error {
+	mfa := &iam_es_model.MFA{}
+	err := mfa.SetData(event)
+	if err != nil {
+		return err
+	}
+	o.LoginPolicy.SoftwareMFAs = append(o.LoginPolicy.SoftwareMFAs, mfa.MfaType)
+	return nil
+}
+
+func (o *Org) appendRemoveSoftwareMFAFromLoginPolicyEvent(event *es_models.Event) error {
+	mfa := &iam_es_model.MFA{}
+	err := mfa.SetData(event)
+	if err != nil {
+		return err
+	}
+	if i, m := iam_es_model.GetMFA(o.LoginPolicy.SoftwareMFAs, mfa.MfaType); m != 0 {
+		o.LoginPolicy.SoftwareMFAs[i] = o.LoginPolicy.SoftwareMFAs[len(o.LoginPolicy.SoftwareMFAs)-1]
+		o.LoginPolicy.SoftwareMFAs[len(o.LoginPolicy.SoftwareMFAs)-1] = 0
+		o.LoginPolicy.SoftwareMFAs = o.LoginPolicy.SoftwareMFAs[:len(o.LoginPolicy.SoftwareMFAs)-1]
+		return nil
+	}
+	return nil
+}
+
+func (o *Org) appendAddHardwareMFAToLoginPolicyEvent(event *es_models.Event) error {
+	mfa := &iam_es_model.MFA{}
+	err := mfa.SetData(event)
+	if err != nil {
+		return err
+	}
+	o.LoginPolicy.HardwareMFAs = append(o.LoginPolicy.HardwareMFAs, mfa.MfaType)
+	return nil
+}
+
+func (o *Org) appendRemoveHardwareMFAFromLoginPolicyEvent(event *es_models.Event) error {
+	mfa := &iam_es_model.MFA{}
+	err := mfa.SetData(event)
+	if err != nil {
+		return err
+	}
+	if i, m := iam_es_model.GetMFA(o.LoginPolicy.HardwareMFAs, mfa.MfaType); m != 0 {
+		o.LoginPolicy.HardwareMFAs[i] = o.LoginPolicy.HardwareMFAs[len(o.LoginPolicy.HardwareMFAs)-1]
+		o.LoginPolicy.HardwareMFAs[len(o.LoginPolicy.HardwareMFAs)-1] = 0
+		o.LoginPolicy.HardwareMFAs = o.LoginPolicy.HardwareMFAs[:len(o.LoginPolicy.HardwareMFAs)-1]
+		return nil
 	}
 	return nil
 }

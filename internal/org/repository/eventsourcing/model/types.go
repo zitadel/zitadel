@@ -51,9 +51,14 @@ const (
 	LoginPolicyIDPProviderAdded          models.EventType = "org.policy.login.idpprovider.added"
 	LoginPolicyIDPProviderRemoved        models.EventType = "org.policy.login.idpprovider.removed"
 	LoginPolicyIDPProviderCascadeRemoved models.EventType = "org.policy.login.idpprovider.cascade.removed"
-	LabelPolicyAdded                     models.EventType = "org.policy.label.added"
-	LabelPolicyChanged                   models.EventType = "org.policy.label.changed"
-	LabelPolicyRemoved                   models.EventType = "org.policy.label.removed"
+	LoginPolicySoftwareMFAAdded          models.EventType = "org.policy.login.mfa.software.added"
+	LoginPolicySoftwareMFARemoved        models.EventType = "org.policy.login.mfa.software.removed"
+	LoginPolicyHardwareMFAAdded          models.EventType = "org.policy.login.mfa.hardware.added"
+	LoginPolicyHardwareMFARemoved        models.EventType = "org.policy.login.mfa.hardware.removed"
+
+	LabelPolicyAdded   models.EventType = "org.policy.label.added"
+	LabelPolicyChanged models.EventType = "org.policy.label.changed"
+	LabelPolicyRemoved models.EventType = "org.policy.label.removed"
 
 	PasswordComplexityPolicyAdded   models.EventType = "org.policy.password.complexity.added"
 	PasswordComplexityPolicyChanged models.EventType = "org.policy.password.complexity.changed"

@@ -76,7 +76,10 @@ func TestLoginPolicyAddedAggregate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			agg, err := LoginPolicyAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
-
+			if tt.res.wantErr && !tt.res.errFunc(err) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
 			}
@@ -87,10 +90,6 @@ func TestLoginPolicyAddedAggregate(t *testing.T) {
 				if !tt.res.wantErr && agg.Events[i].Data == nil {
 					t.Errorf("should have data in event")
 				}
-			}
-
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -165,7 +164,10 @@ func TestLoginPolicyChangedAggregate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			agg, err := LoginPolicyChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
-
+			if tt.res.wantErr && !tt.res.errFunc(err) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
 			}
@@ -176,10 +178,6 @@ func TestLoginPolicyChangedAggregate(t *testing.T) {
 				if !tt.res.wantErr && agg.Events[i].Data == nil {
 					t.Errorf("should have data in event")
 				}
-			}
-
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -235,7 +233,10 @@ func TestLoginPolicyRemovedAggregate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			agg, err := LoginPolicyRemovedAggregate(tt.args.aggCreator, tt.args.existing)(tt.args.ctx)
-
+			if tt.res.wantErr && !tt.res.errFunc(err) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
 			}
@@ -243,10 +244,6 @@ func TestLoginPolicyRemovedAggregate(t *testing.T) {
 				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
 					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
 				}
-			}
-
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -318,7 +315,10 @@ func TestLoginPolicyIdpProviderAddedAggregate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			agg, err := LoginPolicyIDPProviderAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new, "IAMID")(tt.args.ctx)
-
+			if tt.res.wantErr && !tt.res.errFunc(err) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
 			}
@@ -329,10 +329,6 @@ func TestLoginPolicyIdpProviderAddedAggregate(t *testing.T) {
 				if !tt.res.wantErr && agg.Events[i].Data == nil {
 					t.Errorf("should have data in event")
 				}
-			}
-
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -431,7 +427,10 @@ func TestLoginPolicyIdpProviderRemovedAggregate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			agg, err := LoginPolicyIDPProviderRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.new, tt.args.cascade)
-
+			if tt.res.wantErr && !tt.res.errFunc(err) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
 			}
@@ -443,9 +442,351 @@ func TestLoginPolicyIdpProviderRemovedAggregate(t *testing.T) {
 					t.Errorf("should have data in event")
 				}
 			}
+		})
+	}
+}
 
-			if tt.res.wantErr && !tt.res.errFunc(err) {
+func TestLoginPolicySoftwareMFAAddedAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *model.Org
+		new        *iam_es_model.MFA
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add software mfa to login policy",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existing: &model.Org{
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
+				},
+				new: &iam_es_model.MFA{
+					MfaType: int32(iam_model.SoftwareMFATypeOTP),
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.LoginPolicySoftwareMFAAdded},
+			},
+		},
+		{
+			name: "existing org nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "mfa nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   &model.Org{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
+				new:        nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := LoginPolicySoftwareMFAAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new, "IAMID")(tt.args.ctx)
+			if tt.res.wantErr && !tt.res.errFunc(err) || (err != nil && !tt.res.wantErr) {
 				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if !tt.res.wantErr && (agg == nil || len(agg.Events) != tt.res.eventLen) {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+				return
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+			}
+
+		})
+	}
+}
+
+func TestLoginPolicySoftwareMFARemovedAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *model.Org
+		new        *iam_es_model.MFA
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove software mfa from login policy",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existing: &model.Org{
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
+					LoginPolicy: &iam_es_model.LoginPolicy{
+						AllowUsernamePassword: true,
+						SoftwareMFAs: []int32{
+							int32(iam_model.SoftwareMFATypeOTP),
+						},
+					}},
+				new: &iam_es_model.MFA{
+					MfaType: int32(iam_model.SoftwareMFATypeOTP),
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.LoginPolicySoftwareMFARemoved},
+			},
+		},
+		{
+			name: "existing org nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "mfa nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   &model.Org{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
+				new:        nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := LoginPolicySoftwareMFARemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.new)
+			if tt.res.wantErr && !tt.res.errFunc(err) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+			}
+		})
+	}
+}
+
+func TestLoginPolicyHardwareMFAAddedAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *model.Org
+		new        *iam_es_model.MFA
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add hardware mfa to login policy",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existing: &model.Org{
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
+				},
+				new: &iam_es_model.MFA{
+					MfaType: int32(iam_model.HardwareMFATypeU2F),
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.LoginPolicyHardwareMFAAdded},
+			},
+		},
+		{
+			name: "existing org nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "mfa nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   &model.Org{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
+				new:        nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := LoginPolicyHardwareMFAAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new, "IAMID")(tt.args.ctx)
+			if tt.res.wantErr && !tt.res.errFunc(err) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if !tt.res.wantErr && (agg == nil || len(agg.Events) != tt.res.eventLen) {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+				return
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+			}
+
+		})
+	}
+}
+
+func TestLoginPolicyHardwareMFARemovedAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *model.Org
+		new        *iam_es_model.MFA
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove hardware mfa from login policy",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existing: &model.Org{
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
+					LoginPolicy: &iam_es_model.LoginPolicy{
+						AllowUsernamePassword: true,
+						HardwareMFAs: []int32{
+							int32(iam_model.HardwareMFATypeU2F),
+						},
+					}},
+				new: &iam_es_model.MFA{
+					MfaType: int32(iam_model.HardwareMFATypeU2F),
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.LoginPolicyHardwareMFARemoved},
+			},
+		},
+		{
+			name: "existing org nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "mfa nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   &model.Org{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
+				new:        nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := LoginPolicyHardwareMFARemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.new)
+			if tt.res.wantErr && !tt.res.errFunc(err) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
 			}
 		})
 	}

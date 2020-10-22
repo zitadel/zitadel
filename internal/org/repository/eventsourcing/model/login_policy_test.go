@@ -208,3 +208,183 @@ func TestRemoveAddIdpToPolicyEvent(t *testing.T) {
 		})
 	}
 }
+
+func TestAppendAddSoftwareMFAToPolicyEvent(t *testing.T) {
+	type args struct {
+		org   *Org
+		mfa   *iam_es_model.MFA
+		event *es_models.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result *Org
+	}{
+		{
+			name: "append add software mfa to login policy event",
+			args: args{
+				org:   &Org{LoginPolicy: &iam_es_model.LoginPolicy{AllowExternalIdp: true, AllowRegister: true, AllowUsernamePassword: true}},
+				mfa:   &iam_es_model.MFA{MfaType: int32(iam_model.SoftwareMFATypeOTP)},
+				event: &es_models.Event{},
+			},
+			result: &Org{LoginPolicy: &iam_es_model.LoginPolicy{
+				AllowExternalIdp:      true,
+				AllowRegister:         true,
+				AllowUsernamePassword: true,
+				SoftwareMFAs: []int32{
+					int32(iam_model.SoftwareMFATypeOTP),
+				}}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.mfa != nil {
+				data, _ := json.Marshal(tt.args.mfa)
+				tt.args.event.Data = data
+			}
+			tt.args.org.appendAddSoftwareMFAToLoginPolicyEvent(tt.args.event)
+			if len(tt.result.LoginPolicy.SoftwareMFAs) != len(tt.args.org.LoginPolicy.SoftwareMFAs) {
+				t.Errorf("got wrong software mfa len: expected: %v, actual: %v ", len(tt.result.LoginPolicy.SoftwareMFAs), len(tt.args.org.LoginPolicy.SoftwareMFAs))
+			}
+			if tt.result.LoginPolicy.SoftwareMFAs[0] != tt.args.mfa.MfaType {
+				t.Errorf("got wrong software mfa: expected: %v, actual: %v ", tt.result.LoginPolicy.SoftwareMFAs[0], tt.args.mfa)
+			}
+		})
+	}
+}
+
+func TestRemoveSoftwareMFAFromPolicyEvent(t *testing.T) {
+	type args struct {
+		org   *Org
+		mfa   *iam_es_model.MFA
+		event *es_models.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result *Org
+	}{
+		{
+			name: "append remove software mfa from login policy event",
+			args: args{
+				org: &Org{
+					LoginPolicy: &iam_es_model.LoginPolicy{
+						AllowExternalIdp:      true,
+						AllowRegister:         true,
+						AllowUsernamePassword: true,
+						SoftwareMFAs: []int32{
+							int32(iam_model.SoftwareMFATypeOTP),
+						}}},
+				mfa:   &iam_es_model.MFA{MfaType: int32(iam_model.SoftwareMFATypeOTP)},
+				event: &es_models.Event{},
+			},
+			result: &Org{LoginPolicy: &iam_es_model.LoginPolicy{
+				AllowExternalIdp:      true,
+				AllowRegister:         true,
+				AllowUsernamePassword: true,
+				SoftwareMFAs:          []int32{}}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.mfa != nil {
+				data, _ := json.Marshal(tt.args.mfa)
+				tt.args.event.Data = data
+			}
+			tt.args.org.appendRemoveSoftwareMFAFromLoginPolicyEvent(tt.args.event)
+			if len(tt.result.LoginPolicy.SoftwareMFAs) != len(tt.args.org.LoginPolicy.SoftwareMFAs) {
+				t.Errorf("got wrong idp mfa len: expected: %v, actual: %v ", len(tt.result.LoginPolicy.SoftwareMFAs), len(tt.args.org.LoginPolicy.SoftwareMFAs))
+			}
+		})
+	}
+}
+
+func TestAppendAddHardwareMFAToPolicyEvent(t *testing.T) {
+	type args struct {
+		org   *Org
+		mfa   *iam_es_model.MFA
+		event *es_models.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result *Org
+	}{
+		{
+			name: "append add hardware mfa to login policy event",
+			args: args{
+				org:   &Org{LoginPolicy: &iam_es_model.LoginPolicy{AllowExternalIdp: true, AllowRegister: true, AllowUsernamePassword: true}},
+				mfa:   &iam_es_model.MFA{MfaType: int32(iam_model.HardwareMFATypeU2F)},
+				event: &es_models.Event{},
+			},
+			result: &Org{LoginPolicy: &iam_es_model.LoginPolicy{
+				AllowExternalIdp:      true,
+				AllowRegister:         true,
+				AllowUsernamePassword: true,
+				HardwareMFAs: []int32{
+					int32(iam_model.HardwareMFATypeU2F),
+				}}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.mfa != nil {
+				data, _ := json.Marshal(tt.args.mfa)
+				tt.args.event.Data = data
+			}
+			tt.args.org.appendAddHardwareMFAToLoginPolicyEvent(tt.args.event)
+			if len(tt.result.LoginPolicy.HardwareMFAs) != len(tt.args.org.LoginPolicy.HardwareMFAs) {
+				t.Errorf("got wrong software mfa len: expected: %v, actual: %v ", len(tt.result.LoginPolicy.HardwareMFAs), len(tt.args.org.LoginPolicy.HardwareMFAs))
+			}
+			if tt.result.LoginPolicy.HardwareMFAs[0] != tt.args.mfa.MfaType {
+				t.Errorf("got wrong software mfa: expected: %v, actual: %v ", tt.result.LoginPolicy.HardwareMFAs[0], tt.args.mfa)
+			}
+		})
+	}
+}
+
+func TestRemoveHardwareMFAFromPolicyEvent(t *testing.T) {
+	type args struct {
+		org   *Org
+		mfa   *iam_es_model.MFA
+		event *es_models.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result *Org
+	}{
+		{
+			name: "append remove hardware mfa from login policy event",
+			args: args{
+				org: &Org{
+					LoginPolicy: &iam_es_model.LoginPolicy{
+						AllowExternalIdp:      true,
+						AllowRegister:         true,
+						AllowUsernamePassword: true,
+						HardwareMFAs: []int32{
+							int32(iam_model.HardwareMFATypeU2F),
+						}}},
+				mfa:   &iam_es_model.MFA{MfaType: int32(iam_model.HardwareMFATypeU2F)},
+				event: &es_models.Event{},
+			},
+			result: &Org{LoginPolicy: &iam_es_model.LoginPolicy{
+				AllowExternalIdp:      true,
+				AllowRegister:         true,
+				AllowUsernamePassword: true,
+				HardwareMFAs:          []int32{}}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.mfa != nil {
+				data, _ := json.Marshal(tt.args.mfa)
+				tt.args.event.Data = data
+			}
+			tt.args.org.appendRemoveHardwareMFAFromLoginPolicyEvent(tt.args.event)
+			if len(tt.result.LoginPolicy.HardwareMFAs) != len(tt.args.org.LoginPolicy.HardwareMFAs) {
+				t.Errorf("got wrong idp mfa len: expected: %v, actual: %v ", len(tt.result.LoginPolicy.HardwareMFAs), len(tt.args.org.LoginPolicy.HardwareMFAs))
+			}
+		})
+	}
+}
