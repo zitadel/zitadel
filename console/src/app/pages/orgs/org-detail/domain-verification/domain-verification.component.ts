@@ -19,6 +19,8 @@ export class DomainVerificationComponent {
     public dns!: OrgDomainValidationResponse.AsObject;
     public copied: string = '';
 
+    public showNew: boolean = false;
+
     constructor(
         private toast: ToastService,
         public dialogRef: MatDialogRef<DomainVerificationComponent>,
@@ -26,6 +28,10 @@ export class DomainVerificationComponent {
         private mgmtService: ManagementService,
     ) {
         this.domain = data.domain;
+        console.log(data);
+        if (this.domain.validationType === OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_UNSPECIFIED) {
+            this.showNew = true;
+        }
     }
 
     async loadHttpToken(): Promise<void> {
