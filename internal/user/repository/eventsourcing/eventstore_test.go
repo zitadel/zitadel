@@ -1287,7 +1287,7 @@ func TestPasswordID(t *testing.T) {
 		{
 			name: "get by id, ok",
 			args: args{
-				es:   GetMockManipulateUserFull(ctrl),
+				es:   GetMockManipulateUserFull(ctrl, false),
 				ctx:  authz.NewMockContext("orgID", "userID"),
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
@@ -1366,7 +1366,7 @@ func TestSetOneTimePassword(t *testing.T) {
 		{
 			name: "create one time pw",
 			args: args{
-				es:       GetMockManipulateUserWithPasswordCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, Human: &repo_model.Human{}}),
+				es:       GetMockManipulateUserWithPasswordCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, Human: &repo_model.Human{Email: &repo_model.Email{EmailAddress: "email"}}}, true),
 				ctx:      authz.NewMockContext("orgID", "userID"),
 				policy:   &iam_model.PasswordComplexityPolicyView{},
 				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SecretString: "Password"},
@@ -1516,8 +1516,10 @@ func TestCheckPassword(t *testing.T) {
 								Algorithm:  "hash",
 								Crypted:    []byte("password"),
 							}},
+							Email: &repo_model.Email{EmailAddress: "email"},
 						},
 					},
+					true,
 				),
 				ctx:      authz.NewMockContext("orgID", "userID"),
 				userID:   "userID",
@@ -1582,8 +1584,10 @@ func TestSetPassword(t *testing.T) {
 								KeyID:      "id",
 								Crypted:    []byte("code"),
 							}},
+							Email: &repo_model.Email{EmailAddress: "email"},
 						},
 					},
+					true,
 				),
 				ctx:      authz.NewMockContext("orgID", "userID"),
 				policy:   &iam_model.PasswordComplexityPolicyView{},
@@ -1627,8 +1631,11 @@ func TestSetPassword(t *testing.T) {
 				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
 					repo_model.User{
 						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
-						Human:      &repo_model.Human{},
+						Human: &repo_model.Human{
+							Email: &repo_model.Email{EmailAddress: "email"},
+						},
 					},
+					true,
 				),
 				ctx:      authz.NewMockContext("orgID", "userID"),
 				policy:   &iam_model.PasswordComplexityPolicyView{},
@@ -1653,8 +1660,10 @@ func TestSetPassword(t *testing.T) {
 								KeyID:      "id",
 								Crypted:    []byte("code2"),
 							}},
+							Email: &repo_model.Email{EmailAddress: "email"},
 						},
 					},
+					true,
 				),
 				ctx:      authz.NewMockContext("orgID", "userID"),
 				policy:   &iam_model.PasswordComplexityPolicyView{},
@@ -1759,8 +1768,11 @@ func TestChangePassword(t *testing.T) {
 				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
 					repo_model.User{
 						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
-						Human:      &repo_model.Human{},
+						Human: &repo_model.Human{
+							Email: &repo_model.Email{EmailAddress: "email"},
+						},
 					},
+					true,
 				),
 				ctx:    authz.NewMockContext("orgID", "userID"),
 				policy: &iam_model.PasswordComplexityPolicyView{},
@@ -1784,8 +1796,10 @@ func TestChangePassword(t *testing.T) {
 								Algorithm:  "hash",
 								Crypted:    []byte("older"),
 							}},
+							Email: &repo_model.Email{EmailAddress: "email"},
 						},
 					},
+					true,
 				),
 				ctx:    authz.NewMockContext("orgID", "userID"),
 				policy: &iam_model.PasswordComplexityPolicyView{},
@@ -1859,7 +1873,12 @@ func TestRequestSetPassword(t *testing.T) {
 		{
 			name: "create pw",
 			args: args{
-				es:         GetMockManipulateUserWithPasswordCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, Human: &repo_model.Human{}}),
+				es: GetMockManipulateUserWithPasswordCodeGen(ctrl, repo_model.User{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+					Human: &repo_model.Human{
+						Email: &repo_model.Email{EmailAddress: "email"},
+					}},
+					true),
 				ctx:        authz.NewMockContext("orgID", "userID"),
 				userID:     "AggregateID",
 				notifyType: model.NotificationTypeEmail,
@@ -1871,7 +1890,7 @@ func TestRequestSetPassword(t *testing.T) {
 		{
 			name: "initial state",
 			args: args{
-				es:         GetMockManipulateUserWithPasswordCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, Human: &repo_model.Human{}, State: int32(model.UserStateInitial)}),
+				es:         GetMockManipulateUserWithPasswordCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, Human: &repo_model.Human{}}, false),
 				ctx:        authz.NewMockContext("orgID", "userID"),
 				userID:     "AggregateID",
 				notifyType: model.NotificationTypeEmail,
@@ -2260,7 +2279,7 @@ func TestProfileByID(t *testing.T) {
 		{
 			name: "get by id, ok",
 			args: args{
-				es:   GetMockManipulateUserFull(ctrl),
+				es:   GetMockManipulateUserFull(ctrl, false),
 				ctx:  authz.NewMockContext("orgID", "userID"),
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Human: &model.Human{}},
 			},
@@ -2327,7 +2346,7 @@ func TestChangeProfile(t *testing.T) {
 		{
 			name: "get by id, ok",
 			args: args{
-				es:      GetMockManipulateUserFull(ctrl),
+				es:      GetMockManipulateUserFull(ctrl, false),
 				ctx:     authz.NewMockContext("orgID", "userID"),
 				profile: &model.Profile{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, FirstName: "FirstName Changed", LastName: "LastName Changed"},
 			},
@@ -2394,7 +2413,7 @@ func TestEmailByID(t *testing.T) {
 		{
 			name: "get by id, ok",
 			args: args{
-				es:   GetMockManipulateUserFull(ctrl),
+				es:   GetMockManipulateUserFull(ctrl, false),
 				ctx:  authz.NewMockContext("orgID", "userID"),
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
@@ -2461,7 +2480,7 @@ func TestChangeEmail(t *testing.T) {
 		{
 			name: "change email address, verified",
 			args: args{
-				es:    GetMockManipulateUserFull(ctrl),
+				es:    GetMockManipulateUserFull(ctrl, true),
 				ctx:   authz.NewMockContext("orgID", "userID"),
 				email: &model.Email{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, EmailAddress: "EmailAddressChanged", IsEmailVerified: true},
 			},
@@ -2479,7 +2498,7 @@ func TestChangeEmail(t *testing.T) {
 						Profile: &repo_model.Profile{DisplayName: "DisplayName"},
 						Email:   &repo_model.Email{EmailAddress: "EmailAddress"},
 					},
-				}),
+				}, true),
 				ctx:   authz.NewMockContext("orgID", "userID"),
 				email: &model.Email{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, EmailAddress: "EmailAddressChanged", IsEmailVerified: false},
 			},
@@ -2497,8 +2516,7 @@ func TestChangeEmail(t *testing.T) {
 						Profile: &repo_model.Profile{DisplayName: "DisplayName"},
 						Email:   &repo_model.Email{EmailAddress: "EmailAddress"},
 					},
-					State: int32(model.UserStateInitial),
-				}),
+				}, false),
 				ctx:   authz.NewMockContext("orgID", "userID"),
 				email: &model.Email{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, EmailAddress: "EmailAddressChanged", IsEmailVerified: false},
 			},
@@ -2532,7 +2550,9 @@ func TestChangeEmail(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.ChangeEmail(tt.args.ctx, tt.args.email)
-
+			if (tt.res.errFunc != nil && !tt.res.errFunc(err)) || (tt.res.errFunc == nil && err != nil) {
+				t.Errorf("got wrong err: %v ", err)
+			}
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
@@ -2541,9 +2561,6 @@ func TestChangeEmail(t *testing.T) {
 			}
 			if tt.res.errFunc == nil && result.IsEmailVerified != tt.res.email.IsEmailVerified {
 				t.Errorf("got wrong result change required: expected: %v, actual: %v ", tt.res.email.IsEmailVerified, result.IsEmailVerified)
-			}
-			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -2660,7 +2677,7 @@ func TestCreateEmailVerificationCode(t *testing.T) {
 					Human: &repo_model.Human{
 						Profile: &repo_model.Profile{DisplayName: "DisplayName"},
 						Email:   &repo_model.Email{EmailAddress: "EmailAddress"},
-					}}),
+					}}, true),
 				ctx:    authz.NewMockContext("orgID", "userID"),
 				userID: "userID",
 			},
@@ -2676,8 +2693,7 @@ func TestCreateEmailVerificationCode(t *testing.T) {
 						Profile: &repo_model.Profile{DisplayName: "DisplayName"},
 						Email:   &repo_model.Email{EmailAddress: "EmailAddress"},
 					},
-					State: int32(model.UserStateInitial),
-				}),
+				}, false),
 				ctx:    authz.NewMockContext("orgID", "userID"),
 				userID: "userID",
 			},
@@ -2734,7 +2750,7 @@ func TestCreateEmailVerificationCode(t *testing.T) {
 			err := tt.args.es.CreateEmailVerificationCode(tt.args.ctx, tt.args.userID)
 
 			if tt.res.errFunc == nil && err != nil {
-				t.Errorf("should not ger err")
+				t.Errorf("should not get err, got: %v", err)
 			}
 			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
@@ -2823,7 +2839,7 @@ func TestPhoneByID(t *testing.T) {
 		{
 			name: "get by id, ok",
 			args: args{
-				es:   GetMockManipulateUserFull(ctrl),
+				es:   GetMockManipulateUserFull(ctrl, false),
 				ctx:  authz.NewMockContext("orgID", "userID"),
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
@@ -2890,7 +2906,7 @@ func TestChangePhone(t *testing.T) {
 		{
 			name: "change phone, verified",
 			args: args{
-				es:    GetMockManipulateUserFull(ctrl),
+				es:    GetMockManipulateUserFull(ctrl, false),
 				ctx:   authz.NewMockContext("orgID", "userID"),
 				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "0711234567", IsPhoneVerified: true},
 			},
@@ -3277,7 +3293,7 @@ func TestAddressByID(t *testing.T) {
 		{
 			name: "get by id, ok",
 			args: args{
-				es:   GetMockManipulateUserFull(ctrl),
+				es:   GetMockManipulateUserFull(ctrl, false),
 				ctx:  authz.NewMockContext("orgID", "userID"),
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
@@ -3344,7 +3360,7 @@ func TestChangeAddress(t *testing.T) {
 		{
 			name: "change address ok",
 			args: args{
-				es:      GetMockManipulateUserFull(ctrl),
+				es:      GetMockManipulateUserFull(ctrl, false),
 				ctx:     authz.NewMockContext("orgID", "userID"),
 				address: &model.Address{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Country: "CountryChanged"},
 			},
