@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/crypto"
+	usr_model "github.com/caos/zitadel/internal/user/model"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -1194,6 +1195,114 @@ func TestRequestSetPasswordAggregate(t *testing.T) {
 			}
 			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestResendInitialPasswordAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		user       *model.User
+		aggCreator *models.AggregateCreator
+		initcode   *usr_model.InitUserCode
+		email      string
+	}
+	type res struct {
+		eventLen  int
+		eventType models.EventType
+		errFunc   func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "resend initial password aggregate ok",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				user: &model.User{
+					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					UserName:   "UserName",
+					Human: &model.Human{
+						Profile: &model.Profile{DisplayName: "DisplayName"},
+						Email:   &model.Email{},
+					},
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+				initcode:   &usr_model.InitUserCode{Expiry: time.Hour * 1},
+			},
+			res: res{
+				eventLen: 1,
+			},
+		},
+		{
+			name: "resend initial password with same email ok",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				user: &model.User{
+					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					UserName:   "UserName",
+					Human: &model.Human{
+						Profile: &model.Profile{DisplayName: "DisplayName"},
+						Email:   &model.Email{EmailAddress: "email"},
+					},
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+				initcode:   &usr_model.InitUserCode{Expiry: time.Hour * 1},
+				email:      "email",
+			},
+			res: res{
+				eventLen: 1,
+			},
+		},
+		{
+			name: "resend initial password with new email ok",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				user: &model.User{
+					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					UserName:   "UserName",
+					Human: &model.Human{
+						Profile: &model.Profile{DisplayName: "DisplayName"},
+						Email:   &model.Email{EmailAddress: "old"},
+					},
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+				initcode:   &usr_model.InitUserCode{Expiry: time.Hour * 1},
+				email:      "new",
+			},
+			res: res{
+				eventLen: 2,
+			},
+		},
+		{
+			name: "request nil",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				user: &model.User{
+					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					UserName:   "UserName",
+					Human: &model.Human{
+						Profile: &model.Profile{DisplayName: "DisplayName"},
+					},
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := ResendInitialPasswordAggregate(tt.args.aggCreator, tt.args.user, tt.args.initcode, tt.args.email)(tt.args.ctx)
+			if (tt.res.errFunc == nil && err != nil) || (tt.res.errFunc != nil && !tt.res.errFunc(err)) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
 			}
 		})
 	}

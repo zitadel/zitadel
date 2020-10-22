@@ -464,7 +464,7 @@ func ResendInitialPasswordAggregate(aggCreator *es_models.AggregateCreator, user
 		if err != nil {
 			return nil, err
 		}
-		if email != "" && email != user.Email.EmailAddress {
+		if email != "" && user.Email != nil && email != user.Email.EmailAddress {
 			agg, err = agg.AppendEvent(model.HumanEmailChanged, map[string]interface{}{"email": email})
 			if err != nil {
 				return nil, err

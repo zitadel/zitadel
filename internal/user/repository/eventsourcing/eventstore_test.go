@@ -3,10 +3,11 @@ package eventsourcing
 import (
 	"context"
 	"encoding/json"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"net"
 	"testing"
 	"time"
+
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 
 	"github.com/golang/mock/gomock"
 
@@ -1869,6 +1870,18 @@ func TestRequestSetPassword(t *testing.T) {
 			},
 		},
 		{
+			name: "initial state",
+			args: args{
+				es:         GetMockManipulateUserWithPasswordCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, Human: &repo_model.Human{}, State: int32(model.UserStateInitial)}),
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				userID:     "AggregateID",
+				notifyType: model.NotificationTypeEmail,
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
 			name: "empty userid",
 			args: args{
 				es:         GetMockManipulateUser(ctrl),
@@ -1894,6 +1907,84 @@ func TestRequestSetPassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := tt.args.es.RequestSetPassword(tt.args.ctx, tt.args.userID, tt.args.notifyType)
+
+			if tt.res.errFunc == nil && err != nil {
+				t.Errorf("should not get err")
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestResendInitialMail(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *UserEventstore
+		ctx    context.Context
+		userID string
+		mail   string
+	}
+	type res struct {
+		password *model.Password
+		errFunc  func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "resend ok",
+			args: args{
+				es:     GetMockManipulateUserWithInitCode(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, Human: &repo_model.Human{}}),
+				ctx:    authz.NewMockContext("orgID", "userID"),
+				userID: "AggregateID",
+				mail:   "",
+			},
+			res: res{
+				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, ChangeRequired: false},
+			},
+		},
+		{
+			name: "resend with email ok",
+			args: args{
+				es:     GetMockManipulateUserWithInitCode(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, Human: &repo_model.Human{}}),
+				ctx:    authz.NewMockContext("orgID", "userID"),
+				userID: "AggregateID",
+				mail:   "email",
+			},
+			res: res{
+				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, ChangeRequired: false},
+			},
+		},
+		{
+			name: "empty userid",
+			args: args{
+				es:   GetMockManipulateUser(ctrl),
+				mail: "",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:     GetMockManipulateUserNoEvents(ctrl),
+				ctx:    authz.NewMockContext("orgID", "userID"),
+				userID: "AggregateID",
+				mail:   "",
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.ResendInitialMail(tt.args.ctx, tt.args.userID, tt.args.mail)
 
 			if tt.res.errFunc == nil && err != nil {
 				t.Errorf("should not get err")
@@ -2398,6 +2489,25 @@ func TestChangeEmail(t *testing.T) {
 			},
 		},
 		{
+			name: "user state initial",
+			args: args{
+				es: GetMockManipulateUserWithEmailCodeGen(ctrl, repo_model.User{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					UserName:   "UserName",
+					Human: &repo_model.Human{
+						Profile: &repo_model.Profile{DisplayName: "DisplayName"},
+						Email:   &repo_model.Email{EmailAddress: "EmailAddress"},
+					},
+					State: int32(model.UserStateInitial),
+				}),
+				ctx:   authz.NewMockContext("orgID", "userID"),
+				email: &model.Email{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, EmailAddress: "EmailAddressChanged", IsEmailVerified: false},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
 			name: "empty userid",
 			args: args{
 				es:    GetMockManipulateUser(ctrl),
@@ -2556,6 +2666,25 @@ func TestCreateEmailVerificationCode(t *testing.T) {
 				userID: "userID",
 			},
 			res: res{},
+		},
+		{
+			name: "initial state",
+			args: args{
+				es: GetMockManipulateUserWithEmailCodeGen(ctrl, repo_model.User{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					UserName:   "UserName",
+					Human: &repo_model.Human{
+						Profile: &repo_model.Profile{DisplayName: "DisplayName"},
+						Email:   &repo_model.Email{EmailAddress: "EmailAddress"},
+					},
+					State: int32(model.UserStateInitial),
+				}),
+				ctx:    authz.NewMockContext("orgID", "userID"),
+				userID: "userID",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
 		},
 		{
 			name: "empty userid",
