@@ -13,22 +13,22 @@ dictionaries:
   - de
 
 # Any files/folders we should ignore?
-# excluded_files:
-#   - ".codecov/*"
-#   - ".github/*"
-#   - "build/*"
-#   - "k8s/*"
-#   - "*.min.css"
-#   - "*.css.map"
-#   - "*.min.js"
-#   - "*.js.map"
-#   - "package-lock.json"
-#   - "package.json"
-#   - ".releaserc.js"
-#   - ".typo-ci.yml"
-#   - ".gitignore"
-#   - "go.mod"
-#   - "go.sum"
+excluded_files:
+  - ".codecov/*"
+  - ".github/*"
+  - "build/*"
+  - "k8s/*"
+  - "*.min.css"
+  - "*.css.map"
+  - "*.min.js"
+  - "*.js.map"
+  - "package-lock.json"
+  - "package.json"
+  - ".releaserc.js"
+  - ".typo-ci.yml"
+  - ".gitignore"
+  - "go.mod"
+  - "go.sum"
 
 # Any typos we should ignore?
 excluded_words:
