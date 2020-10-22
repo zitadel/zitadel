@@ -6,7 +6,7 @@ title: Console
 
 Console is the ZITADEL Graphical User Interface.
 
-**Users** can manage some information by their own.
+**Users** can manage some information on their own.
 
 - profile information
 - credentials

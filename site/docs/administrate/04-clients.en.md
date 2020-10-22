@@ -5,7 +5,7 @@ title: Clients
 ### What are clients
 
 Clients are applications who share the same security context and interface with an "authorization server".
-For example you could have a software project existing out of a web app and a mobile app, both of these application might consume the same roles because the end user might use both of them.
+For example you could have a software project existing out of a web app and a mobile app, both of these applications might consume the same roles because the end user might use both of them.
 
 ### Manage clients
 

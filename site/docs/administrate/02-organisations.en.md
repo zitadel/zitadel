@@ -47,7 +47,7 @@ Input the domain in the input field and click **Add**
 To start the domain verification click the domain name and a dialog will appear, where you can choose between DNS or HTTP challenge methods.
 <img src="img/console_org_domain_verify.png" alt="Organisation Domain Verify" width="1000px" height="auto">
 
-For example, create a TXT record with your DNS provider for the used domain an click verify. **ZITADEL** will then proceed an check your DNS.
+For example, create a TXT record with your DNS provider for the used domain and click verify. **ZITADEL** will then proceed and check your DNS.
 <img src="img/console_org_domain_verify_dns.png" alt="Organisation Domain Verify DNS" width="1000px" height="auto">
 
 > Do not delete the verification code **ZITADEL** will recheck the ownership from time to time
@@ -57,7 +57,7 @@ When the verification is successful you have the option to activate the domain b
 
 > This changes the **preferred loginnames** of your [users](administrate#Users) as indicated [here](administrate#How_ZITADEL_handles_usernames).
 
-Gratulations your are done! You can check this by visiting [https://console.zitadel.ch/users/me](https://console.zitadel.ch/users/me)
+Congratulations your are done! You can check this by visiting [https://console.zitadel.ch/users/me](https://console.zitadel.ch/users/me)
 <img src="img/console_user_personal_info.png" alt="User Personal Information" width="1000px" height="auto">
 
 > This only works when the [user](administrate#Users) is member of this [organisation](administrate#Organisations)
