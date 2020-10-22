@@ -18,6 +18,7 @@
         position: absolute;
         top: 80px;
         height: 60vh;
+        max-height: 500px;
         right: 0;
     }
     .section {
