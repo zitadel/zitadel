@@ -360,7 +360,7 @@
                 "SECONDARYCOLOR":"Font color",
                 "SAVED":"Saved successfully"
             },
-            "BTN_EDIT":"Modifizieren"
+            "BTN_EDIT":"Modify"
         },
         "TOAST":{
             "MEMBERREMOVED":"Manager removed.",
