@@ -106,6 +106,14 @@ func (es *OrgEventstore) OrgByID(ctx context.Context, org *org_model.Org) (*org_
 	return model.OrgToModel(esOrg), nil
 }
 
+func (es *OrgEventstore) OrgEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error) {
+	query, err := OrgByIDQuery(id, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return es.FilterEvents(ctx, query)
+}
+
 func (es *OrgEventstore) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
 	var found bool
 	err = es_sdk.Filter(ctx, es.FilterEvents, isUniqueValidation(&found), OrgNameUniqueQuery(name))

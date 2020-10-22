@@ -871,7 +871,7 @@ func (es *IAMEventstore) GetOrgIAMPolicy(ctx context.Context, iamID string) (*ia
 		return nil, err
 	}
 	if existingIAM.DefaultOrgIAMPolicy == nil {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2Fj8s", "Errors.IAM.OrgIAM.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2Fj8s", "Errors.IAM.OrgIAMPolicy.NotExisting")
 	}
 	return existingIAM.DefaultOrgIAMPolicy, nil
 }

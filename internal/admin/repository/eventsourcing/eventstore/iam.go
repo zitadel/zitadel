@@ -176,9 +176,26 @@ func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_mo
 }
 
 func (repo *IAMRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
-	policy, err := repo.View.LabelPolicyByAggregateID(repo.SystemDefaults.IamID)
-	if err != nil {
-		return nil, err
+	policy, viewErr := repo.View.LabelPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
+		return nil, viewErr
+	}
+	if caos_errs.IsNotFound(viewErr) {
+		policy = new(iam_es_model.LabelPolicyView)
+	}
+	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4bM0s", "Errors.IAM.LabelPolicy.NotFound")
+	}
+	if esErr != nil {
+		logging.Log("EVENT-3M0xs").WithError(esErr).Debug("error retrieving new events")
+		return iam_es_model.LabelPolicyViewToModel(policy), nil
+	}
+	policyCopy := *policy
+	for _, event := range events {
+		if err := policyCopy.AppendEvent(event); err != nil {
+			return iam_es_model.LabelPolicyViewToModel(policy), nil
+		}
 	}
 	return iam_es_model.LabelPolicyViewToModel(policy), nil
 }
@@ -305,9 +322,26 @@ func (repo *IAMRepository) RemoveHardwareMFAFromLoginPolicy(ctx context.Context,
 }
 
 func (repo *IAMRepository) GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error) {
-	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
-	if err != nil {
-		return nil, err
+	policy, viewErr := repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
+		return nil, viewErr
+	}
+	if caos_errs.IsNotFound(viewErr) {
+		policy = new(iam_es_model.PasswordComplexityPolicyView)
+	}
+	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-1Mc0s", "Errors.IAM.PasswordComplexityPolicy.NotFound")
+	}
+	if esErr != nil {
+		logging.Log("EVENT-3M0xs").WithError(esErr).Debug("error retrieving new events")
+		return iam_es_model.PasswordComplexityViewToModel(policy), nil
+	}
+	policyCopy := *policy
+	for _, event := range events {
+		if err := policyCopy.AppendEvent(event); err != nil {
+			return iam_es_model.PasswordComplexityViewToModel(policy), nil
+		}
 	}
 	return iam_es_model.PasswordComplexityViewToModel(policy), nil
 }
@@ -323,9 +357,26 @@ func (repo *IAMRepository) ChangeDefaultPasswordComplexityPolicy(ctx context.Con
 }
 
 func (repo *IAMRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error) {
-	policy, err := repo.View.PasswordAgePolicyByAggregateID(repo.SystemDefaults.IamID)
-	if err != nil {
-		return nil, err
+	policy, viewErr := repo.View.PasswordAgePolicyByAggregateID(repo.SystemDefaults.IamID)
+	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
+		return nil, viewErr
+	}
+	if caos_errs.IsNotFound(viewErr) {
+		policy = new(iam_es_model.PasswordAgePolicyView)
+	}
+	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-vMyS3", "Errors.IAM.PasswordAgePolicy.NotFound")
+	}
+	if esErr != nil {
+		logging.Log("EVENT-3M0xs").WithError(esErr).Debug("error retrieving new events")
+		return iam_es_model.PasswordAgeViewToModel(policy), nil
+	}
+	policyCopy := *policy
+	for _, event := range events {
+		if err := policyCopy.AppendEvent(event); err != nil {
+			return iam_es_model.PasswordAgeViewToModel(policy), nil
+		}
 	}
 	return iam_es_model.PasswordAgeViewToModel(policy), nil
 }
@@ -341,9 +392,26 @@ func (repo *IAMRepository) ChangeDefaultPasswordAgePolicy(ctx context.Context, p
 }
 
 func (repo *IAMRepository) GetDefaultPasswordLockoutPolicy(ctx context.Context) (*iam_model.PasswordLockoutPolicyView, error) {
-	policy, err := repo.View.PasswordLockoutPolicyByAggregateID(repo.SystemDefaults.IamID)
-	if err != nil {
-		return nil, err
+	policy, viewErr := repo.View.PasswordLockoutPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
+		return nil, viewErr
+	}
+	if caos_errs.IsNotFound(viewErr) {
+		policy = new(iam_es_model.PasswordLockoutPolicyView)
+	}
+	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2M9oP", "Errors.IAM.PasswordLockoutPolicy.NotFound")
+	}
+	if esErr != nil {
+		logging.Log("EVENT-3M0xs").WithError(esErr).Debug("error retrieving new events")
+		return iam_es_model.PasswordLockoutViewToModel(policy), nil
+	}
+	policyCopy := *policy
+	for _, event := range events {
+		if err := policyCopy.AppendEvent(event); err != nil {
+			return iam_es_model.PasswordLockoutViewToModel(policy), nil
+		}
 	}
 	return iam_es_model.PasswordLockoutViewToModel(policy), nil
 }
@@ -359,9 +427,26 @@ func (repo *IAMRepository) ChangeDefaultPasswordLockoutPolicy(ctx context.Contex
 }
 
 func (repo *IAMRepository) GetOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
-	policy, err := repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
-	if err != nil {
-		return nil, err
+	policy, viewErr := repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
+		return nil, viewErr
+	}
+	if caos_errs.IsNotFound(viewErr) {
+		policy = new(iam_es_model.OrgIAMPolicyView)
+	}
+	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-MkoL0", "Errors.IAM.OrgIAMPolicy.NotFound")
+	}
+	if esErr != nil {
+		logging.Log("EVENT-3M0xs").WithError(esErr).Debug("error retrieving new events")
+		return iam_es_model.OrgIAMViewToModel(policy), nil
+	}
+	policyCopy := *policy
+	for _, event := range events {
+		if err := policyCopy.AppendEvent(event); err != nil {
+			return iam_es_model.OrgIAMViewToModel(policy), nil
+		}
 	}
 	return iam_es_model.OrgIAMViewToModel(policy), nil
 }

@@ -151,7 +151,7 @@ Errors:
     LoginPolicyNotExisting: Login Policy doesn't exist
     IdpProviderInvalid: Idp Provider is invalid
     LoginPolicy:
-      NotFound: Default Login Policy nicht gefunden
+      NotFound: Default Login Policy not found
       NotExisting: Default Login Policy not existig
       AlreadyExists: Default Login Policy already exists
       IdpProviderAlreadyExisting: Idp Provider already existing
@@ -160,27 +160,25 @@ Errors:
         AlreadyExists: Multifactor already exists
         NotExisting: Multifactor not existing
         Unspecified: Multifactor invalid
+    LabelPolicy:
+      NotFound: Default Private Label Policy not found
     PasswordComplexityPolicy:
+      NotFound: Default Private Label Policy not found
       NotExisting: Default Password Complexity Policy not existing
       AlreadyExists: Default Password Complexity Policy already existing
       Empty: Default Password Complexity Policy empty
     PasswordAgePolicy:
+      NotFound: Default Password Age Policy not found
       NotExisting: Default Password Age Policy not existing
       AlreadyExists: Default Password Age Policy already existing
       Empty: Default Password Age Policy empty
     PasswordLockoutPolicy:
+      NotFound: Default Password Lockout Policy not found
       NotExisting: Default Password Lockout Policy not existing
       AlreadyExists: Default Password Lockout Policy already existing
       Empty: Default Password Lockout Policy empty
-    PasswordLockout:
-      Empty: Passwort Lockout Policy is empty
-      NotExisting: Passwort Lockout Policy not existing
-      AlreadyExists: Passwort Lockout Policy already exists
-    PasswordAge:
-      Empty: Passwort Age Policy is empty
-      NotExisting: Passwort Age Policy not existing
-      AlreadyExists: Passwort Age Policy already exists
-    OrgIAM:
+    OrgIAMPolicy:
+      NotFound: Org IAM Policy not found
       Empty: Org IAM Policy is empty
       NotExisting: Org IAM Policy not existing
       AlreadyExists: Org IAM Policy already exists
