@@ -626,8 +626,3 @@ func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*management.Change
 
 	return result
 }
-
-//
-//func initialMailRequestToModel(request *management.InitialMailRequest) *usr_model. {
-//
-//}
