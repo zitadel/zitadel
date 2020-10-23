@@ -13,9 +13,9 @@ import {
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 export enum UserGrantContext {
-    USER,
-    OWNED_PROJECT,
-    GRANTED_PROJECT,
+    USER = 'user',
+    OWNED_PROJECT = 'owned',
+    GRANTED_PROJECT = 'granted',
 }
 
 export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {

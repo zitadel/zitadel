@@ -28,7 +28,7 @@
         <ng-container *ngIf="context && context == UserGrantContext.USER">
             <h1>{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</h1>
 
-            <app-search-project-autocomplete class="block" singleOutput="true" target="UserTarget.EXTERNAL"
+            <app-search-project-autocomplete class="block" singleOutput="true"
                 (selectionChanged)="selectProject($event)">
             </app-search-project-autocomplete>
         </ng-container>
@@ -59,9 +59,8 @@
 
     <div class="btn-container">
         <ng-container *ngIf="currentCreateStep === 1">
-            <button
-                [disabled]="!org || ((context == UserGrantContext.GRANTED_PROJECT || context == UserGrantContext.OWNED_PROJECT) && !projectId) || (context == UserGrantContext.USER && !userId)"
-                (click)="next()" color="primary" mat-raised-button class="big-button" cdkFocusInitial>
+            <button [disabled]="!org || !projectId || !userId" (click)="next()" color="primary" mat-raised-button
+                class="big-button" cdkFocusInitial>
                 {{ 'ACTIONS.CONTINUE' | translate }}
             </button>
         </ng-container>

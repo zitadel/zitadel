@@ -21,7 +21,7 @@
                 </th>
                 <td class="selection" mat-cell *matCellDef="let row">
                     <mat-checkbox
-                        [disabled]="!(disableWrite || (['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + row?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + row?.grantId] : []) | hasRole | async))"
+                        [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + row?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + row?.grantId] : []) | hasRole | async))"
                         color="primary" (click)="$event.stopPropagation()"
                         (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
                         <app-avatar
@@ -75,7 +75,7 @@
                                 <span class="role" *ngFor="let role of grant.roleKeysList">{{ role }}</span>
                                 <button mat-stroked-button
                                     *ngIf="grant.grantId ? loadedGrantId !== grant.grantId : loadedProjectId !== grant.projectId"
-                                    [disabled]="!(disableWrite || (['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.grantId] : []) | hasRole | async))"
+                                    [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.grantId] : []) | hasRole | async))"
                                     (click)="grant.grantId ? getGrantRoleOptions(grant.grantId, grant.projectId) : getProjectRoleOptions(grant.projectId)"
                                     matTooltip="{{'ACTIONS.CHANGE' | translate}}">
                                     <i class="las la-edit"></i>
@@ -91,7 +91,7 @@
                             *ngIf="loadedProjectId && loadedProjectId === grant.projectId">
                             <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
                             <mat-select [(ngModel)]="grant.roleKeysList" multiple
-                                [disabled]="!(disableWrite || (['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.grantId] : []) | hasRole | async))"
+                                [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.grantId] : []) | hasRole | async))"
                                 (selectionChange)="updateRoles(grant, $event)">
                                 <mat-option *ngFor="let role of projectRoleOptions" [value]="role.key">
                                     {{role.key}}
@@ -106,7 +106,7 @@
                             *ngIf="loadedGrantId && loadedGrantId === grant.grantId">
                             <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
                             <mat-select [(ngModel)]="grant.roleKeysList" multiple
-                                [disabled]="!(disableWrite || (['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.grantId] : []) | hasRole | async))"
+                                [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.grantId] : []) | hasRole | async))"
                                 (selectionChange)="updateRoles(grant, $event)">
                                 <mat-option *ngFor="let role of grantRoleOptions" [value]="role">
                                     {{role}}
