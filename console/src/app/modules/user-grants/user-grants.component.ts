@@ -117,6 +117,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public getGrantRoleOptions(grantId: string, projectId: string): void {
+        console.log('getgrantoptions', grantId, projectId);
         this.mgmtService.GetGrantedProjectByID(projectId, grantId).then(resp => {
             this.loadedGrantId = grantId;
             this.grantRoleOptions = resp.toObject().roleKeysList;
@@ -127,6 +128,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public getProjectRoleOptions(projectId: string): void {
+        console.log('getprojectroleoptions');
         this.mgmtService.SearchProjectRoles(projectId, 100, 0).then(resp => {
             this.loadedProjectId = projectId;
             this.projectRoleOptions = resp.toObject().resultList;

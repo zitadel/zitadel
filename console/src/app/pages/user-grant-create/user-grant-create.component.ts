@@ -141,6 +141,7 @@ export class UserGrantCreateComponent implements OnDestroy {
     public selectProject(project: ProjectView.AsObject | ProjectGrantView.AsObject | any): void {
         this.project = project;
         this.projectId = project.projectId;
+        this.grantRolesKeyList = project.roleKeysList ?? [];
     }
 
     public selectUser(user: UserView.AsObject): void {
