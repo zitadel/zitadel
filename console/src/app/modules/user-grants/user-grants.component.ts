@@ -4,14 +4,7 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
-import {
-    ProjectRoleView,
-    SearchMethod,
-    UserGrant,
-    UserGrantSearchKey,
-    UserGrantSearchQuery,
-    UserGrantView,
-} from 'src/app/proto/generated/management_pb';
+import { ProjectRoleView, UserGrant, UserGrantView } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -142,33 +135,12 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     updateRoles(grant: UserGrant.AsObject, selectionChange: MatSelectChange): void {
-        switch (this.context) {
-            case UserGrantContext.OWNED_PROJECT:
-                if (grant.id && grant.projectId) {
-                    this.userService.UpdateUserGrant(grant.id, grant.userId, selectionChange.value)
-                        .then(() => {
-                            this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
-                        }).catch(error => {
-                            this.toast.showError(error);
-                        });
-                }
-                break;
-            case UserGrantContext.GRANTED_PROJECT:
-                if (this.grantId && this.projectId) {
-                    const projectQuery: UserGrantSearchQuery = new UserGrantSearchQuery();
-                    projectQuery.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID);
-                    projectQuery.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
-                    projectQuery.setValue(this.projectId);
-                    this.userService.UpdateUserGrant(
-                        grant.id, grant.userId, selectionChange.value)
-                        .then(() => {
-                            this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
-                        }).catch(error => {
-                            this.toast.showError(error);
-                        });
-                }
-                break;
-        }
+        this.userService.UpdateUserGrant(grant.id, grant.userId, selectionChange.value)
+            .then(() => {
+                this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
+            }).catch(error => {
+                this.toast.showError(error);
+            });
     }
 
     deleteGrantSelection(): void {

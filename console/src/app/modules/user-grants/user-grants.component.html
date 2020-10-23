@@ -69,7 +69,7 @@
                             *ngIf="grant.roleKeysList?.length === 0">{{'PROJECT.GRANT.NOROLES' | translate}}</span>-->
 
                         <ng-container
-                            *ngIf="(grant.grantId && loadedGrantId !== grant.grantId) || (loadedProjectId !== grant.projectId); else roles">
+                            *ngIf="(grant.grantId && loadedGrantId !== grant.grantId) || (loadedProjectId !== grant.projectId)">
                             <span class="role"
                                 *ngFor="let role of grant.roleKeysList">{{ (role.length>6)? (role | slice:0:6)+'..':(role) }}</span>
                             <button mat-icon-button
@@ -80,11 +80,11 @@
                             </button>
                         </ng-container>
 
-                        <ng-template #roles>
+                        <!-- <ng-template #roles>
                             <span *ngFor="let role of grant.roleKeysList">
                                 {{ (role.length>8)? (role | slice:0:8)+'..':(role) }}
                             </span>
-                        </ng-template>
+                        </ng-template> -->
 
                         <mat-form-field class="form-field" appearance="outline"
                             *ngIf="loadedProjectId === grant.projectId">

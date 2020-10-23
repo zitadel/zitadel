@@ -20,7 +20,10 @@ export class UserGrantCreateComponent implements OnDestroy {
 
     public org!: Org.AsObject;
     public userId: string = '';
+
     public projectId: string = '';
+    public project!: ProjectGrantView.AsObject | ProjectView.AsObject;
+
     public grantId: string = '';
     public rolesList: string[] = [];
 
@@ -37,6 +40,9 @@ export class UserGrantCreateComponent implements OnDestroy {
 
     public user!: UserView.AsObject;
     public UserTarget: any = UserTarget;
+
+    public ProjectGrantView: any = ProjectGrantView;
+    public ProjectView: any = ProjectView;
     constructor(
         private userService: ManagementService,
         private toast: ToastService,
@@ -109,11 +115,31 @@ export class UserGrantCreateComponent implements OnDestroy {
                     this.toast.showError(error);
                 });
                 break;
+            case UserGrantContext.USER:
+                let grantId;
+
+                if ((this.project as ProjectGrantView.AsObject)?.id) {
+                    grantId = (this.project as ProjectGrantView.AsObject).id;
+                }
+
+                this.userService.CreateUserGrant(
+                    this.userId,
+                    this.rolesList,
+                    this.project.projectId,
+                    grantId,
+                ).then((data: UserGrant) => {
+                    this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
+                    this.close();
+                }).catch((error: any) => {
+                    this.toast.showError(error);
+                });
+                break;
         }
 
     }
 
     public selectProject(project: ProjectView.AsObject | ProjectGrantView.AsObject | any): void {
+        this.project = project;
         this.projectId = project.projectId;
     }
 
