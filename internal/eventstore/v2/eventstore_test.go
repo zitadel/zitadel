@@ -69,6 +69,10 @@ func (e *testEvent) PreviousSequence() uint64 {
 	return 0
 }
 
+func (e *testEvent) MetaData() *EventMetaData {
+	return nil
+}
+
 func testFilterMapper(*repository.Event) (Event, error) {
 	return &testEvent{description: "hodor"}, nil
 }
@@ -151,7 +155,7 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 			fields: fields{
 				eventMapper: map[EventType]eventTypeInterceptors{
 					"event.type": {
-						filterMapper: func(*repository.Event) (Event, error) {
+						eventMapper: func(*repository.Event) (Event, error) {
 							return nil, errors.ThrowUnimplemented(nil, "V2-1qPvn", "unimplemented")
 						},
 					},
@@ -181,7 +185,7 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 			}
 
 			mapper := es.eventMapper[tt.args.eventType]
-			event, err := mapper.filterMapper(nil)
+			event, err := mapper.eventMapper(nil)
 			if err != nil {
 				t.Errorf("unexpected error %v", err)
 			}

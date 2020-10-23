@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"reflect"
 	"sync"
+	"time"
 
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
@@ -28,6 +29,32 @@ type Event interface {
 	// * struct which can be marshalled to json
 	// * pointer to struct which can be marshalled to json
 	Data() interface{}
+	//MetaData returns all data saved on a event
+	// It must not be set on push
+	// The event mapper function must set this struct
+	MetaData() *EventMetaData
+}
+
+func MetaDataFromRepo(event *repository.Event) *EventMetaData {
+	return &EventMetaData{
+		AggregateID:       event.AggregateID,
+		AggregateType:     AggregateType(event.AggregateType),
+		AggregateVersion:  Version(event.Version),
+		PreviouseSequence: event.PreviousSequence,
+		ResourceOwner:     event.ResourceOwner,
+		Sequence:          event.Sequence,
+		CreationDate:      event.CreationDate,
+	}
+}
+
+type EventMetaData struct {
+	AggregateID       string
+	AggregateType     AggregateType
+	ResourceOwner     string
+	AggregateVersion  Version
+	Sequence          uint64
+	PreviouseSequence uint64
+	CreationDate      time.Time
 }
 
 //Eventstore abstracts all functions needed to store valid events
@@ -39,7 +66,15 @@ type Eventstore struct {
 }
 
 type eventTypeInterceptors struct {
-	filterMapper func(*repository.Event) (Event, error)
+	eventMapper func(*repository.Event) (Event, error)
+}
+
+func NewEventstore(repo repository.Repository) *Eventstore {
+	return &Eventstore{
+		repo:             repo,
+		eventMapper:      map[EventType]eventTypeInterceptors{},
+		interceptorMutex: sync.Mutex{},
+	}
 }
 
 //Health checks if the eventstore can properly work
@@ -56,6 +91,8 @@ type aggregater interface {
 	//Events returns the events which will be pushed
 	Events() []Event
 	//ResourceOwner returns the organisation id which manages this aggregate
+	// resource owner is only on the inital push needed
+	// afterwards the resource owner of the previous event is taken
 	ResourceOwner() string
 	//Version represents the semantic version of the aggregate
 	Version() Version
@@ -133,10 +170,10 @@ func (es *Eventstore) mapEvents(events []*repository.Event) (mappedEvents []Even
 
 	for i, event := range events {
 		interceptors, ok := es.eventMapper[EventType(event.Type)]
-		if !ok || interceptors.filterMapper == nil {
+		if !ok || interceptors.eventMapper == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "V2-usujB", "event mapper not defined")
 		}
-		mappedEvents[i], err = interceptors.filterMapper(event)
+		mappedEvents[i], err = interceptors.eventMapper(event)
 		if err != nil {
 			return nil, err
 		}
@@ -176,19 +213,15 @@ func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQu
 }
 
 //RegisterFilterEventMapper registers a function for mapping an eventstore event to an event
-func (es *Eventstore) RegisterFilterEventMapper(eventType EventType, mapper func(*repository.Event) (Event, error)) error {
-	if eventType == "" || mapper == nil {
-		return errors.ThrowInvalidArgument(nil, "V2-IPpUR", "eventType and mapper must be filled")
-	}
-
+func (es *Eventstore) RegisterFilterEventMapper(eventType EventType, mapper func(*repository.Event) (Event, error)) *Eventstore {
 	es.interceptorMutex.Lock()
 	defer es.interceptorMutex.Unlock()
 
 	interceptor := es.eventMapper[eventType]
-	interceptor.filterMapper = mapper
+	interceptor.eventMapper = mapper
 	es.eventMapper[eventType] = interceptor
 
-	return nil
+	return es
 }
 
 func eventData(event Event) ([]byte, error) {

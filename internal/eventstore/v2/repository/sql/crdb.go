@@ -122,6 +122,10 @@ type CRDB struct {
 	client *sql.DB
 }
 
+func NewCRDB(client *sql.DB) *CRDB {
+	return &CRDB{client}
+}
+
 func (db *CRDB) Health(ctx context.Context) error { return db.client.Ping() }
 
 // Push adds all events to the eventstreams of the aggregates.
