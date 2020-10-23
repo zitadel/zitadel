@@ -16,6 +16,7 @@ import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource
     styleUrls: ['./user-grants.component.scss'],
 })
 export class UserGrantsComponent implements OnInit, AfterViewInit {
+    public INITIAL_PAGE_SIZE: number = 50;
     @Input() context: UserGrantContext = UserGrantContext.USER;
     @Input() refreshOnPreviousRoute: string = '';
     public grants: UserGrantView.AsObject[] = [];
@@ -77,11 +78,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
                 this.routerLink = ['/grant-create'];
         }
 
-        this.dataSource.loadGrants(this.context, 0, 25, {
-            projectId: this.projectId,
-            grantId: this.grantId,
-            userId: this.userId,
-        });
+        this.loadGrantsPage();
     }
 
     public ngAfterViewInit(): void {
@@ -93,13 +90,15 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     private loadGrantsPage(): void {
+        console.log('grantspage');
         this.dataSource.loadGrants(
             this.context,
-            this.paginator.pageIndex,
-            this.paginator.pageSize,
+            this.paginator?.pageIndex ?? 0,
+            this.paginator?.pageSize ?? this.INITIAL_PAGE_SIZE,
             {
                 projectId: this.projectId,
                 grantId: this.grantId,
+                userId: this.userId,
             },
         );
     }

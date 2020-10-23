@@ -1,0 +1,8 @@
+<div class="max-width-container">
+    <h2>{{ 'GRANTS.USER.TITLE' | translate }}</h2>
+    <p>{{'GRANTS.USER.DESCRIPTION' | translate }}</p>
+    <app-user-grants [displayedColumns]="['select', 'org', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']"
+        [disableWrite]="((['user.grant.write$'] | hasRole) | async) == false"
+        [disableDelete]="((['user.grant.delete$'] | hasRole) | async) == false">
+    </app-user-grants>
+</div>

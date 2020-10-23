@@ -35,7 +35,9 @@
         "LOGOUT": "Alle Benutzer abmelden",
         "NEWORG":"Neue Organisation",
         "IAMADMIN":"Du bist ein IAM-Administrator. Beachte, dass Du erhöhte Rechte besitzt.",
-        "SHOWORGS":"Alle Organisationen anzeigen"
+        "SHOWORGS":"Alle Organisationen anzeigen",
+        "GRANTSECTION":"Berechtigungssektion",
+        "GRANTS":"Berechtigungen"
     },
     "ACTIONS": {
         "SAVE": "Speichern",

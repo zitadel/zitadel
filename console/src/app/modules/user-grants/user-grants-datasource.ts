@@ -47,6 +47,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
                     this.loadingSubject.next(true);
                     const userfilter = new UserGrantSearchQuery();
                     userfilter.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID);
+                    userfilter.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
                     userfilter.setValue(data.userId);
                     if (queries) {
                         queries.push(userfilter);
@@ -63,6 +64,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
                     this.loadingSubject.next(true);
                     const projectfilter = new UserGrantSearchQuery();
                     projectfilter.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID);
+                    projectfilter.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
                     projectfilter.setValue(data.projectId);
                     if (queries) {
                         queries.push(projectfilter);
@@ -97,6 +99,11 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
                     const promise2 = this.userService.SearchUserGrants(pageSize, pageSize * pageIndex, queries);
                     this.loadResponse(promise2);
                 }
+                break;
+            default:
+                this.loadingSubject.next(true);
+                const promise3 = this.userService.SearchUserGrants(pageSize, pageSize * pageIndex, []);
+                this.loadResponse(promise3);
                 break;
         }
     }

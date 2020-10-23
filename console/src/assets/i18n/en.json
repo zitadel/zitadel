@@ -35,7 +35,9 @@
         "LOGOUT": "Logout All Users",
         "NEWORG":"New Organisation",
         "IAMADMIN":"You are an IAM Administrator. Note that you have extended permissions.",
-        "SHOWORGS":"Show All Organisations"
+        "SHOWORGS":"Show All Organisations",
+        "GRANTSECTION":"Authorization Section",
+        "GRANTS":"Authorizations"
     },
     "ACTIONS": {
         "SAVE": "Save",
