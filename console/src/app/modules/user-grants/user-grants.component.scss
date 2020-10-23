@@ -39,29 +39,29 @@
 }
 
 .flex-row {
-    display: flex;
-    flex-direction: column;
-    max-width: 400px;    
+  display: flex;
+  flex-direction: column;
+  max-width: 400px;
 
-    .role {
-        display: block;
-        margin: .25rem;
-        font-size: 14px;
-        text-overflow: ellipsis;
-        overflow: hidden;
+  .role {
+    display: block;
+    margin: .25rem;
+    font-size: 14px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  button {
+    margin: .5rem 0;
+    max-width: 120px;
+
+    i {
+      font-size: 1.2rem;
+      margin-bottom: 5px;
     }
-
-    button {
-        margin: .5rem 0;
-        max-width: 120px;
-
-        i {
-            font-size: 1.2rem;
-            margin-bottom: 5px;
-        }
-    }
+  }
 }
 
 .fill-space {
-    flex: 1;
+  flex: 1;
 }

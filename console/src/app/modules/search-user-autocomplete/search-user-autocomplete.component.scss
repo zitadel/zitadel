@@ -33,34 +33,34 @@
 }
 
 .found {
-    margin: .5rem 0;
-    background: #4072b410;
-    border-radius: .5rem;
-    padding: .5rem;
+  margin: .5rem 0;
+  background: #4072b410;
+  border-radius: .5rem;
+  padding: .5rem;
 
-    .found-user-row {
-        padding: .5rem 0;
-        display: flex;
-        align-items: center;
-        min-height: 56px;
-        
-        button {
-            visibility: hidden;
-        }
+  .found-user-row {
+    padding: .5rem 0;
+    display: flex;
+    align-items: center;
+    min-height: 56px;
 
-        &:hover {
-            button {
-                visibility: visible;
-            }
-        }
+    button {
+      visibility: hidden;
     }
 
-    .found-label {
-        font-size: .9rem;
-        color: var(--grey);
+    &:hover {
+      button {
+        visibility: visible;
+      }
     }
+  }
+
+  .found-label {
+    font-size: .9rem;
+    color: var(--grey);
+  }
 }
 
 .circle {
-    margin-right: .5rem;
+  margin-right: .5rem;
 }
