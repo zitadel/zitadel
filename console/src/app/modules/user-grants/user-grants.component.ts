@@ -17,7 +17,7 @@ import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource
 })
 export class UserGrantsComponent implements OnInit, AfterViewInit {
     public INITIAL_PAGE_SIZE: number = 50;
-    @Input() context: UserGrantContext = UserGrantContext.USER;
+    @Input() context: UserGrantContext = UserGrantContext.NONE;
     @Input() refreshOnPreviousRoute: string = '';
     public grants: UserGrantView.AsObject[] = [];
 
@@ -74,7 +74,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
                     this.routerLink = ['/grant-create', 'user', this.userId];
                 }
                 break;
-            default:
+            case UserGrantContext.NONE:
                 this.routerLink = ['/grant-create'];
         }
 

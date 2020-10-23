@@ -65,10 +65,7 @@
             <ng-container matColumnDef="roleNamesList">
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }} </th>
                 <td mat-cell *matCellDef="let grant; let i = index">
-                    <ng-container *ngIf="context === UserGrantContext.USER">
-                        <!-- <span class="no-roles"
-                            *ngIf="grant.roleKeysList?.length === 0">{{'PROJECT.GRANT.NOROLES' | translate}}</span>-->
-
+                    <ng-container *ngIf="context === UserGrantContext.USER || context === UserGrantContext.NONE">
                         <ng-container
                             *ngIf="(grant.grantId && loadedGrantId !== grant.grantId) || (loadedProjectId !== grant.projectId)">
                             <div class="flex-row">
@@ -86,7 +83,7 @@
                     </ng-container>
 
                     <ng-container
-                        *ngIf="context === UserGrantContext.OWNED_PROJECT || context === UserGrantContext.USER">
+                        *ngIf="context === UserGrantContext.OWNED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE">
                         <mat-form-field class="form-field" appearance="outline"
                             *ngIf="loadedProjectId && loadedProjectId === grant.projectId">
                             <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
@@ -101,7 +98,7 @@
                     </ng-container>
 
                     <ng-container
-                        *ngIf="context === UserGrantContext.GRANTED_PROJECT || context === UserGrantContext.USER">
+                        *ngIf="context === UserGrantContext.GRANTED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE">
                         <mat-form-field class="form-field" appearance="outline"
                             *ngIf="loadedGrantId && loadedGrantId === grant.grantId">
                             <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>

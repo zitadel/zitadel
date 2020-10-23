@@ -34,7 +34,7 @@
 }
 
 .no-roles {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--grey);
 }
 
@@ -53,6 +53,7 @@
 
     button {
         margin: .5rem 0;
+        max-width: 120px;
 
         i {
             font-size: 1.2rem;

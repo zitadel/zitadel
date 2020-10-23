@@ -52,8 +52,8 @@ export class UserGrantCreateComponent implements OnDestroy {
         private mgmtService: ManagementService,
     ) {
         this.subscription = this.route.params.subscribe((params: Params) => {
-            const { context, projectid, grantid, userid } = params;
-            this.context = context;
+            const { projectid, grantid, userid } = params;
+            this.context = UserGrantContext.NONE;
 
             this.projectId = projectid;
             this.grantId = grantid;
@@ -127,6 +127,25 @@ export class UserGrantCreateComponent implements OnDestroy {
                     this.rolesList,
                     this.project.projectId,
                     grantId,
+                ).then((data: UserGrant) => {
+                    this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
+                    this.close();
+                }).catch((error: any) => {
+                    this.toast.showError(error);
+                });
+                break;
+            case UserGrantContext.NONE:
+                let tempGrantId;
+
+                if ((this.project as ProjectGrantView.AsObject)?.id) {
+                    tempGrantId = (this.project as ProjectGrantView.AsObject).id;
+                }
+
+                this.userService.CreateUserGrant(
+                    this.userId,
+                    this.rolesList,
+                    this.project.projectId,
+                    tempGrantId,
                 ).then((data: UserGrant) => {
                     this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
                     this.close();

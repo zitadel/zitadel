@@ -104,6 +104,15 @@ const routes: Routes = [
                     roles: ['user.grant.write'],
                 },
             },
+            {
+                path: '',
+                loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
+                    .then(m => m.UserGrantCreateModule),
+                canActivate: [RoleGuard],
+                data: {
+                    roles: ['user.grant.write'],
+                },
+            },
         ],
     },
     {

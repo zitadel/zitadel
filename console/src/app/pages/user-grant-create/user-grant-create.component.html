@@ -25,7 +25,7 @@
             </app-search-user-autocomplete>
         </ng-container>
 
-        <ng-container *ngIf="context && context == UserGrantContext.USER">
+        <ng-container *ngIf="context && (context == UserGrantContext.USER || context == UserGrantContext.NONE)">
             <h1>{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</h1>
 
             <app-search-project-autocomplete class="block" singleOutput="true"
@@ -37,7 +37,7 @@
     <ng-container *ngIf="currentCreateStep === STEPS">
         <h1>{{'PROJECT.GRANT.CREATE.SEL_ROLES' | translate}}</h1>
         <ng-container
-            *ngIf="(projectId && (context === UserGrantContext.OWNED_PROJECT || (context === UserGrantContext.USER && $any(project)?.id == undefined)))">
+            *ngIf="(projectId && (context === UserGrantContext.OWNED_PROJECT || ((context === UserGrantContext.USER || context === UserGrantContext.NONE) && $any(project)?.id == undefined)))">
             <app-card>
                 <app-project-roles (changedSelection)="selectRoles($event)" [projectId]="projectId">
                 </app-project-roles>
@@ -45,7 +45,7 @@
         </ng-container>
 
         <ng-container
-            *ngIf="(context === UserGrantContext.GRANTED_PROJECT || (context === UserGrantContext.USER && $any(project)?.id)) && grantRolesKeyList">
+            *ngIf="(context === UserGrantContext.GRANTED_PROJECT || ((context === UserGrantContext.USER || context === UserGrantContext.NONE) && $any(project)?.id)) && grantRolesKeyList">
             <mat-form-field class="form-field" appearance="outline">
                 <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
                 <mat-select multiple (selectionChange)="rolesList = $event.value">

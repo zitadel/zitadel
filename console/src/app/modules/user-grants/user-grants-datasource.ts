@@ -13,6 +13,7 @@ import {
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 export enum UserGrantContext {
+    NONE = 'none',
     USER = 'user',
     OWNED_PROJECT = 'owned',
     GRANTED_PROJECT = 'granted',
