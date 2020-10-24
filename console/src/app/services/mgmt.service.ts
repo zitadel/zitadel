@@ -612,13 +612,13 @@ export class ManagementService {
 
     public getLocalizedComplexityPolicyPatternErrorString(policy: PasswordComplexityPolicy.AsObject): string {
         if (policy.hasNumber && policy.hasSymbol) {
-            return 'ORG.POLICY.PWD_COMPLEXITY.SYMBOLANDNUMBERERROR';
+            return 'POLICY.PWD_COMPLEXITY.SYMBOLANDNUMBERERROR';
         } else if (policy.hasNumber) {
-            return 'ORG.POLICY.PWD_COMPLEXITY.NUMBERERROR';
+            return 'POLICY.PWD_COMPLEXITY.NUMBERERROR';
         } else if (policy.hasSymbol) {
-            return 'ORG.POLICY.PWD_COMPLEXITY.SYMBOLERROR';
+            return 'POLICY.PWD_COMPLEXITY.SYMBOLERROR';
         } else {
-            return 'ORG.POLICY.PWD_COMPLEXITY.PATTERNERROR';
+            return 'POLICY.PWD_COMPLEXITY.PATTERNERROR';
         }
     }
 

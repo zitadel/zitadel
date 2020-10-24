@@ -69,7 +69,7 @@ export class PasswordAgePolicyComponent implements OnDestroy {
     public removePolicy(): void {
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
             (this.service as ManagementService).RemovePasswordAgePolicy().then(() => {
-                this.toast.showInfo('ORG.POLICY.TOAST.RESETSUCCESS', true);
+                this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
                 setTimeout(() => {
                     this.getData();
                 }, 1000);
@@ -111,7 +111,7 @@ export class PasswordAgePolicyComponent implements OnDestroy {
                         this.ageData.maxAgeDays,
                         this.ageData.expireWarnDays,
                     ).then(() => {
-                        this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                        this.toast.showInfo('POLICY.TOAST.SET', true);
                     }).catch(error => {
                         this.toast.showError(error);
                     });
@@ -120,7 +120,7 @@ export class PasswordAgePolicyComponent implements OnDestroy {
                         this.ageData.maxAgeDays,
                         this.ageData.expireWarnDays,
                     ).then(() => {
-                        this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                        this.toast.showInfo('POLICY.TOAST.SET', true);
                     }).catch(error => {
                         this.toast.showError(error);
                     });
@@ -131,7 +131,7 @@ export class PasswordAgePolicyComponent implements OnDestroy {
                     this.ageData.maxAgeDays,
                     this.ageData.expireWarnDays,
                 ).then(() => {
-                    this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                    this.toast.showInfo('POLICY.TOAST.SET', true);
                 }).catch(error => {
                     this.toast.showError(error);
                 });
