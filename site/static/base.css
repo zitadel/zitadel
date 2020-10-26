@@ -316,7 +316,7 @@ a {
 	border-bottom: 1px solid currentColor;
 	user-select: none;
 	color: var(--prime);
-	transition: color .2s, border .2s, padding .2s;
+	transition: color .2s,
 }
 
 a:hover {
@@ -557,20 +557,18 @@ input[type="checkbox"]:checked::after {
 	left: calc(100% - 9px);
 }
 
-.my-gallery {
+.zitadel-gallery {
     display: flex;
     width: 100%;
-  }
-  .my-gallery img {
+}
+
+.zitadel-gallery img {
     width: 100%;
     object-fit: contain;
-  }
-  .my-gallery figure {
+}
+.zitadel-gallery figure {
     flex-basis: 30%;
     object-fit: contain;
-    margin: 0 5px 5px 0;
+    margin: 5px 5px 5px 0;
     width: 150px;
-  }
-  .my-gallery figcaption {
-    display: none;
-  }
+}

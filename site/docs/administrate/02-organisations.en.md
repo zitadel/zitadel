@@ -37,44 +37,76 @@ An organisation can have multiple domain names, but only one of it can be primar
 Browse to your [organisation](administrate#Organisations) by visiting [https://console.zitadel.ch/org](https://console.zitadel.ch/org).
 
 Add the domain to your [organisation](administrate#Organisations) by clicking the button **Add Domain**.
-<img src="img/console_org_domain_default.png" alt="Organisation Overview" width="1000px" height="auto">
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_org_domain_default.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_org_domain_default.png" itemprop="thumbnail" alt="Organisation Overview" />
+        </a>
+        <figcaption itemprop="caption description">Organisation Overview</figcaption>
+    </figure>
+</div>
 
 Input the domain in the input field and click **Add**
-<img src="img/console_org_domain_add.png" alt="Organisation Add Domain" width="1000px" height="auto">
-
-<img src="img/console_org_domain_added.png" alt="Organisation Domain Added" width="1000px" height="auto">
-
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_org_domain_add.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_org_domain_add.png" itemprop="thumbnail" alt="Organisation Add Domain" />
+        </a>
+        <figcaption itemprop="caption description">Organisation Add Domain</figcaption>
+    </figure>
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_org_domain_added.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_org_domain_added.png" itemprop="thumbnail" alt="Organisation Domain Added" />
+        </a>
+        <figcaption itemprop="caption description">Organisation Domain Added</figcaption>
+    </figure>
+</div>
 To start the domain verification click the domain name and a dialog will appear, where you can choose between DNS or HTTP challenge methods.
-<img src="img/console_org_domain_verify.png" alt="Organisation Domain Verify" width="1000px" height="auto">
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_org_domain_verify.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_org_domain_verify.png" itemprop="thumbnail" alt="Organisation Domain Verify" />
+        </a>
+        <figcaption itemprop="caption description">Organisation Domain Verify</figcaption>
+    </figure>
+</div>
 
 For example, create a TXT record with your DNS provider for the used domain an click verify. **ZITADEL** will then proceed an check your DNS.
-<img src="img/console_org_domain_verify_dns.png" alt="Organisation Domain Verify DNS" width="1000px" height="auto">
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_org_domain_verify_dns.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_org_domain_verify_dns.png" itemprop="thumbnail" alt="Organisation Domain Verify DNS" />
+        </a>
+        <figcaption itemprop="caption description">Organisation Domain Verify DNS</figcaption>
+    </figure>
+</div>
+
 
 > Do not delete the verification code **ZITADEL** will recheck the ownership from time to time
 
 When the verification is successful you have the option to activate the domain by clicking **Set as primary**
-<img src="img/console_org_domain_verified.png" alt="Organisation Domain Verified" width="1000px" height="auto">
+
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_org_domain_verified.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_org_domain_verified.png" itemprop="thumbnail" alt="Organization Domain Verified" />
+        </a>
+        <figcaption itemprop="caption description">Organisation verified</figcaption>
+    </figure>
+</div>
 
 > This changes the **preferred loginnames** of your [users](administrate#Users) as indicated [here](administrate#How_ZITADEL_handles_usernames).
 
 Gratulations your are done! You can check this by visiting [https://console.zitadel.ch/users/me](https://console.zitadel.ch/users/me)
-<img src="img/console_user_personal_info.png" alt="User Personal Information" width="1000px" height="auto">
 
-<div class="my-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
-        <a href="img/console_org_domain_verified.png" itemprop="contentUrl">
-            <img src="img/console_org_domain_verified.png" itemprop="thumbnail" alt="Image description" />
+        <a href="img/console_user_personal_info.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_user_personal_info.png" itemprop="thumbnail" alt="User Personal Information" />
         </a>
-        <figcaption itemprop="caption description">Image caption</figcaption>
-    </figure>
-    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
-        <a href="img/console_user_personal_info.png" itemprop="contentUrl">
-            <img src="img/console_user_personal_info.png" itemprop="thumbnail" alt="Image description" />
-        </a>
-        <figcaption itemprop="caption description">Image caption</figcaption>
+        <figcaption itemprop="caption description">User Personal Information</figcaption>
     </figure>
 </div>
-
 
 > This only works when the [user](administrate#Users) is member of this [organisation](administrate#Organisations)
 

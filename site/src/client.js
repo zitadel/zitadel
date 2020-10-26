@@ -6,7 +6,7 @@ import { startClient } from './i18n.js';
 import { initPhotoSwipeFromDOM } from './utils/photoswipe.js';
 
 startClient();
-initPhotoSwipeFromDOM('.my-gallery');
+initPhotoSwipeFromDOM('.zitadel-gallery');
 
 sapper.start({
     target: document.querySelector('#sapper')
