@@ -90,7 +90,6 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     private loadGrantsPage(): void {
-        console.log('grantspage');
         this.dataSource.loadGrants(
             this.context,
             this.paginator?.pageIndex ?? 0,
@@ -116,22 +115,18 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public getGrantRoleOptions(grantId: string, projectId: string): void {
-        console.log('getgrantoptions', grantId, projectId);
         this.mgmtService.GetGrantedProjectByID(projectId, grantId).then(resp => {
             this.loadedGrantId = grantId;
             this.grantRoleOptions = resp.toObject().roleKeysList;
-            console.log('grant roles', this.grantRoleOptions);
         }).catch(error => {
             this.toast.showError(error);
         });
     }
 
     public getProjectRoleOptions(projectId: string): void {
-        console.log('getprojectroleoptions');
         this.mgmtService.SearchProjectRoles(projectId, 100, 0).then(resp => {
             this.loadedProjectId = projectId;
             this.projectRoleOptions = resp.toObject().resultList;
-            console.log('project roles', this.projectRoleOptions);
         });
     }
 
