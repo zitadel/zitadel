@@ -1363,6 +1363,68 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
+  rpc GetLoginPolicySoftwareMFAs(google.protobuf.Empty) returns (SoftwareMFAResult) {
+    option (google.api.http) = {
+            get: "/orgs/me/policies/login/mfas/software/_search"
+        };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+  }
+
+  rpc AddSoftwareMFAToLoginPolicy(SoftwareMFA) returns (SoftwareMFA) {
+    option (google.api.http) = {
+            post: "/orgs/me/policies/login/mfas/software"
+            body: "*"
+        };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+  }
+
+  rpc RemoveSoftwareMFAFromLoginPolicy(SoftwareMFA) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+            delete: "/orgs/me/policies/login/mfas/software/{mfa}"
+        };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+  }
+
+  rpc GetLoginPolicyHardwareMFAs(google.protobuf.Empty) returns (HardwareMFAResult) {
+    option (google.api.http) = {
+            get: "/orgs/me/policies/login/mfas/hardware/_search"
+        };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+  }
+
+  rpc AddHardwareMFAToLoginPolicy(HardwareMFA) returns (HardwareMFA) {
+    option (google.api.http) = {
+            post: "/orgs/me/policies/login/mfas/hardware"
+            body: "*"
+        };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+  }
+
+  rpc RemoveHardwareMFAFromLoginPolicy(HardwareMFA) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+            delete: "/orgs/me/policies/login/mfas/hardware/{mfa}"
+        };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+  }
+
   rpc GetPasswordComplexityPolicy(google.protobuf.Empty) returns (PasswordComplexityPolicyView) {
     option (google.api.http) = {
       get: "/orgs/me/policies/password/complexity"
@@ -2972,12 +3034,14 @@ message LoginPolicy {
     bool allow_external_idp = 3;
     google.protobuf.Timestamp creation_date = 4;
     google.protobuf.Timestamp change_date = 5;
+    bool force_mfa = 6;
 }
 
 message LoginPolicyRequest {
   bool allow_username_password = 1;
   bool allow_register = 2;
   bool allow_external_idp = 3;
+  bool force_mfa = 4;
 }
 
 message IdpProviderID {
@@ -3001,6 +3065,7 @@ message LoginPolicyView {
     bool allow_external_idp = 4;
     google.protobuf.Timestamp creation_date = 5;
     google.protobuf.Timestamp change_date = 6;
+    bool force_mfa = 7;
 }
 
 message IdpProviderView {
@@ -3071,6 +3136,32 @@ message ExternalIDPRemoveRequest {
   string user_id = 1;
   string idp_config_id = 2;
   string external_user_id = 3;
+}
+
+message SoftwareMFAResult {
+  repeated SoftwareMFAType mfas = 1;
+}
+
+message SoftwareMFA {
+  SoftwareMFAType mfa = 1;
+}
+
+enum SoftwareMFAType {
+  SOFTWAREMFATYPE_UNSPECIFIED = 0;
+  SOFTWAREMFATYPE_OTP = 1;
+}
+
+message HardwareMFAResult {
+  repeated HardwareMFAType mfas = 1;
+}
+
+message HardwareMFA {
+  HardwareMFAType mfa = 1;
+}
+
+enum HardwareMFAType {
+  HARDWAREMFATYPE_UNSPECIFIED = 0;
+  HARDWAREMFATYPE_U2F = 1;
 }
 
 message PasswordComplexityPolicy {

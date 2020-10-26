@@ -63,3 +63,45 @@ func (s *Server) RemoveIdpProviderFromLoginPolicy(ctx context.Context, provider 
 	err := s.org.RemoveIDPProviderFromLoginPolicy(ctx, idpProviderToModel(provider))
 	return &empty.Empty{}, err
 }
+
+func (s *Server) GetLoginPolicySoftwareMFAs(ctx context.Context, _ *empty.Empty) (*management.SoftwareMFAResult, error) {
+	result, err := s.org.SearchSoftwareMFAs(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return softwareMFAResultFromModel(result), nil
+}
+
+func (s *Server) AddSoftwareMFAToLoginPolicy(ctx context.Context, mfa *management.SoftwareMFA) (*management.SoftwareMFA, error) {
+	result, err := s.org.AddSoftwareMFAToLoginPolicy(ctx, softwareMFATypeToModel(mfa))
+	if err != nil {
+		return nil, err
+	}
+	return softwareMFAFromModel(result), nil
+}
+
+func (s *Server) RemoveSoftwareMFAFromLoginPolicy(ctx context.Context, mfa *management.SoftwareMFA) (*empty.Empty, error) {
+	err := s.org.RemoveSoftwareMFAFromLoginPolicy(ctx, softwareMFATypeToModel(mfa))
+	return &empty.Empty{}, err
+}
+
+func (s *Server) GetLoginPolicyHardwareMFAs(ctx context.Context, _ *empty.Empty) (*management.HardwareMFAResult, error) {
+	result, err := s.org.SearchHardwareMFAs(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return hardwareMFAResultFromModel(result), nil
+}
+
+func (s *Server) AddHardwareMFAToLoginPolicy(ctx context.Context, mfa *management.HardwareMFA) (*management.HardwareMFA, error) {
+	result, err := s.org.AddHardwareMFAToLoginPolicy(ctx, hardwareMFATypeToModel(mfa))
+	if err != nil {
+		return nil, err
+	}
+	return hardwareMFAFromModel(result), nil
+}
+
+func (s *Server) RemoveHardwareMFAFromLoginPolicy(ctx context.Context, mfa *management.HardwareMFA) (*empty.Empty, error) {
+	err := s.org.RemoveHardwareMFAFromLoginPolicy(ctx, hardwareMFATypeToModel(mfa))
+	return &empty.Empty{}, err
+}

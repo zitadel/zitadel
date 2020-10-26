@@ -13383,6 +13383,8 @@ func (m *LoginPolicy) Validate() error {
 		}
 	}
 
+	// no validation rules for ForceMfa
+
 	return nil
 }
 
@@ -13453,6 +13455,8 @@ func (m *LoginPolicyRequest) Validate() error {
 	// no validation rules for AllowRegister
 
 	// no validation rules for AllowExternalIdp
+
+	// no validation rules for ForceMfa
 
 	return nil
 }
@@ -13772,6 +13776,8 @@ func (m *LoginPolicyView) Validate() error {
 			}
 		}
 	}
+
+	// no validation rules for ForceMfa
 
 	return nil
 }
@@ -14412,6 +14418,274 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ExternalIDPRemoveRequestValidationError{}
+
+// Validate checks the field values on SoftwareMFAResult with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *SoftwareMFAResult) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// SoftwareMFAResultValidationError is the validation error returned by
+// SoftwareMFAResult.Validate if the designated constraints aren't met.
+type SoftwareMFAResultValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SoftwareMFAResultValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SoftwareMFAResultValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SoftwareMFAResultValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SoftwareMFAResultValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SoftwareMFAResultValidationError) ErrorName() string {
+	return "SoftwareMFAResultValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SoftwareMFAResultValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSoftwareMFAResult.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SoftwareMFAResultValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SoftwareMFAResultValidationError{}
+
+// Validate checks the field values on SoftwareMFA with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *SoftwareMFA) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Mfa
+
+	return nil
+}
+
+// SoftwareMFAValidationError is the validation error returned by
+// SoftwareMFA.Validate if the designated constraints aren't met.
+type SoftwareMFAValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SoftwareMFAValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SoftwareMFAValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SoftwareMFAValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SoftwareMFAValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SoftwareMFAValidationError) ErrorName() string { return "SoftwareMFAValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SoftwareMFAValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSoftwareMFA.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SoftwareMFAValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SoftwareMFAValidationError{}
+
+// Validate checks the field values on HardwareMFAResult with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *HardwareMFAResult) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// HardwareMFAResultValidationError is the validation error returned by
+// HardwareMFAResult.Validate if the designated constraints aren't met.
+type HardwareMFAResultValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e HardwareMFAResultValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e HardwareMFAResultValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e HardwareMFAResultValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e HardwareMFAResultValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e HardwareMFAResultValidationError) ErrorName() string {
+	return "HardwareMFAResultValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e HardwareMFAResultValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHardwareMFAResult.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = HardwareMFAResultValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = HardwareMFAResultValidationError{}
+
+// Validate checks the field values on HardwareMFA with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *HardwareMFA) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Mfa
+
+	return nil
+}
+
+// HardwareMFAValidationError is the validation error returned by
+// HardwareMFA.Validate if the designated constraints aren't met.
+type HardwareMFAValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e HardwareMFAValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e HardwareMFAValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e HardwareMFAValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e HardwareMFAValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e HardwareMFAValidationError) ErrorName() string { return "HardwareMFAValidationError" }
+
+// Error satisfies the builtin error interface
+func (e HardwareMFAValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHardwareMFA.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = HardwareMFAValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = HardwareMFAValidationError{}
 
 // Validate checks the field values on PasswordComplexityPolicy with the rules
 // defined in the proto definition for this message. If any rules are

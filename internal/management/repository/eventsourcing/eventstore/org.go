@@ -455,6 +455,44 @@ func (repo *OrgRepository) RemoveIDPProviderFromIdpProvider(ctx context.Context,
 	return sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
 }
 
+func (repo *OrgRepository) SearchSoftwareMFAs(ctx context.Context) (*iam_model.SoftwareMFASearchResponse, error) {
+	policy, err := repo.GetLoginPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &iam_model.SoftwareMFASearchResponse{
+		TotalResult: uint64(len(policy.SoftwareMFAs)),
+		Result:      policy.SoftwareMFAs,
+	}, nil
+}
+
+func (repo *OrgRepository) AddSoftwareMFAToLoginPolicy(ctx context.Context, mfa iam_model.SoftwareMFAType) (iam_model.SoftwareMFAType, error) {
+	return repo.OrgEventstore.AddSoftwareMFAToLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, mfa)
+}
+
+func (repo *OrgRepository) RemoveSoftwareMFAFromLoginPolicy(ctx context.Context, mfa iam_model.SoftwareMFAType) error {
+	return repo.OrgEventstore.RemoveSoftwareMFAFromLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, mfa)
+}
+
+func (repo *OrgRepository) SearchHardwareMFAs(ctx context.Context) (*iam_model.HardwareMFASearchResponse, error) {
+	policy, err := repo.GetLoginPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &iam_model.HardwareMFASearchResponse{
+		TotalResult: uint64(len(policy.HardwareMFAs)),
+		Result:      policy.HardwareMFAs,
+	}, nil
+}
+
+func (repo *OrgRepository) AddHardwareMFAToLoginPolicy(ctx context.Context, mfa iam_model.HardwareMFAType) (iam_model.HardwareMFAType, error) {
+	return repo.OrgEventstore.AddHardwareMFAToLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, mfa)
+}
+
+func (repo *OrgRepository) RemoveHardwareMFAFromLoginPolicy(ctx context.Context, mfa iam_model.HardwareMFAType) error {
+	return repo.OrgEventstore.RemoveHardwareMFAFromLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, mfa)
+}
+
 func (repo *OrgRepository) GetPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error) {
 	policy, viewErr := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if viewErr != nil && !errors.IsNotFound(viewErr) {

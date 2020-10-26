@@ -12,6 +12,7 @@ func loginPolicyRequestToModel(policy *management.LoginPolicyRequest) *iam_model
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		AllowRegister:         policy.AllowRegister,
+		ForceMFA:              policy.ForceMfa,
 	}
 }
 
@@ -28,6 +29,7 @@ func loginPolicyFromModel(policy *iam_model.LoginPolicy) *management.LoginPolicy
 		AllowRegister:         policy.AllowRegister,
 		CreationDate:          creationDate,
 		ChangeDate:            changeDate,
+		ForceMfa:              policy.ForceMFA,
 	}
 }
 
@@ -45,6 +47,7 @@ func loginPolicyViewFromModel(policy *iam_model.LoginPolicyView) *management.Log
 		AllowRegister:         policy.AllowRegister,
 		CreationDate:          creationDate,
 		ChangeDate:            changeDate,
+		ForceMfa:              policy.ForceMFA,
 	}
 }
 
@@ -138,5 +141,73 @@ func idpProviderTypeFromModel(providerType iam_model.IDPProviderType) management
 		return management.IdpProviderType_IDPPROVIDERTYPE_ORG
 	default:
 		return management.IdpProviderType_IDPPROVIDERTYPE_UNSPECIFIED
+	}
+}
+
+func softwareMFAResultFromModel(result *iam_model.SoftwareMFASearchResponse) *management.SoftwareMFAResult {
+	converted := make([]management.SoftwareMFAType, len(result.Result))
+	for i, mfaType := range result.Result {
+		converted[i] = softwareMFATypeFromModel(mfaType)
+	}
+	return &management.SoftwareMFAResult{
+		Mfas: converted,
+	}
+}
+
+func softwareMFAFromModel(mfaType iam_model.SoftwareMFAType) *management.SoftwareMFA {
+	return &management.SoftwareMFA{
+		Mfa: softwareMFATypeFromModel(mfaType),
+	}
+}
+
+func softwareMFATypeFromModel(mfaType iam_model.SoftwareMFAType) management.SoftwareMFAType {
+	switch mfaType {
+	case iam_model.SoftwareMFATypeOTP:
+		return management.SoftwareMFAType_SOFTWAREMFATYPE_OTP
+	default:
+		return management.SoftwareMFAType_SOFTWAREMFATYPE_UNSPECIFIED
+	}
+}
+
+func softwareMFATypeToModel(mfaType *management.SoftwareMFA) iam_model.SoftwareMFAType {
+	switch mfaType.Mfa {
+	case management.SoftwareMFAType_SOFTWAREMFATYPE_OTP:
+		return iam_model.SoftwareMFATypeOTP
+	default:
+		return iam_model.SoftwareMFATypeUnspecified
+	}
+}
+
+func hardwareMFAResultFromModel(result *iam_model.HardwareMFASearchResponse) *management.HardwareMFAResult {
+	converted := make([]management.HardwareMFAType, len(result.Result))
+	for i, mfaType := range result.Result {
+		converted[i] = hardwareMFATypeFromModel(mfaType)
+	}
+	return &management.HardwareMFAResult{
+		Mfas: converted,
+	}
+}
+
+func hardwareMFAFromModel(mfaType iam_model.HardwareMFAType) *management.HardwareMFA {
+	return &management.HardwareMFA{
+		Mfa: hardwareMFATypeFromModel(mfaType),
+	}
+}
+
+func hardwareMFATypeFromModel(mfaType iam_model.HardwareMFAType) management.HardwareMFAType {
+	switch mfaType {
+	case iam_model.HardwareMFATypeU2F:
+		return management.HardwareMFAType_HARDWAREMFATYPE_U2F
+	default:
+		return management.HardwareMFAType_HARDWAREMFATYPE_UNSPECIFIED
+	}
+}
+
+func hardwareMFATypeToModel(mfaType *management.HardwareMFA) iam_model.HardwareMFAType {
+	switch mfaType.Mfa {
+	case management.HardwareMFAType_HARDWAREMFATYPE_U2F:
+		return iam_model.HardwareMFATypeU2F
+	default:
+		return iam_model.HardwareMFATypeUnspecified
 	}
 }

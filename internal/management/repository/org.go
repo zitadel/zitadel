@@ -49,6 +49,12 @@ type OrgRepository interface {
 	SearchIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error)
 	AddIDPProviderToLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) (*iam_model.IDPProvider, error)
 	RemoveIDPProviderFromLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) error
+	SearchSoftwareMFAs(ctx context.Context) (*iam_model.SoftwareMFASearchResponse, error)
+	AddSoftwareMFAToLoginPolicy(ctx context.Context, mfa iam_model.SoftwareMFAType) (iam_model.SoftwareMFAType, error)
+	RemoveSoftwareMFAFromLoginPolicy(ctx context.Context, mfa iam_model.SoftwareMFAType) error
+	SearchHardwareMFAs(ctx context.Context) (*iam_model.HardwareMFASearchResponse, error)
+	AddHardwareMFAToLoginPolicy(ctx context.Context, mfa iam_model.HardwareMFAType) (iam_model.HardwareMFAType, error)
+	RemoveHardwareMFAFromLoginPolicy(ctx context.Context, mfa iam_model.HardwareMFAType) error
 
 	GetPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error)
 	GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error)
