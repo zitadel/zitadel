@@ -237,7 +237,9 @@ a.pswp__share--pinterest:hover {
   color: #CE272D; }
 
 a.pswp__share--download:hover {
-  background: #DDD; }
+  background: #DDD;
+  padding: 8px 12px;
+}
 
 /*
 
