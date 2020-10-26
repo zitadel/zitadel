@@ -29,21 +29,49 @@ If someone verifies a domain name within the organisation **ZITADEL** will gener
 
 #### Search Users
 
-<img src="img/console_user_list_search.png" alt="User list Search" width="1000px" height="auto">
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_user_list_search.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_user_list_search.png" itemprop="thumbnail" alt="User list Search" />
+        </a>
+        <figcaption itemprop="caption description">User list Search</figcaption>
+    </figure>
+</div>
 
 Image 1: User List Search
 
 #### Create Users
 
-<img src="img/console_user_list.png" alt="User list" width="1000px" height="auto">
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_user_list.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_user_list.png" itemprop="thumbnail" alt="User list" />
+        </a>
+        <figcaption itemprop="caption description">User list</figcaption>
+    </figure>
+</div>
 
 Image 2: User List
 
-<img src="img/console_user_create_form.png" alt="User Create Form" width="1000px" height="auto">
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_user_create_form.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_user_create_form.png" itemprop="thumbnail" alt="User Create Form" />
+        </a>
+        <figcaption itemprop="caption description">User Create Form</figcaption>
+    </figure>
+</div>
 
 Image 3: User Create Form
 
-<img src="img/console_user_create_done.png" alt="User Create Done" width="1000px" height="auto">
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_user_create_done.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_user_create_done.png" itemprop="thumbnail" alt="User Create Done" />
+        </a>
+        <figcaption itemprop="caption description">User Create Done</figcaption>
+    </figure>
+</div>
 
 Image 4: User Create Done
 

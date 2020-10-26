@@ -350,10 +350,6 @@
             "DELETE":"Entfernen",
             "DELETESUCCESS":"Gescheiterte Events entfernt."
         },
-        "POLICY": {
-            "TITLE":"Standardrichtlinien für ihre Organisationen",
-            "DESCRIPTION":"Diese Einstellungen können von Organisationen erweitert und/oder verändert werden."
-        },
         "TOAST":{
             "MEMBERREMOVED":"Manager entfernt.",
             "MEMBERSADDED": "Manager hinzugefügt.",
@@ -421,74 +417,6 @@
             "TITLE":"Manager der Organisation verwalten",
             "DESCRIPTION":"Definiere hier die Benutzer, die Operationen auf Deinen Organisationen vornehmen dürfen."
         },
-        "POLICY": {
-            "TITLE":"Richtlinen entdecken",
-            "DESCRIPTION":"Vorgefertigte Richtlinien, die Dir Zeit sparen und die Sicherheit erhöhen.",
-            "PWD_COMPLEXITY": {
-                "TITLE":"Passwortkomplexität",
-                "DESCRIPTION":"Stellt sicher, dass alle festgelegten Passwörter einem bestimmten Muster entsprechen.",
-                "TITLECREATE":"Passwortkomplexitätsrichtlinie erstellen",
-                "DESCRIPTIONCREATE":"Stellt sicher, dass alle festgelegten Passwörter einem bestimmten Muster entsprechen.",
-                "SYMBOLANDNUMBERERROR":"Das Password muss ein Symbol/Satzzeichen und eine Ziffer beinhalten.",
-                "SYMBOLERROR":"Das Password muss ein Symbol/Satzzeichen beinhalten.",
-                "NUMBERERROR":"Das Password muss eine Ziffer beinhalten.",
-                "PATTERNERROR":"Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
-            },
-            "PWD_AGE": {
-                "TITLE":"Gültigkeitsdauer für Passwörter",
-                "DESCRIPTION":"Du kannst eine Richtlinie für die maximale Gültigkeitsdauer von Passwörtern festlegen. Diese Richtlinie löst eine Warnung nach Ablauf einer festgelegten Gültigkeitsdauer aus.",
-                "TITLECREATE":"Richtlinie für Gültigkeitsdauer von Passwörtern festlegen",
-                "DESCRIPTIONCREATE":"Du kannst eine Richtlinie für die Gültigkeitsdauer von Passwörtern  festlegen. Diese Richtlinie löst eine Warnung nach Ablauf einer festgelegten Gültigkeitsdauer aus."
-            },
-            "PWD_LOCKOUT": {
-                "TITLE":"Passwortsperre",
-                "DESCRIPTION":"Standardmässig sind die Passwortwiederholungen bei Falscheingabe nicht begrenzt. Du musst diese Richtlinie installieren, wenn Du Wiederholungsversuche anzeigen, oder eine maximale Anzahl von wiederholten Passworteingaben festlegen möchtest.",
-                "TITLECREATE":"Richtline zur Passwortsperre festlegen",
-                "DESCRIPTIONCREATE":"Standardmässig sind die Passwortwiederholungen bei Falscheingabe nicht begrenzt. Du musst diese Richtlinie anwenden, wenn Du Wiederholungsversuche anzeigen, oder eine maximale Anzahl von wiederholten Passworteingaben festlegen möchtest."
-            },
-            "IAM_POLICY": {
-                "TITLE":"Zugangseinstellungen IAM",
-                "DESCRIPTION":"Definiere die Zugangseistellungen für Benutzer.",
-                "TITLECREATE":"Zugangseinstellungen für IAM festlegen",
-                "DESCRIPTIONCREATE":"E-Mails als Benutzernamen sind nicht erlaubt, wenn die Eigenschaft \"UserLoginMustBeDomain\" gesetzt ist."
-            },
-            "LOGIN_POLICY": {
-                "TITLE":"Login Richtlinien",
-                "DESCRIPTION":"Definiere die Loginmethoden für Benutzer",
-                "TITLECREATE":"Definiere die Loginmethoden für Benutzer",
-                "DESCRIPTIONCREATEADMIN":"Nutzer können sich mit den verfügbaren Idps authentifizieren.",
-                "DESCRIPTIONCREATEMGMT":"Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
-                "SAVED":"Erfolgreich gespeichert."
-            },
-            "DEFAULTLABEL":"Die aktuelle Richtlinie entspricht der IAM-Standard Einstellung.",
-            "BTN_INSTALL":"Installieren",
-            "BTN_EDIT":"Modifizieren",
-            "DATA": {
-                "DESCRIPTION":"Beschreibung",
-                "MINLENGTH":"Mindestlänge",
-                "HASNUMBER": "erfordert Ziffer",
-                "HASSYMBOL": "erfordert Symbol/Satzzeichen",
-                "HASLOWERCASE": "erfordert Kleinbuchstaben",
-                "HASUPPERCASE": "erfordert Grossbuchstaben",
-                "SHOWLOCKOUTFAILURES":"Zeige Anzahl Anmeldeversuche",
-                "MAXATTEMPTS":"Maximale Anzahl an Versuchen",
-                "EXPIREWARNDAYS":"Ablauf Warnung nach Tagen",
-                "MAXAGEDAYS":"Maximale Gültigkeit in Tagen",
-                "USERLOGINMUSTBEDOMAIN":"Benutzer-Login muss eine Domain sein",
-                "ALLOWUSERNAMEPASSWORD":"Benutzername Password erlaubt",
-                "ALLOWEXTERNALIDP":"Externer IDP erlaubt",
-                "ALLOWREGISTER":"Registrieren erlaubt",
-                "ALLOWUSERNAMEPASSWORD_DESC":"Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
-                "ALLOWEXTERNALIDP_DESC":"Der Login wird für die darunter liegenden Identity Provider erlaubt.",
-                "ALLOWREGISTER_DESC":"Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers."
-            },
-            "RESET":"Richtlinie zurücksetzen",
-            "CREATECUSTOM":"Benutzerdefinierte Richtlinie erstellen",
-            "TOAST":{
-                "SET":"Richtline erfolgreich gesetzt!",
-                "RESETSUCCESS":"Richtline zurückgesetzt!"
-            }
-        },
         "TOAST": {
             "DEACTIVATED":"Organisation deaktiviert.",
             "REACTIVATED":"Organisation reaktiviert.",
@@ -498,6 +426,72 @@
             "MEMBERREMOVED":"Manager entfernt.",
             "MEMBERCHANGED":"Manager geändert.",
             "SETPRIMARY":"Primäre Domain gesetzt."
+        }
+    },
+    "POLICY": {
+        "TITLE":"Richtlinen entdecken",
+        "DESCRIPTION":"Vorgefertigte Richtlinien, die Dir Zeit sparen und die Sicherheit erhöhen.",
+        "PWD_COMPLEXITY": {
+            "TITLE":"Passwortkomplexität",
+            "DESCRIPTION":"Stellt sicher, dass alle festgelegten Passwörter einem bestimmten Muster entsprechen.",
+            "SYMBOLANDNUMBERERROR":"Das Password muss ein Symbol/Satzzeichen und eine Ziffer beinhalten.",
+            "SYMBOLERROR":"Das Password muss ein Symbol/Satzzeichen beinhalten.",
+            "NUMBERERROR":"Das Password muss eine Ziffer beinhalten.",
+            "PATTERNERROR":"Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
+        },
+        "PWD_AGE": {
+            "TITLE":"Gültigkeitsdauer für Passwörter",
+            "DESCRIPTION":"Du kannst eine Richtlinie für die maximale Gültigkeitsdauer von Passwörtern festlegen. Diese Richtlinie löst eine Warnung nach Ablauf einer festgelegten Gültigkeitsdauer aus."
+        },
+        "PWD_LOCKOUT": {
+            "TITLE":"Passwortsperre",
+            "DESCRIPTION":"Standardmässig sind die Passwortwiederholungen bei Falscheingabe nicht begrenzt. Du musst diese Richtlinie installieren, wenn Du Wiederholungsversuche anzeigen, oder eine maximale Anzahl von wiederholten Passworteingaben festlegen möchtest."
+        },
+        "IAM_POLICY": {
+            "TITLE":"Zugangseinstellungen IAM",
+            "DESCRIPTION":"Definiere die Zugangseistellungen für Benutzer."
+        },
+        "LOGIN_POLICY": {
+            "TITLE":"Login Richtlinien",
+            "DESCRIPTION":"Definiere die Loginmethoden für Benutzer",
+            "DESCRIPTIONCREATEADMIN":"Nutzer können sich mit den verfügbaren Idps authentifizieren.",
+            "DESCRIPTIONCREATEMGMT":"Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
+            "SAVED":"Erfolgreich gespeichert."
+        },
+        "LABEL": {
+            "TITLE":"Email Labelling Einstellungen",
+            "DESCRIPTION":"Definieren Sie das Erscheinungsbild Ihrer Benachrichtigungs-Mails",
+            "PRIMARYCOLOR":"Hintergrundfarbe",
+            "SECONDARYCOLOR":"Schriftfarbe",
+            "SAVED":"Erfolgreich gespeichert."
+        },
+        "DEFAULTLABEL":"Die aktuelle Richtlinie entspricht der IAM-Standard Einstellung.",
+        "BTN_INSTALL":"Installieren",
+        "BTN_EDIT":"Modifizieren",
+        "DATA": {
+            "DESCRIPTION":"Beschreibung",
+            "MINLENGTH":"Mindestlänge",
+            "HASNUMBER": "erfordert Ziffer",
+            "HASSYMBOL": "erfordert Symbol/Satzzeichen",
+            "HASLOWERCASE": "erfordert Kleinbuchstaben",
+            "HASUPPERCASE": "erfordert Grossbuchstaben",
+            "SHOWLOCKOUTFAILURES":"Zeige Anzahl Anmeldeversuche",
+            "MAXATTEMPTS":"Maximale Anzahl an Versuchen",
+            "EXPIREWARNDAYS":"Ablauf Warnung nach Tagen",
+            "MAXAGEDAYS":"Maximale Gültigkeit in Tagen",
+            "USERLOGINMUSTBEDOMAIN":"Benutzer-Login muss eine Domain sein",
+            "ALLOWUSERNAMEPASSWORD":"Benutzername Password erlaubt",
+            "ALLOWEXTERNALIDP":"Externer IDP erlaubt",
+            "ALLOWREGISTER":"Registrieren erlaubt",
+            "ALLOWUSERNAMEPASSWORD_DESC":"Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
+            "ALLOWEXTERNALIDP_DESC":"Der Login wird für die darunter liegenden Identity Provider erlaubt.",
+            "ALLOWREGISTER_DESC":"Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers."
+        },
+        "RESET":"Richtlinie zurücksetzen",
+        "CREATECUSTOM":"Benutzerdefinierte Richtlinie erstellen",
+        "TOAST":{
+            "SET":"Richtline erfolgreich gesetzt!",
+            "RESETSUCCESS":"Richtline zurückgesetzt!"
         }
     },
     "ORG_DETAIL": {

@@ -9,11 +9,11 @@ h1 {
 .row-lyt {
   display: flex;
   flex-wrap: wrap;
-  margin: 0 -1rem;
+  margin: 0 -.5rem;
 
   .p-item {
-    flex-basis: 300px;
-    margin: 1rem;
+    flex-basis: 290px;
+    margin: .5rem;
     display: flex;
     flex-direction: column;
     min-height: 200px;
@@ -38,6 +38,7 @@ h1 {
         font-size: 2.5rem;
         height: 2.5rem;
         line-height: 2.5rem;
+        color: white;
       }
     }
 
@@ -46,7 +47,7 @@ h1 {
       align-items: center;
 
       span {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
       }
 
       .icon {
@@ -56,7 +57,7 @@ h1 {
     }
 
     .desc {
-      font-size: .9rem;
+      font-size: 14px;
       color: var(--grey);
     }
 
