@@ -42,11 +42,25 @@ To make it more easily to differentiate ZITADEL Console displays these both as s
 
 To create your project go to [https://console.zitadel.ch/projects](https://console.zitadel.ch/projects)
 
-<img src="img/console_projects_empty.png" alt="Manage Projects" width="1000px" height="auto">
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_projects_empty.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_projects_empty.png" itemprop="thumbnail" alt="Manage Projects" />
+        </a>
+        <figcaption itemprop="caption description">Manage Projects</figcaption>
+    </figure>
+</div>
 
 Create a new project with name which explains what's the intended use of this project.
 
-<img src="img/console_projects_my_first_project.png" alt="Manage Projects" width="1000px" height="auto">
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_projects_my_first_project.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_projects_my_first_project.png" itemprop="thumbnail" alt="Manage Projects" />
+        </a>
+        <figcaption itemprop="caption description">Manage Projects</figcaption>
+    </figure>
+</div>
 
 #### RBAC Settings
 

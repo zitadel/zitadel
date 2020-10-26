@@ -18,7 +18,7 @@ Under normal circumstances **ZITADEL** need four domain names to operate properl
 #### OpenID Connect 1.0 Discovery
 
 The OpenID Connect Discovery Endpoint is located with the issuer domain.
-For example with [zitadel.ch](zitadel.ch) this would be the domain [issuer.zitadel.ch](issuer.zitadel.ch). This would give us [https://issuer.zitadel.ch/.well-known/openid-configuration](https://issuer.zitadel.ch/.well-known/openid-configuration).
+For example with [zitadel.ch](https://zitadel.ch) this would be the domain [issuer.zitadel.ch](https://issuer.zitadel.ch). This would give us [https://issuer.zitadel.ch/.well-known/openid-configuration](https://issuer.zitadel.ch/.well-known/openid-configuration).
 
 **Link to spec.** [OpenID Connect Discovery 1.0 incorporating errata set 1](https://openid.net/specs/openid-connect-discovery-1_0.html)
 

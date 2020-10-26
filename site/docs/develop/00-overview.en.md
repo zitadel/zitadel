@@ -7,6 +7,8 @@ description: …
 
 ### APIs
 
+---
+
 ZITADEL provides three API's for different use cases. These API's are built with GRPC and then generate a REST service.
 Each services proto definition is located in the source control on GitHub.
 As we generate the REST services and Swagger file out of the proto definition we recommend that you rely on the proto file.
@@ -26,6 +28,8 @@ See below for an example with the call **GetMyUser**.
     };
   }
 ```
+
+---
 
 As you can see the `GetMyUser` function is also available as REST service under the path `/users/me`.
 In the table below you can see the URI of those calls.
