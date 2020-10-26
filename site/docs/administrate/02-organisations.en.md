@@ -70,8 +70,7 @@ To start the domain verification click the domain name and a dialog will appear,
         <figcaption itemprop="caption description">Organisation Domain Verify</figcaption>
     </figure>
 </div>
-
-For example, create a TXT record with your DNS provider for the used domain an click verify. **ZITADEL** will then proceed an check your DNS.
+For example, create a TXT record with your DNS provider for the used domain and click verify. **ZITADEL** will then proceed an check your DNS.
 <div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
         <a href="img/console_org_domain_verify_dns.png" itemprop="contentUrl" data-size="1920x1080">
@@ -80,7 +79,6 @@ For example, create a TXT record with your DNS provider for the used domain an c
         <figcaption itemprop="caption description">Organisation Domain Verify DNS</figcaption>
     </figure>
 </div>
-
 
 > Do not delete the verification code **ZITADEL** will recheck the ownership from time to time
 
@@ -97,8 +95,7 @@ When the verification is successful you have the option to activate the domain b
 
 > This changes the **preferred loginnames** of your [users](administrate#Users) as indicated [here](administrate#How_ZITADEL_handles_usernames).
 
-Gratulations your are done! You can check this by visiting [https://console.zitadel.ch/users/me](https://console.zitadel.ch/users/me)
-
+Congratulations your are done! You can check this by visiting [https://console.zitadel.ch/users/me](https://console.zitadel.ch/users/me)
 <div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
         <a href="img/console_user_personal_info.png" itemprop="contentUrl" data-size="1920x1080">
