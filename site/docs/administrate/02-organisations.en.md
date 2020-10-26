@@ -60,6 +60,22 @@ When the verification is successful you have the option to activate the domain b
 Gratulations your are done! You can check this by visiting [https://console.zitadel.ch/users/me](https://console.zitadel.ch/users/me)
 <img src="img/console_user_personal_info.png" alt="User Personal Information" width="1000px" height="auto">
 
+<div class="my-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_org_domain_verified.png" itemprop="contentUrl">
+            <img src="img/console_org_domain_verified.png" itemprop="thumbnail" alt="Image description" />
+        </a>
+        <figcaption itemprop="caption description">Image caption</figcaption>
+    </figure>
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_user_personal_info.png" itemprop="contentUrl">
+            <img src="img/console_user_personal_info.png" itemprop="thumbnail" alt="Image description" />
+        </a>
+        <figcaption itemprop="caption description">Image caption</figcaption>
+    </figure>
+</div>
+
+
 > This only works when the [user](administrate#Users) is member of this [organisation](administrate#Organisations)
 
 ### Audit organisation changes

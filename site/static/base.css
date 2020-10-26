@@ -556,3 +556,21 @@ input[type="checkbox"]::after {
 input[type="checkbox"]:checked::after {
 	left: calc(100% - 9px);
 }
+
+.my-gallery {
+    display: flex;
+    width: 100%;
+  }
+  .my-gallery img {
+    width: 100%;
+    object-fit: contain;
+  }
+  .my-gallery figure {
+    flex-basis: 30%;
+    object-fit: contain;
+    margin: 0 5px 5px 0;
+    width: 150px;
+  }
+  .my-gallery figcaption {
+    display: none;
+  }
