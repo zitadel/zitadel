@@ -68,7 +68,8 @@
                     [appHasRole]="['project.grant.read:' + project.projectId, 'project.grant.read']">
                     <app-card title="{{ 'PROJECT.GRANT.TITLE' | translate }}"
                         description="{{ 'PROJECT.GRANT.DESCRIPTION' | translate }}">
-                        <app-project-grants refreshOnPreviousRoute="/projects/{{projectId}}/grants/create"
+                        <app-project-grants
+                            [refreshOnPreviousRoutes]="['/projects/'+projectId+'/grants/create','/projects/'+projectId+'/roles/create']"
                             [disabled]="((['project.grant.write$', 'project.grant.write:'+ project.projectId]| hasRole | async))== false"
                             [projectId]="projectId">
                         </app-project-grants>
@@ -97,7 +98,7 @@
                     <app-card *ngIf="project?.projectId" title="{{ 'GRANTS.PROJECT.TITLE' | translate }}"
                         description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
                         <app-user-grants [context]="UserGrantContext.OWNED_PROJECT" [projectId]="projectId"
-                            refreshOnPreviousRoute="/grant-create/project/{{projectId}}"
+                            [refreshOnPreviousRoutes]="['/grant-create/project/'+projectId]"
                             [disableWrite]="((['user.grant.write$', 'user.grant.write:'+projectId] | hasRole) | async) == false"
                             [disableDelete]="((['user.grant.delete$','user.grant.delete:'+projectId] | hasRole) | async) == false">
                         </app-user-grants>

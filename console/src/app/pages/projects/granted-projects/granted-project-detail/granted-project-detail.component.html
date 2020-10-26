@@ -20,7 +20,7 @@
                     [displayedColumns]="['select','user', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']"
                     [disableWrite]="(['user.grant.write$','user.grant.write:'+grantId] | hasRole | async) == false"
                     [disableDelete]="(['user.grant.delete$','user.grant.delete:'+grantId] | hasRole | async) == false"
-                    refreshOnPreviousRoute="/grant-create/project/{{projectId}}/grant/{{grantId}}">
+                    refreshOnPreviousRoutes="['/grant-create/project/{{projectId}}/grant/{{grantId}}']">
                 </app-user-grants>
             </app-card>
         </ng-template>

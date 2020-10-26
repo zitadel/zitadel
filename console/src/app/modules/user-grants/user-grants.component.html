@@ -1,5 +1,5 @@
 <app-refresh-table [loading]="dataSource?.loading$ | async" (refreshed)="changePage()"
-    [emitRefreshOnPreviousRoute]="refreshOnPreviousRoute" [timestamp]="dataSource?.viewTimestamp"
+    [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes" [timestamp]="dataSource?.viewTimestamp"
     [dataSize]="dataSource?.totalResult" [selection]="selection">
     <button color="warn" matTooltip="{{'GRANTS.DELETE' | translate}}" class="icon-button" mat-icon-button actions
         (click)="deleteGrantSelection()" *ngIf="selection.hasValue() && disableDelete == false">

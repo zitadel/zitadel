@@ -1,5 +1,5 @@
 <app-refresh-table *ngIf="projectId" (refreshed)="refreshPage()" [dataSize]="dataSource?.totalResult"
-    emitRefreshOnPreviousRoute="/projects/{{projectId}}/roles/create" [selection]="selection"
+    [emitRefreshOnPreviousRoutes]="['/projects/'+projectId+'/roles/create']" [selection]="selection"
     [loading]="dataSource?.loading$ | async" [timestamp]="dataSource?.viewTimestamp">
     <ng-template appHasRole [appHasRole]="['project.role.delete', 'project.role.delete:' + projectId]" actions>
         <button color="warn" class="icon-button" [disabled]="disabled"

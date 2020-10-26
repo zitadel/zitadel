@@ -18,7 +18,7 @@ import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource
 export class UserGrantsComponent implements OnInit, AfterViewInit {
     public INITIAL_PAGE_SIZE: number = 50;
     @Input() context: UserGrantContext = UserGrantContext.NONE;
-    @Input() refreshOnPreviousRoute: string = '';
+    @Input() refreshOnPreviousRoutes: string[] = [];
     public grants: UserGrantView.AsObject[] = [];
 
     public dataSource!: UserGrantsDataSource;

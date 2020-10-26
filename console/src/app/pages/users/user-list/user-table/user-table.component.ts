@@ -27,7 +27,7 @@ export class UserTableComponent implements OnInit {
     public userSearchKey: UserSearchKey | undefined = undefined;
     public UserType: any = UserType;
     @Input() userType: UserType = UserType.HUMAN;
-    @Input() refreshOnPreviousRoute: string = '';
+    @Input() refreshOnPreviousRoutes: string[] = [];
     @Input() disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild('input') public filter!: MatInput;
