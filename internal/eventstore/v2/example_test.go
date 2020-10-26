@@ -217,10 +217,12 @@ func (rm *UsersReadModel) AppendEvents(events ...eventstore.Event) (err error) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *UserAddedEvent:
+			//insert
 			user := NewUserReadModel(e.MetaData().AggregateID)
 			rm.Users = append(rm.Users, user)
 			err = user.AppendEvents(e)
 		case *UserFirstNameChangedEvent, *UserPasswordCheckedEvent:
+			//update
 			_, user := rm.userByID(e.MetaData().AggregateID)
 			if user == nil {
 				return errors.New("user not found")
@@ -231,6 +233,10 @@ func (rm *UsersReadModel) AppendEvents(events ...eventstore.Event) (err error) {
 			return err
 		}
 	}
+
+	//begin
+	//for stmt range stmts; exec
+	//commit
 	return nil
 }
 
