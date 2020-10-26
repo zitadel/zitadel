@@ -14,31 +14,14 @@ You can either use [ZITADEL.ch](https://zitadel.ch) or deploy a dedicated **ZITA
 To register your free [organisation](administrate#Organisations), visit this link [register organisation](https://accounts.zitadel.ch/register/org).
 After accepting the TOS and filling out all the required fields you will receive a email with further instructions.
 
-<img id="org-register-img" style="cursor: pointer; border-radius: 8px;" src="img/accounts_org_register.png" alt="Organisation Register" width="800px" height="auto">
-<script>
-    var openPhotoSwipe = function() {
-        console.log('show image');
-        var pswpElement = document.querySelectorAll('.pswp')[0];
-        var options = {
-            history: false,
-            focus: false,
-            showAnimationDuration: 0,
-            hideAnimationDuration: 0
-        };
-        var items = [
-            {
-                src: 'img/accounts_org_register.png',
-                w: 1024,
-                h: 768,
-                msrc: 'path/to/small-image.jpg',
-                title: 'Image Caption'
-            },
-        ];
-        var gallery = new PhotoSwipe( pswpElement, PhotoSwipeUI_Default, items, options);
-        gallery.init();
-    }
-    document.getElementById('org-register-img').onclick = openPhotoSwipe;
-</script>
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/accounts_org_register.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/accounts_org_register.png" itemprop="thumbnail" alt="Organisation Overview" />
+        </a>
+        <figcaption itemprop="caption description">Organisation Register</figcaption>
+    </figure>
+</div>
 
 #### Verify your domain name (optional)
 
