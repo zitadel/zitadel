@@ -12,7 +12,7 @@
     <span *ngIf="errorMessage" class="err-container">{{errorMessage}}</span>
 
     <app-card title="{{ 'APP.PAGES.DETAIL.TITLE' | translate }}" *ngIf="app">
-        <form [formGroup]="appNameForm" (ngSubmit)="saveOIDCApp()">
+        <form [formGroup]="appNameForm" (ngSubmit)="saveApp()">
             <div class="content">
                 <mat-button-toggle-group formControlName="state" class="toggle" (change)="changeState($event)">
                     <mat-button-toggle [value]="AppState.APPSTATE_INACTIVE"
