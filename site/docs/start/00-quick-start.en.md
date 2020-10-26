@@ -16,7 +16,7 @@ After accepting the TOS and filling out all the required fields you will receive
 
 <div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
-        <a href="img/accounts_org_register.png" itemprop="contentUrl" data-size="1920x1080">
+        <a href="img/accounts_org_register.png" itemprop="contentUrl" data-size="1472x1000">
             <img src="img/accounts_org_register.png" itemprop="thumbnail" alt="Organisation Overview" />
         </a>
         <figcaption itemprop="caption description">Organisation Register</figcaption>
