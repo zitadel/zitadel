@@ -870,6 +870,8 @@
     },
     "ROLESLABEL":"Roles",
     "GRANTS": {
+        "TITLE":"Authorisations",
+        "DESC":"Here you can manage authorizations of your organization users.",
         "DELETE":"Delete Authorisation",
         "ADD":"Create Authorisation",
         "ADD_BTN":"New",
