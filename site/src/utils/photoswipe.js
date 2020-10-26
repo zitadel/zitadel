@@ -1,4 +1,4 @@
-export var initPhotoSwipeFromDOM = function (gallerySelector) {
+export function initPhotoSwipeFromDOM(gallerySelector) {
 
     // parse slide data (url, title, size ...) from DOM elements 
     // (children of gallerySelector)
