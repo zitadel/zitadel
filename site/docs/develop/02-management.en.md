@@ -5,7 +5,7 @@ description: …
 
 ### Management
 
-The management API is as the name states the interface where systems can mutate IAM objects like, organisations, projects, clients, user and so on if they have the necessary access rights.
+The management API is as the name states the interface where systems can mutate IAM objects like, organisations, projects, clients, users and so on if they have the necessary access rights.
 
 | Service | URI                                                                                                                                                 |
 |:--------|:----------------------------------------------------------------------------------------------------------------------------------------------------|
