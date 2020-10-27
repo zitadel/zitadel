@@ -381,8 +381,8 @@
                 "VERIFICATION_SKIP":"Du kannst die Überprüfung vorerst überspringen und Deine Organisation erstellen. Um Deine Organisation jedoch verwenden zu können, muss dieser Schritt abgeschlossen sein.",
                 "VERIFICATION_VALIDATION_DESC":"Die Tokens werden regelmässig überprüft, um sicherzustellen, dass Du weiterhin im Besitz der Domain bist.",
                 "VERIFICATION_NEWTOKEN_TITLE":"Neues Token anfordern",
-                "VERIFICATION_NEWTOKEN_DESC":"Wenn Du ein neues Token anfordern willst, klicke auf die gewünschte Methode. Wenn Du ein vorhandenes Token validieren möchtest, klicke auf \"Validieren\".",
-                "VERIFICATION_VALIDATION_ONGOING":"Ein Token zur Validierung wurde bereits angefragt. Klicke auf \"Validieren\", um dieses Token zu validieren.",
+                "VERIFICATION_NEWTOKEN_DESC":"Wenn Du ein neues Token anfordern willst, klicke auf die gewünschte Methode. Wenn Du ein vorhandenes Token validieren möchtest, klicke auf \"Verifizieren\".",
+                "VERIFICATION_VALIDATION_ONGOING":"Ein Token zur Validierung wurde bereits angefragt. Klicke auf \"Verifizieren\", um dieses Token zu validieren.",
                 "VERIFICATION_VALIDATION_ONGOING_TYPE":"Typ des Tokens:",
                 "REQUESTNEWTOKEN":"Neues Token anfordern",
                 "TYPES": {
