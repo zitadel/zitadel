@@ -9,6 +9,7 @@
   export let dir = "";
   export let edit_title = "edit this section";
   export let sections;
+  import SearchSelector from './SearchSelector.svelte';
   let active_section;
 
   let container;

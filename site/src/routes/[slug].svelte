@@ -15,6 +15,7 @@
     import { onMount } from 'svelte';
     export let tags;
     import { initPhotoSwipeFromDOM } from '../utils/photoswipe.js';
+    import SearchSelector from '../components/SearchSelector.svelte';
 
     onMount(() => {
         initPhotoSwipeFromDOM('.zitadel-gallery');
@@ -30,3 +31,5 @@
 </svelte:head>
 
 <Docs {sections} project="zitadel/site" dir="{slug}"/>
+
+<SearchSelector></SearchSelector>
