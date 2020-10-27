@@ -3,13 +3,15 @@ package handler
 import (
 	"errors"
 	"fmt"
-	"github.com/caos/logging"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/gorilla/csrf"
-	"golang.org/x/text/language"
 	"html/template"
 	"net/http"
 	"path"
+
+	"github.com/caos/logging"
+	"github.com/gorilla/csrf"
+	"golang.org/x/text/language"
+
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
@@ -39,6 +41,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		tmplMfaVerify:              "mfa_verify.html",
 		tmplMfaPrompt:              "mfa_prompt.html",
 		tmplMfaInitVerify:          "mfa_init_verify.html",
+		tmplMfaU2FInitVerify:       "mfa_init_u2f.html",
 		tmplMfaInitDone:            "mfa_init_done.html",
 		tmplMailVerification:       "mail_verification.html",
 		tmplMailVerified:           "mail_verified.html",
@@ -103,6 +106,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		},
 		"mfaInitVerifyUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMfaInitVerify)
+		},
+		"mfaInitU2FVerifyUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointMfaInitU2FVerify)
 		},
 		"mailVerificationUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMailVerification)

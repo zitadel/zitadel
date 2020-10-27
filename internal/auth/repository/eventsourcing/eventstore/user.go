@@ -3,6 +3,8 @@ package eventstore
 import (
 	"context"
 
+	"github.com/duo-labs/webauthn/protocol"
+
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 
@@ -296,6 +298,16 @@ func (repo *UserRepo) VerifyMyMfaOTPSetup(ctx context.Context, code string) erro
 
 func (repo *UserRepo) RemoveMyMfaOTP(ctx context.Context) error {
 	return repo.UserEvents.RemoveOTP(ctx, authz.GetCtxData(ctx).UserID)
+}
+
+func (repo *UserRepo) AddU2FKey(ctx context.Context, userID string, data *protocol.ParsedCredentialCreationData) error {
+	//return repo.UserEvents.AddU2FKey(ctx, userID)
+	return nil
+}
+
+func (repo *UserRepo) AddMyU2FKey(ctx context.Context) error {
+	//return repo.UserEvents.AddU2FKey(ctx, authz.GetCtxData(ctx).UserID)
+	return nil
 }
 
 func (repo *UserRepo) ChangeMyUsername(ctx context.Context, username string) error {

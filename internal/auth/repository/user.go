@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 
+	"github.com/duo-labs/webauthn/protocol"
+
 	org_model "github.com/caos/zitadel/internal/org/model"
 
 	"github.com/caos/zitadel/internal/user/model"
@@ -27,6 +29,8 @@ type UserRepository interface {
 
 	AddMfaOTP(ctx context.Context, userID string) (*model.OTP, error)
 	VerifyMfaOTPSetup(ctx context.Context, userID, code string) error
+
+	AddU2FKey(ctx context.Context, userID string, data *protocol.ParsedCredentialCreationData) error
 
 	ChangeUsername(ctx context.Context, userID, username string) error
 
@@ -67,6 +71,7 @@ type myUserRepo interface {
 	AddMyMfaOTP(ctx context.Context) (*model.OTP, error)
 	VerifyMyMfaOTPSetup(ctx context.Context, code string) error
 	RemoveMyMfaOTP(ctx context.Context) error
+	AddMyU2FKey(ctx context.Context) error
 
 	ChangeMyUsername(ctx context.Context, username string) error
 

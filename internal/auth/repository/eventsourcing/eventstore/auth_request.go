@@ -365,9 +365,9 @@ func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID
 	if err != nil {
 		return nil, err
 	}
-	if request.AgentID != userAgentID {
-		return nil, errors.ThrowPermissionDenied(nil, "EVENT-adk13", "Errors.AuthRequest.UserAgentNotCorresponding")
-	}
+	//if request.AgentID != userAgentID {
+	//	return nil, errors.ThrowPermissionDenied(nil, "EVENT-adk13", "Errors.AuthRequest.UserAgentNotCorresponding")
+	//}
 	err = repo.fillLoginPolicy(ctx, request)
 	if err != nil {
 		return nil, err

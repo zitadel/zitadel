@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"net"
 	"net/http"
 
@@ -16,10 +15,12 @@ import (
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	auth_repository "github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/form"
 	"github.com/caos/zitadel/internal/id"
 	_ "github.com/caos/zitadel/internal/ui/login/statik"
+	"github.com/caos/zitadel/internal/webauthn"
 )
 
 type Login struct {
@@ -32,6 +33,7 @@ type Login struct {
 	zitadelURL          string
 	oidcAuthCallbackURL string
 	IDPConfigAesCrypto  crypto.EncryptionAlgorithm
+	webAuthN            *webauthn.WebAuthN
 }
 
 type Config struct {
@@ -61,12 +63,17 @@ func CreateLogin(config Config, authRepo *eventsourcing.EsRepository, systemDefa
 	if err != nil {
 		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")
 	}
+	web, err := webauthn.StartServer("zitadel", "localhost", "")
+	if err != nil {
+		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")
+	}
 	login := &Login{
 		oidcAuthCallbackURL: config.OidcAuthCallbackURL,
 		baseURL:             config.BaseURL,
 		zitadelURL:          config.ZitadelURL,
 		authRepo:            authRepo,
 		IDPConfigAesCrypto:  aesCrypto,
+		webAuthN:            web,
 	}
 	prefix := ""
 	if localDevMode {
