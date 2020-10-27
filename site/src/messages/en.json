@@ -9,7 +9,9 @@
     "developlink":"Develop with the ZITADEL api's",
     "docslink":"ZITADEL Documentations",
     "uselink":"User Manuals",
-    "toconsole":"Open ZITADEL Console"
+    "toconsole":"Open ZITADEL Console",
+    "search_results":"Search Results",
+    "search_input_placeholder":"Search for ..."
 }
 
 

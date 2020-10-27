@@ -1,5 +1,17 @@
 <script>
     import { createEventDispatcher } from 'svelte';
+    import { _ } from 'svelte-i18n';
+
+    export let sections;
+    export let slug;
+
+    console.log(slug)
+
+    let filteredResults = [];
+
+    function init(el){
+        el.focus()
+    }
 
 	const dispatch = createEventDispatcher();
     let searchValue = '';
@@ -10,7 +22,31 @@
     $: executeQuery(searchValue);
 
     function executeQuery(value) {
-        console.log(value);
+        console.log(sections);
+        const toSearchFor = value.toLowerCase();
+        const filteredSections = sections.filter(section => {
+            const slugContainsValue = section.slug.toLowerCase().includes(toSearchFor);
+            const htmlContainsValue = section.html.replace(/<[^>]*>?/gm, '').toLowerCase().includes(toSearchFor);
+            return slugContainsValue || htmlContainsValue;
+        }).map(section => {
+            const removedHtml = section.html.replace(/<[^>]*>?/gm, '');
+            const foundIndex = removedHtml.indexOf(toSearchFor);
+            const subhtml = section.html.substring(foundIndex, (removedHtml.length - 1) - foundIndex > 150 ? 150 : removedHtml.length - 1)
+            return {
+                title: section.slug,
+                slug: section.slug,
+                html: subhtml,
+            }
+        });
+
+        const filteredSubSections = sections.map(section => section.subsections).flat().filter(subsection => {
+            if (subsection.slug) {
+                return subsection.slug.toLowerCase().includes(toSearchFor);
+            }
+        });
+
+        filteredResults = filteredSections.concat(filteredSubSections);
+        console.log(filteredResults);
     }
 
     function closeSearch() {
@@ -43,7 +79,7 @@
         top: 30%;
         left: 50%;
         padding: 1rem;
-        transform: translateX(-50%) translateY(-50%);
+        transform: translateX(-50%);
         display: relative;
     }
 
@@ -83,17 +119,19 @@
         font-style: italic;
     }
 
-    .result-list {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .result-list .result-d {
+    .result-d {
         color: var(--grey);
         font-weight: 700;
         margin: 0;
         font-size: 1.3rem;
         margin: 5px 0;
+    }
+
+    .result-list {
+        display: flex;
+        flex-direction: column;
+        max-height: 400px;
+        overflow-y: auto;
     }
 
     .result-list .result-item {
@@ -104,10 +142,17 @@
         padding: 1rem;
         border-radius: 8px;
         margin: 2px 0;
+        border-bottom: none;
     }
 
     .result-list .result-item:hover {
         background-color: #556cd6;
+    }
+
+    .text {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .result-list .result-item .title{
@@ -120,6 +165,9 @@
         color: var(--grey-text);
         margin: 0;
         font-size: 1.3rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 </style>
 
@@ -127,23 +175,19 @@
 <div class="search-field">
     <div class="search-line">
         <i class="las la-search"></i>
-        <input placeholder="Search for... " bind:value={searchValue}>
+        <input placeholder="{$_('search_input_placeholder')}" bind:value={searchValue} use:init>
     </div>
+        <p class="result-d">{$_('search_results')}: </p>
     <div class="result-list">
-    <p class="result-d">Found results: {searchValue}</p>
-        <div class="result-item">
-            <div>
-                <p class="title">Title</p>
-                <p class="desc">desc</p>
+        {#each filteredResults as result}
+        <a class="result-item" href="{slug}#{result.slug}" on:click="{closeSearch}">
+            <div class="text">
+                <p class="title">{result.slug}</p>
+                <p class="desc" style="color: #85d996;">{slug}#{result.slug}</p>
+                <p class="desc">{result.html || result.slug}</p>
             </div>
             <i class="las la-link"></i>
-        </div>
-        <div class="result-item">
-            <div>
-                <p class="title">Title</p>
-                <p class="desc">desc</p>
-            </div>
-            <i class="las la-link"></i>
-        </div>
+        </a>
+        {/each}
     </div>
 </div>

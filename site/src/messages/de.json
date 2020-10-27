@@ -9,7 +9,9 @@
     "developlink":"Entwickeln",
     "docslink":"Dokumentation",
     "uselink":"Benutzer Handbuch",
-    "toconsole":"ZITADEL Console öffnen"
+    "toconsole":"ZITADEL Console öffnen",
+    "search_results":"Suchergebnisse",
+    "search_input_placeholder":"Suche nach ..."
 }
 
 

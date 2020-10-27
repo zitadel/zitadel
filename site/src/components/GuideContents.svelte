@@ -6,7 +6,7 @@
 	export let sections = [];
 	export let active_section = null;
 	export let show_contents;
-	export let prevent_sidebar_scroll = false;
+    export let prevent_sidebar_scroll = false;
 
 	let ul;
 

@@ -18,9 +18,9 @@
   let aside;
   let show_contents = false;
 
-    function handleSearch(event) {
-        searchEnabled = !event.detail.closed;
-    }
+  function handleSearch(event) {
+    searchEnabled = !event.detail.closed;
+  }
 
   onMount(() => {
     // don't update `active_section` for headings above level 4, see _sections.js
@@ -432,5 +432,5 @@
 </aside>
 
 {#if searchEnabled == true}
-    <SearchSelector on:close={handleSearch}></SearchSelector>
+    <SearchSelector on:close={handleSearch} {sections} slug={dir}></SearchSelector>
 {/if}
