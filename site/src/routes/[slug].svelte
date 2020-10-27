@@ -32,4 +32,4 @@
 
 <Docs {sections} project="zitadel/site" dir="{slug}"/>
 
-<SearchSelector></SearchSelector>
+<!-- <SearchSelector></SearchSelector> -->

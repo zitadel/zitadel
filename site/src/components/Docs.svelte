@@ -10,11 +10,18 @@
   export let edit_title = "edit this section";
   export let sections;
   import SearchSelector from './SearchSelector.svelte';
+  import SearchTrigger from './SearchTrigger.svelte';
+  let searchEnabled = false;
   let active_section;
 
   let container;
   let aside;
   let show_contents = false;
+
+  function handleSearch() {
+    alert('clicked');
+      searchEnabled = true;
+  }
 
   onMount(() => {
     // don't update `active_section` for headings above level 4, see _sections.js
@@ -165,12 +172,6 @@
       content: "";
       bottom: 0;
       height: var(--top-offset);
-      /* background: linear-gradient(
-        to bottom,
-        rgba(103, 103, 120, 0) 0%,
-        rgba(103, 103, 120, 0.7) 50%,
-        rgba(103, 103, 120, 1) 100%
-      ); */
     }
 
     aside button {
@@ -420,6 +421,8 @@
 
 <aside bind:this={aside} class="sidebar-container" class:open={show_contents}>
   <div class="sidebar" on:click={() => (show_contents = false)}>
+    <SearchTrigger on:click={handleSearch}/>
+
     <!-- scroll container -->
     <GuideContents {dir} {sections} {active_section} {show_contents} />
   </div>
@@ -428,3 +431,7 @@
     <Icon name={show_contents ? 'las la-window-close' : 'las la-bars'} />
   </button>
 </aside>
+
+{#if searchEnabled == true}
+    <SearchSelector></SearchSelector>
+{/if}
