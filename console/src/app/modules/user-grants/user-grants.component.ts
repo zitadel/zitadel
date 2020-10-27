@@ -4,14 +4,7 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
-import {
-    ProjectRoleView,
-    SearchMethod,
-    UserGrant,
-    UserGrantSearchKey,
-    UserGrantSearchQuery,
-    UserGrantView,
-} from 'src/app/proto/generated/management_pb';
+import { ProjectRoleView, UserGrant, UserGrantView } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -23,8 +16,9 @@ import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource
     styleUrls: ['./user-grants.component.scss'],
 })
 export class UserGrantsComponent implements OnInit, AfterViewInit {
-    @Input() context: UserGrantContext = UserGrantContext.USER;
-    @Input() refreshOnPreviousRoute: string = '';
+    public INITIAL_PAGE_SIZE: number = 50;
+    @Input() context: UserGrantContext = UserGrantContext.NONE;
+    @Input() refreshOnPreviousRoutes: string[] = [];
     public grants: UserGrantView.AsObject[] = [];
 
     public dataSource!: UserGrantsDataSource;
@@ -32,8 +26,8 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatTable) public table!: MatTable<UserGrantView.AsObject>;
 
-    @Input() allowCreate: boolean = false;
-    @Input() allowDelete: boolean = false;
+    @Input() disableWrite: boolean = false;
+    @Input() disableDelete: boolean = false;
 
     @Input() userId: string = '';
     @Input() projectId: string = '';
@@ -80,15 +74,11 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
                     this.routerLink = ['/grant-create', 'user', this.userId];
                 }
                 break;
-            default:
+            case UserGrantContext.NONE:
                 this.routerLink = ['/grant-create'];
         }
 
-        this.dataSource.loadGrants(this.context, 0, 25, {
-            projectId: this.projectId,
-            grantId: this.grantId,
-            userId: this.userId,
-        });
+        this.loadGrantsPage();
     }
 
     public ngAfterViewInit(): void {
@@ -102,11 +92,12 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     private loadGrantsPage(): void {
         this.dataSource.loadGrants(
             this.context,
-            this.paginator.pageIndex,
-            this.paginator.pageSize,
+            this.paginator?.pageIndex ?? 0,
+            this.paginator?.pageSize ?? this.INITIAL_PAGE_SIZE,
             {
                 projectId: this.projectId,
                 grantId: this.grantId,
+                userId: this.userId,
             },
         );
     }
@@ -125,7 +116,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
     public getGrantRoleOptions(grantId: string, projectId: string): void {
         this.mgmtService.GetGrantedProjectByID(projectId, grantId).then(resp => {
-            this.loadedGrantId = projectId;
+            this.loadedGrantId = grantId;
             this.grantRoleOptions = resp.toObject().roleKeysList;
         }).catch(error => {
             this.toast.showError(error);
@@ -140,33 +131,12 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     updateRoles(grant: UserGrant.AsObject, selectionChange: MatSelectChange): void {
-        switch (this.context) {
-            case UserGrantContext.OWNED_PROJECT:
-                if (grant.id && grant.projectId) {
-                    this.userService.UpdateUserGrant(grant.id, grant.userId, selectionChange.value)
-                        .then(() => {
-                            this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
-                        }).catch(error => {
-                            this.toast.showError(error);
-                        });
-                }
-                break;
-            case UserGrantContext.GRANTED_PROJECT:
-                if (this.grantId && this.projectId) {
-                    const projectQuery: UserGrantSearchQuery = new UserGrantSearchQuery();
-                    projectQuery.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID);
-                    projectQuery.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
-                    projectQuery.setValue(this.projectId);
-                    this.userService.UpdateUserGrant(
-                        grant.id, grant.userId, selectionChange.value)
-                        .then(() => {
-                            this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
-                        }).catch(error => {
-                            this.toast.showError(error);
-                        });
-                }
-                break;
-        }
+        this.userService.UpdateUserGrant(grant.id, grant.userId, selectionChange.value)
+            .then(() => {
+                this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
+            }).catch(error => {
+                this.toast.showError(error);
+            });
     }
 
     deleteGrantSelection(): void {

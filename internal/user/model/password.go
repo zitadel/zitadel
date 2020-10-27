@@ -4,7 +4,7 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	policy_model "github.com/caos/zitadel/internal/policy/model"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"time"
 )
 
@@ -35,7 +35,7 @@ func (p *Password) IsValid() bool {
 	return p.AggregateID != "" && p.SecretString != ""
 }
 
-func (p *Password) HashPasswordIfExisting(policy *policy_model.PasswordComplexityPolicy, passwordAlg crypto.HashAlgorithm, onetime bool) error {
+func (p *Password) HashPasswordIfExisting(policy *iam_model.PasswordComplexityPolicyView, passwordAlg crypto.HashAlgorithm, onetime bool) error {
 	if p.SecretString == "" {
 		return nil
 	}

@@ -1,19 +1,22 @@
 package model
 
 import (
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/golang/protobuf/ptypes/timestamp"
+
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 )
 
 type Project struct {
 	es_models.ObjectRoot
 
-	State        ProjectState
-	Name         string
-	Members      []*ProjectMember
-	Roles        []*ProjectRole
-	Applications []*Application
-	Grants       []*ProjectGrant
+	State                ProjectState
+	Name                 string
+	Members              []*ProjectMember
+	Roles                []*ProjectRole
+	Applications         []*Application
+	Grants               []*ProjectGrant
+	ProjectRoleAssertion bool
+	ProjectRoleCheck     bool
 }
 type ProjectChanges struct {
 	Changes      []*ProjectChange

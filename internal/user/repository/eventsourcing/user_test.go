@@ -2388,8 +2388,9 @@ func TestExternalIDPRemovedAggregates(t *testing.T) {
 				aggCreator: models.NewAggregateCreator("test"),
 				user: &model.User{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "AggregateID",
-						Sequence:    5,
+						AggregateID:   "AggregateID",
+						Sequence:      5,
+						ResourceOwner: "ResourceOwner",
 					},
 				},
 				externalIDP: &model.ExternalIDP{

@@ -11,8 +11,9 @@ import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
-import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
-import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
+import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
+import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
+import { TruncatePipeModule } from 'src/app/pipes/truncate-pipe/truncate-pipe.module';
 
 import { IdpTableComponent } from './idp-table.component';
 
@@ -34,6 +35,7 @@ import { IdpTableComponent } from './idp-table.component';
         RouterModule,
         RefreshTableModule,
         HasRoleModule,
+        TruncatePipeModule,
     ],
     exports: [
         IdpTableComponent,

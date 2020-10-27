@@ -1,0 +1,24 @@
+.content {
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 0 -.5rem;
+
+  .form-field {
+    flex: 1;
+    margin: 0 .5rem;
+  }
+}
+
+.btn-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+
+  button {
+    margin-top: 3rem;
+    display: block;
+    padding: .5rem 4rem;
+  }
+}

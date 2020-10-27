@@ -62,17 +62,18 @@ func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_mode
 			return model.ProjectToModel(&viewProject), nil
 		}
 	}
-
+	if viewProject.State == int32(proj_model.ProjectStateRemoved) {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-3Mo0s", "Errors.Project.NotFound")
+	}
 	return model.ProjectToModel(project), nil
 }
 
-func (repo *ProjectRepo) CreateProject(ctx context.Context, name string) (*proj_model.Project, error) {
+func (repo *ProjectRepo) CreateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
 	ctxData := authz.GetCtxData(ctx)
 	iam, err := repo.IAMEvents.IAMByID(ctx, repo.IAMID)
 	if err != nil {
 		return nil, err
 	}
-	project := &proj_model.Project{Name: name}
 	return repo.ProjectEvents.CreateProject(ctx, project, iam.GlobalOrgID == ctxData.OrgID)
 }
 

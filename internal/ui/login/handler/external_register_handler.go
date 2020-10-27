@@ -1,8 +1,13 @@
 package handler
 
 import (
+	"net/http"
+	"strings"
+
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/rp"
+	"golang.org/x/text/language"
+
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errors "github.com/caos/zitadel/internal/errors"
@@ -10,8 +15,6 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	"net/http"
-	"strings"
 )
 
 func (l *Login) handleExternalRegister(w http.ResponseWriter, r *http.Request) {
@@ -71,11 +74,6 @@ func (l *Login) handleExternalRegisterCallback(w http.ResponseWriter, r *http.Re
 }
 
 func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
-	orgIamPolicy, err := l.getOrgIamPolicy(r, authReq.GetScopeOrgID())
-	if err != nil {
-		l.renderRegisterOption(w, r, authReq, err)
-		return
-	}
 	iam, err := l.authRepo.GetIAM(r.Context())
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
@@ -86,11 +84,24 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		ObjectRoot: models.ObjectRoot{AggregateID: iam.GlobalOrgID},
 		Roles:      []string{orgProjectCreatorRole},
 	}
-	if authReq.GetScopeOrgID() != iam.GlobalOrgID && authReq.GetScopeOrgID() != "" {
-		member = nil
-		resourceOwner = authReq.GetScopeOrgID()
-	}
 
+	if authReq.GetScopeOrgPrimaryDomain() != "" {
+		primaryDomain := authReq.GetScopeOrgPrimaryDomain()
+		org, err := l.authRepo.GetOrgByPrimaryDomain(primaryDomain)
+		if err != nil {
+			l.renderRegisterOption(w, r, authReq, err)
+			return
+		}
+		if org.ID != iam.GlobalOrgID {
+			member = nil
+			resourceOwner = org.ID
+		}
+	}
+	orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
+	if err != nil {
+		l.renderRegisterOption(w, r, authReq, err)
+		return
+	}
 	user, externalIDP := l.mapTokenToLoginUserAndExternalIDP(orgIamPolicy, tokens, idpConfig)
 	_, err = l.authRepo.RegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, member, resourceOwner)
 	if err != nil {
@@ -100,12 +111,12 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) mapTokenToLoginUserAndExternalIDP(orgIamPolicy *org_model.OrgIAMPolicy, tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) (*usr_model.User, *usr_model.ExternalIDP) {
-	username := tokens.IDTokenClaims.PreferredUsername
+func (l *Login) mapTokenToLoginUserAndExternalIDP(orgIamPolicy *iam_model.OrgIAMPolicyView, tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) (*usr_model.User, *usr_model.ExternalIDP) {
+	username := tokens.IDTokenClaims.GetPreferredUsername()
 	switch idpConfig.OIDCUsernameMapping {
 	case iam_model.OIDCMappingFieldEmail:
-		if tokens.IDTokenClaims.EmailVerified && tokens.IDTokenClaims.Email != "" {
-			username = tokens.IDTokenClaims.Email
+		if tokens.IDTokenClaims.IsEmailVerified() && tokens.IDTokenClaims.GetEmail() != "" {
+			username = tokens.IDTokenClaims.GetEmail()
 		}
 	}
 
@@ -120,35 +131,35 @@ func (l *Login) mapTokenToLoginUserAndExternalIDP(orgIamPolicy *org_model.OrgIAM
 		UserName: username,
 		Human: &usr_model.Human{
 			Profile: &usr_model.Profile{
-				FirstName:         tokens.IDTokenClaims.GivenName,
-				LastName:          tokens.IDTokenClaims.FamilyName,
-				PreferredLanguage: tokens.IDTokenClaims.Locale,
-				NickName:          tokens.IDTokenClaims.Nickname,
+				FirstName:         tokens.IDTokenClaims.GetGivenName(),
+				LastName:          tokens.IDTokenClaims.GetFamilyName(),
+				PreferredLanguage: language.Tag(tokens.IDTokenClaims.GetLocale()),
+				NickName:          tokens.IDTokenClaims.GetNickname(),
 			},
 			Email: &usr_model.Email{
-				EmailAddress:    tokens.IDTokenClaims.Email,
-				IsEmailVerified: tokens.IDTokenClaims.EmailVerified,
+				EmailAddress:    tokens.IDTokenClaims.GetEmail(),
+				IsEmailVerified: tokens.IDTokenClaims.IsEmailVerified(),
 			},
 		},
 	}
-	if tokens.IDTokenClaims.PhoneNumber != "" {
+	if tokens.IDTokenClaims.GetPhoneNumber() != "" {
 		user.Phone = &usr_model.Phone{
-			PhoneNumber:     tokens.IDTokenClaims.PhoneNumber,
-			IsPhoneVerified: tokens.IDTokenClaims.PhoneNumberVerified,
+			PhoneNumber:     tokens.IDTokenClaims.GetPhoneNumber(),
+			IsPhoneVerified: tokens.IDTokenClaims.IsPhoneNumberVerified(),
 		}
 	}
 
-	displayName := tokens.IDTokenClaims.PreferredUsername
+	displayName := tokens.IDTokenClaims.GetPreferredUsername()
 	switch idpConfig.OIDCIDPDisplayNameMapping {
 	case iam_model.OIDCMappingFieldEmail:
-		if tokens.IDTokenClaims.EmailVerified && tokens.IDTokenClaims.Email != "" {
-			displayName = tokens.IDTokenClaims.Email
+		if tokens.IDTokenClaims.IsEmailVerified() && tokens.IDTokenClaims.GetEmail() != "" {
+			displayName = tokens.IDTokenClaims.GetEmail()
 		}
 	}
 
 	externalIDP := &usr_model.ExternalIDP{
 		IDPConfigID: idpConfig.IDPConfigID,
-		UserID:      tokens.IDTokenClaims.Subject,
+		UserID:      tokens.IDTokenClaims.GetSubject(),
 		DisplayName: displayName,
 	}
 	return user, externalIDP

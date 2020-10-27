@@ -67,6 +67,8 @@ const (
 	UserDeactivated models.EventType = "user.deactivated"
 	UserReactivated models.EventType = "user.reactivated"
 	UserRemoved     models.EventType = "user.removed"
+
+	UserTokenAdded models.EventType = "user.token.added"
 )
 
 // the following consts are for user(v2).human
@@ -83,6 +85,8 @@ const (
 	HumanPasswordCodeSent       models.EventType = "user.human.password.code.sent"
 	HumanPasswordCheckSucceeded models.EventType = "user.human.password.check.succeeded"
 	HumanPasswordCheckFailed    models.EventType = "user.human.password.check.failed"
+
+	HumanExternalLoginCheckSucceeded models.EventType = "user.human.externallogin.check.succeeded"
 
 	HumanExternalIDPReserved models.EventType = "user.human.externalidp.reserved"
 	HumanExternalIDPReleased models.EventType = "user.human.externalidp.released"

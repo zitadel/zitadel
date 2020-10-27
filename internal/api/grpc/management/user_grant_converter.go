@@ -135,7 +135,7 @@ func userGrantViewFromModel(grant *grant_model.UserGrantView) *management.UserGr
 		Email:         grant.Email,
 		ProjectName:   grant.ProjectName,
 		OrgName:       grant.OrgName,
-		OrgDomain:     grant.OrgDomain,
+		OrgDomain:     grant.OrgPrimaryDomain,
 		RoleKeys:      grant.RoleKeys,
 		UserId:        grant.UserID,
 		ProjectId:     grant.ProjectID,

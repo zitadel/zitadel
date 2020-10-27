@@ -1,9 +1,7 @@
 {{ define "error-message" }}
 {{if .ErrMessage }}
-<div class="field">
-    <div class="error">
-        {{ if .ErrType }}{{ .ErrType }} - {{end}}{{ .ErrMessage }}
-    </div>
+<div class="error">
+    {{ if .ErrType }}{{ .ErrType }} - {{end}}{{ .ErrMessage }}
 </div>
 {{end}}
 {{ end }}

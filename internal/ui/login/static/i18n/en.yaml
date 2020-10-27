@@ -187,6 +187,7 @@ Errors:
   AuthRequest:
     NotFound: Could not find authrequest
     UserAgentNotCorresponding: User Agent does not correspond
+    RequestTypeNotSupported: Request type is not supported
   User:
     NotFound: User could not be found
     NotMatchingUserID: User and user in authrequest don't match
@@ -225,6 +226,8 @@ Errors:
     NotActive: User is not active
     ExternalIDP:
       IDPTypeNotImplemented: IDP Type is not implemented
+      NotAllowed: External Login Provider not allowed
+    GrantRequired: Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.
 
 
 optional: (optional)

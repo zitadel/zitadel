@@ -1,17 +1,24 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { ViewportScroller } from '@angular/common';
-import { Component, HostBinding, Inject, OnDestroy, ViewChild } from '@angular/core';
+import { DOCUMENT, ViewportScroller } from '@angular/common';
+import { Component, ElementRef, HostBinding, Inject, OnDestroy, ViewChild } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router, RouterOutlet } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
-import { Observable, of, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
+import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
+import { catchError, debounceTime, finalize, map, take } from 'rxjs/operators';
 
 import { accountCard, navAnimations, routeAnimations, toolbarAnimation } from './animations';
-import { Org, UserProfileView } from './proto/generated/auth_pb';
+import {
+    MyProjectOrgSearchKey,
+    MyProjectOrgSearchQuery,
+    Org,
+    SearchMethod,
+    UserProfileView,
+} from './proto/generated/auth_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';
@@ -32,6 +39,7 @@ import { UpdateService } from './services/update.service';
 })
 export class AppComponent implements OnDestroy {
     @ViewChild('drawer') public drawer!: MatDrawer;
+    @ViewChild('input', { static: false }) input!: ElementRef;
     public isHandset$: Observable<boolean> = this.breakpointObserver
         .observe('(max-width: 599px)')
         .pipe(map(result => {
@@ -41,17 +49,18 @@ export class AppComponent implements OnDestroy {
 
     public showAccount: boolean = false;
     public org!: Org.AsObject;
-    public orgs: Org.AsObject[] = [];
+    public orgs$: Observable<Org.AsObject[]> = of([]);
     public profile!: UserProfileView.AsObject;
     public isDarkTheme: Observable<boolean> = of(true);
 
-    public orgLoading: boolean = false;
+    public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
 
     public showProjectSection: boolean = false;
 
     public grantedProjectsCount: number = 0;
     public ownedProjectsCount: number = 0;
 
+    public filterControl: FormControl = new FormControl('');
     private authSub: Subscription = new Subscription();
     private orgSub: Subscription = new Subscription();
 
@@ -70,6 +79,7 @@ export class AppComponent implements OnDestroy {
         private toast: ToastService,
         private router: Router,
         update: UpdateService,
+        @Inject(DOCUMENT) private document: Document,
     ) {
         console.log('%cWait!', 'text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; color: #5282c1; font-size: 50px');
         console.log('%cInserting something here could give attackers access to your zitadel account.', 'color: red; font-size: 18px');
@@ -140,7 +150,6 @@ export class AppComponent implements OnDestroy {
 
         this.orgSub = this.authService.activeOrgChanged.subscribe(org => {
             this.org = org;
-
             this.getProjectCount();
         });
 
@@ -160,6 +169,16 @@ export class AppComponent implements OnDestroy {
 
         this.isDarkTheme = this.themeService.isDarkTheme;
         this.isDarkTheme.subscribe(thema => this.onSetTheme(thema ? 'dark-theme' : 'light-theme'));
+
+        this.translate.onLangChange.subscribe((language: LangChangeEvent) => {
+            this.document.documentElement.lang = language.lang;
+        });
+
+        this.filterControl.valueChanges.pipe(debounceTime(300)).subscribe(value => {
+            this.loadOrgs(
+                value.trim().toLowerCase(),
+            );
+        });
     }
 
     public ngOnDestroy(): void {
@@ -167,15 +186,26 @@ export class AppComponent implements OnDestroy {
         this.orgSub.unsubscribe();
     }
 
-    public loadOrgs(): void {
-        this.orgLoading = true;
-        this.authService.SearchMyProjectOrgs(10, 0).then(res => {
-            this.orgs = res.toObject().resultList;
-            this.orgLoading = false;
-        }).catch(error => {
-            this.toast.showError(error);
-            this.orgLoading = false;
-        });
+    public loadOrgs(filter?: string): void {
+        let query;
+        if (filter) {
+            query = new MyProjectOrgSearchQuery();
+            query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
+            query.setKey(MyProjectOrgSearchKey.MYPROJECTORGSEARCHKEY_ORG_NAME);
+            query.setValue(filter);
+        }
+
+        this.orgLoading$.next(true);
+        this.orgs$ = from(this.authService.SearchMyProjectOrgs(10, 0, query ? [query] : undefined)).pipe(
+            map(resp => {
+                return resp.toObject().resultList;
+            }),
+            catchError(() => of([])),
+            finalize(() => {
+                this.orgLoading$.next(false);
+                this.focusFilter();
+            }),
+        );
     }
 
     public prepareRoute(outlet: RouterOutlet): boolean {
@@ -200,19 +230,24 @@ export class AppComponent implements OnDestroy {
 
         this.authService.user.subscribe(userprofile => {
             this.profile = userprofile;
-            const lang = userprofile.preferredLanguage.match(/en|de/) ? userprofile.preferredLanguage : 'en';
+            const cropped = navigator.language.split('-')[0] ?? 'en';
+            const fallbackLang = cropped.match(/en|de/) ? cropped : 'en';
+            const lang = userprofile.preferredLanguage.match(/en|de/) ? userprofile.preferredLanguage : fallbackLang;
             this.translate.use(lang);
+            this.document.documentElement.lang = lang;
         });
     }
 
     public setActiveOrg(org: Org.AsObject): void {
         this.org = org;
         this.authService.setActiveOrg(org);
-        this.router.navigate(['/']);
+        this.authService.zitadelPermissionsChanged.pipe(take(1)).subscribe(() => {
+            this.router.navigate(['/']);
+        });
     }
 
     private getProjectCount(): void {
-        this.authService.isAllowed(['project.read']).subscribe((allowed) => {
+        this.authService.isAllowed(['project.read$']).subscribe((allowed) => {
             if (allowed) {
                 this.mgmtService.SearchProjects(0, 0).then(res => {
                     this.ownedProjectsCount = res.toObject().totalResult;
@@ -223,6 +258,12 @@ export class AppComponent implements OnDestroy {
                 });
             }
         });
+    }
+
+    focusFilter(): void {
+        setTimeout(() => {
+            this.input.nativeElement.focus();
+        }, 0);
     }
 }
 

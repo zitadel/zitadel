@@ -20,20 +20,20 @@ import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
+import { PolicyGridModule } from 'src/app/modules/policy-grid/policy-grid.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
-import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
-import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
-import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
+import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
+import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
 import { FailedEventsComponent } from './failed-events/failed-events.component';
-import { IamPolicyGridComponent } from './iam-policy-grid/iam-policy-grid.component';
 import { IamRoutingModule } from './iam-routing.module';
 import { IamViewsComponent } from './iam-views/iam-views.component';
 import { IamComponent } from './iam.component';
 
 @NgModule({
-    declarations: [IamComponent, IamViewsComponent, FailedEventsComponent, IamPolicyGridComponent],
+    declarations: [IamComponent, IamViewsComponent, FailedEventsComponent],
     imports: [
         CommonModule,
         IamRoutingModule,
@@ -63,6 +63,8 @@ import { IamComponent } from './iam.component';
         SharedModule,
         RefreshTableModule,
         HasRolePipeModule,
+        MatSortModule,
+        PolicyGridModule,
     ],
 })
 export class IamModule { }

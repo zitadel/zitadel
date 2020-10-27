@@ -44,34 +44,40 @@ func appConfigFromModel(app *proj_model.Application) management.AppConfig {
 
 func oidcConfigFromModel(config *proj_model.OIDCConfig) *management.OIDCConfig {
 	return &management.OIDCConfig{
-		RedirectUris:           config.RedirectUris,
-		ResponseTypes:          oidcResponseTypesFromModel(config.ResponseTypes),
-		GrantTypes:             oidcGrantTypesFromModel(config.GrantTypes),
-		ApplicationType:        oidcApplicationTypeFromModel(config.ApplicationType),
-		ClientId:               config.ClientID,
-		ClientSecret:           config.ClientSecretString,
-		AuthMethodType:         oidcAuthMethodTypeFromModel(config.AuthMethodType),
-		PostLogoutRedirectUris: config.PostLogoutRedirectUris,
-		Version:                oidcVersionFromModel(config.OIDCVersion),
-		NoneCompliant:          config.Compliance.NoneCompliant,
-		ComplianceProblems:     complianceProblemsToLocalizedMessages(config.Compliance.Problems),
-		DevMode:                config.DevMode,
+		RedirectUris:             config.RedirectUris,
+		ResponseTypes:            oidcResponseTypesFromModel(config.ResponseTypes),
+		GrantTypes:               oidcGrantTypesFromModel(config.GrantTypes),
+		ApplicationType:          oidcApplicationTypeFromModel(config.ApplicationType),
+		ClientId:                 config.ClientID,
+		ClientSecret:             config.ClientSecretString,
+		AuthMethodType:           oidcAuthMethodTypeFromModel(config.AuthMethodType),
+		PostLogoutRedirectUris:   config.PostLogoutRedirectUris,
+		Version:                  oidcVersionFromModel(config.OIDCVersion),
+		NoneCompliant:            config.Compliance.NoneCompliant,
+		ComplianceProblems:       complianceProblemsToLocalizedMessages(config.Compliance.Problems),
+		DevMode:                  config.DevMode,
+		AccessTokenType:          oidcTokenTypeFromModel(config.AccessTokenType),
+		AccessTokenRoleAssertion: config.AccessTokenRoleAssertion,
+		IdTokenRoleAssertion:     config.IDTokenRoleAssertion,
 	}
 }
 
 func oidcConfigFromApplicationViewModel(app *proj_model.ApplicationView) *management.OIDCConfig {
 	return &management.OIDCConfig{
-		RedirectUris:           app.OIDCRedirectUris,
-		ResponseTypes:          oidcResponseTypesFromModel(app.OIDCResponseTypes),
-		GrantTypes:             oidcGrantTypesFromModel(app.OIDCGrantTypes),
-		ApplicationType:        oidcApplicationTypeFromModel(app.OIDCApplicationType),
-		ClientId:               app.OIDCClientID,
-		AuthMethodType:         oidcAuthMethodTypeFromModel(app.OIDCAuthMethodType),
-		PostLogoutRedirectUris: app.OIDCPostLogoutRedirectUris,
-		Version:                oidcVersionFromModel(app.OIDCVersion),
-		NoneCompliant:          app.NoneCompliant,
-		ComplianceProblems:     complianceProblemsToLocalizedMessages(app.ComplianceProblems),
-		DevMode:                app.DevMode,
+		RedirectUris:             app.OIDCRedirectUris,
+		ResponseTypes:            oidcResponseTypesFromModel(app.OIDCResponseTypes),
+		GrantTypes:               oidcGrantTypesFromModel(app.OIDCGrantTypes),
+		ApplicationType:          oidcApplicationTypeFromModel(app.OIDCApplicationType),
+		ClientId:                 app.OIDCClientID,
+		AuthMethodType:           oidcAuthMethodTypeFromModel(app.OIDCAuthMethodType),
+		PostLogoutRedirectUris:   app.OIDCPostLogoutRedirectUris,
+		Version:                  oidcVersionFromModel(app.OIDCVersion),
+		NoneCompliant:            app.NoneCompliant,
+		ComplianceProblems:       complianceProblemsToLocalizedMessages(app.ComplianceProblems),
+		DevMode:                  app.DevMode,
+		AccessTokenType:          oidcTokenTypeFromModel(app.AccessTokenType),
+		AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
+		IdTokenRoleAssertion:     app.IDTokenRoleAssertion,
 	}
 }
 
@@ -92,14 +98,17 @@ func oidcAppCreateToModel(app *management.OIDCApplicationCreate) *proj_model.App
 		Name: app.Name,
 		Type: proj_model.AppTypeOIDC,
 		OIDCConfig: &proj_model.OIDCConfig{
-			OIDCVersion:            oidcVersionToModel(app.Version),
-			RedirectUris:           app.RedirectUris,
-			ResponseTypes:          oidcResponseTypesToModel(app.ResponseTypes),
-			GrantTypes:             oidcGrantTypesToModel(app.GrantTypes),
-			ApplicationType:        oidcApplicationTypeToModel(app.ApplicationType),
-			AuthMethodType:         oidcAuthMethodTypeToModel(app.AuthMethodType),
-			PostLogoutRedirectUris: app.PostLogoutRedirectUris,
-			DevMode:                app.DevMode,
+			OIDCVersion:              oidcVersionToModel(app.Version),
+			RedirectUris:             app.RedirectUris,
+			ResponseTypes:            oidcResponseTypesToModel(app.ResponseTypes),
+			GrantTypes:               oidcGrantTypesToModel(app.GrantTypes),
+			ApplicationType:          oidcApplicationTypeToModel(app.ApplicationType),
+			AuthMethodType:           oidcAuthMethodTypeToModel(app.AuthMethodType),
+			PostLogoutRedirectUris:   app.PostLogoutRedirectUris,
+			DevMode:                  app.DevMode,
+			AccessTokenType:          oidcTokenTypeToModel(app.AccessTokenType),
+			AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
+			IDTokenRoleAssertion:     app.IdTokenRoleAssertion,
 		},
 	}
 }
@@ -119,14 +128,17 @@ func oidcConfigUpdateToModel(app *management.OIDCConfigUpdate) *proj_model.OIDCC
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: app.ProjectId,
 		},
-		AppID:                  app.ApplicationId,
-		RedirectUris:           app.RedirectUris,
-		ResponseTypes:          oidcResponseTypesToModel(app.ResponseTypes),
-		GrantTypes:             oidcGrantTypesToModel(app.GrantTypes),
-		ApplicationType:        oidcApplicationTypeToModel(app.ApplicationType),
-		AuthMethodType:         oidcAuthMethodTypeToModel(app.AuthMethodType),
-		PostLogoutRedirectUris: app.PostLogoutRedirectUris,
-		DevMode:                app.DevMode,
+		AppID:                    app.ApplicationId,
+		RedirectUris:             app.RedirectUris,
+		ResponseTypes:            oidcResponseTypesToModel(app.ResponseTypes),
+		GrantTypes:               oidcGrantTypesToModel(app.GrantTypes),
+		ApplicationType:          oidcApplicationTypeToModel(app.ApplicationType),
+		AuthMethodType:           oidcAuthMethodTypeToModel(app.AuthMethodType),
+		PostLogoutRedirectUris:   app.PostLogoutRedirectUris,
+		DevMode:                  app.DevMode,
+		AccessTokenType:          oidcTokenTypeToModel(app.AccessTokenType),
+		AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
+		IDTokenRoleAssertion:     app.IdTokenRoleAssertion,
 	}
 }
 
@@ -348,6 +360,28 @@ func oidcAuthMethodTypeFromModel(authType proj_model.OIDCAuthMethodType) managem
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE
 	default:
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC
+	}
+}
+
+func oidcTokenTypeToModel(tokenType management.OIDCTokenType) proj_model.OIDCTokenType {
+	switch tokenType {
+	case management.OIDCTokenType_OIDCTokenType_Bearer:
+		return proj_model.OIDCTokenTypeBearer
+	case management.OIDCTokenType_OIDCTokenType_JWT:
+		return proj_model.OIDCTokenTypeJWT
+	default:
+		return proj_model.OIDCTokenTypeBearer
+	}
+}
+
+func oidcTokenTypeFromModel(tokenType proj_model.OIDCTokenType) management.OIDCTokenType {
+	switch tokenType {
+	case proj_model.OIDCTokenTypeBearer:
+		return management.OIDCTokenType_OIDCTokenType_Bearer
+	case proj_model.OIDCTokenTypeJWT:
+		return management.OIDCTokenType_OIDCTokenType_JWT
+	default:
+		return management.OIDCTokenType_OIDCTokenType_Bearer
 	}
 }
 

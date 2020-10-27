@@ -1,0 +1,26 @@
+<app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam' : '/org']"
+    [title]="'POLICY.IAM_POLICY.TITLECREATE' | translate" [description]="'POLICY.IAM_POLICY.DESCRIPTION' | translate">
+    <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
+
+    <ng-template appHasRole [appHasRole]="['iam.policy.delete']">
+        <button *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
+            matTooltip="{{'POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()" mat-stroked-button>
+            {{'POLICY.RESET' | translate}}
+        </button>
+    </ng-template>
+
+    <div class="content" *ngIf="iamData">
+        <div class="row">
+            <span class="left-desc">{{'POLICY.DATA.USERLOGINMUSTBEDOMAIN' | translate}}</span>
+            <span class="fill-space"></span>
+            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+                [(ngModel)]="iamData.userLoginMustBeDomain">
+            </mat-slide-toggle>
+        </div>
+    </div>
+
+    <div class="btn-container">
+        <button (click)="savePolicy()" color="primary" type="submit"
+            mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+    </div>
+</app-detail-layout>

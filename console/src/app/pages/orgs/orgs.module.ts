@@ -17,20 +17,19 @@ import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/memb
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
+import { PolicyGridModule } from 'src/app/modules/policy-grid/policy-grid.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
-import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { ChangesModule } from '../../modules/changes/changes.module';
 import { AddDomainDialogModule } from './org-detail/add-domain-dialog/add-domain-dialog.module';
 import { DomainVerificationComponent } from './org-detail/domain-verification/domain-verification.component';
 import { OrgDetailComponent } from './org-detail/org-detail.component';
-import { OrgGridComponent } from './org-grid/org-grid.component';
 import { OrgsRoutingModule } from './orgs-routing.module';
-import { PolicyGridComponent } from './policy-grid/policy-grid.component';
 
 @NgModule({
-    declarations: [OrgDetailComponent, OrgGridComponent, PolicyGridComponent, DomainVerificationComponent],
+    declarations: [OrgDetailComponent, DomainVerificationComponent],
     imports: [
         CommonModule,
         HasRolePipeModule,
@@ -48,7 +47,6 @@ import { PolicyGridComponent } from './policy-grid/policy-grid.component';
         MetaLayoutModule,
         MatTabsModule,
         MatTooltipModule,
-        MatDialogModule,
         WarnDialogModule,
         MemberCreateDialogModule,
         MatMenuModule,
@@ -58,6 +56,7 @@ import { PolicyGridComponent } from './policy-grid/policy-grid.component';
         SharedModule,
         ContributorsModule,
         CopyToClipboardModule,
+        PolicyGridModule,
     ],
 })
 export class OrgsModule { }

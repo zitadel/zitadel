@@ -1,47 +1,7 @@
-.add-button {
-  border-radius: .5rem;
+.wrapp {
+  width: 100% !important;
 }
 
-.table-wrapper {
-  overflow: auto;
-  width: 100%;
-
-  .table,
-  .paginator {
-    width: 100%;
-
-    td,
-    th {
-      padding: .5rem;
-
-      &:first-child {
-        padding-left: 0;
-        padding-right: 1rem;
-      }
-
-      &:last-child {
-        padding-right: 0;
-      }
-    }
-
-    .action {
-      width: 40px;
-    }
-
-    .data-row {
-      &:hover {
-        background-color: #ffffff05;
-      }
-    }
-
-    .selection {
-      width: 50px;
-      max-width: 50px;
-    }
-  }
-}
-
-.pointer {
-  outline: none;
-  cursor: pointer;
+.del-button {
+  margin-right: .5rem;
 }

@@ -9,8 +9,6 @@ import (
 	"github.com/caos/zitadel/internal/notification/providers/email"
 	"github.com/caos/zitadel/internal/notification/providers/twilio"
 	"github.com/caos/zitadel/internal/notification/templates"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	pol "github.com/caos/zitadel/internal/policy"
 )
 
 type SystemDefaults struct {
@@ -22,7 +20,6 @@ type SystemDefaults struct {
 	IDPConfigVerificationKey *crypto.KeyConfig
 	Multifactors             MultifactorConfig
 	VerificationLifetimes    VerificationLifetimes
-	DefaultPolicies          DefaultPolicies
 	DomainVerification       DomainVerification
 	IamID                    string
 	Notifications            Notifications
@@ -53,17 +50,11 @@ type OTPConfig struct {
 }
 
 type VerificationLifetimes struct {
-	PasswordCheck    types.Duration
-	MfaInitSkip      types.Duration
-	MfaSoftwareCheck types.Duration
-	MfaHardwareCheck types.Duration
-}
-
-type DefaultPolicies struct {
-	Age        pol.PasswordAgePolicyDefault
-	Complexity pol.PasswordComplexityPolicyDefault
-	Lockout    pol.PasswordLockoutPolicyDefault
-	OrgIam     org_model.OrgIAMPolicy
+	PasswordCheck      types.Duration
+	ExternalLoginCheck types.Duration
+	MfaInitSkip        types.Duration
+	MfaSoftwareCheck   types.Duration
+	MfaHardwareCheck   types.Duration
 }
 
 type DomainVerification struct {

@@ -398,7 +398,7 @@ func (mr *MockManagementServiceClientMockRecorder) ChangeUserUserName(arg0, arg1
 }
 
 // CreateLoginPolicy mocks base method
-func (m *MockManagementServiceClient) CreateLoginPolicy(arg0 context.Context, arg1 *management.LoginPolicyAdd, arg2 ...grpc.CallOption) (*management.LoginPolicy, error) {
+func (m *MockManagementServiceClient) CreateLoginPolicy(arg0 context.Context, arg1 *management.LoginPolicyRequest, arg2 ...grpc.CallOption) (*management.LoginPolicy, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -478,7 +478,7 @@ func (mr *MockManagementServiceClientMockRecorder) CreateOrg(arg0, arg1 interfac
 }
 
 // CreatePasswordAgePolicy mocks base method
-func (m *MockManagementServiceClient) CreatePasswordAgePolicy(arg0 context.Context, arg1 *management.PasswordAgePolicyCreate, arg2 ...grpc.CallOption) (*management.PasswordAgePolicy, error) {
+func (m *MockManagementServiceClient) CreatePasswordAgePolicy(arg0 context.Context, arg1 *management.PasswordAgePolicyRequest, arg2 ...grpc.CallOption) (*management.PasswordAgePolicy, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -498,7 +498,7 @@ func (mr *MockManagementServiceClientMockRecorder) CreatePasswordAgePolicy(arg0,
 }
 
 // CreatePasswordComplexityPolicy mocks base method
-func (m *MockManagementServiceClient) CreatePasswordComplexityPolicy(arg0 context.Context, arg1 *management.PasswordComplexityPolicyCreate, arg2 ...grpc.CallOption) (*management.PasswordComplexityPolicy, error) {
+func (m *MockManagementServiceClient) CreatePasswordComplexityPolicy(arg0 context.Context, arg1 *management.PasswordComplexityPolicyRequest, arg2 ...grpc.CallOption) (*management.PasswordComplexityPolicy, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -518,7 +518,7 @@ func (mr *MockManagementServiceClientMockRecorder) CreatePasswordComplexityPolic
 }
 
 // CreatePasswordLockoutPolicy mocks base method
-func (m *MockManagementServiceClient) CreatePasswordLockoutPolicy(arg0 context.Context, arg1 *management.PasswordLockoutPolicyCreate, arg2 ...grpc.CallOption) (*management.PasswordLockoutPolicy, error) {
+func (m *MockManagementServiceClient) CreatePasswordLockoutPolicy(arg0 context.Context, arg1 *management.PasswordLockoutPolicyRequest, arg2 ...grpc.CallOption) (*management.PasswordLockoutPolicy, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -777,66 +777,6 @@ func (mr *MockManagementServiceClientMockRecorder) DeleteMachineKey(arg0, arg1 i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMachineKey", reflect.TypeOf((*MockManagementServiceClient)(nil).DeleteMachineKey), varargs...)
 }
 
-// DeletePasswordAgePolicy mocks base method
-func (m *MockManagementServiceClient) DeletePasswordAgePolicy(arg0 context.Context, arg1 *management.PasswordAgePolicyID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "DeletePasswordAgePolicy", varargs...)
-	ret0, _ := ret[0].(*emptypb.Empty)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeletePasswordAgePolicy indicates an expected call of DeletePasswordAgePolicy
-func (mr *MockManagementServiceClientMockRecorder) DeletePasswordAgePolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePasswordAgePolicy", reflect.TypeOf((*MockManagementServiceClient)(nil).DeletePasswordAgePolicy), varargs...)
-}
-
-// DeletePasswordComplexityPolicy mocks base method
-func (m *MockManagementServiceClient) DeletePasswordComplexityPolicy(arg0 context.Context, arg1 *management.PasswordComplexityPolicyID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "DeletePasswordComplexityPolicy", varargs...)
-	ret0, _ := ret[0].(*emptypb.Empty)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeletePasswordComplexityPolicy indicates an expected call of DeletePasswordComplexityPolicy
-func (mr *MockManagementServiceClientMockRecorder) DeletePasswordComplexityPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePasswordComplexityPolicy", reflect.TypeOf((*MockManagementServiceClient)(nil).DeletePasswordComplexityPolicy), varargs...)
-}
-
-// DeletePasswordLockoutPolicy mocks base method
-func (m *MockManagementServiceClient) DeletePasswordLockoutPolicy(arg0 context.Context, arg1 *management.PasswordLockoutPolicyID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "DeletePasswordLockoutPolicy", varargs...)
-	ret0, _ := ret[0].(*emptypb.Empty)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeletePasswordLockoutPolicy indicates an expected call of DeletePasswordLockoutPolicy
-func (mr *MockManagementServiceClientMockRecorder) DeletePasswordLockoutPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePasswordLockoutPolicy", reflect.TypeOf((*MockManagementServiceClient)(nil).DeletePasswordLockoutPolicy), varargs...)
-}
-
 // DeleteUser mocks base method
 func (m *MockManagementServiceClient) DeleteUser(arg0 context.Context, arg1 *management.UserID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
@@ -877,15 +817,55 @@ func (mr *MockManagementServiceClientMockRecorder) GenerateMyOrgDomainValidation
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateMyOrgDomainValidation", reflect.TypeOf((*MockManagementServiceClient)(nil).GenerateMyOrgDomainValidation), varargs...)
 }
 
+// GetDefaultLoginPolicy mocks base method
+func (m *MockManagementServiceClient) GetDefaultLoginPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.LoginPolicyView, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetDefaultLoginPolicy", varargs...)
+	ret0, _ := ret[0].(*management.LoginPolicyView)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDefaultLoginPolicy indicates an expected call of GetDefaultLoginPolicy
+func (mr *MockManagementServiceClientMockRecorder) GetDefaultLoginPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultLoginPolicy", reflect.TypeOf((*MockManagementServiceClient)(nil).GetDefaultLoginPolicy), varargs...)
+}
+
+// GetDefaultPasswordAgePolicy mocks base method
+func (m *MockManagementServiceClient) GetDefaultPasswordAgePolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.PasswordAgePolicyView, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetDefaultPasswordAgePolicy", varargs...)
+	ret0, _ := ret[0].(*management.PasswordAgePolicyView)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDefaultPasswordAgePolicy indicates an expected call of GetDefaultPasswordAgePolicy
+func (mr *MockManagementServiceClientMockRecorder) GetDefaultPasswordAgePolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultPasswordAgePolicy", reflect.TypeOf((*MockManagementServiceClient)(nil).GetDefaultPasswordAgePolicy), varargs...)
+}
+
 // GetDefaultPasswordComplexityPolicy mocks base method
-func (m *MockManagementServiceClient) GetDefaultPasswordComplexityPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.PasswordComplexityPolicy, error) {
+func (m *MockManagementServiceClient) GetDefaultPasswordComplexityPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.PasswordComplexityPolicyView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetDefaultPasswordComplexityPolicy", varargs...)
-	ret0, _ := ret[0].(*management.PasswordComplexityPolicy)
+	ret0, _ := ret[0].(*management.PasswordComplexityPolicyView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -895,6 +875,26 @@ func (mr *MockManagementServiceClientMockRecorder) GetDefaultPasswordComplexityP
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultPasswordComplexityPolicy", reflect.TypeOf((*MockManagementServiceClient)(nil).GetDefaultPasswordComplexityPolicy), varargs...)
+}
+
+// GetDefaultPasswordLockoutPolicy mocks base method
+func (m *MockManagementServiceClient) GetDefaultPasswordLockoutPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.PasswordLockoutPolicyView, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetDefaultPasswordLockoutPolicy", varargs...)
+	ret0, _ := ret[0].(*management.PasswordLockoutPolicyView)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDefaultPasswordLockoutPolicy indicates an expected call of GetDefaultPasswordLockoutPolicy
+func (mr *MockManagementServiceClientMockRecorder) GetDefaultPasswordLockoutPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultPasswordLockoutPolicy", reflect.TypeOf((*MockManagementServiceClient)(nil).GetDefaultPasswordLockoutPolicy), varargs...)
 }
 
 // GetGrantedProjectByID mocks base method
@@ -1018,14 +1018,14 @@ func (mr *MockManagementServiceClientMockRecorder) GetMyOrg(arg0, arg1 interface
 }
 
 // GetMyOrgIamPolicy mocks base method
-func (m *MockManagementServiceClient) GetMyOrgIamPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.OrgIamPolicy, error) {
+func (m *MockManagementServiceClient) GetMyOrgIamPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.OrgIamPolicyView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetMyOrgIamPolicy", varargs...)
-	ret0, _ := ret[0].(*management.OrgIamPolicy)
+	ret0, _ := ret[0].(*management.OrgIamPolicyView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1078,14 +1078,14 @@ func (mr *MockManagementServiceClientMockRecorder) GetOrgMemberRoles(arg0, arg1 
 }
 
 // GetPasswordAgePolicy mocks base method
-func (m *MockManagementServiceClient) GetPasswordAgePolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.PasswordAgePolicy, error) {
+func (m *MockManagementServiceClient) GetPasswordAgePolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.PasswordAgePolicyView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetPasswordAgePolicy", varargs...)
-	ret0, _ := ret[0].(*management.PasswordAgePolicy)
+	ret0, _ := ret[0].(*management.PasswordAgePolicyView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1098,14 +1098,14 @@ func (mr *MockManagementServiceClientMockRecorder) GetPasswordAgePolicy(arg0, ar
 }
 
 // GetPasswordComplexityPolicy mocks base method
-func (m *MockManagementServiceClient) GetPasswordComplexityPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.PasswordComplexityPolicy, error) {
+func (m *MockManagementServiceClient) GetPasswordComplexityPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.PasswordComplexityPolicyView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetPasswordComplexityPolicy", varargs...)
-	ret0, _ := ret[0].(*management.PasswordComplexityPolicy)
+	ret0, _ := ret[0].(*management.PasswordComplexityPolicyView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1118,14 +1118,14 @@ func (mr *MockManagementServiceClientMockRecorder) GetPasswordComplexityPolicy(a
 }
 
 // GetPasswordLockoutPolicy mocks base method
-func (m *MockManagementServiceClient) GetPasswordLockoutPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.PasswordLockoutPolicy, error) {
+func (m *MockManagementServiceClient) GetPasswordLockoutPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.PasswordLockoutPolicyView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetPasswordLockoutPolicy", varargs...)
-	ret0, _ := ret[0].(*management.PasswordLockoutPolicy)
+	ret0, _ := ret[0].(*management.PasswordLockoutPolicyView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1817,6 +1817,66 @@ func (mr *MockManagementServiceClientMockRecorder) RemoveMyOrgMember(arg0, arg1 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMyOrgMember", reflect.TypeOf((*MockManagementServiceClient)(nil).RemoveMyOrgMember), varargs...)
 }
 
+// RemovePasswordAgePolicy mocks base method
+func (m *MockManagementServiceClient) RemovePasswordAgePolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RemovePasswordAgePolicy", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemovePasswordAgePolicy indicates an expected call of RemovePasswordAgePolicy
+func (mr *MockManagementServiceClientMockRecorder) RemovePasswordAgePolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemovePasswordAgePolicy", reflect.TypeOf((*MockManagementServiceClient)(nil).RemovePasswordAgePolicy), varargs...)
+}
+
+// RemovePasswordComplexityPolicy mocks base method
+func (m *MockManagementServiceClient) RemovePasswordComplexityPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RemovePasswordComplexityPolicy", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemovePasswordComplexityPolicy indicates an expected call of RemovePasswordComplexityPolicy
+func (mr *MockManagementServiceClientMockRecorder) RemovePasswordComplexityPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemovePasswordComplexityPolicy", reflect.TypeOf((*MockManagementServiceClient)(nil).RemovePasswordComplexityPolicy), varargs...)
+}
+
+// RemovePasswordLockoutPolicy mocks base method
+func (m *MockManagementServiceClient) RemovePasswordLockoutPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RemovePasswordLockoutPolicy", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemovePasswordLockoutPolicy indicates an expected call of RemovePasswordLockoutPolicy
+func (mr *MockManagementServiceClientMockRecorder) RemovePasswordLockoutPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemovePasswordLockoutPolicy", reflect.TypeOf((*MockManagementServiceClient)(nil).RemovePasswordLockoutPolicy), varargs...)
+}
+
 // RemoveProject mocks base method
 func (m *MockManagementServiceClient) RemoveProject(arg0 context.Context, arg1 *management.ProjectID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
@@ -2438,7 +2498,7 @@ func (mr *MockManagementServiceClientMockRecorder) UpdateIdpConfig(arg0, arg1 in
 }
 
 // UpdateLoginPolicy mocks base method
-func (m *MockManagementServiceClient) UpdateLoginPolicy(arg0 context.Context, arg1 *management.LoginPolicy, arg2 ...grpc.CallOption) (*management.LoginPolicy, error) {
+func (m *MockManagementServiceClient) UpdateLoginPolicy(arg0 context.Context, arg1 *management.LoginPolicyRequest, arg2 ...grpc.CallOption) (*management.LoginPolicy, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -2478,7 +2538,7 @@ func (mr *MockManagementServiceClientMockRecorder) UpdateOidcIdpConfig(arg0, arg
 }
 
 // UpdatePasswordAgePolicy mocks base method
-func (m *MockManagementServiceClient) UpdatePasswordAgePolicy(arg0 context.Context, arg1 *management.PasswordAgePolicyUpdate, arg2 ...grpc.CallOption) (*management.PasswordAgePolicy, error) {
+func (m *MockManagementServiceClient) UpdatePasswordAgePolicy(arg0 context.Context, arg1 *management.PasswordAgePolicyRequest, arg2 ...grpc.CallOption) (*management.PasswordAgePolicy, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -2498,7 +2558,7 @@ func (mr *MockManagementServiceClientMockRecorder) UpdatePasswordAgePolicy(arg0,
 }
 
 // UpdatePasswordComplexityPolicy mocks base method
-func (m *MockManagementServiceClient) UpdatePasswordComplexityPolicy(arg0 context.Context, arg1 *management.PasswordComplexityPolicyUpdate, arg2 ...grpc.CallOption) (*management.PasswordComplexityPolicy, error) {
+func (m *MockManagementServiceClient) UpdatePasswordComplexityPolicy(arg0 context.Context, arg1 *management.PasswordComplexityPolicyRequest, arg2 ...grpc.CallOption) (*management.PasswordComplexityPolicy, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -2518,7 +2578,7 @@ func (mr *MockManagementServiceClientMockRecorder) UpdatePasswordComplexityPolic
 }
 
 // UpdatePasswordLockoutPolicy mocks base method
-func (m *MockManagementServiceClient) UpdatePasswordLockoutPolicy(arg0 context.Context, arg1 *management.PasswordLockoutPolicyUpdate, arg2 ...grpc.CallOption) (*management.PasswordLockoutPolicy, error) {
+func (m *MockManagementServiceClient) UpdatePasswordLockoutPolicy(arg0 context.Context, arg1 *management.PasswordLockoutPolicyRequest, arg2 ...grpc.CallOption) (*management.PasswordLockoutPolicy, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {

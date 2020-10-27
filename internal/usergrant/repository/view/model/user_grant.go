@@ -5,11 +5,12 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/lib/pq"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/usergrant/model"
 	es_model "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
-	"github.com/lib/pq"
 )
 
 const (
@@ -24,19 +25,20 @@ const (
 )
 
 type UserGrantView struct {
-	ID            string         `json:"-" gorm:"column:id;primary_key"`
-	ResourceOwner string         `json:"-" gorm:"resource_owner"`
-	UserID        string         `json:"userId" gorm:"user_id"`
-	ProjectID     string         `json:"projectId" gorm:"column:project_id"`
-	GrantID       string         `json:"grantId" gorm:"column:grant_id"`
-	UserName      string         `json:"-" gorm:"column:user_name"`
-	FirstName     string         `json:"-" gorm:"column:first_name"`
-	LastName      string         `json:"-" gorm:"column:last_name"`
-	DisplayName   string         `json:"-" gorm:"column:display_name"`
-	Email         string         `json:"-" gorm:"column:email"`
-	ProjectName   string         `json:"-" gorm:"column:project_name"`
-	OrgName       string         `json:"-" gorm:"column:org_name"`
-	RoleKeys      pq.StringArray `json:"roleKeys" gorm:"column:role_keys"`
+	ID               string         `json:"-" gorm:"column:id;primary_key"`
+	ResourceOwner    string         `json:"-" gorm:"resource_owner"`
+	UserID           string         `json:"userId" gorm:"user_id"`
+	ProjectID        string         `json:"projectId" gorm:"column:project_id"`
+	GrantID          string         `json:"grantId" gorm:"column:grant_id"`
+	UserName         string         `json:"-" gorm:"column:user_name"`
+	FirstName        string         `json:"-" gorm:"column:first_name"`
+	LastName         string         `json:"-" gorm:"column:last_name"`
+	DisplayName      string         `json:"-" gorm:"column:display_name"`
+	Email            string         `json:"-" gorm:"column:email"`
+	ProjectName      string         `json:"-" gorm:"column:project_name"`
+	OrgName          string         `json:"-" gorm:"column:org_name"`
+	OrgPrimaryDomain string         `json:"-" gorm:"column:org_primary_domain"`
+	RoleKeys         pq.StringArray `json:"roleKeys" gorm:"column:role_keys"`
 
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
@@ -47,22 +49,24 @@ type UserGrantView struct {
 
 func UserGrantToModel(grant *UserGrantView) *model.UserGrantView {
 	return &model.UserGrantView{
-		ID:            grant.ID,
-		ResourceOwner: grant.ResourceOwner,
-		UserID:        grant.UserID,
-		ProjectID:     grant.ProjectID,
-		ChangeDate:    grant.ChangeDate,
-		CreationDate:  grant.CreationDate,
-		State:         model.UserGrantState(grant.State),
-		UserName:      grant.UserName,
-		FirstName:     grant.FirstName,
-		LastName:      grant.LastName,
-		DisplayName:   grant.DisplayName,
-		Email:         grant.Email,
-		ProjectName:   grant.ProjectName,
-		OrgName:       grant.OrgName,
-		RoleKeys:      grant.RoleKeys,
-		Sequence:      grant.Sequence,
+		ID:               grant.ID,
+		ResourceOwner:    grant.ResourceOwner,
+		UserID:           grant.UserID,
+		ProjectID:        grant.ProjectID,
+		ChangeDate:       grant.ChangeDate,
+		CreationDate:     grant.CreationDate,
+		State:            model.UserGrantState(grant.State),
+		UserName:         grant.UserName,
+		FirstName:        grant.FirstName,
+		LastName:         grant.LastName,
+		DisplayName:      grant.DisplayName,
+		Email:            grant.Email,
+		ProjectName:      grant.ProjectName,
+		OrgName:          grant.OrgName,
+		OrgPrimaryDomain: grant.OrgPrimaryDomain,
+		RoleKeys:         grant.RoleKeys,
+		Sequence:         grant.Sequence,
+		GrantID:          grant.GrantID,
 	}
 }
 

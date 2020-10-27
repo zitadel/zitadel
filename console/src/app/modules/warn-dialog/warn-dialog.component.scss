@@ -4,7 +4,7 @@
 }
 
 .desc {
-  color: #8795a1;
+  color: var(--grey);
   font-size: .9rem;
 }
 
@@ -17,9 +17,5 @@
 
   .fill-space {
     flex: 1;
-  }
-
-  button {
-    border-radius: .5rem;
   }
 }

@@ -1,0 +1,20 @@
+<app-detail-layout [backRouterLink]="['/iam']" [title]="'POLICY.LABEL.TITLE' | translate"
+    [description]="'POLICY.LABEL.DESCRIPTION' | translate">
+
+    <div class="content" *ngIf="labelData">
+        <mat-form-field class="form-field" appearance="outline">
+            <mat-label>{{'POLICY.LABEL.PRIMARYCOLOR' | translate}}</mat-label>
+            <input [(ngModel)]="labelData.primaryColor" matInput />
+        </mat-form-field>
+
+        <mat-form-field class="form-field" appearance="outline">
+            <mat-label>{{'POLICY.LABEL.SECONDARYCOLOR' | translate}}</mat-label>
+            <input [(ngModel)]="labelData.secondaryColor" matInput />
+        </mat-form-field>
+    </div>
+
+    <div class="btn-container">
+        <button (click)="savePolicy()" color="primary" type="submit"
+            mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+    </div>
+</app-detail-layout>

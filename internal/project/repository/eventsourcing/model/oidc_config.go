@@ -2,26 +2,31 @@ package model
 
 import (
 	"encoding/json"
+	"reflect"
+
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
-	"reflect"
 )
 
 type OIDCConfig struct {
 	es_models.ObjectRoot
-	Version                int32               `json:"oidcVersion,omitempty"`
-	AppID                  string              `json:"appId"`
-	ClientID               string              `json:"clientId,omitempty"`
-	ClientSecret           *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	RedirectUris           []string            `json:"redirectUris,omitempty"`
-	ResponseTypes          []int32             `json:"responseTypes,omitempty"`
-	GrantTypes             []int32             `json:"grantTypes,omitempty"`
-	ApplicationType        int32               `json:"applicationType,omitempty"`
-	AuthMethodType         int32               `json:"authMethodType,omitempty"`
-	PostLogoutRedirectUris []string            `json:"postLogoutRedirectUris,omitempty"`
-	DevMode                bool                `json:"devMode,omitempty"`
+	Version                  int32               `json:"oidcVersion,omitempty"`
+	AppID                    string              `json:"appId"`
+	ClientID                 string              `json:"clientId,omitempty"`
+	ClientSecret             *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	RedirectUris             []string            `json:"redirectUris,omitempty"`
+	ResponseTypes            []int32             `json:"responseTypes,omitempty"`
+	GrantTypes               []int32             `json:"grantTypes,omitempty"`
+	ApplicationType          int32               `json:"applicationType,omitempty"`
+	AuthMethodType           int32               `json:"authMethodType,omitempty"`
+	PostLogoutRedirectUris   []string            `json:"postLogoutRedirectUris,omitempty"`
+	DevMode                  bool                `json:"devMode,omitempty"`
+	AccessTokenType          int32               `json:"accessTokenType,omitempty"`
+	AccessTokenRoleAssertion bool                `json:"accessTokenRoleAssertion,omitempty"`
+	IDTokenRoleAssertion     bool                `json:"idTokenRoleAssertion,omitempty"`
 }
 
 func (c *OIDCConfig) Changes(changed *OIDCConfig) map[string]interface{} {
@@ -51,6 +56,15 @@ func (c *OIDCConfig) Changes(changed *OIDCConfig) map[string]interface{} {
 	if c.DevMode != changed.DevMode {
 		changes["devMode"] = changed.DevMode
 	}
+	if c.AccessTokenType != changed.AccessTokenType {
+		changes["accessTokenType"] = changed.AccessTokenType
+	}
+	if c.AccessTokenRoleAssertion != changed.AccessTokenRoleAssertion {
+		changes["accessTokenRoleAssertion"] = changed.AccessTokenRoleAssertion
+	}
+	if c.IDTokenRoleAssertion != changed.IDTokenRoleAssertion {
+		changes["idTokenRoleAssertion"] = changed.IDTokenRoleAssertion
+	}
 	return changes
 }
 
@@ -64,18 +78,21 @@ func OIDCConfigFromModel(config *model.OIDCConfig) *OIDCConfig {
 		grantTypes[i] = int32(rt)
 	}
 	return &OIDCConfig{
-		ObjectRoot:             config.ObjectRoot,
-		AppID:                  config.AppID,
-		Version:                int32(config.OIDCVersion),
-		ClientID:               config.ClientID,
-		ClientSecret:           config.ClientSecret,
-		RedirectUris:           config.RedirectUris,
-		ResponseTypes:          responseTypes,
-		GrantTypes:             grantTypes,
-		ApplicationType:        int32(config.ApplicationType),
-		AuthMethodType:         int32(config.AuthMethodType),
-		PostLogoutRedirectUris: config.PostLogoutRedirectUris,
-		DevMode:                config.DevMode,
+		ObjectRoot:               config.ObjectRoot,
+		AppID:                    config.AppID,
+		Version:                  int32(config.OIDCVersion),
+		ClientID:                 config.ClientID,
+		ClientSecret:             config.ClientSecret,
+		RedirectUris:             config.RedirectUris,
+		ResponseTypes:            responseTypes,
+		GrantTypes:               grantTypes,
+		ApplicationType:          int32(config.ApplicationType),
+		AuthMethodType:           int32(config.AuthMethodType),
+		PostLogoutRedirectUris:   config.PostLogoutRedirectUris,
+		DevMode:                  config.DevMode,
+		AccessTokenType:          int32(config.AccessTokenType),
+		AccessTokenRoleAssertion: config.AccessTokenRoleAssertion,
+		IDTokenRoleAssertion:     config.IDTokenRoleAssertion,
 	}
 }
 
@@ -89,18 +106,21 @@ func OIDCConfigToModel(config *OIDCConfig) *model.OIDCConfig {
 		grantTypes[i] = model.OIDCGrantType(rt)
 	}
 	oidcConfig := &model.OIDCConfig{
-		ObjectRoot:             config.ObjectRoot,
-		AppID:                  config.AppID,
-		OIDCVersion:            model.OIDCVersion(config.Version),
-		ClientID:               config.ClientID,
-		ClientSecret:           config.ClientSecret,
-		RedirectUris:           config.RedirectUris,
-		ResponseTypes:          responseTypes,
-		GrantTypes:             grantTypes,
-		ApplicationType:        model.OIDCApplicationType(config.ApplicationType),
-		AuthMethodType:         model.OIDCAuthMethodType(config.AuthMethodType),
-		PostLogoutRedirectUris: config.PostLogoutRedirectUris,
-		DevMode:                config.DevMode,
+		ObjectRoot:               config.ObjectRoot,
+		AppID:                    config.AppID,
+		OIDCVersion:              model.OIDCVersion(config.Version),
+		ClientID:                 config.ClientID,
+		ClientSecret:             config.ClientSecret,
+		RedirectUris:             config.RedirectUris,
+		ResponseTypes:            responseTypes,
+		GrantTypes:               grantTypes,
+		ApplicationType:          model.OIDCApplicationType(config.ApplicationType),
+		AuthMethodType:           model.OIDCAuthMethodType(config.AuthMethodType),
+		PostLogoutRedirectUris:   config.PostLogoutRedirectUris,
+		DevMode:                  config.DevMode,
+		AccessTokenType:          model.OIDCTokenType(config.AccessTokenType),
+		AccessTokenRoleAssertion: config.AccessTokenRoleAssertion,
+		IDTokenRoleAssertion:     config.IDTokenRoleAssertion,
 	}
 	oidcConfig.FillCompliance()
 	return oidcConfig

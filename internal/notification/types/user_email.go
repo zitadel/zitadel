@@ -1,6 +1,8 @@
 package types
 
 import (
+	"html"
+
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/notification/providers"
@@ -14,6 +16,7 @@ func generateEmail(user *view_model.NotifyUser, subject, content string, config 
 	if err != nil {
 		return err
 	}
+	content = html.UnescapeString(content)
 	message := &email.EmailMessage{
 		SenderEmail: config.Providers.Email.From,
 		Recipients:  []string{user.VerifiedEmail},

@@ -52,8 +52,12 @@
             }}</span>
             <span class="fill-space"></span>
         </div>
-        <button [ngClass]="{ selected: selection.isSelected(item)}" (click)="selection.toggle(item)" class="edit-button"
-            mat-icon-button>
+        <button *ngIf="item.projectId !== zitadelProjectId" matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn"
+            (click)="deleteProject(item)" class="delete-button" mat-icon-button>
+            <i class="las la-trash"></i>
+        </button>
+        <button matTooltip="{{'ACTIONS.PIN' | translate}}" [ngClass]="{ selected: selection.isSelected(item)}"
+            (click)="selection.toggle(item)" class="edit-button" mat-icon-button>
             <mat-icon *ngIf="selection.isSelected(item)" svgIcon="mdi_pin"></mat-icon>
             <mat-icon svgIcon="mdi_pin_outline" *ngIf="!selection.isSelected(item)"></mat-icon>
         </button>

@@ -19,10 +19,6 @@
   .ok-button {
     margin-left: .5rem;
   }
-
-  button {
-    border-radius: .5rem;
-  }
 }
 
 .row {
@@ -37,7 +33,7 @@
   }
 
   .left {
-    color: #8795a1;
+    color: var(--grey);
     margin-right: 1rem;
     margin-top: 0;
     margin-bottom: .5rem;
@@ -52,5 +48,4 @@
 
 .download-button {
   margin-bottom: 1rem;
-  border-radius: .5rem;
 }
