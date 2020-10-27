@@ -199,6 +199,10 @@ Errors:
     NotFound: UserSession not found
   Key:
     ExpireBeforeNow: The expiration date is in the past
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: Multifactor is configured as required, but no possible providers are configured. Please contact your system administrator.
 EventTypes:
   user:
     added: User added

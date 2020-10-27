@@ -21,9 +21,9 @@ type UserSessionView struct {
 	PasswordVerification        time.Time
 	ExternalLoginVerification   time.Time
 	MfaSoftwareVerification     time.Time
-	MfaSoftwareVerificationType req_model.MfaType
+	MfaSoftwareVerificationType req_model.MFAType
 	MfaHardwareVerification     time.Time
-	MfaHardwareVerificationType req_model.MfaType
+	MfaHardwareVerificationType req_model.MFAType
 	Sequence                    uint64
 }
 

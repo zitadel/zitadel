@@ -559,7 +559,15 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 		request.AuthTime = userSession.PasswordVerification
 	}
 
-	if step, ok := repo.mfaChecked(userSession, request, user); !ok {
+	policy, err := repo.getLoginPolicy(ctx, request.UserOrgID)
+	if err != nil {
+		return nil, err
+	}
+	step, ok, err := repo.mfaChecked(userSession, request, user, policy)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
 		return append(steps, step), nil
 	}
 
@@ -611,45 +619,52 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *model.AuthRequest) (
 	return users, nil
 }
 
-func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *model.AuthRequest, user *user_model.UserView) (model.NextStep, bool) {
+func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *model.AuthRequest, user *user_model.UserView, policy *iam_model.LoginPolicyView) (model.NextStep, bool, error) {
 	mfaLevel := request.MfaLevel()
-	promptRequired := user.MfaMaxSetUp < mfaLevel
-	if promptRequired || !repo.mfaSkippedOrSetUp(user) {
+	promptRequired := (user.MfaMaxSetUp < mfaLevel) || !user.HasRequiredOrgMFALevel(policy)
+	if promptRequired || !repo.mfaSkippedOrSetUp(user, policy) {
+		types := user.MfaTypesSetupPossible(mfaLevel, policy)
+		if promptRequired && len(types) == 0 {
+			return nil, false, errors.ThrowPreconditionFailed(nil, "LOGIN-5Hm8s", "Errors.Login.LoginPolicy.MFA.ForceAndNotConfigured")
+		}
 		return &model.MfaPromptStep{
 			Required:     promptRequired,
-			MfaProviders: user.MfaTypesSetupPossible(mfaLevel),
-		}, false
+			MfaProviders: types,
+		}, false, nil
 	}
 	switch mfaLevel {
 	default:
 		fallthrough
-	case model.MfaLevelNotSetUp:
-		if user.MfaMaxSetUp == model.MfaLevelNotSetUp {
-			return nil, true
+	case model.MFALevelNotSetUp:
+		if user.MfaMaxSetUp == model.MFALevelNotSetUp {
+			return nil, true, nil
 		}
 		fallthrough
-	case model.MfaLevelSoftware:
+	case model.MFALevelSoftware:
 		if checkVerificationTime(userSession.MfaSoftwareVerification, repo.MfaSoftwareCheckLifeTime) {
 			request.MfasVerified = append(request.MfasVerified, userSession.MfaSoftwareVerificationType)
 			request.AuthTime = userSession.MfaSoftwareVerification
-			return nil, true
+			return nil, true, nil
 		}
 		fallthrough
-	case model.MfaLevelHardware:
+	case model.MFALevelHardware:
 		if checkVerificationTime(userSession.MfaHardwareVerification, repo.MfaHardwareCheckLifeTime) {
 			request.MfasVerified = append(request.MfasVerified, userSession.MfaHardwareVerificationType)
 			request.AuthTime = userSession.MfaHardwareVerification
-			return nil, true
+			return nil, true, nil
 		}
 	}
 	return &model.MfaVerificationStep{
-		MfaProviders: user.MfaTypesAllowed(mfaLevel),
-	}, false
+		MfaProviders: user.MfaTypesAllowed(mfaLevel, policy),
+	}, false, nil
 }
 
-func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
-	if user.MfaMaxSetUp > model.MfaLevelNotSetUp {
+func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView, policy *iam_model.LoginPolicyView) bool {
+	if user.MfaMaxSetUp > model.MFALevelNotSetUp {
 		return true
+	}
+	if policy.ForceMFA {
+		return false
 	}
 	return checkVerificationTime(user.MfaInitSkipped, repo.MfaInitSkippedLifeTime)
 }

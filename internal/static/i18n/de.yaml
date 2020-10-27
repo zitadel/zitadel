@@ -211,6 +211,10 @@ Errors:
     NotFound: Benutzer Sitzung konnte nicht gefunden werden
   Key:
     ExpireBeforeNow: Das Ablaufdatum liegt in der Vergangenheit
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: Multifaktor ist als zwingend konfiguriert, jedoch sind keine möglichen Provider hinterlegt. Bitte melde dich beim Administrator des Systems.
 EventTypes:
   user:
     added: Benutzer hinzugefügt

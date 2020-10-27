@@ -1,6 +1,7 @@
 package model
 
 import (
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"time"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
@@ -46,7 +47,7 @@ type HumanView struct {
 	Region                 string
 	StreetAddress          string
 	OTPState               MfaState
-	MfaMaxSetUp            req_model.MfaLevel
+	MfaMaxSetUp            req_model.MFALevel
 	MfaInitSkipped         time.Time
 	InitRequired           bool
 }
@@ -107,38 +108,88 @@ func (r *UserSearchRequest) AppendMyOrgQuery(orgID string) {
 	r.Queries = append(r.Queries, &UserSearchQuery{Key: UserSearchKeyResourceOwner, Method: model.SearchMethodEquals, Value: orgID})
 }
 
-func (u *UserView) MfaTypesSetupPossible(level req_model.MfaLevel) []req_model.MfaType {
-	types := make([]req_model.MfaType, 0)
+func (u *UserView) MfaTypesSetupPossible(level req_model.MFALevel, policy *iam_model.LoginPolicyView) []req_model.MFAType {
+	types := make([]req_model.MFAType, 0)
 	switch level {
 	default:
 		fallthrough
-	case req_model.MfaLevelSoftware:
-		if u.OTPState != MfaStateReady {
-			types = append(types, req_model.MfaTypeOTP)
+	case req_model.MFALevelSoftware:
+		if policy.SoftwareMFAs != nil && len(policy.SoftwareMFAs) != 0 {
+			for _, mfaType := range policy.SoftwareMFAs {
+				switch mfaType {
+				case iam_model.SoftwareMFATypeOTP:
+					if u.OTPState != MfaStateReady {
+						types = append(types, req_model.MFATypeOTP)
+					}
+				}
+			}
 		}
+
 		//PLANNED: add sms
 		fallthrough
-	case req_model.MfaLevelHardware:
+	case req_model.MFALevelHardware:
+		if policy.HardwareMFAs != nil && len(policy.HardwareMFAs) != 0 {
+			for _, mfaType := range policy.HardwareMFAs {
+				switch mfaType {
+				case iam_model.HardwareMFATypeU2F:
+					// TODO: Check if not set up already
+					// types = append(types, req_model.MFATypeU2F)
+				}
+			}
+		}
 		//PLANNED: add token
 	}
 	return types
 }
 
-func (u *UserView) MfaTypesAllowed(level req_model.MfaLevel) []req_model.MfaType {
-	types := make([]req_model.MfaType, 0)
+func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.LoginPolicyView) []req_model.MFAType {
+	types := make([]req_model.MFAType, 0)
 	switch level {
 	default:
 		fallthrough
-	case req_model.MfaLevelSoftware:
-		if u.OTPState == MfaStateReady {
-			types = append(types, req_model.MfaTypeOTP)
+	case req_model.MFALevelSoftware:
+		if policy.SoftwareMFAs != nil && len(policy.SoftwareMFAs) != 0 {
+			for _, mfaType := range policy.SoftwareMFAs {
+				switch mfaType {
+				case iam_model.SoftwareMFATypeOTP:
+					if u.OTPState == MfaStateReady {
+						types = append(types, req_model.MFATypeOTP)
+					}
+				}
+			}
 		}
 		//PLANNED: add sms
 		fallthrough
-	case req_model.MfaLevelHardware:
+	case req_model.MFALevelHardware:
+		if policy.HardwareMFAs != nil && len(policy.HardwareMFAs) != 0 {
+			for _, mfaType := range policy.HardwareMFAs {
+				switch mfaType {
+				case iam_model.HardwareMFATypeU2F:
+					// TODO: Check if not set up already
+					// types = append(types, req_model.MFATypeU2F)
+				}
+			}
+		}
 		//PLANNED: add token
 	}
 	return types
+}
+
+func (u *UserView) HasRequiredOrgMFALevel(policy *iam_model.LoginPolicyView) bool {
+	if !policy.ForceMFA {
+		return true
+	}
+	switch u.MfaMaxSetUp {
+	case req_model.MFALevelSoftware:
+		if policy.SoftwareMFAs == nil || len(policy.SoftwareMFAs) == 0 {
+			return false
+		}
+		return true
+	case req_model.MFALevelHardware:
+		return true
+	default:
+		return false
+	}
 }
 
 func (u *UserView) GetProfile() (*Profile, error) {

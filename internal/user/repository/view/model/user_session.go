@@ -64,9 +64,9 @@ func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 		PasswordVerification:        userSession.PasswordVerification,
 		ExternalLoginVerification:   userSession.ExternalLoginVerification,
 		MfaSoftwareVerification:     userSession.MfaSoftwareVerification,
-		MfaSoftwareVerificationType: req_model.MfaType(userSession.MfaSoftwareVerificationType),
+		MfaSoftwareVerificationType: req_model.MFAType(userSession.MfaSoftwareVerificationType),
 		MfaHardwareVerification:     userSession.MfaHardwareVerification,
-		MfaHardwareVerificationType: req_model.MfaType(userSession.MfaHardwareVerificationType),
+		MfaHardwareVerificationType: req_model.MFAType(userSession.MfaHardwareVerificationType),
 		Sequence:                    userSession.Sequence,
 	}
 }
@@ -101,7 +101,7 @@ func (v *UserSessionView) AppendEvent(event *models.Event) {
 	case es_model.MFAOTPCheckSucceeded,
 		es_model.HumanMFAOTPCheckSucceeded:
 		v.MfaSoftwareVerification = event.CreationDate
-		v.MfaSoftwareVerificationType = int32(req_model.MfaTypeOTP)
+		v.MfaSoftwareVerificationType = int32(req_model.MFATypeOTP)
 		v.State = int32(req_model.UserSessionStateActive)
 	case es_model.MFAOTPCheckFailed,
 		es_model.MFAOTPRemoved,

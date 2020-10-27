@@ -140,7 +140,7 @@ func UserToModel(user *UserView) *model.UserView {
 			Region:                 user.Region,
 			StreetAddress:          user.StreetAddress,
 			OTPState:               model.MfaState(user.OTPState),
-			MfaMaxSetUp:            req_model.MfaLevel(user.MfaMaxSetUp),
+			MfaMaxSetUp:            req_model.MFALevel(user.MfaMaxSetUp),
 			MfaInitSkipped:         user.MfaInitSkipped,
 			InitRequired:           user.InitRequired,
 		}
@@ -313,9 +313,9 @@ func (u *UserView) ComputeObject() {
 		}
 	}
 	if u.OTPState != int32(model.MfaStateReady) {
-		u.MfaMaxSetUp = int32(req_model.MfaLevelNotSetUp)
+		u.MfaMaxSetUp = int32(req_model.MFALevelNotSetUp)
 	}
 	if u.OTPState == int32(model.MfaStateReady) {
-		u.MfaMaxSetUp = int32(req_model.MfaLevelSoftware)
+		u.MfaMaxSetUp = int32(req_model.MFALevelSoftware)
 	}
 }

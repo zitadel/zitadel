@@ -421,7 +421,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userViewProvider: &mockViewUser{
 					IsEmailVerified: true,
-					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+					MfaMaxSetUp:     int32(model.MFALevelSoftware),
 				},
 				userEventProvider:        &mockEventUser{},
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
@@ -440,7 +440,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userViewProvider: &mockViewUser{
 					IsEmailVerified: true,
-					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+					MfaMaxSetUp:     int32(model.MFALevelSoftware),
 				},
 				userEventProvider:          &mockEventUser{},
 				orgViewProvider:            &mockViewOrg{State: org_model.OrgStateActive},
@@ -477,7 +477,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
 					IsEmailVerified: true,
-					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+					MfaMaxSetUp:     int32(model.MFALevelSoftware),
 				},
 				userEventProvider:          &mockEventUser{},
 				orgViewProvider:            &mockViewOrg{State: org_model.OrgStateActive},
@@ -498,7 +498,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet: true,
 					OTPState:    int32(user_model.MfaStateReady),
-					MfaMaxSetUp: int32(model.MfaLevelSoftware),
+					MfaMaxSetUp: int32(model.MFALevelSoftware),
 				},
 				userEventProvider:        &mockEventUser{},
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
@@ -507,7 +507,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&model.AuthRequest{UserID: "UserID"}, false},
 			[]model.NextStep{&model.MfaVerificationStep{
-				MfaProviders: []model.MfaType{model.MfaTypeOTP},
+				MfaProviders: []model.MFAType{model.MFATypeOTP},
 			}},
 			nil,
 		},
@@ -521,7 +521,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet: true,
 					OTPState:    int32(user_model.MfaStateReady),
-					MfaMaxSetUp: int32(model.MfaLevelSoftware),
+					MfaMaxSetUp: int32(model.MFALevelSoftware),
 				},
 				userEventProvider:          &mockEventUser{},
 				orgViewProvider:            &mockViewOrg{State: org_model.OrgStateActive},
@@ -531,7 +531,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&model.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID"}, false},
 			[]model.NextStep{&model.MfaVerificationStep{
-				MfaProviders: []model.MfaType{model.MfaTypeOTP},
+				MfaProviders: []model.MFAType{model.MFATypeOTP},
 			}},
 			nil,
 		},
@@ -546,7 +546,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					PasswordSet:            true,
 					PasswordChangeRequired: true,
 					IsEmailVerified:        true,
-					MfaMaxSetUp:            int32(model.MfaLevelSoftware),
+					MfaMaxSetUp:            int32(model.MFALevelSoftware),
 				},
 				userEventProvider:        &mockEventUser{},
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
@@ -566,7 +566,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet: true,
-					MfaMaxSetUp: int32(model.MfaLevelSoftware),
+					MfaMaxSetUp: int32(model.MFALevelSoftware),
 				},
 				userEventProvider:        &mockEventUser{},
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
@@ -587,7 +587,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:            true,
 					PasswordChangeRequired: true,
-					MfaMaxSetUp:            int32(model.MfaLevelSoftware),
+					MfaMaxSetUp:            int32(model.MFALevelSoftware),
 				},
 				userEventProvider:        &mockEventUser{},
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
@@ -608,7 +608,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
 					IsEmailVerified: true,
-					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+					MfaMaxSetUp:     int32(model.MFALevelSoftware),
 				},
 				userEventProvider:        &mockEventUser{},
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
@@ -630,7 +630,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
 					IsEmailVerified: true,
-					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+					MfaMaxSetUp:     int32(model.MFALevelSoftware),
 				},
 				userEventProvider:        &mockEventUser{},
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
@@ -652,7 +652,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
 					IsEmailVerified: true,
-					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+					MfaMaxSetUp:     int32(model.MFALevelSoftware),
 				},
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
@@ -677,7 +677,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
 					IsEmailVerified: true,
-					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+					MfaMaxSetUp:     int32(model.MFALevelSoftware),
 				},
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
@@ -701,7 +701,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
 					IsEmailVerified: true,
-					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+					MfaMaxSetUp:     int32(model.MFALevelSoftware),
 				},
 				userEventProvider:        &mockEventUser{},
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
@@ -726,7 +726,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
 					IsEmailVerified: true,
-					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+					MfaMaxSetUp:     int32(model.MFALevelSoftware),
 				},
 				userEventProvider:        &mockEventUser{},
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
@@ -808,13 +808,13 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				request: &model.AuthRequest{},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
-						MfaMaxSetUp: model.MfaLevelNotSetUp,
+						MfaMaxSetUp: model.MFALevelNotSetUp,
 					},
 				},
 			},
 			&model.MfaPromptStep{
-				MfaProviders: []model.MfaType{
-					model.MfaTypeOTP,
+				MfaProviders: []model.MFAType{
+					model.MFATypeOTP,
 				},
 			},
 			false,
@@ -828,7 +828,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				request: &model.AuthRequest{},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
-						MfaMaxSetUp:    model.MfaLevelNotSetUp,
+						MfaMaxSetUp:    model.MFALevelNotSetUp,
 						MfaInitSkipped: time.Now().UTC(),
 					},
 				},
@@ -845,7 +845,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				request: &model.AuthRequest{},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
-						MfaMaxSetUp: model.MfaLevelSoftware,
+						MfaMaxSetUp: model.MFALevelSoftware,
 						OTPState:    user_model.MfaStateReady,
 					},
 				},
@@ -863,7 +863,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				request: &model.AuthRequest{},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
-						MfaMaxSetUp: model.MfaLevelSoftware,
+						MfaMaxSetUp: model.MFALevelSoftware,
 						OTPState:    user_model.MfaStateReady,
 					},
 				},
@@ -871,7 +871,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 
 			&model.MfaVerificationStep{
-				MfaProviders: []model.MfaType{model.MfaTypeOTP},
+				MfaProviders: []model.MFAType{model.MFATypeOTP},
 			},
 			false,
 		},
@@ -910,7 +910,7 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 			fields{},
 			args{&user_model.UserView{
 				HumanView: &user_model.HumanView{
-					MfaMaxSetUp: model.MfaLevelSoftware,
+					MfaMaxSetUp: model.MFALevelSoftware,
 				},
 			}},
 			true,
