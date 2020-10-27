@@ -214,6 +214,9 @@ func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQu
 
 //RegisterFilterEventMapper registers a function for mapping an eventstore event to an event
 func (es *Eventstore) RegisterFilterEventMapper(eventType EventType, mapper func(*repository.Event) (Event, error)) *Eventstore {
+	if mapper == nil || eventType == "" {
+		return es
+	}
 	es.interceptorMutex.Lock()
 	defer es.interceptorMutex.Unlock()
 
