@@ -5,64 +5,17 @@ import (
 	"encoding/json"
 	"reflect"
 	"sync"
-	"time"
 
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
-//Event is the representation of a state change
-type Event interface {
-	//CheckPrevious ensures the event order if true
-	// if false the previous sequence is not checked on push
-	CheckPrevious() bool
-	//EditorService must return the name of the service which creates the new event
-	EditorService() string
-	//EditorUser must return the id of the user who created the event
-	EditorUser() string
-	//Type must return an event type which should be unique in the aggregate
-	Type() EventType
-	//Data returns the payload of the event. It represent the changed fields by the event
-	// valid types are:
-	// * nil (no payload),
-	// * json byte array
-	// * struct which can be marshalled to json
-	// * pointer to struct which can be marshalled to json
-	Data() interface{}
-	//MetaData returns all data saved on a event
-	// It must not be set on push
-	// The event mapper function must set this struct
-	MetaData() *EventMetaData
-}
-
-func MetaDataFromRepo(event *repository.Event) *EventMetaData {
-	return &EventMetaData{
-		AggregateID:       event.AggregateID,
-		AggregateType:     AggregateType(event.AggregateType),
-		AggregateVersion:  Version(event.Version),
-		PreviouseSequence: event.PreviousSequence,
-		ResourceOwner:     event.ResourceOwner,
-		Sequence:          event.Sequence,
-		CreationDate:      event.CreationDate,
-	}
-}
-
-type EventMetaData struct {
-	AggregateID       string
-	AggregateType     AggregateType
-	ResourceOwner     string
-	AggregateVersion  Version
-	Sequence          uint64
-	PreviouseSequence uint64
-	CreationDate      time.Time
-}
-
 //Eventstore abstracts all functions needed to store valid events
 // and filters the stored events
 type Eventstore struct {
-	repo             repository.Repository
-	interceptorMutex sync.Mutex
-	eventMapper      map[EventType]eventTypeInterceptors
+	repo              repository.Repository
+	interceptorMutex  sync.Mutex
+	eventInterceptors map[EventType]eventTypeInterceptors
 }
 
 type eventTypeInterceptors struct {
@@ -71,9 +24,9 @@ type eventTypeInterceptors struct {
 
 func NewEventstore(repo repository.Repository) *Eventstore {
 	return &Eventstore{
-		repo:             repo,
-		eventMapper:      map[EventType]eventTypeInterceptors{},
-		interceptorMutex: sync.Mutex{},
+		repo:              repo,
+		eventInterceptors: map[EventType]eventTypeInterceptors{},
+		interceptorMutex:  sync.Mutex{},
 	}
 }
 
@@ -169,7 +122,7 @@ func (es *Eventstore) mapEvents(events []*repository.Event) (mappedEvents []Even
 	defer es.interceptorMutex.Unlock()
 
 	for i, event := range events {
-		interceptors, ok := es.eventMapper[EventType(event.Type)]
+		interceptors, ok := es.eventInterceptors[EventType(event.Type)]
 		if !ok || interceptors.eventMapper == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "V2-usujB", "event mapper not defined")
 		}
@@ -220,9 +173,9 @@ func (es *Eventstore) RegisterFilterEventMapper(eventType EventType, mapper func
 	es.interceptorMutex.Lock()
 	defer es.interceptorMutex.Unlock()
 
-	interceptor := es.eventMapper[eventType]
+	interceptor := es.eventInterceptors[eventType]
 	interceptor.eventMapper = mapper
-	es.eventMapper[eventType] = interceptor
+	es.eventInterceptors[eventType] = interceptor
 
 	return es
 }

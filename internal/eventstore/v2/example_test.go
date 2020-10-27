@@ -197,6 +197,46 @@ func (e *UserPasswordCheckedEvent) MetaData() *eventstore.EventMetaData {
 }
 
 // ------------------------------------------------------------
+// User deleted event
+// ------------------------------------------------------------
+
+type UserDeletedEvent struct {
+	metaData *eventstore.EventMetaData `json:"-"`
+}
+
+func UserDeletedMapper() (eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
+	return "user.deleted", func(event *repository.Event) (eventstore.Event, error) {
+		return &UserDeletedEvent{
+			metaData: eventstore.MetaDataFromRepo(event),
+		}, nil
+	}
+}
+
+func (e *UserDeletedEvent) CheckPrevious() bool {
+	return false
+}
+
+func (e *UserDeletedEvent) EditorService() string {
+	return "test.suite"
+}
+
+func (e *UserDeletedEvent) EditorUser() string {
+	return "adlerhurst"
+}
+
+func (e *UserDeletedEvent) Type() eventstore.EventType {
+	return "user.deleted"
+}
+
+func (e *UserDeletedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *UserDeletedEvent) MetaData() *eventstore.EventMetaData {
+	return e.metaData
+}
+
+// ------------------------------------------------------------
 // Users read model start
 // ------------------------------------------------------------
 
@@ -228,15 +268,20 @@ func (rm *UsersReadModel) AppendEvents(events ...eventstore.Event) (err error) {
 				return errors.New("user not found")
 			}
 			err = user.AppendEvents(e)
+		case *UserDeletedEvent:
+			idx, _ := rm.userByID(e.metaData.AggregateID)
+			if idx < 0 {
+				return nil
+			}
+			copy(rm.Users[idx:], rm.Users[idx+1:])
+			rm.Users[len(rm.Users)-1] = nil // or the zero value of T
+			rm.Users = rm.Users[:len(rm.Users)-1]
 		}
 		if err != nil {
 			return err
 		}
 	}
 
-	//begin
-	//for stmt range stmts; exec
-	//commit
 	return nil
 }
 
@@ -307,11 +352,13 @@ func TestUserReadModel(t *testing.T) {
 	es := eventstore.NewEventstore(sql.NewCRDB(testCRDBClient))
 	es.RegisterFilterEventMapper(UserAddedEventMapper()).
 		RegisterFilterEventMapper(UserFirstNameChangedMapper()).
-		RegisterFilterEventMapper(UserPasswordCheckedMapper())
+		RegisterFilterEventMapper(UserPasswordCheckedMapper()).
+		RegisterFilterEventMapper(UserDeletedMapper())
 
 	events, err := es.PushAggregates(context.Background(),
 		NewUserAggregate("1").AppendEvents(&UserAddedEvent{FirstName: "hodor"}),
 		NewUserAggregate("2").AppendEvents(&UserAddedEvent{FirstName: "hodor"}, &UserPasswordCheckedEvent{}, &UserPasswordCheckedEvent{}, &UserFirstNameChangedEvent{FirstName: "ueli"}),
+		NewUserAggregate("2").AppendEvents(&UserDeletedEvent{}),
 	)
 	if err != nil {
 		t.Errorf("unexpected error on push aggregates: %v", err)
