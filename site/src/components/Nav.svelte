@@ -1,7 +1,7 @@
 <script>
     import LanguageSwitcher from './LanguageSwitcher.svelte'
     import NavItem from './NavItem.svelte'
-	import { onMount, setContext } from 'svelte';
+	import { setContext } from 'svelte';
 	import { writable } from 'svelte/store';
 	import Icon from './Icon.svelte';
 	export let segment;

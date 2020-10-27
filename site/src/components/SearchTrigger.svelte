@@ -1,3 +1,13 @@
+<script>
+    import {onMount} from 'svelte';
+    import { _ } from 'svelte-i18n';
+    let buttonname = '';
+
+    onMount(() => {
+        buttonname = navigator.platform.indexOf('Mac') > -1 ? 'Cmd': 'Ctrl';
+	});
+</script>
+
 <style>
     button {
         height: 20px;
@@ -26,9 +36,20 @@
         font-size: 1.3rem;
         margin-right: 1rem;
     }
+
+    .fill-space {
+        flex: 1;
+    }
+
+    .strg {
+        font-size: 1.3rem;
+        margin-right: 1rem;
+    }
 </style>
 
 <button on:click>
     <i class="las la-search"></i>
-    <span>Search for anything</span>
+    <span>{$_('search_button_holder')}</span>
+    <span class="fill-space"></span>
+    <span class="strg">{buttonname || 'Ctrl'} F</span>
 </button>

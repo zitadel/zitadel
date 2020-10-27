@@ -22,6 +22,14 @@
     searchEnabled = !event.detail.closed;
   }
 
+  function handleKeydown(event) {
+      const isCtrlKey = navigator.platform.indexOf('Mac') > -1 ? event.metaKey : event.ctrlKey
+    if ((event.keyCode == 114) || (isCtrlKey && event.keyCode == 70)) {
+        event.preventDefault();
+        searchEnabled = !searchEnabled;
+    }
+  }
+
   onMount(() => {
     // don't update `active_section` for headings above level 4, see _sections.js
     const anchors = container.querySelectorAll("[id]:not([data-scrollignore])");
@@ -394,6 +402,8 @@
     color: var(--prime);
   }
 </style>
+
+<svelte:window on:keydown={handleKeydown}/>
 
 <div bind:this={container} class="content listify">
   {#each sections as section}

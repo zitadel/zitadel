@@ -5,8 +5,6 @@
     export let sections;
     export let slug;
 
-    console.log(slug)
-
     let filteredResults = [];
 
     function init(el){
