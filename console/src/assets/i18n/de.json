@@ -871,7 +871,7 @@
     "ROLESLABEL":"Rollen",
     "GRANTS": {
         "TITLE":"Berechtigungen",
-        "DESC":"Hier können Sie die Berechtiungen Ihrer Organisation verwalten.",
+        "DESC":"Hier kannst Du die Berechtigungen Deiner Organisation verwalten.",
         "DELETE":"Berechtigung löschen",
         "ADD":"Berechtigung erstellen",
         "ADD_BTN":"Neu",
