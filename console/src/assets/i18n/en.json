@@ -35,7 +35,9 @@
         "LOGOUT": "Logout All Users",
         "NEWORG":"New Organisation",
         "IAMADMIN":"You are an IAM Administrator. Note that you have extended permissions.",
-        "SHOWORGS":"Show All Organisations"
+        "SHOWORGS":"Show All Organisations",
+        "GRANTSECTION":"Authorization Section",
+        "GRANTS":"Authorizations"
     },
     "ACTIONS": {
         "SAVE": "Save",
@@ -870,6 +872,8 @@
     },
     "ROLESLABEL":"Roles",
     "GRANTS": {
+        "TITLE":"Authorisations",
+        "DESC":"Here you can manage authorizations of your organization users.",
         "DELETE":"Delete Authorisation",
         "ADD":"Create Authorisation",
         "ADD_BTN":"New",
