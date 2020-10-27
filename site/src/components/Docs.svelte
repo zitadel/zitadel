@@ -18,10 +18,9 @@
   let aside;
   let show_contents = false;
 
-  function handleSearch() {
-    alert('clicked');
-      searchEnabled = true;
-  }
+    function handleSearch(event) {
+        searchEnabled = !event.detail.closed;
+    }
 
   onMount(() => {
     // don't update `active_section` for headings above level 4, see _sections.js
@@ -433,5 +432,5 @@
 </aside>
 
 {#if searchEnabled == true}
-    <SearchSelector></SearchSelector>
+    <SearchSelector on:close={handleSearch}></SearchSelector>
 {/if}

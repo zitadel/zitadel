@@ -1,4 +1,7 @@
 <script>
+    import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher();
     let searchValue = '';
     // $: if (searchValue) {
     //     executeQuery(searchValue);
@@ -8,6 +11,13 @@
 
     function executeQuery(value) {
         console.log(value);
+    }
+
+    function closeSearch() {
+        console.log('clsoe search');
+        dispatch('close', {
+            closed: true,
+        });
     }
 </script>
 
@@ -113,7 +123,7 @@
     }
 </style>
 
-<div class="overlay"></div>
+<div on:click="{closeSearch}" class="overlay"></div>
 <div class="search-field">
     <div class="search-line">
         <i class="las la-search"></i>
