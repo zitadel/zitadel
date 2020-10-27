@@ -11,7 +11,8 @@
     "uselink":"User Manuals",
     "toconsole":"Open ZITADEL Console",
     "search_results":"Search Results",
-    "search_input_placeholder":"Search for ..."
+    "search_input_placeholder":"Search for ...",
+    "search_button_holder":"Search for anything"
 }
 
 

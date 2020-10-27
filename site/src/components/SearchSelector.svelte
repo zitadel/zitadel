@@ -15,9 +15,6 @@
 
 	const dispatch = createEventDispatcher();
     let searchValue = '';
-    // $: if (searchValue) {
-    //     executeQuery(searchValue);
-    // }
 
     $: executeQuery(searchValue);
 
