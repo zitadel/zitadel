@@ -3,6 +3,8 @@ package eventstore
 import (
 	"context"
 	"encoding/json"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"testing"
 	"time"
 
@@ -116,6 +118,14 @@ type mockViewUser struct {
 	MfaInitSkipped         time.Time
 }
 
+type mockLoginPolicy struct {
+	policy *iam_view_model.LoginPolicyView
+}
+
+func (m *mockLoginPolicy) LoginPolicyByAggregateID(id string) (*iam_view_model.LoginPolicyView, error) {
+	return m.policy, nil
+}
+
 func (m *mockViewUser) UserByID(string) (*user_view_model.UserView, error) {
 	return &user_view_model.UserView{
 		State:    int32(user_model.UserStateActive),
@@ -186,6 +196,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 		userEventProvider          userEventProvider
 		orgViewProvider            orgViewProvider
 		userGrantProvider          userGrantProvider
+		loginPolicyProvider        loginPolicyViewProvider
 		PasswordCheckLifeTime      time.Duration
 		ExternalLoginCheckLifeTime time.Duration
 		MfaInitSkippedLifeTime     time.Duration
@@ -442,13 +453,23 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					IsEmailVerified: true,
 					MfaMaxSetUp:     int32(model.MFALevelSoftware),
 				},
-				userEventProvider:          &mockEventUser{},
-				orgViewProvider:            &mockViewOrg{State: org_model.OrgStateActive},
-				userGrantProvider:          &mockUserGrants{},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider: &mockUserGrants{},
+				loginPolicyProvider: &mockLoginPolicy{
+					policy: &iam_view_model.LoginPolicyView{},
+				},
 				ExternalLoginCheckLifeTime: 10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime:   18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID", Request: &model.AuthRequestOIDC{}}, false},
+			args{
+				&model.AuthRequest{
+					UserID:              "UserID",
+					SelectedIDPConfigID: "IDPConfigID",
+					Request:             &model.AuthRequestOIDC{},
+					LoginPolicy:         &iam_model.LoginPolicyView{},
+				},
+				false},
 			[]model.NextStep{&model.RedirectToCallbackStep{}},
 			nil,
 		},
@@ -485,7 +506,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				MfaSoftwareCheckLifeTime:   18 * time.Hour,
 				ExternalLoginCheckLifeTime: 10 * 24 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID", Request: &model.AuthRequestOIDC{}}, false},
+			args{
+				&model.AuthRequest{
+					UserID:              "UserID",
+					SelectedIDPConfigID: "IDPConfigID",
+					Request:             &model.AuthRequestOIDC{},
+					LoginPolicy:         &iam_model.LoginPolicyView{},
+				}, false},
 			[]model.NextStep{&model.RedirectToCallbackStep{}},
 			nil,
 		},
@@ -505,7 +532,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{
+				&model.AuthRequest{
+					UserID: "UserID",
+					LoginPolicy: &iam_model.LoginPolicyView{
+						SoftwareMFAs: []iam_model.SoftwareMFAType{iam_model.SoftwareMFATypeOTP},
+					},
+				}, false},
 			[]model.NextStep{&model.MfaVerificationStep{
 				MfaProviders: []model.MFAType{model.MFATypeOTP},
 			}},
@@ -529,7 +562,14 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				ExternalLoginCheckLifeTime: 10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime:   18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID"}, false},
+			args{
+				&model.AuthRequest{
+					UserID:              "UserID",
+					SelectedIDPConfigID: "IDPConfigID",
+					LoginPolicy: &iam_model.LoginPolicyView{
+						SoftwareMFAs: []iam_model.SoftwareMFAType{iam_model.SoftwareMFATypeOTP},
+					},
+				}, false},
 			[]model.NextStep{&model.MfaVerificationStep{
 				MfaProviders: []model.MFAType{model.MFATypeOTP},
 			}},
@@ -553,7 +593,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{
+				&model.AuthRequest{
+					UserID: "UserID",
+					LoginPolicy: &iam_model.LoginPolicyView{
+						SoftwareMFAs: []iam_model.SoftwareMFAType{iam_model.SoftwareMFATypeOTP},
+					},
+				}, false},
 			[]model.NextStep{&model.ChangePasswordStep{}},
 			nil,
 		},
@@ -573,7 +619,12 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{&model.AuthRequest{
+				UserID: "UserID",
+				LoginPolicy: &iam_model.LoginPolicyView{
+					SoftwareMFAs: []iam_model.SoftwareMFAType{iam_model.SoftwareMFATypeOTP},
+				},
+			}, false},
 			[]model.NextStep{&model.VerifyEMailStep{}},
 			nil,
 		},
@@ -594,7 +645,12 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{&model.AuthRequest{
+				UserID: "UserID",
+				LoginPolicy: &iam_model.LoginPolicyView{
+					SoftwareMFAs: []iam_model.SoftwareMFAType{iam_model.SoftwareMFATypeOTP},
+				},
+			}, false},
 			[]model.NextStep{&model.ChangePasswordStep{}, &model.VerifyEMailStep{}},
 			nil,
 		},
@@ -616,7 +672,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID", Request: &model.AuthRequestOIDC{}}, false},
+			args{&model.AuthRequest{
+				UserID:  "UserID",
+				Request: &model.AuthRequestOIDC{},
+				LoginPolicy: &iam_model.LoginPolicyView{
+					SoftwareMFAs: []iam_model.SoftwareMFAType{iam_model.SoftwareMFATypeOTP},
+				},
+			}, false},
 			[]model.NextStep{&model.RedirectToCallbackStep{}},
 			nil,
 		},
@@ -638,7 +700,14 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID", Prompt: model.PromptNone, Request: &model.AuthRequestOIDC{}}, true},
+			args{&model.AuthRequest{
+				UserID:  "UserID",
+				Prompt:  model.PromptNone,
+				Request: &model.AuthRequestOIDC{},
+				LoginPolicy: &iam_model.LoginPolicyView{
+					SoftwareMFAs: []iam_model.SoftwareMFAType{iam_model.SoftwareMFATypeOTP},
+				},
+			}, true},
 			[]model.NextStep{&model.RedirectToCallbackStep{}},
 			nil,
 		},
@@ -663,7 +732,14 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID", Prompt: model.PromptNone, Request: &model.AuthRequestOIDC{}}, true},
+			args{&model.AuthRequest{
+				UserID:  "UserID",
+				Prompt:  model.PromptNone,
+				Request: &model.AuthRequestOIDC{},
+				LoginPolicy: &iam_model.LoginPolicyView{
+					SoftwareMFAs: []iam_model.SoftwareMFAType{iam_model.SoftwareMFATypeOTP},
+				},
+			}, true},
 			[]model.NextStep{&model.GrantRequiredStep{}},
 			nil,
 		},
@@ -688,7 +764,14 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID", Prompt: model.PromptNone, Request: &model.AuthRequestOIDC{}}, true},
+			args{&model.AuthRequest{
+				UserID:  "UserID",
+				Prompt:  model.PromptNone,
+				Request: &model.AuthRequestOIDC{},
+				LoginPolicy: &iam_model.LoginPolicyView{
+					SoftwareMFAs: []iam_model.SoftwareMFAType{iam_model.SoftwareMFATypeOTP},
+				},
+			}, true},
 			[]model.NextStep{&model.RedirectToCallbackStep{}},
 			nil,
 		},
@@ -738,6 +821,9 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					UserID:              "UserID",
 					SelectedIDPConfigID: "IDPConfigID",
 					LinkingUsers:        []*model.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "UserID", DisplayName: "DisplayName"}},
+					LoginPolicy: &iam_model.LoginPolicyView{
+						SoftwareMFAs: []iam_model.SoftwareMFAType{iam_model.SoftwareMFATypeOTP},
+					},
 				}, false},
 			[]model.NextStep{&model.LinkUsersStep{}},
 			nil,
@@ -754,6 +840,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				UserEventProvider:          tt.fields.userEventProvider,
 				OrgViewProvider:            tt.fields.orgViewProvider,
 				UserGrantProvider:          tt.fields.userGrantProvider,
+				LoginPolicyViewProvider:    tt.fields.loginPolicyProvider,
 				PasswordCheckLifeTime:      tt.fields.PasswordCheckLifeTime,
 				ExternalLoginCheckLifeTime: tt.fields.ExternalLoginCheckLifeTime,
 				MfaInitSkippedLifeTime:     tt.fields.MfaInitSkippedLifeTime,
@@ -780,6 +867,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 		userSession *user_model.UserSessionView
 		request     *model.AuthRequest
 		user        *user_model.UserView
+		policy      *iam_model.LoginPolicyView
 	}
 	tests := []struct {
 		name        string
@@ -787,6 +875,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 		args        args
 		want        model.NextStep
 		wantChecked bool
+		errFunc     func(err error) bool
 	}{
 		//{
 		//	"required, prompt and false", //TODO: enable when LevelsOfAssurance is checked
@@ -800,12 +889,37 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 		//	false,
 		//},
 		{
+			"not set up, forced by policy, no mfas configured, error",
+			fields{
+				MfaInitSkippedLifeTime: 30 * 24 * time.Hour,
+			},
+			args{
+				request: &model.AuthRequest{
+					LoginPolicy: &iam_model.LoginPolicyView{
+						ForceMFA: true,
+					},
+				},
+				user: &user_model.UserView{
+					HumanView: &user_model.HumanView{
+						MfaMaxSetUp: model.MFALevelNotSetUp,
+					},
+				},
+			},
+			nil,
+			false,
+			errors.IsPreconditionFailed,
+		},
+		{
 			"not set up, prompt and false",
 			fields{
 				MfaInitSkippedLifeTime: 30 * 24 * time.Hour,
 			},
 			args{
-				request: &model.AuthRequest{},
+				request: &model.AuthRequest{
+					LoginPolicy: &iam_model.LoginPolicyView{
+						SoftwareMFAs: []iam_model.SoftwareMFAType{iam_model.SoftwareMFATypeOTP},
+					},
+				},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
 						MfaMaxSetUp: model.MFALevelNotSetUp,
@@ -818,6 +932,34 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				},
 			},
 			false,
+			nil,
+		},
+		{
+			"not set up, forced by org, true",
+			fields{
+				MfaInitSkippedLifeTime: 30 * 24 * time.Hour,
+			},
+			args{
+				request: &model.AuthRequest{
+					LoginPolicy: &iam_model.LoginPolicyView{
+						ForceMFA:     true,
+						SoftwareMFAs: []iam_model.SoftwareMFAType{iam_model.SoftwareMFATypeOTP},
+					},
+				},
+				user: &user_model.UserView{
+					HumanView: &user_model.HumanView{
+						MfaMaxSetUp: model.MFALevelNotSetUp,
+					},
+				},
+			},
+			&model.MfaPromptStep{
+				Required: true,
+				MfaProviders: []model.MFAType{
+					model.MFATypeOTP,
+				},
+			},
+			false,
+			nil,
 		},
 		{
 			"not set up and skipped, true",
@@ -825,7 +967,9 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				MfaInitSkippedLifeTime: 30 * 24 * time.Hour,
 			},
 			args{
-				request: &model.AuthRequest{},
+				request: &model.AuthRequest{
+					LoginPolicy: &iam_model.LoginPolicyView{},
+				},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
 						MfaMaxSetUp:    model.MFALevelNotSetUp,
@@ -835,6 +979,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			nil,
 			true,
+			nil,
 		},
 		{
 			"checked mfa software, true",
@@ -842,7 +987,9 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
 			args{
-				request: &model.AuthRequest{},
+				request: &model.AuthRequest{
+					LoginPolicy: &iam_model.LoginPolicyView{},
+				},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
 						MfaMaxSetUp: model.MFALevelSoftware,
@@ -853,6 +1000,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			nil,
 			true,
+			nil,
 		},
 		{
 			"not checked, check and false",
@@ -860,7 +1008,11 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
 			args{
-				request: &model.AuthRequest{},
+				request: &model.AuthRequest{
+					LoginPolicy: &iam_model.LoginPolicyView{
+						SoftwareMFAs: []iam_model.SoftwareMFAType{iam_model.SoftwareMFATypeOTP},
+					},
+				},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
 						MfaMaxSetUp: model.MFALevelSoftware,
@@ -874,6 +1026,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				MfaProviders: []model.MFAType{model.MFATypeOTP},
 			},
 			false,
+			nil,
 		},
 	}
 	for _, tt := range tests {
@@ -883,7 +1036,11 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				MfaSoftwareCheckLifeTime: tt.fields.MfaSoftwareCheckLifeTime,
 				MfaHardwareCheckLifeTime: tt.fields.MfaHardwareCheckLifeTime,
 			}
-			got, ok := repo.mfaChecked(tt.args.userSession, tt.args.request, tt.args.user)
+			got, ok, err := repo.mfaChecked(tt.args.userSession, tt.args.request, tt.args.user)
+			if (tt.errFunc != nil && !tt.errFunc(err)) || (err != nil && tt.errFunc == nil) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
 			if ok != tt.wantChecked {
 				t.Errorf("mfaChecked() checked = %v, want %v", ok, tt.wantChecked)
 			}
@@ -897,7 +1054,8 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 		MfaInitSkippedLifeTime time.Duration
 	}
 	type args struct {
-		user *user_model.UserView
+		user   *user_model.UserView
+		policy *iam_model.LoginPolicyView
 	}
 	tests := []struct {
 		name   string
@@ -908,11 +1066,16 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 		{
 			"mfa set up, true",
 			fields{},
-			args{&user_model.UserView{
-				HumanView: &user_model.HumanView{
-					MfaMaxSetUp: model.MFALevelSoftware,
+			args{
+				&user_model.UserView{
+					HumanView: &user_model.HumanView{
+						MfaMaxSetUp: model.MFALevelSoftware,
+					},
 				},
-			}},
+				&iam_model.LoginPolicyView{
+					SoftwareMFAs: []iam_model.SoftwareMFAType{iam_model.SoftwareMFATypeOTP},
+				},
+			},
 			true,
 		},
 		{
@@ -920,25 +1083,54 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 			fields{
 				MfaInitSkippedLifeTime: 30 * 24 * time.Hour,
 			},
-			args{&user_model.UserView{
-				HumanView: &user_model.HumanView{
-					MfaMaxSetUp:    -1,
-					MfaInitSkipped: time.Now().UTC().Add(-10 * time.Hour),
+			args{
+				&user_model.UserView{
+					HumanView: &user_model.HumanView{
+						MfaMaxSetUp:    -1,
+						MfaInitSkipped: time.Now().UTC().Add(-10 * time.Hour),
+					},
 				},
-			}},
+				&iam_model.LoginPolicyView{
+					SoftwareMFAs: []iam_model.SoftwareMFAType{iam_model.SoftwareMFATypeOTP},
+				},
+			},
 			true,
+		},
+		{
+			"mfa skipped active, forced by login policy, false",
+			fields{
+				MfaInitSkippedLifeTime: 30 * 24 * time.Hour,
+			},
+			args{
+				&user_model.UserView{
+					HumanView: &user_model.HumanView{
+						MfaMaxSetUp:    -1,
+						MfaInitSkipped: time.Now().UTC().Add(-10 * time.Hour),
+					},
+				},
+				&iam_model.LoginPolicyView{
+					ForceMFA:     true,
+					SoftwareMFAs: []iam_model.SoftwareMFAType{iam_model.SoftwareMFATypeOTP},
+				},
+			},
+			false,
 		},
 		{
 			"mfa skipped inactive, false",
 			fields{
 				MfaInitSkippedLifeTime: 30 * 24 * time.Hour,
 			},
-			args{&user_model.UserView{
-				HumanView: &user_model.HumanView{
-					MfaMaxSetUp:    -1,
-					MfaInitSkipped: time.Now().UTC().Add(-40 * 24 * time.Hour),
+			args{
+				&user_model.UserView{
+					HumanView: &user_model.HumanView{
+						MfaMaxSetUp:    -1,
+						MfaInitSkipped: time.Now().UTC().Add(-40 * 24 * time.Hour),
+					},
 				},
-			}},
+				&iam_model.LoginPolicyView{
+					SoftwareMFAs: []iam_model.SoftwareMFAType{iam_model.SoftwareMFATypeOTP},
+				},
+			},
 			false,
 		},
 	}
@@ -947,7 +1139,7 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 			repo := &AuthRequestRepo{
 				MfaInitSkippedLifeTime: tt.fields.MfaInitSkippedLifeTime,
 			}
-			if got := repo.mfaSkippedOrSetUp(tt.args.user); got != tt.want {
+			if got := repo.mfaSkippedOrSetUp(tt.args.user, tt.args.policy); got != tt.want {
 				t.Errorf("mfaSkippedOrSetUp() = %v, want %v", got, tt.want)
 			}
 		})

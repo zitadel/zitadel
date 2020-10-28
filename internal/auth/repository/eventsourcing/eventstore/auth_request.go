@@ -150,6 +150,10 @@ func (repo *AuthRequestRepo) AuthRequestByCode(ctx context.Context, code string)
 	if err != nil {
 		return nil, err
 	}
+	err = repo.fillLoginPolicy(ctx, request)
+	if err != nil {
+		return nil, err
+	}
 	steps, err := repo.nextSteps(ctx, request, true)
 	if err != nil {
 		return nil, err
@@ -559,11 +563,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 		request.AuthTime = userSession.PasswordVerification
 	}
 
-	policy, err := repo.getLoginPolicy(ctx, request.UserOrgID)
-	if err != nil {
-		return nil, err
-	}
-	step, ok, err := repo.mfaChecked(userSession, request, user, policy)
+	step, ok, err := repo.mfaChecked(userSession, request, user)
 	if err != nil {
 		return nil, err
 	}
@@ -619,11 +619,11 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *model.AuthRequest) (
 	return users, nil
 }
 
-func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *model.AuthRequest, user *user_model.UserView, policy *iam_model.LoginPolicyView) (model.NextStep, bool, error) {
+func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *model.AuthRequest, user *user_model.UserView) (model.NextStep, bool, error) {
 	mfaLevel := request.MfaLevel()
-	promptRequired := (user.MfaMaxSetUp < mfaLevel) || !user.HasRequiredOrgMFALevel(policy)
-	if promptRequired || !repo.mfaSkippedOrSetUp(user, policy) {
-		types := user.MfaTypesSetupPossible(mfaLevel, policy)
+	promptRequired := (user.MfaMaxSetUp < mfaLevel) || !user.HasRequiredOrgMFALevel(request.LoginPolicy)
+	if promptRequired || !repo.mfaSkippedOrSetUp(user, request.LoginPolicy) {
+		types := user.MfaTypesSetupPossible(mfaLevel, request.LoginPolicy)
 		if promptRequired && len(types) == 0 {
 			return nil, false, errors.ThrowPreconditionFailed(nil, "LOGIN-5Hm8s", "Errors.Login.LoginPolicy.MFA.ForceAndNotConfigured")
 		}
@@ -655,7 +655,7 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 		}
 	}
 	return &model.MfaVerificationStep{
-		MfaProviders: user.MfaTypesAllowed(mfaLevel, policy),
+		MfaProviders: user.MfaTypesAllowed(mfaLevel, request.LoginPolicy),
 	}, false, nil
 }
 
