@@ -1,6 +1,12 @@
 <app-refresh-table [loading]="dataSource?.loading$ | async" (refreshed)="changePage()"
     [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes" [timestamp]="dataSource?.viewTimestamp"
     [dataSize]="dataSource?.totalResult" [selection]="selection">
+    <mat-form-field @appearfade *ngIf="userGrantSearchKey != undefined" actions class="filtername">
+        <mat-label>{{'USER.PAGES.FILTER' | translate}}</mat-label>
+        <input matInput (keyup)="applyFilter($event)"
+            [placeholder]="('USER.TABLE.FILTER.' + userGrantSearchKey.toString()) | translate" #input>
+    </mat-form-field>
+
     <button color="warn" matTooltip="{{'GRANTS.DELETE' | translate}}" class="icon-button" mat-icon-button actions
         (click)="deleteGrantSelection()" *ngIf="selection.hasValue() && disableDelete == false">
         <i class="las la-trash"></i>
@@ -66,7 +72,7 @@
                 <th mat-header-cell *matHeaderCellDef>
                     {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}
                     <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERSEARCHKEY_EMAIL}"></template>
+                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERGRANTSEARCHKEY_ROLE_KEY}"></template>
                 </th>
                 <td mat-cell *matCellDef="let grant; let i = index">
                     <ng-container *ngIf="context === UserGrantContext.USER || context === UserGrantContext.NONE">
