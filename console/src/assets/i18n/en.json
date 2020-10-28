@@ -384,6 +384,7 @@
                 "VERIFICATION_NEWTOKEN_DESC":"If you want to request a new token, select you preferred method. If you want to validate a persisting token, click the button above.",
                 "VERIFICATION_VALIDATION_ONGOING":"A verification token has already been requested. Click on the button to trigger a verification check.",
                 "VERIFICATION_VALIDATION_ONGOING_TYPE":"Type of the token:",
+                "VERIFICATION_SUCCESSFUL":"Domain successfully verified!",
                 "REQUESTNEWTOKEN":"Request new Token",
                 "TYPES": {
                     "1":"HTTP",

@@ -393,11 +393,9 @@ export class ManagementService {
         return this.grpcService.mgmt.removeMyOrgDomain(req);
     }
 
-    public SearchMyOrgDomains(offset: number, limit: number, queryList?: OrgDomainSearchQuery[]):
+    public SearchMyOrgDomains(queryList?: OrgDomainSearchQuery[]):
         Promise<OrgDomainSearchResponse> {
         const req: OrgDomainSearchRequest = new OrgDomainSearchRequest();
-        req.setLimit(limit);
-        req.setOffset(offset);
         if (queryList) {
             req.setQueriesList(queryList);
         }

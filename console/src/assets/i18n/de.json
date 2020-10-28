@@ -384,6 +384,7 @@
                 "VERIFICATION_NEWTOKEN_DESC":"Wenn Du ein neues Token anfordern willst, klicke auf die gewünschte Methode. Wenn Du ein vorhandenes Token validieren möchtest, klicke auf \"Verifizieren\".",
                 "VERIFICATION_VALIDATION_ONGOING":"Ein Token zur Validierung wurde bereits angefragt. Klicke auf \"Verifizieren\", um dieses Token zu validieren.",
                 "VERIFICATION_VALIDATION_ONGOING_TYPE":"Typ des Tokens:",
+                "VERIFICATION_SUCCESSFUL":"Domain erfolgreich validiert!",
                 "REQUESTNEWTOKEN":"Neues Token anfordern",
                 "TYPES": {
                     "1":"HTTP",
