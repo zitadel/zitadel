@@ -88,7 +88,7 @@
         background-color: #2a2f45;
         border-radius: 8px;
         position: fixed;
-        top: 30%;
+        top: 20%;
         left: 50%;
         padding: 1rem;
         transform: translateX(-50%);

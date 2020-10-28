@@ -161,7 +161,7 @@
       display: block;
       width: var(--sidebar-w);
       height: 100vh;
-      top: 0;
+      top: 120px;
       left: 0;
       overflow: hidden;
       box-shadow: none;
@@ -186,7 +186,7 @@
     }
 
     .sidebar {
-      padding: var(--top-offset) 0 6.4rem 0;
+      padding: 1em 0 6.4rem 0;
       font-family: var(--font);
       overflow-y: auto;
       height: 100%;
