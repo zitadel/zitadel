@@ -22,6 +22,10 @@
         padding: 1rem;
         width: calc(var(--sidebar-w) - 4rem);
         box-sizing: border-box;
+
+        /* position: fixed;
+        top: 80px;
+        left: 0; */
     }
 
     button:hover {

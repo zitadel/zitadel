@@ -1,4 +1,4 @@
-<script context="module">
+<!-- <script context="module">
     import { combinedSlugs } from '../utils/_searchStore.js';    
 
 	export async function preload() {
@@ -6,9 +6,11 @@
             console.log(value);
         })
     };
-</script>
+</script> -->
 
 <script>
+    import { combinedSlugs } from '../utils/searchStore.js';    
+
     import { createEventDispatcher } from 'svelte';
     import { _ } from 'svelte-i18n';
 
@@ -27,27 +29,32 @@
     $: executeQuery(searchValue);
 
     function executeQuery(value) {
-        console.log('comb: ', $combinedSlugs);
+        console.log('comb: ', combinedSlugs);
         console.log(sections);
         const toSearchFor = value.toLowerCase();
         const filteredSections = sections.filter(section => {
             const slugContainsValue = section.slug.toLowerCase().includes(toSearchFor);
-            const htmlContainsValue = section.html.replace(/<[^>]*>?/gm, '').toLowerCase().includes(toSearchFor);
-            return slugContainsValue || htmlContainsValue;
+            // const htmlContainsValue = section.html.replace(/<[^>]*>?/gm, '').toLowerCase().includes(toSearchFor);
+            return slugContainsValue;
         }).map(section => {
-            const removedHtml = section.html.replace(/<[^>]*>?/gm, '');
-            const foundIndex = removedHtml.indexOf(toSearchFor);
-            const subhtml = section.html.substring(foundIndex, (removedHtml.length - 1) - foundIndex > 150 ? 150 : removedHtml.length - 1)
+            // const removedHtml = section.html.replace(/<[^>]*>?/gm, '');
+            // const foundIndex = removedHtml.indexOf(toSearchFor);
+            // const subhtml = section.html.substring(foundIndex, (removedHtml.length - 1) - foundIndex > 150 ? 150 : removedHtml.length - 1)
             return {
                 title: section.slug,
                 slug: section.slug,
-                html: subhtml,
             }
         });
 
-        const filteredSubSections = sections.map(section => section.subsections).flat().filter(subsection => {
+        const filteredSubSections = sections.map(section => {
+            return section.subsections.map(sub => {
+                return {parent: section.slug, ...sub};
+            });
+        }).flat().filter(subsection => {
             if (subsection.slug) {
-                return subsection.slug.toLowerCase().includes(toSearchFor);
+                const slugContainsValue = subsection.slug.toLowerCase().includes(toSearchFor);
+                const titleContainsValue = subsection.title.toLowerCase().includes(toSearchFor);
+                return slugContainsValue || titleContainsValue;
             }
         });
 
@@ -56,7 +63,6 @@
     }
 
     function closeSearch() {
-        console.log('clsoe search');
         dispatch('close', {
             closed: true,
         });
@@ -167,6 +173,11 @@
         font-weight: 700;
     }
 
+    .result-list .result-item .title .second-param {
+        color: var(--grey-text);
+        margin-left: 2rem;
+    }
+
     .result-list .result-item .desc{
         color: var(--grey-text);
         margin: 0;
@@ -188,7 +199,11 @@
         {#each filteredResults as result}
         <a class="result-item" href="{slug}#{result.slug}" on:click="{closeSearch}">
             <div class="text">
+            {#if result.level > 2}
+                <p class="title">{result.title}<span class="second-param">{result.parent}</span></p>
+            {:else}
                 <p class="title">{result.slug}</p>
+            {/if}
                 <p class="desc" style="color: #85d996;">{slug}#{result.slug}</p>
                 <p class="desc">{result.html || result.slug}</p>
             </div>
