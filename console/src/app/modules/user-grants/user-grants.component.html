@@ -63,7 +63,11 @@
             </ng-container>
 
             <ng-container matColumnDef="roleNamesList">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }} </th>
+                <th mat-header-cell *matHeaderCellDef>
+                    {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}
+                    <template [ngTemplateOutlet]="templateRef"
+                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERSEARCHKEY_EMAIL}"></template>
+                </th>
                 <td mat-cell *matCellDef="let grant; let i = index">
                     <ng-container *ngIf="context === UserGrantContext.USER || context === UserGrantContext.NONE">
                         <ng-container
@@ -124,3 +128,10 @@
         </mat-paginator>
     </div>
 </app-refresh-table>
+
+<ng-template #templateRef let-key="key">
+    <button class="search-button" mat-icon-button (click)="setFilter(key)">
+        <mat-icon *ngIf="this.userGrantSearchKey != key">search</mat-icon>
+        <mat-icon *ngIf="this.userGrantSearchKey == key">search_off</mat-icon>
+    </button>
+</ng-template>
