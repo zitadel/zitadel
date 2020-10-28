@@ -41,7 +41,8 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		tmplMfaVerify:              "mfa_verify.html",
 		tmplMfaPrompt:              "mfa_prompt.html",
 		tmplMfaInitVerify:          "mfa_init_verify.html",
-		tmplMfaU2FInitVerify:       "mfa_init_u2f.html",
+		tmplMfaU2FInit:             "mfa_init_u2f.html",
+		tmplMfaU2FInitVerification: "mfa_init_u2f_login.html",
 		tmplMfaInitDone:            "mfa_init_done.html",
 		tmplMailVerification:       "mail_verification.html",
 		tmplMailVerified:           "mail_verified.html",
@@ -109,6 +110,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		},
 		"mfaInitU2FVerifyUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMfaInitU2FVerify)
+		},
+		"mfaInitU2FLoginUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointMfaInitU2FLogin)
 		},
 		"mailVerificationUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMailVerification)

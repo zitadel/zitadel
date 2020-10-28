@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/caos/logging"
+	webauthn2 "github.com/duo-labs/webauthn/webauthn"
 	"github.com/gorilla/csrf"
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
@@ -34,6 +35,8 @@ type Login struct {
 	oidcAuthCallbackURL string
 	IDPConfigAesCrypto  crypto.EncryptionAlgorithm
 	webAuthN            *webauthn.WebAuthN
+	sessionData         webauthn2.SessionData
+	creds               []webauthn2.Credential
 }
 
 type Config struct {
@@ -63,7 +66,7 @@ func CreateLogin(config Config, authRepo *eventsourcing.EsRepository, systemDefa
 	if err != nil {
 		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")
 	}
-	web, err := webauthn.StartServer("zitadel", "localhost", "")
+	web, err := webauthn.StartServer("zitadel", "localhost", "http://localhost:50003")
 	if err != nil {
 		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")
 	}
