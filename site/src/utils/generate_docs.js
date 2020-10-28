@@ -4,6 +4,7 @@ import marked from 'marked';
 import path from 'path';
 
 import { SLUG_PRESERVE_UNICODE, SLUG_SEPARATOR } from '../../config';
+import { combinedSlugs } from './_searchStore.js';
 import { extract_frontmatter, extract_metadata, langs, link_renderer } from './markdown.js';
 import { make_session_slug_processor } from './slug';
 
@@ -123,6 +124,8 @@ export default function generate_docs(dirpath, dir, lang) {
 
             const html = marked(content, { renderer });
             const hashes = {};
+
+            combinedSlugs.update(n => n.concat([{ name: 'abcd' }]));
 
             return {
                 html: html.replace(/@@(\d+)/g, (m, id) => hashes[id] || m),

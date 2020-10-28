@@ -3,6 +3,7 @@ import { locale } from 'svelte-i18n';
 
 import { LANGUAGES } from '../../config.js';
 import { INIT_OPTIONS } from '../i18n.js';
+import { combinedSlugs } from '../utils/_searchStore.js';
 import generate_docs from '../utils/generate_docs.js';
 
 let json;
@@ -16,7 +17,9 @@ export function get(req, res) {
                 console.log(INIT_OPTIONS);
                 localecode = INIT_OPTIONS.initialLocale || 'en';
             }
-            json = JSON.stringify(generate_docs('docs/', slug, localecode)); // TODO it errors if I send the non-stringified value
+            const docs = generate_docs('docs/', slug, localecode);
+            combinedSlugs.set([]);
+            json = JSON.stringify(docs); // TODO it errors if I send the non-stringified value
         });
     }
 
