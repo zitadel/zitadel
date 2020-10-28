@@ -51,8 +51,6 @@ Image 1: User List Search
     </figure>
 </div>
 
-Image 2: User List
-
 <div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
         <a href="img/console_user_create_form.png" itemprop="contentUrl" data-size="1920x1080">
@@ -61,8 +59,6 @@ Image 2: User List
         <figcaption itemprop="caption description">User Create Form</figcaption>
     </figure>
 </div>
-
-Image 3: User Create Form
 
 <div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
@@ -73,8 +69,6 @@ Image 3: User Create Form
     </figure>
 </div>
 
-Image 4: User Create Done
-
 #### Set Password
 
 > Screenshot here
@@ -83,9 +77,26 @@ Image 4: User Create Done
 
 > Screenshot here
 
-### Authorizations
+### Manage User Authorisations
 
 > Screenshot here
+
+### Manage User ZITADEL Roles
+
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_user_manage_roles_1.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_user_manage_roles_1.png" itemprop="thumbnail" alt="Manage ZITADEL Roles 1" />
+        </a>
+        <figcaption itemprop="caption description">Manage ZITADEL Roles 1</figcaption>
+    </figure>
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_user_manage_roles_2.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_user_manage_roles_2.png" itemprop="thumbnail" alt="Manage ZITADEL Roles 2" />
+        </a>
+        <figcaption itemprop="caption description">Manage ZITADEL Roles 2</figcaption>
+    </figure>
+</div>
 
 ### Audit user changes
 
