@@ -39,19 +39,28 @@
             </ng-container>
 
             <ng-container matColumnDef="user">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.USER' | translate }} </th>
+                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.USER' | translate }}
+                    <template [ngTemplateOutlet]="templateRef"
+                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID}"></template>
+                </th>
                 <td mat-cell *matCellDef="let grant">
                     {{grant?.displayName}}</td>
             </ng-container>
 
             <ng-container matColumnDef="org">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.GRANTEDORGDOMAIN' | translate }} </th>
+                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.GRANTEDORGDOMAIN' | translate }}
+                    <template [ngTemplateOutlet]="templateRef"
+                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERGRANTSEARCHKEY_ORG_ID}"></template>
+                </th>
                 <td mat-cell *matCellDef="let grant">
                     {{grant.orgName}} </td>
             </ng-container>
 
             <ng-container matColumnDef="projectId">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.PROJECTNAME' | translate }} </th>
+                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.PROJECTNAME' | translate }}
+                    <template [ngTemplateOutlet]="templateRef"
+                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID}"></template>
+                </th>
                 <td mat-cell *matCellDef="let grant">
                     {{grant.projectName}} </td>
             </ng-container>

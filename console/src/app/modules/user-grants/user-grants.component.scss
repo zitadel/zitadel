@@ -21,6 +21,19 @@
       }
     }
 
+    th {
+        .search-button {
+        visibility: hidden;
+        }
+    
+        &:hover,
+        &.search-active {
+        .search-button {
+            visibility: visible;
+        }
+        }
+    }
+
     .selection {
       width: 50px;
       max-width: 50px;
