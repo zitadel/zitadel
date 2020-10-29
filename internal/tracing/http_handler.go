@@ -4,29 +4,20 @@ import (
 	"net/http"
 	"strings"
 
-	"go.opencensus.io/plugin/ochttp"
-	"go.opencensus.io/trace"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
-func TraceHandler(handler http.Handler, ignoredEndpoints ...string) http.Handler {
-	return &ochttp.Handler{
-		Handler: handler,
-		FormatSpanName: func(r *http.Request) string {
-			host := r.URL.Host
-			if host == "" {
-				host = r.Host
+func ignoredEndpointsFilter(endpoints ...string) func(r *http.Request) bool {
+	return func(r *http.Request) bool {
+		for _, endpoint := range endpoints {
+			if strings.HasPrefix(r.URL.RequestURI(), endpoint) {
+				return true
 			}
-			return host + r.URL.Path
-		},
-
-		StartOptions: trace.StartOptions{Sampler: Sampler()},
-		IsHealthEndpoint: func(r *http.Request) bool {
-			for _, endpoint := range ignoredEndpoints {
-				if strings.HasPrefix(r.URL.RequestURI(), endpoint) {
-					return true
-				}
-			}
-			return false
-		},
+		}
+		return false
 	}
+}
+
+func TraceHandler(handler http.Handler, ignoredEndpoints ...string) http.Handler {
+	return otelhttp.NewHandler(handler, "zitadel", otelhttp.WithFilter(ignoredEndpointsFilter(ignoredEndpoints...)))
 }

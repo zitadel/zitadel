@@ -4,18 +4,17 @@ import (
 	"context"
 	"net/http"
 
-	"go.opencensus.io/trace"
+	apitrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 type Tracer interface {
-	Start() error
 	NewSpan(ctx context.Context, caller string) (context.Context, *Span)
 	NewClientSpan(ctx context.Context, caller string) (context.Context, *Span)
 	NewServerSpan(ctx context.Context, caller string) (context.Context, *Span)
 	NewClientInterceptorSpan(ctx context.Context, name string) (context.Context, *Span)
 	NewServerInterceptorSpan(ctx context.Context, name string) (context.Context, *Span)
 	NewSpanHTTP(r *http.Request, caller string) (*http.Request, *Span)
-	Sampler() trace.Sampler
+	Sampler() apitrace.Sampler
 }
 
 type Config interface {
@@ -24,9 +23,9 @@ type Config interface {
 
 var T Tracer
 
-func Sampler() trace.Sampler {
+func Sampler() apitrace.Sampler {
 	if T == nil {
-		return trace.NeverSample()
+		return apitrace.NeverSample()
 	}
 	return T.Sampler()
 }

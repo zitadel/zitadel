@@ -27,9 +27,10 @@ type Server interface {
 
 func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, lang language.Tag) *grpc.Server {
 	return grpc.NewServer(
-		middleware.DefaultTracingStatsServer(),
+		// middleware.DefaultTracingStatsServer(),
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
+				middleware.DefaultTracingServer(),
 				middleware.ErrorHandler(),
 				middleware.AuthorizationInterceptor(verifier, authConfig),
 				middleware.TranslationHandler(lang),

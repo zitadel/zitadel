@@ -1,30 +1,27 @@
 package tracing
 
 import (
-	"fmt"
-	errors2 "github.com/caos/zitadel/internal/api/grpc/errors"
-	"strconv"
-
-	"go.opencensus.io/trace"
-
-	"github.com/caos/zitadel/internal/errors"
+	grpc_errs "github.com/caos/zitadel/internal/api/grpc/errors"
+	apitrace "go.opentelemetry.io/otel/api/trace"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/label"
 )
 
 type Span struct {
-	span       *trace.Span
-	attributes []trace.Attribute
+	span apitrace.Span
+	opts []apitrace.SpanOption
 }
 
-func CreateSpan(span *trace.Span) *Span {
-	return &Span{span: span, attributes: []trace.Attribute{}}
+func CreateSpan(span apitrace.Span) *Span {
+	return &Span{span: span, opts: []apitrace.SpanOption{}}
 }
 
 func (s *Span) End() {
 	if s.span == nil {
 		return
 	}
-	s.span.AddAttributes(s.attributes...)
-	s.span.End()
+
+	s.span.End(s.opts...)
 }
 
 func (s *Span) EndWithError(err error) {
@@ -36,53 +33,10 @@ func (s *Span) SetStatusByError(err error) {
 	if s.span == nil {
 		return
 	}
-	s.span.SetStatus(statusFromError(err))
-}
-
-func statusFromError(err error) trace.Status {
-	code, msg, _, _ := errors2.ExtractCaosError(err)
-	return trace.Status{Code: int32(code), Message: msg}
-}
-
-// AddAnnotation creates an annotation. The annotation will not be added to the tracing use Annotate(msg) afterwards
-func (s *Span) AddAnnotation(key string, value interface{}) *Span {
-	attribute, err := toTraceAttribute(key, value)
 	if err != nil {
-		return s
+		s.span.SetStatus(codes.Error, err.Error())
 	}
-	s.attributes = append(s.attributes, attribute)
-	return s
-}
 
-// Annotate creates an annotation in tracing. Before added annotations will be set
-func (s *Span) Annotate(message string) *Span {
-	if s.span == nil {
-		return s
-	}
-	s.span.Annotate(s.attributes, message)
-	s.attributes = []trace.Attribute{}
-	return s
-}
-
-func (s *Span) Annotatef(format string, addiations ...interface{}) *Span {
-	s.Annotate(fmt.Sprintf(format, addiations...))
-	return s
-}
-
-func toTraceAttribute(key string, value interface{}) (attr trace.Attribute, err error) {
-	switch value := value.(type) {
-	case bool:
-		return trace.BoolAttribute(key, value), nil
-	case string:
-		return trace.StringAttribute(key, value), nil
-	}
-	if valueInt, err := convertToInt64(value); err == nil {
-		return trace.Int64Attribute(key, valueInt), nil
-	}
-	return attr, errors.ThrowInternal(nil, "TRACE-jlq3s", "Attribute is not of type bool, string or int64")
-}
-
-func convertToInt64(value interface{}) (int64, error) {
-	valueString := fmt.Sprintf("%v", value)
-	return strconv.ParseInt(valueString, 10, 64)
+	code, msg, _, _ := grpc_errs.ExtractCaosError(err)
+	s.span.SetAttributes(label.Uint32("grpc_code", uint32(code)), label.String("grpc_msg", msg))
 }
