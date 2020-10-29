@@ -34,8 +34,8 @@
         const toSearchFor = value.toLowerCase();
         const filteredSections = sections.filter(section => {
             const slugContainsValue = section.slug.toLowerCase().includes(toSearchFor);
-            // const htmlContainsValue = section.html.replace(/<[^>]*>?/gm, '').toLowerCase().includes(toSearchFor);
-            return slugContainsValue;
+            const htmlContainsValue = section.html.replace(/<[^>]*>?/gm, '').toLowerCase().includes(toSearchFor);
+            return slugContainsValue || htmlContainsValue;
         }).map(section => {
             // const removedHtml = section.html.replace(/<[^>]*>?/gm, '');
             // const foundIndex = removedHtml.indexOf(toSearchFor);

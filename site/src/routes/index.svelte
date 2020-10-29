@@ -16,14 +16,14 @@
     }
     .caos-back {
         position: absolute;
-        top: 80px;
-        height: 60vh;
+        top: calc(2rem + var(--nav-h));
+        height: 30vh;
         max-height: 500px;
-        right: 0;
+        right: 2rem;
     }
     .section {
         width: 100%;
-        margin-top: 70vh;
+        margin-top: 40vh;
         min-height: 80vh;
     }
     @media screen and (min-width: 768px) {

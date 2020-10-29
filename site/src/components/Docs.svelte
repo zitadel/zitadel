@@ -88,8 +88,8 @@
     background-color: var(--side-nav-back);
     left: 0.8rem;
     bottom: 0.8rem;
-    width: 2em;
-    height: 2em;
+    width: 3.4rem; /* size to match button */
+    height: 3.4rem; /* size to match button */
     border-radius: .5rem;
     overflow: hidden;
     border: 1px solid #8795a1;
@@ -106,8 +106,8 @@
   }
 
   aside.open {
-    width: calc(100vw - 3rem);
-    height: calc(100vh - var(--nav-h) - 3rem);
+    width: calc(100vw - 1.5rem);
+    height: calc(100vh - var(--nav-h) - 6rem);
   }
 
   aside.open::before {
@@ -145,6 +145,14 @@
     height: 100%;
     padding: 4em 1.6rem 2em 3.2rem;
     bottom: 2em;
+  }
+
+  aside .sidebar :global(.search-trigger) {
+      visibility: hidden;
+  }
+
+  aside.open .sidebar :global(.search-trigger) {
+      visibility: visible;
   }
 
   .sidebar::-webkit-scrollbar-track {
@@ -204,6 +212,10 @@
       display: none;
     }
 
+    aside .sidebar :global(.search-trigger) {
+      visibility: visible;
+    }
+
     .sidebar {
       padding: 1em .5rem 6.4rem 0;
       font-family: var(--font);
@@ -211,6 +223,10 @@
       height: 100%;
       bottom: auto;
       width: 100%;
+    }
+
+    .sidebar :global(.search-trigger) {
+      visibility: visible;
     }
 
     .content {
@@ -261,9 +277,9 @@
     display: block;
     /* TODO replace link icon */
     /* background: url(../icons/link.svg) 0 50% no-repeat; */
-    background-size: 1em 1em;
-    width: 1.4em;
-    height: 1em;
+    background-size: 30px 30px;
+    width: 30px;
+    height: 30px;
     left: -1.3em;
     opacity: 0;
     color: white;
@@ -273,7 +289,7 @@
 
   .content :global(.anchor) :global(i) {
     color: #8795a1;
-    font-size: 24px;
+    /* font-size: 24px; */
   }
 
   @media (min-width: 768px) {
@@ -456,7 +472,7 @@
   </div>
 
   <button on:click={() => (show_contents = !show_contents)}>
-    <Icon name={show_contents ? 'las la-window-close' : 'las la-bars'} />
+    <Icon name={show_contents ? 'las la-times' : 'las la-bars'} />
   </button>
 </aside>
 

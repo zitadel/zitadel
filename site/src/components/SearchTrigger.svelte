@@ -20,7 +20,7 @@
         border: 1px solid #ffffff20;
         height: 35px;
         padding: 1rem;
-        width: calc(var(--sidebar-w) - 4rem);
+        width: calc(100% - 4rem);
         box-sizing: border-box;
         position: fixed;
         top: 60px;
@@ -48,9 +48,15 @@
         font-size: 1.3rem;
         margin-right: 1rem;
     }
+
+    @media (min-width: 832px) {
+        button {
+            width: calc(var(--sidebar-w) - 4rem);
+        }
+    }
 </style>
 
-<button on:click>
+<button on:click class="search-trigger">
     <i class="las la-search"></i>
     <span>{$_('search_button_holder')}</span>
     <span class="fill-space"></span>

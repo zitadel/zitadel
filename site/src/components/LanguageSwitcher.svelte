@@ -20,7 +20,6 @@
 
 <style>
     :root {
-        --deep-blue: #1e3470;
         --speed3: cubic-bezier(0.26, 0.48, 0.08, 0.9);
         --height: 30px;
     }
@@ -41,7 +40,7 @@
         width: var(--height);
         border-radius: 50vw;
         font-size: calc(var(--height) / 2.5);
-        color: #6c8eef;
+        color: white;
         mix-blend-mode: difference;    
         display: flex;
         align-items: center;
@@ -50,7 +49,7 @@
     }
 
     .language-switcher .current {
-        background-color: #6c8eef;
+        background-color: white;
         color: black;
     }
 </style>

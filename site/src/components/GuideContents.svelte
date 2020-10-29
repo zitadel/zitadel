@@ -97,7 +97,6 @@
 	}
 
 	.icon-container {
-        margin-right: 1rem;
         margin-left: .5rem;
         color: white;
     }
