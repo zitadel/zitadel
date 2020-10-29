@@ -26,7 +26,7 @@
   }
 </style>
 
-<Nav {segment} title="{manifest.name}" logo="logos/zitadel-logo-light.svg"></Nav>
+<!-- <Nav {segment} title="{manifest.name}" logo="logos/zitadel-logo-light.svg"></Nav> -->
 
 <main>
   <slot />
