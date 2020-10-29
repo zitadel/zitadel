@@ -115,7 +115,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: calc(100% - 2rem);
+    width: 100%;
     height: 2em;
     pointer-events: none;
     z-index: 2;
@@ -125,15 +125,15 @@
     content: "";
     position: absolute;
     left: 0;
-    bottom: 1.9em;
-    width: calc(100% - 2rem);
+    bottom: 0;
+    width: 100%;
     height: 2em;
-    /* background: linear-gradient(
+    background: linear-gradient(
       to bottom,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.7) 50%,
-      rgba(255, 255, 255, 1) 100%
-    ); */
+       #1a1f3600 0%,
+       #1a1f3670 50%,
+      #1a1f36 100%
+    );
     pointer-events: none;
   }
 
@@ -145,6 +145,25 @@
     height: 100%;
     padding: 4em 1.6rem 2em 3.2rem;
     bottom: 2em;
+  }
+
+  .sidebar::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: #00000010;
+    border-radius: 8px;
+  }
+
+  .sidebar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: #00000010;
+  }
+
+  .sidebar::-webkit-scrollbar-thumb {
+    background-color: #5282c130;
+    border-radius: 8px;
+    cursor: pointer;
   }
 
   .content {
@@ -160,8 +179,8 @@
     aside {
       display: block;
       width: var(--sidebar-w);
-      height: 100vh;
-      top: 120px;
+      height: calc(100vh - var(--searchbar-space));
+      top: var(--searchbar-space); /* space for searchbar */
       left: 0;
       overflow: hidden;
       box-shadow: none;
@@ -186,7 +205,7 @@
     }
 
     .sidebar {
-      padding: 1em 0 6.4rem 0;
+      padding: 1em .5rem 6.4rem 0;
       font-family: var(--font);
       overflow-y: auto;
       height: 100%;

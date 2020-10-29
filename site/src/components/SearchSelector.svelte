@@ -76,7 +76,7 @@
         bottom: 0;
         left: 0;
         right: 0;
-        background: #ffffff60;
+        background: #ffffff30;
         backdrop-filter: blur(10px);
     }
 

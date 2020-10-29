@@ -22,9 +22,8 @@
         padding: 1rem;
         width: calc(var(--sidebar-w) - 4rem);
         box-sizing: border-box;
-
         position: fixed;
-        top: 70px;
+        top: 60px;
         left: 0;
     }
 

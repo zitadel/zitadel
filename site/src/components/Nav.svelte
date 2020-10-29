@@ -117,17 +117,18 @@
         box-shadow: 0 0 0 0 rgba(0,0,0,.2), 0 0 0 0 rgba(0,0,0,.14), 0 0 0 0 rgba(0,0,0,.12);
         padding: 0 15px;
         height: 36px;
-        color: var(--prime);
+        color: #6c8eef;/*var(--prime);*/
         transition: background-color .2 ease;
         margin: 0 1rem;
         min-width: 120px;
+        background: var(--back);
     }
 
     button:hover {
-        background-color: #5282c110;
+        background-color: var(--back-hover);
     }
     button:active {
-        background-color: #5282c120;
+        background-color: var(--back-hover);
     }
 
     button span {

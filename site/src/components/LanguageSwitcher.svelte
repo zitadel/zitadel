@@ -41,7 +41,7 @@
         width: var(--height);
         border-radius: 50vw;
         font-size: calc(var(--height) / 2.5);
-        color: #fff;
+        color: #6c8eef;
         mix-blend-mode: difference;    
         display: flex;
         align-items: center;
@@ -50,7 +50,7 @@
     }
 
     .language-switcher .current {
-        background-color: white;
+        background-color: #6c8eef;
         color: black;
     }
 </style>
