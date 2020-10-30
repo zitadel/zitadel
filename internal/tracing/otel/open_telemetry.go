@@ -7,8 +7,6 @@ import (
 	"github.com/caos/zitadel/internal/tracing"
 	"go.opentelemetry.io/otel/api/global"
 	apitrace "go.opentelemetry.io/otel/api/trace"
-	"go.opentelemetry.io/otel/codes"
-	"go.opentelemetry.io/otel/label"
 	"go.opentelemetry.io/otel/sdk/export/trace"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
@@ -68,9 +66,4 @@ func (t *Tracer) NewSpanHTTP(r *http.Request, caller string) (*http.Request, *tr
 	ctx, span := t.NewSpan(r.Context(), caller)
 	r = r.WithContext(ctx)
 	return r, span
-}
-
-func (t *Tracer) SetErrStatus(span apitrace.Span, code int32, err error, obj ...string) {
-	span.RecordError(context.TODO(), err, apitrace.WithErrorStatus(codes.Error))
-	span.SetAttributes(label.Int32("code", code), label.Array("error_attributes", obj))
 }

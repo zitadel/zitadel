@@ -1,6 +1,8 @@
 package tracing
 
 import (
+	"context"
+
 	grpc_errs "github.com/caos/zitadel/internal/api/grpc/errors"
 	apitrace "go.opentelemetry.io/otel/api/trace"
 	"go.opentelemetry.io/otel/codes"
@@ -34,7 +36,7 @@ func (s *Span) SetStatusByError(err error) {
 		return
 	}
 	if err != nil {
-		s.span.SetStatus(codes.Error, err.Error())
+		s.span.RecordError(context.TODO(), err, apitrace.WithErrorStatus(codes.Error))
 	}
 
 	code, msg, _, _ := grpc_errs.ExtractCaosError(err)
