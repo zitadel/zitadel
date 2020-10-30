@@ -35,7 +35,9 @@
         "LOGOUT": "Logout All Users",
         "NEWORG":"New Organisation",
         "IAMADMIN":"You are an IAM Administrator. Note that you have extended permissions.",
-        "SHOWORGS":"Show All Organisations"
+        "SHOWORGS":"Show All Organisations",
+        "GRANTSECTION":"Authorization Section",
+        "GRANTS":"Authorizations"
     },
     "ACTIONS": {
         "SAVE": "Save",
@@ -350,10 +352,6 @@
             "DELETE":"Remove",
             "DELETESUCCESS":"Failed events removed."
         },
-        "POLICY": {
-            "TITLE":"Default policies for organisations",
-            "DESCRIPTION":"These settings can be enhanced and/or customized by registered organisations."
-        },
         "TOAST":{
             "MEMBERREMOVED":"Manager removed.",
             "MEMBERSADDED": "Managers added.",
@@ -421,74 +419,6 @@
             "TITLE":"Organisation Managers",
             "DESCRIPTION":"Define the users who can change your organisations preferences."
         },
-        "POLICY": {
-            "TITLE":"Explore Policies",
-            "DESCRIPTION":"Pre-packaged policies that enhance your security.",
-            "PWD_COMPLEXITY": {
-                "TITLE":"Password Complexity",
-                "DESCRIPTION":"Ensures that all set passwords correspond to a specific pattern",
-                "TITLECREATE":"Create Password Complexity Policy",
-                "DESCRIPTIONCREATE":"Ensures that all set passwords correspond to a specific pattern",
-                "SYMBOLANDNUMBERERROR":"The password must consist of a digit and a symbol/punctuation mark.",
-                "SYMBOLERROR":"The password must include a symbol/punctuation mark.",
-                "NUMBERERROR":"The password must include a digit.",
-                "PATTERNERROR":"The password does not meet the required pattern."
-            },
-            "PWD_AGE": {
-                "TITLE":"Password Aging",
-                "DESCRIPTION":"You can set a policy for the aging of passwords. This policy emits a warning after the specific aging time has elapsed.",
-                "TITLECREATE":"Create Password Aging Policy",
-                "DESCRIPTIONCREATE":"You can set a policy for the aging of passwords. This policy emits a warning after the specific aging time has elapsed."
-            },
-            "PWD_LOCKOUT": {
-                "TITLE":"Password Lockout",
-                "DESCRIPTION":"Password retries are infinite in default mode. You have to apply this policy if you want to show the number of retries, or set a maximum number of retries after which the account will be blocked.",
-                "TITLECREATE":"Create Password Lockout Policy",
-                "DESCRIPTIONCREATE":"Password retries are infinite in default mode. You have to apply this policy if you want to show the number of retries, or set a maximum number of retries after which the account will be blocked."
-            },
-            "IAM_POLICY": {
-                "TITLE":"IAM Access Preferences",
-                "DESCRIPTION":"Define access properties of your users.",
-                "TITLECREATE":"Set IAM Access Preferences",
-                "DESCRIPTIONCREATE":"If the property \"UserLoginMustBeDomain\" is enabled an e-mail address cannot be used as a user name."
-            },
-            "LOGIN_POLICY": {
-                "TITLE":"Login Policy",
-                "DESCRIPTION":"Define how Users can be authenticated",
-                "TITLECREATE":"Define how Users can be authenticated",
-                "DESCRIPTIONCREATEADMIN":"Users can choose from the available identity providers below.",
-                "DESCRIPTIONCREATEMGMT":"Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only.",
-                "SAVED":"Saved successfully!"
-            },
-            "DEFAULTLABEL":"The currently set guideline corresponds to the standard setting set by the IAM Administrator.",
-            "BTN_INSTALL":"Setup",
-            "BTN_EDIT":"Modify",
-            "DATA": {
-                "DESCRIPTION":"Description",
-                "MINLENGTH":"minimum length",
-                "HASNUMBER": "has number",
-                "HASSYMBOL": "has symbol",
-                "HASLOWERCASE": "has lowercase",
-                "HASUPPERCASE": "has uppercase",
-                "SHOWLOCKOUTFAILURES":"show lockout failures",
-                "MAXATTEMPTS":"Max Attempts",
-                "EXPIREWARNDAYS":"Expiration Warning after day",
-                "MAXAGEDAYS":"Max Age in days",
-                "USERLOGINMUSTBEDOMAIN":"User Login must be Domain",
-                "ALLOWUSERNAMEPASSWORD":"Username Password allowed",
-                "ALLOWEXTERNALIDP":"External IDP allowed",
-                "ALLOWREGISTER":"Register allowed",
-                "ALLOWUSERNAMEPASSWORD_DESC":"The conventional login with user name and password is allowed.",
-                "ALLOWEXTERNALIDP_DESC":"The login is allowed for the underlying identity providers",
-                "ALLOWREGISTER_DESC":"If the option is selected, an additional step for registering a user appears in the login."
-            },
-            "RESET":"Reset Policy",
-            "CREATECUSTOM":"Create Custom Policy",
-            "TOAST":{
-                "SET":"Policy set successfully!",
-                "RESETSUCCESS":"Policy reset successfully!"
-            }
-        },
         "TOAST": {
             "DEACTIVATED":"Organisation deactivated.",
             "REACTIVATED":"Organisation reactivated.",
@@ -498,6 +428,72 @@
             "MEMBERREMOVED":"Manager removed.",
             "MEMBERCHANGED":"Manager changed.",
             "SETPRIMARY":"Primary domain set."
+        }
+    },
+    "POLICY": {
+        "TITLE":"Explore Policies",
+        "DESCRIPTION":"Pre-packaged policies that enhance your security.",
+        "PWD_COMPLEXITY": {
+            "TITLE":"Password Complexity",
+            "DESCRIPTION":"Ensures that all set passwords correspond to a specific pattern",
+            "SYMBOLANDNUMBERERROR":"The password must consist of a digit and a symbol/punctuation mark.",
+            "SYMBOLERROR":"The password must include a symbol/punctuation mark.",
+            "NUMBERERROR":"The password must include a digit.",
+            "PATTERNERROR":"The password does not meet the required pattern."
+        },
+        "PWD_AGE": {
+            "TITLE":"Password Aging",
+            "DESCRIPTION":"You can set a policy for the aging of passwords. This policy emits a warning after the specific aging time has elapsed."
+        },
+        "PWD_LOCKOUT": {
+            "TITLE":"Password Lockout",
+            "DESCRIPTION":"Password retries are infinite in default mode. You have to apply this policy if you want to show the number of retries, or set a maximum number of retries after which the account will be blocked."
+        },
+        "IAM_POLICY": {
+            "TITLE":"IAM Access Preferences",
+            "DESCRIPTION":"Define access properties of your users."
+        },
+        "LOGIN_POLICY": {
+            "TITLE":"Login Policy",
+            "DESCRIPTION":"Define how Users can be authenticated",
+            "DESCRIPTIONCREATEADMIN":"Users can choose from the available identity providers below.",
+            "DESCRIPTIONCREATEMGMT":"Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only.",
+            "SAVED":"Saved successfully!"
+        },
+        "LABEL": {
+            "TITLE":"Email Labelling Settings",
+            "DESCRIPTION":"Change the look of your emails.",
+            "PRIMARYCOLOR":"Background color",
+            "SECONDARYCOLOR":"Font color",
+            "SAVED":"Saved successfully"
+        },
+        "DEFAULTLABEL":"The currently set guideline corresponds to the standard setting set by the IAM Administrator.",
+        "BTN_INSTALL":"Setup",
+        "BTN_EDIT":"Modify",
+        "DATA": {
+            "DESCRIPTION":"Description",
+            "MINLENGTH":"minimum length",
+            "HASNUMBER": "has number",
+            "HASSYMBOL": "has symbol",
+            "HASLOWERCASE": "has lowercase",
+            "HASUPPERCASE": "has uppercase",
+            "SHOWLOCKOUTFAILURES":"show lockout failures",
+            "MAXATTEMPTS":"Max Attempts",
+            "EXPIREWARNDAYS":"Expiration Warning after day",
+            "MAXAGEDAYS":"Max Age in days",
+            "USERLOGINMUSTBEDOMAIN":"User Login must be Domain",
+            "ALLOWUSERNAMEPASSWORD":"Username Password allowed",
+            "ALLOWEXTERNALIDP":"External IDP allowed",
+            "ALLOWREGISTER":"Register allowed",
+            "ALLOWUSERNAMEPASSWORD_DESC":"The conventional login with user name and password is allowed.",
+            "ALLOWEXTERNALIDP_DESC":"The login is allowed for the underlying identity providers",
+            "ALLOWREGISTER_DESC":"If the option is selected, an additional step for registering a user appears in the login."
+        },
+        "RESET":"Reset Policy",
+        "CREATECUSTOM":"Create Custom Policy",
+        "TOAST":{
+            "SET":"Policy set successfully!",
+            "RESETSUCCESS":"Policy reset successfully!"
         }
     },
     "ORG_DETAIL": {
@@ -876,6 +872,8 @@
     },
     "ROLESLABEL":"Roles",
     "GRANTS": {
+        "TITLE":"Authorisations",
+        "DESC":"Here you can manage authorizations of your organization users.",
         "DELETE":"Delete Authorisation",
         "ADD":"Create Authorisation",
         "ADD_BTN":"New",

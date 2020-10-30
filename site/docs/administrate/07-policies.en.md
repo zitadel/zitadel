@@ -4,8 +4,8 @@ title: Policies
 
 ### What are policies
 
-Polices are a means of enforcing certain behavior of ZITADEL.
-ZITADEL defines a default policy on the system level. However a org. owner can change these aspects within his own org.
+Policies are a means of enforcing certain behaviour of ZITADEL.
+ZITADEL defines a default policy on the system level. However an organisation owner can change these aspects within his own organisation.
 
 Below is a list of available policies
 
@@ -24,7 +24,7 @@ This policy enforces passwords of users within the org. to be compliant.
 ### IAM Access Preference
 
 This policy enforces, when set to true, that usernames are suffixed with the organisations domain.
-Under normal operation this policy is only false on the `global` org. so that users can choose there email as username.
+Under normal operation this policy is only false on the `global` org. so that users can choose their email as their username.
 Only available for the `IAM Administrator`
 
 > Screenshot here

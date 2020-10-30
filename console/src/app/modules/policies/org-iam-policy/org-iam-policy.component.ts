@@ -83,7 +83,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
                         this.org.id,
                         this.iamData.userLoginMustBeDomain,
                     ).then(() => {
-                        this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                        this.toast.showInfo('POLICY.TOAST.SET', true);
                     }).catch(error => {
                         this.toast.showError(error);
                     });
@@ -93,7 +93,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
                         this.org.id,
                         this.iamData.userLoginMustBeDomain,
                     ).then(() => {
-                        this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                        this.toast.showInfo('POLICY.TOAST.SET', true);
                     }).catch(error => {
                         this.toast.showError(error);
                     });
@@ -105,7 +105,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
                     this.org.id,
                     this.iamData.userLoginMustBeDomain,
                 ).then(() => {
-                    this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                    this.toast.showInfo('POLICY.TOAST.SET', true);
                 }).catch(error => {
                     this.toast.showError(error);
                 });
@@ -116,7 +116,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
     public removePolicy(): void {
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
             this.adminService.RemoveOrgIamPolicy(this.org.id).then(() => {
-                this.toast.showInfo('ORG.POLICY.TOAST.RESETSUCCESS', true);
+                this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
                 setTimeout(() => {
                     this.fetchData();
                 }, 1000);

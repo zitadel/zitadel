@@ -2,6 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { Gender, UserAddress, UserEmail, UserPhone, UserProfile, UserView } from 'src/app/proto/generated/auth_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -25,6 +26,8 @@ export class AuthUserDetailComponent implements OnDestroy {
 
     public ChangeType: any = ChangeType;
     public userLoginMustBeDomain: boolean = false;
+
+    public USERGRANTCONTEXT: UserGrantContext = UserGrantContext.USER;
 
     constructor(
         public translate: TranslateService,

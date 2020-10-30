@@ -7,6 +7,9 @@ import {
     CreateHumanRequest,
     CreateOrgRequest,
     CreateUserRequest,
+    DefaultLabelPolicy,
+    DefaultLabelPolicyUpdate,
+    DefaultLabelPolicyView,
     DefaultLoginPolicy,
     DefaultLoginPolicyView,
     DefaultPasswordAgePolicyRequest,
@@ -160,6 +163,17 @@ export class AdminService {
         req.setShowLockoutFailure(showLockoutFailures);
 
         return this.grpcService.admin.updateDefaultPasswordLockoutPolicy(req);
+    }
+
+    /* label */
+
+    public GetDefaultLabelPolicy(): Promise<DefaultLabelPolicyView> {
+        const req = new Empty();
+        return this.grpcService.admin.getDefaultLabelPolicy(req);
+    }
+
+    public UpdateDefaultLabelPolicy(req: DefaultLabelPolicyUpdate): Promise<DefaultLabelPolicy> {
+        return this.grpcService.admin.updateDefaultLabelPolicy(req);
     }
 
     /* login */

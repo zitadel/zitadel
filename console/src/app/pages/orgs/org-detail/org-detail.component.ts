@@ -10,6 +10,7 @@ import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
+import { PolicyGridType } from 'src/app/modules/policy-grid/policy-grid.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
     Org,
@@ -54,6 +55,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     public totalMemberResult: number = 0;
     public membersSubject: BehaviorSubject<OrgMemberView.AsObject[]>
         = new BehaviorSubject<OrgMemberView.AsObject[]>([]);
+    public PolicyGridType: any = PolicyGridType;
 
     constructor(
         private dialog: MatDialog,
@@ -132,6 +134,8 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
                     newDomainView.setVerified(newDomain.getVerified());
 
                     this.domains.push(newDomainView.toObject());
+
+                    this.verifyDomain(newDomainView.toObject());
                     this.toast.showInfo('ORG.TOAST.DOMAINADDED', true);
                 });
             }
@@ -202,6 +206,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
             data: {
                 domain: domain,
             },
+            width: '500px',
         });
     }
 

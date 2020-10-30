@@ -23,6 +23,8 @@ In the OIDC and OAuth world this client profile is called "native application"
 
 ### How to consume authorizations in your application or service
 
+---
+
 With ZITADEL you can manage the [roles](administrate#Roles) a [project](administrate#Projects) supplies to your users in the form of authorizations.
 On the [project](administrate#Projects) it can be configured how **project roles** are supplied to the [clients](administrate#Clients).
 By default ZITADEL asserts the claim **urn:zitadel:iam:org:project:roles** to the [Userinfo Endpoint](documentation#userinfo_endpoint)
@@ -38,5 +40,7 @@ By default ZITADEL asserts the claim **urn:zitadel:iam:org:project:roles** to th
     }
   }
 ```
+
+---
 
 For more details about how **ZITADEL** treats [scopes](documentation#Scopes) and [claims](documentation#Claims) see the [documentations](documentation).

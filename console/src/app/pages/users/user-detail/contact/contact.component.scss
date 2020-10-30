@@ -22,7 +22,7 @@
 
     .label {
       font-size: .9rem;
-      min-width: 100px;
+      max-width: 100px;
       color: var(--grey);
     }
 
@@ -44,4 +44,8 @@
       }
     }
   }
+}
+
+.overflow {
+  overflow: auto;
 }

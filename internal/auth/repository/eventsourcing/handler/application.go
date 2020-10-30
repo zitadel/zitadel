@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"context"
+
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -32,10 +34,17 @@ func (p *Application) EventQuery() (*models.SearchQuery, error) {
 	return eventsourcing.ProjectQuery(sequence.CurrentSequence), nil
 }
 
-func (p *Application) Reduce(event *models.Event) (err error) {
+func (a *Application) Reduce(event *models.Event) (err error) {
 	app := new(view_model.ApplicationView)
 	switch event.Type {
 	case es_model.ApplicationAdded:
+		project, err := a.projectEvents.ProjectByID(context.Background(), event.AggregateID)
+		if err != nil {
+			return err
+		}
+		app.ProjectRoleCheck = project.ProjectRoleCheck
+		app.ProjectRoleAssertion = project.ProjectRoleAssertion
+
 		err = app.AppendEvent(event)
 	case es_model.ApplicationChanged,
 		es_model.OIDCConfigAdded,
@@ -46,7 +55,7 @@ func (p *Application) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		app, err = p.view.ApplicationByID(event.AggregateID, app.ID)
+		app, err = a.view.ApplicationByID(event.AggregateID, app.ID)
 		if err != nil {
 			return err
 		}
@@ -56,30 +65,30 @@ func (p *Application) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return p.view.DeleteApplication(app.ID, event.Sequence)
+		return a.view.DeleteApplication(app.ID, event.Sequence)
 	case es_model.ProjectChanged:
-		apps, err := p.view.ApplicationsByProjectID(event.AggregateID)
+		apps, err := a.view.ApplicationsByProjectID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		if len(apps) == 0 {
-			return p.view.ProcessedApplicationSequence(event.Sequence)
+			return a.view.ProcessedApplicationSequence(event.Sequence)
 		}
 		for _, app := range apps {
 			if err := app.AppendEvent(event); err != nil {
 				return err
 			}
 		}
-		return p.view.PutApplications(apps, event.Sequence)
+		return a.view.PutApplications(apps, event.Sequence)
 	case es_model.ProjectRemoved:
-		return p.view.DeleteApplicationsByProjectID(event.AggregateID)
+		return a.view.DeleteApplicationsByProjectID(event.AggregateID)
 	default:
-		return p.view.ProcessedApplicationSequence(event.Sequence)
+		return a.view.ProcessedApplicationSequence(event.Sequence)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutApplication(app)
+	return a.view.PutApplication(app)
 }
 
 func (p *Application) OnError(event *models.Event, spoolerError error) error {

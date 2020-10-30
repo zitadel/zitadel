@@ -11,6 +11,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
 
+import { AvatarModule } from '../avatar/avatar.module';
 import { SearchUserAutocompleteComponent } from './search-user-autocomplete.component';
 
 
@@ -29,6 +30,7 @@ import { SearchUserAutocompleteComponent } from './search-user-autocomplete.comp
         FormsModule,
         TranslateModule,
         MatSelectModule,
+        AvatarModule,
     ],
     exports: [SearchUserAutocompleteComponent],
 })

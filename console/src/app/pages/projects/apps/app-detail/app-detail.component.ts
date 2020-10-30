@@ -216,6 +216,22 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         }
     }
 
+    public saveApp(): void {
+        if (this.appNameForm.valid) {
+            this.app.name = this.name?.value;
+
+            this.mgmtService
+                .UpdateApplication(this.projectId, this.app.id, this.name?.value)
+                .then(() => {
+                    this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
+                })
+                .catch(error => {
+                    this.toast.showError(error);
+                });
+        }
+    }
+
+
     public saveOIDCApp(): void {
         if (this.appNameForm.valid) {
             this.app.name = this.name?.value;
