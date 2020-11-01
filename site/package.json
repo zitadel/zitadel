@@ -19,7 +19,7 @@
 		"highlight.js": "^10.1.2",
 		"marked": "^1.1.1",
 		"polka": "^0.5.2",
-		"sirv": "^0.4.2",
+		"sirv": "^1.0.7",
 		"svelte-i18n": "^3.0.4"
 	},
 	"devDependencies": {
