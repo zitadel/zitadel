@@ -663,9 +663,6 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView, policy
 	if user.MfaMaxSetUp > model.MFALevelNotSetUp {
 		return true
 	}
-	if policy.ForceMFA {
-		return false
-	}
 	return checkVerificationTime(user.MfaInitSkipped, repo.MfaInitSkippedLifeTime)
 }
 

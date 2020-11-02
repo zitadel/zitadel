@@ -66,7 +66,7 @@ InitUserDone:
 MfaPrompt:
   Title: Multifaktor hinzufügen
   Description: Möchtest du einen Mulitfaktor hinzufügen?
-  Provider0: OTP (One time password)
+  Provider0: OTP (One Time Password)
   Provider1: U2F (Universal 2nd Factor)
 
 MfaInitVerify:

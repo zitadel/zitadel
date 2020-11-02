@@ -114,7 +114,7 @@ func (u *UserView) MfaTypesSetupPossible(level req_model.MFALevel, policy *iam_m
 	default:
 		fallthrough
 	case req_model.MFALevelSecondFactor:
-		if policy.SecondFactors != nil && len(policy.SecondFactors) != 0 {
+		if policy.HasSecondFactors() {
 			for _, mfaType := range policy.SecondFactors {
 				switch mfaType {
 				case iam_model.SecondFactorTypeOTP:
@@ -128,7 +128,7 @@ func (u *UserView) MfaTypesSetupPossible(level req_model.MFALevel, policy *iam_m
 		//PLANNED: add sms
 		fallthrough
 	case req_model.MFALevelMultiFactor:
-		if policy.MultiFactors != nil && len(policy.MultiFactors) != 0 {
+		if policy.HasMultiFactors() {
 			for _, mfaType := range policy.MultiFactors {
 				switch mfaType {
 				case iam_model.MultiFactorTypeU2FWithPIN:
@@ -148,7 +148,7 @@ func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.L
 	default:
 		fallthrough
 	case req_model.MFALevelSecondFactor:
-		if policy.SecondFactors != nil && len(policy.SecondFactors) != 0 {
+		if policy.HasSecondFactors() {
 			for _, mfaType := range policy.SecondFactors {
 				switch mfaType {
 				case iam_model.SecondFactorTypeOTP:
@@ -161,7 +161,7 @@ func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.L
 		//PLANNED: add sms
 		fallthrough
 	case req_model.MFALevelMultiFactor:
-		if policy.MultiFactors != nil && len(policy.MultiFactors) != 0 {
+		if policy.HasMultiFactors() {
 			for _, mfaType := range policy.MultiFactors {
 				switch mfaType {
 				case iam_model.MultiFactorTypeU2FWithPIN:
@@ -181,10 +181,7 @@ func (u *UserView) HasRequiredOrgMFALevel(policy *iam_model.LoginPolicyView) boo
 	}
 	switch u.MfaMaxSetUp {
 	case req_model.MFALevelSecondFactor:
-		if policy.SecondFactors == nil || len(policy.SecondFactors) == 0 {
-			return false
-		}
-		return true
+		return policy.HasSecondFactors()
 	case req_model.MFALevelMultiFactor:
 		return true
 	default:

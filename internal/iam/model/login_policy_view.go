@@ -49,3 +49,17 @@ type LoginPolicySearchResponse struct {
 	Sequence    uint64
 	Timestamp   time.Time
 }
+
+func (p *LoginPolicyView) HasSecondFactors() bool {
+	if p.SecondFactors == nil || len(p.SecondFactors) == 0 {
+		return false
+	}
+	return true
+}
+
+func (p *LoginPolicyView) HasMultiFactors() bool {
+	if p.MultiFactors == nil || len(p.MultiFactors) == 0 {
+		return false
+	}
+	return true
+}
