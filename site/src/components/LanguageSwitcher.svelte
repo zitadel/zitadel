@@ -1,5 +1,6 @@
 <script context="module">
     import { setCookie } from '../modules/cookie.js';
+    import { goto } from '@sapper/app';
     import { docLanguages } from '../modules/language-store.js'
     import {LANGUAGES} from '../../config.js';
 </script>
@@ -10,10 +11,10 @@
 
     let group= $locale;
 
-    $:setLocale(group);
     function setLocale(language) {
         if (typeof window !== 'undefined') {
             locale.set(language);
+            // return goto('', {hl: language});
         }
     }
 </script>
@@ -25,40 +26,35 @@
     }
 
     .language-switcher {
+        position: fixed;
+        left: 0;
+        bottom: 0;
         display: flex;
         align-items: center;
-        position: relative;
-    }
-    
-    .language-switcher input {
-        appearance: none;
-        display: none;
+        z-index: 1;
+        width: var(--sidebar-w);
+        justify-content: center;
     }
 
-    .language-switcher .select {
+    a {
         height: var(--height);
-        width: var(--height);
-        border-radius: 50vw;
-        font-size: calc(var(--height) / 2.5);
+        margin: .5rem 1rem;
+        font-size: 12px;
         color: white;
-        mix-blend-mode: difference;    
         display: flex;
         align-items: center;
         cursor: pointer;
         justify-content: center;
+        border: none;
     }
 
-    .language-switcher .current {
-        background-color: white;
-        color: black;
+    a.current {
+        color: var(--prime);
     }
 </style>
 
 <div class="language-switcher">
 	{#each LANGUAGES as lang}
-		<label class="select {lang == group ? 'current' : 'notcurrent'}">
-            <input type=radio bind:group value={lang}>
-            {lang.toUpperCase()}
-        </label>
+        <a href="&hl={lang}" class="{lang == group ? 'current': ''}">{lang == 'de'? 'Deutsch' : 'English'}</a>
 	{/each}
 </div>

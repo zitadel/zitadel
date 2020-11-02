@@ -11,6 +11,7 @@
   export let sections;
   import SearchSelector from './SearchSelector.svelte';
   import SearchTrigger from './SearchTrigger.svelte';
+  import LanguageSwitcher from './LanguageSwitcher.svelte';
   let searchEnabled = false;
   let active_section;
 
@@ -127,11 +128,11 @@
     left: 0;
     bottom: 0;
     width: 100%;
-    height: 2em;
+    height: 3em;
     background: linear-gradient(
       to bottom,
        #1a1f3600 0%,
-       #1a1f3670 50%,
+       #1a1f3680 50%,
       #1a1f36 100%
     );
     pointer-events: none;
@@ -499,6 +500,8 @@
 
     <!-- scroll container -->
     <GuideContents {dir} {sections} {active_section} {show_contents} />
+
+    <LanguageSwitcher></LanguageSwitcher>
   </div>
 
   <button on:click={() => (show_contents = !show_contents)}>
