@@ -1,19 +1,156 @@
+<script>
+    import { stores } from "@sapper/app";
+    import { _ } from 'svelte-i18n';
+    const { page } = stores();
+    let menuOpen = false;
+
+    page.subscribe(() => {
+		menuOpen = false;
+	});
+</script>
+
 <style>
     .content {
         width: 100%;
         margin: 0;
-        padding: 0 var(--side-nav);
-        tab-size: 2;
-        -moz-tab-size: 2;
+        padding: 0 var(--side-nav) 0 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        height: var(--nav-h);
+        box-shadow: 0 -0.4rem 0.9rem 0.2rem rgba(0,0,0,.5);
+		z-index: 100;
+        backdrop-filter: saturate(100%) blur(10px);
     }
+
+    .content .home {
+        width: var(--nav-h);
+        height: var(--nav-h);
+        border: none;
+        object-fit: contain;
+        padding: 1rem;
+    }
+
+    .content .fill-space {
+        flex: 1;
+    }
+
+    .content .list-item {
+        margin-right: 20px;
+        border: none;
+        padding: 0;
+        color: var(--prime);
+        font-weight: 500;
+    }
+
+    .content :last-child {
+        margin-right: 0;
+    }
+
+    .content .btn-wrapper {
+        position: relative;
+    }
+
+    .content .wrapper {
+        position: absolute;
+        left: 0;
+        top: var(--nav-h);
+        z-index: 10;
+        transform: translateX(50%);
+    }
+
+    .content .wrapper #menu {
+        position: absolute;
+    }
+
+    /* menu appearance*/
+    #menu {
+        position: relative;
+        color: #999;
+        width: 200px;
+        padding: 10px;
+        margin: auto;
+        border-radius: 8px;
+        background: #2a2f45;
+        box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+        transform: translateX(-50%);
+    }
+    #menu:after {
+        position: absolute;
+        top: -10px;
+        left: 85px;
+        content: "";
+        display: block;
+        border-left: 15px solid transparent;
+        border-right: 15px solid transparent;
+        border-bottom: 20px solid #2a2f45;
+    }
+
+    ul, li, li a {
+        list-style: none;
+        display: block;
+        margin: 0;
+        padding: 4px 0;
+        font-size: 1.5rem;
+    }
+
+    li a {
+        text-decoration: none;
+        border: none;
+    }
+
+    .modal-background {
+		position: fixed;
+		width: 100%;
+		height: 100%;
+		left: 0;
+		top: 0;
+	}
 
     @media (min-width: 832px) {
         .content {
-        padding-left: calc(var(--sidebar-w) + var(--side-nav));
+            position: relative;
+            padding-left: calc(var(--sidebar-w) + var(--side-nav));
+            box-shadow: none;
+            background: none;
+            backdrop-filter: none;
+        }
+
+        .hide-if-desktop {
+			display: none !important;
         }
     }
 </style>
 
 <div class="content">
-hey
+    <a class="home" href="." ><img src="logos/zitadel-logo-solo-darkdesign.svg" alt="zitadel logo" /></a>
+    <span class="fill-space"></span>
+
+    <div class="btn-wrapper">
+        <button class="list-item" on:click="{() => menuOpen = !menuOpen}"><span>{$_('references')}</span></button>
+        <div class="wrapper">
+            {#if menuOpen}
+                <div id="menu">
+                    <ul>
+                        <li><a href="/start" >{$_('startlink')}</a></li>
+                        <li><a href="/integrate">{$_('integratelink')}</a></li>
+                        <li><a href="/administrate" >{$_('administratelink')}</a></li>
+                        <li><a href="/develop" >{$_('developlink')}</a></li>
+                        <li><a href="/documentation" >{$_('docslink')}</a></li>
+                        <li><a href="/use" >{$_('uselink')}</a></li>
+                    </ul>
+                </div>
+            {/if}
+        </div>
+    </div>
+
+    <a class="list-item" href="https://console.zitadel.ch" target="_blank">Sign in</a>
 </div>
+
+{#if menuOpen}
+    <div class="modal-background hide-if-desktop" on:click="{() => menuOpen = false}"></div>
+{/if}

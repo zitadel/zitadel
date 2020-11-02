@@ -23,6 +23,14 @@
     });
 </script>
 
+<style>
+    @media (min-width: 832px) {
+        :global(main) {
+            padding: 0 !important;
+        }
+    }
+</style>
+
 <svelte:head>
   <title>{manifest.name} • {slug}</title>    
 

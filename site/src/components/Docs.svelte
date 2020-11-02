@@ -148,13 +148,14 @@
   }
 
   aside.open .sidebar .home {
-      position: fixed;
+      display: none;
+      /* position: fixed;
       top: 0;
       width: 170px;
       left: 50%;
       margin: 2rem 0;
       border-bottom: none;
-      transform: translatex(-50%);
+      transform: translatex(-50%); */
   }
 
   aside .sidebar :global(.search-trigger) {
