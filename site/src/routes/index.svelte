@@ -72,7 +72,7 @@
     ZITADEL • Documentation
   </title>
 </svelte:head>
-    <!-- <Nav {segment} title="Zitadel docs" logo="logos/zitadel-logo-light.svg"></Nav> -->
+    <Nav {segment} title="Zitadel docs" logo="logos/zitadel-logo-light.svg"></Nav>
     <img class="caos-back" src="logos/zitadel-logo-solo-darkdesign.svg" alt="caos logo">
 
     <Section>

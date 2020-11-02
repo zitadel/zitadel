@@ -40,7 +40,7 @@
     }
 
     .content .list-item {
-        margin-right: 20px;
+        margin: 0 20px;
         border: none;
         padding: 0;
         color: var(--prime);
@@ -55,16 +55,10 @@
         position: relative;
     }
 
-    .content .wrapper {
-        position: absolute;
-        left: 0;
-        top: var(--nav-h);
-        z-index: 10;
-        transform: translateX(50%);
-    }
-
     .content .wrapper #menu {
         position: absolute;
+        top: calc(var(--nav-h) - 15px);
+        left: 50%;
     }
 
     /* menu appearance*/
@@ -120,8 +114,8 @@
             backdrop-filter: none;
         }
 
-        .hide-if-desktop {
-			display: none !important;
+        .content .home {
+            display: none;
         }
     }
 </style>
@@ -152,5 +146,5 @@
 </div>
 
 {#if menuOpen}
-    <div class="modal-background hide-if-desktop" on:click="{() => menuOpen = false}"></div>
+    <div class="modal-background" on:click="{() => menuOpen = false}"></div>
 {/if}
