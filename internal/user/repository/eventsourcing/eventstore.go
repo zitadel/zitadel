@@ -2,10 +2,14 @@ package eventsourcing
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/duo-labs/webauthn/protocol"
+	"github.com/duo-labs/webauthn/webauthn"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pquerna/otp/totp"
 
@@ -24,6 +28,7 @@ import (
 	"github.com/caos/zitadel/internal/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	webauthn_helper "github.com/caos/zitadel/internal/webauthn"
 )
 
 const (
@@ -45,6 +50,8 @@ type UserEventstore struct {
 	MachineKeySize           int
 	Multifactors             global_model.Multifactors
 	validateTOTP             func(string, string) bool
+	webauthn                 *webauthn_helper.WebAuthN
+	creds                    []webauthn.Credential
 }
 
 type UserConfig struct {
@@ -68,7 +75,10 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 	passwordVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.PasswordVerificationCode, aesCrypto)
 	aesOtpCrypto, err := crypto.NewAESCrypto(systemDefaults.Multifactors.OTP.VerificationKey)
 	passwordAlg := crypto.NewBCrypt(systemDefaults.SecretGenerators.PasswordSaltCost)
-
+	web, err := webauthn_helper.StartServer("zitadel", "9f659fddfd9d.ngrok.io", "https://9f659fddfd9d.ngrok.io")
+	if err != nil {
+		return nil, err
+	}
 	return &UserEventstore{
 		Eventstore:               conf.Eventstore,
 		userCache:                userCache,
@@ -88,6 +98,7 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 		validateTOTP:   totp.Validate,
 		MachineKeyAlg:  aesCrypto,
 		MachineKeySize: int(systemDefaults.SecretGenerators.MachineKeySize),
+		webauthn:       web,
 	}, nil
 }
 
@@ -1398,6 +1409,104 @@ func (es *UserEventstore) verifyMfaOTP(otp *usr_model.OTP, code string) error {
 		return caos_errs.ThrowInvalidArgument(nil, "EVENT-8isk2", "Errors.User.Mfa.Otp.InvalidCode")
 	}
 	return nil
+}
+
+func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model.U2F, error) {
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if user.Human == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-GDdd1", "Errors.User.NotHuman")
+	}
+	//if user.IsOTPReady() {
+	//	return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-do9se", "Errors.User.Mfa.Otp.AlreadyReady")
+	//}
+	credential, sessionData, err := es.webauthn.BeginRegistration(user, protocol.Platform, protocol.VerificationDiscouraged, es.creds...)
+	if err != nil {
+		return nil, err
+	}
+	cred, _ := json.Marshal(credential)
+	return &usr_model.U2F{CredentialCreationData: base64.RawURLEncoding.EncodeToString(cred), SessionData: &sessionData}, nil
+	//return , sessionData, nil
+	//
+	//encryptedSecret, err := crypto.Encrypt([]byte(key.Secret()), es.Multifactors.OTP.CryptoMFA)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//repoOTP := &model.OTP{Secret: encryptedSecret}
+	//repoUser := model.UserFromModel(user)
+	//updateAggregate := MFAU2FAddAggregate(es.AggregateCreator(), repoUser, repoOTP)
+	//err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, updateAggregate)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//es.userCache.cacheUser(repoUser)
+	//otp := model.OTPToModel(repoUser.OTP)
+	//otp.Url = key.URL()
+	//otp.SecretString = key.Secret()
+	//return otp, nil
+
+}
+
+func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID string, sessionData webauthn.SessionData, data *protocol.ParsedCredentialCreationData) error {
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if user.Human == nil {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-BH552", "Errors.User.NotHuman")
+	}
+	//if user.OTP == nil {
+	//	return caos_errs.ThrowPreconditionFailed(nil, "EVENT-yERHV", "Errors.Users.Mfa.Otp.NotExisting")
+	//}
+	//if user.IsOTPReady() {
+	//	return caos_errs.ThrowPreconditionFailed(nil, "EVENT-qx4ls", "Errors.Users.Mfa.Otp.AlreadyReady")
+	//}
+	cred, err := es.webauthn.FinishRegistration(user, sessionData, data)
+	if err != nil {
+		return err
+	}
+	if es.creds == nil {
+		es.creds = make([]webauthn.Credential, 0)
+	}
+	es.creds = append(es.creds, *cred)
+	//repoUser := model.UserFromModel(user)
+	//err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAOTPVerifyAggregate(es.AggregateCreator(), repoUser))
+	//if err != nil {
+	//	return err
+	//}
+	//
+	//es.userCache.cacheUser(repoUser)
+	return nil
+}
+
+func (es *UserEventstore) BeginMfaU2FLogin(ctx context.Context, userID string) (string, *webauthn.SessionData, error) {
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return "", nil, err
+	}
+	if user.Human == nil {
+		return "", nil, errors.ThrowPreconditionFailed(nil, "EVENT-2Ks11", "Errors.User.NotHuman")
+	}
+	credential, sessionData, err := es.webauthn.BeginLogin(user, protocol.VerificationDiscouraged, es.creds...)
+	if err != nil {
+		return "", nil, err
+	}
+	credentialData, _ := json.Marshal(credential)
+	return base64.URLEncoding.EncodeToString(credentialData), sessionData, nil
+}
+
+func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID string, sessionData webauthn.SessionData, data *protocol.ParsedCredentialAssertionData) error {
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if user.Human == nil {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-BHeq1", "Errors.User.NotHuman")
+	}
+	return es.webauthn.FinishLogin(user, sessionData, data, es.creds...)
 }
 
 func (es *UserEventstore) SignOut(ctx context.Context, agentID string, userIDs []string) error {

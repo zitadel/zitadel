@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/duo-labs/webauthn/protocol"
+	"github.com/duo-labs/webauthn/webauthn"
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
@@ -300,14 +301,20 @@ func (repo *UserRepo) RemoveMyMfaOTP(ctx context.Context) error {
 	return repo.UserEvents.RemoveOTP(ctx, authz.GetCtxData(ctx).UserID)
 }
 
-func (repo *UserRepo) AddU2FKey(ctx context.Context, userID string, data *protocol.ParsedCredentialCreationData) error {
-	//return repo.UserEvents.AddU2FKey(ctx, userID)
-	return nil
+func (repo *UserRepo) AddMfaU2F(ctx context.Context, userID string) (*model.U2F, error) {
+	return repo.UserEvents.AddU2F(ctx, userID)
 }
 
-func (repo *UserRepo) AddMyU2FKey(ctx context.Context) error {
-	//return repo.UserEvents.AddU2FKey(ctx, authz.GetCtxData(ctx).UserID)
-	return nil
+func (repo *UserRepo) VerifyMfaU2FSetup(ctx context.Context, userID string, sessionData webauthn.SessionData, data *protocol.ParsedCredentialCreationData) error {
+	return repo.UserEvents.VerifyU2FSetup(ctx, userID, sessionData, data)
+}
+
+func (repo *UserRepo) BeginMfaU2FLogin(ctx context.Context, userID string) (string, *webauthn.SessionData, error) {
+	return repo.UserEvents.BeginMfaU2FLogin(ctx, userID)
+}
+
+func (repo *UserRepo) VerifyMfaU2F(ctx context.Context, userID string, sessionData webauthn.SessionData, data *protocol.ParsedCredentialAssertionData) error {
+	return repo.UserEvents.VerifyMfaU2F(ctx, userID, sessionData, data)
 }
 
 func (repo *UserRepo) ChangeMyUsername(ctx context.Context, username string) error {

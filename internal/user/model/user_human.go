@@ -1,8 +1,9 @@
 package model
 
 import (
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"time"
+
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -20,6 +21,7 @@ type Human struct {
 	PhoneCode    *PhoneCode
 	PasswordCode *PasswordCode
 	OTP          *OTP
+	U2F          *U2F
 }
 
 type InitUserCode struct {

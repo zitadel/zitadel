@@ -25,18 +25,19 @@ import (
 )
 
 type Login struct {
-	endpoint            string
-	router              http.Handler
-	renderer            *Renderer
-	parser              *form.Parser
-	authRepo            auth_repository.Repository
-	baseURL             string
-	zitadelURL          string
-	oidcAuthCallbackURL string
-	IDPConfigAesCrypto  crypto.EncryptionAlgorithm
-	webAuthN            *webauthn.WebAuthN
-	sessionData         webauthn2.SessionData
-	creds               []webauthn2.Credential
+	endpoint              string
+	router                http.Handler
+	renderer              *Renderer
+	parser                *form.Parser
+	authRepo              auth_repository.Repository
+	baseURL               string
+	zitadelURL            string
+	oidcAuthCallbackURL   string
+	IDPConfigAesCrypto    crypto.EncryptionAlgorithm
+	webAuthN              *webauthn.WebAuthN
+	sessionData           webauthn2.SessionData
+	creds                 []webauthn2.Credential
+	webAuthnCookieHandler *http_utils.CookieHandler
 }
 
 type Config struct {
@@ -94,6 +95,7 @@ func CreateLogin(config Config, authRepo *eventsourcing.EsRepository, systemDefa
 	logging.Log("CONFI-Dvwf2").OnError(err).Panic("unable to create userAgentInterceptor")
 	login.router = CreateRouter(login, statikFS, csrf, cache, security, userAgentCookie, middleware.TraceHandler(EndpointResources))
 	login.renderer = CreateRenderer(prefix, statikFS, config.LanguageCookieName, config.DefaultLanguage)
+	login.webAuthnCookieHandler = http_utils.NewCookieHandler(http_utils.WithEncryption([]byte("test"), []byte("test1234test1234")))
 	login.parser = form.NewParser()
 	return login, handlerPrefix
 }

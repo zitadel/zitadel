@@ -3,7 +3,6 @@ package handler
 import (
 	"bytes"
 	"encoding/base64"
-	"encoding/json"
 	"net/http"
 
 	"github.com/duo-labs/webauthn/protocol"
@@ -15,6 +14,8 @@ import (
 const (
 	tmplMfaU2FInit             = "mfainitu2f"
 	tmplMfaU2FInitVerification = "mfainitu2fverification"
+
+	webauthnRegisterSession = "register-session"
 )
 
 type webAuthNData struct {
@@ -31,16 +32,18 @@ func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authRe
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
 	}
-	user, err := l.authRepo.UserByID(r.Context(), authReq.UserID)
+	u2f, err := l.authRepo.AddMfaU2F(r.Context(), authReq.UserID)
 	if err != nil {
-
+		l.renderError(w, r, authReq, err)
+		return
 	}
-	credential, sessionData, _ := l.webAuthN.BeginRegistration(user, protocol.Platform, protocol.VerificationDiscouraged, l.creds...)
-	l.sessionData = *sessionData
-	credentialData, _ := json.Marshal(credential)
+	if err = l.webAuthnCookieHandler.SetEncryptedCookie(w, webauthnRegisterSession, u2f.SessionData); err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
 	data := &webAuthNData{
 		userData:               l.getUserData(r, authReq, "Register U2F", errType, errMessage),
-		CredentialCreationData: base64.URLEncoding.EncodeToString(credentialData),
+		CredentialCreationData: u2f.CredentialCreationDataString,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMfaU2FInit], data, nil)
 }
@@ -60,16 +63,11 @@ func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	user, err := l.authRepo.UserByID(r.Context(), authReq.UserID)
-	if err != nil {
+	sessionData := new(webauthn.SessionData)
+	if err = l.webAuthnCookieHandler.GetEncryptedCookieValue(r, webauthnRegisterSession, sessionData); err != nil {
 
 	}
-	credential, _ := l.webAuthN.FinishRegistration(user, l.sessionData, data)
-	if l.creds == nil {
-		l.creds = make([]webauthn.Credential, 0)
-	}
-	l.creds = append(l.creds, *credential)
-	if err = l.authRepo.AddU2FKey(r.Context(), authReq.UserID, data); err != nil {
+	if err = l.authRepo.VerifyMfaU2FSetup(r.Context(), authReq.UserID, *sessionData, data); err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
@@ -84,20 +82,18 @@ func (l *Login) renderLoginU2F(w http.ResponseWriter, r *http.Request, authReq *
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
 	}
-	user, err := l.authRepo.UserByID(r.Context(), authReq.UserID)
+	credential, sessionData, err := l.authRepo.BeginMfaU2FLogin(r.Context(), authReq.UserID)
 	if err != nil {
-
+		l.renderError(w, r, authReq, err)
+		return
 	}
-	credential, sessionData, _ := l.webAuthN.BeginLogin(user, protocol.VerificationDiscouraged, l.creds...)
 	l.sessionData = *sessionData
-	credentialData, _ := json.Marshal(credential)
 	data := &webAuthNData{
 		userData:               l.getUserData(r, authReq, "Register U2F", errType, errMessage),
-		CredentialCreationData: base64.URLEncoding.EncodeToString(credentialData),
+		CredentialCreationData: credential,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMfaU2FInitVerification], data, nil)
 }
-
 
 func (l *Login) handleLoginU2F(w http.ResponseWriter, r *http.Request) {
 	formData := new(webAuthNFormData)
@@ -112,11 +108,7 @@ func (l *Login) handleLoginU2F(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data, err := protocol.ParseCredentialRequestResponseBody(bytes.NewReader(credData))
-	user, err := l.authRepo.UserByID(r.Context(), authReq.UserID)
-	if err != nil {
-
-	}
-	err = l.webAuthN.FinishLogin(user, l.sessionData, data, l.creds...)
+	err = l.authRepo.VerifyMfaU2F(r.Context(), authReq.UserID, l.sessionData, data)
 	if err != nil {
 
 	}

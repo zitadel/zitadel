@@ -28,41 +28,33 @@ func StartServer(displayName, id, origin string) (*WebAuthN, error) {
 	}, err
 }
 
-type user struct {
-	id          string
-	username    string
-	displayName string
+type webUser struct {
+	*usr_model.User
 	credentials []webauthn.Credential
 }
 
-func (u *user) WebAuthnID() []byte {
-	return []byte(u.id)
+func (u *webUser) WebAuthnID() []byte {
+	return []byte(u.AggregateID)
 }
 
-func (u *user) WebAuthnName() string {
-	return u.username
+func (u *webUser) WebAuthnName() string {
+	return u.UserName
 }
 
-func (u *user) WebAuthnDisplayName() string {
-	return u.displayName
+func (u *webUser) WebAuthnDisplayName() string {
+	return u.DisplayName
 }
 
-func (u *user) WebAuthnIcon() string {
+func (u *webUser) WebAuthnIcon() string {
 	return ""
 }
 
-func (u *user) WebAuthnCredentials() []webauthn.Credential {
+func (u *webUser) WebAuthnCredentials() []webauthn.Credential {
 	return u.credentials
 }
 
-func (w *WebAuthN) BeginRegistration(view *usr_model.UserView, authType protocol.AuthenticatorAttachment, userVerification protocol.UserVerificationRequirement, creds ...webauthn.Credential) (*protocol.CredentialCreation, *webauthn.SessionData, error) {
+func (w *WebAuthN) BeginRegistration(user *usr_model.User, authType protocol.AuthenticatorAttachment, userVerification protocol.UserVerificationRequirement, creds ...webauthn.Credential) (*protocol.CredentialCreation, *webauthn.SessionData, error) {
 	residentKeyRequirement := false
-	user := &user{
-		id:          view.ID,
-		username:    view.UserName,
-		displayName: view.DisplayName,
-		credentials: creds,
-	}
 	existing := make([]protocol.CredentialDescriptor, len(creds))
 	for i, cred := range creds {
 		existing[i] = protocol.CredentialDescriptor{
@@ -70,7 +62,10 @@ func (w *WebAuthN) BeginRegistration(view *usr_model.UserView, authType protocol
 			CredentialID: cred.ID,
 		}
 	}
-	credentialOptions, sessionData, err := w.web.BeginRegistration(user,
+	credentialOptions, sessionData, err := w.web.BeginRegistration(&webUser{
+		User:        user,
+		credentials: creds,
+	},
 		webauthn.WithAuthenticatorSelection(protocol.AuthenticatorSelection{
 			RequireResidentKey: &residentKeyRequirement,
 			UserVerification:   userVerification,
@@ -84,28 +79,23 @@ func (w *WebAuthN) BeginRegistration(view *usr_model.UserView, authType protocol
 	return credentialOptions, sessionData, nil
 }
 
-func (w *WebAuthN) FinishRegistration(view *usr_model.UserView, sessionData webauthn.SessionData, credentialData *protocol.ParsedCredentialCreationData) (*webauthn.Credential, error) {
-	user := &user{
-		id:          view.ID,
-		username:    view.UserName,
-		displayName: view.DisplayName,
-		credentials: nil,
-	}
-	credential, err := w.web.CreateCredential(user, sessionData, credentialData)
+func (w *WebAuthN) FinishRegistration(user *usr_model.User, sessionData webauthn.SessionData, credentialData *protocol.ParsedCredentialCreationData) (*webauthn.Credential, error) {
+	credential, err := w.web.CreateCredential(
+		&webUser{
+			User: user,
+		},
+		sessionData, credentialData)
 	if err != nil {
 		//return nil, err
 	}
 	return credential, nil
 }
 
-func (w *WebAuthN) BeginLogin(view *usr_model.UserView, userVerification protocol.UserVerificationRequirement, creds ...webauthn.Credential) (*protocol.CredentialAssertion, *webauthn.SessionData, error) {
-	user := &user{
-		id:          view.ID,
-		username:    view.UserName,
-		displayName: view.DisplayName,
+func (w *WebAuthN) BeginLogin(user *usr_model.User, userVerification protocol.UserVerificationRequirement, creds ...webauthn.Credential) (*protocol.CredentialAssertion, *webauthn.SessionData, error) {
+	assertion, sessionData, err := w.web.BeginLogin(&webUser{
+		User:        user,
 		credentials: creds,
-	}
-	assertion, sessionData, err := w.web.BeginLogin(user)//webauthn.WithUserVerification(userVerification),
+	}) //webauthn.WithUserVerification(userVerification),
 
 	if err != nil {
 		return nil, nil, err
@@ -113,14 +103,12 @@ func (w *WebAuthN) BeginLogin(view *usr_model.UserView, userVerification protoco
 	return assertion, sessionData, nil
 }
 
-func (w *WebAuthN) FinishLogin(view *usr_model.UserView, sessionData webauthn.SessionData, assertionData *protocol.ParsedCredentialAssertionData, creds ...webauthn.Credential) error {
-	user := &user{
-		id:          view.ID,
-		username:    view.UserName,
-		displayName: view.DisplayName,
+func (w *WebAuthN) FinishLogin(user *usr_model.User, sessionData webauthn.SessionData, assertionData *protocol.ParsedCredentialAssertionData, creds ...webauthn.Credential) error {
+	webUser := &webUser{
+		User:        user,
 		credentials: creds,
 	}
-	credential, err := w.web.ValidateLogin(user, sessionData, assertionData)
+	credential, err := w.web.ValidateLogin(webUser, sessionData, assertionData)
 	if err != nil {
 		return err
 	}
@@ -128,7 +116,7 @@ func (w *WebAuthN) FinishLogin(view *usr_model.UserView, sessionData webauthn.Se
 	if credential.Authenticator.CloneWarning {
 		return nil //ErrCredentialCloned
 	}
-	for _, cred := range user.WebAuthnCredentials() {
+	for _, cred := range webUser.WebAuthnCredentials() {
 		if bytes.Equal(cred.ID, credential.ID) {
 
 		}

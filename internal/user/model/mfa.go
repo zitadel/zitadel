@@ -14,6 +14,16 @@ type OTP struct {
 	State        MfaState
 }
 
+type U2F struct {
+	es_models.ObjectRoot
+
+	Secret                       *crypto.CryptoValue
+	SessionData                  interface{}
+	CredentialCreationData       string
+	CredentialCreationDataString string
+	State                        MfaState
+}
+
 type MfaState int32
 
 const (
