@@ -7,10 +7,17 @@
 <script>
     import Split from "../components/Split.svelte";
     import Section from '../components/Section.svelte';
-    import { _ } from 'svelte-i18n';
+    import { _ , locale} from 'svelte-i18n';
+    import LanguageSwitcher from '../components/LanguageSwitcher.svelte';
     import Nav from '../components/Nav.svelte';
-      export let segment;
+    export let segment;
+    import {LANGUAGES} from '../../config.js';
 
+    function reload(language) {
+        if (typeof window !== 'undefined') {
+            locale.set(language);
+        }
+    }
 </script>
 
 <style>
@@ -65,6 +72,15 @@
     .doc-container .doc a:hover {
         padding: 0;
     }
+
+    blockquote {
+        color: white;
+        background: #2a2f45; 
+    }
+
+    blockquote button {
+        color: var(--prime);
+    }
 </style>
 
 <svelte:head>
@@ -77,6 +93,15 @@
 
     <Section>
         <div class="section">
+        <blockquote>
+            <p>This site is also available in: 
+            {#each LANGUAGES as lang}
+                {#if lang != $locale}
+                    <button on:click="{() => reload(lang)}" class="{lang == $locale ? 'current': ''}">{lang == 'de'? 'Deutsch' : 'English'}</button>
+                {/if}
+            {/each}
+            </p>
+        </blockquote>
             <h2>{$_('title')}</h2>
             <p>{$_('description')}</p>
             <p>{$_('description2')}</p>

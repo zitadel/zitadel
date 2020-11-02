@@ -129,6 +129,16 @@
         text-align: center;
         margin: auto;
     }
+
+    .show-on-desktop {
+        display: none;
+    }
+
+    @media (min-width: 832px) {
+        .show-on-desktop {
+            display: flex;
+        }
+    }
 </style>
 
 <svelte:window on:hashchange={handle_hashchange} on:scroll={handle_scroll} />
@@ -150,25 +160,22 @@
         </a>
 
         <span class="fill-space"></span>
+        <div class="show-on-desktop">
+            <NavItem external="https://zitadel.ch" title="GitHub Repo">
+                {$_('moreabout')}
+            </NavItem>
 
-        <!-- <NavItem external="https://github.com/caos" title="GitHub Repo">
-            <Icon name="lab la-github" size="24px"></Icon>
-        </NavItem> -->
+            <a href='https://console.zitadel.ch'>
+                <button>
+                    <span>{$_('login')}</span>
+                </button>
+            </a>
 
-        <NavItem external="https://zitadel.ch" title="GitHub Repo">
-            More about ZITADEL
-        </NavItem>
-
-        <a href='https://console.zitadel.ch'>
-            <button>
-                <span>{$_('login')}</span>
-            </button>
-        </a>
-
-        <a href='https://accounts.zitadel.ch/register'>
-            <button style="border-color: var(--second); margin-left: 0;">
-                <span>{$_('register')}</span>
-            </button>
-        </a>
+            <a href='https://accounts.zitadel.ch/register'>
+                <button style="border-color: var(--second); margin-left: 0;">
+                    <span>{$_('register')}</span>
+                </button>
+            </a>
+        </div>
 	</nav>
 </header>

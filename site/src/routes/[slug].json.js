@@ -10,13 +10,6 @@ let json;
 export function get(req, res) {
     if (!json || process.env.NODE_ENV !== 'production') {
         const { slug } = req.params;
-        console.log(req.params);
-        console.log('slug:' + slug);
-        const match = slug.match(/&.*=.*$/);
-        if (match && match.index) {
-            const rem = slug.splice(0, match.index + 2);
-            console.log(rem);
-        }
 
         locale.subscribe(localecode => {
             console.log('sublocale: ' + localecode, LANGUAGES);
@@ -24,7 +17,7 @@ export function get(req, res) {
                 console.log(INIT_OPTIONS);
                 localecode = INIT_OPTIONS.initialLocale || 'en';
             }
-            const docs = generate_docs('docs/', slug.replace(/&.*=.*$/, ""), localecode);
+            const docs = generate_docs('docs/', slug, localecode);
             json = JSON.stringify(docs); // TODO it errors if I send the non-stringified value
         });
     }

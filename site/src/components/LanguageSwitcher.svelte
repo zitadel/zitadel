@@ -11,10 +11,10 @@
 
     let group= $locale;
 
-    function setLocale(language) {
+    function reload(language) {
         if (typeof window !== 'undefined') {
             locale.set(language);
-            // return goto('', {hl: language});
+            location.reload();
         }
     }
 </script>
@@ -36,7 +36,7 @@
         justify-content: center;
     }
 
-    a {
+    button {
         height: var(--height);
         margin: .5rem 1rem;
         font-size: 12px;
@@ -48,13 +48,13 @@
         border: none;
     }
 
-    a.current {
+    button.current {
         color: var(--prime);
     }
 </style>
 
 <div class="language-switcher">
 	{#each LANGUAGES as lang}
-        <a href="&hl={lang}" class="{lang == group ? 'current': ''}">{lang == 'de'? 'Deutsch' : 'English'}</a>
+        <button on:click="{() => reload(lang)}" class="{lang == group ? 'current': ''}">{lang == 'de'? 'Deutsch' : 'English'}</button>
 	{/each}
 </div>
