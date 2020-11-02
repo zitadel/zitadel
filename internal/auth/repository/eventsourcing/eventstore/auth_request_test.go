@@ -1097,25 +1097,6 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 			true,
 		},
 		{
-			"mfa skipped active, forced by login policy, false",
-			fields{
-				MfaInitSkippedLifeTime: 30 * 24 * time.Hour,
-			},
-			args{
-				&user_model.UserView{
-					HumanView: &user_model.HumanView{
-						MfaMaxSetUp:    -1,
-						MfaInitSkipped: time.Now().UTC().Add(-10 * time.Hour),
-					},
-				},
-				&iam_model.LoginPolicyView{
-					ForceMFA:      true,
-					SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
-				},
-			},
-			false,
-		},
-		{
 			"mfa skipped inactive, false",
 			fields{
 				MfaInitSkippedLifeTime: 30 * 24 * time.Hour,
