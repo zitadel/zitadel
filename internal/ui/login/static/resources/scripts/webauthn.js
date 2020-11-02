@@ -9,7 +9,7 @@ function bufferEncode(value) {
         .replace(/=/g, "");
 }
 
-function register() {
+function registerCredential() {
     let opt = JSON.parse(atob(document.getElementsByName('credentialCreationData')[0].value));
     opt.publicKey.challenge = bufferDecode(opt.publicKey.challenge);
     opt.publicKey.user.id = bufferDecode(opt.publicKey.user.id);
@@ -25,7 +25,8 @@ function register() {
         console.log(credential);
         createCredential(credential);
     }).catch(function (err) {
-        console.log(err.name);
+        alert(err.name);
+        alert(err.message);
     });
 }
 
@@ -64,8 +65,8 @@ function login() {
             console.log(credential);
             verifyAssertion(credential);
         }).catch(function (err) {
-        console.log(err.name);
-        showErrorAlert(err.message);
+        alert(err.name);
+        alert(err.message);
     });
 }
 
