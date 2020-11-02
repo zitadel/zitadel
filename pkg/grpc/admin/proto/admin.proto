@@ -416,9 +416,9 @@ service AdminService {
         };
     }
 
-    rpc GetDefaultLoginPolicySoftwareMFAs(google.protobuf.Empty) returns (SoftwareMFAResult) {
+    rpc GetDefaultLoginPolicySecondFactors(google.protobuf.Empty) returns (SecondFactorsResult) {
         option (google.api.http) = {
-            get: "/policies/login/mfas/software/_search"
+            get: "/policies/login/secondfactors/_search"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -426,9 +426,9 @@ service AdminService {
         };
     }
 
-    rpc AddSoftwareMFAToDefaultLoginPolicy(SoftwareMFA) returns (SoftwareMFA) {
+    rpc AddSecondFactorToDefaultLoginPolicy(SecondFactor) returns (SecondFactor) {
         option (google.api.http) = {
-            post: "/policies/login/mfas/software"
+            post: "/policies/login/secondfactors"
             body: "*"
         };
 
@@ -437,9 +437,9 @@ service AdminService {
         };
     }
 
-    rpc RemoveSoftwareMFAFromDefaultLoginPolicy(SoftwareMFA) returns (google.protobuf.Empty) {
+    rpc RemoveSecondFactorFromDefaultLoginPolicy(SecondFactor) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/policies/login/mfas/software/{mfa}"
+            delete: "/policies/login/secondfactors/{second_factor}"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -447,9 +447,9 @@ service AdminService {
         };
     }
 
-    rpc GetDefaultLoginPolicyHardwareMFAs(google.protobuf.Empty) returns (HardwareMFAResult) {
+    rpc GetDefaultLoginPolicyMultiFactors(google.protobuf.Empty) returns (MultiFactorsResult) {
         option (google.api.http) = {
-            get: "/policies/login/mfas/hardware/_search"
+            get: "/policies/login/multifactors/_search"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -457,9 +457,9 @@ service AdminService {
         };
     }
 
-    rpc AddHardwareMFAToDefaultLoginPolicy(HardwareMFA) returns (HardwareMFA) {
+    rpc AddMultiFactorToDefaultLoginPolicy(MultiFactor) returns (MultiFactor) {
         option (google.api.http) = {
-            post: "/policies/login/mfas/hardware"
+            post: "/policies/login/multifactors"
             body: "*"
         };
 
@@ -468,9 +468,9 @@ service AdminService {
         };
     }
 
-    rpc RemoveHardwareMFAFromDefaultLoginPolicy(HardwareMFA) returns (google.protobuf.Empty) {
+    rpc RemoveMultiFactorFromDefaultLoginPolicy(MultiFactor) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/policies/login/mfas/hardware/{mfa}"
+            delete: "/policies/login/multifactors/{multi_factor}"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -1060,30 +1060,31 @@ message IdpProviderSearchRequest {
     uint64 limit = 2;
 }
 
-message SoftwareMFAResult {
-    repeated SoftwareMFAType mfas = 1;
+message SecondFactorsResult {
+    repeated SecondFactorType second_factors = 1;
 }
 
-message SoftwareMFA {
-    SoftwareMFAType mfa = 1;
+message SecondFactor {
+    SecondFactorType second_factor = 1;
 }
 
-enum SoftwareMFAType {
-    SOFTWAREMFATYPE_UNSPECIFIED = 0;
-    SOFTWAREMFATYPE_OTP = 1;
+enum SecondFactorType {
+    SECONDFACTORTYPE_UNSPECIFIED = 0;
+    SECONDFACTORTYPE_OTP = 1;
+    SECONDFACTORTYPE_U2F = 2;
 }
 
-message HardwareMFAResult {
-    repeated HardwareMFAType mfas = 1;
+message MultiFactorsResult {
+    repeated MultiFactorType multi_factors = 1;
 }
 
-message HardwareMFA {
-    HardwareMFAType mfa = 1;
+message MultiFactor {
+    MultiFactorType multi_factor = 1;
 }
 
-enum HardwareMFAType {
-    HARDWAREMFATYPE_UNSPECIFIED = 0;
-    HARDWAREMFATYPE_U2F = 1;
+enum MultiFactorType {
+    MULTIFACTORTYPE_UNSPECIFIED = 0;
+    MULTIFACTORTYPE_U2F_WITH_PIN = 1;
 }
 
 message DefaultPasswordComplexityPolicy {

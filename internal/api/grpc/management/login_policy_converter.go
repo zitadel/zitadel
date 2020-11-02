@@ -144,70 +144,74 @@ func idpProviderTypeFromModel(providerType iam_model.IDPProviderType) management
 	}
 }
 
-func softwareMFAResultFromModel(result *iam_model.SoftwareMFASearchResponse) *management.SoftwareMFAResult {
-	converted := make([]management.SoftwareMFAType, len(result.Result))
+func secondFactorResultFromModel(result *iam_model.SecondFactorsSearchResponse) *management.SecondFactorsResult {
+	converted := make([]management.SecondFactorType, len(result.Result))
 	for i, mfaType := range result.Result {
-		converted[i] = softwareMFATypeFromModel(mfaType)
+		converted[i] = secondFactorTypeFromModel(mfaType)
 	}
-	return &management.SoftwareMFAResult{
-		Mfas: converted,
-	}
-}
-
-func softwareMFAFromModel(mfaType iam_model.SoftwareMFAType) *management.SoftwareMFA {
-	return &management.SoftwareMFA{
-		Mfa: softwareMFATypeFromModel(mfaType),
+	return &management.SecondFactorsResult{
+		SecondFactors: converted,
 	}
 }
 
-func softwareMFATypeFromModel(mfaType iam_model.SoftwareMFAType) management.SoftwareMFAType {
+func secondFactorFromModel(mfaType iam_model.SecondFactorType) *management.SecondFactor {
+	return &management.SecondFactor{
+		SecondFactor: secondFactorTypeFromModel(mfaType),
+	}
+}
+
+func secondFactorTypeFromModel(mfaType iam_model.SecondFactorType) management.SecondFactorType {
 	switch mfaType {
-	case iam_model.SoftwareMFATypeOTP:
-		return management.SoftwareMFAType_SOFTWAREMFATYPE_OTP
+	case iam_model.SecondFactorTypeOTP:
+		return management.SecondFactorType_SECONDFACTORTYPE_OTP
+	case iam_model.SecondFactorTypeU2F:
+		return management.SecondFactorType_SECONDFACTORTYPE_U2F
 	default:
-		return management.SoftwareMFAType_SOFTWAREMFATYPE_UNSPECIFIED
+		return management.SecondFactorType_SECONDFACTORTYPE_UNSPECIFIED
 	}
 }
 
-func softwareMFATypeToModel(mfaType *management.SoftwareMFA) iam_model.SoftwareMFAType {
-	switch mfaType.Mfa {
-	case management.SoftwareMFAType_SOFTWAREMFATYPE_OTP:
-		return iam_model.SoftwareMFATypeOTP
+func secondFactorTypeToModel(mfaType *management.SecondFactor) iam_model.SecondFactorType {
+	switch mfaType.SecondFactor {
+	case management.SecondFactorType_SECONDFACTORTYPE_OTP:
+		return iam_model.SecondFactorTypeOTP
+	case management.SecondFactorType_SECONDFACTORTYPE_U2F:
+		return iam_model.SecondFactorTypeU2F
 	default:
-		return iam_model.SoftwareMFATypeUnspecified
+		return iam_model.SecondFactorTypeUnspecified
 	}
 }
 
-func hardwareMFAResultFromModel(result *iam_model.HardwareMFASearchResponse) *management.HardwareMFAResult {
-	converted := make([]management.HardwareMFAType, len(result.Result))
+func multiFactorResultFromModel(result *iam_model.MultiFactorsSearchResponse) *management.MultiFactorsResult {
+	converted := make([]management.MultiFactorType, len(result.Result))
 	for i, mfaType := range result.Result {
-		converted[i] = hardwareMFATypeFromModel(mfaType)
+		converted[i] = multiFactorTypeFromModel(mfaType)
 	}
-	return &management.HardwareMFAResult{
-		Mfas: converted,
-	}
-}
-
-func hardwareMFAFromModel(mfaType iam_model.HardwareMFAType) *management.HardwareMFA {
-	return &management.HardwareMFA{
-		Mfa: hardwareMFATypeFromModel(mfaType),
+	return &management.MultiFactorsResult{
+		MultiFactors: converted,
 	}
 }
 
-func hardwareMFATypeFromModel(mfaType iam_model.HardwareMFAType) management.HardwareMFAType {
+func multiFactorFromModel(mfaType iam_model.MultiFactorType) *management.MultiFactor {
+	return &management.MultiFactor{
+		MultiFactor: multiFactorTypeFromModel(mfaType),
+	}
+}
+
+func multiFactorTypeFromModel(mfaType iam_model.MultiFactorType) management.MultiFactorType {
 	switch mfaType {
-	case iam_model.HardwareMFATypeU2F:
-		return management.HardwareMFAType_HARDWAREMFATYPE_U2F
+	case iam_model.MultiFactorTypeU2FWithPIN:
+		return management.MultiFactorType_MULTIFACTORTYPE_U2F_WITH_PIN
 	default:
-		return management.HardwareMFAType_HARDWAREMFATYPE_UNSPECIFIED
+		return management.MultiFactorType_MULTIFACTORTYPE_UNSPECIFIED
 	}
 }
 
-func hardwareMFATypeToModel(mfaType *management.HardwareMFA) iam_model.HardwareMFAType {
-	switch mfaType.Mfa {
-	case management.HardwareMFAType_HARDWAREMFATYPE_U2F:
-		return iam_model.HardwareMFATypeU2F
+func multiFactorTypeToModel(mfaType *management.MultiFactor) iam_model.MultiFactorType {
+	switch mfaType.MultiFactor {
+	case management.MultiFactorType_MULTIFACTORTYPE_U2F_WITH_PIN:
+		return iam_model.MultiFactorTypeU2FWithPIN
 	default:
-		return iam_model.HardwareMFATypeUnspecified
+		return iam_model.MultiFactorTypeUnspecified
 	}
 }

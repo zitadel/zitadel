@@ -16,8 +16,8 @@ type LoginPolicy struct {
 	AllowExternalIdp      bool           `json:"allowExternalIdp"`
 	ForceMFA              bool           `json:"forceMfa"`
 	IDPProviders          []*IDPProvider `json:"-"`
-	SoftwareMFAs          []int32        `json:"-"`
-	HardwareMFAs          []int32        `json:"-"`
+	SecondFactors         []int32        `json:"-"`
+	MultiFactors          []int32        `json:"-"`
 }
 
 type IDPProvider struct {
@@ -53,8 +53,8 @@ func GetMFA(mfas []int32, mfaType int32) (int, int32) {
 }
 func LoginPolicyToModel(policy *LoginPolicy) *iam_model.LoginPolicy {
 	idps := IDPProvidersToModel(policy.IDPProviders)
-	softwareMFAs := SoftwareMFAsToModel(policy.SoftwareMFAs)
-	hardwareMFAs := HardwareMFAsToModel(policy.HardwareMFAs)
+	secondFactors := SecondFactorsToModel(policy.SecondFactors)
+	multiFactors := MultiFactorsToModel(policy.MultiFactors)
 	return &iam_model.LoginPolicy{
 		ObjectRoot:            policy.ObjectRoot,
 		State:                 iam_model.PolicyState(policy.State),
@@ -63,15 +63,15 @@ func LoginPolicyToModel(policy *LoginPolicy) *iam_model.LoginPolicy {
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		IDPProviders:          idps,
 		ForceMFA:              policy.ForceMFA,
-		SoftwareMFAs:          softwareMFAs,
-		HardwareMFAs:          hardwareMFAs,
+		SecondFactors:         secondFactors,
+		MultiFactors:          multiFactors,
 	}
 }
 
 func LoginPolicyFromModel(policy *iam_model.LoginPolicy) *LoginPolicy {
 	idps := IDOProvidersFromModel(policy.IDPProviders)
-	softwareMFAs := SoftwareMFAsFromModel(policy.SoftwareMFAs)
-	hardwareMFAs := HardwareMFAsFromModel(policy.HardwareMFAs)
+	secondFactors := SecondFactorsFromModel(policy.SecondFactors)
+	multiFactors := MultiFactorsFromModel(policy.MultiFactors)
 	return &LoginPolicy{
 		ObjectRoot:            policy.ObjectRoot,
 		State:                 int32(policy.State),
@@ -80,8 +80,8 @@ func LoginPolicyFromModel(policy *iam_model.LoginPolicy) *LoginPolicy {
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		IDPProviders:          idps,
 		ForceMFA:              policy.ForceMFA,
-		SoftwareMFAs:          softwareMFAs,
-		HardwareMFAs:          hardwareMFAs,
+		SecondFactors:         secondFactors,
+		MultiFactors:          multiFactors,
 	}
 }
 
@@ -117,7 +117,7 @@ func IDPProviderFromModel(provider *iam_model.IDPProvider) *IDPProvider {
 	}
 }
 
-func SoftwareMFAsFromModel(mfas []iam_model.SoftwareMFAType) []int32 {
+func SecondFactorsFromModel(mfas []iam_model.SecondFactorType) []int32 {
 	convertedMFAs := make([]int32, len(mfas))
 	for i, mfa := range mfas {
 		convertedMFAs[i] = int32(mfa)
@@ -125,19 +125,19 @@ func SoftwareMFAsFromModel(mfas []iam_model.SoftwareMFAType) []int32 {
 	return convertedMFAs
 }
 
-func SoftwareMFAFromModel(mfa iam_model.SoftwareMFAType) *MFA {
+func SecondFactorFromModel(mfa iam_model.SecondFactorType) *MFA {
 	return &MFA{MfaType: int32(mfa)}
 }
 
-func SoftwareMFAsToModel(mfas []int32) []iam_model.SoftwareMFAType {
-	convertedMFAs := make([]iam_model.SoftwareMFAType, len(mfas))
+func SecondFactorsToModel(mfas []int32) []iam_model.SecondFactorType {
+	convertedMFAs := make([]iam_model.SecondFactorType, len(mfas))
 	for i, mfa := range mfas {
-		convertedMFAs[i] = iam_model.SoftwareMFAType(mfa)
+		convertedMFAs[i] = iam_model.SecondFactorType(mfa)
 	}
 	return convertedMFAs
 }
 
-func HardwareMFAsFromModel(mfas []iam_model.HardwareMFAType) []int32 {
+func MultiFactorsFromModel(mfas []iam_model.MultiFactorType) []int32 {
 	convertedMFAs := make([]int32, len(mfas))
 	for i, mfa := range mfas {
 		convertedMFAs[i] = int32(mfa)
@@ -145,14 +145,14 @@ func HardwareMFAsFromModel(mfas []iam_model.HardwareMFAType) []int32 {
 	return convertedMFAs
 }
 
-func HardwareMFAFromModel(mfa iam_model.HardwareMFAType) *MFA {
+func MultiFactorFromModel(mfa iam_model.MultiFactorType) *MFA {
 	return &MFA{MfaType: int32(mfa)}
 }
 
-func HardwareMFAsToModel(mfas []int32) []iam_model.HardwareMFAType {
-	convertedMFAs := make([]iam_model.HardwareMFAType, len(mfas))
+func MultiFactorsToModel(mfas []int32) []iam_model.MultiFactorType {
+	convertedMFAs := make([]iam_model.MultiFactorType, len(mfas))
 	for i, mfa := range mfas {
-		convertedMFAs[i] = iam_model.HardwareMFAType(mfa)
+		convertedMFAs[i] = iam_model.MultiFactorType(mfa)
 	}
 	return convertedMFAs
 }
@@ -215,51 +215,51 @@ func (iam *IAM) appendRemoveIDPProviderFromLoginPolicyEvent(event *es_models.Eve
 	return nil
 }
 
-func (iam *IAM) appendAddSoftwareMFAToLoginPolicyEvent(event *es_models.Event) error {
+func (iam *IAM) appendAddSecondFactorToLoginPolicyEvent(event *es_models.Event) error {
 	mfa := new(MFA)
 	err := mfa.SetData(event)
 	if err != nil {
 		return err
 	}
-	iam.DefaultLoginPolicy.SoftwareMFAs = append(iam.DefaultLoginPolicy.SoftwareMFAs, mfa.MfaType)
+	iam.DefaultLoginPolicy.SecondFactors = append(iam.DefaultLoginPolicy.SecondFactors, mfa.MfaType)
 	return nil
 }
 
-func (iam *IAM) appendRemoveSoftwareMFAFromLoginPolicyEvent(event *es_models.Event) error {
+func (iam *IAM) appendRemoveSecondFactorFromLoginPolicyEvent(event *es_models.Event) error {
 	mfa := new(MFA)
 	err := mfa.SetData(event)
 	if err != nil {
 		return err
 	}
-	if i, m := GetMFA(iam.DefaultLoginPolicy.SoftwareMFAs, mfa.MfaType); m != 0 {
-		iam.DefaultLoginPolicy.SoftwareMFAs[i] = iam.DefaultLoginPolicy.SoftwareMFAs[len(iam.DefaultLoginPolicy.SoftwareMFAs)-1]
-		iam.DefaultLoginPolicy.SoftwareMFAs[len(iam.DefaultLoginPolicy.SoftwareMFAs)-1] = 0
-		iam.DefaultLoginPolicy.SoftwareMFAs = iam.DefaultLoginPolicy.SoftwareMFAs[:len(iam.DefaultLoginPolicy.SoftwareMFAs)-1]
+	if i, m := GetMFA(iam.DefaultLoginPolicy.SecondFactors, mfa.MfaType); m != 0 {
+		iam.DefaultLoginPolicy.SecondFactors[i] = iam.DefaultLoginPolicy.SecondFactors[len(iam.DefaultLoginPolicy.SecondFactors)-1]
+		iam.DefaultLoginPolicy.SecondFactors[len(iam.DefaultLoginPolicy.SecondFactors)-1] = 0
+		iam.DefaultLoginPolicy.SecondFactors = iam.DefaultLoginPolicy.SecondFactors[:len(iam.DefaultLoginPolicy.SecondFactors)-1]
 		return nil
 	}
 	return nil
 }
 
-func (iam *IAM) appendAddHardwareMFAToLoginPolicyEvent(event *es_models.Event) error {
+func (iam *IAM) appendAddMultiFactorToLoginPolicyEvent(event *es_models.Event) error {
 	mfa := new(MFA)
 	err := mfa.SetData(event)
 	if err != nil {
 		return err
 	}
-	iam.DefaultLoginPolicy.HardwareMFAs = append(iam.DefaultLoginPolicy.HardwareMFAs, mfa.MfaType)
+	iam.DefaultLoginPolicy.MultiFactors = append(iam.DefaultLoginPolicy.MultiFactors, mfa.MfaType)
 	return nil
 }
 
-func (iam *IAM) appendRemoveHardwareMFAFromLoginPolicyEvent(event *es_models.Event) error {
+func (iam *IAM) appendRemoveMultiFactorFromLoginPolicyEvent(event *es_models.Event) error {
 	mfa := new(MFA)
 	err := mfa.SetData(event)
 	if err != nil {
 		return err
 	}
-	if i, m := GetMFA(iam.DefaultLoginPolicy.HardwareMFAs, mfa.MfaType); m != 0 {
-		iam.DefaultLoginPolicy.HardwareMFAs[i] = iam.DefaultLoginPolicy.HardwareMFAs[len(iam.DefaultLoginPolicy.HardwareMFAs)-1]
-		iam.DefaultLoginPolicy.HardwareMFAs[len(iam.DefaultLoginPolicy.HardwareMFAs)-1] = 0
-		iam.DefaultLoginPolicy.HardwareMFAs = iam.DefaultLoginPolicy.HardwareMFAs[:len(iam.DefaultLoginPolicy.HardwareMFAs)-1]
+	if i, m := GetMFA(iam.DefaultLoginPolicy.MultiFactors, mfa.MfaType); m != 0 {
+		iam.DefaultLoginPolicy.MultiFactors[i] = iam.DefaultLoginPolicy.MultiFactors[len(iam.DefaultLoginPolicy.MultiFactors)-1]
+		iam.DefaultLoginPolicy.MultiFactors[len(iam.DefaultLoginPolicy.MultiFactors)-1] = 0
+		iam.DefaultLoginPolicy.MultiFactors = iam.DefaultLoginPolicy.MultiFactors[:len(iam.DefaultLoginPolicy.MultiFactors)-1]
 		return nil
 	}
 	return nil

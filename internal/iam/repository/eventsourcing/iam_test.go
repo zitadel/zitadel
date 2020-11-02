@@ -1468,7 +1468,7 @@ func TestLoginPolicyIdpProviderRemovedAggregate(t *testing.T) {
 	}
 }
 
-func TestLoginPolicySoftwareMFAAddedAggregate(t *testing.T) {
+func TestLoginPolicySecondFactorAddedAggregate(t *testing.T) {
 	type args struct {
 		ctx         context.Context
 		existingIAM *model.IAM
@@ -1487,7 +1487,7 @@ func TestLoginPolicySoftwareMFAAddedAggregate(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "add software mfa to login policy",
+			name: "add second factor to login policy",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
 				existingIAM: &model.IAM{
@@ -1497,13 +1497,13 @@ func TestLoginPolicySoftwareMFAAddedAggregate(t *testing.T) {
 						AllowUsernamePassword: true,
 					}},
 				newMFA: &model.MFA{
-					MfaType: int32(iam_model.SoftwareMFATypeOTP),
+					MfaType: int32(iam_model.SecondFactorTypeOTP),
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.LoginPolicySoftwareMFAAdded},
+				eventTypes: []models.EventType{model.LoginPolicySecondFactorAdded},
 			},
 		},
 		{
@@ -1534,7 +1534,7 @@ func TestLoginPolicySoftwareMFAAddedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LoginPolicySoftwareMFAAddedAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.newMFA)(tt.args.ctx)
+			agg, err := LoginPolicySecondFactorAddedAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.newMFA)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -1555,7 +1555,7 @@ func TestLoginPolicySoftwareMFAAddedAggregate(t *testing.T) {
 	}
 }
 
-func TestLoginPolicySoftwareMFARemovedAggregate(t *testing.T) {
+func TestLoginPolicySecondFactorRemovedAggregate(t *testing.T) {
 	type args struct {
 		ctx         context.Context
 		existingIAM *model.IAM
@@ -1574,7 +1574,7 @@ func TestLoginPolicySoftwareMFARemovedAggregate(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "remove software mfa to login policy",
+			name: "remove second factor to login policy",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
 				existingIAM: &model.IAM{
@@ -1582,18 +1582,18 @@ func TestLoginPolicySoftwareMFARemovedAggregate(t *testing.T) {
 					IAMProjectID: "IAMProjectID",
 					DefaultLoginPolicy: &model.LoginPolicy{
 						AllowUsernamePassword: true,
-						SoftwareMFAs: []int32{
-							int32(iam_model.SoftwareMFATypeOTP),
+						SecondFactors: []int32{
+							int32(iam_model.SecondFactorTypeOTP),
 						},
 					}},
 				mfa: &model.MFA{
-					MfaType: int32(iam_model.SoftwareMFATypeOTP),
+					MfaType: int32(iam_model.SecondFactorTypeOTP),
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.LoginPolicySoftwareMFARemoved},
+				eventTypes: []models.EventType{model.LoginPolicySecondFactorRemoved},
 			},
 		},
 		{
@@ -1624,7 +1624,7 @@ func TestLoginPolicySoftwareMFARemovedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LoginPolicySoftwareMFARemovedAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.mfa)(tt.args.ctx)
+			agg, err := LoginPolicySecondFactorRemovedAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.mfa)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -1645,7 +1645,7 @@ func TestLoginPolicySoftwareMFARemovedAggregate(t *testing.T) {
 	}
 }
 
-func TestLoginPolicyHardwareMFAAddedAggregate(t *testing.T) {
+func TestLoginPolicyMultiFactorAddedAggregate(t *testing.T) {
 	type args struct {
 		ctx         context.Context
 		existingIAM *model.IAM
@@ -1664,7 +1664,7 @@ func TestLoginPolicyHardwareMFAAddedAggregate(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "add hardware mfa to login policy",
+			name: "add mfa to login policy",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
 				existingIAM: &model.IAM{
@@ -1674,13 +1674,13 @@ func TestLoginPolicyHardwareMFAAddedAggregate(t *testing.T) {
 						AllowUsernamePassword: true,
 					}},
 				newMFA: &model.MFA{
-					MfaType: int32(iam_model.HardwareMFATypeU2F),
+					MfaType: int32(iam_model.MultiFactorTypeU2FWithPIN),
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.LoginPolicyHardwareMFAAdded},
+				eventTypes: []models.EventType{model.LoginPolicyMultiFactorAdded},
 			},
 		},
 		{
@@ -1711,7 +1711,7 @@ func TestLoginPolicyHardwareMFAAddedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LoginPolicyHardwareMFAAddedAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.newMFA)(tt.args.ctx)
+			agg, err := LoginPolicyMultiFactorAddedAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.newMFA)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -1732,7 +1732,7 @@ func TestLoginPolicyHardwareMFAAddedAggregate(t *testing.T) {
 	}
 }
 
-func TestLoginPolicyHardwareMFARemovedAggregate(t *testing.T) {
+func TestLoginPolicyMultiFactorRemovedAggregate(t *testing.T) {
 	type args struct {
 		ctx         context.Context
 		existingIAM *model.IAM
@@ -1751,7 +1751,7 @@ func TestLoginPolicyHardwareMFARemovedAggregate(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "remove hardware mfa to login policy",
+			name: "remove mfa to login policy",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
 				existingIAM: &model.IAM{
@@ -1759,18 +1759,18 @@ func TestLoginPolicyHardwareMFARemovedAggregate(t *testing.T) {
 					IAMProjectID: "IAMProjectID",
 					DefaultLoginPolicy: &model.LoginPolicy{
 						AllowUsernamePassword: true,
-						SoftwareMFAs: []int32{
-							int32(iam_model.SoftwareMFATypeOTP),
+						SecondFactors: []int32{
+							int32(iam_model.SecondFactorTypeOTP),
 						},
 					}},
 				mfa: &model.MFA{
-					MfaType: int32(iam_model.SoftwareMFATypeOTP),
+					MfaType: int32(iam_model.SecondFactorTypeOTP),
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.LoginPolicyHardwareMFARemoved},
+				eventTypes: []models.EventType{model.LoginPolicyMultiFactorRemoved},
 			},
 		},
 		{
@@ -1801,7 +1801,7 @@ func TestLoginPolicyHardwareMFARemovedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LoginPolicyHardwareMFARemovedAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.mfa)(tt.args.ctx)
+			agg, err := LoginPolicyMultiFactorRemovedAggregate(tt.args.aggCreator, tt.args.existingIAM, tt.args.mfa)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

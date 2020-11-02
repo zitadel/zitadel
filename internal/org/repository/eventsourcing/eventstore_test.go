@@ -2732,16 +2732,16 @@ func TestRemoveIdpProviderFromLoginPolicy(t *testing.T) {
 	}
 }
 
-func TestAddSoftwareMFAToLoginPolicy(t *testing.T) {
+func TestAddSecondFactorToLoginPolicy(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
 		es          *OrgEventstore
 		ctx         context.Context
 		aggregateID string
-		mfa         iam_model.SoftwareMFAType
+		mfa         iam_model.SecondFactorType
 	}
 	type res struct {
-		result  iam_model.SoftwareMFAType
+		result  iam_model.SecondFactorType
 		wantErr bool
 		errFunc func(err error) bool
 	}
@@ -2751,24 +2751,24 @@ func TestAddSoftwareMFAToLoginPolicy(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "add software mfa to login policy, ok",
+			name: "add second factor to login policy, ok",
 			args: args{
 				es:          GetMockChangesOrgWithLoginPolicy(ctrl),
 				ctx:         authz.NewMockContext("orgID", "userID"),
 				aggregateID: "AggregateID",
-				mfa:         iam_model.SoftwareMFATypeOTP,
+				mfa:         iam_model.SecondFactorTypeOTP,
 			},
 			res: res{
-				result: iam_model.SoftwareMFATypeOTP,
+				result: iam_model.SecondFactorTypeOTP,
 			},
 		},
 		{
-			name: "add software mfa to login policy, already existing",
+			name: "add second factor to login policy, already existing",
 			args: args{
 				es:          GetMockChangesOrgWithLoginPolicyWithMFA(ctrl),
 				ctx:         authz.NewMockContext("orgID", "userID"),
 				aggregateID: "AggregateID",
-				mfa:         iam_model.SoftwareMFATypeOTP,
+				mfa:         iam_model.SecondFactorTypeOTP,
 			},
 			res: res{
 				wantErr: true,
@@ -2781,7 +2781,7 @@ func TestAddSoftwareMFAToLoginPolicy(t *testing.T) {
 				es:          GetMockChangesOrgOK(ctrl),
 				ctx:         authz.NewMockContext("orgID", "userID"),
 				aggregateID: "AggregateID",
-				mfa:         iam_model.SoftwareMFATypeUnspecified,
+				mfa:         iam_model.SecondFactorTypeUnspecified,
 			},
 			res: res{
 				wantErr: true,
@@ -2794,7 +2794,7 @@ func TestAddSoftwareMFAToLoginPolicy(t *testing.T) {
 				es:          GetMockChangesOrgNoEvents(ctrl),
 				ctx:         authz.NewMockContext("orgID", "userID"),
 				aggregateID: "Test",
-				mfa:         iam_model.SoftwareMFATypeOTP,
+				mfa:         iam_model.SecondFactorTypeOTP,
 			},
 			res: res{
 				wantErr: true,
@@ -2804,7 +2804,7 @@ func TestAddSoftwareMFAToLoginPolicy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.AddSoftwareMFAToLoginPolicy(tt.args.ctx, tt.args.aggregateID, tt.args.mfa)
+			result, err := tt.args.es.AddSecondFactorToLoginPolicy(tt.args.ctx, tt.args.aggregateID, tt.args.mfa)
 			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
 				t.Errorf("got wrong err: %v ", err)
 				return
@@ -2819,13 +2819,13 @@ func TestAddSoftwareMFAToLoginPolicy(t *testing.T) {
 	}
 }
 
-func TestRemoveSoftwareMFAFromLoginPolicy(t *testing.T) {
+func TestRemoveSecondFactorFromLoginPolicy(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
 		es          *OrgEventstore
 		ctx         context.Context
 		aggregateID string
-		mfa         iam_model.SoftwareMFAType
+		mfa         iam_model.SecondFactorType
 	}
 	type res struct {
 		wantErr bool
@@ -2837,23 +2837,23 @@ func TestRemoveSoftwareMFAFromLoginPolicy(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "remove software mfa from login policy, ok",
+			name: "remove second factor from login policy, ok",
 			args: args{
 				es:          GetMockChangesOrgWithLoginPolicyWithMFA(ctrl),
 				ctx:         authz.NewMockContext("orgID", "userID"),
 				aggregateID: "AggregateID",
-				mfa:         iam_model.SoftwareMFATypeOTP,
+				mfa:         iam_model.SecondFactorTypeOTP,
 			},
 			res: res{},
 		},
 		{
-			name: "remove software mfa from  login policy, not existing",
+			name: "remove second factor from  login policy, not existing",
 			args: args{
 				es:  GetMockChangesOrgWithLoginPolicy(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 
 				aggregateID: "AggregateID",
-				mfa:         iam_model.SoftwareMFATypeOTP,
+				mfa:         iam_model.SecondFactorTypeOTP,
 			},
 			res: res{
 				wantErr: true,
@@ -2866,7 +2866,7 @@ func TestRemoveSoftwareMFAFromLoginPolicy(t *testing.T) {
 				es:          GetMockChangesOrgOK(ctrl),
 				ctx:         authz.NewMockContext("orgID", "userID"),
 				aggregateID: "AggregateID",
-				mfa:         iam_model.SoftwareMFATypeUnspecified,
+				mfa:         iam_model.SecondFactorTypeUnspecified,
 			},
 			res: res{
 				wantErr: true,
@@ -2879,7 +2879,7 @@ func TestRemoveSoftwareMFAFromLoginPolicy(t *testing.T) {
 				es:          GetMockChangesOrgNoEvents(ctrl),
 				ctx:         authz.NewMockContext("orgID", "userID"),
 				aggregateID: "Test",
-				mfa:         iam_model.SoftwareMFATypeOTP,
+				mfa:         iam_model.SecondFactorTypeOTP,
 			},
 			res: res{
 				wantErr: true,
@@ -2889,7 +2889,7 @@ func TestRemoveSoftwareMFAFromLoginPolicy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.es.RemoveSoftwareMFAFromLoginPolicy(tt.args.ctx, tt.args.aggregateID, tt.args.mfa)
+			err := tt.args.es.RemoveSecondFactorFromLoginPolicy(tt.args.ctx, tt.args.aggregateID, tt.args.mfa)
 
 			if !tt.res.wantErr && err != nil {
 				t.Errorf("should not get err: %v ", err)
@@ -2901,16 +2901,16 @@ func TestRemoveSoftwareMFAFromLoginPolicy(t *testing.T) {
 	}
 }
 
-func TestAddHardwareMFAToLoginPolicy(t *testing.T) {
+func TestAddMultiFactorToLoginPolicy(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
 		es          *OrgEventstore
 		ctx         context.Context
 		aggregateID string
-		mfa         iam_model.HardwareMFAType
+		mfa         iam_model.MultiFactorType
 	}
 	type res struct {
-		result  iam_model.HardwareMFAType
+		result  iam_model.MultiFactorType
 		wantErr bool
 		errFunc func(err error) bool
 	}
@@ -2920,24 +2920,24 @@ func TestAddHardwareMFAToLoginPolicy(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "add hardware mfa to login policy, ok",
+			name: "add mfa to login policy, ok",
 			args: args{
 				es:          GetMockChangesOrgWithLoginPolicy(ctrl),
 				ctx:         authz.NewMockContext("orgID", "userID"),
 				aggregateID: "AggregateID",
-				mfa:         iam_model.HardwareMFATypeU2F,
+				mfa:         iam_model.MultiFactorTypeU2FWithPIN,
 			},
 			res: res{
-				result: iam_model.HardwareMFATypeU2F,
+				result: iam_model.MultiFactorTypeU2FWithPIN,
 			},
 		},
 		{
-			name: "add hardware mfa to login policy, already existing",
+			name: "add mfa to login policy, already existing",
 			args: args{
 				es:          GetMockChangesOrgWithLoginPolicyWithMFA(ctrl),
 				ctx:         authz.NewMockContext("orgID", "userID"),
 				aggregateID: "AggregateID",
-				mfa:         iam_model.HardwareMFATypeU2F,
+				mfa:         iam_model.MultiFactorTypeU2FWithPIN,
 			},
 			res: res{
 				wantErr: true,
@@ -2950,7 +2950,7 @@ func TestAddHardwareMFAToLoginPolicy(t *testing.T) {
 				es:          GetMockChangesOrgOK(ctrl),
 				ctx:         authz.NewMockContext("orgID", "userID"),
 				aggregateID: "AggregateID",
-				mfa:         iam_model.HardwareMFATypeUnspecified,
+				mfa:         iam_model.MultiFactorTypeUnspecified,
 			},
 			res: res{
 				wantErr: true,
@@ -2963,7 +2963,7 @@ func TestAddHardwareMFAToLoginPolicy(t *testing.T) {
 				es:          GetMockChangesOrgNoEvents(ctrl),
 				ctx:         authz.NewMockContext("orgID", "userID"),
 				aggregateID: "Test",
-				mfa:         iam_model.HardwareMFATypeU2F,
+				mfa:         iam_model.MultiFactorTypeU2FWithPIN,
 			},
 			res: res{
 				wantErr: true,
@@ -2973,7 +2973,7 @@ func TestAddHardwareMFAToLoginPolicy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.AddHardwareMFAToLoginPolicy(tt.args.ctx, tt.args.aggregateID, tt.args.mfa)
+			result, err := tt.args.es.AddMultiFactorToLoginPolicy(tt.args.ctx, tt.args.aggregateID, tt.args.mfa)
 			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
 				t.Errorf("got wrong err: %v ", err)
 				return
@@ -2988,13 +2988,13 @@ func TestAddHardwareMFAToLoginPolicy(t *testing.T) {
 	}
 }
 
-func TestRemoveHardwareMFAFromLoginPolicy(t *testing.T) {
+func TestRemoveMultiFactorFromLoginPolicy(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
 		es          *OrgEventstore
 		ctx         context.Context
 		aggregateID string
-		mfa         iam_model.HardwareMFAType
+		mfa         iam_model.MultiFactorType
 	}
 	type res struct {
 		wantErr bool
@@ -3006,23 +3006,23 @@ func TestRemoveHardwareMFAFromLoginPolicy(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "remove hardware mfa from login policy, ok",
+			name: "remove mfa from login policy, ok",
 			args: args{
 				es:          GetMockChangesOrgWithLoginPolicyWithMFA(ctrl),
 				ctx:         authz.NewMockContext("orgID", "userID"),
 				aggregateID: "AggregateID",
-				mfa:         iam_model.HardwareMFATypeU2F,
+				mfa:         iam_model.MultiFactorTypeU2FWithPIN,
 			},
 			res: res{},
 		},
 		{
-			name: "remove hardware mfa from  login policy, not existing",
+			name: "remove mfa from  login policy, not existing",
 			args: args{
 				es:  GetMockChangesOrgWithLoginPolicy(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 
 				aggregateID: "AggregateID",
-				mfa:         iam_model.HardwareMFATypeU2F,
+				mfa:         iam_model.MultiFactorTypeU2FWithPIN,
 			},
 			res: res{
 				wantErr: true,
@@ -3035,7 +3035,7 @@ func TestRemoveHardwareMFAFromLoginPolicy(t *testing.T) {
 				es:          GetMockChangesOrgOK(ctrl),
 				ctx:         authz.NewMockContext("orgID", "userID"),
 				aggregateID: "AggregateID",
-				mfa:         iam_model.HardwareMFATypeUnspecified,
+				mfa:         iam_model.MultiFactorTypeUnspecified,
 			},
 			res: res{
 				wantErr: true,
@@ -3048,7 +3048,7 @@ func TestRemoveHardwareMFAFromLoginPolicy(t *testing.T) {
 				es:          GetMockChangesOrgNoEvents(ctrl),
 				ctx:         authz.NewMockContext("orgID", "userID"),
 				aggregateID: "Test",
-				mfa:         iam_model.HardwareMFATypeU2F,
+				mfa:         iam_model.MultiFactorTypeU2FWithPIN,
 			},
 			res: res{
 				wantErr: true,
@@ -3058,7 +3058,7 @@ func TestRemoveHardwareMFAFromLoginPolicy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.es.RemoveHardwareMFAFromLoginPolicy(tt.args.ctx, tt.args.aggregateID, tt.args.mfa)
+			err := tt.args.es.RemoveMultiFactorFromLoginPolicy(tt.args.ctx, tt.args.aggregateID, tt.args.mfa)
 
 			if !tt.res.wantErr && err != nil {
 				t.Errorf("should not get err: %v ", err)

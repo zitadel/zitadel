@@ -127,14 +127,14 @@ func GetMockManipulateIAMWithLoginPolicy(ctrl *gomock.Controller) *IAMEventstore
 func GetMockManipulateIAMWithLoginPolicyWithMFAs(ctrl *gomock.Controller) *IAMEventstore {
 	policyData, _ := json.Marshal(model.LoginPolicy{AllowRegister: true, AllowUsernamePassword: true, AllowExternalIdp: true})
 	idpProviderData, _ := json.Marshal(model.IDPProvider{IDPConfigID: "IDPConfigID", Type: 1})
-	softwareMFA, _ := json.Marshal(model.MFA{MfaType: int32(model2.SoftwareMFATypeOTP)})
-	hardwareMFA, _ := json.Marshal(model.MFA{MfaType: int32(model2.HardwareMFATypeU2F)})
+	secondFactor, _ := json.Marshal(model.MFA{MfaType: int32(model2.SecondFactorTypeOTP)})
+	multiFactor, _ := json.Marshal(model.MFA{MfaType: int32(model2.MultiFactorTypeU2FWithPIN)})
 	events := []*es_models.Event{
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.IAMSetupStarted},
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyAdded, Data: policyData},
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyIDPProviderAdded, Data: idpProviderData},
-		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicySoftwareMFAAdded, Data: softwareMFA},
-		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyHardwareMFAAdded, Data: hardwareMFA},
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicySecondFactorAdded, Data: secondFactor},
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyMultiFactorAdded, Data: multiFactor},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)

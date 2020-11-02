@@ -14,8 +14,8 @@ type LoginPolicy struct {
 	AllowExternalIdp      bool
 	IDPProviders          []*IDPProvider
 	ForceMFA              bool
-	SoftwareMFAs          []SoftwareMFAType
-	HardwareMFAs          []HardwareMFAType
+	SecondFactors         []SecondFactorType
+	MultiFactors          []MultiFactorType
 }
 
 type IDPProvider struct {
@@ -38,18 +38,19 @@ const (
 	IDPProviderTypeOrg
 )
 
-type SoftwareMFAType int32
+type SecondFactorType int32
 
 const (
-	SoftwareMFATypeUnspecified SoftwareMFAType = iota
-	SoftwareMFATypeOTP
+	SecondFactorTypeUnspecified SecondFactorType = iota
+	SecondFactorTypeOTP
+	SecondFactorTypeU2F
 )
 
-type HardwareMFAType int32
+type MultiFactorType int32
 
 const (
-	HardwareMFATypeUnspecified HardwareMFAType = iota
-	HardwareMFATypeU2F
+	MultiFactorTypeUnspecified MultiFactorType = iota
+	MultiFactorTypeU2FWithPIN
 )
 
 func (p *LoginPolicy) IsValid() bool {
@@ -69,8 +70,8 @@ func (p *LoginPolicy) GetIdpProvider(id string) (int, *IDPProvider) {
 	return -1, nil
 }
 
-func (p *LoginPolicy) GetSoftwareMFA(mfaType SoftwareMFAType) (int, SoftwareMFAType) {
-	for i, m := range p.SoftwareMFAs {
+func (p *LoginPolicy) GetSecondFactor(mfaType SecondFactorType) (int, SecondFactorType) {
+	for i, m := range p.SecondFactors {
 		if m == mfaType {
 			return i, m
 		}
@@ -78,8 +79,8 @@ func (p *LoginPolicy) GetSoftwareMFA(mfaType SoftwareMFAType) (int, SoftwareMFAT
 	return -1, 0
 }
 
-func (p *LoginPolicy) GetHardwareMFA(mfaType HardwareMFAType) (int, HardwareMFAType) {
-	for i, m := range p.HardwareMFAs {
+func (p *LoginPolicy) GetMultiFactor(mfaType MultiFactorType) (int, MultiFactorType) {
+	for i, m := range p.MultiFactors {
 		if m == mfaType {
 			return i, m
 		}

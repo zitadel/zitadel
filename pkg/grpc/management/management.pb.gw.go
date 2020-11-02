@@ -7416,26 +7416,26 @@ func local_request_ManagementService_RemoveIdpProviderFromLoginPolicy_0(ctx cont
 
 }
 
-func request_ManagementService_GetLoginPolicySoftwareMFAs_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ManagementService_GetLoginPolicySecondFactors_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq empty.Empty
 	var metadata runtime.ServerMetadata
 
-	msg, err := client.GetLoginPolicySoftwareMFAs(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.GetLoginPolicySecondFactors(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_ManagementService_GetLoginPolicySoftwareMFAs_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ManagementService_GetLoginPolicySecondFactors_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq empty.Empty
 	var metadata runtime.ServerMetadata
 
-	msg, err := server.GetLoginPolicySoftwareMFAs(ctx, &protoReq)
+	msg, err := server.GetLoginPolicySecondFactors(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
-func request_ManagementService_AddSoftwareMFAToLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SoftwareMFA
+func request_ManagementService_AddSecondFactorToLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq SecondFactor
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -7446,13 +7446,13 @@ func request_ManagementService_AddSoftwareMFAToLoginPolicy_0(ctx context.Context
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.AddSoftwareMFAToLoginPolicy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.AddSecondFactorToLoginPolicy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_ManagementService_AddSoftwareMFAToLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SoftwareMFA
+func local_request_ManagementService_AddSecondFactorToLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq SecondFactor
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -7463,13 +7463,13 @@ func local_request_ManagementService_AddSoftwareMFAToLoginPolicy_0(ctx context.C
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.AddSoftwareMFAToLoginPolicy(ctx, &protoReq)
+	msg, err := server.AddSecondFactorToLoginPolicy(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
-func request_ManagementService_RemoveSoftwareMFAFromLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SoftwareMFA
+func request_ManagementService_RemoveSecondFactorFromLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq SecondFactor
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -7480,26 +7480,26 @@ func request_ManagementService_RemoveSoftwareMFAFromLoginPolicy_0(ctx context.Co
 		_   = err
 	)
 
-	val, ok = pathParams["mfa"]
+	val, ok = pathParams["second_factor"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "mfa")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "second_factor")
 	}
 
-	e, err = runtime.Enum(val, SoftwareMFAType_value)
+	e, err = runtime.Enum(val, SecondFactorType_value)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "mfa", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "second_factor", err)
 	}
 
-	protoReq.Mfa = SoftwareMFAType(e)
+	protoReq.SecondFactor = SecondFactorType(e)
 
-	msg, err := client.RemoveSoftwareMFAFromLoginPolicy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.RemoveSecondFactorFromLoginPolicy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_ManagementService_RemoveSoftwareMFAFromLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SoftwareMFA
+func local_request_ManagementService_RemoveSecondFactorFromLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq SecondFactor
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -7510,44 +7510,44 @@ func local_request_ManagementService_RemoveSoftwareMFAFromLoginPolicy_0(ctx cont
 		_   = err
 	)
 
-	val, ok = pathParams["mfa"]
+	val, ok = pathParams["second_factor"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "mfa")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "second_factor")
 	}
 
-	e, err = runtime.Enum(val, SoftwareMFAType_value)
+	e, err = runtime.Enum(val, SecondFactorType_value)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "mfa", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "second_factor", err)
 	}
 
-	protoReq.Mfa = SoftwareMFAType(e)
+	protoReq.SecondFactor = SecondFactorType(e)
 
-	msg, err := server.RemoveSoftwareMFAFromLoginPolicy(ctx, &protoReq)
+	msg, err := server.RemoveSecondFactorFromLoginPolicy(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
-func request_ManagementService_GetLoginPolicyHardwareMFAs_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ManagementService_GetLoginPolicyMultiFactors_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq empty.Empty
 	var metadata runtime.ServerMetadata
 
-	msg, err := client.GetLoginPolicyHardwareMFAs(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.GetLoginPolicyMultiFactors(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_ManagementService_GetLoginPolicyHardwareMFAs_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ManagementService_GetLoginPolicyMultiFactors_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq empty.Empty
 	var metadata runtime.ServerMetadata
 
-	msg, err := server.GetLoginPolicyHardwareMFAs(ctx, &protoReq)
+	msg, err := server.GetLoginPolicyMultiFactors(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
-func request_ManagementService_AddHardwareMFAToLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq HardwareMFA
+func request_ManagementService_AddMultiFactorToLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq MultiFactor
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -7558,13 +7558,13 @@ func request_ManagementService_AddHardwareMFAToLoginPolicy_0(ctx context.Context
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.AddHardwareMFAToLoginPolicy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.AddMultiFactorToLoginPolicy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_ManagementService_AddHardwareMFAToLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq HardwareMFA
+func local_request_ManagementService_AddMultiFactorToLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq MultiFactor
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -7575,13 +7575,13 @@ func local_request_ManagementService_AddHardwareMFAToLoginPolicy_0(ctx context.C
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.AddHardwareMFAToLoginPolicy(ctx, &protoReq)
+	msg, err := server.AddMultiFactorToLoginPolicy(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
-func request_ManagementService_RemoveHardwareMFAFromLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq HardwareMFA
+func request_ManagementService_RemoveMultiFactorFromLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq MultiFactor
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -7592,26 +7592,26 @@ func request_ManagementService_RemoveHardwareMFAFromLoginPolicy_0(ctx context.Co
 		_   = err
 	)
 
-	val, ok = pathParams["mfa"]
+	val, ok = pathParams["multi_factor"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "mfa")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "multi_factor")
 	}
 
-	e, err = runtime.Enum(val, HardwareMFAType_value)
+	e, err = runtime.Enum(val, MultiFactorType_value)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "mfa", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "multi_factor", err)
 	}
 
-	protoReq.Mfa = HardwareMFAType(e)
+	protoReq.MultiFactor = MultiFactorType(e)
 
-	msg, err := client.RemoveHardwareMFAFromLoginPolicy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.RemoveMultiFactorFromLoginPolicy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_ManagementService_RemoveHardwareMFAFromLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq HardwareMFA
+func local_request_ManagementService_RemoveMultiFactorFromLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq MultiFactor
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -7622,20 +7622,20 @@ func local_request_ManagementService_RemoveHardwareMFAFromLoginPolicy_0(ctx cont
 		_   = err
 	)
 
-	val, ok = pathParams["mfa"]
+	val, ok = pathParams["multi_factor"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "mfa")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "multi_factor")
 	}
 
-	e, err = runtime.Enum(val, HardwareMFAType_value)
+	e, err = runtime.Enum(val, MultiFactorType_value)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "mfa", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "multi_factor", err)
 	}
 
-	protoReq.Mfa = HardwareMFAType(e)
+	protoReq.MultiFactor = MultiFactorType(e)
 
-	msg, err := server.RemoveHardwareMFAFromLoginPolicy(ctx, &protoReq)
+	msg, err := server.RemoveMultiFactorFromLoginPolicy(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -10471,7 +10471,7 @@ func RegisterManagementServiceHandlerServer(ctx context.Context, mux *runtime.Se
 
 	})
 
-	mux.Handle("GET", pattern_ManagementService_GetLoginPolicySoftwareMFAs_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ManagementService_GetLoginPolicySecondFactors_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -10480,18 +10480,18 @@ func RegisterManagementServiceHandlerServer(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ManagementService_GetLoginPolicySoftwareMFAs_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ManagementService_GetLoginPolicySecondFactors_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ManagementService_GetLoginPolicySoftwareMFAs_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ManagementService_GetLoginPolicySecondFactors_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_ManagementService_AddSoftwareMFAToLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ManagementService_AddSecondFactorToLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -10500,18 +10500,18 @@ func RegisterManagementServiceHandlerServer(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ManagementService_AddSoftwareMFAToLoginPolicy_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ManagementService_AddSecondFactorToLoginPolicy_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ManagementService_AddSoftwareMFAToLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ManagementService_AddSecondFactorToLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("DELETE", pattern_ManagementService_RemoveSoftwareMFAFromLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("DELETE", pattern_ManagementService_RemoveSecondFactorFromLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -10520,18 +10520,18 @@ func RegisterManagementServiceHandlerServer(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ManagementService_RemoveSoftwareMFAFromLoginPolicy_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ManagementService_RemoveSecondFactorFromLoginPolicy_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ManagementService_RemoveSoftwareMFAFromLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ManagementService_RemoveSecondFactorFromLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_ManagementService_GetLoginPolicyHardwareMFAs_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ManagementService_GetLoginPolicyMultiFactors_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -10540,18 +10540,18 @@ func RegisterManagementServiceHandlerServer(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ManagementService_GetLoginPolicyHardwareMFAs_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ManagementService_GetLoginPolicyMultiFactors_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ManagementService_GetLoginPolicyHardwareMFAs_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ManagementService_GetLoginPolicyMultiFactors_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_ManagementService_AddHardwareMFAToLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ManagementService_AddMultiFactorToLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -10560,18 +10560,18 @@ func RegisterManagementServiceHandlerServer(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ManagementService_AddHardwareMFAToLoginPolicy_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ManagementService_AddMultiFactorToLoginPolicy_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ManagementService_AddHardwareMFAToLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ManagementService_AddMultiFactorToLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("DELETE", pattern_ManagementService_RemoveHardwareMFAFromLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("DELETE", pattern_ManagementService_RemoveMultiFactorFromLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -10580,14 +10580,14 @@ func RegisterManagementServiceHandlerServer(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ManagementService_RemoveHardwareMFAFromLoginPolicy_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ManagementService_RemoveMultiFactorFromLoginPolicy_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ManagementService_RemoveHardwareMFAFromLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ManagementService_RemoveMultiFactorFromLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -13392,7 +13392,7 @@ func RegisterManagementServiceHandlerClient(ctx context.Context, mux *runtime.Se
 
 	})
 
-	mux.Handle("GET", pattern_ManagementService_GetLoginPolicySoftwareMFAs_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ManagementService_GetLoginPolicySecondFactors_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -13401,18 +13401,18 @@ func RegisterManagementServiceHandlerClient(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ManagementService_GetLoginPolicySoftwareMFAs_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ManagementService_GetLoginPolicySecondFactors_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ManagementService_GetLoginPolicySoftwareMFAs_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ManagementService_GetLoginPolicySecondFactors_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_ManagementService_AddSoftwareMFAToLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ManagementService_AddSecondFactorToLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -13421,18 +13421,18 @@ func RegisterManagementServiceHandlerClient(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ManagementService_AddSoftwareMFAToLoginPolicy_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ManagementService_AddSecondFactorToLoginPolicy_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ManagementService_AddSoftwareMFAToLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ManagementService_AddSecondFactorToLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("DELETE", pattern_ManagementService_RemoveSoftwareMFAFromLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("DELETE", pattern_ManagementService_RemoveSecondFactorFromLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -13441,18 +13441,18 @@ func RegisterManagementServiceHandlerClient(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ManagementService_RemoveSoftwareMFAFromLoginPolicy_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ManagementService_RemoveSecondFactorFromLoginPolicy_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ManagementService_RemoveSoftwareMFAFromLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ManagementService_RemoveSecondFactorFromLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_ManagementService_GetLoginPolicyHardwareMFAs_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ManagementService_GetLoginPolicyMultiFactors_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -13461,18 +13461,18 @@ func RegisterManagementServiceHandlerClient(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ManagementService_GetLoginPolicyHardwareMFAs_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ManagementService_GetLoginPolicyMultiFactors_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ManagementService_GetLoginPolicyHardwareMFAs_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ManagementService_GetLoginPolicyMultiFactors_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_ManagementService_AddHardwareMFAToLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ManagementService_AddMultiFactorToLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -13481,18 +13481,18 @@ func RegisterManagementServiceHandlerClient(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ManagementService_AddHardwareMFAToLoginPolicy_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ManagementService_AddMultiFactorToLoginPolicy_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ManagementService_AddHardwareMFAToLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ManagementService_AddMultiFactorToLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("DELETE", pattern_ManagementService_RemoveHardwareMFAFromLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("DELETE", pattern_ManagementService_RemoveMultiFactorFromLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -13501,14 +13501,14 @@ func RegisterManagementServiceHandlerClient(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ManagementService_RemoveHardwareMFAFromLoginPolicy_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ManagementService_RemoveMultiFactorFromLoginPolicy_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ManagementService_RemoveHardwareMFAFromLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ManagementService_RemoveMultiFactorFromLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -14062,17 +14062,17 @@ var (
 
 	pattern_ManagementService_RemoveIdpProviderFromLoginPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"orgs", "me", "policies", "login", "idpproviders", "idp_config_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ManagementService_GetLoginPolicySoftwareMFAs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 2, 6}, []string{"orgs", "me", "policies", "login", "mfas", "software", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_GetLoginPolicySecondFactors_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"orgs", "me", "policies", "login", "secondfactors", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ManagementService_AddSoftwareMFAToLoginPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"orgs", "me", "policies", "login", "mfas", "software"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_AddSecondFactorToLoginPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"orgs", "me", "policies", "login", "secondfactors"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ManagementService_RemoveSoftwareMFAFromLoginPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"orgs", "me", "policies", "login", "mfas", "software", "mfa"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_RemoveSecondFactorFromLoginPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"orgs", "me", "policies", "login", "secondfactors", "second_factor"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ManagementService_GetLoginPolicyHardwareMFAs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 2, 6}, []string{"orgs", "me", "policies", "login", "mfas", "hardware", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_GetLoginPolicyMultiFactors_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"orgs", "me", "policies", "login", "multifactors", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ManagementService_AddHardwareMFAToLoginPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"orgs", "me", "policies", "login", "mfas", "hardware"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_AddMultiFactorToLoginPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"orgs", "me", "policies", "login", "multifactors"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ManagementService_RemoveHardwareMFAFromLoginPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"orgs", "me", "policies", "login", "mfas", "hardware", "mfa"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_RemoveMultiFactorFromLoginPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"orgs", "me", "policies", "login", "multifactors", "multi_factor"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_ManagementService_GetPasswordComplexityPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"orgs", "me", "policies", "password", "complexity"}, "", runtime.AssumeColonVerbOpt(true)))
 
@@ -14352,17 +14352,17 @@ var (
 
 	forward_ManagementService_RemoveIdpProviderFromLoginPolicy_0 = runtime.ForwardResponseMessage
 
-	forward_ManagementService_GetLoginPolicySoftwareMFAs_0 = runtime.ForwardResponseMessage
+	forward_ManagementService_GetLoginPolicySecondFactors_0 = runtime.ForwardResponseMessage
 
-	forward_ManagementService_AddSoftwareMFAToLoginPolicy_0 = runtime.ForwardResponseMessage
+	forward_ManagementService_AddSecondFactorToLoginPolicy_0 = runtime.ForwardResponseMessage
 
-	forward_ManagementService_RemoveSoftwareMFAFromLoginPolicy_0 = runtime.ForwardResponseMessage
+	forward_ManagementService_RemoveSecondFactorFromLoginPolicy_0 = runtime.ForwardResponseMessage
 
-	forward_ManagementService_GetLoginPolicyHardwareMFAs_0 = runtime.ForwardResponseMessage
+	forward_ManagementService_GetLoginPolicyMultiFactors_0 = runtime.ForwardResponseMessage
 
-	forward_ManagementService_AddHardwareMFAToLoginPolicy_0 = runtime.ForwardResponseMessage
+	forward_ManagementService_AddMultiFactorToLoginPolicy_0 = runtime.ForwardResponseMessage
 
-	forward_ManagementService_RemoveHardwareMFAFromLoginPolicy_0 = runtime.ForwardResponseMessage
+	forward_ManagementService_RemoveMultiFactorFromLoginPolicy_0 = runtime.ForwardResponseMessage
 
 	forward_ManagementService_GetPasswordComplexityPolicy_0 = runtime.ForwardResponseMessage
 

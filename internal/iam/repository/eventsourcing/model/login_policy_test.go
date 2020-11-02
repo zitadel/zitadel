@@ -260,7 +260,7 @@ func TestRemoveIdpToPolicyEvent(t *testing.T) {
 	}
 }
 
-func TestAppendAddSoftwareMFAToPolicyEvent(t *testing.T) {
+func TestAppendAddSecondFactorToPolicyEvent(t *testing.T) {
 	type args struct {
 		iam   *IAM
 		mfa   *MFA
@@ -272,15 +272,15 @@ func TestAppendAddSoftwareMFAToPolicyEvent(t *testing.T) {
 		result *IAM
 	}{
 		{
-			name: "append add software mfa to login policy event",
+			name: "append add second factor to login policy event",
 			args: args{
 				iam:   &IAM{DefaultLoginPolicy: &LoginPolicy{AllowExternalIdp: true, AllowRegister: true, AllowUsernamePassword: true}},
-				mfa:   &MFA{MfaType: int32(model.SoftwareMFATypeOTP)},
+				mfa:   &MFA{MfaType: int32(model.SecondFactorTypeOTP)},
 				event: &es_models.Event{},
 			},
 			result: &IAM{DefaultLoginPolicy: &LoginPolicy{
-				SoftwareMFAs: []int32{
-					int32(model.SoftwareMFATypeOTP),
+				SecondFactors: []int32{
+					int32(model.SecondFactorTypeOTP),
 				}}},
 		},
 	}
@@ -290,18 +290,18 @@ func TestAppendAddSoftwareMFAToPolicyEvent(t *testing.T) {
 				data, _ := json.Marshal(tt.args.mfa)
 				tt.args.event.Data = data
 			}
-			tt.args.iam.appendAddSoftwareMFAToLoginPolicyEvent(tt.args.event)
-			if len(tt.result.DefaultLoginPolicy.SoftwareMFAs) != len(tt.args.iam.DefaultLoginPolicy.SoftwareMFAs) {
-				t.Errorf("got wrong software mfas len: expected: %v, actual: %v ", len(tt.result.DefaultLoginPolicy.SoftwareMFAs), len(tt.args.iam.DefaultLoginPolicy.SoftwareMFAs))
+			tt.args.iam.appendAddSecondFactorToLoginPolicyEvent(tt.args.event)
+			if len(tt.result.DefaultLoginPolicy.SecondFactors) != len(tt.args.iam.DefaultLoginPolicy.SecondFactors) {
+				t.Errorf("got wrong second factors len: expected: %v, actual: %v ", len(tt.result.DefaultLoginPolicy.SecondFactors), len(tt.args.iam.DefaultLoginPolicy.SecondFactors))
 			}
-			if tt.result.DefaultLoginPolicy.SoftwareMFAs[0] != tt.args.mfa.MfaType {
-				t.Errorf("got wrong software mfa: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.SoftwareMFAs[0], tt.args.mfa)
+			if tt.result.DefaultLoginPolicy.SecondFactors[0] != tt.args.mfa.MfaType {
+				t.Errorf("got wrong second factor: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.SecondFactors[0], tt.args.mfa)
 			}
 		})
 	}
 }
 
-func TestRemoveSoftwareMFAToPolicyEvent(t *testing.T) {
+func TestRemoveSecondFactorToPolicyEvent(t *testing.T) {
 	type args struct {
 		iam   *IAM
 		mfa   *MFA
@@ -313,21 +313,21 @@ func TestRemoveSoftwareMFAToPolicyEvent(t *testing.T) {
 		result *IAM
 	}{
 		{
-			name: "append remove software mfa to login policy event",
+			name: "append remove second factor to login policy event",
 			args: args{
 				iam: &IAM{
 					DefaultLoginPolicy: &LoginPolicy{
-						SoftwareMFAs: []int32{
-							int32(model.SoftwareMFATypeOTP),
+						SecondFactors: []int32{
+							int32(model.SecondFactorTypeOTP),
 						}}},
-				mfa:   &MFA{MfaType: int32(model.SoftwareMFATypeOTP)},
+				mfa:   &MFA{MfaType: int32(model.SecondFactorTypeOTP)},
 				event: &es_models.Event{},
 			},
 			result: &IAM{DefaultLoginPolicy: &LoginPolicy{
 				AllowExternalIdp:      true,
 				AllowRegister:         true,
 				AllowUsernamePassword: true,
-				SoftwareMFAs:          []int32{}}},
+				SecondFactors:         []int32{}}},
 		},
 	}
 	for _, tt := range tests {
@@ -336,15 +336,15 @@ func TestRemoveSoftwareMFAToPolicyEvent(t *testing.T) {
 				data, _ := json.Marshal(tt.args.mfa)
 				tt.args.event.Data = data
 			}
-			tt.args.iam.appendRemoveSoftwareMFAFromLoginPolicyEvent(tt.args.event)
-			if len(tt.result.DefaultLoginPolicy.SoftwareMFAs) != len(tt.args.iam.DefaultLoginPolicy.SoftwareMFAs) {
-				t.Errorf("got wrong software mfa len: expected: %v, actual: %v ", len(tt.result.DefaultLoginPolicy.SoftwareMFAs), len(tt.args.iam.DefaultLoginPolicy.SoftwareMFAs))
+			tt.args.iam.appendRemoveSecondFactorFromLoginPolicyEvent(tt.args.event)
+			if len(tt.result.DefaultLoginPolicy.SecondFactors) != len(tt.args.iam.DefaultLoginPolicy.SecondFactors) {
+				t.Errorf("got wrong second factor len: expected: %v, actual: %v ", len(tt.result.DefaultLoginPolicy.SecondFactors), len(tt.args.iam.DefaultLoginPolicy.SecondFactors))
 			}
 		})
 	}
 }
 
-func TestAppendAddHardwareMFAToPolicyEvent(t *testing.T) {
+func TestAppendAddMultiFactorToPolicyEvent(t *testing.T) {
 	type args struct {
 		iam   *IAM
 		mfa   *MFA
@@ -356,15 +356,15 @@ func TestAppendAddHardwareMFAToPolicyEvent(t *testing.T) {
 		result *IAM
 	}{
 		{
-			name: "append add hardware mfa to login policy event",
+			name: "append add mfa to login policy event",
 			args: args{
 				iam:   &IAM{DefaultLoginPolicy: &LoginPolicy{AllowExternalIdp: true, AllowRegister: true, AllowUsernamePassword: true}},
-				mfa:   &MFA{MfaType: int32(model.HardwareMFATypeU2F)},
+				mfa:   &MFA{MfaType: int32(model.MultiFactorTypeU2FWithPIN)},
 				event: &es_models.Event{},
 			},
 			result: &IAM{DefaultLoginPolicy: &LoginPolicy{
-				HardwareMFAs: []int32{
-					int32(model.HardwareMFATypeU2F),
+				MultiFactors: []int32{
+					int32(model.MultiFactorTypeU2FWithPIN),
 				}}},
 		},
 	}
@@ -374,18 +374,18 @@ func TestAppendAddHardwareMFAToPolicyEvent(t *testing.T) {
 				data, _ := json.Marshal(tt.args.mfa)
 				tt.args.event.Data = data
 			}
-			tt.args.iam.appendAddHardwareMFAToLoginPolicyEvent(tt.args.event)
-			if len(tt.result.DefaultLoginPolicy.HardwareMFAs) != len(tt.args.iam.DefaultLoginPolicy.HardwareMFAs) {
-				t.Errorf("got wrong hardware mfas len: expected: %v, actual: %v ", len(tt.result.DefaultLoginPolicy.HardwareMFAs), len(tt.args.iam.DefaultLoginPolicy.HardwareMFAs))
+			tt.args.iam.appendAddMultiFactorToLoginPolicyEvent(tt.args.event)
+			if len(tt.result.DefaultLoginPolicy.MultiFactors) != len(tt.args.iam.DefaultLoginPolicy.MultiFactors) {
+				t.Errorf("got wrong mfas len: expected: %v, actual: %v ", len(tt.result.DefaultLoginPolicy.MultiFactors), len(tt.args.iam.DefaultLoginPolicy.MultiFactors))
 			}
-			if tt.result.DefaultLoginPolicy.HardwareMFAs[0] != tt.args.mfa.MfaType {
-				t.Errorf("got wrong hardware mfa: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.HardwareMFAs[0], tt.args.mfa)
+			if tt.result.DefaultLoginPolicy.MultiFactors[0] != tt.args.mfa.MfaType {
+				t.Errorf("got wrong mfa: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.MultiFactors[0], tt.args.mfa)
 			}
 		})
 	}
 }
 
-func TestRemoveHardwareMFAToPolicyEvent(t *testing.T) {
+func TestRemoveMultiFactorToPolicyEvent(t *testing.T) {
 	type args struct {
 		iam   *IAM
 		mfa   *MFA
@@ -397,21 +397,21 @@ func TestRemoveHardwareMFAToPolicyEvent(t *testing.T) {
 		result *IAM
 	}{
 		{
-			name: "append remove hardware mfa to login policy event",
+			name: "append remove mfa to login policy event",
 			args: args{
 				iam: &IAM{
 					DefaultLoginPolicy: &LoginPolicy{
-						HardwareMFAs: []int32{
-							int32(model.HardwareMFATypeU2F),
+						MultiFactors: []int32{
+							int32(model.MultiFactorTypeU2FWithPIN),
 						}}},
-				mfa:   &MFA{MfaType: int32(model.HardwareMFATypeU2F)},
+				mfa:   &MFA{MfaType: int32(model.MultiFactorTypeU2FWithPIN)},
 				event: &es_models.Event{},
 			},
 			result: &IAM{DefaultLoginPolicy: &LoginPolicy{
 				AllowExternalIdp:      true,
 				AllowRegister:         true,
 				AllowUsernamePassword: true,
-				HardwareMFAs:          []int32{}}},
+				MultiFactors:          []int32{}}},
 		},
 	}
 	for _, tt := range tests {
@@ -420,9 +420,9 @@ func TestRemoveHardwareMFAToPolicyEvent(t *testing.T) {
 				data, _ := json.Marshal(tt.args.mfa)
 				tt.args.event.Data = data
 			}
-			tt.args.iam.appendRemoveHardwareMFAFromLoginPolicyEvent(tt.args.event)
-			if len(tt.result.DefaultLoginPolicy.HardwareMFAs) != len(tt.args.iam.DefaultLoginPolicy.HardwareMFAs) {
-				t.Errorf("got wrong hardware mfa len: expected: %v, actual: %v ", len(tt.result.DefaultLoginPolicy.HardwareMFAs), len(tt.args.iam.DefaultLoginPolicy.HardwareMFAs))
+			tt.args.iam.appendRemoveMultiFactorFromLoginPolicyEvent(tt.args.event)
+			if len(tt.result.DefaultLoginPolicy.MultiFactors) != len(tt.args.iam.DefaultLoginPolicy.MultiFactors) {
+				t.Errorf("got wrong mfa len: expected: %v, actual: %v ", len(tt.result.DefaultLoginPolicy.MultiFactors), len(tt.args.iam.DefaultLoginPolicy.MultiFactors))
 			}
 		})
 	}

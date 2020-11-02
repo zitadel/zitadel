@@ -28,8 +28,8 @@ type LoginPolicyView struct {
 	AllowUsernamePassword bool          `json:"allowUsernamePassword" gorm:"column:allow_username_password"`
 	AllowExternalIDP      bool          `json:"allowExternalIdp" gorm:"column:allow_external_idp"`
 	ForceMFA              bool          `json:"forceMFA" gorm:"column:force_mfa"`
-	SoftwareMFAs          pq.Int64Array `json:"-" gorm:"column:software_mfas"`
-	HardwareMFAs          pq.Int64Array `json:"-" gorm:"column:hardware_mfas"`
+	SecondFactors         pq.Int64Array `json:"-" gorm:"column:second_factors"`
+	MultiFactors          pq.Int64Array `json:"-" gorm:"column:multi_factors"`
 	Default               bool          `json:"-" gorm:"-"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
@@ -45,13 +45,13 @@ func LoginPolicyViewFromModel(policy *model.LoginPolicyView) *LoginPolicyView {
 		AllowExternalIDP:      policy.AllowExternalIDP,
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		ForceMFA:              policy.ForceMFA,
-		SoftwareMFAs:          softwareMFAsFromModel(policy.SoftwareMFAs),
-		HardwareMFAs:          hardwareMFAsFromModel(policy.HardwareMFAs),
+		SecondFactors:         secondFactorsFromModel(policy.SecondFactors),
+		MultiFactors:          multiFactorsFromModel(policy.MultiFactors),
 		Default:               policy.Default,
 	}
 }
 
-func softwareMFAsFromModel(mfas []model.SoftwareMFAType) []int64 {
+func secondFactorsFromModel(mfas []model.SecondFactorType) []int64 {
 	convertedMFAs := make([]int64, len(mfas))
 	for i, m := range mfas {
 		convertedMFAs[i] = int64(m)
@@ -59,7 +59,7 @@ func softwareMFAsFromModel(mfas []model.SoftwareMFAType) []int64 {
 	return convertedMFAs
 }
 
-func hardwareMFAsFromModel(mfas []model.HardwareMFAType) []int64 {
+func multiFactorsFromModel(mfas []model.MultiFactorType) []int64 {
 	convertedMFAs := make([]int64, len(mfas))
 	for i, m := range mfas {
 		convertedMFAs[i] = int64(m)
@@ -77,24 +77,24 @@ func LoginPolicyViewToModel(policy *LoginPolicyView) *model.LoginPolicyView {
 		AllowExternalIDP:      policy.AllowExternalIDP,
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		ForceMFA:              policy.ForceMFA,
-		SoftwareMFAs:          softwareMFAsToModel(policy.SoftwareMFAs),
-		HardwareMFAs:          hardwareMFAsToToModel(policy.HardwareMFAs),
+		SecondFactors:         secondFactorsToModel(policy.SecondFactors),
+		MultiFactors:          multiFactorsToToModel(policy.MultiFactors),
 		Default:               policy.Default,
 	}
 }
 
-func softwareMFAsToModel(mfas []int64) []model.SoftwareMFAType {
-	convertedMFAs := make([]model.SoftwareMFAType, len(mfas))
+func secondFactorsToModel(mfas []int64) []model.SecondFactorType {
+	convertedMFAs := make([]model.SecondFactorType, len(mfas))
 	for i, m := range mfas {
-		convertedMFAs[i] = model.SoftwareMFAType(m)
+		convertedMFAs[i] = model.SecondFactorType(m)
 	}
 	return convertedMFAs
 }
 
-func hardwareMFAsToToModel(mfas []int64) []model.HardwareMFAType {
-	convertedMFAs := make([]model.HardwareMFAType, len(mfas))
+func multiFactorsToToModel(mfas []int64) []model.MultiFactorType {
+	convertedMFAs := make([]model.MultiFactorType, len(mfas))
 	for i, m := range mfas {
-		convertedMFAs[i] = model.HardwareMFAType(m)
+		convertedMFAs[i] = model.MultiFactorType(m)
 	}
 	return convertedMFAs
 }
@@ -109,24 +109,24 @@ func (p *LoginPolicyView) AppendEvent(event *models.Event) (err error) {
 		err = p.SetData(event)
 	case es_model.LoginPolicyChanged, org_es_model.LoginPolicyChanged:
 		err = p.SetData(event)
-	case es_model.LoginPolicySoftwareMFAAdded, org_es_model.LoginPolicySoftwareMFAAdded:
+	case es_model.LoginPolicySecondFactorAdded, org_es_model.LoginPolicySecondFactorAdded:
 		mfa := new(es_model.MFA)
 		err := mfa.SetData(event)
 		if err != nil {
 			return err
 		}
-		p.SoftwareMFAs = append(p.SoftwareMFAs, int64(mfa.MfaType))
-	case es_model.LoginPolicySoftwareMFARemoved, org_es_model.LoginPolicySoftwareMFARemoved:
-		err = p.removeSoftwareMFA(event)
-	case es_model.LoginPolicyHardwareMFAAdded, org_es_model.LoginPolicyHardwareMFAAdded:
+		p.SecondFactors = append(p.SecondFactors, int64(mfa.MfaType))
+	case es_model.LoginPolicySecondFactorRemoved, org_es_model.LoginPolicySecondFactorRemoved:
+		err = p.removeSecondFactor(event)
+	case es_model.LoginPolicyMultiFactorAdded, org_es_model.LoginPolicyMultiFactorAdded:
 		mfa := new(es_model.MFA)
 		err := mfa.SetData(event)
 		if err != nil {
 			return err
 		}
-		p.HardwareMFAs = append(p.HardwareMFAs, int64(mfa.MfaType))
-	case es_model.LoginPolicyHardwareMFARemoved, org_es_model.LoginPolicyHardwareMFARemoved:
-		err = p.removeHardwareMFA(event)
+		p.MultiFactors = append(p.MultiFactors, int64(mfa.MfaType))
+	case es_model.LoginPolicyMultiFactorRemoved, org_es_model.LoginPolicyMultiFactorRemoved:
+		err = p.removeMultiFactor(event)
 	}
 	return err
 }
@@ -143,34 +143,34 @@ func (r *LoginPolicyView) SetData(event *models.Event) error {
 	return nil
 }
 
-func (p *LoginPolicyView) removeSoftwareMFA(event *models.Event) error {
+func (p *LoginPolicyView) removeSecondFactor(event *models.Event) error {
 	mfa := new(es_model.MFA)
 	err := mfa.SetData(event)
 	if err != nil {
 		return err
 	}
-	for i := len(p.SoftwareMFAs) - 1; i >= 0; i-- {
-		if p.SoftwareMFAs[i] == int64(mfa.MfaType) {
-			copy(p.SoftwareMFAs[i:], p.SoftwareMFAs[i+1:])
-			p.SoftwareMFAs[len(p.SoftwareMFAs)-1] = 0
-			p.SoftwareMFAs = p.SoftwareMFAs[:len(p.SoftwareMFAs)-1]
+	for i := len(p.SecondFactors) - 1; i >= 0; i-- {
+		if p.SecondFactors[i] == int64(mfa.MfaType) {
+			copy(p.SecondFactors[i:], p.SecondFactors[i+1:])
+			p.SecondFactors[len(p.SecondFactors)-1] = 0
+			p.SecondFactors = p.SecondFactors[:len(p.SecondFactors)-1]
 			return nil
 		}
 	}
 	return nil
 }
 
-func (p *LoginPolicyView) removeHardwareMFA(event *models.Event) error {
+func (p *LoginPolicyView) removeMultiFactor(event *models.Event) error {
 	mfa := new(es_model.MFA)
 	err := mfa.SetData(event)
 	if err != nil {
 		return err
 	}
-	for i := len(p.HardwareMFAs) - 1; i >= 0; i-- {
-		if p.HardwareMFAs[i] == int64(mfa.MfaType) {
-			copy(p.HardwareMFAs[i:], p.HardwareMFAs[i+1:])
-			p.HardwareMFAs[len(p.HardwareMFAs)-1] = 0
-			p.HardwareMFAs = p.HardwareMFAs[:len(p.HardwareMFAs)-1]
+	for i := len(p.MultiFactors) - 1; i >= 0; i-- {
+		if p.MultiFactors[i] == int64(mfa.MfaType) {
+			copy(p.MultiFactors[i:], p.MultiFactors[i+1:])
+			p.MultiFactors[len(p.MultiFactors)-1] = 0
+			p.MultiFactors = p.MultiFactors[:len(p.MultiFactors)-1]
 			return nil
 		}
 	}

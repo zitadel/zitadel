@@ -297,42 +297,42 @@ func (repo *IAMRepository) RemoveIDPProviderFromLoginPolicy(ctx context.Context,
 	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
 }
 
-func (repo *IAMRepository) SearchDefaultSoftwareMFAs(ctx context.Context) (*iam_model.SoftwareMFASearchResponse, error) {
+func (repo *IAMRepository) SearchDefaultSecondFactors(ctx context.Context) (*iam_model.SecondFactorsSearchResponse, error) {
 	policy, err := repo.GetDefaultLoginPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &iam_model.SoftwareMFASearchResponse{
-		TotalResult: uint64(len(policy.SoftwareMFAs)),
-		Result:      policy.SoftwareMFAs,
+	return &iam_model.SecondFactorsSearchResponse{
+		TotalResult: uint64(len(policy.SecondFactors)),
+		Result:      policy.SecondFactors,
 	}, nil
 }
 
-func (repo *IAMRepository) AddSoftwareMFAToLoginPolicy(ctx context.Context, mfa iam_model.SoftwareMFAType) (iam_model.SoftwareMFAType, error) {
-	return repo.IAMEventstore.AddSoftwareMFAToLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
+func (repo *IAMRepository) AddSecondFactorToLoginPolicy(ctx context.Context, mfa iam_model.SecondFactorType) (iam_model.SecondFactorType, error) {
+	return repo.IAMEventstore.AddSecondFactorToLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
 }
 
-func (repo *IAMRepository) RemoveSoftwareMFAFromLoginPolicy(ctx context.Context, mfa iam_model.SoftwareMFAType) error {
-	return repo.IAMEventstore.RemoveSoftwareMFAFromLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
+func (repo *IAMRepository) RemoveSecondFactorFromLoginPolicy(ctx context.Context, mfa iam_model.SecondFactorType) error {
+	return repo.IAMEventstore.RemoveSecondFactorFromLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
 }
 
-func (repo *IAMRepository) SearchDefaultHardwareMFAs(ctx context.Context) (*iam_model.HardwareMFASearchResponse, error) {
+func (repo *IAMRepository) SearchDefaultMultiFactors(ctx context.Context) (*iam_model.MultiFactorsSearchResponse, error) {
 	policy, err := repo.GetDefaultLoginPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &iam_model.HardwareMFASearchResponse{
-		TotalResult: uint64(len(policy.HardwareMFAs)),
-		Result:      policy.HardwareMFAs,
+	return &iam_model.MultiFactorsSearchResponse{
+		TotalResult: uint64(len(policy.MultiFactors)),
+		Result:      policy.MultiFactors,
 	}, nil
 }
 
-func (repo *IAMRepository) AddHardwareMFAToLoginPolicy(ctx context.Context, mfa iam_model.HardwareMFAType) (iam_model.HardwareMFAType, error) {
-	return repo.IAMEventstore.AddHardwareMFAToLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
+func (repo *IAMRepository) AddMultiFactorToLoginPolicy(ctx context.Context, mfa iam_model.MultiFactorType) (iam_model.MultiFactorType, error) {
+	return repo.IAMEventstore.AddMultiFactorToLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
 }
 
-func (repo *IAMRepository) RemoveHardwareMFAFromLoginPolicy(ctx context.Context, mfa iam_model.HardwareMFAType) error {
-	return repo.IAMEventstore.RemoveHardwareMFAFromLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
+func (repo *IAMRepository) RemoveMultiFactorFromLoginPolicy(ctx context.Context, mfa iam_model.MultiFactorType) error {
+	return repo.IAMEventstore.RemoveMultiFactorFromLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
 }
 
 func (repo *IAMRepository) GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error) {

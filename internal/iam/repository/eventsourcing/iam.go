@@ -346,7 +346,7 @@ func LoginPolicyIDPProviderRemovedAggregate(ctx context.Context, aggCreator *es_
 	return agg.AppendEvent(model.LoginPolicyIDPProviderRemoved, provider)
 }
 
-func LoginPolicySoftwareMFAAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, mfa *model.MFA) func(ctx context.Context) (*es_models.Aggregate, error) {
+func LoginPolicySecondFactorAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, mfa *model.MFA) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if mfa == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-4Gm9s", "Errors.Internal")
@@ -359,13 +359,13 @@ func LoginPolicySoftwareMFAAddedAggregate(aggCreator *es_models.AggregateCreator
 			AggregateTypeFilter(model.IAMAggregate).
 			AggregateIDFilter(existing.AggregateID)
 
-		validation := checkExistingLoginPolicySoftwareMFAValidation(mfa.MfaType)
+		validation := checkExistingLoginPolicySecondFactorValidation(mfa.MfaType)
 		agg.SetPrecondition(validationQuery, validation)
-		return agg.AppendEvent(model.LoginPolicySoftwareMFAAdded, mfa)
+		return agg.AppendEvent(model.LoginPolicySecondFactorAdded, mfa)
 	}
 }
 
-func LoginPolicySoftwareMFARemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, mfa *model.MFA) func(ctx context.Context) (*es_models.Aggregate, error) {
+func LoginPolicySecondFactorRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, mfa *model.MFA) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if mfa == nil || existing == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5Bm9s", "Errors.Internal")
@@ -374,11 +374,11 @@ func LoginPolicySoftwareMFARemovedAggregate(aggCreator *es_models.AggregateCreat
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.LoginPolicySoftwareMFARemoved, mfa)
+		return agg.AppendEvent(model.LoginPolicySecondFactorRemoved, mfa)
 	}
 }
 
-func LoginPolicyHardwareMFAAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, mfa *model.MFA) func(ctx context.Context) (*es_models.Aggregate, error) {
+func LoginPolicyMultiFactorAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, mfa *model.MFA) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if mfa == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-4Gm9s", "Errors.Internal")
@@ -391,13 +391,13 @@ func LoginPolicyHardwareMFAAddedAggregate(aggCreator *es_models.AggregateCreator
 			AggregateTypeFilter(model.IAMAggregate).
 			AggregateIDFilter(existing.AggregateID)
 
-		validation := checkExistingLoginPolicyHardwareMFAValidation(mfa.MfaType)
+		validation := checkExistingLoginPolicyMultiFactorValidation(mfa.MfaType)
 		agg.SetPrecondition(validationQuery, validation)
-		return agg.AppendEvent(model.LoginPolicyHardwareMFAAdded, mfa)
+		return agg.AppendEvent(model.LoginPolicyMultiFactorAdded, mfa)
 	}
 }
 
-func LoginPolicyHardwareMFARemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, mfa *model.MFA) func(ctx context.Context) (*es_models.Aggregate, error) {
+func LoginPolicyMultiFactorRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, mfa *model.MFA) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if mfa == nil || existing == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-6Mso9", "Errors.Internal")
@@ -406,7 +406,7 @@ func LoginPolicyHardwareMFARemovedAggregate(aggCreator *es_models.AggregateCreat
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.LoginPolicyHardwareMFARemoved, mfa)
+		return agg.AppendEvent(model.LoginPolicyMultiFactorRemoved, mfa)
 	}
 }
 
@@ -678,19 +678,19 @@ func checkExistingLoginPolicyIDPProviderValidation(idpConfigID string) func(...*
 	}
 }
 
-func checkExistingLoginPolicySoftwareMFAValidation(mfaType int32) func(...*es_models.Event) error {
+func checkExistingLoginPolicySecondFactorValidation(mfaType int32) func(...*es_models.Event) error {
 	return func(events ...*es_models.Event) error {
 		mfas := make([]int32, 0)
 		for _, event := range events {
 			switch event.Type {
-			case model.LoginPolicySoftwareMFAAdded:
+			case model.LoginPolicySecondFactorAdded:
 				idp := new(model.MFA)
 				err := idp.SetData(event)
 				if err != nil {
 					return err
 				}
 				mfas = append(mfas, idp.MfaType)
-			case model.LoginPolicySoftwareMFARemoved:
+			case model.LoginPolicySecondFactorRemoved:
 				mfa := new(model.MFA)
 				err := mfa.SetData(event)
 				if err != nil {
@@ -715,19 +715,19 @@ func checkExistingLoginPolicySoftwareMFAValidation(mfaType int32) func(...*es_mo
 	}
 }
 
-func checkExistingLoginPolicyHardwareMFAValidation(mfaType int32) func(...*es_models.Event) error {
+func checkExistingLoginPolicyMultiFactorValidation(mfaType int32) func(...*es_models.Event) error {
 	return func(events ...*es_models.Event) error {
 		mfas := make([]int32, 0)
 		for _, event := range events {
 			switch event.Type {
-			case model.LoginPolicyHardwareMFAAdded:
+			case model.LoginPolicyMultiFactorAdded:
 				idp := new(model.MFA)
 				err := idp.SetData(event)
 				if err != nil {
 					return err
 				}
 				mfas = append(mfas, idp.MfaType)
-			case model.LoginPolicyHardwareMFARemoved:
+			case model.LoginPolicyMultiFactorRemoved:
 				mfa := new(model.MFA)
 				err := mfa.SetData(event)
 				if err != nil {

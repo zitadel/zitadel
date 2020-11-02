@@ -4,11 +4,11 @@ import (
 	"github.com/caos/zitadel/internal/model"
 )
 
-type SoftwareMFASearchRequest struct {
+type SecondFactorsSearchRequest struct {
 	Queries []*MFASearchQuery
 }
 
-type HardwareMFASearchRequest struct {
+type MultiFactorsSearchRequest struct {
 	Offset  uint64
 	Limit   uint64
 	Asc     bool
@@ -28,20 +28,20 @@ const (
 	MFASearchKeyAggregateID
 )
 
-type SoftwareMFASearchResponse struct {
+type SecondFactorsSearchResponse struct {
 	TotalResult uint64
-	Result      []SoftwareMFAType
+	Result      []SecondFactorType
 }
 
-type HardwareMFASearchResponse struct {
+type MultiFactorsSearchResponse struct {
 	TotalResult uint64
-	Result      []HardwareMFAType
+	Result      []MultiFactorType
 }
 
-func (r *SoftwareMFASearchRequest) AppendAggregateIDQuery(aggregateID string) {
+func (r *SecondFactorsSearchRequest) AppendAggregateIDQuery(aggregateID string) {
 	r.Queries = append(r.Queries, &MFASearchQuery{Key: MFASearchKeyAggregateID, Method: model.SearchMethodEquals, Value: aggregateID})
 }
 
-func (r *HardwareMFASearchRequest) AppendAggregateIDQuery(aggregateID string) {
+func (r *MultiFactorsSearchRequest) AppendAggregateIDQuery(aggregateID string) {
 	r.Queries = append(r.Queries, &MFASearchQuery{Key: MFASearchKeyAggregateID, Method: model.SearchMethodEquals, Value: aggregateID})
 }

@@ -113,11 +113,11 @@ func (u *UserView) MfaTypesSetupPossible(level req_model.MFALevel, policy *iam_m
 	switch level {
 	default:
 		fallthrough
-	case req_model.MFALevelSoftware:
-		if policy.SoftwareMFAs != nil && len(policy.SoftwareMFAs) != 0 {
-			for _, mfaType := range policy.SoftwareMFAs {
+	case req_model.MFALevelSecondFactor:
+		if policy.SecondFactors != nil && len(policy.SecondFactors) != 0 {
+			for _, mfaType := range policy.SecondFactors {
 				switch mfaType {
-				case iam_model.SoftwareMFATypeOTP:
+				case iam_model.SecondFactorTypeOTP:
 					if u.OTPState != MfaStateReady {
 						types = append(types, req_model.MFATypeOTP)
 					}
@@ -127,11 +127,11 @@ func (u *UserView) MfaTypesSetupPossible(level req_model.MFALevel, policy *iam_m
 
 		//PLANNED: add sms
 		fallthrough
-	case req_model.MFALevelHardware:
-		if policy.HardwareMFAs != nil && len(policy.HardwareMFAs) != 0 {
-			for _, mfaType := range policy.HardwareMFAs {
+	case req_model.MFALevelMultiFactor:
+		if policy.MultiFactors != nil && len(policy.MultiFactors) != 0 {
+			for _, mfaType := range policy.MultiFactors {
 				switch mfaType {
-				case iam_model.HardwareMFATypeU2F:
+				case iam_model.MultiFactorTypeU2FWithPIN:
 					// TODO: Check if not set up already
 					// types = append(types, req_model.MFATypeU2F)
 				}
@@ -147,11 +147,11 @@ func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.L
 	switch level {
 	default:
 		fallthrough
-	case req_model.MFALevelSoftware:
-		if policy.SoftwareMFAs != nil && len(policy.SoftwareMFAs) != 0 {
-			for _, mfaType := range policy.SoftwareMFAs {
+	case req_model.MFALevelSecondFactor:
+		if policy.SecondFactors != nil && len(policy.SecondFactors) != 0 {
+			for _, mfaType := range policy.SecondFactors {
 				switch mfaType {
-				case iam_model.SoftwareMFATypeOTP:
+				case iam_model.SecondFactorTypeOTP:
 					if u.OTPState == MfaStateReady {
 						types = append(types, req_model.MFATypeOTP)
 					}
@@ -160,11 +160,11 @@ func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.L
 		}
 		//PLANNED: add sms
 		fallthrough
-	case req_model.MFALevelHardware:
-		if policy.HardwareMFAs != nil && len(policy.HardwareMFAs) != 0 {
-			for _, mfaType := range policy.HardwareMFAs {
+	case req_model.MFALevelMultiFactor:
+		if policy.MultiFactors != nil && len(policy.MultiFactors) != 0 {
+			for _, mfaType := range policy.MultiFactors {
 				switch mfaType {
-				case iam_model.HardwareMFATypeU2F:
+				case iam_model.MultiFactorTypeU2FWithPIN:
 					// TODO: Check if not set up already
 					// types = append(types, req_model.MFATypeU2F)
 				}
@@ -180,12 +180,12 @@ func (u *UserView) HasRequiredOrgMFALevel(policy *iam_model.LoginPolicyView) boo
 		return true
 	}
 	switch u.MfaMaxSetUp {
-	case req_model.MFALevelSoftware:
-		if policy.SoftwareMFAs == nil || len(policy.SoftwareMFAs) == 0 {
+	case req_model.MFALevelSecondFactor:
+		if policy.SecondFactors == nil || len(policy.SecondFactors) == 0 {
 			return false
 		}
 		return true
-	case req_model.MFALevelHardware:
+	case req_model.MFALevelMultiFactor:
 		return true
 	default:
 		return false

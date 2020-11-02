@@ -316,6 +316,6 @@ func (u *UserView) ComputeObject() {
 		u.MfaMaxSetUp = int32(req_model.MFALevelNotSetUp)
 	}
 	if u.OTPState == int32(model.MfaStateReady) {
-		u.MfaMaxSetUp = int32(req_model.MFALevelSoftware)
+		u.MfaMaxSetUp = int32(req_model.MFALevelSecondFactor)
 	}
 }

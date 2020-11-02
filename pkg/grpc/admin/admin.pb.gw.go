@@ -1646,26 +1646,26 @@ func local_request_AdminService_RemoveIdpProviderFromDefaultLoginPolicy_0(ctx co
 
 }
 
-func request_AdminService_GetDefaultLoginPolicySoftwareMFAs_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_AdminService_GetDefaultLoginPolicySecondFactors_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq empty.Empty
 	var metadata runtime.ServerMetadata
 
-	msg, err := client.GetDefaultLoginPolicySoftwareMFAs(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.GetDefaultLoginPolicySecondFactors(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_AdminService_GetDefaultLoginPolicySoftwareMFAs_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_AdminService_GetDefaultLoginPolicySecondFactors_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq empty.Empty
 	var metadata runtime.ServerMetadata
 
-	msg, err := server.GetDefaultLoginPolicySoftwareMFAs(ctx, &protoReq)
+	msg, err := server.GetDefaultLoginPolicySecondFactors(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
-func request_AdminService_AddSoftwareMFAToDefaultLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SoftwareMFA
+func request_AdminService_AddSecondFactorToDefaultLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq SecondFactor
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -1676,13 +1676,13 @@ func request_AdminService_AddSoftwareMFAToDefaultLoginPolicy_0(ctx context.Conte
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.AddSoftwareMFAToDefaultLoginPolicy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.AddSecondFactorToDefaultLoginPolicy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_AdminService_AddSoftwareMFAToDefaultLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SoftwareMFA
+func local_request_AdminService_AddSecondFactorToDefaultLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq SecondFactor
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -1693,13 +1693,13 @@ func local_request_AdminService_AddSoftwareMFAToDefaultLoginPolicy_0(ctx context
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.AddSoftwareMFAToDefaultLoginPolicy(ctx, &protoReq)
+	msg, err := server.AddSecondFactorToDefaultLoginPolicy(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
-func request_AdminService_RemoveSoftwareMFAFromDefaultLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SoftwareMFA
+func request_AdminService_RemoveSecondFactorFromDefaultLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq SecondFactor
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1710,26 +1710,26 @@ func request_AdminService_RemoveSoftwareMFAFromDefaultLoginPolicy_0(ctx context.
 		_   = err
 	)
 
-	val, ok = pathParams["mfa"]
+	val, ok = pathParams["second_factor"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "mfa")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "second_factor")
 	}
 
-	e, err = runtime.Enum(val, SoftwareMFAType_value)
+	e, err = runtime.Enum(val, SecondFactorType_value)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "mfa", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "second_factor", err)
 	}
 
-	protoReq.Mfa = SoftwareMFAType(e)
+	protoReq.SecondFactor = SecondFactorType(e)
 
-	msg, err := client.RemoveSoftwareMFAFromDefaultLoginPolicy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.RemoveSecondFactorFromDefaultLoginPolicy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_AdminService_RemoveSoftwareMFAFromDefaultLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SoftwareMFA
+func local_request_AdminService_RemoveSecondFactorFromDefaultLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq SecondFactor
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1740,44 +1740,44 @@ func local_request_AdminService_RemoveSoftwareMFAFromDefaultLoginPolicy_0(ctx co
 		_   = err
 	)
 
-	val, ok = pathParams["mfa"]
+	val, ok = pathParams["second_factor"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "mfa")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "second_factor")
 	}
 
-	e, err = runtime.Enum(val, SoftwareMFAType_value)
+	e, err = runtime.Enum(val, SecondFactorType_value)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "mfa", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "second_factor", err)
 	}
 
-	protoReq.Mfa = SoftwareMFAType(e)
+	protoReq.SecondFactor = SecondFactorType(e)
 
-	msg, err := server.RemoveSoftwareMFAFromDefaultLoginPolicy(ctx, &protoReq)
+	msg, err := server.RemoveSecondFactorFromDefaultLoginPolicy(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
-func request_AdminService_GetDefaultLoginPolicyHardwareMFAs_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_AdminService_GetDefaultLoginPolicyMultiFactors_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq empty.Empty
 	var metadata runtime.ServerMetadata
 
-	msg, err := client.GetDefaultLoginPolicyHardwareMFAs(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.GetDefaultLoginPolicyMultiFactors(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_AdminService_GetDefaultLoginPolicyHardwareMFAs_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_AdminService_GetDefaultLoginPolicyMultiFactors_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq empty.Empty
 	var metadata runtime.ServerMetadata
 
-	msg, err := server.GetDefaultLoginPolicyHardwareMFAs(ctx, &protoReq)
+	msg, err := server.GetDefaultLoginPolicyMultiFactors(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
-func request_AdminService_AddHardwareMFAToDefaultLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq HardwareMFA
+func request_AdminService_AddMultiFactorToDefaultLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq MultiFactor
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -1788,13 +1788,13 @@ func request_AdminService_AddHardwareMFAToDefaultLoginPolicy_0(ctx context.Conte
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.AddHardwareMFAToDefaultLoginPolicy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.AddMultiFactorToDefaultLoginPolicy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_AdminService_AddHardwareMFAToDefaultLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq HardwareMFA
+func local_request_AdminService_AddMultiFactorToDefaultLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq MultiFactor
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -1805,13 +1805,13 @@ func local_request_AdminService_AddHardwareMFAToDefaultLoginPolicy_0(ctx context
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.AddHardwareMFAToDefaultLoginPolicy(ctx, &protoReq)
+	msg, err := server.AddMultiFactorToDefaultLoginPolicy(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
-func request_AdminService_RemoveHardwareMFAFromDefaultLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq HardwareMFA
+func request_AdminService_RemoveMultiFactorFromDefaultLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq MultiFactor
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1822,26 +1822,26 @@ func request_AdminService_RemoveHardwareMFAFromDefaultLoginPolicy_0(ctx context.
 		_   = err
 	)
 
-	val, ok = pathParams["mfa"]
+	val, ok = pathParams["multi_factor"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "mfa")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "multi_factor")
 	}
 
-	e, err = runtime.Enum(val, HardwareMFAType_value)
+	e, err = runtime.Enum(val, MultiFactorType_value)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "mfa", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "multi_factor", err)
 	}
 
-	protoReq.Mfa = HardwareMFAType(e)
+	protoReq.MultiFactor = MultiFactorType(e)
 
-	msg, err := client.RemoveHardwareMFAFromDefaultLoginPolicy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.RemoveMultiFactorFromDefaultLoginPolicy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_AdminService_RemoveHardwareMFAFromDefaultLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq HardwareMFA
+func local_request_AdminService_RemoveMultiFactorFromDefaultLoginPolicy_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq MultiFactor
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1852,20 +1852,20 @@ func local_request_AdminService_RemoveHardwareMFAFromDefaultLoginPolicy_0(ctx co
 		_   = err
 	)
 
-	val, ok = pathParams["mfa"]
+	val, ok = pathParams["multi_factor"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "mfa")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "multi_factor")
 	}
 
-	e, err = runtime.Enum(val, HardwareMFAType_value)
+	e, err = runtime.Enum(val, MultiFactorType_value)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "mfa", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "multi_factor", err)
 	}
 
-	protoReq.Mfa = HardwareMFAType(e)
+	protoReq.MultiFactor = MultiFactorType(e)
 
-	msg, err := server.RemoveHardwareMFAFromDefaultLoginPolicy(ctx, &protoReq)
+	msg, err := server.RemoveMultiFactorFromDefaultLoginPolicy(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -2771,7 +2771,7 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 
 	})
 
-	mux.Handle("GET", pattern_AdminService_GetDefaultLoginPolicySoftwareMFAs_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_AdminService_GetDefaultLoginPolicySecondFactors_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -2780,18 +2780,18 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AdminService_GetDefaultLoginPolicySoftwareMFAs_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_AdminService_GetDefaultLoginPolicySecondFactors_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_GetDefaultLoginPolicySoftwareMFAs_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_GetDefaultLoginPolicySecondFactors_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_AdminService_AddSoftwareMFAToDefaultLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_AdminService_AddSecondFactorToDefaultLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -2800,18 +2800,18 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AdminService_AddSoftwareMFAToDefaultLoginPolicy_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_AdminService_AddSecondFactorToDefaultLoginPolicy_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_AddSoftwareMFAToDefaultLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_AddSecondFactorToDefaultLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("DELETE", pattern_AdminService_RemoveSoftwareMFAFromDefaultLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("DELETE", pattern_AdminService_RemoveSecondFactorFromDefaultLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -2820,18 +2820,18 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AdminService_RemoveSoftwareMFAFromDefaultLoginPolicy_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_AdminService_RemoveSecondFactorFromDefaultLoginPolicy_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_RemoveSoftwareMFAFromDefaultLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_RemoveSecondFactorFromDefaultLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_AdminService_GetDefaultLoginPolicyHardwareMFAs_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_AdminService_GetDefaultLoginPolicyMultiFactors_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -2840,18 +2840,18 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AdminService_GetDefaultLoginPolicyHardwareMFAs_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_AdminService_GetDefaultLoginPolicyMultiFactors_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_GetDefaultLoginPolicyHardwareMFAs_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_GetDefaultLoginPolicyMultiFactors_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_AdminService_AddHardwareMFAToDefaultLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_AdminService_AddMultiFactorToDefaultLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -2860,18 +2860,18 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AdminService_AddHardwareMFAToDefaultLoginPolicy_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_AdminService_AddMultiFactorToDefaultLoginPolicy_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_AddHardwareMFAToDefaultLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_AddMultiFactorToDefaultLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("DELETE", pattern_AdminService_RemoveHardwareMFAFromDefaultLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("DELETE", pattern_AdminService_RemoveMultiFactorFromDefaultLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -2880,14 +2880,14 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AdminService_RemoveHardwareMFAFromDefaultLoginPolicy_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_AdminService_RemoveMultiFactorFromDefaultLoginPolicy_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_RemoveHardwareMFAFromDefaultLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_RemoveMultiFactorFromDefaultLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -3792,7 +3792,7 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 
 	})
 
-	mux.Handle("GET", pattern_AdminService_GetDefaultLoginPolicySoftwareMFAs_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_AdminService_GetDefaultLoginPolicySecondFactors_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -3801,18 +3801,18 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AdminService_GetDefaultLoginPolicySoftwareMFAs_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_AdminService_GetDefaultLoginPolicySecondFactors_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_GetDefaultLoginPolicySoftwareMFAs_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_GetDefaultLoginPolicySecondFactors_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_AdminService_AddSoftwareMFAToDefaultLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_AdminService_AddSecondFactorToDefaultLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -3821,18 +3821,18 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AdminService_AddSoftwareMFAToDefaultLoginPolicy_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_AdminService_AddSecondFactorToDefaultLoginPolicy_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_AddSoftwareMFAToDefaultLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_AddSecondFactorToDefaultLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("DELETE", pattern_AdminService_RemoveSoftwareMFAFromDefaultLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("DELETE", pattern_AdminService_RemoveSecondFactorFromDefaultLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -3841,18 +3841,18 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AdminService_RemoveSoftwareMFAFromDefaultLoginPolicy_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_AdminService_RemoveSecondFactorFromDefaultLoginPolicy_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_RemoveSoftwareMFAFromDefaultLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_RemoveSecondFactorFromDefaultLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_AdminService_GetDefaultLoginPolicyHardwareMFAs_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_AdminService_GetDefaultLoginPolicyMultiFactors_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -3861,18 +3861,18 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AdminService_GetDefaultLoginPolicyHardwareMFAs_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_AdminService_GetDefaultLoginPolicyMultiFactors_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_GetDefaultLoginPolicyHardwareMFAs_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_GetDefaultLoginPolicyMultiFactors_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_AdminService_AddHardwareMFAToDefaultLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_AdminService_AddMultiFactorToDefaultLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -3881,18 +3881,18 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AdminService_AddHardwareMFAToDefaultLoginPolicy_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_AdminService_AddMultiFactorToDefaultLoginPolicy_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_AddHardwareMFAToDefaultLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_AddMultiFactorToDefaultLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("DELETE", pattern_AdminService_RemoveHardwareMFAFromDefaultLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("DELETE", pattern_AdminService_RemoveMultiFactorFromDefaultLoginPolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -3901,14 +3901,14 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AdminService_RemoveHardwareMFAFromDefaultLoginPolicy_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_AdminService_RemoveMultiFactorFromDefaultLoginPolicy_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_RemoveHardwareMFAFromDefaultLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_RemoveMultiFactorFromDefaultLoginPolicy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -4110,17 +4110,17 @@ var (
 
 	pattern_AdminService_RemoveIdpProviderFromDefaultLoginPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"policies", "login", "idpproviders", "idp_config_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_GetDefaultLoginPolicySoftwareMFAs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"policies", "login", "mfas", "software", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_AdminService_GetDefaultLoginPolicySecondFactors_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"policies", "login", "secondfactors", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_AddSoftwareMFAToDefaultLoginPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"policies", "login", "mfas", "software"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_AdminService_AddSecondFactorToDefaultLoginPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "login", "secondfactors"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_RemoveSoftwareMFAFromDefaultLoginPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"policies", "login", "mfas", "software", "mfa"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_AdminService_RemoveSecondFactorFromDefaultLoginPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"policies", "login", "secondfactors", "second_factor"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_GetDefaultLoginPolicyHardwareMFAs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"policies", "login", "mfas", "hardware", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_AdminService_GetDefaultLoginPolicyMultiFactors_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"policies", "login", "multifactors", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_AddHardwareMFAToDefaultLoginPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"policies", "login", "mfas", "hardware"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_AdminService_AddMultiFactorToDefaultLoginPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "login", "multifactors"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_RemoveHardwareMFAFromDefaultLoginPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"policies", "login", "mfas", "hardware", "mfa"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_AdminService_RemoveMultiFactorFromDefaultLoginPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"policies", "login", "multifactors", "multi_factor"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_AdminService_GetDefaultPasswordComplexityPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "password", "complexity"}, "", runtime.AssumeColonVerbOpt(true)))
 
@@ -4210,17 +4210,17 @@ var (
 
 	forward_AdminService_RemoveIdpProviderFromDefaultLoginPolicy_0 = runtime.ForwardResponseMessage
 
-	forward_AdminService_GetDefaultLoginPolicySoftwareMFAs_0 = runtime.ForwardResponseMessage
+	forward_AdminService_GetDefaultLoginPolicySecondFactors_0 = runtime.ForwardResponseMessage
 
-	forward_AdminService_AddSoftwareMFAToDefaultLoginPolicy_0 = runtime.ForwardResponseMessage
+	forward_AdminService_AddSecondFactorToDefaultLoginPolicy_0 = runtime.ForwardResponseMessage
 
-	forward_AdminService_RemoveSoftwareMFAFromDefaultLoginPolicy_0 = runtime.ForwardResponseMessage
+	forward_AdminService_RemoveSecondFactorFromDefaultLoginPolicy_0 = runtime.ForwardResponseMessage
 
-	forward_AdminService_GetDefaultLoginPolicyHardwareMFAs_0 = runtime.ForwardResponseMessage
+	forward_AdminService_GetDefaultLoginPolicyMultiFactors_0 = runtime.ForwardResponseMessage
 
-	forward_AdminService_AddHardwareMFAToDefaultLoginPolicy_0 = runtime.ForwardResponseMessage
+	forward_AdminService_AddMultiFactorToDefaultLoginPolicy_0 = runtime.ForwardResponseMessage
 
-	forward_AdminService_RemoveHardwareMFAFromDefaultLoginPolicy_0 = runtime.ForwardResponseMessage
+	forward_AdminService_RemoveMultiFactorFromDefaultLoginPolicy_0 = runtime.ForwardResponseMessage
 
 	forward_AdminService_GetDefaultPasswordComplexityPolicy_0 = runtime.ForwardResponseMessage
 

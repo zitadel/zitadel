@@ -53,8 +53,8 @@ type VerificationLifetimes struct {
 	PasswordCheck      types.Duration
 	ExternalLoginCheck types.Duration
 	MfaInitSkip        types.Duration
-	MfaSoftwareCheck   types.Duration
-	MfaHardwareCheck   types.Duration
+	SecondFactorCheck  types.Duration
+	MultiFactorCheck   types.Duration
 }
 
 type DomainVerification struct {

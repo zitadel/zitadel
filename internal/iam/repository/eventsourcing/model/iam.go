@@ -168,14 +168,14 @@ func (i *IAM) AppendEvent(event *es_models.Event) (err error) {
 		return i.appendAddIDPProviderToLoginPolicyEvent(event)
 	case LoginPolicyIDPProviderRemoved:
 		return i.appendRemoveIDPProviderFromLoginPolicyEvent(event)
-	case LoginPolicySoftwareMFAAdded:
-		return i.appendAddSoftwareMFAToLoginPolicyEvent(event)
-	case LoginPolicySoftwareMFARemoved:
-		return i.appendRemoveSoftwareMFAFromLoginPolicyEvent(event)
-	case LoginPolicyHardwareMFAAdded:
-		return i.appendAddHardwareMFAToLoginPolicyEvent(event)
-	case LoginPolicyHardwareMFARemoved:
-		return i.appendRemoveHardwareMFAFromLoginPolicyEvent(event)
+	case LoginPolicySecondFactorAdded:
+		return i.appendAddSecondFactorToLoginPolicyEvent(event)
+	case LoginPolicySecondFactorRemoved:
+		return i.appendRemoveSecondFactorFromLoginPolicyEvent(event)
+	case LoginPolicyMultiFactorAdded:
+		return i.appendAddMultiFactorToLoginPolicyEvent(event)
+	case LoginPolicyMultiFactorRemoved:
+		return i.appendRemoveMultiFactorFromLoginPolicyEvent(event)
 	case LabelPolicyAdded:
 		return i.appendAddLabelPolicyEvent(event)
 	case LabelPolicyChanged:

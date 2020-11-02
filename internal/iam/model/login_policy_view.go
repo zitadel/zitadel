@@ -11,8 +11,8 @@ type LoginPolicyView struct {
 	AllowRegister         bool
 	AllowExternalIDP      bool
 	ForceMFA              bool
-	SoftwareMFAs          []SoftwareMFAType
-	HardwareMFAs          []HardwareMFAType
+	SecondFactors         []SecondFactorType
+	MultiFactors          []MultiFactorType
 	Default               bool
 
 	CreationDate time.Time

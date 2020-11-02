@@ -184,32 +184,32 @@ var AdminService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultLoginPolicySoftwareMFAs": authz.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultLoginPolicySecondFactors": authz.Option{
 		Permission: "iam.policy.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.admin.api.v1.AdminService/AddSoftwareMFAToDefaultLoginPolicy": authz.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/AddSecondFactorToDefaultLoginPolicy": authz.Option{
 		Permission: "iam.policy.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.admin.api.v1.AdminService/RemoveSoftwareMFAFromDefaultLoginPolicy": authz.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/RemoveSecondFactorFromDefaultLoginPolicy": authz.Option{
 		Permission: "iam.policy.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultLoginPolicyHardwareMFAs": authz.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultLoginPolicyMultiFactors": authz.Option{
 		Permission: "iam.policy.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.admin.api.v1.AdminService/AddHardwareMFAToDefaultLoginPolicy": authz.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/AddMultiFactorToDefaultLoginPolicy": authz.Option{
 		Permission: "iam.policy.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.admin.api.v1.AdminService/RemoveHardwareMFAFromDefaultLoginPolicy": authz.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/RemoveMultiFactorFromDefaultLoginPolicy": authz.Option{
 		Permission: "iam.policy.write",
 		CheckParam: "",
 	},

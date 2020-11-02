@@ -775,7 +775,7 @@ func (es *OrgEventstore) AddLoginPolicy(ctx context.Context, policy *iam_model.L
 
 func (es *OrgEventstore) ChangeLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
 	if policy == nil || !policy.IsValid() {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.Org.LoginPolicy.Invalid")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-mL0ps", "Errors.Org.LoginPolicy.Invalid")
 	}
 	org, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
 	if err != nil {
@@ -783,7 +783,7 @@ func (es *OrgEventstore) ChangeLoginPolicy(ctx context.Context, policy *iam_mode
 	}
 
 	if org.LoginPolicy == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.Org.LoginPolicy.NotExisting")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-3Mg9s", "Errors.Org.LoginPolicy.NotExisting")
 	}
 
 	repoOrg := model.OrgFromModel(org)
@@ -878,8 +878,8 @@ func (es *OrgEventstore) RemoveIDPProviderFromLoginPolicy(ctx context.Context, p
 	return es_sdk.PushAggregates(ctx, es.PushAggregates, repoOrg.AppendEvents, agg)
 }
 
-func (es *OrgEventstore) AddSoftwareMFAToLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.SoftwareMFAType) (iam_model.SoftwareMFAType, error) {
-	if mfa == iam_model.SoftwareMFATypeUnspecified {
+func (es *OrgEventstore) AddSecondFactorToLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.SecondFactorType) (iam_model.SecondFactorType, error) {
+	if mfa == iam_model.SecondFactorTypeUnspecified {
 		return 0, errors.ThrowPreconditionFailed(nil, "EVENT-3Rf8s", "Errors.Org.LoginPolicy.MFA.Unspecified")
 	}
 	org, err := es.OrgByID(ctx, org_model.NewOrg(aggregateID))
@@ -889,42 +889,42 @@ func (es *OrgEventstore) AddSoftwareMFAToLoginPolicy(ctx context.Context, aggreg
 	if org.LoginPolicy == nil {
 		return 0, errors.ThrowAlreadyExists(nil, "EVENT-hMd9s", "Errors.Org.LoginPolicy.NotExisting")
 	}
-	if _, m := org.LoginPolicy.GetSoftwareMFA(mfa); m != 0 {
+	if _, m := org.LoginPolicy.GetSecondFactor(mfa); m != 0 {
 		return 0, errors.ThrowAlreadyExists(nil, "EVENT-3Bm9s", "Errors.Org.LoginPolicy.MFA.AlreadyExisting")
 	}
 	repoOrg := model.OrgFromModel(org)
-	repoMFA := iam_es_model.SoftwareMFAFromModel(mfa)
+	repoMFA := iam_es_model.SecondFactorFromModel(mfa)
 
-	addAggregate := LoginPolicySoftwareMFAAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMFA, es.IamID)
+	addAggregate := LoginPolicySecondFactorAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMFA, es.IamID)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
 	if err != nil {
 		return 0, err
 	}
-	if _, m := iam_es_model.GetMFA(repoOrg.LoginPolicy.SoftwareMFAs, repoMFA.MfaType); m != 0 {
-		return iam_model.SoftwareMFAType(m), nil
+	if _, m := iam_es_model.GetMFA(repoOrg.LoginPolicy.SecondFactors, repoMFA.MfaType); m != 0 {
+		return iam_model.SecondFactorType(m), nil
 	}
 	return 0, errors.ThrowInternal(nil, "EVENT-rM9so", "Errors.Internal")
 }
 
-func (es *OrgEventstore) RemoveSoftwareMFAFromLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.SoftwareMFAType) error {
-	if mfa == iam_model.SoftwareMFATypeUnspecified {
+func (es *OrgEventstore) RemoveSecondFactorFromLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.SecondFactorType) error {
+	if mfa == iam_model.SecondFactorTypeUnspecified {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-6Nm9s", "Errors.Org.LoginPolicy.MFA.Unspecified")
 	}
 	org, err := es.OrgByID(ctx, org_model.NewOrg(aggregateID))
 	if err != nil {
 		return err
 	}
-	if _, m := org.LoginPolicy.GetSoftwareMFA(mfa); m == 0 {
+	if _, m := org.LoginPolicy.GetSecondFactor(mfa); m == 0 {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-5Mso9", "Errors.IAM.LoginPolicy.MFA.NotExisting")
 	}
 	repoOrg := model.OrgFromModel(org)
-	repoMFA := iam_es_model.SoftwareMFAFromModel(mfa)
-	agg := LoginPolicySoftwareMFARemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMFA)
+	repoMFA := iam_es_model.SecondFactorFromModel(mfa)
+	agg := LoginPolicySecondFactorRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMFA)
 	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, agg)
 }
 
-func (es *OrgEventstore) AddHardwareMFAToLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.HardwareMFAType) (iam_model.HardwareMFAType, error) {
-	if mfa == iam_model.HardwareMFATypeUnspecified {
+func (es *OrgEventstore) AddMultiFactorToLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.MultiFactorType) (iam_model.MultiFactorType, error) {
+	if mfa == iam_model.MultiFactorTypeUnspecified {
 		return 0, errors.ThrowPreconditionFailed(nil, "EVENT-6Zms9", "Errors.Org.LoginPolicy.MFA.Unspecified")
 	}
 	org, err := es.OrgByID(ctx, org_model.NewOrg(aggregateID))
@@ -934,37 +934,37 @@ func (es *OrgEventstore) AddHardwareMFAToLoginPolicy(ctx context.Context, aggreg
 	if org.LoginPolicy == nil {
 		return 0, errors.ThrowAlreadyExists(nil, "EVENT-fGmx9", "Errors.Org.LoginPolicy.NotExisting")
 	}
-	if _, m := org.LoginPolicy.GetHardwareMFA(mfa); m != 0 {
+	if _, m := org.LoginPolicy.GetMultiFactor(mfa); m != 0 {
 		return 0, errors.ThrowAlreadyExists(nil, "EVENT-2Fj9s", "Errors.Org.LoginPolicy.MFA.AlreadyExisting")
 	}
 	repoOrg := model.OrgFromModel(org)
-	repoMFA := iam_es_model.HardwareMFAFromModel(mfa)
+	repoMFA := iam_es_model.MultiFactorFromModel(mfa)
 
-	addAggregate := LoginPolicyHardwareMFAAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMFA, es.IamID)
+	addAggregate := LoginPolicyMultiFactorAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMFA, es.IamID)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
 	if err != nil {
 		return 0, err
 	}
-	if _, m := iam_es_model.GetMFA(repoOrg.LoginPolicy.HardwareMFAs, repoMFA.MfaType); m != 0 {
-		return iam_model.HardwareMFAType(m), nil
+	if _, m := iam_es_model.GetMFA(repoOrg.LoginPolicy.MultiFactors, repoMFA.MfaType); m != 0 {
+		return iam_model.MultiFactorType(m), nil
 	}
 	return 0, errors.ThrowInternal(nil, "EVENT-2fMo0", "Errors.Internal")
 }
 
-func (es *OrgEventstore) RemoveHardwareMFAFromLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.HardwareMFAType) error {
-	if mfa == iam_model.HardwareMFATypeUnspecified {
+func (es *OrgEventstore) RemoveMultiFactorFromLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.MultiFactorType) error {
+	if mfa == iam_model.MultiFactorTypeUnspecified {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-lsM9c", "Errors.Org.LoginPolicy.MFA.Unspecified")
 	}
 	org, err := es.OrgByID(ctx, org_model.NewOrg(aggregateID))
 	if err != nil {
 		return err
 	}
-	if _, m := org.LoginPolicy.GetHardwareMFA(mfa); m == 0 {
+	if _, m := org.LoginPolicy.GetMultiFactor(mfa); m == 0 {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-3dM0s", "Errors.IAM.LoginPolicy.MFA.NotExisting")
 	}
 	repoOrg := model.OrgFromModel(org)
-	repoMFA := iam_es_model.HardwareMFAFromModel(mfa)
-	agg := LoginPolicyHardwareMFARemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMFA)
+	repoMFA := iam_es_model.MultiFactorFromModel(mfa)
+	agg := LoginPolicyMultiFactorRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMFA)
 	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, agg)
 }
 

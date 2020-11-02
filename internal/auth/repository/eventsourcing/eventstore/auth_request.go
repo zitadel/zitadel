@@ -48,8 +48,8 @@ type AuthRequestRepo struct {
 	PasswordCheckLifeTime      time.Duration
 	ExternalLoginCheckLifeTime time.Duration
 	MfaInitSkippedLifeTime     time.Duration
-	MfaSoftwareCheckLifeTime   time.Duration
-	MfaHardwareCheckLifeTime   time.Duration
+	SecondFactorCheckLifeTime  time.Duration
+	MultiFactorCheckLifeTime   time.Duration
 
 	IAMID string
 }
@@ -640,17 +640,17 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 			return nil, true, nil
 		}
 		fallthrough
-	case model.MFALevelSoftware:
-		if checkVerificationTime(userSession.MfaSoftwareVerification, repo.MfaSoftwareCheckLifeTime) {
-			request.MfasVerified = append(request.MfasVerified, userSession.MfaSoftwareVerificationType)
-			request.AuthTime = userSession.MfaSoftwareVerification
+	case model.MFALevelSecondFactor:
+		if checkVerificationTime(userSession.SecondFactorVerification, repo.SecondFactorCheckLifeTime) {
+			request.MfasVerified = append(request.MfasVerified, userSession.SecondFactorVerificationType)
+			request.AuthTime = userSession.SecondFactorVerification
 			return nil, true, nil
 		}
 		fallthrough
-	case model.MFALevelHardware:
-		if checkVerificationTime(userSession.MfaHardwareVerification, repo.MfaHardwareCheckLifeTime) {
-			request.MfasVerified = append(request.MfasVerified, userSession.MfaHardwareVerificationType)
-			request.AuthTime = userSession.MfaHardwareVerification
+	case model.MFALevelMultiFactor:
+		if checkVerificationTime(userSession.MultiFactorVerification, repo.MultiFactorCheckLifeTime) {
+			request.MfasVerified = append(request.MfasVerified, userSession.MultiFactorVerificationType)
+			request.AuthTime = userSession.MultiFactorVerification
 			return nil, true, nil
 		}
 	}

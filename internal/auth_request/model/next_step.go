@@ -151,7 +151,7 @@ type MFALevel int
 
 const (
 	MFALevelNotSetUp MFALevel = iota
-	MFALevelSoftware
-	MFALevelHardware
-	MFALevelHardwareCertified
+	MFALevelSecondFactor
+	MFALevelMultiFactor
+	MFALevelMultiFactorCertified
 )

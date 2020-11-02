@@ -390,7 +390,7 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
-  rpc GetUserMfas(UserID) returns (MultiFactors) {
+  rpc GetUserMfas(UserID) returns (UserMultiFactors) {
     option (google.api.http) = {
       get: "/users/{id}/mfas"
     };
@@ -1363,9 +1363,9 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
-  rpc GetLoginPolicySoftwareMFAs(google.protobuf.Empty) returns (SoftwareMFAResult) {
+  rpc GetLoginPolicySecondFactors(google.protobuf.Empty) returns (SecondFactorsResult) {
     option (google.api.http) = {
-            get: "/orgs/me/policies/login/mfas/software/_search"
+            get: "/orgs/me/policies/login/secondfactors/_search"
         };
 
     option (caos.zitadel.utils.v1.auth_option) = {
@@ -1373,9 +1373,9 @@ rpc GetUserByID(UserID) returns (UserView) {
         };
   }
 
-  rpc AddSoftwareMFAToLoginPolicy(SoftwareMFA) returns (SoftwareMFA) {
+  rpc AddSecondFactorToLoginPolicy(SecondFactor) returns (SecondFactor) {
     option (google.api.http) = {
-            post: "/orgs/me/policies/login/mfas/software"
+            post: "/orgs/me/policies/login/secondfactors"
             body: "*"
         };
 
@@ -1384,9 +1384,9 @@ rpc GetUserByID(UserID) returns (UserView) {
         };
   }
 
-  rpc RemoveSoftwareMFAFromLoginPolicy(SoftwareMFA) returns (google.protobuf.Empty) {
+  rpc RemoveSecondFactorFromLoginPolicy(SecondFactor) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-            delete: "/orgs/me/policies/login/mfas/software/{mfa}"
+            delete: "/orgs/me/policies/login/secondfactors/{second_factor}"
         };
 
     option (caos.zitadel.utils.v1.auth_option) = {
@@ -1394,9 +1394,9 @@ rpc GetUserByID(UserID) returns (UserView) {
         };
   }
 
-  rpc GetLoginPolicyHardwareMFAs(google.protobuf.Empty) returns (HardwareMFAResult) {
+  rpc GetLoginPolicyMultiFactors(google.protobuf.Empty) returns (MultiFactorsResult) {
     option (google.api.http) = {
-            get: "/orgs/me/policies/login/mfas/hardware/_search"
+            get: "/orgs/me/policies/login/multifactors/_search"
         };
 
     option (caos.zitadel.utils.v1.auth_option) = {
@@ -1404,9 +1404,9 @@ rpc GetUserByID(UserID) returns (UserView) {
         };
   }
 
-  rpc AddHardwareMFAToLoginPolicy(HardwareMFA) returns (HardwareMFA) {
+  rpc AddMultiFactorToLoginPolicy(MultiFactor) returns (MultiFactor) {
     option (google.api.http) = {
-            post: "/orgs/me/policies/login/mfas/hardware"
+            post: "/orgs/me/policies/login/multifactors"
             body: "*"
         };
 
@@ -1415,9 +1415,9 @@ rpc GetUserByID(UserID) returns (UserView) {
         };
   }
 
-  rpc RemoveHardwareMFAFromLoginPolicy(HardwareMFA) returns (google.protobuf.Empty) {
+  rpc RemoveMultiFactorFromLoginPolicy(MultiFactor) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-            delete: "/orgs/me/policies/login/mfas/hardware/{mfa}"
+            delete: "/orgs/me/policies/login/multifactors/{multi_factor}"
         };
 
     option (caos.zitadel.utils.v1.auth_option) = {
@@ -2012,11 +2012,11 @@ message UpdateUserAddressRequest {
   string street_address = 6 [(validate.rules).string = {max_len: 200}];
 }
 
-message MultiFactors {
-  repeated MultiFactor mfas = 1;
+message UserMultiFactors {
+  repeated UserMultiFactor mfas = 1;
 }
 
-message MultiFactor {
+message UserMultiFactor {
   MfaType type = 1;
   MFAState state = 2;
 }
@@ -3138,30 +3138,31 @@ message ExternalIDPRemoveRequest {
   string external_user_id = 3;
 }
 
-message SoftwareMFAResult {
-  repeated SoftwareMFAType mfas = 1;
+message SecondFactorsResult {
+  repeated SecondFactorType second_factors = 1;
 }
 
-message SoftwareMFA {
-  SoftwareMFAType mfa = 1;
+message SecondFactor {
+  SecondFactorType second_factor = 1;
 }
 
-enum SoftwareMFAType {
-  SOFTWAREMFATYPE_UNSPECIFIED = 0;
-  SOFTWAREMFATYPE_OTP = 1;
+enum SecondFactorType {
+  SECONDFACTORTYPE_UNSPECIFIED = 0;
+  SECONDFACTORTYPE_OTP = 1;
+  SECONDFACTORTYPE_U2F = 2;
 }
 
-message HardwareMFAResult {
-  repeated HardwareMFAType mfas = 1;
+message MultiFactorsResult {
+  repeated MultiFactorType multi_factors = 1;
 }
 
-message HardwareMFA {
-  HardwareMFAType mfa = 1;
+message MultiFactor {
+  MultiFactorType multi_factor = 1;
 }
 
-enum HardwareMFAType {
-  HARDWAREMFATYPE_UNSPECIFIED = 0;
-  HARDWAREMFATYPE_U2F = 1;
+enum MultiFactorType {
+  MULTIFACTORTYPE_UNSPECIFIED = 0;
+  MULTIFACTORTYPE_U2F_WITH_PIN = 1;
 }
 
 message PasswordComplexityPolicy {

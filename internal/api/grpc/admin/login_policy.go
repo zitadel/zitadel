@@ -43,44 +43,44 @@ func (s *Server) RemoveIdpProviderFromDefaultLoginPolicy(ctx context.Context, pr
 	return &empty.Empty{}, err
 }
 
-func (s *Server) GetDefaultLoginPolicySoftwareMFAs(ctx context.Context, _ *empty.Empty) (*admin.SoftwareMFAResult, error) {
-	result, err := s.iam.SearchDefaultSoftwareMFAs(ctx)
+func (s *Server) GetDefaultLoginPolicySecondFactors(ctx context.Context, _ *empty.Empty) (*admin.SecondFactorsResult, error) {
+	result, err := s.iam.SearchDefaultSecondFactors(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return softwareMFAResultFromModel(result), nil
+	return secondFactorsResultFromModel(result), nil
 }
 
-func (s *Server) AddSoftwareMFAToDefaultLoginPolicy(ctx context.Context, mfa *admin.SoftwareMFA) (*admin.SoftwareMFA, error) {
-	result, err := s.iam.AddSoftwareMFAToLoginPolicy(ctx, softwareMFATypeToModel(mfa))
+func (s *Server) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, mfa *admin.SecondFactor) (*admin.SecondFactor, error) {
+	result, err := s.iam.AddSecondFactorToLoginPolicy(ctx, secondFactorTypeToModel(mfa))
 	if err != nil {
 		return nil, err
 	}
-	return softwareMFAFromModel(result), nil
+	return secondFactorFromModel(result), nil
 }
 
-func (s *Server) RemoveSoftwareMFAFromDefaultLoginPolicy(ctx context.Context, mfa *admin.SoftwareMFA) (*empty.Empty, error) {
-	err := s.iam.RemoveSoftwareMFAFromLoginPolicy(ctx, softwareMFATypeToModel(mfa))
+func (s *Server) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context, mfa *admin.SecondFactor) (*empty.Empty, error) {
+	err := s.iam.RemoveSecondFactorFromLoginPolicy(ctx, secondFactorTypeToModel(mfa))
 	return &empty.Empty{}, err
 }
 
-func (s *Server) GetDefaultLoginPolicyHardwareMFAs(ctx context.Context, _ *empty.Empty) (*admin.HardwareMFAResult, error) {
-	result, err := s.iam.SearchDefaultHardwareMFAs(ctx)
+func (s *Server) GetDefaultLoginPolicyMultiFactors(ctx context.Context, _ *empty.Empty) (*admin.MultiFactorsResult, error) {
+	result, err := s.iam.SearchDefaultMultiFactors(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return hardwareMFAResultFromModel(result), nil
+	return multiFactorResultFromModel(result), nil
 }
 
-func (s *Server) AddHardwareMFAToDefaultLoginPolicy(ctx context.Context, mfa *admin.HardwareMFA) (*admin.HardwareMFA, error) {
-	result, err := s.iam.AddHardwareMFAToLoginPolicy(ctx, hardwareMFATypeToModel(mfa))
+func (s *Server) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, mfa *admin.MultiFactor) (*admin.MultiFactor, error) {
+	result, err := s.iam.AddMultiFactorToLoginPolicy(ctx, multiFactorTypeToModel(mfa))
 	if err != nil {
 		return nil, err
 	}
-	return hardwareMFAFromModel(result), nil
+	return multiFactorFromModel(result), nil
 }
 
-func (s *Server) RemoveHardwareMFAFromDefaultLoginPolicy(ctx context.Context, mfa *admin.HardwareMFA) (*empty.Empty, error) {
-	err := s.iam.RemoveHardwareMFAFromLoginPolicy(ctx, hardwareMFATypeToModel(mfa))
+func (s *Server) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, mfa *admin.MultiFactor) (*empty.Empty, error) {
+	err := s.iam.RemoveMultiFactorFromLoginPolicy(ctx, multiFactorTypeToModel(mfa))
 	return &empty.Empty{}, err
 }
