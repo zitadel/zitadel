@@ -65,14 +65,6 @@ func (c *Client) DevMode() bool {
 	return c.ApplicationView.DevMode
 }
 
-//func (c *Client) AssertAdditionalIdTokenScopes() bool {
-//	return c.IDTokenRoleAssertion
-//}
-//
-//func (c *Client) AssertAdditionalAccessTokenScopes() bool {
-//	return c.AccessTokenRoleAssertion
-//}
-
 func (c *Client) RestrictAdditionalIdTokenScopes() func(scopes []string) []string {
 	return func(scopes []string) []string {
 		if c.IDTokenRoleAssertion {
