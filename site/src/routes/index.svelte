@@ -8,6 +8,9 @@
     import Split from "../components/Split.svelte";
     import Section from '../components/Section.svelte';
     import { _ } from 'svelte-i18n';
+    import Nav from '../components/Nav.svelte';
+      export let segment;
+
 </script>
 
 <style>
@@ -24,7 +27,6 @@
     .section {
         width: 100%;
         margin-top: 40vh;
-        min-height: 80vh;
     }
     @media screen and (min-width: 768px) {
         .caos-back {
@@ -33,8 +35,35 @@
         }
         .section {
             width: 50%;
-            margin-top: 50px;
+            margin: 50px 0;
         }
+    }
+
+    .doc-container {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -1rem;
+    }
+
+    .doc-container .doc {
+        flex: 1;
+        min-width: 270px;
+        margin: 1rem;
+        padding: 2rem;
+        background: #2a2f45;
+        border-radius: 10px;
+    }
+
+    .doc-container .doc a {
+        display: block;
+        font-size: 2rem;
+        border: none;
+        margin-bottom: 1rem;
+        padding: 0;
+    }
+
+    .doc-container .doc a:hover {
+        padding: 0;
     }
 </style>
 
@@ -43,7 +72,7 @@
     ZITADEL • Documentation
   </title>
 </svelte:head>
-
+    <Nav {segment} title="Zitadel docs" logo="logos/zitadel-logo-light.svg"></Nav>
     <img class="caos-back" src="logos/zitadel-logo-solo-darkdesign.svg" alt="caos logo">
 
     <Section>
@@ -52,15 +81,37 @@
             <p>{$_('description')}</p>
             <p>{$_('description2')}</p>
             <p>{$_('description3')}</p>
-            
-            <ul style="list-style-type: none;">
-            <li><a href="/start" >{$_('startlink')}</a></li>
-            <li><a href="/integrate" >{$_('integratelink')}</a></li>
-            <li><a href="/administrate" >{$_('administratelink')}</a></li>
-            <li><a href="/develop" >{$_('developlink')}</a></li>
-            <li><a href="/documentation" >{$_('docslink')}</a></li>
-            <li><a href="/use" >{$_('uselink')}</a></li>
-            </ul>
-            
+        </div>
+
+        <div class="doc-container">
+            <div class="doc">
+                <a href="/start" >{$_('startlink')}</a>
+                <p>{$_('startlink_desc')}</p>
+            </div>
+
+            <div class="doc">
+                <a href="/integrate">{$_('integratelink')}</a>
+                <p>{$_('integratelink_desc')}</p>
+            </div>
+
+            <div class="doc">
+                <a href="/administrate" >{$_('administratelink')}</a>
+                <p>{$_('administratelink_desc')}</p>
+            </div>
+
+            <div class="doc">
+                <a href="/develop" >{$_('developlink')}</a>
+                <p>{$_('developlink_desc')}</p>
+            </div>
+
+            <div class="doc">
+                <a href="/documentation" >{$_('docslink')}</a>
+                <p>{$_('docslink_desc')}</p>
+            </div>
+
+            <div class="doc">
+                <a href="/use" >{$_('uselink')}</a>
+                <p>{$_('uselink_desc')}</p>
+            </div>
         </div>
     </Section>

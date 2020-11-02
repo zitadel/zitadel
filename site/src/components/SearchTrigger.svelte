@@ -23,7 +23,7 @@
         width: calc(100% - 4rem);
         box-sizing: border-box;
         position: fixed;
-        top: 60px;
+        top: 80px;
         left: 0;
     }
 

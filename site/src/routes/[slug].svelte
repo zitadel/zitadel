@@ -8,6 +8,7 @@
 </script>
 
 <script>
+    import DocsHeader from '../components/DocsHeader.svelte';
     import manifest from '../../static/manifest.json';
     import Docs from "../components/Docs.svelte";
     export let slug;
@@ -30,6 +31,7 @@
 	{/each}
 </svelte:head>
 
+<DocsHeader></DocsHeader>
 <Docs {sections} project="zitadel/site" dir="{slug}"/>
 
 <!-- <SearchSelector></SearchSelector> -->

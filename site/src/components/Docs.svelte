@@ -107,7 +107,7 @@
 
   aside.open {
     width: calc(100vw - 1.5rem);
-    height: calc(100vh - var(--nav-h) - 6rem);
+    height: calc(100vh - var(--nav-h) - 9rem);
   }
 
   aside.open::before {
@@ -145,6 +145,16 @@
     height: 100%;
     padding: 4em 1.6rem 2em 3.2rem;
     bottom: 2em;
+  }
+
+  aside.open .sidebar .home {
+      position: fixed;
+      top: 0;
+      width: 170px;
+      left: 50%;
+      margin: 2rem 0;
+      border-bottom: none;
+      transform: translatex(-50%);
   }
 
   aside .sidebar :global(.search-trigger) {
@@ -223,6 +233,16 @@
       height: 100%;
       bottom: auto;
       width: 100%;
+    }
+
+    .sidebar .home {
+      position: fixed;
+      top: 0;
+      width: 170px;
+      left: calc(var(--sidebar-w)/2);
+      margin: 2rem 0;
+      transform: translateX(-50%);
+      border-bottom: none;
     }
 
     .sidebar :global(.search-trigger) {
@@ -465,6 +485,9 @@
 
 <aside bind:this={aside} class="sidebar-container" class:open={show_contents}>
   <div class="sidebar" on:click={() => (show_contents = false)}>
+    <a rel="prefetch" href="." class="home" title="Zitadel Docs">
+      <img src="logos/zitadel-logo-light.svg" alt="zitadel-logo" />
+    </a>
     <SearchTrigger on:click={handleSearch}/>
 
     <!-- scroll container -->

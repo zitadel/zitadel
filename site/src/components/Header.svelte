@@ -14,32 +14,25 @@
 </script>
 
 <style>
-    header {
+    .header {
+        position: fixed;
         box-sizing: border-box;
-		position: fixed;
 		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		width: 100vw;
+        align-items: center;
+        justify-content: flex-end;
+        width: 100%;
 		height: var(--nav-h);
-		padding: 0 16px;
+        padding: 0 16px;
+        top: 0;
 		margin: 0 auto;
-		box-shadow: 0 -0.4rem 0.9rem 0.2rem rgba(0,0,0,.5);
-		z-index: 100;
-		user-select: none;
-		transform: translate(0,calc(-100% - 1rem));
-        transition: transform 0.2s;
-        backdrop-filter: saturate(100%) blur(10px);
     }
     
-    header img {
+    .header img {
         margin: auto;
         display: block;
     }
 </style>
 
-<div>
-    <header>
-        <img src={logo} alt={title} />
-    </header>
+<div class="header">
+    <img src={logo} alt={title} />
 </div>

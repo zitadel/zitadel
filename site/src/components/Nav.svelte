@@ -31,7 +31,8 @@
 <style>
 	header {
         box-sizing: border-box;
-		position: fixed;
+        position: fixed;
+        top: 0;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
