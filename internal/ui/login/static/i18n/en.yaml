@@ -66,7 +66,7 @@ InitUserDone:
 MfaPrompt:
   Title: Multifactor Setup
   Description: Would you like to setup multifactor authentication?
-  Provider0: OTP (One time password)
+  Provider0: OTP (One Time Password)
   Provider1: U2F (Universal 2nd Factor)
 
 MfaInitVerify:
