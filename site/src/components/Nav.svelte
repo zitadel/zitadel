@@ -71,20 +71,16 @@
     }
     
 	.home {
-        width: 200px;
         line-height: 22px;
         font-size: 22px;
-        display: none;
+        display: flex;
+        align-items: center;
     }
 
     .home:hover {
         color: inherit;
         text-decoration:none;
         border: none;
-    }
-
-    .home img {
-        display: block;
     }
     
 	a {
@@ -94,20 +90,15 @@
         padding: 0;
     }
 
-    @media (min-width: 400px) {
-        .home {
-            display: inline-block;
-        }
+    .home span {
+        color: var(--second);
+        margin-left: 3px;
     }
 
     a img {
         width: 160px;
         max-height: 45px;
         padding: 0;
-    }
-
-    .switcher-wrapper {
-        padding: 0 1rem;
     }
 
     button {
@@ -118,11 +109,11 @@
         box-shadow: 0 0 0 0 rgba(0,0,0,.2), 0 0 0 0 rgba(0,0,0,.14), 0 0 0 0 rgba(0,0,0,.12);
         padding: 0 15px;
         height: 36px;
-        color: var(--prime);
+        color: white;
         transition: background-color .2 ease;
         margin: 0 1rem;
         min-width: 120px;
-        background: var(--back);
+        /* background: #2a2f45; */
     }
 
     button:hover {
@@ -135,6 +126,8 @@
     button span {
         font-size: 14px;
         line-height: 14px;
+        text-align: center;
+        margin: auto;
     }
 </style>
 
@@ -153,21 +146,29 @@
             {:else if title}
                 {title}
             {/if}
+            <span>DOCS</span>
         </a>
 
         <span class="fill-space"></span>
 
-        <a href='https://console.zitadel.ch'><button>
-            <span>{$_('toconsole')}</span>
-        </button>
-        </a>
-
-        <NavItem external="https://github.com/caos" title="GitHub Repo">
+        <!-- <NavItem external="https://github.com/caos" title="GitHub Repo">
             <Icon name="lab la-github" size="24px"></Icon>
+        </NavItem> -->
+
+        <NavItem external="https://zitadel.ch" title="GitHub Repo">
+            More about ZITADEL
         </NavItem>
 
-        <div class="switcher-wrapper">
-            <LanguageSwitcher></LanguageSwitcher>
-        </div>
+        <a href='https://console.zitadel.ch'>
+            <button>
+                <span>{$_('login')}</span>
+            </button>
+        </a>
+
+        <a href='https://accounts.zitadel.ch/register'>
+            <button style="border-color: var(--second); margin-left: 0;">
+                <span>{$_('register')}</span>
+            </button>
+        </a>
 	</nav>
 </header>

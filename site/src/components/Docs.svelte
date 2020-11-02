@@ -149,13 +149,6 @@
 
   aside.open .sidebar .home {
       display: none;
-      /* position: fixed;
-      top: 0;
-      width: 170px;
-      left: 50%;
-      margin: 2rem 0;
-      border-bottom: none;
-      transform: translatex(-50%); */
   }
 
   aside .sidebar :global(.search-trigger) {
@@ -239,11 +232,23 @@
     .sidebar .home {
       position: fixed;
       top: 0;
-      width: 170px;
       left: calc(var(--sidebar-w)/2);
       margin: 2rem 0;
       transform: translateX(-50%);
       border-bottom: none;
+      display: flex;
+      align-items: center;
+      font-size: 22px;
+      padding: 0;
+    }
+
+    .sidebar .home img {
+        width: 170px;
+    }
+
+    .sidebar .home span {
+        margin-left: 3px;
+        color: var(--second);
     }
 
     .sidebar :global(.search-trigger) {
@@ -488,6 +493,7 @@
   <div class="sidebar" on:click={() => (show_contents = false)}>
     <a rel="prefetch" href="." class="home" title="Zitadel Docs">
       <img src="logos/zitadel-logo-light.svg" alt="zitadel-logo" />
+      <span>DOCS</span>
     </a>
     <SearchTrigger on:click={handleSearch}/>
 

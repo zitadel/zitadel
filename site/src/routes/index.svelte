@@ -30,8 +30,8 @@
     }
     @media screen and (min-width: 768px) {
         .caos-back {
-            right: 0;
-            height: 70vh;
+            right: 50px;
+            height: 60vh;
         }
         .section {
             width: 50%;

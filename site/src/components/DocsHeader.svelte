@@ -23,8 +23,8 @@
         justify-content: flex-end;
         height: var(--nav-h);
         box-shadow: 0 -0.4rem 0.9rem 0.2rem rgba(0,0,0,.5);
-		z-index: 100;
         backdrop-filter: saturate(100%) blur(10px);
+        z-index: 1;
     }
 
     .content .home {
@@ -40,11 +40,24 @@
     }
 
     .content .list-item {
-        margin: 0 20px;
+        margin: 0 15px;
         border: none;
         padding: 0;
         color: var(--prime);
         font-weight: 500;
+    }
+
+    button {
+        display: flex;
+        align-items: center;
+        margin-top: 20px !important;
+        margin-bottom: 22px !important;
+    }
+
+    button.list-item i{
+        color: var(--prime);
+        margin-top: 2px;
+        margin-right: 3px;
     }
 
     .content :last-child {
@@ -59,6 +72,7 @@
         position: absolute;
         top: calc(var(--nav-h) - 15px);
         left: 50%;
+        z-index: 2;
     }
 
     /* menu appearance*/
@@ -112,6 +126,7 @@
             box-shadow: none;
             background: none;
             backdrop-filter: none;
+            z-index: auto;
         }
 
         .content .home {
@@ -125,7 +140,7 @@
     <span class="fill-space"></span>
 
     <div class="btn-wrapper">
-        <button class="list-item" on:click="{() => menuOpen = !menuOpen}"><span>{$_('references')}</span></button>
+        <button class="list-item" on:click="{() => menuOpen = !menuOpen}"><i class="las la-bars"></i><span>{$_('references')}</span></button>
         <div class="wrapper">
             {#if menuOpen}
                 <div id="menu">
@@ -142,6 +157,7 @@
         </div>
     </div>
 
+    <a class="list-item" href="https://zitadel.ch" target="_blank">More about ZITADEL</a>
     <a class="list-item" href="https://console.zitadel.ch" target="_blank">Sign in</a>
 </div>
 
