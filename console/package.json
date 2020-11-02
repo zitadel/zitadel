@@ -37,7 +37,7 @@
     "grpc-web": "^1.2.1",
     "moment": "^2.29.1",
     "ngx-moment": "^5.0.0",
-    "ngx-quicklink": "^0.2.4",
+    "ngx-quicklink": "^0.2.6",
     "rxjs": "~6.6.3",
     "ts-protoc-gen": "^0.13.0",
     "tslib": "^2.0.3",
