@@ -2,6 +2,7 @@ package zitadel
 
 import (
 	"github.com/caos/orbos/pkg/orb"
+	"github.com/caos/orbos/pkg/secret"
 	"sort"
 	"strconv"
 
@@ -34,16 +35,19 @@ func AdaptFunc(
 	) (
 		operator.QueryFunc,
 		operator.DestroyFunc,
+		map[string]*secret.Secret,
 		error,
 	) {
 
+		allSecrets := make(map[string]*secret.Secret)
 		internalMonitor := monitor.WithField("kind", "iam")
 
 		desiredKind, err := parseDesiredV0(desired)
 		if err != nil {
-			return nil, nil, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, allSecrets, errors.Wrap(err, "parsing desired state failed")
 		}
 		desired.Parsed = desiredKind
+		secret.AppendSecrets("zitadel", allSecrets, getSecretsMap(desiredKind))
 
 		if !monitor.IsVerbose() && desiredKind.Spec.Verbose {
 			internalMonitor.Verbose()
@@ -99,16 +103,16 @@ func AdaptFunc(
 
 		queryNS, err := namespace.AdaptFuncToEnsure(namespaceStr)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, allSecrets, err
 		}
 		destroyNS, err := namespace.AdaptFuncToDestroy(namespaceStr)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, allSecrets, err
 		}
 
 		queryS, destroyS, getClientID, err := services.AdaptFunc(internalMonitor, namespaceStr, internalLabels, grpcServiceName, grpcPort, httpServiceName, httpPort, uiServiceName, uiPort)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, allSecrets, err
 		}
 
 		queryC, destroyC, configurationDone, getConfigurationHashes, err := configuration.AdaptFunc(
@@ -129,7 +133,7 @@ func AdaptFunc(
 			orbconfig.Repokey,
 		)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, allSecrets, err
 		}
 
 		queryM, destroyM, migrationDone, _, err := migration.AdaptFunc(
@@ -146,7 +150,7 @@ func AdaptFunc(
 			orbconfig.Repokey,
 		)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, allSecrets, err
 		}
 
 		queryD, destroyD, deploymentReady, scaleDeployment, ensureInit, err := deployment.AdaptFunc(
@@ -171,7 +175,7 @@ func AdaptFunc(
 			getConfigurationHashes,
 		)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, allSecrets, err
 		}
 
 		queryAmbassador, destroyAmbassador, err := ambassador.AdaptFunc(
@@ -184,7 +188,7 @@ func AdaptFunc(
 			desiredKind.Spec.Configuration.DNS,
 		)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, allSecrets, err
 		}
 
 		destroyers := make([]operator.DestroyFunc, 0)
@@ -238,6 +242,7 @@ func AdaptFunc(
 				return operator.QueriersToEnsureFunc(internalMonitor, true, queriers, k8sClient, queried)
 			},
 			operator.DestroyersToDestroyFunc(monitor, destroyers),
+			allSecrets,
 			nil
 	}
 }
