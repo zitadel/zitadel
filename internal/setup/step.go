@@ -8,7 +8,7 @@ import (
 
 type step interface {
 	step() iam_model.Step
-	execute(context.Context) error
+	execute(context.Context) (*iam_model.IAM, error)
 	init(*Setup)
 	isNil() bool
 }

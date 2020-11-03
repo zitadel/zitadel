@@ -70,3 +70,8 @@ func DeleteIAMMember(db *gorm.DB, table, orgID, userID string) error {
 	delete := repository.PrepareDeleteByObject(table, member)
 	return delete(db)
 }
+
+func DeleteIAMMembersByUserID(db *gorm.DB, table, userID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.IAMMemberSearchKey(iam_model.IAMMemberSearchKeyUserID), userID)
+	return delete(db)
+}

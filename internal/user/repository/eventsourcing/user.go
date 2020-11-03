@@ -282,7 +282,7 @@ func releasedUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.
 		return nil, err
 	}
 
-	return aggregate.SetPrecondition(UserUserNameUniqueQuery(uniqueUserName), isEventValidation(aggregate, model.UserUserNameReserved)), nil
+	return aggregate.SetPrecondition(UserUserNameUniqueQuery(uniqueUserName), isEventValidation(aggregate, model.UserUserNameReleased)), nil
 }
 
 func changeUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, oldUsername, username string, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
@@ -313,6 +313,25 @@ func UserLockAggregate(aggCreator *es_models.AggregateCreator, user *model.User)
 
 func UserUnlockAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return userStateAggregate(aggCreator, user, model.UserUnlocked)
+}
+
+func UserRemoveAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
+	agg, err := UserAggregate(ctx, aggCreator, user)
+	if err != nil {
+		return nil, err
+	}
+	agg, err = agg.AppendEvent(model.UserRemoved, nil)
+	if err != nil {
+		return nil, err
+	}
+	uniqueAgg, err := releasedUniqueUserNameAggregate(ctx, aggCreator, user.ResourceOwner, user.UserName, userLoginMustBeDomain)
+	if err != nil {
+		return nil, err
+	}
+	return []*es_models.Aggregate{
+		agg,
+		uniqueAgg,
+	}, nil
 }
 
 func userStateAggregate(aggCreator *es_models.AggregateCreator, user *model.User, state es_models.EventType) func(ctx context.Context) (*es_models.Aggregate, error) {
@@ -442,6 +461,26 @@ func PasswordCodeSentAggregate(aggCreator *es_models.AggregateCreator, user *mod
 			return nil, err
 		}
 		return agg.AppendEvent(model.HumanPasswordCodeSent, nil)
+	}
+}
+
+func ExternalLoginCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, user *model.User, check *model.AuthRequest) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregateOverwriteContext(ctx, aggCreator, user, user.ResourceOwner, user.AggregateID)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.HumanExternalLoginCheckSucceeded, check)
+	}
+}
+
+func TokenAddedAggregate(aggCreator *es_models.AggregateCreator, user *model.User, token *model.Token) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregateOverwriteContext(ctx, aggCreator, user, user.ResourceOwner, user.AggregateID)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.UserTokenAdded, token)
 	}
 }
 
@@ -797,7 +836,7 @@ func ExternalIDPRemovedAggregate(ctx context.Context, aggCreator *es_models.Aggr
 	}
 
 	aggregates := make([]*es_models.Aggregate, 0)
-	agg, err := UserAggregate(ctx, aggCreator, user)
+	agg, err := UserAggregateOverwriteContext(ctx, aggCreator, user, user.ResourceOwner, authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -806,7 +845,7 @@ func ExternalIDPRemovedAggregate(ctx context.Context, aggCreator *es_models.Aggr
 	} else {
 		agg, err = agg.AppendEvent(model.HumanExternalIDPRemoved, externalIDP)
 	}
-	uniqueReleasedAggregate, err := releasedUniqueExternalIDPAggregate(ctx, aggCreator, externalIDP)
+	uniqueReleasedAggregate, err := releasedUniqueExternalIDPAggregate(ctx, aggCreator, externalIDP, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -831,9 +870,10 @@ func reservedUniqueExternalIDPAggregate(ctx context.Context, aggCreator *es_mode
 	return aggregate.SetPrecondition(UserExternalIDPUniqueQuery(uniqueExternlIDP), isEventValidation(aggregate, model.HumanExternalIDPReserved)), nil
 }
 
-func releasedUniqueExternalIDPAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, externalIDP *model.ExternalIDP) (aggregate *es_models.Aggregate, err error) {
+func releasedUniqueExternalIDPAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, externalIDP *model.ExternalIDP, resourceOwnerID string) (aggregate *es_models.Aggregate, err error) {
 	uniqueExternlIDP := externalIDP.IDPConfigID + externalIDP.UserID
-	aggregate, err = aggCreator.NewAggregate(ctx, uniqueExternlIDP, model.UserExternalIDPAggregate, model.UserVersion, 0)
+	aggregate, err = aggCreator.NewAggregate(ctx, uniqueExternlIDP, model.UserExternalIDPAggregate, model.UserVersion, 0, es_models.OverwriteResourceOwner(resourceOwnerID), es_models.OverwriteEditorUser(authz.GetCtxData(ctx).UserID))
+
 	if err != nil {
 		return nil, err
 	}

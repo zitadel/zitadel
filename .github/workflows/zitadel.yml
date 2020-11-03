@@ -5,13 +5,13 @@ env:
   GITHUB_TOKEN: ${{ secrets.CR_PAT }}
   REGISTRY: ghcr.io
   NODE_VERSION: '12'
-  GO_VERSION: '1.14'
+  GO_VERSION: '1.15'
 
 jobs:
 
   ## Angular test, will be added later
 
-  angular-lint:
+  angular-lint: 
     runs-on: ubuntu-18.04
     defaults:
       run:
@@ -72,9 +72,9 @@ jobs:
       with:
         file: ./profile.cov
         name: codecov-go
-
+      
   ## go lint, will be added later
-
+  
   go-build:
     runs-on: ubuntu-18.04
     needs: [angular-build, angular-lint, go-test] ### We need the artifact from the angular build and that's why we wait here

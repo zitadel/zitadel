@@ -3,13 +3,17 @@ import { CommonModule, registerLocaleData } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -37,8 +41,10 @@ import { GrpcAuthService } from './services/grpc-auth.service';
 import { GrpcService } from './services/grpc.service';
 import { AuthInterceptor } from './services/interceptors/auth.interceptor';
 import { GRPC_INTERCEPTORS } from './services/interceptors/grpc-interceptor';
+import { I18nInterceptor } from './services/interceptors/i18n.interceptor';
 import { OrgInterceptor } from './services/interceptors/org.interceptor';
 import { RefreshService } from './services/refresh.service';
+import { SeoService } from './services/seo.service';
 import { StatehandlerProcessorService, StatehandlerProcessorServiceImpl } from './services/statehandler-processor.service';
 import { StatehandlerService, StatehandlerServiceImpl } from './services/statehandler.service';
 import { StorageService } from './services/storage.service';
@@ -104,9 +110,13 @@ const authConfig: AuthConfig = {
         MatSidenavModule,
         MatCardModule,
         OutsideClickModule,
+        MatFormFieldModule,
+        MatInputModule,
         HasRolePipeModule,
         MatProgressBarModule,
+        MatProgressSpinnerModule,
         MatToolbarModule,
+        ReactiveFormsModule,
         MatMenuModule,
         MatSnackBarModule,
         AvatarModule,
@@ -153,8 +163,14 @@ const authConfig: AuthConfig = {
         {
             provide: GRPC_INTERCEPTORS,
             multi: true,
+            useClass: I18nInterceptor,
+        },
+        {
+            provide: GRPC_INTERCEPTORS,
+            multi: true,
             useClass: OrgInterceptor,
         },
+        SeoService,
         RefreshService,
         GrpcService,
         GrpcAuthService,

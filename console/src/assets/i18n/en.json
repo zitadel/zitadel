@@ -35,7 +35,9 @@
         "LOGOUT": "Logout All Users",
         "NEWORG":"New Organisation",
         "IAMADMIN":"You are an IAM Administrator. Note that you have extended permissions.",
-        "SHOWORGS":"Show All Organisations"
+        "SHOWORGS":"Show All Organisations",
+        "GRANTSECTION":"Authorization Section",
+        "GRANTS":"Authorizations"
     },
     "ACTIONS": {
         "SAVE": "Save",
@@ -50,6 +52,7 @@
         "INFO": "Info",
         "OK": "OK",
         "VIEW": "Show",
+        "SELECTIONDELETE":"Delete selection",
         "DELETE": "Delete",
         "REMOVE":"Remove",
         "VERIFY":"Verify",
@@ -59,7 +62,9 @@
         "DEACTIVATE":"Deactivate",
         "REFRESH":"Refresh",
         "LOGIN":"Login",
-        "EDIT":"Edit"
+        "EDIT":"Edit",
+        "PIN":"Pin / Unpin",
+        "CONFIGURE":"Configure"
     },
     "ERRORS": {
         "REQUIRED": "Some required fields are missing.",
@@ -86,7 +91,24 @@
             "COPIED":"Copied to clipboard.",
             "NOUSER":"No associated users.",
             "REACTIVATE":"Reactivate",
-            "DEACTIVATE":"Deactivate"
+            "DEACTIVATE":"Deactivate",
+            "FILTER":"Filter",
+            "DELETE":"Delete User"
+        },
+        "DIALOG": {
+            "DELETE_TITLE":"Delete User",
+            "DELETE_DESCRIPTION":"You are about to permanently delete a user. Are you sure?"
+        },
+        "TABLE":{
+            "DEACTIVATE":"Deactivate",
+            "ACTIVATE":"Activate",
+            "FILTER": {
+                "1":"Filter for Username",
+                "2":"filter for Firstname",
+                "3":"filter for Lastname",
+                "5":"filter for DisplayName",
+                "6":"filter for email"
+            }
         },
         "MFA": {
             "TABLETYPE":"Type",
@@ -120,7 +142,11 @@
           "IDPCONFIGID": "Idp Config ID",
           "IDPNAME": "Idp Name",
           "USERDISPLAYNAME":  "External Name",
-          "EXTERNALUSERID": "External User ID"
+          "EXTERNALUSERID": "External User ID",
+          "DIALOG": {
+            "REMOVE_TITLE":"Remove IDP",
+            "REMOVE_DESCRIPTION":"You are about to delete an Identity Provider from a user. Do you really want to continue?"
+        }
         },
         "CREATE": {
             "TITLE": "Create a New User",
@@ -199,6 +225,7 @@
         },
         "EMAIL": "E-mail",
         "PHONE": "Phone Number",
+        "PREFERRED_LOGINNAME":"Preferred Loginname",
         "LOGINMETHODS": {
             "TITLE": "Contact Information",
             "DESCRIPTION": "The provided information is used to send important information, like password reset e-mails to you.",
@@ -270,7 +297,8 @@
             "SELECTEDDEACTIVATED":"Selected users deactivated.",
             "SELECTEDKEYSDELETED":"Selected keys deleted.",
             "KEYADDED":"Key added!",
-            "MACHINEADDED":"Service User created!"
+            "MACHINEADDED":"Service User created!",
+            "DELETED":"User deleted successfully!"
         },
         "MEMBERSHIPS": {
             "TITLE":"ZITADEL Manager Roles",
@@ -305,7 +333,12 @@
             "SEQUENCE":"Sequence",
             "TIMESTAMP":"Timestamp",
             "ACTIONS":"Actions",
-            "CLEAR":"Clear"
+            "CLEAR":"Clear",
+            "CLEARED":"View was successfully cleared!",
+            "DIALOG": {
+                "VIEW_CLEAR_TITLE": "Clear View",
+                "VIEW_CLEAR_DESCRIPTION":"You are about to clear a view. Clearing a view creates a process during which data is possibly not available for endusers. Are you really sure?"
+            }
         },
         "FAILEDEVENTS": {
             "TITLE":"Failed Events",
@@ -332,19 +365,31 @@
     },
     "ORG": {
         "PAGES": {
+            "NAME":"Name",
+            "ID":"ID",
+            "FILTER":"Filter",
+            "FILTERPLACEHOLDER":"Filter for the name",
             "LIST": "Organisations",
             "LISTDESCRIPTION":"Choose an organisation.",
             "ACTIVE":"Active",
             "CREATE":"Create Organisation",
             "ORGDETAIL_TITLE":"Enter the name and domain of your new organisation.",
-            "ORGDOMAIN_TITLE":"Organisation Domain Ownership Verification",
-            "ORGDOMAIN_VERIFICATION":"Verify the ownership of your domain. You need to download a verification file and upload it at the provided URL listed below, or place a TXT Record DNS entry for the provided URL. To complete, click the button to verify.",
-            "ORGDOMAIN_VERIFICATION_SKIP":"You can skip verification for now and continue to create your organisation, but in order to use your organisation this step has to be completed!",
             "ORGDETAILUSER_TITLE":"Configure Organisation Owner",
-            "ORGDOMAIN_VERIFICATION_VALIDATION_DESC":"The tokens are checked regularly to ensure you are still owner of the domain.",
-            "ORGDOMAIN_VERIFICATION_NEWTOKEN_TITLE":"Request New Token",
-            "ORGDOMAIN_VERIFICATION_NEWTOKEN_DESC":"If you want to request a new token, select you preferred method. If you want to validate a persisting token, click the button above.",
-            "ORGDOMAIN_VERIFICATION_VALIDATION_ONGOING":"A verification token has already been requested. Click on the button to trigger a verification check.",
+            "ORGDOMAIN": {
+                "TITLE":"Organisation Domain Ownership Verification",
+                "VERIFICATION":"Verify the ownership of your domain. You need to download a verification file and upload it at the provided URL listed below, or place a TXT Record DNS entry for the provided URL. To complete, click the button to verify.",
+                "VERIFICATION_SKIP":"You can skip verification for now and continue to create your organisation, but in order to use your organisation this step has to be completed!",
+                "VERIFICATION_VALIDATION_DESC":"The tokens are checked regularly to ensure you are still owner of the domain.",
+                "VERIFICATION_NEWTOKEN_TITLE":"Request New Token",
+                "VERIFICATION_NEWTOKEN_DESC":"If you want to request a new token, select you preferred method. If you want to validate a persisting token, click the button above.",
+                "VERIFICATION_VALIDATION_ONGOING":"A verification token has already been requested. Click on the button to trigger a verification check.",
+                "VERIFICATION_VALIDATION_ONGOING_TYPE":"Type of the token:",
+                "REQUESTNEWTOKEN":"Request new Token",
+                "TYPES": {
+                    "1":"HTTP",
+                    "2":"DNS"
+                }
+            },
             "DOWNLOAD_FILE":"Download File",
             "SELECTORGTOOLTIP":"Select this organisation.",
             "PRIMARYDOMAIN":"Primary Domain",
@@ -374,64 +419,6 @@
             "TITLE":"Organisation Managers",
             "DESCRIPTION":"Define the users who can change your organisations preferences."
         },
-        "POLICY": {
-            "TITLE":"Explore Policies",
-            "DESCRIPTION":"Pre-packaged policies that enhance your security.",
-            "PWD_COMPLEXITY": {
-                "TITLE":"Password Complexity",
-                "DESCRIPTION":"Ensures that all set passwords correspond to a specific pattern",
-                "TITLECREATE":"Create Password Complexity Policy",
-                "DESCRIPTIONCREATE":"Ensures that all set passwords correspond to a specific pattern",
-                "SYMBOLANDNUMBERERROR":"The password must consist of a digit and a symbol/punctuation mark.",
-                "SYMBOLERROR":"The password must include a symbol/punctuation mark.",
-                "NUMBERERROR":"The password must include a digit.",
-                "PATTERNERROR":"The password does not meet the required pattern."
-            },
-            "PWD_AGE": {
-                "TITLE":"Password Aging",
-                "DESCRIPTION":"You can set a policy for the aging of passwords. This policy emits a warning after the specific aging time has elapsed.",
-                "TITLECREATE":"Create Password Aging Policy",
-                "DESCRIPTIONCREATE":"You can set a policy for the aging of passwords. This policy emits a warning after the specific aging time has elapsed."
-            },
-            "PWD_LOCKOUT": {
-                "TITLE":"Password Lockout",
-                "DESCRIPTION":"Password retries are infinite in default mode. You have to apply this policy if you want to show the number of retries, or set a maximum number of retries after which the account will be blocked.",
-                "TITLECREATE":"Create Password Lockout Policy",
-                "DESCRIPTIONCREATE":"Password retries are infinite in default mode. You have to apply this policy if you want to show the number of retries, or set a maximum number of retries after which the account will be blocked."
-            },
-            "IAM_POLICY": {
-                "TITLE":"IAM Access Preferences",
-                "DESCRIPTION":"Define access properties of your users.",
-                "TITLECREATE":"Set IAM Access Preferences",
-                "DESCRIPTIONCREATE":"If the property \"UserLoginMustBeDomain\" is enabled an e-mail address cannot be used as a user name."
-            },
-            "LOGIN_POLICY": {
-                "TITLE":"Login Policy",
-                "DESCRIPTION":"Define how Users can be authenticated",
-                "TITLECREATE":"Define how Users can be authenticated",
-                "DESCRIPTIONCREATEADMIN":"Users can choose from the available identity providers below.",
-                "DESCRIPTIONCREATEMGMT":"Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only."
-            },
-            "BTN_INSTALL":"Setup",
-            "BTN_EDIT":"Modify",
-            "DATA": {
-                "DESCRIPTION":"Description",
-                "MINLENGTH":"minimum length",
-                "HASNUMBER": "has number",
-                "HASSYMBOL": "has symbol",
-                "HASLOWERCASE": "has lowercase",
-                "HASUPPERCASE": "has uppercase",
-                "SHOWLOCKOUTFAILURES":"show lockout failures",
-                "MAXATTEMPTS":"Max Attempts",
-                "EXPIREWARNDAYS":"Expiration Warning after day",
-                "MAXAGEDAYS":"Max Age in days",
-                "USERLOGINMUSTBEDOMAIN":"User Login must be Domain",
-                "ALLOWUSERNAMEPASSWORD":"Username Password allowed",
-                "ALLOWEXTERNALIDP":"External IDP allowed",
-                "ALLOWREGISTER":"Register allowed"
-            },
-            "DELETE":"Uninstall/Reset Policy"
-        },
         "TOAST": {
             "DEACTIVATED":"Organisation deactivated.",
             "REACTIVATED":"Organisation reactivated.",
@@ -441,6 +428,72 @@
             "MEMBERREMOVED":"Manager removed.",
             "MEMBERCHANGED":"Manager changed.",
             "SETPRIMARY":"Primary domain set."
+        }
+    },
+    "POLICY": {
+        "TITLE":"Explore Policies",
+        "DESCRIPTION":"Pre-packaged policies that enhance your security.",
+        "PWD_COMPLEXITY": {
+            "TITLE":"Password Complexity",
+            "DESCRIPTION":"Ensures that all set passwords correspond to a specific pattern",
+            "SYMBOLANDNUMBERERROR":"The password must consist of a digit and a symbol/punctuation mark.",
+            "SYMBOLERROR":"The password must include a symbol/punctuation mark.",
+            "NUMBERERROR":"The password must include a digit.",
+            "PATTERNERROR":"The password does not meet the required pattern."
+        },
+        "PWD_AGE": {
+            "TITLE":"Password Aging",
+            "DESCRIPTION":"You can set a policy for the aging of passwords. This policy emits a warning after the specific aging time has elapsed."
+        },
+        "PWD_LOCKOUT": {
+            "TITLE":"Password Lockout",
+            "DESCRIPTION":"Password retries are infinite in default mode. You have to apply this policy if you want to show the number of retries, or set a maximum number of retries after which the account will be blocked."
+        },
+        "IAM_POLICY": {
+            "TITLE":"IAM Access Preferences",
+            "DESCRIPTION":"Define access properties of your users."
+        },
+        "LOGIN_POLICY": {
+            "TITLE":"Login Policy",
+            "DESCRIPTION":"Define how Users can be authenticated",
+            "DESCRIPTIONCREATEADMIN":"Users can choose from the available identity providers below.",
+            "DESCRIPTIONCREATEMGMT":"Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only.",
+            "SAVED":"Saved successfully!"
+        },
+        "LABEL": {
+            "TITLE":"Email Labelling Settings",
+            "DESCRIPTION":"Change the look of your emails.",
+            "PRIMARYCOLOR":"Background color",
+            "SECONDARYCOLOR":"Font color",
+            "SAVED":"Saved successfully"
+        },
+        "DEFAULTLABEL":"The currently set guideline corresponds to the standard setting set by the IAM Administrator.",
+        "BTN_INSTALL":"Setup",
+        "BTN_EDIT":"Modify",
+        "DATA": {
+            "DESCRIPTION":"Description",
+            "MINLENGTH":"minimum length",
+            "HASNUMBER": "has number",
+            "HASSYMBOL": "has symbol",
+            "HASLOWERCASE": "has lowercase",
+            "HASUPPERCASE": "has uppercase",
+            "SHOWLOCKOUTFAILURES":"show lockout failures",
+            "MAXATTEMPTS":"Max Attempts",
+            "EXPIREWARNDAYS":"Expiration Warning after day",
+            "MAXAGEDAYS":"Max Age in days",
+            "USERLOGINMUSTBEDOMAIN":"User Login must be Domain",
+            "ALLOWUSERNAMEPASSWORD":"Username Password allowed",
+            "ALLOWEXTERNALIDP":"External IDP allowed",
+            "ALLOWREGISTER":"Register allowed",
+            "ALLOWUSERNAMEPASSWORD_DESC":"The conventional login with user name and password is allowed.",
+            "ALLOWEXTERNALIDP_DESC":"The login is allowed for the underlying identity providers",
+            "ALLOWREGISTER_DESC":"If the option is selected, an additional step for registering a user appears in the login."
+        },
+        "RESET":"Reset Policy",
+        "CREATECUSTOM":"Create Custom Policy",
+        "TOAST":{
+            "SET":"Policy set successfully!",
+            "RESETSUCCESS":"Policy reset successfully!"
         }
     },
     "ORG_DETAIL": {
@@ -461,6 +514,7 @@
             "USERNAME": "User Name",
             "FIRSTNAME": "First Name",
             "LASTNAME": "Last Name",
+            "LOGINNAME":"Login Name",
             "EMAIL": "E-mail",
             "ROLES": "Roles",
             "ADD": "Add Member",
@@ -602,7 +656,12 @@
             "EDITDESCRIPTION": "Enter the new data for the role.",
             "DELETE":"Delete Role",
             "CREATIONDATE":"Created",
-            "SELECTGROUPTOOLTIP":"Select all Roles of the group {{group}}."
+            "SELECTGROUPTOOLTIP":"Select all Roles of the group {{group}}.",
+            "OPTIONS":"Options",
+            "ASSERTION":"Assert Roles on Authentication.",
+            "ASSERTION_DESCRIPTION":"Roleinformation is sent as Token, Userinfo endpoint or other type, depending on your application settings.",
+            "CHECK":"Check roles on Authentication",
+            "CHECK_DESCRIPTION":"If set, users are only allowed to authenticate if any role is assigned to their account."
         },
         "TABLE": {
             "TOTAL": "Entries total:",
@@ -643,9 +702,10 @@
         },
         "DETAIL": {
           "TITLE":"Identity Provider",
-          "DESCRIPTION":"Configuration of your identity provider.",
+          "DESCRIPTION":"General Configuration of your identity provider.",
           "OIDC": {
-            "TITLE": "OIDC Configuration"
+            "TITLE": "OIDC Configuration",
+            "DESCRIPTION":"Provide the correct OIDC Configuration for your identity Provider below!"
           }
         },
         "TYPES": {
@@ -661,12 +721,16 @@
           "1": "Preferred Username",
           "2": "Email"
         },
+        "STYLE":"Style",
+        "STYLEFIELD": {
+            "0": "No Styling",
+            "1": "Google"
+          },
         "TYPE":"Type",
         "ID": "ID",
         "NAME":"Name",
         "CONFIG":"Configuration",
         "STATE":"State",
-        "LOGOSRC":"Logo Src",
         "ISSUER":"Issuer",
         "SCOPESLIST":"Scopes List",
         "CLIENTID":"Client ID",
@@ -678,8 +742,18 @@
         "DEACTIVATE":"Deactivate",
         "ACTIVATE":"Activate",
         "DELETE":"Delete",
+        "DELETE_TITLE":"Delete Idp",
+        "DELETE_DESCRIPTION":"You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
+        "DELETE_SELECTION_TITLE":"Delete Idp",
+        "DELETE_SELECTION_DESCRIPTION":"You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
         "TOAST": {
-            "SAVED": "Successfully saved."
+            "SAVED": "Successfully saved.",
+            "REACTIVATED":"Idp reactivated.",
+            "DEACTIVATED":"Idp deactivated.",
+            "SELECTEDREACTIVATED":"Selected idps reactivated.",
+            "SELECTEDDEACTIVATED":"Selected idps deactivated.",
+            "SELECTEDKEYSDELETED":"Selected idps deleted.",
+            "DELETED":"Idp removed successfully!"
         }
     },
     "LOGINPOLICY": {
@@ -715,6 +789,8 @@
         "TYPE":"Application Type",
         "GRANT":"Grant Types",
         "OIDC": {
+            "TOKENSECTIONTITLE":"AuthToken Options",
+            "REDIRECTSECTIONTITLE":"Redirect Settings",
             "PROSWITCH":"I'm a pro. Skip this wizard.",
             "NAMEANDTYPESECTION":"Name and Type",
             "TITLEFIRST":"Insert a name first.",
@@ -755,9 +831,16 @@
             "AUTHMETHOD0":"Basic",
             "AUTHMETHOD1":"Post",
             "AUTHMETHOD2":"None",
+            "TOKENTYPE":"Auth Token Type",
+            "TOKENTYPE0": "Bearer Token",
+            "TOKENTYPE1": "JWT",
             "UNSECUREREDIRECT":"I sure hope you know what you are doing.",
             "OVERVIEWSECTION":"Overview",
-            "OVERVIEWTITLE":"You are now done. Review your configuration."
+            "OVERVIEWTITLE":"You are now done. Review your configuration.",
+            "ACCESSTOKENROLEASSERTION":"Add user roles to the access token",
+            "ACCESSTOKENROLEASSERTION_DESCRIPTION":"If selected, the roles of the authenticated user are added to the access token.",
+            "IDTOKENROLEASSERTION":"Add user roles to the id token",
+            "IDTOKENROLEASSERTION_DESCRIPTION":"If selected, the roles of the authenticated user are added to the id token."
         },
         "TOAST": {
             "REACTIVATED":"Application reactivated.",
@@ -789,6 +872,8 @@
     },
     "ROLESLABEL":"Roles",
     "GRANTS": {
+        "TITLE":"Authorisations",
+        "DESC":"Here you can manage authorizations of your organization users.",
         "DELETE":"Delete Authorisation",
         "ADD":"Create Authorisation",
         "ADD_BTN":"New",

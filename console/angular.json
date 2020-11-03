@@ -34,9 +34,7 @@
             "scripts": [],
             "allowedCommonJsDependencies": [
                 "@angular/common/locales/de",
-                "src/app/proto/generated/*.js",
-                "src/app/proto/generated/**/*.js",
-                "src/app/proto/generated/auth_pb",
+                "src/app/proto/generated/**",
                 "file-saver",
                 "qrcode"
              ]

@@ -2,6 +2,11 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/logging"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/user/repository/view/model"
+	"strings"
 	"time"
 
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
@@ -9,6 +14,7 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/tracing"
 )
 
 type TokenVerifierRepo struct {
@@ -16,16 +22,57 @@ type TokenVerifierRepo struct {
 	IAMID                string
 	IAMEvents            *iam_event.IAMEventstore
 	ProjectEvents        *proj_event.ProjectEventstore
+	UserEvents           *usr_event.UserEventstore
 	View                 *view.View
 }
 
+func (repo *TokenVerifierRepo) TokenByID(ctx context.Context, tokenID, userID string) (*usr_model.TokenView, error) {
+	token, viewErr := repo.View.TokenByID(tokenID)
+	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
+		return nil, viewErr
+	}
+	if caos_errs.IsNotFound(viewErr) {
+		token = new(model.TokenView)
+		token.ID = tokenID
+		token.UserID = userID
+	}
+
+	events, esErr := repo.UserEvents.UserEventsByID(ctx, userID, token.Sequence)
+	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
+	}
+
+	if esErr != nil {
+		logging.Log("EVENT-5Nm9s").WithError(viewErr).Debug("error retrieving new events")
+		return model.TokenViewToModel(token), nil
+	}
+	viewToken := *token
+	for _, event := range events {
+		err := token.AppendEventIfMyToken(event)
+		if err != nil {
+			return model.TokenViewToModel(&viewToken), nil
+		}
+	}
+	if !token.Expiration.After(time.Now().UTC()) || token.Deactivated {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.Token.NotFound")
+	}
+	return model.TokenViewToModel(token), nil
+}
+
 func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenString, clientID string) (userID string, agentID string, prefLang string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	//TODO: use real key
-	tokenID, err := crypto.DecryptAESString(tokenString, string(repo.TokenVerificationKey[:32]))
+	tokenIDSubject, err := crypto.DecryptAESString(tokenString, string(repo.TokenVerificationKey[:32]))
 	if err != nil {
 		return "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-8EF0zZ", "invalid token")
 	}
-	token, err := repo.View.TokenByID(tokenID)
+
+	splittedToken := strings.Split(tokenIDSubject, ":")
+	if len(splittedToken) != 2 {
+		return "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-GDg3a", "invalid token")
+	}
+	token, err := repo.TokenByID(ctx, splittedToken[0], splittedToken[1])
 	if err != nil {
 		return "", "", "", caos_errs.ThrowUnauthenticated(err, "APP-BxUSiL", "invalid token")
 	}
@@ -54,12 +101,15 @@ func (repo *TokenVerifierRepo) ExistsOrg(ctx context.Context, orgID string) erro
 	return err
 }
 
-func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName string) (string, error) {
+func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName string) (_ string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	iam, err := repo.IAMEvents.IAMByID(ctx, repo.IAMID)
 	if err != nil {
 		return "", err
 	}
-	app, err := repo.View.ApplicationByProjecIDAndAppName(iam.IAMProjectID, appName)
+	app, err := repo.View.ApplicationByProjecIDAndAppName(ctx, iam.IAMProjectID, appName)
 	if err != nil {
 		return "", err
 	}

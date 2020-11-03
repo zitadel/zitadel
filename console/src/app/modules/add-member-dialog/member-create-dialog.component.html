@@ -9,8 +9,9 @@
         <mat-form-field class="full-width" appearance="outline">
             <mat-label>{{ 'MEMBER.CREATIONTYPE' | translate }}</mat-label>
             <mat-select [(ngModel)]="creationType" (selectionChange)="loadRoles()">
-                <mat-option *ngFor="let type of creationTypes" [value]="type">
-                    {{ 'MEMBER.CREATIONTYPES.'+type | translate}}
+                <mat-option *ngFor="let type of creationTypes" [value]="type.type"
+                    [disabled]="(type.disabled$ | async) == false">
+                    {{ 'MEMBER.CREATIONTYPES.'+type.type | translate}}
                 </mat-option>
             </mat-select>
         </mat-form-field>

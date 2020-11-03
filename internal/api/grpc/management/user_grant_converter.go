@@ -89,6 +89,22 @@ func userGrantSearchKeyToModel(key management.UserGrantSearchKey) grant_model.Us
 		return grant_model.UserGrantSearchKeyRoleKey
 	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_GRANT_ID:
 		return grant_model.UserGrantSearchKeyGrantID
+	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_USER_NAME:
+		return grant_model.UserGrantSearchKeyUserName
+	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_FIRST_NAME:
+		return grant_model.UserGrantSearchKeyFirstName
+	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_LAST_NAME:
+		return grant_model.UserGrantSearchKeyLastName
+	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_EMAIL:
+		return grant_model.UserGrantSearchKeyEmail
+	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_ORG_NAME:
+		return grant_model.UserGrantSearchKeyOrgName
+	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_ORG_DOMAIN:
+		return grant_model.UserGrantSearchKeyOrgDomain
+	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_PROJECT_NAME:
+		return grant_model.UserGrantSearchKeyProjectName
+	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_DISPLAY_NAME:
+		return grant_model.UserGrantSearchKeyDisplayName
 	default:
 		return grant_model.UserGrantSearchKeyUnspecified
 	}
@@ -135,7 +151,7 @@ func userGrantViewFromModel(grant *grant_model.UserGrantView) *management.UserGr
 		Email:         grant.Email,
 		ProjectName:   grant.ProjectName,
 		OrgName:       grant.OrgName,
-		OrgDomain:     grant.OrgDomain,
+		OrgDomain:     grant.OrgPrimaryDomain,
 		RoleKeys:      grant.RoleKeys,
 		UserId:        grant.UserID,
 		ProjectId:     grant.ProjectID,

@@ -5,6 +5,7 @@ import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
+import { PolicyGridType } from 'src/app/modules/policy-grid/policy-grid.component';
 import { OrgMemberView, UserView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -21,6 +22,8 @@ export class IamComponent {
     public totalMemberResult: number = 0;
     public membersSubject: BehaviorSubject<OrgMemberView.AsObject[]>
         = new BehaviorSubject<OrgMemberView.AsObject[]>([]);
+
+    public PolicyGridType: any = PolicyGridType;
 
     constructor(public adminService: AdminService, private dialog: MatDialog, private toast: ToastService,
         private router: Router) {

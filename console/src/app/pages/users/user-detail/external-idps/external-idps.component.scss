@@ -19,21 +19,9 @@
         padding-right: 0;
       }
     }
-
-    .data-row {
-      cursor: pointer;
-
-      &:hover {
-        background-color: #ffffff05;
-      }
-    }
   }
 }
 
 tr {
   outline: none;
-}
-
-.add-button {
-  border-radius: .5rem;
 }

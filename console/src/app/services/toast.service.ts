@@ -1,19 +1,16 @@
 import { Injectable } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
-
-import { AuthenticationService } from './authentication.service';
+import { take } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ToastService {
-    constructor(private dialog: MatDialog,
+    constructor(
         private snackBar: MatSnackBar,
         private translate: TranslateService,
-        private authService: AuthenticationService,
     ) { }
 
     public showInfo(message: string, i18nkey: boolean = false): void {
@@ -21,22 +18,28 @@ export class ToastService {
             this.translate
                 .get(message)
                 .subscribe(data => {
-                    this.showMessage(data, 'close');
+                    this.translate.get('ACTIONS.CLOSE').pipe(take(1)).subscribe(value => {
+                        this.showMessage(data, value);
+                    });
                 });
         } else {
-            this.showMessage(message, 'close');
+            this.translate.get('ACTIONS.CLOSE').pipe(take(1)).subscribe(value => {
+                this.showMessage(message, value);
+            });
         }
     }
 
     public showError(grpcError: any): void {
         const { message, code, metadata } = grpcError;
         if (code !== 16) {
-            this.showMessage(decodeURI(message), 'close', { duration: 4000 });
+            this.translate.get('ACTIONS.CLOSE').pipe(take(1)).subscribe(value => {
+                this.showMessage(decodeURI(message), value);
+            });
         }
     }
 
-    private showMessage(message: string, action: string, config?: MatSnackBarConfig): Observable<void> {
-        const ref = this.snackBar.open(message, action, config);
+    private showMessage(message: string, action: string): Observable<void> {
+        const ref = this.snackBar.open(message, action, { duration: 4000 });
 
         return ref.onAction();
     }

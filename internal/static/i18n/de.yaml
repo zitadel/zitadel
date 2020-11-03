@@ -83,12 +83,30 @@ Errors:
     IdpNotExisting: IDP Konfiguration existiert nicht
     OIDCConfigInvalid: OIDC IDP Konfiguration ist ungültig
     IdpIsNotOIDC: IDP Konfiguration ist nicht vom Typ OIDC
+    IDP:
+      InvalidSearchQuery: Ungültiger Suchparameter
     LoginPolicy:
       Invalid: Login Policy ist ungültig
       NotExisting: Login Policy existiert nicht auf dieser Organisation
       AlreadyExists: Login Policy existiert bereits
       IdpProviderAlreadyExisting: Idp Provider existiert bereits
       IdpProviderNotExisting: Idp Provider existiert nicht
+    PasswordComplexity:
+      Empty: Passwort Komplexitäts Policy ist leer
+      NotExisting: Passwort Komplexitäts Policy existiert nicht
+      AlreadyExists: Passwort Komplexitäts Policy existiert bereits
+    PasswordLockout:
+      Empty: Passwort Lockout Policy ist leer
+      NotExisting: Passwort Lockout Policy existiert nicht
+      AlreadyExists: Passwort Lockout Policy existiert bereits
+    PasswordAge:
+      Empty: Passwort Age Policy ist leer
+      NotExisting: Passwort Age Policy existiert nicht
+      AlreadyExists: Passwort Age Policy existiert bereits
+    OrgIAM:
+      Empty: Org IAM Policy ist leer
+      NotExisting: Org IAM Policy existiert nicht
+      AlreadyExists: Org IAM Policy existiert bereits
   Project:
     ProjectIDMissing: Project Id fehlt
     AlreadyExists: Project existiert bereits auf der Organisation
@@ -141,6 +159,22 @@ Errors:
       AlreadyExists: Default Login Policy existiert bereits
       IdpProviderAlreadyExisting: Idp Provider existiert bereits
       IdpProviderNotExisting: Idp Provider existiert nicht
+    PasswordComplexityPolicy:
+      NotExisting: Default Password Complexity Policy existiert nicht
+      AlreadyExists: Default Password Complexity Policy existiert bereits
+      Empty: Default Password Complexity Policy leer
+    PasswordAgePolicy:
+      NotExisting: Default Password Age Policy existiert nicht
+      AlreadyExists: Default Password Age Policy existiert bereits
+      Empty: Default Password Age Policy leer
+    PasswordLockoutPolicy:
+      NotExisting: Default Password Lockout Policy existiert nicht
+      AlreadyExists: Default Password Lockout Policy existiert bereits
+      Empty: Default Password Lockout Policy leer
+    OrgIAM:
+      NotExisting: Default Org IAM Policy existiert nicht
+      AlreadyExists: Default Org IAM Policy existiert bereits
+      Empty: Default Org IAM Policy leer
   Policy:
     AlreadyExists: Policy existiert bereits
   UserGrant:
@@ -169,6 +203,8 @@ EventTypes:
       check:
         succeeded: Benutzerinitialisierung erfolgreich
         failed: Benutzerinitialisierung fehlgeschlagen
+    token:
+      added: Access Token ausgestellt
     username:
       reserved: Benutzername reserviert
       released: Benutzername freigegeben
@@ -217,6 +253,9 @@ EventTypes:
         check:
           succeeded: Passwortvalidierung erfolgreich
           failed: Passwortvalidierung fehlgeschlagen
+      externallogin:
+        check:
+          succeeded: Externer login erfolgreich durchgeführt
       externalidp:
         added: Externer IDP wurde hinzugefügt
         removed: Externer IDP wurde gelöscht
@@ -340,11 +379,24 @@ EventTypes:
           changed: SAML IDP Konfiguration geändert
     policy:
       login:
-        added: Login Policy hinzugefügt
-        changed: Login Policy geändert
+        added: Login Richtlinie hinzugefügt
+        changed: Login Richtlinie geändert
         idpprovider:
-          added: Idp Provider zu Login Policy hinzugefügt
-          removed: Idp Provider aus Login Policy gelöscht
+          added: Idp Provider zu Login Richtlinie hinzugefügt
+          removed: Idp Provider aus Login Richtlinie gelöscht
+      password:
+        complexity:
+          added: Passwort Komplexitäts Richtlinie hinzugefügt
+          changed: Passwort Komplexitäts Richtlinie geändert
+          removed: Passwort Komplexitäts Richtlinie gelöscht
+        age:
+          added: Passwort Alter Richtlinie hinzugefügt
+          changed: Passwort Alter Richtlinie geändert
+          removed: Passwort Alter Richtlinie gelöscht
+        lockout:
+          added: Passwort Sperrungs Richtlinie hinzugefügt
+          changed: Passwort Sperrungs Richtlinie geändert
+          removed: Passwort Sperrungs Richtlinie gelöscht
   project:
     added: Projekt hinzugefügt
     changed: Project geändert

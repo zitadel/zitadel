@@ -19,8 +19,9 @@
         {{if .LoginPolicy.AllowExternalIDP}}
             {{ $reqid := .AuthReqID}}
             {{range $provider := .IDPProviders}}
-                <a href="{{ externalIDPRegisterURL $reqid $provider.IDPConfigID}}" class="button secondary idp-providers">
-                    {{$provider.Name}}
+                <a href="{{ externalIDPRegisterURL $reqid $provider.IDPConfigID}}" class="button secondary idp-provider {{idpProviderClass $provider.StylingType}}">
+                    <span class="logo"></span>
+                    <span class="provider-name">{{$provider.Name}}</span>
                 </a>
             {{end}}
         {{end}}

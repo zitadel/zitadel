@@ -19,7 +19,7 @@
     width: 100%;
     display: block;
     font-size: .9rem;
-    color: #8795a1;
+    color: var(--grey);
   }
 
   .zitadel-warning {
@@ -31,12 +31,6 @@
 .err-container {
   color: rgb(201, 51, 71);
   font-size: 14px;
-}
-
-.card-actions {
-  button {
-    border-radius: .5rem;
-  }
 }
 
 .compliance .problem {
@@ -66,6 +60,21 @@
     }
   }
 
+  .section-title {
+    margin-bottom: 1.5rem;
+  }
+
+  .full-width {
+    flex-basis: 100%;
+    margin-left: .5rem;
+    margin-right: .5rem;
+  }
+
+  .desc {
+    color: var(--grey);
+    font-size: 14px;
+  }
+
   .devmode {
     flex: 1 1 100%;
     margin: 1rem .5rem;
@@ -73,7 +82,7 @@
 
   .step-description {
     font-size: .9rem;
-    color: #8795a1;
+    color: var(--grey);
     flex-basis: 100%;
     margin: 0 .5rem 1rem .5rem;
   }
@@ -87,15 +96,20 @@
   .docs-line {
     flex-basis: 100%;
     font-size: 14px;
-    color: #8795a1;
+    color: var(--grey);
     margin-top: 0;
   }
 
   .toggle {
+    outline: none;
     align-self: flex-start;
     margin-bottom: 1rem;
     margin-right: 1rem;
     border-radius: .5rem;
+
+    * {
+      outline: none;
+    }
 
     i {
       margin-right: 1rem;
@@ -109,11 +123,17 @@
   margin: 0 -.5rem;
 
   .submit-button {
-    border-radius: .5rem;
     margin: 0 .5rem;
   }
 }
 
 .chip[color='green'] {
   background-color: #56a392 !important;
+}
+
+.divider {
+  flex-basis: 100%;
+  margin: 1.5rem .5rem;
+  height: 1px;
+  background-color: var(--grey);
 }

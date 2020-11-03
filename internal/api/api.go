@@ -103,20 +103,20 @@ func handleReadiness(checks []ValidationFunction) func(w http.ResponseWriter, r 
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := validate(r.Context(), checks)
 		if err == nil {
-			http_util.MarshalJSON(w, "ok")
+			http_util.MarshalJSON(w, "ok", nil, http.StatusOK)
 			return
 		}
-		http_util.MarshalJSON(w, err)
+		http_util.MarshalJSON(w, nil, err, http.StatusPreconditionFailed)
 	}
 }
 
 func (a *API) handleClientID(w http.ResponseWriter, r *http.Request) {
 	id, err := a.health.VerifierClientID(r.Context(), "Zitadel Console")
 	if err != nil {
-		http_util.MarshalJSON(w, err)
+		http_util.MarshalJSON(w, nil, err, http.StatusPreconditionFailed)
 		return
 	}
-	http_util.MarshalJSON(w, id)
+	http_util.MarshalJSON(w, id, nil, http.StatusOK)
 }
 
 type ValidationFunction func(ctx context.Context) error

@@ -9,9 +9,9 @@ import (
 
 func createOidcIdpToModel(idp *admin.OidcIdpConfigCreate) *iam_model.IDPConfig {
 	return &iam_model.IDPConfig{
-		Name:    idp.Name,
-		LogoSrc: idp.LogoSrc,
-		Type:    iam_model.IDPConfigTypeOIDC,
+		Name:        idp.Name,
+		StylingType: idpConfigStylingTypeToModel(idp.StylingType),
+		Type:        iam_model.IDPConfigTypeOIDC,
 		OIDCConfig: &iam_model.OIDCIDPConfig{
 			ClientID:              idp.ClientId,
 			ClientSecretString:    idp.ClientSecret,
@@ -27,7 +27,7 @@ func updateIdpToModel(idp *admin.IdpUpdate) *iam_model.IDPConfig {
 	return &iam_model.IDPConfig{
 		IDPConfigID: idp.Id,
 		Name:        idp.Name,
-		LogoSrc:     idp.LogoSrc,
+		StylingType: idpConfigStylingTypeToModel(idp.StylingType),
 	}
 }
 
@@ -56,7 +56,7 @@ func idpFromModel(idp *iam_model.IDPConfig) *admin.Idp {
 		ChangeDate:   changeDate,
 		Sequence:     idp.Sequence,
 		Name:         idp.Name,
-		LogoSrc:      idp.LogoSrc,
+		StylingType:  idpConfigStylingTypeFromModel(idp.StylingType),
 		State:        idpConfigStateFromModel(idp.State),
 		IdpConfig:    idpConfigFromModel(idp),
 	}
@@ -75,7 +75,7 @@ func idpViewFromModel(idp *iam_model.IDPConfigView) *admin.IdpView {
 		ChangeDate:    changeDate,
 		Sequence:      idp.Sequence,
 		Name:          idp.Name,
-		LogoSrc:       idp.LogoSrc,
+		StylingType:   idpConfigStylingTypeFromModel(idp.StylingType),
 		State:         idpConfigStateFromModel(idp.State),
 		IdpConfigView: idpConfigViewFromModel(idp),
 	}
@@ -205,4 +205,22 @@ func idpConfigsFromView(viewIdps []*iam_model.IDPConfigView) []*admin.IdpView {
 		idps[i] = idpViewFromModel(idp)
 	}
 	return idps
+}
+
+func idpConfigStylingTypeFromModel(stylingType iam_model.IDPStylingType) admin.IdpStylingType {
+	switch stylingType {
+	case iam_model.IDPStylingTypeGoogle:
+		return admin.IdpStylingType_IDPSTYLINGTYPE_GOOGLE
+	default:
+		return admin.IdpStylingType_IDPSTYLINGTYPE_UNSPECIFIED
+	}
+}
+
+func idpConfigStylingTypeToModel(stylingType admin.IdpStylingType) iam_model.IDPStylingType {
+	switch stylingType {
+	case admin.IdpStylingType_IDPSTYLINGTYPE_GOOGLE:
+		return iam_model.IDPStylingTypeGoogle
+	default:
+		return iam_model.IDPStylingTypeUnspecified
+	}
 }

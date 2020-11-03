@@ -20,7 +20,7 @@ func UserMembershipByIDs(db *gorm.DB, table, userID, aggregateID, objectID strin
 	query := repository.PrepareGetByQuery(table, userIDQuery, aggregateIDQuery, objectIDQuery, memberTypeQuery)
 	err := query(db, memberships)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-sj8Sw", "Errors.UserMembership.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-5Tsji", "Errors.UserMembership.NotFound")
 	}
 	return memberships, err
 }
@@ -75,6 +75,24 @@ func DeleteUserMembership(db *gorm.DB, table, userID, aggregateID, objectID stri
 		repository.Key{Key: model.UserMembershipSearchKey(usr_model.UserMembershipSearchKeyAggregateID), Value: aggregateID},
 		repository.Key{Key: model.UserMembershipSearchKey(usr_model.UserMembershipSearchKeyObjectID), Value: objectID},
 		repository.Key{Key: model.UserMembershipSearchKey(usr_model.UserMembershipSearchKeyMemberType), Value: membertype},
+	)
+	return delete(db)
+}
+
+func DeleteUserMembershipsByUserID(db *gorm.DB, table, userID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.UserMembershipSearchKey(usr_model.UserMembershipSearchKeyUserID), userID)
+	return delete(db)
+}
+
+func DeleteUserMembershipsByAggregateID(db *gorm.DB, table, aggregateID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.UserMembershipSearchKey(usr_model.UserMembershipSearchKeyAggregateID), aggregateID)
+	return delete(db)
+}
+
+func DeleteUserMembershipsByAggregateIDAndObjectID(db *gorm.DB, table, aggregateID, objectID string) error {
+	delete := repository.PrepareDeleteByKeys(table,
+		repository.Key{Key: model.UserMembershipSearchKey(usr_model.UserMembershipSearchKeyAggregateID), Value: aggregateID},
+		repository.Key{Key: model.UserMembershipSearchKey(usr_model.UserMembershipSearchKeyObjectID), Value: objectID},
 	)
 	return delete(db)
 }

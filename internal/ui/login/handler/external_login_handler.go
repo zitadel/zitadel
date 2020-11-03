@@ -6,6 +6,7 @@ import (
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/errors"
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -40,6 +41,15 @@ type externalNotFoundOptionData struct {
 	baseData
 }
 
+func (l *Login) handleExternalLoginStep(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, selectedIDPConfigID string) {
+	for _, idp := range authReq.AllowedExternalIDPs {
+		if idp.IDPConfigID == selectedIDPConfigID {
+			l.handleIDP(w, r, authReq, selectedIDPConfigID)
+		}
+	}
+	l.renderLogin(w, r, authReq, errors.ThrowInvalidArgument(nil, "VIEW-Fsj7f", "Errors.User.ExternalIDP.NotAllowed"))
+}
+
 func (l *Login) handleExternalLogin(w http.ResponseWriter, r *http.Request) {
 	data := new(externalIDPData)
 	authReq, err := l.getAuthRequestAndParseData(r, data)
@@ -51,7 +61,11 @@ func (l *Login) handleExternalLogin(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, l.zitadelURL, http.StatusFound)
 		return
 	}
-	idpConfig, err := l.getIDPConfigByID(r, data.IDPConfigID)
+	l.handleIDP(w, r, authReq, data.IDPConfigID)
+}
+
+func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, selectedIDPConfigID string) {
+	idpConfig, err := l.getIDPConfigByID(r, selectedIDPConfigID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -117,9 +131,12 @@ func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *mod
 
 func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
 	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
-	err := l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, userAgentID, externalUser)
+	err := l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, userAgentID, externalUser, model.BrowserInfoFromRequest(r))
 	if err != nil {
-		l.renderExternalNotFoundOption(w, r, authReq, nil)
+		if errors.IsNotFound(err) {
+			err = nil
+		}
+		l.renderExternalNotFoundOption(w, r, authReq, err)
 		return
 	}
 	l.renderNextStep(w, r, authReq)
@@ -196,7 +213,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	user, externalIDP := l.mapExternalUserToLoginUser(orgIamPolicy, authReq.LinkingUsers[len(authReq.LinkingUsers)-1], idpConfig)
-	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, member, authReq.ID, userAgentID, resourceOwner)
+	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, member, authReq.ID, userAgentID, resourceOwner, model.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, err)
 		return
@@ -205,36 +222,36 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 }
 
 func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) *model.ExternalUser {
-	displayName := tokens.IDTokenClaims.PreferredUsername
-	if displayName == "" && tokens.IDTokenClaims.Email != "" {
-		displayName = tokens.IDTokenClaims.Email
+	displayName := tokens.IDTokenClaims.GetPreferredUsername()
+	if displayName == "" && tokens.IDTokenClaims.GetEmail() != "" {
+		displayName = tokens.IDTokenClaims.GetEmail()
 	}
 	switch idpConfig.OIDCIDPDisplayNameMapping {
 	case iam_model.OIDCMappingFieldEmail:
-		if tokens.IDTokenClaims.EmailVerified && tokens.IDTokenClaims.Email != "" {
-			displayName = tokens.IDTokenClaims.Email
+		if tokens.IDTokenClaims.IsEmailVerified() && tokens.IDTokenClaims.GetEmail() != "" {
+			displayName = tokens.IDTokenClaims.GetEmail()
 		}
 	}
 
 	externalUser := &model.ExternalUser{
 		IDPConfigID:       idpConfig.IDPConfigID,
-		ExternalUserID:    tokens.IDTokenClaims.Subject,
-		PreferredUsername: tokens.IDTokenClaims.PreferredUsername,
+		ExternalUserID:    tokens.IDTokenClaims.GetSubject(),
+		PreferredUsername: tokens.IDTokenClaims.GetPreferredUsername(),
 		DisplayName:       displayName,
-		FirstName:         tokens.IDTokenClaims.GivenName,
-		LastName:          tokens.IDTokenClaims.FamilyName,
-		NickName:          tokens.IDTokenClaims.Nickname,
-		Email:             tokens.IDTokenClaims.Email,
-		IsEmailVerified:   tokens.IDTokenClaims.EmailVerified,
+		FirstName:         tokens.IDTokenClaims.GetGivenName(),
+		LastName:          tokens.IDTokenClaims.GetFamilyName(),
+		NickName:          tokens.IDTokenClaims.GetNickname(),
+		Email:             tokens.IDTokenClaims.GetEmail(),
+		IsEmailVerified:   tokens.IDTokenClaims.IsEmailVerified(),
 	}
 
-	if tokens.IDTokenClaims.PhoneNumber != "" {
-		externalUser.Phone = tokens.IDTokenClaims.PhoneNumber
-		externalUser.IsPhoneVerified = tokens.IDTokenClaims.PhoneNumberVerified
+	if tokens.IDTokenClaims.GetPhoneNumber() != "" {
+		externalUser.Phone = tokens.IDTokenClaims.GetPhoneNumber()
+		externalUser.IsPhoneVerified = tokens.IDTokenClaims.IsPhoneNumberVerified()
 	}
 	return externalUser
 }
-func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *org_model.OrgIAMPolicy, linkingUser *model.ExternalUser, idpConfig *iam_model.IDPConfigView) (*usr_model.User, *usr_model.ExternalIDP) {
+func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *iam_model.OrgIAMPolicyView, linkingUser *model.ExternalUser, idpConfig *iam_model.IDPConfigView) (*usr_model.User, *usr_model.ExternalIDP) {
 	username := linkingUser.PreferredUsername
 	switch idpConfig.OIDCUsernameMapping {
 	case iam_model.OIDCMappingFieldEmail:

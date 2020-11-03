@@ -354,6 +354,12 @@ func (u *UserGrant) fillProjectData(grant *view_model.UserGrantView, project *pr
 
 func (u *UserGrant) fillOrgData(grant *view_model.UserGrantView, org *org_model.Org) {
 	grant.OrgName = org.Name
+	for _, domain := range org.Domains {
+		if domain.Primary {
+			grant.OrgPrimaryDomain = domain.Domain
+			break
+		}
+	}
 }
 
 func (u *UserGrant) OnError(event *models.Event, err error) error {

@@ -9,6 +9,7 @@
 
 .content {
   display: flex;
+  flex-direction: row;
   margin: 0 -.5rem;
   flex-wrap: wrap;
 
@@ -16,12 +17,16 @@
     flex-basis: 100%;
     margin: 0 .5rem;
     margin-bottom: 1rem;
-    color: #8795a1;
+    color: var(--grey);
   }
 
   .formfield {
-    flex: 1 0 auto;
+    flex: 1 1 auto;
     margin: 0 .5rem;
+
+    &.fullwidth {
+      flex-basis: 100%;
+    }
 
     @media only screen and (max-width: 450px) {
       flex-basis: 100%;
@@ -29,14 +34,18 @@
   }
 }
 
-.continue-button {
-  margin-bottom: 4rem;
-  display: block;
-  padding: .5rem 4rem;
-  border-radius: .5rem;
+.btn-wrapper {
+  display: flex;
+  justify-content: flex-end;
 
-  @media only screen and (max-width: 450px) {
-    margin-top: 1rem;
-    margin-bottom: 2rem;
+  .continue-button {
+    margin-bottom: 4rem;
+    display: block;
+    padding: .5rem 4rem;
+
+    @media only screen and (max-width: 450px) {
+      margin-top: 1rem;
+      margin-bottom: 2rem;
+    }
   }
 }

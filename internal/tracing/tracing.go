@@ -38,6 +38,13 @@ func NewSpan(ctx context.Context) (context.Context, *Span) {
 	return T.NewSpan(ctx, GetCaller())
 }
 
+func NewNamedSpan(ctx context.Context, name string) (context.Context, *Span) {
+	if T == nil {
+		return ctx, CreateSpan(nil)
+	}
+	return T.NewSpan(ctx, name)
+}
+
 func NewClientSpan(ctx context.Context) (context.Context, *Span) {
 	if T == nil {
 		return ctx, CreateSpan(nil)
@@ -52,18 +59,18 @@ func NewServerSpan(ctx context.Context) (context.Context, *Span) {
 	return T.NewServerSpan(ctx, GetCaller())
 }
 
-func NewClientInterceptorSpan(ctx context.Context, name string) (context.Context, *Span) {
+func NewClientInterceptorSpan(ctx context.Context) (context.Context, *Span) {
 	if T == nil {
 		return ctx, CreateSpan(nil)
 	}
-	return T.NewClientInterceptorSpan(ctx, name)
+	return T.NewClientInterceptorSpan(ctx, GetCaller())
 }
 
-func NewServerInterceptorSpan(ctx context.Context, name string) (context.Context, *Span) {
+func NewServerInterceptorSpan(ctx context.Context) (context.Context, *Span) {
 	if T == nil {
 		return ctx, CreateSpan(nil)
 	}
-	return T.NewServerInterceptorSpan(ctx, name)
+	return T.NewServerInterceptorSpan(ctx, GetCaller())
 }
 
 func NewSpanHTTP(r *http.Request) (*http.Request, *Span) {

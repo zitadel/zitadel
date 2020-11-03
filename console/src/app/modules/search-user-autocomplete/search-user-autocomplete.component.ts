@@ -1,5 +1,15 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import {
+    AfterContentChecked,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    EventEmitter,
+    Input,
+    OnInit,
+    Output,
+    ViewChild,
+} from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
@@ -19,7 +29,7 @@ export enum UserTarget {
     templateUrl: './search-user-autocomplete.component.html',
     styleUrls: ['./search-user-autocomplete.component.scss'],
 })
-export class SearchUserAutocompleteComponent {
+export class SearchUserAutocompleteComponent implements OnInit, AfterContentChecked {
     public selectable: boolean = true;
     public removable: boolean = true;
     public addOnBlur: boolean = true;
@@ -32,7 +42,7 @@ export class SearchUserAutocompleteComponent {
     @Input() public users: Array<UserView.AsObject> = [];
     public filteredUsers: Array<UserView.AsObject> = [];
     public isLoading: boolean = false;
-    public target: UserTarget = UserTarget.SELF;
+    @Input() public target: UserTarget = UserTarget.SELF;
     public hint: string = '';
     public UserTarget: any = UserTarget;
     @ViewChild('usernameInput') public usernameInput!: ElementRef<HTMLInputElement>;
@@ -41,8 +51,19 @@ export class SearchUserAutocompleteComponent {
     @Input() public singleOutput: boolean = false;
 
     private unsubscribed$: Subject<void> = new Subject();
-    constructor(private userService: ManagementService, private toast: ToastService) {
-        this.getFilteredResults();
+    constructor(private userService: ManagementService, private toast: ToastService, private cdref: ChangeDetectorRef) { }
+
+    public ngOnInit(): void {
+        if (this.target === UserTarget.EXTERNAL) {
+            this.filteredUsers = [];
+            this.unsubscribed$.next(); // clear old subscription
+        } else if (this.target === UserTarget.SELF) {
+            this.getFilteredResults(); // new subscription
+        }
+    }
+
+    public ngAfterContentChecked(): void {
+        this.cdref.detectChanges();
     }
 
     private getFilteredResults(): void {
@@ -118,8 +139,12 @@ export class SearchUserAutocompleteComponent {
                 } else {
                     this.users = [this.filteredUsers[index]];
                 }
-                this.selectionChanged.emit(this.users);
 
+                if (this.singleOutput) {
+                    this.selectionChanged.emit(this.users[0]);
+                } else {
+                    this.selectionChanged.emit(this.users);
+                }
                 this.usernameInput.nativeElement.value = '';
                 this.myControl.setValue(null);
             }
@@ -139,8 +164,13 @@ export class SearchUserAutocompleteComponent {
 
     public getGlobalUser(): void {
         this.userService.GetUserByLoginNameGlobal(this.globalLoginNameControl.value).then(user => {
-            this.users = [user.toObject()];
-            this.selectionChanged.emit(this.users);
+            if (this.singleOutput) {
+                this.users = [user.toObject()];
+                this.selectionChanged.emit(this.users[0]);
+            } else {
+                this.users.push(user.toObject());
+                this.selectionChanged.emit(this.users);
+            }
         }).catch(error => {
             this.toast.showError(error);
         });

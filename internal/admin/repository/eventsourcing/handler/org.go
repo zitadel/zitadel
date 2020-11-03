@@ -35,7 +35,10 @@ func (o *Org) Reduce(event *es_models.Event) error {
 
 	switch event.Type {
 	case model.OrgAdded:
-		org.AppendEvent(event)
+		err := org.AppendEvent(event)
+		if err != nil {
+			return err
+		}
 	case model.OrgChanged:
 		err := org.SetData(event)
 		if err != nil {

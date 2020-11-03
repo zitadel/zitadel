@@ -1,7 +1,6 @@
 package model
 
 import (
-	"bytes"
 	"encoding/json"
 	"github.com/caos/logging"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -14,7 +13,7 @@ type IDPConfig struct {
 	State       int32  `json:"-"`
 	Name        string `json:"name,omitempty"`
 	Type        int32  `json:"idpType,omitempty"`
-	LogoSrc     []byte `json:"logoSrc,omitempty"`
+	StylingType int32  `json:"stylingType,omitempty"`
 
 	OIDCIDPConfig *OIDCIDPConfig `json:"-"`
 }
@@ -39,8 +38,8 @@ func (c *IDPConfig) Changes(changed *IDPConfig) map[string]interface{} {
 	if changed.Name != "" && c.Name != changed.Name {
 		changes["name"] = changed.Name
 	}
-	if changed.LogoSrc != nil && bytes.Equal(c.LogoSrc, changed.LogoSrc) {
-		changes["logoSrc"] = changed.LogoSrc
+	if c.StylingType != changed.StylingType {
+		changes["stylingType"] = changed.StylingType
 	}
 	return changes
 }
@@ -68,7 +67,7 @@ func IDPConfigFromModel(idp *model.IDPConfig) *IDPConfig {
 		Name:        idp.Name,
 		State:       int32(idp.State),
 		Type:        int32(idp.Type),
-		LogoSrc:     idp.LogoSrc,
+		StylingType: int32(idp.StylingType),
 	}
 	if idp.OIDCConfig != nil {
 		converted.OIDCIDPConfig = OIDCIDPConfigFromModel(idp.OIDCConfig)
@@ -81,7 +80,7 @@ func IDPConfigToModel(idp *IDPConfig) *model.IDPConfig {
 		ObjectRoot:  idp.ObjectRoot,
 		IDPConfigID: idp.IDPConfigID,
 		Name:        idp.Name,
-		LogoSrc:     idp.LogoSrc,
+		StylingType: model.IDPStylingType(idp.StylingType),
 		State:       model.IDPConfigState(idp.State),
 		Type:        model.IdpConfigType(idp.Type),
 	}

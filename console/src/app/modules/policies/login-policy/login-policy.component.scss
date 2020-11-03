@@ -1,46 +1,36 @@
+.default {
+  color: #5282c1;
+  margin-top: 0;
+}
 
-button {
-  border-radius: .5rem;
+.spinner-wr {
+  margin: .5rem 0;
 }
 
 .content {
   padding-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
 
   .row {
-    display: flex;
-    align-items: center;
-    padding: .5rem 0;
-
-    .left-desc {
-      color: #8795a1;
-      font-size: .9rem;
+    .toggle {
+      margin: .3rem 0;
     }
 
-    .fill-space {
-      flex: 1;
-    }
-
-    .length-wrapper {
-      display: flex;
-      align-items: center;
+    p {
+      margin-top: .5rem;
+      font-size: 14px;
+      color: var(--grey);
     }
   }
 }
 
-.btn-container {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
+.save-button {
+  margin-top: 3rem;
+  display: block;
+  padding: .5rem 4rem;
+}
 
-  button {
-    margin-top: 3rem;
-    display: block;
-    padding: .5rem 4rem;
-    border-radius: .5rem;
-  }
+.idp-table-card {
+  width: 100%;
 }
 
 .subheader {
@@ -58,10 +48,16 @@ button {
     justify-content: center;
     margin: .5rem;
     padding: 10px;
-    border: 1px solid #8795a1;
+    border: 1px solid var(--grey);
     border-radius: .5rem;
     cursor: pointer;
     position: relative;
+    min-height: 70px;
+    min-width: 150px;
+
+    .name {
+      font-weight: 700;
+    }
 
     span {
       padding: 2px;
@@ -69,6 +65,7 @@ button {
 
     .meta {
       font-size: 12px;
+      color: var(--grey);
     }
 
     .rm {
@@ -77,10 +74,16 @@ button {
       left: 0;
       transform: translateX(-50%) translateY(-50%);
       cursor: pointer;
+
+      &[disabled] {
+        display: none;
+      }
     }
 
-    &:hover {
-      background-color: #ffffff10;
+    &:not(.disabled) {
+      &:hover {
+        background-color: #ffffff10;
+      }
     }
 
     img {

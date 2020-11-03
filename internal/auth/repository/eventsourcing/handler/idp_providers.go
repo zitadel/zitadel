@@ -66,16 +66,21 @@ func (m *IDPProvider) processIdpProvider(event *models.Event) (err error) {
 		}
 		return m.view.DeleteIDPProvider(event.AggregateID, provider.IDPConfigID, event.Sequence)
 	case model.IDPConfigChanged, org_es_model.IDPConfigChanged:
-		config := new(iam_model.IDPConfig)
-		config.AppendEvent(event)
-		providers, err := m.view.IDPProvidersByIDPConfigID(config.IDPConfigID)
+		esConfig := new(iam_view_model.IDPConfigView)
+		providerType := iam_model.IDPProviderTypeSystem
+		if event.AggregateID != m.systemDefaults.IamID {
+			providerType = iam_model.IDPProviderTypeOrg
+		}
+		esConfig.AppendEvent(providerType, event)
+		providers, err := m.view.IDPProvidersByIDPConfigID(esConfig.IDPConfigID)
 		if err != nil {
 			return err
 		}
-		if provider.IDPProviderType == int32(iam_model.IDPProviderTypeSystem) {
-			config, err = m.iamEvents.GetIDPConfig(context.Background(), provider.AggregateID, config.IDPConfigID)
+		config := new(iam_model.IDPConfig)
+		if event.AggregateID == m.systemDefaults.IamID {
+			config, err = m.iamEvents.GetIDPConfig(context.Background(), event.AggregateID, esConfig.IDPConfigID)
 		} else {
-			config, err = m.orgEvents.GetIDPConfig(context.Background(), provider.AggregateID, provider.IDPConfigID)
+			config, err = m.orgEvents.GetIDPConfig(context.Background(), event.AggregateID, esConfig.IDPConfigID)
 		}
 		if err != nil {
 			return err
@@ -111,6 +116,7 @@ func (m *IDPProvider) fillData(provider *iam_view_model.IDPProviderView) (err er
 
 func (m *IDPProvider) fillConfigData(provider *iam_view_model.IDPProviderView, config *iam_model.IDPConfig) {
 	provider.Name = config.Name
+	provider.StylingType = int32(config.StylingType)
 	provider.IDPConfigType = int32(config.Type)
 	provider.IDPState = int32(config.State)
 }

@@ -29,7 +29,7 @@ SetUp:
     DefaultLoginPolicy:
       AllowUsernamePassword: true
       AllowRegister: true
-      AllowExternalIdp: true
+      AllowExternalIdp: true  
     Orgs:
       - Name: 'Global'
         Domain: 'global.caos.ch'
@@ -73,8 +73,25 @@ SetUp:
                 DevMode: $ZITADEL_CONSOLE_DEV_MODE
     Owners:
       - 'zitadel-admin@caos.ch'
-  #TODO: label policy
-  # Step2:
-  #   DefaulLabelPolicy:
-  #     PrimaryColor: green
-  #     SecondaryColor: red
+  Step2:
+    DefaultPasswordComplexityPolicy:
+      MinLength: 8
+      HasLowercase: true
+      HasUppercase: true
+      HasSymbol: true
+      HasNumber: true
+  Step3:
+    DefaultPasswordAgePolicy:
+      MaxAgeDays: 0
+      ExpireWarnDays: 0
+  Step4:
+    DefaultPasswordLockoutPolicy:
+      MaxAttempts: 5
+      ShowLockOutFailures: false
+  Step5:
+    DefaultOrgIAMPolicy:
+      UserLoginMustBeDomain: true
+  Step6:
+    DefaultLabelPolicy:
+      PrimaryColor: '#222324'
+      SecondaryColor: '#ffffff'  

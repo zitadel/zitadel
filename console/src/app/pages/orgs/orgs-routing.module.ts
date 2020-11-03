@@ -5,7 +5,6 @@ import { PolicyComponentServiceType, PolicyComponentType } from 'src/app/modules
 
 import { OrgCreateComponent } from './org-create/org-create.component';
 import { OrgDetailComponent } from './org-detail/org-detail.component';
-import { OrgGridComponent } from './org-grid/org-grid.component';
 
 const routes: Routes = [
     {
@@ -26,6 +25,7 @@ const routes: Routes = [
                 canActivate: [RoleGuard],
                 data: {
                     roles: ['org.idp.write'],
+                    serviceType: PolicyComponentServiceType.MGMT,
                 },
             },
             {
@@ -34,7 +34,7 @@ const routes: Routes = [
                 canActivate: [RoleGuard],
                 data: {
                     roles: ['iam.idp.read'],
-                    serviceType: PolicyComponentServiceType.ADMIN,
+                    serviceType: PolicyComponentServiceType.MGMT,
                 },
             },
         ],
@@ -44,23 +44,35 @@ const routes: Routes = [
         children: [
             {
                 path: PolicyComponentType.AGE,
+                data: {
+                    serviceType: PolicyComponentServiceType.MGMT,
+                },
                 loadChildren: () => import('src/app/modules/policies/password-age-policy/password-age-policy.module')
                     .then(m => m.PasswordAgePolicyModule),
             },
             {
                 path: PolicyComponentType.LOCKOUT,
+                data: {
+                    serviceType: PolicyComponentServiceType.MGMT,
+                },
                 loadChildren: () => import('src/app/modules/policies/password-lockout-policy/password-lockout-policy.module')
                     .then(m => m.PasswordLockoutPolicyModule),
             },
             {
                 path: PolicyComponentType.COMPLEXITY,
+                data: {
+                    serviceType: PolicyComponentServiceType.MGMT,
+                },
                 loadChildren: () => import('src/app/modules/policies/password-complexity-policy/password-complexity-policy.module')
                     .then(m => m.PasswordComplexityPolicyModule),
             },
             {
                 path: PolicyComponentType.IAM,
-                loadChildren: () => import('src/app/modules/policies/password-iam-policy/password-iam-policy.module')
-                    .then(m => m.PasswordIamPolicyModule),
+                data: {
+                    serviceType: PolicyComponentServiceType.MGMT,
+                },
+                loadChildren: () => import('src/app/modules/policies/org-iam-policy/org-iam-policy.module')
+                    .then(m => m.OrgIamPolicyModule),
             },
             {
                 path: PolicyComponentType.LOGIN,
@@ -82,7 +94,7 @@ const routes: Routes = [
     },
     {
         path: 'overview',
-        component: OrgGridComponent,
+        loadChildren: () => import('./org-list/org-list.module').then(m => m.OrgListModule),
     },
 ];
 
