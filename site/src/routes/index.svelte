@@ -194,6 +194,8 @@
                     <i class="las la-arrow-right"></i>
                 </Button>
             </a>
+
+            <p class="section">{$_('inthissection')}</p>
             <div class="sublinks">
                 <a class="sublink" href="start#Use_ORBOS_to_install_ZITADEL">{$_('startlink_useorbos')}</a>
                 <a class="sublink" href="start#Use_ORBOS_to_install_ZITADEL">{$_('startlink_setupapp')}</a>
@@ -237,6 +239,13 @@
                     <h4>{$_('developlink')}</h4>
                     <p>{$_('developlink_desc')}</p>
                     <a href="/develop">{$_('learnmore')}<i class="las la-arrow-right"></i></a>
+
+                    <p class="section">{$_('inthissection')}</p>
+                    <div class="sectionlinks">
+                        <a class="link" href="develop#Authentication_API">{$_('developlink_authapi')}</a>
+                        <a class="link" href="develop#Management_API">{$_('developlink_mgmtapi')}</a>
+                        <a class="link" href="develop#Admin_API">{$_('developlink_adminapi')}</a>
+                    </div>
                 </div>
             </div>
 
@@ -245,6 +254,13 @@
                     <h4>{$_('docslink')}</h4>
                     <p>{$_('docslink_desc')}</p>
                     <a href="/documentation" >{$_('learnmore')}<i class="las la-arrow-right"></i></a>
+
+                    <p class="section">{$_('inthissection')}</p>
+                    <div class="sectionlinks">
+                        <a class="link" href="documentation#Principles">{$_('docslink_principles')}</a>
+                        <a class="link" href="documentation#Architecture">{$_('docslink_architecture')}</a>
+                        <a class="link" href="documentation#OpenID_Connect_1_0_and_OAuth_2_0">{$_('docslink_oidc')}</a>
+                    </div>
                 </div>
             </div>
 
