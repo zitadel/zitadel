@@ -87,6 +87,8 @@ github.com/caos/logging v0.0.2/go.mod h1:9LKiDE2ChuGv6CHYif/kiugrfEXu9AwDiFWSreX
 github.com/caos/logging v0.0.2/go.mod h1:9LKiDE2ChuGv6CHYif/kiugrfEXu9AwDiFWSreX7Wp0=
 github.com/caos/oidc v0.12.3 h1:bzUg5BdFwRK+Bi7vPHH0pZ3ni/0vMZTNtayRCFPbD4U=
 github.com/caos/oidc v0.12.3/go.mod h1:R9UKITZmSo5vNhSLUYcTDH8pAaV2xwPASXg8wpEs2xQ=
+github.com/caos/oidc v0.12.4 h1:E6E+LcnVQFHzOSN8GnTfJGgXWiDYtdKu/Xm2+YC/xFk=
+github.com/caos/oidc v0.12.4/go.mod h1:dLvfYUiAt9ORfl77L/KkcWuR/N0ll8Ry1nD2ERsamDY=
 github.com/census-instrumentation/opencensus-proto v0.2.1 h1:glEXhBS5PSLLv4IXzLA5yPRVX4bilULVyxxbrfOtDAk=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
