@@ -16,6 +16,7 @@ import (
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/tracing"
 )
 
 type Config struct {
@@ -96,7 +97,7 @@ func (a *API) healthHandler() http.Handler {
 
 func handleHealth(w http.ResponseWriter, r *http.Request) {
 	_, err := w.Write([]byte("ok"))
-	logging.Log("API-Hfss2").OnError(err).Error("error writing ok for health")
+	logging.Log("API-Hfss2").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(r.Context())).Error("error writing ok for health")
 }
 
 func handleReadiness(checks []ValidationFunction) func(w http.ResponseWriter, r *http.Request) {
@@ -124,7 +125,7 @@ type ValidationFunction func(ctx context.Context) error
 func validate(ctx context.Context, validations []ValidationFunction) error {
 	for _, validation := range validations {
 		if err := validation(ctx); err != nil {
-			logging.Log("API-vf823").WithError(err).Error("validation failed")
+			logging.Log("API-vf823").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Error("validation failed")
 			return err
 		}
 	}

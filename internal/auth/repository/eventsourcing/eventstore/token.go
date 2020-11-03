@@ -2,13 +2,15 @@ package eventstore
 
 import (
 	"context"
+	"time"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
-	"time"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 )
@@ -67,7 +69,7 @@ func (repo *TokenRepo) TokenByID(ctx context.Context, userID, tokenID string) (*
 	}
 
 	if esErr != nil {
-		logging.Log("EVENT-5Nm9s").WithError(viewErr).Debug("error retrieving new events")
+		logging.Log("EVENT-5Nm9s").WithError(viewErr).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
 		return model.TokenViewToModel(token), nil
 	}
 	viewToken := *token

@@ -20,6 +20,7 @@ import (
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
+	"github.com/caos/zitadel/internal/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
@@ -105,7 +106,7 @@ func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_
 	request.EnsureLimit(repo.SearchLimit)
 	request.Queries = append(request.Queries, &org_model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyOrgID, Method: global_model.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID})
 	sequence, sequenceErr := repo.View.GetLatestOrgDomainSequence()
-	logging.Log("EVENT-SLowp").OnError(sequenceErr).Warn("could not read latest org domain sequence")
+	logging.Log("EVENT-SLowp").OnError(sequenceErr).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest org domain sequence")
 	domains, count, err := repo.View.SearchOrgDomains(request)
 	if err != nil {
 		return nil, err

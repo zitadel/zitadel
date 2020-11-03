@@ -9,13 +9,13 @@ import (
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	usr_model "github.com/caos/zitadel/internal/user/model"
-	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/tracing"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type IAMRepository struct {
@@ -54,7 +54,7 @@ func (repo *IAMRepository) RemoveIAMMember(ctx context.Context, userID string) e
 func (repo *IAMRepository) SearchIAMMembers(ctx context.Context, request *iam_model.IAMMemberSearchRequest) (*iam_model.IAMMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, err := repo.View.GetLatestIAMMemberSequence()
-	logging.Log("EVENT-Slkci").OnError(err).Warn("could not read latest iam sequence")
+	logging.Log("EVENT-Slkci").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest iam sequence")
 	members, count, err := repo.View.SearchIAMMembers(request)
 	if err != nil {
 		return nil, err
@@ -156,7 +156,7 @@ func (repo *IAMRepository) ChangeOidcIDPConfig(ctx context.Context, oidcConfig *
 func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, err := repo.View.GetLatestIDPConfigSequence()
-	logging.Log("EVENT-Dk8si").OnError(err).Warn("could not read latest idp config sequence")
+	logging.Log("EVENT-Dk8si").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest idp config sequence")
 	idps, count, err := repo.View.SearchIDPConfigs(request)
 	if err != nil {
 		return nil, err
@@ -214,7 +214,7 @@ func (repo *IAMRepository) SearchDefaultIDPProviders(ctx context.Context, reques
 	request.EnsureLimit(repo.SearchLimit)
 	request.AppendAggregateIDQuery(repo.SystemDefaults.IamID)
 	sequence, err := repo.View.GetLatestIDPProviderSequence()
-	logging.Log("EVENT-Tuiks").OnError(err).Warn("could not read latest iam sequence")
+	logging.Log("EVENT-Tuiks").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest iam sequence")
 	providers, count, err := repo.View.SearchIDPProviders(request)
 	if err != nil {
 		return nil, err

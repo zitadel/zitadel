@@ -11,6 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
 	"github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/tracing"
 )
 
 const (
@@ -50,9 +51,9 @@ func Serve(ctx context.Context, server *grpc.Server, port string) {
 	go func() {
 		listener := http.CreateListener(port)
 		err := server.Serve(listener)
-		logging.Log("SERVE-Ga3e94").OnError(err).Panic("grpc server serve failed")
+		logging.Log("SERVE-Ga3e94").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("grpc server serve failed")
 	}()
-	logging.LogWithFields("SERVE-bZ44QM", "port", port).Info("grpc server is listening")
+	logging.LogWithFields("SERVE-bZ44QM", "port", port).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Info("grpc server is listening")
 }
 
 func grpcPort(port string) string {

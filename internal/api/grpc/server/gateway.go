@@ -14,6 +14,7 @@ import (
 	client_middleware "github.com/caos/zitadel/internal/api/grpc/client/middleware"
 	http_util "github.com/caos/zitadel/internal/api/http"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
+	"github.com/caos/zitadel/internal/tracing"
 )
 
 const (
@@ -103,7 +104,7 @@ func createGateway(ctx context.Context, g Gateway, port string, customHeaders ..
 	mux := createMux(g, customHeaders...)
 	opts := createDialOptions(g)
 	err := g.RegisterGateway()(ctx, mux, http_util.Endpoint(port), opts)
-	logging.Log("SERVE-7B7G0E").OnError(err).Panic("failed to register grpc gateway")
+	logging.Log("SERVE-7B7G0E").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("failed to register grpc gateway")
 	return addInterceptors(mux, g)
 }
 
