@@ -4,7 +4,6 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/zitadel/operator/start"
 	"github.com/spf13/cobra"
-	"io/ioutil"
 )
 
 func StartOperator(rv RootValues) *cobra.Command {
@@ -25,14 +24,11 @@ func StartOperator(rv RootValues) *cobra.Command {
 			return errFunc(cmd)
 		}
 
-		value, err := ioutil.ReadFile(kubeconfig)
+		k8sClient, err := kubernetes.NewK8sClientWithPath(monitor, kubeconfig)
 		if err != nil {
-			monitor.Error(err)
 			return err
 		}
-		kubeconfigStr := string(value)
 
-		k8sClient := kubernetes.NewK8sClient(monitor, &kubeconfigStr)
 		if k8sClient.Available() {
 			return start.Operator(monitor, orbConfig.Path, k8sClient)
 		}
