@@ -25,16 +25,14 @@
     h2 {
         margin-bottom: 2rem;
     }
-    .caos-back {
-        position: absolute;
-        top: calc(2rem + var(--nav-h));
-        height: 30vh;
-        max-height: 500px;
-        right: 2rem;
-    }
+    
     .section {
         width: 100%;
-        margin-top: 40vh;
+        margin-top: 100px;
+    }
+
+    .section .caos-back {
+        display: none;
     }
 
     .subsection .getstarted-btn {
@@ -43,37 +41,22 @@
         padding: 0;
         border: none;
     }
-    
-    .doc-container {
-        display: flex;
-        flex-wrap: wrap;
-        margin: 0 -1rem;
-    }
 
     .doc-container .doc {
-        flex-basis: 45%;
-        margin: 1rem;
         padding: 1.5rem;
         background: #2a2f45;
         border-radius: 10px;
-        display: flex;
         box-sizing: border-box;
+        display: block;
+        margin-bottom: 2rem;
     }
 
     .doc-container .doc img{
-        width: 180px;
-        margin-left: 1rem;
-        object-fit: cover;
-        margin-right: -1.5rem;
-        margin-top: -1.5rem;
-        margin-bottom: -1.5rem;
-        border-top-right-radius: 10px;
-        border-bottom-right-radius: 10px;
+        display: none;
     }
 
     .doc-container .doc .text{
-        flex: 1;
-        min-width: 250px;
+        top: 180px;
     }
 
     .doc-container .doc .text p{
@@ -129,6 +112,7 @@
         font-size: 15px;
         margin-right: 2rem;
         border: none;
+        white-space: nowrap;
     }
 
     .sectionlinks {
@@ -141,16 +125,50 @@
         font-size: 13px !important;
         margin-bottom: 4px !important;
         border: none;
+        white-space: nowrap;
     }
 
     @media screen and (min-width: 768px) {
-        .caos-back {
-            right: 50px;
-            height: 60vh;
-        }
         .section {
-            width: 50%;
-            margin: 50px 0;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .section .left,
+        .section .caos-back {
+            flex: 1;
+        }
+
+        .section .caos-back {
+            display: block;
+            margin: 50px;
+        }
+
+        .doc-container {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -1rem;
+        }
+
+        .doc-container .doc {
+            display: flex;
+            margin: 1rem;
+            max-width: 500px;
+            flex: 1 0 auto;
+        }
+
+        .doc-container .doc img{
+            display: block;
+            width: 180px;
+            margin-left: 1rem;
+            object-fit: cover;
+            margin-right: -1.5rem;
+            margin-top: -1.5rem;
+            margin-bottom: -1.5rem;
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+            object-position: 0 0;
         }
     }
 </style>
@@ -161,30 +179,28 @@
   </title>
 </svelte:head>
     <Nav {segment} title="Zitadel docs" logo="logos/zitadel-logo-light.svg"></Nav>
-    <img class="caos-back" src="logos/zitadel-logo-solo-darkdesign.svg" alt="caos logo">
 
     <Section>
         <div class="section">
-            <blockquote>
-                <p>This site is also available in: 
-                {#each LANGUAGES as lang}
-                    {#if lang != $locale}
-                        <a href="/" on:click="{() => reload(lang)}" class="{lang == $locale ? 'current': ''}">{lang == 'de'? 'Deutsch' : 'English'}</a>
-                    {/if}
-                {/each}
-                </p>
-            </blockquote>
-            <h2>{$_('title')}</h2>
-            <p>{$_('description')}</p>
-            <p>{$_('description2')}</p>
-            <p>{$_('description3')}</p>
-
+            <div class="left">
+                <blockquote>
+                    <p>{$_('languagealsoavailable')}: 
+                    {#each LANGUAGES as lang}
+                        {#if lang != $locale}
+                            <a href="/" on:click="{() => reload(lang)}" class="{lang == $locale ? 'current': ''}">{lang == 'de'? 'Deutsch' : 'English'}</a>
+                        {/if}
+                    {/each}
+                    </p>
+                </blockquote>
+                <h2>{$_('title')}</h2>
+                <p>{$_('description')}</p>
+                <p>{$_('description2')}</p>
+                <p>{$_('description3')}</p>
+            </div>
+            <img class="caos-back" src="logos/zitadel-logo-solo-darkdesign.svg" alt="caos logo">
         </div>
 
         <div class="subsection">
-            <!-- <h3>{$_('subheader_title')}</h3>
-            <p>{$_('subheader_description')}</p> -->
-
             <h3>{$_('startlink')}</h3>
             <p>{$_('startlink_desc')}</p>
 
@@ -194,12 +210,17 @@
                     <i class="las la-arrow-right"></i>
                 </Button>
             </a>
-
-            <p class="section">{$_('inthissection')}</p>
-            <div class="sublinks">
-                <a class="sublink" href="start#Use_ORBOS_to_install_ZITADEL">{$_('startlink_useorbos')}</a>
-                <a class="sublink" href="start#Use_ORBOS_to_install_ZITADEL">{$_('startlink_setupapp')}</a>
-            </div>
+            {#if $locale == 'en'}
+                <div class="sublinks">
+                    <a class="sublink" href="start#Use_ORBOS_to_install_ZITADEL">{$_('startlink_useorbos')}</a>
+                    <a class="sublink" href="start#Use_ORBOS_to_install_ZITADEL">{$_('startlink_setupapp')}</a>
+                </div>
+            {:else if $locale == 'de'}
+                <div class="sublinks">
+                    <a class="sublink" href="start#Use_ORBOS_to_install_ZITADEL">{$_('startlink_useorbos')}</a>
+                    <a class="sublink" href="start#Use_ORBOS_to_install_ZITADEL">{$_('startlink_setupapp')}</a>
+                </div>
+            {/if}
         </div>
 
         <div class="doc-container">
@@ -210,13 +231,21 @@
                     <a href="/integrate">{$_('learnmore')}<i class="las la-arrow-right"></i></a>
 
                     <p class="section">{$_('inthissection')}</p>
-                    <div class="sectionlinks">
-                        <a class="link" href="integrate#Single_Page_Application">{$_('integratelink_spa')}</a>
-                        <a class="link" href="integrate#Server_Side_Application">{$_('integratelink_ssr')}</a>
-                        <a class="link" href="integrate#Mobile_App_Native_App">{$_('integratelink_nativeapp')}</a>
-                    </div>
+                    {#if $locale == 'en'}
+                        <div class="sectionlinks">
+                            <a class="link" href="integrate#Single_Page_Application">{$_('integratelink_spa')}</a>
+                            <a class="link" href="integrate#Server_Side_Application">{$_('integratelink_ssr')}</a>
+                            <a class="link" href="integrate#Mobile_App_Native_App">{$_('integratelink_nativeapp')}</a>
+                        </div>
+                    <!-- {:else if $locale == 'de'}
+                        <div class="sectionlinks">
+                            <a class="link" href="integrate#Single_Page_Application">{$_('integratelink_spa')}</a>
+                            <a class="link" href="integrate#Server_Side_Application">{$_('integratelink_ssr')}</a>
+                            <a class="link" href="integrate#Mobile_App_Native_App">{$_('integratelink_nativeapp')}</a>
+                        </div> -->
+                    {/if}
                 </div>
-                <img src="img/developcropped.png" alt="Develop" />
+                <img src="img/develop2.png" alt="Develop" />
             </div>
 
             <div class="doc">
@@ -226,12 +255,20 @@
                     <a href="/administrate">{$_('learnmore')}<i class="las la-arrow-right"></i></a>
 
                     <p class="section">{$_('inthissection')}</p>
-                    <div class="sectionlinks">
-                        <a class="link" href="administrate#Organisations">{$_('administratelink_orgs')}</a>
-                        <a class="link" href="administrate#Projects">{$_('administratelink_projects')}</a>
-                    </div>
+                    
+                    {#if $locale == 'en'}
+                        <div class="sectionlinks">
+                            <a class="link" href="administrate#Organisations">{$_('administratelink_orgs')}</a>
+                            <a class="link" href="administrate#Projects">{$_('administratelink_projects')}</a>
+                        </div>
+                    {:else if $locale == 'de'}
+                        <div class="sectionlinks">
+                            <a class="link" href="administrate#Organisationen">{$_('administratelink_orgs')}</a>
+                            <a class="link" href="administrate#Projekte">{$_('administratelink_projects')}</a>
+                        </div>
+                    {/if}
                 </div>
-                <img src="img/projects.png" alt="Develop" />
+                <img src="img/projects2.png" alt="Develop" />
             </div>
 
             <div class="doc">
@@ -241,11 +278,20 @@
                     <a href="/develop">{$_('learnmore')}<i class="las la-arrow-right"></i></a>
 
                     <p class="section">{$_('inthissection')}</p>
-                    <div class="sectionlinks">
-                        <a class="link" href="develop#Authentication_API">{$_('developlink_authapi')}</a>
-                        <a class="link" href="develop#Management_API">{$_('developlink_mgmtapi')}</a>
-                        <a class="link" href="develop#Admin_API">{$_('developlink_adminapi')}</a>
-                    </div>
+
+                    {#if $locale == 'en'}
+                       <div class="sectionlinks">
+                            <a class="link" href="develop#Authentication_API">{$_('developlink_authapi')}</a>
+                            <a class="link" href="develop#Management_API">{$_('developlink_mgmtapi')}</a>
+                            <a class="link" href="develop#Admin_API">{$_('developlink_adminapi')}</a>
+                        </div>
+                    {:else if $locale == 'de'}
+                        <div class="sectionlinks">
+                            <a class="link" href="develop#Authentication_API">{$_('developlink_authapi')}</a>
+                            <a class="link" href="develop#Management_API">{$_('developlink_mgmtapi')}</a>
+                            <a class="link" href="develop#Admin_API">{$_('developlink_adminapi')}</a>
+                        </div>
+                    {/if}
                 </div>
             </div>
 
@@ -256,11 +302,19 @@
                     <a href="/documentation" >{$_('learnmore')}<i class="las la-arrow-right"></i></a>
 
                     <p class="section">{$_('inthissection')}</p>
-                    <div class="sectionlinks">
-                        <a class="link" href="documentation#Principles">{$_('docslink_principles')}</a>
-                        <a class="link" href="documentation#Architecture">{$_('docslink_architecture')}</a>
-                        <a class="link" href="documentation#OpenID_Connect_1_0_and_OAuth_2_0">{$_('docslink_oidc')}</a>
-                    </div>
+                    {#if $locale == 'en'}
+                       <div class="sectionlinks">
+                            <a class="link" href="documentation#Principles">{$_('docslink_principles')}</a>
+                            <a class="link" href="documentation#Architecture">{$_('docslink_architecture')}</a>
+                            <a class="link" href="documentation#OpenID_Connect_1_0_and_OAuth_2_0">{$_('docslink_oidc')}</a>
+                        </div>
+                    {:else if $locale == 'de'}
+                        <div class="sectionlinks">
+                            <a class="link" href="documentation#Prinzipien">{$_('docslink_principles')}</a>
+                            <a class="link" href="documentation#Architektur">{$_('docslink_architecture')}</a>
+                            <a class="link" href="documentation#OpenID_Connect_1_0_and_OAuth_2_0">{$_('docslink_oidc')}</a>
+                        </div>
+                    {/if}
                 </div>
             </div>
 
@@ -270,7 +324,8 @@
                     <p>{$_('uselink_desc')}</p>
                     <a href="/use" >{$_('learnmore')}<i class="las la-arrow-right"></i></a>
                 </div>
-                <img src="img/usermanual.png" alt="Develop" />
+
+                <img src="img/personal2.png" alt="Develop" />
             </div>
         </div>
     </Section>
