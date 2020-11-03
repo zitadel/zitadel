@@ -1223,6 +1223,183 @@
         ]
       }
     },
+    "/orgs/me/policies/login/multifactors": {
+      "post": {
+        "operationId": "ManagementService_AddMultiFactorToLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MultiFactor"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1MultiFactor"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/policies/login/multifactors/_search": {
+      "get": {
+        "operationId": "ManagementService_GetLoginPolicyMultiFactors",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MultiFactorsResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/policies/login/multifactors/{multi_factor}": {
+      "delete": {
+        "operationId": "ManagementService_RemoveMultiFactorFromLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "multi_factor",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "MULTIFACTORTYPE_UNSPECIFIED",
+              "MULTIFACTORTYPE_U2F_WITH_PIN"
+            ]
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/policies/login/secondfactors": {
+      "post": {
+        "operationId": "ManagementService_AddSecondFactorToLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SecondFactor"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SecondFactor"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/policies/login/secondfactors/_search": {
+      "get": {
+        "operationId": "ManagementService_GetLoginPolicySecondFactors",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SecondFactorsResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/policies/login/secondfactors/{second_factor}": {
+      "delete": {
+        "operationId": "ManagementService_RemoveSecondFactorFromLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "second_factor",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "SECONDFACTORTYPE_UNSPECIFIED",
+              "SECONDFACTORTYPE_OTP",
+              "SECONDFACTORTYPE_U2F"
+            ]
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/orgs/me/policies/password/age": {
       "get": {
         "operationId": "ManagementService_GetPasswordAgePolicy",
@@ -3808,7 +3985,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1MultiFactors"
+              "$ref": "#/definitions/v1UserMultiFactors"
             }
           },
           "default": {
@@ -5691,6 +5868,10 @@
         "change_date": {
           "type": "string",
           "format": "date-time"
+        },
+        "force_mfa": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -5706,6 +5887,10 @@
           "format": "boolean"
         },
         "allow_external_idp": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "force_mfa": {
           "type": "boolean",
           "format": "boolean"
         }
@@ -5737,6 +5922,10 @@
         "change_date": {
           "type": "string",
           "format": "date-time"
+        },
+        "force_mfa": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -5880,21 +6069,26 @@
     "v1MultiFactor": {
       "type": "object",
       "properties": {
-        "type": {
-          "$ref": "#/definitions/v1MfaType"
-        },
-        "state": {
-          "$ref": "#/definitions/v1MFAState"
+        "multi_factor": {
+          "$ref": "#/definitions/v1MultiFactorType"
         }
       }
     },
-    "v1MultiFactors": {
+    "v1MultiFactorType": {
+      "type": "string",
+      "enum": [
+        "MULTIFACTORTYPE_UNSPECIFIED",
+        "MULTIFACTORTYPE_U2F_WITH_PIN"
+      ],
+      "default": "MULTIFACTORTYPE_UNSPECIFIED"
+    },
+    "v1MultiFactorsResult": {
       "type": "object",
       "properties": {
-        "mfas": {
+        "multi_factors": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1MultiFactor"
+            "$ref": "#/definitions/v1MultiFactorType"
           }
         }
       }
@@ -7905,6 +8099,34 @@
       ],
       "default": "SEARCHMETHOD_EQUALS"
     },
+    "v1SecondFactor": {
+      "type": "object",
+      "properties": {
+        "second_factor": {
+          "$ref": "#/definitions/v1SecondFactorType"
+        }
+      }
+    },
+    "v1SecondFactorType": {
+      "type": "string",
+      "enum": [
+        "SECONDFACTORTYPE_UNSPECIFIED",
+        "SECONDFACTORTYPE_OTP",
+        "SECONDFACTORTYPE_U2F"
+      ],
+      "default": "SECONDFACTORTYPE_UNSPECIFIED"
+    },
+    "v1SecondFactorsResult": {
+      "type": "object",
+      "properties": {
+        "second_factors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1SecondFactorType"
+          }
+        }
+      }
+    },
     "v1SetPasswordNotificationRequest": {
       "type": "object",
       "properties": {
@@ -8519,6 +8741,28 @@
         },
         "resource_owner": {
           "type": "string"
+        }
+      }
+    },
+    "v1UserMultiFactor": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/v1MfaType"
+        },
+        "state": {
+          "$ref": "#/definitions/v1MFAState"
+        }
+      }
+    },
+    "v1UserMultiFactors": {
+      "type": "object",
+      "properties": {
+        "mfas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserMultiFactor"
+          }
         }
       }
     },
