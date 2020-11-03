@@ -158,7 +158,7 @@
     </div>
 
     <a class="list-item" href="https://zitadel.ch" target="_blank">More about ZITADEL</a>
-    <a class="list-item" href="https://console.zitadel.ch" target="_blank">Sign in</a>
+    <!-- <a class="list-item" href="https://console.zitadel.ch" target="_blank">Sign in</a> -->
 </div>
 
 {#if menuOpen}

@@ -148,6 +148,10 @@
     bottom: 2em;
   }
 
+  .sidebar :global(.language-switcher) {
+        position: relative;
+  }
+
   aside.open .sidebar .home {
       display: none;
   }
@@ -250,6 +254,11 @@
     .sidebar .home span {
         margin-left: 3px;
         color: var(--second);
+    }
+
+    .sidebar :global(.language-switcher) {
+        display: flex;
+        position: fixed;
     }
 
     .sidebar :global(.search-trigger) {

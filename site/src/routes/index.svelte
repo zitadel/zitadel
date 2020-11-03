@@ -106,6 +106,7 @@
     .sublinks {
         display: block;
         margin: 1rem 0;
+        margin-bottom: 5rem;
     }
 
     .sublinks .sublink {
@@ -187,7 +188,7 @@
                     <p>{$_('languagealsoavailable')}: 
                     {#each LANGUAGES as lang}
                         {#if lang != $locale}
-                            <a href="/" on:click="{() => reload(lang)}" class="{lang == $locale ? 'current': ''}">{lang == 'de'? 'Deutsch' : 'English'}</a>
+                            <a href="/" on:click="{() => reload(lang)}" class="{lang == $locale ? 'current': ''}">{lang == 'de'? 'Deutsch (WIP)' : 'English'}</a>
                         {/if}
                     {/each}
                     </p>
