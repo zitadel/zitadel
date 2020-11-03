@@ -40,7 +40,11 @@
     "search_results":"Search Results",
     "search_input_placeholder":"Search for ...",
     "search_button_holder":"Search for anything",
-    "references":"Docs"
+    "references":"Docs",
+    "home_seo": {
+        "title":"Zitadel • Documentation",
+        "description":"Learn more about the ZITADEL, the cloud native IAM from switzerland."
+    }
 }
 
 

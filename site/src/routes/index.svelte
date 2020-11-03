@@ -178,6 +178,21 @@
   <title>
     ZITADEL • Documentation
   </title>
+	<title>{$_('title')}</title>
+    <meta property="description" content="{$_('home_seo.description')}" />
+
+    <meta property="og:url" content="https://docs.zitadel.ch" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="{$_('home_seo.title')}" />
+    <meta property="og:description" content="{$_('home_seo.description')}" />
+    <meta property="og:image"
+        content="https://www.zitadel.ch/zitadel-social-preview25.png" />
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@caos_ch">
+    <meta name="twitter:title" content="{$_('home_seo.title')}" />
+    <meta name="twitter:description" content="{$_('home_seo.description')}" />
+    <meta name="twitter:image" content="https://www.zitadel.ch/zitadel-social-preview25.png">
 </svelte:head>
     <Nav {segment} title="Zitadel docs" logo="logos/zitadel-logo-light.svg"></Nav>
 

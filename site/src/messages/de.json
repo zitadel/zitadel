@@ -40,7 +40,11 @@
     "search_results":"Suchergebnisse",
     "search_input_placeholder":"Suche nach ...",
     "search_button_holder":"Suche nach allem",
-    "references":"Docs"
+    "references":"Docs",
+    "home_seo": {
+        "title":"Zitadel • Documentation",
+        "description":"Erfahren Sie mehr über ZITADEL, das Cloud-Native IAM aus der Schweiz"
+    }
 }
 
 
