@@ -67,6 +67,20 @@ func (key UserGrantSearchKey) ToColumnName() string {
 		return UserGrantKeyRole
 	case grant_model.UserGrantSearchKeyID:
 		return UserGrantKeyID
+	case grant_model.UserGrantSearchKeyUserName:
+		return UserGrantKeyUserName
+	case grant_model.UserGrantSearchKeyFirstName:
+		return UserGrantKeyFirstName
+	case grant_model.UserGrantSearchKeyLastName:
+		return UserGrantKeyLastName
+	case grant_model.UserGrantSearchKeyEmail:
+		return UserGrantKeyEmail
+	case grant_model.UserGrantSearchKeyOrgDomain:
+		return UserGrantKeyOrgDomain
+	case grant_model.UserGrantSearchKeyProjectName:
+		return UserGrantKeyProjectName
+	case grant_model.UserGrantSearchKeyDisplayName:
+		return UserGrantKeyDisplayName
 	default:
 		return ""
 	}
