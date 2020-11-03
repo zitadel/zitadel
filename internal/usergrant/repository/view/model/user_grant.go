@@ -22,6 +22,13 @@ const (
 	UserGrantKeyState         = "state"
 	UserGrantKeyOrgName       = "org_name"
 	UserGrantKeyRole          = "role_keys"
+	UserGrantKeyUserName      = "user_name"
+	UserGrantKeyFirstName     = "first_name"
+	UserGrantKeyLastName      = "last_name"
+	UserGrantKeyEmail         = "email"
+	UserGrantKeyOrgDomain     = "org_primary_domain"
+	UserGrantKeyProjectName   = "project_name"
+	UserGrantKeyDisplayName   = "display_name"
 )
 
 type UserGrantView struct {
