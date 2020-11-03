@@ -70,7 +70,7 @@
 
     .content .wrapper #menu {
         position: absolute;
-        top: calc(var(--nav-h) - 15px);
+        top: calc(var(--nav-h) - 5px);
         left: 50%;
         z-index: 2;
     }

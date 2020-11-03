@@ -174,7 +174,7 @@
   }
 
   .sidebar::-webkit-scrollbar-thumb {
-    background-color: #5282c130;
+    background-color: #6c8eef30;
     border-radius: 8px;
     cursor: pointer;
   }

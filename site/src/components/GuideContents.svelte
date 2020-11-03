@@ -110,7 +110,7 @@
 		.section:hover,
 		.subsection:hover,
 		.active {
-			color: #5282c1;
+			color: var(--prime);
 		}
     }
 </style>
