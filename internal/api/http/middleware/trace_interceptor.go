@@ -8,7 +8,7 @@ import (
 )
 
 func DefaultTraceHandler(handler http.Handler) http.Handler {
-	return tracing.TraceHandler(handler, http_utils.Probes...)
+	return TraceHandler(http_utils.Probes...)(handler)
 }
 
 func TraceHandler(ignoredMethods ...string) func(http.Handler) http.Handler {

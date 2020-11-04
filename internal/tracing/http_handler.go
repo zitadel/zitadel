@@ -7,17 +7,25 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
-func ignoredEndpointsFilter(endpoints ...string) func(r *http.Request) bool {
+func shouldNotIgnore(endpoints ...string) func(r *http.Request) bool {
 	return func(r *http.Request) bool {
 		for _, endpoint := range endpoints {
 			if strings.HasPrefix(r.URL.RequestURI(), endpoint) {
-				return true
+				return false
 			}
 		}
-		return false
+		return true
 	}
 }
 
 func TraceHandler(handler http.Handler, ignoredEndpoints ...string) http.Handler {
-	return otelhttp.NewHandler(handler, "zitadel", otelhttp.WithFilter(ignoredEndpointsFilter(ignoredEndpoints...)))
+	return otelhttp.NewHandler(handler,
+		"zitadel",
+		otelhttp.WithFilter(shouldNotIgnore(ignoredEndpoints...)),
+		otelhttp.WithPublicEndpoint(),
+		otelhttp.WithSpanNameFormatter(spanNameFormatter))
+}
+
+func spanNameFormatter(_ string, r *http.Request) string {
+	return r.Host + r.URL.EscapedPath()
 }
