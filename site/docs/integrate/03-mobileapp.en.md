@@ -30,10 +30,10 @@ By default ZITADEL asserts the claim **urn:zitadel:iam:org:project:roles** to th
 ```
 ---
 
-#### Swift Example
+### Swift Example
 
 > Link here
 
-#### Java Example
+### Java Example
 
 > Link here

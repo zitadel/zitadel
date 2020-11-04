@@ -5,8 +5,10 @@ description: ...
 
 ### Proxy Protocol and Flow recommendation
 
-#### Ambassador Example
+### Ambassador Example
 
-#### NGINX Example
+### NGINX Example
 
-#### Cloudflare Access Example
+### OAuth Proxy Example
+
+### Cloudflare Access Example

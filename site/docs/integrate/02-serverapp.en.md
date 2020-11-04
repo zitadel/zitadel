@@ -30,7 +30,6 @@ By default ZITADEL asserts the claim **urn:zitadel:iam:org:project:roles** to th
 ```
 ---
 
-#### ASP.net core example
+### ASP.net core example
 
 > Link here
-

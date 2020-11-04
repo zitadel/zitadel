@@ -30,10 +30,10 @@ By default ZITADEL asserts the claim **urn:zitadel:iam:org:project:roles** to th
 ```
 ---
 
-#### Electron Example
+### Electron Example
 
 > Link here
 
-#### c# Example
+### c# Example
 
 > Link here
