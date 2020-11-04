@@ -1,16 +1,4 @@
-<!-- <script context="module">
-    import { combinedSlugs } from '../utils/_searchStore.js';    
-
-	export async function preload() {
-        combinedSlugs.subscribe(value => {
-            console.log(value);
-        })
-    };
-</script> -->
-
 <script>
-    import { combinedSlugs } from '../utils/searchStore.js';    
-
     import { createEventDispatcher } from 'svelte';
     import { _ } from 'svelte-i18n';
 
@@ -58,8 +46,6 @@
     $: executeQuery(searchValue);
 
     function executeQuery(value) {
-        console.log('comb: ', combinedSlugs);
-        console.log(sections);
         const toSearchFor = value.toLowerCase();
         const filteredSections = sections.filter(section => {
             const slugContainsValue = section.slug.toLowerCase().includes(toSearchFor);
