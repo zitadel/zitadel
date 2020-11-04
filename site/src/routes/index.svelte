@@ -35,6 +35,11 @@
         display: none;
     }
 
+    .subsection {
+        display: block;
+        margin-bottom: 50px;
+    }
+
     .subsection .getstarted-btn {
         border-radius: 8px;
         color: white;
@@ -106,7 +111,6 @@
     .sublinks {
         display: block;
         margin: 1rem 0;
-        margin-bottom: 5rem;
     }
 
     .sublinks .sublink {
@@ -157,11 +161,13 @@
             margin: 1rem;
             max-width: 500px;
             flex: 1 0 auto;
+            max-height: 350px;
         }
 
         .doc-container .doc img{
             display: block;
             width: 180px;
+            height: auto;
             margin-left: 1rem;
             object-fit: cover;
             margin-right: -1.5rem;

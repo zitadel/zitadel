@@ -140,8 +140,6 @@
     }
 
     .result-list {
-        display: flex;
-        flex-direction: column;
         max-height: 400px;
         overflow-y: auto;
     }
@@ -155,6 +153,8 @@
         border-radius: 8px;
         margin: 2px 0;
         border-bottom: none;
+        height: 77px;
+        max-height: 80px;
     }
 
     .result-list .result-item:hover {

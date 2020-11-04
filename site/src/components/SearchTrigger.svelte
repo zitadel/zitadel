@@ -19,7 +19,7 @@
         background-color: #2a2f45;
         border: 1px solid #ffffff20;
         height: 35px;
-        padding: 1rem;
+        padding: 0 1rem;
         width: calc(100% - 4rem);
         box-sizing: border-box;
         position: fixed;
