@@ -13,13 +13,13 @@ According to [https://www.getambassador.io/docs/latest/](https://www.getambassad
 
 #### Configure ZITADEL for Ambassador
 
-You can use **ZITADEL** for Authentication and Authorization with **Ambassador**
+You can use **ZITADEL** for Authentication and Authorization with **Ambassador**.
 
 
 
 > The redirect URI is `https://{AMBASSADOR_URL}/.ambassador/oauth2/redirection-endpoint`
 
-#### Ambassador Filter
+#### Ambassador Filter Authentication
 
 ```yaml
 apiVersion: getambassador.io/v2
@@ -35,6 +35,24 @@ spec:
     protectedOrigins:
     - origin: https://{PROTECTED_URL}
 ```
+
+#### Ambassador Filter Authorisation
+
+```yaml
+apiVersion: getambassador.io/v2
+kind: Filter
+metadata:
+  name: zitadel-filter
+  namespace: default
+spec:
+  OAuth2:
+    authorizationURL: https://accounts.zitadel.ch/oauth/v2/authorize
+    clientID: {ZITADEL_GENERATED_CLIENT_ID}
+    secret: {ZITADEL_GENERATED_CLIENT_SECRET}
+    protectedOrigins:
+    - origin: https://{PROTECTED_URL}
+```
+
 
 #### Ambassador FilterPolicy
 
