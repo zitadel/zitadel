@@ -3,10 +3,12 @@
     import { _ } from 'svelte-i18n';
     const { page } = stores();
     let menuOpen = false;
+    export let slug;
 
     page.subscribe(() => {
 		menuOpen = false;
-	});
+    });
+
 </script>
 
 <style>
@@ -111,6 +113,10 @@
         border: none;
     }
 
+    li.active a {
+        color: var(--second);
+    }
+
     .modal-background {
 		position: fixed;
 		width: 100%;
@@ -145,12 +151,12 @@
             {#if menuOpen}
                 <div id="menu">
                     <ul>
-                        <li><a href="/start" >{$_('startlink')}</a></li>
-                        <li><a href="/integrate">{$_('integratelink')}</a></li>
-                        <li><a href="/administrate" >{$_('administratelink')}</a></li>
-                        <li><a href="/develop" >{$_('developlink')}</a></li>
-                        <li><a href="/documentation" >{$_('docslink')}</a></li>
-                        <li><a href="/use" >{$_('uselink')}</a></li>
+                        <li class="{slug == 'start' ? 'active' : ''}"><a href="/start" >{$_('startlink')}</a></li>
+                        <li class="{slug == 'integrate' ? 'active' : ''}"><a href="/integrate">{$_('integratelink')}</a></li>
+                        <li class="{slug == 'administrate' ? 'active' : ''}"><a href="/administrate" >{$_('administratelink')}</a></li>
+                        <li class="{slug == 'develop' ? 'active' : ''}"><a href="/develop" >{$_('developlink')}</a></li>
+                        <li class="{slug == 'documentation' ? 'active' : ''}"><a href="/documentation" >{$_('docslink')}</a></li>
+                        <li class="{slug == 'use' ? 'active' : ''}"><a href="/use" >{$_('uselink')}</a></li>
                     </ul>
                 </div>
             {/if}

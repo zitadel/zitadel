@@ -1,8 +1,5 @@
 <script>
-    export let selected;
-
-    let className = '';
-    export {className as class};
+    export let selected = false;
 </script>
 <style>
     button {
@@ -49,6 +46,6 @@
     }
 </style>
 
-<button {selected} class="{className}">            
+<button {selected}>            
     <slot />
 </button> 

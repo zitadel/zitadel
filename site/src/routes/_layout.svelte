@@ -5,7 +5,7 @@
   import NavItem from "../components/NavItem.svelte";
   import manifest from '../../static/manifest.json';
   import PhotoSwipe from '../components/PhotoSwipe.svelte';
-//   export let segment;
+  export let segment;
   const { page } = stores();
 </script>
 

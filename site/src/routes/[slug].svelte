@@ -1,9 +1,8 @@
 <script context="module">
     export async function preload({params}) {
         const {lang, slug} = params;
-        const sections = await this.fetch(`${slug}.json`).then(r => r.json());
-        const tags = [];
-        return { sections, slug, tags };
+        const {docs, seo} = await this.fetch(`${slug}.json`).then(r => r.json());
+        return { sections: docs, seo, slug };
     }
 </script>
 
@@ -13,8 +12,8 @@
     import Docs from "../components/Docs.svelte";
     export let slug;
     export let sections;
+    export let seo;
     import { onMount } from 'svelte';
-    export let tags;
     import { initPhotoSwipeFromDOM } from '../utils/photoswipe.js';
     import SearchSelector from '../components/SearchSelector.svelte';
 
@@ -34,12 +33,10 @@
 <svelte:head>
   <title>{manifest.name} • {slug}</title>    
 
-    {#each tags as { name, content }, i}
-     <meta name={name} content={content} />
-	{/each}
+   { @html seo}
 </svelte:head>
 
-<DocsHeader></DocsHeader>
+<DocsHeader {slug}></DocsHeader>
 <Docs {sections} project="zitadel/site" dir="{slug}"/>
 
 <!-- <SearchSelector></SearchSelector> -->
