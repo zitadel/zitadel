@@ -1,5 +1,5 @@
 ---
-title:  Mobile App
+title:  Mobile Application
 description: ...
 ---
 
