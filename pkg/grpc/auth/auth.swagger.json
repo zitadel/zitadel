@@ -607,26 +607,6 @@
       }
     },
     "/users/me/mfas/u2f": {
-      "delete": {
-        "operationId": "AuthService_RemoveMfaU2F",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "tags": [
-          "AuthService"
-        ]
-      },
       "post": {
         "operationId": "AuthService_AddMfaU2F",
         "responses": {
@@ -990,19 +970,6 @@
     }
   },
   "definitions": {
-    "apiv1Response": {
-      "type": "object",
-      "properties": {
-        "attestion_object": {
-          "type": "string",
-          "format": "byte"
-        },
-        "client_data_JSON": {
-          "type": "string",
-          "format": "byte"
-        }
-      }
-    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -1046,40 +1013,6 @@
           }
         }
       }
-    },
-    "v1AuthenticatorAttachment": {
-      "type": "string",
-      "enum": [
-        "AuthenticatorAttachmentUnspecified",
-        "AuthenticatorAttachmentPlatform",
-        "AuthenticatorAttachmentCrossPlatform"
-      ],
-      "default": "AuthenticatorAttachmentUnspecified"
-    },
-    "v1AuthenticatorSelection": {
-      "type": "object",
-      "properties": {
-        "authenticator_attachment": {
-          "$ref": "#/definitions/v1AuthenticatorAttachment"
-        },
-        "require_resident_key": {
-          "type": "boolean"
-        },
-        "user_verification": {
-          "$ref": "#/definitions/v1UserVerificationRequirement"
-        }
-      }
-    },
-    "v1AuthenticatorTransport": {
-      "type": "string",
-      "enum": [
-        "AuthenticatorTransportUnspecified",
-        "AuthenticatorTransportUSB",
-        "AuthenticatorTransportNFC",
-        "AuthenticatorTransportBLE",
-        "AuthenticatorTransportInternal"
-      ],
-      "default": "AuthenticatorTransportUnspecified"
     },
     "v1Change": {
       "type": "object",
@@ -1132,52 +1065,6 @@
           "format": "uint64"
         }
       }
-    },
-    "v1ConveyancePreference": {
-      "type": "string",
-      "enum": [
-        "ConveyancePreferenceNoAttestation",
-        "ConveyancePreferenceIndirectAttestation",
-        "ConveyancePreferenceDirectAttestation"
-      ],
-      "default": "ConveyancePreferenceNoAttestation"
-    },
-    "v1CredentialDescriptor": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "$ref": "#/definitions/v1CredentialType"
-        },
-        "id": {
-          "type": "string",
-          "format": "byte"
-        },
-        "transports": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1AuthenticatorTransport"
-          }
-        }
-      }
-    },
-    "v1CredentialParameter": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "$ref": "#/definitions/v1CredentialType"
-        },
-        "algorithm": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "v1CredentialType": {
-      "type": "string",
-      "enum": [
-        "CredentialTypePublicKey"
-      ],
-      "default": "CredentialTypePublicKey"
     },
     "v1ExternalIDPSearchRequest": {
       "type": "object",
@@ -1384,7 +1271,8 @@
           "type": "string"
         },
         "public_key": {
-          "$ref": "#/definitions/v1U2FPublicKey"
+          "type": "string",
+          "format": "byte"
         },
         "state": {
           "$ref": "#/definitions/v1MFAState"
@@ -1555,20 +1443,6 @@
         }
       }
     },
-    "v1RelyingParty": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "icon": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        }
-      }
-    },
     "v1SearchMethod": {
       "type": "string",
       "enum": [
@@ -1580,49 +1454,6 @@
         "SEARCHMETHOD_CONTAINS_IGNORE_CASE"
       ],
       "default": "SEARCHMETHOD_EQUALS"
-    },
-    "v1U2FPublicKey": {
-      "type": "object",
-      "properties": {
-        "challenge": {
-          "type": "string",
-          "format": "byte"
-        },
-        "rp": {
-          "$ref": "#/definitions/v1RelyingParty"
-        },
-        "user": {
-          "$ref": "#/definitions/v1UserEntity"
-        },
-        "pub_key_cred_params": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1CredentialParameter"
-          }
-        },
-        "authenticator_selection": {
-          "$ref": "#/definitions/v1AuthenticatorSelection"
-        },
-        "timeout": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "exclude_credentials": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1CredentialDescriptor"
-          }
-        },
-        "extensions": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "attestation": {
-          "$ref": "#/definitions/v1ConveyancePreference"
-        }
-      }
     },
     "v1UpdateUserAddressRequest": {
       "type": "object",
@@ -1799,24 +1630,6 @@
         "change_date": {
           "type": "string",
           "format": "date-time"
-        }
-      }
-    },
-    "v1UserEntity": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "icon": {
-          "type": "string"
-        },
-        "display_name": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string",
-          "format": "byte"
         }
       }
     },
@@ -2125,15 +1938,6 @@
       ],
       "default": "USERSTATE_UNSPECIFIED"
     },
-    "v1UserVerificationRequirement": {
-      "type": "string",
-      "enum": [
-        "UserVerificationRequirementPreferred",
-        "UserVerificationRequirementDiscouraged",
-        "UserVerificationRequirementRequired"
-      ],
-      "default": "UserVerificationRequirementPreferred"
-    },
     "v1UserView": {
       "type": "object",
       "properties": {
@@ -2193,18 +1997,9 @@
     "v1VerifyMfaU2f": {
       "type": "object",
       "properties": {
-        "type": {
-          "$ref": "#/definitions/v1CredentialType"
-        },
-        "id": {
-          "type": "string"
-        },
-        "raw_id": {
+        "public_key_credential": {
           "type": "string",
           "format": "byte"
-        },
-        "response": {
-          "$ref": "#/definitions/apiv1Response"
         }
       }
     },
