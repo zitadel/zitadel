@@ -252,8 +252,8 @@
                     <p>{$_('integratelink_desc')}</p>
                     <a href="/integrate">{$_('learnmore')}<i class="las la-arrow-right"></i></a>
 
-                    <p class="section">{$_('inthissection')}</p>
                     {#if $locale == 'en'}
+                        <p class="section">{$_('inthissection')}</p>
                         <div class="sectionlinks">
                             <a class="link" href="integrate#Single_Page_Application">{$_('integratelink_spa')}</a>
                             <a class="link" href="integrate#Server_Side_Application">{$_('integratelink_ssr')}</a>
