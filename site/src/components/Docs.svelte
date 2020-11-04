@@ -4,8 +4,7 @@
   import Icon from "./Icon.svelte";
   import manifest from '../../static/manifest.json';
   export let owner = "caos";
-  export let project = "zitadel";
-  export let path = "site/docs";
+  export let path = "docs";
   export let dir = "";
   export let edit_title = "edit this section";
   export let sections;
@@ -487,7 +486,7 @@
         {@html section.metadata.title}
         <small>
           <a
-            href="https://github.com/{owner}/{project}/edit/master{path}/{dir}/{section.file}"
+            href="https://github.com/{owner}/zitadel/edit/master/site/{path}/{dir}/{section.file}"
             title={edit_title}>
             <Icon name="las la-external-link-alt" size="24px" />
           </a>
