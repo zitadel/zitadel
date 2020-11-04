@@ -2327,6 +2327,791 @@ var _ interface {
 	ErrorName() string
 } = MfaOtpResponseValidationError{}
 
+// Validate checks the field values on MfaU2FResponse with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *MfaU2FResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Id
+
+	if v, ok := interface{}(m.GetPublicKey()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MfaU2FResponseValidationError{
+				field:  "PublicKey",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for State
+
+	return nil
+}
+
+// MfaU2FResponseValidationError is the validation error returned by
+// MfaU2FResponse.Validate if the designated constraints aren't met.
+type MfaU2FResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MfaU2FResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MfaU2FResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MfaU2FResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MfaU2FResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MfaU2FResponseValidationError) ErrorName() string { return "MfaU2FResponseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MfaU2FResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMfaU2FResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MfaU2FResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MfaU2FResponseValidationError{}
+
+// Validate checks the field values on U2FPublicKey with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *U2FPublicKey) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Challenge
+
+	if v, ok := interface{}(m.GetRp()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return U2FPublicKeyValidationError{
+				field:  "Rp",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetUser()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return U2FPublicKeyValidationError{
+				field:  "User",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetPubKeyCredParams() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return U2FPublicKeyValidationError{
+					field:  fmt.Sprintf("PubKeyCredParams[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if v, ok := interface{}(m.GetAuthenticatorSelection()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return U2FPublicKeyValidationError{
+				field:  "AuthenticatorSelection",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Timeout
+
+	for idx, item := range m.GetExcludeCredentials() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return U2FPublicKeyValidationError{
+					field:  fmt.Sprintf("ExcludeCredentials[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for Extensions
+
+	// no validation rules for Attestation
+
+	return nil
+}
+
+// U2FPublicKeyValidationError is the validation error returned by
+// U2FPublicKey.Validate if the designated constraints aren't met.
+type U2FPublicKeyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e U2FPublicKeyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e U2FPublicKeyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e U2FPublicKeyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e U2FPublicKeyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e U2FPublicKeyValidationError) ErrorName() string { return "U2FPublicKeyValidationError" }
+
+// Error satisfies the builtin error interface
+func (e U2FPublicKeyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sU2FPublicKey.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = U2FPublicKeyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = U2FPublicKeyValidationError{}
+
+// Validate checks the field values on RelyingParty with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *RelyingParty) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Name
+
+	// no validation rules for Icon
+
+	// no validation rules for Id
+
+	return nil
+}
+
+// RelyingPartyValidationError is the validation error returned by
+// RelyingParty.Validate if the designated constraints aren't met.
+type RelyingPartyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RelyingPartyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RelyingPartyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RelyingPartyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RelyingPartyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RelyingPartyValidationError) ErrorName() string { return "RelyingPartyValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RelyingPartyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRelyingParty.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RelyingPartyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RelyingPartyValidationError{}
+
+// Validate checks the field values on UserEntity with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *UserEntity) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Name
+
+	// no validation rules for Icon
+
+	// no validation rules for DisplayName
+
+	// no validation rules for Id
+
+	return nil
+}
+
+// UserEntityValidationError is the validation error returned by
+// UserEntity.Validate if the designated constraints aren't met.
+type UserEntityValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UserEntityValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UserEntityValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UserEntityValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UserEntityValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UserEntityValidationError) ErrorName() string { return "UserEntityValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UserEntityValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUserEntity.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UserEntityValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UserEntityValidationError{}
+
+// Validate checks the field values on CredentialParameter with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CredentialParameter) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Type
+
+	// no validation rules for Algorithm
+
+	return nil
+}
+
+// CredentialParameterValidationError is the validation error returned by
+// CredentialParameter.Validate if the designated constraints aren't met.
+type CredentialParameterValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CredentialParameterValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CredentialParameterValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CredentialParameterValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CredentialParameterValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CredentialParameterValidationError) ErrorName() string {
+	return "CredentialParameterValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CredentialParameterValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCredentialParameter.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CredentialParameterValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CredentialParameterValidationError{}
+
+// Validate checks the field values on AuthenticatorSelection with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *AuthenticatorSelection) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for AuthenticatorAttachment
+
+	// no validation rules for RequireResidentKey
+
+	// no validation rules for UserVerification
+
+	return nil
+}
+
+// AuthenticatorSelectionValidationError is the validation error returned by
+// AuthenticatorSelection.Validate if the designated constraints aren't met.
+type AuthenticatorSelectionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AuthenticatorSelectionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AuthenticatorSelectionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AuthenticatorSelectionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AuthenticatorSelectionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AuthenticatorSelectionValidationError) ErrorName() string {
+	return "AuthenticatorSelectionValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AuthenticatorSelectionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAuthenticatorSelection.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AuthenticatorSelectionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AuthenticatorSelectionValidationError{}
+
+// Validate checks the field values on CredentialDescriptor with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CredentialDescriptor) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Type
+
+	// no validation rules for Id
+
+	return nil
+}
+
+// CredentialDescriptorValidationError is the validation error returned by
+// CredentialDescriptor.Validate if the designated constraints aren't met.
+type CredentialDescriptorValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CredentialDescriptorValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CredentialDescriptorValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CredentialDescriptorValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CredentialDescriptorValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CredentialDescriptorValidationError) ErrorName() string {
+	return "CredentialDescriptorValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CredentialDescriptorValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCredentialDescriptor.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CredentialDescriptorValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CredentialDescriptorValidationError{}
+
+// Validate checks the field values on VerifyMfaU2F with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *VerifyMfaU2F) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Type
+
+	// no validation rules for Id
+
+	// no validation rules for RawId
+
+	if v, ok := interface{}(m.GetResponse()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return VerifyMfaU2FValidationError{
+				field:  "Response",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// VerifyMfaU2FValidationError is the validation error returned by
+// VerifyMfaU2F.Validate if the designated constraints aren't met.
+type VerifyMfaU2FValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e VerifyMfaU2FValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e VerifyMfaU2FValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e VerifyMfaU2FValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e VerifyMfaU2FValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e VerifyMfaU2FValidationError) ErrorName() string { return "VerifyMfaU2FValidationError" }
+
+// Error satisfies the builtin error interface
+func (e VerifyMfaU2FValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sVerifyMfaU2F.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = VerifyMfaU2FValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = VerifyMfaU2FValidationError{}
+
+// Validate checks the field values on Response with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *Response) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for AttestionObject
+
+	// no validation rules for ClientData_JSON
+
+	return nil
+}
+
+// ResponseValidationError is the validation error returned by
+// Response.Validate if the designated constraints aren't met.
+type ResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ResponseValidationError) ErrorName() string { return "ResponseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ResponseValidationError{}
+
+// Validate checks the field values on Raw with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *Raw) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Test
+
+	return nil
+}
+
+// RawValidationError is the validation error returned by Raw.Validate if the
+// designated constraints aren't met.
+type RawValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RawValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RawValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RawValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RawValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RawValidationError) ErrorName() string { return "RawValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RawValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRaw.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RawValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RawValidationError{}
+
 // Validate checks the field values on UserGrantSearchRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

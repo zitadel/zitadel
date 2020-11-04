@@ -32,9 +32,9 @@ type UserRepository interface {
 	VerifyMfaOTPSetup(ctx context.Context, userID, code string) error
 
 	AddMfaU2F(ctx context.Context, id string) (*model.U2F, error)
-	VerifyMfaU2FSetup(ctx context.Context, userID string, sessionData webauthn.SessionData, data *protocol.ParsedCredentialCreationData) error
+	VerifyMfaU2FSetup(ctx context.Context, userID, sessionID string, data *protocol.CredentialCreationResponse) error
 	BeginMfaU2FLogin(ctx context.Context, userID string) (string, *webauthn.SessionData, error)
-	VerifyMfaU2F(ctx context.Context, userID string, sessionData webauthn.SessionData, data *protocol.ParsedCredentialAssertionData) error
+	VerifyMfaU2F(ctx context.Context, userID, sessionID string, data *protocol.ParsedCredentialAssertionData) error
 
 	ChangeUsername(ctx context.Context, userID, username string) error
 
@@ -75,6 +75,8 @@ type myUserRepo interface {
 	AddMyMfaOTP(ctx context.Context) (*model.OTP, error)
 	VerifyMyMfaOTPSetup(ctx context.Context, code string) error
 	RemoveMyMfaOTP(ctx context.Context) error
+	AddMyMfaU2F(ctx context.Context) (*model.U2F, error)
+	VerifyMyMfaU2FSetup(ctx context.Context, sessionID string, data *protocol.CredentialCreationResponse) error
 
 	ChangeMyUsername(ctx context.Context, username string) error
 

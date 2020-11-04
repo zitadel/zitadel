@@ -2,6 +2,7 @@ package webauthn
 
 import (
 	"bytes"
+	"encoding/json"
 
 	"github.com/duo-labs/webauthn/protocol"
 	"github.com/duo-labs/webauthn/webauthn"
@@ -54,7 +55,7 @@ func (u *webUser) WebAuthnCredentials() []webauthn.Credential {
 }
 
 func (w *WebAuthN) BeginRegistration(user *usr_model.User, authType protocol.AuthenticatorAttachment, userVerification protocol.UserVerificationRequirement, creds ...webauthn.Credential) (*protocol.CredentialCreation, *webauthn.SessionData, error) {
-	residentKeyRequirement := false
+	//residentKeyRequirement := false
 	existing := make([]protocol.CredentialDescriptor, len(creds))
 	for i, cred := range creds {
 		existing[i] = protocol.CredentialDescriptor{
@@ -67,8 +68,8 @@ func (w *WebAuthN) BeginRegistration(user *usr_model.User, authType protocol.Aut
 		credentials: creds,
 	},
 		webauthn.WithAuthenticatorSelection(protocol.AuthenticatorSelection{
-			RequireResidentKey: &residentKeyRequirement,
-			UserVerification:   userVerification,
+			//RequireResidentKey: &residentKeyRequirement,
+			UserVerification: userVerification,
 		}),
 		webauthn.WithConveyancePreference(protocol.PreferNoAttestation),
 		webauthn.WithExclusions(existing),
@@ -79,12 +80,14 @@ func (w *WebAuthN) BeginRegistration(user *usr_model.User, authType protocol.Aut
 	return credentialOptions, sessionData, nil
 }
 
-func (w *WebAuthN) FinishRegistration(user *usr_model.User, sessionData webauthn.SessionData, credentialData *protocol.ParsedCredentialCreationData) (*webauthn.Credential, error) {
+func (w *WebAuthN) FinishRegistration(user *usr_model.User, sessionData webauthn.SessionData, credentialData *protocol.CredentialCreationResponse) (*webauthn.Credential, error) {
+	data, err := json.Marshal(credentialData)
+	parsedCredentialData, err := protocol.ParseCredentialCreationResponseBody(bytes.NewReader(data))
 	credential, err := w.web.CreateCredential(
 		&webUser{
 			User: user,
 		},
-		sessionData, credentialData)
+		sessionData, parsedCredentialData)
 	if err != nil {
 		//return nil, err
 	}

@@ -256,12 +256,12 @@ service AuthService {
 
   rpc GetMyPasswordComplexityPolicy(google.protobuf.Empty) returns (PasswordComplexityPolicy) {
     option (google.api.http) = {
-            get: "/policies/passwords/complexity"
-        };
+      get: "/policies/passwords/complexity"
+    };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "authenticated"
-        };
+      permission: "authenticated"
+    };
   }
 
   //ExternalIDP
@@ -311,6 +311,37 @@ service AuthService {
   rpc RemoveMfaOTP(google.protobuf.Empty) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/users/me/mfas/otp"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
+  rpc AddMfaU2F(google.protobuf.Empty) returns (MfaU2FResponse) {
+    option (google.api.http) = {
+      post: "/users/me/mfas/u2f"
+      body: "*"
+    };
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
+  rpc VerifyMfaU2F(VerifyMfaU2f) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/users/me/mfas/u2f/_verify"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
+  rpc RemoveMfaU2F(google.protobuf.Empty) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/users/me/mfas/u2f"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
@@ -614,6 +645,100 @@ message MfaOtpResponse {
   MFAState state = 4;
 }
 
+message MfaU2FResponse {
+  string id = 1;
+  U2FPublicKey public_key = 2;
+  MFAState state = 3;
+}
+
+message U2FPublicKey {
+  bytes challenge = 1;
+  RelyingParty rp = 2;
+  UserEntity user = 3;
+  repeated CredentialParameter pub_key_cred_params = 4;
+  AuthenticatorSelection authenticator_selection = 5;
+  int32 timeout = 6;
+  repeated CredentialDescriptor exclude_credentials = 7;
+  map<string, string> extensions = 8;
+  ConveyancePreference attestation = 9;
+}
+
+message RelyingParty {
+  string name = 1;
+  string icon = 2;
+  string id = 3;
+}
+
+message UserEntity {
+  string name = 1;
+  string icon = 2;
+  string display_name = 3;
+  bytes id = 4;
+}
+
+message CredentialParameter {
+  CredentialType type = 1;
+  int32 algorithm = 2;
+}
+
+enum CredentialType {
+  CredentialTypePublicKey = 0;
+}
+
+message AuthenticatorSelection {
+  AuthenticatorAttachment authenticator_attachment = 1;
+  bool require_resident_key = 2;
+  UserVerificationRequirement user_verification = 3;
+}
+
+enum AuthenticatorAttachment {
+  AuthenticatorAttachmentUnspecified = 0;
+  AuthenticatorAttachmentPlatform = 1;
+  AuthenticatorAttachmentCrossPlatform = 2;
+}
+
+enum UserVerificationRequirement {
+  UserVerificationRequirementPreferred = 0;
+  UserVerificationRequirementDiscouraged = 1;
+  UserVerificationRequirementRequired = 2;
+}
+
+message CredentialDescriptor {
+  CredentialType type = 1;
+  bytes id = 2;
+  repeated AuthenticatorTransport transports = 3;
+}
+
+enum AuthenticatorTransport {
+  AuthenticatorTransportUnspecified = 0;
+  AuthenticatorTransportUSB = 1;
+  AuthenticatorTransportNFC = 2;
+  AuthenticatorTransportBLE = 3;
+  AuthenticatorTransportInternal = 4;
+}
+
+enum ConveyancePreference {
+  ConveyancePreferenceNoAttestation = 0;
+  ConveyancePreferenceIndirectAttestation = 1;
+  ConveyancePreferenceDirectAttestation = 2;
+}
+
+message VerifyMfaU2f {
+  CredentialType type = 1;
+  string id = 2;
+  bytes raw_id = 3;
+  Response response = 4;
+}
+
+message Response {
+  bytes attestion_object = 1;
+  bytes client_data_JSON = 2;
+}
+
+message Raw {
+  string test = 1;
+}
+
 enum MFAState {
   MFASTATE_UNSPECIFIED = 0;
   MFASTATE_NOT_READY = 1;
@@ -703,7 +828,7 @@ enum SearchMethod {
 }
 
 message ChangesRequest {
-  uint64 limit= 1;
+  uint64 limit = 1;
   uint64 sequence_offset = 2;
   bool asc = 3;
 }

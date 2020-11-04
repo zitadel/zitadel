@@ -139,6 +139,21 @@ var AuthService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.auth.api.v1.AuthService/AddMfaU2F": authz.Option{
+		Permission: "authenticated",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.auth.api.v1.AuthService/VerifyMfaU2F": authz.Option{
+		Permission: "authenticated",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.auth.api.v1.AuthService/RemoveMfaU2F": authz.Option{
+		Permission: "authenticated",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.auth.api.v1.AuthService/SearchMyUserGrant": authz.Option{
 		Permission: "authenticated",
 		CheckParam: "",

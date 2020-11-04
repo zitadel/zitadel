@@ -1,6 +1,9 @@
 package model
 
 import (
+	"github.com/duo-labs/webauthn/protocol"
+	"github.com/duo-labs/webauthn/webauthn"
+
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 )
@@ -17,11 +20,11 @@ type OTP struct {
 type U2F struct {
 	es_models.ObjectRoot
 
-	Secret                       *crypto.CryptoValue
-	SessionData                  interface{}
-	CredentialCreationData       string
+	SessionID                    string
 	CredentialCreationDataString string
+	CredentialCreationData       *protocol.CredentialCreation
 	State                        MfaState
+	SessionData                  *webauthn.SessionData
 }
 
 type MfaState int32

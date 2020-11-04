@@ -1426,8 +1426,15 @@ func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model
 	if err != nil {
 		return nil, err
 	}
-	cred, _ := json.Marshal(credential)
-	return &usr_model.U2F{CredentialCreationData: base64.RawURLEncoding.EncodeToString(cred), SessionData: &sessionData}, nil
+	cred, err := json.Marshal(credential)
+	if err != nil {
+		return nil, err
+	}
+	return &usr_model.U2F{
+		CredentialCreationData:       credential,
+		CredentialCreationDataString: base64.RawURLEncoding.EncodeToString(cred),
+		SessionData:                  sessionData,
+	}, nil
 	//return , sessionData, nil
 	//
 	//encryptedSecret, err := crypto.Encrypt([]byte(key.Secret()), es.Multifactors.OTP.CryptoMFA)
@@ -1450,7 +1457,7 @@ func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model
 
 }
 
-func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID string, sessionData webauthn.SessionData, data *protocol.ParsedCredentialCreationData) error {
+func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID, sessionID string, data *protocol.CredentialCreationResponse) error {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
@@ -1464,6 +1471,7 @@ func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID string, ses
 	//if user.IsOTPReady() {
 	//	return caos_errs.ThrowPreconditionFailed(nil, "EVENT-qx4ls", "Errors.Users.Mfa.Otp.AlreadyReady")
 	//}
+
 	cred, err := es.webauthn.FinishRegistration(user, sessionData, data)
 	if err != nil {
 		return err
@@ -1498,7 +1506,7 @@ func (es *UserEventstore) BeginMfaU2FLogin(ctx context.Context, userID string) (
 	return base64.URLEncoding.EncodeToString(credentialData), sessionData, nil
 }
 
-func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID string, sessionData webauthn.SessionData, data *protocol.ParsedCredentialAssertionData) error {
+func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID, sessionID string, data *protocol.ParsedCredentialAssertionData) error {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
