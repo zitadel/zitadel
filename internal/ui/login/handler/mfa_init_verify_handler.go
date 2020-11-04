@@ -16,7 +16,7 @@ const (
 )
 
 type mfaInitVerifyData struct {
-	MfaType model.MfaType `schema:"mfaType"`
+	MfaType model.MFAType `schema:"mfaType"`
 	Code    string        `schema:"code"`
 	URL     string        `schema:"url"`
 	Secret  string        `schema:"secret"`
@@ -31,7 +31,7 @@ func (l *Login) handleMfaInitVerify(w http.ResponseWriter, r *http.Request) {
 	}
 	var verifyData *mfaVerifyData
 	switch data.MfaType {
-	case model.MfaTypeOTP:
+	case model.MFATypeOTP:
 		verifyData = l.handleOtpVerify(w, r, authReq, data)
 	}
 
@@ -69,7 +69,7 @@ func (l *Login) renderMfaInitVerify(w http.ResponseWriter, r *http.Request, auth
 	}
 	data.baseData = l.getBaseData(r, authReq, "Mfa Init Verify", errType, errMessage)
 	data.profileData = l.getProfileData(authReq)
-	if data.MfaType == model.MfaTypeOTP {
+	if data.MfaType == model.MFATypeOTP {
 		code, err := generateQrCode(data.otpData.Url)
 		if err == nil {
 			data.otpData.QrCode = code

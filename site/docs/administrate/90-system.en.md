@@ -23,7 +23,22 @@ There is even a possibility to regenerate a read model.
 > When a read model is regenerated it might take up some time to be fully operational again
 > Depending on the model which is regenerated this might have a operational impact for the end-users
 
-> Screenshot here
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_iam_admin_views.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_iam_admin_views.png" itemprop="thumbnail" alt="IAM View Management" />
+        </a>
+        <figcaption itemprop="caption description">IAM View Management</figcaption>
+    </figure>
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_iam_admin_failed.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_iam_admin_failed.png" itemprop="thumbnail" alt="IAM Failed Events" />
+        </a>
+        <figcaption itemprop="caption description">IAM Failed Events</figcaption>
+    </figure>
+</div>
+
+> Additional infos to the architecture of ZITADEL is located in [Architecture Docs](documentation#Architecture)
 
 ### Secret Handling
 

@@ -29,7 +29,9 @@ To achieve this the owner of a project can grant (some could say delegate) certa
 After granting that organisation it can manage on its own which user has what roles.
 This feature is especially useful for service providers, because they are able to establish a great self-service culture for their business customers.
 
-**Authorizations** 
+**Authorizations**
+
+> TODO, Link to authorizations
 
 #### Project vs. granted Project
 
@@ -74,6 +76,27 @@ Create a new project with a name which explains what's the intended use of this 
 ### Grant project to a third party
 
 > Screenshot here
+
+### Manage Project Authorisations
+
+> Screenshot here
+
+### Manage Project ZITADEL Roles
+
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_project_manage_roles_1.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_project_manage_roles_1.png" itemprop="thumbnail" alt="Manage ZITADEL Roles 1" />
+        </a>
+        <figcaption itemprop="caption description">Manage ZITADEL Roles 1</figcaption>
+    </figure>
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_project_manage_roles_2.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_project_manage_roles_2.png" itemprop="thumbnail" alt="Manage ZITADEL Roles 2" />
+        </a>
+        <figcaption itemprop="caption description">Manage ZITADEL Roles 2</figcaption>
+    </figure>
+</div>
 
 ### Audit project changes
 

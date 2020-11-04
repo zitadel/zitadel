@@ -1,6 +1,6 @@
 <app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
     [timestamp]="userResult?.viewTimestamp" [selection]="selection"
-    [emitRefreshOnPreviousRoute]="refreshOnPreviousRoute">
+    [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes">
     <mat-form-field @appearfade *ngIf="userSearchKey != undefined" actions class="filtername">
         <mat-label>{{'USER.PAGES.FILTER' | translate}}</mat-label>
         <input matInput (keyup)="applyFilter($event)"
