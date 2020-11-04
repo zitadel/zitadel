@@ -6,7 +6,7 @@
 	export let sections = [];
 	export let active_section = null;
 	export let show_contents;
-	export let prevent_sidebar_scroll = false;
+    export let prevent_sidebar_scroll = false;
 
 	let ul;
 
@@ -97,7 +97,6 @@
 	}
 
 	.icon-container {
-        margin-right: 1rem;
         margin-left: .5rem;
         color: white;
     }
@@ -111,7 +110,7 @@
 		.section:hover,
 		.subsection:hover,
 		.active {
-			color: #5282c1;
+			color: var(--prime);
 		}
     }
 </style>
