@@ -17,7 +17,9 @@ You can use **ZITADEL** for Authentication and Authorization with **Ambassador**
 
 > The redirect URI is `https://{AMBASSADOR_URL}/.ambassador/oauth2/redirection-endpoint`
 
-#### Ambassador Filter Authentication
+#### Use Ambassador to Authenticate with ZITADEL
+
+With this you can use Ambassador to initiate the Authorization Code Flow.
 
 ```yaml
 apiVersion: getambassador.io/v2
@@ -34,7 +36,25 @@ spec:
     - origin: https://{PROTECTED_URL}
 ```
 
-#### Ambassador Filter Authorisation
+```yaml
+apiVersion: getambassador.io/v2
+kind: FilterPolicy
+metadata:
+  name: zitadel-policy
+  namespace: default
+spec:
+  rules:
+    - host: "*"
+      path: /backend/get-quote/
+      filters:
+        - name: zitadel-filter
+```
+
+#### Use Ambassador to check JWT Bearer Tokens
+
+If you would like **Ambassador** to verify a JWT token from the autorization header you can do so by configuring **ZITADEL's** endpoints.
+
+> Make sure that in your client settings of **ZITADEL** the "AuthToken Options" is **JWT** by default **ZITADEL** will use opaque tokens!
 
 ```yaml
 apiVersion: getambassador.io/v2
@@ -43,16 +63,13 @@ metadata:
   name: zitadel-filter
   namespace: default
 spec:
-  OAuth2:
-    authorizationURL: https://accounts.zitadel.ch/oauth/v2/authorize
-    clientID: {ZITADEL_GENERATED_CLIENT_ID}
-    secret: {ZITADEL_GENERATED_CLIENT_SECRET}
-    protectedOrigins:
-    - origin: https://{PROTECTED_URL}
+  JWT:
+    jwksURI:            "https://api.zitadel.ch/oauth/v2/keys"
+    validAlgorithms:
+    - "RS256"
+    issuer:             "https://issuer.zitadel.ch"
+    requireIssuer:      true
 ```
-
-
-#### Ambassador FilterPolicy
 
 ```yaml
 apiVersion: getambassador.io/v2
@@ -74,23 +91,25 @@ spec:
 
 ### OAuth2 Proxy Example
 
----
-Some text
+[OAuth2-proxy](https://github.com/oauth2-proxy/oauth2-proxy) is a project which allows services to delegate the authentication flow to a IDP, for example **ZITADEL**
+
+> Right now the OAuth 2.0 proxy is not [spec. compliant](https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims) because **ZITADEL** does not assert information into the ID Token when an access Token is delivered, we will change this however with [ISSUE #940](https://github.com/caos/zitadel/issues/940)
 
 ```toml
-provider = "ZITADEL"
-redirect_url = "https://example.corp.com/oauth2/callback"
-oidc_issuer_url = "https://issuer.zitadel.ch/.well-known/openid-configuration"
+provider = "oidc"
+provider_display_name "ZITADEL"
+redirect_url = "http://127.0.0.1:4180/oauth2/callback"
+oidc_issuer_url = "https://issuer.zitadel.ch"
 upstreams = [
     "https://example.corp.com"
 ]
 email_domains = [
-    "corp.com"
+    "*"
 ]
-client_id = "XXXXX"
-client_secret = "YYYYY"
+client_id = "{ZITADEL_GENERATED_CLIENT_ID}"
+client_secret = "{ZITADEL_GENERATED_CLIENT_SECRET}"
 pass_access_token = true
-cookie_secret = "ZZZZZ"
+cookie_secret = "{SUPPLY_SOME_SECRET_HERE}"
 skip_provider_button = true
 ```
 
