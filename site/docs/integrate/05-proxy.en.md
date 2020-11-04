@@ -15,8 +15,6 @@ According to [https://www.getambassador.io/docs/latest/](https://www.getambassad
 
 You can use **ZITADEL** for Authentication and Authorization with **Ambassador**.
 
-
-
 > The redirect URI is `https://{AMBASSADOR_URL}/.ambassador/oauth2/redirection-endpoint`
 
 #### Ambassador Filter Authentication
