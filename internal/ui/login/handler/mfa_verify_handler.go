@@ -12,7 +12,7 @@ const (
 )
 
 type mfaVerifyFormData struct {
-	MfaType model.MfaType `schema:"mfaType"`
+	MfaType model.MFAType `schema:"mfaType"`
 	Code    string        `schema:"code"`
 }
 
@@ -23,7 +23,7 @@ func (l *Login) handleMfaVerify(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	if data.MfaType == model.MfaTypeOTP {
+	if data.MfaType == model.MFATypeOTP {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 		err = l.authRepo.VerifyMfaOTP(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, data.Code, userAgentID, model.BrowserInfoFromRequest(r))
 	}

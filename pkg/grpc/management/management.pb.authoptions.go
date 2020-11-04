@@ -609,6 +609,36 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/GetLoginPolicySecondFactors": authz.Option{
+		Permission: "iam.policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/AddSecondFactorToLoginPolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveSecondFactorFromLoginPolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GetLoginPolicyMultiFactors": authz.Option{
+		Permission: "iam.policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/AddMultiFactorToLoginPolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveMultiFactorFromLoginPolicy": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/GetPasswordComplexityPolicy": authz.Option{
 		Permission: "policy.read",
 		CheckParam: "",
