@@ -11,56 +11,29 @@ This flow has great support with most modern languages and frameworks and is the
 
 > In the OIDC and OAuth world this **client profile** is called "user-agent-based application"
 
-### Typescript Example
-
-#### Typescript Authentication Example
-
 ---
 
-If you use a framework like Angular, Vue, React, ... you can use this code snippet here to integrate **ZITADEL** into you application
+With ZITADEL you can manage the [roles](administrate#Roles) a [project](administrate#Projects) supplies to your users in the form of authorizations.
+On the [project](administrate#Projects) it can be configured how **project roles** are supplied to the [clients](administrate#Clients).
+By default ZITADEL asserts the claim **urn:zitadel:iam:org:project:roles** to the [Userinfo Endpoint](documentation#userinfo_endpoint)
 
-Library used for this example [https://github.com/IdentityModel/oidc-client-js](https://github.com/IdentityModel/oidc-client-js)
+- Assert the claim **urn:zitadel:iam:org:project:roles** to **access_token**
+- Assert the claim **urn:zitadel:iam:org:project:roles** to **id_token**
 
-```ts
-import { UserManager, WebStorageStateStore, User } from 'oidc-client';
-
-export default class AuthService {
-    private userManager: UserManager;
-
-    constructor() {
-        const ZITADEL_ISSUER_DOMAIN: string = "https://issuer.zitadel.ch";
-
-        const settings: any = {
-            userStore: new WebStorageStateStore({ store: window.localStorage }),
-            authority: ZITADEL_ISSUER_DOMAIN,
-            client_id: 'YOUR_ZITADEL_CLIENT_ID',
-            redirect_uri: 'http://localhost:44444/callback.html',
-            response_type: 'code',
-            scope: 'openid profile',
-            post_logout_redirect_uri: 'http://localhost:44444/',
-        };
-
-        this.userManager = new UserManager(settings);
+```JSON
+ "urn:zitadel:iam:org:project:roles": {
+    "user": {
+      "id1": "acme.zitadel.ch",
+      "id2": "caos.ch",
     }
-
-    public getUser(): Promise<User | null> {
-        return this.userManager.getUser();
-    }
-
-    public login(): Promise<void> {
-        return this.userManager.signinRedirect();
-    }
-
-    public logout(): Promise<void> {
-        return this.userManager.signoutRedirect();
-    }
-
-    public getAccessToken(): Promise<string> {
-        return this.userManager.getUser().then((data: any) => {
-            return data.access_token;
-        });
-    }
-}
+  }
 ```
-
 ---
+
+#### Angular Example
+
+> Link here
+
+#### Vue Example
+
+> Link here
