@@ -19,12 +19,14 @@ type Human struct {
 	*Email
 	*Phone
 	*Address
-	ExternalIDPs []*ExternalIDP `json:"-"`
-	InitCode     *InitUserCode  `json:"-"`
-	EmailCode    *EmailCode     `json:"-"`
-	PhoneCode    *PhoneCode     `json:"-"`
-	PasswordCode *PasswordCode  `json:"-"`
-	OTP          *OTP           `json:"-"`
+	ExternalIDPs       []*ExternalIDP   `json:"-"`
+	InitCode           *InitUserCode    `json:"-"`
+	EmailCode          *EmailCode       `json:"-"`
+	PhoneCode          *PhoneCode       `json:"-"`
+	PasswordCode       *PasswordCode    `json:"-"`
+	OTP                *OTP             `json:"-"`
+	U2FTokens          []*WebauthNToken `json:"-"`
+	PasswordlessTokens []*WebauthNToken `json:"-"`
 }
 
 type InitUserCode struct {

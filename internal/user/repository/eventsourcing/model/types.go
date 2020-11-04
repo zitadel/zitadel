@@ -118,6 +118,18 @@ const (
 	HumanMFAOTPCheckFailed    models.EventType = "user.human.mfa.otp.check.failed"
 	HumanMFAInitSkipped       models.EventType = "user.human.mfa.init.skipped"
 
+	HumanMFAU2FTokenAdded          models.EventType = "user.human.mfa.u2f.token.added"
+	HumanMFAU2FTokenVerified       models.EventType = "user.human.mfa.u2f.token.verified"
+	HumanMFAU2FTokenRemoved        models.EventType = "user.human.mfa.u2f.token.removed"
+	HumanMFAU2FTokenCheckSucceeded models.EventType = "user.human.mfa.u2f.token.check.succeeded"
+	HumanMFAU2FTokenCheckFailed    models.EventType = "user.human.mfa.u2f.token.check.failed"
+
+	HumanMFAPasswordlessTokenAdded          models.EventType = "user.human.mfa.passwordless.token.added"
+	HumanMFAPasswordlessTokenVerified       models.EventType = "user.human.mfa.passwordless.token.verified"
+	HumanMFAPasswordlessTokenRemoved        models.EventType = "user.human.mfa.passwordless.token.removed"
+	HumanMFAPasswordlessTokenCheckSucceeded models.EventType = "user.human.mfa.passwordless.token.check.succeeded"
+	HumanMFAPasswordlessTokenCheckFailed    models.EventType = "user.human.mfa.passwordless.token.check.failed"
+
 	HumanSignedOut models.EventType = "user.human.signed.out"
 )
 
