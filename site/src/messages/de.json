@@ -9,7 +9,7 @@
     "learnmore":"Mehr erfahren",
     "inthissection":"In dieser Sektion",
     "startlink": "Erfahren Sie hier, wie Sie starten",
-    "startlink_useorbos":"Verwenden Sie Orbos, um Zitadel zu installieren",
+    "startlink_useorbos":"Verwenden Sie ORBOS, um ZITADEL zu installieren",
     "startlink_setupapp":"Applikation erstellen",
     "startlink_desc":"Befolgen Sie diese Anleitung, um mit ZITADEL im Allgemeinen zu beginnen.",
     "integratelink": "Integration",
@@ -42,10 +42,9 @@
     "search_button_holder":"Suche nach allem",
     "references":"Docs",
     "home_seo": {
-        "title":"Zitadel • Documentation",
+        "title":"ZITADEL • Documentation",
         "description":"Erfahren Sie mehr über ZITADEL, das Cloud-Native IAM aus der Schweiz"
     }
 }
-
 
 
