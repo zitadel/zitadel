@@ -59,8 +59,6 @@ func (t *Tracer) newSpan(ctx context.Context, caller string, options ...apitrace
 }
 
 func (t *Tracer) newSpanFromName(ctx context.Context, name string, options ...apitrace.SpanOption) (context.Context, *tracing.Span) {
-	//TODO: should we use apitrace.SpanFromContext?
-
 	ctx, span := t.Exporter.Start(ctx, name, options...)
 	return ctx, tracing.CreateSpan(span)
 }
