@@ -9,6 +9,7 @@ Tracing:
     ProjectID: $ZITADEL_TRACING_PROJECT_ID
     MetricPrefix: ZITADEL-V1
     Fraction: $ZITADEL_TRACING_FRACTION
+    Endpoint: localhost:9096
 
 AuthZ:
   Repository:
