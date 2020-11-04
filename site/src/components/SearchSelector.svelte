@@ -19,8 +19,37 @@
 
     let filteredResults = [];
 
+    let selectedIndex = 0;
+
+    $: selectIndex(selectedIndex);
+
     function init(el){
         el.focus()
+    }
+
+    function handleKeydown(event) {
+        console.log(event)
+        if (event) {
+            if (event.keyCode == 37 || event.keyCode == 38) {
+                if (selectedIndex > 0) {
+                    event.preventDefault();
+                    selectedIndex --;
+                }
+            }
+            else if (event.keyCode == 39 || event.keyCode == 40) {
+                event.preventDefault();
+                selectedIndex ++;
+            }
+        }
+    }
+
+    function selectIndex(index) {
+        console.log(index);
+        const el = document.getElementById(index);
+        if (el) {
+            console.log('focus: '+ el);
+            el.focus();
+        }
     }
 
 	const dispatch = createEventDispatcher();
@@ -156,8 +185,13 @@
         height: 77px;
         max-height: 80px;
     }
-
+ 
     .result-list .result-item:hover {
+        background-color: #556cd680;
+        box-sizing: border-box;
+    } 
+
+    .result-list .result-item:focus {
         background-color: #556cd6;
     }
 
@@ -188,6 +222,8 @@
     }
 </style>
 
+<svelte:window on:keydown={handleKeydown}/>
+
 <div on:click="{closeSearch}" class="overlay"></div>
 <div class="search-field">
     <div class="search-line">
@@ -195,9 +231,9 @@
         <input placeholder="{$_('search_input_placeholder')}" bind:value={searchValue} use:init>
     </div>
         <p class="result-d">{$_('search_results')}: </p>
-    <div class="result-list">
-        {#each filteredResults as result}
-        <a class="result-item" href="{slug}#{result.slug}" on:click="{closeSearch}">
+    <div tabindex="-1" class="result-list">
+        {#each filteredResults as result, i}
+        <a tabindex="0" class="result-item" href="{slug}#{result.slug}" on:click="{closeSearch}" id="{i}">
             <div class="text">
             {#if result.level > 2}
                 <p class="title">{result.title}<span class="second-param">{result.parent}</span></p>
