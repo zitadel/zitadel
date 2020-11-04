@@ -390,7 +390,7 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
-  rpc GetUserMfas(UserID) returns (MultiFactors) {
+  rpc GetUserMfas(UserID) returns (UserMultiFactors) {
     option (google.api.http) = {
       get: "/users/{id}/mfas"
     };
@@ -1363,6 +1363,68 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
+  rpc GetLoginPolicySecondFactors(google.protobuf.Empty) returns (SecondFactorsResult) {
+    option (google.api.http) = {
+            get: "/orgs/me/policies/login/secondfactors/_search"
+        };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+  }
+
+  rpc AddSecondFactorToLoginPolicy(SecondFactor) returns (SecondFactor) {
+    option (google.api.http) = {
+            post: "/orgs/me/policies/login/secondfactors"
+            body: "*"
+        };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+  }
+
+  rpc RemoveSecondFactorFromLoginPolicy(SecondFactor) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+            delete: "/orgs/me/policies/login/secondfactors/{second_factor}"
+        };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+  }
+
+  rpc GetLoginPolicyMultiFactors(google.protobuf.Empty) returns (MultiFactorsResult) {
+    option (google.api.http) = {
+            get: "/orgs/me/policies/login/multifactors/_search"
+        };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+  }
+
+  rpc AddMultiFactorToLoginPolicy(MultiFactor) returns (MultiFactor) {
+    option (google.api.http) = {
+            post: "/orgs/me/policies/login/multifactors"
+            body: "*"
+        };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+  }
+
+  rpc RemoveMultiFactorFromLoginPolicy(MultiFactor) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+            delete: "/orgs/me/policies/login/multifactors/{multi_factor}"
+        };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+  }
+
   rpc GetPasswordComplexityPolicy(google.protobuf.Empty) returns (PasswordComplexityPolicyView) {
     option (google.api.http) = {
       get: "/orgs/me/policies/password/complexity"
@@ -1950,11 +2012,11 @@ message UpdateUserAddressRequest {
   string street_address = 6 [(validate.rules).string = {max_len: 200}];
 }
 
-message MultiFactors {
-  repeated MultiFactor mfas = 1;
+message UserMultiFactors {
+  repeated UserMultiFactor mfas = 1;
 }
 
-message MultiFactor {
+message UserMultiFactor {
   MfaType type = 1;
   MFAState state = 2;
 }
@@ -2980,12 +3042,14 @@ message LoginPolicy {
     bool allow_external_idp = 3;
     google.protobuf.Timestamp creation_date = 4;
     google.protobuf.Timestamp change_date = 5;
+    bool force_mfa = 6;
 }
 
 message LoginPolicyRequest {
   bool allow_username_password = 1;
   bool allow_register = 2;
   bool allow_external_idp = 3;
+  bool force_mfa = 4;
 }
 
 message IdpProviderID {
@@ -3009,6 +3073,7 @@ message LoginPolicyView {
     bool allow_external_idp = 4;
     google.protobuf.Timestamp creation_date = 5;
     google.protobuf.Timestamp change_date = 6;
+    bool force_mfa = 7;
 }
 
 message IdpProviderView {
@@ -3079,6 +3144,33 @@ message ExternalIDPRemoveRequest {
   string user_id = 1;
   string idp_config_id = 2;
   string external_user_id = 3;
+}
+
+message SecondFactorsResult {
+  repeated SecondFactorType second_factors = 1;
+}
+
+message SecondFactor {
+  SecondFactorType second_factor = 1;
+}
+
+enum SecondFactorType {
+  SECONDFACTORTYPE_UNSPECIFIED = 0;
+  SECONDFACTORTYPE_OTP = 1;
+  SECONDFACTORTYPE_U2F = 2;
+}
+
+message MultiFactorsResult {
+  repeated MultiFactorType multi_factors = 1;
+}
+
+message MultiFactor {
+  MultiFactorType multi_factor = 1;
+}
+
+enum MultiFactorType {
+  MULTIFACTORTYPE_UNSPECIFIED = 0;
+  MULTIFACTORTYPE_U2F_WITH_PIN = 1;
 }
 
 message PasswordComplexityPolicy {

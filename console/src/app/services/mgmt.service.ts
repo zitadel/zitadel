@@ -48,7 +48,6 @@ import {
     MachineKeySearchResponse,
     MachineKeyType,
     MachineResponse,
-    MultiFactors,
     NotificationType,
     OIDCApplicationCreate,
     OIDCConfig,
@@ -142,6 +141,7 @@ import {
     UserMembershipSearchQuery,
     UserMembershipSearchRequest,
     UserMembershipSearchResponse,
+    UserMultiFactors,
     UserPhone,
     UserProfile,
     UserResponse,
@@ -668,7 +668,7 @@ export class ManagementService {
         return this.grpcService.mgmt.getUserProfile(req);
     }
 
-    public getUserMfas(id: string): Promise<MultiFactors> {
+    public getUserMfas(id: string): Promise<UserMultiFactors> {
         const req = new UserID();
         req.setId(id);
         return this.grpcService.mgmt.getUserMfas(req);
