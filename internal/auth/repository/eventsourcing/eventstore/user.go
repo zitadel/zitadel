@@ -309,12 +309,12 @@ func (repo *UserRepo) AddMyMfaU2F(ctx context.Context) (*model.U2F, error) {
 	return repo.UserEvents.AddU2F(ctx, authz.GetCtxData(ctx).UserID)
 }
 
-func (repo *UserRepo) VerifyMfaU2FSetup(ctx context.Context, userID, sessionID string, data *protocol.CredentialCreationResponse) error {
-	return repo.UserEvents.VerifyU2FSetup(ctx, userID, sessionID, data)
+func (repo *UserRepo) VerifyMfaU2FSetup(ctx context.Context, userID string, data *protocol.ParsedCredentialCreationData) error {
+	return repo.UserEvents.VerifyU2FSetup(ctx, userID, data)
 }
 
-func (repo *UserRepo) VerifyMyMfaU2FSetup(ctx context.Context, sessionID string, data *protocol.CredentialCreationResponse) error {
-	return repo.UserEvents.VerifyU2FSetup(ctx, authz.GetCtxData(ctx).UserID, sessionID, data)
+func (repo *UserRepo) VerifyMyMfaU2FSetup(ctx context.Context, data *protocol.ParsedCredentialCreationData) error {
+	return repo.UserEvents.VerifyU2FSetup(ctx, authz.GetCtxData(ctx).UserID, data)
 }
 
 func (repo *UserRepo) BeginMfaU2FLogin(ctx context.Context, userID string) (string, *webauthn.SessionData, error) {

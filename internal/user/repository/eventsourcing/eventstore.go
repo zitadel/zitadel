@@ -51,7 +51,8 @@ type UserEventstore struct {
 	Multifactors             global_model.Multifactors
 	validateTOTP             func(string, string) bool
 	webauthn                 *webauthn_helper.WebAuthN
-	creds                    []webauthn.Credential
+	creds                    []webauthn.Credential //TODO: remove
+	sessionData              *webauthn.SessionData //TODO: remove
 }
 
 type UserConfig struct {
@@ -1430,6 +1431,7 @@ func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model
 	if err != nil {
 		return nil, err
 	}
+	es.sessionData = sessionData
 	return &usr_model.U2F{
 		CredentialCreationData:       credential,
 		CredentialCreationDataString: base64.RawURLEncoding.EncodeToString(cred),
@@ -1457,7 +1459,7 @@ func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model
 
 }
 
-func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID, sessionID string, data *protocol.CredentialCreationResponse) error {
+func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID string, data *protocol.ParsedCredentialCreationData) error {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
@@ -1472,7 +1474,7 @@ func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID, sessionID 
 	//	return caos_errs.ThrowPreconditionFailed(nil, "EVENT-qx4ls", "Errors.Users.Mfa.Otp.AlreadyReady")
 	//}
 
-	cred, err := es.webauthn.FinishRegistration(user, sessionData, data)
+	cred, err := es.webauthn.FinishRegistration(user, *es.sessionData, data)
 	if err != nil {
 		return err
 	}
@@ -1514,7 +1516,7 @@ func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID, sessionID st
 	if user.Human == nil {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-BHeq1", "Errors.User.NotHuman")
 	}
-	return es.webauthn.FinishLogin(user, sessionData, data, es.creds...)
+	return es.webauthn.FinishLogin(user, *es.sessionData, data, es.creds...)
 }
 
 func (es *UserEventstore) SignOut(ctx context.Context, agentID string, userIDs []string) error {

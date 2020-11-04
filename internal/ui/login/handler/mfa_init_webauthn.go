@@ -3,7 +3,6 @@ package handler
 import (
 	"bytes"
 	"encoding/base64"
-	"encoding/json"
 	"net/http"
 
 	"github.com/duo-labs/webauthn/protocol"
@@ -68,9 +67,8 @@ func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	credentialData := new(protocol.CredentialCreationResponse)
-	err = json.Unmarshal(credData, credentialData)
-	if err = l.authRepo.VerifyMfaU2FSetup(r.Context(), authReq.UserID, data.SessionID, credentialData); err != nil {
+	credentialData, _ := protocol.ParseCredentialCreationResponseBody(bytes.NewReader(credData))
+	if err = l.authRepo.VerifyMfaU2FSetup(r.Context(), authReq.UserID, credentialData); err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
