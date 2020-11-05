@@ -878,19 +878,19 @@
         "ADD":"Berechtigung erstellen",
         "ADD_BTN":"Neu",
         "PROJECT": {
-            "TITLE": "Authorisierung",
-            "DESCRIPTION": "Definiere die Operationen und Rechte, die dem Benutzer zur Verfügung gestellt werden. Achtung: Du kannst nur Einträge von Projekten sehen, für die Du eine Authorisierung besitzt."
+            "TITLE": "Autorisierung",
+            "DESCRIPTION": "Definiere die Operationen und Rechte, die dem Benutzer zur Verfügung gestellt werden. Achtung: Du kannst nur Einträge von Projekten sehen, für die Du eine Autorisierung besitzt."
         },
         "USER": {
-            "TITLE": "Authorisierung",
-            "DESCRIPTION": "Definiere die Operationen und Rechte, die dem Benutzer zur Verfügung gestellt werden. Achtung: Du kannst nur Einträge von Projekten sehen, für die Du eine Authorisierung besitzt."
+            "TITLE": "Autorisierung",
+            "DESCRIPTION": "Definiere die Operationen und Rechte, die dem Benutzer zur Verfügung gestellt werden. Achtung: Du kannst nur Einträge von Projekten sehen, für die Du eine Autorisierung besitzt."
         },
         "CREATE": {
-            "TITLE": "Authorisierung erstellen",
+            "TITLE": "Autorisierung erstellen",
             "DESCRIPTION": "Suche nach der Organisation, dem Projekt und den verfügbaren Rollen."
         },
         "DETAIL": {
-            "TITLE":"Authorisierungsdetails",
+            "TITLE":"Autorisierungsdetails",
             "DESCRIPTION":""
         },
         "TOAST": {
