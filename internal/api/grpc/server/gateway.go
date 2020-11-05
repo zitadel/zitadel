@@ -119,8 +119,7 @@ func createMux(g Gateway, customHeaders ...string) *runtime.ServeMux {
 func createDialOptions(g Gateway) []grpc.DialOption {
 	opts := []grpc.DialOption{
 		grpc.WithInsecure(),
-		// client_middleware.DefaultTracingStatsClient(),
-		client_middleware.DefaultTracingClient(),
+		grpc.WithUnaryInterceptor(client_middleware.DefaultTracingClient()),
 	}
 
 	if customOpts, ok := g.(gatewayCustomCallOptions); ok {
