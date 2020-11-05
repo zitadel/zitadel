@@ -21,7 +21,7 @@ type Human struct {
 	PhoneCode    *PhoneCode
 	PasswordCode *PasswordCode
 	OTP          *OTP
-	U2F          *U2F
+	U2Fs         []*U2F
 }
 
 type InitUserCode struct {

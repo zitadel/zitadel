@@ -33,7 +33,7 @@ func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authRe
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
 	}
-	u2f, err := l.authRepo.AddMfaU2F(r.Context(), authReq.UserID)
+	u2f, err := l.authRepo.AddMfaU2F(setContext(r.Context(), authReq.UserOrgID), authReq.UserID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

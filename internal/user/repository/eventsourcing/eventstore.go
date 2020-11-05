@@ -1420,9 +1420,6 @@ func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model
 	if user.Human == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-GDdd1", "Errors.User.NotHuman")
 	}
-	//if user.IsOTPReady() {
-	//	return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-do9se", "Errors.User.Mfa.Otp.AlreadyReady")
-	//}
 	credential, sessionData, err := es.webauthn.BeginRegistration(user, protocol.Platform, protocol.VerificationDiscouraged, es.creds...)
 	if err != nil {
 		return nil, err
@@ -1431,31 +1428,29 @@ func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model
 	if err != nil {
 		return nil, err
 	}
+	id, err := es.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+	repoWebauthN := &model.WebauthNToken{WebauthNTokenID: id, Challenge: sessionData.Challenge}
+	repoUser := model.UserFromModel(user)
+	updateAggregate := MFAU2FAddAggregate(es.AggregateCreator(), repoUser, repoWebauthN)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, updateAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.sessionData = sessionData
-	return &usr_model.U2F{
-		CredentialCreationData:       credential,
-		CredentialCreationDataString: base64.RawURLEncoding.EncodeToString(cred),
-		SessionData:                  sessionData,
-	}, nil
-	//return , sessionData, nil
-	//
-	//encryptedSecret, err := crypto.Encrypt([]byte(key.Secret()), es.Multifactors.OTP.CryptoMFA)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//repoOTP := &model.OTP{Secret: encryptedSecret}
-	//repoUser := model.UserFromModel(user)
-	//updateAggregate := MFAU2FAddAggregate(es.AggregateCreator(), repoUser, repoOTP)
-	//err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, updateAggregate)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//
-	//es.userCache.cacheUser(repoUser)
-	//otp := model.OTPToModel(repoUser.OTP)
-	//otp.Url = key.URL()
-	//otp.SecretString = key.Secret()
-	//return otp, nil
+
+	if _, webauthn := model.GetWebauthn(repoUser.U2FTokens, id); webauthn != nil {
+		u2f := model.U2FToModel(webauthn)
+		u2f.CredentialCreationData = credential
+		u2f.CredentialCreationDataString = base64.RawURLEncoding.EncodeToString(cred)
+		u2f.SessionData.UserID = sessionData.UserID
+		u2f.SessionData.AllowedCredentialIDs = sessionData.AllowedCredentialIDs
+		u2f.SessionData.UserVerification = sessionData.UserVerification
+		return u2f, nil
+	}
+	return nil, errors.ThrowNotFound(nil, "EVENT-tMlos", "Errors.User.U2F.NotExisting")
 
 }
 

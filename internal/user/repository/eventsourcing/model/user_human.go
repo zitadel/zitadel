@@ -58,6 +58,9 @@ func HumanFromModel(user *model.Human) *Human {
 	if user.ExternalIDPs != nil {
 		human.ExternalIDPs = ExternalIDPsFromModel(user.ExternalIDPs)
 	}
+	if user.U2Fs != nil {
+		human.U2FTokens = U2FsFromModel(user.U2Fs)
+	}
 	return human
 }
 
@@ -95,6 +98,9 @@ func HumanToModel(user *Human) *model.Human {
 	}
 	if user.OTP != nil {
 		human.OTP = OTPToModel(user.OTP)
+	}
+	if user.U2FTokens != nil {
+		human.U2Fs = U2FsToModel(user.U2FTokens)
 	}
 	return human
 }
@@ -182,6 +188,10 @@ func (h *Human) AppendEvent(event *es_models.Event) (err error) {
 		err = h.appendExternalIDPAddedEvent(event)
 	case HumanExternalIDPRemoved, HumanExternalIDPCascadeRemoved:
 		err = h.appendExternalIDPRemovedEvent(event)
+	case HumanMFAU2FTokenAdded:
+		err = h.appendU2FAddedEvent(event)
+	case HumanMFAU2FTokenRemoved:
+		err = h.appendU2FRemovedEvent(event)
 	}
 	if err != nil {
 		return err
