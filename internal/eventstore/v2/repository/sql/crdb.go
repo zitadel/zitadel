@@ -52,7 +52,7 @@ const (
 		"				aggregate_type = $2::VARCHAR " +
 		"				AND aggregate_id = $3::VARCHAR " +
 		"			GROUP BY resource_owner " +
-		"		) UNION ALL (" +
+		"		) UNION (" +
 		// if no previous event we use the given data
 		"			VALUES (" +
 		"				$1::VARCHAR, " +
