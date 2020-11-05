@@ -9,7 +9,7 @@ import (
 
 type Config struct {
 	Fraction     float64
-	MetrixPrefix string
+	MetricPrefix string
 }
 
 type Tracer struct {
@@ -23,6 +23,6 @@ func (c *Config) NewTracer() error {
 		return err
 	}
 
-	tracing.T = &Tracer{Tracer: *(otel.NewTracer(c.MetrixPrefix, sampler, exporter))}
+	tracing.T = &Tracer{Tracer: *(otel.NewTracer(c.MetricPrefix, sampler, exporter))}
 	return nil
 }

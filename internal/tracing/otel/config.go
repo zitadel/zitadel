@@ -8,7 +8,7 @@ import (
 
 type Config struct {
 	Fraction     float64
-	MetrixPrefix string
+	MetricPrefix string
 	Endpoint     string
 }
 
@@ -19,6 +19,6 @@ func (c *Config) NewTracer() error {
 		return err
 	}
 
-	tracing.T = NewTracer(c.MetrixPrefix, sampler, exporter)
+	tracing.T = NewTracer(c.MetricPrefix, sampler, exporter)
 	return nil
 }
