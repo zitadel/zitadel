@@ -1,4 +1,6 @@
-
+document.getElementById('btn-login').addEventListener('click', function () {
+    login();
+})
 
 function login() {
     let makeAssertionOptions = JSON.parse(atob(document.getElementsByName('credentialAssertionData')[0].value));
