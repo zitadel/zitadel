@@ -6,21 +6,21 @@ import (
 
 	"github.com/caos/zitadel/internal/tracing"
 	"go.opentelemetry.io/otel/api/global"
-	apitrace "go.opentelemetry.io/otel/api/trace"
+	api_trace "go.opentelemetry.io/otel/api/trace"
 	"go.opentelemetry.io/otel/propagators"
 	"go.opentelemetry.io/otel/sdk/export/trace"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 type Tracer struct {
-	Exporter apitrace.Tracer
-	sampler  sdktrace.Sampler
+	Exporter api_trace.Tracer
+	sampler  sdk_trace.Sampler
 }
 
-func NewTracer(name string, sampler sdktrace.Sampler, exporter trace.SpanExporter) *Tracer {
-	tp := sdktrace.NewTracerProvider(
-		sdktrace.WithConfig(sdktrace.Config{DefaultSampler: sampler}),
-		sdktrace.WithSyncer(exporter),
+func NewTracer(name string, sampler sdk_trace.Sampler, exporter trace.SpanExporter) *Tracer {
+	tp := sdk_trace.NewTracerProvider(
+		sdk_trace.WithConfig(sdk_trace.Config{DefaultSampler: sampler}),
+		sdk_trace.WithSyncer(exporter),
 	)
 
 	global.SetTracerProvider(tp)
@@ -30,35 +30,35 @@ func NewTracer(name string, sampler sdktrace.Sampler, exporter trace.SpanExporte
 	return &Tracer{Exporter: tp.Tracer(name), sampler: sampler}
 }
 
-func (t *Tracer) Sampler() sdktrace.Sampler {
+func (t *Tracer) Sampler() sdk_trace.Sampler {
 	return t.sampler
 }
 
 func (t *Tracer) NewServerInterceptorSpan(ctx context.Context, name string) (context.Context, *tracing.Span) {
-	return t.newSpanFromName(ctx, name, apitrace.WithSpanKind(apitrace.SpanKindServer))
+	return t.newSpanFromName(ctx, name, api_trace.WithSpanKind(api_trace.SpanKindServer))
 }
 
 func (t *Tracer) NewServerSpan(ctx context.Context, caller string) (context.Context, *tracing.Span) {
-	return t.newSpan(ctx, caller, apitrace.WithSpanKind(apitrace.SpanKindServer))
+	return t.newSpan(ctx, caller, api_trace.WithSpanKind(api_trace.SpanKindServer))
 }
 
 func (t *Tracer) NewClientInterceptorSpan(ctx context.Context, name string) (context.Context, *tracing.Span) {
-	return t.newSpanFromName(ctx, name, apitrace.WithSpanKind(apitrace.SpanKindClient))
+	return t.newSpanFromName(ctx, name, api_trace.WithSpanKind(api_trace.SpanKindClient))
 }
 
 func (t *Tracer) NewClientSpan(ctx context.Context, caller string) (context.Context, *tracing.Span) {
-	return t.newSpan(ctx, caller, apitrace.WithSpanKind(apitrace.SpanKindClient))
+	return t.newSpan(ctx, caller, api_trace.WithSpanKind(api_trace.SpanKindClient))
 }
 
 func (t *Tracer) NewSpan(ctx context.Context, caller string) (context.Context, *tracing.Span) {
 	return t.newSpan(ctx, caller)
 }
 
-func (t *Tracer) newSpan(ctx context.Context, caller string, options ...apitrace.SpanOption) (context.Context, *tracing.Span) {
+func (t *Tracer) newSpan(ctx context.Context, caller string, options ...api_trace.SpanOption) (context.Context, *tracing.Span) {
 	return t.newSpanFromName(ctx, caller, options...)
 }
 
-func (t *Tracer) newSpanFromName(ctx context.Context, name string, options ...apitrace.SpanOption) (context.Context, *tracing.Span) {
+func (t *Tracer) newSpanFromName(ctx context.Context, name string, options ...api_trace.SpanOption) (context.Context, *tracing.Span) {
 	ctx, span := t.Exporter.Start(ctx, name, options...)
 	return ctx, tracing.CreateSpan(span)
 }

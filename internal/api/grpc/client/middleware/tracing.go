@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	grpc_utils "github.com/caos/zitadel/internal/api/grpc"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	grpc_trace "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 )
 
@@ -30,6 +30,6 @@ func TracingServer(ignoredMethods ...GRPCMethod) grpc.UnaryClientInterceptor {
 				return invoker(ctx, method, req, reply, cc, opts...)
 			}
 		}
-		return otelgrpc.UnaryClientInterceptor()(ctx, method, req, reply, cc, invoker, opts...)
+		return grpc_trace.UnaryClientInterceptor()(ctx, method, req, reply, cc, invoker, opts...)
 	}
 }

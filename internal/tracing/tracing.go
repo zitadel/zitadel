@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	apitrace "go.opentelemetry.io/otel/api/trace"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	api_trace "go.opentelemetry.io/otel/api/trace"
+	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 type Tracer interface {
@@ -15,7 +15,7 @@ type Tracer interface {
 	NewClientInterceptorSpan(ctx context.Context, name string) (context.Context, *Span)
 	NewServerInterceptorSpan(ctx context.Context, name string) (context.Context, *Span)
 	NewSpanHTTP(r *http.Request, caller string) (*http.Request, *Span)
-	Sampler() sdktrace.Sampler
+	Sampler() sdk_trace.Sampler
 }
 
 type Config interface {
@@ -24,9 +24,9 @@ type Config interface {
 
 var T Tracer
 
-func Sampler() sdktrace.Sampler {
+func Sampler() sdk_trace.Sampler {
 	if T == nil {
-		return sdktrace.NeverSample()
+		return sdk_trace.NeverSample()
 	}
 	return T.Sampler()
 }
@@ -81,5 +81,5 @@ func NewSpanHTTP(r *http.Request) (*http.Request, *Span) {
 }
 
 func TraceIDFromCtx(ctx context.Context) string {
-	return apitrace.SpanFromContext(ctx).SpanContext().TraceID.String()
+	return api_trace.SpanFromContext(ctx).SpanContext().TraceID.String()
 }

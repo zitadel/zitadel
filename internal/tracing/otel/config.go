@@ -3,7 +3,7 @@ package otel
 import (
 	"github.com/caos/zitadel/internal/tracing"
 	"go.opentelemetry.io/otel/exporters/otlp"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 type Config struct {
@@ -13,7 +13,7 @@ type Config struct {
 }
 
 func (c *Config) NewTracer() error {
-	sampler := sdktrace.ParentBased(sdktrace.TraceIDRatioBased(c.Fraction))
+	sampler := sdk_trace.ParentBased(sdk_trace.TraceIDRatioBased(c.Fraction))
 	exporter, err := otlp.NewExporter(otlp.WithAddress(c.Endpoint), otlp.WithInsecure())
 	if err != nil {
 		return err

@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/tracing"
 	"github.com/caos/zitadel/internal/tracing/otel"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 type Config struct {
@@ -26,7 +26,7 @@ func (c *Config) NewTracer() error {
 		return errors.ThrowInvalidArgument(nil, "GOOGL-sdh3a", "env not properly set, GOOGLE_APPLICATION_CREDENTIALS is misconfigured or missing")
 	}
 
-	sampler := sdktrace.ParentBased(sdktrace.TraceIDRatioBased(c.Fraction))
+	sampler := sdk_trace.ParentBased(sdk_trace.TraceIDRatioBased(c.Fraction))
 	exporter, err := texporter.NewExporter(texporter.WithProjectID(c.ProjectID))
 	if err != nil {
 		return err

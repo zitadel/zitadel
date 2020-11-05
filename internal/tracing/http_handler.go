@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	http_trace "go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 func shouldNotIgnore(endpoints ...string) func(r *http.Request) bool {
@@ -19,11 +19,11 @@ func shouldNotIgnore(endpoints ...string) func(r *http.Request) bool {
 }
 
 func TraceHandler(handler http.Handler, ignoredEndpoints ...string) http.Handler {
-	return otelhttp.NewHandler(handler,
+	return http_trace.NewHandler(handler,
 		"zitadel",
-		otelhttp.WithFilter(shouldNotIgnore(ignoredEndpoints...)),
-		otelhttp.WithPublicEndpoint(),
-		otelhttp.WithSpanNameFormatter(spanNameFormatter))
+		http_trace.WithFilter(shouldNotIgnore(ignoredEndpoints...)),
+		http_trace.WithPublicEndpoint(),
+		http_trace.WithSpanNameFormatter(spanNameFormatter))
 }
 
 func spanNameFormatter(_ string, r *http.Request) string {
