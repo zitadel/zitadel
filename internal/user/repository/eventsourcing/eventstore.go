@@ -76,7 +76,7 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 	passwordVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.PasswordVerificationCode, aesCrypto)
 	aesOtpCrypto, err := crypto.NewAESCrypto(systemDefaults.Multifactors.OTP.VerificationKey)
 	passwordAlg := crypto.NewBCrypt(systemDefaults.SecretGenerators.PasswordSaltCost)
-	web, err := webauthn_helper.StartServer("zitadel", "9f659fddfd9d.ngrok.io", "https://9f659fddfd9d.ngrok.io")
+	web, err := webauthn_helper.StartServer("zitadel", "localhost", "http://localhost:50003")
 	if err != nil {
 		return nil, err
 	}
