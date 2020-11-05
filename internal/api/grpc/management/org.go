@@ -5,9 +5,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes/empty"
 
-	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/tracing"
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
@@ -24,7 +22,6 @@ func (s *Server) GetMyOrg(ctx context.Context, _ *empty.Empty) (*management.OrgV
 	if err != nil {
 		return nil, err
 	}
-	logging.Log("MANAG-8wCTy").WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("asdf")
 	return orgViewFromModel(org), nil
 }
 
