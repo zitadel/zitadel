@@ -93,6 +93,7 @@ func WebAuthNToModel(u2f *WebAuthNToken) *model.WebauthNToken {
 		ObjectRoot: u2f.ObjectRoot,
 		SessionID:  u2f.WebauthNTokenID,
 		SessionData: &webauthn.SessionData{
+			UserID:    []byte(u2f.AggregateID),
 			Challenge: u2f.Challenge,
 		},
 		State: model.MfaState(u2f.State),

@@ -52,7 +52,6 @@ type UserEventstore struct {
 	validateTOTP             func(string, string) bool
 	webauthn                 *webauthn_helper.WebAuthN
 	creds                    []webauthn.Credential //TODO: remove
-	sessionData              *webauthn.SessionData //TODO: remove
 }
 
 type UserConfig struct {
@@ -1463,7 +1462,6 @@ func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID string, dat
 	}
 
 	_, u2f := user.Human.GetU2FToVerify()
-	u2f.SessionData.UserID = []byte(user.AggregateID)
 	cred, err := es.webauthn.FinishRegistration(user, *u2f.SessionData, data)
 	if err != nil {
 		return err
@@ -1501,7 +1499,7 @@ func (es *UserEventstore) BeginMfaU2FLogin(ctx context.Context, userID string) (
 	return base64.URLEncoding.EncodeToString(credentialData), sessionData, nil
 }
 
-func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID, sessionID string, data *protocol.ParsedCredentialAssertionData) error {
+func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID, webAuthNTokenID string, data *protocol.ParsedCredentialAssertionData) error {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
@@ -1509,7 +1507,8 @@ func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID, sessionID st
 	if user.Human == nil {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-BHeq1", "Errors.User.NotHuman")
 	}
-	return es.webauthn.FinishLogin(user, *es.sessionData, data, es.creds...)
+	_, u2f := user.GetU2F(webAuthNTokenID)
+	return es.webauthn.FinishLogin(user, *u2f.SessionData, data, es.creds...)
 }
 
 func (es *UserEventstore) SignOut(ctx context.Context, agentID string, userIDs []string) error {

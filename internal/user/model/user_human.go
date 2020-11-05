@@ -108,6 +108,15 @@ func (u *Human) GetExternalIDP(externalIDP *ExternalIDP) (int, *ExternalIDP) {
 	return -1, nil
 }
 
+func (u *Human) GetU2F(webAuthNTokenID string) (int, *WebauthNToken) {
+	for i, u2f := range u.U2Fs {
+		if u2f.SessionID == webAuthNTokenID {
+			return i, u2f
+		}
+	}
+	return -1, nil
+}
+
 func (u *Human) GetU2FToVerify() (int, *WebauthNToken) {
 	for i, u2f := range u.U2Fs {
 		if u2f.State == MfaStateNotReady {
