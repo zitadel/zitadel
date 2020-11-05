@@ -35,8 +35,9 @@ allow_sign_up = true
 
 1. Create Roles (Admin, Editor, Viewer) in **ZITADEL's** project which contains **Grafana**
 2. Enable "Assert Roles on Authentication" so that the roles are asserted to the userinfo endpoint
-3. (Optioanl) Enable "Check roles on Authentication", this will prevent that someone without any role can login to **Grafana** via **ZITADEL**
-4. Append the config below to your **Grafana** instance
+3. (Optional) Enable "Check roles on Authentication", this will prevent that someone without any role can login to **Grafana** via **ZITADEL**
+4. Append the config below to your **Grafana** instance and reload
+5. Authorize the necessary users
 
 ```ini
 [auth.generic_oauth]
