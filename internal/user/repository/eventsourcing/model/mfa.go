@@ -7,7 +7,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
-	"github.com/duo-labs/webauthn/protocol"
 )
 
 type OTP struct {
@@ -20,13 +19,8 @@ type OTP struct {
 type WebauthNToken struct {
 	es_models.ObjectRoot
 
-	SessionID                    string `json:"sessionID,omitempty"`
-	CredentialCreationDataString string `json:"credentialCreationDataString,omitempty"`
-	CredentialCreationData       *protocol.CredentialCreation
-	Challenge                    string   `json:"challenge"`
-	UserID                       []byte   `json:"user_id"`
-	AllowedCredentialIDs         [][]byte `json:"allowed_credentials,omitempty"`
-	UserVerification             string   `json:"userVerification"`
+	Challenge string `json:"challenge"`
+	//Credenital, publickey, etc...
 }
 
 func OTPFromModel(otp *model.OTP) *OTP {
