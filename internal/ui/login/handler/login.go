@@ -67,7 +67,7 @@ func CreateLogin(config Config, authRepo *eventsourcing.EsRepository, systemDefa
 	if err != nil {
 		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")
 	}
-	web, err := webauthn.StartServer("zitadel", "9f659fddfd9d.ngrok.io", "https://9f659fddfd9d.ngrok.io")
+	web, err := webauthn.StartServer("zitadel", "localhost", "http://localhost:50003")
 	if err != nil {
 		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")
 	}
