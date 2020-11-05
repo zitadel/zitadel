@@ -301,11 +301,11 @@ func (repo *UserRepo) RemoveMyMfaOTP(ctx context.Context) error {
 	return repo.UserEvents.RemoveOTP(ctx, authz.GetCtxData(ctx).UserID)
 }
 
-func (repo *UserRepo) AddMfaU2F(ctx context.Context, userID string) (*model.U2F, error) {
+func (repo *UserRepo) AddMfaU2F(ctx context.Context, userID string) (*model.WebauthNToken, error) {
 	return repo.UserEvents.AddU2F(ctx, userID)
 }
 
-func (repo *UserRepo) AddMyMfaU2F(ctx context.Context) (*model.U2F, error) {
+func (repo *UserRepo) AddMyMfaU2F(ctx context.Context) (*model.WebauthNToken, error) {
 	return repo.UserEvents.AddU2F(ctx, authz.GetCtxData(ctx).UserID)
 }
 

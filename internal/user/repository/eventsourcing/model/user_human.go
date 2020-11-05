@@ -25,8 +25,8 @@ type Human struct {
 	PhoneCode          *PhoneCode       `json:"-"`
 	PasswordCode       *PasswordCode    `json:"-"`
 	OTP                *OTP             `json:"-"`
-	U2FTokens          []*WebauthNToken `json:"-"`
-	PasswordlessTokens []*WebauthNToken `json:"-"`
+	U2FTokens          []*WebAuthNToken `json:"-"`
+	PasswordlessTokens []*WebAuthNToken `json:"-"`
 }
 
 type InitUserCode struct {
@@ -59,7 +59,7 @@ func HumanFromModel(user *model.Human) *Human {
 		human.ExternalIDPs = ExternalIDPsFromModel(user.ExternalIDPs)
 	}
 	if user.U2Fs != nil {
-		human.U2FTokens = U2FsFromModel(user.U2Fs)
+		human.U2FTokens = WebAuthNsFromModel(user.U2Fs)
 	}
 	return human
 }
@@ -100,7 +100,7 @@ func HumanToModel(user *Human) *model.Human {
 		human.OTP = OTPToModel(user.OTP)
 	}
 	if user.U2FTokens != nil {
-		human.U2Fs = U2FsToModel(user.U2FTokens)
+		human.U2Fs = WebAuthNsToModel(user.U2FTokens)
 	}
 	return human
 }
@@ -190,6 +190,8 @@ func (h *Human) AppendEvent(event *es_models.Event) (err error) {
 		err = h.appendExternalIDPRemovedEvent(event)
 	case HumanMFAU2FTokenAdded:
 		err = h.appendU2FAddedEvent(event)
+	case HumanMFAU2FTokenVerified:
+		err = h.appendU2FVerifiedEvent(event)
 	case HumanMFAU2FTokenRemoved:
 		err = h.appendU2FRemovedEvent(event)
 	}

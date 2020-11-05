@@ -17,7 +17,7 @@ type OTP struct {
 	State        MfaState
 }
 
-type U2F struct {
+type WebauthNToken struct {
 	es_models.ObjectRoot
 
 	SessionID                    string
@@ -25,6 +25,8 @@ type U2F struct {
 	CredentialCreationData       *protocol.CredentialCreation
 	State                        MfaState
 	SessionData                  *webauthn.SessionData
+	PublicKey                    []byte
+	AttestationType              string
 }
 
 type MfaState int32

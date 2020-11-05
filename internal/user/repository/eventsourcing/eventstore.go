@@ -1412,7 +1412,7 @@ func (es *UserEventstore) verifyMfaOTP(otp *usr_model.OTP, code string) error {
 	return nil
 }
 
-func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model.U2F, error) {
+func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model.WebauthNToken, error) {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -1432,17 +1432,16 @@ func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model
 	if err != nil {
 		return nil, err
 	}
-	repoWebauthN := &model.WebauthNToken{WebauthNTokenID: id, Challenge: sessionData.Challenge}
+	repoWebauthN := &model.WebAuthNToken{WebauthNTokenID: id, Challenge: sessionData.Challenge}
 	repoUser := model.UserFromModel(user)
 	updateAggregate := MFAU2FAddAggregate(es.AggregateCreator(), repoUser, repoWebauthN)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, updateAggregate)
 	if err != nil {
 		return nil, err
 	}
-	es.sessionData = sessionData
 
 	if _, webauthn := model.GetWebauthn(repoUser.U2FTokens, id); webauthn != nil {
-		u2f := model.U2FToModel(webauthn)
+		u2f := model.WebAuthNToModel(webauthn)
 		u2f.CredentialCreationData = credential
 		u2f.CredentialCreationDataString = base64.RawURLEncoding.EncodeToString(cred)
 		u2f.SessionData.UserID = sessionData.UserID
@@ -1450,7 +1449,7 @@ func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model
 		u2f.SessionData.UserVerification = sessionData.UserVerification
 		return u2f, nil
 	}
-	return nil, errors.ThrowNotFound(nil, "EVENT-tMlos", "Errors.User.U2F.NotExisting")
+	return nil, errors.ThrowNotFound(nil, "EVENT-tMlos", "Errors.User.WebAuthNToken.NotExisting")
 
 }
 
@@ -1462,28 +1461,27 @@ func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID string, dat
 	if user.Human == nil {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-BH552", "Errors.User.NotHuman")
 	}
-	//if user.OTP == nil {
-	//	return caos_errs.ThrowPreconditionFailed(nil, "EVENT-yERHV", "Errors.Users.Mfa.Otp.NotExisting")
-	//}
-	//if user.IsOTPReady() {
-	//	return caos_errs.ThrowPreconditionFailed(nil, "EVENT-qx4ls", "Errors.Users.Mfa.Otp.AlreadyReady")
-	//}
 
-	cred, err := es.webauthn.FinishRegistration(user, *es.sessionData, data)
+	_, u2f := user.Human.GetU2FToVerify()
+	u2f.SessionData.UserID = []byte(user.AggregateID)
+	cred, err := es.webauthn.FinishRegistration(user, *u2f.SessionData, data)
 	if err != nil {
 		return err
 	}
-	if es.creds == nil {
-		es.creds = make([]webauthn.Credential, 0)
+	webAuthNVerify := &model.WebAuthNVerify{
+		ObjectRoot:      u2f.ObjectRoot,
+		WebauthNTokenID: u2f.SessionID,
+		PublicKey:       cred.PublicKey,
+		AttestationType: cred.AttestationType,
 	}
-	es.creds = append(es.creds, *cred)
-	//repoUser := model.UserFromModel(user)
-	//err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAOTPVerifyAggregate(es.AggregateCreator(), repoUser))
-	//if err != nil {
-	//	return err
-	//}
-	//
-	//es.userCache.cacheUser(repoUser)
+	repoUser := model.UserFromModel(user)
+	verifyAggregate := MFAU2FVerifyAggregate(es.AggregateCreator(), repoUser, webAuthNVerify)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, verifyAggregate)
+	if err != nil {
+		return err
+	}
+
+	es.userCache.cacheUser(repoUser)
 	return nil
 }
 

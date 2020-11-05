@@ -39,7 +39,7 @@ func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authRe
 		return
 	}
 	data := &webAuthNData{
-		userData:               l.getUserData(r, authReq, "Register U2F", errType, errMessage),
+		userData:               l.getUserData(r, authReq, "Register WebAuthNToken", errType, errMessage),
 		CredentialCreationData: u2f.CredentialCreationDataString,
 		SessionID:              u2f.SessionID,
 	}
@@ -68,7 +68,7 @@ func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	credentialData, _ := protocol.ParseCredentialCreationResponseBody(bytes.NewReader(credData))
-	if err = l.authRepo.VerifyMfaU2FSetup(r.Context(), authReq.UserID, credentialData); err != nil {
+	if err = l.authRepo.VerifyMfaU2FSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, credentialData); err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
@@ -90,7 +90,7 @@ func (l *Login) renderLoginU2F(w http.ResponseWriter, r *http.Request, authReq *
 	}
 	l.sessionData = *sessionData
 	data := &webAuthNData{
-		userData:               l.getUserData(r, authReq, "Register U2F", errType, errMessage),
+		userData:               l.getUserData(r, authReq, "Register WebAuthNToken", errType, errMessage),
 		CredentialCreationData: credential,
 		SessionID:              sessionData.Challenge,
 	}

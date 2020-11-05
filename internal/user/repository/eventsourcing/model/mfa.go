@@ -17,16 +17,28 @@ type OTP struct {
 	State  int32               `json:"-"`
 }
 
-type WebauthNToken struct {
+type WebAuthNToken struct {
 	es_models.ObjectRoot
 
-	WebauthNTokenID string `json:"webauthNTokenId"`
+	WebauthNTokenID string `json:"webAuthNTokenId"`
 	Challenge       string `json:"challenge"`
 	State           int32  `json:"-"`
-	//Credenital, publickey, etc...
+
+	PublicKey       []byte `json:"publicKey"`
+	AttestationType string `json:"attestationType"`
 }
 
-func GetWebauthn(webauthnTokens []*WebauthNToken, id string) (int, *WebauthNToken) {
+type WebAuthNVerify struct {
+	es_models.ObjectRoot
+
+	WebauthNTokenID string `json:"webAuthNTokenId"`
+	State           int32  `json:"-"`
+
+	PublicKey       []byte `json:"publicKey"`
+	AttestationType string `json:"attestationType"`
+}
+
+func GetWebauthn(webauthnTokens []*WebAuthNToken, id string) (int, *WebAuthNToken) {
 	for i, webauthn := range webauthnTokens {
 		if webauthn.WebauthNTokenID == id {
 			return i, webauthn
@@ -51,24 +63,24 @@ func OTPToModel(otp *OTP) *model.OTP {
 	}
 }
 
-func U2FsToModel(u2fs []*WebauthNToken) []*model.U2F {
-	convertedIDPs := make([]*model.U2F, len(u2fs))
+func WebAuthNsToModel(u2fs []*WebAuthNToken) []*model.WebauthNToken {
+	convertedIDPs := make([]*model.WebauthNToken, len(u2fs))
 	for i, m := range u2fs {
-		convertedIDPs[i] = U2FToModel(m)
+		convertedIDPs[i] = WebAuthNToModel(m)
 	}
 	return convertedIDPs
 }
 
-func U2FsFromModel(u2fs []*model.U2F) []*WebauthNToken {
-	convertedIDPs := make([]*WebauthNToken, len(u2fs))
+func WebAuthNsFromModel(u2fs []*model.WebauthNToken) []*WebAuthNToken {
+	convertedIDPs := make([]*WebAuthNToken, len(u2fs))
 	for i, m := range u2fs {
-		convertedIDPs[i] = U2FFromModel(m)
+		convertedIDPs[i] = WebAuthNFromModel(m)
 	}
 	return convertedIDPs
 }
 
-func U2FFromModel(u2f *model.U2F) *WebauthNToken {
-	return &WebauthNToken{
+func WebAuthNFromModel(u2f *model.WebauthNToken) *WebAuthNToken {
+	return &WebAuthNToken{
 		ObjectRoot:      u2f.ObjectRoot,
 		WebauthNTokenID: u2f.SessionID,
 		Challenge:       u2f.SessionData.Challenge,
@@ -76,8 +88,8 @@ func U2FFromModel(u2f *model.U2F) *WebauthNToken {
 	}
 }
 
-func U2FToModel(u2f *WebauthNToken) *model.U2F {
-	return &model.U2F{
+func WebAuthNToModel(u2f *WebAuthNToken) *model.WebauthNToken {
+	return &model.WebauthNToken{
 		ObjectRoot: u2f.ObjectRoot,
 		SessionID:  u2f.WebauthNTokenID,
 		SessionData: &webauthn.SessionData{
@@ -112,32 +124,56 @@ func (o *OTP) setData(event *es_models.Event) error {
 }
 
 func (u *Human) appendU2FAddedEvent(event *es_models.Event) error {
-	webauthn := new(WebauthNToken)
+	webauthn := new(WebAuthNToken)
 	err := webauthn.setData(event)
 	if err != nil {
 		return err
 	}
 	webauthn.ObjectRoot.CreationDate = event.CreationDate
+	webauthn.State = int32(model.MfaStateNotReady)
+	for i, token := range u.U2FTokens {
+		if token.State == int32(model.MfaStateNotReady) {
+			u.U2FTokens[i] = webauthn
+			return nil
+		}
+	}
 	u.U2FTokens = append(u.U2FTokens, webauthn)
 	return nil
 }
 
-func (u *Human) appendU2FRemovedEvent(event *es_models.Event) error {
-	webauthn := new(WebauthNToken)
+func (u *Human) appendU2FVerifiedEvent(event *es_models.Event) error {
+	webauthn := new(WebAuthNToken)
 	err := webauthn.setData(event)
 	if err != nil {
 		return err
 	}
 	if i, token := GetWebauthn(u.U2FTokens, webauthn.WebauthNTokenID); token != nil {
 		u.U2FTokens[i] = u.U2FTokens[len(u.U2FTokens)-1]
-		u.U2FTokens[len(u.U2FTokens)-1] = nil
-		u.U2FTokens = u.U2FTokens[:len(u.U2FTokens)-1]
+		return nil
+	}
+	webauthn.State = int32(model.MfaStateNotReady)
+	u.U2FTokens = append(u.U2FTokens, webauthn)
+	return nil
+}
+
+func (u *Human) appendU2FRemovedEvent(event *es_models.Event) error {
+	webauthn := new(WebAuthNToken)
+	err := webauthn.setData(event)
+	if err != nil {
+		return err
+	}
+	if i, token := GetWebauthn(u.U2FTokens, webauthn.WebauthNTokenID); token != nil {
+		err = u.U2FTokens[i].setData(event)
+		if err != nil {
+			return err
+		}
+		webauthn.State = int32(model.MfaStateReady)
 		return nil
 	}
 	return nil
 }
 
-func (w *WebauthNToken) setData(event *es_models.Event) error {
+func (w *WebAuthNToken) setData(event *es_models.Event) error {
 	w.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, w); err != nil {
 		logging.Log("EVEN-4M9is").WithError(err).Error("could not unmarshal event data")
