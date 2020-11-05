@@ -24,8 +24,11 @@ type WebAuthNToken struct {
 	Challenge       string `json:"challenge"`
 	State           int32  `json:"-"`
 
+	KeyID           []byte `json:"keyID"`
 	PublicKey       []byte `json:"publicKey"`
 	AttestationType string `json:"attestationType"`
+	AAGUID          []byte `json:"aaguid"`
+	SignCount       uint32 `json:"signCount"`
 }
 
 type WebAuthNVerify struct {
@@ -34,8 +37,11 @@ type WebAuthNVerify struct {
 	WebauthNTokenID string `json:"webAuthNTokenId"`
 	State           int32  `json:"-"`
 
+	KeyID           []byte `json:"keyID"`
 	PublicKey       []byte `json:"publicKey"`
 	AttestationType string `json:"attestationType"`
+	AAGUID          []byte `json:"aaguid"`
+	SignCount       uint32 `json:"signCount"`
 }
 
 func GetWebauthn(webauthnTokens []*WebAuthNToken, id string) (int, *WebAuthNToken) {
@@ -79,24 +85,34 @@ func WebAuthNsFromModel(u2fs []*model.WebauthNToken) []*WebAuthNToken {
 	return convertedIDPs
 }
 
-func WebAuthNFromModel(u2f *model.WebauthNToken) *WebAuthNToken {
+func WebAuthNFromModel(webAuthN *model.WebauthNToken) *WebAuthNToken {
 	return &WebAuthNToken{
-		ObjectRoot:      u2f.ObjectRoot,
-		WebauthNTokenID: u2f.SessionID,
-		Challenge:       u2f.SessionData.Challenge,
-		State:           int32(u2f.State),
+		ObjectRoot:      webAuthN.ObjectRoot,
+		WebauthNTokenID: webAuthN.SessionID,
+		Challenge:       webAuthN.SessionData.Challenge,
+		State:           int32(webAuthN.State),
+		KeyID:           webAuthN.KeyID,
+		PublicKey:       webAuthN.PublicKey,
+		AAGUID:          webAuthN.AAGUID,
+		SignCount:       webAuthN.SignCount,
+		AttestationType: webAuthN.AttestationType,
 	}
 }
 
-func WebAuthNToModel(u2f *WebAuthNToken) *model.WebauthNToken {
+func WebAuthNToModel(webAuthN *WebAuthNToken) *model.WebauthNToken {
 	return &model.WebauthNToken{
-		ObjectRoot: u2f.ObjectRoot,
-		SessionID:  u2f.WebauthNTokenID,
+		ObjectRoot: webAuthN.ObjectRoot,
+		SessionID:  webAuthN.WebauthNTokenID,
 		SessionData: &webauthn.SessionData{
-			UserID:    []byte(u2f.AggregateID),
-			Challenge: u2f.Challenge,
+			UserID:    []byte(webAuthN.AggregateID),
+			Challenge: webAuthN.Challenge,
 		},
-		State: model.MfaState(u2f.State),
+		State:           model.MfaState(webAuthN.State),
+		KeyID:           webAuthN.KeyID,
+		PublicKey:       webAuthN.PublicKey,
+		AAGUID:          webAuthN.AAGUID,
+		SignCount:       webAuthN.SignCount,
+		AttestationType: webAuthN.AttestationType,
 	}
 }
 

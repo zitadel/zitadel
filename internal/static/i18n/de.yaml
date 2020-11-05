@@ -57,6 +57,8 @@ Errors:
         NotExisting: Multifaktor OTP (OneTimePassword) existiert nicht
         NotReady: Multifaktor OTP (OneTimePassword) ist nicht bereit
         InvalidCode: Code ist ungültig
+      U2F:
+        NotExisting: U2F existiert nicht
   Org:
     Invalid: Organisation ist ungültig
     AlreadyDeactivated: Organisation ist bereits deaktiviert

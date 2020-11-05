@@ -25,8 +25,11 @@ type WebauthNToken struct {
 	CredentialCreationData       *protocol.CredentialCreation
 	State                        MfaState
 	SessionData                  *webauthn.SessionData
+	KeyID                        []byte
 	PublicKey                    []byte
 	AttestationType              string
+	AAGUID                       []byte
+	SignCount                    uint32
 }
 
 type MfaState int32
