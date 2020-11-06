@@ -1411,7 +1411,7 @@ func (es *UserEventstore) verifyMfaOTP(otp *usr_model.OTP, code string) error {
 	return nil
 }
 
-func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model.WebauthNToken, error) {
+func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model.WebAuthNToken, error) {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -1419,11 +1419,7 @@ func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model
 	if user.Human == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-GDdd1", "Errors.User.NotHuman")
 	}
-	credential, sessionData, err := es.webauthn.BeginRegistration(user, protocol.Platform, protocol.VerificationDiscouraged, user.GetU2FCredentials()...)
-	if err != nil {
-		return nil, err
-	}
-	cred, err := json.Marshal(credential)
+	webAuthN, err := es.webauthn.BeginRegistration(user, protocol.Platform, usr_model.UserVerificationRequirementDiscouraged, user.U2Fs...)
 	if err != nil {
 		return nil, err
 	}
@@ -1431,28 +1427,18 @@ func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model
 	if err != nil {
 		return nil, err
 	}
-	repoWebauthN := &model.WebAuthNToken{WebauthNTokenID: id, Challenge: sessionData.Challenge}
+	webAuthN.WebAuthNTokenID = id
 	repoUser := model.UserFromModel(user)
-	updateAggregate := MFAU2FAddAggregate(es.AggregateCreator(), repoUser, repoWebauthN)
+	repoWebAuthN := model.WebAuthNFromModel(webAuthN)
+	updateAggregate := MFAU2FAddAggregate(es.AggregateCreator(), repoUser, repoWebAuthN)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, updateAggregate)
 	if err != nil {
 		return nil, err
 	}
-
-	if _, wan := model.GetWebauthn(repoUser.U2FTokens, id); wan != nil {
-		u2f := model.WebAuthNToModel(wan)
-		u2f.CredentialCreationData = credential
-		u2f.CredentialCreationDataString = base64.RawURLEncoding.EncodeToString(cred)
-		u2f.SessionData.UserID = sessionData.UserID
-		u2f.SessionData.AllowedCredentialIDs = sessionData.AllowedCredentialIDs
-		u2f.SessionData.UserVerification = sessionData.UserVerification
-		return u2f, nil
-	}
-	return nil, errors.ThrowNotFound(nil, "EVENT-tMlos", "Errors.User.WebAuthNToken.NotExisting")
-
+	return webAuthN, nil
 }
 
-func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID string, data *protocol.ParsedCredentialCreationData) error {
+func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID string, credentialData []byte) error {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
@@ -1462,20 +1448,13 @@ func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID string, dat
 	}
 
 	_, u2f := user.Human.GetU2FToVerify()
-	cred, err := es.webauthn.FinishRegistration(user, *u2f.SessionData, data)
+	webAuthN, err := es.webauthn.FinishRegistration(user, u2f, credentialData)
 	if err != nil {
 		return err
 	}
-	webAuthNVerify := &model.WebAuthNVerify{
-		ObjectRoot:      u2f.ObjectRoot,
-		WebauthNTokenID: u2f.SessionID,
-		PublicKey:       cred.PublicKey,
-		AttestationType: cred.AttestationType,
-		AAGUID:          cred.Authenticator.AAGUID,
-		SignCount:       cred.Authenticator.SignCount,
-	}
 	repoUser := model.UserFromModel(user)
-	verifyAggregate := MFAU2FVerifyAggregate(es.AggregateCreator(), repoUser, webAuthNVerify)
+	repoWebAuthN := model.WebAuthNVerifyFromModel(webAuthN)
+	verifyAggregate := MFAU2FVerifyAggregate(es.AggregateCreator(), repoUser, repoWebAuthN)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, verifyAggregate)
 	if err != nil {
 		return err
@@ -1496,7 +1475,7 @@ func (es *UserEventstore) BeginMfaU2FLogin(ctx context.Context, userID string) (
 	if user.U2Fs == nil {
 		return "", nil, errors.ThrowPreconditionFailed(nil, "EVENT-5Mk8s", "Errors.User.Mfa.U2F.NotExisting")
 	}
-	credential, sessionData, err := es.webauthn.BeginLogin(user, protocol.VerificationDiscouraged, user.GetU2FCredentials()...)
+	credential, sessionData, err := es.webauthn.BeginLogin(user, usr_model.UserVerificationRequirementDiscouraged, user.U2Fs...)
 	if err != nil {
 		return "", nil, err
 	}
@@ -1504,7 +1483,7 @@ func (es *UserEventstore) BeginMfaU2FLogin(ctx context.Context, userID string) (
 	return base64.URLEncoding.EncodeToString(credentialData), sessionData, nil
 }
 
-func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID, webAuthNTokenID string, data *protocol.ParsedCredentialAssertionData) error {
+func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID, webAuthNTokenID string, credentialData []byte) error {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
@@ -1513,7 +1492,7 @@ func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID, webAuthNToke
 		return errors.ThrowPreconditionFailed(nil, "EVENT-BHeq1", "Errors.User.NotHuman")
 	}
 	_, u2f := user.GetU2F(webAuthNTokenID)
-	return es.webauthn.FinishLogin(user, *u2f.SessionData, data, user.GetU2FCredentials()...)
+	return es.webauthn.FinishLogin(user, u2f, credentialData, user.U2Fs...)
 }
 
 func (es *UserEventstore) SignOut(ctx context.Context, agentID string, userIDs []string) error {

@@ -1,11 +1,9 @@
 package auth
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
+	"github.com/caos/zitadel/internal/user/model"
 
-	"github.com/duo-labs/webauthn/protocol"
 	"github.com/golang/protobuf/ptypes/empty"
 
 	"github.com/caos/zitadel/pkg/grpc/auth"
@@ -166,20 +164,19 @@ func (s *Server) RemoveMfaOTP(ctx context.Context, _ *empty.Empty) (_ *empty.Emp
 
 func (s *Server) AddMfaU2F(ctx context.Context, _ *empty.Empty) (_ *auth.MfaU2FResponse, err error) {
 	u2f, err := s.repo.AddMyMfaU2F(ctx)
-	return verifyMfaU2FFromModel(u2f.CredentialCreationData), err
+	return verifyMfaU2FFromModel(u2f), err
 }
 
 func (s *Server) VerifyMfaU2F(ctx context.Context, request *auth.VerifyMfaU2F) (*empty.Empty, error) {
-	err := s.repo.VerifyMyMfaU2FSetup(ctx, verifyMfaU2FToModel(request))
+	err := s.repo.VerifyMyMfaU2FSetup(ctx, request.PublicKeyCredential)
 	return &empty.Empty{}, err
 }
 
-func verifyMfaU2FFromModel(request *protocol.CredentialCreation) *auth.MfaU2FResponse {
-	publicKey, _ := json.Marshal(request.Response)
+func verifyMfaU2FFromModel(u2f *model.WebAuthNToken) *auth.MfaU2FResponse {
 	return &auth.MfaU2FResponse{
-		Id:        "",
-		PublicKey: publicKey,
-		State:     0,
+		Id:        u2f.WebAuthNTokenID,
+		PublicKey: u2f.PublicKey,
+		State:     mfaStateFromModel(u2f.State),
 	}
 }
 
@@ -334,11 +331,6 @@ func verifyMfaU2FFromModel(request *protocol.CredentialCreation) *auth.MfaU2FRes
 //		Id:   party.ID,
 //	}
 //}
-
-func verifyMfaU2FToModel(request *auth.VerifyMfaU2F) *protocol.ParsedCredentialCreationData {
-	response, _ := protocol.ParseCredentialCreationResponseBody(bytes.NewReader(request.PublicKeyCredential))
-	return response
-}
 
 //
 //func attestionToModel(response *auth.Response) protocol.AuthenticatorAttestationResponse {

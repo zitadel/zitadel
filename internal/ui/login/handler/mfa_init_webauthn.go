@@ -1,11 +1,8 @@
 package handler
 
 import (
-	"bytes"
 	"encoding/base64"
 	"net/http"
-
-	"github.com/duo-labs/webauthn/protocol"
 
 	"github.com/caos/zitadel/internal/auth_request/model"
 )
@@ -40,8 +37,8 @@ func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authRe
 	}
 	data := &webAuthNData{
 		userData:               l.getUserData(r, authReq, "Register WebAuthNToken", errType, errMessage),
-		CredentialCreationData: u2f.CredentialCreationDataString,
-		SessionID:              u2f.SessionID,
+		CredentialCreationData: base64.RawURLEncoding.EncodeToString(u2f.CredentialCreationData),
+		SessionID:              u2f.WebAuthNTokenID,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMfaU2FInit], data, nil)
 }
@@ -67,8 +64,8 @@ func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	credentialData, _ := protocol.ParseCredentialCreationResponseBody(bytes.NewReader(credData))
-	if err = l.authRepo.VerifyMfaU2FSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, credentialData); err != nil {
+
+	if err = l.authRepo.VerifyMfaU2FSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, credData); err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
@@ -109,8 +106,7 @@ func (l *Login) handleLoginU2F(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	data, err := protocol.ParseCredentialRequestResponseBody(bytes.NewReader(credData))
-	err = l.authRepo.VerifyMfaU2F(r.Context(), authReq.UserID, formData.SessionID, data)
+	err = l.authRepo.VerifyMfaU2F(r.Context(), authReq.UserID, formData.SessionID, credData)
 	if err != nil {
 
 	}

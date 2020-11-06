@@ -22,7 +22,7 @@ type Human struct {
 	PhoneCode    *PhoneCode
 	PasswordCode *PasswordCode
 	OTP          *OTP
-	U2Fs         []*WebauthNToken
+	U2Fs         []*WebAuthNToken
 }
 
 type InitUserCode struct {
@@ -109,16 +109,16 @@ func (u *Human) GetExternalIDP(externalIDP *ExternalIDP) (int, *ExternalIDP) {
 	return -1, nil
 }
 
-func (u *Human) GetU2F(webAuthNTokenID string) (int, *WebauthNToken) {
+func (u *Human) GetU2F(webAuthNTokenID string) (int, *WebAuthNToken) {
 	for i, u2f := range u.U2Fs {
-		if u2f.SessionID == webAuthNTokenID {
+		if u2f.WebAuthNTokenID == webAuthNTokenID {
 			return i, u2f
 		}
 	}
 	return -1, nil
 }
 
-func (u *Human) GetU2FToVerify() (int, *WebauthNToken) {
+func (u *Human) GetU2FToVerify() (int, *WebAuthNToken) {
 	for i, u2f := range u.U2Fs {
 		if u2f.State == MfaStateNotReady {
 			return i, u2f

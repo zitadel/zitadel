@@ -3,7 +3,6 @@ package eventstore
 import (
 	"context"
 
-	"github.com/duo-labs/webauthn/protocol"
 	"github.com/duo-labs/webauthn/webauthn"
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -301,28 +300,28 @@ func (repo *UserRepo) RemoveMyMfaOTP(ctx context.Context) error {
 	return repo.UserEvents.RemoveOTP(ctx, authz.GetCtxData(ctx).UserID)
 }
 
-func (repo *UserRepo) AddMfaU2F(ctx context.Context, userID string) (*model.WebauthNToken, error) {
+func (repo *UserRepo) AddMfaU2F(ctx context.Context, userID string) (*model.WebAuthNToken, error) {
 	return repo.UserEvents.AddU2F(ctx, userID)
 }
 
-func (repo *UserRepo) AddMyMfaU2F(ctx context.Context) (*model.WebauthNToken, error) {
+func (repo *UserRepo) AddMyMfaU2F(ctx context.Context) (*model.WebAuthNToken, error) {
 	return repo.UserEvents.AddU2F(ctx, authz.GetCtxData(ctx).UserID)
 }
 
-func (repo *UserRepo) VerifyMfaU2FSetup(ctx context.Context, userID string, data *protocol.ParsedCredentialCreationData) error {
-	return repo.UserEvents.VerifyU2FSetup(ctx, userID, data)
+func (repo *UserRepo) VerifyMfaU2FSetup(ctx context.Context, userID string, credentialData []byte) error {
+	return repo.UserEvents.VerifyU2FSetup(ctx, userID, credentialData)
 }
 
-func (repo *UserRepo) VerifyMyMfaU2FSetup(ctx context.Context, data *protocol.ParsedCredentialCreationData) error {
-	return repo.UserEvents.VerifyU2FSetup(ctx, authz.GetCtxData(ctx).UserID, data)
+func (repo *UserRepo) VerifyMyMfaU2FSetup(ctx context.Context, credentialData []byte) error {
+	return repo.UserEvents.VerifyU2FSetup(ctx, authz.GetCtxData(ctx).UserID, credentialData)
 }
 
 func (repo *UserRepo) BeginMfaU2FLogin(ctx context.Context, userID string) (string, *webauthn.SessionData, error) {
 	return repo.UserEvents.BeginMfaU2FLogin(ctx, userID)
 }
 
-func (repo *UserRepo) VerifyMfaU2F(ctx context.Context, userID, sessionID string, data *protocol.ParsedCredentialAssertionData) error {
-	return repo.UserEvents.VerifyMfaU2F(ctx, userID, sessionID, data)
+func (repo *UserRepo) VerifyMfaU2F(ctx context.Context, userID, sessionID string, credentialData []byte) error {
+	return repo.UserEvents.VerifyMfaU2F(ctx, userID, sessionID, credentialData)
 }
 
 func (repo *UserRepo) ChangeMyUsername(ctx context.Context, username string) error {

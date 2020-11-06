@@ -2,7 +2,7 @@ package webauthn
 
 import (
 	"bytes"
-
+	"encoding/json"
 	"github.com/duo-labs/webauthn/protocol"
 	"github.com/duo-labs/webauthn/webauthn"
 
@@ -53,8 +53,9 @@ func (u *webUser) WebAuthnCredentials() []webauthn.Credential {
 	return u.credentials
 }
 
-func (w *WebAuthN) BeginRegistration(user *usr_model.User, authType protocol.AuthenticatorAttachment, userVerification protocol.UserVerificationRequirement, creds ...webauthn.Credential) (*protocol.CredentialCreation, *webauthn.SessionData, error) {
+func (w *WebAuthN) BeginRegistration(user *usr_model.User, authType protocol.AuthenticatorAttachment, userVerification usr_model.UserVerificationRequirement, webAuthNs ...*usr_model.WebAuthNToken) (*usr_model.WebAuthNToken, error) {
 	//residentKeyRequirement := false
+	creds := WebAuthNsToCredentials(webAuthNs)
 	existing := make([]protocol.CredentialDescriptor, len(creds))
 	for i, cred := range creds {
 		existing[i] = protocol.CredentialDescriptor{
@@ -68,35 +69,52 @@ func (w *WebAuthN) BeginRegistration(user *usr_model.User, authType protocol.Aut
 	},
 		webauthn.WithAuthenticatorSelection(protocol.AuthenticatorSelection{
 			//RequireResidentKey: &residentKeyRequirement,
-			UserVerification: userVerification,
+			UserVerification: UserVerificationFromModel(userVerification),
 		}),
 		webauthn.WithConveyancePreference(protocol.PreferNoAttestation),
 		webauthn.WithExclusions(existing),
 	)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return credentialOptions, sessionData, nil
+	cred, err := json.Marshal(credentialOptions)
+	if err != nil {
+		return nil, err
+	}
+	return &usr_model.WebAuthNToken{
+		Challenge:              sessionData.Challenge,
+		CredentialCreationData: cred,
+		AllowedCredentialIDs:   sessionData.AllowedCredentialIDs,
+		UserVerification:       UserVerificationToModel(sessionData.UserVerification),
+	}, nil
 }
 
-func (w *WebAuthN) FinishRegistration(user *usr_model.User, sessionData webauthn.SessionData, credentialData *protocol.ParsedCredentialCreationData) (*webauthn.Credential, error) {
-	//data, err := json.Marshal(credentialData)
-	//parsedCredentialData, err := protocol.ParseCredentialCreationResponseBody(bytes.NewReader(data))
+func (w *WebAuthN) FinishRegistration(user *usr_model.User, webAuthN *usr_model.WebAuthNToken, credData []byte) (*usr_model.WebAuthNToken, error) {
+	credentialData, err := protocol.ParseCredentialCreationResponseBody(bytes.NewReader(credData))
+	if err != nil {
+		return nil, err
+	}
+	sessionData := WebAuthNToSessionData(webAuthN)
 	credential, err := w.web.CreateCredential(
 		&webUser{
 			User: user,
 		},
 		sessionData, credentialData)
 	if err != nil {
-		//return nil, err
+		return nil, err
 	}
-	return credential, nil
+
+	webAuthN.PublicKey = credential.PublicKey
+	webAuthN.AttestationType = credential.AttestationType
+	webAuthN.AAGUID = credential.Authenticator.AAGUID
+	webAuthN.SignCount = credential.Authenticator.SignCount
+	return webAuthN, nil
 }
 
-func (w *WebAuthN) BeginLogin(user *usr_model.User, userVerification protocol.UserVerificationRequirement, creds ...webauthn.Credential) (*protocol.CredentialAssertion, *webauthn.SessionData, error) {
+func (w *WebAuthN) BeginLogin(user *usr_model.User, userVerification usr_model.UserVerificationRequirement, webAuthNs ...*usr_model.WebAuthNToken) (*protocol.CredentialAssertion, *webauthn.SessionData, error) {
 	assertion, sessionData, err := w.web.BeginLogin(&webUser{
 		User:        user,
-		credentials: creds,
+		credentials: WebAuthNsToCredentials(webAuthNs),
 	}) //webauthn.WithUserVerification(userVerification),
 
 	if err != nil {
@@ -105,12 +123,13 @@ func (w *WebAuthN) BeginLogin(user *usr_model.User, userVerification protocol.Us
 	return assertion, sessionData, nil
 }
 
-func (w *WebAuthN) FinishLogin(user *usr_model.User, sessionData webauthn.SessionData, assertionData *protocol.ParsedCredentialAssertionData, creds ...webauthn.Credential) error {
+func (w *WebAuthN) FinishLogin(user *usr_model.User, webAuthN *usr_model.WebAuthNToken, credData []byte, webAuthNs ...*usr_model.WebAuthNToken) error {
+	assertionData, err := protocol.ParseCredentialRequestResponseBody(bytes.NewReader(credData))
 	webUser := &webUser{
 		User:        user,
-		credentials: creds,
+		credentials: WebAuthNsToCredentials(webAuthNs),
 	}
-	credential, err := w.web.ValidateLogin(webUser, sessionData, assertionData)
+	credential, err := w.web.ValidateLogin(webUser, WebAuthNToSessionData(webAuthN), assertionData)
 	if err != nil {
 		return err
 	}

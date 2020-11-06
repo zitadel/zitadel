@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 
-	"github.com/duo-labs/webauthn/protocol"
 	"github.com/duo-labs/webauthn/webauthn"
 
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -31,10 +30,10 @@ type UserRepository interface {
 	AddMfaOTP(ctx context.Context, userID string) (*model.OTP, error)
 	VerifyMfaOTPSetup(ctx context.Context, userID, code string) error
 
-	AddMfaU2F(ctx context.Context, id string) (*model.WebauthNToken, error)
-	VerifyMfaU2FSetup(ctx context.Context, userID string, data *protocol.ParsedCredentialCreationData) error
+	AddMfaU2F(ctx context.Context, id string) (*model.WebAuthNToken, error)
+	VerifyMfaU2FSetup(ctx context.Context, userID string, credentialData []byte) error
 	BeginMfaU2FLogin(ctx context.Context, userID string) (string, *webauthn.SessionData, error)
-	VerifyMfaU2F(ctx context.Context, userID, sessionID string, data *protocol.ParsedCredentialAssertionData) error
+	VerifyMfaU2F(ctx context.Context, userID, sessionID string, credentialData []byte) error
 
 	ChangeUsername(ctx context.Context, userID, username string) error
 
@@ -75,8 +74,8 @@ type myUserRepo interface {
 	AddMyMfaOTP(ctx context.Context) (*model.OTP, error)
 	VerifyMyMfaOTPSetup(ctx context.Context, code string) error
 	RemoveMyMfaOTP(ctx context.Context) error
-	AddMyMfaU2F(ctx context.Context) (*model.WebauthNToken, error)
-	VerifyMyMfaU2FSetup(ctx context.Context, data *protocol.ParsedCredentialCreationData) error
+	AddMyMfaU2F(ctx context.Context) (*model.WebAuthNToken, error)
+	VerifyMyMfaU2FSetup(ctx context.Context, data []byte) error
 
 	ChangeMyUsername(ctx context.Context, username string) error
 

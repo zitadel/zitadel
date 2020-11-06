@@ -7,7 +7,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
-	"github.com/duo-labs/webauthn/webauthn"
 )
 
 type OTP struct {
@@ -32,11 +31,7 @@ type WebAuthNToken struct {
 }
 
 type WebAuthNVerify struct {
-	es_models.ObjectRoot
-
 	WebauthNTokenID string `json:"webAuthNTokenId"`
-	State           int32  `json:"-"`
-
 	KeyID           []byte `json:"keyID"`
 	PublicKey       []byte `json:"publicKey"`
 	AttestationType string `json:"attestationType"`
@@ -69,15 +64,15 @@ func OTPToModel(otp *OTP) *model.OTP {
 	}
 }
 
-func WebAuthNsToModel(u2fs []*WebAuthNToken) []*model.WebauthNToken {
-	convertedIDPs := make([]*model.WebauthNToken, len(u2fs))
+func WebAuthNsToModel(u2fs []*WebAuthNToken) []*model.WebAuthNToken {
+	convertedIDPs := make([]*model.WebAuthNToken, len(u2fs))
 	for i, m := range u2fs {
 		convertedIDPs[i] = WebAuthNToModel(m)
 	}
 	return convertedIDPs
 }
 
-func WebAuthNsFromModel(u2fs []*model.WebauthNToken) []*WebAuthNToken {
+func WebAuthNsFromModel(u2fs []*model.WebAuthNToken) []*WebAuthNToken {
 	convertedIDPs := make([]*WebAuthNToken, len(u2fs))
 	for i, m := range u2fs {
 		convertedIDPs[i] = WebAuthNFromModel(m)
@@ -85,11 +80,11 @@ func WebAuthNsFromModel(u2fs []*model.WebauthNToken) []*WebAuthNToken {
 	return convertedIDPs
 }
 
-func WebAuthNFromModel(webAuthN *model.WebauthNToken) *WebAuthNToken {
+func WebAuthNFromModel(webAuthN *model.WebAuthNToken) *WebAuthNToken {
 	return &WebAuthNToken{
 		ObjectRoot:      webAuthN.ObjectRoot,
-		WebauthNTokenID: webAuthN.SessionID,
-		Challenge:       webAuthN.SessionData.Challenge,
+		WebauthNTokenID: webAuthN.WebAuthNTokenID,
+		Challenge:       webAuthN.Challenge,
 		State:           int32(webAuthN.State),
 		KeyID:           webAuthN.KeyID,
 		PublicKey:       webAuthN.PublicKey,
@@ -99,15 +94,23 @@ func WebAuthNFromModel(webAuthN *model.WebauthNToken) *WebAuthNToken {
 	}
 }
 
-func WebAuthNToModel(webAuthN *WebAuthNToken) *model.WebauthNToken {
-	return &model.WebauthNToken{
-		ObjectRoot: webAuthN.ObjectRoot,
-		SessionID:  webAuthN.WebauthNTokenID,
-		SessionData: &webauthn.SessionData{
-			UserID:    []byte(webAuthN.AggregateID),
-			Challenge: webAuthN.Challenge,
-		},
+func WebAuthNToModel(webAuthN *WebAuthNToken) *model.WebAuthNToken {
+	return &model.WebAuthNToken{
+		ObjectRoot:      webAuthN.ObjectRoot,
+		WebAuthNTokenID: webAuthN.WebauthNTokenID,
+		Challenge:       webAuthN.Challenge,
 		State:           model.MfaState(webAuthN.State),
+		KeyID:           webAuthN.KeyID,
+		PublicKey:       webAuthN.PublicKey,
+		AAGUID:          webAuthN.AAGUID,
+		SignCount:       webAuthN.SignCount,
+		AttestationType: webAuthN.AttestationType,
+	}
+}
+
+func WebAuthNVerifyFromModel(webAuthN *model.WebAuthNToken) *WebAuthNVerify {
+	return &WebAuthNVerify{
+		WebauthNTokenID: webAuthN.WebAuthNTokenID,
 		KeyID:           webAuthN.KeyID,
 		PublicKey:       webAuthN.PublicKey,
 		AAGUID:          webAuthN.AAGUID,
