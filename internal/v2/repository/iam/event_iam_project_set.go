@@ -7,28 +7,27 @@ import (
 )
 
 const (
-	IAMProjectSetEventType eventstore.EventType = "iam.project.iam.set"
+	ProjectSetEventType eventstore.EventType = "iam.project.iam.set"
 )
 
-type IAMProjectSetEvent struct {
+type ProjectSetEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ProjectID string `json:"iamProjectId"`
 }
 
-func (e *IAMProjectSetEvent) CheckPrevious() bool {
+func (e *ProjectSetEvent) CheckPrevious() bool {
 	return e.Type() == SetupStartedEventType
 }
 
-func (e *IAMProjectSetEvent) Data() interface{} {
+func (e *ProjectSetEvent) Data() interface{} {
 	return e
 }
 
-func NewIAMProjectSetEvent(ctx context.Context, service, projectID string) *IAMProjectSetEvent {
-	return &IAMProjectSetEvent{
+func NewProjectSetEvent(ctx context.Context, projectID string) *ProjectSetEvent {
+	return &ProjectSetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			service,
 			SetupDoneEventType,
 		),
 		ProjectID: projectID,

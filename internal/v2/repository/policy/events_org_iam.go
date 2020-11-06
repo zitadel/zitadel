@@ -26,14 +26,12 @@ func (e *OrgIAMPolicyAddedEvent) Data() interface{} {
 
 func NewOrgIAMPolicyAddedEvent(
 	ctx context.Context,
-	service string,
 	userLoginMustBeDomain bool,
 ) *OrgIAMPolicyAddedEvent {
 
 	return &OrgIAMPolicyAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			service,
 			OrgIAMPolicyAddedEventType,
 		),
 		UserLoginMustBeDomain: userLoginMustBeDomain,

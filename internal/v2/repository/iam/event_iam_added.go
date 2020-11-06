@@ -24,11 +24,10 @@ func (e *GlobalOrgSetEvent) Data() interface{} {
 	return e
 }
 
-func NewGlobalOrgSetEventEvent(ctx context.Context, service, orgID string) *GlobalOrgSetEvent {
+func NewGlobalOrgSetEventEvent(ctx context.Context, orgID string) *GlobalOrgSetEvent {
 	return &GlobalOrgSetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			service,
 			GlobalOrgSetEventType,
 		),
 		OrgID: orgID,

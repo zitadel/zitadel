@@ -6,31 +6,34 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 )
 
-type MemberRemovedEvent struct {
+type MemberChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserID string `json:"userId"`
+	Roles  []string `json:"roles"`
+	UserID string   `json:"userId"`
 }
 
-func (e *MemberRemovedEvent) CheckPrevious() bool {
+func (e *MemberChangedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *MemberRemovedEvent) Data() interface{} {
+func (e *MemberChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewMemberRemovedEvent(
+func NewMemberChangedEvent(
 	ctx context.Context,
 	eventType eventstore.EventType,
 	userID string,
-) *MemberRemovedEvent {
+	roles ...string,
+) *MemberChangedEvent {
 
-	return &MemberRemovedEvent{
+	return &MemberChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			eventType,
 		),
+		Roles:  roles,
 		UserID: userID,
 	}
 }

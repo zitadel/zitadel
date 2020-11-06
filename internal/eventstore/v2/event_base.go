@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/api/service"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
@@ -77,10 +78,11 @@ func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 	}
 }
 
-func NewBaseEventForPush(ctx context.Context, service string, typ EventType) *BaseEvent {
+func NewBaseEventForPush(ctx context.Context, typ EventType) *BaseEvent {
+	svcName := service.FromContext(ctx)
 	return &BaseEvent{
 		User:      authz.GetCtxData(ctx).UserID,
-		Service:   service,
+		Service:   svcName,
 		EventType: typ,
 	}
 }

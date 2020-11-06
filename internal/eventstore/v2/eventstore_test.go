@@ -7,6 +7,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
@@ -56,7 +57,7 @@ func newTestEvent(description string, data func() interface{}, checkPrevious boo
 		data:                data,
 		shouldCheckPrevious: checkPrevious,
 		BaseEvent: *NewBaseEventForPush(
-			"editorUser",
+			authz.NewMockContext("resourceOwner", "editorUser"),
 			"editorService",
 			"test.event",
 		),
@@ -87,7 +88,7 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 		mapper    func(*repository.Event) (EventReader, error)
 	}
 	type res struct {
-		event       Event
+		event       EventReader
 		mapperCount int
 	}
 

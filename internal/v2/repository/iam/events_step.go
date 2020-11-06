@@ -2,8 +2,11 @@ package iam
 
 import (
 	"context"
+	"encoding/json"
 
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
 const (
@@ -17,6 +20,7 @@ type SetupStepEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Step Step `json:"Step"`
+	Done bool `json:"-"`
 }
 
 func (e *SetupStepEvent) CheckPrevious() bool {
@@ -27,21 +31,32 @@ func (e *SetupStepEvent) Data() interface{} {
 	return e
 }
 
-func NewSetupStepDoneEvent(ctx context.Context, service string) *SetupStepEvent {
+func SetupStepMapper(event *repository.Event) (eventstore.EventReader, error) {
+	step := &SetupStepEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+		Done:      eventstore.EventType(event.Type) == SetupDoneEventType,
+	}
+	err := json.Unmarshal(event.Data, step)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "IAM-O6rVg", "unable to unmarshal step")
+	}
+
+	return step, nil
+}
+
+func NewSetupStepDoneEvent(ctx context.Context) *SetupStepEvent {
 	return &SetupStepEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			service,
 			SetupDoneEventType,
 		),
 	}
 }
 
-func NewSetupStepStartedEvent(ctx context.Context, service string) *SetupStepEvent {
+func NewSetupStepStartedEvent(ctx context.Context) *SetupStepEvent {
 	return &SetupStepEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			service,
 			SetupStartedEventType,
 		),
 	}

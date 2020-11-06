@@ -39,9 +39,3 @@ type EventReader interface {
 	PreviousSequence() uint64
 	CreationDate() time.Time
 }
-
-//Event is the representation of a state change
-type Event interface {
-	EventPusher
-	EventReader
-}

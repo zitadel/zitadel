@@ -2,9 +2,9 @@ package eventstore
 
 import "time"
 
-func NewReadModel(id string) *ReadModel {
+func NewReadModel( /*id string*/ ) *ReadModel {
 	return &ReadModel{
-		ID:     id,
+		// ID:     id,
 		Events: []EventReader{},
 	}
 }
@@ -12,11 +12,11 @@ func NewReadModel(id string) *ReadModel {
 //ReadModel is the minimum representation of a View model.
 // it might be saved in a database or in memory
 type ReadModel struct {
-	ProcessedSequence uint64        `json:"-"`
-	ID                string        `json:"-"`
-	CreationDate      time.Time     `json:"-"`
-	ChangeDate        time.Time     `json:"-"`
-	Events            []EventReader `json:"-"`
+	ProcessedSequence uint64 `json:"-"`
+	// ID                string        `json:"-"`
+	CreationDate time.Time     `json:"-"`
+	ChangeDate   time.Time     `json:"-"`
+	Events       []EventReader `json:"-"`
 }
 
 //AppendEvents adds all the events to the read model.
@@ -40,38 +40,5 @@ func (rm *ReadModel) Reduce() error {
 	// all events processed and not needed anymore
 	rm.Events = nil
 	rm.Events = []EventReader{}
-	return nil
-}
-
-func NewAggregate(id string) *Aggregate {
-	return &Aggregate{
-		ID:     id,
-		Events: []Event{},
-	}
-}
-
-type Aggregate struct {
-	PreviousSequence uint64  `json:"-"`
-	ID               string  `json:"-"`
-	Events           []Event `json:"-"`
-}
-
-//AppendEvents adds all the events to the aggregate.
-// The function doesn't compute the new state of the aggregate
-func (a *Aggregate) AppendEvents(events ...Event) *Aggregate {
-	a.Events = append(a.Events, events...)
-	return a
-}
-
-//Reduce must be the last step in the reduce function of the extension
-func (a *Aggregate) Reduce() error {
-	if len(a.Events) == 0 {
-		return nil
-	}
-
-	a.PreviousSequence = a.Events[len(a.Events)-1].Sequence()
-	// all events processed and not needed anymore
-	a.Events = nil
-	a.Events = []Event{}
 	return nil
 }

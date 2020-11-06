@@ -21,11 +21,16 @@ func (e *MemberAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewMemberAddedEvent(ctx context.Context, eventType eventstore.EventType, service, userID string, roles ...string) *MemberAddedEvent {
+func NewMemberAddedEvent(
+	ctx context.Context,
+	eventType eventstore.EventType,
+	userID string,
+	roles ...string,
+) *MemberAddedEvent {
+
 	return &MemberAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			service,
 			eventType,
 		),
 		Roles:  roles,

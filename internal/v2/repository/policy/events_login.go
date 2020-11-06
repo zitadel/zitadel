@@ -7,8 +7,18 @@ import (
 )
 
 const (
-	LoginPolicyAddedEventType = "policy.login.added"
+	LoginPolicyAddedEventType   = "policy.login.added"
+	LoginPolicyChangedEventType = "policy.login.changed"
+	LoginPolicyRemovedEventType = "policy.login.removed"
 )
+
+type LoginPolicyAggregate struct {
+	eventstore.Aggregate
+
+	AllowUserNamePassword bool
+	AllowRegister         bool
+	AllowExternalIDP      bool
+}
 
 type LoginPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
@@ -29,7 +39,6 @@ func (e *LoginPolicyAddedEvent) Data() interface{} {
 
 func NewLoginPolicyAddedEvent(
 	ctx context.Context,
-	service string,
 	allowUserNamePassword,
 	allowRegister,
 	allowExternalIDP bool,
@@ -38,11 +47,71 @@ func NewLoginPolicyAddedEvent(
 	return &LoginPolicyAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			service,
 			LoginPolicyAddedEventType,
 		),
 		AllowExternalIDP:      allowExternalIDP,
 		AllowRegister:         allowRegister,
 		AllowUserNamePassword: allowUserNamePassword,
+	}
+}
+
+type LoginPolicyChangedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	current *LoginPolicyAggregate
+	changed *LoginPolicyAggregate
+}
+
+func (e *LoginPolicyChangedEvent) CheckPrevious() bool {
+	return true
+}
+
+func (e *LoginPolicyChangedEvent) Data() interface{} {
+	changes := map[string]interface{}{}
+	if e.current.AllowExternalIDP != e.changed.AllowExternalIDP {
+		changes["allowUsernamePassword"] = e.changed.AllowExternalIDP
+	}
+	if e.current.AllowRegister != e.changed.AllowRegister {
+		changes["allowRegister"] = e.changed.AllowExternalIDP
+	}
+	if e.current.AllowExternalIDP != e.changed.AllowExternalIDP {
+		changes["allowExternalIdp"] = e.changed.AllowExternalIDP
+	}
+
+	return changes
+}
+
+func NewLoginPolicyChangedEvent(
+	ctx context.Context,
+	current,
+	changed *LoginPolicyAggregate,
+) *LoginPolicyChangedEvent {
+
+	return &LoginPolicyChangedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			LoginPolicyChangedEventType,
+		),
+	}
+}
+
+type LoginPolicyRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *LoginPolicyRemovedEvent) CheckPrevious() bool {
+	return true
+}
+
+func (e *LoginPolicyRemovedEvent) Data() interface{} {
+	return nil
+}
+
+func NewLoginPolicyRemovedEvent(ctx context.Context) *LoginPolicyRemovedEvent {
+	return &LoginPolicyRemovedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			LoginPolicyRemovedEventType,
+		),
 	}
 }

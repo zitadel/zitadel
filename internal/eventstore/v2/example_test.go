@@ -18,9 +18,8 @@ import (
 // ------------------------------------------------------------
 
 type UserAggregate struct {
-	eventstore.BaseEvent
-
 	eventstore.Aggregate
+
 	FirstName string
 }
 
@@ -54,7 +53,7 @@ func NewUserAggregate(id string) *UserAggregate {
 	}
 }
 
-func (rm *UserAggregate) AppendEvents(events ...eventstore.Event) *UserAggregate {
+func (rm *UserAggregate) AppendEvents(events ...eventstore.EventReader) *UserAggregate {
 	rm.Aggregate.AppendEvents(events...)
 	return rm
 }
