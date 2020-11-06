@@ -50,7 +50,7 @@ spec:
 
 #### Use Ambassador to check JWT Bearer Tokens
 
-If you would like **Ambassador** to verify a JWT token from the autorization header you can do so by configuring **ZITADEL's** endpoints.
+If you would like **Ambassador** to verify a JWT token from the authorization header you can do so by configuring **ZITADEL's** endpoints.
 
 > Make sure that in your client settings of **ZITADEL** the "AuthToken Options" is **JWT** by default **ZITADEL** will use opaque tokens!
 

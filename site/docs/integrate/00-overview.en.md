@@ -5,7 +5,7 @@ description: ...
 
 > All documentations are under active work and subject to change soon!
 
-This Integration guide gives you recommendations on how to intergrate different Clients with **ZITADEL**
+This Integration guide gives you recommendations on how to integrate different Clients with **ZITADEL**
 
 - Single Page Application
 - Server Side Application
