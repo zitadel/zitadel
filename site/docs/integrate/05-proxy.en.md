@@ -108,7 +108,7 @@ client_secret = "{ZITADEL_GENERATED_CLIENT_SECRET}"
 pass_access_token = true
 cookie_secret = "{SUPPLY_SOME_SECRET_HERE}"
 skip_provider_button = true
-cookie_secure = false #localdev only
+cookie_secure = false #localdev only false
 http_address = "127.0.0.1:4180" #localdev only
 ```
 
