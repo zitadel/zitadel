@@ -89,6 +89,8 @@ spec:
 
 [OAuth2-proxy](https://github.com/oauth2-proxy/oauth2-proxy) is a project which allows services to delegate the authentication flow to a IDP, for example **ZITADEL**
 
+#### OAuth2 Proxy Authentication Example
+
 ```toml
 provider = "oidc"
 user_id_claim = "sub" #uses the subject as ID instead of the email
@@ -111,6 +113,10 @@ http_address = "127.0.0.1:4180" #localdev only
 ```
 
 > This was tested with version `oauth2-proxy v6.1.1 (built with go1.14.2)`
+
+#### OAuth2 Proxy Authorization Example
+
+> Not yet supported but with the work of [https://github.com/oauth2-proxy/oauth2-proxy/pull/797](https://github.com/oauth2-proxy/oauth2-proxy/pull/797) it should be possible in the future
 
 ### Cloudflare Access Example
 
