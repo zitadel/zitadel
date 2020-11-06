@@ -4,8 +4,16 @@ title: Clients
 
 ### What are clients
 
-Clients are applications who share the same security context and interface with an "authorization server".
+Clients are applications that share the same security context and interface with an "authorization server" (issuer of access tokens).
+
 For example you could have a software project existing out of a web app and a mobile app, both of these applications might consume the same roles because the end user might use both of them.
+
+Typical types of applications are: 
+* Web
+* User Agent (Single-Page-Application)
+* Native
+
+Check out our [Integration Guide](integrate#Overview) for mor information.
 
 ### Manage clients
 

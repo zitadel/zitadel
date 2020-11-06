@@ -12,13 +12,20 @@ ZITADEL is organised around the idea that multiple organisations share the same 
 ZITADEL provides a global organisation for users who manage their accounts on their own. Think of this like the difference between a "Microsoft Live Login" vs. "AzureAD User"
 or if you think of Google "Gmail" vs "Gsuite".
 
+[//]: # (@fforootd I don't understand the point of this chapter, and the comparison doesn't make much sense to me.)
+
 ### Create an organisation without existing login
 
 ZITADEL allows you to create a new organisation without a pre-existing user. For [ZITADEL.ch](https://zitadel.ch) you can create a org by visiting the [Register organisation](https://accounts.zitadel.ch/register/org)
 
 > Screenshot here
 
+<details>
+    <summary>
+        Dedicated Instance
+    </summary>
 For dedicated ZITADEL instances this URL might be different, but in most cases should be something like https://accounts.YOURDOMAIN.TLD/register/org
+</details>
 
 ### Create an organisation with existing login
 
@@ -26,7 +33,12 @@ You can simply create a new organisation by visiting the [ZITADEL Console](https
 
 > Screenshot here
 
+<details>
+    <summary>
+        Dedicated Instance
+    </summary>
 For dedicated ZITADEL instances this URL might be different, but in most cases should be something like `https://console.YOURDOMAIN.TLD`
+</details>
 
 ### Verify a domain name
 
@@ -108,6 +120,9 @@ Congratulations your are done! You can check this by visiting [https://console.z
 > This only works when the [user](administrate#Users) is member of this [organisation](administrate#Organisations)
 
 ### Manage Organisation ZITADEL Roles
+
+[//]: # (@fforootd screenshot sais "projects" - bit confusing)
+[//]: # (@fforootd Is a "Manager" another "Organisation owner", or is this a special role?)
 
 <div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">

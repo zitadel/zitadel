@@ -4,7 +4,7 @@ title: Roles
 
 ### What are Roles
 
-With **roles** **ZITADEL** lets [projects](administrate#projects) define there **role based access control**.
+**ZITADEL** lets [projects](administrate#projects) define their **role based access control**.
 
 **Roles** can be consumed by the [clients](administrate#clients) which exist within a specific [project](administrate#projects).
 
@@ -24,18 +24,18 @@ Each **role** consist of three fields.
 
 ### Granting Roles
 
-To give someone (or somewhat) access to a [projects](administrate#projects) resources and services **ZITADEL** provides to processes. **Roles** can be either granted to [users](administrate#Users) org to [organisations](administrate#Organisations).
+To give someone (or somewhat) access to a [project's](administrate#projects) resources and services **ZITADEL** provides two processes: **Roles** can either be granted to [users](administrate#Users) or to [organisations](administrate#Organisations).
 
 #### Grant Roles to Organisations
 
-The possibility to grant **roles** to an [organisation](administrate#Organisations) is intended as "delegation" so that a [org](administrate#Organisations) can on their own grant access to [users](administrate#Users).
+The possibility to grant **roles** to an [organisation](administrate#Organisations) is intended as "delegation" so that a [organisation](administrate#Organisations) can on their own grant access to [users](administrate#Users).
 
-For example a **service provider** could grant the **roles** user, and manager to an [org](administrate#Organisations) as soon as they purchases his service. This can be automated by utilising a [service user](administrate#Manage_Service_Users) in the **service providers** business process.
+For example a **service provider** could grant the **roles** `user`, and `manager` to an [organisation](administrate#Organisations) as soon as they purchases his service. This can be automated by utilising a [service user](administrate#Manage_Service_Users) in the **service providers** business process.
 
 > Screenshot here
 
 #### Grant Roles to Users
 
-By granting **roles** to [users](administrate#Users), be it [humans or machines](administrate#Human_vs_Service_Users), this [user](administrate#Users) receives the authorization to access resources from a service.
+By granting **roles** to [users](administrate#Users), be it [humans or machines](administrate#Human_vs_Service_Users), this [user](administrate#Users) receives the authorization to access a project's resources.
 
 > Screenshot here

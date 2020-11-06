@@ -6,28 +6,27 @@ title: Projects
 
 The idea of projects is to have a vessel for all components who are closely related to each other.
 In ZITADEL all clients located in the same project share their roles, grants and authorizations.
-From an access management perspective you manage who has what role in the project and your application consumes this information.
-A project belongs to exactly one organisation.
-The attribute project role assertion defines, if the roles should be integrated in the tokens without sending corresponding scope (urn:zitadel:iam:org:project:role:{rolename})
-With the project role check you can define if a user should have a requested role to be able to logon.
+From an access management perspective you manage who has what role in the project and your application consumes this information. A project belongs to exactly one [organisation](administrate#Organisations).
+
+The attribute `project role assertion` defines, if the roles should be integrated in the tokens without sending corresponding scope (`urn:zitadel:iam:org:project:role:{rolename}`)
+
+With the project role check you can define, if a user should have a requested role to be able to logon.
 
 **Clients**
 
-Clients are described here [What are clients](administrate#What_are_clients)
-Basically these are your applications who initiate the authorization flow.
+These are your applications who initiate the authorization flow (see  [What are clients](administrate#What_are_clients)). 
 
 **Roles**
 
-[Roles (or Project Roles)](administrate#Roles) is a means of managing users access rights for a certain project.
-These [roles](administrate#Roles)  are opaque for ZITADEL and have no weight in relation to each other.
-So if a [user](administrate#Users) has two roles, admin and user in a certain project, the information will be treated additive.
+[Roles (or Project Roles)](administrate#Roles) are a means of managing users access rights for a certain project. These [roles](administrate#Roles) are opaque for ZITADEL and have no weight in relation to each other. 
+
+As example, if [user](administrate#Users) has two roles, `admin` and `user` in a certain project, the information will be treated additive. There is no meaning or hierarchy implied by these roles.
 
 **Grants**
 
-With ZITADEL it is possible to give third parties (other organisations) the possibility to manage certain roles on their own.
-To achieve this the owner of a project can grant (some could say delegate) certain roles or all roles to an organisation.
-After granting that organisation it can manage on its own which user has what roles.
-This feature is especially useful for service providers, because they are able to establish a great self-service culture for their business customers.
+With ZITADEL it is possible to give third parties (other organisations) the possibility to manage certain roles on their own. As a service provider, you will find this feature useful, as it allows you to establish a self-service culture for your business customers.
+
+The owner of a project can grant (some would say "delegate") certain roles or all roles to another organisation. The target organisaton can then indipendently manage the assignment of their users to  the role within the [granted project](administrate#Project_vs_granted_Project).
 
 **Authorizations**
 
@@ -35,8 +34,9 @@ This feature is especially useful for service providers, because they are able t
 
 #### Project vs. granted Project
 
-The simple difference of a project vs a granted project is that a project belongs to your organisation and the granted project belongs to a third party who did grant you some rights to manage certain roles of their project.
-To make it more easier to differentiate, ZITADEL Console displays these both as separate menu in the project section.
+A project belongs to your organisation. You can [grant certain roles](administrate#Grant_project_to_a_third_party) to another organisation. A granted project, on the other hand, belongs to a third party, granting you some rights to manage certain roles of their project. 
+
+To make it more easier to differentiate ZITADEL Console displays these both as separate menu in the project section.
 
 ### Manage a project
 
@@ -65,6 +65,8 @@ Create a new project with a name which explains what's the intended use of this 
 </div>
 
 #### RBAC Settings
+
+[//]: # (@fforootd I don't get the connection here...)
 
 - Authorisation Check option (Check if the user at least has one role granted)
 - Enable Project_Role Assertion (if this is enabled assert project_roles, with the config of the corresponding client)
