@@ -11,8 +11,6 @@ According to [https://www.getambassador.io/docs/latest/](https://www.getambassad
 
 >The Ambassador Edge Stack is a comprehensive, self-service edge stack and API Gateway for Kubernetes built on Envoy Proxy. The shift to Kubernetes and microservices has profound consequences for the capabilities you need at the edge, as well as how you manage the edge. The Ambassador Edge Stack has been engineered with this world in mind.
 
-#### Configure ZITADEL for Ambassador
-
 You can use **ZITADEL** for Authentication and Authorization with **Ambassador**.
 
 > The redirect URI is `https://{AMBASSADOR_URL}/.ambassador/oauth2/redirection-endpoint`
@@ -87,18 +85,13 @@ spec:
 
 > Additional Infos can be found with [Ambassadors Documentation](https://www.getambassador.io/docs/latest/howtos/oauth-oidc-auth/)
 
-### NGINX Example
-
-> TODO
-
 ### OAuth2 Proxy Example
 
 [OAuth2-proxy](https://github.com/oauth2-proxy/oauth2-proxy) is a project which allows services to delegate the authentication flow to a IDP, for example **ZITADEL**
 
-> Right now the OAuth 2.0 proxy is not [spec. compliant](https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims) because **ZITADEL** does not assert information into the ID Token when an access Token is delivered, we will change this however with [ISSUE #940](https://github.com/caos/zitadel/issues/940)
-
 ```toml
 provider = "oidc"
+user_id_claim = "sub" #uses the subject as ID instead of the email
 provider_display_name "ZITADEL"
 redirect_url = "http://127.0.0.1:4180/oauth2/callback"
 oidc_issuer_url = "https://issuer.zitadel.ch"
@@ -113,6 +106,16 @@ client_secret = "{ZITADEL_GENERATED_CLIENT_SECRET}"
 pass_access_token = true
 cookie_secret = "{SUPPLY_SOME_SECRET_HERE}"
 skip_provider_button = true
+cookie_secure = false #localdev only
+http_address = "127.0.0.1:4180" #localdev only
 ```
 
+> This was tested with version `oauth2-proxy v6.1.1 (built with go1.14.2)`
+
 ### Cloudflare Access Example
+
+> TODO
+
+### NGINX Example
+
+> TODO
