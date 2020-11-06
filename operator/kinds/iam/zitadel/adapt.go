@@ -26,6 +26,7 @@ func AdaptFunc(
 	tolerations []core.Toleration,
 	orbconfig *orb.Orb,
 	action string,
+	migrationsPath string,
 	features []string,
 ) operator.AdaptFunc {
 	return func(
@@ -148,6 +149,7 @@ func AdaptFunc(
 			tolerations,
 			orbconfig.URL,
 			orbconfig.Repokey,
+			migrationsPath,
 		)
 		if err != nil {
 			return nil, nil, allSecrets, err

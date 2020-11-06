@@ -8,8 +8,9 @@ import (
 
 func StartOperator(rv RootValues) *cobra.Command {
 	var (
-		kubeconfig string
-		cmd        = &cobra.Command{
+		kubeconfig     string
+		migrationsPath string
+		cmd            = &cobra.Command{
 			Use:   "operator",
 			Short: "Launch a ZITADEL operator",
 			Long:  "Ensures a desired state of ZITADEL",
@@ -17,6 +18,7 @@ func StartOperator(rv RootValues) *cobra.Command {
 	)
 	flags := cmd.Flags()
 	flags.StringVar(&kubeconfig, "kubeconfig", "", "Kubeconfig for ZITADEL operator deployment")
+	flags.StringVar(&migrationsPath, "migrations", "./migrations/", "Path to the migration files")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		_, monitor, orbConfig, _, _, errFunc := rv()
@@ -30,7 +32,7 @@ func StartOperator(rv RootValues) *cobra.Command {
 		}
 
 		if k8sClient.Available() {
-			return start.Operator(monitor, orbConfig.Path, k8sClient)
+			return start.Operator(monitor, orbConfig.Path, k8sClient, migrationsPath)
 		}
 		return nil
 	}

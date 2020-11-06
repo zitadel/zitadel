@@ -5,6 +5,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/database"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/caos/orbos/mntr"
@@ -12,7 +17,6 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes/resources/configmap"
 	"github.com/caos/orbos/pkg/kubernetes/resources/job"
 	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/kinds/iam/zitadel/migration/scripts"
 	"github.com/pkg/errors"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -30,6 +34,7 @@ func AdaptFunc(
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
 	repoURL, repoKey string,
+	localMigrationsPath string,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
@@ -78,7 +83,8 @@ func AdaptFunc(
 			}
 			internalLabels["app.kubernetes.io/component"] = "migration"
 
-			allScripts := scripts.GetAll()
+			allScripts := getMigrationFiles(localMigrationsPath)
+
 			gracePeriod := int64(30)
 			completions := int32(1)
 
@@ -206,7 +212,11 @@ func AdaptFunc(
 				},
 			}
 
-			queryCM, err := configmap.AdaptFuncToEnsure(namespace, migrationConfigmap, labels, allScripts)
+			allScriptsMap := make(map[string]string)
+			for _, script := range allScripts {
+				allScriptsMap[script.Filename] = script.Data
+			}
+			queryCM, err := configmap.AdaptFuncToEnsure(namespace, migrationConfigmap, labels, allScriptsMap)
 			if err != nil {
 				return nil, err
 			}
@@ -224,7 +234,7 @@ func AdaptFunc(
 		operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
 		func(k8sClient *kubernetes.Client) error {
 			internalMonitor.Info("waiting for migration to be completed")
-			if err := k8sClient.WaitUntilJobCompleted(namespace, jobName, 60); err != nil {
+			if err := k8sClient.WaitUntilJobCompleted(namespace, jobName, 300); err != nil {
 				internalMonitor.Error(errors.Wrap(err, "error while waiting for migration to be completed"))
 				return err
 			}
@@ -310,7 +320,7 @@ func migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPassw
 	return migrationEnvVars
 }
 
-func getHash(dataMap map[string]string) string {
+func getHash(dataMap []migration) string {
 	data, err := json.Marshal(dataMap)
 	if err != nil {
 		return ""
@@ -319,21 +329,46 @@ func getHash(dataMap map[string]string) string {
 	return base64.URLEncoding.EncodeToString(h.Sum(data))
 }
 
-//func getHash(values map[string]string) string {
-//	scriptsStr := ""
-//	for k, v := range values {
-//		if scriptsStr == "" {
-//			scriptsStr = k + ": " + v
-//		} else {
-//			scriptsStr = scriptsStr + "," + k + ": " + v
-//		}
-//	}
-//
-//	h := sha512.New()
-//	_, err := h.Write([]byte(scriptsStr))
-//	if err != nil {
-//		return ""
-//	}
-//	hash := h.Sum(nil)
-//	return base64.URLEncoding.EncodeToString(h.Sum(hash))
-//}
+type migration struct {
+	Filename string
+	Data     string
+}
+
+const migrationFileRegex = `(V|U)(\.|\d)+(__)(\w|\_|\ )+(\.sql)`
+
+func getMigrationFiles(root string) []migration {
+	migrations := make([]migration, 0)
+	files := []string{}
+
+	absPath, err := filepath.Abs(root)
+	if err != nil {
+		return migrations
+	}
+
+	err = filepath.Walk(absPath, func(path string, info os.FileInfo, err error) error {
+		matched, err := regexp.MatchString(migrationFileRegex, info.Name())
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() && matched {
+			files = append(files, info.Name())
+		}
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+	sort.Strings(files)
+
+	for _, file := range files {
+		fullName := filepath.Join(root, file)
+
+		data, err := ioutil.ReadFile(fullName)
+		if err != nil {
+			continue
+		}
+		migrations = append(migrations, migration{file, string(data)})
+	}
+
+	return migrations
+}

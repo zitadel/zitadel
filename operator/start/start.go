@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.Client) error {
+func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.Client, migrationsPath string) error {
 	takeoffChan := make(chan struct{})
 	go func() {
 		takeoffChan <- struct{}{}
@@ -33,7 +33,7 @@ func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 			return err
 		}
 
-		takeoff := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(orbConfig, "ensure", []string{"iam"}), k8sClient)
+		takeoff := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(orbConfig, "ensure", migrationsPath, []string{"iam"}), k8sClient)
 
 		go func() {
 			started := time.Now()
@@ -51,7 +51,7 @@ func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 	return nil
 }
 
-func Restore(monitor mntr.Monitor, gitClient *git.Client, k8sClient *kubernetes.Client, backup string) error {
+func Restore(monitor mntr.Monitor, gitClient *git.Client, k8sClient *kubernetes.Client, backup, migrationsPath string) error {
 	databasesList := []string{
 		"notification",
 		"adminapi",
@@ -66,7 +66,7 @@ func Restore(monitor mntr.Monitor, gitClient *git.Client, k8sClient *kubernetes.
 		return err
 	}
 
-	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(emptyOrbConfig, "scaledown", []string{"scaledown"}), k8sClient)(); err != nil {
+	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(emptyOrbConfig, "scaledown", migrationsPath, []string{"scaledown"}), k8sClient)(); err != nil {
 		return err
 	}
 
@@ -74,7 +74,7 @@ func Restore(monitor mntr.Monitor, gitClient *git.Client, k8sClient *kubernetes.
 		return err
 	}
 
-	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(emptyOrbConfig, "migration", []string{"migration"}), k8sClient)(); err != nil {
+	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(emptyOrbConfig, "migration", migrationsPath, []string{"migration"}), k8sClient)(); err != nil {
 		return err
 	}
 
@@ -88,7 +88,7 @@ func Restore(monitor mntr.Monitor, gitClient *git.Client, k8sClient *kubernetes.
 		return err
 	}
 
-	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(emptyOrbConfig, "scaleup", []string{"scaleup"}), k8sClient)(); err != nil {
+	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(emptyOrbConfig, "scaleup", migrationsPath, []string{"scaleup"}), k8sClient)(); err != nil {
 		return err
 	}
 
