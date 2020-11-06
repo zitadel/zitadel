@@ -37,6 +37,12 @@ allow_sign_up = true
 
 <div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/grafana_project_settings.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/grafana_project_settings.png" itemprop="thumbnail" alt="Project Settings for Grafana" />
+        </a>
+        <figcaption itemprop="caption description">Project Settings for Grafana</figcaption>
+    </figure>
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
         <a href="img/grafana_client_settings.png" itemprop="contentUrl" data-size="1920x1080">
             <img src="img/grafana_client_settings.png" itemprop="thumbnail" alt="Client Settings for Grafana" />
         </a>
@@ -62,12 +68,6 @@ role_attribute_path =  keys("urn:zitadel:iam:org:project:roles") | contains(@, '
 ```
 
 <div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
-    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
-        <a href="img/grafana_project_settings.png" itemprop="contentUrl" data-size="1920x1080">
-            <img src="img/grafana_project_settings.png" itemprop="thumbnail" alt="Project Settings for Grafana" />
-        </a>
-        <figcaption itemprop="caption description">Project Settings for Grafana</figcaption>
-    </figure>
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
         <a href="img/grafana_zitadel_authorization.png" itemprop="contentUrl" data-size="1920x1080">
             <img src="img/grafana_zitadel_authorization.png" itemprop="thumbnail" alt="Authorization for Grafana Role in ZITADEL" />
