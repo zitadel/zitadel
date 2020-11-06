@@ -9,7 +9,7 @@ Normally federation uses protocols like [OpenID Connect 1.0](https://openid.net/
 
 Some examples include:
 
-#### Social Providers
+**Social Providers**
 
 - Google Account
 - Microsoft Live Account
@@ -18,13 +18,13 @@ Some examples include:
 - GitLab
 - ...
 
-#### Enterprise Providers**
+**Enterprise Providers**
 
 - Azure AD Tenant
 - Gsuite hosted domain
 - ...
 
-### Generic
+**Generic**
 
 - ADFS
 - ADDS
@@ -34,7 +34,9 @@ Some examples include:
 ### What is Identity Brokering
 
 ZITADEL supports the usage as identity broker, by linking multiple external idps into one user.
-With identity brokering the client which relies on ZITADEL does not need to care about the linking of identity.
+With identity brokering the client, that relies on ZITADEL, doesn't need to care about the linking of identity.
+
+[//]: # (needs an example)
 
 ### Manage Identity Providers
 

@@ -4,7 +4,10 @@ title: Console
 
 ### What is Console
 
-Console is the ZITADEL Graphical User Interface.
+Console is the ZITADEL Graphical User Interface. 
+
+ZITADEL Console can be reached at [console.zitadel.ch](https://console.zitadel.ch/).
+ For dedicated ZITADEL instances this URL might be different, but in most cases should be something like `https://console.YOURDOMAIN.TLD`
 
 #### ZITADEL Users
 
@@ -31,7 +34,7 @@ Console is the ZITADEL Graphical User Interface.
 
 #### ZITADEL Organisation Owners
 
-Users (**org owners**) who manage organisations do this also with Console.
+Users who manage organisations (**organisation owners**) do this also with Console.
 
 - Organisation settings (policies, domains, idps)
 - Manage users

@@ -5,11 +5,17 @@ description: A quick-start reference for the impatient reader.
 
 > All documentations are under active work and subject to change soon!
 
-### Try ZITADEL
+Hi there, 
 
-You can either use [ZITADEL.ch](https://zitadel.ch) or deploy a dedicated **ZITADEL** instance.
+### Trying out ZITADEL
+
+You can either use our cloud-instance [ZITADEL.ch](https://zitadel.ch) or deploy a dedicated **ZITADEL** instance. To get started, we recommend you try out our free tier on [ZITADEL.ch](https://zitadel.ch).
 
 ### Use ZITADEL.ch
+
+To use ZITADEL in your project you need to:
+1. Set up a new [client](administrate#What_are_clients) and [users](administrate#What_are_users) in our [Console](administrate#What_is_Console);
+2. Configure your project to use ZITADEL.
 
 To register your free [organisation](administrate#Organisations), visit this link [register organisation](https://accounts.zitadel.ch/register/org).
 After accepting the TOS and filling out all the required fields you will receive an email with further instructions.
