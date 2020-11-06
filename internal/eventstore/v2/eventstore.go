@@ -42,7 +42,7 @@ type aggregater interface {
 	//Type returns the aggregate type
 	Type() AggregateType
 	//Events returns the events which will be pushed
-	Events() []Event
+	Events() []EventPusher
 	//ResourceOwner returns the organisation id which manages this aggregate
 	// resource owner is only on the inital push needed
 	// afterwards the resource owner of the previous event is taken
@@ -58,7 +58,7 @@ type aggregater interface {
 
 //PushAggregates maps the events of all aggregates to an eventstore event
 // based on the pushMapper
-func (es *Eventstore) PushAggregates(ctx context.Context, aggregates ...aggregater) ([]Event, error) {
+func (es *Eventstore) PushAggregates(ctx context.Context, aggregates ...aggregater) ([]EventReader, error) {
 	events, err := es.aggregatesToEvents(aggregates)
 	if err != nil {
 		return nil, err
@@ -102,7 +102,7 @@ func (es *Eventstore) aggregatesToEvents(aggregates []aggregater) ([]*repository
 
 //FilterEvents filters the stored events based on the searchQuery
 // and maps the events to the defined event structs
-func (es *Eventstore) FilterEvents(ctx context.Context, queryFactory *SearchQueryFactory) ([]Event, error) {
+func (es *Eventstore) FilterEvents(ctx context.Context, queryFactory *SearchQueryFactory) ([]EventReader, error) {
 	query, err := queryFactory.build()
 	if err != nil {
 		return nil, err
@@ -115,8 +115,8 @@ func (es *Eventstore) FilterEvents(ctx context.Context, queryFactory *SearchQuer
 	return es.mapEvents(events)
 }
 
-func (es *Eventstore) mapEvents(events []*repository.Event) (mappedEvents []Event, err error) {
-	mappedEvents = make([]Event, len(events))
+func (es *Eventstore) mapEvents(events []*repository.Event) (mappedEvents []EventReader, err error) {
+	mappedEvents = make([]EventReader, len(events))
 
 	es.interceptorMutex.Lock()
 	defer es.interceptorMutex.Unlock()
@@ -140,7 +140,7 @@ type reducer interface {
 	// it only appends the newly added events
 	Reduce() error
 	//AppendEvents appends the passed events to an internal list of events
-	AppendEvents(...Event) error
+	AppendEvents(...EventReader) error
 }
 
 //FilterToReducer filters the events based on the search query, appends all events to the reducer and calls it's reduce function
@@ -180,7 +180,7 @@ func (es *Eventstore) RegisterFilterEventMapper(eventType EventType, mapper func
 	return es
 }
 
-func eventData(event Event) ([]byte, error) {
+func eventData(event EventPusher) ([]byte, error) {
 	switch data := event.Data().(type) {
 	case nil:
 		return nil, nil

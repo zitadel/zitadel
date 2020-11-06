@@ -33,10 +33,10 @@ func (rm *ReadModel) Reduce() error {
 	}
 
 	if rm.CreationDate.IsZero() {
-		rm.CreationDate = rm.Events[0].MetaData().CreationDate
+		rm.CreationDate = rm.Events[0].Base().creationDate
 	}
-	rm.ChangeDate = rm.Events[len(rm.Events)-1].MetaData().CreationDate
-	rm.ProcessedSequence = rm.Events[len(rm.Events)-1].MetaData().Sequence
+	rm.ChangeDate = rm.Events[len(rm.Events)-1].Base().creationDate
+	rm.ProcessedSequence = rm.Events[len(rm.Events)-1].Base().sequence
 	// all events processed and not needed anymore
 	rm.Events = nil
 	rm.Events = []Event{}
@@ -69,7 +69,7 @@ func (a *Aggregate) Reduce() error {
 		return nil
 	}
 
-	a.PreviousSequence = a.Events[len(a.Events)-1].MetaData().Sequence
+	a.PreviousSequence = a.Events[len(a.Events)-1].Base().sequence
 	// all events processed and not needed anymore
 	a.Events = nil
 	a.Events = []Event{}

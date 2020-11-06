@@ -18,6 +18,8 @@ import (
 // ------------------------------------------------------------
 
 type UserAggregate struct {
+	eventstore.BaseEvent
+
 	eventstore.Aggregate
 	FirstName string
 }
@@ -28,8 +30,13 @@ func (a *UserAggregate) ID() string {
 func (a *UserAggregate) Type() eventstore.AggregateType {
 	return "test.user"
 }
-func (a *UserAggregate) Events() []eventstore.Event {
-	return a.Aggregate.Events
+func (a *UserAggregate) Events() []eventstore.EventPusher {
+	events := make([]eventstore.EventPusher, len(a.Aggregate.Events))
+	for i, event := range a.Aggregate.Events {
+		events[i] = event
+	}
+
+	return events
 }
 func (a *UserAggregate) ResourceOwner() string {
 	return "caos"
@@ -69,14 +76,26 @@ func (rm *UserAggregate) Reduce() error {
 // ------------------------------------------------------------
 
 type UserAddedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
 	FirstName string `json:"firstName"`
-	metaData  *eventstore.EventMetaData
+}
+
+func NewUserAddedEvent(firstName string) *UserAddedEvent {
+	return &UserAddedEvent{
+		FirstName: firstName,
+		BaseEvent: eventstore.BaseEvent{
+			Service:   "test.suite",
+			User:      "adlerhurst",
+			EventType: "user.added",
+		},
+	}
 }
 
 func UserAddedEventMapper() (eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
 	return "user.added", func(event *repository.Event) (eventstore.Event, error) {
 		e := &UserAddedEvent{
-			metaData: eventstore.MetaDataFromRepo(event),
+			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}
 		err := json.Unmarshal(event.Data, e)
 		if err != nil {
@@ -90,24 +109,8 @@ func (e *UserAddedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *UserAddedEvent) EditorService() string {
-	return "test.suite"
-}
-
-func (e *UserAddedEvent) EditorUser() string {
-	return "adlerhurst"
-}
-
-func (e *UserAddedEvent) Type() eventstore.EventType {
-	return "user.added"
-}
-
 func (e *UserAddedEvent) Data() interface{} {
 	return e
-}
-
-func (e *UserAddedEvent) MetaData() *eventstore.EventMetaData {
-	return e.metaData
 }
 
 // ------------------------------------------------------------
@@ -115,14 +118,26 @@ func (e *UserAddedEvent) MetaData() *eventstore.EventMetaData {
 // ------------------------------------------------------------
 
 type UserFirstNameChangedEvent struct {
-	FirstName string                    `json:"firstName"`
-	metaData  *eventstore.EventMetaData `json:"-"`
+	eventstore.BaseEvent `json:"-"`
+
+	FirstName string `json:"firstName"`
+}
+
+func NewUserFirstNameChangedEvent(firstName string) *UserFirstNameChangedEvent {
+	return &UserFirstNameChangedEvent{
+		FirstName: firstName,
+		BaseEvent: eventstore.BaseEvent{
+			Service:   "test.suite",
+			User:      "adlerhurst",
+			EventType: "user.firstName.changed",
+		},
+	}
 }
 
 func UserFirstNameChangedMapper() (eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
 	return "user.firstName.changed", func(event *repository.Event) (eventstore.Event, error) {
 		e := &UserFirstNameChangedEvent{
-			metaData: eventstore.MetaDataFromRepo(event),
+			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}
 		err := json.Unmarshal(event.Data, e)
 		if err != nil {
@@ -136,24 +151,8 @@ func (e *UserFirstNameChangedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *UserFirstNameChangedEvent) EditorService() string {
-	return "test.suite"
-}
-
-func (e *UserFirstNameChangedEvent) EditorUser() string {
-	return "adlerhurst"
-}
-
-func (e *UserFirstNameChangedEvent) Type() eventstore.EventType {
-	return "user.firstName.changed"
-}
-
 func (e *UserFirstNameChangedEvent) Data() interface{} {
 	return e
-}
-
-func (e *UserFirstNameChangedEvent) MetaData() *eventstore.EventMetaData {
-	return e.metaData
 }
 
 // ------------------------------------------------------------
@@ -161,13 +160,23 @@ func (e *UserFirstNameChangedEvent) MetaData() *eventstore.EventMetaData {
 // ------------------------------------------------------------
 
 type UserPasswordCheckedEvent struct {
-	metaData *eventstore.EventMetaData `json:"-"`
+	eventstore.BaseEvent `json:"-"`
+}
+
+func NewUserPasswordCheckedEvent() *UserPasswordCheckedEvent {
+	return &UserPasswordCheckedEvent{
+		BaseEvent: eventstore.BaseEvent{
+			Service:   "test.suite",
+			User:      "adlerhurst",
+			EventType: "user.password.checked",
+		},
+	}
 }
 
 func UserPasswordCheckedMapper() (eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
 	return "user.password.checked", func(event *repository.Event) (eventstore.Event, error) {
 		return &UserPasswordCheckedEvent{
-			metaData: eventstore.MetaDataFromRepo(event),
+			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}, nil
 	}
 }
@@ -176,24 +185,8 @@ func (e *UserPasswordCheckedEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *UserPasswordCheckedEvent) EditorService() string {
-	return "test.suite"
-}
-
-func (e *UserPasswordCheckedEvent) EditorUser() string {
-	return "adlerhurst"
-}
-
-func (e *UserPasswordCheckedEvent) Type() eventstore.EventType {
-	return "user.password.checked"
-}
-
 func (e *UserPasswordCheckedEvent) Data() interface{} {
 	return nil
-}
-
-func (e *UserPasswordCheckedEvent) MetaData() *eventstore.EventMetaData {
-	return e.metaData
 }
 
 // ------------------------------------------------------------
@@ -201,13 +194,23 @@ func (e *UserPasswordCheckedEvent) MetaData() *eventstore.EventMetaData {
 // ------------------------------------------------------------
 
 type UserDeletedEvent struct {
-	metaData *eventstore.EventMetaData `json:"-"`
+	eventstore.BaseEvent `json:"-"`
+}
+
+func NewUserDeletedEvent() *UserDeletedEvent {
+	return &UserDeletedEvent{
+		BaseEvent: eventstore.BaseEvent{
+			Service:   "test.suite",
+			User:      "adlerhurst",
+			EventType: "user.deleted",
+		},
+	}
 }
 
 func UserDeletedMapper() (eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
 	return "user.deleted", func(event *repository.Event) (eventstore.Event, error) {
 		return &UserDeletedEvent{
-			metaData: eventstore.MetaDataFromRepo(event),
+			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}, nil
 	}
 }
@@ -216,24 +219,8 @@ func (e *UserDeletedEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *UserDeletedEvent) EditorService() string {
-	return "test.suite"
-}
-
-func (e *UserDeletedEvent) EditorUser() string {
-	return "adlerhurst"
-}
-
-func (e *UserDeletedEvent) Type() eventstore.EventType {
-	return "user.deleted"
-}
-
 func (e *UserDeletedEvent) Data() interface{} {
 	return nil
-}
-
-func (e *UserDeletedEvent) MetaData() *eventstore.EventMetaData {
-	return e.metaData
 }
 
 // ------------------------------------------------------------
@@ -258,18 +245,18 @@ func (rm *UsersReadModel) AppendEvents(events ...eventstore.Event) (err error) {
 		switch e := event.(type) {
 		case *UserAddedEvent:
 			//insert
-			user := NewUserReadModel(e.MetaData().AggregateID)
+			user := NewUserReadModel(e.Base().AggregateID)
 			rm.Users = append(rm.Users, user)
 			err = user.AppendEvents(e)
 		case *UserFirstNameChangedEvent, *UserPasswordCheckedEvent:
 			//update
-			_, user := rm.userByID(e.MetaData().AggregateID)
+			_, user := rm.userByID(e.Base().aggregateID)
 			if user == nil {
 				return errors.New("user not found")
 			}
 			err = user.AppendEvents(e)
 		case *UserDeletedEvent:
-			idx, _ := rm.userByID(e.metaData.AggregateID)
+			idx, _ := rm.userByID(e.Base().AggregateID)
 			if idx < 0 {
 				return nil
 			}
@@ -337,7 +324,7 @@ func (rm *UserReadModel) Reduce() error {
 			rm.FirstName = e.FirstName
 		case *UserPasswordCheckedEvent:
 			rm.pwCheckCount++
-			rm.lastPasswordCheck = e.metaData.CreationDate
+			rm.lastPasswordCheck = e.Base().CreationDate
 		}
 	}
 	rm.ReadModel.Reduce()
@@ -356,9 +343,9 @@ func TestUserReadModel(t *testing.T) {
 		RegisterFilterEventMapper(UserDeletedMapper())
 
 	events, err := es.PushAggregates(context.Background(),
-		NewUserAggregate("1").AppendEvents(&UserAddedEvent{FirstName: "hodor"}),
-		NewUserAggregate("2").AppendEvents(&UserAddedEvent{FirstName: "hodor"}, &UserPasswordCheckedEvent{}, &UserPasswordCheckedEvent{}, &UserFirstNameChangedEvent{FirstName: "ueli"}),
-		NewUserAggregate("2").AppendEvents(&UserDeletedEvent{}),
+		NewUserAggregate("1").AppendEvents(NewUserAddedEvent("hodor")),
+		NewUserAggregate("2").AppendEvents(NewUserAddedEvent("hodor"), NewUserPasswordCheckedEvent(), NewUserPasswordCheckedEvent(), NewUserFirstNameChangedEvent("ueli")),
+		NewUserAggregate("2").AppendEvents(NewUserDeletedEvent()),
 	)
 	if err != nil {
 		t.Errorf("unexpected error on push aggregates: %v", err)
