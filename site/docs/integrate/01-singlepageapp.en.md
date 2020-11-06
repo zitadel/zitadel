@@ -13,6 +13,8 @@ This flow has great support with most modern languages and frameworks and is the
 
 ### Typescript Example
 
+#### Typescript Authentication Example
+
 If you use a framework like Angular, Vue, React, ... you can use this code snippet here to integrate **ZITADEL** into you application
 
 Library used for this example [https://github.com/IdentityModel/oidc-client-js](https://github.com/IdentityModel/oidc-client-js)
