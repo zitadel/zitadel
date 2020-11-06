@@ -6,14 +6,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 )
 
-func NewMemberAddedEvent(ctx context.Context, userID string, roles ...string) *MemberAddedEvent {
-	return &MemberAddedEvent{
-		BaseEvent: eventstore.BaseEvent{},
-		Roles:     roles,
-		UserID:    userID,
-	}
-}
-
 type MemberAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
@@ -27,4 +19,16 @@ func (e *MemberAddedEvent) CheckPrevious() bool {
 
 func (e *MemberAddedEvent) Data() interface{} {
 	return e
+}
+
+func NewMemberAddedEvent(ctx context.Context, eventType eventstore.EventType, service, userID string, roles ...string) *MemberAddedEvent {
+	return &MemberAddedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			service,
+			eventType,
+		),
+		Roles:  roles,
+		UserID: userID,
+	}
 }

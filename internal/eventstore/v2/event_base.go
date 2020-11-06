@@ -1,8 +1,10 @@
 package eventstore
 
 import (
+	"context"
 	"time"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
@@ -75,4 +77,10 @@ func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 	}
 }
 
-func NewBaseEvent()
+func NewBaseEventForPush(ctx context.Context, service string, typ EventType) *BaseEvent {
+	return &BaseEvent{
+		User:      authz.GetCtxData(ctx).UserID,
+		Service:   service,
+		EventType: typ,
+	}
+}

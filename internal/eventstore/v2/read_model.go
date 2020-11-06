@@ -5,23 +5,23 @@ import "time"
 func NewReadModel(id string) *ReadModel {
 	return &ReadModel{
 		ID:     id,
-		Events: []Event{},
+		Events: []EventReader{},
 	}
 }
 
 //ReadModel is the minimum representation of a View model.
 // it might be saved in a database or in memory
 type ReadModel struct {
-	ProcessedSequence uint64    `json:"-"`
-	ID                string    `json:"-"`
-	CreationDate      time.Time `json:"-"`
-	ChangeDate        time.Time `json:"-"`
-	Events            []Event   `json:"-"`
+	ProcessedSequence uint64        `json:"-"`
+	ID                string        `json:"-"`
+	CreationDate      time.Time     `json:"-"`
+	ChangeDate        time.Time     `json:"-"`
+	Events            []EventReader `json:"-"`
 }
 
 //AppendEvents adds all the events to the read model.
 // The function doesn't compute the new state of the read model
-func (rm *ReadModel) AppendEvents(events ...Event) *ReadModel {
+func (rm *ReadModel) AppendEvents(events ...EventReader) *ReadModel {
 	rm.Events = append(rm.Events, events...)
 	return rm
 }
@@ -33,13 +33,13 @@ func (rm *ReadModel) Reduce() error {
 	}
 
 	if rm.CreationDate.IsZero() {
-		rm.CreationDate = rm.Events[0].Base().creationDate
+		rm.CreationDate = rm.Events[0].CreationDate()
 	}
-	rm.ChangeDate = rm.Events[len(rm.Events)-1].Base().creationDate
-	rm.ProcessedSequence = rm.Events[len(rm.Events)-1].Base().sequence
+	rm.ChangeDate = rm.Events[len(rm.Events)-1].CreationDate()
+	rm.ProcessedSequence = rm.Events[len(rm.Events)-1].Sequence()
 	// all events processed and not needed anymore
 	rm.Events = nil
-	rm.Events = []Event{}
+	rm.Events = []EventReader{}
 	return nil
 }
 
@@ -69,7 +69,7 @@ func (a *Aggregate) Reduce() error {
 		return nil
 	}
 
-	a.PreviousSequence = a.Events[len(a.Events)-1].Base().sequence
+	a.PreviousSequence = a.Events[len(a.Events)-1].Sequence()
 	// all events processed and not needed anymore
 	a.Events = nil
 	a.Events = []Event{}

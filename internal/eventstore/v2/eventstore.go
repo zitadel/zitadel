@@ -19,7 +19,7 @@ type Eventstore struct {
 }
 
 type eventTypeInterceptors struct {
-	eventMapper func(*repository.Event) (Event, error)
+	eventMapper func(*repository.Event) (EventReader, error)
 }
 
 func NewEventstore(repo repository.Repository) *Eventstore {
@@ -166,7 +166,7 @@ func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQu
 }
 
 //RegisterFilterEventMapper registers a function for mapping an eventstore event to an event
-func (es *Eventstore) RegisterFilterEventMapper(eventType EventType, mapper func(*repository.Event) (Event, error)) *Eventstore {
+func (es *Eventstore) RegisterFilterEventMapper(eventType EventType, mapper func(*repository.Event) (EventReader, error)) *Eventstore {
 	if mapper == nil || eventType == "" {
 		return es
 	}

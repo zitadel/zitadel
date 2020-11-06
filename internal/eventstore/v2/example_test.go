@@ -92,8 +92,8 @@ func NewUserAddedEvent(firstName string) *UserAddedEvent {
 	}
 }
 
-func UserAddedEventMapper() (eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
-	return "user.added", func(event *repository.Event) (eventstore.Event, error) {
+func UserAddedEventMapper() (eventstore.EventType, func(*repository.Event) (eventstore.EventReader, error)) {
+	return "user.added", func(event *repository.Event) (eventstore.EventReader, error) {
 		e := &UserAddedEvent{
 			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}
@@ -134,8 +134,8 @@ func NewUserFirstNameChangedEvent(firstName string) *UserFirstNameChangedEvent {
 	}
 }
 
-func UserFirstNameChangedMapper() (eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
-	return "user.firstName.changed", func(event *repository.Event) (eventstore.Event, error) {
+func UserFirstNameChangedMapper() (eventstore.EventType, func(*repository.Event) (eventstore.EventReader, error)) {
+	return "user.firstName.changed", func(event *repository.Event) (eventstore.EventReader, error) {
 		e := &UserFirstNameChangedEvent{
 			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}
@@ -173,8 +173,8 @@ func NewUserPasswordCheckedEvent() *UserPasswordCheckedEvent {
 	}
 }
 
-func UserPasswordCheckedMapper() (eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
-	return "user.password.checked", func(event *repository.Event) (eventstore.Event, error) {
+func UserPasswordCheckedMapper() (eventstore.EventType, func(*repository.Event) (eventstore.EventReader, error)) {
+	return "user.password.checked", func(event *repository.Event) (eventstore.EventReader, error) {
 		return &UserPasswordCheckedEvent{
 			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}, nil
@@ -207,8 +207,8 @@ func NewUserDeletedEvent() *UserDeletedEvent {
 	}
 }
 
-func UserDeletedMapper() (eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
-	return "user.deleted", func(event *repository.Event) (eventstore.Event, error) {
+func UserDeletedMapper() (eventstore.EventType, func(*repository.Event) (eventstore.EventReader, error)) {
+	return "user.deleted", func(event *repository.Event) (eventstore.EventReader, error) {
 		return &UserDeletedEvent{
 			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}, nil
@@ -239,24 +239,24 @@ func NewUsersReadModel() *UsersReadModel {
 	}
 }
 
-func (rm *UsersReadModel) AppendEvents(events ...eventstore.Event) (err error) {
+func (rm *UsersReadModel) AppendEvents(events ...eventstore.EventReader) (err error) {
 	rm.ReadModel.AppendEvents(events...)
 	for _, event := range events {
 		switch e := event.(type) {
 		case *UserAddedEvent:
 			//insert
-			user := NewUserReadModel(e.Base().AggregateID)
+			user := NewUserReadModel(e.AggregateID())
 			rm.Users = append(rm.Users, user)
 			err = user.AppendEvents(e)
 		case *UserFirstNameChangedEvent, *UserPasswordCheckedEvent:
 			//update
-			_, user := rm.userByID(e.Base().aggregateID)
+			_, user := rm.userByID(e.AggregateID())
 			if user == nil {
 				return errors.New("user not found")
 			}
 			err = user.AppendEvents(e)
 		case *UserDeletedEvent:
-			idx, _ := rm.userByID(e.Base().AggregateID)
+			idx, _ := rm.userByID(e.AggregateID())
 			if idx < 0 {
 				return nil
 			}
@@ -310,7 +310,7 @@ func NewUserReadModel(id string) *UserReadModel {
 	}
 }
 
-func (rm *UserReadModel) AppendEvents(events ...eventstore.Event) error {
+func (rm *UserReadModel) AppendEvents(events ...eventstore.EventReader) error {
 	rm.ReadModel.AppendEvents(events...)
 	return nil
 }
@@ -324,7 +324,7 @@ func (rm *UserReadModel) Reduce() error {
 			rm.FirstName = e.FirstName
 		case *UserPasswordCheckedEvent:
 			rm.pwCheckCount++
-			rm.lastPasswordCheck = e.Base().CreationDate
+			rm.lastPasswordCheck = e.CreationDate()
 		}
 	}
 	rm.ReadModel.Reduce()
