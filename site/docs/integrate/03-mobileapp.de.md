@@ -1,5 +1,5 @@
 ---
-title: OpenID Connect & OAuth
+title:  Mobile Application
 description: ...
 ---
 
