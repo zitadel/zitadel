@@ -18,36 +18,22 @@
       &:last-child {
         padding-right: 0;
       }
+
+      .search-button {
+        visibility: hidden;
+      }
+
+      &:hover,
+      &.search-active {
+        .search-button {
+          visibility: visible;
+        }
+      }
     }
 
     .selection {
       width: 50px;
       max-width: 50px;
-    }
-  }
-}
-
-th {
-  button {
-    visibility: hidden;
-  }
-
-  &:hover {
-    button {
-      visibility: visible;
-    }
-  }
-}
-
-th {
-  .search-button {
-    visibility: hidden;
-  }
-
-  &:hover,
-  &.search-active {
-    .search-button {
-      visibility: visible;
     }
   }
 }

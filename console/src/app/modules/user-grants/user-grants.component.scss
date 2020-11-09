@@ -22,16 +22,16 @@
     }
 
     th {
-        .search-button {
+      .search-button {
         visibility: hidden;
-        }
-    
-        &:hover,
-        &.search-active {
+      }
+
+      &:hover,
+      &.search-active {
         .search-button {
-            visibility: visible;
+          visibility: visible;
         }
-        }
+      }
     }
 
     .selection {
@@ -75,5 +75,5 @@
 }
 
 .filtername {
-    margin-right: 1rem;
+  margin-right: 1rem;
 }
