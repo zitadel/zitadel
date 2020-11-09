@@ -80,6 +80,15 @@ MfaInitDone:
   Title: Multifcator Verification done
   Description: Multifactor verification successfully done. The multifactor has to be entered on each login, even in the actual authentification process.
 
+MfaInitU2F:
+  Title: Multifactor Setup U2F / WebAuthN
+  Description: Add your Token by clicking on the 'Register Token' button below.
+
+WebAuthn:
+  NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
+  Error:
+    Retry: Retry, create a new challenge or choose a different method.
+
 PasswordChange:
   Title: Change Password
   Description: Change your password. Enter your old and new password.
@@ -181,6 +190,9 @@ Actions:
   ForgotPassword: reset password
   Cancel: cancel
   Save: save
+  RegisterToken: Register Token
+  ValidateToken: Validate Token
+  Recreate: recreate
 
 Errors:
   Internal: An internal error occured

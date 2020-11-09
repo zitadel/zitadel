@@ -24,7 +24,7 @@ type webAuthNData struct {
 type webAuthNFormData struct {
 	CredentialData string `schema:"credentialData"`
 	SessionID      string `schema:"sessionID"`
-	Resend         bool   `schema:"resend"`
+	Resend         bool   `schema:"recreate"`
 }
 
 func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {

@@ -1,29 +1,16 @@
-document.addEventListener('DOMContentLoaded', checkWebauthnSupported, false);
-
-function checkWebauthnSupported() {
-    if (typeof (PublicKeyCredential) == "undefined") {
-        let noSupport = document.getElementsByClassName("wa-support");
-        for (let item of noSupport) {
-            item.style.display = 'inline-block';
-        }
-        return
-    }
-    let support = document.getElementsByClassName("wa-no-support");
-    for (let item of support) {
-        item.style.display = 'none';
-    }
-    document.getElementById('btn-register').addEventListener('click', function () {
-        registerCredential();
-    });
-}
+document.addEventListener('DOMContentLoaded', checkWebauthnSupported('btn-register', registerCredential));
 
 function registerCredential() {
+    document.getElementById('wa-error').classList.add('hidden');
+
     let opt = JSON.parse(atob(document.getElementsByName('credentialCreationData')[0].value));
     opt.publicKey.challenge = bufferDecode(opt.publicKey.challenge);
     opt.publicKey.user.id = bufferDecode(opt.publicKey.user.id);
     if (opt.publicKey.excludeCredentials) {
         for (let i = 0; i < opt.publicKey.excludeCredentials.length; i++) {
-            opt.publicKey.excludeCredentials[i].id = bufferDecode(opt.publicKey.excludeCredentials[i].id);
+            if (opt.publicKey.excludeCredentials[i].id !== null) {
+                opt.publicKey.excludeCredentials[i].id = bufferDecode(opt.publicKey.excludeCredentials[i].id);
+            }
         }
     }
     console.log(opt);
@@ -36,11 +23,6 @@ function registerCredential() {
         console.log(err);
         webauthnError(err);
     });
-}
-
-function webauthnError(error) {
-    let err = document.getElementById('wa-error');
-    err.getElementsByClassName('cause')[0].innerText = error.message;
 }
 
 function createCredential(newCredential) {

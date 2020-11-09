@@ -130,7 +130,7 @@ header .logo {
   margin: auto;
 }
 
-.content form, #webauthn {
+.content form {
   margin: auto;
   padding: 20px;
   width: 100%;
@@ -485,6 +485,14 @@ footer {
 
 .error {
   color: #F20D6B;
+}
+
+.hidden {
+  display: none;
+}
+
+#webauthn #wa-error {
+  margin-top: 20px;
 }
 
 html {

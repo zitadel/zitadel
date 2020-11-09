@@ -1,21 +1,4 @@
-document.addEventListener('DOMContentLoaded', checkWebauthnSupported, false);
-
-function checkWebauthnSupported() {
-    if (typeof (PublicKeyCredential) == "undefined") {
-        let noSupport = document.getElementsByClassName("wa-support");
-        for (let item of noSupport) {
-            item.style.display = 'inline-block';
-        }
-        return
-    }
-    let support = document.getElementsByClassName("wa-no-support");
-    for (let item of support) {
-        item.style.display = 'none';
-    }
-    document.getElementById('btn-login').addEventListener('click', function () {
-        login();
-    });
-}
+document.addEventListener('DOMContentLoaded', checkWebauthnSupported('btn-login', login));
 
 function login() {
     let makeAssertionOptions = JSON.parse(atob(document.getElementsByName('credentialAssertionData')[0].value));
@@ -36,7 +19,6 @@ function login() {
         alert(err.message);
     });
 }
-
 
 function verifyAssertion(assertedCredential) {
     // Move data into Arrays incase it is super long
