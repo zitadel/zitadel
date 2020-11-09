@@ -46,7 +46,11 @@ func (m *LoginPolicy) processLoginPolicy(event *models.Event) (err error) {
 	switch event.Type {
 	case iam_es_model.LoginPolicyAdded, model.LoginPolicyAdded:
 		err = policy.AppendEvent(event)
-	case iam_es_model.LoginPolicyChanged, model.LoginPolicyChanged:
+	case iam_es_model.LoginPolicyChanged, model.LoginPolicyChanged,
+		iam_es_model.LoginPolicySecondFactorAdded, model.LoginPolicySecondFactorAdded,
+		iam_es_model.LoginPolicySecondFactorRemoved, model.LoginPolicySecondFactorRemoved,
+		iam_es_model.LoginPolicyMultiFactorAdded, model.LoginPolicyMultiFactorAdded,
+		iam_es_model.LoginPolicyMultiFactorRemoved, model.LoginPolicyMultiFactorRemoved:
 		policy, err = m.view.LoginPolicyByAggregateID(event.AggregateID)
 		if err != nil {
 			return err

@@ -30,7 +30,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -52,7 +52,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -96,7 +96,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -118,7 +118,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -150,7 +150,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -182,7 +182,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -220,7 +220,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -248,7 +248,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -276,7 +276,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -314,7 +314,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -352,7 +352,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -390,7 +390,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -422,7 +422,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -454,7 +454,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -476,7 +476,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -504,7 +504,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -543,7 +543,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -579,7 +579,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -611,7 +611,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -644,7 +644,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -664,7 +664,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -696,7 +696,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -726,7 +726,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -754,7 +754,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -782,7 +782,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -818,7 +818,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -856,7 +856,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -876,7 +876,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -908,7 +908,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -928,7 +928,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -960,7 +960,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -992,7 +992,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1024,7 +1024,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1043,6 +1043,183 @@
         ]
       }
     },
+    "/policies/login/multifactors": {
+      "post": {
+        "operationId": "AdminService_AddMultiFactorToDefaultLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MultiFactor"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1MultiFactor"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/login/multifactors/_search": {
+      "get": {
+        "operationId": "AdminService_GetDefaultLoginPolicyMultiFactors",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MultiFactorsResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/login/multifactors/{multi_factor}": {
+      "delete": {
+        "operationId": "AdminService_RemoveMultiFactorFromDefaultLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "multi_factor",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "MULTIFACTORTYPE_UNSPECIFIED",
+              "MULTIFACTORTYPE_U2F_WITH_PIN"
+            ]
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/login/secondfactors": {
+      "post": {
+        "operationId": "AdminService_AddSecondFactorToDefaultLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SecondFactor"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SecondFactor"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/login/secondfactors/_search": {
+      "get": {
+        "operationId": "AdminService_GetDefaultLoginPolicySecondFactors",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SecondFactorsResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/login/secondfactors/{second_factor}": {
+      "delete": {
+        "operationId": "AdminService_RemoveSecondFactorFromDefaultLoginPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "second_factor",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "SECONDFACTORTYPE_UNSPECIFIED",
+              "SECONDFACTORTYPE_OTP",
+              "SECONDFACTORTYPE_U2F"
+            ]
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/policies/password/age": {
       "get": {
         "operationId": "AdminService_GetDefaultPasswordAgePolicy",
@@ -1054,7 +1231,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1074,7 +1251,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1106,7 +1283,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1126,7 +1303,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1158,7 +1335,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1178,7 +1355,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1211,7 +1388,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1233,7 +1410,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1255,7 +1432,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1277,7 +1454,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1398,13 +1575,15 @@
           "type": "string"
         },
         "is_email_verified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "phone": {
           "type": "string"
         },
         "is_phone_verified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "country": {
           "type": "string"
@@ -1515,13 +1694,16 @@
       "type": "object",
       "properties": {
         "allow_username_password": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "allow_register": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "allow_external_idp": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "creation_date": {
           "type": "string",
@@ -1530,6 +1712,10 @@
         "change_date": {
           "type": "string",
           "format": "date-time"
+        },
+        "force_mfa": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -1537,13 +1723,20 @@
       "type": "object",
       "properties": {
         "allow_username_password": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "allow_register": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "allow_external_idp": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "force_mfa": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -1551,13 +1744,16 @@
       "type": "object",
       "properties": {
         "allow_username_password": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "allow_register": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "allow_external_idp": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "creation_date": {
           "type": "string",
@@ -1566,6 +1762,10 @@
         "change_date": {
           "type": "string",
           "format": "date-time"
+        },
+        "force_mfa": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -1632,16 +1832,20 @@
           "format": "uint64"
         },
         "has_uppercase": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_lowercase": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_number": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_symbol": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "creation_date": {
           "type": "string",
@@ -1661,16 +1865,20 @@
           "format": "uint64"
         },
         "has_uppercase": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_lowercase": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_number": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_symbol": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -1682,16 +1890,20 @@
           "format": "uint64"
         },
         "has_uppercase": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_lowercase": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_number": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_symbol": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "creation_date": {
           "type": "string",
@@ -1711,7 +1923,8 @@
           "format": "uint64"
         },
         "show_lockout_failure": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "creation_date": {
           "type": "string",
@@ -1731,7 +1944,8 @@
           "format": "uint64"
         },
         "show_lockout_failure": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -1743,7 +1957,8 @@
           "format": "uint64"
         },
         "show_lockout_failure": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "creation_date": {
           "type": "string",
@@ -1823,13 +2038,15 @@
           "type": "string"
         },
         "is_email_verified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "phone": {
           "type": "string"
         },
         "is_phone_verified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "country": {
           "type": "string"
@@ -2300,6 +2517,33 @@
         }
       }
     },
+    "v1MultiFactor": {
+      "type": "object",
+      "properties": {
+        "multi_factor": {
+          "$ref": "#/definitions/v1MultiFactorType"
+        }
+      }
+    },
+    "v1MultiFactorType": {
+      "type": "string",
+      "enum": [
+        "MULTIFACTORTYPE_UNSPECIFIED",
+        "MULTIFACTORTYPE_U2F_WITH_PIN"
+      ],
+      "default": "MULTIFACTORTYPE_UNSPECIFIED"
+    },
+    "v1MultiFactorsResult": {
+      "type": "object",
+      "properties": {
+        "multi_factors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1MultiFactorType"
+          }
+        }
+      }
+    },
     "v1OIDCMappingField": {
       "type": "string",
       "enum": [
@@ -2445,10 +2689,12 @@
           "type": "string"
         },
         "user_login_must_be_domain": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "default": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -2474,7 +2720,8 @@
           "type": "string"
         },
         "user_login_must_be_domain": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -2485,10 +2732,12 @@
           "type": "string"
         },
         "user_login_must_be_domain": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "default": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -2552,7 +2801,8 @@
           "$ref": "#/definitions/v1OrgSearchKey"
         },
         "asc": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "queries": {
           "type": "array",
@@ -2641,11 +2891,40 @@
       ],
       "default": "SEARCHMETHOD_EQUALS"
     },
+    "v1SecondFactor": {
+      "type": "object",
+      "properties": {
+        "second_factor": {
+          "$ref": "#/definitions/v1SecondFactorType"
+        }
+      }
+    },
+    "v1SecondFactorType": {
+      "type": "string",
+      "enum": [
+        "SECONDFACTORTYPE_UNSPECIFIED",
+        "SECONDFACTORTYPE_OTP",
+        "SECONDFACTORTYPE_U2F"
+      ],
+      "default": "SECONDFACTORTYPE_UNSPECIFIED"
+    },
+    "v1SecondFactorsResult": {
+      "type": "object",
+      "properties": {
+        "second_factors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1SecondFactorType"
+          }
+        }
+      }
+    },
     "v1UniqueOrgResponse": {
       "type": "object",
       "properties": {
         "is_unique": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },

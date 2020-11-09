@@ -86,20 +86,28 @@ Errors:
     IDP:
       InvalidSearchQuery: Ungültiger Suchparameter
     LoginPolicy:
+      NotFound: Login Policy konnte nicht gefunden werden
       Invalid: Login Policy ist ungültig
       NotExisting: Login Policy existiert nicht auf dieser Organisation
       AlreadyExists: Login Policy existiert bereits
       IdpProviderAlreadyExisting: Idp Provider existiert bereits
       IdpProviderNotExisting: Idp Provider existiert nicht
+      MFA:
+        AlreadyExists: Multifaktor existiert bereits
+        NotExisting: Multifaktor existiert nicht
+        Unspecified: Multifaktor ungültig
     PasswordComplexity:
+      NotFound: Password Komplexitäts Policy konnte nicht gefunden werden
       Empty: Passwort Komplexitäts Policy ist leer
       NotExisting: Passwort Komplexitäts Policy existiert nicht
       AlreadyExists: Passwort Komplexitäts Policy existiert bereits
     PasswordLockout:
+      NotFound: Password Lockout Policy konnte nicht gefunden werden
       Empty: Passwort Lockout Policy ist leer
       NotExisting: Passwort Lockout Policy existiert nicht
       AlreadyExists: Passwort Lockout Policy existiert bereits
     PasswordAge:
+      NotFound: Password Age Policy konnte nicht gefunden werden
       Empty: Passwort Age Policy ist leer
       NotExisting: Passwort Age Policy existiert nicht
       AlreadyExists: Passwort Age Policy existiert bereits
@@ -140,7 +148,7 @@ Errors:
     GrantNotExists: Projekt Grant existiert nicht
     GrantHasNotExistingRole: Eine der Rollen existiert nicht auf dem Projekt
     UserIDMisisng: User ID fehlt
-  Iam:
+  IAM:
     MemberInvalid: Member ist ungültig
     MemberAlreadyExisting: Member existiert bereits
     MemberNotExisting: Member existiert nicht
@@ -155,23 +163,34 @@ Errors:
     LoginPolicyNotExisting: Login Policy nicht vorhanden
     IdpProviderInvalid: Idp Provider ist ungültig
     LoginPolicy:
+      NotFound: Default Login Policy konnte nicht gefunden
       NotExisting: Default Login Policy existiert nicht
       AlreadyExists: Default Login Policy existiert bereits
       IdpProviderAlreadyExisting: Idp Provider existiert bereits
       IdpProviderNotExisting: Idp Provider existiert nicht
+      MFA:
+        AlreadyExists: Multifaktor existiert bereits
+        NotExisting: Multifaktor existiert nicht
+        Unspecified: Multifaktor ungültig
+    LabelPolicy:
+      NotFound: Default Private Label Policy konnte nicht gefunden
     PasswordComplexityPolicy:
+      NotFound: Default Password Complexity Policy konnte nicht gefunden werden
       NotExisting: Default Password Complexity Policy existiert nicht
       AlreadyExists: Default Password Complexity Policy existiert bereits
       Empty: Default Password Complexity Policy leer
     PasswordAgePolicy:
+      NotFound: Default Password Age Policy konnte nicht gefunden werden
       NotExisting: Default Password Age Policy existiert nicht
       AlreadyExists: Default Password Age Policy existiert bereits
       Empty: Default Password Age Policy leer
     PasswordLockoutPolicy:
+      NotFound: Default Password Lockout Policy konnte nicht gefunden werden
       NotExisting: Default Password Lockout Policy existiert nicht
       AlreadyExists: Default Password Lockout Policy existiert bereits
       Empty: Default Password Lockout Policy leer
-    OrgIAM:
+    OrgIAMPolicy:
+      NotFound: Default Org IAM Policy konnte nicht gefunden werden
       NotExisting: Default Org IAM Policy existiert nicht
       AlreadyExists: Default Org IAM Policy existiert bereits
       Empty: Default Org IAM Policy leer
@@ -192,6 +211,10 @@ Errors:
     NotFound: Benutzer Sitzung konnte nicht gefunden werden
   Key:
     ExpireBeforeNow: Das Ablaufdatum liegt in der Vergangenheit
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: Multifaktor ist als zwingend konfiguriert, jedoch sind keine möglichen Provider hinterlegt. Bitte melde dich beim Administrator des Systems.
 EventTypes:
   user:
     added: Benutzer hinzugefügt

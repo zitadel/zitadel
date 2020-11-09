@@ -107,6 +107,23 @@ Congratulations your are done! You can check this by visiting [https://console.z
 
 > This only works when the [user](administrate#Users) is member of this [organisation](administrate#Organisations)
 
+### Manage Organisation ZITADEL Roles
+
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_org_manage_roles_1.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_org_manage_roles_1.png" itemprop="thumbnail" alt="Manage ZITADEL Roles 1" />
+        </a>
+        <figcaption itemprop="caption description">Manage ZITADEL Roles 1</figcaption>
+    </figure>
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_org_manage_roles_2.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_org_manage_roles_2.png" itemprop="thumbnail" alt="Manage ZITADEL Roles 2" />
+        </a>
+        <figcaption itemprop="caption description">Manage ZITADEL Roles 2</figcaption>
+    </figure>
+</div>
+
 ### Audit organisation changes
 
 All changes to the organisation are displayed on the organisation menu within [ZITADEL Console](https://console.zitadel.ch/org) organisation menu. Located on the right hand side under "activity".

@@ -51,10 +51,6 @@ export default function generate_docs(dirpath, dir, lang) {
                 return '<div class="side-by-side"><div class="copy">';
             };
 
-            // renderer.list = (src) => {
-            //     console.log(src);
-            // };
-
             renderer.code = (source, lang) => {
                 source = source.replace(/^ +/gm, (match) => match.split('    ').join('\t'));
 

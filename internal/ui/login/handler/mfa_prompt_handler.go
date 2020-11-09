@@ -12,7 +12,7 @@ const (
 )
 
 type mfaPromptData struct {
-	MfaProvider model.MfaType `schema:"provider"`
+	MfaProvider model.MFAType `schema:"provider"`
 	Skip        bool          `schema:"skip"`
 }
 
@@ -78,7 +78,7 @@ func (l *Login) renderMfaPrompt(w http.ResponseWriter, r *http.Request, authReq 
 
 func (l *Login) handleMfaCreation(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *mfaVerifyData) {
 	switch data.MfaType {
-	case model.MfaTypeOTP:
+	case model.MFATypeOTP:
 		l.handleOtpCreation(w, r, authReq, data)
 		return
 	}
