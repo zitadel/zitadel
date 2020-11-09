@@ -59,6 +59,8 @@ Errors:
         InvalidCode: Code ist ungültig
       U2F:
         NotExisting: U2F existiert nicht
+      Passwordless:
+        NotExisting: Passwortlos existiert nicht
   Org:
     Invalid: Organisation ist ungültig
     AlreadyDeactivated: Organisation ist bereits deaktiviert

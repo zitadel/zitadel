@@ -1,7 +1,6 @@
 package model
 
 import (
-	"github.com/duo-labs/webauthn/webauthn"
 	"time"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -16,13 +15,14 @@ type Human struct {
 	*Email
 	*Phone
 	*Address
-	ExternalIDPs []*ExternalIDP
-	InitCode     *InitUserCode
-	EmailCode    *EmailCode
-	PhoneCode    *PhoneCode
-	PasswordCode *PasswordCode
-	OTP          *OTP
-	U2Fs         []*WebAuthNToken
+	ExternalIDPs       []*ExternalIDP
+	InitCode           *InitUserCode
+	EmailCode          *EmailCode
+	PhoneCode          *PhoneCode
+	PasswordCode       *PasswordCode
+	OTP                *OTP
+	U2FTokens          []*WebAuthNToken
+	PasswordlessTokens []*WebAuthNToken
 }
 
 type InitUserCode struct {
@@ -110,7 +110,7 @@ func (u *Human) GetExternalIDP(externalIDP *ExternalIDP) (int, *ExternalIDP) {
 }
 
 func (u *Human) GetU2F(webAuthNTokenID string) (int, *WebAuthNToken) {
-	for i, u2f := range u.U2Fs {
+	for i, u2f := range u.U2FTokens {
 		if u2f.WebAuthNTokenID == webAuthNTokenID {
 			return i, u2f
 		}
@@ -119,7 +119,7 @@ func (u *Human) GetU2F(webAuthNTokenID string) (int, *WebAuthNToken) {
 }
 
 func (u *Human) GetU2FToVerify() (int, *WebAuthNToken) {
-	for i, u2f := range u.U2Fs {
+	for i, u2f := range u.U2FTokens {
 		if u2f.State == MfaStateNotReady {
 			return i, u2f
 		}
@@ -127,18 +127,20 @@ func (u *Human) GetU2FToVerify() (int, *WebAuthNToken) {
 	return -1, nil
 }
 
-func (u *Human) GetU2FCredentials() []webauthn.Credential {
-	creds := make([]webauthn.Credential, len(u.U2Fs))
-	for i, u2f := range u.U2Fs {
-		creds[i] = webauthn.Credential{
-			ID:              u2f.KeyID,
-			PublicKey:       u2f.PublicKey,
-			AttestationType: u2f.AttestationType,
-			Authenticator: webauthn.Authenticator{
-				AAGUID:    u2f.AAGUID,
-				SignCount: u2f.SignCount,
-			},
+func (u *Human) GetPasswordless(webAuthNTokenID string) (int, *WebAuthNToken) {
+	for i, u2f := range u.PasswordlessTokens {
+		if u2f.WebAuthNTokenID == webAuthNTokenID {
+			return i, u2f
 		}
 	}
-	return creds
+	return -1, nil
+}
+
+func (u *Human) GetPasswordlessToVerify() (int, *WebAuthNToken) {
+	for i, u2f := range u.PasswordlessTokens {
+		if u2f.State == MfaStateNotReady {
+			return i, u2f
+		}
+	}
+	return -1, nil
 }

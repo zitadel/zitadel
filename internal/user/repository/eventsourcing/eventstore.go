@@ -1412,6 +1412,14 @@ func (es *UserEventstore) verifyMfaOTP(otp *usr_model.OTP, code string) error {
 }
 
 func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model.WebAuthNToken, error) {
+	return es.addWebAuthN(ctx, userID, usr_model.WebAuthNMethodU2F)
+}
+
+func (es *UserEventstore) AddPasswordless(ctx context.Context, userID string) (*usr_model.WebAuthNToken, error) {
+	return es.addWebAuthN(ctx, userID, usr_model.WebAuthNMethodPasswordless)
+}
+
+func (es *UserEventstore) addWebAuthN(ctx context.Context, userID string, method usr_model.WebAuthNMethod) (*usr_model.WebAuthNToken, error) {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -1419,10 +1427,18 @@ func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model
 	if user.Human == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-GDdd1", "Errors.User.NotHuman")
 	}
-	webAuthN, err := es.webauthn.BeginRegistration(user, protocol.Platform, usr_model.UserVerificationRequirementDiscouraged, user.U2Fs...)
+	var tokens []*usr_model.WebAuthNToken
+	switch method {
+	case usr_model.WebAuthNMethodU2F:
+		tokens = user.U2FTokens
+	case usr_model.WebAuthNMethodPasswordless:
+		tokens = user.PasswordlessTokens
+	}
+	webAuthN, err := es.webauthn.BeginRegistration(user, protocol.Platform, usr_model.UserVerificationRequirementDiscouraged, tokens...)
 	if err != nil {
 		return nil, err
 	}
+
 	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -1430,7 +1446,14 @@ func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model
 	webAuthN.WebAuthNTokenID = id
 	repoUser := model.UserFromModel(user)
 	repoWebAuthN := model.WebAuthNFromModel(webAuthN)
-	updateAggregate := MFAU2FAddAggregate(es.AggregateCreator(), repoUser, repoWebAuthN)
+
+	var updateAggregate func(ctx context.Context) (*es_models.Aggregate, error)
+	switch method {
+	case usr_model.WebAuthNMethodU2F:
+		updateAggregate = MFAU2FAddAggregate(es.AggregateCreator(), repoUser, repoWebAuthN)
+	case usr_model.WebAuthNMethodPasswordless:
+		updateAggregate = MFAPasswordlessAddAggregate(es.AggregateCreator(), repoUser, repoWebAuthN)
+	}
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, updateAggregate)
 	if err != nil {
 		return nil, err
@@ -1439,6 +1462,14 @@ func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model
 }
 
 func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID string, credentialData []byte) error {
+	return es.verifyWebAuthNSetup(ctx, userID, credentialData, usr_model.WebAuthNMethodU2F)
+}
+
+func (es *UserEventstore) VerifyPasswordlessSetup(ctx context.Context, userID string, credentialData []byte) error {
+	return es.verifyWebAuthNSetup(ctx, userID, credentialData, usr_model.WebAuthNMethodPasswordless)
+}
+
+func (es *UserEventstore) verifyWebAuthNSetup(ctx context.Context, userID string, credentialData []byte, method usr_model.WebAuthNMethod) error {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
@@ -1446,15 +1477,26 @@ func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID string, cre
 	if user.Human == nil {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-BH552", "Errors.User.NotHuman")
 	}
-
-	_, u2f := user.Human.GetU2FToVerify()
-	webAuthN, err := es.webauthn.FinishRegistration(user, u2f, credentialData)
+	var token *usr_model.WebAuthNToken
+	switch method {
+	case usr_model.WebAuthNMethodU2F:
+		_, token = user.Human.GetU2FToVerify()
+	case usr_model.WebAuthNMethodPasswordless:
+		_, token = user.Human.GetPasswordlessToVerify()
+	}
+	webAuthN, err := es.webauthn.FinishRegistration(user, token, credentialData)
 	if err != nil {
 		return err
 	}
 	repoUser := model.UserFromModel(user)
 	repoWebAuthN := model.WebAuthNVerifyFromModel(webAuthN)
-	verifyAggregate := MFAU2FVerifyAggregate(es.AggregateCreator(), repoUser, repoWebAuthN)
+	var verifyAggregate func(ctx context.Context) (*es_models.Aggregate, error)
+	switch method {
+	case usr_model.WebAuthNMethodU2F:
+		verifyAggregate = MFAU2FVerifyAggregate(es.AggregateCreator(), repoUser, repoWebAuthN)
+	case usr_model.WebAuthNMethodPasswordless:
+		verifyAggregate = MFAPasswordlessVerifyAggregate(es.AggregateCreator(), repoUser, repoWebAuthN)
+	}
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, verifyAggregate)
 	if err != nil {
 		return err
@@ -1464,7 +1506,15 @@ func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID string, cre
 	return nil
 }
 
-func (es *UserEventstore) BeginMfaU2FLogin(ctx context.Context, userID string) (string, *webauthn.SessionData, error) {
+func (es *UserEventstore) BeginU2FLogin(ctx context.Context, userID string) (string, *webauthn.SessionData, error) {
+	return es.beginWebAuthNLogin(ctx, userID, usr_model.WebAuthNMethodU2F)
+}
+
+func (es *UserEventstore) BeginPasswordlessLogin(ctx context.Context, userID string) (string, *webauthn.SessionData, error) {
+	return es.beginWebAuthNLogin(ctx, userID, usr_model.WebAuthNMethodPasswordless)
+}
+
+func (es *UserEventstore) beginWebAuthNLogin(ctx context.Context, userID string, method usr_model.WebAuthNMethod) (string, *webauthn.SessionData, error) {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return "", nil, err
@@ -1472,10 +1522,20 @@ func (es *UserEventstore) BeginMfaU2FLogin(ctx context.Context, userID string) (
 	if user.Human == nil {
 		return "", nil, errors.ThrowPreconditionFailed(nil, "EVENT-2Ks11", "Errors.User.NotHuman")
 	}
-	if user.U2Fs == nil {
-		return "", nil, errors.ThrowPreconditionFailed(nil, "EVENT-5Mk8s", "Errors.User.Mfa.U2F.NotExisting")
+	var tokens []*usr_model.WebAuthNToken
+	switch method {
+	case usr_model.WebAuthNMethodU2F:
+		if user.U2FTokens == nil {
+			return "", nil, errors.ThrowPreconditionFailed(nil, "EVENT-5Mk8s", "Errors.User.Mfa.U2F.NotExisting")
+		}
+		tokens = user.U2FTokens
+	case usr_model.WebAuthNMethodPasswordless:
+		if user.PasswordlessTokens == nil {
+			return "", nil, errors.ThrowPreconditionFailed(nil, "EVENT-5Mk8s", "Errors.User.Mfa.Passwordless.NotExisting")
+		}
+		tokens = user.PasswordlessTokens
 	}
-	credential, sessionData, err := es.webauthn.BeginLogin(user, usr_model.UserVerificationRequirementDiscouraged, user.U2Fs...)
+	credential, sessionData, err := es.webauthn.BeginLogin(user, usr_model.UserVerificationRequirementDiscouraged, tokens...)
 	if err != nil {
 		return "", nil, err
 	}
@@ -1492,7 +1552,7 @@ func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID, webAuthNToke
 		return errors.ThrowPreconditionFailed(nil, "EVENT-BHeq1", "Errors.User.NotHuman")
 	}
 	_, u2f := user.GetU2F(webAuthNTokenID)
-	err = es.webauthn.FinishLogin(user, u2f, credentialData, user.U2Fs...)
+	err = es.webauthn.FinishLogin(user, u2f, credentialData, user.U2FTokens...)
 
 	repoUser := model.UserFromModel(user)
 	repoAuthRequest := model.AuthRequestFromModel(authRequest)
@@ -1502,6 +1562,30 @@ func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID, webAuthNToke
 	}
 	if err != nil {
 		verifyAggregate := U2FCheckFailedAggregate(es.AggregateCreator(), repoUser, repoAuthRequest)
+		err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, verifyAggregate)
+	}
+	return err
+}
+
+func (es *UserEventstore) VerifyPasswordless(ctx context.Context, userID, webAuthNTokenID string, credentialData []byte, authRequest *req_model.AuthRequest) error {
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if user.Human == nil {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-BHeq1", "Errors.User.NotHuman")
+	}
+	_, passwordless := user.GetPasswordless(webAuthNTokenID)
+	err = es.webauthn.FinishLogin(user, passwordless, credentialData, user.PasswordlessTokens...)
+
+	repoUser := model.UserFromModel(user)
+	repoAuthRequest := model.AuthRequestFromModel(authRequest)
+	if err == nil {
+		verifyAggregate := PasswordlessCheckSucceededAggregate(es.AggregateCreator(), repoUser, repoAuthRequest)
+		err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, verifyAggregate)
+	}
+	if err != nil {
+		verifyAggregate := PasswordlessCheckFailedAggregate(es.AggregateCreator(), repoUser, repoAuthRequest)
 		err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, verifyAggregate)
 	}
 	return err
