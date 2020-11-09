@@ -3,7 +3,7 @@
 <div class="head">
     {{ template "user-profile" . }}
 
-    <p>{{t "MfaInitVerify.Description"}}</p>
+    <p>{{t "MfaInitU2F.Description"}}</p>
 </div>
 
 <form action="{{ mfaInitU2FVerifyUrl }}" method="POST">
@@ -14,38 +14,21 @@
     <input type="hidden" name="credentialCreationData" value="{{ .CredentialCreationData }}" />
     <input type="hidden" name="credentialData" />
 
-{{/*    {{if (eq .MfaType 0) }}*/}}
-{{/*        <p>{{t "MfaInitVerify.OtpDescription"}}</p>*/}}
-{{/*        <div id="qrcode">*/}}
-{{/*            {{.QrCode}}*/}}
-{{/*        </div>*/}}
-{{/*        <div class="fields">*/}}
-{{/*            <div class="field">*/}}
-{{/*                <span class="label" for="secret">{{t "MfaInitVerify.Secret"}}</span>*/}}
-{{/*                <span class="input" id="secret">*/}}
-{{/*                    {{.Secret}}*/}}
-{{/*                    <span class="copy material-icons" data-copy="{{ .Secret }}" >content_copy</span>*/}}
-{{/*                </span>*/}}
-{{/*            </div>*/}}
-{{/*            <div class="field">*/}}
-{{/*               <label class="label" for="code">{{t "MfaInitVerify.Code"}}</label>*/}}
-{{/*                <input class="input" type="text" id="code" name="code" autocomplete="off" autofocus required>*/}}
-{{/*            </div>*/}}
-{{/*        </div>*/}}
-{{/*    {{end}}*/}}
+    <div id="webauthn">
+        <p class="wa-no-support">{{t "WebAuthn.NotSupported"}}</p>
+        <a id="btn-register" class="button primary wa-support">{{t "Actions.RegisterToken"}}</a>
+    </div>
+    <div id="wa-error" class="error">
+        <span class="cause"></span>
+        <span>{{t "WebAuthn.Error.Retry"}}</span>
+    </div>
 
-{{/*    <div class="actions">*/}}
-{{/*        <button class="primary right" id="submit-button" type="submit">{{t "Actions.Next"}}</button>*/}}
-{{/*        <a class="button secondary" href="{{ mfaPromptChangeUrl .AuthReqID .MfaType }}">*/}}
-{{/*            {{t "Actions.Back"}}*/}}
-{{/*        </a>*/}}
-{{/*        <a class="button secondary" href="{{ loginUrl }}">*/}}
-{{/*            {{t "Actions.Cancel"}}*/}}
-{{/*        </a>*/}}
-{{/*    </div>*/}}
+    {{ template "error-message" .}}
+
+    <div class="actions">
+        <button class="secondary right" id="submit-button" type="submit" name="recreate" value="true">{{t "Actions.Recreate"}}</button>
+    </div>
 </form>
-
-<button id="btn-register">Test</button>
 
 <script src="{{ resourceUrl "scripts/base64.js" }}"></script>
 <script src="{{ resourceUrl "scripts/webauthn_register.js" }}"></script>

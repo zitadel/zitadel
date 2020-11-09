@@ -1,6 +1,21 @@
-document.getElementById('btn-register').addEventListener('click', function () {
-    registerCredential();
-});
+document.addEventListener('DOMContentLoaded', checkWebauthnSupported, false);
+
+function checkWebauthnSupported() {
+    if (typeof (PublicKeyCredential) == "undefined") {
+        let noSupport = document.getElementsByClassName("wa-support");
+        for (let item of noSupport) {
+            item.style.display = 'inline-block';
+        }
+        return
+    }
+    let support = document.getElementsByClassName("wa-no-support");
+    for (let item of support) {
+        item.style.display = 'none';
+    }
+    document.getElementById('btn-register').addEventListener('click', function () {
+        registerCredential();
+    });
+}
 
 function registerCredential() {
     let opt = JSON.parse(atob(document.getElementsByName('credentialCreationData')[0].value));
@@ -18,9 +33,14 @@ function registerCredential() {
         console.log(credential);
         createCredential(credential);
     }).catch(function (err) {
-        alert(err.name);
-        alert(err.message);
+        console.log(err);
+        webauthnError(err);
     });
+}
+
+function webauthnError(error) {
+    let err = document.getElementById('wa-error');
+    err.getElementsByClassName('cause')[0].innerText = error.message;
 }
 
 function createCredential(newCredential) {

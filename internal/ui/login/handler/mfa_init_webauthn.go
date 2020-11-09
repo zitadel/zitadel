@@ -24,6 +24,7 @@ type webAuthNData struct {
 type webAuthNFormData struct {
 	CredentialData string `schema:"credentialData"`
 	SessionID      string `schema:"sessionID"`
+	Resend         bool   `schema:"resend"`
 }
 
 func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
@@ -58,6 +59,10 @@ func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {
 	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
+		return
+	}
+	if data.Resend {
+		l.renderRegisterU2F(w, r, authReq, nil)
 		return
 	}
 	credData, err := base64.URLEncoding.DecodeString(data.CredentialData)

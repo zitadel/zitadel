@@ -1,6 +1,21 @@
-document.getElementById('btn-login').addEventListener('click', function () {
-    login();
-})
+document.addEventListener('DOMContentLoaded', checkWebauthnSupported, false);
+
+function checkWebauthnSupported() {
+    if (typeof (PublicKeyCredential) == "undefined") {
+        let noSupport = document.getElementsByClassName("wa-support");
+        for (let item of noSupport) {
+            item.style.display = 'inline-block';
+        }
+        return
+    }
+    let support = document.getElementsByClassName("wa-no-support");
+    for (let item of support) {
+        item.style.display = 'none';
+    }
+    document.getElementById('btn-login').addEventListener('click', function () {
+        login();
+    });
+}
 
 function login() {
     let makeAssertionOptions = JSON.parse(atob(document.getElementsByName('credentialAssertionData')[0].value));
@@ -47,7 +62,3 @@ function verifyAssertion(assertedCredential) {
     document.getElementsByName('credentialData')[0].value = btoa(data);
     document.getElementsByTagName('form')[0].submit();
 }
-
-document.getElementById('test').addEventListener('click', function () {
-    registerCredential();
-});

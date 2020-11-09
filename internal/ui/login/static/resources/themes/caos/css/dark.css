@@ -129,7 +129,7 @@ header .logo {
   margin: auto;
 }
 
-.content form {
+.content form, #webauthn {
   margin: auto;
   padding: 20px;
   width: 100%;
