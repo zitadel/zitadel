@@ -74,7 +74,7 @@ func TestAppendMfaU2FVerifyEvent(t *testing.T) {
 					{
 						WebauthNTokenID: "WebauthNTokenID",
 						Challenge:       "Challenge",
-						State:           int32(auth.MFAState_MFASTATE_NOT_READY),
+						State:           int32(auth.MFAState_MFASTATE_READY),
 						KeyID:           []byte("KeyID"),
 						PublicKey:       []byte("PublicKey"),
 						AttestationType: "AttestationType",
