@@ -1483,7 +1483,7 @@ func (es *UserEventstore) BeginMfaU2FLogin(ctx context.Context, userID string) (
 	return base64.URLEncoding.EncodeToString(credentialData), sessionData, nil
 }
 
-func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID, webAuthNTokenID string, credentialData []byte) error {
+func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID, webAuthNTokenID string, credentialData []byte, authRequest *req_model.AuthRequest) error {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
@@ -1493,10 +1493,16 @@ func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID, webAuthNToke
 	}
 	_, u2f := user.GetU2F(webAuthNTokenID)
 	err = es.webauthn.FinishLogin(user, u2f, credentialData, user.U2Fs...)
+
+	repoUser := model.UserFromModel(user)
+	repoAuthRequest := model.AuthRequestFromModel(authRequest)
+	if err == nil {
+		verifyAggregate := U2FCheckSucceededAggregate(es.AggregateCreator(), repoUser, repoAuthRequest)
+		err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, verifyAggregate)
+	}
 	if err != nil {
-
-	} else {
-
+		verifyAggregate := U2FCheckFailedAggregate(es.AggregateCreator(), repoUser, repoAuthRequest)
+		err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, verifyAggregate)
 	}
 	return err
 }

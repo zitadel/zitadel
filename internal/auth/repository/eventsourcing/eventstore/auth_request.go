@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"github.com/duo-labs/webauthn/webauthn"
 	"time"
 
 	"github.com/caos/logging"
@@ -261,6 +262,25 @@ func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, us
 		return errors.ThrowPreconditionFailed(nil, "EVENT-ADJ26", "Errors.User.NotMatchingUserID")
 	}
 	return repo.UserEvents.CheckMfaOTP(ctx, userID, code, request.WithCurrentInfo(info))
+}
+
+func (repo *AuthRequestRepo) BeginMfaU2FLogin(ctx context.Context, userID string) (credData string, sessionData *webauthn.SessionData, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	return repo.UserEvents.BeginMfaU2FLogin(ctx, userID)
+}
+
+func (repo *AuthRequestRepo) VerifyMfaU2F(ctx context.Context, userID, sessionID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	request, err := repo.getAuthRequest(ctx, authRequestID, userAgentID)
+	if err != nil {
+		return err
+	}
+	if request.UserID != userID {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-5M09s", "Errors.User.NotMatchingUserID")
+	}
+	return repo.UserEvents.VerifyMfaU2F(ctx, userID, sessionID, credentialData, request)
 }
 
 func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, userAgentID string, info *model.BrowserInfo) (err error) {

@@ -3,8 +3,6 @@ package eventstore
 import (
 	"context"
 
-	"github.com/duo-labs/webauthn/webauthn"
-
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 
@@ -314,14 +312,6 @@ func (repo *UserRepo) VerifyMfaU2FSetup(ctx context.Context, userID string, cred
 
 func (repo *UserRepo) VerifyMyMfaU2FSetup(ctx context.Context, credentialData []byte) error {
 	return repo.UserEvents.VerifyU2FSetup(ctx, authz.GetCtxData(ctx).UserID, credentialData)
-}
-
-func (repo *UserRepo) BeginMfaU2FLogin(ctx context.Context, userID string) (string, *webauthn.SessionData, error) {
-	return repo.UserEvents.BeginMfaU2FLogin(ctx, userID)
-}
-
-func (repo *UserRepo) VerifyMfaU2F(ctx context.Context, userID, sessionID string, credentialData []byte) error {
-	return repo.UserEvents.VerifyMfaU2F(ctx, userID, sessionID, credentialData)
 }
 
 func (repo *UserRepo) ChangeMyUsername(ctx context.Context, username string) error {

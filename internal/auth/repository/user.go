@@ -3,8 +3,6 @@ package repository
 import (
 	"context"
 
-	"github.com/duo-labs/webauthn/webauthn"
-
 	org_model "github.com/caos/zitadel/internal/org/model"
 
 	"github.com/caos/zitadel/internal/user/model"
@@ -32,8 +30,6 @@ type UserRepository interface {
 
 	AddMfaU2F(ctx context.Context, id string) (*model.WebAuthNToken, error)
 	VerifyMfaU2FSetup(ctx context.Context, userID string, credentialData []byte) error
-	BeginMfaU2FLogin(ctx context.Context, userID string) (string, *webauthn.SessionData, error)
-	VerifyMfaU2F(ctx context.Context, userID, sessionID string, credentialData []byte) error
 
 	ChangeUsername(ctx context.Context, userID, username string) error
 

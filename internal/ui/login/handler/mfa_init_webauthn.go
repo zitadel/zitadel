@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/base64"
+	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"net/http"
 
 	"github.com/caos/zitadel/internal/auth_request/model"
@@ -106,7 +107,8 @@ func (l *Login) handleLoginU2F(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	err = l.authRepo.VerifyMfaU2F(r.Context(), authReq.UserID, formData.SessionID, credData)
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	err = l.authRepo.VerifyMfaU2F(r.Context(), authReq.UserID, formData.SessionID, authReq.ID, userAgentID, credData, model.BrowserInfoFromRequest(r))
 	if err != nil {
 
 	}

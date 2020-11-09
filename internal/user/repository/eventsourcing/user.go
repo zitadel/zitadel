@@ -827,21 +827,38 @@ func MFAWebauthNRemoveAggregate(aggCreator *es_models.AggregateCreator, user *mo
 }
 
 func U2FCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, user *model.User, check *model.AuthRequest) es_sdk.AggregateFunc {
+	return WebAuthNCheckSucceededAggregate(aggCreator, user, check, model.HumanMFAU2FTokenCheckSucceeded)
+}
+
+func PasswordlessCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, user *model.User, check *model.AuthRequest) es_sdk.AggregateFunc {
+	return WebAuthNCheckSucceededAggregate(aggCreator, user, check, model.HumanMFAPasswordlessTokenCheckSucceeded)
+}
+
+func WebAuthNCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, user *model.User, check *model.AuthRequest, event es_models.EventType) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.HumanMFAU2FTokenCheckSucceeded, check)
+		return agg.AppendEvent(event, check)
 	}
 }
-func U2FCheckCheckFailedAggregate(aggCreator *es_models.AggregateCreator, user *model.User, check *model.AuthRequest) es_sdk.AggregateFunc {
+
+func U2FCheckFailedAggregate(aggCreator *es_models.AggregateCreator, user *model.User, check *model.AuthRequest) es_sdk.AggregateFunc {
+	return WebAuthNCheckFailedAggregate(aggCreator, user, check, model.HumanMFAU2FTokenCheckFailed)
+}
+
+func PasswordlessCheckFailedAggregate(aggCreator *es_models.AggregateCreator, user *model.User, check *model.AuthRequest) es_sdk.AggregateFunc {
+	return WebAuthNCheckFailedAggregate(aggCreator, user, check, model.HumanMFAPasswordlessTokenCheckFailed)
+}
+
+func WebAuthNCheckFailedAggregate(aggCreator *es_models.AggregateCreator, user *model.User, check *model.AuthRequest, event es_models.EventType) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.HumanMFAU2FTokenCheckFailed, check)
+		return agg.AppendEvent(event, check)
 	}
 }
 
