@@ -20,6 +20,14 @@ type WebAuthNToken struct {
 	SignCount              uint32
 }
 
+type WebAuthNMethod int32
+
+const (
+	WebAuthNMethodUnspecified WebAuthNMethod = iota
+	WebAuthNMethodU2F
+	WebAuthNMethodPasswordless
+)
+
 type UserVerificationRequirement int32
 
 const (

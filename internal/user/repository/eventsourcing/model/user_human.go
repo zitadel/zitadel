@@ -58,8 +58,11 @@ func HumanFromModel(user *model.Human) *Human {
 	if user.ExternalIDPs != nil {
 		human.ExternalIDPs = ExternalIDPsFromModel(user.ExternalIDPs)
 	}
-	if user.U2Fs != nil {
-		human.U2FTokens = WebAuthNsFromModel(user.U2Fs)
+	if user.U2FTokens != nil {
+		human.U2FTokens = WebAuthNsFromModel(user.U2FTokens)
+	}
+	if user.PasswordlessTokens != nil {
+		human.PasswordlessTokens = WebAuthNsFromModel(user.PasswordlessTokens)
 	}
 	return human
 }
@@ -100,7 +103,10 @@ func HumanToModel(user *Human) *model.Human {
 		human.OTP = OTPToModel(user.OTP)
 	}
 	if user.U2FTokens != nil {
-		human.U2Fs = WebAuthNsToModel(user.U2FTokens)
+		human.U2FTokens = WebAuthNsToModel(user.U2FTokens)
+	}
+	if user.PasswordlessTokens != nil {
+		human.PasswordlessTokens = WebAuthNsToModel(user.PasswordlessTokens)
 	}
 	return human
 }
