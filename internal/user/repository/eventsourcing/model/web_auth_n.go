@@ -123,13 +123,12 @@ func (u *Human) appendU2FVerifiedEvent(event *es_models.Event) error {
 	if err != nil {
 		return err
 	}
-	if i, token := GetWebauthn(u.U2FTokens, webauthn.WebauthNTokenID); token != nil {
-		u.U2FTokens[i] = u.U2FTokens[len(u.U2FTokens)-1]
+	if _, token := GetWebauthn(u.U2FTokens, webauthn.WebauthNTokenID); token != nil {
+		token.setData(event)
+		token.State = int32(model.MfaStateReady)
 		return nil
 	}
-	webauthn.State = int32(model.MfaStateNotReady)
-	u.U2FTokens = append(u.U2FTokens, webauthn)
-	return nil
+	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-4hu9s", "Errors.Users.Mfa.U2F.NotExisting")
 }
 
 func (u *Human) appendU2FRemovedEvent(event *es_models.Event) error {

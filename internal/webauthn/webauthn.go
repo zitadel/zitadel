@@ -104,6 +104,7 @@ func (w *WebAuthN) FinishRegistration(user *usr_model.User, webAuthN *usr_model.
 		return nil, err
 	}
 
+	webAuthN.KeyID = credential.ID
 	webAuthN.PublicKey = credential.PublicKey
 	webAuthN.AttestationType = credential.AttestationType
 	webAuthN.AAGUID = credential.Authenticator.AAGUID
