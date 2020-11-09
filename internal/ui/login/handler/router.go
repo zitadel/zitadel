@@ -24,9 +24,10 @@ const (
 	EndpointMfaVerify                = "/mfa/verify"
 	EndpointMfaPrompt                = "/mfa/prompt"
 	EndpointMfaInitVerify            = "/mfa/init/verify"
-	EndpointMfaInitU2FTest           = "/mfa/init/u2f/test"
+	EndpointMfaInitU2FTest           = "/mfa/init/u2f/test" //TODO: remove
 	EndpointMfaInitU2FVerify         = "/mfa/init/u2f/verify"
 	EndpointMfaInitU2FLogin          = "/mfa/init/u2f/login"
+	EndpointMfaU2FLoginTest          = "/mfa/login/u2f/test" //TODO: remove
 	EndpointMailVerification         = "/mail/verification"
 	EndpointMailVerified             = "/mail/verified"
 	EndpointRegisterOption           = "/register/option"
@@ -63,7 +64,8 @@ func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.M
 	router.HandleFunc(EndpointMfaPrompt, login.handleMfaPromptSelection).Methods(http.MethodGet)
 	router.HandleFunc(EndpointMfaPrompt, login.handleMfaPrompt).Methods(http.MethodPost)
 	router.HandleFunc(EndpointMfaInitVerify, login.handleMfaInitVerify).Methods(http.MethodPost)
-	router.HandleFunc(EndpointMfaInitU2FTest, login.handleRegisterU2FTest).Methods(http.MethodGet)
+	router.HandleFunc(EndpointMfaInitU2FTest, login.handleRegisterU2FTest).Methods(http.MethodGet) //TODO: remove
+	router.HandleFunc(EndpointMfaU2FLoginTest, login.handleLoginU2FTest).Methods(http.MethodGet)   //TODO: remove
 	router.HandleFunc(EndpointMfaInitU2FVerify, login.handleRegisterU2F).Methods(http.MethodPost)
 	router.HandleFunc(EndpointMfaInitU2FLogin, login.handleLoginU2F).Methods(http.MethodPost)
 	router.HandleFunc(EndpointMailVerification, login.handleMailVerification).Methods(http.MethodGet)
