@@ -148,6 +148,55 @@ func (u *Human) appendU2FRemovedEvent(event *es_models.Event) error {
 	return nil
 }
 
+func (u *Human) appendPasswordlessAddedEvent(event *es_models.Event) error {
+	webauthn := new(WebAuthNToken)
+	err := webauthn.setData(event)
+	if err != nil {
+		return err
+	}
+	webauthn.ObjectRoot.CreationDate = event.CreationDate
+	webauthn.State = int32(model.MfaStateNotReady)
+	for i, token := range u.PasswordlessTokens {
+		if token.State == int32(model.MfaStateNotReady) {
+			u.PasswordlessTokens[i] = webauthn
+			return nil
+		}
+	}
+	u.PasswordlessTokens = append(u.PasswordlessTokens, webauthn)
+	return nil
+}
+
+func (u *Human) appendPasswordlessVerifiedEvent(event *es_models.Event) error {
+	webauthn := new(WebAuthNToken)
+	err := webauthn.setData(event)
+	if err != nil {
+		return err
+	}
+	if _, token := GetWebauthn(u.PasswordlessTokens, webauthn.WebauthNTokenID); token != nil {
+		token.setData(event)
+		token.State = int32(model.MfaStateReady)
+		return nil
+	}
+	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-mKns8", "Errors.Users.Mfa.Passwordless.NotExisting")
+}
+
+func (u *Human) appendPasswordlessRemovedEvent(event *es_models.Event) error {
+	webauthn := new(WebAuthNToken)
+	err := webauthn.setData(event)
+	if err != nil {
+		return err
+	}
+	for i := len(u.PasswordlessTokens) - 1; i >= 0; i-- {
+		if u.PasswordlessTokens[i].WebauthNTokenID == webauthn.WebauthNTokenID {
+			copy(u.PasswordlessTokens[i:], u.PasswordlessTokens[i+1:])
+			u.PasswordlessTokens[len(u.PasswordlessTokens)-1] = nil
+			u.PasswordlessTokens = u.PasswordlessTokens[:len(u.PasswordlessTokens)-1]
+			return nil
+		}
+	}
+	return nil
+}
+
 func (w *WebAuthNToken) setData(event *es_models.Event) error {
 	w.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, w); err != nil {
