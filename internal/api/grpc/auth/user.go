@@ -158,7 +158,7 @@ func (s *Server) VerifyMfaOTP(ctx context.Context, request *auth.VerifyMfaOtp) (
 }
 
 func (s *Server) RemoveMfaOTP(ctx context.Context, _ *empty.Empty) (_ *empty.Empty, err error) {
-	s.repo.RemoveMyMfaOTP(ctx)
+	err = s.repo.RemoveMyMfaOTP(ctx)
 	return &empty.Empty{}, err
 }
 
