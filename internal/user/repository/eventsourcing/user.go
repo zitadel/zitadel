@@ -805,24 +805,43 @@ func MFAWebauthNVerifyAggregate(aggCreator *es_models.AggregateCreator, user *mo
 	}
 }
 
-func MFAU2FRemoveAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNToken) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return MFAWebauthNAddAggregate(aggCreator, user, webauthN, model.HumanMFAU2FTokenRemoved)
+func MFAU2FRemoveAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNTokenID) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return MFAWebauthNRemoveAggregate(aggCreator, user, webauthN, model.HumanMFAU2FTokenRemoved)
 }
 
-func MFAPasswordlessRemoveAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNToken) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return MFAWebauthNAddAggregate(aggCreator, user, webauthN, model.HumanMFAPasswordlessTokenRemoved)
+func MFAPasswordlessRemoveAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNTokenID) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return MFAWebauthNRemoveAggregate(aggCreator, user, webauthN, model.HumanMFAPasswordlessTokenRemoved)
 }
 
-func MFAWebauthNRemoveAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNToken, event es_models.EventType) func(ctx context.Context) (*es_models.Aggregate, error) {
+func MFAWebauthNRemoveAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNTokenID, event es_models.EventType) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if webauthN == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-2Mi9s", "Errors.Internal")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-4Ms9l", "Errors.Internal")
 		}
 		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
 		return agg.AppendEvent(event, webauthN)
+	}
+}
+
+func U2FCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, user *model.User, check *model.AuthRequest) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, user)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.HumanMFAU2FTokenCheckSucceeded, check)
+	}
+}
+func U2FCheckCheckFailedAggregate(aggCreator *es_models.AggregateCreator, user *model.User, check *model.AuthRequest) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, user)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.HumanMFAU2FTokenCheckFailed, check)
 	}
 }
 

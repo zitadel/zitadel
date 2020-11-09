@@ -7,16 +7,18 @@ import (
 )
 
 func WebAuthNsToCredentials(webAuthNs []*model.WebAuthNToken) []webauthn.Credential {
-	creds := make([]webauthn.Credential, len(webAuthNs))
-	for i, webAuthN := range webAuthNs {
-		creds[i] = webauthn.Credential{
-			ID:              webAuthN.KeyID,
-			PublicKey:       webAuthN.PublicKey,
-			AttestationType: webAuthN.AttestationType,
-			Authenticator: webauthn.Authenticator{
-				AAGUID:    webAuthN.AAGUID,
-				SignCount: webAuthN.SignCount,
-			},
+	creds := make([]webauthn.Credential, 0)
+	for _, webAuthN := range webAuthNs {
+		if webAuthN.State == model.MfaStateReady {
+			creds = append(creds, webauthn.Credential{
+				ID:              webAuthN.KeyID,
+				PublicKey:       webAuthN.PublicKey,
+				AttestationType: webAuthN.AttestationType,
+				Authenticator: webauthn.Authenticator{
+					AAGUID:    webAuthN.AAGUID,
+					SignCount: webAuthN.SignCount,
+				},
+			})
 		}
 	}
 	return creds

@@ -1492,7 +1492,13 @@ func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID, webAuthNToke
 		return errors.ThrowPreconditionFailed(nil, "EVENT-BHeq1", "Errors.User.NotHuman")
 	}
 	_, u2f := user.GetU2F(webAuthNTokenID)
-	return es.webauthn.FinishLogin(user, u2f, credentialData, user.U2Fs...)
+	err = es.webauthn.FinishLogin(user, u2f, credentialData, user.U2Fs...)
+	if err != nil {
+
+	} else {
+
+	}
+	return err
 }
 
 func (es *UserEventstore) SignOut(ctx context.Context, agentID string, userIDs []string) error {
