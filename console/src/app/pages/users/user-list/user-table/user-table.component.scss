@@ -33,11 +33,11 @@
     }
 
     tr {
-        &:hover {
-            .dlt-button {
-                visibility: visible;
-            }
+      &:hover {
+        .dlt-button {
+          visibility: visible;
         }
+      }
     }
 
     .selection {
