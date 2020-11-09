@@ -102,17 +102,19 @@
                                     <div class="c_label">
                                         <span>{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}
                                             {{'MENU.PROJECT' | translate}} </span>
-                                        <span *ngIf="ownedProjectsCount as ownedPCount"
-                                            class="count">{{ownedPCount}}</span>
+                                        <span *ngIf="(mgmtService?.ownedProjectsCount | async)"
+                                            class="count">{{mgmtService?.ownedProjectsCount | async}}</span>
                                     </div>
                                 </a>
 
-                                <a @navitem *ngIf="grantedProjectsCount as grantPCount" class="nav-item"
-                                    [routerLinkActive]="['active']" [routerLink]="[ '/granted-projects']">
+                                <a @navitem
+                                    *ngIf="mgmtService?.grantedProjectsCount && (mgmtService?.grantedProjectsCount | async)"
+                                    class="nav-item" [routerLinkActive]="['active']"
+                                    [routerLink]="[ '/granted-projects']">
                                     <i class="icon las la-layer-group"></i>
                                     <div class="c_label">
                                         <span>{{ 'MENU.GRANTEDPROJECT' | translate }}</span>
-                                        <span class="count">{{grantPCount}}</span>
+                                        <span class="count">{{mgmtService?.grantedProjectsCount | async}}</span>
                                     </div>
                                 </a>
                             </ng-template>

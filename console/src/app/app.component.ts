@@ -57,9 +57,6 @@ export class AppComponent implements OnDestroy {
 
     public showProjectSection: boolean = false;
 
-    public grantedProjectsCount: number = 0;
-    public ownedProjectsCount: number = 0;
-
     public filterControl: FormControl = new FormControl('');
     private authSub: Subscription = new Subscription();
     private orgSub: Subscription = new Subscription();
@@ -73,7 +70,7 @@ export class AppComponent implements OnDestroy {
         private breakpointObserver: BreakpointObserver,
         public overlayContainer: OverlayContainer,
         private themeService: ThemeService,
-        private mgmtService: ManagementService,
+        public mgmtService: ManagementService,
         public matIconRegistry: MatIconRegistry,
         public domSanitizer: DomSanitizer,
         private toast: ToastService,
@@ -249,13 +246,9 @@ export class AppComponent implements OnDestroy {
     private getProjectCount(): void {
         this.authService.isAllowed(['project.read$']).subscribe((allowed) => {
             if (allowed) {
-                this.mgmtService.SearchProjects(0, 0).then(res => {
-                    this.ownedProjectsCount = res.toObject().totalResult;
-                });
+                this.mgmtService.SearchProjects(0, 0);
 
-                this.mgmtService.SearchGrantedProjects(0, 0).then(res => {
-                    this.grantedProjectsCount = res.toObject().totalResult;
-                });
+                this.mgmtService.SearchGrantedProjects(0, 0);
             }
         });
     }
