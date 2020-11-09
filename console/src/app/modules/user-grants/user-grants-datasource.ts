@@ -103,7 +103,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
                 break;
             default:
                 this.loadingSubject.next(true);
-                const promise3 = this.userService.SearchUserGrants(pageSize, pageSize * pageIndex, []);
+                const promise3 = this.userService.SearchUserGrants(pageSize, pageSize * pageIndex, queries ?? []);
                 this.loadResponse(promise3);
                 break;
         }

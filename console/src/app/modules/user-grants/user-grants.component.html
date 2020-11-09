@@ -41,7 +41,7 @@
             <ng-container matColumnDef="user">
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.USER' | translate }}
                     <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID}"></template>
+                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERGRANTSEARCHKEY_DISPLAY_NAME}"></template>
                 </th>
                 <td mat-cell *matCellDef="let grant">
                     {{grant?.displayName}}</td>
@@ -50,7 +50,7 @@
             <ng-container matColumnDef="org">
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.GRANTEDORGDOMAIN' | translate }}
                     <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERGRANTSEARCHKEY_ORG_ID}"></template>
+                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERGRANTSEARCHKEY_ORG_NAME}"></template>
                 </th>
                 <td mat-cell *matCellDef="let grant">
                     {{grant.orgName}} </td>
@@ -59,7 +59,7 @@
             <ng-container matColumnDef="projectId">
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.PROJECTNAME' | translate }}
                     <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID}"></template>
+                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_NAME}"></template>
                 </th>
                 <td mat-cell *matCellDef="let grant">
                     {{grant.projectName}} </td>
@@ -85,15 +85,13 @@
                 </th>
                 <td mat-cell *matCellDef="let grant; let i = index">
                     <ng-container *ngIf="context === UserGrantContext.USER || context === UserGrantContext.NONE">
-                        <ng-container
-                            *ngIf="(grant.grantId && loadedGrantId !== grant.grantId) || (loadedProjectId !== grant.projectId)">
+                        <ng-container *ngIf="(grant.grantId && grantToEdit !== grant.id) || (grantToEdit !== grant.id)">
                             <div class="flex-row">
                                 <span class="role" *ngFor="let role of grant.roleKeysList">{{ role }}</span>
                                 <button mat-stroked-button
-                                    *ngIf="grant.grantId ? loadedGrantId !== grant.grantId : loadedProjectId !== grant.projectId"
+                                    *ngIf="grant.grantId ? grantToEdit !== grant.id : grantToEdit !== grant.id"
                                     [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.grantId] : []) | hasRole | async))"
-                                    (click)="grant.grantId ? getGrantRoleOptions(grant.grantId, grant.projectId) : getProjectRoleOptions(grant.projectId)"
-                                    matTooltip="{{'ACTIONS.CHANGE' | translate}}">
+                                    (click)="loadGrantOptions(grant)" matTooltip="{{'ACTIONS.CHANGE' | translate}}">
                                     <i class="las la-edit"></i>
                                     {{'ACTIONS.EDIT' | translate}}
                                 </button>
@@ -104,7 +102,7 @@
                     <ng-container
                         *ngIf="context === UserGrantContext.OWNED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE">
                         <mat-form-field class="form-field" appearance="outline"
-                            *ngIf="loadedProjectId && loadedProjectId === grant.projectId">
+                            *ngIf="loadedProjectId && grantToEdit == grant.id && loadedProjectId === grant.projectId">
                             <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
                             <mat-select [(ngModel)]="grant.roleKeysList" multiple
                                 [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.grantId] : []) | hasRole | async))"
@@ -119,7 +117,7 @@
                     <ng-container
                         *ngIf="context === UserGrantContext.GRANTED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE">
                         <mat-form-field class="form-field" appearance="outline"
-                            *ngIf="loadedGrantId && loadedGrantId === grant.grantId">
+                            *ngIf="loadedGrantId && loadedGrantId === grant.grantId && grantToEdit == grant.id">
                             <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
                             <mat-select [(ngModel)]="grant.roleKeysList" multiple
                                 [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.grantId] : []) | hasRole | async))"

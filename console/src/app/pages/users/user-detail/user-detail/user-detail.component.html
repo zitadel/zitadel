@@ -6,12 +6,12 @@
             </a>
             <h1>{{user.human ? user.human?.displayName : user.machine?.name}}</h1>
 
-            <span class="fill-space"></span>
-
             <ng-template appHasRole [appHasRole]="['user.delete$', 'user.delete:'+user?.id]">
-                <button mat-raised-button color="warn" (click)="deleteUser()"><i
-                        class="las la-trash"></i>{{'USER.PAGES.DELETE' | translate}}</button>
+                <button mat-icon-button color="warn" matTooltip="{{'USER.PAGES.DELETE' | translate}}"
+                    (click)="deleteUser()"><i class="las la-trash"></i></button>
             </ng-template>
+
+            <span class="fill-space"></span>
 
             <ng-template appHasRole [appHasRole]="['user.write$', 'user.write:'+user?.id]">
                 <button class="state-button" mat-stroked-button color="warn"

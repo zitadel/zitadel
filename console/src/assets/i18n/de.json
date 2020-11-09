@@ -106,8 +106,11 @@
                 "1":"Nach Username filtern",
                 "2":"Nach Vornamen filtern",
                 "3":"Nach Nachnamen filtern",
+                "4":"Nach rollenschlüssel filtern",
                 "5":"Nach Display Namen filtern",
-                "6":"Nach Email filtern"
+                "6":"Nach Email filtern",
+                "10":"Nach Orgname filtern",
+                "12":"Project Name"
             }
         },
         "MFA": {
