@@ -182,7 +182,10 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
             if (resp) {
                 this.mgmtService.RemoveProject(this.projectId).then(() => {
                     this.toast.showInfo('PROJECT.TOAST.DELETED', true);
-                    this.router.navigate(['/projects']);
+                    const params: Params = {
+                        'deferredReload': true,
+                    };
+                    this.router.navigate(['/projects'], { queryParams: params });
                 }).catch(error => {
                     this.toast.showError(error);
                 });

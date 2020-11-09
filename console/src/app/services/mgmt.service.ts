@@ -931,10 +931,15 @@ export class ManagementService {
     // project
 
     public SearchProjects(
-        limit: number, offset: number, queryList?: ProjectSearchQuery[]): Promise<ProjectSearchResponse> {
+        limit?: number, offset?: number, queryList?: ProjectSearchQuery[]): Promise<ProjectSearchResponse> {
         const req = new ProjectSearchRequest();
-        req.setLimit(limit);
-        req.setOffset(offset);
+        if (limit) {
+            req.setLimit(limit);
+        }
+        if (offset) {
+            req.setOffset(offset);
+        }
+
         if (queryList) {
             req.setQueriesList(queryList);
         }
