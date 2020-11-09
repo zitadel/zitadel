@@ -23,13 +23,13 @@
 
     th {
       .search-button {
-        visibility: hidden;
+        display: none;
       }
 
       &:hover,
       &.search-active {
         .search-button {
-          visibility: visible;
+          display: inline-block;
         }
       }
     }
@@ -48,15 +48,22 @@
 
 .flex-row {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   max-width: 400px;
 
   .role {
-    display: block;
+    display: flex;
+    flex-direction: column;
     margin: .25rem;
     font-size: 14px;
     text-overflow: ellipsis;
     overflow: hidden;
+    justify-items: center;
+    align-self: center;
+  }
+
+  .fill-space {
+      flex: 1;
   }
 
   button {

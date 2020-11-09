@@ -19,7 +19,8 @@
         padding-right: 0;
       }
 
-      .search-button {
+      .search-button,
+      .dlt-button {
         visibility: hidden;
       }
 
@@ -29,6 +30,14 @@
           visibility: visible;
         }
       }
+    }
+
+    tr {
+        &:hover {
+            .dlt-button {
+                visibility: visible;
+            }
+        }
     }
 
     .selection {
