@@ -11,13 +11,13 @@ ZITADEL's own role model is built around the IAM resource. The roles have some h
 
 > Screenshots
 
-#### System Roles
+##### System Roles
 
 IAM_OWNER
 
 IAM_OWNER_VIEWER
 
-#### Organisation Roles
+##### Organisation Roles
 
 ORG_OWNER
 
@@ -29,7 +29,7 @@ ORG_PROJECT_PERMISSION_EDITOR
 
 ORG_PROJECT_CREATOR
 
-#### Owned Project Roles
+##### Owned Project Roles
 
 PROJECT_OWNER
 
@@ -39,12 +39,12 @@ PROJECT_OWNER_GLOBAL
 
 PROJECT_OWNER_VIEWER_GLOBAL
 
-#### Granted Project Roles
+##### Granted Project Roles
 
 PROJECT_GRANT_OWNER
 
 PROJECT_GRANT_OWNER_VIEWER
 
-### Project Roles Management
+##### Project Roles Management
 
 > Explain Project Authorization
