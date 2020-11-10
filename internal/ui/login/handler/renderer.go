@@ -42,7 +42,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		tmplMfaPrompt:              "mfa_prompt.html",
 		tmplMfaInitVerify:          "mfa_init_verify.html",
 		tmplMfaU2FInit:             "mfa_init_u2f.html",
-		tmplMfaU2FInitVerification: "mfa_init_u2f_login.html",
+		tmplMfaU2FInitVerification: "mfa_verification_u2f.html",
 		tmplMfaInitDone:            "mfa_init_done.html",
 		tmplMailVerification:       "mail_verification.html",
 		tmplMailVerified:           "mail_verified.html",
