@@ -52,13 +52,30 @@ func AdaptFunc(
 ) {
 	internalMonitor := monitor.WithField("component", "deployment")
 
-	rootSecret := "client-root"
-	secretMode := int32(0777)
+	secretMode := int32(384)
 	replicas := int32(replicaCount)
 	runAsUser := int64(1000)
-	runAsNonRoot := true
-	certMountPath := "/dbsecrets"
+
+	rootSecret := "client-root"
+	dbSecrets := "db-secrets"
+
+	deployName := "zitadel"
 	containerName := "zitadel"
+	maxUnavailable := intstr.FromInt(1)
+	maxSurge := intstr.FromInt(1)
+
+	if resources == nil {
+		resources = &k8s.Resources{
+			Limits: corev1.ResourceList{
+				corev1.ResourceCPU:    resource.MustParse("2"),
+				corev1.ResourceMemory: resource.MustParse("2Gi"),
+			},
+			Requests: corev1.ResourceList{
+				corev1.ResourceCPU:    resource.MustParse("500m"),
+				corev1.ResourceMemory: resource.MustParse("512Mi"),
+			},
+		}
+	}
 
 	volumes := []corev1.Volume{{
 		Name: secretName,
@@ -89,12 +106,12 @@ func AdaptFunc(
 				LocalObjectReference: corev1.LocalObjectReference{Name: consoleCMName},
 			},
 		},
+	}, {
+		Name: dbSecrets,
+		VolumeSource: corev1.VolumeSource{
+			EmptyDir: &corev1.EmptyDirVolumeSource{},
+		},
 	}}
-	volMounts := []corev1.VolumeMount{
-		{Name: secretName, MountPath: secretPath},
-		{Name: consoleCMName, MountPath: "/console/environment.json", SubPath: "environment.json"},
-		{Name: rootSecret, MountPath: certMountPath + "/ca.crt", SubPath: "ca.crt"},
-	}
 
 	for _, user := range users {
 		userReplaced := strings.ReplaceAll(user, "_", "-")
@@ -108,84 +125,6 @@ func AdaptFunc(
 				},
 			},
 		})
-		volMounts = append(volMounts, corev1.VolumeMount{
-			Name: internalName,
-			//ReadOnly:  true,
-			MountPath: certMountPath + "/client." + user + ".crt",
-			SubPath:   "client." + user + ".crt",
-		})
-		volMounts = append(volMounts, corev1.VolumeMount{
-			Name: internalName,
-			//ReadOnly:  true,
-			MountPath: certMountPath + "/client." + user + ".key",
-			SubPath:   "client." + user + ".key",
-		})
-	}
-
-	envVars := []corev1.EnvVar{
-		{Name: "POD_IP",
-			ValueFrom: &corev1.EnvVarSource{
-				FieldRef: &corev1.ObjectFieldSelector{
-					FieldPath: "status.podIP",
-				},
-			}},
-		{Name: "CHAT_URL",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-					Key:                  "ZITADEL_GOOGLE_CHAT_URL",
-				},
-			}},
-		{Name: "TWILIO_TOKEN",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-					Key:                  "ZITADEL_TWILIO_AUTH_TOKEN",
-				},
-			}},
-		{Name: "TWILIO_SERVICE_SID",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-					Key:                  "ZITADEL_TWILIO_SID",
-				},
-			}},
-		{Name: "SMTP_PASSWORD",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-					Key:                  "ZITADEL_EMAILAPPKEY",
-				},
-			}},
-	}
-
-	for _, user := range users {
-		envVars = append(envVars, corev1.EnvVar{
-			Name: "CR_" + strings.ToUpper(user) + "_PASSWORD",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: secretPasswordsName},
-					Key:                  user,
-				},
-			},
-		})
-	}
-
-	deployName := "zitadel"
-	maxUnavailable := intstr.FromInt(1)
-	maxSurge := intstr.FromInt(1)
-
-	if resources == nil {
-		resources = &k8s.Resources{
-			Limits: corev1.ResourceList{
-				corev1.ResourceCPU:    resource.MustParse("2"),
-				corev1.ResourceMemory: resource.MustParse("2Gi"),
-			},
-			Requests: corev1.ResourceList{
-				corev1.ResourceCPU:    resource.MustParse("500m"),
-				corev1.ResourceMemory: resource.MustParse("512Mi"),
-			},
-		}
 	}
 
 	deploymentDef := &appsv1.Deployment{
@@ -216,64 +155,31 @@ func AdaptFunc(
 					NodeSelector: nodeSelector,
 					Tolerations:  tolerations,
 					Affinity:     affinity.K8s(),
-					SecurityContext: &corev1.PodSecurityContext{
-						RunAsUser:    &runAsUser,
-						RunAsNonRoot: &runAsNonRoot,
+					InitContainers: []corev1.Container{
+						getInitContainer(
+							rootSecret,
+							dbSecrets,
+							users,
+							runAsUser,
+						),
 					},
-					Containers: []corev1.Container{{
-						Resources: corev1.ResourceRequirements(*resources),
-						Lifecycle: &corev1.Lifecycle{
-							PostStart: &corev1.Handler{
-								Exec: &corev1.ExecAction{
-									// TODO: until proper fix of https://github.com/kubernetes/kubernetes/issues/2630
-									Command: []string{"sh", "-c",
-										"mkdir -p " + certPath + "/ && cp " + certMountPath + "/* " + certPath + "/ && chmod 400 " + certPath + "/*"},
-								},
-							},
-						},
-						Args: []string{"start"},
-						SecurityContext: &corev1.SecurityContext{
-							RunAsUser:    &runAsUser,
-							RunAsNonRoot: &runAsNonRoot,
-						},
-						Name:            containerName,
-						Image:           zitadelImage,
-						ImagePullPolicy: "IfNotPresent",
-						Ports: []corev1.ContainerPort{
-							{Name: "grpc", ContainerPort: 50001},
-							{Name: "http", ContainerPort: 50002},
-							{Name: "ui", ContainerPort: 50003},
-						},
-						Env: envVars,
-						EnvFrom: []corev1.EnvFromSource{
-							{ConfigMapRef: &corev1.ConfigMapEnvSource{
-								LocalObjectReference: corev1.LocalObjectReference{Name: cmName},
-							}}},
-						VolumeMounts: volMounts,
-						/*LivenessProbe: &corev1.Probe{
-							Handler: corev1.Handler{
-								HTTPGet: &corev1.HTTPGetAction{
-									Path:   "/healthz",
-									Port:   intstr.Parse("http"),
-									Scheme: "HTTP",
-								},
-							},
-							PeriodSeconds:       5,
-							FailureThreshold:    2,
-							InitialDelaySeconds: 60,
-						},*/
-						ReadinessProbe: &corev1.Probe{
-							Handler: corev1.Handler{
-								HTTPGet: &corev1.HTTPGetAction{
-									Path:   "/ready",
-									Port:   intstr.Parse("http"),
-									Scheme: "HTTP",
-								},
-							},
-							PeriodSeconds:    5,
-							FailureThreshold: 2,
-						},
-					}},
+					Containers: []corev1.Container{
+						getContainer(
+							containerName,
+							runAsUser,
+							true,
+							resources,
+							cmName,
+							certPath,
+							secretName,
+							secretPath,
+							consoleCMName,
+							secretVarsName,
+							secretPasswordsName,
+							users,
+							dbSecrets,
+						),
+					},
 					Volumes: volumes,
 				},
 			},
@@ -300,7 +206,7 @@ func AdaptFunc(
 
 	checkDeployNotReady := func(k8sClient *kubernetes.Client) error {
 		internalMonitor.Info("checking for deployment to not be ready")
-		if err := k8sClient.WaitUntilStatefulsetIsReady(namespace, deployName, true, true, 1); err != nil {
+		if err := k8sClient.WaitUntilDeploymentReady(namespace, deployName, true, true, 1); err != nil {
 			internalMonitor.Info("deployment is not ready")
 			return nil
 		}
