@@ -34,7 +34,6 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     public INITIAL_PAGE_SIZE: number = 50;
     @Input() context: UserGrantContext = UserGrantContext.NONE;
     @Input() refreshOnPreviousRoutes: string[] = [];
-    public grants: UserGrantView.AsObject[] = [];
 
     public dataSource!: UserGrantsDataSource;
     public selection: SelectionModel<UserGrantView.AsObject> = new SelectionModel<UserGrantView.AsObject>(true, []);
@@ -206,6 +205,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public applyFilter(event: Event): void {
+        this.selection.clear();
         const filterValue = (event.target as HTMLInputElement).value;
 
         this.loadGrantsPage(filterValue);

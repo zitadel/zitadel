@@ -836,13 +836,17 @@ export class ManagementService {
     // USER GRANTS
 
     public SearchUserGrants(
-        limit: number,
-        offset: number,
+        limit?: number,
+        offset?: number,
         queryList?: UserGrantSearchQuery[],
     ): Promise<UserGrantSearchResponse> {
         const req = new UserGrantSearchRequest();
-        req.setLimit(limit);
-        req.setOffset(offset);
+        if (limit) {
+            req.setLimit(limit);
+        }
+        if (offset) {
+            req.setOffset(offset);
+        }
         if (queryList) {
             req.setQueriesList(queryList);
         }
