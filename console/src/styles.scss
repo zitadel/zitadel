@@ -169,6 +169,7 @@ $custom-typography:
 
   --grey: #697386;
   --table-row-back: #e7ebf0;
+  --color-main: #5469D4;
 
   .sidenav,
   .main-container,
@@ -206,6 +207,7 @@ $custom-typography:
   @include angular-material-theme($dark-theme);
 
   --table-row-back: #292a2b;
+  --color-main: #5282c1;
 
   .sidenav,
   .main-container,
@@ -234,7 +236,7 @@ $custom-typography:
   }
 
   .root-header {
-    box-shadow: inset 0 -1px #3c3e40;
+    box-shadow: inset 0 -1px #303131;
   }
 }
 // @include mat-checkbox-theme($candy-app-theme);

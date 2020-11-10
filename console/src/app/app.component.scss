@@ -219,7 +219,8 @@
   .hiddenline {
     display: block;
     visibility: hidden;
-    flex: 1;
+    // flex: 1;
+    width: 4rem;
   }
 }
 
@@ -253,4 +254,9 @@
     justify-content: center;
     align-items: center;
   }
+}
+
+.org-wrapper {
+    max-height: 350px;
+    overflow-y: auto;
 }

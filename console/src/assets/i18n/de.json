@@ -38,6 +38,7 @@
         "PERSONAL_INFO": "Persönliche Informationen",
         "IAM":"Administration",
         "ORGANIZATION": "Organisation",
+        "ADMINSECTION":"Administration",
         "PROJECTSSECTION":"Projektsektion",
         "PROJECT": "Projekte",
         "GRANTEDPROJECT":"Berechtigte Projekte",

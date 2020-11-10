@@ -64,8 +64,8 @@
     z-index: 1;
     font-size: 13px;
     padding: 3px 2rem;
-    transform: translateY(80%);
-    transition: all .2s ease-in-out;
+    transform: translateY(75%);
+    transition: all .2s;
     border-top-right-radius: 5px;
 
     span {
@@ -85,16 +85,6 @@
         }
     }
 
-    &.expanded,
-    &:hover {
-        transform: translateY(0%);
-        right: 0;
-
-        span {
-            display: inline-block;
-        }
-    }
-
     &::before {
       content: '';
       position: absolute;
@@ -105,6 +95,16 @@
       border-bottom: 20px solid transparent;
       border-left: 20px solid $primary-dark;
       transition: border-color .3s cubic-bezier(.645, .045, .355, 1);
+    }
+
+    &.expanded,
+    &:hover {
+        transform: translateY(0%);
+        right: 0;
+
+        span {
+            display: inline-block;
+        }
     }
   }
 }

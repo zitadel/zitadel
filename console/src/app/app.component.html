@@ -29,10 +29,12 @@
                         placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}" #input>
                 </mat-form-field>
 
-                <button [ngClass]="{'active': temporg.id === org?.id}" [disabled]="!temporg.id"
-                    *ngFor="let temporg of orgs$ | async" mat-menu-item (click)="setActiveOrg(temporg)">
-                    {{temporg?.name ? temporg.name : 'NO NAME'}}
-                </button>
+                <div class="org-wrapper">
+                    <button [ngClass]="{'active': temporg.id === org?.id}" [disabled]="!temporg.id"
+                        *ngFor="let temporg of orgs$ | async" mat-menu-item (click)="setActiveOrg(temporg)">
+                        {{temporg?.name ? temporg.name : 'NO NAME'}}
+                    </button>
+                </div>
 
                 <button class="show-all" mat-menu-item
                     [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' | translate}}</button>
@@ -70,8 +72,10 @@
                         </ng-container>
 
                         <ng-container *ngIf="iamuser$ | async">
-                            <div class="divider">
+                            <div @navitem class="divider">
                                 <div class="line"></div>
+                                <span>{{'MENU.ADMINSECTION' | translate}}</span>
+                                <div class="hiddenline"></div>
                             </div>
                             <a @navitem class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/iam']">
                                 <i class="icon las la-gem"></i>
