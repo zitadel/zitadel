@@ -30,13 +30,11 @@
     flex-wrap: wrap;
     margin: -1rem;
     justify-content: space-evenly;
-    align-items: stretch;
 
     .item {
       flex: 1 0 45%;
       margin: 0 1rem;
       display: flex;
-      height: 100%;
       flex-direction: column;
 
       .top {
@@ -84,8 +82,23 @@
 }
 
 .short-link {
-    margin-bottom: 1rem;
+    margin-bottom: .5rem;
     font-size: 15px;
     text-decoration: none;
     display: block;
+    position: relative;
+
+    .las {
+        font-size: 1.5rem !important;
+        height: 1.5rem;
+        visibility: hidden;
+        position: absolute;
+        right: 0;
+    }
+
+    &:hover {
+        .las {
+            visibility: visible;
+        }
+    }
 }

@@ -61,20 +61,20 @@ $caos-dark-brand: (
 );
 
 $caos-light-brand: (
-  50: #fff,
-  100: #dde6f3,
-  200: #b4c9e4,
-  300: #7fa3d1,
-  400: #6992c9,
-  500: #5282c1,
-  600: #4072b4,
-  700: #38649d,
-  800: #305687,
-  900: #284770,
-  A100: #fff,
-  A200: #dde6f3,
-  A300: #6992c9,
-  A400: #38649d,
+  50: #EAEDFA,
+  100: #CCD2F2,
+  200: #AAB4EA,
+  300: #8796E1,
+  400: #6E80DA,
+  500: #5469D4,
+  600: #4D61CF,
+  700: #4356C9,
+  800: #3A4CC3,
+  900: #293BB9,
+  A100: #F9FAFF,
+  A200: #C6CCFF,
+  A300: #939FFF,
+  A400: #7A88FF,
   A500:#333,
   A600: #000,
   A700: #8795a1,
@@ -167,7 +167,8 @@ $custom-typography:
   @include component-themes($light-theme);
   @include angular-material-theme($light-theme);
 
-  --table-row-back: #292a2b;
+  --grey: #697386;
+  --table-row-back: #e7ebf0;
 
   .sidenav,
   .main-container,
@@ -193,6 +194,10 @@ $custom-typography:
     background-color: #737c8850;
     border-radius: 8px;
     cursor: pointer;
+  }
+
+  .root-header {
+      box-shadow: inset 0 -1px #e3e8ee;
   }
 }
 
@@ -226,6 +231,10 @@ $custom-typography:
     background-color: #737c8870;
     border-radius: 8px;
     cursor: pointer;
+  }
+
+  .root-header {
+    box-shadow: inset 0 -1px #3c3e40;
   }
 }
 // @include mat-checkbox-theme($candy-app-theme);

@@ -215,6 +215,12 @@
     margin: .5rem 0;
     flex: 1;
   }
+
+  .hiddenline {
+    display: block;
+    visibility: hidden;
+    flex: 1;
+  }
 }
 
 @mixin textvar($theme) {
