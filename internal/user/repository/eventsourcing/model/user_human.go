@@ -27,6 +27,8 @@ type Human struct {
 	OTP                *OTP             `json:"-"`
 	U2FTokens          []*WebAuthNToken `json:"-"`
 	PasswordlessTokens []*WebAuthNToken `json:"-"`
+	U2FLogins          []*WebAuthNLogin `json:"-"`
+	PasswordlessLogins []*WebAuthNLogin `json:"-"`
 }
 
 type InitUserCode struct {
@@ -63,6 +65,9 @@ func HumanFromModel(user *model.Human) *Human {
 	}
 	if user.PasswordlessTokens != nil {
 		human.PasswordlessTokens = WebAuthNsFromModel(user.PasswordlessTokens)
+	}
+	if user.U2FLogins != nil {
+		human.U2FLogins = WebAuthNLoginsFromModel(user.U2FLogins)
 	}
 	return human
 }
@@ -107,6 +112,9 @@ func HumanToModel(user *Human) *model.Human {
 	}
 	if user.PasswordlessTokens != nil {
 		human.PasswordlessTokens = WebAuthNsToModel(user.PasswordlessTokens)
+	}
+	if user.U2FLogins != nil {
+		human.U2FLogins = WebAuthNLoginsToModel(user.U2FLogins)
 	}
 	return human
 }
@@ -206,6 +214,10 @@ func (h *Human) AppendEvent(event *es_models.Event) (err error) {
 		err = h.appendPasswordlessVerifiedEvent(event)
 	case HumanMFAPasswordlessTokenRemoved:
 		err = h.appendPasswordlessRemovedEvent(event)
+	case HumanMFAU2FTokenBeginLogin:
+		err = h.appendU2FLoginEvent(event)
+	case HumanMFAPasswordlessTokenBeginLogin:
+		err = h.appendPasswordlessLoginEvent(event)
 	}
 	if err != nil {
 		return err

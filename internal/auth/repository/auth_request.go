@@ -2,11 +2,9 @@ package repository
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/auth_request/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	user_model "github.com/caos/zitadel/internal/user/model"
-	"github.com/duo-labs/webauthn/webauthn"
-
-	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
 type AuthRequestRepository interface {
@@ -24,9 +22,9 @@ type AuthRequestRepository interface {
 	VerifyPassword(ctx context.Context, id, userID, password, userAgentID string, info *model.BrowserInfo) error
 
 	VerifyMfaOTP(ctx context.Context, agentID, authRequestID, code, userAgentID string, info *model.BrowserInfo) error
-	BeginMfaU2FLogin(ctx context.Context, userID string) (string, *webauthn.SessionData, error)
+	BeginMfaU2FLogin(ctx context.Context, userID, authRequestID, userAgentID string) (*user_model.WebAuthNLogin, error)
 	VerifyMfaU2F(ctx context.Context, userID, sessionID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) error
-	BeginPasswordlessLogin(ctx context.Context, userID string) (string, *webauthn.SessionData, error)
+	BeginPasswordlessLogin(ctx context.Context, userID, authRequestID, userAgentID string) (*user_model.WebAuthNLogin, error)
 	VerifyPasswordless(ctx context.Context, userID, sessionID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) error
 
 	LinkExternalUsers(ctx context.Context, authReqID, userAgentID string, info *model.BrowserInfo) error

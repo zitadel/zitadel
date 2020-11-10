@@ -35,6 +35,14 @@ type WebAuthNTokenID struct {
 	WebauthNTokenID string `json:"webAuthNTokenId"`
 }
 
+type WebAuthNLogin struct {
+	es_models.ObjectRoot
+
+	WebauthNTokenID string `json:"webAuthNTokenId"`
+	Challenge       string `json:"challenge"`
+	*AuthRequest
+}
+
 func GetWebauthn(webauthnTokens []*WebAuthNToken, id string) (int, *WebAuthNToken) {
 	for i, webauthn := range webauthnTokens {
 		if webauthn.WebauthNTokenID == id {
@@ -96,6 +104,38 @@ func WebAuthNVerifyFromModel(webAuthN *model.WebAuthNToken) *WebAuthNVerify {
 		AAGUID:          webAuthN.AAGUID,
 		SignCount:       webAuthN.SignCount,
 		AttestationType: webAuthN.AttestationType,
+	}
+}
+
+func WebAuthNLoginsToModel(u2fs []*WebAuthNLogin) []*model.WebAuthNLogin {
+	convertedIDPs := make([]*model.WebAuthNLogin, len(u2fs))
+	for i, m := range u2fs {
+		convertedIDPs[i] = WebAuthNLoginToModel(m)
+	}
+	return convertedIDPs
+}
+
+func WebAuthNLoginsFromModel(u2fs []*model.WebAuthNLogin) []*WebAuthNLogin {
+	convertedIDPs := make([]*WebAuthNLogin, len(u2fs))
+	for i, m := range u2fs {
+		convertedIDPs[i] = WebAuthNLoginFromModel(m)
+	}
+	return convertedIDPs
+}
+
+func WebAuthNLoginFromModel(webAuthN *model.WebAuthNLogin) *WebAuthNLogin {
+	return &WebAuthNLogin{
+		ObjectRoot:  webAuthN.ObjectRoot,
+		Challenge:   webAuthN.Challenge,
+		AuthRequest: AuthRequestFromModel(webAuthN.AuthRequest),
+	}
+}
+
+func WebAuthNLoginToModel(webAuthN *WebAuthNLogin) *model.WebAuthNLogin {
+	return &model.WebAuthNLogin{
+		ObjectRoot:  webAuthN.ObjectRoot,
+		Challenge:   webAuthN.Challenge,
+		AuthRequest: AuthRequestToModel(webAuthN.AuthRequest),
 	}
 }
 
@@ -201,6 +241,51 @@ func (w *WebAuthNToken) setData(event *es_models.Event) error {
 	w.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, w); err != nil {
 		logging.Log("EVEN-4M9is").WithError(err).Error("could not unmarshal event data")
+		return caos_errs.ThrowInternal(err, "MODEL-lo023", "could not unmarshal event")
+	}
+	return nil
+}
+
+func (u *Human) appendU2FLoginEvent(event *es_models.Event) error {
+	webauthn := new(WebAuthNLogin)
+	webauthn.ObjectRoot.AppendEvent(event)
+	err := webauthn.setData(event)
+	if err != nil {
+		return err
+	}
+	webauthn.ObjectRoot.CreationDate = event.CreationDate
+	for i, token := range u.U2FLogins {
+		if token.AuthRequest.ID == webauthn.AuthRequest.ID {
+			u.U2FLogins[i] = webauthn
+			return nil
+		}
+	}
+	u.U2FLogins = append(u.U2FLogins, webauthn)
+	return nil
+}
+
+func (u *Human) appendPasswordlessLoginEvent(event *es_models.Event) error {
+	webauthn := new(WebAuthNLogin)
+	webauthn.ObjectRoot.AppendEvent(event)
+	err := webauthn.setData(event)
+	if err != nil {
+		return err
+	}
+	webauthn.ObjectRoot.CreationDate = event.CreationDate
+	for i, token := range u.PasswordlessLogins {
+		if token.AuthRequest.ID == webauthn.AuthRequest.ID {
+			u.PasswordlessLogins[i] = webauthn
+			return nil
+		}
+	}
+	u.PasswordlessLogins = append(u.PasswordlessLogins, webauthn)
+	return nil
+}
+
+func (w *WebAuthNLogin) setData(event *es_models.Event) error {
+	w.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, w); err != nil {
+		logging.Log("EVEN-hmSlo").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-lo023", "could not unmarshal event")
 	}
 	return nil

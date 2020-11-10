@@ -2,7 +2,6 @@ package eventstore
 
 import (
 	"context"
-	"github.com/duo-labs/webauthn/webauthn"
 	"time"
 
 	"github.com/caos/logging"
@@ -268,10 +267,17 @@ func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, us
 	return repo.UserEvents.CheckMfaOTP(ctx, userID, code, request.WithCurrentInfo(info))
 }
 
-func (repo *AuthRequestRepo) BeginMfaU2FLogin(ctx context.Context, userID string) (credData string, sessionData *webauthn.SessionData, err error) {
+func (repo *AuthRequestRepo) BeginMfaU2FLogin(ctx context.Context, userID, authRequestID, userAgentID string) (login *user_model.WebAuthNLogin, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return repo.UserEvents.BeginU2FLogin(ctx, userID)
+	request, err := repo.getAuthRequest(ctx, authRequestID, userAgentID)
+	if err != nil {
+		return nil, err
+	}
+	if request.UserID != userID {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5M09s", "Errors.User.NotMatchingUserID")
+	}
+	return repo.UserEvents.BeginU2FLogin(ctx, userID, request)
 }
 
 func (repo *AuthRequestRepo) VerifyMfaU2F(ctx context.Context, userID, sessionID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) (err error) {
@@ -287,10 +293,17 @@ func (repo *AuthRequestRepo) VerifyMfaU2F(ctx context.Context, userID, sessionID
 	return repo.UserEvents.VerifyMfaU2F(ctx, userID, sessionID, credentialData, request)
 }
 
-func (repo *AuthRequestRepo) BeginPasswordlessLogin(ctx context.Context, userID string) (credData string, sessionData *webauthn.SessionData, err error) {
+func (repo *AuthRequestRepo) BeginPasswordlessLogin(ctx context.Context, userID, authRequestID, userAgentID string) (login *user_model.WebAuthNLogin, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return repo.UserEvents.BeginPasswordlessLogin(ctx, userID)
+	request, err := repo.getAuthRequest(ctx, authRequestID, userAgentID)
+	if err != nil {
+		return nil, err
+	}
+	if request.UserID != userID {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5M09s", "Errors.User.NotMatchingUserID")
+	}
+	return repo.UserEvents.BeginPasswordlessLogin(ctx, userID, request)
 }
 
 func (repo *AuthRequestRepo) VerifyPasswordless(ctx context.Context, userID, sessionID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) (err error) {

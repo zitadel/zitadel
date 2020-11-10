@@ -33,6 +33,15 @@ func WebAuthNToSessionData(webAuthN *model.WebAuthNToken) webauthn.SessionData {
 	}
 }
 
+func WebAuthNLoginToSessionData(webAuthN *model.WebAuthNLogin) webauthn.SessionData {
+	return webauthn.SessionData{
+		Challenge:            webAuthN.Challenge,
+		UserID:               []byte(webAuthN.AggregateID),
+		AllowedCredentialIDs: webAuthN.AllowedCredentialIDs,
+		UserVerification:     UserVerificationFromModel(webAuthN.UserVerification),
+	}
+}
+
 func UserVerificationToModel(verification protocol.UserVerificationRequirement) model.UserVerificationRequirement {
 	switch verification {
 	case protocol.VerificationRequired:

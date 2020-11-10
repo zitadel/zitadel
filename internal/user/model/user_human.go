@@ -23,6 +23,8 @@ type Human struct {
 	OTP                *OTP
 	U2FTokens          []*WebAuthNToken
 	PasswordlessTokens []*WebAuthNToken
+	U2FLogins          []*WebAuthNLogin
+	PasswordlessLogins []*WebAuthNLogin
 }
 
 type InitUserCode struct {
@@ -140,6 +142,24 @@ func (u *Human) GetPasswordlessToVerify() (int, *WebAuthNToken) {
 	for i, u2f := range u.PasswordlessTokens {
 		if u2f.State == MfaStateNotReady {
 			return i, u2f
+		}
+	}
+	return -1, nil
+}
+
+func (u *Human) GetU2FLogin(authReqID string) (int, *WebAuthNLogin) {
+	for i, u2f := range u.U2FLogins {
+		if u2f.AuthRequest.ID == authReqID {
+			return i, u2f
+		}
+	}
+	return -1, nil
+}
+
+func (u *Human) GetPasswordlessLogin(authReqID string) (int, *WebAuthNLogin) {
+	for i, pw := range u.PasswordlessLogins {
+		if pw.AuthRequest.ID == authReqID {
+			return i, pw
 		}
 	}
 	return -1, nil

@@ -121,12 +121,14 @@ const (
 	HumanMFAU2FTokenAdded          models.EventType = "user.human.mfa.u2f.token.added"
 	HumanMFAU2FTokenVerified       models.EventType = "user.human.mfa.u2f.token.verified"
 	HumanMFAU2FTokenRemoved        models.EventType = "user.human.mfa.u2f.token.removed"
+	HumanMFAU2FTokenBeginLogin     models.EventType = "user.human.mfa.u2f.token.begin.login"
 	HumanMFAU2FTokenCheckSucceeded models.EventType = "user.human.mfa.u2f.token.check.succeeded"
 	HumanMFAU2FTokenCheckFailed    models.EventType = "user.human.mfa.u2f.token.check.failed"
 
 	HumanMFAPasswordlessTokenAdded          models.EventType = "user.human.mfa.passwordless.token.added"
 	HumanMFAPasswordlessTokenVerified       models.EventType = "user.human.mfa.passwordless.token.verified"
 	HumanMFAPasswordlessTokenRemoved        models.EventType = "user.human.mfa.passwordless.token.removed"
+	HumanMFAPasswordlessTokenBeginLogin     models.EventType = "user.human.mfa.passwordless.token.begin.login"
 	HumanMFAPasswordlessTokenCheckSucceeded models.EventType = "user.human.mfa.passwordless.token.check.succeeded"
 	HumanMFAPasswordlessTokenCheckFailed    models.EventType = "user.human.mfa.passwordless.token.check.failed"
 

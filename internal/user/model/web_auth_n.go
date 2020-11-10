@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/auth_request/model"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 )
 
@@ -18,6 +19,16 @@ type WebAuthNToken struct {
 	AttestationType        string
 	AAGUID                 []byte
 	SignCount              uint32
+}
+
+type WebAuthNLogin struct {
+	es_models.ObjectRoot
+
+	CredentialAssertionData []byte
+	Challenge               string
+	AllowedCredentialIDs    [][]byte
+	UserVerification        UserVerificationRequirement
+	*model.AuthRequest
 }
 
 type WebAuthNMethod int32

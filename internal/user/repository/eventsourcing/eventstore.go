@@ -2,14 +2,11 @@ package eventsourcing
 
 import (
 	"context"
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"time"
 
 	"github.com/caos/logging"
 	"github.com/duo-labs/webauthn/protocol"
-	"github.com/duo-labs/webauthn/webauthn"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pquerna/otp/totp"
 
@@ -1506,41 +1503,55 @@ func (es *UserEventstore) verifyWebAuthNSetup(ctx context.Context, userID string
 	return nil
 }
 
-func (es *UserEventstore) BeginU2FLogin(ctx context.Context, userID string) (string, *webauthn.SessionData, error) {
-	return es.beginWebAuthNLogin(ctx, userID, usr_model.WebAuthNMethodU2F)
+func (es *UserEventstore) BeginU2FLogin(ctx context.Context, userID string, authRequest *req_model.AuthRequest) (*usr_model.WebAuthNLogin, error) {
+	return es.beginWebAuthNLogin(ctx, userID, usr_model.WebAuthNMethodU2F, authRequest)
 }
 
-func (es *UserEventstore) BeginPasswordlessLogin(ctx context.Context, userID string) (string, *webauthn.SessionData, error) {
-	return es.beginWebAuthNLogin(ctx, userID, usr_model.WebAuthNMethodPasswordless)
+func (es *UserEventstore) BeginPasswordlessLogin(ctx context.Context, userID string, authRequest *req_model.AuthRequest) (*usr_model.WebAuthNLogin, error) {
+	return es.beginWebAuthNLogin(ctx, userID, usr_model.WebAuthNMethodPasswordless, authRequest)
 }
 
-func (es *UserEventstore) beginWebAuthNLogin(ctx context.Context, userID string, method usr_model.WebAuthNMethod) (string, *webauthn.SessionData, error) {
+func (es *UserEventstore) beginWebAuthNLogin(ctx context.Context, userID string, method usr_model.WebAuthNMethod, authRequest *req_model.AuthRequest) (*usr_model.WebAuthNLogin, error) {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
 	if user.Human == nil {
-		return "", nil, errors.ThrowPreconditionFailed(nil, "EVENT-2Ks11", "Errors.User.NotHuman")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-2Ks11", "Errors.User.NotHuman")
 	}
 	var tokens []*usr_model.WebAuthNToken
 	switch method {
 	case usr_model.WebAuthNMethodU2F:
 		if user.U2FTokens == nil {
-			return "", nil, errors.ThrowPreconditionFailed(nil, "EVENT-5Mk8s", "Errors.User.Mfa.U2F.NotExisting")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5Mk8s", "Errors.User.Mfa.U2F.NotExisting")
 		}
 		tokens = user.U2FTokens
 	case usr_model.WebAuthNMethodPasswordless:
 		if user.PasswordlessTokens == nil {
-			return "", nil, errors.ThrowPreconditionFailed(nil, "EVENT-5Mk8s", "Errors.User.Mfa.Passwordless.NotExisting")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5Mk8s", "Errors.User.Mfa.Passwordless.NotExisting")
 		}
 		tokens = user.PasswordlessTokens
 	}
-	credential, sessionData, err := es.webauthn.BeginLogin(user, usr_model.UserVerificationRequirementDiscouraged, tokens...)
+	webAuthNLogin, err := es.webauthn.BeginLogin(user, usr_model.UserVerificationRequirementDiscouraged, tokens...)
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
-	credentialData, _ := json.Marshal(credential)
-	return base64.URLEncoding.EncodeToString(credentialData), sessionData, nil
+	webAuthNLogin.AuthRequest = authRequest
+	repoUser := model.UserFromModel(user)
+	repoWebAuthNLogin := model.WebAuthNLoginFromModel(webAuthNLogin)
+	var loginAggregate func(ctx context.Context) (*es_models.Aggregate, error)
+	switch method {
+	case usr_model.WebAuthNMethodU2F:
+		loginAggregate = MFAU2FBeginLoginAggregate(es.AggregateCreator(), repoUser, repoWebAuthNLogin)
+	case usr_model.WebAuthNMethodPasswordless:
+		loginAggregate = MFAPasswordlessBeginLoginAggregate(es.AggregateCreator(), repoUser, repoWebAuthNLogin)
+	}
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, loginAggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	return webAuthNLogin, nil
 }
 
 func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID, webAuthNTokenID string, credentialData []byte, authRequest *req_model.AuthRequest) error {
@@ -1551,7 +1562,7 @@ func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID, webAuthNToke
 	if user.Human == nil {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-BHeq1", "Errors.User.NotHuman")
 	}
-	_, u2f := user.GetU2F(webAuthNTokenID)
+	_, u2f := user.GetU2FLogin(authRequest.ID)
 	err = es.webauthn.FinishLogin(user, u2f, credentialData, user.U2FTokens...)
 
 	repoUser := model.UserFromModel(user)
@@ -1575,7 +1586,7 @@ func (es *UserEventstore) VerifyPasswordless(ctx context.Context, userID, webAut
 	if user.Human == nil {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-BHeq1", "Errors.User.NotHuman")
 	}
-	_, passwordless := user.GetPasswordless(webAuthNTokenID)
+	_, passwordless := user.GetPasswordlessLogin(authRequest.ID)
 	err = es.webauthn.FinishLogin(user, passwordless, credentialData, user.PasswordlessTokens...)
 
 	repoUser := model.UserFromModel(user)

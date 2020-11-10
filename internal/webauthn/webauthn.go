@@ -112,25 +112,34 @@ func (w *WebAuthN) FinishRegistration(user *usr_model.User, webAuthN *usr_model.
 	return webAuthN, nil
 }
 
-func (w *WebAuthN) BeginLogin(user *usr_model.User, userVerification usr_model.UserVerificationRequirement, webAuthNs ...*usr_model.WebAuthNToken) (*protocol.CredentialAssertion, *webauthn.SessionData, error) {
+func (w *WebAuthN) BeginLogin(user *usr_model.User, userVerification usr_model.UserVerificationRequirement, webAuthNs ...*usr_model.WebAuthNToken) (*usr_model.WebAuthNLogin, error) {
 	assertion, sessionData, err := w.web.BeginLogin(&webUser{
 		User:        user,
 		credentials: WebAuthNsToCredentials(webAuthNs),
 	}) //webauthn.WithUserVerification(userVerification),
 
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return assertion, sessionData, nil
+	cred, err := json.Marshal(assertion)
+	if err != nil {
+		return nil, err
+	}
+	return &usr_model.WebAuthNLogin{
+		Challenge:               sessionData.Challenge,
+		CredentialAssertionData: cred,
+		AllowedCredentialIDs:    sessionData.AllowedCredentialIDs,
+		UserVerification:        UserVerificationToModel(sessionData.UserVerification),
+	}, nil
 }
 
-func (w *WebAuthN) FinishLogin(user *usr_model.User, webAuthN *usr_model.WebAuthNToken, credData []byte, webAuthNs ...*usr_model.WebAuthNToken) error {
+func (w *WebAuthN) FinishLogin(user *usr_model.User, webAuthN *usr_model.WebAuthNLogin, credData []byte, webAuthNs ...*usr_model.WebAuthNToken) error {
 	assertionData, err := protocol.ParseCredentialRequestResponseBody(bytes.NewReader(credData))
 	webUser := &webUser{
 		User:        user,
 		credentials: WebAuthNsToCredentials(webAuthNs),
 	}
-	credential, err := w.web.ValidateLogin(webUser, WebAuthNToSessionData(webAuthN), assertionData)
+	credential, err := w.web.ValidateLogin(webUser, WebAuthNLoginToSessionData(webAuthN), assertionData)
 	if err != nil {
 		return err
 	}
