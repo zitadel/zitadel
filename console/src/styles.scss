@@ -167,7 +167,7 @@ $custom-typography:
   @include component-themes($light-theme);
   @include angular-material-theme($light-theme);
 
-  --table-row-back: #eceef1;
+  --table-row-back: #292a2b;
 
   .sidenav,
   .main-container,
@@ -200,7 +200,7 @@ $custom-typography:
   @include component-themes($dark-theme);
   @include angular-material-theme($dark-theme);
 
-  --table-row-back: #363738;
+  --table-row-back: #292a2b;
 
   .sidenav,
   .main-container,

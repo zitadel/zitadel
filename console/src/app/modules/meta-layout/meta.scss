@@ -27,7 +27,7 @@
             left top,
             left bottom,
             from($primary-color),
-            to($primary-dark),
+            to(rgb(0,0,0,.5)),
             color-stop(
               01,
               $primary-dark
@@ -39,7 +39,7 @@
             left top,
             left bottom,
             from($primary-color),
-            to($primary-dark),
+            to(rgb(0,0,0,.5)),
             color-stop(
               01,
               $primary-dark
