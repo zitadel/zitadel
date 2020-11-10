@@ -61,20 +61,20 @@ $caos-dark-brand: (
 );
 
 $caos-light-brand: (
-  50: #EAEDFA,
-  100: #CCD2F2,
-  200: #AAB4EA,
-  300: #8796E1,
-  400: #6E80DA,
-  500: #5469D4,
-  600: #4D61CF,
-  700: #4356C9,
-  800: #3A4CC3,
-  900: #293BB9,
-  A100: #F9FAFF,
-  A200: #C6CCFF,
-  A300: #939FFF,
-  A400: #7A88FF,
+  50: #eaedfa,
+  100: #ccd2f2,
+  200: #aab4ea,
+  300: #8796e1,
+  400: #6e80da,
+  500: #5469d4,
+  600: #4d61cf,
+  700: #4356c9,
+  800: #3a4cc3,
+  900: #293bb9,
+  A100: #f9faff,
+  A200: #c6ccff,
+  A300: #939fff,
+  A400: #7a88ff,
   A500:#333,
   A600: #000,
   A700: #8795a1,
@@ -169,7 +169,7 @@ $custom-typography:
 
   --grey: #697386;
   --table-row-back: #e7ebf0;
-  --color-main: #5469D4;
+  --color-main: #5469d4;
 
   .sidenav,
   .main-container,
@@ -198,7 +198,7 @@ $custom-typography:
   }
 
   .root-header {
-      box-shadow: inset 0 -1px #e3e8ee;
+    box-shadow: inset 0 -1px #e3e8ee;
   }
 }
 

@@ -69,20 +69,20 @@
     border-top-right-radius: 5px;
 
     span {
-        display: none;
+      display: none;
     }
 
     button {
+      height: 1.2rem;
+      width: 1.2rem;
+      line-height: 1.2rem;
+      margin-right: 1rem;
+
+      * {
         height: 1.2rem;
         width: 1.2rem;
-        line-height: 1.2rem;
-        margin-right: 1rem;
-
-        * {
-            height: 1.2rem;
-            width: 1.2rem;
-            line-height: 1rem;
-        }
+        line-height: 1rem;
+      }
     }
 
     &::before {
@@ -99,12 +99,12 @@
 
     &.expanded,
     &:hover {
-        transform: translateY(0%);
-        right: 0;
+      transform: translateY(0%);
+      right: 0;
 
-        span {
-            display: inline-block;
-        }
+      span {
+        display: inline-block;
+      }
     }
   }
 }

@@ -82,23 +82,23 @@
 }
 
 .short-link {
-    margin-bottom: .5rem;
-    font-size: 15px;
-    text-decoration: none;
-    display: block;
-    position: relative;
+  margin-bottom: .5rem;
+  font-size: 15px;
+  text-decoration: none;
+  display: block;
+  position: relative;
 
+  .las {
+    font-size: 1.5rem !important;
+    height: 1.5rem;
+    visibility: hidden;
+    position: absolute;
+    right: 0;
+  }
+
+  &:hover {
     .las {
-        font-size: 1.5rem !important;
-        height: 1.5rem;
-        visibility: hidden;
-        position: absolute;
-        right: 0;
+      visibility: visible;
     }
-
-    &:hover {
-        .las {
-            visibility: visible;
-        }
-    }
+  }
 }
