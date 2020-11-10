@@ -134,6 +134,8 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
                     newDomainView.setVerified(newDomain.getVerified());
 
                     this.domains.push(newDomainView.toObject());
+
+                    this.verifyDomain(newDomainView.toObject());
                     this.toast.showInfo('ORG.TOAST.DOMAINADDED', true);
                 });
             }
@@ -204,6 +206,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
             data: {
                 domain: domain,
             },
+            width: '500px',
         });
     }
 

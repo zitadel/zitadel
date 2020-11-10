@@ -28,22 +28,25 @@ export class DomainVerificationComponent {
         private mgmtService: ManagementService,
     ) {
         this.domain = data.domain;
-        console.log(data);
         if (this.domain.validationType === OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_UNSPECIFIED) {
             this.showNew = true;
         }
     }
 
     async loadHttpToken(): Promise<void> {
-        this.http = (await this.mgmtService.GenerateMyOrgDomainValidation(
+        this.mgmtService.GenerateMyOrgDomainValidation(
             this.domain.domain,
-            OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_HTTP)).toObject();
+            OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_HTTP).then((http) => {
+                this.http = http.toObject();
+            });
     }
 
     async loadDnsToken(): Promise<void> {
-        this.dns = (await this.mgmtService.GenerateMyOrgDomainValidation(
+        this.mgmtService.GenerateMyOrgDomainValidation(
             this.domain.domain,
-            OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_DNS)).toObject();
+            OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_DNS).then((dns) => {
+                this.dns = dns.toObject();
+            });
     }
 
     public closeDialog(): void {

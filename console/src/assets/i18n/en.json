@@ -35,7 +35,9 @@
         "LOGOUT": "Logout All Users",
         "NEWORG":"New Organisation",
         "IAMADMIN":"You are an IAM Administrator. Note that you have extended permissions.",
-        "SHOWORGS":"Show All Organisations"
+        "SHOWORGS":"Show All Organisations",
+        "GRANTSECTION":"Authorization Section",
+        "GRANTS":"Authorizations"
     },
     "ACTIONS": {
         "SAVE": "Save",
@@ -67,7 +69,7 @@
     "ERRORS": {
         "REQUIRED": "Some required fields are missing.",
         "TOKENINVALID": {
-            "TITLE":"Your authorisation token has expired.",
+            "TITLE":"Your authorization token has expired.",
             "DESCRIPTION":"Click the button below to log in again."
         }
     },
@@ -870,24 +872,26 @@
     },
     "ROLESLABEL":"Roles",
     "GRANTS": {
-        "DELETE":"Delete Authorisation",
-        "ADD":"Create Authorisation",
+        "TITLE":"Authorizations",
+        "DESC":"Here you can manage authorizations of your organization users.",
+        "DELETE":"Delete Authorization",
+        "ADD":"Create Authorization",
         "ADD_BTN":"New",
         "PROJECT": {
-            "TITLE": "Authorisations",
-            "DESCRIPTION": "Define authorisations for the specified project. Note that you can only see entries of projects and users for which you have the permissions."
+            "TITLE": "Authorization",
+            "DESCRIPTION": "Define authorizations for the specified project. Note that you can only see entries of projects and users for which you have the permissions."
         },
         "USER": {
-            "TITLE": "Authorisations",
-            "DESCRIPTION": "Define authorisations for the specified user. Note that you can only see entries of projects and users for which you have the permissions."
+            "TITLE": "Authorization",
+            "DESCRIPTION": "Define authorizations for the specified user. Note that you can only see entries of projects and users for which you have the permissions."
         },
         "CREATE": {
-            "TITLE": "Create authorisation",
+            "TITLE": "Create authorization",
             "DESCRIPTION": "Search for the orgnanisation, the project, and the corresponding roles."
         },
         "DETAIL": {
-            "TITLE":"Authorisation Detail",
-            "DESCRIPTION":"Here you can see all the details of the authorisation."
+            "TITLE":"Authorization Detail",
+            "DESCRIPTION":"Here you can see all the details of the authorization."
         },
         "TOAST": {
             "UPDATED":"Grant updated.",

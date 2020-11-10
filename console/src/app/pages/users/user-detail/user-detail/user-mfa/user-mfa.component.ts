@@ -2,7 +2,7 @@ import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { MFAState, MfaType, MultiFactor, UserView } from 'src/app/proto/generated/management_pb';
+import { MFAState, MfaType, UserMultiFactor, UserView } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 
@@ -19,13 +19,13 @@ export interface MFAItem {
 export class UserMfaComponent implements OnInit, OnDestroy {
     public displayedColumns: string[] = ['type', 'state'];
     @Input() private user!: UserView.AsObject;
-    public mfaSubject: BehaviorSubject<MultiFactor.AsObject[]> = new BehaviorSubject<MultiFactor.AsObject[]>([]);
+    public mfaSubject: BehaviorSubject<UserMultiFactor.AsObject[]> = new BehaviorSubject<UserMultiFactor.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-    @ViewChild(MatTable) public table!: MatTable<MultiFactor.AsObject>;
+    @ViewChild(MatTable) public table!: MatTable<UserMultiFactor.AsObject>;
     @ViewChild(MatSort) public sort!: MatSort;
-    public dataSource!: MatTableDataSource<MultiFactor.AsObject>;
+    public dataSource!: MatTableDataSource<UserMultiFactor.AsObject>;
 
     public MfaType: any = MfaType;
     public MFAState: any = MFAState;
