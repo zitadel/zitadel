@@ -3,7 +3,7 @@ FROM alpine:latest as prepare
 RUN adduser -D zitadel
 COPY .artifacts/zitadelctl-linux-amd64 /app/zitadelctl
 RUN chmod a+x /app/zitadelctl
-COPY migrations/cockroach/V1* /migrations/cockroach/
+COPY migrations/cockroach/V1* /migrations/
 
 # This Stage is intended as production image
 FROM scratch as final
