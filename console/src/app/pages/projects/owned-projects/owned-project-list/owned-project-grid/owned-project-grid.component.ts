@@ -167,10 +167,3 @@ export class OwnedProjectGridComponent implements OnChanges {
         });
     }
 }
-
-// this.notPinned = this.notPinned.filter(np => this.selection.selected
-//     .findIndex(sel => sel.projectId === np.projectId) === -1);
-// const toRemoveFromSelection = this.selection.selected.filter(sel => this.notPinned
-//     .findIndex(np => np.projectId === sel.projectId) === -1);
-
-// this.selection.deselect(...toRemoveFromSelection);
