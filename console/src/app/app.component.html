@@ -163,13 +163,18 @@
                 </div>
             </mat-drawer>
             <mat-drawer-content class="content">
-                <div @toolbar *ngIf="iamuser$ | async" class="admin-line" matTooltip="IAM Administrator">
-                    <span>{{'MENU.IAMADMIN' | translate}}</span>
-                </div>
                 <div class="router" [@routeAnimations]="prepareRoute(outlet)">
                     <router-outlet #outlet="outlet"></router-outlet>
                 </div>
             </mat-drawer-content>
         </mat-drawer-container>
+        <div @toolbar *ngIf="iamuser$ | async" class="admin-line" [ngClass]="{'expanded': !hideAdminWarn}"
+            matTooltip="IAM Administrator">
+            <button [matTooltip]="!hideAdminWarn ? 'Unpin': 'Pin'" (click)="toggleAdminHide()" mat-icon-button>
+                <mat-icon *ngIf="!hideAdminWarn" svgIcon="mdi_pin"></mat-icon>
+                <mat-icon *ngIf="hideAdminWarn" svgIcon="mdi_pin_outline"></mat-icon>
+            </button>
+            <span>{{'MENU.IAMADMIN' | translate}}</span>
+        </div>
     </ng-container>
 </ng-container>

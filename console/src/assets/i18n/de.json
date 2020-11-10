@@ -11,6 +11,7 @@
         "PROJECTS": "Volle Skalierbarkeit und Anpassungsfähigkeit",
         "PROJECTS_DESC": "Autorisiere andere Benutzer, Deine eigenen Projekte zu verwenden, oder erstelle benutzerdefinierte Rollen für berechtigte Projekte",
         "PROJECTS_BUTTON": "Projektübersicht",
+        "PROJECTS_NEW_LINK":"Neues Project erstellen",
         "USERS": "Erstelle und verwalte Deine Benutzer.",
         "USERS_DESC": "Überwache Dein Rollenkonzept in Echtzeit. Ergreife sofort Massnahmen.",
         "USERS_BUTTON": "Benutzer anzeigen",

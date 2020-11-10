@@ -11,6 +11,7 @@
         "PROJECTS": "Create and Manage Your Applications and Projects",
         "PROJECTS_DESC": "Authorize others to use your projects or define custom roles on eligible projects.",
         "PROJECTS_BUTTON": "Project Overview",
+        "PROJECTS_NEW_LINK":"Create new project",
         "USERS": "Create and Manage Your Users",
         "USERS_DESC": "Monitor your role concept in real time. Take immediate action.",
         "USERS_BUTTON": "Show Users",

@@ -30,11 +30,13 @@
     flex-wrap: wrap;
     margin: -1rem;
     justify-content: space-evenly;
+    align-items: stretch;
 
     .item {
-      flex: 1 1 45%;
+      flex: 1 0 45%;
       margin: 0 1rem;
       display: flex;
+      height: 100%;
       flex-direction: column;
 
       .top {
@@ -79,4 +81,11 @@
     font-size: 14px;
     margin-top: 3rem;
   }
+}
+
+.short-link {
+    margin-bottom: 1rem;
+    font-size: 15px;
+    text-decoration: none;
+    display: block;
 }

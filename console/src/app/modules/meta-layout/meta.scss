@@ -7,7 +7,7 @@
   $primary-dark: mat-color($primary, A800);
   /* stylelint-enable */
 
-  $lighter-color: rgba(mat-color($primary, 300), .5);
+  $lighter-color: rgba(0,0,0,.5);//rgba(mat-color($primary, A900), .5);
 
   .meta-wrapper {
     .meta {

@@ -51,6 +51,10 @@
                         <i class="icon las la-layer-group"></i>
                         {{'HOME.PROJECTS'| translate}}</h2>
                     <p>{{'HOME.PROJECTS_DESC'| translate}}</p>
+                    <ng-template appHasRole [appHasRole]="['project.create']">
+                        <a class="short-link"
+                            [routerLink]="[ '/projects', 'create']">{{'HOME.PROJECTS_NEW_LINK' | translate}}</a>
+                    </ng-template>
                 </div>
                 <span class="fill-space"></span>
                 <div class="footer">

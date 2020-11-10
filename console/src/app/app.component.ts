@@ -23,7 +23,6 @@ import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';
 import { ThemeService } from './services/theme.service';
-import { ToastService } from './services/toast.service';
 import { UpdateService } from './services/update.service';
 
 @Component({
@@ -61,6 +60,7 @@ export class AppComponent implements OnDestroy {
     private authSub: Subscription = new Subscription();
     private orgSub: Subscription = new Subscription();
 
+    public hideAdminWarn: boolean = true;
     constructor(
         public viewPortScroller: ViewportScroller,
         @Inject('windowObject') public window: Window,
@@ -73,7 +73,6 @@ export class AppComponent implements OnDestroy {
         public mgmtService: ManagementService,
         public matIconRegistry: MatIconRegistry,
         public domSanitizer: DomSanitizer,
-        private toast: ToastService,
         private router: Router,
         update: UpdateService,
         @Inject(DOCUMENT) private document: Document,
@@ -176,11 +175,18 @@ export class AppComponent implements OnDestroy {
                 value.trim().toLowerCase(),
             );
         });
+
+        this.hideAdminWarn = !!localStorage.getItem('hideAdministratorWarning') ?? false;
     }
 
     public ngOnDestroy(): void {
         this.authSub.unsubscribe();
         this.orgSub.unsubscribe();
+    }
+
+    public toggleAdminHide(): void {
+        this.hideAdminWarn = !this.hideAdminWarn;
+        localStorage.setItem('hideAdministratorWarning', this.hideAdminWarn.toString());
     }
 
     public loadOrgs(filter?: string): void {
