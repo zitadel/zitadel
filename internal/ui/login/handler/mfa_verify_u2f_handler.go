@@ -8,6 +8,10 @@ import (
 	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
+const (
+	tmplMfaU2FInitVerification = "mfainitu2fverification"
+)
+
 func (l *Login) renderLoginU2F(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
 	var errType, errMessage string
 	if err != nil {

@@ -8,8 +8,7 @@ import (
 )
 
 const (
-	tmplMfaU2FInit             = "mfainitu2f"
-	tmplMfaU2FInitVerification = "mfainitu2fverification"
+	tmplMfaU2FInit = "mfainitu2f"
 )
 
 func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {

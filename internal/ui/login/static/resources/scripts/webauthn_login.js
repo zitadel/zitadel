@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', checkWebauthnSupported('btn-login', login));
 
 function login() {
+    document.getElementById('wa-error').classList.add('hidden');
+
     let makeAssertionOptions = JSON.parse(atob(document.getElementsByName('credentialAssertionData')[0].value));
     console.log("Assertion Options:");
     console.log(makeAssertionOptions);
