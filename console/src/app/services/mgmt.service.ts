@@ -945,7 +945,7 @@ export class ManagementService {
         }
         return this.grpcService.mgmt.searchProjects(req).then(value => {
             const count = value.toObject().resultList.length;
-            if (count) {
+            if (count >= 0) {
                 this.ownedProjectsCount.next(count);
             }
 
