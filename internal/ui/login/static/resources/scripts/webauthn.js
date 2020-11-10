@@ -20,12 +20,11 @@ function webauthnError(error) {
 }
 
 function bufferDecode(value) {
-    return base64js.decode(value);
-    // return Uint8Array.from(atob(value), c => c.charCodeAt(0));
+    return decode(value);
 }
 
 function bufferEncode(value) {
-    return base64js.encode(value)
+    return encode(value)
         .replace(/\+/g, "-")
         .replace(/\//g, "_")
         .replace(/=/g, "");
