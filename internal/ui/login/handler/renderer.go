@@ -102,7 +102,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		"mfaPromptUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMfaPrompt)
 		},
-		"mfaPromptChangeUrl": func(id string, provider model.MfaType) string {
+		"mfaPromptChangeUrl": func(id string, provider model.MFAType) string {
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s;%s=%v", EndpointMfaPrompt, queryAuthRequestID, id, "provider", provider))
 		},
 		"mfaInitVerifyUrl": func() string {
@@ -168,7 +168,7 @@ func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID, userAgentID)
 	if err != nil {
-		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-sio0W", "could not get authreq"))
+		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(err, "APP-sio0W", "could not get authreq"))
 		return
 	}
 	if len(authReq.PossibleSteps) == 0 {
@@ -366,8 +366,8 @@ type userData struct {
 	baseData
 	profileData
 	PasswordChecked     string
-	MfaProviders        []model.MfaType
-	SelectedMfaProvider model.MfaType
+	MfaProviders        []model.MFAType
+	SelectedMfaProvider model.MFAType
 	Linking             bool
 }
 
@@ -396,21 +396,21 @@ type userSelectionData struct {
 type mfaData struct {
 	baseData
 	profileData
-	MfaProviders []model.MfaType
+	MfaProviders []model.MFAType
 	MfaRequired  bool
 }
 
 type mfaVerifyData struct {
 	baseData
 	profileData
-	MfaType model.MfaType
+	MfaType model.MFAType
 	otpData
 }
 
 type mfaDoneData struct {
 	baseData
 	profileData
-	MfaType model.MfaType
+	MfaType model.MFAType
 }
 
 type otpData struct {

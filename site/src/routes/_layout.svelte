@@ -4,9 +4,15 @@
   import Nav from "../components/Nav.svelte";
   import NavItem from "../components/NavItem.svelte";
   import manifest from '../../static/manifest.json';
-
-  export let segment;
+  import PhotoSwipe from '../components/PhotoSwipe.svelte';
   const { page } = stores();
+</script>
+
+<script context="module">
+  import { waitLocale } from 'svelte-i18n';
+  export async function preload(page) {
+    return waitLocale();
+  }
 </script>
 
 <style>
@@ -18,8 +24,9 @@
   }
 </style>
 
-<Nav {segment} title="{manifest.name}" logo="logos/zitadel-logo-light.svg"></Nav>
+<!-- <Nav {segment} title="{manifest.name}" logo="logos/zitadel-logo-light.svg"></Nav> -->
 
 <main>
   <slot />
+  <PhotoSwipe/>
 </main>

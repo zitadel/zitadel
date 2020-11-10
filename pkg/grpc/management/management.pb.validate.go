@@ -4011,10 +4011,10 @@ var _ interface {
 	ErrorName() string
 } = UpdateUserAddressRequestValidationError{}
 
-// Validate checks the field values on MultiFactors with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *MultiFactors) Validate() error {
+// Validate checks the field values on UserMultiFactors with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *UserMultiFactors) Validate() error {
 	if m == nil {
 		return nil
 	}
@@ -4024,7 +4024,7 @@ func (m *MultiFactors) Validate() error {
 
 		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return MultiFactorsValidationError{
+				return UserMultiFactorsValidationError{
 					field:  fmt.Sprintf("Mfas[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -4037,9 +4037,9 @@ func (m *MultiFactors) Validate() error {
 	return nil
 }
 
-// MultiFactorsValidationError is the validation error returned by
-// MultiFactors.Validate if the designated constraints aren't met.
-type MultiFactorsValidationError struct {
+// UserMultiFactorsValidationError is the validation error returned by
+// UserMultiFactors.Validate if the designated constraints aren't met.
+type UserMultiFactorsValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -4047,22 +4047,22 @@ type MultiFactorsValidationError struct {
 }
 
 // Field function returns field value.
-func (e MultiFactorsValidationError) Field() string { return e.field }
+func (e UserMultiFactorsValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e MultiFactorsValidationError) Reason() string { return e.reason }
+func (e UserMultiFactorsValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e MultiFactorsValidationError) Cause() error { return e.cause }
+func (e UserMultiFactorsValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e MultiFactorsValidationError) Key() bool { return e.key }
+func (e UserMultiFactorsValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e MultiFactorsValidationError) ErrorName() string { return "MultiFactorsValidationError" }
+func (e UserMultiFactorsValidationError) ErrorName() string { return "UserMultiFactorsValidationError" }
 
 // Error satisfies the builtin error interface
-func (e MultiFactorsValidationError) Error() string {
+func (e UserMultiFactorsValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -4074,14 +4074,14 @@ func (e MultiFactorsValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sMultiFactors.%s: %s%s",
+		"invalid %sUserMultiFactors.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = MultiFactorsValidationError{}
+var _ error = UserMultiFactorsValidationError{}
 
 var _ interface {
 	Field() string
@@ -4089,12 +4089,12 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = MultiFactorsValidationError{}
+} = UserMultiFactorsValidationError{}
 
-// Validate checks the field values on MultiFactor with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *MultiFactor) Validate() error {
+// Validate checks the field values on UserMultiFactor with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *UserMultiFactor) Validate() error {
 	if m == nil {
 		return nil
 	}
@@ -4106,9 +4106,9 @@ func (m *MultiFactor) Validate() error {
 	return nil
 }
 
-// MultiFactorValidationError is the validation error returned by
-// MultiFactor.Validate if the designated constraints aren't met.
-type MultiFactorValidationError struct {
+// UserMultiFactorValidationError is the validation error returned by
+// UserMultiFactor.Validate if the designated constraints aren't met.
+type UserMultiFactorValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -4116,22 +4116,22 @@ type MultiFactorValidationError struct {
 }
 
 // Field function returns field value.
-func (e MultiFactorValidationError) Field() string { return e.field }
+func (e UserMultiFactorValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e MultiFactorValidationError) Reason() string { return e.reason }
+func (e UserMultiFactorValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e MultiFactorValidationError) Cause() error { return e.cause }
+func (e UserMultiFactorValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e MultiFactorValidationError) Key() bool { return e.key }
+func (e UserMultiFactorValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e MultiFactorValidationError) ErrorName() string { return "MultiFactorValidationError" }
+func (e UserMultiFactorValidationError) ErrorName() string { return "UserMultiFactorValidationError" }
 
 // Error satisfies the builtin error interface
-func (e MultiFactorValidationError) Error() string {
+func (e UserMultiFactorValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -4143,14 +4143,14 @@ func (e MultiFactorValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sMultiFactor.%s: %s%s",
+		"invalid %sUserMultiFactor.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = MultiFactorValidationError{}
+var _ error = UserMultiFactorValidationError{}
 
 var _ interface {
 	Field() string
@@ -4158,7 +4158,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = MultiFactorValidationError{}
+} = UserMultiFactorValidationError{}
 
 // Validate checks the field values on PasswordRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, an
@@ -13383,6 +13383,8 @@ func (m *LoginPolicy) Validate() error {
 		}
 	}
 
+	// no validation rules for ForceMfa
+
 	return nil
 }
 
@@ -13453,6 +13455,8 @@ func (m *LoginPolicyRequest) Validate() error {
 	// no validation rules for AllowRegister
 
 	// no validation rules for AllowExternalIdp
+
+	// no validation rules for ForceMfa
 
 	return nil
 }
@@ -13772,6 +13776,8 @@ func (m *LoginPolicyView) Validate() error {
 			}
 		}
 	}
+
+	// no validation rules for ForceMfa
 
 	return nil
 }
@@ -14412,6 +14418,274 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ExternalIDPRemoveRequestValidationError{}
+
+// Validate checks the field values on SecondFactorsResult with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *SecondFactorsResult) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// SecondFactorsResultValidationError is the validation error returned by
+// SecondFactorsResult.Validate if the designated constraints aren't met.
+type SecondFactorsResultValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SecondFactorsResultValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SecondFactorsResultValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SecondFactorsResultValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SecondFactorsResultValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SecondFactorsResultValidationError) ErrorName() string {
+	return "SecondFactorsResultValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SecondFactorsResultValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSecondFactorsResult.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SecondFactorsResultValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SecondFactorsResultValidationError{}
+
+// Validate checks the field values on SecondFactor with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *SecondFactor) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for SecondFactor
+
+	return nil
+}
+
+// SecondFactorValidationError is the validation error returned by
+// SecondFactor.Validate if the designated constraints aren't met.
+type SecondFactorValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SecondFactorValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SecondFactorValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SecondFactorValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SecondFactorValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SecondFactorValidationError) ErrorName() string { return "SecondFactorValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SecondFactorValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSecondFactor.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SecondFactorValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SecondFactorValidationError{}
+
+// Validate checks the field values on MultiFactorsResult with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MultiFactorsResult) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// MultiFactorsResultValidationError is the validation error returned by
+// MultiFactorsResult.Validate if the designated constraints aren't met.
+type MultiFactorsResultValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MultiFactorsResultValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MultiFactorsResultValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MultiFactorsResultValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MultiFactorsResultValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MultiFactorsResultValidationError) ErrorName() string {
+	return "MultiFactorsResultValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MultiFactorsResultValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMultiFactorsResult.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MultiFactorsResultValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MultiFactorsResultValidationError{}
+
+// Validate checks the field values on MultiFactor with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *MultiFactor) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for MultiFactor
+
+	return nil
+}
+
+// MultiFactorValidationError is the validation error returned by
+// MultiFactor.Validate if the designated constraints aren't met.
+type MultiFactorValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MultiFactorValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MultiFactorValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MultiFactorValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MultiFactorValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MultiFactorValidationError) ErrorName() string { return "MultiFactorValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MultiFactorValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMultiFactor.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MultiFactorValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MultiFactorValidationError{}
 
 // Validate checks the field values on PasswordComplexityPolicy with the rules
 // defined in the proto definition for this message. If any rules are

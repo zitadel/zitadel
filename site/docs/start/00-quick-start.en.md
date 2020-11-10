@@ -12,13 +12,20 @@ You can either use [ZITADEL.ch](https://zitadel.ch) or deploy a dedicated **ZITA
 ### Use ZITADEL.ch
 
 To register your free [organisation](administrate#Organisations), visit this link [register organisation](https://accounts.zitadel.ch/register/org).
-After accepting the TOS and filling out all the required fields you will receive a email with further instructions.
+After accepting the TOS and filling out all the required fields you will receive an email with further instructions.
 
-<img src="img/accounts_org_register.png" alt="Organisation Register" width="1000px" height="auto">
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/accounts_org_register.png" itemprop="contentUrl" data-size="1472x1000">
+            <img src="img/accounts_org_register.png" itemprop="thumbnail" alt="Organisation Overview" />
+        </a>
+        <figcaption itemprop="caption description">Organisation Register</figcaption>
+    </figure>
+</div>
 
 #### Verify your domain name (optional)
 
-When you verify your domain you get the benefit that your [organisations](administrate#Organisations) [users](administrate#Users) can use this domain as **preferred loginname**. You find a more detailed explanation [How ZITADEL handles usernames](administrate#How_ZITADEL_handles_usernames).
+When you verify your domain you get the benefit that your [organisations](administrate#Organisations) [users](administrate#Users) can use this domain as **preferred logonname**. You find a more detailed explanation [How ZITADEL handles usernames](administrate#How_ZITADEL_handles_usernames).
 
 The verification process is documented [here](administrate#Verify_a_domain_name)
 

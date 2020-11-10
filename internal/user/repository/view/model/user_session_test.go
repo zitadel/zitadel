@@ -78,7 +78,7 @@ func TestAppendEvent(t *testing.T) {
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.MFAOTPCheckSucceeded},
 				userView: &UserSessionView{},
 			},
-			result: &UserSessionView{ChangeDate: now(), MfaSoftwareVerification: now()},
+			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: now()},
 		},
 		{
 			name: "append human otp check succeeded event",
@@ -86,55 +86,55 @@ func TestAppendEvent(t *testing.T) {
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.HumanMFAOTPCheckSucceeded},
 				userView: &UserSessionView{},
 			},
-			result: &UserSessionView{ChangeDate: now(), MfaSoftwareVerification: now()},
+			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: now()},
 		},
 		{
 			name: "append user otp check failed event",
 			args: args{
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.MFAOTPCheckFailed},
-				userView: &UserSessionView{MfaSoftwareVerification: now()},
+				userView: &UserSessionView{SecondFactorVerification: now()},
 			},
-			result: &UserSessionView{ChangeDate: now(), MfaSoftwareVerification: time.Time{}},
+			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: time.Time{}},
 		},
 		{
 			name: "append human otp check failed event",
 			args: args{
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.HumanMFAOTPCheckFailed},
-				userView: &UserSessionView{MfaSoftwareVerification: now()},
+				userView: &UserSessionView{SecondFactorVerification: now()},
 			},
-			result: &UserSessionView{ChangeDate: now(), MfaSoftwareVerification: time.Time{}},
+			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: time.Time{}},
 		},
 		{
 			name: "append user otp removed event",
 			args: args{
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.MFAOTPRemoved},
-				userView: &UserSessionView{MfaSoftwareVerification: now()},
+				userView: &UserSessionView{SecondFactorVerification: now()},
 			},
-			result: &UserSessionView{ChangeDate: now(), MfaSoftwareVerification: time.Time{}},
+			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: time.Time{}},
 		},
 		{
 			name: "append human otp removed event",
 			args: args{
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.HumanMFAOTPRemoved},
-				userView: &UserSessionView{MfaSoftwareVerification: now()},
+				userView: &UserSessionView{SecondFactorVerification: now()},
 			},
-			result: &UserSessionView{ChangeDate: now(), MfaSoftwareVerification: time.Time{}},
+			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: time.Time{}},
 		},
 		{
 			name: "append user signed out event",
 			args: args{
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.SignedOut},
-				userView: &UserSessionView{PasswordVerification: now(), MfaSoftwareVerification: now()},
+				userView: &UserSessionView{PasswordVerification: now(), SecondFactorVerification: now()},
 			},
-			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}, MfaSoftwareVerification: time.Time{}, State: 1},
+			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}, SecondFactorVerification: time.Time{}, State: 1},
 		},
 		{
 			name: "append human signed out event",
 			args: args{
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.HumanSignedOut},
-				userView: &UserSessionView{PasswordVerification: now(), MfaSoftwareVerification: now()},
+				userView: &UserSessionView{PasswordVerification: now(), SecondFactorVerification: now()},
 			},
-			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}, MfaSoftwareVerification: time.Time{}, State: 1},
+			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}, SecondFactorVerification: time.Time{}, State: 1},
 		},
 	}
 	for _, tt := range tests {

@@ -138,6 +138,21 @@
                                     <span class="label">{{ 'MENU.MACHINEUSERS' | translate }}</span>
                                 </a>
                             </ng-template>
+
+                            <ng-template appHasRole [appHasRole]="['user.grant.read(:[0-9]*)?']">
+                                <div @navitem class="divider">
+                                    <div class="line"></div>
+                                    <span class="label">
+                                        {{ 'MENU.GRANTSECTION' | translate }}</span>
+                                    <div class="line"></div>
+                                </div>
+
+                                <a @navitem class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/grants']"
+                                    [routerLinkActiveOptions]="{ exact: true }">
+                                    <i class="icon las la-shield-alt"></i>
+                                    <span class="label">{{ 'MENU.GRANTS' | translate }}</span>
+                                </a>
+                            </ng-template>
                         </div>
 
                         <span class="fill-space"></span>
