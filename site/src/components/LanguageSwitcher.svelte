@@ -1,5 +1,4 @@
 <script context="module">
-    import { setCookie } from '../modules/cookie.js';
     import { goto } from '@sapper/app';
     import { docLanguages } from '../modules/language-store.js'
     import {LANGUAGES} from '../../config.js';
@@ -40,7 +39,7 @@
         height: var(--height);
         margin: .5rem 1rem;
         font-size: 12px;
-        color: white;
+        /* color: var(--grey-text); */
         display: flex;
         align-items: center;
         cursor: pointer;
@@ -49,12 +48,12 @@
     }
 
     button.current {
-        color: var(--prime);
+        color: var(--grey-text);
     }
 </style>
 
 <div class="language-switcher">
 	{#each LANGUAGES as lang}
-        <button on:click="{() => reload(lang)}" class="{lang == group ? 'current': ''}">{lang == 'de'? 'Deutsch' : 'English'}</button>
+        <button on:click="{() => reload(lang)}" disabled="{lang == group}" class="{lang == group ? 'current': ''}">{lang == 'de'? 'Deutsch' : 'English'}</button>
 	{/each}
 </div>

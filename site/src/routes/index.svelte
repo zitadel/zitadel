@@ -19,6 +19,10 @@
             locale.set(language);
         }
     }
+
+    locale.subscribe(l => {
+        console.log(l);
+    })
 </script>
 
 <style>
@@ -206,7 +210,8 @@
         <div class="section">
             <div class="left">
                 <blockquote>
-                    <p>{$_('languagealsoavailable')}: 
+                
+                    <p>{$_('languagealsoavailable')}:
                     {#each LANGUAGES as lang}
                         {#if lang != $locale}
                             <a href="/" on:click="{() => reload(lang)}" class="{lang == $locale ? 'current': ''}">{lang == 'de'? 'Deutsch (WIP)' : 'English'}</a>
