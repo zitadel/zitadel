@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { HumanView as AuthHumanView } from 'src/app/proto/generated/auth_pb';
-import { HumanView as MgmtHumanView } from 'src/app/proto/generated/management_pb';
+import { HumanView as AuthHumanView, UserState as AuthUserState } from 'src/app/proto/generated/auth_pb';
+import { HumanView as MgmtHumanView, UserState as MgmtUserState } from 'src/app/proto/generated/management_pb';
 
 import { CodeDialogComponent } from '../auth-user-detail/code-dialog/code-dialog.component';
 
@@ -10,23 +10,22 @@ import { CodeDialogComponent } from '../auth-user-detail/code-dialog/code-dialog
     templateUrl: './contact.component.html',
     styleUrls: ['./contact.component.scss'],
 })
-export class ContactComponent implements OnInit {
+export class ContactComponent {
     @Input() disablePhoneCode: boolean = false;
     @Input() canWrite: boolean = false;
     @Input() human!: AuthHumanView.AsObject | MgmtHumanView.AsObject;
+    @Input() state!: AuthUserState | MgmtUserState;
     @Output() savedPhone: EventEmitter<string> = new EventEmitter();
     @Output() savedEmail: EventEmitter<string> = new EventEmitter();
     @Output() resendEmailVerification: EventEmitter<void> = new EventEmitter();
     @Output() resendPhoneVerification: EventEmitter<void> = new EventEmitter();
     @Output() enteredPhoneCode: EventEmitter<string> = new EventEmitter();
     @Output() deletedPhone: EventEmitter<void> = new EventEmitter();
+    @Input() public userStateEnum: any;
 
     public emailEditState: boolean = false;
     public phoneEditState: boolean = false;
     constructor(private dialog: MatDialog) { }
-
-    ngOnInit(): void {
-    }
 
     savePhone(): void {
         this.phoneEditState = false;

@@ -276,6 +276,7 @@
         "SIGNEDOUT_BTN":"Anmelden",
         "EDITACCOUNT":"Konto bearbeiten",
         "ADDACCOUNT":"Konto hinzufügen",
+        "RESENDEMAILNOTIFICATION":"Benachrichtigungsmail senden",
         "TOAST": {
             "CREATED":"Benutzer erfolgreich erstellt.",
             "SAVED":"Profil gespeichert.",

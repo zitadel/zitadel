@@ -4,7 +4,6 @@
 
         <span>*********</span>
         <div>
-            <ng-content select="[phoneAction]"></ng-content>
             <a [disabled]="!canWrite" [routerLink]="['password']" mat-icon-button>
                 <mat-icon class="icon">chevron_right</mat-icon>
             </a>
@@ -24,12 +23,14 @@
                     <mat-icon class="icon" color="warn" aria-hidden="false" aria-label="not verified icon">
                         highlight_off
                     </mat-icon>
-                    <a *ngIf="canWrite" class="verify" matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
+                    <a *ngIf="canWrite && state != userStateEnum.USERSTATE_INITIAL" class="verify"
+                        matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
                         (click)="emitEmailVerification()">{{'USER.LOGINMETHODS.RESENDCODE' | translate}}</a>
                 </ng-container>
             </div>
 
             <div>
+                <ng-content select="[emailAction]"></ng-content>
                 <button [disabled]="!canWrite" (click)="emailEditState = true" mat-icon-button>
                     <mat-icon class="icon">edit</mat-icon>
                 </button>
@@ -72,6 +73,8 @@
             </div>
 
             <div>
+                <ng-content select="[phoneAction]"></ng-content>
+
                 <button [disabled]="!canWrite" (click)="phoneEditState = true" mat-icon-button>
                     <mat-icon class="icon">edit</mat-icon>
                 </button>

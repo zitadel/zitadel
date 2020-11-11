@@ -276,6 +276,7 @@
         "SIGNEDOUT_BTN":"Sign In",
         "EDITACCOUNT":"Edit Account",
         "ADDACCOUNT":"Log in With Another Account",
+        "RESENDEMAILNOTIFICATION":"Resend Email notification",
         "TOAST": {
             "CREATED":"User created successfully.",
             "SAVED":"Profile saved successfully.",
