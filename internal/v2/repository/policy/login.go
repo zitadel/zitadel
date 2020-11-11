@@ -20,6 +20,14 @@ type LoginPolicyAggregate struct {
 	AllowExternalIDP      bool
 }
 
+type LoginPolicyReadModel struct {
+	eventstore.ReadModel
+
+	AllowUserNamePassword bool
+	AllowRegister         bool
+	AllowExternalIDP      bool
+}
+
 type LoginPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
@@ -58,8 +66,9 @@ func NewLoginPolicyAddedEvent(
 type LoginPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	current *LoginPolicyAggregate
-	changed *LoginPolicyAggregate
+	AllowUserNamePassword bool `json:"allowUsernamePassword,omitempty"`
+	AllowRegister         bool `json:"allowRegister"`
+	AllowExternalIDP      bool `json:"allowExternalIdp"`
 }
 
 func (e *LoginPolicyChangedEvent) CheckPrevious() bool {
@@ -67,18 +76,7 @@ func (e *LoginPolicyChangedEvent) CheckPrevious() bool {
 }
 
 func (e *LoginPolicyChangedEvent) Data() interface{} {
-	changes := map[string]interface{}{}
-	if e.current.AllowExternalIDP != e.changed.AllowExternalIDP {
-		changes["allowUsernamePassword"] = e.changed.AllowExternalIDP
-	}
-	if e.current.AllowRegister != e.changed.AllowRegister {
-		changes["allowRegister"] = e.changed.AllowExternalIDP
-	}
-	if e.current.AllowExternalIDP != e.changed.AllowExternalIDP {
-		changes["allowExternalIdp"] = e.changed.AllowExternalIDP
-	}
-
-	return changes
+	return e
 }
 
 func NewLoginPolicyChangedEvent(
@@ -87,12 +85,24 @@ func NewLoginPolicyChangedEvent(
 	changed *LoginPolicyAggregate,
 ) *LoginPolicyChangedEvent {
 
-	return &LoginPolicyChangedEvent{
+	e := &LoginPolicyChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			LoginPolicyChangedEventType,
 		),
 	}
+
+	if current.AllowUserNamePassword != changed.AllowUserNamePassword {
+		e.AllowUserNamePassword = changed.AllowUserNamePassword
+	}
+	if current.AllowRegister != changed.AllowRegister {
+		e.AllowRegister = changed.AllowRegister
+	}
+	if current.AllowExternalIDP != changed.AllowExternalIDP {
+		e.AllowExternalIDP = changed.AllowExternalIDP
+	}
+
+	return e
 }
 
 type LoginPolicyRemovedEvent struct {

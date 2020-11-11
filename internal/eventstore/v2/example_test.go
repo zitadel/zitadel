@@ -23,43 +23,20 @@ type UserAggregate struct {
 	FirstName string
 }
 
-func (a *UserAggregate) ID() string {
-	return a.Aggregate.ID
-}
-func (a *UserAggregate) Type() eventstore.AggregateType {
-	return "test.user"
-}
-func (a *UserAggregate) Events() []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, len(a.Aggregate.Events))
-	for i, event := range a.Aggregate.Events {
-		events[i] = event
-	}
-
-	return events
-}
-func (a *UserAggregate) ResourceOwner() string {
-	return "caos"
-}
-func (a *UserAggregate) Version() eventstore.Version {
-	return "v1"
-}
-func (a *UserAggregate) PreviousSequence() uint64 {
-	return a.Aggregate.PreviousSequence
-}
-
 func NewUserAggregate(id string) *UserAggregate {
 	return &UserAggregate{
-		Aggregate: *eventstore.NewAggregate(id),
+		Aggregate: *eventstore.NewAggregate(
+			id,
+			"test.user",
+			"caos",
+			"v1",
+			0,
+		),
 	}
-}
-
-func (rm *UserAggregate) AppendEvents(events ...eventstore.EventReader) *UserAggregate {
-	rm.Aggregate.AppendEvents(events...)
-	return rm
 }
 
 func (rm *UserAggregate) Reduce() error {
-	for _, event := range rm.Aggregate.Events {
+	for _, event := range rm.Aggregate.Events() {
 		switch e := event.(type) {
 		case *UserAddedEvent:
 			rm.FirstName = e.FirstName
@@ -67,7 +44,7 @@ func (rm *UserAggregate) Reduce() error {
 			rm.FirstName = e.FirstName
 		}
 	}
-	return rm.Aggregate.Reduce()
+	return nil
 }
 
 // ------------------------------------------------------------
@@ -228,12 +205,13 @@ func (e *UserDeletedEvent) Data() interface{} {
 
 type UsersReadModel struct {
 	eventstore.ReadModel
+
 	Users []*UserReadModel
 }
 
 func NewUsersReadModel() *UsersReadModel {
 	return &UsersReadModel{
-		ReadModel: *eventstore.NewReadModel(""),
+		ReadModel: *eventstore.NewReadModel(),
 		Users:     []*UserReadModel{},
 	}
 }
@@ -284,7 +262,7 @@ func (rm *UsersReadModel) Reduce() error {
 
 func (rm *UsersReadModel) userByID(id string) (idx int, user *UserReadModel) {
 	for idx, user = range rm.Users {
-		if user.ReadModel.ID == id {
+		if user.ID == id {
 			return idx, user
 		}
 	}
@@ -298,6 +276,8 @@ func (rm *UsersReadModel) userByID(id string) (idx int, user *UserReadModel) {
 
 type UserReadModel struct {
 	eventstore.ReadModel
+
+	ID                string
 	FirstName         string
 	pwCheckCount      int
 	lastPasswordCheck time.Time
@@ -305,7 +285,8 @@ type UserReadModel struct {
 
 func NewUserReadModel(id string) *UserReadModel {
 	return &UserReadModel{
-		ReadModel: *eventstore.NewReadModel(id),
+		ReadModel: *eventstore.NewReadModel(),
+		ID:        id,
 	}
 }
 
@@ -342,9 +323,9 @@ func TestUserReadModel(t *testing.T) {
 		RegisterFilterEventMapper(UserDeletedMapper())
 
 	events, err := es.PushAggregates(context.Background(),
-		NewUserAggregate("1").AppendEvents(NewUserAddedEvent("hodor")),
-		NewUserAggregate("2").AppendEvents(NewUserAddedEvent("hodor"), NewUserPasswordCheckedEvent(), NewUserPasswordCheckedEvent(), NewUserFirstNameChangedEvent("ueli")),
-		NewUserAggregate("2").AppendEvents(NewUserDeletedEvent()),
+		NewUserAggregate("1").PushEvents(NewUserAddedEvent("hodor")),
+		NewUserAggregate("2").PushEvents(NewUserAddedEvent("hodor"), NewUserPasswordCheckedEvent(), NewUserPasswordCheckedEvent(), NewUserFirstNameChangedEvent("ueli")),
+		NewUserAggregate("2").PushEvents(NewUserDeletedEvent()),
 	)
 	if err != nil {
 		t.Errorf("unexpected error on push aggregates: %v", err)

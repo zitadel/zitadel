@@ -2,21 +2,21 @@ package eventstore
 
 import "time"
 
-func NewReadModel( /*id string*/ ) *ReadModel {
+func NewReadModel() *ReadModel {
 	return &ReadModel{
-		// ID:     id,
 		Events: []EventReader{},
 	}
 }
 
 //ReadModel is the minimum representation of a View model.
+// It implements a basic reducer
 // it might be saved in a database or in memory
 type ReadModel struct {
-	ProcessedSequence uint64 `json:"-"`
-	// ID                string        `json:"-"`
-	CreationDate time.Time     `json:"-"`
-	ChangeDate   time.Time     `json:"-"`
-	Events       []EventReader `json:"-"`
+	AggregateID       string        `json:"-"`
+	ProcessedSequence uint64        `json:"-"`
+	CreationDate      time.Time     `json:"-"`
+	ChangeDate        time.Time     `json:"-"`
+	Events            []EventReader `json:"-"`
 }
 
 //AppendEvents adds all the events to the read model.
@@ -26,10 +26,15 @@ func (rm *ReadModel) AppendEvents(events ...EventReader) *ReadModel {
 	return rm
 }
 
-//Reduce must be the last step in the reduce function of the extension
+//Reduce is the basic implementaion of reducer
+// If this function is extended the extending function should be the last step
 func (rm *ReadModel) Reduce() error {
 	if len(rm.Events) == 0 {
 		return nil
+	}
+
+	if rm.AggregateID == "" {
+		rm.AggregateID = rm.Events[0].AggregateID()
 	}
 
 	if rm.CreationDate.IsZero() {

@@ -13,6 +13,18 @@ const (
 )
 
 type PasswordComplexityPolicyAggregate struct {
+	eventstore.Aggregate
+
+	MinLength    int
+	HasLowercase bool
+	HasUpperCase bool
+	HasNumber    bool
+	HasSymbol    bool
+}
+
+type PasswordComplexityPolicyReadModel struct {
+	eventstore.ReadModel
+
 	MinLength    int
 	HasLowercase bool
 	HasUpperCase bool
@@ -63,8 +75,11 @@ func NewPasswordComplexityPolicyAddedEvent(
 type PasswordComplexityPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	current *PasswordComplexityPolicyAggregate
-	changed *PasswordComplexityPolicyAggregate
+	MinLength    int  `json:"minLength"`
+	HasLowercase bool `json:"hasLowercase"`
+	HasUpperCase bool `json:"hasUppercase"`
+	HasNumber    bool `json:"hasNumber"`
+	HasSymbol    bool `json:"hasSymbol"`
 }
 
 func (e *PasswordComplexityPolicyChangedEvent) CheckPrevious() bool {
@@ -72,25 +87,7 @@ func (e *PasswordComplexityPolicyChangedEvent) CheckPrevious() bool {
 }
 
 func (e *PasswordComplexityPolicyChangedEvent) Data() interface{} {
-	changes := map[string]interface{}{}
-
-	if e.current.MinLength != e.changed.MinLength {
-		changes["minLength"] = e.changed.MinLength
-	}
-	if e.current.HasLowercase != e.changed.HasLowercase {
-		changes["hasLowercase"] = e.changed.HasLowercase
-	}
-	if e.current.HasUpperCase != e.changed.HasUpperCase {
-		changes["hasUppercase"] = e.changed.HasUpperCase
-	}
-	if e.current.HasNumber != e.changed.HasNumber {
-		changes["hasNumber"] = e.changed.HasNumber
-	}
-	if e.current.HasSymbol != e.changed.HasSymbol {
-		changes["hasSymbol"] = e.changed.HasSymbol
-	}
-
-	return changes
+	return e
 }
 
 func NewPasswordComplexityPolicyChangedEvent(
@@ -99,14 +96,30 @@ func NewPasswordComplexityPolicyChangedEvent(
 	changed *PasswordComplexityPolicyAggregate,
 ) *PasswordComplexityPolicyChangedEvent {
 
-	return &PasswordComplexityPolicyChangedEvent{
+	e := &PasswordComplexityPolicyChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			PasswordComplexityPolicyAddedEventType,
+			PasswordComplexityPolicyChangedEventType,
 		),
-		current: current,
-		changed: changed,
 	}
+
+	if current.MinLength != changed.MinLength {
+		e.MinLength = changed.MinLength
+	}
+	if current.HasLowercase != changed.HasLowercase {
+		e.HasLowercase = changed.HasLowercase
+	}
+	if current.HasUpperCase != changed.HasUpperCase {
+		e.HasUpperCase = changed.HasUpperCase
+	}
+	if current.HasNumber != changed.HasNumber {
+		e.HasNumber = changed.HasNumber
+	}
+	if current.HasSymbol != changed.HasSymbol {
+		e.HasSymbol = changed.HasSymbol
+	}
+
+	return e
 }
 
 type PasswordComplexityPolicyRemovedEvent struct {
@@ -128,7 +141,7 @@ func NewPasswordComplexityPolicyRemovedEvent(
 	return &PasswordComplexityPolicyRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			PasswordComplexityPolicyChangedEventType,
+			PasswordComplexityPolicyRemovedEventType,
 		),
 	}
 }

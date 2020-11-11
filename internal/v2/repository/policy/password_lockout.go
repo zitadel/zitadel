@@ -7,11 +7,20 @@ import (
 )
 
 const (
-	PasswordLockoutPolicyAddedEventType = "policy.password.lockout.added"
+	PasswordLockoutPolicyAddedEventType   = "policy.password.lockout.added"
+	PasswordLockoutPolicyChangedEventType = "policy.password.lockout.changed"
+	PasswordLockoutPolicyRemovedEventType = "policy.password.lockout.removed"
 )
 
-type PasswordLockoutAggregate struct {
+type PasswordLockoutPolicyAggregate struct {
 	eventstore.Aggregate
+
+	MaxAttempts         int
+	ShowLockOutFailures bool
+}
+
+type PasswordLockoutPolicyReadModel struct {
+	eventstore.ReadModel
 
 	MaxAttempts         int
 	ShowLockOutFailures bool
@@ -41,7 +50,7 @@ func NewPasswordLockoutPolicyAddedEvent(
 	return &PasswordLockoutPolicyAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			LabelPolicyAddedEventType,
+			PasswordLockoutPolicyAddedEventType,
 		),
 		MaxAttempts:         maxAttempts,
 		ShowLockOutFailures: showLockOutFailures,
@@ -51,8 +60,8 @@ func NewPasswordLockoutPolicyAddedEvent(
 type PasswordLockoutPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	current *PasswordLockoutAggregate
-	changed *PasswordLockoutAggregate
+	MaxAttempts         int  `json:"maxAttempts,omitempty"`
+	ShowLockOutFailures bool `json:"showLockOutFailures,omitempty"`
 }
 
 func (e *PasswordLockoutPolicyChangedEvent) CheckPrevious() bool {
@@ -60,32 +69,30 @@ func (e *PasswordLockoutPolicyChangedEvent) CheckPrevious() bool {
 }
 
 func (e *PasswordLockoutPolicyChangedEvent) Data() interface{} {
-	changes := map[string]interface{}{}
-
-	if e.current.MaxAttempts != e.changed.MaxAttempts {
-		changes["maxAttempts"] = e.changed.MaxAttempts
-	}
-	if e.current.ShowLockOutFailures != e.changed.ShowLockOutFailures {
-		changes["showLockOutFailures"] = e.changed.ShowLockOutFailures
-	}
-
-	return changes
+	return e
 }
 
 func NewPasswordLockoutPolicyChangedEvent(
 	ctx context.Context,
 	current,
-	changed *PasswordLockoutAggregate,
+	changed *PasswordLockoutPolicyAggregate,
 ) *PasswordLockoutPolicyChangedEvent {
 
-	return &PasswordLockoutPolicyChangedEvent{
+	e := &PasswordLockoutPolicyChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			LabelPolicyAddedEventType,
+			PasswordLockoutPolicyChangedEventType,
 		),
-		current: current,
-		changed: changed,
 	}
+
+	if current.MaxAttempts != changed.MaxAttempts {
+		e.MaxAttempts = changed.MaxAttempts
+	}
+	if current.ShowLockOutFailures != changed.ShowLockOutFailures {
+		e.ShowLockOutFailures = changed.ShowLockOutFailures
+	}
+
+	return e
 }
 
 type PasswordLockoutPolicyRemovedEvent struct {
@@ -107,7 +114,7 @@ func NewPasswordLockoutPolicyRemovedEvent(
 	return &PasswordLockoutPolicyRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			LabelPolicyAddedEventType,
+			PasswordLockoutPolicyRemovedEventType,
 		),
 	}
 }

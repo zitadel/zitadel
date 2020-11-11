@@ -58,7 +58,6 @@ func newTestEvent(description string, data func() interface{}, checkPrevious boo
 		shouldCheckPrevious: checkPrevious,
 		BaseEvent: *NewBaseEventForPush(
 			authz.NewMockContext("resourceOwner", "editorUser"),
-			"editorService",
 			"test.event",
 		),
 	}

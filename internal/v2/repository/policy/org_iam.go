@@ -10,6 +10,18 @@ const (
 	OrgIAMPolicyAddedEventType = "policy.org.iam.added"
 )
 
+type OrgIAMPolicyAggregate struct {
+	eventstore.Aggregate
+
+	UserLoginMustBeDomain bool
+}
+
+type OrgIAMPolicyReadModel struct {
+	eventstore.ReadModel
+
+	UserLoginMustBeDomain bool
+}
+
 type OrgIAMPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 

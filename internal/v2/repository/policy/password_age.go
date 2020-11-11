@@ -19,6 +19,13 @@ type PasswordAgePolicyAggregate struct {
 	MaxAgeDays     int
 }
 
+type PasswordAgePolicyReadModel struct {
+	eventstore.ReadModel
+
+	ExpireWarnDays int
+	MaxAgeDays     int
+}
+
 type PasswordAgePolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
@@ -53,8 +60,8 @@ func NewPasswordAgePolicyAddedEvent(
 type PasswordAgePolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	current *PasswordAgePolicyAggregate
-	changed *PasswordAgePolicyAggregate
+	ExpireWarnDays int `json:"expireWarnDays,omitempty"`
+	MaxAgeDays     int `json:"maxAgeDays,omitempty"`
 }
 
 func (e *PasswordAgePolicyChangedEvent) CheckPrevious() bool {
@@ -62,16 +69,7 @@ func (e *PasswordAgePolicyChangedEvent) CheckPrevious() bool {
 }
 
 func (e *PasswordAgePolicyChangedEvent) Data() interface{} {
-	changes := map[string]interface{}{}
-
-	if e.current.ExpireWarnDays != e.changed.ExpireWarnDays {
-		changes["expireWarnDays"] = e.changed.ExpireWarnDays
-	}
-	if e.current.MaxAgeDays != e.changed.MaxAgeDays {
-		changes["maxAgeDays"] = e.changed.ExpireWarnDays
-	}
-
-	return changes
+	return e
 }
 
 func NewPasswordAgePolicyChangedEvent(
@@ -80,14 +78,21 @@ func NewPasswordAgePolicyChangedEvent(
 	changed *PasswordAgePolicyAggregate,
 ) *PasswordAgePolicyChangedEvent {
 
-	return &PasswordAgePolicyChangedEvent{
+	e := &PasswordAgePolicyChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			PasswordAgePolicyChangedEventType,
 		),
-		current: current,
-		changed: changed,
 	}
+
+	if current.ExpireWarnDays != changed.ExpireWarnDays {
+		e.ExpireWarnDays = changed.ExpireWarnDays
+	}
+	if current.MaxAgeDays != changed.MaxAgeDays {
+		e.MaxAgeDays = changed.ExpireWarnDays
+	}
+
+	return e
 }
 
 type PasswordAgePolicyRemovedEvent struct {
@@ -111,7 +116,7 @@ func NewPasswordAgePolicyRemovedEvent(
 	return &PasswordAgePolicyChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			PasswordAgePolicyChangedEventType,
+			PasswordAgePolicyRemovedEventType,
 		),
 	}
 }

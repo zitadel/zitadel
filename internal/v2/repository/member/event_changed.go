@@ -1,39 +1,37 @@
 package member
 
 import (
-	"context"
-
 	"github.com/caos/zitadel/internal/eventstore/v2"
 )
 
-type MemberChangedEvent struct {
+const (
+	ChangedEventType = "member.changed"
+)
+
+type ChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Roles  []string `json:"roles"`
 	UserID string   `json:"userId"`
 }
 
-func (e *MemberChangedEvent) CheckPrevious() bool {
+func (e *ChangedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *MemberChangedEvent) Data() interface{} {
+func (e *ChangedEvent) Data() interface{} {
 	return e
 }
 
 func NewMemberChangedEvent(
-	ctx context.Context,
-	eventType eventstore.EventType,
+	base *eventstore.BaseEvent,
 	userID string,
 	roles ...string,
-) *MemberChangedEvent {
+) *ChangedEvent {
 
-	return &MemberChangedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			eventType,
-		),
-		Roles:  roles,
-		UserID: userID,
+	return &ChangedEvent{
+		BaseEvent: *base,
+		Roles:     roles,
+		UserID:    userID,
 	}
 }

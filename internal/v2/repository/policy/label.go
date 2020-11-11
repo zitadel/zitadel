@@ -19,6 +19,13 @@ type LabelPolicyAggregate struct {
 	SecondaryColor string
 }
 
+type LabelPolicyReadModel struct {
+	eventstore.ReadModel
+
+	PrimaryColor   string
+	SecondaryColor string
+}
+
 type LabelPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
@@ -53,8 +60,8 @@ func NewLabelPolicyAddedEvent(
 type LabelPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	current *LabelPolicyAggregate
-	changed *LabelPolicyAggregate
+	PrimaryColor   string `json:"primaryColor,omitempty"`
+	SecondaryColor string `json:"secondaryColor,omitempty"`
 }
 
 func (e *LabelPolicyChangedEvent) CheckPrevious() bool {
@@ -62,15 +69,7 @@ func (e *LabelPolicyChangedEvent) CheckPrevious() bool {
 }
 
 func (e *LabelPolicyChangedEvent) Data() interface{} {
-	changes := map[string]interface{}{}
-	if e.current.PrimaryColor != e.changed.PrimaryColor {
-		changes["primaryColor"] = e.changed.PrimaryColor
-	}
-	if e.current.SecondaryColor != e.changed.SecondaryColor {
-		changes["secondaryColor"] = e.changed.SecondaryColor
-	}
-
-	return changes
+	return e
 }
 
 func NewLabelPolicyChangedEvent(
@@ -79,14 +78,20 @@ func NewLabelPolicyChangedEvent(
 	changed *LabelPolicyAggregate,
 ) *LabelPolicyChangedEvent {
 
-	return &LabelPolicyChangedEvent{
+	e := &LabelPolicyChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			LabelPolicyChangedEventType,
 		),
-		current: current,
-		changed: changed,
 	}
+	if current.PrimaryColor != changed.PrimaryColor {
+		e.PrimaryColor = changed.PrimaryColor
+	}
+	if current.SecondaryColor != changed.SecondaryColor {
+		e.SecondaryColor = changed.SecondaryColor
+	}
+
+	return e
 }
 
 type LabelPolicyRemovedEvent struct {
@@ -101,14 +106,11 @@ func (e *LabelPolicyRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewLabelPolicyRemovedEvent(
-	ctx context.Context,
-) *LabelPolicyRemovedEvent {
-
+func NewLabelPolicyRemovedEvent(ctx context.Context) *LabelPolicyRemovedEvent {
 	return &LabelPolicyRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			LabelPolicyChangedEventType,
+			LabelPolicyRemovedEventType,
 		),
 	}
 }
