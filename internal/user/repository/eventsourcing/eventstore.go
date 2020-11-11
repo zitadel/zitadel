@@ -1554,7 +1554,7 @@ func (es *UserEventstore) beginWebAuthNLogin(ctx context.Context, userID string,
 	return webAuthNLogin, nil
 }
 
-func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID, webAuthNTokenID string, credentialData []byte, authRequest *req_model.AuthRequest) error {
+func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID string, credentialData []byte, authRequest *req_model.AuthRequest) error {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err

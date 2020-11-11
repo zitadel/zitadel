@@ -280,7 +280,7 @@ func (repo *AuthRequestRepo) BeginMfaU2FLogin(ctx context.Context, userID, authR
 	return repo.UserEvents.BeginU2FLogin(ctx, userID, request)
 }
 
-func (repo *AuthRequestRepo) VerifyMfaU2F(ctx context.Context, userID, sessionID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) VerifyMfaU2F(ctx context.Context, userID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authRequestID, userAgentID)
@@ -290,7 +290,7 @@ func (repo *AuthRequestRepo) VerifyMfaU2F(ctx context.Context, userID, sessionID
 	if request.UserID != userID {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-5M09s", "Errors.User.NotMatchingUserID")
 	}
-	return repo.UserEvents.VerifyMfaU2F(ctx, userID, sessionID, credentialData, request)
+	return repo.UserEvents.VerifyMfaU2F(ctx, userID, credentialData, request)
 }
 
 func (repo *AuthRequestRepo) BeginPasswordlessLogin(ctx context.Context, userID, authRequestID, userAgentID string) (login *user_model.WebAuthNLogin, err error) {

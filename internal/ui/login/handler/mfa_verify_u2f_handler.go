@@ -45,7 +45,7 @@ func (l *Login) handleLoginU2F(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.VerifyMfaU2F(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, formData.SessionID, authReq.ID, userAgentID, credData, model.BrowserInfoFromRequest(r))
+	err = l.authRepo.VerifyMfaU2F(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.ID, userAgentID, credData, model.BrowserInfoFromRequest(r))
 	if err != nil {
 
 	}

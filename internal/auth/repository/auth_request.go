@@ -23,7 +23,7 @@ type AuthRequestRepository interface {
 
 	VerifyMfaOTP(ctx context.Context, agentID, authRequestID, code, userAgentID string, info *model.BrowserInfo) error
 	BeginMfaU2FLogin(ctx context.Context, userID, authRequestID, userAgentID string) (*user_model.WebAuthNLogin, error)
-	VerifyMfaU2F(ctx context.Context, userID, sessionID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) error
+	VerifyMfaU2F(ctx context.Context, userID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) error
 	BeginPasswordlessLogin(ctx context.Context, userID, authRequestID, userAgentID string) (*user_model.WebAuthNLogin, error)
 	VerifyPasswordless(ctx context.Context, userID, sessionID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) error
 
