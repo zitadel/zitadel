@@ -259,12 +259,6 @@
                             <a class="link" href="integrate#Server_Side_Application">{$_('integratelink_ssr')}</a>
                             <a class="link" href="integrate#Mobile_App_Native_App">{$_('integratelink_nativeapp')}</a>
                         </div>
-                    <!-- {:else if $locale == 'de'}
-                        <div class="sectionlinks">
-                            <a class="link" href="integrate#Single_Page_Application">{$_('integratelink_spa')}</a>
-                            <a class="link" href="integrate#Server_Side_Application">{$_('integratelink_ssr')}</a>
-                            <a class="link" href="integrate#Mobile_App_Native_App">{$_('integratelink_nativeapp')}</a>
-                        </div> -->
                     {/if}
                 </div>
                 <img src="img/develop2.png" alt="Develop" />
