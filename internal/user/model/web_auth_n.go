@@ -47,3 +47,11 @@ const (
 	UserVerificationRequirementPreferred
 	UserVerificationRequirementDiscouraged
 )
+
+type AuthenticatorAttachment int32
+
+const (
+	AuthenticatorAttachmentUnspecified AuthenticatorAttachment = iota
+	AuthenticatorAttachmentPlattform
+	AuthenticatorAttachmentCrossPlattform
+)

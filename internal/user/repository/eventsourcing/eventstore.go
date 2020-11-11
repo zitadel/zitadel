@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/duo-labs/webauthn/protocol"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pquerna/otp/totp"
 
@@ -1431,7 +1430,7 @@ func (es *UserEventstore) addWebAuthN(ctx context.Context, userID string, method
 	case usr_model.WebAuthNMethodPasswordless:
 		tokens = user.PasswordlessTokens
 	}
-	webAuthN, err := es.webauthn.BeginRegistration(user, protocol.Platform, usr_model.UserVerificationRequirementDiscouraged, tokens...)
+	webAuthN, err := es.webauthn.BeginRegistration(user, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementDiscouraged, tokens...)
 	if err != nil {
 		return nil, err
 	}

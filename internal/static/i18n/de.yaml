@@ -61,6 +61,14 @@ Errors:
         NotExisting: U2F existiert nicht
       Passwordless:
         NotExisting: Passwortlos existiert nicht
+    WebAuthN:
+      BeginRegisterFailed: Es ist ein Fehler bei der WebAuthN Registrierung aufgetreten
+      MarshalError: Daten konnten nicht umgewandelt werden
+      ErrorOnParseCredential: Zugangsdaten konnten nicht geparsed werden
+      CreateCredentialFailed: Zugangsdaten konnten nicht gespeichert werden
+      BeginLoginFailed: Es ist ein Fehler beim WebAuthN Login aufgetreten
+      ValidateLoginFailed: Zugangsdaten konnten nicht validiert werden
+      CloneWarning: Authentifizierungsdaten wurden möglicherweise geklont
   Org:
     Invalid: Organisation ist ungültig
     AlreadyDeactivated: Organisation ist bereits deaktiviert

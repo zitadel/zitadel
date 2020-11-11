@@ -67,3 +67,14 @@ func UserVerificationFromModel(verification model.UserVerificationRequirement) p
 		return protocol.VerificationDiscouraged
 	}
 }
+
+func AuthenticatorAttachmentFromModel(authType model.AuthenticatorAttachment) protocol.AuthenticatorAttachment {
+	switch authType {
+	case model.AuthenticatorAttachmentPlattform:
+		return protocol.Platform
+	case model.AuthenticatorAttachmentCrossPlattform:
+		return protocol.CrossPlatform
+	default:
+		return ""
+	}
+}

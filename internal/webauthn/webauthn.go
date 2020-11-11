@@ -3,6 +3,7 @@ package webauthn
 import (
 	"bytes"
 	"encoding/json"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/duo-labs/webauthn/protocol"
 	"github.com/duo-labs/webauthn/webauthn"
 
@@ -53,7 +54,7 @@ func (u *webUser) WebAuthnCredentials() []webauthn.Credential {
 	return u.credentials
 }
 
-func (w *WebAuthN) BeginRegistration(user *usr_model.User, authType protocol.AuthenticatorAttachment, userVerification usr_model.UserVerificationRequirement, webAuthNs ...*usr_model.WebAuthNToken) (*usr_model.WebAuthNToken, error) {
+func (w *WebAuthN) BeginRegistration(user *usr_model.User, authType usr_model.AuthenticatorAttachment, userVerification usr_model.UserVerificationRequirement, webAuthNs ...*usr_model.WebAuthNToken) (*usr_model.WebAuthNToken, error) {
 	//residentKeyRequirement := false
 	creds := WebAuthNsToCredentials(webAuthNs)
 	existing := make([]protocol.CredentialDescriptor, len(creds))
@@ -63,23 +64,25 @@ func (w *WebAuthN) BeginRegistration(user *usr_model.User, authType protocol.Aut
 			CredentialID: cred.ID,
 		}
 	}
-	credentialOptions, sessionData, err := w.web.BeginRegistration(&webUser{
-		User:        user,
-		credentials: creds,
-	},
+	credentialOptions, sessionData, err := w.web.BeginRegistration(
+		&webUser{
+			User:        user,
+			credentials: creds,
+		},
 		webauthn.WithAuthenticatorSelection(protocol.AuthenticatorSelection{
 			//RequireResidentKey: &residentKeyRequirement,
-			UserVerification: UserVerificationFromModel(userVerification),
+			UserVerification:        UserVerificationFromModel(userVerification),
+			AuthenticatorAttachment: AuthenticatorAttachmentFromModel(authType),
 		}),
 		webauthn.WithConveyancePreference(protocol.PreferNoAttestation),
 		webauthn.WithExclusions(existing),
 	)
 	if err != nil {
-		return nil, err
+		return nil, caos_errs.ThrowInternal(err, "WEBAU-bM8sd", "Errors.Users.WebAuthN.BeginRegisterFailed")
 	}
 	cred, err := json.Marshal(credentialOptions)
 	if err != nil {
-		return nil, err
+		return nil, caos_errs.ThrowInternal(err, "WEBAU-D7cus", "Errors.Users.WebAuthN.MarshalError")
 	}
 	return &usr_model.WebAuthNToken{
 		Challenge:              sessionData.Challenge,
@@ -92,7 +95,7 @@ func (w *WebAuthN) BeginRegistration(user *usr_model.User, authType protocol.Aut
 func (w *WebAuthN) FinishRegistration(user *usr_model.User, webAuthN *usr_model.WebAuthNToken, credData []byte) (*usr_model.WebAuthNToken, error) {
 	credentialData, err := protocol.ParseCredentialCreationResponseBody(bytes.NewReader(credData))
 	if err != nil {
-		return nil, err
+		return nil, caos_errs.ThrowInternal(err, "WEBAU-sEr8c", "Errors.Users.WebAuthN.ErrorOnParseCredential")
 	}
 	sessionData := WebAuthNToSessionData(webAuthN)
 	credential, err := w.web.CreateCredential(
@@ -101,7 +104,7 @@ func (w *WebAuthN) FinishRegistration(user *usr_model.User, webAuthN *usr_model.
 		},
 		sessionData, credentialData)
 	if err != nil {
-		return nil, err
+		return nil, caos_errs.ThrowInternal(err, "WEBAU-3Vb9s", "Errors.Users.WebAuthN.CreateCredentialFailed")
 	}
 
 	webAuthN.KeyID = credential.ID
@@ -119,11 +122,11 @@ func (w *WebAuthN) BeginLogin(user *usr_model.User, userVerification usr_model.U
 	}) //webauthn.WithUserVerification(userVerification),
 
 	if err != nil {
-		return nil, err
+		return nil, caos_errs.ThrowInternal(err, "WEBAU-4G8sw", "Errors.Users.WebAuthN.BeginLoginFailed")
 	}
 	cred, err := json.Marshal(assertion)
 	if err != nil {
-		return nil, err
+		return nil, caos_errs.ThrowInternal(err, "WEBAU-2M0s9", "Errors.Users.WebAuthN.MarshalError")
 	}
 	return &usr_model.WebAuthNLogin{
 		Challenge:               sessionData.Challenge,
@@ -141,11 +144,11 @@ func (w *WebAuthN) FinishLogin(user *usr_model.User, webAuthN *usr_model.WebAuth
 	}
 	credential, err := w.web.ValidateLogin(webUser, WebAuthNLoginToSessionData(webAuthN), assertionData)
 	if err != nil {
-		return err
+		return caos_errs.ThrowInternal(err, "WEBAU-3M9si", "Errors.Users.WebAuthN.ValidateLoginFailed")
 	}
 
 	if credential.Authenticator.CloneWarning {
-		return nil //ErrCredentialCloned
+		return caos_errs.ThrowInternal(err, "WEBAU-4M90s", "Errors.Users.WebAuthN.CloneWarning")
 	}
 	for _, cred := range webUser.WebAuthnCredentials() {
 		if bytes.Equal(cred.ID, credential.ID) {
