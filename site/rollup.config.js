@@ -1,8 +1,8 @@
+import babel from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
-import babel from 'rollup-plugin-babel';
-import replace from 'rollup-plugin-replace';
+import replace from '@rollup/plugin-replace';
 import svelte from 'rollup-plugin-svelte';
 import { terser } from 'rollup-plugin-terser';
 import config from 'sapper/config/rollup.js';
