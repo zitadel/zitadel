@@ -116,6 +116,20 @@ func (es *UserEventstore) UserByID(ctx context.Context, id string) (*usr_model.U
 	return model.UserToModel(user), nil
 }
 
+func (es *UserEventstore) HumanByID(ctx context.Context, userID string) (*usr_model.User, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-3M9sf", "Errors.User.UserIDMissing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if user.Human == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-jLHYG", "Errors.User.NotHuman")
+	}
+	return user, nil
+}
+
 func (es *UserEventstore) UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error) {
 	query, err := UserByIDQuery(id, sequence)
 	if err != nil {
@@ -411,17 +425,10 @@ func ChangesQuery(userID string, latestSequence, limit uint64, sortAscending boo
 }
 
 func (es *UserEventstore) InitializeUserCodeByID(ctx context.Context, userID string) (*usr_model.InitUserCode, error) {
-	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-d8diw", "Errors.User.UserIDMissing")
-	}
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	if user.Human == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-mDPtj", "Errors.User.NotHuman")
-	}
-
 	if user.InitCode != nil {
 		return user.InitCode, nil
 	}
@@ -429,15 +436,9 @@ func (es *UserEventstore) InitializeUserCodeByID(ctx context.Context, userID str
 }
 
 func (es *UserEventstore) CreateInitializeUserCodeByID(ctx context.Context, userID string) (*usr_model.InitUserCode, error) {
-	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dic8s", "Errors.User.UserIDMissing")
-	}
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
-	}
-	if user.Human == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9bbXj", "Errors.User.NotHuman")
 	}
 
 	initCode := new(usr_model.InitUserCode)
@@ -459,15 +460,9 @@ func (es *UserEventstore) CreateInitializeUserCodeByID(ctx context.Context, user
 }
 
 func (es *UserEventstore) InitCodeSent(ctx context.Context, userID string) error {
-	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-0posw", "Errors.User.UserIDMissing")
-	}
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
-	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-SvPa6", "Errors.User.NotHuman")
 	}
 
 	repoUser := model.UserFromModel(user)
@@ -481,23 +476,17 @@ func (es *UserEventstore) InitCodeSent(ctx context.Context, userID string) error
 }
 
 func (es *UserEventstore) VerifyInitCode(ctx context.Context, policy *iam_model.PasswordComplexityPolicyView, userID, verificationCode, password string) error {
-	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9fd", "Errors.User.UserIDMissing")
+	user, err := es.HumanByID(ctx, userID)
+	if err != nil {
+		return err
 	}
 	if verificationCode == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9fd", "Errors.User.Code.Empty")
 	}
 	pw := &usr_model.Password{SecretString: password}
-	err := pw.HashPasswordIfExisting(policy, es.PasswordAlg, false)
+	err = pw.HashPasswordIfExisting(policy, es.PasswordAlg, false)
 	if err != nil {
 		return err
-	}
-	user, err := es.UserByID(ctx, userID)
-	if err != nil {
-		return err
-	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-b3xda", "Errors.User.NotHuman")
 	}
 	if user.InitCode == nil {
 		return caos_errs.ThrowNotFound(nil, "EVENT-spo9W", "Errors.User.Code.NotFound")
@@ -522,15 +511,9 @@ func (es *UserEventstore) VerifyInitCode(ctx context.Context, policy *iam_model.
 }
 
 func (es *UserEventstore) SkipMfaInit(ctx context.Context, userID string) error {
-	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-dic8s", "Errors.User.UserIDMissing")
-	}
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
-	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-S1tdl", "Errors.User.NotHuman")
 	}
 
 	repoUser := model.UserFromModel(user)
@@ -544,15 +527,9 @@ func (es *UserEventstore) SkipMfaInit(ctx context.Context, userID string) error 
 }
 
 func (es *UserEventstore) UserPasswordByID(ctx context.Context, userID string) (*usr_model.Password, error) {
-	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di834", "Errors.User.UserIDMissing")
-	}
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
-	}
-	if user.Human == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-jLHYG", "Errors.User.NotHuman")
 	}
 
 	if user.Password != nil {
@@ -564,12 +541,9 @@ func (es *UserEventstore) UserPasswordByID(ctx context.Context, userID string) (
 func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password string, authRequest *req_model.AuthRequest) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
-	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-HxcAx", "Errors.User.NotHuman")
 	}
 	if user.Password == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-s35Fa", "Errors.User.Password.Empty")
@@ -601,23 +575,17 @@ func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_
 }
 
 func (es *UserEventstore) SetOneTimePassword(ctx context.Context, policy *iam_model.PasswordComplexityPolicyView, password *usr_model.Password) (*usr_model.Password, error) {
-	user, err := es.UserByID(ctx, password.AggregateID)
+	user, err := es.HumanByID(ctx, password.AggregateID)
 	if err != nil {
 		return nil, err
-	}
-	if user.Human == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-PjDfJ", "Errors.User.NotHuman")
 	}
 	return es.changedPassword(ctx, user, policy, password.SecretString, true)
 }
 
 func (es *UserEventstore) SetPassword(ctx context.Context, policy *iam_model.PasswordComplexityPolicyView, userID, code, password string) error {
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
-	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-pHkAQ", "Errors.User.NotHuman")
 	}
 	if user.PasswordCode == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-65sdr", "Errors.User.Code.NotFound")
@@ -630,12 +598,9 @@ func (es *UserEventstore) SetPassword(ctx context.Context, policy *iam_model.Pas
 }
 
 func (es *UserEventstore) ExternalLoginChecked(ctx context.Context, userID string, authRequest *req_model.AuthRequest) error {
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
-	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-Gns8i", "Errors.User.NotHuman")
 	}
 	repoUser := model.UserFromModel(user)
 	repoAuthRequest := model.AuthRequestFromModel(authRequest)
@@ -694,12 +659,10 @@ func (es *UserEventstore) ChangeMachine(ctx context.Context, machine *usr_model.
 func (es *UserEventstore) ChangePassword(ctx context.Context, policy *iam_model.PasswordComplexityPolicyView, userID, old, new string) (_ *usr_model.Password, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	user, err := es.UserByID(ctx, userID)
+
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
-	}
-	if user.Human == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9AuLE", "Errors.User.NotHuman")
 	}
 	if user.Password == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Fds3s", "Errors.User.Password.Empty")
@@ -734,15 +697,9 @@ func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.U
 }
 
 func (es *UserEventstore) RequestSetPassword(ctx context.Context, userID string, notifyType usr_model.NotificationType) error {
-	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-dic8s", "Errors.User.UserIDMissing")
-	}
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
-	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-33ywz", "Errors.User.NotHuman")
 	}
 
 	passwordCode := new(model.PasswordCode)
@@ -762,15 +719,9 @@ func (es *UserEventstore) RequestSetPassword(ctx context.Context, userID string,
 }
 
 func (es *UserEventstore) PasswordCodeSent(ctx context.Context, userID string) error {
-	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-s09ow", "Errors.User.UserIDMissing")
-	}
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
-	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-tbVAo", "Errors.User.NotHuman")
 	}
 
 	repoUser := model.UserFromModel(user)
@@ -787,12 +738,9 @@ func (es *UserEventstore) AddExternalIDP(ctx context.Context, externalIDP *usr_m
 	if externalIDP == nil || !externalIDP.IsValid() {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Ek9s", "Errors.User.ExternalIDP.Invalid")
 	}
-	existingUser, err := es.UserByID(ctx, externalIDP.AggregateID)
+	existingUser, err := es.HumanByID(ctx, externalIDP.AggregateID)
 	if err != nil {
 		return nil, err
-	}
-	if existingUser.Human == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Cnk8s", "Errors.User.NotHuman")
 	}
 	repoUser := model.UserFromModel(existingUser)
 	repoExternalIDP := model.ExternalIDPFromModel(externalIDP)
@@ -821,12 +769,9 @@ func (es *UserEventstore) BulkAddExternalIDPs(ctx context.Context, userID string
 			return caos_errs.ThrowPreconditionFailed(nil, "EVENT-idue3", "Errors.User.ExternalIDP.Invalid")
 		}
 	}
-	existingUser, err := es.UserByID(ctx, userID)
+	existingUser, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
-	}
-	if existingUser.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-Cnk8s", "Errors.User.NotHuman")
 	}
 	repoUser := model.UserFromModel(existingUser)
 	repoExternalIDPs := model.ExternalIDPsFromModel(externalIDPs)
@@ -847,12 +792,9 @@ func (es *UserEventstore) PrepareRemoveExternalIDP(ctx context.Context, external
 	if externalIDP == nil || !externalIDP.IsValid() {
 		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-Cm8sj", "Errors.User.ExternalIDP.Invalid")
 	}
-	existingUser, err := es.UserByID(ctx, externalIDP.AggregateID)
+	existingUser, err := es.HumanByID(ctx, externalIDP.AggregateID)
 	if err != nil {
 		return nil, nil, err
-	}
-	if existingUser.Human == nil {
-		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-E8iod", "Errors.User.NotHuman")
 	}
 	_, existingIDP := existingUser.GetExternalIDP(externalIDP)
 	if existingIDP == nil {
@@ -881,15 +823,9 @@ func (es *UserEventstore) RemoveExternalIDP(ctx context.Context, externalIDP *us
 }
 
 func (es *UserEventstore) ProfileByID(ctx context.Context, userID string) (*usr_model.Profile, error) {
-	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di834", "Errors.User.UserIDMissing")
-	}
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
-	}
-	if user.Human == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-BaE4M", "Errors.User.NotHuman")
 	}
 
 	if user.Profile != nil {
@@ -903,12 +839,9 @@ func (es *UserEventstore) ChangeProfile(ctx context.Context, profile *usr_model.
 	if !profile.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-d82i3", "Errors.User.ProfileInvalid")
 	}
-	user, err := es.UserByID(ctx, profile.AggregateID)
+	user, err := es.HumanByID(ctx, profile.AggregateID)
 	if err != nil {
 		return nil, err
-	}
-	if user.Human == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Xhw8Y", "Errors.User.NotHuman")
 	}
 
 	repoUser := model.UserFromModel(user)
@@ -925,15 +858,9 @@ func (es *UserEventstore) ChangeProfile(ctx context.Context, profile *usr_model.
 }
 
 func (es *UserEventstore) EmailByID(ctx context.Context, userID string) (*usr_model.Email, error) {
-	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di834", "Errors.User.UserIDMissing")
-	}
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
-	}
-	if user.Human == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-zHtOg", "Errors.User.NotHuman")
 	}
 
 	if user.Email != nil {
@@ -946,12 +873,9 @@ func (es *UserEventstore) ChangeEmail(ctx context.Context, email *usr_model.Emai
 	if !email.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lco09", "Errors.User.EmailInvalid")
 	}
-	user, err := es.UserByID(ctx, email.AggregateID)
+	user, err := es.HumanByID(ctx, email.AggregateID)
 	if err != nil {
 		return nil, err
-	}
-	if user.Human == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-tgBdL", "Errors.User.NotHuman")
 	}
 
 	emailCode, err := email.GenerateEmailCodeIfNeeded(es.EmailVerificationCode)
@@ -977,18 +901,12 @@ func (es *UserEventstore) ChangeEmail(ctx context.Context, email *usr_model.Emai
 }
 
 func (es *UserEventstore) VerifyEmail(ctx context.Context, userID, verificationCode string) error {
-	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9fd", "Errors.User.UserIDMissing")
-	}
-	if verificationCode == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-skDws", "Errors.User.Code.Empty")
-	}
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
 	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-YgXu6", "Errors.User.NotHuman")
+	if verificationCode == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-skDws", "Errors.User.Code.Empty")
 	}
 	if user.EmailCode == nil {
 		return caos_errs.ThrowNotFound(nil, "EVENT-lso9w", "Errors.User.Code.NotFound")
@@ -1015,15 +933,9 @@ func (es *UserEventstore) setEmailVerifyResult(ctx context.Context, user *usr_mo
 }
 
 func (es *UserEventstore) CreateEmailVerificationCode(ctx context.Context, userID string) error {
-	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lco09", "Errors.User.UserIDMissing")
-	}
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
-	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-hqUZP", "Errors.User.NotHuman")
 	}
 	if user.Email == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-pdo9s", "Errors.User.EmailNotFound")
@@ -1051,15 +963,9 @@ func (es *UserEventstore) CreateEmailVerificationCode(ctx context.Context, userI
 }
 
 func (es *UserEventstore) EmailVerificationCodeSent(ctx context.Context, userID string) error {
-	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-spo0w", "Errors.User.UserIDMissing")
-	}
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
-	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-BcFVd", "Errors.User.NotHuman")
 	}
 
 	repoUser := model.UserFromModel(user)
@@ -1073,15 +979,9 @@ func (es *UserEventstore) EmailVerificationCodeSent(ctx context.Context, userID 
 }
 
 func (es *UserEventstore) PhoneByID(ctx context.Context, userID string) (*usr_model.Phone, error) {
-	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9se", "Errors.User.UserIDMissing")
-	}
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
-	}
-	if user.Human == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-LwQeA", "Errors.User.NotHuman")
 	}
 
 	if user.Phone != nil {
@@ -1094,12 +994,9 @@ func (es *UserEventstore) ChangePhone(ctx context.Context, phone *usr_model.Phon
 	if !phone.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9s4", "Errors.User.PhoneInvalid")
 	}
-	user, err := es.UserByID(ctx, phone.AggregateID)
+	user, err := es.HumanByID(ctx, phone.AggregateID)
 	if err != nil {
 		return nil, err
-	}
-	if user.Human == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-oREkn", "Errors.User.NotHuman")
 	}
 
 	phoneCode, err := phone.GeneratePhoneCodeIfNeeded(es.PhoneVerificationCode)
@@ -1125,12 +1022,9 @@ func (es *UserEventstore) VerifyPhone(ctx context.Context, userID, verificationC
 	if userID == "" || verificationCode == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-dsi8s", "Errors.User.UserIDMissing")
 	}
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
-	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-UspdK", "Errors.User.NotHuman")
 	}
 	if user.PhoneCode == nil {
 		return caos_errs.ThrowNotFound(nil, "EVENT-slp0s", "Errors.User.Code.NotFound")
@@ -1157,15 +1051,9 @@ func (es *UserEventstore) setPhoneVerifyResult(ctx context.Context, user *usr_mo
 }
 
 func (es *UserEventstore) CreatePhoneVerificationCode(ctx context.Context, userID string) error {
-	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9sw", "Errors.User.UserIDMissing")
-	}
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
-	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-eEi05", "Errors.User.NotHuman")
 	}
 	if user.Phone == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp9fs", "Errors.User.PhoneNotFound")
@@ -1193,15 +1081,9 @@ func (es *UserEventstore) CreatePhoneVerificationCode(ctx context.Context, userI
 }
 
 func (es *UserEventstore) PhoneVerificationCodeSent(ctx context.Context, userID string) error {
-	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp0wa", "Errors.User.UserIDMissing")
-	}
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
-	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-5bhOP", "Errors.User.NotHuman")
 	}
 
 	repoUser := model.UserFromModel(user)
@@ -1215,12 +1097,9 @@ func (es *UserEventstore) PhoneVerificationCodeSent(ctx context.Context, userID 
 }
 
 func (es *UserEventstore) RemovePhone(ctx context.Context, userID string) error {
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
-	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-Satfl", "Errors.User.NotHuman")
 	}
 	repoUser := model.UserFromModel(user)
 	removeAggregate := PhoneRemovedAggregate(es.AggregateCreator(), repoUser)
@@ -1234,15 +1113,9 @@ func (es *UserEventstore) RemovePhone(ctx context.Context, userID string) error 
 }
 
 func (es *UserEventstore) AddressByID(ctx context.Context, userID string) (*usr_model.Address, error) {
-	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di8ws", "Errors.User.UserIDMissing")
-	}
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
-	}
-	if user.Human == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-pHrLu", "Errors.User.NotHuman")
 	}
 
 	if user.Address != nil {
@@ -1252,12 +1125,9 @@ func (es *UserEventstore) AddressByID(ctx context.Context, userID string) (*usr_
 }
 
 func (es *UserEventstore) ChangeAddress(ctx context.Context, address *usr_model.Address) (*usr_model.Address, error) {
-	user, err := es.UserByID(ctx, address.AggregateID)
+	user, err := es.HumanByID(ctx, address.AggregateID)
 	if err != nil {
 		return nil, err
-	}
-	if user.Human == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-crpHD", "Errors.User.NotHuman")
 	}
 	repoUser := model.UserFromModel(user)
 	repoAddress := model.AddressFromModel(address)
@@ -1273,12 +1143,9 @@ func (es *UserEventstore) ChangeAddress(ctx context.Context, address *usr_model.
 }
 
 func (es *UserEventstore) AddOTP(ctx context.Context, userID, accountName string) (*usr_model.OTP, error) {
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
-	}
-	if user.Human == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-XJvu3", "Errors.User.NotHuman")
 	}
 	if user.IsOTPReady() {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-do9se", "Errors.User.Mfa.Otp.AlreadyReady")
@@ -1313,12 +1180,9 @@ func (es *UserEventstore) AddOTP(ctx context.Context, userID, accountName string
 }
 
 func (es *UserEventstore) RemoveOTP(ctx context.Context, userID string) error {
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
-	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-WsBv9", "Errors.User.NotHuman")
 	}
 	if user.OTP == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp0de", "Errors.User.Mfa.Otp.NotExisting")
@@ -1335,12 +1199,9 @@ func (es *UserEventstore) RemoveOTP(ctx context.Context, userID string) error {
 }
 
 func (es *UserEventstore) CheckMfaOTPSetup(ctx context.Context, userID, code string) error {
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
-	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-7zRQM", "Errors.User.NotHuman")
 	}
 	if user.OTP == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-yERHV", "Errors.Users.Mfa.Otp.NotExisting")
@@ -1362,12 +1223,9 @@ func (es *UserEventstore) CheckMfaOTPSetup(ctx context.Context, userID, code str
 }
 
 func (es *UserEventstore) CheckMfaOTP(ctx context.Context, userID, code string, authRequest *req_model.AuthRequest) error {
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
-	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-ckqn5", "Errors.User.NotHuman")
 	}
 	if !user.IsOTPReady() {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sd5NJ", "Errors.User.Mfa.Otp.NotReady")
@@ -1408,33 +1266,14 @@ func (es *UserEventstore) verifyMfaOTP(otp *usr_model.OTP, code string) error {
 }
 
 func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model.WebAuthNToken, error) {
-	return es.addWebAuthN(ctx, userID, usr_model.WebAuthNMethodU2F)
-}
-
-func (es *UserEventstore) AddPasswordless(ctx context.Context, userID string) (*usr_model.WebAuthNToken, error) {
-	return es.addWebAuthN(ctx, userID, usr_model.WebAuthNMethodPasswordless)
-}
-
-func (es *UserEventstore) addWebAuthN(ctx context.Context, userID string, method usr_model.WebAuthNMethod) (*usr_model.WebAuthNToken, error) {
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	if user.Human == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-GDdd1", "Errors.User.NotHuman")
-	}
-	var tokens []*usr_model.WebAuthNToken
-	switch method {
-	case usr_model.WebAuthNMethodU2F:
-		tokens = user.U2FTokens
-	case usr_model.WebAuthNMethodPasswordless:
-		tokens = user.PasswordlessTokens
-	}
-	webAuthN, err := es.webauthn.BeginRegistration(user, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementDiscouraged, tokens...)
+	webAuthN, err := es.webauthn.BeginRegistration(user, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementDiscouraged, user.U2FTokens...)
 	if err != nil {
 		return nil, err
 	}
-
 	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -1443,14 +1282,7 @@ func (es *UserEventstore) addWebAuthN(ctx context.Context, userID string, method
 	repoUser := model.UserFromModel(user)
 	repoWebAuthN := model.WebAuthNFromModel(webAuthN)
 
-	var updateAggregate func(ctx context.Context) (*es_models.Aggregate, error)
-	switch method {
-	case usr_model.WebAuthNMethodU2F:
-		updateAggregate = MFAU2FAddAggregate(es.AggregateCreator(), repoUser, repoWebAuthN)
-	case usr_model.WebAuthNMethodPasswordless:
-		updateAggregate = MFAPasswordlessAddAggregate(es.AggregateCreator(), repoUser, repoWebAuthN)
-	}
-	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, updateAggregate)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAU2FAddAggregate(es.AggregateCreator(), repoUser, repoWebAuthN))
 	if err != nil {
 		return nil, err
 	}
@@ -1458,108 +1290,92 @@ func (es *UserEventstore) addWebAuthN(ctx context.Context, userID string, method
 }
 
 func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID string, credentialData []byte) error {
-	return es.verifyWebAuthNSetup(ctx, userID, credentialData, usr_model.WebAuthNMethodU2F)
-}
-
-func (es *UserEventstore) VerifyPasswordlessSetup(ctx context.Context, userID string, credentialData []byte) error {
-	return es.verifyWebAuthNSetup(ctx, userID, credentialData, usr_model.WebAuthNMethodPasswordless)
-}
-
-func (es *UserEventstore) verifyWebAuthNSetup(ctx context.Context, userID string, credentialData []byte, method usr_model.WebAuthNMethod) error {
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
 	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-BH552", "Errors.User.NotHuman")
-	}
-	var token *usr_model.WebAuthNToken
-	switch method {
-	case usr_model.WebAuthNMethodU2F:
-		_, token = user.Human.GetU2FToVerify()
-	case usr_model.WebAuthNMethodPasswordless:
-		_, token = user.Human.GetPasswordlessToVerify()
-	}
+	_, token := user.Human.GetU2FToVerify()
 	webAuthN, err := es.webauthn.FinishRegistration(user, token, credentialData)
 	if err != nil {
 		return err
 	}
 	repoUser := model.UserFromModel(user)
 	repoWebAuthN := model.WebAuthNVerifyFromModel(webAuthN)
-	var verifyAggregate func(ctx context.Context) (*es_models.Aggregate, error)
-	switch method {
-	case usr_model.WebAuthNMethodU2F:
-		verifyAggregate = MFAU2FVerifyAggregate(es.AggregateCreator(), repoUser, repoWebAuthN)
-	case usr_model.WebAuthNMethodPasswordless:
-		verifyAggregate = MFAPasswordlessVerifyAggregate(es.AggregateCreator(), repoUser, repoWebAuthN)
-	}
-	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, verifyAggregate)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAU2FVerifyAggregate(es.AggregateCreator(), repoUser, repoWebAuthN))
 	if err != nil {
 		return err
 	}
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
 
+func (es *UserEventstore) AddPasswordless(ctx context.Context, userID string) (*usr_model.WebAuthNToken, error) {
+	user, err := es.HumanByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	webAuthN, err := es.webauthn.BeginRegistration(user, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementDiscouraged, user.PasswordlessTokens...)
+	if err != nil {
+		return nil, err
+	}
+	id, err := es.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+	webAuthN.WebAuthNTokenID = id
+	repoUser := model.UserFromModel(user)
+	repoWebAuthN := model.WebAuthNFromModel(webAuthN)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAPasswordlessAddAggregate(es.AggregateCreator(), repoUser, repoWebAuthN))
+	if err != nil {
+		return nil, err
+	}
+	return webAuthN, nil
+}
+
+func (es *UserEventstore) RemoveU2FToken(ctx context.Context, userID, webAuthNTokenID string) error {
+	user, err := es.HumanByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if _, token := user.Human.GetU2F(webAuthNTokenID); token == nil {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-2M9ds", "Errors.User.NotHuman")
+	}
+	repoUser := model.UserFromModel(user)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAU2FRemoveAggregate(es.AggregateCreator(), repoUser, &model.WebAuthNTokenID{webAuthNTokenID}))
+	if err != nil {
+		return err
+	}
 	es.userCache.cacheUser(repoUser)
 	return nil
 }
 
 func (es *UserEventstore) BeginU2FLogin(ctx context.Context, userID string, authRequest *req_model.AuthRequest) (*usr_model.WebAuthNLogin, error) {
-	return es.beginWebAuthNLogin(ctx, userID, usr_model.WebAuthNMethodU2F, authRequest)
-}
-
-func (es *UserEventstore) BeginPasswordlessLogin(ctx context.Context, userID string, authRequest *req_model.AuthRequest) (*usr_model.WebAuthNLogin, error) {
-	return es.beginWebAuthNLogin(ctx, userID, usr_model.WebAuthNMethodPasswordless, authRequest)
-}
-
-func (es *UserEventstore) beginWebAuthNLogin(ctx context.Context, userID string, method usr_model.WebAuthNMethod, authRequest *req_model.AuthRequest) (*usr_model.WebAuthNLogin, error) {
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	if user.Human == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-2Ks11", "Errors.User.NotHuman")
+	if user.U2FTokens == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5Mk8s", "Errors.User.Mfa.U2F.NotExisting")
 	}
-	var tokens []*usr_model.WebAuthNToken
-	switch method {
-	case usr_model.WebAuthNMethodU2F:
-		if user.U2FTokens == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5Mk8s", "Errors.User.Mfa.U2F.NotExisting")
-		}
-		tokens = user.U2FTokens
-	case usr_model.WebAuthNMethodPasswordless:
-		if user.PasswordlessTokens == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5Mk8s", "Errors.User.Mfa.Passwordless.NotExisting")
-		}
-		tokens = user.PasswordlessTokens
-	}
-	webAuthNLogin, err := es.webauthn.BeginLogin(user, usr_model.UserVerificationRequirementDiscouraged, tokens...)
+
+	webAuthNLogin, err := es.webauthn.BeginLogin(user, usr_model.UserVerificationRequirementDiscouraged, user.U2FTokens...)
 	if err != nil {
 		return nil, err
 	}
 	webAuthNLogin.AuthRequest = authRequest
 	repoUser := model.UserFromModel(user)
 	repoWebAuthNLogin := model.WebAuthNLoginFromModel(webAuthNLogin)
-	var loginAggregate func(ctx context.Context) (*es_models.Aggregate, error)
-	switch method {
-	case usr_model.WebAuthNMethodU2F:
-		loginAggregate = MFAU2FBeginLoginAggregate(es.AggregateCreator(), repoUser, repoWebAuthNLogin)
-	case usr_model.WebAuthNMethodPasswordless:
-		loginAggregate = MFAPasswordlessBeginLoginAggregate(es.AggregateCreator(), repoUser, repoWebAuthNLogin)
-	}
-	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, loginAggregate)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAU2FBeginLoginAggregate(es.AggregateCreator(), repoUser, repoWebAuthNLogin))
 	if err != nil {
 		return nil, err
 	}
-
 	return webAuthNLogin, nil
 }
 
 func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID string, credentialData []byte, authRequest *req_model.AuthRequest) error {
-	user, err := es.UserByID(ctx, userID)
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
-	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-BHeq1", "Errors.User.NotHuman")
 	}
 	_, u2f := user.GetU2FLogin(authRequest.ID)
 	keyID, signCount, err := es.webauthn.FinishLogin(user, u2f, credentialData, user.U2FTokens...)
@@ -1595,13 +1411,69 @@ func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID string, crede
 	return es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, aggregates...)
 }
 
-func (es *UserEventstore) VerifyPasswordless(ctx context.Context, userID, webAuthNTokenID string, credentialData []byte, authRequest *req_model.AuthRequest) error {
-	user, err := es.UserByID(ctx, userID)
+func (es *UserEventstore) VerifyPasswordlessSetup(ctx context.Context, userID string, credentialData []byte) error {
+	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
 	}
-	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-BHeq1", "Errors.User.NotHuman")
+	_, token := user.Human.GetPasswordlessToVerify()
+	webAuthN, err := es.webauthn.FinishRegistration(user, token, credentialData)
+	if err != nil {
+		return err
+	}
+	repoUser := model.UserFromModel(user)
+	repoWebAuthN := model.WebAuthNVerifyFromModel(webAuthN)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAPasswordlessVerifyAggregate(es.AggregateCreator(), repoUser, repoWebAuthN))
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
+func (es *UserEventstore) RemovePasswordlessToken(ctx context.Context, userID, webAuthNTokenID string) error {
+	user, err := es.HumanByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if _, token := user.Human.GetPasswordless(webAuthNTokenID); token == nil {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-5M0sw", "Errors.User.NotHuman")
+	}
+	repoUser := model.UserFromModel(user)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAPasswordlessRemoveAggregate(es.AggregateCreator(), repoUser, &model.WebAuthNTokenID{webAuthNTokenID}))
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
+func (es *UserEventstore) BeginPasswordlessLogin(ctx context.Context, userID string, authRequest *req_model.AuthRequest) (*usr_model.WebAuthNLogin, error) {
+	user, err := es.HumanByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if user.PasswordlessTokens == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5M9sd", "Errors.User.Mfa.Passwordless.NotExisting")
+	}
+	webAuthNLogin, err := es.webauthn.BeginLogin(user, usr_model.UserVerificationRequirementDiscouraged, user.PasswordlessTokens...)
+	if err != nil {
+		return nil, err
+	}
+	webAuthNLogin.AuthRequest = authRequest
+	repoUser := model.UserFromModel(user)
+	repoWebAuthNLogin := model.WebAuthNLoginFromModel(webAuthNLogin)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAPasswordlessBeginLoginAggregate(es.AggregateCreator(), repoUser, repoWebAuthNLogin))
+	if err != nil {
+		return nil, err
+	}
+	return webAuthNLogin, nil
+}
+
+func (es *UserEventstore) VerifyPasswordless(ctx context.Context, userID, webAuthNTokenID string, credentialData []byte, authRequest *req_model.AuthRequest) error {
+	user, err := es.HumanByID(ctx, userID)
+	if err != nil {
+		return err
 	}
 	_, passwordless := user.GetPasswordlessLogin(authRequest.ID)
 	keyID, signCount, err := es.webauthn.FinishLogin(user, passwordless, credentialData, user.PasswordlessTokens...)

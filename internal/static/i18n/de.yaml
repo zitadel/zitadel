@@ -62,6 +62,7 @@ Errors:
       Passwordless:
         NotExisting: Passwortlos existiert nicht
     WebAuthN:
+      NotFound: WebAuthN Token konnte nicht gefunden werden
       BeginRegisterFailed: Es ist ein Fehler bei der WebAuthN Registrierung aufgetreten
       MarshalError: Daten konnten nicht umgewandelt werden
       ErrorOnParseCredential: Zugangsdaten konnten nicht geparsed werden

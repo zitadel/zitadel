@@ -78,11 +78,11 @@ func (w *WebAuthN) BeginRegistration(user *usr_model.User, authType usr_model.Au
 		webauthn.WithExclusions(existing),
 	)
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "WEBAU-bM8sd", "Errors.Users.WebAuthN.BeginRegisterFailed")
+		return nil, caos_errs.ThrowInternal(err, "WEBAU-bM8sd", "Errors.User.WebAuthN.BeginRegisterFailed")
 	}
 	cred, err := json.Marshal(credentialOptions)
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "WEBAU-D7cus", "Errors.Users.WebAuthN.MarshalError")
+		return nil, caos_errs.ThrowInternal(err, "WEBAU-D7cus", "Errors.User.WebAuthN.MarshalError")
 	}
 	return &usr_model.WebAuthNToken{
 		Challenge:              sessionData.Challenge,
@@ -93,9 +93,12 @@ func (w *WebAuthN) BeginRegistration(user *usr_model.User, authType usr_model.Au
 }
 
 func (w *WebAuthN) FinishRegistration(user *usr_model.User, webAuthN *usr_model.WebAuthNToken, credData []byte) (*usr_model.WebAuthNToken, error) {
+	if webAuthN == nil {
+		return nil, caos_errs.ThrowInternal(nil, "WEBAU-5M9so", "Errors.User.WebAuthN.NotFound")
+	}
 	credentialData, err := protocol.ParseCredentialCreationResponseBody(bytes.NewReader(credData))
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "WEBAU-sEr8c", "Errors.Users.WebAuthN.ErrorOnParseCredential")
+		return nil, caos_errs.ThrowInternal(err, "WEBAU-sEr8c", "Errors.User.WebAuthN.ErrorOnParseCredential")
 	}
 	sessionData := WebAuthNToSessionData(webAuthN)
 	credential, err := w.web.CreateCredential(
@@ -104,7 +107,7 @@ func (w *WebAuthN) FinishRegistration(user *usr_model.User, webAuthN *usr_model.
 		},
 		sessionData, credentialData)
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "WEBAU-3Vb9s", "Errors.Users.WebAuthN.CreateCredentialFailed")
+		return nil, caos_errs.ThrowInternal(err, "WEBAU-3Vb9s", "Errors.User.WebAuthN.CreateCredentialFailed")
 	}
 
 	webAuthN.KeyID = credential.ID
@@ -122,11 +125,11 @@ func (w *WebAuthN) BeginLogin(user *usr_model.User, userVerification usr_model.U
 	}) //webauthn.WithUserVerification(userVerification),
 
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "WEBAU-4G8sw", "Errors.Users.WebAuthN.BeginLoginFailed")
+		return nil, caos_errs.ThrowInternal(err, "WEBAU-4G8sw", "Errors.User.WebAuthN.BeginLoginFailed")
 	}
 	cred, err := json.Marshal(assertion)
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "WEBAU-2M0s9", "Errors.Users.WebAuthN.MarshalError")
+		return nil, caos_errs.ThrowInternal(err, "WEBAU-2M0s9", "Errors.User.WebAuthN.MarshalError")
 	}
 	return &usr_model.WebAuthNLogin{
 		Challenge:               sessionData.Challenge,
@@ -144,11 +147,11 @@ func (w *WebAuthN) FinishLogin(user *usr_model.User, webAuthN *usr_model.WebAuth
 	}
 	credential, err := w.web.ValidateLogin(webUser, WebAuthNLoginToSessionData(webAuthN), assertionData)
 	if err != nil {
-		return nil, 0, caos_errs.ThrowInternal(err, "WEBAU-3M9si", "Errors.Users.WebAuthN.ValidateLoginFailed")
+		return nil, 0, caos_errs.ThrowInternal(err, "WEBAU-3M9si", "Errors.User.WebAuthN.ValidateLoginFailed")
 	}
 
 	if credential.Authenticator.CloneWarning {
-		return nil, 0, caos_errs.ThrowInternal(err, "WEBAU-4M90s", "Errors.Users.WebAuthN.CloneWarning")
+		return nil, 0, caos_errs.ThrowInternal(err, "WEBAU-4M90s", "Errors.User.WebAuthN.CloneWarning")
 	}
 	return credential.ID, credential.Authenticator.SignCount, nil
 }
