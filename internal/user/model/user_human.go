@@ -1,6 +1,7 @@
 package model
 
 import (
+	"bytes"
 	"time"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -120,6 +121,15 @@ func (u *Human) GetU2F(webAuthNTokenID string) (int, *WebAuthNToken) {
 	return -1, nil
 }
 
+func (u *Human) GetU2FByKeyID(keyID []byte) (int, *WebAuthNToken) {
+	for i, u2f := range u.U2FTokens {
+		if bytes.Compare(u2f.KeyID, keyID) == 0 {
+			return i, u2f
+		}
+	}
+	return -1, nil
+}
+
 func (u *Human) GetU2FToVerify() (int, *WebAuthNToken) {
 	for i, u2f := range u.U2FTokens {
 		if u2f.State == MfaStateNotReady {
@@ -133,6 +143,15 @@ func (u *Human) GetPasswordless(webAuthNTokenID string) (int, *WebAuthNToken) {
 	for i, u2f := range u.PasswordlessTokens {
 		if u2f.WebAuthNTokenID == webAuthNTokenID {
 			return i, u2f
+		}
+	}
+	return -1, nil
+}
+
+func (u *Human) GetPasswordlessByKeyID(keyID []byte) (int, *WebAuthNToken) {
+	for i, pwl := range u.PasswordlessTokens {
+		if bytes.Compare(pwl.KeyID, keyID) == 0 {
+			return i, pwl
 		}
 	}
 	return -1, nil

@@ -136,7 +136,7 @@ func (w *WebAuthN) BeginLogin(user *usr_model.User, userVerification usr_model.U
 	}, nil
 }
 
-func (w *WebAuthN) FinishLogin(user *usr_model.User, webAuthN *usr_model.WebAuthNLogin, credData []byte, webAuthNs ...*usr_model.WebAuthNToken) error {
+func (w *WebAuthN) FinishLogin(user *usr_model.User, webAuthN *usr_model.WebAuthNLogin, credData []byte, webAuthNs ...*usr_model.WebAuthNToken) ([]byte, uint32, error) {
 	assertionData, err := protocol.ParseCredentialRequestResponseBody(bytes.NewReader(credData))
 	webUser := &webUser{
 		User:        user,
@@ -144,20 +144,13 @@ func (w *WebAuthN) FinishLogin(user *usr_model.User, webAuthN *usr_model.WebAuth
 	}
 	credential, err := w.web.ValidateLogin(webUser, WebAuthNLoginToSessionData(webAuthN), assertionData)
 	if err != nil {
-		return caos_errs.ThrowInternal(err, "WEBAU-3M9si", "Errors.Users.WebAuthN.ValidateLoginFailed")
+		return nil, 0, caos_errs.ThrowInternal(err, "WEBAU-3M9si", "Errors.Users.WebAuthN.ValidateLoginFailed")
 	}
 
 	if credential.Authenticator.CloneWarning {
-		return caos_errs.ThrowInternal(err, "WEBAU-4M90s", "Errors.Users.WebAuthN.CloneWarning")
+		return nil, 0, caos_errs.ThrowInternal(err, "WEBAU-4M90s", "Errors.Users.WebAuthN.CloneWarning")
 	}
-	for _, cred := range webUser.WebAuthnCredentials() {
-		if bytes.Equal(cred.ID, credential.ID) {
-
-		}
-	}
-
-	//w.storage.UpdateSignCount(credential.AuthenticatorID, credential.Authenticator.SignCount)
-	return nil
+	return credential.ID, credential.Authenticator.SignCount, nil
 }
 
 //let options = JSON.parse(atob(document.getElementsByName('credentialCreationData')[0].value));

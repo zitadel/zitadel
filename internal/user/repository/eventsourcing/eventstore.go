@@ -1562,19 +1562,37 @@ func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID string, crede
 		return errors.ThrowPreconditionFailed(nil, "EVENT-BHeq1", "Errors.User.NotHuman")
 	}
 	_, u2f := user.GetU2FLogin(authRequest.ID)
-	err = es.webauthn.FinishLogin(user, u2f, credentialData, user.U2FTokens...)
+	keyID, signCount, err := es.webauthn.FinishLogin(user, u2f, credentialData, user.U2FTokens...)
+	if err != nil {
+		return err
+	}
 
+	_, token := user.GetU2FByKeyID(keyID)
 	repoUser := model.UserFromModel(user)
 	repoAuthRequest := model.AuthRequestFromModel(authRequest)
+
+	aggregates := make([]*es_models.Aggregate, 0)
+	signAgg, err := MFAU2FSignCountAggregate(ctx, es.AggregateCreator(), repoUser, &model.WebAuthNSignCount{WebauthNTokenID: token.WebAuthNTokenID, SignCount: signCount})
+	if err != nil {
+		return err
+	}
+	aggregates = append(aggregates, signAgg)
 	if err == nil {
-		verifyAggregate := U2FCheckSucceededAggregate(es.AggregateCreator(), repoUser, repoAuthRequest)
-		err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, verifyAggregate)
+		verifyAggregate, err := U2FCheckSucceededAggregate(ctx, es.AggregateCreator(), repoUser, repoAuthRequest)
+		if err != nil {
+			return err
+		}
+		aggregates = append(aggregates, verifyAggregate)
 	}
 	if err != nil {
-		verifyAggregate := U2FCheckFailedAggregate(es.AggregateCreator(), repoUser, repoAuthRequest)
-		err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, verifyAggregate)
+		verifyAggregate, err := U2FCheckFailedAggregate(ctx, es.AggregateCreator(), repoUser, repoAuthRequest)
+		if err != nil {
+			return err
+			aggregates = append(aggregates, verifyAggregate)
+		}
+		aggregates = append(aggregates, verifyAggregate)
 	}
-	return err
+	return es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, aggregates...)
 }
 
 func (es *UserEventstore) VerifyPasswordless(ctx context.Context, userID, webAuthNTokenID string, credentialData []byte, authRequest *req_model.AuthRequest) error {
@@ -1586,19 +1604,35 @@ func (es *UserEventstore) VerifyPasswordless(ctx context.Context, userID, webAut
 		return errors.ThrowPreconditionFailed(nil, "EVENT-BHeq1", "Errors.User.NotHuman")
 	}
 	_, passwordless := user.GetPasswordlessLogin(authRequest.ID)
-	err = es.webauthn.FinishLogin(user, passwordless, credentialData, user.PasswordlessTokens...)
-
+	keyID, signCount, err := es.webauthn.FinishLogin(user, passwordless, credentialData, user.PasswordlessTokens...)
+	if err != nil {
+		return err
+	}
+	_, token := user.GetPasswordlessByKeyID(keyID)
 	repoUser := model.UserFromModel(user)
 	repoAuthRequest := model.AuthRequestFromModel(authRequest)
+
+	aggregates := make([]*es_models.Aggregate, 0)
+	signAgg, err := MFAU2FSignCountAggregate(ctx, es.AggregateCreator(), repoUser, &model.WebAuthNSignCount{WebauthNTokenID: token.WebAuthNTokenID, SignCount: signCount})
+	if err != nil {
+		return err
+	}
+	aggregates = append(aggregates, signAgg)
 	if err == nil {
-		verifyAggregate := PasswordlessCheckSucceededAggregate(es.AggregateCreator(), repoUser, repoAuthRequest)
-		err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, verifyAggregate)
+		verifyAggregate, err := PasswordlessCheckSucceededAggregate(ctx, es.AggregateCreator(), repoUser, repoAuthRequest)
+		if err != nil {
+			return err
+		}
+		aggregates = append(aggregates, verifyAggregate)
 	}
 	if err != nil {
-		verifyAggregate := PasswordlessCheckFailedAggregate(es.AggregateCreator(), repoUser, repoAuthRequest)
-		err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, verifyAggregate)
+		verifyAggregate, err := PasswordlessCheckFailedAggregate(ctx, es.AggregateCreator(), repoUser, repoAuthRequest)
+		if err != nil {
+			return err
+		}
+		aggregates = append(aggregates, verifyAggregate)
 	}
-	return err
+	return es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, aggregates...)
 }
 
 func (es *UserEventstore) SignOut(ctx context.Context, agentID string, userIDs []string) error {

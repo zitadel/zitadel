@@ -31,6 +31,11 @@ type WebAuthNVerify struct {
 	SignCount       uint32 `json:"signCount"`
 }
 
+type WebAuthNSignCount struct {
+	WebauthNTokenID string `json:"webAuthNTokenId"`
+	SignCount       uint32 `json:"signCount"`
+}
+
 type WebAuthNTokenID struct {
 	WebauthNTokenID string `json:"webAuthNTokenId"`
 }
@@ -171,6 +176,19 @@ func (u *Human) appendU2FVerifiedEvent(event *es_models.Event) error {
 	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-4hu9s", "Errors.Users.Mfa.U2F.NotExisting")
 }
 
+func (u *Human) appendU2FChangeSignCountEvent(event *es_models.Event) error {
+	webauthn := new(WebAuthNToken)
+	err := webauthn.setData(event)
+	if err != nil {
+		return err
+	}
+	if _, token := GetWebauthn(u.U2FTokens, webauthn.WebauthNTokenID); token != nil {
+		token.setData(event)
+		return nil
+	}
+	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-5Ms8h", "Errors.Users.Mfa.U2F.NotExisting")
+}
+
 func (u *Human) appendU2FRemovedEvent(event *es_models.Event) error {
 	webauthn := new(WebAuthNToken)
 	err := webauthn.setData(event)
@@ -218,6 +236,19 @@ func (u *Human) appendPasswordlessVerifiedEvent(event *es_models.Event) error {
 		return nil
 	}
 	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-mKns8", "Errors.Users.Mfa.Passwordless.NotExisting")
+}
+
+func (u *Human) appendPasswordlessChangeSignCountEvent(event *es_models.Event) error {
+	webauthn := new(WebAuthNToken)
+	err := webauthn.setData(event)
+	if err != nil {
+		return err
+	}
+	if _, token := GetWebauthn(u.PasswordlessTokens, webauthn.WebauthNTokenID); token != nil {
+		token.setData(event)
+		return nil
+	}
+	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-2Mv9s", "Errors.Users.Mfa.Passwordless.NotExisting")
 }
 
 func (u *Human) appendPasswordlessRemovedEvent(event *es_models.Event) error {
