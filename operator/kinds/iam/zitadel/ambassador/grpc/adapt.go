@@ -4,7 +4,6 @@ import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/ambassador/mapping"
-	"github.com/caos/orbos/pkg/kubernetes/resources/ambassador/module"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/configuration"
 )
@@ -25,7 +24,6 @@ func AdaptFunc(
 	adminMName := "admin-grpc-v1"
 	authMName := "auth-grpc-v1"
 	mgmtMName := "mgmt-grpc-v1"
-	moduleName := "ambassador"
 
 	destroyAdminG, err := mapping.AdaptFuncToDestroy(namespace, adminMName)
 	if err != nil {
@@ -39,16 +37,11 @@ func AdaptFunc(
 	if err != nil {
 		return nil, nil, err
 	}
-	destroyModule, err := module.AdaptFuncToDestroy("caos-system", moduleName)
-	if err != nil {
-		return nil, nil, err
-	}
 
 	destroyers := []operator.DestroyFunc{
 		operator.ResourceDestroyToZitadelDestroy(destroyAdminG),
 		operator.ResourceDestroyToZitadelDestroy(destroyAuthG),
 		operator.ResourceDestroyToZitadelDestroy(destroyMgmtGRPC),
-		operator.ResourceDestroyToZitadelDestroy(destroyModule),
 	}
 
 	return func(k8sClient *kubernetes.Client, queried map[string]interface{}) (operator.EnsureFunc, error) {
@@ -57,16 +50,9 @@ func AdaptFunc(
 				return func(k8sClient *kubernetes.Client) error { return nil }, nil
 			}
 
-			crd, err = k8sClient.CheckCRD("modules.getambassador.io")
-			if crd == nil || err != nil {
-				return func(k8sClient *kubernetes.Client) error { return nil }, nil
-			}
-
 			apiDomain := dns.Subdomains.API + "." + dns.Domain
 			consoleDomain := dns.Subdomains.Console + "." + dns.Domain
 			_ = consoleDomain
-
-			queryModule, err := module.AdaptFuncToEnsure("caos-system", moduleName, labels, &module.Config{EnableGrpcWeb: true})
 
 			cors := &mapping.CORS{
 				Origins:        "*",
@@ -129,7 +115,6 @@ func AdaptFunc(
 			}
 
 			queriers := []operator.QueryFunc{
-				operator.ResourceQueryToZitadelQuery(queryModule),
 				operator.ResourceQueryToZitadelQuery(queryAdminG),
 				operator.ResourceQueryToZitadelQuery(queryAuthG),
 				operator.ResourceQueryToZitadelQuery(queryMgmtGRPC),
