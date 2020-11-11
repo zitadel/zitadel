@@ -39,7 +39,6 @@
         height: var(--height);
         margin: .5rem 1rem;
         font-size: 12px;
-        /* color: var(--grey-text); */
         display: flex;
         align-items: center;
         cursor: pointer;
