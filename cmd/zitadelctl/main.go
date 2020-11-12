@@ -18,12 +18,16 @@ func main() {
 	takeoffCmd := cmds.TakeoffCommand(rootValues)
 	backuplistCmd := cmds.BackupListCommand(rootValues)
 	restoreCmd := cmds.RestoreCommand(rootValues)
+	readsecretCmd := cmds.ReadSecretCommand(rootValues)
+	writesecretCmd := cmds.WriteSecretCommand(rootValues)
 
 	rootCmd.AddCommand(
 		startCmd,
 		takeoffCmd,
 		backuplistCmd,
 		restoreCmd,
+		readsecretCmd,
+		writesecretCmd,
 	)
 
 	if err := rootCmd.Execute(); err != nil {

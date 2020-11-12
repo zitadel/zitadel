@@ -48,7 +48,7 @@ func AdaptFunc(
 			return nil, nil, allSecrets, errors.Wrap(err, "parsing desired state failed")
 		}
 		desired.Parsed = desiredKind
-		secret.AppendSecrets("zitadel", allSecrets, getSecretsMap(desiredKind))
+		secret.AppendSecrets("", allSecrets, getSecretsMap(desiredKind))
 
 		if !monitor.IsVerbose() && desiredKind.Spec.Verbose {
 			internalMonitor.Verbose()
