@@ -62,7 +62,8 @@
         "LOGIN":"Einloggen",
         "EDIT":"Bearbeiten",
         "PIN":"Anpinnen",
-        "CONFIGURE":"Konfigurieren"
+        "CONFIGURE":"Konfigurieren",
+        "SEND":"Senden"
     },
     "ERRORS": {
         "REQUIRED": "Bitte fülle alle benötigten Felder aus.",
@@ -96,6 +97,11 @@
         "DIALOG": {
             "DELETE_TITLE":"User löschen",
             "DELETE_DESCRIPTION":"Sie sind im Begriff einen Benutzer endgültig zu löschen. Wollen Sie dies wirklich tun?"
+        },
+        "SENDEMAILDIALOG":{
+            "TITLE":"Email Benachrichtigung senden",
+            "DESCRIPTION":"Klicken Sie den untenstehenden Button and die aktuelle Emailadresse zu versenden oder ändern Sie die Emailadresse in dem Feld.",
+            "NEWEMAIL":"Neue Email"
         },
         "TABLE":{
             "DEACTIVATE":"Deaktivieren",
@@ -223,6 +229,10 @@
         },
         "EMAIL": "E-Mail",
         "PHONE": "Telefonnummer",
+        "PHONEEMPTY":"Keine Telefonnummer hinterlegt",
+        "PHONEVERIFIED":"Telefonnummer bestätigt.",
+        "EMAILVERIFIED":"Email verifiziert",
+        "NOTVERIFIED":"nicht verifiziert",
         "PREFERRED_LOGINNAME":"Bevorzugter Loginname",
         "LOGINMETHODS": {
             "TITLE": "Kontaktinformationen",
@@ -276,11 +286,13 @@
         "SIGNEDOUT_BTN":"Anmelden",
         "EDITACCOUNT":"Konto bearbeiten",
         "ADDACCOUNT":"Konto hinzufügen",
+        "RESENDINITIALEMAIL":"Neue Initialisierungsmail senden",
         "RESENDEMAILNOTIFICATION":"Benachrichtigungsmail senden",
         "TOAST": {
             "CREATED":"Benutzer erfolgreich erstellt.",
             "SAVED":"Profil gespeichert.",
             "EMAILSAVED":"E-Mail gespeichert.",
+            "INITEMAILSENT":"Initialisierung Email gesendet.",
             "PHONESAVED":"Telefonnummer gespeichert.",
             "PHONEREMOVED":"Telefonnummer gelöscht.",
             "PHONEVERIFIED":"Telefonnummer bestätigt.",

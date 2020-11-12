@@ -20,6 +20,8 @@ import {
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
+
 @Component({
     selector: 'app-user-detail',
     templateUrl: './user-detail.component.html',
@@ -209,6 +211,22 @@ export class UserDetailComponent implements OnInit, OnDestroy {
                 this.mgmtUserService.DeleteUser(this.user.id).then(() => {
                     this.navigateBack();
                     this.toast.showInfo('USER.TOAST.DELETED', true);
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
+            }
+        });
+    }
+
+    public resendInitEmail(): void {
+        const dialogRef = this.dialog.open(ResendEmailDialogComponent, {
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp.send && this.user.id) {
+                this.mgmtUserService.ResendInitialMail(this.user.id, resp.email ?? '').then(() => {
+                    this.toast.showInfo('USER.TOAST.INITEMAILSENT', true);
                 }).catch(error => {
                     this.toast.showError(error);
                 });

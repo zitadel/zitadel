@@ -39,6 +39,7 @@ import {
     IdpSearchResponse,
     IdpUpdate,
     IdpView,
+    InitialMailRequest,
     LoginName,
     LoginPolicy,
     LoginPolicyRequest,
@@ -782,6 +783,14 @@ export class ManagementService {
         const req = new UserID();
         req.setId(id);
         return this.grpcService.mgmt.resendEmailVerificationMail(req);
+    }
+
+    public ResendInitialMail(userId: string, newemail: string): Promise<Empty> {
+        const req = new InitialMailRequest();
+        req.setEmail(newemail);
+        req.setId(userId);
+
+        return this.grpcService.mgmt.resendInitialMail(req);
     }
 
     public ResendPhoneVerification(id: string): Promise<any> {

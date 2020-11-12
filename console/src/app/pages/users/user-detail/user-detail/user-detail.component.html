@@ -73,9 +73,12 @@
                 [human]="user.human" (savedPhone)="savePhone($event)" (savedEmail)="saveEmail($event)"
                 (deletedPhone)="deletePhone()" (resendEmailVerification)="resendEmailVerification()"
                 (resendPhoneVerification)="resendPhoneVerification()">
-                <button phoneAction [disabled]="(canWrite$ | async) == false" (click)="sendSetPasswordNotification()"
+                <button pwdAction [disabled]="(canWrite$ | async) == false" (click)="sendSetPasswordNotification()"
                     mat-stroked-button color="primary"
                     *ngIf="user.state === UserState.USERSTATE_INITIAL">{{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
+                <button emailAction class="resendemail" *ngIf="user.state == UserState.USERSTATE_INITIAL"
+                    mat-stroked-button color="primary"
+                    (click)="resendInitEmail()">{{'USER.RESENDINITIALEMAIL' | translate}}</button>
             </app-contact>
         </app-card>
 

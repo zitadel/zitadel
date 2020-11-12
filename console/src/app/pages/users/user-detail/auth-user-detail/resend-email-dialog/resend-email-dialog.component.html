@@ -1,11 +1,11 @@
 <h1 mat-dialog-title>
-    <span class="title">{{'USER.CODEDIALOG.TITLE' | translate}} {{data?.number}}</span>
+    <span class="title">{{'USER.SENDEMAILDIALOG.TITLE' | translate}} {{data?.number}}</span>
 </h1>
-<p class="desc">{{'USER.CODEDIALOG.DESCRIPTION' | translate}}</p>
+<p class="desc">{{'USER.SENDEMAILDIALOG.DESCRIPTION' | translate}}</p>
 <div mat-dialog-content>
     <mat-form-field class="formfield">
-        <mat-label>{{ 'USER.CODEDIALOG.CODE' | translate }}</mat-label>
-        <input matInput [(ngModel)]="code" />
+        <mat-label>{{ 'USER.SENDEMAILDIALOG.NEWEMAIL' | translate }}</mat-label>
+        <input matInput [(ngModel)]="email" />
     </mat-form-field>
 </div>
 <div mat-dialog-actions class="action">
@@ -13,8 +13,8 @@
         {{'ACTIONS.CLOSE' | translate}}
     </button>
 
-    <button [disabled]="!code" cdkFocusInitial color="primary" mat-raised-button class="ok-button"
-        (click)="closeDialog(code)">
-        {{'ACTIONS.OK' | translate}}
+    <button [disabled]="!email" cdkFocusInitial color="primary" mat-raised-button class="ok-button"
+        (click)="closeDialogWithSend(email)">
+        {{'ACTIONS.SEND' | translate}}
     </button>
 </div>

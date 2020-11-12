@@ -7,11 +7,15 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
     styleUrls: ['./resend-email-dialog.component.scss'],
 })
 export class ResendEmailDialogComponent {
-    public code: string = '';
+    public email: string = '';
     constructor(public dialogRef: MatDialogRef<ResendEmailDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any) { }
 
-    closeDialog(code: string = ''): void {
-        this.dialogRef.close(code);
+    closeDialog(email: string = ''): void {
+        this.dialogRef.close(email);
+    }
+
+    closeDialogWithSend(email: string = ''): void {
+        this.dialogRef.close({ send: true, email });
     }
 }

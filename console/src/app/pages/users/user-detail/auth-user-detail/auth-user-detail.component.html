@@ -40,14 +40,11 @@
 
         <app-card *ngIf="user" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
             description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
-            <app-contact *ngIf="user?.human" [human]="user.human" [state]="user.state" [userStateEnum]="UserState"
-                (savedPhone)="savePhone($event)" (savedEmail)="saveEmail($event)"
+            <app-contact *ngIf="user?.human" [human]="user.human" [state]="user.state" canWrite="true"
+                [userStateEnum]="UserState" (savedPhone)="savePhone($event)" (savedEmail)="saveEmail($event)"
                 (enteredPhoneCode)="enteredPhoneCode($event)" (deletedPhone)="deletePhone()"
                 (resendEmailVerification)="resendEmailVerification()"
                 (resendPhoneVerification)="resendPhoneVerification()">
-
-                <button emailAction *ngIf="user.state == UserState.USERSTATE_INITIAL" mat-stroked-button
-                    (click)="resendEmail()">{{'USER.RESENDEMAILNOTIFICATION' | translate}}</button>
             </app-contact>
         </app-card>
 

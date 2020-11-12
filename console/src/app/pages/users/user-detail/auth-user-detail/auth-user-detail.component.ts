@@ -1,4 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
@@ -39,6 +40,7 @@ export class AuthUserDetailComponent implements OnDestroy {
         public translate: TranslateService,
         private toast: ToastService,
         public userService: GrpcAuthService,
+        private dialog: MatDialog,
     ) {
         this.loading = true;
         this.userService.GetMyUser().then(user => {
@@ -105,14 +107,6 @@ export class AuthUserDetailComponent implements OnDestroy {
         this.translate.use(language);
     }
 
-    public resendEmailVerification(): void {
-        this.userService.ResendEmailVerification().then(() => {
-            this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
-        }).catch(error => {
-            this.toast.showError(error);
-        });
-    }
-
     public resendPhoneVerification(): void {
         this.userService.ResendPhoneVerification().then(() => {
             this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
@@ -121,8 +115,12 @@ export class AuthUserDetailComponent implements OnDestroy {
         });
     }
 
-    public resendEmail(): void {
-
+    public resendEmailVerification(): void {
+        this.userService.ResendMyEmailVerificationMail().then(() => {
+            this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
+        }).catch(error => {
+            this.toast.showError(error);
+        });
     }
 
     public deletePhone(): void {
