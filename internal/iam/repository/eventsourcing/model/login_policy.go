@@ -15,6 +15,7 @@ type LoginPolicy struct {
 	AllowRegister         bool           `json:"allowRegister"`
 	AllowExternalIdp      bool           `json:"allowExternalIdp"`
 	ForceMFA              bool           `json:"forceMfa"`
+	PasswordlessType      int32          `json:"passwordlessType"`
 	IDPProviders          []*IDPProvider `json:"-"`
 	SecondFactors         []int32        `json:"-"`
 	MultiFactors          []int32        `json:"-"`
@@ -65,6 +66,7 @@ func LoginPolicyToModel(policy *LoginPolicy) *iam_model.LoginPolicy {
 		ForceMFA:              policy.ForceMFA,
 		SecondFactors:         secondFactors,
 		MultiFactors:          multiFactors,
+		PasswordlessType:      iam_model.PasswordlessType(policy.PasswordlessType),
 	}
 }
 
@@ -82,6 +84,7 @@ func LoginPolicyFromModel(policy *iam_model.LoginPolicy) *LoginPolicy {
 		ForceMFA:              policy.ForceMFA,
 		SecondFactors:         secondFactors,
 		MultiFactors:          multiFactors,
+		PasswordlessType:      int32(policy.PasswordlessType),
 	}
 }
 
@@ -171,6 +174,9 @@ func (p *LoginPolicy) Changes(changed *LoginPolicy) map[string]interface{} {
 	}
 	if changed.ForceMFA != p.ForceMFA {
 		changes["forceMFA"] = changed.ForceMFA
+	}
+	if changed.PasswordlessType != p.PasswordlessType {
+		changes["passwordlessType"] = changed.PasswordlessType
 	}
 	return changes
 }

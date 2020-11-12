@@ -28,6 +28,7 @@ type LoginPolicyView struct {
 	AllowUsernamePassword bool          `json:"allowUsernamePassword" gorm:"column:allow_username_password"`
 	AllowExternalIDP      bool          `json:"allowExternalIdp" gorm:"column:allow_external_idp"`
 	ForceMFA              bool          `json:"forceMFA" gorm:"column:force_mfa"`
+	PasswordlessType      int32         `json:"passwordlessType" gorm:"column:passwordless_type"`
 	SecondFactors         pq.Int64Array `json:"-" gorm:"column:second_factors"`
 	MultiFactors          pq.Int64Array `json:"-" gorm:"column:multi_factors"`
 	Default               bool          `json:"-" gorm:"-"`
@@ -45,6 +46,7 @@ func LoginPolicyViewFromModel(policy *model.LoginPolicyView) *LoginPolicyView {
 		AllowExternalIDP:      policy.AllowExternalIDP,
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		ForceMFA:              policy.ForceMFA,
+		PasswordlessType:      int32(policy.PasswordlessType),
 		SecondFactors:         secondFactorsFromModel(policy.SecondFactors),
 		MultiFactors:          multiFactorsFromModel(policy.MultiFactors),
 		Default:               policy.Default,
@@ -77,6 +79,7 @@ func LoginPolicyViewToModel(policy *LoginPolicyView) *model.LoginPolicyView {
 		AllowExternalIDP:      policy.AllowExternalIDP,
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		ForceMFA:              policy.ForceMFA,
+		PasswordlessType:      model.PasswordlessType(policy.PasswordlessType),
 		SecondFactors:         secondFactorsToModel(policy.SecondFactors),
 		MultiFactors:          multiFactorsToToModel(policy.MultiFactors),
 		Default:               policy.Default,

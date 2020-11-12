@@ -11,6 +11,7 @@ type LoginPolicyView struct {
 	AllowRegister         bool
 	AllowExternalIDP      bool
 	ForceMFA              bool
+	PasswordlessType      PasswordlessType
 	SecondFactors         []SecondFactorType
 	MultiFactors          []MultiFactorType
 	Default               bool

@@ -2,8 +2,6 @@ package auth
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/user/model"
-
 	"github.com/golang/protobuf/ptypes/empty"
 
 	"github.com/caos/zitadel/pkg/grpc/auth"
@@ -162,194 +160,35 @@ func (s *Server) RemoveMfaOTP(ctx context.Context, _ *empty.Empty) (_ *empty.Emp
 	return &empty.Empty{}, err
 }
 
-func (s *Server) AddMfaU2F(ctx context.Context, _ *empty.Empty) (_ *auth.MfaU2FResponse, err error) {
+func (s *Server) AddMyMfaU2F(ctx context.Context, _ *empty.Empty) (_ *auth.WebAuthNResponse, err error) {
 	u2f, err := s.repo.AddMyMfaU2F(ctx)
-	return verifyMfaU2FFromModel(u2f), err
+	return verifyWebAuthNFromModel(u2f), err
 }
 
-func (s *Server) VerifyMfaU2F(ctx context.Context, request *auth.VerifyMfaU2F) (*empty.Empty, error) {
+func (s *Server) VerifyMyMfaU2F(ctx context.Context, request *auth.VerifyWebAuthN) (*empty.Empty, error) {
 	err := s.repo.VerifyMyMfaU2FSetup(ctx, request.PublicKeyCredential)
 	return &empty.Empty{}, err
 }
 
-func verifyMfaU2FFromModel(u2f *model.WebAuthNToken) *auth.MfaU2FResponse {
-	return &auth.MfaU2FResponse{
-		Id:        u2f.WebAuthNTokenID,
-		PublicKey: u2f.PublicKey,
-		State:     mfaStateFromModel(u2f.State),
-	}
+func (s *Server) RemoveMyMfaU2F(ctx context.Context, id *auth.WebAuthNTokenID) (*empty.Empty, error) {
+	err := s.repo.RemoveMyMfaU2F(ctx, id.Id)
+	return &empty.Empty{}, err
 }
 
-//
-//func publicKeyFromModel(response protocol.PublicKeyCredentialCreationOptions) *auth.U2FPublicKey {
-//	return &auth.U2FPublicKey{
-//		Challenge:              response.Challenge,
-//		Rp:                     rpFromModel(response.RelyingParty),
-//		User:                   userFromModel(response.User),
-//		PubKeyCredParams:       publicKeyCredParamsFromModel(response.Parameters),
-//		AuthenticatorSelection: authenticatorSelectionFromModel(response.AuthenticatorSelection),
-//		Timeout:                int32(response.Timeout),
-//		ExcludeCredentials:     excludeCredentialsFromModel(response.CredentialExcludeList),
-//		Extensions:             extensionsFromModel(response.Extensions),
-//		Attestation:            attestionFromModel(response.Attestation),
-//	}
-//}
-//
-//func attestionFromModel(attestation protocol.ConveyancePreference) auth.ConveyancePreference {
-//	switch attestation {
-//	case protocol.PreferNoAttestation:
-//		return auth.ConveyancePreference_ConveyancePreferenceNoAttestation
-//	case protocol.PreferDirectAttestation:
-//		return auth.ConveyancePreference_ConveyancePreferenceDirectAttestation
-//	case protocol.PreferIndirectAttestation:
-//		return auth.ConveyancePreference_ConveyancePreferenceIndirectAttestation
-//	default:
-//		return auth.ConveyancePreference_ConveyancePreferenceNoAttestation
-//	}
-//}
-//
-//func extensionsFromModel(extensions protocol.AuthenticationExtensions) map[string]string {
-//	if extensions == nil {
-//		return nil
-//	}
-//	exts := make(map[string]string)
-//	for key, value := range extensions {
-//		exts[key] = value.(string)
-//	}
-//	return exts
-//}
-//
-//func excludeCredentialsFromModel(list []protocol.CredentialDescriptor) []*auth.CredentialDescriptor {
-//	if list == nil {
-//		return nil
-//	}
-//	creds := make([]*auth.CredentialDescriptor, len(list))
-//	for i, desc := range list {
-//		creds[i] = &auth.CredentialDescriptor{
-//			Type:       credentialTypeFromModel(desc.Type),
-//			Id:         desc.CredentialID,
-//			Transports: transportsFromModel(desc.Transport),
-//		}
-//	}
-//	return creds
-//}
-//
-//func transportsFromModel(transports []protocol.AuthenticatorTransport) []auth.AuthenticatorTransport {
-//	if transports == nil {
-//		return nil
-//	}
-//	trans := make([]auth.AuthenticatorTransport, len(transports))
-//	for i, t := range transports {
-//		trans[i] = transportFromModel(t)
-//	}
-//	return trans
-//}
-//
-//func transportFromModel(trans protocol.AuthenticatorTransport) auth.AuthenticatorTransport {
-//	switch trans {
-//	case protocol.USB:
-//		return auth.AuthenticatorTransport_AuthenticatorTransportUSB
-//	case protocol.NFC:
-//		return auth.AuthenticatorTransport_AuthenticatorTransportNFC
-//	case protocol.BLE:
-//		return auth.AuthenticatorTransport_AuthenticatorTransportBLE
-//	case protocol.Internal:
-//		return auth.AuthenticatorTransport_AuthenticatorTransportInternal
-//	default:
-//		return auth.AuthenticatorTransport_AuthenticatorTransportUnspecified
-//	}
-//}
-//
-//func authenticatorSelectionFromModel(selection protocol.AuthenticatorSelection) *auth.AuthenticatorSelection {
-//	return &auth.AuthenticatorSelection{
-//		AuthenticatorAttachment: authenticatorAttachementFromModel(selection.AuthenticatorAttachment),
-//		RequireResidentKey:      *selection.RequireResidentKey,
-//		UserVerification:        userVerificationFromModel(selection.UserVerification),
-//	}
-//}
-//
-//func userVerificationFromModel(verification protocol.UserVerificationRequirement) auth.UserVerificationRequirement {
-//	switch verification {
-//	case protocol.VerificationDiscouraged:
-//		return auth.UserVerificationRequirement_UserVerificationRequirementDiscouraged
-//	case protocol.VerificationPreferred:
-//		return auth.UserVerificationRequirement_UserVerificationRequirementPreferred
-//	case protocol.VerificationRequired:
-//		return auth.UserVerificationRequirement_UserVerificationRequirementRequired
-//	default:
-//		return auth.UserVerificationRequirement_UserVerificationRequirementPreferred
-//	}
-//}
-//
-//func authenticatorAttachementFromModel(attachment protocol.AuthenticatorAttachment) auth.AuthenticatorAttachment {
-//	switch attachment {
-//	case protocol.Platform:
-//		return auth.AuthenticatorAttachment_AuthenticatorAttachmentPlatform
-//	case protocol.CrossPlatform:
-//		return auth.AuthenticatorAttachment_AuthenticatorAttachmentCrossPlatform
-//	default:
-//		return auth.AuthenticatorAttachment_AuthenticatorAttachmentUnspecified
-//	}
-//}
-//
-//func publicKeyCredParamsFromModel(parameters []protocol.CredentialParameter) []*auth.CredentialParameter {
-//	if parameters == nil {
-//		return nil
-//	}
-//	creds := make([]*auth.CredentialParameter, len(parameters))
-//	for i, param := range parameters {
-//		creds[i] = &auth.CredentialParameter{
-//			Type:      credentialTypeFromModel(param.Type),
-//			Algorithm: int32(param.Algorithm),
-//		}
-//	}
-//	return creds
-//}
-//
-//func credentialTypeFromModel(credentialType protocol.CredentialType) auth.CredentialType {
-//	switch credentialType {
-//	case protocol.PublicKeyCredentialType:
-//		return auth.CredentialType_CredentialTypePublicKey
-//	default:
-//		return auth.CredentialType_CredentialTypePublicKey
-//	}
-//}
-//
-//func userFromModel(user protocol.UserEntity) *auth.UserEntity {
-//	return &auth.UserEntity{
-//		Name:        user.Name,
-//		Icon:        user.Icon,
-//		DisplayName: user.DisplayName,
-//		Id:          user.ID,
-//	}
-//}
-//
-//func rpFromModel(party protocol.RelyingPartyEntity) *auth.RelyingParty {
-//	return &auth.RelyingParty{
-//		Name: party.Name,
-//		Icon: party.Icon,
-//		Id:   party.ID,
-//	}
-//}
+func (s *Server) AddMyPasswordless(ctx context.Context, _ *empty.Empty) (_ *auth.WebAuthNResponse, err error) {
+	u2f, err := s.repo.AddMyPasswordless(ctx)
+	return verifyWebAuthNFromModel(u2f), err
+}
 
-//
-//func attestionToModel(response *auth.Response) protocol.AuthenticatorAttestationResponse {
-//	return protocol.AuthenticatorAttestationResponse{
-//		AuthenticatorResponse: protocol.AuthenticatorResponse{
-//			ClientDataJSON: response.ClientData_JSON,
-//		},
-//		AttestationObject: response.AttestionObject,
-//	}
-//}
-//
-//func credentialTypeToModel(credentialType auth.CredentialType) protocol.CredentialType {
-//	switch credentialType {
-//	case auth.CredentialType_CredentialTypePublicKey:
-//		return protocol.PublicKeyCredentialType
-//	default:
-//		return protocol.PublicKeyCredentialType
-//	}
-//}
+func (s *Server) VerifyMyPasswordless(ctx context.Context, request *auth.VerifyWebAuthN) (*empty.Empty, error) {
+	err := s.repo.VerifyMyPasswordlessSetup(ctx, request.PublicKeyCredential)
+	return &empty.Empty{}, err
+}
+
+func (s *Server) RemoveMyPasswordless(ctx context.Context, id *auth.WebAuthNTokenID) (*empty.Empty, error) {
+	err := s.repo.RemoveMyPasswordless(ctx, id.Id)
+	return &empty.Empty{}, err
+}
 
 func (s *Server) GetMyUserChanges(ctx context.Context, request *auth.ChangesRequest) (*auth.Changes, error) {
 	changes, err := s.repo.MyUserChanges(ctx, request.SequenceOffset, request.Limit, request.Asc)

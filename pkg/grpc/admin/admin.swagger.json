@@ -1716,6 +1716,9 @@
         "force_mfa": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "passwordless_type": {
+          "$ref": "#/definitions/v1PasswordlessType"
         }
       }
     },
@@ -1737,6 +1740,9 @@
         "force_mfa": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "passwordless_type": {
+          "$ref": "#/definitions/v1PasswordlessType"
         }
       }
     },
@@ -1766,6 +1772,9 @@
         "force_mfa": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "passwordless_type": {
+          "$ref": "#/definitions/v1PasswordlessType"
         }
       }
     },
@@ -2873,6 +2882,15 @@
         "ORGSTATE_INACTIVE"
       ],
       "default": "ORGSTATE_UNSPECIFIED"
+    },
+    "v1PasswordlessType": {
+      "type": "string",
+      "enum": [
+        "PASSWORDLESSTYPE_NOT_ALLOWED",
+        "PASSWORDLESSTYPE_ALLOWED",
+        "PASSWORDLESSTYPE_VERIFICATION_REQUIRED"
+      ],
+      "default": "PASSWORDLESSTYPE_NOT_ALLOWED"
     },
     "v1SearchMethod": {
       "type": "string",

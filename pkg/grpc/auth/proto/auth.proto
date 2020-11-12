@@ -318,7 +318,7 @@ service AuthService {
     };
   }
 
-  rpc AddMfaU2F(google.protobuf.Empty) returns (MfaU2FResponse) {
+  rpc AddMyMfaU2F(google.protobuf.Empty) returns (WebAuthNResponse) {
     option (google.api.http) = {
       post: "/users/me/mfas/u2f"
       body: "*"
@@ -328,7 +328,7 @@ service AuthService {
     };
   }
 
-  rpc VerifyMfaU2F(VerifyMfaU2f) returns (google.protobuf.Empty) {
+  rpc VerifyMyMfaU2F(VerifyWebAuthN) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/users/me/mfas/u2f/_verify"
       body: "*"
@@ -339,15 +339,46 @@ service AuthService {
     };
   }
 
-//  rpc RemoveMfaU2F(google.protobuf.Empty) returns (google.protobuf.Empty) {
-//    option (google.api.http) = {
-//      delete: "/users/me/mfas/u2f"
-//    };
-//
-//    option (caos.zitadel.utils.v1.auth_option) = {
-//      permission: "authenticated"
-//    };
-//  }
+  rpc RemoveMyMfaU2F(WebAuthNTokenID) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/users/me/mfas/u2f/{id}"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
+  rpc AddMyPasswordless(google.protobuf.Empty) returns (WebAuthNResponse) {
+    option (google.api.http) = {
+      post: "/users/me/passwordless"
+      body: "*"
+    };
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
+  rpc VerifyMyPasswordless(VerifyWebAuthN) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/users/me/passwordless/_verify"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
+  rpc RemoveMyPasswordless(WebAuthNTokenID) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/users/me/passwordless/{id}"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
 
   rpc SearchMyUserGrant(UserGrantSearchRequest) returns (UserGrantSearchResponse) {
     option (google.api.http) = {
@@ -645,14 +676,18 @@ message MfaOtpResponse {
   MFAState state = 4;
 }
 
-message MfaU2FResponse {
+message WebAuthNResponse {
   string id = 1;
   bytes public_key = 2;
   MFAState state = 3;
 }
 
-message VerifyMfaU2f {
+message VerifyWebAuthN {
   bytes public_key_credential = 1;
+}
+
+message WebAuthNTokenID {
+  string id = 1;
 }
 
 enum MFAState {

@@ -30,7 +30,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -63,7 +63,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -85,7 +85,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -108,7 +108,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -130,7 +130,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -152,7 +152,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -174,7 +174,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -207,7 +207,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -229,7 +229,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -249,7 +249,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -281,7 +281,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -306,7 +306,8 @@
             "name": "asc",
             "in": "query",
             "required": false,
-            "type": "boolean"
+            "type": "boolean",
+            "format": "boolean"
           }
         ],
         "tags": [
@@ -325,7 +326,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -345,7 +346,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -377,7 +378,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -409,7 +410,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -442,7 +443,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -474,7 +475,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -510,7 +511,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -532,7 +533,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -553,7 +554,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -585,7 +586,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -608,16 +609,16 @@
     },
     "/users/me/mfas/u2f": {
       "post": {
-        "operationId": "AuthService_AddMfaU2F",
+        "operationId": "AuthService_AddMyMfaU2F",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1MfaU2FResponse"
+              "$ref": "#/definitions/v1WebAuthNResponse"
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -640,7 +641,7 @@
     },
     "/users/me/mfas/u2f/_verify": {
       "put": {
-        "operationId": "AuthService_VerifyMfaU2F",
+        "operationId": "AuthService_VerifyMyMfaU2F",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -649,7 +650,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -661,8 +662,132 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1VerifyMfaU2f"
+              "$ref": "#/definitions/v1VerifyWebAuthN"
             }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/mfas/u2f/{id}": {
+      "delete": {
+        "operationId": "AuthService_RemoveMyMfaU2F",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/passwordless": {
+      "post": {
+        "operationId": "AuthService_AddMyPasswordless",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1WebAuthNResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "properties": {}
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/passwordless/_verify": {
+      "put": {
+        "operationId": "AuthService_VerifyMyPasswordless",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1VerifyWebAuthN"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/passwordless/{id}": {
+      "delete": {
+        "operationId": "AuthService_RemoveMyPasswordless",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
           }
         ],
         "tags": [
@@ -682,7 +807,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -714,7 +839,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -734,7 +859,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -754,7 +879,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -786,7 +911,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -818,7 +943,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -850,7 +975,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -870,7 +995,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -903,7 +1028,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -925,7 +1050,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -957,7 +1082,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1177,13 +1302,15 @@
           "type": "string"
         },
         "is_email_verified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "phone": {
           "type": "string"
         },
         "is_phone_verified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "country": {
           "type": "string"
@@ -1264,21 +1391,6 @@
       ],
       "default": "MFATYPE_UNSPECIFIED"
     },
-    "v1MfaU2FResponse": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "public_key": {
-          "type": "string",
-          "format": "byte"
-        },
-        "state": {
-          "$ref": "#/definitions/v1MFAState"
-        }
-      }
-    },
     "v1MultiFactor": {
       "type": "object",
       "properties": {
@@ -1346,7 +1458,8 @@
           "format": "uint64"
         },
         "asc": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "queries": {
           "type": "array",
@@ -1423,23 +1536,28 @@
           "format": "uint64"
         },
         "has_lowercase": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_uppercase": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_number": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_symbol": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "sequence": {
           "type": "string",
           "format": "uint64"
         },
         "is_default": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -1591,7 +1709,8 @@
           "type": "string"
         },
         "isEmailVerified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -1617,7 +1736,8 @@
           "type": "string"
         },
         "isEmailVerified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -1671,7 +1791,8 @@
           "$ref": "#/definitions/v1UserGrantSearchKey"
         },
         "asc": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "queries": {
           "type": "array",
@@ -1748,7 +1869,8 @@
           "type": "string"
         },
         "is_phone_verified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -1774,7 +1896,8 @@
           "type": "string"
         },
         "is_phone_verified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -1994,15 +2117,6 @@
         }
       }
     },
-    "v1VerifyMfaU2f": {
-      "type": "object",
-      "properties": {
-        "public_key_credential": {
-          "type": "string",
-          "format": "byte"
-        }
-      }
-    },
     "v1VerifyMyUserEmailRequest": {
       "type": "object",
       "properties": {
@@ -2016,6 +2130,30 @@
       "properties": {
         "code": {
           "type": "string"
+        }
+      }
+    },
+    "v1VerifyWebAuthN": {
+      "type": "object",
+      "properties": {
+        "public_key_credential": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "v1WebAuthNResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "public_key": {
+          "type": "string",
+          "format": "byte"
+        },
+        "state": {
+          "$ref": "#/definitions/v1MFAState"
         }
       }
     }

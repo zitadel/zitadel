@@ -4498,6 +4498,8 @@ func (m *DefaultLoginPolicy) Validate() error {
 
 	// no validation rules for ForceMfa
 
+	// no validation rules for PasswordlessType
+
 	return nil
 }
 
@@ -4572,6 +4574,8 @@ func (m *DefaultLoginPolicyRequest) Validate() error {
 	// no validation rules for AllowExternalIdp
 
 	// no validation rules for ForceMfa
+
+	// no validation rules for PasswordlessType
 
 	return nil
 }
@@ -4739,6 +4743,8 @@ func (m *DefaultLoginPolicyView) Validate() error {
 	}
 
 	// no validation rules for ForceMfa
+
+	// no validation rules for PasswordlessType
 
 	return nil
 }

@@ -139,12 +139,32 @@ var AuthService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/AddMfaU2F": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/AddMyMfaU2F": authz.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/VerifyMfaU2F": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/VerifyMyMfaU2F": authz.Option{
+		Permission: "authenticated",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.auth.api.v1.AuthService/RemoveMyMfaU2F": authz.Option{
+		Permission: "authenticated",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.auth.api.v1.AuthService/AddMyPasswordless": authz.Option{
+		Permission: "authenticated",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.auth.api.v1.AuthService/VerifyMyPasswordless": authz.Option{
+		Permission: "authenticated",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.auth.api.v1.AuthService/RemoveMyPasswordless": authz.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},

@@ -314,6 +314,38 @@ func (repo *UserRepo) VerifyMyMfaU2FSetup(ctx context.Context, credentialData []
 	return repo.UserEvents.VerifyU2FSetup(ctx, authz.GetCtxData(ctx).UserID, credentialData)
 }
 
+func (repo *UserRepo) RemoveMfaU2F(ctx context.Context, userID, webAuthNTokenID string) error {
+	return repo.UserEvents.RemoveU2FToken(ctx, userID, webAuthNTokenID)
+}
+
+func (repo *UserRepo) RemoveMyMfaU2F(ctx context.Context, webAuthNTokenID string) error {
+	return repo.UserEvents.RemoveU2FToken(ctx, authz.GetCtxData(ctx).UserID, webAuthNTokenID)
+}
+
+func (repo *UserRepo) AddPasswordless(ctx context.Context, userID string) (*model.WebAuthNToken, error) {
+	return repo.UserEvents.AddPasswordless(ctx, userID)
+}
+
+func (repo *UserRepo) AddMyPasswordless(ctx context.Context) (*model.WebAuthNToken, error) {
+	return repo.UserEvents.AddPasswordless(ctx, authz.GetCtxData(ctx).UserID)
+}
+
+func (repo *UserRepo) VerifyPasswordlessSetup(ctx context.Context, userID string, credentialData []byte) error {
+	return repo.UserEvents.VerifyPasswordlessSetup(ctx, userID, credentialData)
+}
+
+func (repo *UserRepo) VerifyMyPasswordlessSetup(ctx context.Context, credentialData []byte) error {
+	return repo.UserEvents.VerifyPasswordlessSetup(ctx, authz.GetCtxData(ctx).UserID, credentialData)
+}
+
+func (repo *UserRepo) RemovePasswordless(ctx context.Context, userID, webAuthNTokenID string) error {
+	return repo.UserEvents.RemovePasswordlessToken(ctx, userID, webAuthNTokenID)
+}
+
+func (repo *UserRepo) RemoveMyPasswordless(ctx context.Context, webAuthNTokenID string) error {
+	return repo.UserEvents.RemovePasswordlessToken(ctx, authz.GetCtxData(ctx).UserID, webAuthNTokenID)
+}
+
 func (repo *UserRepo) ChangeMyUsername(ctx context.Context, username string) error {
 	ctxData := authz.GetCtxData(ctx)
 	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(ctxData.OrgID)

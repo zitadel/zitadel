@@ -2327,10 +2327,10 @@ var _ interface {
 	ErrorName() string
 } = MfaOtpResponseValidationError{}
 
-// Validate checks the field values on MfaU2FResponse with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *MfaU2FResponse) Validate() error {
+// Validate checks the field values on WebAuthNResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *WebAuthNResponse) Validate() error {
 	if m == nil {
 		return nil
 	}
@@ -2344,9 +2344,9 @@ func (m *MfaU2FResponse) Validate() error {
 	return nil
 }
 
-// MfaU2FResponseValidationError is the validation error returned by
-// MfaU2FResponse.Validate if the designated constraints aren't met.
-type MfaU2FResponseValidationError struct {
+// WebAuthNResponseValidationError is the validation error returned by
+// WebAuthNResponse.Validate if the designated constraints aren't met.
+type WebAuthNResponseValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -2354,22 +2354,22 @@ type MfaU2FResponseValidationError struct {
 }
 
 // Field function returns field value.
-func (e MfaU2FResponseValidationError) Field() string { return e.field }
+func (e WebAuthNResponseValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e MfaU2FResponseValidationError) Reason() string { return e.reason }
+func (e WebAuthNResponseValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e MfaU2FResponseValidationError) Cause() error { return e.cause }
+func (e WebAuthNResponseValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e MfaU2FResponseValidationError) Key() bool { return e.key }
+func (e WebAuthNResponseValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e MfaU2FResponseValidationError) ErrorName() string { return "MfaU2FResponseValidationError" }
+func (e WebAuthNResponseValidationError) ErrorName() string { return "WebAuthNResponseValidationError" }
 
 // Error satisfies the builtin error interface
-func (e MfaU2FResponseValidationError) Error() string {
+func (e WebAuthNResponseValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -2381,14 +2381,14 @@ func (e MfaU2FResponseValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sMfaU2FResponse.%s: %s%s",
+		"invalid %sWebAuthNResponse.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = MfaU2FResponseValidationError{}
+var _ error = WebAuthNResponseValidationError{}
 
 var _ interface {
 	Field() string
@@ -2396,12 +2396,12 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = MfaU2FResponseValidationError{}
+} = WebAuthNResponseValidationError{}
 
-// Validate checks the field values on VerifyMfaU2F with the rules defined in
+// Validate checks the field values on VerifyWebAuthN with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.
-func (m *VerifyMfaU2F) Validate() error {
+func (m *VerifyWebAuthN) Validate() error {
 	if m == nil {
 		return nil
 	}
@@ -2411,9 +2411,9 @@ func (m *VerifyMfaU2F) Validate() error {
 	return nil
 }
 
-// VerifyMfaU2FValidationError is the validation error returned by
-// VerifyMfaU2F.Validate if the designated constraints aren't met.
-type VerifyMfaU2FValidationError struct {
+// VerifyWebAuthNValidationError is the validation error returned by
+// VerifyWebAuthN.Validate if the designated constraints aren't met.
+type VerifyWebAuthNValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -2421,22 +2421,22 @@ type VerifyMfaU2FValidationError struct {
 }
 
 // Field function returns field value.
-func (e VerifyMfaU2FValidationError) Field() string { return e.field }
+func (e VerifyWebAuthNValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e VerifyMfaU2FValidationError) Reason() string { return e.reason }
+func (e VerifyWebAuthNValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e VerifyMfaU2FValidationError) Cause() error { return e.cause }
+func (e VerifyWebAuthNValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e VerifyMfaU2FValidationError) Key() bool { return e.key }
+func (e VerifyWebAuthNValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e VerifyMfaU2FValidationError) ErrorName() string { return "VerifyMfaU2FValidationError" }
+func (e VerifyWebAuthNValidationError) ErrorName() string { return "VerifyWebAuthNValidationError" }
 
 // Error satisfies the builtin error interface
-func (e VerifyMfaU2FValidationError) Error() string {
+func (e VerifyWebAuthNValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -2448,14 +2448,14 @@ func (e VerifyMfaU2FValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sVerifyMfaU2F.%s: %s%s",
+		"invalid %sVerifyWebAuthN.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = VerifyMfaU2FValidationError{}
+var _ error = VerifyWebAuthNValidationError{}
 
 var _ interface {
 	Field() string
@@ -2463,7 +2463,74 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = VerifyMfaU2FValidationError{}
+} = VerifyWebAuthNValidationError{}
+
+// Validate checks the field values on WebAuthNTokenID with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *WebAuthNTokenID) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Id
+
+	return nil
+}
+
+// WebAuthNTokenIDValidationError is the validation error returned by
+// WebAuthNTokenID.Validate if the designated constraints aren't met.
+type WebAuthNTokenIDValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WebAuthNTokenIDValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WebAuthNTokenIDValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WebAuthNTokenIDValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WebAuthNTokenIDValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WebAuthNTokenIDValidationError) ErrorName() string { return "WebAuthNTokenIDValidationError" }
+
+// Error satisfies the builtin error interface
+func (e WebAuthNTokenIDValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWebAuthNTokenID.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WebAuthNTokenIDValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WebAuthNTokenIDValidationError{}
 
 // Validate checks the field values on UserGrantSearchRequest with the rules
 // defined in the proto definition for this message. If any rules are

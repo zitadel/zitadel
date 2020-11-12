@@ -57,24 +57,44 @@ func (mr *MockAuthServiceClientMockRecorder) AddMfaOTP(arg0, arg1 interface{}, a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMfaOTP", reflect.TypeOf((*MockAuthServiceClient)(nil).AddMfaOTP), varargs...)
 }
 
-// AddMfaU2F mocks base method
-func (m *MockAuthServiceClient) AddMfaU2F(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*auth.MfaU2FResponse, error) {
+// AddMyMfaU2F mocks base method
+func (m *MockAuthServiceClient) AddMyMfaU2F(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*auth.WebAuthNResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "AddMfaU2F", varargs...)
-	ret0, _ := ret[0].(*auth.MfaU2FResponse)
+	ret := m.ctrl.Call(m, "AddMyMfaU2F", varargs...)
+	ret0, _ := ret[0].(*auth.WebAuthNResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// AddMfaU2F indicates an expected call of AddMfaU2F
-func (mr *MockAuthServiceClientMockRecorder) AddMfaU2F(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+// AddMyMfaU2F indicates an expected call of AddMyMfaU2F
+func (mr *MockAuthServiceClientMockRecorder) AddMyMfaU2F(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMfaU2F", reflect.TypeOf((*MockAuthServiceClient)(nil).AddMfaU2F), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMyMfaU2F", reflect.TypeOf((*MockAuthServiceClient)(nil).AddMyMfaU2F), varargs...)
+}
+
+// AddMyPasswordless mocks base method
+func (m *MockAuthServiceClient) AddMyPasswordless(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*auth.WebAuthNResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "AddMyPasswordless", varargs...)
+	ret0, _ := ret[0].(*auth.WebAuthNResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddMyPasswordless indicates an expected call of AddMyPasswordless
+func (mr *MockAuthServiceClientMockRecorder) AddMyPasswordless(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMyPasswordless", reflect.TypeOf((*MockAuthServiceClient)(nil).AddMyPasswordless), varargs...)
 }
 
 // ChangeMyPassword mocks base method
@@ -457,6 +477,46 @@ func (mr *MockAuthServiceClientMockRecorder) RemoveMyExternalIDP(arg0, arg1 inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMyExternalIDP", reflect.TypeOf((*MockAuthServiceClient)(nil).RemoveMyExternalIDP), varargs...)
 }
 
+// RemoveMyMfaU2F mocks base method
+func (m *MockAuthServiceClient) RemoveMyMfaU2F(arg0 context.Context, arg1 *auth.WebAuthNTokenID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RemoveMyMfaU2F", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemoveMyMfaU2F indicates an expected call of RemoveMyMfaU2F
+func (mr *MockAuthServiceClientMockRecorder) RemoveMyMfaU2F(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMyMfaU2F", reflect.TypeOf((*MockAuthServiceClient)(nil).RemoveMyMfaU2F), varargs...)
+}
+
+// RemoveMyPasswordless mocks base method
+func (m *MockAuthServiceClient) RemoveMyPasswordless(arg0 context.Context, arg1 *auth.WebAuthNTokenID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RemoveMyPasswordless", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemoveMyPasswordless indicates an expected call of RemoveMyPasswordless
+func (mr *MockAuthServiceClientMockRecorder) RemoveMyPasswordless(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMyPasswordless", reflect.TypeOf((*MockAuthServiceClient)(nil).RemoveMyPasswordless), varargs...)
+}
+
 // RemoveMyUserPhone mocks base method
 func (m *MockAuthServiceClient) RemoveMyUserPhone(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
@@ -657,24 +717,44 @@ func (mr *MockAuthServiceClientMockRecorder) VerifyMfaOTP(arg0, arg1 interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyMfaOTP", reflect.TypeOf((*MockAuthServiceClient)(nil).VerifyMfaOTP), varargs...)
 }
 
-// VerifyMfaU2F mocks base method
-func (m *MockAuthServiceClient) VerifyMfaU2F(arg0 context.Context, arg1 *auth.VerifyMfaU2F, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+// VerifyMyMfaU2F mocks base method
+func (m *MockAuthServiceClient) VerifyMyMfaU2F(arg0 context.Context, arg1 *auth.VerifyWebAuthN, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "VerifyMfaU2F", varargs...)
+	ret := m.ctrl.Call(m, "VerifyMyMfaU2F", varargs...)
 	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// VerifyMfaU2F indicates an expected call of VerifyMfaU2F
-func (mr *MockAuthServiceClientMockRecorder) VerifyMfaU2F(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+// VerifyMyMfaU2F indicates an expected call of VerifyMyMfaU2F
+func (mr *MockAuthServiceClientMockRecorder) VerifyMyMfaU2F(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyMfaU2F", reflect.TypeOf((*MockAuthServiceClient)(nil).VerifyMfaU2F), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyMyMfaU2F", reflect.TypeOf((*MockAuthServiceClient)(nil).VerifyMyMfaU2F), varargs...)
+}
+
+// VerifyMyPasswordless mocks base method
+func (m *MockAuthServiceClient) VerifyMyPasswordless(arg0 context.Context, arg1 *auth.VerifyWebAuthN, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "VerifyMyPasswordless", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// VerifyMyPasswordless indicates an expected call of VerifyMyPasswordless
+func (mr *MockAuthServiceClientMockRecorder) VerifyMyPasswordless(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyMyPasswordless", reflect.TypeOf((*MockAuthServiceClient)(nil).VerifyMyPasswordless), varargs...)
 }
 
 // VerifyMyUserEmail mocks base method
