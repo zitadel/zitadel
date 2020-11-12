@@ -787,7 +787,9 @@ export class ManagementService {
 
     public ResendInitialMail(userId: string, newemail: string): Promise<Empty> {
         const req = new InitialMailRequest();
-        req.setEmail(newemail);
+        if (newemail) {
+            req.setEmail(newemail);
+        }
         req.setId(userId);
 
         return this.grpcService.mgmt.resendInitialMail(req);
