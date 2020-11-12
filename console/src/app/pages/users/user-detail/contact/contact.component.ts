@@ -47,7 +47,7 @@ export class ContactComponent {
 
     emitEmailVerification(): void {
         this.resendEmailVerification.emit();
-    };
+    }
 
     emitPhoneVerification(): void {
         this.resendPhoneVerification.emit();

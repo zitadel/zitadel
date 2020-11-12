@@ -12,43 +12,43 @@
     flex-wrap: wrap;
 
     .left {
-        .label {
-            font-size: 13px;
-            margin-bottom: .5rem;
-            min-width: 100px;
-            color: var(--grey);
-            display: block;
-          }
+      .label {
+        font-size: 13px;
+        margin-bottom: .5rem;
+        min-width: 100px;
+        color: var(--grey);
+        display: block;
+      }
 
-          .name {
-              display: block;
-              margin-bottom: .5rem;
-          }
+      .name {
+        display: block;
+        margin-bottom: .5rem;
+      }
 
-          .state {
-            font-size: 14px;
-            margin-bottom: .5rem;
-    
-            &.verified {
-               color: #85d996;
-               display: block;
-            }
-    
-            &.notverified {
-              color: #ff4436;
-              margin-right: 1rem;
-            }
-          }
+      .state {
+        font-size: 14px;
+        margin-bottom: .5rem;
 
-          .block {
-              display: block;
-          }
+        &.verified {
+          color: #85d996;
+          display: block;
+        }
+
+        &.notverified {
+          color: #ff4436;
+          margin-right: 1rem;
+        }
+      }
+
+      .block {
+        display: block;
+      }
     }
 
     .right {
-        flex-basis: 70px;
-        display: flex;
-        justify-content: flex-end;
+      flex-basis: 70px;
+      display: flex;
+      justify-content: flex-end;
     }
 
     .verified-icon {
@@ -76,5 +76,5 @@
 }
 
 .mat-form-field-wrapper {
-    padding-bottom: 0 !important;
+  padding-bottom: 0 !important;
 }
