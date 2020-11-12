@@ -349,7 +349,7 @@ func (es *UserEventstore) RemoveUser(ctx context.Context, id string, orgIamPolic
 func (es *UserEventstore) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*usr_model.UserChanges, error) {
 	query := ChangesQuery(id, lastSequence, limit, sortAscending)
 
-	events, err := es.Eventstore.FilterEvents(context.Background(), query)
+	events, err := es.Eventstore.FilterEvents(ctx, query)
 	if err != nil {
 		logging.Log("EVENT-g9HCv").WithError(err).Warn("eventstore unavailable")
 		return nil, errors.ThrowInternal(err, "EVENT-htuG9", "Errors.Internal")
