@@ -119,6 +119,8 @@ For a list of supported or unsupported `Grant Types` please have a look at the t
 
 #### JSON Web Token (JWT) Profile
 
+##### Using JWTs as Authorization Grants
+
 Our service user work with the JWT profile to authenticate them against ZITADEL.
 
 1. Create or use an existing service user
@@ -151,7 +153,7 @@ Key JSON
 
 JWT
 
-| Claim | Example                     | Description                                                                      | 
+| Claim | Example                     | Description                                                                      |
 |:------|:----------------------------|:---------------------------------------------------------------------------------|
 | iss   | "http://localhost:50003"    | String which represents the requesting party                                     |
 | sub   | "77479219772321307"         | The subject ID of the service user, normally the `userId` from the json key file |
@@ -172,6 +174,13 @@ JWT
 ---
 
 Access Token Request
+
+| Parameter    | Example                                     | Description                                   |
+|:-------------|:--------------------------------------------|:----------------------------------------------|
+| Content-Type | application/x-www-form-urlencoded           |                                               |
+| grant_type   | urn:ietf:params:oauth:grant-type:jwt-bearer | Using JWTs as Authorization Grants            |
+| assertion    | eyJhbGciOiJSUzI1Ni...                       | The base64 encoded JWT created above          |
+| scope        | openid profile email address                | Scopes you would like to request from ZITADEL |
 
 ```BASH
 curl --request POST \
