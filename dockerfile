@@ -61,4 +61,42 @@ RUN build/console/generate-grpc.sh
 ARG build=prodbuild
 RUN npm run $build
 
+RUN echo totsch
+
 RUN ls dist/console
+
+## Cache go mod 
+## Speed up this step by mounting your local go mod pkg directory
+FROM golang:1.15 as gomoddownload
+
+WORKDIR src/github.com/caos/zitadel/
+
+COPY go.mod go.sum ./
+
+RUN go mod download
+
+FROM golang:1.15 as gotest
+
+WORKDIR src/github.com/caos/zitadel/
+
+COPY --from=gomoddownload $GOPATH/pkg/mod $GOPATH/pkg/mod/
+COPY . .
+
+RUN go test -race -v -coverprofile=profile.cov ./...
+
+## Build go code
+FROM golang:1.15 as gobuild
+
+COPY --from=gomoddownload $GOPATH/pkg/mod $GOPATH/pkg/mod/
+COPY --from=npmbuilder console/dist/console console/dist/console/
+COPY . .
+
+RUN ./build/console/generate-static.sh \
+    && ./build/login/generate-static.sh \
+    && ./build/notification/generate-static.sh \
+    && ./build/zitadel/generate-static.sh
+
+## TODO ARG
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel-linux-amd64 cmd/zitadel/main.go
+
+RUN echo yeeessssss
