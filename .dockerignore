@@ -1,0 +1,6 @@
+.git
+.codecov
+.github
+site
+console/node_modules
+console/tmp

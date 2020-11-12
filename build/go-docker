@@ -1,7 +1,0 @@
-FROM golang:1.15
-
-## BUILD PROTO
-
-## GO TEST
-
-## GO BUILD
