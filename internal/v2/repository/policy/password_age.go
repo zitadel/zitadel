@@ -2,8 +2,11 @@ package policy
 
 import (
 	"context"
+	"encoding/json"
 
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
 const (
@@ -15,22 +18,36 @@ const (
 type PasswordAgePolicyAggregate struct {
 	eventstore.Aggregate
 
-	ExpireWarnDays int
-	MaxAgeDays     int
+	ExpireWarnDays uint16
+	MaxAgeDays     uint16
 }
 
 type PasswordAgePolicyReadModel struct {
 	eventstore.ReadModel
 
-	ExpireWarnDays int
-	MaxAgeDays     int
+	ExpireWarnDays uint16
+	MaxAgeDays     uint16
+}
+
+func (rm *PasswordAgePolicyReadModel) Reduce() error {
+	for _, event := range rm.Events {
+		switch e := event.(type) {
+		case *PasswordAgePolicyAddedEvent:
+			rm.ExpireWarnDays = e.ExpireWarnDays
+			rm.MaxAgeDays = e.MaxAgeDays
+		case *PasswordAgePolicyChangedEvent:
+			rm.ExpireWarnDays = e.ExpireWarnDays
+			rm.MaxAgeDays = e.MaxAgeDays
+		}
+	}
+	return rm.ReadModel.Reduce()
 }
 
 type PasswordAgePolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ExpireWarnDays int `json:"expireWarnDays"`
-	MaxAgeDays     int `json:"maxAgeDays"`
+	ExpireWarnDays uint16 `json:"expireWarnDays"`
+	MaxAgeDays     uint16 `json:"maxAgeDays"`
 }
 
 func (e *PasswordAgePolicyAddedEvent) CheckPrevious() bool {
@@ -44,7 +61,7 @@ func (e *PasswordAgePolicyAddedEvent) Data() interface{} {
 func NewPasswordAgePolicyAddedEvent(
 	ctx context.Context,
 	expireWarnDays,
-	maxAgeDays int,
+	maxAgeDays uint16,
 ) *PasswordAgePolicyAddedEvent {
 
 	return &PasswordAgePolicyAddedEvent{
@@ -57,11 +74,24 @@ func NewPasswordAgePolicyAddedEvent(
 	}
 }
 
+func PasswordAgePolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &PasswordAgePolicyAddedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "POLIC-T3mGp", "unable to unmarshal policy")
+	}
+
+	return e, nil
+}
+
 type PasswordAgePolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ExpireWarnDays int `json:"expireWarnDays,omitempty"`
-	MaxAgeDays     int `json:"maxAgeDays,omitempty"`
+	ExpireWarnDays uint16 `json:"expireWarnDays,omitempty"`
+	MaxAgeDays     uint16 `json:"maxAgeDays,omitempty"`
 }
 
 func (e *PasswordAgePolicyChangedEvent) CheckPrevious() bool {
@@ -95,6 +125,19 @@ func NewPasswordAgePolicyChangedEvent(
 	return e
 }
 
+func PasswordAgePolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &PasswordAgePolicyChangedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "POLIC-PqaVq", "unable to unmarshal policy")
+	}
+
+	return e, nil
+}
+
 type PasswordAgePolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
@@ -119,4 +162,17 @@ func NewPasswordAgePolicyRemovedEvent(
 			PasswordAgePolicyRemovedEventType,
 		),
 	}
+}
+
+func PasswordAgePolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &PasswordAgePolicyRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "POLIC-02878", "unable to unmarshal policy")
+	}
+
+	return e, nil
 }

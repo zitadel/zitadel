@@ -9,13 +9,13 @@ import (
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
+	iam_business "github.com/caos/zitadel/internal/v2/business/iam"
 )
 
 type IAMRepository struct {
@@ -26,6 +26,8 @@ type IAMRepository struct {
 	View           *admin_view.View
 	SystemDefaults systemdefaults.SystemDefaults
 	Roles          []string
+
+	IAMV2 *iam_business.Repository
 }
 
 func (repo *IAMRepository) IAMMemberByID(ctx context.Context, orgID, userID string) (*iam_model.IAMMemberView, error) {
@@ -38,16 +40,25 @@ func (repo *IAMRepository) IAMMemberByID(ctx context.Context, orgID, userID stri
 
 func (repo *IAMRepository) AddIAMMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
 	member.AggregateID = repo.SystemDefaults.IamID
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.AddIAMMember(ctx, member)
+	}
 	return repo.IAMEventstore.AddIAMMember(ctx, member)
 }
 
 func (repo *IAMRepository) ChangeIAMMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
 	member.AggregateID = repo.SystemDefaults.IamID
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.ChangeIAMMember(ctx, member)
+	}
 	return repo.IAMEventstore.ChangeIAMMember(ctx, member)
 }
 
 func (repo *IAMRepository) RemoveIAMMember(ctx context.Context, userID string) error {
 	member := iam_model.NewIAMMember(repo.SystemDefaults.IamID, userID)
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.RemoveIAMMember(ctx, member)
+	}
 	return repo.IAMEventstore.RemoveIAMMember(ctx, member)
 }
 

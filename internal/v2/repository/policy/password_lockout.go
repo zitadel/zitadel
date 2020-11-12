@@ -2,8 +2,11 @@ package policy
 
 import (
 	"context"
+	"encoding/json"
 
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
 const (
@@ -15,22 +18,36 @@ const (
 type PasswordLockoutPolicyAggregate struct {
 	eventstore.Aggregate
 
-	MaxAttempts         int
+	MaxAttempts         uint8
 	ShowLockOutFailures bool
 }
 
 type PasswordLockoutPolicyReadModel struct {
 	eventstore.ReadModel
 
-	MaxAttempts         int
+	MaxAttempts         uint8
 	ShowLockOutFailures bool
+}
+
+func (rm *PasswordLockoutPolicyReadModel) Reduce() error {
+	for _, event := range rm.Events {
+		switch e := event.(type) {
+		case *PasswordLockoutPolicyAddedEvent:
+			rm.MaxAttempts = e.MaxAttempts
+			rm.ShowLockOutFailures = e.ShowLockOutFailures
+		case *PasswordLockoutPolicyChangedEvent:
+			rm.MaxAttempts = e.MaxAttempts
+			rm.ShowLockOutFailures = e.ShowLockOutFailures
+		}
+	}
+	return rm.ReadModel.Reduce()
 }
 
 type PasswordLockoutPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	MaxAttempts         int  `json:"maxAttempts"`
-	ShowLockOutFailures bool `json:"showLockOutFailures"`
+	MaxAttempts         uint8 `json:"maxAttempts"`
+	ShowLockOutFailures bool  `json:"showLockOutFailures"`
 }
 
 func (e *PasswordLockoutPolicyAddedEvent) CheckPrevious() bool {
@@ -43,7 +60,7 @@ func (e *PasswordLockoutPolicyAddedEvent) Data() interface{} {
 
 func NewPasswordLockoutPolicyAddedEvent(
 	ctx context.Context,
-	maxAttempts int,
+	maxAttempts uint8,
 	showLockOutFailures bool,
 ) *PasswordLockoutPolicyAddedEvent {
 
@@ -57,11 +74,24 @@ func NewPasswordLockoutPolicyAddedEvent(
 	}
 }
 
+func PasswordLockoutPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &PasswordLockoutPolicyAddedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "POLIC-8XiVd", "unable to unmarshal policy")
+	}
+
+	return e, nil
+}
+
 type PasswordLockoutPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	MaxAttempts         int  `json:"maxAttempts,omitempty"`
-	ShowLockOutFailures bool `json:"showLockOutFailures,omitempty"`
+	MaxAttempts         uint8 `json:"maxAttempts,omitempty"`
+	ShowLockOutFailures bool  `json:"showLockOutFailures,omitempty"`
 }
 
 func (e *PasswordLockoutPolicyChangedEvent) CheckPrevious() bool {
@@ -95,6 +125,19 @@ func NewPasswordLockoutPolicyChangedEvent(
 	return e
 }
 
+func PasswordLockoutPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &PasswordLockoutPolicyChangedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "POLIC-lWGRc", "unable to unmarshal policy")
+	}
+
+	return e, nil
+}
+
 type PasswordLockoutPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
@@ -117,4 +160,10 @@ func NewPasswordLockoutPolicyRemovedEvent(
 			PasswordLockoutPolicyRemovedEventType,
 		),
 	}
+}
+
+func PasswordLockoutPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &PasswordLockoutPolicyRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
 }

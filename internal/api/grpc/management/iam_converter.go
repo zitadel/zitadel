@@ -18,9 +18,17 @@ func iamSetupStepFromModel(step iam_model.Step) management.IamSetupStep {
 	switch step {
 	case iam_model.Step1:
 		return management.IamSetupStep_iam_setup_step_1
-		//TODO: label policy
-	// case iam_model.Step2:
-	// 	return management.IamSetupStep_iam_setup_step_2
+	case iam_model.Step2:
+		return management.IamSetupStep_iam_setup_step_2
+	case iam_model.Step3:
+		return management.IamSetupStep_iam_setup_step_3
+	case iam_model.Step4:
+		return management.IamSetupStep_iam_setup_step_4
+	case iam_model.Step5:
+		return management.IamSetupStep_iam_setup_step_5
+	case iam_model.Step6:
+		return management.IamSetupStep_iam_setup_step_6
+
 	default:
 		return management.IamSetupStep_iam_setup_step_UNDEFINED
 	}

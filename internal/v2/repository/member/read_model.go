@@ -12,6 +12,7 @@ type ReadModel struct {
 func NewMemberReadModel(userID string) *ReadModel {
 	return &ReadModel{
 		ReadModel: *eventstore.NewReadModel(),
+		UserID:    userID,
 	}
 }
 

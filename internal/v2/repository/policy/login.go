@@ -2,8 +2,11 @@ package policy
 
 import (
 	"context"
+	"encoding/json"
 
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
 const (
@@ -26,6 +29,22 @@ type LoginPolicyReadModel struct {
 	AllowUserNamePassword bool
 	AllowRegister         bool
 	AllowExternalIDP      bool
+}
+
+func (rm *LoginPolicyReadModel) Reduce() error {
+	for _, event := range rm.Events {
+		switch e := event.(type) {
+		case *LoginPolicyAddedEvent:
+			rm.AllowUserNamePassword = e.AllowUserNamePassword
+			rm.AllowExternalIDP = e.AllowExternalIDP
+			rm.AllowRegister = e.AllowRegister
+		case *LoginPolicyChangedEvent:
+			rm.AllowUserNamePassword = e.AllowUserNamePassword
+			rm.AllowExternalIDP = e.AllowExternalIDP
+			rm.AllowRegister = e.AllowRegister
+		}
+	}
+	return rm.ReadModel.Reduce()
 }
 
 type LoginPolicyAddedEvent struct {
@@ -61,6 +80,19 @@ func NewLoginPolicyAddedEvent(
 		AllowRegister:         allowRegister,
 		AllowUserNamePassword: allowUserNamePassword,
 	}
+}
+
+func LoginPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &LoginPolicyAddedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "POLIC-nWndT", "unable to unmarshal policy")
+	}
+
+	return e, nil
 }
 
 type LoginPolicyChangedEvent struct {
@@ -105,6 +137,19 @@ func NewLoginPolicyChangedEvent(
 	return e
 }
 
+func LoginPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &LoginPolicyChangedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "POLIC-ehssl", "unable to unmarshal policy")
+	}
+
+	return e, nil
+}
+
 type LoginPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
@@ -124,4 +169,10 @@ func NewLoginPolicyRemovedEvent(ctx context.Context) *LoginPolicyRemovedEvent {
 			LoginPolicyRemovedEventType,
 		),
 	}
+}
+
+func LoginPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &LoginPolicyRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
 }

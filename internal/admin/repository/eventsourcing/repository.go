@@ -14,6 +14,9 @@ import (
 	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	iam_business "github.com/caos/zitadel/internal/v2/business/iam"
+	"github.com/caos/zitadel/internal/v2/repository/iam"
+	"github.com/caos/zitadel/internal/v2/repository/member"
 )
 
 type Config struct {
@@ -37,6 +40,10 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 	if err != nil {
 		return nil, err
 	}
+	esV2 := es.V2()
+	esV2.RegisterFilterEventMapper(iam.MemberAddedEventType, member.AddedEventMapper).
+		RegisterFilterEventMapper(iam.MemberChangedEventType, member.ChangedEventMapper).
+		RegisterFilterEventMapper(iam.MemberRemovedEventType, member.RemovedEventMapper)
 
 	iam, err := es_iam.StartIAM(es_iam.IAMConfig{
 		Eventstore: es,
@@ -84,6 +91,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 			SystemDefaults: systemDefaults,
 			SearchLimit:    conf.SearchLimit,
 			Roles:          roles,
+			IAMV2:          iam_business.StartRepository(&iam_business.Config{Eventstore: esV2}),
 		},
 		AdministratorRepo: eventstore.AdministratorRepo{
 			View: view,

@@ -1,17 +1,40 @@
-package iam
+package org
 
 import (
 	"context"
 
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/member"
+	"github.com/caos/zitadel/internal/v2/repository/members"
+)
+
+const (
+	orgEventTypePrefix = eventstore.EventType("org.")
 )
 
 var (
-	MemberAddedEventType   = iamEventTypePrefix + member.AddedEventType
-	MemberChangedEventType = iamEventTypePrefix + member.ChangedEventType
-	MemberRemovedEventType = iamEventTypePrefix + member.RemovedEventType
+	MemberAddedEventType   = orgEventTypePrefix + member.AddedEventType
+	MemberChangedEventType = orgEventTypePrefix + member.ChangedEventType
+	MemberRemovedEventType = orgEventTypePrefix + member.RemovedEventType
 )
+
+type MembersReadModel struct {
+	members.ReadModel
+}
+
+func (rm *MembersReadModel) AppendEvents(events ...eventstore.EventReader) (err error) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *MemberAddedEvent:
+			rm.ReadModel.AppendEvents(&e.AddedEvent)
+		case *MemberChangedEvent:
+			rm.ReadModel.AppendEvents(&e.ChangedEvent)
+		case *MemberRemovedEvent:
+			rm.ReadModel.AppendEvents(&e.RemovedEvent)
+		}
+	}
+	return nil
+}
 
 type MemberReadModel member.ReadModel
 
@@ -22,8 +45,6 @@ func (rm *MemberReadModel) AppendEvents(events ...eventstore.EventReader) (err e
 			rm.ReadModel.AppendEvents(&e.AddedEvent)
 		case *MemberChangedEvent:
 			rm.ReadModel.AppendEvents(&e.ChangedEvent)
-		case *member.AddedEvent, *member.ChangedEvent, *MemberRemovedEvent:
-			rm.ReadModel.AppendEvents(e)
 		}
 	}
 	return nil

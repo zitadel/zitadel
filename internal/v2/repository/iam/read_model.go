@@ -17,12 +17,12 @@ type ReadModel struct {
 	GlobalOrgID string
 	ProjectID   string
 
-	DefaultLoginPolicy              policy.LoginPolicyReadModel
-	DefaultLabelPolicy              policy.LabelPolicyReadModel
-	DefaultOrgIAMPolicy             policy.OrgIAMPolicyReadModel
-	DefaultPasswordComplexityPolicy policy.PasswordComplexityPolicyReadModel
-	DefaultPasswordAgePolicy        policy.PasswordAgePolicyReadModel
-	DefaultPasswordLockoutPolicy    policy.PasswordLockoutPolicyReadModel
+	DefaultLoginPolicy              LoginPolicyReadModel
+	DefaultLabelPolicy              LabelPolicyReadModel
+	DefaultOrgIAMPolicy             OrgIAMPolicyReadModel
+	DefaultPasswordComplexityPolicy PasswordComplexityPolicyReadModel
+	DefaultPasswordAgePolicy        PasswordAgePolicyReadModel
+	DefaultPasswordLockoutPolicy    PasswordLockoutPolicyReadModel
 }
 
 func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) (err error) {
@@ -65,7 +65,6 @@ func (rm *ReadModel) Reduce() (err error) {
 	}
 	for _, reduce := range []func() error{
 		rm.Members.Reduce,
-		rm.Members.Reduce,
 		rm.DefaultLoginPolicy.Reduce,
 		rm.DefaultLabelPolicy.Reduce,
 		rm.DefaultOrgIAMPolicy.Reduce,
@@ -80,4 +79,11 @@ func (rm *ReadModel) Reduce() (err error) {
 	}
 
 	return nil
+}
+
+func (rm *ReadModel) AppendAndReduce(events ...eventstore.EventReader) error {
+	if err := rm.AppendEvents(events...); err != nil {
+		return err
+	}
+	return rm.Reduce()
 }

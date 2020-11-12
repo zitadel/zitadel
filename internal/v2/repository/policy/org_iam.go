@@ -2,8 +2,11 @@ package policy
 
 import (
 	"context"
+	"encoding/json"
 
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
 const (
@@ -20,6 +23,16 @@ type OrgIAMPolicyReadModel struct {
 	eventstore.ReadModel
 
 	UserLoginMustBeDomain bool
+}
+
+func (rm *OrgIAMPolicyReadModel) Reduce() error {
+	for _, event := range rm.Events {
+		switch e := event.(type) {
+		case *OrgIAMPolicyAddedEvent:
+			rm.UserLoginMustBeDomain = e.UserLoginMustBeDomain
+		}
+	}
+	return rm.ReadModel.Reduce()
 }
 
 type OrgIAMPolicyAddedEvent struct {
@@ -48,4 +61,17 @@ func NewOrgIAMPolicyAddedEvent(
 		),
 		UserLoginMustBeDomain: userLoginMustBeDomain,
 	}
+}
+
+func OrgIAMPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &OrgIAMPolicyAddedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "POLIC-TvSmA", "unable to unmarshal policy")
+	}
+
+	return e, nil
 }

@@ -2,8 +2,11 @@ package iam
 
 import (
 	"context"
+	"encoding/json"
 
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
 const (
@@ -32,4 +35,16 @@ func NewProjectSetEvent(ctx context.Context, projectID string) *ProjectSetEvent 
 		),
 		ProjectID: projectID,
 	}
+}
+
+func ProjectSetMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &ProjectSetEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "IAM-cdFZH", "unable to unmarshal global org set")
+	}
+
+	return e, nil
 }

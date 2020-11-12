@@ -1,6 +1,8 @@
 package sql
 
 import (
+	"database/sql"
+
 	_ "github.com/lib/pq"
 
 	"github.com/caos/zitadel/internal/config/types"
@@ -11,12 +13,12 @@ type Config struct {
 	SQL types.SQL
 }
 
-func Start(conf Config) (*SQL, error) {
+func Start(conf Config) (*SQL, *sql.DB, error) {
 	client, err := conf.SQL.Start()
 	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(err, "SQL-9qBtr", "unable to open database connection")
+		return nil, nil, errors.ThrowPreconditionFailed(err, "SQL-9qBtr", "unable to open database connection")
 	}
 	return &SQL{
 		client: client,
-	}, nil
+	}, client, nil
 }

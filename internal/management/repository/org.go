@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -30,8 +31,6 @@ type OrgRepository interface {
 
 	GetOrgMemberRoles() []string
 
-	GetMyOrgIamPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error)
-
 	SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error)
 	IDPConfigByID(ctx context.Context, id string) (*iam_model.IDPConfigView, error)
 	AddOIDCIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error)
@@ -40,6 +39,8 @@ type OrgRepository interface {
 	ReactivateIDPConfig(ctx context.Context, idpConfigID string) (*iam_model.IDPConfig, error)
 	RemoveIDPConfig(ctx context.Context, idpConfigID string) error
 	ChangeOIDCIDPConfig(ctx context.Context, oidcConfig *iam_model.OIDCIDPConfig) (*iam_model.OIDCIDPConfig, error)
+
+	GetMyOrgIamPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error)
 
 	GetLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error)
 	GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error)

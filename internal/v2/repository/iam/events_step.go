@@ -44,20 +44,30 @@ func SetupStepMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return step, nil
 }
 
-func NewSetupStepDoneEvent(ctx context.Context) *SetupStepEvent {
+func NewSetupStepDoneEvent(
+	ctx context.Context,
+	step Step,
+) *SetupStepEvent {
+
 	return &SetupStepEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			SetupDoneEventType,
 		),
+		Step: step,
 	}
 }
 
-func NewSetupStepStartedEvent(ctx context.Context) *SetupStepEvent {
+func NewSetupStepStartedEvent(
+	ctx context.Context,
+	step Step,
+) *SetupStepEvent {
+
 	return &SetupStepEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			SetupStartedEventType,
 		),
+		Step: step,
 	}
 }

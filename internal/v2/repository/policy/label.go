@@ -2,8 +2,11 @@ package policy
 
 import (
 	"context"
+	"encoding/json"
 
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
 const (
@@ -24,6 +27,20 @@ type LabelPolicyReadModel struct {
 
 	PrimaryColor   string
 	SecondaryColor string
+}
+
+func (rm *LabelPolicyReadModel) Reduce() error {
+	for _, event := range rm.Events {
+		switch e := event.(type) {
+		case *LabelPolicyAddedEvent:
+			rm.PrimaryColor = e.PrimaryColor
+			rm.SecondaryColor = e.SecondaryColor
+		case *LabelPolicyChangedEvent:
+			rm.PrimaryColor = e.PrimaryColor
+			rm.SecondaryColor = e.SecondaryColor
+		}
+	}
+	return rm.ReadModel.Reduce()
 }
 
 type LabelPolicyAddedEvent struct {
@@ -55,6 +72,19 @@ func NewLabelPolicyAddedEvent(
 		PrimaryColor:   primaryColor,
 		SecondaryColor: secondaryColor,
 	}
+}
+
+func LabelPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &LabelPolicyAddedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "POLIC-puqv4", "unable to unmarshal label policy")
+	}
+
+	return e, nil
 }
 
 type LabelPolicyChangedEvent struct {
@@ -94,6 +124,19 @@ func NewLabelPolicyChangedEvent(
 	return e
 }
 
+func LabelPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &LabelPolicyChangedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "POLIC-qhfFb", "unable to unmarshal label policy")
+	}
+
+	return e, nil
+}
+
 type LabelPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
@@ -113,4 +156,10 @@ func NewLabelPolicyRemovedEvent(ctx context.Context) *LabelPolicyRemovedEvent {
 			LabelPolicyRemovedEventType,
 		),
 	}
+}
+
+func LabelPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &LabelPolicyRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
 }

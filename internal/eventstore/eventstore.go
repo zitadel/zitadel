@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/internal/repository"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	es_v2 "github.com/caos/zitadel/internal/eventstore/v2"
 )
 
 type Eventstore interface {
@@ -14,6 +15,7 @@ type Eventstore interface {
 	PushAggregates(ctx context.Context, aggregates ...*models.Aggregate) error
 	FilterEvents(ctx context.Context, searchQuery *models.SearchQuery) (events []*models.Event, err error)
 	LatestSequence(ctx context.Context, searchQuery *models.SearchQueryFactory) (uint64, error)
+	V2() *es_v2.Eventstore
 }
 
 var _ Eventstore = (*eventstore)(nil)
@@ -21,6 +23,8 @@ var _ Eventstore = (*eventstore)(nil)
 type eventstore struct {
 	repo             repository.Repository
 	aggregateCreator *models.AggregateCreator
+
+	esV2 *es_v2.Eventstore
 }
 
 func (es *eventstore) AggregateCreator() *models.AggregateCreator {
@@ -61,4 +65,8 @@ func (es *eventstore) LatestSequence(ctx context.Context, queryFactory *models.S
 
 func (es *eventstore) Health(ctx context.Context) error {
 	return es.repo.Health(ctx)
+}
+
+func (es *eventstore) V2() *es_v2.Eventstore {
+	return es.esV2
 }

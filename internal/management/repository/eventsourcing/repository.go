@@ -7,6 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/handler"
@@ -16,6 +17,10 @@ import (
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_grant "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
+	iam_business "github.com/caos/zitadel/internal/v2/business/iam"
+	"github.com/caos/zitadel/internal/v2/repository/iam"
+	"github.com/caos/zitadel/internal/v2/repository/member"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
 type Config struct {
@@ -36,10 +41,30 @@ type EsRepository struct {
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRepository, error) {
+
 	es, err := es_int.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
 	}
+	esV2 := es.V2()
+	esV2.RegisterFilterEventMapper(iam.SetupStartedEventType, iam.SetupStepMapper).
+		RegisterFilterEventMapper(iam.SetupDoneEventType, iam.SetupStepMapper).
+		RegisterFilterEventMapper(iam.GlobalOrgSetEventType, iam.GlobalOrgSetMapper).
+		RegisterFilterEventMapper(iam.ProjectSetEventType, iam.ProjectSetMapper).
+		RegisterFilterEventMapper(iam.LabelPolicyAddedEventType, policy.LabelPolicyAddedEventMapper).
+		RegisterFilterEventMapper(iam.LabelPolicyChangedEventType, policy.LabelPolicyChangedEventMapper).
+		RegisterFilterEventMapper(iam.LoginPolicyAddedEventType, policy.LoginPolicyAddedEventMapper).
+		RegisterFilterEventMapper(iam.LoginPolicyChangedEventType, policy.LoginPolicyChangedEventMapper).
+		RegisterFilterEventMapper(iam.OrgIAMPolicyAddedEventType, policy.OrgIAMPolicyAddedEventMapper).
+		RegisterFilterEventMapper(iam.PasswordAgePolicyAddedEventType, policy.PasswordAgePolicyAddedEventMapper).
+		RegisterFilterEventMapper(iam.PasswordAgePolicyChangedEventType, policy.PasswordAgePolicyChangedEventMapper).
+		RegisterFilterEventMapper(iam.PasswordComplexityPolicyAddedEventType, policy.PasswordComplexityPolicyAddedEventMapper).
+		RegisterFilterEventMapper(iam.PasswordComplexityPolicyChangedEventType, policy.PasswordComplexityPolicyChangedEventMapper).
+		RegisterFilterEventMapper(iam.PasswordLockoutPolicyAddedEventType, policy.PasswordLockoutPolicyAddedEventMapper).
+		RegisterFilterEventMapper(iam.PasswordLockoutPolicyChangedEventType, policy.PasswordLockoutPolicyChangedEventMapper).
+		RegisterFilterEventMapper(iam.MemberAddedEventType, member.AddedEventMapper).
+		RegisterFilterEventMapper(iam.MemberChangedEventType, member.ChangedEventMapper).
+		RegisterFilterEventMapper(iam.MemberRemovedEventType, member.RemovedEventMapper)
 
 	sqlClient, err := conf.View.Start()
 	if err != nil {
@@ -89,10 +114,17 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, project, usergrant, user, iam, view, roles, systemDefaults.IamID},
 		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, user, org, usergrant, view, systemDefaults},
 		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
-		IAMRepository: eventstore.IAMRepository{iam},
+		IAMRepository: eventstore.IAMRepository{
+			IAMEvents: iam,
+			IAMV2:     iam_business.StartRepository(&iam_business.Config{Eventstore: esV2}),
+		},
 	}, nil
 }
 
 func (repo *EsRepository) Health() error {
 	return repo.ProjectEvents.Health(context.Background())
+}
+
+func (repo *EsRepository) IAMByID(ctx context.Context, id string) (*iam_model.IAM, error) {
+	return repo.IAMRepository.IAMByID(ctx, id)
 }
