@@ -1,6 +1,13 @@
 .git
 .codecov
 .github
+build/dockerfile
 site
 console/node_modules
 console/tmp
+.releaserc.js
+.typo-ci.yml
+CONTRIBUTING.md
+LICENSE
+README.md
+SECURITY.md

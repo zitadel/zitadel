@@ -1,3 +1,5 @@
+ARG APP_ENV=dev
+
 ## This step downloads protoc and protoc-gen-grpc-web for later use
 FROM alpine as protoc
 
@@ -67,36 +69,33 @@ RUN ls dist/console
 
 ## Cache go mod 
 ## Speed up this step by mounting your local go mod pkg directory
-FROM golang:1.15 as gomoddownload
+FROM golang:1.15 as go-base
 
 WORKDIR src/github.com/caos/zitadel/
-
 COPY go.mod go.sum ./
-
 RUN go mod download
-
-FROM golang:1.15 as gotest
-
-WORKDIR src/github.com/caos/zitadel/
-
-COPY --from=gomoddownload $GOPATH/pkg/mod $GOPATH/pkg/mod/
 COPY . .
+
+FROM go-base as gotest
 
 RUN go test -race -v -coverprofile=profile.cov ./...
 
-## Build go code
-FROM golang:1.15 as gobuild
+FROM gotest as prod-build
 
-COPY --from=gomoddownload $GOPATH/pkg/mod $GOPATH/pkg/mod/
 COPY --from=npmbuilder console/dist/console console/dist/console/
-COPY . .
 
-RUN ./build/console/generate-static.sh \
+RUN go get github.com/rakyll/statik \
+    && ./build/console/generate-static.sh \
     && ./build/login/generate-static.sh \
     && ./build/notification/generate-static.sh \
     && ./build/zitadel/generate-static.sh
 
-## TODO ARG
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel-linux-amd64 cmd/zitadel/main.go
+RUN echo prod
 
-RUN echo yeeessssss
+FROM go-base as dev-build
+
+RUN echo dev
+
+FROM ${APP_ENV}-build as final
+
+RUN echo final
