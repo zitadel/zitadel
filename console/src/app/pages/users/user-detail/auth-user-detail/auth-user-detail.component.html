@@ -40,8 +40,11 @@
 
         <app-card *ngIf="user" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
             description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
+            <button card-actions mat-icon-button (click)="refreshUser()">
+                <mat-icon>refresh</mat-icon>
+            </button>
             <app-contact *ngIf="user?.human" [human]="user.human" [state]="user.state" canWrite="true"
-                [userStateEnum]="UserState" (savedPhone)="savePhone($event)" (savedEmail)="saveEmail($event)"
+                [userStateEnum]="UserState" (editType)="openEditDialog($event)"
                 (enteredPhoneCode)="enteredPhoneCode($event)" (deletedPhone)="deletePhone()"
                 (resendEmailVerification)="resendEmailVerification()"
                 (resendPhoneVerification)="resendPhoneVerification()">

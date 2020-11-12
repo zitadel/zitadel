@@ -13,8 +13,7 @@
         {{'ACTIONS.CLOSE' | translate}}
     </button>
 
-    <button [disabled]="!email" cdkFocusInitial color="primary" mat-raised-button class="ok-button"
-        (click)="closeDialogWithSend(email)">
+    <button cdkFocusInitial color="primary" mat-raised-button class="ok-button" (click)="closeDialogWithSend(email)">
         {{'ACTIONS.SEND' | translate}}
     </button>
 </div>

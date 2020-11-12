@@ -63,7 +63,8 @@
         "EDIT":"Bearbeiten",
         "PIN":"Anpinnen",
         "CONFIGURE":"Konfigurieren",
-        "SEND":"Senden"
+        "SEND":"Senden",
+        "NEWVALUE":"Neuer Wert"
     },
     "ERRORS": {
         "REQUIRED": "Bitte fülle alle benötigten Felder aus.",
@@ -240,12 +241,18 @@
             "EMAIL": {
                 "TITLE": "E-Mail",
                 "VALID": "Validiert",
-                "RESEND": "Verifikationsmail erneut senden"
+                "RESEND": "Verifikationsmail erneut senden",
+                "EDITTITLE":"Email ändern",
+                "EDITDESC":"Geben Sie die neue Email in dem darunterliegenden Feld ein!"
             },
             "PHONE": {
                 "TITLE": "Telefon",
                 "VALID": "Validiert",
-                "RESEND": "Verifikationsnachricht erneut senden"
+                "RESEND": "Verifikationsnachricht erneut senden",
+                "EDITTITLE":"Nummer ändern",
+                "EDITDESC":"Geben Sie die neue Nummer in dem darunterliegenden Feld ein!",
+                "DELETETITLE":"Telefonnummer löschen",
+                "DELETEDESC":"Wollen Sie die Telefonnummer wirklich löschen?"
             },
             "RESENDCODE": "Code erneut senden",
             "ENTERCODE":"Verifizieren",

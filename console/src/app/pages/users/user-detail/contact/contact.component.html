@@ -3,14 +3,14 @@
         <div class="left">
             <span class="label">{{ 'USER.PROFILE.PASSWORD' | translate }}</span>
             <span class="name">*********</span>
+
+            <ng-content select="[pwdAction]"></ng-content>
         </div>
 
-        <ng-content select="[pwdAction]"></ng-content>
-
-        <div>
+        <div class="right">
             <a matTooltip="{{'USER.PASSWORD.SET' | translate}}" [disabled]="!canWrite" [routerLink]="['password']"
                 mat-icon-button>
-                <mat-icon class="icon">chevron_right</mat-icon>
+                <i class="las la-edit"></i>
             </a>
         </div>
     </div>
@@ -19,57 +19,37 @@
         <div class="left">
             <span class="label">{{ 'USER.EMAIL' | translate }}</span>
             <span class="name">{{human?.email}}</span>
-        </div>
+            <span *ngIf="human?.isEmailVerified" class="state verified">{{'USER.EMAILVERIFIED' | translate}}</span>
+            <div *ngIf="!human?.isEmailVerified" class="block">
+                <span class="state notverified">{{'USER.NOTVERIFIED' | translate}}</span>
 
-        <ng-container *ngIf="!emailEditState; else emailEdit">
-            <div class="actions">
-                <span *ngIf="human?.isEmailVerified" class="state verified">{{'USER.EMAILVERIFIED' | translate}}</span>
-
-                <ng-container *ngIf="human?.email && !human?.isEmailVerified">
-                    <span class="state notverified">{{'USER.NOTVERIFIED' | translate}}</span>
+                <ng-container *ngIf="human?.email">
                     <a *ngIf="canWrite && state != userStateEnum?.USERSTATE_INITIAL" class="verify"
                         matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
                         (click)="emitEmailVerification()">{{'USER.LOGINMETHODS.RESENDCODE' | translate}}</a>
                 </ng-container>
             </div>
 
-            <div>
-                <ng-content select="[emailAction]"></ng-content>
-                <button [disabled]="!canWrite" (click)="emailEditState = true" mat-icon-button>
-                    <mat-icon class="icon">edit</mat-icon>
-                </button>
-            </div>
-        </ng-container>
-        <ng-template #emailEdit>
-            <div>
-                <mat-form-field class="name">
-                    <mat-label>{{ 'USER.EMAIL' | translate }}</mat-label>
-                    <input *ngIf="human && human.email !== undefined && human.email !== null" matInput
-                        [(ngModel)]="human.email" />
-                </mat-form-field>
-                <button (click)="emailEditState = false" mat-icon-button>
-                    <mat-icon class="icon">close</mat-icon>
-                </button>
-                <button *ngIf="human" [disabled]="!human.email" type="button" color="primary" (click)="saveEmail()"
-                    mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
-            </div>
-        </ng-template>
+            <ng-content select="[emailAction]"></ng-content>
+        </div>
+
+        <div class="right">
+            <button [disabled]="!canWrite" (click)="openEditDialog(EditDialogType.EMAIL)" mat-icon-button>
+                <i class="las la-edit"></i>
+            </button>
+        </div>
     </div>
 
     <div class="method-row">
         <div class="left">
             <span class="label">{{ 'USER.PHONE' | translate }}</span>
             <span class="name">{{human?.phone ? human.phone : ('USER.PHONEEMPTY' | translate)}}</span>
-        </div>
+            <span *ngIf="human?.isPhoneVerified" class="state verified">{{'USER.PHONEVERIFIED' | translate}}</span>
+            <div *ngIf="!human?.isPhoneVerified" class="block">
+                <span class="state notverified">{{'USER.NOTVERIFIED' | translate}}</span>
 
-        <ng-container *ngIf="!phoneEditState; else phoneEdit">
-            <div class="actions">
-                <span *ngIf="human?.isPhoneVerified" class="state verified">{{'USER.PHONEVERIFIED' | translate}}</span>
-
-                <ng-container *ngIf="human?.phone && !human?.isPhoneVerified">
-                    <span class="state notverified">{{'USER.NOTVERIFIED' | translate}}</span>
-
-                    <a *ngIf="!disablePhoneCode && !canWrite" class="verify"
+                <ng-container *ngIf="human?.phone">
+                    <a *ngIf="!disablePhoneCode && canWrite" class="verify"
                         matTooltip="{{'USER.LOGINMETHODS.ENTERCODE_DESC' | translate}}"
                         (click)="enterCode()">{{'USER.LOGINMETHODS.ENTERCODE' | translate}}</a>
                     <a *ngIf="canWrite" class="verify" matTooltip="{{'USER.LOGINMETHODS.PHONE.RESEND' | translate}}"
@@ -77,31 +57,18 @@
                 </ng-container>
             </div>
 
-            <div>
-                <ng-content select="[phoneAction]"></ng-content>
+            <ng-content select="[phoneAction]"></ng-content>
+        </div>
 
-                <button [disabled]="!canWrite" (click)="phoneEditState = true" mat-icon-button>
-                    <mat-icon class="icon">edit</mat-icon>
-                </button>
-            </div>
-        </ng-container>
-
-        <ng-template #phoneEdit>
-            <div>
-                <mat-form-field class="name">
-                    <mat-label>{{ 'USER.PHONE' | translate }}</mat-label>
-                    <input *ngIf="human && human.phone !== undefined && human.phone !== null" matInput
-                        [(ngModel)]="human.phone" />
-                </mat-form-field>
-                <button (click)="phoneEditState = false" mat-icon-button>
-                    <mat-icon class="icon">close</mat-icon>
-                </button>
-                <button *ngIf="human && human.phone" color="warn" (click)="emitDeletePhone()" mat-icon-button>
-                    <i class="las la-trash"></i>
-                </button>
-                <button *ngIf="human" [disabled]="!human.phone" type="button" color="primary" (click)="savePhone()"
-                    mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
-            </div>
-        </ng-template>
+        <div class="right">
+            <button matTooltip="{{'ACTIONS.DELETE' | translate}}" *ngIf="human && human.phone" color="warn"
+                (click)="emitDeletePhone()" mat-icon-button>
+                <i class="las la-trash"></i>
+            </button>
+            <button matTooltip="{{'ACTIONS.EDIT' | translate}}" [disabled]="!canWrite"
+                (click)="openEditDialog(EditDialogType.PHONE)" mat-icon-button>
+                <i class="las la-edit"></i>
+            </button>
+        </div>
     </div>
 </div>

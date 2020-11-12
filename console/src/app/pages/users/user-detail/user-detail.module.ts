@@ -34,6 +34,7 @@ import { AuthUserDetailComponent } from './auth-user-detail/auth-user-detail.com
 import { AuthUserMfaComponent } from './auth-user-detail/auth-user-mfa/auth-user-mfa.component';
 import { CodeDialogComponent } from './auth-user-detail/code-dialog/code-dialog.component';
 import { DialogOtpComponent } from './auth-user-detail/dialog-otp/dialog-otp.component';
+import { EditDialogComponent } from './auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from './auth-user-detail/resend-email-dialog/resend-email-dialog.component';
 import { ThemeSettingComponent } from './auth-user-detail/theme-setting/theme-setting.component';
 import { ContactComponent } from './contact/contact.component';
@@ -54,6 +55,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         AuthUserDetailComponent,
         UserDetailComponent,
         DialogOtpComponent,
+        EditDialogComponent,
         AuthUserMfaComponent,
         UserMfaComponent,
         ThemeSettingComponent,

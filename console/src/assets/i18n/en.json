@@ -63,7 +63,8 @@
         "EDIT":"Edit",
         "PIN":"Pin / Unpin",
         "CONFIGURE":"Configure",
-        "SEND":"Send"
+        "SEND":"Send",
+        "NEWVALUE":"New Value"
     },
     "ERRORS": {
         "REQUIRED": "Some required fields are missing.",
@@ -232,7 +233,7 @@
         "PHONEEMPTY":"No phonenumber defined",
         "PHONEVERIFIED":"Phonenumber verified.",
         "EMAILVERIFIED":"Email verified",
-        "NOTVERIFIED":"nicht verifiziert",
+        "NOTVERIFIED":"not verified",
         "PREFERRED_LOGINNAME":"Preferred Loginname",
         "LOGINMETHODS": {
             "TITLE": "Contact Information",
@@ -240,12 +241,18 @@
             "EMAIL": {
                 "TITLE": "E-mail",
                 "VALID": "validated",
-                "RESEND": "Resend Verification E-mail"
+                "RESEND": "Resend Verification E-mail",
+                "EDITTITLE":"Change Email",
+                "EDITDESC":"Enter the new email in the field below."
             },
             "PHONE": {
                 "TITLE": "Phone",
                 "VALID": "validated",
-                "RESEND": "Resend Verification Text Message"
+                "RESEND": "Resend Verification Text Message",
+                "EDITTITLE":"Change number",
+                "EDITDESC":"Enter the new phonenumber in the field below.",
+                "DELETETITLE":"Delete Phonenumber",
+                "DELETEDESC":"Do you really want to delete the phonenumber"
             },
             "RESENDCODE": "Resend Code",
             "ENTERCODE":"Verify",
