@@ -2,15 +2,17 @@ package eventstore
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/iam/model"
-	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
+	iam_business "github.com/caos/zitadel/internal/v2/business/iam"
 )
 
 type IAMRepository struct {
-	IAMID     string
-	IAMEvents *iam_event.IAMEventstore
+	IAMID string
+
+	IAMV2 *iam_business.Repository
 }
 
 func (repo *IAMRepository) GetIAM(ctx context.Context) (*model.IAM, error) {
-	return repo.IAMEvents.IAMByID(ctx, repo.IAMID)
+	return repo.IAMV2.IAMByID(ctx, repo.IAMID)
 }

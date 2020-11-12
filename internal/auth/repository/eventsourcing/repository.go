@@ -21,6 +21,10 @@ import (
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	iam_business "github.com/caos/zitadel/internal/v2/business/iam"
+	"github.com/caos/zitadel/internal/v2/repository/iam"
+	"github.com/caos/zitadel/internal/v2/repository/member"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
 type Config struct {
@@ -51,6 +55,25 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 	if err != nil {
 		return nil, err
 	}
+	esV2 := es.V2()
+	esV2.RegisterFilterEventMapper(iam.SetupStartedEventType, iam.SetupStepMapper).
+		RegisterFilterEventMapper(iam.SetupDoneEventType, iam.SetupStepMapper).
+		RegisterFilterEventMapper(iam.GlobalOrgSetEventType, iam.GlobalOrgSetMapper).
+		RegisterFilterEventMapper(iam.ProjectSetEventType, iam.ProjectSetMapper).
+		RegisterFilterEventMapper(iam.LabelPolicyAddedEventType, policy.LabelPolicyAddedEventMapper).
+		RegisterFilterEventMapper(iam.LabelPolicyChangedEventType, policy.LabelPolicyChangedEventMapper).
+		RegisterFilterEventMapper(iam.LoginPolicyAddedEventType, policy.LoginPolicyAddedEventMapper).
+		RegisterFilterEventMapper(iam.LoginPolicyChangedEventType, policy.LoginPolicyChangedEventMapper).
+		RegisterFilterEventMapper(iam.OrgIAMPolicyAddedEventType, policy.OrgIAMPolicyAddedEventMapper).
+		RegisterFilterEventMapper(iam.PasswordAgePolicyAddedEventType, policy.PasswordAgePolicyAddedEventMapper).
+		RegisterFilterEventMapper(iam.PasswordAgePolicyChangedEventType, policy.PasswordAgePolicyChangedEventMapper).
+		RegisterFilterEventMapper(iam.PasswordComplexityPolicyAddedEventType, policy.PasswordComplexityPolicyAddedEventMapper).
+		RegisterFilterEventMapper(iam.PasswordComplexityPolicyChangedEventType, policy.PasswordComplexityPolicyChangedEventMapper).
+		RegisterFilterEventMapper(iam.PasswordLockoutPolicyAddedEventType, policy.PasswordLockoutPolicyAddedEventMapper).
+		RegisterFilterEventMapper(iam.PasswordLockoutPolicyChangedEventType, policy.PasswordLockoutPolicyChangedEventMapper).
+		RegisterFilterEventMapper(iam.MemberAddedEventType, member.AddedEventMapper).
+		RegisterFilterEventMapper(iam.MemberChangedEventType, member.ChangedEventMapper).
+		RegisterFilterEventMapper(iam.MemberRemovedEventType, member.RemovedEventMapper)
 
 	sqlClient, err := conf.View.Start()
 	if err != nil {
@@ -176,8 +199,8 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 			SystemDefaults: systemDefaults,
 		},
 		eventstore.IAMRepository{
-			IAMEvents: iam,
-			IAMID:     systemDefaults.IamID,
+			IAMID: systemDefaults.IamID,
+			IAMV2: iam_business.StartRepository(&iam_business.Config{Eventstore: esV2}),
 		},
 	}, nil
 }
