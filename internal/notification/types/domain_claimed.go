@@ -1,7 +1,6 @@
 package types
 
 import (
-	"net/http"
 	"strings"
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -15,7 +14,7 @@ type DomainClaimedData struct {
 	URL string
 }
 
-func SendDomainClaimed(dir http.FileSystem, i18n *i18n.Translator, user *view_model.NotifyUser, username string, systemDefaults systemdefaults.SystemDefaults) error {
+func SendDomainClaimed(mailhtml string, i18n *i18n.Translator, user *view_model.NotifyUser, username string, systemDefaults systemdefaults.SystemDefaults) error {
 	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.DomainClaimed, &UrlData{UserID: user.ID})
 	if err != nil {
 		return err
@@ -29,7 +28,7 @@ func SendDomainClaimed(dir http.FileSystem, i18n *i18n.Translator, user *view_mo
 	}
 	systemDefaults.Notifications.TemplateData.DomainClaimed.Translate(i18n, args, user.PreferredLanguage)
 	data := &DomainClaimedData{TemplateData: systemDefaults.Notifications.TemplateData.DomainClaimed, URL: url}
-	template, err := templates.GetParsedTemplate(dir, data)
+	template, err := templates.GetParsedTemplate(mailhtml, data)
 	if err != nil {
 		return err
 	}

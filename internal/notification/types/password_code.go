@@ -1,8 +1,6 @@
 package types
 
 import (
-	"net/http"
-
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/i18n"
@@ -19,7 +17,7 @@ type PasswordCodeData struct {
 	URL       string
 }
 
-func SendPasswordCode(dir http.FileSystem, i18n *i18n.Translator, user *view_model.NotifyUser, code *es_model.PasswordCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView) error {
+func SendPasswordCode(mailhtml string, i18n *i18n.Translator, user *view_model.NotifyUser, code *es_model.PasswordCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -39,7 +37,7 @@ func SendPasswordCode(dir http.FileSystem, i18n *i18n.Translator, user *view_mod
 	// Set the color in initCodeData
 	passwordCodeData.PrimaryColor = colors.PrimaryColor
 	passwordCodeData.SecondaryColor = colors.SecondaryColor
-	template, err := templates.GetParsedTemplate(dir, passwordCodeData)
+	template, err := templates.GetParsedTemplate(mailhtml, passwordCodeData)
 	if err != nil {
 		return err
 	}

@@ -1,7 +1,7 @@
 package types
 
 import (
-	"net/http"
+	"html"
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -17,7 +17,7 @@ type EmailVerificationCodeData struct {
 	URL string
 }
 
-func SendEmailVerificationCode(dir http.FileSystem, i18n *i18n.Translator, user *view_model.NotifyUser, code *es_model.EmailCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView) error {
+func SendEmailVerificationCode(mailhtml string, text *iam_model.MailTextView, i18n *i18n.Translator, user *view_model.NotifyUser, code *es_model.EmailCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -32,12 +32,22 @@ func SendEmailVerificationCode(dir http.FileSystem, i18n *i18n.Translator, user 
 		"Code":      codeString,
 	}
 	systemDefaults.Notifications.TemplateData.VerifyEmail.Translate(i18n, args, user.PreferredLanguage)
-	emailCodeData := &EmailVerificationCodeData{TemplateData: systemDefaults.Notifications.TemplateData.VerifyEmail, URL: url}
+	emailCodeData := &EmailVerificationCodeData{TemplateData: templates.TemplateData{
+		Title:          text.Title,
+		PreHeader:      text.PreHeader,
+		Subject:        text.Subject,
+		Greeting:       text.Greeting,
+		Text:           html.UnescapeString(text.Text),
+		Href:           url,
+		ButtonText:     text.ButtonText,
+		PrimaryColor:   colors.PrimaryColor,
+		SecondaryColor: colors.SecondaryColor,
+		FirstName:      user.FirstName,
+		LastName:       user.LastName,
+		Code:           codeString,
+	}, URL: url}
 
-	// Set the color in initCodeData
-	emailCodeData.PrimaryColor = colors.PrimaryColor
-	emailCodeData.SecondaryColor = colors.SecondaryColor
-	template, err := templates.GetParsedTemplate(dir, emailCodeData)
+	template, err := templates.GetParsedTemplate(mailhtml, emailCodeData)
 	if err != nil {
 		return err
 	}

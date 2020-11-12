@@ -35,10 +35,19 @@ type Notification struct {
 }
 
 const (
-	notificationTable   = "notification.notifications"
-	NotifyUserID        = "NOTIFICATION"
-	labelPolicyTableOrg = "management.label_policies"
-	labelPolicyTableDef = "adminapi.label_policies"
+	notificationTable         = "notification.notifications"
+	NotifyUserID              = "NOTIFICATION"
+	labelPolicyTableOrg       = "management.label_policies"
+	labelPolicyTableDef       = "adminapi.label_policies"
+	mailTemplateTableOrg      = "management.mail_templates"
+	mailTemplateTableDef      = "adminapi.mail_templates"
+	mailTextTableOrg          = "management.mail_texts"
+	mailTextTableDef          = "adminapi.mail_texts"
+	mailTextTypeDomainClaimed = "DomainClaimed"
+	mailTextTypeInitCode      = "InitCode"
+	mailTextTypePasswordReset = "PasswordReset"
+	mailTextTypeVerifyEmail   = "VerifyEmail"
+	mailTextTypeVerifyPhone   = "VerifyPhone"
 )
 
 func (n *Notification) ViewModel() string {
@@ -89,13 +98,19 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
+	template, err := n.getMailTemplate(context.Background())
+	if err != nil {
+		return err
+	}
+
 	initCode := new(es_model.InitUserCode)
 	initCode.SetData(event)
 	user, err := n.view.NotifyUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
-	err = types.SendUserInitCode(n.statikDir, n.i18n, user, initCode, n.systemDefaults, n.AesCrypto, colors)
+
+	err = types.SendUserInitCode(string(template.Template), n.i18n, user, initCode, n.systemDefaults, n.AesCrypto, colors)
 	if err != nil {
 		return err
 	}
@@ -113,13 +128,18 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 		return err
 	}
 
+	template, err := n.getMailTemplate(context.Background())
+	if err != nil {
+		return err
+	}
+
 	pwCode := new(es_model.PasswordCode)
 	pwCode.SetData(event)
 	user, err := n.view.NotifyUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordCode(n.statikDir, n.i18n, user, pwCode, n.systemDefaults, n.AesCrypto, colors)
+	err = types.SendPasswordCode(string(template.Template), n.i18n, user, pwCode, n.systemDefaults, n.AesCrypto, colors)
 	if err != nil {
 		return err
 	}
@@ -137,13 +157,24 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
+	template, err := n.getMailTemplate(context.Background())
+	if err != nil {
+		return err
+	}
+
 	emailCode := new(es_model.EmailCode)
 	emailCode.SetData(event)
 	user, err := n.view.NotifyUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
-	err = types.SendEmailVerificationCode(n.statikDir, n.i18n, user, emailCode, n.systemDefaults, n.AesCrypto, colors)
+
+	text, err := n.getMailText(context.Background(), mailTextTypeVerifyEmail, user.PreferredLanguage[len(user.PreferredLanguage)-2:])
+	if err != nil {
+		return err
+	}
+
+	err = types.SendEmailVerificationCode(string(template.Template), text, n.i18n, user, emailCode, n.systemDefaults, n.AesCrypto, colors)
 	if err != nil {
 		return err
 	}
@@ -182,7 +213,11 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	err = types.SendDomainClaimed(n.statikDir, n.i18n, user, data["userName"], n.systemDefaults)
+	template, err := n.getMailTemplate(context.Background())
+	if err != nil {
+		return err
+	}
+	err = types.SendDomainClaimed(string(template.Template), n.i18n, user, data["userName"], n.systemDefaults)
 	if err != nil {
 		return err
 	}
@@ -236,4 +271,40 @@ func (n *Notification) getLabelPolicy(ctx context.Context) (*iam_model.LabelPoli
 		return nil, err
 	}
 	return iam_es_model.LabelPolicyViewToModel(policy), err
+}
+
+// Read organization specific template
+func (n *Notification) getMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
+	// read from Org
+	template, err := n.view.MailTemplateByAggregateID(authz.GetCtxData(ctx).OrgID, mailTemplateTableOrg)
+	if errors.IsNotFound(err) {
+		// read from default
+		template, err = n.view.MailTemplateByAggregateID(n.systemDefaults.IamID, mailTemplateTableDef)
+		if err != nil {
+			return nil, err
+		}
+		template.Default = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.MailTemplateViewToModel(template), err
+}
+
+// Read organization specific texts
+func (n *Notification) getMailText(ctx context.Context, textType string, language string) (*iam_model.MailTextView, error) {
+	// read from Org
+	mailText, err := n.view.MailTextByIDs(authz.GetCtxData(ctx).OrgID, textType, language, mailTextTableOrg)
+	if errors.IsNotFound(err) {
+		// read from default
+		mailText, err = n.view.MailTextByIDs(n.systemDefaults.IamID, textType, language, mailTextTableDef)
+		if err != nil {
+			return nil, err
+		}
+		mailText.Default = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.MailTextViewToModel(mailText), err
 }

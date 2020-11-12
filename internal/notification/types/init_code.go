@@ -1,8 +1,6 @@
 package types
 
 import (
-	"net/http"
-
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/i18n"
@@ -23,7 +21,7 @@ type UrlData struct {
 	PasswordSet bool
 }
 
-func SendUserInitCode(dir http.FileSystem, i18n *i18n.Translator, user *view_model.NotifyUser, code *es_model.InitUserCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView) error {
+func SendUserInitCode(mailhtml string, i18n *i18n.Translator, user *view_model.NotifyUser, code *es_model.InitUserCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -44,7 +42,7 @@ func SendUserInitCode(dir http.FileSystem, i18n *i18n.Translator, user *view_mod
 	// Set the color in initCodeData
 	initCodeData.PrimaryColor = colors.PrimaryColor
 	initCodeData.SecondaryColor = colors.SecondaryColor
-	template, err := templates.GetParsedTemplate(dir, initCodeData)
+	template, err := templates.GetParsedTemplate(mailhtml, initCodeData)
 	if err != nil {
 		return err
 	}

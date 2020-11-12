@@ -3,7 +3,7 @@ CREATE TABLE adminapi.mail_templates (
 
     creation_date TIMESTAMPTZ,
     change_date TIMESTAMPTZ,
-    label_policy_state SMALLINT,
+    mail_template_state SMALLINT,
     sequence BIGINT,
 
     template BYTES,
@@ -17,7 +17,7 @@ CREATE TABLE management.mail_templates (
 
     creation_date TIMESTAMPTZ,
     change_date TIMESTAMPTZ,
-    label_policy_state SMALLINT,
+    mail_template_state SMALLINT,
     sequence BIGINT,
 
     template BYTES,
@@ -34,7 +34,7 @@ CREATE TABLE adminapi.mail_texts (
 
     creation_date TIMESTAMPTZ,
     change_date TIMESTAMPTZ,
-    label_policy_state SMALLINT,
+    mail_text_state SMALLINT,
     sequence BIGINT,
 
     mail_text_type TEXT,
@@ -55,7 +55,7 @@ CREATE TABLE management.mail_texts (
 
     creation_date TIMESTAMPTZ,
     change_date TIMESTAMPTZ,
-    label_policy_state SMALLINT,
+    mail_text_state SMALLINT,
     sequence BIGINT,
 
     mail_text_type TEXT,

@@ -174,22 +174,40 @@ func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_mo
 	return result, nil
 }
 
-func (repo *IAMRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
-	policy, err := repo.View.LabelPolicyByAggregateID(repo.SystemDefaults.IamID)
+func (repo *IAMRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
+	template, err := repo.View.MailTemplateByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.LabelPolicyViewToModel(policy), err
+	return iam_es_model.MailTemplateViewToModel(template), err
 }
 
-func (repo *IAMRepository) AddDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	return repo.IAMEventstore.AddLabelPolicy(ctx, policy)
+func (repo *IAMRepository) AddDefaultMailTemplate(ctx context.Context, template *iam_model.MailTemplate) (*iam_model.MailTemplate, error) {
+	template.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.AddMailTemplate(ctx, template)
 }
 
-func (repo *IAMRepository) ChangeDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	return repo.IAMEventstore.ChangeLabelPolicy(ctx, policy)
+func (repo *IAMRepository) ChangeDefaultMailTemplate(ctx context.Context, template *iam_model.MailTemplate) (*iam_model.MailTemplate, error) {
+	template.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.ChangeMailTemplate(ctx, template)
+}
+
+func (repo *IAMRepository) GetDefaultMailText(ctx context.Context, textType string, language string) (*iam_model.MailTextView, error) {
+	template, err := repo.View.MailTextByIDs(repo.SystemDefaults.IamID, textType, language)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.MailTextViewToModel(template), err
+}
+
+func (repo *IAMRepository) AddDefaultMailText(ctx context.Context, template *iam_model.MailText) (*iam_model.MailText, error) {
+	template.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.AddMailText(ctx, template)
+}
+
+func (repo *IAMRepository) ChangeDefaultMailText(ctx context.Context, template *iam_model.MailText) (*iam_model.MailText, error) {
+	template.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.ChangeMailText(ctx, template)
 }
 
 func (repo *IAMRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
@@ -332,4 +350,22 @@ func (repo *IAMRepository) AddDefaultOrgIAMPolicy(ctx context.Context, policy *i
 func (repo *IAMRepository) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
 	policy.AggregateID = repo.SystemDefaults.IamID
 	return repo.IAMEventstore.ChangeOrgIAMPolicy(ctx, policy)
+}
+
+func (repo *IAMRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
+	policy, err := repo.View.LabelPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.LabelPolicyViewToModel(policy), err
+}
+
+func (repo *IAMRepository) AddDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.AddLabelPolicy(ctx, policy)
+}
+
+func (repo *IAMRepository) ChangeDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.ChangeLabelPolicy(ctx, policy)
 }
