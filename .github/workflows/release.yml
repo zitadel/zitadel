@@ -8,10 +8,8 @@ env:
   GO_VERSION: '1.15'
 
 jobs:
-
   container-prod:
     runs-on: ubuntu-18.04
-    needs: go-build
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
