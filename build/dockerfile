@@ -1,23 +1,16 @@
-ARG APP_ENV=dev
+ARG ENV=dev
 
 ## This step downloads protoc and protoc-gen-grpc-web for later use
-FROM alpine as protoc
+FROM alpine as base
 
 RUN apk add tar curl
 WORKDIR /.tmp
 
 RUN wget -O protoc https://github.com/protocolbuffers/protobuf/releases/download/v3.13.0/protoc-3.13.0-linux-x86_64.zip \
     && unzip protoc \
-    && wget -O bin/protoc-gen-grpc-web https://github.com/grpc/grpc-web/releases/download/1.2.0/protoc-gen-grpc-web-1.2.0-linux-x86_64
+    && wget -O bin/protoc-gen-grpc-web https://github.com/grpc/grpc-web/releases/download/1.2.0/protoc-gen-grpc-web-1.2.0-linux-x86_64 \
+    && chmod +x bin/protoc-gen-grpc-web
 
-RUN chmod +x bin/protoc-gen-grpc-web
-
-# This step downloads all protofiles
-FROM alpine as proto
-
-RUN apk add curl
-
-WORKDIR /.tmp
 RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.0/validate/validate.proto --create-dirs -o validate/validate.proto  \
     && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/annotations.proto --create-dirs -o protoc-gen-swagger/options/annotations.proto \
     && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/openapiv2.proto --create-dirs -o protoc-gen-swagger/options/openapiv2.proto \
@@ -32,40 +25,34 @@ COPY pkg/grpc/management/proto/management.proto management/proto/management.prot
 COPY pkg/grpc/message/proto/message.proto message/proto/message.proto
 COPY internal/protoc/protoc-gen-authoption/authoption/options.proto authoption/options.proto
 
-RUN ls -l
-
 ## With this step we prepare all node_modules, this helps caching the build
 ## Speed up this step by mounting your local node_modules directory
-FROM node:12 as npminstaller
+FROM node:12 as npm-base
 
-WORKDIR deps
+WORKDIR console
 
 COPY console/package.json console/package-lock.json ./
 
 RUN npm install
 
-## This step does build the angular code
-FROM node:12 as npmbuilder
-
-WORKDIR console
-
 RUN mkdir .tmp
 
 COPY console .
-COPY --from=protoc /.tmp/bin /usr/local/bin/
-COPY --from=proto /.tmp .tmp/protos/
-COPY --from=npminstaller deps/node_modules node_modules/
+COPY --from=base /.tmp/bin /usr/local/bin/
+COPY --from=base /.tmp .tmp/protos/
 COPY build/console build/console/
 
 RUN build/console/generate-grpc.sh
 
-## Override this when localy
-ARG build=prodbuild
-RUN npm run $build
+FROM npm-base as dev-angular-build
 
-RUN echo totsch
+RUN npm install -g @angular/cli
+EXPOSE 4200
+RUN ls -la
 
-RUN ls dist/console
+FROM npm-base as prod-angular-build
+
+RUN npm run prodbuild
 
 ## Cache go mod 
 ## Speed up this step by mounting your local go mod pkg directory
@@ -80,9 +67,9 @@ FROM go-base as gotest
 
 RUN go test -race -v -coverprofile=profile.cov ./...
 
-FROM gotest as prod-build
+FROM gotest as prod-go-build
 
-COPY --from=npmbuilder console/dist/console console/dist/console/
+COPY --from=prod-angular-build console/dist/console console/dist/console/
 
 RUN go get github.com/rakyll/statik \
     && ./build/console/generate-static.sh \
@@ -90,12 +77,16 @@ RUN go get github.com/rakyll/statik \
     && ./build/notification/generate-static.sh \
     && ./build/zitadel/generate-static.sh
 
-RUN echo prod
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel-linux-amd64 cmd/zitadel/main.go
 
-FROM go-base as dev-build
+FROM go-base as dev-go-build
+RUN go get github.com/go-delve/delve/cmd/dlv
 
-RUN echo dev
+## TODO Expose API Ports
+EXPOSE 2345
 
-FROM ${APP_ENV}-build as final
+FROM ${ENV}-go-build as final
 
-RUN echo final
+RUN echo final reached
+
+## TODO create scratch
