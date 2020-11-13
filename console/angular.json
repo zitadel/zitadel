@@ -12,7 +12,7 @@
       },
       "root": "",
       "sourceRoot": "src",
-      "prefix": "app",
+      "prefix": "console",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",

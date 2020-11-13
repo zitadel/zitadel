@@ -24,10 +24,10 @@
                     </mat-spinner>
                 </div>
 
-                <mat-form-field class="filter-form" appearance="fill">
-                    <input matInput [formControl]="filterControl" autocomplete="off" (click)="$event.stopPropagation()"
-                        placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}" #input>
-                </mat-form-field>
+                <!-- <mat-form-field class="filter-form" appearance="fill"> -->
+                <input [formControl]="filterControl" autocomplete="off" (click)="$event.stopPropagation()"
+                    placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}" #input>
+                <!-- </mat-form-field> -->
 
                 <button [ngClass]="{'active': temporg.id === org?.id}" [disabled]="!temporg.id"
                     *ngFor="let temporg of orgs$ | async" mat-menu-item (click)="setActiveOrg(temporg)">

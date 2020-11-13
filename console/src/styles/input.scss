@@ -1,0 +1,55 @@
+@import '~@angular/material/theming';
+
+@mixin input-theme($theme) {
+  /* stylelint-disable */
+  $primary: map-get($theme, primary);
+  $primary-dark: mat-color($primary, A900);
+  $secondary-dark: mat-color($primary, A800);
+  $inv-color: mat-color($primary, A600);
+  $primary-color: mat-color($primary, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  input,
+  .mat-select {
+    display: block;
+    box-sizing: border-box;
+    padding-inline-start: 10px;
+    outline: none;
+    display: inline-block;
+    text-align: start;
+    background-color: inherit;
+    cursor: text;
+    border-radius: 8px;
+    transform: all .2 linear;
+    font-size: 1rem;
+    color: white;
+    border: none;
+    border: 1px solid if($is-dark-theme, #00000050, #00000010);
+    background-color:if($is-dark-theme, #00000010, #ffffff10);
+    border-radius: 4px;
+    height: 40px;
+    padding: 10px;
+    transition: border-color .2s ease-in-out;
+    width: 100%;
+
+    &:hover {
+        border-color: if($is-dark-theme,#040405, #ff0000);
+    }
+
+    &:active,
+    &:focus {
+        border-color: $primary-color;
+    }
+
+    &[disabled] {
+        border-color: if($is-dark-theme,#202225, #00ff00);
+    }
+  }
+
+  input::placeholder {
+    font-size: 14px;
+    color: var(--grey-text);
+    font-style: italic;
+  }
+}

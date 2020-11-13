@@ -1,5 +1,6 @@
 @import 'src/app/modules/card/card';
 @import './styles/table';
+@import './styles/input.scss';
 @import './styles/sidenav-list';
 @import 'src/app/modules/avatar/avatar.component';
 @import 'src/app/modules/changes/changes.component';
@@ -9,6 +10,8 @@
 @import 'src/app/pages/users/user-detail/auth-user-detail/theme-setting/theme-card';
 @import 'src/app/pages/users/user-detail/memberships/memberships.component';
 @import 'src/app/app.component.scss';
+@import 'src/app/modules/form-field/form-field.component.scss';
+@import 'src/app/modules/label/label.component.scss';
 
 @mixin component-themes($theme) {
   @include avatar-theme($theme);
@@ -21,5 +24,8 @@
   @include changes-theme($theme);
   @include meta-theme($theme);
   @include theme-card($theme);
+  @include input-theme($theme);
   @include textvar($theme);
+  @include cnsl-form-field-theme($theme);
+  @include cnsl-label-theme($theme);
 }
