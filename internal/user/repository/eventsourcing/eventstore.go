@@ -1373,7 +1373,7 @@ func (es *UserEventstore) AddPasswordless(ctx context.Context, userID string) (*
 	if err != nil {
 		return nil, err
 	}
-	webAuthN, err := es.webauthn.BeginRegistration(user, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementDiscouraged, user.PasswordlessTokens...)
+	webAuthN, err := es.webauthn.BeginRegistration(user, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementRequired, user.PasswordlessTokens...)
 	if err != nil {
 		return nil, err
 	}
@@ -1436,7 +1436,7 @@ func (es *UserEventstore) BeginPasswordlessLogin(ctx context.Context, userID str
 	if user.PasswordlessTokens == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5M9sd", "Errors.User.Mfa.Passwordless.NotExisting")
 	}
-	webAuthNLogin, err := es.webauthn.BeginLogin(user, usr_model.UserVerificationRequirementDiscouraged, user.PasswordlessTokens...)
+	webAuthNLogin, err := es.webauthn.BeginLogin(user, usr_model.UserVerificationRequirementRequired, user.PasswordlessTokens...)
 	if err != nil {
 		return nil, err
 	}

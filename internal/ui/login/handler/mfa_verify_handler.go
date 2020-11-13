@@ -40,9 +40,17 @@ func (l *Login) renderMfaVerify(w http.ResponseWriter, r *http.Request, authReq 
 		errMessage = l.getErrorMessage(r, err)
 	}
 	data := l.getUserData(r, authReq, "Mfa Verify", errType, errMessage)
-	if verificationStep != nil {
+	if verificationStep == nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	switch verificationStep.MfaProviders[len(verificationStep.MfaProviders)-1] {
+	case model.MFATypeU2F:
+		l.renderLoginU2F(w, r, authReq, nil)
+		return
+	case model.MFATypeOTP:
 		data.MfaProviders = verificationStep.MfaProviders
-		data.SelectedMfaProvider = verificationStep.MfaProviders[0]
+		data.SelectedMfaProvider = model.MFATypeOTP
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMfaVerify], data, nil)
 }

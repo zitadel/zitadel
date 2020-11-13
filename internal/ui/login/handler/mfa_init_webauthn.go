@@ -50,10 +50,10 @@ func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	//done := &mfaDoneData{
-	//	//MfaType: nil,
-	//}
-	l.renderLoginU2F(w, r, authReq, nil)
+	done := &mfaDoneData{
+		MfaType: model.MFATypeU2F,
+	}
+	l.renderMfaInitDone(w, r, authReq, done)
 }
 
 //TODO: remove

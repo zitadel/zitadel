@@ -48,6 +48,8 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		es_model.HumanExternalLoginCheckSucceeded,
 		es_model.HumanMFAOTPCheckSucceeded,
 		es_model.HumanMFAOTPCheckFailed,
+		es_model.HumanMFAU2FTokenCheckSucceeded,
+		es_model.HumanMFAU2FTokenCheckFailed,
 		es_model.HumanSignedOut:
 		eventData, err := view_model.UserSessionFromEvent(event)
 		if err != nil {

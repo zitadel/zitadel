@@ -145,6 +145,7 @@ type MFAType int
 const (
 	MFATypeOTP MFAType = iota
 	MFATypeU2F
+	MFATypeU2FUserVerification
 )
 
 type MFALevel int

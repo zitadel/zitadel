@@ -421,9 +421,9 @@ func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID
 	if err != nil {
 		return nil, err
 	}
-	//if request.AgentID != userAgentID {
-	//	return nil, errors.ThrowPermissionDenied(nil, "EVENT-adk13", "Errors.AuthRequest.UserAgentNotCorresponding")
-	//}
+	if request.AgentID != userAgentID {
+		return nil, errors.ThrowPermissionDenied(nil, "EVENT-adk13", "Errors.AuthRequest.UserAgentNotCorresponding")
+	}
 	err = repo.fillLoginPolicy(ctx, request)
 	if err != nil {
 		return nil, err
@@ -679,6 +679,9 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 		if promptRequired && len(types) == 0 {
 			return nil, false, errors.ThrowPreconditionFailed(nil, "LOGIN-5Hm8s", "Errors.Login.LoginPolicy.MFA.ForceAndNotConfigured")
 		}
+		if len(types) == 0 {
+			return nil, true, nil
+		}
 		return &model.MfaPromptStep{
 			Required:     promptRequired,
 			MfaProviders: types,
@@ -706,8 +709,12 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 			return nil, true, nil
 		}
 	}
+	required, providers := user.MfaTypesAllowed(mfaLevel, request.LoginPolicy)
+	if required && len(providers) == 0 {
+		return nil, false, errors.ThrowPreconditionFailed(nil, "LOGIN-Gh31n", "Errors.Login.LoginPolicy.MFA.ForceAndNotConfigured")
+	}
 	return &model.MfaVerificationStep{
-		MfaProviders: user.MfaTypesAllowed(mfaLevel, request.LoginPolicy),
+		MfaProviders: providers,
 	}, false, nil
 }
 

@@ -23,7 +23,6 @@ func (l *Login) renderLoginU2F(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	//l.sessionData = *sessionData
 	data := &webAuthNData{
 		userData:               l.getUserData(r, authReq, "Register WebAuthNToken", errType, errMessage),
 		CredentialCreationData: base64.URLEncoding.EncodeToString(webAuthNLogin.CredentialAssertionData),
@@ -39,6 +38,10 @@ func (l *Login) handleLoginU2F(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	if formData.Resend {
+		l.renderLoginU2F(w, r, authReq, nil)
+		return
+	}
 	credData, err := base64.URLEncoding.DecodeString(formData.CredentialData)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
@@ -47,12 +50,10 @@ func (l *Login) handleLoginU2F(w http.ResponseWriter, r *http.Request) {
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	err = l.authRepo.VerifyMfaU2F(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.ID, userAgentID, credData, model.BrowserInfoFromRequest(r))
 	if err != nil {
-
+		l.renderError(w, r, authReq, err)
+		return
 	}
-	done := &mfaDoneData{
-		//MfaType: nil,
-	}
-	l.renderMfaInitDone(w, r, authReq, done)
+	l.renderNextStep(w, r, authReq)
 }
 
 //TODO: remove

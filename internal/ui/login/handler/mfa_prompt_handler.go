@@ -81,6 +81,9 @@ func (l *Login) handleMfaCreation(w http.ResponseWriter, r *http.Request, authRe
 	case model.MFATypeOTP:
 		l.handleOtpCreation(w, r, authReq, data)
 		return
+	case model.MFATypeU2F:
+		l.renderRegisterU2F(w, r, authReq, nil)
+		return
 	}
 	l.renderError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-Or3HO", "Errors.User.Mfa.NoProviders"))
 }

@@ -1,14 +1,15 @@
 package model
 
 import (
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"time"
+
+	"golang.org/x/text/language"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/model"
-	"golang.org/x/text/language"
 )
 
 type UserView struct {
@@ -47,6 +48,7 @@ type HumanView struct {
 	Region                 string
 	StreetAddress          string
 	OTPState               MfaState
+	U2FVerifiedIDs         []string
 	MfaMaxSetUp            req_model.MFALevel
 	MfaInitSkipped         time.Time
 	InitRequired           bool
@@ -121,10 +123,11 @@ func (u *UserView) MfaTypesSetupPossible(level req_model.MFALevel, policy *iam_m
 					if u.OTPState != MfaStateReady {
 						types = append(types, req_model.MFATypeOTP)
 					}
+				case iam_model.SecondFactorTypeU2F:
+					types = append(types, req_model.MFATypeU2F)
 				}
 			}
 		}
-
 		//PLANNED: add sms
 		fallthrough
 	case req_model.MFALevelMultiFactor:
@@ -132,20 +135,20 @@ func (u *UserView) MfaTypesSetupPossible(level req_model.MFALevel, policy *iam_m
 			for _, mfaType := range policy.MultiFactors {
 				switch mfaType {
 				case iam_model.MultiFactorTypeU2FWithPIN:
-					// TODO: Check if not set up already
-					// types = append(types, req_model.MFATypeU2F)
+					types = append(types, req_model.MFATypeU2FUserVerification)
 				}
 			}
 		}
-		//PLANNED: add token
 	}
 	return types
 }
 
-func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.LoginPolicyView) []req_model.MFAType {
+func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.LoginPolicyView) (bool, []req_model.MFAType) {
 	types := make([]req_model.MFAType, 0)
+	required := true
 	switch level {
 	default:
+		required = false
 		fallthrough
 	case req_model.MFALevelSecondFactor:
 		if policy.HasSecondFactors() {
@@ -154,6 +157,10 @@ func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.L
 				case iam_model.SecondFactorTypeOTP:
 					if u.OTPState == MfaStateReady {
 						types = append(types, req_model.MFATypeOTP)
+					}
+				case iam_model.SecondFactorTypeU2F:
+					if len(u.U2FVerifiedIDs) > 0 {
+						types = append(types, req_model.MFATypeU2F)
 					}
 				}
 			}
@@ -165,14 +172,15 @@ func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.L
 			for _, mfaType := range policy.MultiFactors {
 				switch mfaType {
 				case iam_model.MultiFactorTypeU2FWithPIN:
-					// TODO: Check if not set up already
-					// types = append(types, req_model.MFATypeU2F)
+					if len(u.U2FVerifiedIDs) > 0 {
+						types = append(types, req_model.MFATypeU2FUserVerification)
+					}
 				}
 			}
 		}
 		//PLANNED: add token
 	}
-	return types
+	return required, types
 }
 
 func (u *UserView) HasRequiredOrgMFALevel(policy *iam_model.LoginPolicyView) bool {
@@ -183,7 +191,7 @@ func (u *UserView) HasRequiredOrgMFALevel(policy *iam_model.LoginPolicyView) boo
 	case req_model.MFALevelSecondFactor:
 		return policy.HasSecondFactors()
 	case req_model.MFALevelMultiFactor:
-		return true
+		return policy.HasMultiFactors()
 	default:
 		return false
 	}

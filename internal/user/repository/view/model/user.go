@@ -2,11 +2,13 @@ package model
 
 import (
 	"encoding/json"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"time"
 
-	org_model "github.com/caos/zitadel/internal/org/model"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+
 	"github.com/lib/pq"
+
+	org_model "github.com/caos/zitadel/internal/org/model"
 
 	"github.com/caos/logging"
 
@@ -67,25 +69,26 @@ const (
 )
 
 type HumanView struct {
-	FirstName         string    `json:"firstName" gorm:"column:first_name"`
-	LastName          string    `json:"lastName" gorm:"column:last_name"`
-	NickName          string    `json:"nickName" gorm:"column:nick_name"`
-	DisplayName       string    `json:"displayName" gorm:"column:display_name"`
-	PreferredLanguage string    `json:"preferredLanguage" gorm:"column:preferred_language"`
-	Gender            int32     `json:"gender" gorm:"column:gender"`
-	Email             string    `json:"email" gorm:"column:email"`
-	IsEmailVerified   bool      `json:"-" gorm:"column:is_email_verified"`
-	Phone             string    `json:"phone" gorm:"column:phone"`
-	IsPhoneVerified   bool      `json:"-" gorm:"column:is_phone_verified"`
-	Country           string    `json:"country" gorm:"column:country"`
-	Locality          string    `json:"locality" gorm:"column:locality"`
-	PostalCode        string    `json:"postalCode" gorm:"column:postal_code"`
-	Region            string    `json:"region" gorm:"column:region"`
-	StreetAddress     string    `json:"streetAddress" gorm:"column:street_address"`
-	OTPState          int32     `json:"-" gorm:"column:otp_state"`
-	MfaMaxSetUp       int32     `json:"-" gorm:"column:mfa_max_set_up"`
-	MfaInitSkipped    time.Time `json:"-" gorm:"column:mfa_init_skipped"`
-	InitRequired      bool      `json:"-" gorm:"column:init_required"`
+	FirstName         string         `json:"firstName" gorm:"column:first_name"`
+	LastName          string         `json:"lastName" gorm:"column:last_name"`
+	NickName          string         `json:"nickName" gorm:"column:nick_name"`
+	DisplayName       string         `json:"displayName" gorm:"column:display_name"`
+	PreferredLanguage string         `json:"preferredLanguage" gorm:"column:preferred_language"`
+	Gender            int32          `json:"gender" gorm:"column:gender"`
+	Email             string         `json:"email" gorm:"column:email"`
+	IsEmailVerified   bool           `json:"-" gorm:"column:is_email_verified"`
+	Phone             string         `json:"phone" gorm:"column:phone"`
+	IsPhoneVerified   bool           `json:"-" gorm:"column:is_phone_verified"`
+	Country           string         `json:"country" gorm:"column:country"`
+	Locality          string         `json:"locality" gorm:"column:locality"`
+	PostalCode        string         `json:"postalCode" gorm:"column:postal_code"`
+	Region            string         `json:"region" gorm:"column:region"`
+	StreetAddress     string         `json:"streetAddress" gorm:"column:street_address"`
+	OTPState          int32          `json:"-" gorm:"column:otp_state"`
+	U2FVerifiedIDs    pq.StringArray `json:"-" gorm:"column:u2f_verified_ids"`
+	MfaMaxSetUp       int32          `json:"-" gorm:"column:mfa_max_set_up"`
+	MfaInitSkipped    time.Time      `json:"-" gorm:"column:mfa_init_skipped"`
+	InitRequired      bool           `json:"-" gorm:"column:init_required"`
 
 	PasswordSet            bool      `json:"-" gorm:"column:password_set"`
 	PasswordChangeRequired bool      `json:"-" gorm:"column:password_change_required"`
@@ -140,6 +143,7 @@ func UserToModel(user *UserView) *model.UserView {
 			Region:                 user.Region,
 			StreetAddress:          user.StreetAddress,
 			OTPState:               model.MfaState(user.OTPState),
+			U2FVerifiedIDs:         user.U2FVerifiedIDs,
 			MfaMaxSetUp:            req_model.MFALevel(user.MfaMaxSetUp),
 			MfaInitSkipped:         user.MfaInitSkipped,
 			InitRequired:           user.InitRequired,
@@ -259,6 +263,27 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	case es_model.MFAOTPRemoved,
 		es_model.HumanMFAOTPRemoved:
 		u.OTPState = int32(model.MfaStateUnspecified)
+	//case es_model.HumanMFAU2FTokenAdded:
+	//
+	case es_model.HumanMFAU2FTokenVerified:
+		token := new(model.WebAuthNToken)
+		if err := json.Unmarshal(event.Data, token); err != nil {
+			return err
+		}
+		u.U2FVerifiedIDs = append(u.U2FVerifiedIDs, token.WebAuthNTokenID)
+		u.MfaInitSkipped = time.Time{}
+	case es_model.HumanMFAU2FTokenRemoved:
+		token := new(model.WebAuthNToken)
+		if err := json.Unmarshal(event.Data, token); err != nil {
+			return err
+		}
+		for i := len(u.U2FVerifiedIDs) - 1; i >= 0; i-- {
+			if u.U2FVerifiedIDs[i] == token.WebAuthNTokenID {
+				u.U2FVerifiedIDs[i] = u.U2FVerifiedIDs[len(u.U2FVerifiedIDs)-1]
+				u.U2FVerifiedIDs[len(u.U2FVerifiedIDs)-1] = ""
+				u.U2FVerifiedIDs = u.U2FVerifiedIDs[:len(u.U2FVerifiedIDs)-1]
+			}
+		}
 	case es_model.MFAInitSkipped,
 		es_model.HumanMFAInitSkipped:
 		u.MfaInitSkipped = event.CreationDate
@@ -312,10 +337,17 @@ func (u *UserView) ComputeObject() {
 			u.State = int32(model.UserStateInitial)
 		}
 	}
-	if u.OTPState != int32(model.MfaStateReady) {
-		u.MfaMaxSetUp = int32(req_model.MFALevelNotSetUp)
+	u.ComputeMFAMaxSetUp()
+}
+
+func (u *UserView) ComputeMFAMaxSetUp() {
+	if len(u.U2FVerifiedIDs) > 0 {
+		u.MfaMaxSetUp = int32(req_model.MFALevelSecondFactor)
+		return
 	}
 	if u.OTPState == int32(model.MfaStateReady) {
 		u.MfaMaxSetUp = int32(req_model.MFALevelSecondFactor)
+		return
 	}
+	u.MfaMaxSetUp = int32(req_model.MFALevelNotSetUp)
 }

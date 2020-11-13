@@ -106,8 +106,13 @@ func (v *UserSessionView) AppendEvent(event *models.Event) {
 	case es_model.MFAOTPCheckFailed,
 		es_model.MFAOTPRemoved,
 		es_model.HumanMFAOTPCheckFailed,
-		es_model.HumanMFAOTPRemoved:
+		es_model.HumanMFAOTPRemoved,
+		es_model.HumanMFAU2FTokenCheckFailed: //TODO: token removed?
 		v.SecondFactorVerification = time.Time{}
+	case es_model.HumanMFAU2FTokenCheckSucceeded:
+		v.SecondFactorVerification = event.CreationDate
+		v.SecondFactorVerificationType = int32(req_model.MFATypeU2F)
+		v.State = int32(req_model.UserSessionStateActive)
 	case es_model.SignedOut,
 		es_model.HumanSignedOut,
 		es_model.UserLocked,
