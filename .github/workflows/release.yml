@@ -38,7 +38,7 @@ jobs:
         context: .
         file: ./build/dockerfile
         platforms: linux/amd64
-        tags: ${{ github.repository }}:${{ steps.vars.outputs.sha_short }}
+        tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.vars.outputs.sha_short }}
         push: true
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
