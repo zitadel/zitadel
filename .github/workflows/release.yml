@@ -8,7 +8,7 @@ env:
   GO_VERSION: '1.15'
 
 jobs:
-  container-prod:
+  container:
     runs-on: ubuntu-18.04
     steps:
     - name: Source checkout
@@ -42,10 +42,12 @@ jobs:
         push: true
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
+        outputs: type=local,dest=/tmp/output
+    - run: ls -l /tmp/output
 
   release:
     runs-on: ubuntu-18.04
-    needs: [container-prod]
+    needs: [container]
     env:
       DOCKER_USERNAME: ${{ github.actor }}
       DOCKER_PASSWORD: ${{ secrets.CR_PAT }}
