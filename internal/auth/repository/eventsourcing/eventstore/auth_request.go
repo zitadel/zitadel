@@ -100,15 +100,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 		return nil, err
 	}
 	request.ID = reqID
-	app, err := repo.View.ApplicationByClientID(ctx, request.ApplicationID)
-	if err != nil {
-		return nil, err
-	}
-	appIDs, err := repo.View.AppIDsFromProjectID(ctx, app.ProjectID)
-	if err != nil {
-		return nil, err
-	}
-	request.Audience = appIDs
+	request.Audience = request.GetScopeProjectIDsForAud()
 	if request.LoginHint != "" {
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
 		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID).OnError(err).Debug("login hint invalid")

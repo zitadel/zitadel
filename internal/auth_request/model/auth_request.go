@@ -137,3 +137,16 @@ func (a *AuthRequest) GetScopeOrgPrimaryDomain() string {
 	}
 	return ""
 }
+
+func (a *AuthRequest) GetScopeProjectIDsForAud() []string {
+	projectIDs := make([]string, 0)
+	switch request := a.Request.(type) {
+	case *AuthRequestOIDC:
+		for _, scope := range request.Scopes {
+			if strings.HasPrefix(scope, ProjectIDAudScope) {
+				projectIDs = append(projectIDs, strings.TrimPrefix(scope, ProjectIDAudScope))
+			}
+		}
+	}
+	return projectIDs
+}
