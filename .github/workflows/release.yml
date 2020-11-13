@@ -19,7 +19,7 @@ jobs:
     - name: Check output
       run: echo ${{ steps.vars.outputs.short_ref }}
     - name: Generate Short SHA Container Tag
-      id: vars
+      id: branch
       run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
     - name: Cache Docker layers
       uses: actions/cache@v2
@@ -43,7 +43,7 @@ jobs:
         context: .
         file: ./build/dockerfile
         platforms: linux/amd64
-        tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.vars.outputs.short_ref }}
+        tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.branch.outputs.short_ref }}
         push: true
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
