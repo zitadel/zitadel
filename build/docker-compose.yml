@@ -15,6 +15,7 @@ services:
     build:
       context: ..
       dockerfile: build/Dockerfile
+      target: dev-go-build
       args:
         ENV: dev
     command: go run cmd/zitadel/main.go

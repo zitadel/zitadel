@@ -85,8 +85,15 @@ RUN go get github.com/go-delve/delve/cmd/dlv
 ## TODO Expose API Ports
 EXPOSE 2345
 
-FROM ${ENV}-go-build as final
+FROM ${ENV}-go-build as artifact
+RUN useradd zitadel
+COPY cmd/zitadel/*.yaml app/
+RUN chmod a+x zitadel-linux-amd64
+RUN mv zitadel-linux-amd64 app/zitadel
 
-RUN echo final reached
-
-## TODO create scratch
+FROM scratch as final
+COPY --from=artifact /etc/passwd /etc/passwd
+COPY --from=artifact /go/src/github.com/caos/zitadel/app app/
+USER zitadel
+HEALTHCHECK NONE
+ENTRYPOINT ["/app/zitadel"]

@@ -15,6 +15,7 @@ services:
     build:
       context: ..
       dockerfile: build/Dockerfile
+      target: dev-go-build
       args:
         ENV: dev
     command: dlv --listen=:2345 --headless=true --log=true --log-output=debugger,debuglineerr,gdbwire,lldbout,rpc --accept-multiclient --api-version=2 debug cmd/zitadel/main.go
