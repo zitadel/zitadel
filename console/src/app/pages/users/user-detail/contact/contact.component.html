@@ -36,11 +36,11 @@
             </div>
         </ng-container>
         <ng-template #emailEdit>
-            <mat-form-field class="name">
-                <mat-label>{{ 'USER.EMAIL' | translate }}</mat-label>
+            <cnsl-form-field class="name">
+                <cnsl-label>{{ 'USER.EMAIL' | translate }}</cnsl-label>
                 <input *ngIf="human && human.email !== undefined && human.email !== null" matInput
                     [(ngModel)]="human.email" />
-            </mat-form-field>
+            </cnsl-form-field>
             <button (click)="emailEditState = false" mat-icon-button>
                 <mat-icon class="icon">close</mat-icon>
             </button>
@@ -79,11 +79,11 @@
         </ng-container>
 
         <ng-template #phoneEdit>
-            <mat-form-field class="name">
-                <mat-label>{{ 'USER.PHONE' | translate }}</mat-label>
+            <cnsl-form-field class="name">
+                <cnsl-label>{{ 'USER.PHONE' | translate }}</cnsl-label>
                 <input *ngIf="human && human.phone !== undefined && human.phone !== null" matInput
                     [(ngModel)]="human.phone" />
-            </mat-form-field>
+            </cnsl-form-field>
             <button (click)="phoneEditState = false" mat-icon-button>
                 <mat-icon class="icon">close</mat-icon>
             </button>

@@ -2,21 +2,21 @@
 <div mat-dialog-content>
     <p class="desc"> {{'USER.MACHINE.ADD.DESCRIPTION' | translate}}</p>
 
-    <mat-form-field class="form-field" appearance="outline">
-        <mat-label>{{'USER.MACHINE.TYPE' | translate}}</mat-label>
+    <cnsl-form-field class="form-field" appearance="outline">
+        <cnsl-label>{{'USER.MACHINE.TYPE' | translate}}</cnsl-label>
         <mat-select [(ngModel)]="type">
             <mat-option *ngFor="let t of types" [value]="t">
                 {{'USER.MACHINE.KEYTYPES.'+t | translate}}
             </mat-option>
         </mat-select>
-    </mat-form-field>
+    </cnsl-form-field>
 
-    <mat-form-field class="form-field" appearance="outline">
-        <mat-label>{{'USER.MACHINE.CHOOSEEXPIRY' | translate}}</mat-label>
-        <input matInput [matDatepicker]="picker" [(ngModel)]="date">
+    <cnsl-form-field class="form-field" appearance="outline">
+        <cnsl-label>{{'USER.MACHINE.CHOOSEEXPIRY' | translate}}</cnsl-label>
+        <input [matDatepicker]="picker" [(ngModel)]="date">
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
-    </mat-form-field>
+    </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">
     <button mat-button (click)="closeDialog()">
