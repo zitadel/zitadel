@@ -12,7 +12,7 @@
         "PROJECTS": "Volle Skalierbarkeit und Anpassungsfähigkeit",
         "PROJECTS_DESC": "Autorisiere andere Benutzer, Deine eigenen Projekte zu verwenden, oder erstelle benutzerdefinierte Rollen für berechtigte Projekte",
         "PROJECTS_BUTTON": "Projektübersicht",
-        "PROJECTS_NEW_LINK":"Neues Project erstellen",
+        "PROJECTS_NEW_LINK":"Neues Projekt erstellen",
         "IAM_CREATE_ORG":"Organisation erstellen",
         "ORG_POLICY_COMPLEXITY":"Passwort Komplexität",
         "ORG_POLICY_IAM":"Organisation Zugangseinstellungen",
