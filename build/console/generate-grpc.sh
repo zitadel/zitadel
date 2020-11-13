@@ -23,8 +23,6 @@ protoc \
   .tmp/protos/auth/proto/*.proto \
   .tmp/protos/management/proto/*.proto
 
-pwd
-
 echo "Generate annotations js file (compatibility)"
 
 mkdir -p $GEN_PATH/google/api/

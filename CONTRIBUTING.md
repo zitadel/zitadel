@@ -4,7 +4,7 @@
 
 ## **Want to contribute code?**
 
-* Check out our [dev build guide](build/README.md).
+* Check out our [Dev Build Guide](build/README.md).
 
 ## **Did you find a security flaw?**
 

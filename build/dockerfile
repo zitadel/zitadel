@@ -37,8 +37,8 @@ COPY internal/protoc/protoc-gen-authoption/authoption/options.proto authoption/o
 FROM node:12 as npm-base
 WORKDIR console
 COPY console/package.json console/package-lock.json ./
-RUN npm install
-RUN mkdir .tmp
+RUN npm install \
+    && mkdir .tmp
 COPY console .
 COPY --from=base /.tmp/bin /usr/local/bin/
 COPY --from=base /.tmp .tmp/protos/
@@ -89,7 +89,6 @@ COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/ .
 ## Go test
 FROM go-base as gotest
 COPY . .
-RUN ls -latr $GOPATH/src/github.com/caos/zitadel/pkg/grpc/management/
 RUN go test -race -v -coverprofile=profile.cov ./...
 
 ## Go prod build
