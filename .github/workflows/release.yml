@@ -33,7 +33,7 @@ jobs:
         context: .
         file: ./build/Dockerfile
         platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
-        tags: ${{ github.repository }}:${BRANCH_NAME},${{ github.repository }}:${{ steps.vars.outputs.sha_short }}
+        tags: ${{ github.repository }}:${{BRANCH_NAME}},${{ github.repository }}:${{ steps.vars.outputs.sha_short }}
         push: true
 
   release:
