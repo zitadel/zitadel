@@ -110,7 +110,12 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	err = types.SendUserInitCode(string(template.Template), n.i18n, user, initCode, n.systemDefaults, n.AesCrypto, colors)
+	text, err := n.getMailText(context.Background(), mailTextTypeInitCode, user.PreferredLanguage[len(user.PreferredLanguage)-2:])
+	if err != nil {
+		return err
+	}
+
+	err = types.SendUserInitCode(string(template.Template), text, user, initCode, n.systemDefaults, n.AesCrypto, colors)
 	if err != nil {
 		return err
 	}
@@ -139,7 +144,12 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordCode(string(template.Template), n.i18n, user, pwCode, n.systemDefaults, n.AesCrypto, colors)
+
+	text, err := n.getMailText(context.Background(), mailTextTypePasswordReset, user.PreferredLanguage[len(user.PreferredLanguage)-2:])
+	if err != nil {
+		return err
+	}
+	err = types.SendPasswordCode(string(template.Template), text, user, pwCode, n.systemDefaults, n.AesCrypto, colors)
 	if err != nil {
 		return err
 	}
@@ -174,7 +184,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	err = types.SendEmailVerificationCode(string(template.Template), text, n.i18n, user, emailCode, n.systemDefaults, n.AesCrypto, colors)
+	err = types.SendEmailVerificationCode(string(template.Template), text, user, emailCode, n.systemDefaults, n.AesCrypto, colors)
 	if err != nil {
 		return err
 	}
@@ -213,11 +223,21 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
+	colors, err := n.getLabelPolicy(context.Background())
+	if err != nil {
+		return err
+	}
+
 	template, err := n.getMailTemplate(context.Background())
 	if err != nil {
 		return err
 	}
-	err = types.SendDomainClaimed(string(template.Template), n.i18n, user, data["userName"], n.systemDefaults)
+
+	text, err := n.getMailText(context.Background(), mailTextTypeDomainClaimed, user.PreferredLanguage[len(user.PreferredLanguage)-2:])
+	if err != nil {
+		return err
+	}
+	err = types.SendDomainClaimed(string(template.Template), text, user, data["userName"], n.systemDefaults, colors)
 	if err != nil {
 		return err
 	}

@@ -1,9 +1,10 @@
 package types
 
 import (
+	"html"
+
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/i18n"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/notification/templates"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -17,7 +18,7 @@ type PasswordCodeData struct {
 	URL       string
 }
 
-func SendPasswordCode(mailhtml string, i18n *i18n.Translator, user *view_model.NotifyUser, code *es_model.PasswordCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView) error {
+func SendPasswordCode(mailhtml string, text *iam_model.MailTextView, user *view_model.NotifyUser, code *es_model.PasswordCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -31,15 +32,28 @@ func SendPasswordCode(mailhtml string, i18n *i18n.Translator, user *view_model.N
 		"LastName":  user.LastName,
 		"Code":      codeString,
 	}
-	systemDefaults.Notifications.TemplateData.PasswordReset.Translate(i18n, args, user.PreferredLanguage)
-	passwordCodeData := &PasswordCodeData{TemplateData: systemDefaults.Notifications.TemplateData.PasswordReset, FirstName: user.FirstName, LastName: user.LastName, URL: url}
 
-	// Set the color in initCodeData
-	passwordCodeData.PrimaryColor = colors.PrimaryColor
-	passwordCodeData.SecondaryColor = colors.SecondaryColor
-	template, err := templates.GetParsedTemplate(mailhtml, passwordCodeData)
+	text.Greeting, err = templates.ParseTemplateText(text.Greeting, args)
+	text.Text, err = templates.ParseTemplateText(text.Text, args)
+	text.Text = html.UnescapeString(text.Text)
+
+	emailCodeData := &EmailVerificationCodeData{
+		TemplateData: templates.TemplateData{
+			Title:          text.Title,
+			PreHeader:      text.PreHeader,
+			Subject:        text.Subject,
+			Greeting:       text.Greeting,
+			Text:           html.UnescapeString(text.Text),
+			Href:           url,
+			ButtonText:     text.ButtonText,
+			PrimaryColor:   colors.PrimaryColor,
+			SecondaryColor: colors.SecondaryColor,
+		},
+		URL: url,
+	}
+	template, err := templates.GetParsedTemplate(mailhtml, emailCodeData)
 	if err != nil {
 		return err
 	}
-	return generateEmail(user, systemDefaults.Notifications.TemplateData.PasswordReset.Subject, template, systemDefaults.Notifications, false)
+	return generateEmail(user, text.Subject, template, systemDefaults.Notifications, true)
 }

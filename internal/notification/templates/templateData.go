@@ -16,9 +16,6 @@ type TemplateData struct {
 	ButtonText     string
 	PrimaryColor   string
 	SecondaryColor string
-	FirstName      string
-	LastName       string
-	Code           string
 }
 
 func (data *TemplateData) Translate(i18n *i18n.Translator, args map[string]interface{}, langs ...string) {
