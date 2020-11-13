@@ -22,3 +22,9 @@ services:
     ports:
       - 2345:2345
       - 50000:50000
+  db:
+    image: cockroachdb/cockroach:v20.2.0
+    command: start-single-node --insecure
+    ports:
+      - 8080:8080
+      - 26257:26257

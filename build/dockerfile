@@ -16,9 +16,14 @@ RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.0
     && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/annotations.proto --create-dirs -o protoc-gen-swagger/options/annotations.proto \
     && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/openapiv2.proto --create-dirs -o protoc-gen-swagger/options/openapiv2.proto \
     && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/annotations.proto --create-dirs -o google/api/annotations.proto \
+    && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/http.proto --create-dirs -o google/api/http.proto \
     && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/empty.proto --create-dirs -o google/protobuf/empty.proto \
     && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/timestamp.proto --create-dirs -o google/protobuf/timestamp.proto \
+    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/descriptor.proto --create-dirs -o google/protobuf/descriptor.proto \
+    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/duration.proto --create-dirs -o google/protobuf/duration.proto \
+    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/any.proto --create-dirs -o google/protobuf/any.proto \
     && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/struct.proto --create-dirs -o google/protobuf/struct.proto
+
 COPY pkg/grpc/admin/proto/admin.proto admin/proto/admin.proto
 COPY pkg/grpc/auth/proto/auth.proto auth/proto/auth.proto
 COPY pkg/grpc/management/proto/management.proto management/proto/management.proto
@@ -58,9 +63,22 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY --from=base /.tmp .tmp/protos/
 COPY --from=base /.tmp/bin /usr/local/bin/
+COPY internal/protoc/protoc-base internal/protoc/protoc-base/
+COPY internal/protoc/protoc-gen-authoption internal/protoc/protoc-gen-authoption/
+
+RUN go install \
+    github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
+    github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger \
+    github.com/golang/protobuf/protoc-gen-go \
+    github.com/envoyproxy/protoc-gen-validate
+
+RUN go get -u github.com/go-bindata/go-bindata/...
+
+RUN go-bindata ./internal/protoc/protoc-gen-authoption/templates \
+    && go install ./internal/protoc/protoc-gen-authoption
+    
 COPY build/zitadel build/zitadel/
 RUN build/zitadel/generate-grpc.sh
-RUN ls -la 
 COPY . .
 
 ## Go test

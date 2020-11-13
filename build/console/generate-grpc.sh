@@ -21,7 +21,7 @@ protoc \
   .tmp/protos/message/proto/*.proto \
   .tmp/protos/admin/proto/*.proto \
   .tmp/protos/auth/proto/*.proto \
-  .tmp/protos/management/proto/*.proto \
+  .tmp/protos/management/proto/*.proto
 
 echo "Generate annotations js file (compatibility)"
 
