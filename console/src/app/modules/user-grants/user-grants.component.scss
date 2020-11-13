@@ -60,3 +60,18 @@
 .fill-space {
   flex: 1;
 }
+
+.role-data {
+    min-width: 180px;
+}
+
+.date-block {
+    margin: .5rem 0;
+    display: block;
+
+    .date-sub {
+        font-size: 13px;
+        color: var(--grey);
+        display: block;
+    }
+}

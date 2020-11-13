@@ -7,6 +7,7 @@
   $secondary-dark: mat-color($primary, A800);
   $inv-color: mat-color($primary, A600);
   $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
 
   .mat-table,
   .mat-paginator {
@@ -24,6 +25,12 @@
     padding: 3px 1rem;
   }
 
+  th {
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: bold;
+  }
+
   td {
     .cnsl-form-field-wrapper {
       padding-bottom: 0;
@@ -31,6 +38,11 @@
   }
 
   tr {
+    &.mat-header-row {
+        height: 40px;
+        padding-bottom: 4px;
+    }
+
     &.highlight {
       cursor: pointer;
 
@@ -40,5 +52,13 @@
         }
       }
     }
+
+    // &:nth-child(2n){
+    //     background-color: if($is-dark-theme, #ffffff10, #00000010);
+    // }
   }
+
+//   td.mat-cell{
+//     border-bottom-style: none;
+//     }
 }

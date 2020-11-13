@@ -51,7 +51,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     @Input() public displayedColumns: string[] = ['select',
         'user',
         'org',
-        'projectId', 'creationDate', 'changeDate', 'roleNamesList'];
+        'projectId', 'dates', 'roleNamesList'];
 
     public ngOnInit(): void {
         this.dataSource = new UserGrantsDataSource(this.userService);
