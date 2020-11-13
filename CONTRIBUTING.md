@@ -2,6 +2,10 @@
 
 ## **Did you find a bug?**
 
+## **Want to contribute code?**
+
+* Check out our [dev build guide](build/README.md).
+
 ## **Did you find a security flaw?**
 
 * Please read [Security Policy](SECURITY.md).

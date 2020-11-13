@@ -1,44 +1,54 @@
 
-## Prerequisites
+# Development
 
-- Buildkit
+## Prerequisite
 
-## Local Dev
+- Buildkit compatible docker installation
 
-## Angular Generate Proto Stub
+## Generate Proto Clients
+
+### Angular
+
+This command generates the grpc stub for angular into the folder console/src/app/proto/generated for local development
 
 ```Bash
 DOCKER_BUILDKIT=1 docker build -f build/Dockerfile . -t zitadel:local --target npm-copy -o console/src/app/proto/generated
 ```
 
-## Go Generate Proto Stub
+### Go
+
+With this command you can generate the stub for golang into the correct dir pkg/
 
 ```Bash
 DOCKER_BUILDKIT=1 docker build -f build/Dockerfile . -t zitadel:local --target go-copy -o pkg
 ```
 
-### Angular Run
+## Run
+
+### Run Angular
 
 ```Bash
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f build/docker-compose-dev.yml up --build angular
 ```
 
-### Go Run
+### Run Go
 
 ```Bash
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f build/docker-compose-dev.yml up --build  go
 ```
 
-### Go Debug
+### Fullstack including database
+
+```Bash
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f build/docker-compose.yml up --build
+```
+
+## Debug
+
+### Debug Go
 
 ```Bash
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f build/docker-compose-debug.yml up --build  go
-```
-
-### Go, Dd
-
-```Bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f build/docker-compose.yml up go db --build
 ```
 
 ## Production Build
