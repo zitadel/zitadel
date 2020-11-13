@@ -11,24 +11,15 @@
     margin: 10px 0;
   }
 
-//   .mat-select {
-//     padding: 10px 0;
-//     box-sizing: border-box;
-//     padding-left: 10px;
-//     border-radius: 4px;
-//     border: 1px solid #00000050;
+  .cnsl-rel {
+      position: relative;
+  }
 
-//     &:hover {
-//         border-color: if($is-dark-theme,#040405, #ff0000);
-//     }
-    
-//     &:active,
-//     &:focus {
-//         border-color: $primary-color;
-//     }
-    
-//     &[disabled] {
-//         border-color: if($is-dark-theme,#202225, #00ff00);
-//     }
-//   }
+  [cnslSuffix] {
+      position: absolute;
+      right: 0.5rem;
+      top: 9px;
+      height: inherit;
+      vertical-align: middle;
+  }
 }

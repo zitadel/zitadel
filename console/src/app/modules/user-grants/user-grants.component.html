@@ -84,9 +84,9 @@
 
                     <ng-container
                         *ngIf="context === UserGrantContext.OWNED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE">
-                        <mat-form-field class="form-field" appearance="outline"
+                        <cnsl-form-field class="form-field"
                             *ngIf="loadedProjectId && loadedProjectId === grant.projectId">
-                            <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
+                            <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
                             <mat-select [(ngModel)]="grant.roleKeysList" multiple
                                 [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.grantId] : []) | hasRole | async))"
                                 (selectionChange)="updateRoles(grant, $event)">
@@ -94,14 +94,13 @@
                                     {{role.key}}
                                 </mat-option>
                             </mat-select>
-                        </mat-form-field>
+                        </cnsl-form-field>
                     </ng-container>
 
                     <ng-container
                         *ngIf="context === UserGrantContext.GRANTED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE">
-                        <mat-form-field class="form-field" appearance="outline"
-                            *ngIf="loadedGrantId && loadedGrantId === grant.grantId">
-                            <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
+                        <cnsl-form-field class="form-field" *ngIf="loadedGrantId && loadedGrantId === grant.grantId">
+                            <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
                             <mat-select [(ngModel)]="grant.roleKeysList" multiple
                                 [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.grantId] : []) | hasRole | async))"
                                 (selectionChange)="updateRoles(grant, $event)">
@@ -109,7 +108,7 @@
                                     {{role}}
                                 </mat-option>
                             </mat-select>
-                        </mat-form-field>
+                        </cnsl-form-field>
                     </ng-container>
                 </td>
             </ng-container>

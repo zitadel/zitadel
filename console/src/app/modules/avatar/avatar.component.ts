@@ -9,7 +9,7 @@ export class AvatarComponent implements OnInit {
     @Input() name: string = '';
     @Input() credentials: string = '';
     @Input() size: number = 24;
-    @Input() fontSize: number = 16;
+    @Input() fontSize: number = 14;
     @Input() active: boolean = false;
     @Input() color: string = '';
     constructor() { }

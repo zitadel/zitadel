@@ -32,6 +32,7 @@
     padding: 10px;
     transition: border-color .2s ease-in-out;
     width: 100%;
+    margin-bottom: 2px;
 
     &:hover {
         border-color: if($is-dark-theme,#040405, #ff0000);

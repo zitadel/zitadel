@@ -1,4 +1,7 @@
 <div class="cnsl-form-field-wrapper">
     <ng-content select="cnsl-label"></ng-content>
-    <ng-content></ng-content>
+    <div class="cnsl-rel">
+        <ng-content></ng-content>
+        <ng-content select="cnslSuffix"></ng-content>
+    </div>
 </div>

@@ -3,15 +3,14 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
+import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
 
 import { UserCreateRoutingModule } from './user-create-routing.module';
 import { UserCreateComponent } from './user-create.component';
@@ -25,8 +24,6 @@ import { UserCreateComponent } from './user-create.component';
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
-        MatInputModule,
-        MatFormFieldModule,
         MatSelectModule,
         MatButtonModule,
         MatIconModule,
@@ -36,6 +33,7 @@ import { UserCreateComponent } from './user-create.component';
         MatTooltipModule,
         TranslateModule,
         DetailLayoutModule,
+        FormFieldModule,
     ],
 })
 export class UserCreateModule { }
