@@ -21,8 +21,6 @@ services:
     command: go run cmd/zitadel/main.go
     ports:
       - 50000:50000
-    volumes: 
-      - "../pgk/grpc:pgk/grpc"
   db:
     image: cockroachdb/cockroach:v20.2.0
     command: start-single-node --insecure

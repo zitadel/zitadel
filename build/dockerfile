@@ -79,10 +79,14 @@ RUN go-bindata ./internal/protoc/protoc-gen-authoption/templates \
     
 COPY build/zitadel build/zitadel/
 RUN build/zitadel/generate-grpc.sh
-COPY . .
+
+FROM scratch as copy
+COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/ .
 
 ## Go test
 FROM go-base as gotest
+COPY . .
+RUN ls -latr $GOPATH/src/github.com/caos/zitadel/pkg/grpc/management/
 RUN go test -race -v -coverprofile=profile.cov ./...
 
 ## Go prod build
