@@ -5,6 +5,18 @@
 
 ## Local Dev
 
+## Angular Generate Proto Stub
+
+```Bash
+DOCKER_BUILDKIT=1 docker build -f build/Dockerfile . -t zitadel:local --target npm-copy -o console/src/app/proto/generated
+```
+
+## Go Generate Proto Stub
+
+```Bash
+DOCKER_BUILDKIT=1 docker build -f build/Dockerfile . -t zitadel:local --target go-copy -o pkg
+```
+
 ### Angular Run
 
 ```Bash
@@ -31,7 +43,7 @@ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f build/docker-comp
 
 ## Production Build
 
-This can also be run localy!
+This can also be run locally!
 
 ```Bash
 DOCKER_BUILDKIT=1 docker build -f build/Dockerfile . -t zitadel:local --build-arg ENV=prod

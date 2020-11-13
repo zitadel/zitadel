@@ -45,6 +45,9 @@ COPY --from=base /.tmp .tmp/protos/
 COPY build/console build/console/
 RUN build/console/generate-grpc.sh
 
+FROM scratch as npm-copy
+COPY --from=npm-base /console/src/app/proto/generated .
+
 ## anular dev build
 FROM npm-base as dev-angular-build
 RUN npm install -g @angular/cli
@@ -80,7 +83,7 @@ RUN go-bindata ./internal/protoc/protoc-gen-authoption/templates \
 COPY build/zitadel build/zitadel/
 RUN build/zitadel/generate-grpc.sh
 
-FROM scratch as copy
+FROM scratch as go-copy
 COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/ .
 
 ## Go test

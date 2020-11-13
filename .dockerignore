@@ -4,6 +4,7 @@
 build/dockerfile
 site
 console/node_modules
+console/src/app/proto/generated
 console/tmp
 .releaserc.js
 .typo-ci.yml
