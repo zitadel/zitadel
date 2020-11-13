@@ -60,6 +60,7 @@ COPY --from=base /.tmp .tmp/protos/
 COPY --from=base /.tmp/bin /usr/local/bin/
 COPY build/zitadel build/zitadel/
 RUN build/zitadel/generate-grpc.sh
+RUN ls -la 
 COPY . .
 
 ## Go test
