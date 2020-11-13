@@ -42,8 +42,6 @@ jobs:
         push: true
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
-        outputs: type=local,dest=/tmp/output
-    - run: ls -l /tmp/output
 
   release:
     runs-on: ubuntu-18.04
@@ -57,12 +55,6 @@ jobs:
     - name: Generate Short SHA Container Tag
       id: vars
       run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
-    - uses: actions/download-artifact@v2
-      with:
-        path: .artifacts
-    - name: Display structure of downloaded files
-      run: ls -R
-      working-directory: .artifacts
     - name: Docker Login
       run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
     - name: Docker Pull short-sha
