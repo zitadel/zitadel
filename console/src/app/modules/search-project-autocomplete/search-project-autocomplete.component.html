@@ -1,7 +1,7 @@
 <form>
-    <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Project Name</mat-label>
-        <input matInput *ngIf="singleOutput" type="text" placeholder="Search for the project name" #nameInput
+    <cnsl-form-field appearance="outline" class="full-width">
+        <cnsl-label>Project Name</cnsl-label>
+        <input *ngIf="singleOutput" type="text" placeholder="Search for the project name" #nameInput
             [formControl]="myControl" [matAutocomplete]="auto" />
 
         <mat-chip-list *ngIf="!singleOutput" #chipList aria-label="name selection">
@@ -24,5 +24,5 @@
                 {{project?.name ? project.name + ' (owned)' : project?.projectName ? project.projectName + ' (granted)': ''}}
             </mat-option>
         </mat-autocomplete>
-    </mat-form-field>
+    </cnsl-form-field>
 </form>

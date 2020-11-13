@@ -6,9 +6,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -21,6 +19,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
+import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
 
 import { AppCreateComponent } from './app-create/app-create.component';
 import { AppDetailComponent } from './app-detail/app-detail.component';
@@ -40,8 +39,7 @@ import { AppsRoutingModule } from './apps-routing.module';
         TranslateModule,
         ReactiveFormsModule,
         HasRoleModule,
-        MatFormFieldModule,
-        MatInputModule,
+        FormFieldModule,
         MatMenuModule,
         MatChipsModule,
         MatIconModule,

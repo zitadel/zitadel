@@ -2,9 +2,8 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { TranslateModule } from '@ngx-translate/core';
+import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
 
 import { AddDomainDialogComponent } from './add-domain-dialog.component';
 
@@ -14,8 +13,7 @@ import { AddDomainDialogComponent } from './add-domain-dialog.component';
         CommonModule,
         TranslateModule,
         MatButtonModule,
-        MatFormFieldModule,
-        MatInputModule,
+        FormFieldModule,
         FormsModule,
     ],
 })

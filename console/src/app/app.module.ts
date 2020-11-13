@@ -8,9 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -25,6 +23,7 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import { QuicklinkModule } from 'ngx-quicklink';
+import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
 import { RegExpPipeModule } from 'src/app/pipes/regexp-pipe/regexp-pipe.module';
 
 import { environment } from '../environments/environment';
@@ -110,8 +109,7 @@ const authConfig: AuthConfig = {
         MatSidenavModule,
         MatCardModule,
         OutsideClickModule,
-        MatFormFieldModule,
-        MatInputModule,
+        FormFieldModule,
         HasRolePipeModule,
         MatProgressBarModule,
         MatProgressSpinnerModule,

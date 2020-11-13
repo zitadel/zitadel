@@ -35,7 +35,7 @@
     margin-bottom: 2px;
 
     &:hover {
-        border-color: if($is-dark-theme,#040405, #ff0000);
+        border-color: if($is-dark-theme,#040405 ,#c5c5f3);
     }
 
     &:active,
@@ -44,7 +44,7 @@
     }
 
     &[disabled] {
-        border-color: if($is-dark-theme,#202225, #00ff00);
+        border-color: if($is-dark-theme,#202225, #c4d0e2);
     }
   }
 

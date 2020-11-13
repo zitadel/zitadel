@@ -2,7 +2,7 @@
     <div class="content">
         <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'USER.MACHINE.USERNAME' | translate }}</cnsl-label>
-            <input matInput formControlName="userName" required />
+            <input formControlName="userName" required />
             <cnsl-error *ngIf="userName?.invalid && userName?.errors?.required">
                 {{ 'USER.VALIDATION.REQUIRED' | translate }}
             </cnsl-error>
@@ -12,14 +12,14 @@
         </cnsl-form-field>
         <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'USER.MACHINE.NAME' | translate }}</cnsl-label>
-            <input matInput formControlName="name" required />
+            <input formControlName="name" required />
             <cnsl-error *ngIf="name?.invalid && name?.errors?.required">
                 {{ 'USER.VALIDATION.REQUIRED' | translate }}
             </cnsl-error>
         </cnsl-form-field>
         <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'USER.MACHINE.DESCRIPTION' | translate }}</cnsl-label>
-            <input matInput formControlName="description" />
+            <input formControlName="description" />
         </cnsl-form-field>
     </div>
     <div class="btn-container">

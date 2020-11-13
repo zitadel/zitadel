@@ -25,10 +25,10 @@
                     </mat-button-toggle>
                 </mat-button-toggle-group>
 
-                <mat-form-field class="formfield">
-                    <mat-label>{{ 'APP.NAME' | translate }}</mat-label>
-                    <input matInput formControlName="name" />
-                </mat-form-field>
+                <cnsl-form-field class="formfield">
+                    <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>
+                    <input formControlName="name" />
+                </cnsl-form-field>
 
                 <p class="docs-line" *ngIf="docs?.discoveryEndpoint">Discovery Endpoint: {{docs.discoveryEndpoint}}</p>
                 <p class="docs-line" *ngIf="docs?.issuer">Issuer: {{docs.issuer}}</p>
@@ -54,59 +54,59 @@
         </div>
         <form *ngIf="appForm" [formGroup]="appForm" (ngSubmit)="saveOIDCApp()">
             <div class="content">
-                <mat-form-field class="formfield" appearance="outline">
-                    <mat-label>{{ 'APP.OIDC.CLIENTID' | translate }}</mat-label>
-                    <input matInput formControlName="clientId" />
-                </mat-form-field>
+                <cnsl-form-field class="formfield" appearance="outline">
+                    <cnsl-label>{{ 'APP.OIDC.CLIENTID' | translate }}</cnsl-label>
+                    <input formControlName="clientId" />
+                </cnsl-form-field>
 
-                <mat-form-field class="formfield" appearance="outline">
-                    <mat-label>{{ 'APP.OIDC.RESPONSE' | translate }}</mat-label>
+                <cnsl-form-field class="formfield" appearance="outline">
+                    <cnsl-label>{{ 'APP.OIDC.RESPONSE' | translate }}</cnsl-label>
                     <mat-select formControlName="responseTypesList" multiple>
                         <mat-option *ngFor="let type of oidcResponseTypes" [value]="type">
                             {{ 'APP.OIDC.RESPONSE'+type | translate }}
                         </mat-option>
                     </mat-select>
-                </mat-form-field>
+                </cnsl-form-field>
 
-                <mat-form-field class="formfield" appearance="outline">
-                    <mat-label>{{ 'APP.OIDC.GRANT' | translate }}</mat-label>
+                <cnsl-form-field class="formfield" appearance="outline">
+                    <cnsl-label>{{ 'APP.OIDC.GRANT' | translate }}</cnsl-label>
                     <mat-select formControlName="grantTypesList" multiple>
                         <mat-option *ngFor="let grant of oidcGrantTypes" [value]="grant">
                             {{ 'APP.OIDC.GRANT'+grant | translate }}
                         </mat-option>
                     </mat-select>
-                </mat-form-field>
+                </cnsl-form-field>
 
-                <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'APP.OIDC.APPTYPE' | translate }}</mat-label>
+                <cnsl-form-field appearance="outline" class="formfield">
+                    <cnsl-label>{{ 'APP.OIDC.APPTYPE' | translate }}</cnsl-label>
                     <mat-select formControlName="applicationType">
                         <mat-option *ngFor="let type of oidcAppTypes" [value]="type">
                             {{ 'APP.OIDC.APPTYPE'+type | translate }}
                         </mat-option>
                     </mat-select>
-                </mat-form-field>
+                </cnsl-form-field>
 
-                <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'APP.OIDC.AUTHMETHOD' | translate }}</mat-label>
+                <cnsl-form-field appearance="outline" class="formfield">
+                    <cnsl-label>{{ 'APP.OIDC.AUTHMETHOD' | translate }}</cnsl-label>
                     <mat-select formControlName="authMethodType">
                         <mat-option *ngFor="let type of oidcAuthMethodType" [value]="type">
                             {{ 'APP.OIDC.AUTHMETHOD'+type | translate }}
                         </mat-option>
                     </mat-select>
-                </mat-form-field>
+                </cnsl-form-field>
 
                 <div class="divider"></div>
 
                 <p class="full-width section-title">{{'APP.OIDC.TOKENSECTIONTITLE' | translate}}</p>
 
-                <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'APP.OIDC.TOKENTYPE' | translate }}</mat-label>
+                <cnsl-form-field appearance="outline" class="formfield">
+                    <cnsl-label>{{ 'APP.OIDC.TOKENTYPE' | translate }}</cnsl-label>
                     <mat-select formControlName="accessTokenType">
                         <mat-option *ngFor="let type of oidcTokenTypes" [value]="type">
                             {{ 'APP.OIDC.TOKENTYPE'+type | translate }}
                         </mat-option>
                     </mat-select>
-                </mat-form-field>
+                </cnsl-form-field>
 
                 <mat-checkbox *ngIf="accessTokenType?.value === OIDCTokenType.OIDCTOKENTYPE_JWT" class="full-width"
                     formControlName="accessTokenRoleAssertion">
@@ -132,8 +132,8 @@
                     *ngIf="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB || applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT">
                     {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</p>
 
-                <mat-form-field class="formfield full-width" appearance="outline">
-                    <mat-label>{{ 'APP.OIDC.REDIRECT' | translate }}</mat-label>
+                <cnsl-form-field class="formfield full-width" appearance="outline">
+                    <cnsl-label>{{ 'APP.OIDC.REDIRECT' | translate }}</cnsl-label>
                     <mat-chip-list [disabled]="!canWrite" #chipRedirectList>
                         <mat-chip class="chip" *ngFor="let redirect of redirectUrisList" selected
                             [matTooltip]="!redirect.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
@@ -146,13 +146,13 @@
                             [matChipInputAddOnBlur]="addOnBlur" [formControl]="redirectControl"
                             (matChipInputTokenEnd)="add($event, RedirectType.REDIRECT)">
                     </mat-chip-list>
-                </mat-form-field>
+                </cnsl-form-field>
 
                 <p *ngIf="redirectControl.value && redirectControl.invalid" class="error">
                     {{'APP.OIDC.REDIRECTNOTVALID' | translate}}</p>
 
-                <mat-form-field class="formfield full-width" appearance="outline">
-                    <mat-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</mat-label>
+                <cnsl-form-field class="formfield full-width" appearance="outline">
+                    <cnsl-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</cnsl-label>
                     <mat-chip-list [disabled]="!canWrite" #chipPostRedirectList>
                         <mat-chip class="chip" *ngFor="let redirect of postLogoutRedirectUrisList" selected
                             (removed)="remove(redirect, RedirectType.POSTREDIRECT)"
@@ -166,7 +166,7 @@
                             (matChipInputTokenEnd)="add($event, RedirectType.POSTREDIRECT)"
                             [formControl]="postRedirectControl">
                     </mat-chip-list>
-                </mat-form-field>
+                </cnsl-form-field>
 
                 <p *ngIf="postRedirectControl.value && postRedirectControl.invalid" class="error">
                     {{'APP.OIDC.REDIRECTNOTVALID' | translate}}</p>

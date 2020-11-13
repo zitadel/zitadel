@@ -6,7 +6,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -19,6 +18,7 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
+import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { PolicyGridModule } from 'src/app/modules/policy-grid/policy-grid.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
@@ -49,7 +49,7 @@ import { IamComponent } from './iam.component';
         MatTabsModule,
         MatTableModule,
         MatPaginatorModule,
-        MatFormFieldModule,
+        FormFieldModule,
         MatSortModule,
         MatTooltipModule,
         ReactiveFormsModule,

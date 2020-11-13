@@ -38,8 +38,7 @@
         <ng-template #emailEdit>
             <cnsl-form-field class="name">
                 <cnsl-label>{{ 'USER.EMAIL' | translate }}</cnsl-label>
-                <input *ngIf="human && human.email !== undefined && human.email !== null" matInput
-                    [(ngModel)]="human.email" />
+                <input *ngIf="human && human.email !== undefined && human.email !== null" [(ngModel)]="human.email" />
             </cnsl-form-field>
             <button (click)="emailEditState = false" mat-icon-button>
                 <mat-icon class="icon">close</mat-icon>
@@ -81,8 +80,7 @@
         <ng-template #phoneEdit>
             <cnsl-form-field class="name">
                 <cnsl-label>{{ 'USER.PHONE' | translate }}</cnsl-label>
-                <input *ngIf="human && human.phone !== undefined && human.phone !== null" matInput
-                    [(ngModel)]="human.phone" />
+                <input *ngIf="human && human.phone !== undefined && human.phone !== null" [(ngModel)]="human.phone" />
             </cnsl-form-field>
             <button (click)="phoneEditState = false" mat-icon-button>
                 <mat-icon class="icon">close</mat-icon>

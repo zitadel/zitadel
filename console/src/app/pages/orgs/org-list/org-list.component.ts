@@ -1,5 +1,4 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
-import { MatInput } from '@angular/material/input';
+import { AfterViewInit, Component, Input, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -23,7 +22,7 @@ export class OrgListComponent implements AfterViewInit {
 
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatSort) sort!: MatSort;
-    @ViewChild('input') public filter!: MatInput;
+    @ViewChild('input') public filter!: Input;
 
     public dataSource!: MatTableDataSource<Org.AsObject>;
     public displayedColumns: string[] = ['select', 'id', 'name'];
