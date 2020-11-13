@@ -17,7 +17,7 @@ updates:
     prefix: chore
     include: scope
 - package-ecosystem: "docker"
-  directory: "/build/docker"
+  directory: "/build/"
   schedule:
     interval: "weekly"
   open-pull-requests-limit: 10
