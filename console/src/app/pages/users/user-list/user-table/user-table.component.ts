@@ -120,6 +120,7 @@ export class UserTableComponent implements OnInit {
     }
 
     public applyFilter(event: Event): void {
+        this.selection.clear();
         const filterValue = (event.target as HTMLInputElement).value;
 
         this.getData(

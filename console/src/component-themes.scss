@@ -1,6 +1,7 @@
 @import 'src/app/modules/card/card';
 @import './styles/table';
 @import './styles/input.scss';
+@import './styles/link.scss';
 @import './styles/sidenav-list';
 @import 'src/app/modules/avatar/avatar.component';
 @import 'src/app/modules/changes/changes.component';
@@ -30,4 +31,5 @@
   @include cnsl-form-field-theme($theme);
   @include cnsl-label-theme($theme);
   @include cnsl-error-theme($theme);
+  @include link-theme($theme);
 }

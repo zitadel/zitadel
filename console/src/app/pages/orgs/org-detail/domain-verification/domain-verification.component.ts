@@ -21,6 +21,7 @@ export class DomainVerificationComponent {
 
     public showNew: boolean = false;
 
+    public validating: boolean = false;
     constructor(
         private toast: ToastService,
         public dialogRef: MatDialogRef<DomainVerificationComponent>,
@@ -54,10 +55,14 @@ export class DomainVerificationComponent {
     }
 
     public validate(): void {
+        this.validating = true;
         this.mgmtService.ValidateMyOrgDomain(this.domain.domain).then(() => {
-            this.dialogRef.close(false);
+            this.dialogRef.close(true);
+            this.toast.showInfo('ORG.PAGES.ORGDOMAIN.VERIFICATION_SUCCESSFUL', true);
+            this.validating = false;
         }).catch((error) => {
             this.toast.showError(error);
+            this.validating = false;
         });
     }
 
