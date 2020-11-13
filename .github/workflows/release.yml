@@ -16,6 +16,13 @@ jobs:
     - name: Generate Short SHA Container Tag
       id: vars
       run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
+    - name: Cache Docker layers
+      uses: actions/cache@v2
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v1
     - name: Set up Docker Buildx
@@ -33,6 +40,8 @@ jobs:
         platforms: linux/amd64
         tags: ${{ github.repository }}:${{ steps.vars.outputs.sha_short }}
         push: true
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache
 
   release:
     runs-on: ubuntu-18.04
