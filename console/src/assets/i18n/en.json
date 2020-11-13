@@ -153,9 +153,9 @@
             "DESCRIPTION": "Please provide the necesary information.",
             "NAMEANDEMAILSECTION":"Name and E-mail",
             "GENDERLANGSECTION":"Gender and Language",
-            "PHONESECTION":"Phonen Numbers",
+            "PHONESECTION":"Phonenumbers",
             "PASSWORDSECTION":"Initial Password",
-            "ADDRESSANDPHONESECTION":"Phone Number"
+            "ADDRESSANDPHONESECTION":"Phonenumber"
         },
         "CODEDIALOG": {
             "TITLE":"Verify Phone Number",
@@ -175,7 +175,7 @@
         "PROFILE": {
             "TITLE": "Profile",
             "EMAIL": "E-mail",
-            "PHONE": "Phonen Number",
+            "PHONE": "Phonenumber",
             "USERNAME": "User Name",
             "FIRSTNAME": "First Name",
             "LASTNAME": "Last Name",

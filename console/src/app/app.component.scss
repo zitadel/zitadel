@@ -110,7 +110,7 @@
           align-items: center;
           text-decoration: none;
           cursor: pointer;
-          padding: .2rem 1rem;
+          padding: 0 1rem;
           margin-right: .5rem;
 
           .icon {
@@ -119,8 +119,9 @@
 
           .label {
             margin-bottom: 0;
-            font-weight: 500;
-            font-size: .9rem;
+            font-size: 14px;
+            // letter-spacing: .1em;
+            // text-transform: uppercase;
           }
 
           .c_label {
@@ -128,7 +129,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: .9rem;
+            font-size: 14px;
+            // letter-spacing: .1em;
+            // text-transform: uppercase;
 
             .count {
               font-size: 12px;
@@ -244,6 +247,10 @@
 
 .menu {
   position: relative;
+
+  .filter-input {
+      margin: .5rem 0;
+  }
 
   .spinner-w {
     top: 1rem;

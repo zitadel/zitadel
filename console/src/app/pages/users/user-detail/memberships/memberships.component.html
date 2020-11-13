@@ -1,5 +1,5 @@
 <div class="membership-groups">
-    <span class="header">{{ 'USER.MEMBERSHIPS.TITLE' | translate }}</span>
+    <span class="me-header">{{ 'USER.MEMBERSHIPS.TITLE' | translate }}</span>
     <div class="people" *ngIf="memberships">
         <div class="img-list" [@cardAnimation]="memberships.totalResult">
             <mat-spinner class="spinner" diameter="20" *ngIf="loading"></mat-spinner>

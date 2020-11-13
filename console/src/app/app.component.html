@@ -24,8 +24,9 @@
                     </mat-spinner>
                 </div>
 
-                <input [formControl]="filterControl" autocomplete="off" (click)="$event.stopPropagation()"
-                    placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}" #input>
+                <input class="filter-input" [formControl]="filterControl" autocomplete="off"
+                    (click)="$event.stopPropagation()" placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}"
+                    #input>
 
                 <button [ngClass]="{'active': temporg.id === org?.id}" [disabled]="!temporg.id"
                     *ngFor="let temporg of orgs$ | async" mat-menu-item (click)="setActiveOrg(temporg)">

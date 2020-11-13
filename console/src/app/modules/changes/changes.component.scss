@@ -1,10 +1,13 @@
 @import '~@angular/material/theming';
 
-.header {
+.ch-header {
   display: block;
   margin-bottom: 1rem;
   font-weight: 400;
   margin-top: 1rem;
+  font-size: 14px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
 }
 
 @mixin changes-theme($theme) {
