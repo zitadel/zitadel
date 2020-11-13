@@ -24,9 +24,11 @@
                     </mat-spinner>
                 </div>
 
-                <input class="filter-input" [formControl]="filterControl" autocomplete="off"
-                    (click)="$event.stopPropagation()" placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}"
-                    #input>
+                <div class="filter-wrapper">
+                    <input class="filter-input" [formControl]="filterControl" autocomplete="off"
+                        (click)="$event.stopPropagation()" placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}"
+                        #input>
+                </div>
 
                 <div class="org-wrapper">
                     <button [ngClass]="{'active': temporg.id === org?.id}" [disabled]="!temporg.id"

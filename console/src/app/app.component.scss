@@ -113,7 +113,7 @@
           .label {
             margin-bottom: 0;
             font-size: 14px;
-            // letter-spacing: .1em;
+            letter-spacing: .05em;
             // text-transform: uppercase;
           }
 
@@ -123,7 +123,7 @@
             justify-content: space-between;
             align-items: center;
             font-size: 14px;
-            // letter-spacing: .1em;
+            letter-spacing: .03em;
             // text-transform: uppercase;
 
             .count {
@@ -247,10 +247,9 @@
 
 .menu {
   position: relative;
-
-  .filter-input {
-      margin: .5rem 0;
-  }
+    .filter-wrapper {
+        padding: 4px;
+    }
 
   .spinner-w {
     top: 1rem;
