@@ -21,3 +21,5 @@ services:
     command: go run cmd/zitadel/main.go
     ports:
       - 50000:50000
+    volumes: 
+      - "./pgk/grpc:/go/src/github.com/caos/zitadel/pgk/grpc"

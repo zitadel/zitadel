@@ -56,6 +56,10 @@ FROM golang:1.15 as go-base
 WORKDIR src/github.com/caos/zitadel/
 COPY go.mod go.sum ./
 RUN go mod download
+COPY --from=base /.tmp .tmp/protos/
+COPY --from=base /.tmp/bin /usr/local/bin/
+COPY build/zitadel build/zitadel/
+RUN build/zitadel/generate-grpc.sh
 COPY . .
 
 ## Go test
