@@ -90,7 +90,6 @@ func (a *API) healthHandler() http.Handler {
 	handler.HandleFunc("/healthz", handleHealth)
 	handler.HandleFunc("/ready", handleReadiness(checks))
 	handler.HandleFunc("/clientID", a.handleClientID)
-	handler.HandleFunc("/projectID", a.handleProjectID)
 
 	return handler
 }
@@ -118,15 +117,6 @@ func (a *API) handleClientID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http_util.MarshalJSON(w, id, nil, http.StatusOK)
-}
-
-func (a *API) handleProjectID(w http.ResponseWriter, r *http.Request) {
-	iam, err := a.health.IamByID(r.Context())
-	if err != nil {
-		http_util.MarshalJSON(w, nil, err, http.StatusPreconditionFailed)
-		return
-	}
-	http_util.MarshalJSON(w, iam.IAMProjectID, nil, http.StatusOK)
 }
 
 type ValidationFunction func(ctx context.Context) error
