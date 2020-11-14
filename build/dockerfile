@@ -87,12 +87,16 @@ FROM scratch as go-copy
 COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/ .
 
 ## Go test
-FROM go-base as gotest
+FROM go-base as go-test
 COPY . .
 RUN go test -race -v -coverprofile=profile.cov ./...
 
+## Go test
+FROM scratch as go-codecov
+COPY --from=go-base profile.cov profile.cov
+
 ## Go prod build
-FROM gotest as prod-go-build
+FROM go-test as prod-go-build
 COPY --from=prod-angular-build console/dist/console console/dist/console/
 RUN go get github.com/rakyll/statik \
     && ./build/console/generate-static.sh \
