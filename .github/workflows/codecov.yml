@@ -33,7 +33,7 @@ jobs:
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
         target: go-codecov
-        output: type=local,dest=.
+        outputs: type=local,dest=.
     - uses: codecov/codecov-action@v1
       with:
         file: ./profile.cov
