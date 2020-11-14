@@ -90,6 +90,7 @@ COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/ .
 FROM go-base as go-test
 COPY . .
 RUN go test -race -v -coverprofile=profile.cov ./...
+RUN ls -la
 
 ## Go test
 FROM scratch as go-codecov
