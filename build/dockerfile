@@ -93,7 +93,7 @@ RUN go test -race -v -coverprofile=profile.cov ./...
 
 ## Go test
 FROM scratch as go-codecov
-COPY --from=go-base profile.cov profile.cov
+COPY --from=go-test profile.cov profile.cov
 
 ## Go prod build
 FROM go-test as prod-go-build
