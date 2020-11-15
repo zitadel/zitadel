@@ -12,14 +12,14 @@
   }
 
   .cnsl-rel {
-      position: relative;
+    position: relative;
   }
 
   [cnslSuffix] {
-      position: absolute;
-      right: 0.5rem;
-      top: 9px;
-      height: inherit;
-      vertical-align: middle;
+    position: absolute;
+    right: .5rem;
+    top: 9px;
+    height: inherit;
+    vertical-align: middle;
   }
 }
