@@ -17,7 +17,7 @@ Under normal circumstances **ZITADEL** need four domain names to operate properl
 
 #### OpenID Connect 1.0 Discovery
 
-The OpenID Connect Discovery Endpoint is located with the issuer domain.
+The OpenID Connect Discovery Endpoint is located within the issuer domain.
 For example with [zitadel.ch](zitadel.ch) this would be the domain [issuer.zitadel.ch](issuer.zitadel.ch). This would give us [https://issuer.zitadel.ch/.well-known/openid-configuration](https://issuer.zitadel.ch/.well-known/openid-configuration).
 
 **Link to spec.** [OpenID Connect Discovery 1.0 incorporating errata set 1](https://openid.net/specs/openid-connect-discovery-1_0.html)
@@ -65,8 +65,9 @@ In addition to the standard compliant scopes we utilize the following scopes.
 | Scope                                           | Description                                                                                                                                                     | Example                                    |
 |:------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------|
 | urn:zitadel:iam:org:project:role:{rolename}     | By using this scope a [client](administrate#clients) can request the claim urn:zitadel:iam:roles:rolename} to be asserted when possible. As an alternative approach you can enable all [roles](administrate#Roles) to be asserted from the [project](administrate#projects) a [client](administrate#clients) belongs to. See details [here](administrate#RBAC_Settings)                                                  | urn:zitadel:iam:org:project:role:user      |
-| urn:zitadel:iam:org:domain:primary:{domainname} | When requesting this scope **ZITADEL** will enforce that the user is member of the selected organisation. If the organisation does not exist a failure is displayed | urn:zitadel:iam:org:domain:primary:acme.ch |
+| urn:zitadel:iam:org:domain:primary:{domainname} | When requesting this scope **ZITADEL** will enforce that the user is a member of the selected organisation. If the organisation does not exist a failure is displayed | urn:zitadel:iam:org:domain:primary:acme.ch |
 | urn:zitadel:iam:role:{rolename}                 |                                                                                                                                                                 |                                            |
+| urn:zitadel:iam:org:project:id:{projectid}:aud  | By adding this scope, the requested projectid will be added to the audience of the access and id token                                                          | ZITADEL Project: urn:zitadel:iam:org:project:id:69234237810729019:aud                                           |
 
 ### Claims
 
@@ -133,7 +134,7 @@ For a list of supported or unsupported `Grant Types` please have a look at the t
 
 #### Resource Owner Password Credentials
 
-> Due to growing security concern we do not support this grant type. With OAuth 2.1 it looks like this grant will be removed.
+> Due to growing security concerns we do not support this grant type. With OAuth 2.1 it looks like this grant will be removed.
 
 **Link to spec.** [OThe OAuth 2.0 Authorization Framework Section 1.3.3](https://tools.ietf.org/html/rfc6749#section-1.3.3)
 

@@ -491,16 +491,16 @@ func userMembershipViewFromModel(membership *usr_model.UserMembershipView) *mana
 	}
 }
 
-func mfasFromModel(mfas []*usr_model.MultiFactor) []*management.MultiFactor {
-	converted := make([]*management.MultiFactor, len(mfas))
+func mfasFromModel(mfas []*usr_model.MultiFactor) []*management.UserMultiFactor {
+	converted := make([]*management.UserMultiFactor, len(mfas))
 	for i, mfa := range mfas {
 		converted[i] = mfaFromModel(mfa)
 	}
 	return converted
 }
 
-func mfaFromModel(mfa *usr_model.MultiFactor) *management.MultiFactor {
-	return &management.MultiFactor{
+func mfaFromModel(mfa *usr_model.MultiFactor) *management.UserMultiFactor {
+	return &management.UserMultiFactor{
 		State: mfaStateFromModel(mfa.State),
 		Type:  mfaTypeFromModel(mfa.Type),
 	}

@@ -93,6 +93,10 @@ Errors:
       AlreadyExists: Login Policy already exists
       IdpProviderAlreadyExisting: Idp Provider already existing
       IdpProviderNotExisting: Idp Provider not existing
+      MFA:
+        AlreadyExists: Multifactor already exists
+        NotExisting: Multifactor not existing
+        Unspecified: Multifactor invalid
     PasswordComplexity:
       Empty: Passwort Complexity Policy is empty
       NotExisting: Passwort Complexity Policy doesn't exist
@@ -134,7 +138,7 @@ Errors:
     GrantNotExists: Project grant doesn't exist
     GrantHasNotExistingRole: One role doesn't exist on project
     UserIDMisisng: User ID missing
-  Iam:
+  IAM:
     MemberInvalid: Member is invalid
     MemberAlreadyExisting: Member already exists
     MemberNotExisting: Member does not exist
@@ -149,31 +153,34 @@ Errors:
     LoginPolicyNotExisting: Login Policy doesn't exist
     IdpProviderInvalid: Idp Provider is invalid
     LoginPolicy:
+      NotFound: Default Login Policy not found
       NotExisting: Default Login Policy not existig
       AlreadyExists: Default Login Policy already exists
       IdpProviderAlreadyExisting: Idp Provider already existing
       IdpProviderNotExisting: Idp Provider not existing
+      MFA:
+        AlreadyExists: Multifactor already exists
+        NotExisting: Multifactor not existing
+        Unspecified: Multifactor invalid
+    LabelPolicy:
+      NotFound: Default Private Label Policy not found
     PasswordComplexityPolicy:
+      NotFound: Default Private Label Policy not found
       NotExisting: Default Password Complexity Policy not existing
       AlreadyExists: Default Password Complexity Policy already existing
       Empty: Default Password Complexity Policy empty
     PasswordAgePolicy:
+      NotFound: Default Password Age Policy not found
       NotExisting: Default Password Age Policy not existing
       AlreadyExists: Default Password Age Policy already existing
       Empty: Default Password Age Policy empty
     PasswordLockoutPolicy:
+      NotFound: Default Password Lockout Policy not found
       NotExisting: Default Password Lockout Policy not existing
       AlreadyExists: Default Password Lockout Policy already existing
       Empty: Default Password Lockout Policy empty
-    PasswordLockout:
-      Empty: Passwort Lockout Policy is empty
-      NotExisting: Passwort Lockout Policy not existing
-      AlreadyExists: Passwort Lockout Policy already exists
-    PasswordAge:
-      Empty: Passwort Age Policy is empty
-      NotExisting: Passwort Age Policy not existing
-      AlreadyExists: Passwort Age Policy already exists
-    OrgIAM:
+    OrgIAMPolicy:
+      NotFound: Org IAM Policy not found
       Empty: Org IAM Policy is empty
       NotExisting: Org IAM Policy not existing
       AlreadyExists: Org IAM Policy already exists
@@ -194,6 +201,10 @@ Errors:
     NotFound: UserSession not found
   Key:
     ExpireBeforeNow: The expiration date is in the past
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: Multifactor is configured as required, but no possible providers are configured. Please contact your system administrator.
 EventTypes:
   user:
     added: User added

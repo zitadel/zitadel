@@ -16,7 +16,7 @@ require (
 	github.com/aws/aws-sdk-go v1.35.11 // indirect
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.12.2
+	github.com/caos/oidc v0.12.5
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/cockroachdb/cockroach-go/v2 v2.0.8
 	github.com/envoyproxy/protoc-gen-validate v0.4.1
@@ -57,7 +57,7 @@ require (
 	golang.org/x/net v0.0.0-20201021035429-f5854403a974 // indirect
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9 // indirect
 	golang.org/x/sys v0.0.0-20201020230747-6e5568b54d1a // indirect
-	golang.org/x/text v0.3.3
+	golang.org/x/text v0.3.4
 	golang.org/x/tools v0.0.0-20201021000207-d49c4edd7d96
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20201019141844-1ed22bb0c154

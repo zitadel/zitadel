@@ -54,8 +54,8 @@ SystemDefaults:
     PasswordCheck: 240h #10d
     ExternalLoginCheck: 240h #10d
     MfaInitSkip: 720h #30d
-    MfaSoftwareCheck: 18h
-    MfaHardwareCheck: 12h
+    SecondFactorCheck: 18h
+    MultiFactorCheck: 12h
   IamID: 'IAM'
   DomainVerification:
     VerificationKey:

@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
     Gender,
@@ -43,6 +44,7 @@ export class UserDetailComponent implements OnInit {
 
     public UserState: any = UserState;
     public copied: string = '';
+    public USERGRANTCONTEXT: UserGrantContext = UserGrantContext.USER;
 
     public EditDialogType: any = EditDialogType;
 

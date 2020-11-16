@@ -1,47 +1,12 @@
-<?xml version="1.0" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
- "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
-<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
- width="1026.000000pt" height="1026.000000pt" viewBox="0 0 1026.000000 1026.000000"
- preserveAspectRatio="xMidYMid meet">
-<metadata>
-Created by potrace 1.11, written by Peter Selinger 2001-2013
-</metadata>
-<g transform="translate(0.000000,1026.000000) scale(0.100000,-0.100000)"
-fill="#000000" stroke="none">
-<path d="M2786 10150 c-8 -24 -67 -243 -72 -265 -2 -11 -17 -69 -34 -130 -17
--60 -59 -218 -94 -350 -36 -132 -89 -332 -119 -445 -31 -113 -67 -248 -81
--300 -14 -52 -37 -138 -51 -190 -31 -112 -86 -319 -90 -340 -2 -8 -10 -40 -18
--70 -9 -30 -47 -172 -86 -316 -38 -144 -95 -355 -126 -470 -50 -186 -156 -581
--185 -689 -6 -22 -15 -56 -20 -75 -8 -29 -175 -651 -184 -685 -2 -5 -6 -23
--11 -40 -4 -16 -18 -68 -31 -115 -12 -47 -25 -96 -28 -110 -3 -14 -46 -176
--96 -360 -93 -343 -168 -621 -175 -653 -2 -9 -17 -65 -34 -125 -17 -59 -41
--150 -55 -202 -13 -52 -63 -239 -110 -415 -48 -176 -102 -381 -122 -455 -20
--74 -44 -164 -54 -200 -10 -36 -51 -186 -90 -335 -40 -148 -105 -391 -145
--540 -40 -148 -101 -376 -135 -505 -35 -129 -71 -266 -82 -305 -35 -131 -69
--260 -73 -279 -3 -10 -16 -60 -31 -110 -14 -50 -28 -99 -30 -109 -2 -10 -6
--27 -9 -37 -3 -10 -8 -27 -10 -37 -2 -10 -49 -186 -105 -392 -55 -206 -99
--375 -97 -377 1 -2 39 6 82 17 44 12 87 23 95 25 12 3 198 52 260 69 8 2 58
-16 110 30 52 14 138 37 190 51 52 14 102 28 110 30 8 2 33 8 55 14 22 6 47 12
-56 14 24 6 279 75 334 91 28 7 138 37 245 65 107 29 209 56 225 61 17 5 82 22
-145 39 63 17 225 60 360 96 135 36 252 68 260 70 8 1 98 25 200 53 102 27 311
-83 465 125 377 100 561 150 880 236 105 28 197 53 205 55 26 5 812 215 880
-235 36 10 126 35 200 54 74 20 221 59 325 87 105 28 197 52 205 54 8 2 58 15
-110 30 91 25 185 50 350 94 189 49 280 74 340 91 36 11 119 33 185 51 66 17
-167 44 225 59 138 37 807 216 1080 289 118 32 310 84 425 115 116 30 262 70
-325 87 63 17 165 44 225 60 61 16 144 38 185 50 41 11 82 22 90 24 8 2 119 31
-245 65 127 34 237 63 246 65 33 7 104 29 111 34 4 4 -544 558 -1218 1231
-l-1225 1225 83 38 c473 221 834 631 991 1127 40 127 73 278 82 385 7 74 7 309
-1 360 -59 472 -225 826 -537 1143 -278 283 -651 473 -1044 532 -44 7 -89 14
--100 16 -25 6 -320 5 -360 0 -154 -20 -160 -21 -247 -41 -277 -63 -591 -221
--795 -402 -216 -191 -375 -401 -479 -631 l-38 -83 -1227 1227 c-798 798 -1230
-1223 -1233 1214z m2384 -3623 c0 -36 73 -233 125 -342 46 -93 163 -289 184
--305 3 -3 19 -23 36 -45 16 -21 36 -47 45 -55 8 -9 36 -39 61 -66 68 -74 151
--147 237 -211 42 -32 79 -61 80 -65 2 -5 8 -8 13 -8 5 0 39 -19 76 -41 124
--76 385 -185 487 -203 16 -3 30 -7 32 -8 2 -3 -1095 -301 -1226 -333 -26 -7
--231 -61 -335 -90 -55 -15 -107 -28 -115 -30 -8 -2 -59 -15 -113 -30 -54 -16
--100 -25 -104 -22 -3 4 -1 23 5 44 5 21 35 133 67 248 56 208 119 445 155 580
-10 39 44 165 75 280 81 300 86 318 90 335 2 8 27 104 57 212 46 172 67 220 68
-155z"/>
-</g>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-1928,0)">
+        <g transform="matrix(1,-0,-0,1,1928,-0)">
+            <use xlink:href="#_Image1" x="0.062" y="0" width="15.938px" height="16px" transform="matrix(0.996144,0,0,1,0,0)"/>
+        </g>
+    </g>
+    <defs>
+        <image id="_Image1" width="16px" height="16px" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABUElEQVQ4jZ2SPy9DURjGn3up6XklZm53jJLGpokaaLUfwmIR6Rfo/QQSCR0MPkGlxGBhEaOZxMgkJgPJfQ7pMZSb/rkoJznLOfn98rxPXuAPx8czweBbODocrUJW/5egC/ME4vrg31CkDHgN4jHECcjeIE4Fh6evIyXwcVTuwjYBGSDmIFsYaQQfRxWI7S5MdK81IV79OoKPowoSa8Mx9wkCYhPiVtA68D8m8HG0ngHvZ8FDCXwjX4V4NADvQdzOgvsS+Ea+lsKJfcH3kLUgG/+uq6AHbqWwS0sDRHjxBbJLiOcQLyC7DW+qHgAC38gHEDchW4NYhCN7Jb5H1CN9hGMxfCjc9XewUcshsQIcVyCWvGwR4hgGJY5AYvXwaXb3x03sFHcmIS5BVoJYgjiXihzPwueo/Osq9wmj62mIy3BcQWKLcJz/C98vC9+DDnz4AV15qEiGMu6oAAAAAElFTkSuQmCC"/>
+    </defs>
 </svg>

@@ -213,12 +213,12 @@ func (s *Server) RemoveExternalIDP(ctx context.Context, request *management.Exte
 	return &empty.Empty{}, err
 }
 
-func (s *Server) GetUserMfas(ctx context.Context, userID *management.UserID) (*management.MultiFactors, error) {
+func (s *Server) GetUserMfas(ctx context.Context, userID *management.UserID) (*management.UserMultiFactors, error) {
 	mfas, err := s.user.UserMfas(ctx, userID.Id)
 	if err != nil {
 		return nil, err
 	}
-	return &management.MultiFactors{Mfas: mfasFromModel(mfas)}, nil
+	return &management.UserMultiFactors{Mfas: mfasFromModel(mfas)}, nil
 }
 
 func (s *Server) SearchUserMemberships(ctx context.Context, in *management.UserMembershipSearchRequest) (*management.UserMembershipSearchResponse, error) {

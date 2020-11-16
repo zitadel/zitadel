@@ -6,12 +6,12 @@
             </a>
             <h1>{{user.human ? user.human?.displayName : user.machine?.name}}</h1>
 
-            <span class="fill-space"></span>
-
             <ng-template appHasRole [appHasRole]="['user.delete$', 'user.delete:'+user?.id]">
-                <button mat-raised-button color="warn" (click)="deleteUser()"><i
-                        class="las la-trash"></i>{{'USER.PAGES.DELETE' | translate}}</button>
+                <button mat-icon-button color="warn" matTooltip="{{'USER.PAGES.DELETE' | translate}}"
+                    (click)="deleteUser()"><i class="las la-trash"></i></button>
             </ng-template>
+
+            <span class="fill-space"></span>
 
             <ng-template appHasRole [appHasRole]="['user.write$', 'user.write:'+user?.id]">
                 <button class="state-button" mat-stroked-button color="warn"
@@ -88,10 +88,10 @@
 
         <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
             description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
-            <app-user-grants [userId]="user.id"
-                [allowWrite]="['user.grant.write$'+ 'user.grant.write:'+user?.id] | hasRole | async"
+            <app-user-grants [userId]="user.id" [context]="USERGRANTCONTEXT"
                 [displayedColumns]="['select', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']"
-                [allowDelete]="['user.grant.delete$', 'user.grant.delete'+ user?.id] | hasRole | async">
+                [disableWrite]="((['user.grant.write$'] | hasRole) | async) == false"
+                [disableDelete]="((['user.grant.delete$'] | hasRole) | async) == false">
             </app-user-grants>
         </app-card>
     </div>

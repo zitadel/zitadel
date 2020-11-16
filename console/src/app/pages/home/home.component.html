@@ -24,6 +24,23 @@
                         {{'HOME.IAM'| translate}}</h2>
                     <p>{{'HOME.IAM_DESC'| translate}}</p>
                 </div>
+
+                <ng-template appHasRole [appHasRole]="['org.create','iam.write']">
+                    <a class="short-link" [routerLink]="[ '/org', 'create']">{{'HOME.IAM_CREATE_ORG' | translate}}<i
+                            class="las la-link"></i></a>
+                </ng-template>
+                <ng-template appHasRole [appHasRole]="['iam.policy.read']">
+                    <a class="short-link"
+                        [routerLink]="[ '/iam', 'policy','iam']">{{'HOME.IAM_POLICY_IAM' | translate}}<i
+                            class="las la-link"></i></a>
+                    <a class="short-link"
+                        [routerLink]="[ '/iam', 'policy','complexity']">{{'HOME.IAM_POLICY_COMPLEXITY' | translate}}<i
+                            class="las la-link"></i></a>
+                    <a class="short-link"
+                        [routerLink]="[ '/iam', 'policy','login']">{{'HOME.IAM_POLICY_LOGIN' | translate}}<i
+                            class="las la-link"></i></a>
+                </ng-template>
+
                 <span class="fill-space"></span>
                 <div class="footer">
                     <a color="primary" mat-stroked-button [routerLink]="['/iam']">{{'HOME.IAM_BUTTON' | translate}}</a>
@@ -37,6 +54,9 @@
                     {{'HOME.SECURITYANDPRIVACY'| translate}}</h2>
                 <p>{{'HOME.SECURITYANDPRIVACY_DESC'| translate}}</p>
             </div>
+            <a class="short-link" [routerLink]="[ '/users', 'me','password']">{{'HOME.CHANGE_PWD' | translate}}<i
+                    class="las la-link"></i></a>
+
             <span class="fill-space"></span>
             <div class="footer">
                 <a color="primary" mat-stroked-button
@@ -51,6 +71,11 @@
                         <i class="icon las la-layer-group"></i>
                         {{'HOME.PROJECTS'| translate}}</h2>
                     <p>{{'HOME.PROJECTS_DESC'| translate}}</p>
+                    <ng-template appHasRole [appHasRole]="['project.create']">
+                        <a class="short-link"
+                            [routerLink]="[ '/projects', 'create']">{{'HOME.PROJECTS_NEW_LINK' | translate}}<i
+                                class="las la-link"></i></a>
+                    </ng-template>
                 </div>
                 <span class="fill-space"></span>
                 <div class="footer">
@@ -66,6 +91,19 @@
                     <h2> <i class="icon las la-archway"></i>
                         {{'HOME.PROTECTION'| translate}}</h2>
                     <p>{{'HOME.PROTECTION_DESC'| translate}}</p>
+                    <ng-template appHasRole [appHasRole]="['iam.policy.read']">
+                        <a class="short-link"
+                            [routerLink]="[ '/org', 'policy','iam']">{{'HOME.ORG_POLICY_IAM' | translate}}<i
+                                class="las la-link"></i></a>
+                    </ng-template>
+                    <ng-template appHasRole [appHasRole]="['policy.read']">
+                        <a class="short-link"
+                            [routerLink]="[ '/org', 'policy','complexity']">{{'HOME.ORG_POLICY_COMPLEXITY' | translate}}<i
+                                class="las la-link"></i></a>
+                        <a class="short-link"
+                            [routerLink]="[ '/org', 'policy','login']">{{'HOME.ORG_POLICY_LOGIN' | translate}}<i
+                                class="las la-link"></i></a>
+                    </ng-template>
                 </div>
                 <span class="fill-space"></span>
                 <div class="footer">
@@ -82,6 +120,18 @@
                         <i class="las la-users"></i>
                         {{'HOME.USERS'| translate}}</h2>
                     <p>{{'HOME.USERS_DESC'| translate}}</p>
+                    <ng-template appHasRole [appHasRole]="['user.read(:[0-9]*)?']">
+                        <a class="short-link"
+                            [routerLink]="[ '/users', 'list', 'humans']">{{'HOME.USERS_HUMANS' | translate}}<i
+                                class="las la-link"></i></a>
+                        <a class="short-link"
+                            [routerLink]="[ '/users', 'list', 'machines']">{{'HOME.USERS_MACHINES' | translate}}<i
+                                class="las la-link"></i></a>
+                    </ng-template>
+                    <ng-template appHasRole [appHasRole]="['user.read']">
+                        <a class="short-link" [routerLink]="[ '/users', 'create']">{{'HOME.USERS_CREATE' | translate}}<i
+                                class="las la-link"></i></a>
+                    </ng-template>
                 </div>
                 <span class="fill-space"></span>
                 <div class="footer">

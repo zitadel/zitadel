@@ -128,7 +128,7 @@ export class LoginPolicyComponent implements OnDestroy {
 
     public savePolicy(): void {
         this.updateData().then(() => {
-            this.toast.showInfo('ORG.POLICY.LOGIN_POLICY.SAVED', true);
+            this.toast.showInfo('POLICY.LOGIN_POLICY.SAVED', true);
             this.loading = true;
             setTimeout(() => {
                 this.fetchData();
@@ -141,7 +141,7 @@ export class LoginPolicyComponent implements OnDestroy {
     public removePolicy(): void {
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
             (this.service as ManagementService).RemoveLoginPolicy().then(() => {
-                this.toast.showInfo('ORG.POLICY.TOAST.RESETSUCCESS', true);
+                this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
                 this.loading = true;
                 setTimeout(() => {
                     this.fetchData();

@@ -7,17 +7,10 @@
   $primary-dark: mat-color($primary, A800);
   /* stylelint-enable */
 
-  $lighter-color: rgba(mat-color($primary, 300), .5);
-
   .meta-wrapper {
     .meta {
       position: relative;
       flex: 1 0 300px;
-      background: linear-gradient(to bottom right, rgba($lighter-color, .05) 20%, transparent 50%);
-
-      &.hidden {
-        background: linear-gradient(to bottom right, rgba($lighter-color, .05), transparent 50%);
-      }
 
       &::after {
         border-left: 2px solid $primary-color;
@@ -27,7 +20,7 @@
             left top,
             left bottom,
             from($primary-color),
-            to($primary-dark),
+            to(rgb(0, 0, 0, .5)),
             color-stop(
               01,
               $primary-dark
@@ -39,7 +32,7 @@
             left top,
             left bottom,
             from($primary-color),
-            to($primary-dark),
+            to(rgb(0, 0, 0, .5)),
             color-stop(
               01,
               $primary-dark

@@ -24,7 +24,7 @@ import { ProjectGrantsDataSource } from './project-grants-datasource';
     ],
 })
 export class ProjectGrantsComponent implements OnInit, AfterViewInit {
-    @Input() refreshOnPreviousRoute: string = '';
+    @Input() refreshOnPreviousRoutes: string[] = [];
     @Input() public projectId: string = '';
     @Input() public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
@@ -50,7 +50,6 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
                 tap(() => this.loadGrantsPage()),
             )
             .subscribe();
-
     }
 
     public loadGrantsPage(pageIndex?: number, pageSize?: number): void {

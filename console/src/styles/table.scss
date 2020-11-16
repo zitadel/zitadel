@@ -31,12 +31,12 @@
   }
 
   tr {
-    cursor: pointer;
-
     &.highlight {
+      cursor: pointer;
+
       &:hover {
         td {
-          background-color: var(--table-row-back); // rgba($inv-color, .05);
+          background: var(--table-row-back); // rgba($inv-color, .05);
         }
       }
     }

@@ -34,7 +34,95 @@ Once you created your organisation you will receive a generated domain name from
 After the domain is verified your users can use both domain names to log-in. The user "coyote" can now use "coyote@acme.zitadel.ch" and "coyote@acme.ch".
 An organisation can have multiple domain names, but only one of it can be primary. The primary domain defines which login name ZITADEL displays to the user, and also what information gets asserted in access_tokens (preferred_username).
 
-> Screenshot here
+Browse to your [organisation](administrate#Organisations) by visiting [https://console.zitadel.ch/org](https://console.zitadel.ch/org).
+
+Add the domain to your [organisation](administrate#Organisations) by clicking the button **Add Domain**.
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_org_domain_default.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_org_domain_default.png" itemprop="thumbnail" alt="Organisation Overview" />
+        </a>
+        <figcaption itemprop="caption description">Organisation Overview</figcaption>
+    </figure>
+</div>
+
+Input the domain in the input field and click **Add**
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_org_domain_add.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_org_domain_add.png" itemprop="thumbnail" alt="Organisation Add Domain" />
+        </a>
+        <figcaption itemprop="caption description">Organisation Add Domain</figcaption>
+    </figure>
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_org_domain_added.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_org_domain_added.png" itemprop="thumbnail" alt="Organisation Domain Added" />
+        </a>
+        <figcaption itemprop="caption description">Organisation Domain Added</figcaption>
+    </figure>
+</div>
+To start the domain verification click the domain name and a dialog will appear, where you can choose between DNS or HTTP challenge methods.
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_org_domain_verify.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_org_domain_verify.png" itemprop="thumbnail" alt="Organisation Domain Verify" />
+        </a>
+        <figcaption itemprop="caption description">Organisation Domain Verify</figcaption>
+    </figure>
+</div>
+For example, create a TXT record with your DNS provider for the used domain and click verify. **ZITADEL** will then proceed an check your DNS.
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_org_domain_verify_dns.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_org_domain_verify_dns.png" itemprop="thumbnail" alt="Organisation Domain Verify DNS" />
+        </a>
+        <figcaption itemprop="caption description">Organisation Domain Verify DNS</figcaption>
+    </figure>
+</div>
+
+> Do not delete the verification code **ZITADEL** will recheck the ownership from time to time
+
+When the verification is successful you have the option to activate the domain by clicking **Set as primary**
+
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_org_domain_verified.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_org_domain_verified.png" itemprop="thumbnail" alt="Organization Domain Verified" />
+        </a>
+        <figcaption itemprop="caption description">Organisation verified</figcaption>
+    </figure>
+</div>
+
+> This changes the **preferred loginnames** of your [users](administrate#Users) as indicated [here](administrate#How_ZITADEL_handles_usernames).
+
+Congratulations your are done! You can check this by visiting [https://console.zitadel.ch/users/me](https://console.zitadel.ch/users/me)
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_user_personal_info.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_user_personal_info.png" itemprop="thumbnail" alt="User Personal Information" />
+        </a>
+        <figcaption itemprop="caption description">User Personal Information</figcaption>
+    </figure>
+</div>
+
+> This only works when the [user](administrate#Users) is member of this [organisation](administrate#Organisations)
+
+### Manage Organisation ZITADEL Roles
+
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_org_manage_roles_1.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_org_manage_roles_1.png" itemprop="thumbnail" alt="Manage ZITADEL Roles 1" />
+        </a>
+        <figcaption itemprop="caption description">Manage ZITADEL Roles 1</figcaption>
+    </figure>
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_org_manage_roles_2.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_org_manage_roles_2.png" itemprop="thumbnail" alt="Manage ZITADEL Roles 2" />
+        </a>
+        <figcaption itemprop="caption description">Manage ZITADEL Roles 2</figcaption>
+    </figure>
+</div>
 
 ### Audit organisation changes
 
