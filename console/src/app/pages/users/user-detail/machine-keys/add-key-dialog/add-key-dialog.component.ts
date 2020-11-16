@@ -1,5 +1,6 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Moment } from 'moment';
 import { MachineKeyType } from 'src/app/proto/generated/management_pb';
 
 @Component({
@@ -7,20 +8,17 @@ import { MachineKeyType } from 'src/app/proto/generated/management_pb';
     templateUrl: './add-key-dialog.component.html',
     styleUrls: ['./add-key-dialog.component.scss'],
 })
-export class AddKeyDialogComponent implements OnInit {
+export class AddKeyDialogComponent {
     types: MachineKeyType[] = [
         MachineKeyType.MACHINEKEY_JSON,
     ];
-    date: any;
+    date!: Moment;
     public type: MachineKeyType = MachineKeyType.MACHINEKEY_JSON;
 
     constructor(
         public dialogRef: MatDialogRef<AddKeyDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
     ) { }
-
-    ngOnInit(): void {
-    }
 
     public closeDialog(): void {
         this.dialogRef.close(false);
