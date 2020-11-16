@@ -77,7 +77,9 @@
         "LOGIN":"Login",
         "EDIT":"Edit",
         "PIN":"Pin / Unpin",
-        "CONFIGURE":"Configure"
+        "CONFIGURE":"Configure",
+        "SEND":"Send",
+        "NEWVALUE":"New Value"
     },
     "ERRORS": {
         "REQUIRED": "Some required fields are missing.",
@@ -111,6 +113,11 @@
         "DIALOG": {
             "DELETE_TITLE":"Delete User",
             "DELETE_DESCRIPTION":"You are about to permanently delete a user. Are you sure?"
+        },
+        "SENDEMAILDIALOG":{
+            "TITLE":"Send Email Notification",
+            "DESCRIPTION":"Click the button below to send a notification to the current email address or change the email address in the field.",
+            "NEWEMAIL":"New email address"
         },
         "TABLE":{
             "DEACTIVATE":"Deactivate",
@@ -240,7 +247,11 @@
             "NOTEQUAL":"The passwords provided do not match."
         },
         "EMAIL": "E-mail",
-        "PHONE": "Phone Number",
+        "PHONE": "Phonenumber",
+        "PHONEEMPTY":"No phonenumber defined",
+        "PHONEVERIFIED":"Phonenumber verified.",
+        "EMAILVERIFIED":"Email verified",
+        "NOTVERIFIED":"not verified",
         "PREFERRED_LOGINNAME":"Preferred Loginname",
         "LOGINMETHODS": {
             "TITLE": "Contact Information",
@@ -248,12 +259,18 @@
             "EMAIL": {
                 "TITLE": "E-mail",
                 "VALID": "validated",
-                "RESEND": "Resend Verification E-mail"
+                "RESEND": "Resend Verification E-mail",
+                "EDITTITLE":"Change Email",
+                "EDITDESC":"Enter the new email in the field below."
             },
             "PHONE": {
                 "TITLE": "Phone",
                 "VALID": "validated",
-                "RESEND": "Resend Verification Text Message"
+                "RESEND": "Resend Verification Text Message",
+                "EDITTITLE":"Change number",
+                "EDITDESC":"Enter the new phonenumber in the field below.",
+                "DELETETITLE":"Delete Phonenumber",
+                "DELETEDESC":"Do you really want to delete the phonenumber"
             },
             "RESENDCODE": "Resend Code",
             "ENTERCODE":"Verify",
@@ -294,10 +311,13 @@
         "SIGNEDOUT_BTN":"Sign In",
         "EDITACCOUNT":"Edit Account",
         "ADDACCOUNT":"Log in With Another Account",
+        "RESENDINITIALEMAIL":"Send new initialisation mail",
+        "RESENDEMAILNOTIFICATION":"Resend Email notification",
         "TOAST": {
             "CREATED":"User created successfully.",
             "SAVED":"Profile saved successfully.",
             "EMAILSAVED":"E-mail saved successfully.",
+            "INITEMAILSENT":"Initializing mail sent.",
             "PHONESAVED":"Phone saved successfully.",
             "PHONEREMOVED":"Phone has been removed.",
             "PHONEVERIFIED":"Phone verified successfully.",
