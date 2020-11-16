@@ -7,9 +7,13 @@
   $is-dark-theme: map-get($theme, is-dark);
 
   .cnsl-error {
-    display: block;
+    display: none;
     font-size: 12px;
     color: $warn-color;
     margin-bottom: 5px;
+
+    &.block {
+      display: block;
+    }
   }
 }

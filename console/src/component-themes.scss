@@ -1,6 +1,7 @@
 @import 'src/app/modules/card/card';
 @import './styles/table';
 @import './styles/input.scss';
+@import './styles/error.scss';
 @import './styles/link.scss';
 @import './styles/sidenav-list';
 @import 'src/app/modules/avatar/avatar.component';
@@ -12,7 +13,6 @@
 @import 'src/app/app.component.scss';
 @import 'src/app/modules/form-field/form-field.component.scss';
 @import 'src/app/modules/label/label.component.scss';
-@import 'src/app/modules/error/error.component.scss';
 
 @mixin component-themes($theme) {
   @include avatar-theme($theme);

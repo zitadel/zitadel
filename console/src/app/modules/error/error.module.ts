@@ -1,15 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
-import { ErrorComponent } from './error.component';
+import { ErrorDirective } from './error.directive';
+
 
 @NgModule({
-    declarations: [ErrorComponent],
+    declarations: [ErrorDirective],
     imports: [
         CommonModule,
     ],
     exports: [
-        ErrorComponent,
+        ErrorDirective,
     ],
 })
 export class ErrorModule { }

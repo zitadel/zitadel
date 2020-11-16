@@ -30,7 +30,7 @@ export class InputDirective {
     // set readonly(value: boolean) { this._readonly = coerceBooleanProperty(value); }
     // private _readonly = false;
     // readonly id!: string;
-    protected _uid: string = `mat-input-${nextUniqueId++}`;
+    protected _uid: string = `cnsl-input-${nextUniqueId++}`;
 
     readonly ngControl!: NgControl | null;
     protected _id!: string;

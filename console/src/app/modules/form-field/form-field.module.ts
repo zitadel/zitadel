@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { MatRippleModule } from '@angular/material/core';
 import { LabelModule } from 'src/app/modules/label/label.module';
 
-import { ErrorComponent } from '../error/error.component';
+import { ErrorDirective } from '../error/error.directive';
 import { ErrorModule } from '../error/error.module';
 import { LabelComponent } from '../label/label.component';
 import { FormFieldComponent } from './form-field.component';
@@ -20,7 +20,7 @@ import { FormFieldComponent } from './form-field.component';
     exports: [
         FormFieldComponent,
         LabelComponent,
-        ErrorComponent,
+        ErrorDirective,
     ],
 })
 export class FormFieldModule { }
