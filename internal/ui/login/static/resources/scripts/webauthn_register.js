@@ -13,14 +13,11 @@ function registerCredential() {
             }
         }
     }
-    console.log(opt);
     navigator.credentials.create({
         publicKey: opt.publicKey
     }).then(function (credential) {
-        console.log(credential);
         createCredential(credential);
     }).catch(function (err) {
-        console.log(err);
         webauthnError(err);
     });
 }

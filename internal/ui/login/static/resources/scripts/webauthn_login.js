@@ -4,8 +4,6 @@ function login() {
     document.getElementById('wa-error').classList.add('hidden');
 
     let makeAssertionOptions = JSON.parse(atob(document.getElementsByName('credentialAssertionData')[0].value));
-    console.log("Assertion Options:");
-    console.log(makeAssertionOptions);
     makeAssertionOptions.publicKey.challenge = bufferDecode(makeAssertionOptions.publicKey.challenge);
     makeAssertionOptions.publicKey.allowCredentials.forEach(function (listItem) {
         listItem.id = bufferDecode(listItem.id)
@@ -14,11 +12,9 @@ function login() {
     navigator.credentials.get({
         publicKey: makeAssertionOptions.publicKey
     }).then(function (credential) {
-            console.log(credential);
             verifyAssertion(credential);
         }).catch(function (err) {
-        alert(err.name);
-        alert(err.message);
+            webauthnError(err);
     });
 }
 
