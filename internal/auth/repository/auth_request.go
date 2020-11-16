@@ -25,7 +25,7 @@ type AuthRequestRepository interface {
 	BeginMfaU2FLogin(ctx context.Context, userID, authRequestID, userAgentID string) (*user_model.WebAuthNLogin, error)
 	VerifyMfaU2F(ctx context.Context, userID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) error
 	BeginPasswordlessLogin(ctx context.Context, userID, authRequestID, userAgentID string) (*user_model.WebAuthNLogin, error)
-	VerifyPasswordless(ctx context.Context, userID, sessionID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) error
+	VerifyPasswordless(ctx context.Context, userID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) error
 
 	LinkExternalUsers(ctx context.Context, authReqID, userAgentID string, info *model.BrowserInfo) error
 	AutoRegisterExternalUser(ctx context.Context, user *user_model.User, externalIDP *user_model.ExternalIDP, member *org_model.OrgMember, authReqID, userAgentID, resourceOwner string, info *model.BrowserInfo) error

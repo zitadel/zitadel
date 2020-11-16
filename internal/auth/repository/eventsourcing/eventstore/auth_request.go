@@ -306,7 +306,7 @@ func (repo *AuthRequestRepo) BeginPasswordlessLogin(ctx context.Context, userID,
 	return repo.UserEvents.BeginPasswordlessLogin(ctx, userID, request)
 }
 
-func (repo *AuthRequestRepo) VerifyPasswordless(ctx context.Context, userID, sessionID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) VerifyPasswordless(ctx context.Context, userID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authRequestID, userAgentID)
@@ -316,7 +316,7 @@ func (repo *AuthRequestRepo) VerifyPasswordless(ctx context.Context, userID, ses
 	if request.UserID != userID {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-4Mlo0", "Errors.User.NotMatchingUserID")
 	}
-	return repo.UserEvents.VerifyPasswordless(ctx, userID, sessionID, credentialData, request)
+	return repo.UserEvents.VerifyPasswordless(ctx, userID, credentialData, request)
 }
 
 func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, userAgentID string, info *model.BrowserInfo) (err error) {
@@ -596,23 +596,17 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 		return nil, err
 	}
 
+	//if isExternalLoginNoUserLinking(request, userSession) {}
 	if (request.SelectedIDPConfigID != "" || userSession.SelectedIDPConfigID != "") && (request.LinkingUsers == nil || len(request.LinkingUsers) == 0) {
 		if !checkVerificationTime(userSession.ExternalLoginVerification, repo.ExternalLoginCheckLifeTime) {
 			return append(steps, &model.ExternalLoginStep{}), nil
 		}
-	} else if (request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == "") || (request.SelectedIDPConfigID != "" && request.LinkingUsers != nil && len(request.LinkingUsers) > 0) {
-		if user.InitRequired {
-			return append(steps, &model.InitUserStep{PasswordSet: user.PasswordSet}), nil
+	}
+	if (request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == "") || (request.SelectedIDPConfigID != "" && request.LinkingUsers != nil && len(request.LinkingUsers) > 0) {
+		step := repo.firstFactorChecked(request, user, userSession)
+		if step != nil {
+			return append(steps, step), nil
 		}
-		if !user.PasswordSet {
-			return append(steps, &model.InitPasswordStep{}), nil
-		}
-
-		if !checkVerificationTime(userSession.PasswordVerification, repo.PasswordCheckLifeTime) {
-			return append(steps, &model.PasswordStep{}), nil
-		}
-		request.PasswordVerified = true
-		request.AuthTime = userSession.PasswordVerification
 	}
 
 	step, ok, err := repo.mfaChecked(userSession, request, user)
@@ -669,6 +663,32 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *model.AuthRequest) (
 		}
 	}
 	return users, nil
+}
+
+func (repo *AuthRequestRepo) firstFactorChecked(request *model.AuthRequest, user *user_model.UserView, userSession *user_model.UserSessionView) model.NextStep {
+	if user.InitRequired {
+		return &model.InitUserStep{PasswordSet: user.PasswordSet}
+	}
+
+	if len(user.PasswordLessVerifiedIDs) > 0 {
+		if !checkVerificationTime(userSession.PasswordLessVerification, repo.MultiFactorCheckLifeTime) {
+			return &model.PasswordLessStep{}
+		}
+		request.AuthTime = userSession.PasswordLessVerification
+		return nil
+	}
+
+	if !user.PasswordSet {
+		return &model.InitPasswordStep{}
+	}
+
+	if !checkVerificationTime(userSession.PasswordVerification, repo.PasswordCheckLifeTime) {
+		return &model.PasswordStep{}
+	}
+	request.PasswordVerified = true
+	request.AuthTime = userSession.PasswordVerification
+	return nil
+
 }
 
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *model.AuthRequest, user *user_model.UserView) (model.NextStep, bool, error) {

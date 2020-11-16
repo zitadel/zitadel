@@ -90,10 +90,11 @@ type HumanView struct {
 	MfaInitSkipped    time.Time      `json:"-" gorm:"column:mfa_init_skipped"`
 	InitRequired      bool           `json:"-" gorm:"column:init_required"`
 
-	PasswordSet            bool      `json:"-" gorm:"column:password_set"`
-	PasswordChangeRequired bool      `json:"-" gorm:"column:password_change_required"`
-	UsernameChangeRequired bool      `json:"-" gorm:"column:username_change_required"`
-	PasswordChanged        time.Time `json:"-" gorm:"column:password_change"`
+	PasswordSet             bool           `json:"-" gorm:"column:password_set"`
+	PasswordChangeRequired  bool           `json:"-" gorm:"column:password_change_required"`
+	UsernameChangeRequired  bool           `json:"-" gorm:"column:username_change_required"`
+	PasswordChanged         time.Time      `json:"-" gorm:"column:password_change"`
+	PasswordLessVerifiedIDs pq.StringArray `json:"-" gorm:"column:passwordless_verified_ids"`
 }
 
 func (h *HumanView) IsZero() bool {
@@ -124,29 +125,30 @@ func UserToModel(user *UserView) *model.UserView {
 	}
 	if !user.HumanView.IsZero() {
 		userView.HumanView = &model.HumanView{
-			PasswordSet:            user.PasswordSet,
-			PasswordChangeRequired: user.PasswordChangeRequired,
-			PasswordChanged:        user.PasswordChanged,
-			FirstName:              user.FirstName,
-			LastName:               user.LastName,
-			NickName:               user.NickName,
-			DisplayName:            user.DisplayName,
-			PreferredLanguage:      user.PreferredLanguage,
-			Gender:                 model.Gender(user.Gender),
-			Email:                  user.Email,
-			IsEmailVerified:        user.IsEmailVerified,
-			Phone:                  user.Phone,
-			IsPhoneVerified:        user.IsPhoneVerified,
-			Country:                user.Country,
-			Locality:               user.Locality,
-			PostalCode:             user.PostalCode,
-			Region:                 user.Region,
-			StreetAddress:          user.StreetAddress,
-			OTPState:               model.MfaState(user.OTPState),
-			U2FVerifiedIDs:         user.U2FVerifiedIDs,
-			MfaMaxSetUp:            req_model.MFALevel(user.MfaMaxSetUp),
-			MfaInitSkipped:         user.MfaInitSkipped,
-			InitRequired:           user.InitRequired,
+			PasswordSet:             user.PasswordSet,
+			PasswordChangeRequired:  user.PasswordChangeRequired,
+			PasswordChanged:         user.PasswordChanged,
+			PasswordLessVerifiedIDs: user.PasswordLessVerifiedIDs,
+			U2FVerifiedIDs:          user.U2FVerifiedIDs,
+			FirstName:               user.FirstName,
+			LastName:                user.LastName,
+			NickName:                user.NickName,
+			DisplayName:             user.DisplayName,
+			PreferredLanguage:       user.PreferredLanguage,
+			Gender:                  model.Gender(user.Gender),
+			Email:                   user.Email,
+			IsEmailVerified:         user.IsEmailVerified,
+			Phone:                   user.Phone,
+			IsPhoneVerified:         user.IsPhoneVerified,
+			Country:                 user.Country,
+			Locality:                user.Locality,
+			PostalCode:              user.PostalCode,
+			Region:                  user.Region,
+			StreetAddress:           user.StreetAddress,
+			OTPState:                model.MfaState(user.OTPState),
+			MfaMaxSetUp:             req_model.MFALevel(user.MfaMaxSetUp),
+			MfaInitSkipped:          user.MfaInitSkipped,
+			InitRequired:            user.InitRequired,
 		}
 	}
 
@@ -216,6 +218,24 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	case es_model.UserPasswordChanged,
 		es_model.HumanPasswordChanged:
 		err = u.setPasswordData(event)
+	case es_model.HumanMFAPasswordlessTokenVerified:
+		token := new(model.WebAuthNToken)
+		if err := json.Unmarshal(event.Data, token); err != nil {
+			return err
+		}
+		u.PasswordLessVerifiedIDs = append(u.PasswordLessVerifiedIDs, token.WebAuthNTokenID)
+	case es_model.HumanMFAPasswordlessTokenRemoved:
+		token := new(model.WebAuthNToken)
+		if err := json.Unmarshal(event.Data, token); err != nil {
+			return err
+		}
+		for i := len(u.PasswordLessVerifiedIDs) - 1; i >= 0; i-- {
+			if u.PasswordLessVerifiedIDs[i] == token.WebAuthNTokenID {
+				u.PasswordLessVerifiedIDs[i] = u.U2FVerifiedIDs[len(u.PasswordLessVerifiedIDs)-1]
+				u.PasswordLessVerifiedIDs[len(u.PasswordLessVerifiedIDs)-1] = ""
+				u.PasswordLessVerifiedIDs = u.PasswordLessVerifiedIDs[:len(u.PasswordLessVerifiedIDs)-1]
+			}
+		}
 	case es_model.UserProfileChanged,
 		es_model.HumanProfileChanged,
 		es_model.UserAddressChanged,
@@ -263,8 +283,6 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	case es_model.MFAOTPRemoved,
 		es_model.HumanMFAOTPRemoved:
 		u.OTPState = int32(model.MfaStateUnspecified)
-	//case es_model.HumanMFAU2FTokenAdded:
-	//
 	case es_model.HumanMFAU2FTokenVerified:
 		token := new(model.WebAuthNToken)
 		if err := json.Unmarshal(event.Data, token); err != nil {

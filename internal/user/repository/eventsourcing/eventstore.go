@@ -1450,7 +1450,7 @@ func (es *UserEventstore) BeginPasswordlessLogin(ctx context.Context, userID str
 	return webAuthNLogin, nil
 }
 
-func (es *UserEventstore) VerifyPasswordless(ctx context.Context, userID, webAuthNTokenID string, credentialData []byte, authRequest *req_model.AuthRequest) error {
+func (es *UserEventstore) VerifyPasswordless(ctx context.Context, userID string, credentialData []byte, authRequest *req_model.AuthRequest) error {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err

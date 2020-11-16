@@ -23,6 +23,7 @@ const (
 	NextStepExternalNotFoundOption
 	NextStepExternalLogin
 	NextStepGrantRequired
+	NextStepPasswordLess
 )
 
 type UserSessionState int32
@@ -79,6 +80,12 @@ type ExternalLoginStep struct {
 
 func (s *ExternalLoginStep) Type() NextStepType {
 	return NextStepExternalLogin
+}
+
+type PasswordLessStep struct{}
+
+func (s *PasswordLessStep) Type() NextStepType {
+	return NextStepPasswordLess
 }
 
 type ChangePasswordStep struct{}

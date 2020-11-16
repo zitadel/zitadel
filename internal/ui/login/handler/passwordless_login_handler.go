@@ -9,25 +9,25 @@ import (
 )
 
 const (
-	tmplU2FVerification = "u2fverification"
+	tmplPasswordLessVerification = "passwordlessverification"
 )
 
-func (l *Login) renderU2FVerification(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
+func (l *Login) renderPasswordLessVerification(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	webAuthNLogin, err := l.authRepo.BeginMfaU2FLogin(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.ID, userAgentID)
+	webAuthNLogin, err := l.authRepo.BeginPasswordlessLogin(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.ID, userAgentID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
 	data := &webAuthNData{
-		userData:               l.getUserData(r, authReq, "Register WebAuthNToken", "", ""),
+		userData:               l.getUserData(r, authReq, "Login PasswordLess", "", ""),
 		CredentialCreationData: base64.URLEncoding.EncodeToString(webAuthNLogin.CredentialAssertionData),
 		SessionID:              webAuthNLogin.Challenge,
 	}
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplU2FVerification], data, nil)
+	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplPasswordLessVerification], data, nil)
 }
 
-func (l *Login) handleU2FVerification(w http.ResponseWriter, r *http.Request) {
+func (l *Login) handlePasswordLessVerification(w http.ResponseWriter, r *http.Request) {
 	formData := new(webAuthNFormData)
 	authReq, err := l.getAuthRequestAndParseData(r, formData)
 	if err != nil {
@@ -35,7 +35,7 @@ func (l *Login) handleU2FVerification(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if formData.Resend {
-		l.renderU2FVerification(w, r, authReq)
+		l.renderPasswordLessVerification(w, r, authReq)
 		return
 	}
 	credData, err := base64.URLEncoding.DecodeString(formData.CredentialData)
@@ -44,7 +44,7 @@ func (l *Login) handleU2FVerification(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.VerifyMfaU2F(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.ID, userAgentID, credData, model.BrowserInfoFromRequest(r))
+	err = l.authRepo.VerifyPasswordless(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.ID, userAgentID, credData, model.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

@@ -28,30 +28,31 @@ type UserView struct {
 }
 
 type HumanView struct {
-	PasswordSet            bool
-	PasswordChangeRequired bool
-	UsernameChangeRequired bool
-	PasswordChanged        time.Time
-	FirstName              string
-	LastName               string
-	NickName               string
-	DisplayName            string
-	PreferredLanguage      string
-	Gender                 Gender
-	Email                  string
-	IsEmailVerified        bool
-	Phone                  string
-	IsPhoneVerified        bool
-	Country                string
-	Locality               string
-	PostalCode             string
-	Region                 string
-	StreetAddress          string
-	OTPState               MfaState
-	U2FVerifiedIDs         []string
-	MfaMaxSetUp            req_model.MFALevel
-	MfaInitSkipped         time.Time
-	InitRequired           bool
+	PasswordSet             bool
+	PasswordChangeRequired  bool
+	UsernameChangeRequired  bool
+	PasswordChanged         time.Time
+	FirstName               string
+	LastName                string
+	NickName                string
+	DisplayName             string
+	PreferredLanguage       string
+	Gender                  Gender
+	Email                   string
+	IsEmailVerified         bool
+	Phone                   string
+	IsPhoneVerified         bool
+	Country                 string
+	Locality                string
+	PostalCode              string
+	Region                  string
+	StreetAddress           string
+	OTPState                MfaState
+	U2FVerifiedIDs          []string
+	PasswordLessVerifiedIDs []string
+	MfaMaxSetUp             req_model.MFALevel
+	MfaInitSkipped          time.Time
+	InitRequired            bool
 }
 
 type MachineView struct {

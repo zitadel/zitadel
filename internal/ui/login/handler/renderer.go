@@ -34,33 +34,34 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		pathPrefix: pathPrefix,
 	}
 	tmplMapping := map[string]string{
-		tmplError:                  "error.html",
-		tmplLogin:                  "login.html",
-		tmplUserSelection:          "select_user.html",
-		tmplPassword:               "password.html",
-		tmplMfaVerify:              "mfa_verify.html",
-		tmplMfaPrompt:              "mfa_prompt.html",
-		tmplMfaInitVerify:          "mfa_init_verify.html",
-		tmplMfaU2FInit:             "mfa_init_u2f.html",
-		tmplMfaU2FInitVerification: "mfa_verification_u2f.html",
-		tmplMfaInitDone:            "mfa_init_done.html",
-		tmplMailVerification:       "mail_verification.html",
-		tmplMailVerified:           "mail_verified.html",
-		tmplInitPassword:           "init_password.html",
-		tmplInitPasswordDone:       "init_password_done.html",
-		tmplInitUser:               "init_user.html",
-		tmplInitUserDone:           "init_user_done.html",
-		tmplPasswordResetDone:      "password_reset_done.html",
-		tmplChangePassword:         "change_password.html",
-		tmplChangePasswordDone:     "change_password_done.html",
-		tmplRegisterOption:         "register_option.html",
-		tmplRegister:               "register.html",
-		tmplLogoutDone:             "logout_done.html",
-		tmplRegisterOrg:            "register_org.html",
-		tmplChangeUsername:         "change_username.html",
-		tmplChangeUsernameDone:     "change_username_done.html",
-		tmplLinkUsersDone:          "link_users_done.html",
-		tmplExternalNotFoundOption: "external_not_found_option.html",
+		tmplError:                    "error.html",
+		tmplLogin:                    "login.html",
+		tmplUserSelection:            "select_user.html",
+		tmplPassword:                 "password.html",
+		tmplPasswordLessVerification: "passwordless.html",
+		tmplMfaVerify:                "mfa_verify.html",
+		tmplMfaPrompt:                "mfa_prompt.html",
+		tmplMfaInitVerify:            "mfa_init_verify.html",
+		tmplMfaU2FInit:               "mfa_init_u2f.html",
+		tmplU2FVerification:          "mfa_verification_u2f.html",
+		tmplMfaInitDone:              "mfa_init_done.html",
+		tmplMailVerification:         "mail_verification.html",
+		tmplMailVerified:             "mail_verified.html",
+		tmplInitPassword:             "init_password.html",
+		tmplInitPasswordDone:         "init_password_done.html",
+		tmplInitUser:                 "init_user.html",
+		tmplInitUserDone:             "init_user_done.html",
+		tmplPasswordResetDone:        "password_reset_done.html",
+		tmplChangePassword:           "change_password.html",
+		tmplChangePasswordDone:       "change_password_done.html",
+		tmplRegisterOption:           "register_option.html",
+		tmplRegister:                 "register.html",
+		tmplLogoutDone:               "logout_done.html",
+		tmplRegisterOrg:              "register_org.html",
+		tmplChangeUsername:           "change_username.html",
+		tmplChangeUsernameDone:       "change_username_done.html",
+		tmplLinkUsersDone:            "link_users_done.html",
+		tmplExternalNotFoundOption:   "external_not_found_option.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -112,7 +113,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 			return path.Join(r.pathPrefix, EndpointMfaInitU2FVerify)
 		},
 		"mfaInitU2FLoginUrl": func() string {
-			return path.Join(r.pathPrefix, EndpointMfaInitU2FLogin)
+			return path.Join(r.pathPrefix, EndpointU2FVerification)
 		},
 		"mailVerificationUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMailVerification)
@@ -200,6 +201,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 	case *model.PasswordStep:
 		l.renderPassword(w, r, authReq, nil)
+	case *model.PasswordLessStep:
+		l.renderPasswordLessVerification(w, r, authReq)
 	case *model.MfaVerificationStep:
 		l.renderMfaVerify(w, r, authReq, step, err)
 	case *model.RedirectToCallbackStep:
