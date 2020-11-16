@@ -143,8 +143,8 @@ func (a *AuthRequest) GetScopeProjectIDsForAud() []string {
 	switch request := a.Request.(type) {
 	case *AuthRequestOIDC:
 		for _, scope := range request.Scopes {
-			if strings.HasPrefix(scope, ProjectIDAudScope) {
-				projectIDs = append(projectIDs, strings.TrimPrefix(scope, ProjectIDAudScope))
+			if strings.HasPrefix(scope, ProjectIDScope) && strings.HasSuffix(scope, AudSuffix) {
+				projectIDs = append(projectIDs, strings.TrimSuffix(strings.TrimPrefix(scope, ProjectIDScope), AudSuffix))
 			}
 		}
 	}

@@ -99,7 +99,7 @@ func (c *Client) IsScopeAllowed(scope string) bool {
 	if strings.HasPrefix(scope, authreq_model.OrgDomainPrimaryScope) {
 		return true
 	}
-	if strings.HasPrefix(scope, authreq_model.ProjectIDAudScope) {
+	if strings.HasPrefix(scope, authreq_model.ProjectIDScope) {
 		return true
 	}
 	for _, allowedScope := range c.allowedScopes {
