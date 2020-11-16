@@ -231,7 +231,7 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		}
 		for i := len(u.PasswordLessVerifiedIDs) - 1; i >= 0; i-- {
 			if u.PasswordLessVerifiedIDs[i] == token.WebAuthNTokenID {
-				u.PasswordLessVerifiedIDs[i] = u.U2FVerifiedIDs[len(u.PasswordLessVerifiedIDs)-1]
+				u.PasswordLessVerifiedIDs[i] = u.PasswordLessVerifiedIDs[len(u.PasswordLessVerifiedIDs)-1]
 				u.PasswordLessVerifiedIDs[len(u.PasswordLessVerifiedIDs)-1] = ""
 				u.PasswordLessVerifiedIDs = u.PasswordLessVerifiedIDs[:len(u.PasswordLessVerifiedIDs)-1]
 			}

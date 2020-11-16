@@ -91,6 +91,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		"userSelectionUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointUserSelection)
 		},
+		"passwordLessVerificationUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointPasswordLessLogin)
+		},
 		"passwordResetUrl": func(id string) string {
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointPasswordReset, queryAuthRequestID, id))
 		},
