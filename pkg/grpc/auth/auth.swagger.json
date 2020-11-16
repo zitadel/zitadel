@@ -30,7 +30,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -63,7 +63,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -85,7 +85,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -108,7 +108,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -130,29 +130,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "tags": [
-          "AuthService"
-        ]
-      }
-    },
-    "/ready": {
-      "get": {
-        "operationId": "AuthService_Ready",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -174,7 +152,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -207,7 +185,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -229,7 +207,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -249,7 +227,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -281,7 +259,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -306,7 +284,8 @@
             "name": "asc",
             "in": "query",
             "required": false,
-            "type": "boolean"
+            "type": "boolean",
+            "format": "boolean"
           }
         ],
         "tags": [
@@ -325,7 +304,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -345,7 +324,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -377,7 +356,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -409,7 +388,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -442,7 +421,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -474,7 +453,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -510,7 +489,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -532,7 +511,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -553,7 +532,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -585,7 +564,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -618,7 +597,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -650,7 +629,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -670,7 +649,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -690,7 +669,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -722,7 +701,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -754,7 +733,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -786,7 +765,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -806,7 +785,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -839,7 +818,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -861,7 +840,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -877,28 +856,6 @@
             }
           }
         ],
-        "tags": [
-          "AuthService"
-        ]
-      }
-    },
-    "/validate": {
-      "get": {
-        "operationId": "AuthService_Validate",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "type": "object"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
         "tags": [
           "AuthService"
         ]
@@ -1113,13 +1070,15 @@
           "type": "string"
         },
         "is_email_verified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "phone": {
           "type": "string"
         },
         "is_phone_verified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "country": {
           "type": "string"
@@ -1267,7 +1226,8 @@
           "format": "uint64"
         },
         "asc": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "queries": {
           "type": "array",
@@ -1344,23 +1304,28 @@
           "format": "uint64"
         },
         "has_lowercase": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_uppercase": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_number": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "has_symbol": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "sequence": {
           "type": "string",
           "format": "uint64"
         },
         "is_default": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -1512,7 +1477,8 @@
           "type": "string"
         },
         "isEmailVerified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -1538,7 +1504,8 @@
           "type": "string"
         },
         "isEmailVerified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -1592,7 +1559,8 @@
           "$ref": "#/definitions/v1UserGrantSearchKey"
         },
         "asc": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "queries": {
           "type": "array",
@@ -1669,7 +1637,8 @@
           "type": "string"
         },
         "is_phone_verified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -1695,7 +1664,8 @@
           "type": "string"
         },
         "is_phone_verified": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "sequence": {
           "type": "string",

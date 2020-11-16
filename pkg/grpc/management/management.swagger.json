@@ -3347,28 +3347,6 @@
         ]
       }
     },
-    "/ready": {
-      "get": {
-        "operationId": "ManagementService_Ready",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
     "/users": {
       "post": {
         "operationId": "ManagementService_CreateUser",
@@ -4850,28 +4828,6 @@
             }
           }
         ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/validate": {
-      "get": {
-        "operationId": "ManagementService_Validate",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "type": "object"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
         "tags": [
           "ManagementService"
         ]

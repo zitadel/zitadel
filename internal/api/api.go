@@ -89,6 +89,7 @@ func (a *API) healthHandler() http.Handler {
 	handler := http.NewServeMux()
 	handler.HandleFunc("/healthz", handleHealth)
 	handler.HandleFunc("/ready", handleReadiness(checks))
+	handler.HandleFunc("/validate", handleValidate(checks))
 	handler.HandleFunc("/clientID", a.handleClientID)
 
 	return handler
@@ -101,12 +102,23 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 
 func handleReadiness(checks []ValidationFunction) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := validate(r.Context(), checks)
-		if err == nil {
+		hasErr, errors := validate(r.Context(), checks)
+		if !hasErr {
 			http_util.MarshalJSON(w, "ok", nil, http.StatusOK)
 			return
 		}
-		http_util.MarshalJSON(w, nil, err, http.StatusPreconditionFailed)
+		http_util.MarshalJSON(w, nil, errors[0], http.StatusPreconditionFailed)
+	}
+}
+
+func handleValidate(checks []ValidationFunction) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		hasErr, errors := validate(r.Context(), checks)
+		if !hasErr {
+			http_util.MarshalJSON(w, "ok", nil, http.StatusOK)
+			return
+		}
+		http_util.MarshalJSON(w, errors, nil, http.StatusOK)
 	}
 }
 
@@ -121,12 +133,15 @@ func (a *API) handleClientID(w http.ResponseWriter, r *http.Request) {
 
 type ValidationFunction func(ctx context.Context) error
 
-func validate(ctx context.Context, validations []ValidationFunction) error {
+func validate(ctx context.Context, validations []ValidationFunction) (bool, []error) {
+	hasErr := false
+	errors := make([]error, 0)
 	for _, validation := range validations {
 		if err := validation(ctx); err != nil {
 			logging.Log("API-vf823").WithError(err).Error("validation failed")
-			return err
+			hasErr = true
+			errors = append(errors, err)
 		}
 	}
-	return nil
+	return hasErr, errors
 }
