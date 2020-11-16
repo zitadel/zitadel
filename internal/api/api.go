@@ -102,8 +102,8 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 
 func handleReadiness(checks []ValidationFunction) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		hasErr, errors := validate(r.Context(), checks)
-		if !hasErr {
+		errors := validate(r.Context(), checks)
+		if len(errors) == 0 {
 			http_util.MarshalJSON(w, "ok", nil, http.StatusOK)
 			return
 		}
@@ -113,8 +113,8 @@ func handleReadiness(checks []ValidationFunction) func(w http.ResponseWriter, r 
 
 func handleValidate(checks []ValidationFunction) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		hasErr, errors := validate(r.Context(), checks)
-		if !hasErr {
+		errors := validate(r.Context(), checks)
+		if len(errors) == 0 {
 			http_util.MarshalJSON(w, "ok", nil, http.StatusOK)
 			return
 		}
@@ -133,15 +133,13 @@ func (a *API) handleClientID(w http.ResponseWriter, r *http.Request) {
 
 type ValidationFunction func(ctx context.Context) error
 
-func validate(ctx context.Context, validations []ValidationFunction) (bool, []error) {
-	hasErr := false
+func validate(ctx context.Context, validations []ValidationFunction) []error {
 	errors := make([]error, 0)
 	for _, validation := range validations {
 		if err := validation(ctx); err != nil {
 			logging.Log("API-vf823").WithError(err).Error("validation failed")
-			hasErr = true
 			errors = append(errors, err)
 		}
 	}
-	return hasErr, errors
+	return errors
 }
