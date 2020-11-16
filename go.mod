@@ -45,7 +45,7 @@ require (
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.1 // indirect
 	github.com/nicksnyder/go-i18n/v2 v2.1.1
-	github.com/pquerna/otp v1.2.0
+	github.com/pquerna/otp v1.3.0
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.7.0
 	github.com/sony/sonyflake v1.0.0
