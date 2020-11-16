@@ -7,27 +7,28 @@
 
     td,
     th {
-      padding: .5rem;
-      outline: none;
+      padding-left: .5rem;
+      padding-right: .5rem;
 
       &:first-child {
         padding-left: 0;
-        padding-right: 1rem;
+        padding-right: .5rem;
       }
 
       &:last-child {
         padding-right: 0;
       }
+    }
 
-      .search-button,
-      .dlt-button {
-        visibility: hidden;
+    th {
+      .search-button {
+        display: none;
       }
 
       &:hover,
       &.search-active {
         .search-button {
-          visibility: visible;
+          display: inline-block;
         }
       }
     }
