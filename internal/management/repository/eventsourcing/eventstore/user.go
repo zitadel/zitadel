@@ -10,6 +10,7 @@ import (
 	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/errors"
@@ -236,6 +237,10 @@ func (repo *UserRepo) SetOneTimePassword(ctx context.Context, password *usr_mode
 
 func (repo *UserRepo) RequestSetPassword(ctx context.Context, id string, notifyType usr_model.NotificationType) error {
 	return repo.UserEvents.RequestSetPassword(ctx, id, notifyType)
+}
+
+func (repo *UserRepo) ResendInitialMail(ctx context.Context, userID, email string) error {
+	return repo.UserEvents.ResendInitialMail(ctx, userID, email)
 }
 
 func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_model.Profile, error) {

@@ -4316,6 +4316,82 @@ var _ interface {
 	ErrorName() string
 } = SetPasswordNotificationRequestValidationError{}
 
+// Validate checks the field values on InitialMailRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *InitialMailRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		return InitialMailRequestValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	// no validation rules for Email
+
+	return nil
+}
+
+// InitialMailRequestValidationError is the validation error returned by
+// InitialMailRequest.Validate if the designated constraints aren't met.
+type InitialMailRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e InitialMailRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e InitialMailRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e InitialMailRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e InitialMailRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e InitialMailRequestValidationError) ErrorName() string {
+	return "InitialMailRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e InitialMailRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sInitialMailRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = InitialMailRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = InitialMailRequestValidationError{}
+
 // Validate checks the field values on OrgIamPolicyView with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.
