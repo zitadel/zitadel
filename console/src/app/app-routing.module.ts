@@ -130,8 +130,9 @@ const routes: Routes = [
         RouterModule.forRoot(
             routes,
             {
-                preloadingStrategy: QuicklinkStrategy,
-            },
+    preloadingStrategy: QuicklinkStrategy,
+    relativeLinkResolution: 'legacy'
+},
         ),
     ],
     exports: [RouterModule],
