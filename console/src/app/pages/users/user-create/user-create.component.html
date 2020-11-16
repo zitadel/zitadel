@@ -7,14 +7,14 @@
             <p class="section">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>
             <cnsl-form-field class="formfield" appearance="fill">
                 <cnsl-label>{{ 'USER.PROFILE.EMAIL' | translate }}</cnsl-label>
-                <input formControlName="email" required />
+                <input cnslInput formControlName="email" required />
                 <cnsl-error *ngIf="email?.invalid && email?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                 </cnsl-error>
             </cnsl-form-field>
             <cnsl-form-field class="formfield" appearance="fill">
                 <cnsl-label>{{ 'USER.PROFILE.USERNAME' | translate }}</cnsl-label>
-                <input formControlName="userName" required />
+                <input cnslInput formControlName="userName" required />
                 <span *ngIf="envSuffix" cnslSuffix>{{envSuffix}}</span>
 
                 <cnsl-error *ngIf="userName?.invalid && userName?.errors?.required">
@@ -28,7 +28,7 @@
         <div class="content">
             <cnsl-form-field class="formfield" appearance="fill">
                 <cnsl-label>{{ 'USER.PROFILE.FIRSTNAME' | translate }}</cnsl-label>
-                <input formControlName="firstName" required />
+                <input cnslInput formControlName="firstName" required />
                 <cnsl-error *ngIf="firstName?.invalid && firstName?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                 </cnsl-error>

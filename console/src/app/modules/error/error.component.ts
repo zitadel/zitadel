@@ -1,6 +1,4 @@
-import { Component } from '@angular/core';
-
-@Component({
+@Directive({
     selector: 'cnsl-error',
     templateUrl: './error.component.html',
     styleUrls: ['./error.component.scss'],
