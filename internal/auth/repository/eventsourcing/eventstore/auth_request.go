@@ -694,7 +694,7 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *model.AuthRequest, user
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *model.AuthRequest, user *user_model.UserView) (model.NextStep, bool, error) {
 	mfaLevel := request.MfaLevel()
 	promptRequired := (user.MfaMaxSetUp < mfaLevel) || !user.HasRequiredOrgMFALevel(request.LoginPolicy)
-	if promptRequired || !repo.mfaSkippedOrSetUp(user, request.LoginPolicy) {
+	if promptRequired || !repo.mfaSkippedOrSetUp(user) {
 		types := user.MfaTypesSetupPossible(mfaLevel, request.LoginPolicy)
 		if promptRequired && len(types) == 0 {
 			return nil, false, errors.ThrowPreconditionFailed(nil, "LOGIN-5Hm8s", "Errors.Login.LoginPolicy.MFA.ForceAndNotConfigured")
@@ -738,7 +738,7 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 	}, false, nil
 }
 
-func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView, policy *iam_model.LoginPolicyView) bool {
+func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
 	if user.MfaMaxSetUp > model.MFALevelNotSetUp {
 		return true
 	}
@@ -815,7 +815,11 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			es_model.HumanExternalLoginCheckSucceeded,
 			es_model.HumanMFAOTPCheckSucceeded,
 			es_model.HumanMFAOTPCheckFailed,
-			es_model.HumanSignedOut:
+			es_model.HumanSignedOut,
+			es_model.HumanMFAPasswordlessTokenCheckSucceeded,
+			es_model.HumanMFAPasswordlessTokenCheckFailed,
+			es_model.HumanMFAU2FTokenCheckSucceeded,
+			es_model.HumanMFAU2FTokenCheckFailed:
 			eventData, err := user_view_model.UserSessionFromEvent(event)
 			if err != nil {
 				logging.Log("EVENT-sdgT3").WithError(err).Debug("error getting event data")
