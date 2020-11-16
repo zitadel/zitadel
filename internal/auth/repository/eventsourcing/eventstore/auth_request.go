@@ -596,13 +596,13 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 		return nil, err
 	}
 
-	//if isExternalLoginNoUserLinking(request, userSession) {}
-	if (request.SelectedIDPConfigID != "" || userSession.SelectedIDPConfigID != "") && (request.LinkingUsers == nil || len(request.LinkingUsers) == 0) {
+	isInternalLogin := request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == ""
+	if !isInternalLogin && len(request.LinkingUsers) == 0 {
 		if !checkVerificationTime(userSession.ExternalLoginVerification, repo.ExternalLoginCheckLifeTime) {
 			return append(steps, &model.ExternalLoginStep{}), nil
 		}
 	}
-	if (request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == "") || (request.SelectedIDPConfigID != "" && request.LinkingUsers != nil && len(request.LinkingUsers) > 0) {
+	if isInternalLogin || (!isInternalLogin && len(request.LinkingUsers) > 0) {
 		step := repo.firstFactorChecked(request, user, userSession)
 		if step != nil {
 			return append(steps, step), nil
