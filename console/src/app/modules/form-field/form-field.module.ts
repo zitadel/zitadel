@@ -3,24 +3,22 @@ import { NgModule } from '@angular/core';
 import { MatRippleModule } from '@angular/material/core';
 import { LabelModule } from 'src/app/modules/label/label.module';
 
-import { ErrorDirective } from '../error/error.directive';
-import { ErrorModule } from '../error/error.module';
 import { LabelComponent } from '../label/label.component';
+import { CnslErrorDirective } from './error.directive';
 import { FormFieldComponent } from './form-field.component';
 
 
 @NgModule({
-    declarations: [FormFieldComponent],
+    declarations: [FormFieldComponent, CnslErrorDirective],
     imports: [
         CommonModule,
         MatRippleModule,
         LabelModule,
-        ErrorModule,
     ],
     exports: [
         FormFieldComponent,
         LabelComponent,
-        ErrorDirective,
+        CnslErrorDirective,
     ],
 })
 export class FormFieldModule { }

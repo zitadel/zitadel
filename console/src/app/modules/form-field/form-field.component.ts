@@ -1,5 +1,7 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, ContentChildren, HostListener, QueryList } from '@angular/core';
 import { Subject } from 'rxjs';
+
+import { CNSL_ERROR, CnslErrorDirective } from './error.directive';
 
 @Component({
     selector: 'cnsl-form-field',
@@ -9,6 +11,8 @@ import { Subject } from 'rxjs';
 export class FormFieldComponent {
     focused: boolean = false;
     readonly stateChanges: Subject<void> = new Subject<void>();
+
+    @ContentChildren(CNSL_ERROR as any, { descendants: true }) _errorChildren!: QueryList<CnslErrorDirective>;
 
     @HostListener('blur', ['false'])
     _focusChanged(isFocused: boolean): void {
