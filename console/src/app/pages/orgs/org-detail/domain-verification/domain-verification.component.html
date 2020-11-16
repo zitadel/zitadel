@@ -12,8 +12,10 @@
         {{'ORG.PAGES.ORGDOMAIN.TYPES.'+ domain.validationType | translate}}</p>
     <div *ngIf="domain.validationType !== OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_UNSPECIFIED"
         class="btn-container">
-        <button color="primary" type="submit" mat-raised-button *ngIf="!(dns || http)"
-            (click)="validate()">{{ 'ACTIONS.VERIFY' | translate }}</button>
+        <button color="primary" type="submit" mat-raised-button *ngIf="!(dns || http)" (click)="validate()">
+            {{ 'ACTIONS.VERIFY' | translate }}
+        </button>
+        <mat-spinner class="spinner" *ngIf="validating" diameter="20" mode="indeterminate"></mat-spinner>
 
         <button *ngIf="!showNew" mat-stroked-button color="primary"
             (click)="showNew = true">{{'ORG.PAGES.ORGDOMAIN.REQUESTNEWTOKEN' | translate}}</button>
@@ -34,8 +36,11 @@
             <div class="btn-container">
                 <button mat-stroked-button (click)="saveFile()"
                     color="primary">{{ 'ORG.PAGES.DOWNLOAD_FILE' | translate }}</button>
-                <button color="primary" type="submit" mat-raised-button
-                    (click)="validate()">{{ 'ACTIONS.VERIFY' | translate }}</button>
+                <button color="primary" class="verify-button" type="submit" mat-raised-button (click)="validate()">
+                    <span>{{ 'ACTIONS.VERIFY' | translate }}</span>
+                    <mat-spinner class="spinner" *ngIf="!validating" diameter="20" mode="indeterminate"></mat-spinner>
+                </button>
+                <mat-spinner class="spinner" *ngIf="validating" diameter="20" mode="indeterminate"></mat-spinner>
             </div>
         </div>
 
@@ -48,8 +53,10 @@
                     <i *ngIf="copied != dns.token" class="las la-clipboard"></i>
                     <i *ngIf="copied == dns.token" class="las la-clipboard-check"></i>
                 </button>
-                <button color="primary" type="submit" mat-raised-button
-                    (click)="validate()">{{ 'ACTIONS.VERIFY' | translate }}</button>
+                <button color="primary" type="submit" mat-raised-button class="verify-button" (click)="validate()">
+                    {{ 'ACTIONS.VERIFY' | translate }}
+                </button>
+                <mat-spinner class="spinner" *ngIf="validating" diameter="20" mode="indeterminate"></mat-spinner>
             </div>
             <p class="entry">{{dns?.url}}</p>
         </div>

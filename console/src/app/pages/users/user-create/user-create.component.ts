@@ -68,7 +68,7 @@ export class UserCreateComponent implements OnDestroy {
     }
 
     private async loadOrg(): Promise<void> {
-        const domains = (await this.mgmtService.SearchMyOrgDomains(0, 100).then(doms => doms.toObject()));
+        const domains = (await this.mgmtService.SearchMyOrgDomains().then(doms => doms.toObject()));
         const found = domains.resultList.find(domain => domain.primary);
         if (found) {
             this.primaryDomain = found;

@@ -7,7 +7,6 @@
   import PhotoSwipe from '../components/PhotoSwipe.svelte';
   const { page } = stores();
   export let segment;
-  console.log('seg:'+segment);
 </script>
 
 <script context="module">
@@ -25,8 +24,6 @@
     overflow-x: hidden;
   }
 </style>
-
-<!-- <Nav {segment} title="{manifest.name}" logo="logos/zitadel-logo-light.svg"></Nav> -->
 
 <main>
   <slot />

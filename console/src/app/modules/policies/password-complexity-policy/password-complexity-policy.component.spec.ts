@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { PasswordComplexityPolicyComponent } from './password-complexity-policy.component';
 
@@ -6,7 +6,7 @@ describe('PasswordComplexityPolicyComponent', () => {
     let component: PasswordComplexityPolicyComponent;
     let fixture: ComponentFixture<PasswordComplexityPolicyComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [PasswordComplexityPolicyComponent],
         })

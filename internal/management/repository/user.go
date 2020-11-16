@@ -54,4 +54,6 @@ type UserRepository interface {
 	ChangeAddress(ctx context.Context, address *model.Address) (*model.Address, error)
 
 	SearchUserMemberships(ctx context.Context, request *model.UserMembershipSearchRequest) (*model.UserMembershipSearchResponse, error)
+
+	ResendInitialMail(ctx context.Context, userID, email string) error
 }

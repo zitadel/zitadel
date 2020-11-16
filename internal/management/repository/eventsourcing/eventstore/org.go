@@ -2,8 +2,9 @@ package eventstore
 
 import (
 	"context"
-	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"strings"
+
+	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/authz"
@@ -166,7 +167,12 @@ func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequen
 		change.ModifierName = change.ModifierId
 		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
 		if user != nil {
-			change.ModifierName = user.DisplayName
+			if user.Human != nil {
+				change.ModifierName = user.DisplayName
+			}
+			if user.Machine != nil {
+				change.ModifierName = user.Machine.Name
+			}
 		}
 	}
 	return changes, nil

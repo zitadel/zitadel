@@ -2,14 +2,15 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/authz"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	"strings"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
@@ -451,6 +452,25 @@ func RequestSetPassword(aggCreator *es_models.AggregateCreator, user *model.User
 			return nil, err
 		}
 		return agg.AppendEvent(model.HumanPasswordCodeAdded, request)
+	}
+}
+
+func ResendInitialPasswordAggregate(aggCreator *es_models.AggregateCreator, user *model.User, code *usr_model.InitUserCode, email string) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if code == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dfs3q", "Errors.Internal")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, user)
+		if err != nil {
+			return nil, err
+		}
+		if email != "" && user.Email != nil && email != user.Email.EmailAddress {
+			agg, err = agg.AppendEvent(model.HumanEmailChanged, map[string]interface{}{"email": email})
+			if err != nil {
+				return nil, err
+			}
+		}
+		return agg.AppendEvent(model.InitializedHumanCodeAdded, code)
 	}
 }
 
