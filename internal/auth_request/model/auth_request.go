@@ -150,3 +150,12 @@ func (a *AuthRequest) GetScopeProjectIDsForAud() []string {
 	}
 	return projectIDs
 }
+
+func (a *AuthRequest) AppendAudIfNotExisting(aud string) {
+	for _, a := range a.Audience {
+		if a == aud {
+			return
+		}
+	}
+	a.Audience = append(a.Audience, aud)
+}
