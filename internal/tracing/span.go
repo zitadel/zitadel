@@ -39,6 +39,6 @@ func (s *Span) SetStatusByError(err error) {
 		s.span.RecordError(context.TODO(), err, api_trace.WithErrorStatus(codes.Error))
 	}
 
-	code, msg, _, _ := grpc_errs.ExtractCaosError(err)
-	s.span.SetAttributes(label.Uint32("grpc_code", uint32(code)), label.String("grpc_msg", msg))
+	code, msg, id, _ := grpc_errs.ExtractCaosError(err)
+	s.span.SetAttributes(label.Uint32("grpc_code", uint32(code)), label.String("grpc_msg", msg), label.String("error_id", id))
 }
