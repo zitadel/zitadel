@@ -908,7 +908,7 @@ func (es *UserEventstore) ChangeEmail(ctx context.Context, email *usr_model.Emai
 	user, err := es.HumanByID(ctx, email.AggregateID)
 	if err != nil {
 		return nil, err
-	}}
+	}
 	if user.State == usr_model.UserStateInitial {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-3H4q", "Errors.User.NotInitialised")
 	}

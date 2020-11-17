@@ -491,7 +491,7 @@ footer {
   display: none;
 }
 
-#webauthn #wa-error {
+#wa-error {
   margin-top: 20px;
 }
 

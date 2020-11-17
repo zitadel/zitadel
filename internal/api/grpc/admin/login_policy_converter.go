@@ -152,8 +152,6 @@ func passwordlessTypeFromModel(passwordlessType iam_model.PasswordlessType) admi
 	switch passwordlessType {
 	case iam_model.PasswordlessTypeAllowed:
 		return admin.PasswordlessType_PASSWORDLESSTYPE_ALLOWED
-	case iam_model.PasswordlessTypeVerificationRequired:
-		return admin.PasswordlessType_PASSWORDLESSTYPE_VERIFICATION_REQUIRED
 	default:
 		return admin.PasswordlessType_PASSWORDLESSTYPE_NOT_ALLOWED
 	}
@@ -163,8 +161,6 @@ func passwordlessTypeToModel(passwordlessType admin.PasswordlessType) iam_model.
 	switch passwordlessType {
 	case admin.PasswordlessType_PASSWORDLESSTYPE_ALLOWED:
 		return iam_model.PasswordlessTypeAllowed
-	case admin.PasswordlessType_PASSWORDLESSTYPE_VERIFICATION_REQUIRED:
-		return iam_model.PasswordlessTypeVerificationRequired
 	default:
 		return iam_model.PasswordlessTypeNotAllowed
 	}

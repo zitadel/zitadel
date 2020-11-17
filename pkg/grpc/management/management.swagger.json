@@ -5907,6 +5907,9 @@
         },
         "force_mfa": {
           "type": "boolean"
+        },
+        "passwordless_type": {
+          "$ref": "#/definitions/v1PasswordlessType"
         }
       }
     },
@@ -5924,6 +5927,9 @@
         },
         "force_mfa": {
           "type": "boolean"
+        },
+        "passwordless_type": {
+          "$ref": "#/definitions/v1PasswordlessType"
         }
       }
     },
@@ -5952,6 +5958,9 @@
         },
         "force_mfa": {
           "type": "boolean"
+        },
+        "passwordless_type": {
+          "$ref": "#/definitions/v1PasswordlessType"
         }
       }
     },
@@ -7096,6 +7105,14 @@
           "type": "string"
         }
       }
+    },
+    "v1PasswordlessType": {
+      "type": "string",
+      "enum": [
+        "PASSWORDLESSTYPE_NOT_ALLOWED",
+        "PASSWORDLESSTYPE_ALLOWED"
+      ],
+      "default": "PASSWORDLESSTYPE_NOT_ALLOWED"
     },
     "v1Project": {
       "type": "object",

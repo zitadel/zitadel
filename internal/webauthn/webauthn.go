@@ -154,15 +154,3 @@ func (w *WebAuthN) FinishLogin(user *usr_model.User, webAuthN *usr_model.WebAuth
 	}
 	return credential.ID, credential.Authenticator.SignCount, nil
 }
-
-//let options = JSON.parse(atob(document.getElementsByName('credentialCreationData')[0].value));
-//options.publicKey.challenge = base64js.toByteArray(options.publicKey.challenge);
-//options.publicKey.user.id = atob(options.publicKey.user.id);
-//navigator.credentials.get({publicKey: options.publicKey})
-//.then(function (credential) {
-//console.log(credential);
-//verifyAssertion(credential);
-//}).catch(function (err) {
-//console.log(err.name);
-//alert(err.message);
-//});

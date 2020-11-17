@@ -223,8 +223,6 @@ func passwordlessTypeFromModel(passwordlessType iam_model.PasswordlessType) mana
 	switch passwordlessType {
 	case iam_model.PasswordlessTypeAllowed:
 		return management.PasswordlessType_PASSWORDLESSTYPE_ALLOWED
-	case iam_model.PasswordlessTypeVerificationRequired:
-		return management.PasswordlessType_PASSWORDLESSTYPE_VERIFICATION_REQUIRED
 	default:
 		return management.PasswordlessType_PASSWORDLESSTYPE_NOT_ALLOWED
 	}
@@ -234,8 +232,6 @@ func passwordlessTypeToModel(passwordlessType management.PasswordlessType) iam_m
 	switch passwordlessType {
 	case management.PasswordlessType_PASSWORDLESSTYPE_ALLOWED:
 		return iam_model.PasswordlessTypeAllowed
-	case management.PasswordlessType_PASSWORDLESSTYPE_VERIFICATION_REQUIRED:
-		return iam_model.PasswordlessTypeVerificationRequired
 	default:
 		return iam_model.PasswordlessTypeNotAllowed
 	}

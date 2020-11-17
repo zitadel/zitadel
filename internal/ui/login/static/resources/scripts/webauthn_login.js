@@ -19,8 +19,6 @@ function login() {
 }
 
 function verifyAssertion(assertedCredential) {
-    // Move data into Arrays incase it is super long
-    console.log('calling verify')
     let authData = new Uint8Array(assertedCredential.response.authenticatorData);
     let clientDataJSON = new Uint8Array(assertedCredential.response.clientDataJSON);
     let rawId = new Uint8Array(assertedCredential.rawId);

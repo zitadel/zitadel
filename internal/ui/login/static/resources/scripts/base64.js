@@ -1,3 +1,13 @@
+/*
+ * modified version of:
+ *
+ * base64-arraybuffer
+ * https://github.com/niklasvh/base64-arraybuffer
+ *
+ * Copyright (c) 2012 Niklas von Hertzen
+ * Licensed under the MIT license.
+ */
+
 "use strict";
 
 let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -26,7 +36,7 @@ function encode(arraybuffer) {
     }
 
     return base64;
-};
+}
 
 function decode(base64) {
     let bufferLength = base64.length * 0.75,

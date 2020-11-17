@@ -59,7 +59,6 @@ type PasswordlessType int32
 const (
 	PasswordlessTypeNotAllowed PasswordlessType = iota
 	PasswordlessTypeAllowed
-	PasswordlessTypeVerificationRequired
 )
 
 func (p *LoginPolicy) IsValid() bool {

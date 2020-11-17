@@ -1026,7 +1026,6 @@ message DefaultLoginPolicyRequest {
 enum PasswordlessType {
     PASSWORDLESSTYPE_NOT_ALLOWED = 0;
     PASSWORDLESSTYPE_ALLOWED = 1;
-    PASSWORDLESSTYPE_VERIFICATION_REQUIRED = 2;
 }
 
 message IdpProviderID {
