@@ -8,7 +8,7 @@
             <cnsl-form-field class="formfield" appearance="fill">
                 <cnsl-label>{{ 'USER.PROFILE.EMAIL' | translate }}</cnsl-label>
                 <input cnslInput formControlName="email" required />
-                <span cnslError *ngIf="email?.invalid && email?.errors?.required">
+                <span cnsl-error *ngIf="email?.invalid && email?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                 </span>
             </cnsl-form-field>
@@ -17,10 +17,10 @@
                 <input cnslInput formControlName="userName" required />
                 <span *ngIf="envSuffix" cnslSuffix>{{envSuffix}}</span>
 
-                <span cnslError *ngIf="userName?.invalid && userName?.errors?.required">
+                <span cnsl-error *ngIf="userName?.invalid && userName?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                 </span>
-                <span cnslError *ngIf="userName?.invalid && userName?.errors?.noEmailValidator">
+                <span cnsl-error *ngIf="userName?.invalid && userName?.errors?.noEmailValidator">
                     {{ 'USER.VALIDATION.NOEMAIL' | translate }}
                 </span>
             </cnsl-form-field>
@@ -29,21 +29,24 @@
             <cnsl-form-field class="formfield" appearance="fill">
                 <cnsl-label>{{ 'USER.PROFILE.FIRSTNAME' | translate }}</cnsl-label>
                 <input cnslInput formControlName="firstName" required />
-                <span cnslError *ngIf="firstName?.invalid && firstName?.errors?.required">
+                <span cnsl-error *ngIf="firstName?.invalid && firstName?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                 </span>
             </cnsl-form-field>
             <cnsl-form-field class="formfield" appearance="fill">
                 <cnsl-label>{{ 'USER.PROFILE.LASTNAME' | translate }}</cnsl-label>
                 <input formControlName="lastName" required />
-                <span cnslError *ngIf="lastName?.invalid && lastName?.errors?.required">
+                <span cnsl-error *ngIf="lastName?.invalid && lastName?.errors?.required">
+                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                </span>
+                <span cnsl-error *ngIf="lastName?.invalid && lastName?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                 </span>
             </cnsl-form-field>
             <cnsl-form-field class="formfield" appearance="fill">
                 <cnsl-label>{{ 'USER.PROFILE.NICKNAME' | translate }}</cnsl-label>
                 <input formControlName="nickName" />
-                <span cnslError *ngIf="nickName?.invalid && nickName?.errors?.required">
+                <span cnsl-error *ngIf="nickName?.invalid && nickName?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                 </span>
             </cnsl-form-field>

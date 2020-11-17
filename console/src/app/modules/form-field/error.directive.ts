@@ -5,7 +5,7 @@ let nextUniqueId = 0;
 export const CNSL_ERROR = new InjectionToken<CnslErrorDirective>('CnslError');
 
 @Directive({
-    selector: '[cnslError]',
+    selector: '[cnsl-error]',
     host: {
         'class': 'cnsl-error',
         'role': 'alert',

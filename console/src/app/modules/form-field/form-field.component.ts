@@ -8,7 +8,6 @@ import {
     ElementRef,
     HostListener,
     InjectionToken,
-    Input,
     QueryList,
     ViewChild,
 } from '@angular/core';
@@ -16,13 +15,13 @@ import { NgControl } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { startWith } from 'rxjs/operators';
 
+import { cnslFormFieldAnimations } from './animations';
 import { CNSL_ERROR, CnslErrorDirective } from './error.directive';
 import { CnslFormFieldControlDirective } from './form-field-control.directive';
 import { _CNSL_HINT, CnslHintDirective } from './hint.directive';
 
 export const CNSL_FORM_FIELD = new InjectionToken<CnslFormFieldComponent>('CnslFormFieldComponent');
 
-let nextUniqueId = 0;
 
 @Component({
     selector: 'cnsl-form-field',
@@ -39,8 +38,9 @@ let nextUniqueId = 0;
         '[class.ng-valid]': '_shouldForward("valid")',
         '[class.ng-invalid]': '_shouldForward("invalid")',
         '[class.ng-pending]': '_shouldForward("pending")',
-        '[class.mat-form-field-invalid]': '_control.errorState',
+        // '[class.cnsl-form-field-invalid]': '_control.errorState',
     },
+    animations: [cnslFormFieldAnimations.transitionMessages],
 })
 export class CnslFormFieldComponent implements AfterContentInit, AfterViewInit {
     focused: boolean = false;
@@ -59,15 +59,6 @@ export class CnslFormFieldComponent implements AfterContentInit, AfterViewInit {
     }
     private _explicitFormFieldControl!: CnslFormFieldControlDirective<any>;
 
-    /** Text for the form field hint. */
-    @Input() get hintLabel(): string { return this._hintLabel; }
-    set hintLabel(value: string) {
-        this._hintLabel = value;
-        this._processHints();
-    }
-    private _hintLabel: string = '';
-
-    readonly _hintLabelId: string = `cnsl-hint-${nextUniqueId++}`;
     _subscriptAnimationState: string = '';
 
     @ContentChildren(CNSL_ERROR as any, { descendants: true }) _errorChildren!: QueryList<CnslErrorDirective>;
@@ -82,7 +73,8 @@ export class CnslFormFieldComponent implements AfterContentInit, AfterViewInit {
         }
     }
 
-    constructor(private _changeDetectorRef: ChangeDetectorRef) { }
+    constructor(public _elementRef: ElementRef, private _changeDetectorRef: ChangeDetectorRef) {
+    }
 
     public ngAfterViewInit(): void {
         // Avoid animations on load.
@@ -108,59 +100,13 @@ export class CnslFormFieldComponent implements AfterContentInit, AfterViewInit {
                 ids.push(...this._control.userAriaDescribedBy.split(' '));
             }
 
-            if (this._getDisplayedMessages() === 'hint') {
-                const startHint = this._hintChildren ?
-                    this._hintChildren.find(hint => hint.align === 'start') : null;
-                const endHint = this._hintChildren ?
-                    this._hintChildren.find(hint => hint.align === 'end') : null;
-
-                if (startHint) {
-                    ids.push(startHint.id);
-                } else if (this._hintLabel) {
-                    ids.push(this._hintLabelId);
-                }
-
-                if (endHint) {
-                    ids.push(endHint.id);
-                }
-            } else if (this._errorChildren) {
+            if (this._errorChildren) {
                 ids.push(...this._errorChildren.map(error => error.id));
             }
 
             this._control.setDescribedByIds(ids);
         }
     }
-
-    /** Does any extra processing that is required when handling the hints. */
-    private _processHints() {
-        this._validateHints();
-        this._syncDescribedByIds();
-    }
-
-    /**
-   * Ensure that there is a maximum of one of each `<mat-hint>` alignment specified, with the
-   * attribute being considered as `align="start"`.
-   */
-    private _validateHints() {
-        // if (this._hintChildren && (typeof ngDevMode === 'undefined' || ngDevMode)) {
-        //     let startHint: CnslHintDirective;
-        //     let endHint: CnslHintDirective;
-        //     this._hintChildren.forEach((hint: CnslHintDirective) => {
-        //         if (hint.align === 'start') {
-        //             if (startHint || this.hintLabel) {
-        //                 // throw getMatFormFieldDuplicatedHintError('start');
-        //             }
-        //             startHint = hint;
-        //         } else if (hint.align === 'end') {
-        //             if (endHint) {
-        //                 // throw getMatFormFieldDuplicatedHintError('end');
-        //             }
-        //             endHint = hint;
-        //         }
-        //     });
-        // }
-    }
-
 
     /** Determines whether a class from the NgControl should be forwarded to the host element. */
     _shouldForward(prop: keyof NgControl): boolean {
@@ -170,7 +116,6 @@ export class CnslFormFieldComponent implements AfterContentInit, AfterViewInit {
 
     /** Determines whether to display hints or errors. */
     _getDisplayedMessages(): 'error' | 'hint' {
-        return (this._errorChildren && this._errorChildren.length > 0 &&
-            this._control.errorState) ? 'error' : 'hint';
+        return (this._errorChildren && this._errorChildren.length > 0) ? 'error' : 'hint';
     }
 }
