@@ -137,3 +137,25 @@ func (a *AuthRequest) GetScopeOrgPrimaryDomain() string {
 	}
 	return ""
 }
+
+func (a *AuthRequest) GetScopeProjectIDsForAud() []string {
+	projectIDs := make([]string, 0)
+	switch request := a.Request.(type) {
+	case *AuthRequestOIDC:
+		for _, scope := range request.Scopes {
+			if strings.HasPrefix(scope, ProjectIDScope) && strings.HasSuffix(scope, AudSuffix) {
+				projectIDs = append(projectIDs, strings.TrimSuffix(strings.TrimPrefix(scope, ProjectIDScope), AudSuffix))
+			}
+		}
+	}
+	return projectIDs
+}
+
+func (a *AuthRequest) AppendAudIfNotExisting(aud string) {
+	for _, a := range a.Audience {
+		if a == aud {
+			return
+		}
+	}
+	a.Audience = append(a.Audience, aud)
+}

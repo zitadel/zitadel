@@ -67,15 +67,20 @@
 
         <app-card *ngIf="user.human" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
             description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
-
+            <button card-actions mat-icon-button (click)="refreshUser()">
+                <mat-icon>refresh</mat-icon>
+            </button>
             <app-contact disablePhoneCode="true"
                 [canWrite]="(['user.write:' + user?.id, 'user.write$'] | hasRole | async)" *ngIf="user?.human"
-                [human]="user.human" (savedPhone)="savePhone($event)" (savedEmail)="saveEmail($event)"
-                (deletedPhone)="deletePhone()" (resendEmailVerification)="resendEmailVerification()"
+                [human]="user.human" (editType)="openEditDialog($event)" (deletedPhone)="deletePhone()"
+                (resendEmailVerification)="resendEmailVerification()"
                 (resendPhoneVerification)="resendPhoneVerification()">
-                <button phoneAction [disabled]="(canWrite$ | async) == false" (click)="sendSetPasswordNotification()"
+                <button pwdAction [disabled]="(canWrite$ | async) == false" (click)="sendSetPasswordNotification()"
                     mat-stroked-button color="primary"
                     *ngIf="user.state === UserState.USERSTATE_INITIAL">{{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
+                <button emailAction class="resendemail" *ngIf="user.state == UserState.USERSTATE_INITIAL"
+                    mat-stroked-button color="primary"
+                    (click)="resendInitEmail()">{{'USER.RESENDINITIALEMAIL' | translate}}</button>
             </app-contact>
         </app-card>
 

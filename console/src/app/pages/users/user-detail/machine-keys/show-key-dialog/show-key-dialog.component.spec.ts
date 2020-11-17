@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ShowKeyDialogComponent } from './show-key-dialog.component';
 
@@ -6,7 +6,7 @@ describe('ShowKeyDialogComponent', () => {
     let component: ShowKeyDialogComponent;
     let fixture: ComponentFixture<ShowKeyDialogComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [ShowKeyDialogComponent],
         })
