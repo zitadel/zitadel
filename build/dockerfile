@@ -112,16 +112,18 @@ RUN go get github.com/go-delve/delve/cmd/dlv
 #######################
 ## Final Production Image
 #######################
-FROM ${ENV}-go-build as artifact
-RUN useradd zitadel
-COPY cmd/zitadel/*.yaml app/
-RUN chmod a+x zitadel-linux-amd64
-RUN mv zitadel-linux-amd64 app/zitadel
+FROM alpine:latest as artifact
+RUN adduser -D zitadel
+COPY cmd/zitadel/*.yaml /
+COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadel-linux-amd64 /zitadel
+RUN chmod a+x zitadel
+RUN ls -la /
 
 ## Scratch Image
-FROM scratch as final
+FROM  scratch as final
 COPY --from=artifact /etc/passwd /etc/passwd
-COPY --from=artifact /go/src/github.com/caos/zitadel/app app/
+## TODO copy should be removed once the operator branch is merged
+COPY --from=artifact / /
 USER zitadel
 HEALTHCHECK NONE
-ENTRYPOINT ["/app/zitadel"]
+ENTRYPOINT ["/zitadel"]
