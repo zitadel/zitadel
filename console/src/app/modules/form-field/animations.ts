@@ -14,5 +14,5 @@ export const cnslFormFieldAnimations: {
             style({ opacity: 0, transform: 'translateY(-100%)' }),
             animate('300ms cubic-bezier(0.55, 0, 0.55, 0.2)'),
         ]),
-    ])
+    ]),
 };

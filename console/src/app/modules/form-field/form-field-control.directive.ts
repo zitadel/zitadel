@@ -67,3 +67,4 @@ export abstract class CnslFormFieldControlDirective<T> {
     /** Handles a click on the control's container. */
     abstract onContainerClick(event: MouseEvent): void;
 }
+
