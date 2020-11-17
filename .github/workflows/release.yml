@@ -52,8 +52,8 @@ jobs:
     runs-on: ubuntu-18.04
     needs: [container]
     env:
-       DOCKER_USERNAME: ${{ github.actor }}
-       DOCKER_PASSWORD: ${{ secrets.CR_PAT }}
+      DOCKER_USERNAME: ${{ github.actor }}
+      DOCKER_PASSWORD: ${{ secrets.CR_PAT }}
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
