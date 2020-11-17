@@ -20,7 +20,7 @@
 		"marked": "^1.2.2",
 		"polka": "^0.5.2",
 		"svelte-i18n": "^3.1.0",
-		"sirv": "^0.4.2"
+		"sirv": "^1.0.7"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.12.3",
