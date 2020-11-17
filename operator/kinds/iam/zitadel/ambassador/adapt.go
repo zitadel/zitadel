@@ -66,7 +66,7 @@ func AdaptFunc(
 		queryHTTP,
 	}
 
-	return func(k8sClient *kubernetes.Client, queried map[string]interface{}) (operator.EnsureFunc, error) {
+	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 			return operator.QueriersToEnsureFunc(internalMonitor, true, queriers, k8sClient, queried)
 		},
 		operator.DestroyersToDestroyFunc(internalMonitor, destroyers),

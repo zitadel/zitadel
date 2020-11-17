@@ -69,6 +69,9 @@ require (
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/square/go-jose.v2 v2.5.1
 	gopkg.in/yaml.v3 v3.0.0-20200605160147-a5ece683394c
+	gotest.tools v2.2.0+incompatible
 	k8s.io/api v0.18.5
 	k8s.io/apimachinery v0.18.5
 )
+
+replace github.com/caos/orbos => /Users/benz/go/src/github.com/caos/orbos

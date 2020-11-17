@@ -125,10 +125,6 @@ github.com/caos/logging v0.0.2/go.mod h1:9LKiDE2ChuGv6CHYif/kiugrfEXu9AwDiFWSreX
 github.com/caos/oidc v0.6.2/go.mod h1:ozoi3b+aY33gzdvjz4w90VZShIHGsmDa0goruuV0arQ=
 github.com/caos/oidc v0.12.4 h1:E6E+LcnVQFHzOSN8GnTfJGgXWiDYtdKu/Xm2+YC/xFk=
 github.com/caos/oidc v0.12.4/go.mod h1:dLvfYUiAt9ORfl77L/KkcWuR/N0ll8Ry1nD2ERsamDY=
-github.com/caos/orbos v0.31.8-0.20201002083402-0b9a526be1a3 h1:RJiMpMsvrcg3H80f2QY4YRqCGEV0F7vS3NukRPBDr2k=
-github.com/caos/orbos v0.31.8-0.20201002083402-0b9a526be1a3/go.mod h1:ztVj3ecXz+OEZ5+3UHWIoox3QSDfK/H59rgHbKfFRlc=
-github.com/caos/orbos v1.0.7-0.20201103150012-96d9c5c7f975 h1:1j57Z6iPnsZdC0GZQv5arlmdJl/lG1yrXpfmmZtr3Oo=
-github.com/caos/orbos v1.0.7-0.20201103150012-96d9c5c7f975/go.mod h1:ztVj3ecXz+OEZ5+3UHWIoox3QSDfK/H59rgHbKfFRlc=
 github.com/caos/orbos v1.0.7-0.20201103151833-6ead82b08a6a h1:IOuBvgpTLsuy1lZlGmRIcrrH7QfuOdmPvpOpTEa24ak=
 github.com/caos/orbos v1.0.7-0.20201103151833-6ead82b08a6a/go.mod h1:ztVj3ecXz+OEZ5+3UHWIoox3QSDfK/H59rgHbKfFRlc=
 github.com/census-instrumentation/opencensus-proto v0.2.1 h1:glEXhBS5PSLLv4IXzLA5yPRVX4bilULVyxxbrfOtDAk=
@@ -633,6 +629,8 @@ github.com/pborman/uuid v1.2.0/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtP
 github.com/pelletier/go-buffruneio v0.2.0/go.mod h1:JkE26KsDizTr40EUHkXVtNPvgGtbSNq5BcowyYOWdKo=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/peterbourgon/diskv v2.0.1+incompatible/go.mod h1:uqqh8zWWbv1HBMNONnaR/tNboyR3/BZd58JJSHlUSCU=
+github.com/pires/go-proxyproto v0.3.0 h1:++BY4zWOpWha50IDjdnp7+NRTLuOHqMQC5PkgS7I4u4=
+github.com/pires/go-proxyproto v0.3.0/go.mod h1:Odh9VFOZJCf9G8cLW5o435Xf1J95Jw9Gw5rnCjcwzAY=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
@@ -1219,6 +1217,7 @@ gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c h1:dUUwHk2QECo/6vqA44rthZ8ie
 gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 gopkg.in/yaml.v3 v3.0.0-20200605160147-a5ece683394c h1:grhR+C34yXImVGp7EzNk+DTIk+323eIUWOmEevy6bDo=
 gopkg.in/yaml.v3 v3.0.0-20200605160147-a5ece683394c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
+gotest.tools v2.2.0+incompatible h1:VsBPFP1AI068pPrMxtb/S8Zkgf9xEmTLJjfM+P5UIEo=
 gotest.tools v2.2.0+incompatible/go.mod h1:DsYFclhRJ6vuDpmuTbkuFWG+y2sxOXAzmJt81HFBacw=
 honnef.co/go/tools v0.0.0-20190102054323-c2f93a96b099/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
 honnef.co/go/tools v0.0.0-20190106161140-3f1c8253044a/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=

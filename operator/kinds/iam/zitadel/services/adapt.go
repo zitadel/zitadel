@@ -5,10 +5,6 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/service"
 	"github.com/caos/zitadel/operator"
-	"io/ioutil"
-	"net/http"
-	"strconv"
-	"strings"
 )
 
 func AdaptFunc(
@@ -24,24 +20,23 @@ func AdaptFunc(
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
-	func() string,
 	error,
 ) {
 	internalMonitor := monitor.WithField("component", "services")
 
 	destroyGRPC, err := service.AdaptFuncToDestroy(namespace, grpcServiceName)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	destroyHTTP, err := service.AdaptFuncToDestroy(namespace, httpServiceName)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	destroyUI, err := service.AdaptFuncToDestroy(namespace, uiServiceName)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	destroyers := []operator.DestroyFunc{
@@ -55,7 +50,7 @@ func AdaptFunc(
 	}
 	queryGRPC, err := service.AdaptFuncToEnsure(namespace, grpcServiceName, labels, grpcPorts, "", labels, false, "", "")
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	httpPorts := []service.Port{
@@ -63,7 +58,7 @@ func AdaptFunc(
 	}
 	queryHTTP, err := service.AdaptFuncToEnsure(namespace, httpServiceName, labels, httpPorts, "", labels, false, "", "")
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	uiPorts := []service.Port{
@@ -71,7 +66,7 @@ func AdaptFunc(
 	}
 	queryUI, err := service.AdaptFuncToEnsure(namespace, uiServiceName, labels, uiPorts, "", labels, false, "", "")
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	queriers := []operator.QueryFunc{
@@ -80,21 +75,10 @@ func AdaptFunc(
 		operator.ResourceQueryToZitadelQuery(queryUI),
 	}
 
-	return func(k8sClient *kubernetes.Client, queried map[string]interface{}) (operator.EnsureFunc, error) {
+	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 			return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
 		},
 		operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
-		func() string {
-			resp, err := http.Get("http://" + httpServiceName + "." + namespace + ":" + strconv.Itoa(httpPort) + "/clientID")
-			if err != nil {
-				return ""
-			}
-			defer resp.Body.Close()
-			body, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				return ""
-			}
-			return strings.TrimSuffix(strings.TrimPrefix(string(body), "\""), "\"")
-		},
+
 		nil
 }

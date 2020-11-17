@@ -44,10 +44,10 @@ func AdaptFunc(
 		operator.ResourceDestroyToZitadelDestroy(destroyMgmtGRPC),
 	}
 
-	return func(k8sClient *kubernetes.Client, queried map[string]interface{}) (operator.EnsureFunc, error) {
+	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 			crd, err := k8sClient.CheckCRD("mappings.getambassador.io")
 			if crd == nil || err != nil {
-				return func(k8sClient *kubernetes.Client) error { return nil }, nil
+				return func(k8sClient kubernetes.ClientInt) error { return nil }, nil
 			}
 
 			apiDomain := dns.Subdomains.API + "." + dns.Domain

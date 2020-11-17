@@ -20,7 +20,7 @@ func AdaptFunc(
 	internalMonitor := monitor.WithField("component", "db-users")
 	destroyers := make([]operator.DestroyFunc, 0)
 
-	destroyers = append(destroyers, func(k8sClient *kubernetes.Client) error {
+	destroyers = append(destroyers, func(k8sClient kubernetes.ClientInt) error {
 		list, err := database.ListUsers(internalMonitor, k8sClient, repoURL, repoKey)
 		if err != nil {
 			return err
@@ -38,7 +38,7 @@ func AdaptFunc(
 		usernames = append(usernames, username)
 	}
 
-	return func(k8sClient *kubernetes.Client, queried map[string]interface{}) (operator.EnsureFunc, error) {
+	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 
 			queriers := make([]operator.QueryFunc, 0)
 			list, err := database.ListUsers(internalMonitor, k8sClient, repoURL, repoKey)
@@ -59,7 +59,7 @@ func AdaptFunc(
 }
 
 func createIfNecessary(monitor mntr.Monitor, user string, list []string, repoURL, repoKey string) operator.QueryFunc {
-	addUser := func(k8sClient *kubernetes.Client) error {
+	addUser := func(k8sClient kubernetes.ClientInt) error {
 		existing := false
 		for _, listedUser := range list {
 			if listedUser == user {
@@ -71,13 +71,13 @@ func createIfNecessary(monitor mntr.Monitor, user string, list []string, repoURL
 		}
 		return nil
 	}
-	return func(k8sClient *kubernetes.Client, queried map[string]interface{}) (operator.EnsureFunc, error) {
+	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 		return addUser, nil
 	}
 }
 
 func deleteIfNotRequired(monitor mntr.Monitor, listedUser string, list []string, repoURL, repoKey string) operator.QueryFunc {
-	deleteUser := func(k8sClient *kubernetes.Client) error {
+	deleteUser := func(k8sClient kubernetes.ClientInt) error {
 		required := false
 		for _, user := range list {
 			if user == listedUser {
@@ -89,7 +89,7 @@ func deleteIfNotRequired(monitor mntr.Monitor, listedUser string, list []string,
 		}
 		return nil
 	}
-	return func(k8sClient *kubernetes.Client, queried map[string]interface{}) (operator.EnsureFunc, error) {
+	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 		return deleteUser, nil
 	}
 }

@@ -10,7 +10,7 @@ import (
 )
 
 func Reconcile(monitor mntr.Monitor, desiredTree *tree.Tree) operator.EnsureFunc {
-	return func(k8sClient *kubernetes2.Client) (err error) {
+	return func(k8sClient kubernetes2.ClientInt) (err error) {
 		defer func() {
 			err = errors.Wrapf(err, "building %s failed", desiredTree.Common.Kind)
 		}()

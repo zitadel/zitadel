@@ -6,15 +6,17 @@ import (
 	"strings"
 )
 
+const (
+	certMountPath     = "/dbsecrets"
+	certTempMountPath = "/tmp/dbsecrets"
+)
+
 func getInitContainer(
 	rootSecret string,
 	dbSecrets string,
 	users []string,
 	runAsUser int64,
 ) corev1.Container {
-
-	certMountPath := "/dbsecrets"
-	certTempMountPath := "/tmp/dbsecrets"
 
 	initVolumeMounts := []corev1.VolumeMount{
 		{Name: rootSecret, MountPath: certMountPath + "/client_root"},

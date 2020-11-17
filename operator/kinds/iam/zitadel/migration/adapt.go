@@ -4,23 +4,35 @@ import (
 	"crypto/sha512"
 	"encoding/base64"
 	"encoding/json"
-	"github.com/caos/zitadel/operator/kinds/iam/zitadel/database"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"regexp"
-	"sort"
-	"strings"
-
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/configmap"
 	"github.com/caos/orbos/pkg/kubernetes/resources/job"
 	"github.com/caos/zitadel/operator"
+	"github.com/caos/zitadel/operator/helpers"
+	"github.com/caos/zitadel/operator/kinds/iam/zitadel/database"
 	"github.com/pkg/errors"
+	"io/ioutil"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"os"
+	"path/filepath"
+	"regexp"
+	"sort"
+)
+
+const (
+	migrationConfigmap = "migrate-db"
+	migrationsPath     = "/migrate"
+	rootUserInternal   = "root"
+	rootUserPath       = "/certificates"
+	envMigrationUser   = "FLYWAY_USER"
+	envMigrationPW     = "FLYWAY_PASSWORD"
+	jobNamePrefix      = "cockroachdb-cluster-migration-"
+	createFile         = "create.sql"
+	grantFile          = "grant.sql"
+	deleteFile         = "delete.sql"
 )
 
 func AdaptFunc(
@@ -33,7 +45,6 @@ func AdaptFunc(
 	users []string,
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
-	repoURL, repoKey string,
 	localMigrationsPath string,
 ) (
 	operator.QueryFunc,
@@ -44,17 +55,7 @@ func AdaptFunc(
 ) {
 	internalMonitor := monitor.WithField("component", "migration")
 
-	migrationConfigmap := "migrate-db"
-	migrationsPath := "/migrate"
-	rootUserInternal := "root"
-	rootUserPath := "/certificates"
-	defaultMode := int32(0400)
-	envMigrationUser := "FLYWAY_USER"
-	envMigrationPW := "FLYWAY_PASSWORD"
-	jobName := "cockroachdb-cluster-migration-" + reason
-	createFile := "create.sql"
-	grantFile := "grant.sql"
-	deleteFile := "delete.sql"
+	jobName := jobNamePrefix + reason
 
 	destroyCM, err := configmap.AdaptFuncToDestroy(namespace, migrationConfigmap)
 	if err != nil {
@@ -71,11 +72,13 @@ func AdaptFunc(
 		operator.ResourceDestroyToZitadelDestroy(destroyCM),
 	}
 
-	return func(k8sClient *kubernetes.Client, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			dbHost, dbPort, err := database.GetConnectionInfo(monitor, k8sClient, repoURL, repoKey)
+	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
+			dbCurrent, err := database.GetDatabaseInQueried(queried)
 			if err != nil {
 				return nil, err
 			}
+			dbHost := dbCurrent.Host
+			dbPort := dbCurrent.Port
 
 			internalLabels := make(map[string]string, 0)
 			for k, v := range labels {
@@ -85,8 +88,8 @@ func AdaptFunc(
 
 			allScripts := getMigrationFiles(localMigrationsPath)
 
-			gracePeriod := int64(30)
-			completions := int32(1)
+			initContainers := getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName)
+			initContainers = append(initContainers, getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users))
 
 			jobDef := &batchv1.Job{
 				ObjectMeta: metav1.ObjectMeta{
@@ -98,92 +101,19 @@ func AdaptFunc(
 					},
 				},
 				Spec: batchv1.JobSpec{
-					Completions: &completions,
+					Completions: helpers.PointerInt32(1),
 					Template: corev1.PodTemplateSpec{
 						Spec: corev1.PodSpec{
 							NodeSelector:    nodeselector,
 							Tolerations:     tolerations,
 							SecurityContext: &corev1.PodSecurityContext{},
-							InitContainers: []corev1.Container{
-								{
-									Name:  "check-db-ready",
-									Image: "postgres:9.6.17",
-									Command: []string{
-										"sh",
-										"-c",
-										"until pg_isready -h " + dbHost + " -p " + dbPort + "; do echo waiting for database; sleep 2; done;",
-									},
-									TerminationMessagePath:   corev1.TerminationMessagePathDefault,
-									TerminationMessagePolicy: "File",
-									ImagePullPolicy:          "IfNotPresent",
-								},
-								{
-									Name:  "create-flyway-user",
-									Image: "cockroachdb/cockroach:v20.1.5",
-									Env:   baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName),
-									VolumeMounts: []corev1.VolumeMount{{
-										Name:      rootUserInternal,
-										MountPath: rootUserPath,
-									}},
-									Command: []string{"/bin/bash", "-c", "--"},
-									Args: []string{
-										strings.Join([]string{
-											createUserCommand(envMigrationUser, envMigrationPW, createFile),
-											grantUserCommand(envMigrationUser, grantFile),
-											"cockroach.sh sql --certs-dir=/certificates --host=" + dbHost + ":" + dbPort + " -e \"$(cat " + createFile + ")\" -e \"$(cat " + grantFile + ")\";",
-										},
-											";"),
-									},
-									TerminationMessagePath:   corev1.TerminationMessagePathDefault,
-									TerminationMessagePolicy: "File",
-									ImagePullPolicy:          "IfNotPresent",
-								},
-								{
-									Name:  "db-migration",
-									Image: "flyway/flyway:6.5.0",
-									Args: []string{
-										"-url=jdbc:postgresql://" + dbHost + ":" + dbPort + "/defaultdb?&sslmode=verify-full&ssl=true&sslrootcert=" + rootUserPath + "/ca.crt&sslfactory=org.postgresql.ssl.NonValidatingFactory",
-										"-locations=filesystem:" + migrationsPath,
-										"migrate",
-									},
-									Env: migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName, users),
-									VolumeMounts: []corev1.VolumeMount{{
-										Name:      migrationConfigmap,
-										MountPath: migrationsPath,
-									}, {
-										Name:      rootUserInternal,
-										MountPath: rootUserPath,
-									}},
-									TerminationMessagePath:   corev1.TerminationMessagePathDefault,
-									TerminationMessagePolicy: "File",
-									ImagePullPolicy:          "IfNotPresent",
-								},
-							},
-							Containers: []corev1.Container{
-								{
-									Name:    "delete-flyway-user",
-									Image:   "cockroachdb/cockroach:v20.1.5",
-									Command: []string{"/bin/bash", "-c", "--"},
-									Args: []string{
-										strings.Join([]string{
-											deleteUserCommand(envMigrationUser, deleteFile),
-											"cockroach.sh sql --certs-dir=/certificates --host=" + dbHost + ":" + dbPort + " -e \"$(cat " + deleteFile + ")\";",
-										}, ";"),
-									},
-									Env: baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName),
-									VolumeMounts: []corev1.VolumeMount{{
-										Name:      rootUserInternal,
-										MountPath: rootUserPath,
-									}},
-									TerminationMessagePath:   corev1.TerminationMessagePathDefault,
-									TerminationMessagePolicy: "File",
-									ImagePullPolicy:          "IfNotPresent",
-								},
-							},
+							InitContainers:  initContainers,
+							Containers:      getPostContainers(dbHost, dbPort, migrationUser, secretPasswordName),
+
 							RestartPolicy:                 "Never",
 							DNSPolicy:                     "ClusterFirst",
 							SchedulerName:                 "default-scheduler",
-							TerminationGracePeriodSeconds: &gracePeriod,
+							TerminationGracePeriodSeconds: helpers.PointerInt64(30),
 							Volumes: []corev1.Volume{{
 								Name: migrationConfigmap,
 								VolumeSource: corev1.VolumeSource{
@@ -196,7 +126,7 @@ func AdaptFunc(
 								VolumeSource: corev1.VolumeSource{
 									Secret: &corev1.SecretVolumeSource{
 										SecretName:  "cockroachdb.client.root",
-										DefaultMode: &defaultMode,
+										DefaultMode: helpers.PointerInt32(0400),
 									},
 								},
 							}, {
@@ -232,7 +162,7 @@ func AdaptFunc(
 			return operator.QueriersToEnsureFunc(internalMonitor, true, queriers, k8sClient, queried)
 		},
 		operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
-		func(k8sClient *kubernetes.Client) error {
+		func(k8sClient kubernetes.ClientInt) error {
 			internalMonitor.Info("waiting for migration to be completed")
 			if err := k8sClient.WaitUntilJobCompleted(namespace, jobName, 300); err != nil {
 				internalMonitor.Error(errors.Wrap(err, "error while waiting for migration to be completed"))
@@ -241,7 +171,7 @@ func AdaptFunc(
 			internalMonitor.Info("migration is completed")
 			return nil
 		},
-		func(k8sClient *kubernetes.Client) error {
+		func(k8sClient kubernetes.ClientInt) error {
 			internalMonitor.Info("cleanup migration job")
 			if err := k8sClient.DeleteJob(namespace, jobName); err != nil {
 				internalMonitor.Error(errors.Wrap(err, "error during job deletion"))
@@ -251,34 +181,6 @@ func AdaptFunc(
 			return nil
 		},
 		nil
-}
-
-func createUserCommand(user, pw, file string) string {
-	return strings.Join([]string{
-		"echo -n 'CREATE USER IF NOT EXISTS ' > " + file,
-		"echo -n ${" + user + "} >> " + file,
-		"echo -n ';' >> " + file,
-		"echo -n 'ALTER USER ' >> " + file,
-		"echo -n ${" + user + "} >> " + file,
-		"echo -n ' WITH PASSWORD ' >> " + file,
-		"echo -n ${" + pw + "} >> " + file,
-		"echo -n ';' >> " + file,
-	}, ";")
-}
-
-func grantUserCommand(user, file string) string {
-	return strings.Join([]string{
-		"echo -n 'GRANT admin TO ' > " + file,
-		"echo -n ${" + user + "} >> " + file,
-		"echo -n ' WITH ADMIN OPTION;'  >> " + file,
-	}, ";")
-}
-func deleteUserCommand(user, file string) string {
-	return strings.Join([]string{
-		"echo -n 'DROP USER IF EXISTS ' > " + file,
-		"echo -n ${" + user + "} >> " + file,
-		"echo -n ';' >> " + file,
-	}, ";")
 }
 
 func baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret string) []corev1.EnvVar {
@@ -297,27 +199,6 @@ func baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsS
 		},
 	}
 	return envVars
-}
-
-func migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret string, users []string) []corev1.EnvVar {
-	envVars := baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret)
-
-	migrationEnvVars := make([]corev1.EnvVar, 0)
-	for _, v := range envVars {
-		migrationEnvVars = append(migrationEnvVars, v)
-	}
-	for _, user := range users {
-		migrationEnvVars = append(migrationEnvVars, corev1.EnvVar{
-			Name: "FLYWAY_PLACEHOLDERS_" + strings.ToUpper(user) + "PASSWORD",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: userPasswordsSecret},
-					Key:                  user,
-				},
-			},
-		})
-	}
-	return migrationEnvVars
 }
 
 func getHash(dataMap []migration) string {
@@ -364,7 +245,7 @@ func getMigrationFiles(root string) []migration {
 		fullName := filepath.Join(root, file)
 
 		data, err := ioutil.ReadFile(fullName)
-		if err != nil {
+		if err != nil || data == nil || len(data) == 0 {
 			continue
 		}
 		migrations = append(migrations, migration{file, string(data)})
