@@ -54,7 +54,9 @@ jobs:
     env:
     #   DOCKER_USERNAME: ${{ github.actor }}
     #   DOCKER_PASSWORD: ${{ secrets.CR_PAT }}
+    # var translation
       nextRelease.version: "1.15"
+      NEXTRELEASE_VERSION: ${{ nextRelease.version }}
     steps:
     # - name: Source checkout
     #   uses: actions/checkout@v2
@@ -72,9 +74,9 @@ jobs:
     #     semantic_version: 17.0.4
 
 
-    - run: echo ${nextRelease.version}
+    - run: echo ${NEXTRELEASE_VERSION}
     
-    - run: echo ${nextRelease.version}
+    - run: echo ${NEXTRELEASE_VERSION}
       if: env.nextRelease.version !=  ''
 
 
