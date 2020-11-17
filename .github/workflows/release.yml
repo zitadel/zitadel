@@ -67,19 +67,18 @@ jobs:
     - name: Semantic Release
       uses: cycjimmy/semantic-release-action@v2
       with:
-        dry_run: false
+        dry_run: true
         semantic_version: 17.0.4
-        extra_plugins: |
-          @semantic-release/exec@5.0.0
+    - run: echo $nextRelease.version
     - name: Docker Tag Version
-      run: docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:$CAOS_NEXT_VERSION
-      if: env.CAOS_NEXT_VERSION !=  ''
+      run: docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:$nextRelease.version
+      if: env.nextRelease.version !=  ''
     - name: Docker Tag Latest
       run: docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:latest
-      if: env.CAOS_NEXT_VERSION !=  ''
+      if: env.nextRelease.version !=  ''
     - name: Docker Push Version
-      run: docker push $REGISTRY/$GITHUB_REPOSITORY:$CAOS_NEXT_VERSION
-      if: env.CAOS_NEXT_VERSION !=  ''
+      run: docker push $REGISTRY/$GITHUB_REPOSITORY:$nextRelease.version
+      if: env.nextRelease.version !=  ''
     - name: Docker Push Latest
       run: docker push $REGISTRY/$GITHUB_REPOSITORY:latest
-      if: env.CAOS_NEXT_VERSION !=  ''
+      if: env.nextRelease.version !=  ''
