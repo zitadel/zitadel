@@ -1,11 +1,11 @@
 <app-refresh-table [loading]="dataSource?.loading$ | async" (refreshed)="changePage()"
     [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes" [timestamp]="dataSource?.viewTimestamp"
     [dataSize]="dataSource?.totalResult" [selection]="selection">
-    <mat-form-field @appearfade *ngIf="userGrantSearchKey != undefined" actions class="filtername">
-        <mat-label>{{'USER.PAGES.FILTER' | translate}}</mat-label>
+    <cnsl-form-field @appearfade *ngIf="userGrantSearchKey != undefined" actions class="filtername">
+        <cnsl-label>{{'USER.PAGES.FILTER' | translate}}</cnsl-label>
         <input matInput (keyup)="applyFilter($event)"
             [placeholder]="('USER.TABLE.FILTER.' + userGrantSearchKey.toString()) | translate" #input>
-    </mat-form-field>
+    </cnsl-form-field>
 
     <button color="warn" matTooltip="{{'GRANTS.DELETE' | translate}}" class="icon-button" mat-icon-button actions
         (click)="deleteGrantSelection()" *ngIf="selection.hasValue() && disableDelete == false">
