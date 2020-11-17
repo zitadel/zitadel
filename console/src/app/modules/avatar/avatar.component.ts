@@ -30,13 +30,13 @@ export class AvatarComponent implements OnInit {
 
     getColor(userName: string): string {
         const colors = [
-            '#B44D51',
-            '#B75073',
-            '#84498E',
-            '#705998',
-            '#5C6598',
-            '#7F90D3',
-            '#3E93B9',
+            'linear-gradient(40deg, #B44D51 30%, rgb(241,138,138))',
+            'linear-gradient(40deg, #B75073 30%, rgb(234,96,143))',
+            'linear-gradient(40deg, #84498E 30%, rgb(214,116,230))',
+            'linear-gradient(40deg, #705998 30%, rgb(163,131,220))',
+            'linear-gradient(40deg, #5C6598 30%, rgb(135,148,222))',
+            'linear-gradient(40deg, #7F90D3 30%, rgb(181,196,247))',
+            'linear-gradient(40deg, #3E93B9 30%, rgb(150,215,245))',
             '#3494A0',
             '#25716A',
             '#427E41',

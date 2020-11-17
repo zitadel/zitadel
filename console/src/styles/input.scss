@@ -25,7 +25,7 @@
     transform: all .2 linear;
     font-size: 1rem;
     border: none;
-    border: 1px solid if($is-dark-theme, #1b1b1b, #00000020);
+    border: 1px solid if($is-dark-theme, #1b1b1b, #00000040);
     background-color:if($is-dark-theme, #00000020, #fafafa50);
     border-radius: 4px;
     height: 40px;
