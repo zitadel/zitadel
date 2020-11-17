@@ -65,21 +65,27 @@ jobs:
     - name: Docker Pull short-sha
       run: docker pull $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }}
     - name: Semantic Release
+      id: semantic
       uses: cycjimmy/semantic-release-action@v2
       with:
         dry_run: false
         semantic_version: 17.0.4
-        extra_plugins: |
-          @semantic-release/exec@5.0.0
+    - name: Do something when a new release published
+      if: steps.semantic.outputs.new_release_published == 'true'
+      run: |
+        echo ${{ steps.semantic.outputs.new_release_version }}
+        echo ${{ steps.semantic.outputs.new_release_major_version }}
+        echo ${{ steps.semantic.outputs.new_release_minor_version }}
+        echo ${{ steps.semantic.outputs.new_release_patch_version }}
     - name: Docker Tag Version
-      run: docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:$CAOS_NEXT_VERSION
-      if: env.CAOS_NEXT_VERSION !=  ''
+      run: docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }}
+      if: steps.semantic.outputs.new_release_published == 'true'
     - name: Docker Tag Latest
       run: docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:latest
-      if: env.CAOS_NEXT_VERSION !=  ''
+      if: steps.semantic.outputs.new_release_published == 'true'
     - name: Docker Push Version
-      run: docker push $REGISTRY/$GITHUB_REPOSITORY:$CAOS_NEXT_VERSION
-      if: env.CAOS_NEXT_VERSION !=  ''
+      run: docker push $REGISTRY/$GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }}
+      if: steps.semantic.outputs.new_release_published == 'true'
     - name: Docker Push Latest
       run: docker push $REGISTRY/$GITHUB_REPOSITORY:latest
-      if: env.CAOS_NEXT_VERSION !=  ''
+      if: steps.semantic.outputs.new_release_published == 'true'
