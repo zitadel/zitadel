@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { DomainVerificationComponent } from './domain-verification.component';
 
@@ -6,7 +6,7 @@ describe('DomainVerificationComponent', () => {
     let component: DomainVerificationComponent;
     let fixture: ComponentFixture<DomainVerificationComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [DomainVerificationComponent],
         })

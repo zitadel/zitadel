@@ -14,6 +14,7 @@
     object-fit: contain;
     -webkit-transform-origin: center center;
     transform-origin: center center;
+    color: white;
   }
 </style>
 

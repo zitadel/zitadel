@@ -1,0 +1,21 @@
+.formfield {
+  width: 100%;
+}
+
+.desc {
+  font-size: 14px;
+  color: var(--grey);
+}
+
+.action {
+  display: flex;
+  justify-content: flex-end;
+
+  .ok-button {
+    margin-left: .5rem;
+  }
+
+  button {
+    border-radius: .5rem;
+  }
+}

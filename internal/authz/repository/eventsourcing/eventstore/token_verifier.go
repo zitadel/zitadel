@@ -81,8 +81,12 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 		return "", "", "", caos_errs.ThrowUnauthenticated(err, "APP-k9KS0", "invalid token")
 	}
 
+	projectID, _, err := repo.ProjectIDAndOriginsByClientID(ctx, clientID)
+	if err != nil {
+		return "", "", "", caos_errs.ThrowUnauthenticated(err, "APP-5M9so", "invalid token")
+	}
 	for _, aud := range token.Audience {
-		if clientID == aud {
+		if clientID == aud || projectID == aud {
 			return token.UserID, token.UserAgentID, token.PreferredLanguage, nil
 		}
 	}

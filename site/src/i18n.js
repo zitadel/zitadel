@@ -1,5 +1,6 @@
 import { getLocaleFromNavigator, init, locale as $locale, register } from 'svelte-i18n';
 
+import { LANGUAGES } from '../config.js';
 import { getCookie, setCookie } from './modules/cookie.js';
 
 export const INIT_OPTIONS = {
@@ -8,6 +9,7 @@ export const INIT_OPTIONS = {
     loadingDelay: 200,
     formats: {},
     warnOnMissingMessages: true,
+    localeOptions: LANGUAGES,
 };
 
 let currentLocale = null;
@@ -28,9 +30,10 @@ $locale.subscribe((value) => {
 
 // initialize the i18n library in client
 export function startClient() {
+    console.log('nav', getLocaleFromNavigator());
     init({
         ...INIT_OPTIONS,
-        initialLocale: getCookie('locale') || getLocaleFromNavigator(),
+        initialLocale: getCookie('locale') || INIT_OPTIONS.localeOptions.find(option => option == cropCountryCode(getLocaleFromNavigator())) || INIT_OPTIONS.initialLocale,
     });
 }
 
@@ -53,8 +56,13 @@ export function i18nMiddleware() {
         // no cookie, let's get the first accepted language
         if (locale == null) {
             if (req.headers['accept-language']) {
-                const headerLang = req.headers['accept-language'].split(',')[0].trim();
-                if (headerLang.length > 1) {
+                const headerLngs = req.headers['accept-language'].split(',');
+                const headerLngCodes = headerLngs.map(lng => lng.split(';')[0].trim());
+                const headerLang = headerLngCodes.find(code => {
+                    return INIT_OPTIONS.localeOptions.find(option => option == code);
+                });
+
+                if (headerLang) {
                     locale = headerLang;
                 }
             } else {
@@ -68,4 +76,8 @@ export function i18nMiddleware() {
 
         next();
     };
+}
+
+function cropCountryCode(code) {
+    return code.split('-')[0].trim();
 }

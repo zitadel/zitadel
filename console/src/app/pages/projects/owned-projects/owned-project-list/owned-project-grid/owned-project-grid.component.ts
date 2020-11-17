@@ -63,11 +63,10 @@ export class OwnedProjectGridComponent implements OnChanges {
             this.setPrefixedItem('pinned-projects', JSON.stringify(
                 this.selection.selected.map(item => item.projectId),
             )).then(() => {
-                const filtered = this.notPinned.filter(item => item === selection.added.find(i => i === item));
-                filtered.forEach((f, i) => {
-                    this.notPinned.splice(i, 1);
+                selection.added.forEach(item => {
+                    const index = this.notPinned.findIndex(i => i.projectId === item.projectId);
+                    this.notPinned.splice(index, 1);
                 });
-
                 this.notPinned.push(...selection.removed);
             });
         });
@@ -102,13 +101,6 @@ export class OwnedProjectGridComponent implements OnChanges {
                     }
                 });
                 this.selection.select(...toSelect);
-
-                const toNotPinned: ProjectView.AsObject[] = this.items.filter((item, index) => {
-                    if (!array.includes(item.projectId)) {
-                        return true;
-                    }
-                });
-                this.notPinned = toNotPinned;
             }
         });
     }
@@ -133,7 +125,13 @@ export class OwnedProjectGridComponent implements OnChanges {
         this.changedView.emit(true);
     }
 
-    public deleteProject(item: ProjectView.AsObject): void {
+    public toggle(item: ProjectView.AsObject, event: any): void {
+        event.stopPropagation();
+        this.selection.toggle(item);
+    }
+
+    public deleteProject(event: any, item: ProjectView.AsObject): void {
+        event.stopPropagation();
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
                 confirmKey: 'ACTIONS.DELETE',
@@ -151,6 +149,16 @@ export class OwnedProjectGridComponent implements OnChanges {
                     const index = this.items.findIndex(iter => iter.projectId === item.projectId);
                     if (index > -1) {
                         this.items.splice(index, 1);
+                    }
+
+                    const indexSelection = this.selection.selected.findIndex(iter => iter.projectId === item.projectId);
+                    if (indexSelection > -1) {
+                        this.selection.selected.splice(indexSelection, 1);
+                    }
+
+                    const indexPinned = this.notPinned.findIndex(iter => iter.projectId === item.projectId);
+                    if (indexPinned > -1) {
+                        this.notPinned.splice(indexPinned, 1);
                     }
                 }).catch(error => {
                     this.toast.showError(error);
