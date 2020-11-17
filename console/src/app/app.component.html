@@ -173,7 +173,7 @@
                 </div>
             </mat-drawer-content>
         </mat-drawer-container>
-        <div @toolbar *ngIf="iamuser$ | async" class="admin-line" [ngClass]="{'expanded': !hideAdminWarn}"
+        <div @adminline *ngIf="iamuser$ | async" class="admin-line" [ngClass]="{'expanded': !hideAdminWarn}"
             matTooltip="IAM Administrator">
             <button [matTooltip]="!hideAdminWarn ? 'Unpin': 'Pin'" (click)="toggleAdminHide()" mat-icon-button>
                 <mat-icon *ngIf="!hideAdminWarn" svgIcon="mdi_pin"></mat-icon>

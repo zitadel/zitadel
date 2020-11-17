@@ -5,19 +5,25 @@ import { LabelModule } from 'src/app/modules/label/label.module';
 
 import { LabelComponent } from '../label/label.component';
 import { CnslErrorDirective } from './error.directive';
-import { FormFieldComponent } from './form-field.component';
+import { CnslFormFieldComponent } from './form-field.component';
+import { CnslHintDirective } from './hint.directive';
 
 @NgModule({
-    declarations: [FormFieldComponent, CnslErrorDirective],
+    declarations: [
+        CnslFormFieldComponent,
+        CnslErrorDirective,
+        CnslHintDirective,
+    ],
     imports: [
         CommonModule,
         MatRippleModule,
         LabelModule,
     ],
     exports: [
-        FormFieldComponent,
+        CnslFormFieldComponent,
         LabelComponent,
         CnslErrorDirective,
+        CnslHintDirective,
     ],
 })
 export class FormFieldModule { }
