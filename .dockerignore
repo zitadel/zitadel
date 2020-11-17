@@ -1,0 +1,16 @@
+.git
+.codecov
+.github
+build/dockerfile
+site
+console/node_modules
+console/src/app/proto/generated
+console/tmp
+.releaserc.js
+.typo-ci.yml
+CONTRIBUTING.md
+LICENSE
+README.md
+SECURITY.md
+pkg/grpc/*/*.pb.*
+pkg/grpc/*/*.swagger.json
