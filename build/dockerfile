@@ -117,11 +117,12 @@ RUN useradd zitadel
 COPY cmd/zitadel/*.yaml app/
 RUN chmod a+x zitadel-linux-amd64
 RUN mv zitadel-linux-amd64 app/zitadel
+RUN ls -la app
 
 ## Scratch Image
 FROM scratch as final
 COPY --from=artifact /etc/passwd /etc/passwd
-COPY --from=artifact /go/src/github.com/caos/zitadel/app app/
+COPY --from=artifact /go/src/github.com/caos/zitadel/app .
 USER zitadel
 HEALTHCHECK NONE
-ENTRYPOINT ["/app/zitadel"]
+ENTRYPOINT ["/zitadel"]
