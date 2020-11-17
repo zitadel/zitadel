@@ -34,10 +34,10 @@ func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, lang l
 				middleware.AuthorizationInterceptor(verifier, authConfig),
 				middleware.TranslationHandler(lang),
 				middleware.ValidationHandler(),
+				middleware.ServiceHandler(),
 			),
 		),
 	)
-
 }
 
 func Serve(ctx context.Context, server *grpc.Server, port string) {

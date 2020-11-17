@@ -1,6 +1,8 @@
 package iam
 
 import (
+	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 )
 
@@ -37,4 +39,19 @@ func AggregateFromReadModel(rm *ReadModel) *Aggregate {
 		SetUpDone:    rm.SetUpDone,
 		SetUpStarted: rm.SetUpStarted,
 	}
+}
+
+func (a *Aggregate) PushMemberAdded(ctx context.Context, userID string, roles ...string) *Aggregate {
+	a.Aggregate = *a.PushEvents(NewMemberAddedEvent(ctx, userID, roles...))
+	return a
+}
+
+func (a *Aggregate) PushMemberChanged(ctx context.Context, userID string, roles ...string) *Aggregate {
+	a.Aggregate = *a.PushEvents(NewMemberChangedEvent(ctx, userID, roles...))
+	return a
+}
+
+func (a *Aggregate) PushMemberRemoved(ctx context.Context, userID string) *Aggregate {
+	a.Aggregate = *a.PushEvents(NewMemberRemovedEvent(ctx, userID))
+	return a
 }
