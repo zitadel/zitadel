@@ -26,9 +26,9 @@
   }
 
   th {
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    font-weight: bold;
   }
 
   td {
@@ -39,8 +39,8 @@
 
   tr {
     &.mat-header-row {
-        height: 40px;
-        padding-bottom: 4px;
+      height: 40px;
+      padding-bottom: 4px;
     }
 
     &.highlight {
@@ -52,13 +52,5 @@
         }
       }
     }
-
-    // &:nth-child(2n){
-    //     background-color: if($is-dark-theme, #ffffff10, #00000010);
-    // }
   }
-
-//   td.mat-cell{
-//     border-bottom-style: none;
-//     }
 }

@@ -114,7 +114,6 @@
             margin-bottom: 0;
             font-size: 14px;
             letter-spacing: .05em;
-            // text-transform: uppercase;
           }
 
           .c_label {
@@ -124,7 +123,6 @@
             align-items: center;
             font-size: 14px;
             letter-spacing: .03em;
-            // text-transform: uppercase;
 
             .count {
               font-size: 12px;
@@ -222,7 +220,6 @@
   .hiddenline {
     display: block;
     visibility: hidden;
-    // flex: 1;
     width: 4rem;
   }
 }
@@ -231,7 +228,6 @@
   .filter-form {
     margin: 0 .5rem;
     /* stylelint-disable */
-
     $foreground: map-get($theme, foreground);
     color: mat-color($foreground, text) !important;
   }
@@ -247,9 +243,10 @@
 
 .menu {
   position: relative;
-    .filter-wrapper {
-        padding: 4px;
-    }
+
+  .filter-wrapper {
+    padding: 4px;
+  }
 
   .spinner-w {
     top: 1rem;
