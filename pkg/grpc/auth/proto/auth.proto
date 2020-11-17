@@ -684,6 +684,7 @@ message WebAuthNResponse {
 
 message VerifyWebAuthN {
   bytes public_key_credential = 1;
+  string token_name = 2;
 }
 
 message WebAuthNTokenID {

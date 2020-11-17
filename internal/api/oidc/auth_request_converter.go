@@ -247,6 +247,10 @@ func AMRFromMFAType(mfaType model.MFAType) string {
 	switch mfaType {
 	case model.MFATypeOTP:
 		return amrOTP
+	//case model.MFATypeU2F:
+	//return amr
+	//case model.MFATypeU2FUserVerification:
+	//return amrHWK
 	default:
 		return ""
 	}

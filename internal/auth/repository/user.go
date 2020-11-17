@@ -29,11 +29,11 @@ type UserRepository interface {
 	VerifyMfaOTPSetup(ctx context.Context, userID, code string) error
 
 	AddMfaU2F(ctx context.Context, id string) (*model.WebAuthNToken, error)
-	VerifyMfaU2FSetup(ctx context.Context, userID string, credentialData []byte) error
+	VerifyMfaU2FSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error
 	RemoveMfaU2F(ctx context.Context, userID, webAuthNTokenID string) error
 
 	AddPasswordless(ctx context.Context, id string) (*model.WebAuthNToken, error)
-	VerifyPasswordlessSetup(ctx context.Context, userID string, credentialData []byte) error
+	VerifyPasswordlessSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error
 	RemovePasswordless(ctx context.Context, userID, webAuthNTokenID string) error
 
 	ChangeUsername(ctx context.Context, userID, username string) error
@@ -77,11 +77,11 @@ type myUserRepo interface {
 	RemoveMyMfaOTP(ctx context.Context) error
 
 	AddMyMfaU2F(ctx context.Context) (*model.WebAuthNToken, error)
-	VerifyMyMfaU2FSetup(ctx context.Context, data []byte) error
+	VerifyMyMfaU2FSetup(ctx context.Context, tokenName string, data []byte) error
 	RemoveMyMfaU2F(ctx context.Context, webAuthNTokenID string) error
 
 	AddMyPasswordless(ctx context.Context) (*model.WebAuthNToken, error)
-	VerifyMyPasswordlessSetup(ctx context.Context, data []byte) error
+	VerifyMyPasswordlessSetup(ctx context.Context, tokenName string, data []byte) error
 	RemoveMyPasswordless(ctx context.Context, webAuthNTokenID string) error
 
 	ChangeMyUsername(ctx context.Context, username string) error

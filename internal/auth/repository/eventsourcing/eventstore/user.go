@@ -306,12 +306,12 @@ func (repo *UserRepo) AddMyMfaU2F(ctx context.Context) (*model.WebAuthNToken, er
 	return repo.UserEvents.AddU2F(ctx, authz.GetCtxData(ctx).UserID)
 }
 
-func (repo *UserRepo) VerifyMfaU2FSetup(ctx context.Context, userID string, credentialData []byte) error {
-	return repo.UserEvents.VerifyU2FSetup(ctx, userID, credentialData)
+func (repo *UserRepo) VerifyMfaU2FSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error {
+	return repo.UserEvents.VerifyU2FSetup(ctx, userID, tokenName, credentialData)
 }
 
-func (repo *UserRepo) VerifyMyMfaU2FSetup(ctx context.Context, credentialData []byte) error {
-	return repo.UserEvents.VerifyU2FSetup(ctx, authz.GetCtxData(ctx).UserID, credentialData)
+func (repo *UserRepo) VerifyMyMfaU2FSetup(ctx context.Context, tokenName string, credentialData []byte) error {
+	return repo.UserEvents.VerifyU2FSetup(ctx, authz.GetCtxData(ctx).UserID, tokenName, credentialData)
 }
 
 func (repo *UserRepo) RemoveMfaU2F(ctx context.Context, userID, webAuthNTokenID string) error {
@@ -330,12 +330,12 @@ func (repo *UserRepo) AddMyPasswordless(ctx context.Context) (*model.WebAuthNTok
 	return repo.UserEvents.AddPasswordless(ctx, authz.GetCtxData(ctx).UserID)
 }
 
-func (repo *UserRepo) VerifyPasswordlessSetup(ctx context.Context, userID string, credentialData []byte) error {
-	return repo.UserEvents.VerifyPasswordlessSetup(ctx, userID, credentialData)
+func (repo *UserRepo) VerifyPasswordlessSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error {
+	return repo.UserEvents.VerifyPasswordlessSetup(ctx, userID, tokenName, credentialData)
 }
 
-func (repo *UserRepo) VerifyMyPasswordlessSetup(ctx context.Context, credentialData []byte) error {
-	return repo.UserEvents.VerifyPasswordlessSetup(ctx, authz.GetCtxData(ctx).UserID, credentialData)
+func (repo *UserRepo) VerifyMyPasswordlessSetup(ctx context.Context, tokenName string, credentialData []byte) error {
+	return repo.UserEvents.VerifyPasswordlessSetup(ctx, authz.GetCtxData(ctx).UserID, tokenName, credentialData)
 }
 
 func (repo *UserRepo) RemovePasswordless(ctx context.Context, userID, webAuthNTokenID string) error {

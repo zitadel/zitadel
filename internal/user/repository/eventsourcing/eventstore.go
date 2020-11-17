@@ -1289,13 +1289,13 @@ func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model
 	return webAuthN, nil
 }
 
-func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID string, credentialData []byte) error {
+func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
 	}
 	_, token := user.Human.GetU2FToVerify()
-	webAuthN, err := es.webauthn.FinishRegistration(user, token, credentialData)
+	webAuthN, err := es.webauthn.FinishRegistration(user, token, tokenName, credentialData)
 	if err != nil {
 		return err
 	}
@@ -1391,13 +1391,13 @@ func (es *UserEventstore) AddPasswordless(ctx context.Context, userID string) (*
 	return webAuthN, nil
 }
 
-func (es *UserEventstore) VerifyPasswordlessSetup(ctx context.Context, userID string, credentialData []byte) error {
+func (es *UserEventstore) VerifyPasswordlessSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
 	}
 	_, token := user.Human.GetPasswordlessToVerify()
-	webAuthN, err := es.webauthn.FinishRegistration(user, token, credentialData)
+	webAuthN, err := es.webauthn.FinishRegistration(user, token, tokenName, credentialData)
 	if err != nil {
 		return err
 	}

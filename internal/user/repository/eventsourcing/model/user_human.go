@@ -155,10 +155,10 @@ func (h *Human) AppendEvent(event *es_models.Event) (err error) {
 		HumanAdded,
 		HumanRegistered,
 		HumanProfileChanged:
-		h.setData(event)
+		err = h.setData(event)
 	case InitializedUserCodeAdded,
 		InitializedHumanCodeAdded:
-		h.appendInitUsercodeCreatedEvent(event)
+		err = h.appendInitUsercodeCreatedEvent(event)
 	case UserPasswordChanged,
 		HumanPasswordChanged:
 		err = h.appendUserPasswordChangedEvent(event)

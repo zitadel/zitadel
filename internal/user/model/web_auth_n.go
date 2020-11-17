@@ -19,6 +19,7 @@ type WebAuthNToken struct {
 	AttestationType        string
 	AAGUID                 []byte
 	SignCount              uint32
+	WebAuthNTokenName      string
 }
 
 type WebAuthNLogin struct {

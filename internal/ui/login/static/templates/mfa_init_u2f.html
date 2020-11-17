@@ -14,18 +14,16 @@
     <input type="hidden" name="credentialCreationData" value="{{ .CredentialCreationData }}" />
     <input type="hidden" name="credentialData" />
 
-    <div id="webauthn">
+    <div class="fields">
         <p class="wa-no-support error hidden">{{t "WebAuthn.NotSupported"}}</p>
+        <div class="field">
+            <label class="label" for="name">{{t "WebAuthN.Name"}}</label>
+            <input class="input" type="text" id="name" name="name" autocomplete="off" autofocus>
+        </div>
         <a id="btn-register" class="button primary wa-support">{{t "Actions.RegisterToken"}}</a>
         <div id="wa-error" class="error hidden">
             <span class="cause"></span>
             <span>{{t "WebAuthn.Error.Retry"}}</span>
-        </div>
-    </div>
-    <div class="fields">
-        <div class="field">
-            <label class="label" for="name">{{t "WebAuthN.Name"}}</label>
-            <input class="input" type="text" id="name" name="name" autocomplete="off" autofocus>
         </div>
     </div>
 

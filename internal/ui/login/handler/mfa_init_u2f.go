@@ -46,7 +46,7 @@ func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = l.authRepo.VerifyMfaU2FSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, credData); err != nil {
+	if err = l.authRepo.VerifyMfaU2FSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.Name, credData); err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
@@ -54,14 +54,4 @@ func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {
 		MfaType: model.MFATypeU2F,
 	}
 	l.renderMfaInitDone(w, r, authReq, done)
-}
-
-//TODO: remove
-func (l *Login) handleRegisterU2FTest(w http.ResponseWriter, r *http.Request) {
-	authReq, err := l.getAuthRequest(r)
-	if err != nil {
-		l.renderError(w, r, authReq, err)
-		return
-	}
-	l.renderRegisterU2F(w, r, authReq, nil)
 }

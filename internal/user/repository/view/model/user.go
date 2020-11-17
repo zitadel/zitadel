@@ -359,6 +359,10 @@ func (u *UserView) ComputeObject() {
 }
 
 func (u *UserView) ComputeMFAMaxSetUp() {
+	if len(u.PasswordLessVerifiedIDs) > 0 {
+		u.MfaMaxSetUp = int32(req_model.MFALevelMultiFactor)
+		return
+	}
 	if len(u.U2FVerifiedIDs) > 0 {
 		u.MfaMaxSetUp = int32(req_model.MFALevelSecondFactor)
 		return

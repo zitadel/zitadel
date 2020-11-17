@@ -2,7 +2,9 @@ package model
 
 import (
 	"encoding/json"
+
 	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
@@ -23,12 +25,13 @@ type WebAuthNToken struct {
 }
 
 type WebAuthNVerify struct {
-	WebauthNTokenID string `json:"webAuthNTokenId"`
-	KeyID           []byte `json:"keyID"`
-	PublicKey       []byte `json:"publicKey"`
-	AttestationType string `json:"attestationType"`
-	AAGUID          []byte `json:"aaguid"`
-	SignCount       uint32 `json:"signCount"`
+	WebAuthNTokenID   string `json:"webAuthNTokenId"`
+	KeyID             []byte `json:"keyID"`
+	PublicKey         []byte `json:"publicKey"`
+	AttestationType   string `json:"attestationType"`
+	AAGUID            []byte `json:"aaguid"`
+	SignCount         uint32 `json:"signCount"`
+	WebAuthNTokenName string `json:"webAuthNTokenName"`
 }
 
 type WebAuthNSignCount struct {
@@ -103,12 +106,13 @@ func WebAuthNToModel(webAuthN *WebAuthNToken) *model.WebAuthNToken {
 
 func WebAuthNVerifyFromModel(webAuthN *model.WebAuthNToken) *WebAuthNVerify {
 	return &WebAuthNVerify{
-		WebauthNTokenID: webAuthN.WebAuthNTokenID,
-		KeyID:           webAuthN.KeyID,
-		PublicKey:       webAuthN.PublicKey,
-		AAGUID:          webAuthN.AAGUID,
-		SignCount:       webAuthN.SignCount,
-		AttestationType: webAuthN.AttestationType,
+		WebAuthNTokenID:   webAuthN.WebAuthNTokenID,
+		KeyID:             webAuthN.KeyID,
+		PublicKey:         webAuthN.PublicKey,
+		AAGUID:            webAuthN.AAGUID,
+		SignCount:         webAuthN.SignCount,
+		AttestationType:   webAuthN.AttestationType,
+		WebAuthNTokenName: webAuthN.WebAuthNTokenName,
 	}
 }
 
@@ -169,7 +173,10 @@ func (u *Human) appendU2FVerifiedEvent(event *es_models.Event) error {
 		return err
 	}
 	if _, token := GetWebauthn(u.U2FTokens, webauthn.WebauthNTokenID); token != nil {
-		token.setData(event)
+		err := token.setData(event)
+		if err != nil {
+			return err
+		}
 		token.State = int32(model.MfaStateReady)
 		return nil
 	}
@@ -231,7 +238,10 @@ func (u *Human) appendPasswordlessVerifiedEvent(event *es_models.Event) error {
 		return err
 	}
 	if _, token := GetWebauthn(u.PasswordlessTokens, webauthn.WebauthNTokenID); token != nil {
-		token.setData(event)
+		err := token.setData(event)
+		if err != nil {
+			return err
+		}
 		token.State = int32(model.MfaStateReady)
 		return nil
 	}
@@ -245,7 +255,10 @@ func (u *Human) appendPasswordlessChangeSignCountEvent(event *es_models.Event) e
 		return err
 	}
 	if _, token := GetWebauthn(u.PasswordlessTokens, webauthn.WebauthNTokenID); token != nil {
-		token.setData(event)
+		err := token.setData(event)
+		if err != nil {
+			return err
+		}
 		return nil
 	}
 	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-2Mv9s", "Errors.Users.Mfa.Passwordless.NotExisting")

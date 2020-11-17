@@ -2408,6 +2408,8 @@ func (m *VerifyWebAuthN) Validate() error {
 
 	// no validation rules for PublicKeyCredential
 
+	// no validation rules for TokenName
+
 	return nil
 }
 

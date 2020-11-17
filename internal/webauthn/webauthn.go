@@ -90,7 +90,7 @@ func (w *WebAuthN) BeginRegistration(user *usr_model.User, authType usr_model.Au
 	}, nil
 }
 
-func (w *WebAuthN) FinishRegistration(user *usr_model.User, webAuthN *usr_model.WebAuthNToken, credData []byte) (*usr_model.WebAuthNToken, error) {
+func (w *WebAuthN) FinishRegistration(user *usr_model.User, webAuthN *usr_model.WebAuthNToken, tokenName string, credData []byte) (*usr_model.WebAuthNToken, error) {
 	if webAuthN == nil {
 		return nil, caos_errs.ThrowInternal(nil, "WEBAU-5M9so", "Errors.User.WebAuthN.NotFound")
 	}
@@ -113,6 +113,7 @@ func (w *WebAuthN) FinishRegistration(user *usr_model.User, webAuthN *usr_model.
 	webAuthN.AttestationType = credential.AttestationType
 	webAuthN.AAGUID = credential.Authenticator.AAGUID
 	webAuthN.SignCount = credential.Authenticator.SignCount
+	webAuthN.WebAuthNTokenName = tokenName
 	return webAuthN, nil
 }
 
