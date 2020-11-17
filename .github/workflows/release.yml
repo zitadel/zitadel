@@ -8,45 +8,45 @@ env:
   GO_VERSION: '1.15'
 
 jobs:
-#   container:
-#     runs-on: ubuntu-18.04
-#     steps:
-#     - name: Source checkout
-#       uses: actions/checkout@v2
-#     - name: Set output
-#       id: branch
-#       run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
-#     - name: Check output
-#       run: echo ${{ steps.branch.outputs.short_ref }}
-#     - name: Generate Short SHA Container Tag
-#       id: vars
-#       run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
-#     - name: Cache Docker layers
-#       uses: actions/cache@v2
-#       with:
-#         path: /tmp/.buildx-cache
-#         key: ${{ runner.os }}-buildx-${{ github.sha }}
-#         restore-keys: |
-#           ${{ runner.os }}-buildx-
-#     - name: Set up QEMU
-#       uses: docker/setup-qemu-action@v1
-#     - name: Set up Docker Buildx
-#       uses: docker/setup-buildx-action@v1
-#     - name: Login to DockerHub
-#       uses: docker/login-action@v1 
-#       with:
-#         username: ${{ github.actor }}
-#         password: ${{ secrets.CR_PAT }}
-#         registry: ${{ env.REGISTRY }}
-#     - uses: docker/build-push-action@v2
-#       with:
-#         context: .
-#         file: ./build/dockerfile
-#         platforms: linux/amd64
-#         tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.branch.outputs.short_ref }}
-#         push: true
-#         cache-from: type=local,src=/tmp/.buildx-cache
-#         cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
+  container:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Source checkout
+      uses: actions/checkout@v2
+    - name: Set output
+      id: branch
+      run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+    - name: Check output
+      run: echo ${{ steps.branch.outputs.short_ref }}
+    - name: Generate Short SHA Container Tag
+      id: vars
+      run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
+    - name: Cache Docker layers
+      uses: actions/cache@v2
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+    - name: Login to DockerHub
+      uses: docker/login-action@v1 
+      with:
+        username: ${{ github.actor }}
+        password: ${{ secrets.CR_PAT }}
+        registry: ${{ env.REGISTRY }}
+    - uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ./build/dockerfile
+        platforms: linux/amd64
+        tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.branch.outputs.short_ref }}
+        push: true
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
 
   release:
     runs-on: ubuntu-18.04
