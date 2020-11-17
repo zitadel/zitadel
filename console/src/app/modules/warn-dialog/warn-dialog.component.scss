@@ -11,6 +11,10 @@
 .action {
   display: flex;
 
+  button {
+    border-radius: .5rem;
+  }
+
   .ok-button {
     margin-left: .5rem;
   }

@@ -16,7 +16,7 @@ require (
 	github.com/aws/aws-sdk-go v1.35.11 // indirect
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.12.4
+	github.com/caos/oidc v0.12.5
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/cockroachdb/cockroach-go/v2 v2.0.8
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43

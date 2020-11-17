@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { MetaLayoutComponent } from './meta-layout.component';
 
@@ -6,7 +6,7 @@ describe('MetaLayoutComponent', () => {
     let component: MetaLayoutComponent;
     let fixture: ComponentFixture<MetaLayoutComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [MetaLayoutComponent],
         })

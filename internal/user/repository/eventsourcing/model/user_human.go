@@ -231,7 +231,7 @@ func (h *Human) AppendEvent(event *es_models.Event) (err error) {
 }
 
 func (h *Human) ComputeObject() {
-	if h.State == int32(model.UserStateUnspecified) {
+	if h.State == int32(model.UserStateUnspecified) || h.State == int32(model.UserStateInitial) {
 		if h.Email != nil && h.IsEmailVerified {
 			h.State = int32(model.UserStateActive)
 		} else {

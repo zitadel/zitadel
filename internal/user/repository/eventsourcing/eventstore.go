@@ -370,7 +370,7 @@ func (es *UserEventstore) RemoveUser(ctx context.Context, id string, orgIamPolic
 func (es *UserEventstore) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*usr_model.UserChanges, error) {
 	query := ChangesQuery(id, lastSequence, limit, sortAscending)
 
-	events, err := es.Eventstore.FilterEvents(context.Background(), query)
+	events, err := es.Eventstore.FilterEvents(ctx, query)
 	if err != nil {
 		logging.Log("EVENT-g9HCv").WithError(err).Warn("eventstore unavailable")
 		return nil, errors.ThrowInternal(err, "EVENT-htuG9", "Errors.Internal")
@@ -701,6 +701,9 @@ func (es *UserEventstore) RequestSetPassword(ctx context.Context, userID string,
 	if err != nil {
 		return err
 	}
+	if user.State == usr_model.UserStateInitial {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Hs11s", "Errors.User.NotInitialised")
+	}
 
 	passwordCode := new(model.PasswordCode)
 	err = es.generatePasswordCode(passwordCode, notifyType)
@@ -710,6 +713,35 @@ func (es *UserEventstore) RequestSetPassword(ctx context.Context, userID string,
 
 	repoUser := model.UserFromModel(user)
 	agg := RequestSetPassword(es.AggregateCreator(), repoUser, passwordCode)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
+func (es *UserEventstore) ResendInitialMail(ctx context.Context, userID, email string) error {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-G4bmn", "Errors.User.UserIDMissing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if user.Human == nil {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Hfsww", "Errors.User.NotHuman")
+	}
+	if user.State != usr_model.UserStateInitial {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-BGbbe", "Errors.User.AlreadyInitialised")
+	}
+	err = user.GenerateInitCodeIfNeeded(es.InitializeUserCode)
+	if err != nil {
+		return err
+	}
+
+	repoUser := model.UserFromModel(user)
+	agg := ResendInitialPasswordAggregate(es.AggregateCreator(), repoUser, user.InitCode, email)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
 	if err != nil {
 		return err
@@ -876,6 +908,9 @@ func (es *UserEventstore) ChangeEmail(ctx context.Context, email *usr_model.Emai
 	user, err := es.HumanByID(ctx, email.AggregateID)
 	if err != nil {
 		return nil, err
+	}}
+	if user.State == usr_model.UserStateInitial {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-3H4q", "Errors.User.NotInitialised")
 	}
 
 	emailCode, err := email.GenerateEmailCodeIfNeeded(es.EmailVerificationCode)
@@ -936,6 +971,9 @@ func (es *UserEventstore) CreateEmailVerificationCode(ctx context.Context, userI
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
+	}
+	if user.State == usr_model.UserStateInitial {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-E3fbw", "Errors.User.NotInitialised")
 	}
 	if user.Email == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-pdo9s", "Errors.User.EmailNotFound")

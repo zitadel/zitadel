@@ -66,13 +66,6 @@
   }
 }
 
-.admin-line {
-  font-size: 12px;
-  padding: 4px 2rem;
-  position: relative;
-  overflow: hidden;
-}
-
 .main-container {
   display: flex;
   flex-direction: column;
@@ -222,6 +215,13 @@
     margin: .5rem 0;
     flex: 1;
   }
+
+  .hiddenline {
+    display: block;
+    visibility: hidden;
+    // flex: 1;
+    width: 4rem;
+  }
 }
 
 @mixin textvar($theme) {
@@ -254,4 +254,9 @@
     justify-content: center;
     align-items: center;
   }
+}
+
+.org-wrapper {
+  max-height: 350px;
+  overflow-y: auto;
 }

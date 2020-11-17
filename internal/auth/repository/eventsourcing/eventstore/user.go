@@ -442,7 +442,12 @@ func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, li
 		change.ModifierName = change.ModifierID
 		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierID)
 		if user != nil {
-			change.ModifierName = user.DisplayName
+			if user.Human != nil {
+				change.ModifierName = user.DisplayName
+			}
+			if user.Machine != nil {
+				change.ModifierName = user.Machine.Name
+			}
 		}
 	}
 	return changes, nil

@@ -184,7 +184,7 @@ strong {
 }
 
 tt,
-code,
+/* code, */
 kbd,
 samp {
 	font: 400 var(--code-fs)/1.7 var(--font-mono);
@@ -195,7 +195,8 @@ code {
 	border-radius: .3em;
 	white-space: nowrap;
 	color: var(--text);
-	-webkit-font-smoothing: initial;
+    -webkit-font-smoothing: initial;
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 pre code {

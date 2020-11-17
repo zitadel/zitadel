@@ -12,6 +12,8 @@ Errors:
     AlreadyInactive: Benutzer ist bereits deaktiviert
     NotInactive: Benutzer ist nicht inaktiv
     ShouldBeActiveOrInitial: Benutzer ist nicht aktiv oder initialisiert
+    AlreadyInitialised: Benutzer ist bereits initialisiert
+    NotInitialised: Benutzer ist noch nicht initialisiert
     NotLocked: Benutzer ist nicht gesperrt
     NoChanges: Keine Änderungen gefunden
     InitCodeNotFound: Kein Initialisierungs Code gefunden
