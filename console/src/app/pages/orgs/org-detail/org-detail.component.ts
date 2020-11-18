@@ -79,10 +79,12 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         }).catch(error => {
             this.toast.showError(error);
         });
-
         this.loadMembers();
+        this.loadDomains();
+    }
 
-        this.mgmtService.SearchMyOrgDomains(0, 100).then(result => {
+    public loadDomains(): void {
+        this.mgmtService.SearchMyOrgDomains().then(result => {
             this.domains = result.toObject().resultList;
             this.primaryDomain = this.domains.find(domain => domain.primary)?.domain ?? '';
         });
@@ -91,7 +93,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     public setPrimary(domain: OrgDomainView.AsObject): void {
         this.mgmtService.setMyPrimaryOrgDomain(domain.domain).then(() => {
             this.toast.showInfo('ORG.TOAST.SETPRIMARY', true);
-            this.getData();
+            this.loadDomains();
         }).catch((error) => {
             this.toast.showError(error);
         });
@@ -202,11 +204,17 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     }
 
     public verifyDomain(domain: OrgDomainView.AsObject): void {
-        this.dialog.open(DomainVerificationComponent, {
+        const dialogRef = this.dialog.open(DomainVerificationComponent, {
             data: {
                 domain: domain,
             },
             width: '500px',
+        });
+
+        dialogRef.afterClosed().subscribe((reload) => {
+            if (reload) {
+                this.loadDomains();
+            }
         });
     }
 

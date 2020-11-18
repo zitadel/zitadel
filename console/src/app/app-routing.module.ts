@@ -131,6 +131,7 @@ const routes: Routes = [
             routes,
             {
                 preloadingStrategy: QuicklinkStrategy,
+                relativeLinkResolution: 'legacy',
             },
         ),
     ],
