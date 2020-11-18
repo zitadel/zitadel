@@ -1,35 +1,51 @@
 package idp
 
-import "github.com/caos/zitadel/internal/eventstore/v2"
+import (
+	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v2"
+)
 
-type ChangedEdvent struct {
+type ConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	current *ConfigAggregate
-	changed *ConfigAggregate
+	ID          string      `json:"idpConfigId"`
+	StylingType StylingType `json:"stylingType,omitempty"`
 
-	Name string `json:"name"`
+	hasChanged bool
 }
 
-func ChangedEvent(
+func NewConfigChangedEvent(
 	base *eventstore.BaseEvent,
 	current *ConfigAggregate,
 	changed *ConfigAggregate,
-) (*ChangedEdvent, error) {
-	//TODO: who to handle chanes?
+) (*ConfigChangedEvent, error) {
 
-	return &ChangedEdvent{
+	change := &ConfigChangedEvent{
 		BaseEvent: *base,
-		current:   current,
-		changed:   changed,
-	}, nil
+	}
+
+	if current.ConfigID != changed.ConfigID {
+		change.ID = changed.ConfigID
+		change.hasChanged = true
+	}
+
+	if current.StylingType != changed.StylingType {
+		change.StylingType = changed.StylingType
+		change.hasChanged = true
+	}
+
+	if !change.hasChanged {
+		return nil, errors.ThrowPreconditionFailed(nil, "IDP-UBJbB", "Errors.NoChanges")
+	}
+
+	return change, nil
 }
 
-func (e *ChangedEdvent) CheckPrevious() bool {
+func (e *ConfigChangedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *ChangedEdvent) Data() interface{} {
+func (e *ConfigChangedEvent) Data() interface{} {
 	if e.current.Name != e.changed.Name {
 		e.Name = e.changed.Name
 	}

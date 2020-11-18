@@ -9,8 +9,10 @@ type Aggregate struct {
 	Roles  []string
 }
 
-func NewMemberAggregate(userID string) *ReadModel {
-	return &ReadModel{
-		ReadModel: *eventstore.NewReadModel(),
+func NewAggregate(aggregate *eventstore.Aggregate, userID string, roles ...string) *Aggregate {
+	return &Aggregate{
+		Aggregate: *aggregate,
+		Roles:     roles,
+		UserID:    userID,
 	}
 }

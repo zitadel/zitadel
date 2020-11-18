@@ -18,6 +18,19 @@ var (
 	MemberRemovedEventType = orgEventTypePrefix + member.RemovedEventType
 )
 
+type MemberWriteModel struct {
+	member.WriteModel
+}
+
+// func NewMemberAggregate(userID string) *MemberAggregate {
+// 	return &MemberAggregate{
+// 		Aggregate: member.NewAggregate(
+// 			eventstore.NewAggregate(userID, MemberAggregateType, "RO", AggregateVersion, 0),
+// 		),
+// 		// Aggregate: member.NewMemberAggregate(userID),
+// 	}
+// }
+
 type MembersReadModel struct {
 	members.ReadModel
 }
@@ -81,20 +94,24 @@ func NewMemberAddedEvent(
 
 func NewMemberChangedEvent(
 	ctx context.Context,
-	userID string,
-	roles ...string,
-) *MemberChangedEvent {
+	current,
+	changed *MemberWriteModel,
+) (*MemberChangedEvent, error) {
 
-	return &MemberChangedEvent{
-		ChangedEvent: *member.NewChangedEvent(
-			eventstore.NewBaseEventForPush(
-				ctx,
-				MemberChangedEventType,
-			),
-			userID,
-			roles...,
+	event, err := member.NewChangedEvent(
+		eventstore.NewBaseEventForPush(
+			ctx,
+			MemberChangedEventType,
 		),
+		&current.WriteModel,
+		&changed.WriteModel,
+	)
+	if err != nil {
+		return nil, err
 	}
+	return &MemberChangedEvent{
+		ChangedEvent: *event,
+	}, nil
 }
 
 func NewMemberRemovedEvent(

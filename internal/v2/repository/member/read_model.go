@@ -2,6 +2,8 @@ package member
 
 import "github.com/caos/zitadel/internal/eventstore/v2"
 
+//ReadModel represenets the default member view.
+// It's computed from events.
 type ReadModel struct {
 	eventstore.ReadModel
 
@@ -9,6 +11,7 @@ type ReadModel struct {
 	Roles  []string
 }
 
+//NewMemberReadModel is the default constructor of ReadModel
 func NewMemberReadModel(userID string) *ReadModel {
 	return &ReadModel{
 		ReadModel: *eventstore.NewReadModel(),
@@ -16,6 +19,7 @@ func NewMemberReadModel(userID string) *ReadModel {
 	}
 }
 
+//Reduce extends eventstore.ReadModel
 func (rm *ReadModel) Reduce() error {
 	for _, event := range rm.Events {
 		switch e := event.(type) {
@@ -29,3 +33,7 @@ func (rm *ReadModel) Reduce() error {
 	}
 	return rm.ReadModel.Reduce()
 }
+
+//WriteModel is used to create events
+// It has no computed fields and represents the data
+type WriteModel ReadModel

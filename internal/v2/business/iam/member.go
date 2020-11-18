@@ -54,13 +54,13 @@ func (r *Repository) ChangeIAMMember(ctx context.Context, member *iam_model.IAMM
 		return nil, err
 	}
 
-	_, currentMember := iam.Members.MemberByUserID(member.UserID)
-	if currentMember == nil {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-GPhuz", "Errors.IAM.MemberNotExisting")
+	existingMember, err := r.memberWriteModelByID(ctx, member.AggregateID, member.UserID)
+	if err != nil {
+		return nil, err
 	}
 
 	iamAgg := iam_repo.AggregateFromReadModel(iam).
-		PushEvents(iam_repo.NewMemberChangedEvent(ctx, member.UserID, member.Roles...))
+		PushMemberChanged(ctx, existingMember, nil)
 
 	events, err := r.eventstore.PushAggregates(ctx, iamAgg)
 	if err != nil {

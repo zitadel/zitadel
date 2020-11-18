@@ -2,6 +2,8 @@ package member
 
 import (
 	"encoding/json"
+	"reflect"
+	"sort"
 
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
@@ -15,8 +17,10 @@ const (
 type ChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Roles  []string `json:"roles"`
-	UserID string   `json:"userId"`
+	Roles  []string `json:"roles,omitempty"`
+	UserID string   `json:"userId,omitempty"`
+
+	hasChanged bool
 }
 
 func (e *ChangedEvent) CheckPrevious() bool {
@@ -29,15 +33,32 @@ func (e *ChangedEvent) Data() interface{} {
 
 func NewChangedEvent(
 	base *eventstore.BaseEvent,
-	userID string,
-	roles ...string,
-) *ChangedEvent {
+	current,
+	changed *WriteModel,
+) (*ChangedEvent, error) {
 
-	return &ChangedEvent{
+	change := &ChangedEvent{
 		BaseEvent: *base,
-		Roles:     roles,
-		UserID:    userID,
 	}
+
+	if current.UserID != changed.UserID {
+		change.UserID = changed.UserID
+		change.hasChanged = true
+	}
+
+	sort.Strings(current.Roles)
+	sort.Strings(changed.Roles)
+	if !reflect.DeepEqual(current.Roles, changed.Roles) {
+		change.Roles = changed.Roles
+		change.hasChanged = true
+	}
+
+	if !change.hasChanged {
+		return nil, errors.ThrowPreconditionFailed(nil, "MEMBE-SeKlD", "Errors.NoChanges")
+	}
+
+	return change, nil
+
 }
 
 func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {

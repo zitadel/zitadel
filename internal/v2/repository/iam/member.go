@@ -13,7 +13,13 @@ var (
 	MemberRemovedEventType = iamEventTypePrefix + member.RemovedEventType
 )
 
-type MemberReadModel member.ReadModel
+type MemberWriteModel struct {
+	member.WriteModel
+}
+
+type MemberReadModel struct {
+	member.ReadModel
+}
 
 func (rm *MemberReadModel) AppendEvents(events ...eventstore.EventReader) (err error) {
 	for _, event := range events {
@@ -60,20 +66,25 @@ func NewMemberAddedEvent(
 
 func NewMemberChangedEvent(
 	ctx context.Context,
-	userID string,
-	roles ...string,
-) *MemberChangedEvent {
+	current,
+	changed *MemberWriteModel,
+) (*MemberChangedEvent, error) {
+
+	m, err := member.NewChangedEvent(
+		eventstore.NewBaseEventForPush(
+			ctx,
+			MemberChangedEventType,
+		),
+		&current.WriteModel,
+		&changed.WriteModel,
+	)
+	if err != nil {
+		return nil, err
+	}
 
 	return &MemberChangedEvent{
-		ChangedEvent: *member.NewChangedEvent(
-			eventstore.NewBaseEventForPush(
-				ctx,
-				MemberChangedEventType,
-			),
-			userID,
-			roles...,
-		),
-	}
+		ChangedEvent: *m,
+	}, nil
 }
 
 func NewMemberRemovedEvent(

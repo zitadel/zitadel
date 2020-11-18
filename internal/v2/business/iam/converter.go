@@ -115,3 +115,7 @@ func readModelToMember(readModel *member.ReadModel) *model.IAMMember {
 		UserID:     readModel.UserID,
 	}
 }
+
+func writeModelFromMember(member *model.IAMMember) *member.WriteModel {
+	return &member.WriteModel{}
+}

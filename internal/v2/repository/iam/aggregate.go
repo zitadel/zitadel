@@ -3,6 +3,7 @@ package iam
 import (
 	"context"
 
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 )
 
@@ -29,7 +30,13 @@ func NewAggregate(
 ) *Aggregate {
 
 	return &Aggregate{
-		Aggregate: *eventstore.NewAggregate(id, AggregateType, resourceOwner, AggregateVersion, previousSequence),
+		Aggregate: *eventstore.NewAggregate(
+			id,
+			AggregateType,
+			resourceOwner,
+			AggregateVersion,
+			previousSequence,
+		),
 	}
 }
 
@@ -46,8 +53,14 @@ func (a *Aggregate) PushMemberAdded(ctx context.Context, userID string, roles ..
 	return a
 }
 
-func (a *Aggregate) PushMemberChanged(ctx context.Context, userID string, roles ...string) *Aggregate {
-	a.Aggregate = *a.PushEvents(NewMemberChangedEvent(ctx, userID, roles...))
+func (a *Aggregate) PushMemberChanged(ctx context.Context, current, changed *MemberWriteModel) *Aggregate {
+	e, err := NewMemberChangedEvent(ctx, current, changed)
+	if err != nil {
+		logging.Log("IAM-KH21C").OnError(err).Warn("unable to push member changed")
+		return a
+	}
+
+	a.Aggregate = *a.PushEvents(e)
 	return a
 }
 
