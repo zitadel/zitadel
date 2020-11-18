@@ -75,6 +75,10 @@ func AdaptFunc(
 		labels := getLabels()
 		users := getAllUsers(desiredKind)
 		allZitadelUsers := getZitadelUserList()
+		dbClient, err := database.NewClient(monitor, orbconfig.URL, orbconfig.Repokey)
+		if err != nil {
+			return nil, nil, allSecrets, err
+		}
 
 		queryNS, err := namespace.AdaptFuncToEnsure(namespaceStr)
 		if err != nil {
@@ -113,8 +117,7 @@ func AdaptFunc(
 			secretPasswordName,
 			users,
 			services.GetClientIDFunc(namespaceStr, httpServiceName, httpPort),
-			orbconfig.URL,
-			orbconfig.Repokey,
+			dbClient,
 		)
 		if err != nil {
 			return nil, nil, allSecrets, err
@@ -122,8 +125,7 @@ func AdaptFunc(
 
 		queryDB, err := database.AdaptFunc(
 			monitor,
-			orbconfig.URL,
-			orbconfig.Repokey,
+			dbClient,
 		)
 		if err != nil {
 			return nil, nil, allSecrets, err

@@ -44,7 +44,7 @@ func AdaptFunc(
 	resources *k8s.Resources,
 	migrationDone operator.EnsureFunc,
 	configurationDone operator.EnsureFunc,
-	getConfigurationHashes func(k8sClient kubernetes.ClientInt) map[string]string,
+	getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) map[string]string,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
@@ -161,7 +161,7 @@ func AdaptFunc(
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			hashes := getConfigurationHashes(k8sClient)
+			hashes := getConfigurationHashes(k8sClient, queried)
 			if hashes != nil && len(hashes) != 0 {
 				for k, v := range hashes {
 					deploymentDef.Annotations[k] = v

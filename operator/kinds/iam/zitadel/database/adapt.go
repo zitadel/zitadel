@@ -8,22 +8,25 @@ import (
 
 func AdaptFunc(
 	monitor mntr.Monitor,
-	repoURL string,
-	repoKey string,
+	dbClient *Client,
 ) (
 	operator.QueryFunc,
 	error,
 ) {
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-		dbHost, dbPort, err := GetConnectionInfo(monitor, k8sClient, repoURL, repoKey)
+
+		dbHost, dbPort, err := dbClient.GetConnectionInfo(monitor, k8sClient)
 		if err != nil {
 			return nil, err
 		}
 
+		users, err := dbClient.ListUsers(monitor, k8sClient)
+
 		curr := &Current{
-			Host: dbHost,
-			Port: dbPort,
+			Host:  dbHost,
+			Port:  dbPort,
+			Users: users,
 		}
 
 		SetDatabaseInQueried(queried, curr)

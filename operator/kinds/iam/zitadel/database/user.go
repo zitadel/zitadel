@@ -6,43 +6,28 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 )
 
-func DeleteUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt, repoURL string, repoKey string) error {
-	gitClient, err := newGit(monitor, repoURL, repoKey)
-	if err != nil {
-		return err
-	}
-
+func (c *Client) DeleteUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {
 	return databases.DeleteUser(
 		monitor,
 		user,
 		k8sClient,
-		gitClient,
+		c.gitClient,
 	)
 }
 
-func AddUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt, repoURL string, repoKey string) error {
-	gitClient, err := newGit(monitor, repoURL, repoKey)
-	if err != nil {
-		return err
-	}
-
+func (c *Client) AddUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {
 	return databases.AddUser(
 		monitor,
 		user,
 		k8sClient,
-		gitClient,
+		c.gitClient,
 	)
 }
 
-func ListUsers(monitor mntr.Monitor, k8sClient kubernetes.ClientInt, repoURL string, repoKey string) ([]string, error) {
-	gitClient, err := newGit(monitor, repoURL, repoKey)
-	if err != nil {
-		return nil, err
-	}
-
+func (c *Client) ListUsers(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) ([]string, error) {
 	return databases.ListUsers(
 		monitor,
 		k8sClient,
-		gitClient,
+		c.gitClient,
 	)
 }
