@@ -112,28 +112,28 @@ Please check below the matrix for an overview where which scope is asserted.
 
 #### Standard Claims
 
-| Claims             | Example                              | Description                                                                                   |
-|:-------------------|:-------------------------------------|-----------------------------------------------------------------------------------------------|
-| acr                | TBA                                  | TBA                                                                                           |
-| address            |                                      |                                                                                               |
-| amr                | `"amr": "pwd mfa"`                   | Authentication Method References as defined in [RFC8176](https://tools.ietf.org/html/rfc8176) |
-| aud                |                                      | By default all client id's and the project id is included                                     |
-| auth_time          |                                      | Unix time of the authentication                                                               |
-| azp                |                                      | Client id of the client who requested the token                                               |
-| email              |                                      | Email Address of the subject                                                                  |
-| email_verified     | True                                 | Boolean if the email was verified by ZITADEL                                                  |
-| exp                |                                      | Time the token expires as unix time                                                           |
-| family_name        |                                      |                                                                                               |
-| gender             |                                      |                                                                                               |
-| given_name         |                                      |                                                                                               |
-| iat                |                                      | Issued at time of the token as unix time                                                      |
-| iss                | `"iss": "https://issuer.zitadel.ch"` | Issuing domain of a token                                                                     |
-| locale             |                                      |                                                                                               |
-| name               |                                      |                                                                                               |
-| nonce              |                                      |                                                                                               |
-| phone              |                                      |                                                                                               |
-| preferred_username |                                      |                                                                                               |
-| sub                |                                      | Subject ID of the user                                                                        |
+| Claims             | Example                                  | Description                                                                                   |
+|:-------------------|:-----------------------------------------|-----------------------------------------------------------------------------------------------|
+| acr                | TBA                                      | TBA                                                                                           |
+| address            | `Teufener Strasse 19, 9000 St. Gallen`   |                                                                                               |
+| amr                | `"amr": "pwd mfa"`                       | Authentication Method References as defined in [RFC8176](https://tools.ietf.org/html/rfc8176) |
+| aud                | `69234237810729019`                      | By default all client id's and the project id is included                                     |
+| auth_time          | `1311280969`                             | Unix time of the authentication                                                               |
+| azp                | `69234237810729234`                      | Client id of the client who requested the token                                               |
+| email              | `road.runner@acme.ch`                    | Email Address of the subject                                                                  |
+| email_verified     | `true`                                   | Boolean if the email was verified by ZITADEL                                                  |
+| exp                | `1311281970`                             | Time the token expires as unix time                                                           |
+| family_name        | `Runner`                                 | The subjects family name                                                                      |
+| gender             | `other`                                  | Gender of the subject                                                                         |
+| given_name         | `Road`                                   | Given name of the subject                                                                     |
+| iat                | `1311280970`                             | Issued at time of the token as unix time                                                      |
+| iss                | `"iss": "https://issuer.zitadel.ch"`     | Issuing domain of a token                                                                     |
+| locale             | `en`                                     | Language from the subject                                                                     |
+| name               | `Road Runner`                            | The subjects full name                                                                        |
+| nonce              | `blQtVEJHNTF0WHhFQmhqZ0RqeHJsdzdkd2d...` | The nonce provided by the client                                                              |
+| phone              | `+41 71 XXX XX XX`                       |                                                                                               |
+| preferred_username | `road.runner@acme.caos.ch`               |                                                                                               |
+| sub                | `77776025198584418`                      | Subject ID of the user                                                                        |
 
 #### Custom Claims
 
