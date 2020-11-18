@@ -32,7 +32,7 @@ func (step *Step7) init(setup *Setup) {
 func (step *Step7) execute(ctx context.Context) (*iam_model.IAM, error) {
 	iam, agg, err := step.add2FAToPolicy(ctx, step.DefaultSecondFactor)
 	if err != nil {
-		logging.Log("SETUP-ZTuS1").WithField("step", step.step()).WithError(err).Error("unable to finish setup (Label policy)")
+		logging.Log("SETUP-ZTuS1").WithField("step", step.step()).WithError(err).Error("unable to finish setup (add default mfa to login policy)")
 		return nil, err
 	}
 	iam, agg, push, err := step.setup.IamEvents.PrepareSetupDone(ctx, iam, agg, step.step())
