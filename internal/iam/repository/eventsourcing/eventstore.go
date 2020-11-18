@@ -83,10 +83,12 @@ func (es *IAMEventstore) StartSetup(ctx context.Context, iamID string, step iam_
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9so34", "Setup already started")
 	}
 
-	repoIAM := &model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: iamID}, SetUpStarted: model.Step(step)}
-	if iam != nil {
-		repoIAM.ObjectRoot = iam.ObjectRoot
+	if iam == nil {
+		iam = &iam_model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: iamID}}
 	}
+	iam.SetUpStarted = step
+	repoIAM := model.IAMFromModel(iam)
+
 	createAggregate := IAMSetupStartedAggregate(es.AggregateCreator(), repoIAM)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoIAM.AppendEvents, createAggregate)
 	if err != nil {
