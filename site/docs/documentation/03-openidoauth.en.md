@@ -80,6 +80,8 @@ In addition to the standard compliant scopes we utilize the following scopes.
 | urn:zitadel:iam:role:{rolename}                 | | |
 | urn:zitadel:iam:org:project:id:{projectid}:aud  | ZITADEL's Project id is `urn:zitadel:iam:org:project:id:69234237810729019:aud` | By adding this scope, the requested projectid will be added to the audience of the access and id token |
 
+> If access to ZITADEL's API's is needed with a service user the scope `urn:zitadel:iam:org:project:id:69234237810729019:aud` needs to be used with the JWT Profile request
+
 ### Claims
 
 ZITADEL asserts claims on different places according to the corresponding specifications or project and clients settings.
