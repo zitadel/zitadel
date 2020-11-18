@@ -50,17 +50,18 @@ For example with [zitadel.ch](zitadel.ch) this would be the domain [issuer.zitad
 
 #### OAuth 2.0 Metadata
 
-**ZITADEL** does not provide a OAuth 2.0 Metadata endpoint but instead provides a [OpenID Connect Discovery Endpoint](#openid-connect-10-discovery).
+**ZITADEL** does not yet provide a OAuth 2.0 Metadata endpoint but instead provides a [OpenID Connect Discovery Endpoint](#openid-connect-10-discovery).
 
 ### Scopes
 
-> TODO describe how scopes work
+ZITADEL supports the usage of scopes as way of requesting information from the IAM and also instruct ZITADEL to do certain operations.
 
 #### Standard Scopes
 
 | Scopes  | Example   | Description                                          |
 |:--------|:----------|------------------------------------------------------|
 | openid  | `openid`  | When using openid connect this is a mandatory scope  |
+| profile | `profile` | Optional scope to request the profile of the subject |
 | email   | `email`   | Optional scope to request the email of the subject   |
 | address | `address` | Optional scope to request the address of the subject |
 
@@ -96,6 +97,12 @@ Please check below the matrix for an overview where which scope is asserted.
 | exp                                             | No                 | Yes                                    | Yes when JWT                             |
 | iat                                             | No                 | Yes                                    | Yes when JWT                             |
 | nonce                                           | No                 | Yes                                    | No                                       |
+| preferred_username                              | Yes when requested | Yes                                    | No                                       |
+| name                                            | Yes when requested | Yes when requested                     | No                                       |
+| family_name                                     | Yes when requested | Yes when requested                     | No                                       |
+| given_name                                      | Yes when requested | Yes when requested                     | No                                       |
+| locale                                          | Yes when requested | Yes when requested                     | No                                       |
+| gender                                          | Yes when requested | Yes when requested                     | No                                       |
 | email                                           | Yes when requested | Yes only when response type `id_token` | No                                       |
 | email_verified                                  | Yes when requested | Yes only when response type `id_token` | No                                       |
 | phone                                           | Yes when requested | Yes only when response type `id_token` | No                                       |
@@ -105,22 +112,28 @@ Please check below the matrix for an overview where which scope is asserted.
 
 #### Standard Claims
 
-| Claims         | Example                              | Description             |
-|:---------------|:-------------------------------------|-------------------------|
-| aud            |                                      | The audience claim will |
-| azp            |                                      |                         |
-| iss            | `"iss": "https://issuer.zitadel.ch"` |                         |
-| sub            |                                      |                         |
-| amr            |                                      |                         |
-| acr            | TBA                                  | TBA                     |
-| auth_time      |                                      |                         |
-| exp            |                                      |                         |
-| iat            |                                      |                         |
-| nonce          |                                      |                         |
-| email          |                                      |                         |
-| email_verified |                                      |                         |
-| phone          |                                      |                         |
-| address        |                                      |                         |
+| Claims             | Example                              | Description                                                                                   |
+|:-------------------|:-------------------------------------|-----------------------------------------------------------------------------------------------|
+| aud                |                                      | By default all client id's and the project id is included                                     |
+| azp                |                                      | Client id of the client who requested the token                                               |
+| iss                | `"iss": "https://issuer.zitadel.ch"` | Issuing domain of a token                                                                     |
+| sub                |                                      | Subject ID of the user                                                                        |
+| amr                | `"amr": "pwd mfa"`                   | Authentication Method References as defined in [RFC8176](https://tools.ietf.org/html/rfc8176) |
+| acr                | TBA                                  | TBA                                                                                           |
+| auth_time          |                                      | Unix time of the authentication                                                               |
+| exp                |                                      | Time the token expires as unix time                                                           |
+| iat                |                                      | Issued at time of the token as unix time                                                      |
+| nonce              |                                      |                                                                                               |
+| preferred_username |                                      |                                                                                               |
+| name               |                                      |                                                                                               |
+| family_name        |                                      |                                                                                               |
+| given_name         |                                      |                                                                                               |
+| locale             |                                      |                                                                                               |
+| email              |                                      | Email Address of the subject                                                                  |
+| email_verified     | True                                 | Boolean if the mail was verfified by ZITADEL                                                  |
+| phone              |                                      |                                                                                               |
+| address            |                                      |                                                                                               |
+| gender             |                                      |                                                                                               |
 
 #### Custom Claims
 
