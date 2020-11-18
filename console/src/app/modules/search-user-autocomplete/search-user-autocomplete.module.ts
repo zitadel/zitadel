@@ -8,9 +8,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
-import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
 
 import { AvatarModule } from '../avatar/avatar.module';
+import { InputModule } from '../input/input.module';
 import { SearchUserAutocompleteComponent } from './search-user-autocomplete.component';
 
 
@@ -21,7 +21,7 @@ import { SearchUserAutocompleteComponent } from './search-user-autocomplete.comp
         MatAutocompleteModule,
         MatChipsModule,
         MatButtonModule,
-        FormFieldModule,
+        InputModule,
         MatIconModule,
         ReactiveFormsModule,
         MatProgressSpinnerModule,

@@ -55,7 +55,8 @@ const _CnslInputMixinBase: CanUpdateErrorStateCtor & typeof CnslInputBase =
     },
     providers: [{ provide: MatFormFieldControl, useExisting: InputDirective }],
 })
-export class InputDirective extends _CnslInputMixinBase implements OnChanges, AfterViewInit, OnDestroy, DoCheck {
+export class InputDirective extends _CnslInputMixinBase implements MatFormFieldControl<any>,
+    OnChanges, AfterViewInit, OnDestroy, DoCheck {
     /** Whether the element is readonly. */
     // @Input()
     // get readonly(): boolean { return this._readonly; }
@@ -69,7 +70,10 @@ export class InputDirective extends _CnslInputMixinBase implements OnChanges, Af
 
     protected _previousNativeValue: any;
     private _inputValueAccessor: { value: any; };
-    private autofilled: boolean = false;
+    autofilled: boolean = false;
+    shouldLabelFloat!: boolean;
+    // controlType?: string | undefined;
+    userAriaDescribedBy?: string | undefined;
 
     protected _uid: string = `cnsl-input-${nextUniqueId++}`;
 
@@ -81,6 +85,8 @@ export class InputDirective extends _CnslInputMixinBase implements OnChanges, Af
 
     focused: boolean = false;
     readonly stateChanges: Subject<void> = new Subject<void>();
+
+    controlType: string = 'cnslInput';
 
     /**
     * Implemented as part of MatFormFieldControl.

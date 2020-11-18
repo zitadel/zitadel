@@ -2,7 +2,7 @@
     <cnsl-form-field *ngIf="target && target == UserTarget.SELF" appearance="outline" class="full-width">
         <cnsl-label>Organizations User Loginname</cnsl-label>
 
-        <input *ngIf="singleOutput" type="text" placeholder="Search for the user loginname" #usernameInput
+        <input cnslInput *ngIf="singleOutput" type="text" placeholder="Search for the user loginname" #usernameInput
             [formControl]="myControl" [matAutocomplete]="auto" />
 
         <mat-chip-list *ngIf="!singleOutput" #chipList aria-label="loginname selection">
@@ -13,8 +13,8 @@
                     {{selecteduser.preferredLoginName}}</small>
                 <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
             </mat-chip>
-            <input placeholder="{{'ORG_DETAIL.MEMBER.LOGINNAME' | translate}}" #usernameInput [formControl]="myControl"
-                [matAutocomplete]="auto" [matChipInputFor]="chipList"
+            <input cnslInput placeholder="{{'ORG_DETAIL.MEMBER.LOGINNAME' | translate}}" #usernameInput
+                [formControl]="myControl" [matAutocomplete]="auto" [matChipInputFor]="chipList"
                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
                 (matChipInputTokenEnd)="add($event)" />
         </mat-chip-list>
@@ -38,7 +38,7 @@
     <div *ngIf="target && target == UserTarget.EXTERNAL" class="line">
         <cnsl-form-field class="form-field" appearance="outline">
             <cnsl-label>Global User Loginname</cnsl-label>
-            <input type="text" [formControl]="globalLoginNameControl" />
+            <input cnslInput type="text" [formControl]="globalLoginNameControl" />
             <mat-hint class="target-desc">
                 {{(target == UserTarget.SELF ? 'USER.TARGET.SELF' : 'USER.TARGET.EXTERNAL') | translate}}
                 <a (click)="changeTarget()">{{'USER.TARGET.CLICKHERE' | translate}}</a>
