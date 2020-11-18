@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/auth_request/model"
 	"strings"
 
 	"golang.org/x/text/language"
@@ -153,6 +154,9 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID, applicati
 			if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 				roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
 			}
+			if strings.HasPrefix(scope, model.OrgDomainPrimaryScope) {
+				userInfo.AppendClaims(model.OrgDomainPrimaryScope, strings.TrimPrefix(scope, model.OrgDomainPrimaryScope))
+			}
 		}
 	}
 
@@ -170,17 +174,19 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID, applicati
 	return userInfo, nil
 }
 
-func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, applicationID string, scopes []string) (claims map[string]interface{}, err error) {
+func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clientID string, scopes []string) (claims map[string]interface{}, err error) {
 	roles := make([]string, 0)
 	for _, scope := range scopes {
 		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 			roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
+		} else if strings.HasPrefix(scope, model.OrgDomainPrimaryScope) {
+			claims = map[string]interface{}{model.OrgDomainPrimaryScope: strings.TrimPrefix(scope, model.OrgDomainPrimaryScope)}
 		}
 	}
-	if len(roles) == 0 || applicationID == "" {
-		return nil, nil
+	if len(roles) == 0 || clientID == "" {
+		return claims, nil
 	}
-	projectRoles, err := o.assertRoles(ctx, userID, applicationID, roles)
+	projectRoles, err := o.assertRoles(ctx, userID, clientID, roles)
 	if err != nil {
 		return nil, err
 	}

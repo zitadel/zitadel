@@ -34,7 +34,7 @@ type AuthRequest struct {
 	LinkingUsers        []*ExternalUser
 	PossibleSteps       []NextStep
 	PasswordVerified    bool
-	MfasVerified        []MfaType
+	MfasVerified        []MFAType
 	Audience            []string
 	AuthTime            time.Time
 	Code                string
@@ -109,7 +109,7 @@ func (a *AuthRequest) IsValid() bool {
 		a.Request != nil && a.Request.IsValid()
 }
 
-func (a *AuthRequest) MfaLevel() MfaLevel {
+func (a *AuthRequest) MfaLevel() MFALevel {
 	return -1
 	//PLANNED: check a.PossibleLOAs (and Prompt Login?)
 }
@@ -136,4 +136,26 @@ func (a *AuthRequest) GetScopeOrgPrimaryDomain() string {
 		}
 	}
 	return ""
+}
+
+func (a *AuthRequest) GetScopeProjectIDsForAud() []string {
+	projectIDs := make([]string, 0)
+	switch request := a.Request.(type) {
+	case *AuthRequestOIDC:
+		for _, scope := range request.Scopes {
+			if strings.HasPrefix(scope, ProjectIDScope) && strings.HasSuffix(scope, AudSuffix) {
+				projectIDs = append(projectIDs, strings.TrimSuffix(strings.TrimPrefix(scope, ProjectIDScope), AudSuffix))
+			}
+		}
+	}
+	return projectIDs
+}
+
+func (a *AuthRequest) AppendAudIfNotExisting(aud string) {
+	for _, a := range a.Audience {
+		if a == aud {
+			return
+		}
+	}
+	a.Audience = append(a.Audience, aud)
 }

@@ -14,7 +14,7 @@ title: User Manual
 
 ### Manage Multi Factor
 
-### Federation
+### Identity Linking
 
 #### Auto Register
 

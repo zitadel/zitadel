@@ -299,7 +299,12 @@ func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequ
 		change.ModifierName = change.ModifierId
 		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
 		if user != nil {
-			change.ModifierName = user.DisplayName
+			if user.Human != nil {
+				change.ModifierName = user.DisplayName
+			}
+			if user.Machine != nil {
+				change.ModifierName = user.Machine.Name
+			}
 		}
 	}
 	return changes, nil
@@ -389,7 +394,12 @@ func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appI
 		change.ModifierName = change.ModifierId
 		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
 		if user != nil {
-			change.ModifierName = user.DisplayName
+			if user.Human != nil {
+				change.ModifierName = user.DisplayName
+			}
+			if user.Machine != nil {
+				change.ModifierName = user.Machine.Name
+			}
 		}
 	}
 	return changes, nil

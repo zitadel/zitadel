@@ -107,7 +107,7 @@ func (s *VerifyEMailStep) Type() NextStepType {
 
 type MfaPromptStep struct {
 	Required     bool
-	MfaProviders []MfaType
+	MfaProviders []MFAType
 }
 
 func (s *MfaPromptStep) Type() NextStepType {
@@ -115,7 +115,7 @@ func (s *MfaPromptStep) Type() NextStepType {
 }
 
 type MfaVerificationStep struct {
-	MfaProviders []MfaType
+	MfaProviders []MFAType
 }
 
 func (s *MfaVerificationStep) Type() NextStepType {
@@ -140,17 +140,18 @@ func (s *RedirectToCallbackStep) Type() NextStepType {
 	return NextStepRedirectToCallback
 }
 
-type MfaType int
+type MFAType int
 
 const (
-	MfaTypeOTP MfaType = iota
+	MFATypeOTP MFAType = iota
+	MFATypeU2F
 )
 
-type MfaLevel int
+type MFALevel int
 
 const (
-	MfaLevelNotSetUp MfaLevel = iota
-	MfaLevelSoftware
-	MfaLevelHardware
-	MfaLevelHardwareCertified
+	MFALevelNotSetUp MFALevel = iota
+	MFALevelSecondFactor
+	MFALevelMultiFactor
+	MFALevelMultiFactorCertified
 )

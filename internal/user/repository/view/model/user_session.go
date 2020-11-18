@@ -21,23 +21,23 @@ const (
 )
 
 type UserSessionView struct {
-	CreationDate                time.Time `json:"-" gorm:"column:creation_date"`
-	ChangeDate                  time.Time `json:"-" gorm:"column:change_date"`
-	ResourceOwner               string    `json:"-" gorm:"column:resource_owner"`
-	State                       int32     `json:"-" gorm:"column:state"`
-	UserAgentID                 string    `json:"userAgentID" gorm:"column:user_agent_id;primary_key"`
-	UserID                      string    `json:"userID" gorm:"column:user_id;primary_key"`
-	UserName                    string    `json:"-" gorm:"column:user_name"`
-	LoginName                   string    `json:"-" gorm:"column:login_name"`
-	DisplayName                 string    `json:"-" gorm:"column:user_display_name"`
-	SelectedIDPConfigID         string    `json:"selectedIDPConfigID" gorm:"column:selected_idp_config_id"`
-	PasswordVerification        time.Time `json:"-" gorm:"column:password_verification"`
-	ExternalLoginVerification   time.Time `json:"-" gorm:"column:external_login_verification"`
-	MfaSoftwareVerification     time.Time `json:"-" gorm:"column:mfa_software_verification"`
-	MfaSoftwareVerificationType int32     `json:"-" gorm:"column:mfa_software_verification_type"`
-	MfaHardwareVerification     time.Time `json:"-" gorm:"column:mfa_hardware_verification"`
-	MfaHardwareVerificationType int32     `json:"-" gorm:"column:mfa_hardware_verification_type"`
-	Sequence                    uint64    `json:"-" gorm:"column:sequence"`
+	CreationDate                 time.Time `json:"-" gorm:"column:creation_date"`
+	ChangeDate                   time.Time `json:"-" gorm:"column:change_date"`
+	ResourceOwner                string    `json:"-" gorm:"column:resource_owner"`
+	State                        int32     `json:"-" gorm:"column:state"`
+	UserAgentID                  string    `json:"userAgentID" gorm:"column:user_agent_id;primary_key"`
+	UserID                       string    `json:"userID" gorm:"column:user_id;primary_key"`
+	UserName                     string    `json:"-" gorm:"column:user_name"`
+	LoginName                    string    `json:"-" gorm:"column:login_name"`
+	DisplayName                  string    `json:"-" gorm:"column:user_display_name"`
+	SelectedIDPConfigID          string    `json:"selectedIDPConfigID" gorm:"column:selected_idp_config_id"`
+	PasswordVerification         time.Time `json:"-" gorm:"column:password_verification"`
+	ExternalLoginVerification    time.Time `json:"-" gorm:"column:external_login_verification"`
+	SecondFactorVerification     time.Time `json:"-" gorm:"column:second_factor_verification"`
+	SecondFactorVerificationType int32     `json:"-" gorm:"column:second_factor_verification_type"`
+	MultiFactorVerification      time.Time `json:"-" gorm:"column:multi_factor_verification"`
+	MultiFactorVerificationType  int32     `json:"-" gorm:"column:multi_factor_verification_type"`
+	Sequence                     uint64    `json:"-" gorm:"column:sequence"`
 }
 
 func UserSessionFromEvent(event *models.Event) (*UserSessionView, error) {
@@ -51,23 +51,23 @@ func UserSessionFromEvent(event *models.Event) (*UserSessionView, error) {
 
 func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 	return &model.UserSessionView{
-		ChangeDate:                  userSession.ChangeDate,
-		CreationDate:                userSession.CreationDate,
-		ResourceOwner:               userSession.ResourceOwner,
-		State:                       req_model.UserSessionState(userSession.State),
-		UserAgentID:                 userSession.UserAgentID,
-		UserID:                      userSession.UserID,
-		UserName:                    userSession.UserName,
-		LoginName:                   userSession.LoginName,
-		DisplayName:                 userSession.DisplayName,
-		SelectedIDPConfigID:         userSession.SelectedIDPConfigID,
-		PasswordVerification:        userSession.PasswordVerification,
-		ExternalLoginVerification:   userSession.ExternalLoginVerification,
-		MfaSoftwareVerification:     userSession.MfaSoftwareVerification,
-		MfaSoftwareVerificationType: req_model.MfaType(userSession.MfaSoftwareVerificationType),
-		MfaHardwareVerification:     userSession.MfaHardwareVerification,
-		MfaHardwareVerificationType: req_model.MfaType(userSession.MfaHardwareVerificationType),
-		Sequence:                    userSession.Sequence,
+		ChangeDate:                   userSession.ChangeDate,
+		CreationDate:                 userSession.CreationDate,
+		ResourceOwner:                userSession.ResourceOwner,
+		State:                        req_model.UserSessionState(userSession.State),
+		UserAgentID:                  userSession.UserAgentID,
+		UserID:                       userSession.UserID,
+		UserName:                     userSession.UserName,
+		LoginName:                    userSession.LoginName,
+		DisplayName:                  userSession.DisplayName,
+		SelectedIDPConfigID:          userSession.SelectedIDPConfigID,
+		PasswordVerification:         userSession.PasswordVerification,
+		ExternalLoginVerification:    userSession.ExternalLoginVerification,
+		SecondFactorVerification:     userSession.SecondFactorVerification,
+		SecondFactorVerificationType: req_model.MFAType(userSession.SecondFactorVerificationType),
+		MultiFactorVerification:      userSession.MultiFactorVerification,
+		MultiFactorVerificationType:  req_model.MFAType(userSession.MultiFactorVerificationType),
+		Sequence:                     userSession.Sequence,
 	}
 }
 
@@ -100,20 +100,20 @@ func (v *UserSessionView) AppendEvent(event *models.Event) {
 		v.PasswordVerification = time.Time{}
 	case es_model.MFAOTPCheckSucceeded,
 		es_model.HumanMFAOTPCheckSucceeded:
-		v.MfaSoftwareVerification = event.CreationDate
-		v.MfaSoftwareVerificationType = int32(req_model.MfaTypeOTP)
+		v.SecondFactorVerification = event.CreationDate
+		v.SecondFactorVerificationType = int32(req_model.MFATypeOTP)
 		v.State = int32(req_model.UserSessionStateActive)
 	case es_model.MFAOTPCheckFailed,
 		es_model.MFAOTPRemoved,
 		es_model.HumanMFAOTPCheckFailed,
 		es_model.HumanMFAOTPRemoved:
-		v.MfaSoftwareVerification = time.Time{}
+		v.SecondFactorVerification = time.Time{}
 	case es_model.SignedOut,
 		es_model.HumanSignedOut,
 		es_model.UserLocked,
 		es_model.UserDeactivated:
 		v.PasswordVerification = time.Time{}
-		v.MfaSoftwareVerification = time.Time{}
+		v.SecondFactorVerification = time.Time{}
 		v.ExternalLoginVerification = time.Time{}
 		v.State = int32(req_model.UserSessionStateTerminated)
 	}

@@ -16,10 +16,9 @@ require (
 	github.com/aws/aws-sdk-go v1.35.15 // indirect
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.12.3
+	github.com/caos/oidc v0.12.5
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/cockroachdb/cockroach-go/v2 v2.0.8
-	github.com/envoyproxy/protoc-gen-validate v0.4.1
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.4.4
@@ -57,10 +56,10 @@ require (
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
 	golang.org/x/net v0.0.0-20201027133719-8eef5233e2a1 // indirect
 	golang.org/x/sys v0.0.0-20201027140754-0fcbb8f4928c // indirect
-	golang.org/x/text v0.3.3
+	golang.org/x/text v0.3.4
 	golang.org/x/tools v0.0.0-20201026223136-e84cfc6dd5ca
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20201026171402-d4b8fe4fd877
+	google.golang.org/genproto v0.0.0-20201026171402-d4b8fe4fd877 // indirect
 	google.golang.org/grpc v1.33.1
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/square/go-jose.v2 v2.5.1

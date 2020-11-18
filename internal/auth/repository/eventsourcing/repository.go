@@ -163,8 +163,8 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 			PasswordCheckLifeTime:      systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
 			ExternalLoginCheckLifeTime: systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
 			MfaInitSkippedLifeTime:     systemDefaults.VerificationLifetimes.MfaInitSkip.Duration,
-			MfaSoftwareCheckLifeTime:   systemDefaults.VerificationLifetimes.MfaSoftwareCheck.Duration,
-			MfaHardwareCheckLifeTime:   systemDefaults.VerificationLifetimes.MfaHardwareCheck.Duration,
+			SecondFactorCheckLifeTime:  systemDefaults.VerificationLifetimes.SecondFactorCheck.Duration,
+			MultiFactorCheckLifeTime:   systemDefaults.VerificationLifetimes.MultiFactorCheck.Duration,
 			IAMID:                      systemDefaults.IamID,
 		},
 		eventstore.TokenRepo{
