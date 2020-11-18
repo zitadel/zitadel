@@ -1,6 +1,7 @@
 import {
     AfterContentInit,
     AfterViewInit,
+    ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     ContentChild,
@@ -8,12 +9,14 @@ import {
     ElementRef,
     HostListener,
     InjectionToken,
+    OnDestroy,
     QueryList,
     ViewChild,
+    ViewEncapsulation,
 } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { Subject } from 'rxjs';
-import { startWith } from 'rxjs/operators';
+import { startWith, takeUntil } from 'rxjs/operators';
 
 import { cnslFormFieldAnimations } from './animations';
 import { CNSL_ERROR, CnslErrorDirective } from './error.directive';
@@ -21,7 +24,6 @@ import { CnslFormFieldControlDirective } from './form-field-control.directive';
 import { _CNSL_HINT, CnslHintDirective } from './hint.directive';
 
 export const CNSL_FORM_FIELD = new InjectionToken<CnslFormFieldComponent>('CnslFormFieldComponent');
-
 
 @Component({
     selector: 'cnsl-form-field',
@@ -40,12 +42,15 @@ export const CNSL_FORM_FIELD = new InjectionToken<CnslFormFieldComponent>('CnslF
         '[class.ng-pending]': '_shouldForward("pending")',
         // '[class.cnsl-form-field-invalid]': '_control.errorState',
     },
+    encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.OnPush,
     animations: [cnslFormFieldAnimations.transitionMessages],
 })
-export class CnslFormFieldComponent implements AfterContentInit, AfterViewInit {
+export class CnslFormFieldComponent implements OnDestroy, AfterContentInit, AfterViewInit {
     focused: boolean = false;
-    readonly stateChanges: Subject<void> = new Subject<void>();
+    private _destroyed: Subject<void> = new Subject<void>();
 
+    @ViewChild('connectionContainer', { static: true }) _connectionContainerRef!: ElementRef;
     @ViewChild('inputContainer') _inputContainerRef!: ElementRef;
     @ContentChild(CnslFormFieldControlDirective) _controlNonStatic!: CnslFormFieldControlDirective<any>;
     @ContentChild(CnslFormFieldControlDirective, { static: true }) _controlStatic!: CnslFormFieldControlDirective<any>;
@@ -58,6 +63,7 @@ export class CnslFormFieldComponent implements AfterContentInit, AfterViewInit {
         this._explicitFormFieldControl = value;
     }
     private _explicitFormFieldControl!: CnslFormFieldControlDirective<any>;
+    readonly stateChanges: Subject<void> = new Subject<void>();
 
     _subscriptAnimationState: string = '';
 
@@ -82,12 +88,40 @@ export class CnslFormFieldComponent implements AfterContentInit, AfterViewInit {
         this._changeDetectorRef.detectChanges();
     }
 
+    public ngOnDestroy(): void {
+        this._destroyed.next();
+        this._destroyed.complete();
+    }
+
     public ngAfterContentInit(): void {
+        this._validateControlChild();
+
+        const control = this._control;
+        // @ts-ignore
+        control.stateChanges.pipe(startWith(<string>null!)).subscribe(() => {
+            this._syncDescribedByIds();
+            this._changeDetectorRef.markForCheck();
+        });
+
+        // Run change detection if the value changes.
+        if (control.ngControl && control.ngControl.valueChanges) {
+            control.ngControl.valueChanges
+                .pipe(takeUntil(this._destroyed))
+                .subscribe(() => this._changeDetectorRef.markForCheck());
+        }
+
         // Update the aria-described by when the number of errors changes.
         this._errorChildren.changes.pipe(startWith(null)).subscribe(() => {
             this._syncDescribedByIds();
             this._changeDetectorRef.markForCheck();
         });
+    }
+
+    /** Throws an error if the form field's control is missing. */
+    protected _validateControlChild(): void {
+        if (!this._control) {
+            throw Error('cnsl-form-field must contain a CnslFormFieldControl.');
+        }
     }
 
     private _syncDescribedByIds(): void {

@@ -35,17 +35,14 @@
             </cnsl-form-field>
             <cnsl-form-field class="formfield" appearance="fill">
                 <cnsl-label>{{ 'USER.PROFILE.LASTNAME' | translate }}</cnsl-label>
-                <input formControlName="lastName" required />
-                <span cnsl-error *ngIf="lastName?.invalid && lastName?.errors?.required">
-                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                </span>
+                <input cnslInput formControlName="lastName" required />
                 <span cnsl-error *ngIf="lastName?.invalid && lastName?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                 </span>
             </cnsl-form-field>
             <cnsl-form-field class="formfield" appearance="fill">
                 <cnsl-label>{{ 'USER.PROFILE.NICKNAME' | translate }}</cnsl-label>
-                <input formControlName="nickName" />
+                <input cnslInput formControlName="nickName" />
                 <span cnsl-error *ngIf="nickName?.invalid && nickName?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                 </span>
@@ -80,7 +77,7 @@
 
             <cnsl-form-field class="formfield" appearance="fill">
                 <cnsl-label>{{ 'USER.PROFILE.PHONE' | translate }}</cnsl-label>
-                <input formControlName="phone" />
+                <input cnslInput formControlName="phone" />
                 <span cnslError *ngIf="phone?.invalid && phone?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                 </span>
