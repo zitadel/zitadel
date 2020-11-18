@@ -54,32 +54,77 @@ For example with [zitadel.ch](zitadel.ch) this would be the domain [issuer.zitad
 
 ### Scopes
 
-#### How scopes work
+> TODO describe how scopes work
 
-> TODO describe
+#### Standard Scopes
 
 #### Reserved Scopes
 
 In addition to the standard compliant scopes we utilize the following scopes.
 
-| Scope                                           | Description                                                                                                                                                     | Example                                    |
-|:------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------|
-| urn:zitadel:iam:org:project:role:{rolename}     | By using this scope a [client](administrate#clients) can request the claim urn:zitadel:iam:roles:rolename} to be asserted when possible. As an alternative approach you can enable all [roles](administrate#Roles) to be asserted from the [project](administrate#projects) a [client](administrate#clients) belongs to. See details [here](administrate#RBAC_Settings)                                                  | urn:zitadel:iam:org:project:role:user      |
-| urn:zitadel:iam:org:domain:primary:{domainname} | When requesting this scope **ZITADEL** will enforce that the user is a member of the selected organisation. If the organisation does not exist a failure is displayed | urn:zitadel:iam:org:domain:primary:acme.ch |
-| urn:zitadel:iam:role:{rolename}                 |                                                                                                                                                                 |                                            |
-| urn:zitadel:iam:org:project:id:{projectid}:aud  | By adding this scope, the requested projectid will be added to the audience of the access and id token                                                          | ZITADEL Project: urn:zitadel:iam:org:project:id:69234237810729019:aud                                           |
+| Scope   | Example    | Description    |
+|:------------------------------------------------|:---------------|--------------------------------------------|
+| urn:zitadel:iam:org:project:role:{rolename}     | `urn:zitadel:iam:org:project:role:user` | By using this scope a [client](administrate#clients) can request the claim urn:zitadel:iam:roles:rolename} to be asserted when possible. As an alternative approach you can enable all [roles](administrate#Roles) to be asserted from the [project](administrate#projects) a [client](administrate#clients) belongs to. See details [here](administrate#RBAC_Settings) |
+| urn:zitadel:iam:org:domain:primary:{domainname} | `urn:zitadel:iam:org:domain:primary:acme.ch` |When requesting this scope **ZITADEL** will enforce that the user is a member of the selected organization. If the organization does not exist a failure is displayed |
+| urn:zitadel:iam:role:{rolename}                 | | |
+| urn:zitadel:iam:org:project:id:{projectid}:aud  | ZITADEL's Project id is `urn:zitadel:iam:org:project:id:69234237810729019:aud` | By adding this scope, the requested projectid will be added to the audience of the access and id token |
 
 ### Claims
 
-> TODO describe
+> TODO describe how claims work
+
+| Claims                                          | Userinfo           | ID Token                               | Access Token                             |
+|:------------------------------------------------|:-------------------|----------------------------------------|------------------------------------------|
+| aud                                             | No                 | Yes                                    | Yes when JWT                             |
+| azp                                             | No                 | Yes                                    | Yes when JWT                             |
+| iss                                             | No                 | Yes                                    | Yes when JWT                             |
+| sub                                             | Yes                | Yes                                    | Yes when JWT                             |
+| amr                                             | Yes                | Yes                                    | No                                       |
+| acr                                             | Yes                | Yes                                    | No                                       |
+| auth_time                                       | Yes                | Yes                                    | No                                       |
+| exp                                             | No                 | Yes                                    | Yes when JWT                             |
+| iat                                             | No                 | Yes                                    | Yes when JWT                             |
+| nonce                                           | No                 | Yes                                    | No                                       |
+| email                                           | Yes                | Yes only when response type `id_token` | No                                       |
+| email_verified                                  | Yes                | Yes only when response type `id_token` | No                                       |
+| phone                                           | Yes                | Yes only when response type `id_token` | No                                       |
+| address                                         | Yes                | Yes only when response type `id_token` | No                                       |
+| urn:zitadel:iam:org:domain:primary:{domainname} | Yes when requested | Yes when requested                     | Yes when JWT and requested               |
+| urn:zitadel:iam:org:project:roles:{rolename}    | Yes                | Yes when requested or configured       | Yes when JWT and requested or configured |
+
+#### Standard Claims
+
+| Claims    | Example                              | Description             |
+|:----------|:-------------------------------------|-------------------------|
+| aud       |                                      | The audience claim will |
+| azp       |                                      |                         |
+| iss       | `"iss": "https://issuer.zitadel.ch"` |                         |
+| sub       |                                      |                         |
+| amr       |                                      |                         |
+| acr       | TBA                                  | TBA                     |
+| auth_time |                                      |                         |
+| exp       |                                      |                         |
+| iat       |                                      |                         |
+| nonce     |                                      |                         |
+
+#### Additional Claims
+
+| Claims         | Example | Description |
+|:---------------|:--------|-------------|
+| email          |         |             |
+| email_verified |         |             |
+| phone          |         |             |
+| address        |         |             |
 
 #### Reserved Claims
 
-| Claims                                          | Description | Example                                                                          |
-|:------------------------------------------------|:------------|----------------------------------------------------------------------------------|
-| urn:zitadel:iam:org:domain:primary:{domainname} |             | `{"urn:zitadel:iam:org:domain:primary": "acme.ch"}`                              |
-| urn:zitadel:iam:org:project:roles:{rolename}    |             | `{"urn:zitadel:iam:org:project:roles": [ {"user": {"id1": "acme.zitade.ch", "id2": "caos.ch"} } ] }` |
-| urn:zitadel:iam:roles:{rolename}                |             |                                                                                  |
+ZITADEL reserves some claims to assert certain data.
+
+| Claims                                          | Example                                                                                              | Description                                                                                                                                                                        |
+|:------------------------------------------------|:-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| urn:zitadel:iam:org:domain:primary:{domainname} | `{"urn:zitadel:iam:org:domain:primary": "acme.ch"}`                                                  | This claim represents the primary domain of the organization the user belongs to.                                                                                                  |
+| urn:zitadel:iam:org:project:roles:{rolename}    | `{"urn:zitadel:iam:org:project:roles": [ {"user": {"id1": "acme.zitade.ch", "id2": "caos.ch"} } ] }` | When roles are asserted, ZITADEL does this by providing the `id` and `primaryDomain` below the role. This gives you the option to check in which organization a user has the role. |
+| urn:zitadel:iam:roles:{rolename}                | TBA                                                                                                  | TBA                                                                                                                                                                                |
 
 ### Grant Types
 
@@ -120,6 +165,8 @@ For a list of supported or unsupported `Grant Types` please have a look at the t
 
 #### JSON Web Token (JWT) Profile
 
+**Link to spec.** [JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and Authorization Grants](https://tools.ietf.org/html/rfc7523)
+
 ##### Using JWTs as Authorization Grants
 
 Our service user work with the JWT profile to authenticate them against ZITADEL.
@@ -134,12 +181,12 @@ Our service user work with the JWT profile to authenticate them against ZITADEL.
 
 Key JSON
 
-| Key    | Example                                                           | Description |
-|:-------|:------------------------------------------------------------------|:------------|
-| type   | "serviceaccount"                                                  | The type of account, right now only serviceaccount is valid            |
-| keyId  | "81693565968772648"                                               | This is unique ID of the key            |
-| key    | "-----BEGIN RSA PRIVATE KEY-----...-----END RSA PRIVATE KEY-----" | The private key generated by ZITADEL, this can not be regenerated!            |
-| userId | 78366401571647008                                                 | The service users ID, this is the same as the subject from tokens |
+| Key    | Example                                                           | Description                                                        |
+|:-------|:------------------------------------------------------------------|:-------------------------------------------------------------------|
+| type   | `"serviceaccount"`                                                  | The type of account, right now only serviceaccount is valid        |
+| keyId  | `"81693565968772648"`                                               | This is unique ID of the key                                       |
+| key    | `"-----BEGIN RSA PRIVATE KEY-----...-----END RSA PRIVATE KEY-----"` | The private key generated by ZITADEL, this can not be regenerated! |
+| userId | `78366401571647008`                                                 | The service users ID, this is the same as the subject from tokens  |
 
 ```JSON
 {
@@ -156,11 +203,11 @@ JWT
 
 | Claim | Example                     | Description                                                                      |
 |:------|:----------------------------|:---------------------------------------------------------------------------------|
-| iss   | "http://localhost:50003"    | String which represents the requesting party                                     |
-| sub   | "77479219772321307"         | The subject ID of the service user, normally the `userId` from the json key file |
-| aud   | "https://issuer.zitadel.ch" | String or Array of intended audiences MUST include ZITADEL's issuing domain      |
-| exp   | 1605183582                  | Unix timestamp of the expiry, MUST NOT be longer than 1h                         |
-| iat   | 1605179982                  | Unix timestamp of the creation singing time of the JWT                           |
+| iss   | `"http://localhost:50003"`    | String which represents the requesting party                                     |
+| sub   | `"77479219772321307"`         | The subject ID of the service user, normally the `userId` from the json key file |
+| aud   | `"https://issuer.zitadel.ch"` | String or Array of intended audiences MUST include ZITADEL's issuing domain      |
+| exp   | `1605183582`                  | Unix timestamp of the expiry, MUST NOT be longer than 1h                         |
+| iat   | `1605179982`                  | Unix timestamp of the creation singing time of the JWT                           |
 
 ```JSON
 {
@@ -176,12 +223,12 @@ JWT
 
 Access Token Request
 
-| Parameter    | Example                                     | Description                                   |
-|:-------------|:--------------------------------------------|:----------------------------------------------|
-| Content-Type | application/x-www-form-urlencoded           |                                               |
-| grant_type   | urn:ietf:params:oauth:grant-type:jwt-bearer | Using JWTs as Authorization Grants            |
-| assertion    | eyJhbGciOiJSUzI1Ni...                       | The base64 encoded JWT created above          |
-| scope        | openid profile email address                | Scopes you would like to request from ZITADEL |
+| Parameter    | Example                                                                   | Description                                   |
+|:-------------|:--------------------------------------------------------------------------|:----------------------------------------------|
+| Content-Type | `application/x-www-form-urlencoded`                                         |                                               |
+| grant_type   | `urn:ietf:params:oauth:grant-type:jwt-bearer`                               | Using JWTs as Authorization Grants            |
+| assertion    | `eyJhbGciOiJSUzI1Ni...`                                                     | The base64 encoded JWT created above          |
+| scope        | `openid profile email urn:zitadel:iam:org:project:id:69234237810729019:aud` | Scopes you would like to request from ZITADEL |
 
 ```BASH
 curl --request POST \
@@ -192,7 +239,9 @@ curl --request POST \
   --data scope=openid profile email address
 ```
 
-**Link to spec.** [JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and Authorization Grants](https://tools.ietf.org/html/rfc7523)
+##### Using JWTs for Client Authentication
+
+> Not yet supported
 
 #### Token Exchange
 
