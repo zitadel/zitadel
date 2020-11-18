@@ -10,6 +10,10 @@ const (
 	mailTextTable = "adminapi.mail_texts"
 )
 
+func (v *View) MailTexts(aggregateID string) ([]*model.MailTextView, error) {
+	return view.GetMailTexts(v.Db, mailTextTable, aggregateID)
+}
+
 func (v *View) MailTextByIDs(aggregateID string, textType string, language string) (*model.MailTextView, error) {
 	return view.GetMailTextByIDs(v.Db, mailTextTable, aggregateID, textType, language)
 }

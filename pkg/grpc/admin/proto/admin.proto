@@ -363,6 +363,48 @@ service AdminService {
         };
     }
 
+    rpc GetDefaultTemplate(google.protobuf.Empty) returns (DefaultTemplateView) {
+        option (google.api.http) = {
+            get: "/policies/template"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc UpdateDefaultTemplate(DefaultTemplateUpdate) returns (DefaultTemplate) {
+        option (google.api.http) = {
+            put: "/policies/template"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc GetDefaultTexts(google.protobuf.Empty) returns (DefaultTextsView) {
+        option (google.api.http) = {
+            get: "/policies/texts"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc UpdateDefaultText(DefaultTextUpdate) returns (DefaultText) {
+        option (google.api.http) = {
+            put: "/policies/text"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
     rpc GetDefaultLoginPolicy(google.protobuf.Empty) returns (DefaultLoginPolicyView) {
         option (google.api.http) = {
             get: "/policies/login"
@@ -941,6 +983,63 @@ message DefaultLabelPolicyView {
     string secondary_color = 2;
     google.protobuf.Timestamp creation_date = 3;
     google.protobuf.Timestamp change_date = 4;
+}
+
+message DefaultTemplate {
+    bytes template = 1;
+    google.protobuf.Timestamp creation_date = 2;
+    google.protobuf.Timestamp change_date = 3;
+}
+
+message DefaultTemplateUpdate {
+    bytes template = 1;
+}
+
+message DefaultTemplateView {
+    bytes template = 1;
+    google.protobuf.Timestamp creation_date = 2;
+    google.protobuf.Timestamp change_date = 3;
+}
+
+message DefaultText {
+	string mail_text_type = 1;
+	string language = 2;
+	string title = 3;
+	string pre_header = 4;
+	string subject = 5;
+	string greeting = 6;
+	string text = 7;
+	string button_text = 8;
+    google.protobuf.Timestamp creation_date = 9;
+    google.protobuf.Timestamp change_date = 10;
+}
+
+message DefaultTextUpdate {   
+	string mail_text_type = 1;
+	string language = 2;
+	string title = 3;
+	string pre_header = 4;
+	string subject = 5;
+	string greeting = 6;
+	string text = 7;
+	string button_text = 8;
+}
+
+message DefaultTextsView{
+    repeated DefaultTextView texts = 1;
+}
+
+message DefaultTextView {
+	string mail_text_type = 1;
+	string language = 2;
+	string title = 3;
+	string pre_header = 4;
+	string subject = 5;
+	string greeting = 6;
+	string text = 7;
+	string button_text = 8;
+    google.protobuf.Timestamp creation_date = 9;
+    google.protobuf.Timestamp change_date = 10;
 }
 
 message DefaultLoginPolicy {

@@ -57,6 +57,20 @@ func MailTextViewFromModel(template *model.MailTextView) *MailTextView {
 	}
 }
 
+func MailTextsViewToModel(textsin []*MailTextView) *model.MailTextsView {
+	return &model.MailTextsView{
+		Texts: mailTextsViewToModelArr(textsin),
+	}
+}
+
+func mailTextsViewToModelArr(texts []*MailTextView) []*model.MailTextView {
+	result := make([]*model.MailTextView, len(texts))
+	for i, r := range texts {
+		result[i] = MailTextViewToModel(r)
+	}
+	return result
+}
+
 func MailTextViewToModel(template *MailTextView) *model.MailTextView {
 	return &model.MailTextView{
 		AggregateID:  template.AggregateID,

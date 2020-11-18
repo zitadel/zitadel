@@ -6,6 +6,9 @@ import (
 	"github.com/caos/zitadel/internal/model"
 )
 
+type MailTextsView struct {
+	Texts []*MailTextView
+}
 type MailTextView struct {
 	AggregateID  string
 	MailTextType string

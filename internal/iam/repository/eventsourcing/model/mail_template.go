@@ -36,7 +36,7 @@ func (p *MailTemplate) Changes(changed *MailTemplate) map[string]interface{} {
 	changes := make(map[string]interface{}, 2)
 
 	if b64.StdEncoding.EncodeToString(changed.Template) != b64.StdEncoding.EncodeToString(p.Template) {
-		changes["mailTemplate"] = changed.Template
+		changes["mailTemplate"] = b64.StdEncoding.EncodeToString(changed.Template)
 	}
 
 	return changes

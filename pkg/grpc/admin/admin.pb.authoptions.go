@@ -159,6 +159,26 @@ var AdminService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultTemplate": authz.Option{
+		Permission: "iam.policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/UpdateDefaultTemplate": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultTexts": authz.Option{
+		Permission: "iam.policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/UpdateDefaultText": authz.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.admin.api.v1.AdminService/GetDefaultLoginPolicy": authz.Option{
 		Permission: "iam.policy.read",
 		CheckParam: "",

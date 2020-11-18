@@ -57,8 +57,10 @@ const (
 
 	MailTemplateAdded   models.EventType = "org.mail.template.added"
 	MailTemplateChanged models.EventType = "org.mail.template.changed"
+	MailTemplateRemoved models.EventType = "org.mail.template.removed"
 	MailTextAdded       models.EventType = "org.mail.text.added"
 	MailTextChanged     models.EventType = "org.mail.text.changed"
+	MailTextRemoved     models.EventType = "org.mail.text.removed"
 
 	PasswordComplexityPolicyAdded   models.EventType = "org.policy.password.complexity.added"
 	PasswordComplexityPolicyChanged models.EventType = "org.policy.password.complexity.changed"

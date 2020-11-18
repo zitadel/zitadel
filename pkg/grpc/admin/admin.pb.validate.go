@@ -4462,6 +4462,616 @@ var _ interface {
 	ErrorName() string
 } = DefaultLabelPolicyViewValidationError{}
 
+// Validate checks the field values on DefaultTemplate with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *DefaultTemplate) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Template
+
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultTemplateValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultTemplateValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// DefaultTemplateValidationError is the validation error returned by
+// DefaultTemplate.Validate if the designated constraints aren't met.
+type DefaultTemplateValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultTemplateValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultTemplateValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultTemplateValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultTemplateValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultTemplateValidationError) ErrorName() string { return "DefaultTemplateValidationError" }
+
+// Error satisfies the builtin error interface
+func (e DefaultTemplateValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultTemplate.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultTemplateValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultTemplateValidationError{}
+
+// Validate checks the field values on DefaultTemplateUpdate with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DefaultTemplateUpdate) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Template
+
+	return nil
+}
+
+// DefaultTemplateUpdateValidationError is the validation error returned by
+// DefaultTemplateUpdate.Validate if the designated constraints aren't met.
+type DefaultTemplateUpdateValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultTemplateUpdateValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultTemplateUpdateValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultTemplateUpdateValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultTemplateUpdateValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultTemplateUpdateValidationError) ErrorName() string {
+	return "DefaultTemplateUpdateValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DefaultTemplateUpdateValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultTemplateUpdate.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultTemplateUpdateValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultTemplateUpdateValidationError{}
+
+// Validate checks the field values on DefaultTemplateView with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DefaultTemplateView) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Template
+
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultTemplateViewValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultTemplateViewValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// DefaultTemplateViewValidationError is the validation error returned by
+// DefaultTemplateView.Validate if the designated constraints aren't met.
+type DefaultTemplateViewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultTemplateViewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultTemplateViewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultTemplateViewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultTemplateViewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultTemplateViewValidationError) ErrorName() string {
+	return "DefaultTemplateViewValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DefaultTemplateViewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultTemplateView.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultTemplateViewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultTemplateViewValidationError{}
+
+// Validate checks the field values on DefaultText with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *DefaultText) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for MailTextType
+
+	// no validation rules for Language
+
+	// no validation rules for Title
+
+	// no validation rules for PreHeader
+
+	// no validation rules for Subject
+
+	// no validation rules for Greeting
+
+	// no validation rules for Text
+
+	// no validation rules for ButtonText
+
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultTextValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultTextValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// DefaultTextValidationError is the validation error returned by
+// DefaultText.Validate if the designated constraints aren't met.
+type DefaultTextValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultTextValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultTextValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultTextValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultTextValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultTextValidationError) ErrorName() string { return "DefaultTextValidationError" }
+
+// Error satisfies the builtin error interface
+func (e DefaultTextValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultText.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultTextValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultTextValidationError{}
+
+// Validate checks the field values on DefaultTextUpdate with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *DefaultTextUpdate) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for MailTextType
+
+	// no validation rules for Language
+
+	// no validation rules for Title
+
+	// no validation rules for PreHeader
+
+	// no validation rules for Subject
+
+	// no validation rules for Greeting
+
+	// no validation rules for Text
+
+	// no validation rules for ButtonText
+
+	return nil
+}
+
+// DefaultTextUpdateValidationError is the validation error returned by
+// DefaultTextUpdate.Validate if the designated constraints aren't met.
+type DefaultTextUpdateValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultTextUpdateValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultTextUpdateValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultTextUpdateValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultTextUpdateValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultTextUpdateValidationError) ErrorName() string {
+	return "DefaultTextUpdateValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DefaultTextUpdateValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultTextUpdate.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultTextUpdateValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultTextUpdateValidationError{}
+
+// Validate checks the field values on DefaultTextsView with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *DefaultTextsView) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetTexts() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DefaultTextsViewValidationError{
+					field:  fmt.Sprintf("Texts[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// DefaultTextsViewValidationError is the validation error returned by
+// DefaultTextsView.Validate if the designated constraints aren't met.
+type DefaultTextsViewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultTextsViewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultTextsViewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultTextsViewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultTextsViewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultTextsViewValidationError) ErrorName() string { return "DefaultTextsViewValidationError" }
+
+// Error satisfies the builtin error interface
+func (e DefaultTextsViewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultTextsView.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultTextsViewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultTextsViewValidationError{}
+
+// Validate checks the field values on DefaultTextView with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *DefaultTextView) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for MailTextType
+
+	// no validation rules for Language
+
+	// no validation rules for Title
+
+	// no validation rules for PreHeader
+
+	// no validation rules for Subject
+
+	// no validation rules for Greeting
+
+	// no validation rules for Text
+
+	// no validation rules for ButtonText
+
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultTextViewValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultTextViewValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// DefaultTextViewValidationError is the validation error returned by
+// DefaultTextView.Validate if the designated constraints aren't met.
+type DefaultTextViewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultTextViewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultTextViewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultTextViewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultTextViewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultTextViewValidationError) ErrorName() string { return "DefaultTextViewValidationError" }
+
+// Error satisfies the builtin error interface
+func (e DefaultTextViewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultTextView.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultTextViewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultTextViewValidationError{}
+
 // Validate checks the field values on DefaultLoginPolicy with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

@@ -25,6 +25,8 @@ type Org struct {
 	Members                  []*OrgMember                           `json:"-"`
 	OrgIAMPolicy             *iam_es_model.OrgIAMPolicy             `json:"-"`
 	LabelPolicy              *iam_es_model.LabelPolicy              `json:"-"`
+	MailTemplate             *iam_es_model.MailTemplate             `json:"-"`
+	MailText                 *iam_es_model.MailText                 `json:"-"`
 	IDPs                     []*iam_es_model.IDPConfig              `json:"-"`
 	LoginPolicy              *iam_es_model.LoginPolicy              `json:"-"`
 	PasswordComplexityPolicy *iam_es_model.PasswordComplexityPolicy `json:"-"`
@@ -52,6 +54,12 @@ func OrgFromModel(org *org_model.Org) *Org {
 	}
 	if org.LabelPolicy != nil {
 		converted.LabelPolicy = iam_es_model.LabelPolicyFromModel(org.LabelPolicy)
+	}
+	if org.MailTemplate != nil {
+		converted.MailTemplate = iam_es_model.MailTemplateFromModel(org.MailTemplate)
+	}
+	if org.MailText != nil {
+		converted.MailText = iam_es_model.MailTextFromModel(org.MailText)
 	}
 	if org.PasswordComplexityPolicy != nil {
 		converted.PasswordComplexityPolicy = iam_es_model.PasswordComplexityPolicyFromModel(org.PasswordComplexityPolicy)

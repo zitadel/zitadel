@@ -9,6 +9,23 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+func GetMailTexts(db *gorm.DB, table string, aggregateID string) ([]*model.MailTextView, error) {
+	texts := make([]*model.MailTextView, 0)
+	queries := []*iam_model.MailTextSearchQuery{
+		{
+			Key:    iam_model.MailTextSearchKeyAggregateID,
+			Value:  aggregateID,
+			Method: global_model.SearchMethodEquals,
+		},
+	}
+	query := repository.PrepareSearchQuery(table, model.MailTextSearchRequest{Queries: queries})
+	_, err := query(db, &texts)
+	if err != nil {
+		return nil, err
+	}
+	return texts, nil
+}
+
 func GetMailTextByIDs(db *gorm.DB, table, aggregateID string, textType string, language string) (*model.MailTextView, error) {
 	mailText := new(model.MailTextView)
 	aggregateIDQuery := &model.MailTextSearchQuery{Key: iam_model.MailTextSearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
