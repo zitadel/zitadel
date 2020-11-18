@@ -8,6 +8,7 @@ import {
     ContentChildren,
     ElementRef,
     HostListener,
+    Inject,
     InjectionToken,
     OnDestroy,
     QueryList,
@@ -15,15 +16,19 @@ import {
     ViewEncapsulation,
 } from '@angular/core';
 import { NgControl } from '@angular/forms';
+import { MatFormFieldControl } from '@angular/material/form-field';
 import { Subject } from 'rxjs';
 import { startWith, takeUntil } from 'rxjs/operators';
 
 import { cnslFormFieldAnimations } from './animations';
 import { CNSL_ERROR, CnslErrorDirective } from './error.directive';
-import { CnslFormFieldControlDirective } from './form-field-control.directive';
 import { _CNSL_HINT, CnslHintDirective } from './hint.directive';
 
 export const CNSL_FORM_FIELD = new InjectionToken<CnslFormFieldComponent>('CnslFormFieldComponent');
+
+class CnslFormFieldBase {
+    constructor(public _elementRef: ElementRef) { }
+}
 
 @Component({
     selector: 'cnsl-form-field',
@@ -46,23 +51,23 @@ export const CNSL_FORM_FIELD = new InjectionToken<CnslFormFieldComponent>('CnslF
     changeDetection: ChangeDetectionStrategy.OnPush,
     animations: [cnslFormFieldAnimations.transitionMessages],
 })
-export class CnslFormFieldComponent implements OnDestroy, AfterContentInit, AfterViewInit {
+export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestroy, AfterContentInit, AfterViewInit {
     focused: boolean = false;
     private _destroyed: Subject<void> = new Subject<void>();
 
     @ViewChild('connectionContainer', { static: true }) _connectionContainerRef!: ElementRef;
     @ViewChild('inputContainer') _inputContainerRef!: ElementRef;
-    @ContentChild(CnslFormFieldControlDirective) _controlNonStatic!: CnslFormFieldControlDirective<any>;
-    @ContentChild(CnslFormFieldControlDirective, { static: true }) _controlStatic!: CnslFormFieldControlDirective<any>;
-    get _control(): CnslFormFieldControlDirective<any> {
+    @ContentChild(MatFormFieldControl) _controlNonStatic!: MatFormFieldControl<any>;
+    @ContentChild(MatFormFieldControl, { static: true }) _controlStatic!: MatFormFieldControl<any>;
+    get _control(): MatFormFieldControl<any> {
         // TODO(crisbeto): we need this workaround in order to support both Ivy and ViewEngine.
         //  We should clean this up once Ivy is the default renderer.
         return this._explicitFormFieldControl || this._controlNonStatic || this._controlStatic;
     }
-    set _control(value: CnslFormFieldControlDirective<any>) {
+    set _control(value: MatFormFieldControl<any>) {
         this._explicitFormFieldControl = value;
     }
-    private _explicitFormFieldControl!: CnslFormFieldControlDirective<any>;
+    private _explicitFormFieldControl!: MatFormFieldControl<any>;
     readonly stateChanges: Subject<void> = new Subject<void>();
 
     _subscriptAnimationState: string = '';
@@ -79,12 +84,18 @@ export class CnslFormFieldComponent implements OnDestroy, AfterContentInit, Afte
         }
     }
 
-    constructor(public _elementRef: ElementRef, private _changeDetectorRef: ChangeDetectorRef) {
+    constructor(public _elementRef: ElementRef, private _changeDetectorRef: ChangeDetectorRef,
+        @Inject(ElementRef)
+        // Use `ElementRef` here so Angular has something to inject.
+        _labelOptions: any) {
+        super(_elementRef);
+
     }
 
     public ngAfterViewInit(): void {
         // Avoid animations on load.
         this._subscriptAnimationState = 'enter';
+        console.log('enter');
         this._changeDetectorRef.detectChanges();
     }
 
@@ -120,7 +131,7 @@ export class CnslFormFieldComponent implements OnDestroy, AfterContentInit, Afte
     /** Throws an error if the form field's control is missing. */
     protected _validateControlChild(): void {
         if (!this._control) {
-            throw Error('cnsl-form-field must contain a CnslFormFieldControl.');
+            throw Error('cnsl-form-field must contain a MatFormFieldControl.');
         }
     }
 

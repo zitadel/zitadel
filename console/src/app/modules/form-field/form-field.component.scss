@@ -23,6 +23,14 @@
     vertical-align: middle;
   }
 
+  // Wrapper for the hints and error messages.
+  .cnsl-form-field-subscript-wrapper {
+    position: absolute;
+    box-sizing: border-box;
+    width: 100%;
+    overflow: hidden; // prevents multi-line errors from overlapping the control
+  }
+
   .cnsl-form-field-hint-wrapper,
   .cnsl-form-field-error-wrapper {
     display: flex;

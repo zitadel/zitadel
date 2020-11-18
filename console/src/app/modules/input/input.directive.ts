@@ -16,10 +16,10 @@ import {
 } from '@angular/core';
 import { FormGroupDirective, NgControl, NgForm } from '@angular/forms';
 import { CanUpdateErrorStateCtor, mixinErrorState } from '@angular/material/core';
+import { MatFormFieldControl } from '@angular/material/form-field';
 import { MAT_INPUT_VALUE_ACCESSOR } from '@angular/material/input';
 import { Subject } from 'rxjs';
 
-import { CnslFormFieldControlDirective } from '../form-field/form-field-control.directive';
 import { CNSL_FORM_FIELD, CnslFormFieldComponent } from '../form-field/form-field.component';
 import { ErrorStateMatcher } from './error-options';
 
@@ -53,7 +53,7 @@ const _CnslInputMixinBase: CanUpdateErrorStateCtor & typeof CnslInputBase =
         '[attr.aria-invalid]': 'errorState',
         '[attr.aria-required]': 'required.toString()',
     },
-    providers: [{ provide: CnslFormFieldControlDirective, useExisting: InputDirective }],
+    providers: [{ provide: MatFormFieldControl, useExisting: InputDirective }],
 })
 export class InputDirective extends _CnslInputMixinBase implements OnChanges, AfterViewInit, OnDestroy, DoCheck {
     /** Whether the element is readonly. */

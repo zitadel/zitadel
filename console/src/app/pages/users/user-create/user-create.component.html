@@ -7,7 +7,7 @@
             <p class="section">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>
             <cnsl-form-field class="formfield" appearance="fill">
                 <cnsl-label>{{ 'USER.PROFILE.EMAIL' | translate }}</cnsl-label>
-                <input cnslInput formControlName="email" required />
+                <input cnslInput matRipple formControlName="email" required />
                 <span cnsl-error *ngIf="email?.invalid && email?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                 </span>
