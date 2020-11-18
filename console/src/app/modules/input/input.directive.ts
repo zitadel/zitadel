@@ -121,8 +121,7 @@ export class InputDirective extends _CnslInputMixinBase implements OnChanges, Af
         }
     }
 
-    @HostListener('input')
-    _onInput() {
+    @HostListener('input') _onInput(): any {
         // This is a noop function and is used to let Angular know whenever the value changes.
         // Angular will run a new change detection each time the `input` event has been dispatched.
         // It's necessary that Angular recognizes the value change, because when floatingLabel
