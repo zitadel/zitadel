@@ -63,8 +63,10 @@ export class InputDirective extends _CnslInputMixinBase implements OnChanges, Af
     // private _readonly = false;
     // readonly id!: string;
 
-    // @ts-ignore
+    /* tslint:disable */
     static ngAcceptInputType_value: any;
+    /* tslint:enable */
+
     protected _previousNativeValue: any;
     private _inputValueAccessor: { value: any; };
     private autofilled: boolean = false;

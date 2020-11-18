@@ -108,8 +108,7 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
         this._validateControlChild();
 
         const control = this._control;
-        // @ts-ignore
-        control.stateChanges.pipe(startWith(<string>null!)).subscribe(() => {
+        control.stateChanges.pipe(startWith(null)).subscribe(() => {
             this._syncDescribedByIds();
             this._changeDetectorRef.markForCheck();
         });
