@@ -51,7 +51,7 @@ Details need to be announced, but feel free to contribute already. As long as yo
 
 We already have documentation specific [guidelines](./site/CONTRIBUTING.md).
 
-Howto Build Zitadel: [contribute](./CONTRIBUTING.md)
+Howto develop ZITADEL: [contribute](./CONTRIBUTING.md)
 
 ## Security
 
