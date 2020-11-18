@@ -8,8 +8,8 @@ This chapter documents the [OpenID Connect 1.0](https://openid.net/connect/) and
 
 Under normal circumstances **ZITADEL** need four domain names to operate properly.
 
-| Domain Name | Example             | Description                                                                                                                          |
-|:------------|:--------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| Domain Name | Example               | Description                                                                                                                          |
+|:------------|:----------------------|--------------------------------------------------------------------------------------------------------------------------------------|
 | issuer      | `issuer.zitadel.ch`   | Provides the [OpenID Connect 1.0 Discovery Endpoint](#openid-connect-10-discovery)                                                   |
 | api         | `api.zitadel.ch`      | All ZITADEL API's are located under this domain see [API explanation](develop#APIs) for details                                      |
 | login       | `accounts.zitadel.ch` | The accounts.* page provides server renderer pages like login and register and as well the authorization_endpoint for OpenID Connect |
@@ -87,26 +87,26 @@ Please check below the matrix for an overview where which scope is asserted.
 
 | Claims                                          | Userinfo           | ID Token                               | Access Token                             |
 |:------------------------------------------------|:-------------------|----------------------------------------|------------------------------------------|
-| aud                                             | No                 | Yes                                    | Yes when JWT                             |
-| azp                                             | No                 | Yes                                    | Yes when JWT                             |
-| iss                                             | No                 | Yes                                    | Yes when JWT                             |
-| sub                                             | Yes                | Yes                                    | Yes when JWT                             |
-| amr                                             | Yes                | Yes                                    | No                                       |
 | acr                                             | Yes                | Yes                                    | No                                       |
+| address                                         | Yes when requested | Yes only when response type `id_token` | No                                       |
+| amr                                             | Yes                | Yes                                    | No                                       |
+| aud                                             | No                 | Yes                                    | Yes when JWT                             |
 | auth_time                                       | Yes                | Yes                                    | No                                       |
-| exp                                             | No                 | Yes                                    | Yes when JWT                             |
-| iat                                             | No                 | Yes                                    | Yes when JWT                             |
-| nonce                                           | No                 | Yes                                    | No                                       |
-| preferred_username                              | Yes when requested | Yes                                    | No                                       |
-| name                                            | Yes when requested | Yes when requested                     | No                                       |
-| family_name                                     | Yes when requested | Yes when requested                     | No                                       |
-| given_name                                      | Yes when requested | Yes when requested                     | No                                       |
-| locale                                          | Yes when requested | Yes when requested                     | No                                       |
-| gender                                          | Yes when requested | Yes when requested                     | No                                       |
+| azp                                             | No                 | Yes                                    | Yes when JWT                             |
 | email                                           | Yes when requested | Yes only when response type `id_token` | No                                       |
 | email_verified                                  | Yes when requested | Yes only when response type `id_token` | No                                       |
+| exp                                             | No                 | Yes                                    | Yes when JWT                             |
+| family_name                                     | Yes when requested | Yes when requested                     | No                                       |
+| gender                                          | Yes when requested | Yes when requested                     | No                                       |
+| given_name                                      | Yes when requested | Yes when requested                     | No                                       |
+| iat                                             | No                 | Yes                                    | Yes when JWT                             |
+| iss                                             | No                 | Yes                                    | Yes when JWT                             |
+| locale                                          | Yes when requested | Yes when requested                     | No                                       |
+| name                                            | Yes when requested | Yes when requested                     | No                                       |
+| nonce                                           | No                 | Yes                                    | No                                       |
 | phone                                           | Yes when requested | Yes only when response type `id_token` | No                                       |
-| address                                         | Yes when requested | Yes only when response type `id_token` | No                                       |
+| preferred_username                              | Yes when requested | Yes                                    | No                                       |
+| sub                                             | Yes                | Yes                                    | Yes when JWT                             |
 | urn:zitadel:iam:org:domain:primary:{domainname} | Yes when requested | Yes when requested                     | Yes when JWT and requested               |
 | urn:zitadel:iam:org:project:roles:{rolename}    | Yes when requested | Yes when requested or configured       | Yes when JWT and requested or configured |
 
@@ -114,26 +114,26 @@ Please check below the matrix for an overview where which scope is asserted.
 
 | Claims             | Example                              | Description                                                                                   |
 |:-------------------|:-------------------------------------|-----------------------------------------------------------------------------------------------|
-| aud                |                                      | By default all client id's and the project id is included                                     |
-| azp                |                                      | Client id of the client who requested the token                                               |
-| iss                | `"iss": "https://issuer.zitadel.ch"` | Issuing domain of a token                                                                     |
-| sub                |                                      | Subject ID of the user                                                                        |
-| amr                | `"amr": "pwd mfa"`                   | Authentication Method References as defined in [RFC8176](https://tools.ietf.org/html/rfc8176) |
 | acr                | TBA                                  | TBA                                                                                           |
+| address            |                                      |                                                                                               |
+| amr                | `"amr": "pwd mfa"`                   | Authentication Method References as defined in [RFC8176](https://tools.ietf.org/html/rfc8176) |
+| aud                |                                      | By default all client id's and the project id is included                                     |
 | auth_time          |                                      | Unix time of the authentication                                                               |
-| exp                |                                      | Time the token expires as unix time                                                           |
-| iat                |                                      | Issued at time of the token as unix time                                                      |
-| nonce              |                                      |                                                                                               |
-| preferred_username |                                      |                                                                                               |
-| name               |                                      |                                                                                               |
-| family_name        |                                      |                                                                                               |
-| given_name         |                                      |                                                                                               |
-| locale             |                                      |                                                                                               |
+| azp                |                                      | Client id of the client who requested the token                                               |
 | email              |                                      | Email Address of the subject                                                                  |
 | email_verified     | True                                 | Boolean if the email was verified by ZITADEL                                                  |
-| phone              |                                      |                                                                                               |
-| address            |                                      |                                                                                               |
+| exp                |                                      | Time the token expires as unix time                                                           |
+| family_name        |                                      |                                                                                               |
 | gender             |                                      |                                                                                               |
+| given_name         |                                      |                                                                                               |
+| iat                |                                      | Issued at time of the token as unix time                                                      |
+| iss                | `"iss": "https://issuer.zitadel.ch"` | Issuing domain of a token                                                                     |
+| locale             |                                      |                                                                                               |
+| name               |                                      |                                                                                               |
+| nonce              |                                      |                                                                                               |
+| phone              |                                      |                                                                                               |
+| preferred_username |                                      |                                                                                               |
+| sub                |                                      | Subject ID of the user                                                                        |
 
 #### Custom Claims
 
@@ -157,12 +157,12 @@ For a list of supported or unsupported `Grant Types` please have a look at the t
 |:------------------------------------------------------|:--------------------|
 | Authorization Code                                    | yes                 |
 | Authorization Code with PKCE                          | yes                 |
-| Implicit                                              | yes                 |
-| Resource Owner Password Credentials                   | no                  |
 | Client Credentials                                    | yes                 |
 | Device Authorization                                  | under consideration |
-| Refresh Token                                         | work in progress    |
+| Implicit                                              | yes                 |
 | JSON Web Token (JWT) Profile                          | partially           |
+| Refresh Token                                         | work in progress    |
+| Resource Owner Password Credentials                   | no                  |
 | Security Assertion Markup Language (SAML) 2.0 Profile | no                  |
 | Token Exchange                                        | work in progress    |
 
@@ -224,13 +224,13 @@ Key JSON
 
 JWT
 
-| Claim | Example                     | Description                                                                      |
-|:------|:----------------------------|:---------------------------------------------------------------------------------|
-| iss   | `"http://localhost:50003"`    | String which represents the requesting party                                     |
-| sub   | `"77479219772321307"`         | The subject ID of the service user, normally the `userId` from the json key file |
+| Claim | Example                       | Description                                                                      |
+|:------|:------------------------------|:---------------------------------------------------------------------------------|
 | aud   | `"https://issuer.zitadel.ch"` | String or Array of intended audiences MUST include ZITADEL's issuing domain      |
 | exp   | `1605183582`                  | Unix timestamp of the expiry, MUST NOT be longer than 1h                         |
 | iat   | `1605179982`                  | Unix timestamp of the creation singing time of the JWT                           |
+| iss   | `"http://localhost:50003"`    | String which represents the requesting party                                     |
+| sub   | `"77479219772321307"`         | The subject ID of the service user, normally the `userId` from the json key file |
 
 ```JSON
 {
