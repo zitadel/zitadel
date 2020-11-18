@@ -109,8 +109,6 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 		return nil, err
 	}
 	request.Audience = appIDs
-	projectIDAud := request.GetScopeProjectIDsForAud()
-	request.Audience = append(request.Audience, projectIDAud...)
 	request.AppendAudIfNotExisting(app.ProjectID)
 	if request.LoginHint != "" {
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
