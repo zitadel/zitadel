@@ -603,29 +603,41 @@ func (es *IAMEventstore) RemoveIDPProviderFromLoginPolicy(ctx context.Context, p
 }
 
 func (es *IAMEventstore) AddSecondFactorToLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.SecondFactorType) (iam_model.SecondFactorType, error) {
-	if mfa == iam_model.SecondFactorTypeUnspecified {
-		return 0, caos_errs.ThrowPreconditionFailed(nil, "EVENT-1M8Js", "Errors.IAM.LoginPolicy.MFA.Unspecified")
-	}
-	iam, err := es.IAMByID(ctx, aggregateID)
+	repoIAM, addAggregate, err := es.PrepareAddSecondFactorToLoginPolicy(ctx, aggregateID, mfa)
 	if err != nil {
 		return 0, err
 	}
-	if _, m := iam.DefaultLoginPolicy.GetSecondFactor(mfa); m != 0 {
-		return 0, caos_errs.ThrowAlreadyExists(nil, "EVENT-4Rk09", "Errors.IAM.LoginPolicy.MFA.AlreadyExists")
-	}
-	repoIam := model.IAMFromModel(iam)
-	repoMFA := model.SecondFactorFromModel(mfa)
-
-	addAggregate := LoginPolicySecondFactorAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoMFA)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoIAM.AppendEvents, addAggregate)
 	if err != nil {
 		return 0, err
 	}
-	es.iamCache.cacheIAM(repoIam)
-	if _, m := model.GetMFA(repoIam.DefaultLoginPolicy.SecondFactors, int32(mfa)); m != 0 {
+	es.iamCache.cacheIAM(repoIAM)
+	if _, m := model.GetMFA(repoIAM.DefaultLoginPolicy.SecondFactors, int32(mfa)); m != 0 {
 		return iam_model.SecondFactorType(m), nil
 	}
 	return 0, caos_errs.ThrowInternal(nil, "EVENT-5N9so", "Errors.Internal")
+}
+
+func (es *IAMEventstore) PrepareAddSecondFactorToLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.SecondFactorType) (*model.IAM, *models.Aggregate, error) {
+	if mfa == iam_model.SecondFactorTypeUnspecified {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-1M8Js", "Errors.IAM.LoginPolicy.MFA.Unspecified")
+	}
+	iam, err := es.IAMByID(ctx, aggregateID)
+	if err != nil {
+		return nil, nil, err
+	}
+	if _, m := iam.DefaultLoginPolicy.GetSecondFactor(mfa); m != 0 {
+		return nil, nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-4Rk09", "Errors.IAM.LoginPolicy.MFA.AlreadyExists")
+	}
+	repoIAM := model.IAMFromModel(iam)
+	repoMFA := model.SecondFactorFromModel(mfa)
+
+	addAggregate := LoginPolicySecondFactorAddedAggregate(es.Eventstore.AggregateCreator(), repoIAM, repoMFA)
+	aggregate, err := addAggregate(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoIAM, aggregate, nil
 }
 
 func (es *IAMEventstore) RemoveSecondFactorFromLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.SecondFactorType) error {
