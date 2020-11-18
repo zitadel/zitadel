@@ -130,7 +130,7 @@ Please check below the matrix for an overview where which scope is asserted.
 | given_name         |                                      |                                                                                               |
 | locale             |                                      |                                                                                               |
 | email              |                                      | Email Address of the subject                                                                  |
-| email_verified     | True                                 | Boolean if the mail was verfified by ZITADEL                                                  |
+| email_verified     | True                                 | Boolean if the email was verified by ZITADEL                                                  |
 | phone              |                                      |                                                                                               |
 | address            |                                      |                                                                                               |
 | gender             |                                      |                                                                                               |
