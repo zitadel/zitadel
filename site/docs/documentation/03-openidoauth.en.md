@@ -10,10 +10,10 @@ Under normal circumstances **ZITADEL** need four domain names to operate properl
 
 | Domain Name | Example             | Description                                                                                                                          |
 |:------------|:--------------------|--------------------------------------------------------------------------------------------------------------------------------------|
-| issuer      | issuer.zitadel.ch   | Provides the [OpenID Connect 1.0 Discovery Endpoint](#openid-connect-10-discovery)                                                   |
-| api         | api.zitadel.ch      | All ZITADEL API's are located under this domain see [API explanation](develop#APIs) for details                                      |
-| login       | accounts.zitadel.ch | The accounts.* page provides server renderer pages like login and register and as well the authorization_endpoint for OpenID Connect |
-| console     | console.zitadel.ch  | With the console.* domain we serve the assets for the management gui                                                                 |
+| issuer      | `issuer.zitadel.ch`   | Provides the [OpenID Connect 1.0 Discovery Endpoint](#openid-connect-10-discovery)                                                   |
+| api         | `api.zitadel.ch`      | All ZITADEL API's are located under this domain see [API explanation](develop#APIs) for details                                      |
+| login       | `accounts.zitadel.ch` | The accounts.* page provides server renderer pages like login and register and as well the authorization_endpoint for OpenID Connect |
+| console     | `console.zitadel.ch`  | With the console.* domain we serve the assets for the management gui                                                                 |
 
 #### OpenID Connect 1.0 Discovery
 
@@ -58,11 +58,21 @@ For example with [zitadel.ch](zitadel.ch) this would be the domain [issuer.zitad
 
 #### Standard Scopes
 
+| Scopes  | Example   | Description                                          |
+|:--------|:----------|------------------------------------------------------|
+| openid  | `openid`  | When using openid connect this is a mandatory scope  |
+| email   | `email`   | Optional scope to request the email of the subject   |
+| address | `address` | Optional scope to request the address of the subject |
+
+#### Custom Scopes
+
+> This feature is not yet released
+
 #### Reserved Scopes
 
 In addition to the standard compliant scopes we utilize the following scopes.
 
-| Scope   | Example    | Description    |
+| Scopes   | Example    | Description    |
 |:------------------------------------------------|:---------------|--------------------------------------------|
 | urn:zitadel:iam:org:project:role:{rolename}     | `urn:zitadel:iam:org:project:role:user` | By using this scope a [client](administrate#clients) can request the claim urn:zitadel:iam:roles:rolename} to be asserted when possible. As an alternative approach you can enable all [roles](administrate#Roles) to be asserted from the [project](administrate#projects) a [client](administrate#clients) belongs to. See details [here](administrate#RBAC_Settings) |
 | urn:zitadel:iam:org:domain:primary:{domainname} | `urn:zitadel:iam:org:domain:primary:acme.ch` |When requesting this scope **ZITADEL** will enforce that the user is a member of the selected organization. If the organization does not exist a failure is displayed |
@@ -71,7 +81,8 @@ In addition to the standard compliant scopes we utilize the following scopes.
 
 ### Claims
 
-> TODO describe how claims work
+ZITADEL asserts claims on different places according to the corresponding specifications or project and clients settings.
+Please check below the matrix for an overview where which scope is asserted.
 
 | Claims                                          | Userinfo           | ID Token                               | Access Token                             |
 |:------------------------------------------------|:-------------------|----------------------------------------|------------------------------------------|
@@ -85,36 +96,35 @@ In addition to the standard compliant scopes we utilize the following scopes.
 | exp                                             | No                 | Yes                                    | Yes when JWT                             |
 | iat                                             | No                 | Yes                                    | Yes when JWT                             |
 | nonce                                           | No                 | Yes                                    | No                                       |
-| email                                           | Yes                | Yes only when response type `id_token` | No                                       |
-| email_verified                                  | Yes                | Yes only when response type `id_token` | No                                       |
-| phone                                           | Yes                | Yes only when response type `id_token` | No                                       |
-| address                                         | Yes                | Yes only when response type `id_token` | No                                       |
+| email                                           | Yes when requested | Yes only when response type `id_token` | No                                       |
+| email_verified                                  | Yes when requested | Yes only when response type `id_token` | No                                       |
+| phone                                           | Yes when requested | Yes only when response type `id_token` | No                                       |
+| address                                         | Yes when requested | Yes only when response type `id_token` | No                                       |
 | urn:zitadel:iam:org:domain:primary:{domainname} | Yes when requested | Yes when requested                     | Yes when JWT and requested               |
-| urn:zitadel:iam:org:project:roles:{rolename}    | Yes                | Yes when requested or configured       | Yes when JWT and requested or configured |
+| urn:zitadel:iam:org:project:roles:{rolename}    | Yes when requested | Yes when requested or configured       | Yes when JWT and requested or configured |
 
 #### Standard Claims
 
-| Claims    | Example                              | Description             |
-|:----------|:-------------------------------------|-------------------------|
-| aud       |                                      | The audience claim will |
-| azp       |                                      |                         |
-| iss       | `"iss": "https://issuer.zitadel.ch"` |                         |
-| sub       |                                      |                         |
-| amr       |                                      |                         |
-| acr       | TBA                                  | TBA                     |
-| auth_time |                                      |                         |
-| exp       |                                      |                         |
-| iat       |                                      |                         |
-| nonce     |                                      |                         |
+| Claims         | Example                              | Description             |
+|:---------------|:-------------------------------------|-------------------------|
+| aud            |                                      | The audience claim will |
+| azp            |                                      |                         |
+| iss            | `"iss": "https://issuer.zitadel.ch"` |                         |
+| sub            |                                      |                         |
+| amr            |                                      |                         |
+| acr            | TBA                                  | TBA                     |
+| auth_time      |                                      |                         |
+| exp            |                                      |                         |
+| iat            |                                      |                         |
+| nonce          |                                      |                         |
+| email          |                                      |                         |
+| email_verified |                                      |                         |
+| phone          |                                      |                         |
+| address        |                                      |                         |
 
-#### Additional Claims
+#### Custom Claims
 
-| Claims         | Example | Description |
-|:---------------|:--------|-------------|
-| email          |         |             |
-| email_verified |         |             |
-| phone          |         |             |
-| address        |         |             |
+> This feature is not yet released
 
 #### Reserved Claims
 
