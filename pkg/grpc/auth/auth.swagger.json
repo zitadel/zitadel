@@ -1396,6 +1396,9 @@
         },
         "state": {
           "$ref": "#/definitions/v1MFAState"
+        },
+        "attribute": {
+          "type": "string"
         }
       }
     },

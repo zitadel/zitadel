@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
@@ -377,8 +378,9 @@ func mfasFromModel(mfas []*usr_model.MultiFactor) []*auth.MultiFactor {
 
 func mfaFromModel(mfa *usr_model.MultiFactor) *auth.MultiFactor {
 	return &auth.MultiFactor{
-		State: mfaStateFromModel(mfa.State),
-		Type:  mfaTypeFromModel(mfa.Type),
+		State:     mfaStateFromModel(mfa.State),
+		Type:      mfaTypeFromModel(mfa.Type),
+		Attribute: mfa.Attribute,
 	}
 }
 
@@ -386,7 +388,7 @@ func mfaTypeFromModel(mfatype usr_model.MfaType) auth.MfaType {
 	switch mfatype {
 	case usr_model.MfaTypeOTP:
 		return auth.MfaType_MFATYPE_OTP
-	case usr_model.MfaTypeSMS:
+	case usr_model.MfaTypeU2F:
 		return auth.MfaType_MFATYPE_SMS
 	default:
 		return auth.MfaType_MFATYPE_UNSPECIFIED

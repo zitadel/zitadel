@@ -258,10 +258,14 @@ func (repo *UserRepo) MyUserMfas(ctx context.Context) ([]*model.MultiFactor, err
 	if err != nil {
 		return nil, err
 	}
-	if user.OTPState == model.MfaStateUnspecified {
-		return []*model.MultiFactor{}, nil
+	mfas := make([]*model.MultiFactor, 0)
+	if user.OTPState != model.MfaStateUnspecified {
+		mfas = append(mfas, &model.MultiFactor{Type: model.MfaTypeOTP, State: user.OTPState})
 	}
-	return []*model.MultiFactor{{Type: model.MfaTypeOTP, State: user.OTPState}}, nil
+	for _, u2f := range user.U2FTokens {
+		mfas = append(mfas, &model.MultiFactor{Type: model.MfaTypeU2F, State: u2f.State, Attribute: u2f.Name})
+	}
+	return mfas, nil
 }
 
 func (repo *UserRepo) AddMfaOTP(ctx context.Context, userID string) (*model.OTP, error) {

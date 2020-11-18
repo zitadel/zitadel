@@ -23,8 +23,9 @@ const (
 )
 
 type MultiFactor struct {
-	Type  MfaType
-	State MfaState
+	Type      MfaType
+	State     MfaState
+	Attribute string
 }
 
 type MfaType int32
@@ -32,5 +33,5 @@ type MfaType int32
 const (
 	MfaTypeUnspecified MfaType = iota
 	MfaTypeOTP
-	MfaTypeSMS
+	MfaTypeU2F
 )

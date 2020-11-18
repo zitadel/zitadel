@@ -667,6 +667,7 @@ message MultiFactors {
 message MultiFactor {
   MfaType type = 1;
   MFAState state = 2;
+  string attribute = 3;
 }
 
 message MfaOtpResponse {

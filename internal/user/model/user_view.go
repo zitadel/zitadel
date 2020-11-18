@@ -48,11 +48,17 @@ type HumanView struct {
 	Region                  string
 	StreetAddress           string
 	OTPState                MfaState
-	U2FVerifiedIDs          []string
+	U2FTokens               []*WebAuthNView
 	PasswordLessVerifiedIDs []string
 	MfaMaxSetUp             req_model.MFALevel
 	MfaInitSkipped          time.Time
 	InitRequired            bool
+}
+
+type WebAuthNView struct {
+	TokenID string
+	Name    string
+	State   MfaState
 }
 
 type MachineView struct {
@@ -160,8 +166,11 @@ func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.L
 						types = append(types, req_model.MFATypeOTP)
 					}
 				case iam_model.SecondFactorTypeU2F:
-					if len(u.U2FVerifiedIDs) > 0 {
-						types = append(types, req_model.MFATypeU2F)
+					for _, token := range u.U2FTokens {
+						if token.State == MfaStateReady {
+							types = append(types, req_model.MFATypeU2F)
+							break
+						}
 					}
 				}
 			}
@@ -173,8 +182,11 @@ func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.L
 			for _, mfaType := range policy.MultiFactors {
 				switch mfaType {
 				case iam_model.MultiFactorTypeU2FWithPIN:
-					if len(u.U2FVerifiedIDs) > 0 {
-						types = append(types, req_model.MFATypeU2FUserVerification)
+					for _, token := range u.U2FTokens {
+						if token.State == MfaStateReady {
+							types = append(types, req_model.MFATypeU2F)
+							break
+						}
 					}
 				}
 			}

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"time"
 
@@ -85,7 +86,7 @@ type HumanView struct {
 	Region            string         `json:"region" gorm:"column:region"`
 	StreetAddress     string         `json:"streetAddress" gorm:"column:street_address"`
 	OTPState          int32          `json:"-" gorm:"column:otp_state"`
-	U2FVerifiedIDs    pq.StringArray `json:"-" gorm:"column:u2f_verified_ids"`
+	U2FTokens         WebAuthNTokens `json:"-" gorm:"column:u2f_tokens"`
 	MfaMaxSetUp       int32          `json:"-" gorm:"column:mfa_max_set_up"`
 	MfaInitSkipped    time.Time      `json:"-" gorm:"column:mfa_init_skipped"`
 	InitRequired      bool           `json:"-" gorm:"column:init_required"`
@@ -95,6 +96,31 @@ type HumanView struct {
 	UsernameChangeRequired  bool           `json:"-" gorm:"column:username_change_required"`
 	PasswordChanged         time.Time      `json:"-" gorm:"column:password_change"`
 	PasswordLessVerifiedIDs pq.StringArray `json:"-" gorm:"column:passwordless_verified_ids"`
+}
+
+type WebAuthNTokens []*WebAuthNView
+
+type WebAuthNView struct {
+	ID    string `json:"webAuthNTokenId"`
+	Name  string `json:"webAuthNTokenName"`
+	State int32  `json:"-"`
+}
+
+func (t WebAuthNTokens) Value() (driver.Value, error) {
+	if t == nil {
+		return nil, nil
+	}
+	return json.Marshal(&t)
+}
+
+func (t *WebAuthNTokens) Scan(src interface{}) error {
+	if b, ok := src.([]byte); ok {
+		return json.Unmarshal(b, t)
+	}
+	if s, ok := src.(string); ok {
+		return json.Unmarshal([]byte(s), t)
+	}
+	return nil
 }
 
 func (h *HumanView) IsZero() bool {
@@ -129,7 +155,7 @@ func UserToModel(user *UserView) *model.UserView {
 			PasswordChangeRequired:  user.PasswordChangeRequired,
 			PasswordChanged:         user.PasswordChanged,
 			PasswordLessVerifiedIDs: user.PasswordLessVerifiedIDs,
-			U2FVerifiedIDs:          user.U2FVerifiedIDs,
+			U2FTokens:               WebauthnTokensToModel(user.U2FTokens),
 			FirstName:               user.FirstName,
 			LastName:                user.LastName,
 			NickName:                user.NickName,
@@ -167,6 +193,22 @@ func UsersToModel(users []*UserView) []*model.UserView {
 		result[i] = UserToModel(p)
 	}
 	return result
+}
+
+func WebauthnTokensToModel(tokens []*WebAuthNView) []*model.WebAuthNView {
+	result := make([]*model.WebAuthNView, len(tokens))
+	for i, t := range tokens {
+		result[i] = WebauthnTokenToModel(t)
+	}
+	return result
+}
+
+func WebauthnTokenToModel(token *WebAuthNView) *model.WebAuthNView {
+	return &model.WebAuthNView{
+		TokenID: token.ID,
+		Name:    token.Name,
+		State:   model.MfaState(token.State),
+	}
 }
 
 func (u *UserView) GenerateLoginName(domain string, appendDomain bool) string {
@@ -283,25 +325,16 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	case es_model.MFAOTPRemoved,
 		es_model.HumanMFAOTPRemoved:
 		u.OTPState = int32(model.MfaStateUnspecified)
+	case es_model.HumanMFAU2FTokenAdded:
+		err = u.addU2FToken(event)
 	case es_model.HumanMFAU2FTokenVerified:
-		token := new(model.WebAuthNToken)
-		if err := json.Unmarshal(event.Data, token); err != nil {
+		err = u.updateU2FToken(event)
+		if err != nil {
 			return err
 		}
-		u.U2FVerifiedIDs = append(u.U2FVerifiedIDs, token.WebAuthNTokenID)
 		u.MfaInitSkipped = time.Time{}
 	case es_model.HumanMFAU2FTokenRemoved:
-		token := new(model.WebAuthNToken)
-		if err := json.Unmarshal(event.Data, token); err != nil {
-			return err
-		}
-		for i := len(u.U2FVerifiedIDs) - 1; i >= 0; i-- {
-			if u.U2FVerifiedIDs[i] == token.WebAuthNTokenID {
-				u.U2FVerifiedIDs[i] = u.U2FVerifiedIDs[len(u.U2FVerifiedIDs)-1]
-				u.U2FVerifiedIDs[len(u.U2FVerifiedIDs)-1] = ""
-				u.U2FVerifiedIDs = u.U2FVerifiedIDs[:len(u.U2FVerifiedIDs)-1]
-			}
-		}
+		err = u.removeU2FToken(event)
 	case es_model.MFAInitSkipped,
 		es_model.HumanMFAInitSkipped:
 		u.MfaInitSkipped = event.CreationDate
@@ -341,6 +374,59 @@ func (u *UserView) setPasswordData(event *models.Event) error {
 	return nil
 }
 
+func (u *UserView) addU2FToken(event *models.Event) error {
+	token, err := webAuthNViewFromEvent(event)
+	if err != nil {
+		return err
+	}
+	for _, t := range u.U2FTokens {
+		if t.State == int32(model.MfaStateNotReady) {
+			t = token
+			return nil
+		}
+	}
+	u.U2FTokens = append(u.U2FTokens, token)
+	return nil
+}
+
+func (u *UserView) updateU2FToken(event *models.Event) error {
+	token, err := webAuthNViewFromEvent(event)
+	if err != nil {
+		return err
+	}
+	for _, t := range u.U2FTokens {
+		if t.ID == token.ID {
+			t = token
+			return nil
+		}
+	}
+	return nil
+}
+
+func (u *UserView) removeU2FToken(event *models.Event) error {
+	token, err := webAuthNViewFromEvent(event)
+	if err != nil {
+		return err
+	}
+	for i := len(u.U2FTokens) - 1; i >= 0; i-- {
+		if u.U2FTokens[i].ID == token.ID {
+			u.U2FTokens[i] = u.U2FTokens[len(u.U2FTokens)-1]
+			u.U2FTokens[len(u.U2FTokens)-1] = nil
+			u.U2FTokens = u.U2FTokens[:len(u.U2FTokens)-1]
+		}
+	}
+	return nil
+}
+
+func webAuthNViewFromEvent(event *models.Event) (*WebAuthNView, error) {
+	token := new(WebAuthNView)
+	err := json.Unmarshal(event.Data, token)
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "MODEL-FSaq1", "could not unmarshal data")
+	}
+	return token, err
+}
+
 func (u *UserView) ComputeObject() {
 	if !u.MachineView.IsZero() {
 		if u.State == int32(model.UserStateUnspecified) {
@@ -363,9 +449,11 @@ func (u *UserView) ComputeMFAMaxSetUp() {
 		u.MfaMaxSetUp = int32(req_model.MFALevelMultiFactor)
 		return
 	}
-	if len(u.U2FVerifiedIDs) > 0 {
-		u.MfaMaxSetUp = int32(req_model.MFALevelSecondFactor)
-		return
+	for _, token := range u.U2FTokens {
+		if token.State == int32(model.MfaStateReady) {
+			u.MfaMaxSetUp = int32(req_model.MFALevelSecondFactor)
+			return
+		}
 	}
 	if u.OTPState == int32(model.MfaStateReady) {
 		u.MfaMaxSetUp = int32(req_model.MFALevelSecondFactor)

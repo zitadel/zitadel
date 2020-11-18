@@ -2197,6 +2197,8 @@ func (m *MultiFactor) Validate() error {
 
 	// no validation rules for State
 
+	// no validation rules for Attribute
+
 	return nil
 }
 
