@@ -61,8 +61,7 @@ export class AddIdpDialogComponent {
             query.setKey(IdpSearchKey.IDPSEARCHKEY_PROVIDER_TYPE);
             query.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
             query.setValue(this.idpType.toString());
-            console.log(this.idpType);
-            console.log(query.toObject());
+
             this.mgmtService.SearchIdps(undefined, undefined, [query]).then(idps => {
                 this.availableIdps = idps.toObject().resultList;
             });
