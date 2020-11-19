@@ -6,7 +6,6 @@
 @import 'src/app/modules/changes/changes.component';
 @import 'src/app/modules/detail-layout/detail-layout.component';
 @import 'src/app/pages/projects/owned-projects/owned-project-detail/application-grid/application-grid.component';
-@import 'src/app/modules/meta-layout/meta';
 @import 'src/app/pages/users/user-detail/auth-user-detail/theme-setting/theme-card';
 @import 'src/app/pages/users/user-detail/memberships/memberships.component';
 @import 'src/app/app.component.scss';
@@ -20,7 +19,6 @@
   @include application-grid-theme($theme);
   @include membership-theme($theme);
   @include changes-theme($theme);
-  @include meta-theme($theme);
   @include theme-card($theme);
   @include textvar($theme);
   @include link-theme($theme);

@@ -11,6 +11,10 @@
   $sec-dark: mat-color($primary, A800);
   /* stylelint-enable */
 
+  .meta {
+    box-shadow: inset 1px 0 #e3e8ee;
+  }
+
   .nav-item {
     color: mat-color($foreground, text) !important;
 

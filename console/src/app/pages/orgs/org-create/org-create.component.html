@@ -12,7 +12,8 @@
 
         <ng-container *ngIf="!forSelf">
             <ng-container *ngIf="currentCreateStep == 1">
-                <h1>{{'ORG.PAGES.ORGDETAIL_TITLE' | translate}}</h1>
+                <h1>{{'ORG.PAGES.ORGDETAIL_TITLE' | translate}} </h1>
+
                 <form [formGroup]="orgForm" (ngSubmit)="next()">
                     <div class="content">
                         <mat-form-field class="formfield" appearance="outline">
@@ -157,7 +158,8 @@
     <ng-template appHasRole [appHasRole]="['org.create']">
         <div *ngIf="forSelf">
             <ng-container *ngIf="currentCreateStep == 1">
-                <h1>{{'ORG.PAGES.ORGDETAIL_TITLE' | translate}}</h1>
+                <h1>{{'ORG.PAGES.ORGDETAIL_TITLE_WITHOUT_DOMAIN' | translate}} </h1>
+
                 <form [formGroup]="orgForm" (ngSubmit)="createOrgForSelf()">
                     <div class="content">
                         <mat-form-field class="formfield" appearance="outline">
