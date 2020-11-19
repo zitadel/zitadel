@@ -60,7 +60,6 @@ func SearchUserGrants(db *gorm.DB, table string, req *grant_model.UserGrantSearc
 		db = db.Where("resource_owner = ? OR project_owner = ?", orgID, orgID)
 	} else {
 		db = db.Where("resource_owner = ?", orgID)
-
 	}
 	query := repository.PrepareSearchQuery(table, model.UserGrantSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &grants)
