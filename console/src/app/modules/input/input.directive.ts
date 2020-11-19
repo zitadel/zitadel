@@ -96,6 +96,7 @@ export class InputDirective extends _CnslInputMixinBase implements MatFormFieldC
 
     @Input() errorStateMatcher!: ErrorStateMatcher;
 
+    @HostListener('focus', ['true'])
     @HostListener('blur', ['false'])
     _focusChanged(isFocused: boolean): void {
         console.log('blur');
