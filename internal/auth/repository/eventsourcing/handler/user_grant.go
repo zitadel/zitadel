@@ -186,13 +186,13 @@ func (u *UserGrant) processIAMMember(event *models.Event, rolePrefix string, suf
 		}
 		if errors.IsNotFound(err) {
 			grant = &view_model.UserGrantView{
-				ID:           u.iamProjectID + member.UserID,
-				GrantOwner:   u.iamID,
-				OrgName:      u.iamID,
-				ProjectID:    u.iamProjectID,
-				UserID:       member.UserID,
-				RoleKeys:     member.Roles,
-				CreationDate: event.CreationDate,
+				ID:            u.iamProjectID + member.UserID,
+				ResourceOwner: u.iamID,
+				OrgName:       u.iamID,
+				ProjectID:     u.iamProjectID,
+				UserID:        member.UserID,
+				RoleKeys:      member.Roles,
+				CreationDate:  event.CreationDate,
 			}
 			if suffix {
 				grant.RoleKeys = suffixRoles(event.AggregateID, grant.RoleKeys)
@@ -234,12 +234,12 @@ func (u *UserGrant) processMember(event *models.Event, rolePrefix, roleSuffix st
 		}
 		if errors.IsNotFound(err) {
 			grant = &view_model.UserGrantView{
-				ID:           u.iamProjectID + event.ResourceOwner + userID,
-				GrantOwner:   event.ResourceOwner,
-				ProjectID:    u.iamProjectID,
-				UserID:       userID,
-				RoleKeys:     roleKeys,
-				CreationDate: event.CreationDate,
+				ID:            u.iamProjectID + event.ResourceOwner + userID,
+				ResourceOwner: event.ResourceOwner,
+				ProjectID:     u.iamProjectID,
+				UserID:        userID,
+				RoleKeys:      roleKeys,
+				CreationDate:  event.CreationDate,
 			}
 			u.fillData(grant, event.ResourceOwner)
 		} else {

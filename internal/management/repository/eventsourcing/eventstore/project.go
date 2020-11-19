@@ -245,7 +245,7 @@ func (repo *ProjectRepo) RemoveProjectRole(ctx context.Context, projectID, key s
 	}
 	for _, grant := range usergrants {
 		changed := &usr_grant_model.UserGrant{
-			ObjectRoot: models.ObjectRoot{AggregateID: grant.ID, Sequence: grant.Sequence, ResourceOwner: grant.GrantOwner},
+			ObjectRoot: models.ObjectRoot{AggregateID: grant.ID, Sequence: grant.Sequence, ResourceOwner: grant.ResourceOwner},
 			RoleKeys:   grant.RoleKeys,
 			ProjectID:  grant.ProjectID,
 			UserID:     grant.UserID,
@@ -515,7 +515,7 @@ func (repo *ProjectRepo) ChangeProjectGrant(ctx context.Context, grant *proj_mod
 	}
 	for _, grant := range usergrants {
 		changed := &usr_grant_model.UserGrant{
-			ObjectRoot: models.ObjectRoot{AggregateID: grant.ID, Sequence: grant.Sequence, ResourceOwner: grant.GrantOwner},
+			ObjectRoot: models.ObjectRoot{AggregateID: grant.ID, Sequence: grant.Sequence, ResourceOwner: grant.ResourceOwner},
 			RoleKeys:   grant.RoleKeys,
 			ProjectID:  grant.ProjectID,
 			UserID:     grant.UserID,

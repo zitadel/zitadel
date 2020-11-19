@@ -32,31 +32,31 @@ func TestUserAppendEvent(t *testing.T) {
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserGrantAdded, ResourceOwner: "OrgID", Data: mockUserGrantData(&es_model.UserGrant{UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}})},
 				grant: &UserGrantView{},
 			},
-			result: &UserGrantView{ID: "AggregateID", GrantOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.UserGrantStateActive)},
+			result: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.UserGrantStateActive)},
 		},
 		{
 			name: "append change grant profile event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserGrantChanged, ResourceOwner: "OrgID", Data: mockUserGrantData(&es_model.UserGrant{RoleKeys: pq.StringArray{"KeysChanged"}})},
-				grant: &UserGrantView{ID: "AggregateID", GrantOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.UserGrantStateActive)},
+				grant: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.UserGrantStateActive)},
 			},
-			result: &UserGrantView{ID: "AggregateID", GrantOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"KeysChanged"}, State: int32(model.UserGrantStateActive)},
+			result: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"KeysChanged"}, State: int32(model.UserGrantStateActive)},
 		},
 		{
 			name: "append grant deactivate event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserGrantDeactivated, ResourceOwner: "OrgID"},
-				grant: &UserGrantView{ID: "AggregateID", GrantOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.UserGrantStateActive)},
+				grant: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.UserGrantStateActive)},
 			},
-			result: &UserGrantView{ID: "AggregateID", GrantOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.UserGrantStateInactive)},
+			result: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.UserGrantStateInactive)},
 		},
 		{
 			name: "append grant reactivate event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserGrantReactivated, ResourceOwner: "OrgID"},
-				grant: &UserGrantView{ID: "AggregateID", GrantOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.UserGrantStateInactive)},
+				grant: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.UserGrantStateInactive)},
 			},
-			result: &UserGrantView{ID: "AggregateID", GrantOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.UserGrantStateActive)},
+			result: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.UserGrantStateActive)},
 		},
 	}
 	for _, tt := range tests {
@@ -65,8 +65,8 @@ func TestUserAppendEvent(t *testing.T) {
 			if tt.args.grant.ID != tt.result.ID {
 				t.Errorf("got wrong result ID: expected: %v, actual: %v ", tt.result.ID, tt.args.grant.ID)
 			}
-			if tt.args.grant.GrantOwner != tt.result.GrantOwner {
-				t.Errorf("got wrong result ResourceOwner: expected: %v, actual: %v ", tt.result.GrantOwner, tt.args.grant.GrantOwner)
+			if tt.args.grant.ResourceOwner != tt.result.ResourceOwner {
+				t.Errorf("got wrong result ResourceOwner: expected: %v, actual: %v ", tt.result.ResourceOwner, tt.args.grant.ResourceOwner)
 			}
 			if tt.args.grant.UserID != tt.result.UserID {
 				t.Errorf("got wrong result UserID: expected: %v, actual: %v ", tt.result.UserID, tt.args.grant.UserID)
