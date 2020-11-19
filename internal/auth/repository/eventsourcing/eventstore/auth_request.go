@@ -239,7 +239,11 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 		return err
 	}
 	request.SetUserInfo(user.ID, user.PreferredLoginName, user.DisplayName, user.ResourceOwner)
-	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+	err = repo.AuthRequests.UpdateAuthRequest(ctx, request)
+	if err != nil {
+		return err
+	}
+	return repo.fillLoginPolicy(ctx, request)
 }
 
 func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, password, userAgentID string, info *model.BrowserInfo) (err error) {
