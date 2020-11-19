@@ -6,6 +6,7 @@ import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
+import { Org } from 'src/app/proto/generated/auth_pb';
 import {
     ProjectRoleView,
     SearchMethod,
@@ -15,6 +16,7 @@ import {
     UserGrantView,
 } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource';
@@ -62,6 +64,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         private userService: ManagementService,
         private mgmtService: ManagementService,
         private toast: ToastService,
+        private sessionStorage: StorageService,
     ) { }
 
     @Input() public displayedColumns: string[] = ['select',
@@ -113,6 +116,11 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
             query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
             query.setValue(filterValue);
             queries = [query];
+        }
+
+        const orgQuery = this.getOrgContextQuery();
+        if (orgQuery) {
+            queries.push(orgQuery);
         }
 
         this.dataSource.loadGrants(
@@ -192,6 +200,8 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public changePage(event?: PageEvent): void {
+        const orgQuery = this.getOrgContextQuery();
+
         this.dataSource.loadGrants(
             this.context,
             event?.pageIndex ?? this.paginator.pageIndex,
@@ -201,7 +211,19 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
                 grantId: this.grantId,
                 userId: this.userId,
             },
+            orgQuery ? [orgQuery] : [],
         );
+    }
+
+    public getOrgContextQuery(): UserGrantSearchQuery | undefined {
+        const orgContext = this.sessionStorage.getItem('organization') as Org.AsObject;
+        if (orgContext && orgContext.id) {
+            const orgContextFilter = new UserGrantSearchQuery();
+            orgContextFilter.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_ORG_ID);
+            orgContextFilter.setValue(orgContext.id);
+
+            return orgContextFilter;
+        }
     }
 
     public applyFilter(event: Event): void {
