@@ -109,8 +109,6 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 		return nil, err
 	}
 	request.Audience = appIDs
-	projectIDAud := request.GetScopeProjectIDsForAud()
-	request.Audience = append(request.Audience, projectIDAud...)
 	request.AppendAudIfNotExisting(app.ProjectID)
 	if request.LoginHint != "" {
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
@@ -624,11 +622,15 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *model.AuthRequest) (
 
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *model.AuthRequest, user *user_model.UserView) (model.NextStep, bool, error) {
 	mfaLevel := request.MfaLevel()
-	promptRequired := (user.MfaMaxSetUp < mfaLevel) || !user.HasRequiredOrgMFALevel(request.LoginPolicy)
-	if promptRequired || !repo.mfaSkippedOrSetUp(user, request.LoginPolicy) {
+	allowedProviders, required := user.MfaTypesAllowed(mfaLevel, request.LoginPolicy)
+	promptRequired := (user.MfaMaxSetUp < mfaLevel) || (len(allowedProviders) == 0 && required)
+	if promptRequired || !repo.mfaSkippedOrSetUp(user) {
 		types := user.MfaTypesSetupPossible(mfaLevel, request.LoginPolicy)
 		if promptRequired && len(types) == 0 {
 			return nil, false, errors.ThrowPreconditionFailed(nil, "LOGIN-5Hm8s", "Errors.Login.LoginPolicy.MFA.ForceAndNotConfigured")
+		}
+		if len(types) == 0 {
+			return nil, true, nil
 		}
 		return &model.MfaPromptStep{
 			Required:     promptRequired,
@@ -639,7 +641,7 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 	default:
 		fallthrough
 	case model.MFALevelNotSetUp:
-		if user.MfaMaxSetUp == model.MFALevelNotSetUp {
+		if len(allowedProviders) == 0 {
 			return nil, true, nil
 		}
 		fallthrough
@@ -658,11 +660,11 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 		}
 	}
 	return &model.MfaVerificationStep{
-		MfaProviders: user.MfaTypesAllowed(mfaLevel, request.LoginPolicy),
+		MfaProviders: allowedProviders,
 	}, false, nil
 }
 
-func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView, policy *iam_model.LoginPolicyView) bool {
+func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
 	if user.MfaMaxSetUp > model.MFALevelNotSetUp {
 		return true
 	}

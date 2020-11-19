@@ -79,8 +79,8 @@ func userGrantSearchQueryToModel(query *management.UserGrantSearchQuery) *grant_
 
 func userGrantSearchKeyToModel(key management.UserGrantSearchKey) grant_model.UserGrantSearchKey {
 	switch key {
-	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_ORG_ID:
-		return grant_model.UserGrantSearchKeyResourceOwner
+	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_WITH_GRANTED:
+		return grant_model.UserGrantSearchKeyWithGranted
 	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_PROJECT_ID:
 		return grant_model.UserGrantSearchKeyProjectID
 	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_USER_ID:

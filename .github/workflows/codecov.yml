@@ -31,7 +31,6 @@ jobs:
         tags: ${{ env.REGISTRY }}/${{ github.repository }}:coverage
         push: false
         cache-from: type=local,src=/tmp/.buildx-cache
-        cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
         target: go-codecov
         outputs: type=local,dest=.
     - uses: codecov/codecov-action@v1
