@@ -8,6 +8,11 @@ import (
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/configuration"
 )
 
+const (
+	ConsoleName  = "console-v1"
+	AccountsName = "accounts-v1"
+)
+
 func AdaptFunc(
 	monitor mntr.Monitor,
 	namespace string,
@@ -21,15 +26,12 @@ func AdaptFunc(
 ) {
 	internalMonitor := monitor.WithField("part", "ui")
 
-	consoleName := "console-v1"
-	accountsName := "accounts-v1"
-
-	destroyAcc, err := mapping.AdaptFuncToDestroy(namespace, accountsName)
+	destroyAcc, err := mapping.AdaptFuncToDestroy(namespace, AccountsName)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyConsole, err := mapping.AdaptFuncToDestroy(namespace, consoleName)
+	destroyConsole, err := mapping.AdaptFuncToDestroy(namespace, ConsoleName)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -50,7 +52,7 @@ func AdaptFunc(
 
 			queryConsole, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				consoleName,
+				ConsoleName,
 				labels,
 				false,
 				consoleDomain,
@@ -67,7 +69,7 @@ func AdaptFunc(
 
 			queryAcc, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				accountsName,
+				AccountsName,
 				labels,
 				false,
 				accountsDomain,

@@ -8,6 +8,12 @@ import (
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/configuration"
 )
 
+const (
+	AdminMName = "admin-grpc-v1"
+	AuthMName  = "auth-grpc-v1"
+	MgmtMName  = "mgmt-grpc-v1"
+)
+
 func AdaptFunc(
 	monitor mntr.Monitor,
 	namespace string,
@@ -21,19 +27,15 @@ func AdaptFunc(
 ) {
 	internalMonitor := monitor.WithField("part", "grpc")
 
-	adminMName := "admin-grpc-v1"
-	authMName := "auth-grpc-v1"
-	mgmtMName := "mgmt-grpc-v1"
-
-	destroyAdminG, err := mapping.AdaptFuncToDestroy(namespace, adminMName)
+	destroyAdminG, err := mapping.AdaptFuncToDestroy(namespace, AdminMName)
 	if err != nil {
 		return nil, nil, err
 	}
-	destroyAuthG, err := mapping.AdaptFuncToDestroy(namespace, authMName)
+	destroyAuthG, err := mapping.AdaptFuncToDestroy(namespace, AuthMName)
 	if err != nil {
 		return nil, nil, err
 	}
-	destroyMgmtGRPC, err := mapping.AdaptFuncToDestroy(namespace, mgmtMName)
+	destroyMgmtGRPC, err := mapping.AdaptFuncToDestroy(namespace, MgmtMName)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -65,7 +67,7 @@ func AdaptFunc(
 
 			queryAdminG, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				adminMName,
+				AdminMName,
 				labels,
 				true,
 				apiDomain,
@@ -82,7 +84,7 @@ func AdaptFunc(
 
 			queryAuthG, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				authMName,
+				AuthMName,
 				labels,
 				true,
 				apiDomain,
@@ -99,7 +101,7 @@ func AdaptFunc(
 
 			queryMgmtGRPC, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				mgmtMName,
+				MgmtMName,
 				labels,
 				true,
 				apiDomain,

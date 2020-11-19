@@ -8,6 +8,16 @@ import (
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/configuration"
 )
 
+const (
+	AdminRName     = "admin-rest-v1"
+	MgmtName       = "mgmt-v1"
+	OauthName      = "oauth-v1"
+	AuthRName      = "auth-rest-v1"
+	AuthorizeName  = "authorize-v1"
+	EndsessionName = "endsession-v1"
+	IssuerName     = "issuer-v1"
+)
+
 func AdaptFunc(
 	monitor mntr.Monitor,
 	namespace string,
@@ -21,45 +31,37 @@ func AdaptFunc(
 ) {
 	internalMonitor := monitor.WithField("part", "http")
 
-	adminRName := "admin-rest-v1"
-	mgmtName := "mgmt-v1"
-	oauthName := "oauth-v1"
-	authRName := "auth-rest-v1"
-	authorizeName := "authorize-v1"
-	endsessionName := "endsession-v1"
-	issuerName := "issuer-v1"
-
-	destroyAdminR, err := mapping.AdaptFuncToDestroy(namespace, adminRName)
+	destroyAdminR, err := mapping.AdaptFuncToDestroy(namespace, AdminRName)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyMgmtRest, err := mapping.AdaptFuncToDestroy(namespace, mgmtName)
+	destroyMgmtRest, err := mapping.AdaptFuncToDestroy(namespace, MgmtName)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyOAuthv2, err := mapping.AdaptFuncToDestroy(namespace, oauthName)
+	destroyOAuthv2, err := mapping.AdaptFuncToDestroy(namespace, OauthName)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyAuthR, err := mapping.AdaptFuncToDestroy(namespace, authRName)
+	destroyAuthR, err := mapping.AdaptFuncToDestroy(namespace, AuthRName)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyAuthorize, err := mapping.AdaptFuncToDestroy(namespace, authorizeName)
+	destroyAuthorize, err := mapping.AdaptFuncToDestroy(namespace, AuthorizeName)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyEndsession, err := mapping.AdaptFuncToDestroy(namespace, endsessionName)
+	destroyEndsession, err := mapping.AdaptFuncToDestroy(namespace, EndsessionName)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyIssuer, err := mapping.AdaptFuncToDestroy(namespace, issuerName)
+	destroyIssuer, err := mapping.AdaptFuncToDestroy(namespace, IssuerName)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -95,7 +97,7 @@ func AdaptFunc(
 
 			queryAdminR, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				adminRName,
+				AdminRName,
 				labels,
 				false,
 				apiDomain,
@@ -112,7 +114,7 @@ func AdaptFunc(
 
 			queryMgmtRest, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				mgmtName,
+				MgmtName,
 				labels,
 				false,
 				apiDomain,
@@ -129,7 +131,7 @@ func AdaptFunc(
 
 			queryOAuthv2, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				oauthName,
+				OauthName,
 				labels,
 				false,
 				apiDomain,
@@ -146,7 +148,7 @@ func AdaptFunc(
 
 			queryAuthR, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				authRName,
+				AuthRName,
 				labels,
 				false,
 				apiDomain,
@@ -163,7 +165,7 @@ func AdaptFunc(
 
 			queryAuthorize, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				authorizeName,
+				AuthorizeName,
 				labels,
 				false,
 				accountsDomain,
@@ -180,7 +182,7 @@ func AdaptFunc(
 
 			queryEndsession, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				endsessionName,
+				EndsessionName,
 				labels,
 				false,
 				accountsDomain,
@@ -197,7 +199,7 @@ func AdaptFunc(
 
 			queryIssuer, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				issuerName,
+				IssuerName,
 				labels,
 				false,
 				issuerDomain,
