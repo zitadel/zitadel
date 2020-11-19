@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/authz"
 	caos_errors "github.com/caos/zitadel/internal/errors"

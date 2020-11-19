@@ -272,7 +272,7 @@ func mergeOrgAndAdminGrant(ctxData authz.CtxData, orgGrant, iamAdminGrant *model
 		if iamAdminGrant != nil {
 			roles = addIamAdminRoles(roles, iamAdminGrant.RoleKeys)
 		}
-		grant = &authz.Grant{OrgID: orgGrant.ResourceOwner, Roles: roles}
+		grant = &authz.Grant{OrgID: orgGrant.GrantOwner, Roles: roles}
 	} else if iamAdminGrant != nil {
 		grant = &authz.Grant{
 			OrgID: ctxData.OrgID,

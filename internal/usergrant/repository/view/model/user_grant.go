@@ -33,7 +33,7 @@ const (
 
 type UserGrantView struct {
 	ID               string         `json:"-" gorm:"column:id;primary_key"`
-	ResourceOwner    string         `json:"-" gorm:"resource_owner"`
+	GrantOwner       string         `json:"-" gorm:"grant_owner"`
 	UserID           string         `json:"userId" gorm:"user_id"`
 	ProjectID        string         `json:"projectId" gorm:"column:project_id"`
 	GrantID          string         `json:"grantId" gorm:"column:grant_id"`
@@ -43,6 +43,7 @@ type UserGrantView struct {
 	DisplayName      string         `json:"-" gorm:"column:display_name"`
 	Email            string         `json:"-" gorm:"column:email"`
 	ProjectName      string         `json:"-" gorm:"column:project_name"`
+	ProjectOwner     string         `json:"-" gorm:"column:project_owner"`
 	OrgName          string         `json:"-" gorm:"column:org_name"`
 	OrgPrimaryDomain string         `json:"-" gorm:"column:org_primary_domain"`
 	RoleKeys         pq.StringArray `json:"roleKeys" gorm:"column:role_keys"`
@@ -57,7 +58,7 @@ type UserGrantView struct {
 func UserGrantToModel(grant *UserGrantView) *model.UserGrantView {
 	return &model.UserGrantView{
 		ID:               grant.ID,
-		ResourceOwner:    grant.ResourceOwner,
+		ResourceOwner:    grant.GrantOwner,
 		UserID:           grant.UserID,
 		ProjectID:        grant.ProjectID,
 		ChangeDate:       grant.ChangeDate,
@@ -106,7 +107,7 @@ func (g *UserGrantView) AppendEvent(event *models.Event) (err error) {
 
 func (u *UserGrantView) setRootData(event *models.Event) {
 	u.ID = event.AggregateID
-	u.ResourceOwner = event.ResourceOwner
+	u.GrantOwner = event.ResourceOwner
 }
 
 func (u *UserGrantView) setData(event *models.Event) error {
