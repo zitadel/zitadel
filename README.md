@@ -51,6 +51,8 @@ Details need to be announced, but feel free to contribute already. As long as yo
 
 We already have documentation specific [guidelines](./site/CONTRIBUTING.md).
 
+Howto develop ZITADEL: [contribute](./CONTRIBUTING.md)
+
 ## Security
 
 See the policy [here](./SECURITY.md)
@@ -60,4 +62,3 @@ See the policy [here](./SECURITY.md)
 See the exact licensing terms [here](./LICENSE)
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
-

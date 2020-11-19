@@ -125,8 +125,15 @@ github.com/caos/logging v0.0.2/go.mod h1:9LKiDE2ChuGv6CHYif/kiugrfEXu9AwDiFWSreX
 github.com/caos/oidc v0.6.2/go.mod h1:ozoi3b+aY33gzdvjz4w90VZShIHGsmDa0goruuV0arQ=
 github.com/caos/oidc v0.12.4 h1:E6E+LcnVQFHzOSN8GnTfJGgXWiDYtdKu/Xm2+YC/xFk=
 github.com/caos/oidc v0.12.4/go.mod h1:dLvfYUiAt9ORfl77L/KkcWuR/N0ll8Ry1nD2ERsamDY=
+github.com/caos/oidc v0.12.5 h1:BN3iu6ZokOIbuoOkLRX/tAZPAfVoTXIkYflKmV156U8=
+github.com/caos/oidc v0.12.5/go.mod h1:dLvfYUiAt9ORfl77L/KkcWuR/N0ll8Ry1nD2ERsamDY=
 github.com/caos/orbos v1.0.7-0.20201103151833-6ead82b08a6a h1:IOuBvgpTLsuy1lZlGmRIcrrH7QfuOdmPvpOpTEa24ak=
 github.com/caos/orbos v1.0.7-0.20201103151833-6ead82b08a6a/go.mod h1:ztVj3ecXz+OEZ5+3UHWIoox3QSDfK/H59rgHbKfFRlc=
+github.com/caos/orbos v1.3.2-0.20201119163358-c34ee9491806 h1:gdMH6MNuJob0odl6+uss/pYvnIDFw6m4tBm5HZFW7fs=
+github.com/caos/orbos v1.3.2-0.20201119163358-c34ee9491806/go.mod h1:k4bDlmxdDinQJUen+yrwTp/XedvRB3yX0JonA+dv+kg=
+github.com/caos/orbos v1.3.2-0.20201119164747-e7f1303ee34c h1:YWDbqRa5l+nIGbUkJriqsNEXJ+GXgfUsj0aQGM5MW1o=
+github.com/caos/orbos v1.3.2-0.20201119164747-e7f1303ee34c/go.mod h1:k4bDlmxdDinQJUen+yrwTp/XedvRB3yX0JonA+dv+kg=
+github.com/caos/orbos v1.5.0 h1:8tvq7tQiQeSKnjotGL+N5gjMEUYs8ULxMMxr+gLyNxg=
 github.com/census-instrumentation/opencensus-proto v0.2.1 h1:glEXhBS5PSLLv4IXzLA5yPRVX4bilULVyxxbrfOtDAk=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=

@@ -41,3 +41,6 @@ cmd/zitadel/zitadel
 # buildfolders and generated js
 tmp/
 console/src/app/proto/generated/
+
+pkg/grpc/*/*.pb.*
+pkg/grpc/*/*.swagger.json

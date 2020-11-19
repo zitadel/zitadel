@@ -243,9 +243,9 @@ func CodeChallengeToOIDC(challenge *model.OIDCCodeChallenge) *oidc.CodeChallenge
 	}
 }
 
-func AMRFromMFAType(mfaType model.MfaType) string {
+func AMRFromMFAType(mfaType model.MFAType) string {
 	switch mfaType {
-	case model.MfaTypeOTP:
+	case model.MFATypeOTP:
 		return amrOTP
 	default:
 		return ""

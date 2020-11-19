@@ -2,10 +2,11 @@
     a {
         display: flex;
         align-items: center;
-        color: var(--text);
+        color: white;
         text-decoration: none;
         border: none;
         padding: 0;
+        font-size: 14px;
     }
 
     a:hover {

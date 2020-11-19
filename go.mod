@@ -1,6 +1,6 @@
 module github.com/caos/zitadel
 
-go 1.14
+go 1.15
 
 require (
 	cloud.google.com/go v0.70.0 // indirect
@@ -16,11 +16,11 @@ require (
 	github.com/aws/aws-sdk-go v1.35.11 // indirect
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.12.4
-	github.com/caos/orbos v1.0.7-0.20201103151833-6ead82b08a6a
+	github.com/caos/oidc v0.12.5
+	github.com/caos/orbos v1.3.2-0.20201119164747-e7f1303ee34c
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/cockroachdb/cockroach-go/v2 v2.0.8
-	github.com/envoyproxy/protoc-gen-validate v0.4.1
+	github.com/envoyproxy/protoc-gen-validate v0.4.1 // indirect
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.4.4
@@ -64,7 +64,7 @@ require (
 	golang.org/x/text v0.3.4
 	golang.org/x/tools v0.0.0-20201021000207-d49c4edd7d96
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20201019141844-1ed22bb0c154
+	google.golang.org/genproto v0.0.0-20201019141844-1ed22bb0c154 // indirect
 	google.golang.org/grpc v1.33.1
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/square/go-jose.v2 v2.5.1
@@ -74,5 +74,3 @@ require (
 	k8s.io/apiextensions-apiserver v0.18.5
 	k8s.io/apimachinery v0.18.5
 )
-
-replace github.com/caos/orbos => /Users/benz/go/src/github.com/caos/orbos
