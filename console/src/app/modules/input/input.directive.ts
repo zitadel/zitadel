@@ -32,7 +32,7 @@ const MAT_INPUT_INVALID_TYPES = [
     'radio',
     'range',
     'reset',
-    'submit'
+    'submit',
 ];
 
 let nextUniqueId = 0;
@@ -112,7 +112,7 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
      * Implemented as part of MatFormFieldControl.
      * @docs-private
      */
-    autofilled = false;
+    autofilled: boolean = false;
 
     /**
      * Implemented as part of MatFormFieldControl.
@@ -135,7 +135,7 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
             this.stateChanges.next();
         }
     }
-    protected _disabled = false;
+    protected _disabled: boolean = false;
 
     /**
      * Implemented as part of MatFormFieldControl.
@@ -159,7 +159,7 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
     @Input()
     get required(): boolean { return this._required; }
     set required(value: boolean) { this._required = coerceBooleanProperty(value); }
-    protected _required = false;
+    protected _required: boolean = false;
 
     /** Input type of the element. */
     @Input()
@@ -175,7 +175,7 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
             (this._elementRef.nativeElement as HTMLInputElement).type = this._type;
         }
     }
-    protected _type = 'text';
+    protected _type: string = 'text';
 
     /** An object used to control when error messages are shown. */
     @Input() errorStateMatcher!: ErrorStateMatcher;
@@ -184,6 +184,7 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
      * Implemented as part of MatFormFieldControl.
      * @docs-private
      */
+    // tslint:disable-next-line:no-input-rename
     @Input('aria-describedby') userAriaDescribedBy!: string;
 
     /**
@@ -203,15 +204,15 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
     @Input()
     get readonly(): boolean { return this._readonly; }
     set readonly(value: boolean) { this._readonly = coerceBooleanProperty(value); }
-    private _readonly = false;
+    private _readonly: boolean = false;
 
-    protected _neverEmptyInputTypes = [
+    protected _neverEmptyInputTypes: string[] = [
         'date',
         'datetime',
         'datetime-local',
         'month',
         'time',
-        'week'
+        'week',
     ].filter(t => getSupportedInputTypes().has(t));
 
     constructor(
@@ -249,7 +250,7 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
         if (_platform.IOS) {
             ngZone.runOutsideAngular(() => {
                 _elementRef.nativeElement.addEventListener('keyup', (event: Event) => {
-                    let el = event.target as HTMLInputElement;
+                    const el: HTMLInputElement = event.target as HTMLInputElement;
                     if (!el.value && !el.selectionStart && !el.selectionEnd) {
                         // Note: Just setting `0, 0` doesn't fix the issue. Setting
                         // `1, 1` fixes it for the first time that you type text and
@@ -272,7 +273,7 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
         }
     }
 
-    ngAfterViewInit() {
+    ngAfterViewInit(): void {
         if (this._platform.isBrowser) {
             this._autofillMonitor.monitor(this._elementRef.nativeElement).subscribe(event => {
                 this.autofilled = event.isAutofilled;
@@ -281,11 +282,11 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
         }
     }
 
-    ngOnChanges() {
+    ngOnChanges(): void {
         this.stateChanges.next();
     }
 
-    ngOnDestroy() {
+    ngOnDestroy(): void {
         this.stateChanges.complete();
 
         if (this._platform.isBrowser) {
@@ -293,7 +294,7 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
         }
     }
 
-    ngDoCheck() {
+    ngDoCheck(): void {
         if (this.ngControl) {
             // We need to re-evaluate this on every change detection cycle, because there are some
             // error triggers that we can't subscribe to (e.g. parent form submissions). This means
@@ -325,7 +326,7 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
     @HostListener('focus', ['true'])
     @HostListener('blur', ['false'])
     // tslint:enable:no-host-decorator-in-concrete
-    _focusChanged(isFocused: boolean) {
+    _focusChanged(isFocused: boolean): void {
         if (isFocused !== this.focused && (!this.readonly || !isFocused)) {
             this.focused = isFocused;
             this.stateChanges.next();
@@ -338,7 +339,7 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
     // TODO(crisbeto): we move this back into `host` once Ivy is turned on by default.
     // tslint:disable-next-line:no-host-decorator-in-concrete
     @HostListener('input')
-    _onInput() {
+    _onInput(): void {
         // This is a noop function and is used to let Angular know whenever the value changes.
         // Angular will run a new change detection each time the `input` event has been dispatched.
         // It's necessary that Angular recognizes the value change, because when floatingLabel
@@ -349,7 +350,7 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
     }
 
     /** Does some manual dirty checking on the native input `placeholder` attribute. */
-    private _dirtyCheckPlaceholder() {
+    private _dirtyCheckPlaceholder(): void {
         // If we're hiding the native placeholder, it should also be cleared from the DOM, otherwise
         // screen readers will read it out twice: once from the label and once from the attribute.
         // TODO: can be removed once we get rid of the `legacy` style for the form field, because it's
@@ -364,7 +365,7 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
     }
 
     /** Does some manual dirty checking on the native input `value` property. */
-    protected _dirtyCheckNativeValue() {
+    protected _dirtyCheckNativeValue(): void {
         const newValue = this._elementRef.nativeElement.value;
 
         if (this._previousNativeValue !== newValue) {
@@ -374,21 +375,21 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
     }
 
     /** Make sure the input is a supported type. */
-    protected _validateType() {
+    protected _validateType(): void {
         if (MAT_INPUT_INVALID_TYPES.indexOf(this._type) > -1) {
             throw getMatInputUnsupportedTypeError(this._type);
         }
     }
 
     /** Checks whether the input type is one of the types that are never empty. */
-    protected _isNeverEmpty() {
+    protected _isNeverEmpty(): boolean {
         return this._neverEmptyInputTypes.indexOf(this._type) > -1;
     }
 
     /** Checks whether the input is invalid based on the native validation. */
-    protected _isBadInput() {
+    protected _isBadInput(): boolean {
         // The `validity` property won't be present on platform-server.
-        let validity = (this._elementRef.nativeElement as HTMLInputElement).validity;
+        const validity = (this._elementRef.nativeElement as HTMLInputElement).validity;
         return validity && validity.badInput;
     }
 
@@ -426,7 +427,7 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
      * Implemented as part of MatFormFieldControl.
      * @docs-private
      */
-    setDescribedByIds(ids: string[]) {
+    setDescribedByIds(ids: string[]): void {
         if (ids.length) {
             this._elementRef.nativeElement.setAttribute('aria-describedby', ids.join(' '));
         } else {
@@ -438,7 +439,7 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
      * Implemented as part of MatFormFieldControl.
      * @docs-private
      */
-    onContainerClick() {
+    onContainerClick(): void {
         // Do not re-focus the input element if the element is already focused. Otherwise it can happen
         // that someone clicks on a time input and the cursor resets to the "hours" field while the
         // "minutes" field was actually clicked. See: https://github.com/angular/components/issues/12849
@@ -446,7 +447,7 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
             this.focus();
         }
     }
-
+    // tslint:disable
     static ngAcceptInputType_disabled: BooleanInput;
     static ngAcceptInputType_readonly: BooleanInput;
     static ngAcceptInputType_required: BooleanInput;
@@ -454,4 +455,5 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
     // Accept `any` to avoid conflicts with other directives on `<input>` that may
     // accept different types.
     static ngAcceptInputType_value: any;
+    // tslint:enable
 }
