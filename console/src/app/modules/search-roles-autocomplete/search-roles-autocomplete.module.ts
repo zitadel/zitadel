@@ -7,7 +7,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslateModule } from '@ngx-translate/core';
-import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 
 import { SearchRolesAutocompleteComponent } from './search-roles-autocomplete.component';
 
@@ -19,7 +19,7 @@ import { SearchRolesAutocompleteComponent } from './search-roles-autocomplete.co
         MatAutocompleteModule,
         MatChipsModule,
         MatButtonModule,
-        FormFieldModule,
+        InputModule,
         MatIconModule,
         ReactiveFormsModule,
         MatProgressSpinnerModule,

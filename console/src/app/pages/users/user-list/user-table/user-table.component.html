@@ -2,7 +2,7 @@
     [timestamp]="userResult?.viewTimestamp" [selection]="selection"
     [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes">
     <cnsl-form-field @appearfade *ngIf="userSearchKey != undefined" actions class="filtername">
-        <input (keyup)="applyFilter($event)"
+        <input cnslInput (keyup)="applyFilter($event)"
             [placeholder]="('USER.TABLE.FILTER.' + userSearchKey.toString()) | translate" #input>
     </cnsl-form-field>
 

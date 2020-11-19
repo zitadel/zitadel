@@ -18,7 +18,7 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
-import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { PolicyGridModule } from 'src/app/modules/policy-grid/policy-grid.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
@@ -49,7 +49,7 @@ import { IamComponent } from './iam.component';
         MatTabsModule,
         MatTableModule,
         MatPaginatorModule,
-        FormFieldModule,
+        InputModule,
         MatSortModule,
         MatTooltipModule,
         ReactiveFormsModule,

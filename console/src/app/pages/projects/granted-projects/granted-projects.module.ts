@@ -18,7 +18,7 @@ import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/memb
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
-import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
@@ -52,7 +52,7 @@ import { GrantedProjectsComponent } from './granted-projects.component';
         HasRoleModule,
         MatTableModule,
         MatPaginatorModule,
-        FormFieldModule,
+        InputModule,
         ChangesModule,
         MatIconModule,
         MatSelectModule,

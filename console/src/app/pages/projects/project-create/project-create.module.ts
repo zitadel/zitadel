@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
-import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 
 import { ProjectCreateRoutingModule } from './project-create-routing.module';
 import { ProjectCreateComponent } from './project-create.component';
@@ -17,7 +17,7 @@ import { ProjectCreateComponent } from './project-create.component';
         ProjectCreateRoutingModule,
         CommonModule,
         FormsModule,
-        FormFieldModule,
+        InputModule,
         MatButtonModule,
         MatIconModule,
         TranslateModule,

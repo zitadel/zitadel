@@ -7,7 +7,8 @@
 
         <cnsl-form-field @appearfade *ngIf="orgSearchKey != undefined" actions class="filter">
             <cnsl-label>{{'ORG.PAGES.FILTER' | translate}}</cnsl-label>
-            <input (keyup)="applyFilter($event)" placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}" #input>
+            <input cnslInput (keyup)="applyFilter($event)" placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}"
+                #input>
         </cnsl-form-field>
 
         <table [dataSource]="dataSource" mat-table class="table" matSort aria-label="Elements">

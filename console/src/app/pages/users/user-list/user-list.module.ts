@@ -13,7 +13,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 import { CardModule } from 'src/app/modules/card/card.module';
-import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
@@ -47,7 +47,7 @@ import { UserTableComponent } from './user-table/user-table.component';
         TranslateModule,
         SharedModule,
         RefreshTableModule,
-        FormFieldModule,
+        InputModule,
     ],
     exports: [
         UserListComponent,

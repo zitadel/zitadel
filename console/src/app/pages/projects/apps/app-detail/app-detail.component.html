@@ -27,7 +27,7 @@
 
                 <cnsl-form-field class="formfield">
                     <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>
-                    <input formControlName="name" />
+                    <input cnslInput formControlName="name" />
                 </cnsl-form-field>
 
                 <p class="docs-line" *ngIf="docs?.discoveryEndpoint">Discovery Endpoint: {{docs.discoveryEndpoint}}</p>
@@ -56,7 +56,7 @@
             <div class="content">
                 <cnsl-form-field class="formfield" appearance="outline">
                     <cnsl-label>{{ 'APP.OIDC.CLIENTID' | translate }}</cnsl-label>
-                    <input formControlName="clientId" />
+                    <input cnslInput formControlName="clientId" />
                 </cnsl-form-field>
 
                 <cnsl-form-field class="formfield" appearance="outline">
@@ -142,9 +142,9 @@
                             {{redirect}}
                             <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
                         </mat-chip>
-                        <input [matChipInputFor]="chipRedirectList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                            [matChipInputAddOnBlur]="addOnBlur" [formControl]="redirectControl"
-                            (matChipInputTokenEnd)="add($event, RedirectType.REDIRECT)">
+                        <input cnslInput [matChipInputFor]="chipRedirectList"
+                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
+                            [formControl]="redirectControl" (matChipInputTokenEnd)="add($event, RedirectType.REDIRECT)">
                     </mat-chip-list>
                 </cnsl-form-field>
 
@@ -161,7 +161,7 @@
                             {{redirect}}
                             <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
                         </mat-chip>
-                        <input [matChipInputFor]="chipPostRedirectList"
+                        <input cnslInput [matChipInputFor]="chipPostRedirectList"
                             [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
                             (matChipInputTokenEnd)="add($event, RedirectType.POSTREDIRECT)"
                             [formControl]="postRedirectControl">

@@ -4,12 +4,12 @@
     <div class="content" *ngIf="labelData">
         <cnsl-form-field class="form-field" appearance="outline">
             <cnsl-label>{{'POLICY.LABEL.PRIMARYCOLOR' | translate}}</cnsl-label>
-            <input [(ngModel)]="labelData.primaryColor" />
+            <input cnslInput [(ngModel)]="labelData.primaryColor" />
         </cnsl-form-field>
 
         <cnsl-form-field class="form-field" appearance="outline">
             <cnsl-label>{{'POLICY.LABEL.SECONDARYCOLOR' | translate}}</cnsl-label>
-            <input [(ngModel)]="labelData.secondaryColor" />
+            <input cnslInput [(ngModel)]="labelData.secondaryColor" />
         </cnsl-form-field>
     </div>
 

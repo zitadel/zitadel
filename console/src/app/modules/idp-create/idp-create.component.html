@@ -18,22 +18,22 @@
             <div class="content">
                 <cnsl-form-field appearance="outline" class="formfield">
                     <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
-                    <input formControlName="name" />
+                    <input cnslInput formControlName="name" />
                 </cnsl-form-field>
                 <cnsl-form-field appearance="outline" class="formfield">
                     <cnsl-label>{{ 'IDP.ISSUER' | translate }}</cnsl-label>
-                    <input formControlName="issuer" />
+                    <input cnslInput formControlName="issuer" />
                 </cnsl-form-field>
             </div>
             <div class="content">
                 <p class="desc">Client Id / Client Secret</p>
                 <cnsl-form-field appearance="outline" class="formfield">
                     <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
-                    <input formControlName="clientId" />
+                    <input cnslInput formControlName="clientId" />
                 </cnsl-form-field>
                 <cnsl-form-field appearance="outline" class="formfield">
                     <cnsl-label>{{ 'IDP.CLIENTSECRET' | translate }}</cnsl-label>
-                    <input formControlName="clientSecret" />
+                    <input cnslInput formControlName="clientSecret" />
                 </cnsl-form-field>
             </div>
             <div class="content">
@@ -44,8 +44,9 @@
                             (removed)="removeScope(scope)">
                             {{scope}} <mat-icon matChipRemove>cancel</mat-icon>
                         </mat-chip>
-                        <input [matChipInputFor]="chipScopesList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                            [matChipInputAddOnBlur]="true" (matChipInputTokenEnd)="addScope($event)">
+                        <input cnslInput [matChipInputFor]="chipScopesList"
+                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
+                            (matChipInputTokenEnd)="addScope($event)">
                     </mat-chip-list>
                 </cnsl-form-field>
             </div>

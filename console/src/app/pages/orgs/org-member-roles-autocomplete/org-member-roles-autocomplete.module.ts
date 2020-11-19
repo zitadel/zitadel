@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
-import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 
 import { OrgMemberRolesAutocompleteComponent } from './org-member-roles-autocomplete.component';
 
@@ -16,7 +16,7 @@ import { OrgMemberRolesAutocompleteComponent } from './org-member-roles-autocomp
         CommonModule,
         MatButtonModule,
         MatSelectModule,
-        FormFieldModule,
+        InputModule,
         MatIconModule,
         ReactiveFormsModule,
         MatProgressSpinnerModule,

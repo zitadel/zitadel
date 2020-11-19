@@ -6,11 +6,11 @@
                 <div class="content">
                     <cnsl-form-field appearance="outline" class="formfield">
                         <cnsl-label>{{ 'IDP.ID' | translate }}</cnsl-label>
-                        <input formControlName="id" />
+                        <input cnslInput formControlName="id" />
                     </cnsl-form-field>
                     <cnsl-form-field appearance="outline" class="formfield">
                         <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
-                        <input formControlName="name" />
+                        <input cnslInput formControlName="name" />
                     </cnsl-form-field>
                     <cnsl-form-field class="formfield" appearance="outline">
                         <cnsl-label>{{ 'IDP.STYLE' | translate }}</cnsl-label>
@@ -40,11 +40,11 @@
                     <div class="content">
                         <cnsl-form-field appearance="outline" class="formfield">
                             <cnsl-label>{{ 'IDP.ISSUER' | translate }}</cnsl-label>
-                            <input formControlName="issuer" />
+                            <input cnslInput formControlName="issuer" />
                         </cnsl-form-field>
                         <cnsl-form-field appearance="outline" class="formfield">
                             <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
-                            <input formControlName="clientId" />
+                            <input cnslInput formControlName="clientId" />
                         </cnsl-form-field>
                         <mat-checkbox class="desc" [(ngModel)]="showIdSecretSection"
                             [ngModelOptions]="{standalone: true}">
@@ -52,7 +52,7 @@
                         </mat-checkbox>
                         <cnsl-form-field appearance="outline" class="formfield" *ngIf="showIdSecretSection">
                             <cnsl-label>{{ 'IDP.CLIENTSECRET' | translate }}</cnsl-label>
-                            <input formControlName="clientSecret" />
+                            <input cnslInput formControlName="clientSecret" />
                         </cnsl-form-field>
                         <cnsl-form-field appearance="outline" class="formfield fullwidth">
                             <cnsl-label>{{ 'IDP.SCOPESLIST' | translate }}</cnsl-label>
@@ -61,7 +61,7 @@
                                     removable (removed)="removeScope(scope)">
                                     {{scope}} <mat-icon matChipRemove>cancel</mat-icon>
                                 </mat-chip>
-                                <input [matChipInputFor]="chipScopesList"
+                                <input cnslInput [matChipInputFor]="chipScopesList"
                                     [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
                                     (matChipInputTokenEnd)="addScope($event)">
                             </mat-chip-list>

@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
 import { CardModule } from 'src/app/modules/card/card.module';
-import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 import {
     SearchProjectAutocompleteModule,
 } from 'src/app/modules/search-project-autocomplete/search-project-autocomplete.module';
@@ -27,7 +27,7 @@ import { UserGrantCreateComponent } from './user-grant-create.component';
         MatIconModule,
         TranslateModule,
         CardModule,
-        FormFieldModule,
+        InputModule,
         MatSelectModule,
         SearchProjectAutocompleteModule,
         SearchUserAutocompleteModule,

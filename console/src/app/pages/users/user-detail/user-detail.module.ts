@@ -18,7 +18,7 @@ import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/memb
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
-import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { PasswordComplexityViewModule } from 'src/app/modules/password-complexity-view/password-complexity-view.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
@@ -82,7 +82,6 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         ShowKeyDialogModule,
         MatCheckboxModule,
         HasRolePipeModule,
-        FormFieldModule,
         UserGrantsModule,
         MatButtonModule,
         MatIconModule,
@@ -102,6 +101,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         MemberCreateDialogModule,
         TimestampToDatePipeModule,
         LocalizedDatePipeModule,
+        InputModule,
     ],
 })
 export class UserDetailModule { }

@@ -6,15 +6,15 @@
     <form *ngIf="formGroup" class="full-width" [formGroup]="formGroup" (ngSubmit)="submitForm()">
         <cnsl-form-field class="formfield" appearance="outline">
             <cnsl-label>{{ 'PROJECT.ROLE.KEY' | translate }}</cnsl-label>
-            <input formControlName="key" />
+            <input cnslInput formControlName="key" />
         </cnsl-form-field>
         <cnsl-form-field class="formfield" appearance="outline">
             <cnsl-label>{{ 'PROJECT.ROLE.DISPLAY_NAME' | translate }}</cnsl-label>
-            <input formControlName="displayName" />
+            <input cnslInput formControlName="displayName" />
         </cnsl-form-field>
         <cnsl-form-field class="formfield" appearance="outline">
             <cnsl-label>{{ 'PROJECT.ROLE.GROUP' | translate }}</cnsl-label>
-            <input formControlName="group" />
+            <input cnslInput formControlName="group" />
         </cnsl-form-field>
     </form>
 </div>

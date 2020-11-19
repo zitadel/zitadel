@@ -8,7 +8,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
-import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 
 import { PasswordLockoutPolicyRoutingModule } from './password-lockout-policy-routing.module';
 import { PasswordLockoutPolicyComponent } from './password-lockout-policy.component';
@@ -19,7 +19,7 @@ import { PasswordLockoutPolicyComponent } from './password-lockout-policy.compon
         PasswordLockoutPolicyRoutingModule,
         CommonModule,
         FormsModule,
-        FormFieldModule,
+        InputModule,
         MatButtonModule,
         MatSlideToggleModule,
         MatIconModule,

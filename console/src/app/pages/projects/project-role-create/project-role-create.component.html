@@ -17,15 +17,15 @@
             <ng-container [formGroup]="formGroup">
                 <cnsl-form-field appearance="outline" class="formfield">
                     <cnsl-label>{{ 'PROJECT.ROLE.KEY' | translate }}</cnsl-label>
-                    <input formControlName="key" />
+                    <input cnslInput formControlName="key" />
                 </cnsl-form-field>
                 <cnsl-form-field appearance="outline" class="formfield">
                     <cnsl-label>{{ 'PROJECT.ROLE.DISPLAY_NAME' | translate }}</cnsl-label>
-                    <input formControlName="displayName" />
+                    <input cnslInput formControlName="displayName" />
                 </cnsl-form-field>
                 <cnsl-form-field appearance="outline" class="formfield">
                     <cnsl-label>{{ 'PROJECT.ROLE.GROUP' | translate }}</cnsl-label>
-                    <input formControlName="group" />
+                    <input cnslInput formControlName="group" />
                 </cnsl-form-field>
                 <button *ngIf="i !== 0" mat-icon-button (click)="removeEntry(i)" type="button" color="warn"
                     matTooltip="{{ 'ACTIONS.REMOVE' | translate }}">

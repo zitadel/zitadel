@@ -8,7 +8,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
-import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 
 import { IdpCreateRoutingModule } from './idp-create-routing.module';
 import { IdpCreateComponent } from './idp-create.component';
@@ -20,7 +20,7 @@ import { IdpCreateComponent } from './idp-create.component';
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
-        FormFieldModule,
+        InputModule,
         MatButtonModule,
         MatSelectModule,
         MatIconModule,

@@ -9,7 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
-import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 
 import { IdpRoutingModule } from './idp-routing.module';
 import { IdpComponent } from './idp.component';
@@ -21,7 +21,7 @@ import { IdpComponent } from './idp.component';
         IdpRoutingModule,
         FormsModule,
         ReactiveFormsModule,
-        FormFieldModule,
+        InputModule,
         MatButtonModule,
         MatIconModule,
         MatTooltipModule,

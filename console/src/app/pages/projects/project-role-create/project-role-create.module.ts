@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
-import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 
 import { ProjectRoleCreateRoutingModule } from './project-role-create-routing.module';
 import { ProjectRoleCreateComponent } from './project-role-create.component';
@@ -17,7 +17,7 @@ import { ProjectRoleCreateComponent } from './project-role-create.component';
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
-        FormFieldModule,
+        InputModule,
         MatButtonModule,
         MatIconModule,
         MatTooltipModule,

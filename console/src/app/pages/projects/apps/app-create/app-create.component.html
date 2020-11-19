@@ -23,8 +23,8 @@
                 <p class="step-title">{{'APP.OIDC.TITLEFIRST' | translate}}</p>
                 <cnsl-form-field appearance="outline" class="formfield">
                     <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>
-                    <input formControlName="name" />
-                    <span cnslError *ngIf="name?.errors?.required">{{'PROJECT.APP.NAMEREQUIRED' | translate}}</span>
+                    <input cnslInput formControlName="name" />
+                    <span cnsl-error *ngIf="name?.errors?.required">{{'PROJECT.APP.NAMEREQUIRED' | translate}}</span>
                 </cnsl-form-field>
 
                 <p class="step-title">{{'APP.OIDC.TYPETITLE' | translate}}</p>
@@ -32,7 +32,7 @@
                     formControlName="applicationType">
                     <mat-radio-button class="radio-button" *ngFor="let type of oidcAppTypes | keyvalue"
                         [value]="type.value">
-                        <div>{{'APP.OIDC.APPTYPE'+type.key | translate}}</div>
+                        <div>{{('APP.OIDC.APPTYPE'+type.key.toString()) | translate}}</div>
                     </mat-radio-button>
                 </mat-radio-group>
                 <div class="actions">
@@ -97,9 +97,9 @@
                         [color]="!uri.startsWith('https://') ? 'warn': 'white'" (removed)="removeUri(uri, 'REDIRECT')">
                         {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
                     </mat-chip>
-                    <input [matChipInputFor]="chipRedirectList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                        [matChipInputAddOnBlur]="true" [formControl]="redirectControl"
-                        (matChipInputTokenEnd)="addUri($event, 'REDIRECT')">
+                    <input cnslInput [matChipInputFor]="chipRedirectList"
+                        [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
+                        [formControl]="redirectControl" (matChipInputTokenEnd)="addUri($event, 'REDIRECT')">
                 </mat-chip-list>
             </cnsl-form-field>
             <p *ngIf="redirectControl.invalid" class="error">{{'APP.OIDC.REDIRECTNOTVALID' | translate}}</p>
@@ -121,7 +121,7 @@
                         [color]="!uri.startsWith('https://') ? 'warn': 'white'">
                         {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
                     </mat-chip>
-                    <input [matChipInputFor]="chipPostRedirectList" [formControl]="postRedirectControl"
+                    <input cnslInput [matChipInputFor]="chipPostRedirectList" [formControl]="postRedirectControl"
                         [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
                         (matChipInputTokenEnd)="addUri($event, 'POSTREDIRECT')">
                 </mat-chip-list>
@@ -225,7 +225,7 @@
             <div class="content">
                 <cnsl-form-field appearance="outline" class="formfield">
                     <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>
-                    <input formControlName="name" />
+                    <input cnslInput formControlName="name" />
                 </cnsl-form-field>
 
                 <cnsl-form-field appearance="outline" class="formfield">
@@ -271,8 +271,9 @@
                             (removed)="removeUri(uri, 'REDIRECT')">
                             {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
                         </mat-chip>
-                        <input [matChipInputFor]="chipRedirectList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                            [matChipInputAddOnBlur]="true" (matChipInputTokenEnd)="addUri($event, 'REDIRECT')">
+                        <input cnslInput [matChipInputFor]="chipRedirectList"
+                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
+                            (matChipInputTokenEnd)="addUri($event, 'REDIRECT')">
                     </mat-chip-list>
                 </cnsl-form-field>
 
@@ -283,7 +284,7 @@
                             (removed)="removeUri(uri, 'POSTREDIRECT')">
                             {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
                         </mat-chip>
-                        <input [matChipInputFor]="chipPostRedirectList"
+                        <input cnslInput [matChipInputFor]="chipPostRedirectList"
                             [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
                             (matChipInputTokenEnd)="addUri($event, 'POSTREDIRECT')">
                     </mat-chip-list>

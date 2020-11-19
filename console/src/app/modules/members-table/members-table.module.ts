@@ -11,7 +11,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 
 import { AvatarModule } from '../avatar/avatar.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
@@ -23,7 +23,7 @@ import { MembersTableComponent } from './members-table.component';
     ],
     imports: [
         CommonModule,
-        FormFieldModule,
+        InputModule,
         MatSelectModule,
         MatCheckboxModule,
         MatIconModule,

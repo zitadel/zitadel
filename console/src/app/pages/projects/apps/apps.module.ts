@@ -19,7 +19,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
-import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 
 import { AppCreateComponent } from './app-create/app-create.component';
 import { AppDetailComponent } from './app-detail/app-detail.component';
@@ -39,7 +39,6 @@ import { AppsRoutingModule } from './apps-routing.module';
         TranslateModule,
         ReactiveFormsModule,
         HasRoleModule,
-        FormFieldModule,
         MatMenuModule,
         MatChipsModule,
         MatIconModule,
@@ -57,6 +56,7 @@ import { AppsRoutingModule } from './apps-routing.module';
         MatRadioModule,
         CopyToClipboardModule,
         MatSlideToggleModule,
+        InputModule,
     ],
     exports: [TranslateModule],
 })

@@ -15,7 +15,7 @@
         <form (ngSubmit)="searchOrg(domain.value)">
             <cnsl-form-field class="org-domain">
                 <cnsl-label>{{'PROJECT.GRANT.CREATE.SEL_ORG_FORMFIELD' | translate}}</cnsl-label>
-                <input #domain />
+                <input cnslInput #domain />
             </cnsl-form-field>
 
             <button [disabled]="domain.value.length == 0" color="primary" type="submit" class="domain-button"

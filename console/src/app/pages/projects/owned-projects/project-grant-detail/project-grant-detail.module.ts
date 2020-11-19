@@ -15,7 +15,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
-import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 import { MembersTableModule } from 'src/app/modules/members-table/members-table.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
@@ -39,7 +39,7 @@ import {
         MatIconModule,
         MatTableModule,
         MatPaginatorModule,
-        FormFieldModule,
+        InputModule,
         MatTooltipModule,
         ReactiveFormsModule,
         MatProgressSpinnerModule,

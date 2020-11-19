@@ -8,7 +8,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
-import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 
 import { OrgIamPolicyRoutingModule } from './org-iam-policy-routing.module';
 import { OrgIamPolicyComponent } from './org-iam-policy.component';
@@ -19,7 +19,7 @@ import { OrgIamPolicyComponent } from './org-iam-policy.component';
         OrgIamPolicyRoutingModule,
         CommonModule,
         FormsModule,
-        FormFieldModule,
+        InputModule,
         MatButtonModule,
         MatSlideToggleModule,
         MatIconModule,

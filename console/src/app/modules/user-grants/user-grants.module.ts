@@ -16,11 +16,10 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
+import { InputModule } from '../../modules/input/input.module';
 import { AvatarModule } from '../avatar/avatar.module';
-import { FormFieldModule } from '../form-field/form-field.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
 import { UserGrantsComponent } from './user-grants.component';
-
 
 
 @NgModule({
@@ -44,7 +43,7 @@ import { UserGrantsComponent } from './user-grants.component';
         TimestampToDatePipeModule,
         RefreshTableModule,
         LocalizedDatePipeModule,
-        FormFieldModule,
+        InputModule,
     ],
     exports: [
         UserGrantsComponent,

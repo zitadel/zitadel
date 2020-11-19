@@ -13,7 +13,8 @@
         <div class="column">
             <cnsl-form-field class="formfield" hintLabel="The name is required!">
                 <cnsl-label>{{'PROJECT.NAME' | translate}}</cnsl-label>
-                <input cdkFocusInitial autofocus [(ngModel)]="project.name" [ngModelOptions]="{ standalone: true }" />
+                <input cnslInput cdkFocusInitial autofocus [(ngModel)]="project.name"
+                    [ngModelOptions]="{ standalone: true }" />
             </cnsl-form-field>
         </div>
 

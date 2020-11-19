@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { TranslateModule } from '@ngx-translate/core';
-import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 
 import { AddDomainDialogComponent } from './add-domain-dialog.component';
 
@@ -13,7 +13,7 @@ import { AddDomainDialogComponent } from './add-domain-dialog.component';
         CommonModule,
         TranslateModule,
         MatButtonModule,
-        FormFieldModule,
+        InputModule,
         FormsModule,
     ],
 })
