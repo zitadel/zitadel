@@ -350,6 +350,7 @@ func (u *UserGrant) fillUserData(grant *view_model.UserGrantView, user *usr_mode
 
 func (u *UserGrant) fillProjectData(grant *view_model.UserGrantView, project *proj_model.Project) {
 	grant.ProjectName = project.Name
+	grant.ProjectOwner = project.ResourceOwner
 }
 
 func (u *UserGrant) fillOrgData(grant *view_model.UserGrantView, org *org_model.Org) {
