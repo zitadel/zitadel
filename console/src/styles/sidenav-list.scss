@@ -9,10 +9,11 @@
   $primary-dark: mat-color($primary, A900);
   $foreground: map-get($theme, foreground);
   $sec-dark: mat-color($primary, A800);
+  $is-dark-theme: map-get($theme, is-dark);
   /* stylelint-enable */
 
   .meta {
-    box-shadow: inset 1px 0 #e3e8ee;
+    box-shadow: inset 1px 0 if($is-dark-theme,#303131, #e3e8ee);
   }
 
   .nav-item {
