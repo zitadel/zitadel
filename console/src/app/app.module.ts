@@ -23,7 +23,6 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import { QuicklinkModule } from 'ngx-quicklink';
-import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
 import { RegExpPipeModule } from 'src/app/pipes/regexp-pipe/regexp-pipe.module';
 
 import { environment } from '../environments/environment';
@@ -33,6 +32,7 @@ import { HasRoleModule } from './directives/has-role/has-role.module';
 import { OutsideClickModule } from './directives/outside-click/outside-click.module';
 import { AccountsCardModule } from './modules/accounts-card/accounts-card.module';
 import { AvatarModule } from './modules/avatar/avatar.module';
+import { InputModule } from './modules/input/input.module';
 import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { HasRolePipeModule } from './pipes/has-role-pipe/has-role-pipe.module';
@@ -109,7 +109,7 @@ const authConfig: AuthConfig = {
         MatSidenavModule,
         MatCardModule,
         OutsideClickModule,
-        FormFieldModule,
+        InputModule,
         HasRolePipeModule,
         MatProgressBarModule,
         MatProgressSpinnerModule,
