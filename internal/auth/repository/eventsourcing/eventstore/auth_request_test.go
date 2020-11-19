@@ -959,6 +959,25 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			errors.IsPreconditionFailed,
 		},
 		{
+			"not set up, no mfas configured, no prompt and true",
+			fields{
+				MfaInitSkippedLifeTime: 30 * 24 * time.Hour,
+			},
+			args{
+				request: &model.AuthRequest{
+					LoginPolicy: &iam_model.LoginPolicyView{},
+				},
+				user: &user_model.UserView{
+					HumanView: &user_model.HumanView{
+						MfaMaxSetUp: model.MFALevelNotSetUp,
+					},
+				},
+			},
+			nil,
+			true,
+			nil,
+		},
+		{
 			"not set up, prompt and false",
 			fields{
 				MfaInitSkippedLifeTime: 30 * 24 * time.Hour,
@@ -1037,7 +1056,9 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			args{
 				request: &model.AuthRequest{
-					LoginPolicy: &iam_model.LoginPolicyView{},
+					LoginPolicy: &iam_model.LoginPolicyView{
+						SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
+					},
 				},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{

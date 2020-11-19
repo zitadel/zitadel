@@ -109,8 +109,6 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 		return nil, err
 	}
 	request.Audience = appIDs
-	projectIDAud := request.GetScopeProjectIDsForAud()
-	request.Audience = append(request.Audience, projectIDAud...)
 	request.AppendAudIfNotExisting(app.ProjectID)
 	if request.LoginHint != "" {
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
@@ -696,7 +694,8 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *model.AuthRequest, user
 
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *model.AuthRequest, user *user_model.UserView) (model.NextStep, bool, error) {
 	mfaLevel := request.MfaLevel()
-	promptRequired := (user.MfaMaxSetUp < mfaLevel) || !user.HasRequiredOrgMFALevel(request.LoginPolicy)
+	allowedProviders, required := user.MfaTypesAllowed(mfaLevel, request.LoginPolicy)
+	promptRequired := (user.MfaMaxSetUp < mfaLevel) || (len(allowedProviders) == 0 && required)
 	if promptRequired || !repo.mfaSkippedOrSetUp(user) {
 		types := user.MfaTypesSetupPossible(mfaLevel, request.LoginPolicy)
 		if promptRequired && len(types) == 0 {
@@ -714,7 +713,7 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 	default:
 		fallthrough
 	case model.MFALevelNotSetUp:
-		if user.MfaMaxSetUp == model.MFALevelNotSetUp {
+		if len(allowedProviders) == 0 {
 			return nil, true, nil
 		}
 		fallthrough
@@ -732,12 +731,8 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 			return nil, true, nil
 		}
 	}
-	required, providers := user.MfaTypesAllowed(mfaLevel, request.LoginPolicy)
-	if required && len(providers) == 0 {
-		return nil, false, errors.ThrowPreconditionFailed(nil, "LOGIN-Gh31n", "Errors.Login.LoginPolicy.MFA.ForceAndNotConfigured")
-	}
 	return &model.MfaVerificationStep{
-		MfaProviders: providers,
+		MfaProviders: allowedProviders,
 	}, false, nil
 }
 

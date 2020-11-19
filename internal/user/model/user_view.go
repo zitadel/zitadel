@@ -150,12 +150,12 @@ func (u *UserView) MfaTypesSetupPossible(level req_model.MFALevel, policy *iam_m
 	return types
 }
 
-func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.LoginPolicyView) (bool, []req_model.MFAType) {
+func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.LoginPolicyView) ([]req_model.MFAType, bool) {
 	types := make([]req_model.MFAType, 0)
 	required := true
 	switch level {
 	default:
-		required = false
+		required = policy.ForceMFA
 		fallthrough
 	case req_model.MFALevelSecondFactor:
 		if policy.HasSecondFactors() {
@@ -193,7 +193,7 @@ func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.L
 		}
 		//PLANNED: add token
 	}
-	return required, types
+	return types, required
 }
 
 func (u *UserView) HasRequiredOrgMFALevel(policy *iam_model.LoginPolicyView) bool {

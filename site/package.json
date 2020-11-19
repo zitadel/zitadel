@@ -9,7 +9,8 @@
 		"start": "node __sapper__/build",
 		"cy:run": "cypress run",
 		"cy:open": "cypress open",
-		"test": "run-p --race dev cy:run"
+        "test": "run-p --race dev cy:run",
+        "imageoptim": "imageoptim --imagealpha 'static/img/*.png'"
 	},
 	"dependencies": {
 		"@polka/send": "^0.4.0",
@@ -20,7 +21,7 @@
 		"marked": "^1.2.2",
 		"polka": "^0.5.2",
 		"svelte-i18n": "^3.1.0",
-		"sirv": "^0.4.2"
+		"sirv": "^1.0.7"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.12.3",
