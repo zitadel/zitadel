@@ -108,7 +108,7 @@ export class OrgCreateComponent {
         this.adminService
             .SetUpOrg(createOrgRequest, humanRequest)
             .then((org: OrgSetUpResponse) => {
-                this.router.navigate(['/orgs/overview']);
+                this.router.navigate(['/org/overview']);
                 // const orgResp = org.getOrg();
                 // if (orgResp) {
                 //     this.authService.setActiveOrg(orgResp.toObject());
@@ -200,7 +200,7 @@ export class OrgCreateComponent {
     public createOrgForSelf(): void {
         if (this.name && this.name.value) {
             this.mgmtService.CreateOrg(this.name.value).then((org) => {
-                this.router.navigate(['/orgs/overview']);
+                this.router.navigate(['/org/overview']);
                 // const newOrg = org.toObject();
                 // setTimeout(() => {
                 //     this.authService.setActiveOrg(newOrg);
