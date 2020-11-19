@@ -15,7 +15,7 @@ import {
     Self,
 } from '@angular/core';
 import { FormGroupDirective, NgControl, NgForm } from '@angular/forms';
-import { CanUpdateErrorStateCtor, mixinErrorState } from '@angular/material/core';
+import { CanUpdateErrorState, CanUpdateErrorStateCtor, mixinErrorState } from '@angular/material/core';
 import { MatFormFieldControl } from '@angular/material/form-field';
 import { MAT_INPUT_VALUE_ACCESSOR } from '@angular/material/input';
 import { Subject } from 'rxjs';
@@ -56,7 +56,7 @@ const _CnslInputMixinBase: CanUpdateErrorStateCtor & typeof CnslInputBase =
     providers: [{ provide: MatFormFieldControl, useExisting: InputDirective }],
 })
 export class InputDirective extends _CnslInputMixinBase implements MatFormFieldControl<any>,
-    OnChanges, AfterViewInit, OnDestroy, DoCheck {
+    OnChanges, AfterViewInit, OnDestroy, DoCheck, CanUpdateErrorState {
     /** Whether the element is readonly. */
     // @Input()
     // get readonly(): boolean { return this._readonly; }
@@ -215,7 +215,9 @@ export class InputDirective extends _CnslInputMixinBase implements MatFormFieldC
     }
 
     public ngDoCheck(): void {
+        console.log('docheck');
         if (this.ngControl) {
+            console.log('ngcontrol');
             // We need to re-evaluate this on every change detection cycle, because there are some
             // error triggers that we can't subscribe to (e.g. parent form submissions). This means
             // that whatever logic is in here has to be super lean or we risk destroying the performance.
