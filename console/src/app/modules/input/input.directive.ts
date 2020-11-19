@@ -51,15 +51,14 @@ const _MatInputMixinBase: CanUpdateErrorStateCtor & typeof MatInputBase =
 
 /** Directive that allows a native input to work inside a `MatFormField`. */
 @Directive({
-    selector: `input[cnslInput], textarea[cnslInput], select[cnslNativeControl],
-      input[matNativeControl], textarea[matNativeControl]`,
-    exportAs: 'matInput',
+    selector: `input[cnslInput], textarea[cnslInput], select[cnslNativeControl]`,
+    exportAs: 'cnslInput',
     host: {
         /**
          * @breaking-change 8.0.0 remove .mat-form-field-autofill-control in favor of AutofillMonitor.
          */
-        'class': 'mat-input-element mat-form-field-autofill-control',
-        '[class.mat-input-server]': '_isServer',
+        // 'class': 'cnsl-input-element cnsl-form-field-autofill-control',
+        // '[class.mat-input-server]': '_isServer',
         // Native input properties that are overwritten by Angular inputs need to be synced with
         // the native input element. Otherwise property bindings for those don't work.
         '[attr.id]': 'id',
@@ -77,7 +76,7 @@ const _MatInputMixinBase: CanUpdateErrorStateCtor & typeof MatInputBase =
 })
 export class InputDirective extends _MatInputMixinBase implements MatFormFieldControl<any>, OnChanges,
     OnDestroy, AfterViewInit, DoCheck, CanUpdateErrorState {
-    protected _uid = `mat-input-${nextUniqueId++}`;
+    protected _uid: string = `cnsl-input-${nextUniqueId++}`;
     protected _previousNativeValue: any;
     private _inputValueAccessor: { value: any; };
     private _previousPlaceholder!: string | null;
