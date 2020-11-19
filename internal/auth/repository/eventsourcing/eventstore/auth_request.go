@@ -671,7 +671,7 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *model.AuthRequest, user
 		return &model.InitUserStep{PasswordSet: user.PasswordSet}
 	}
 
-	if len(user.PasswordLessVerifiedIDs) > 0 {
+	if user.IsPasswordLessReady() {
 		if !checkVerificationTime(userSession.PasswordLessVerification, repo.MultiFactorCheckLifeTime) {
 			return &model.PasswordLessStep{}
 		}

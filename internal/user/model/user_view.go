@@ -28,31 +28,31 @@ type UserView struct {
 }
 
 type HumanView struct {
-	PasswordSet             bool
-	PasswordChangeRequired  bool
-	UsernameChangeRequired  bool
-	PasswordChanged         time.Time
-	FirstName               string
-	LastName                string
-	NickName                string
-	DisplayName             string
-	PreferredLanguage       string
-	Gender                  Gender
-	Email                   string
-	IsEmailVerified         bool
-	Phone                   string
-	IsPhoneVerified         bool
-	Country                 string
-	Locality                string
-	PostalCode              string
-	Region                  string
-	StreetAddress           string
-	OTPState                MfaState
-	U2FTokens               []*WebAuthNView
-	PasswordLessVerifiedIDs []string
-	MfaMaxSetUp             req_model.MFALevel
-	MfaInitSkipped          time.Time
-	InitRequired            bool
+	PasswordSet            bool
+	PasswordChangeRequired bool
+	UsernameChangeRequired bool
+	PasswordChanged        time.Time
+	FirstName              string
+	LastName               string
+	NickName               string
+	DisplayName            string
+	PreferredLanguage      string
+	Gender                 Gender
+	Email                  string
+	IsEmailVerified        bool
+	Phone                  string
+	IsPhoneVerified        bool
+	Country                string
+	Locality               string
+	PostalCode             string
+	Region                 string
+	StreetAddress          string
+	OTPState               MfaState
+	U2FTokens              []*WebAuthNView
+	PasswordLessTokens     []*WebAuthNView
+	MfaMaxSetUp            req_model.MFALevel
+	MfaInitSkipped         time.Time
+	InitRequired           bool
 }
 
 type WebAuthNView struct {
@@ -166,11 +166,8 @@ func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.L
 						types = append(types, req_model.MFATypeOTP)
 					}
 				case iam_model.SecondFactorTypeU2F:
-					for _, token := range u.U2FTokens {
-						if token.State == MfaStateReady {
-							types = append(types, req_model.MFATypeU2F)
-							break
-						}
+					if u.IsU2FReady() {
+						types = append(types, req_model.MFATypeU2F)
 					}
 				}
 			}
@@ -182,11 +179,8 @@ func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.L
 			for _, mfaType := range policy.MultiFactors {
 				switch mfaType {
 				case iam_model.MultiFactorTypeU2FWithPIN:
-					for _, token := range u.U2FTokens {
-						if token.State == MfaStateReady {
-							types = append(types, req_model.MFATypeU2F)
-							break
-						}
+					if u.IsPasswordLessReady() {
+						types = append(types, req_model.MFATypeU2FUserVerification)
 					}
 				}
 			}
@@ -194,6 +188,24 @@ func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.L
 		//PLANNED: add token
 	}
 	return types, required
+}
+
+func (u *UserView) IsU2FReady() bool {
+	for _, token := range u.U2FTokens {
+		if token.State == MfaStateReady {
+			return true
+		}
+	}
+	return false
+}
+
+func (u *UserView) IsPasswordLessReady() bool {
+	for _, token := range u.PasswordLessTokens {
+		if token.State == MfaStateReady {
+			return true
+		}
+	}
+	return false
 }
 
 func (u *UserView) HasRequiredOrgMFALevel(policy *iam_model.LoginPolicyView) bool {
