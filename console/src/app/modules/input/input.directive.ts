@@ -71,7 +71,6 @@ export class InputDirective extends _CnslInputMixinBase implements MatFormFieldC
     protected _previousNativeValue: any;
     private _inputValueAccessor: { value: any; };
     autofilled: boolean = false;
-    shouldLabelFloat!: boolean;
     // controlType?: string | undefined;
     userAriaDescribedBy?: string | undefined;
 
@@ -86,7 +85,7 @@ export class InputDirective extends _CnslInputMixinBase implements MatFormFieldC
     focused: boolean = false;
     readonly stateChanges: Subject<void> = new Subject<void>();
 
-    controlType: string = 'cnslInput';
+    controlType: string = 'mat-input';
 
     /**
     * Implemented as part of MatFormFieldControl.
@@ -277,4 +276,13 @@ export class InputDirective extends _CnslInputMixinBase implements MatFormFieldC
         }
     }
 
+    /**
+   * Implemented as part of MatFormFieldControl.
+   * @docs-private
+   */
+    get shouldLabelFloat(): boolean {
+        return this.focused || !this.empty;
+    }
+    // Accept `any` to avoid conflicts with other directives on `<input>` that may
+    // accept different types.
 }
