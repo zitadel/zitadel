@@ -440,7 +440,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{&model.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID"}, false},
-			[]model.NextStep{&model.ExternalLoginStep{}},
+			[]model.NextStep{&model.ExternalLoginStep{SelectedIDPConfigID: "IDPConfigID"}},
 			nil,
 		},
 		{
@@ -911,6 +911,25 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			errors.IsPreconditionFailed,
 		},
 		{
+			"not set up, no mfas configured, no prompt and true",
+			fields{
+				MfaInitSkippedLifeTime: 30 * 24 * time.Hour,
+			},
+			args{
+				request: &model.AuthRequest{
+					LoginPolicy: &iam_model.LoginPolicyView{},
+				},
+				user: &user_model.UserView{
+					HumanView: &user_model.HumanView{
+						MfaMaxSetUp: model.MFALevelNotSetUp,
+					},
+				},
+			},
+			nil,
+			true,
+			nil,
+		},
+		{
 			"not set up, prompt and false",
 			fields{
 				MfaInitSkippedLifeTime: 30 * 24 * time.Hour,
@@ -989,7 +1008,9 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			args{
 				request: &model.AuthRequest{
-					LoginPolicy: &iam_model.LoginPolicyView{},
+					LoginPolicy: &iam_model.LoginPolicyView{
+						SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
+					},
 				},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
@@ -1055,8 +1076,7 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 		MfaInitSkippedLifeTime time.Duration
 	}
 	type args struct {
-		user   *user_model.UserView
-		policy *iam_model.LoginPolicyView
+		user *user_model.UserView
 	}
 	tests := []struct {
 		name   string
@@ -1073,9 +1093,6 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 						MfaMaxSetUp: model.MFALevelSecondFactor,
 					},
 				},
-				&iam_model.LoginPolicyView{
-					SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
-				},
 			},
 			true,
 		},
@@ -1090,9 +1107,6 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 						MfaMaxSetUp:    -1,
 						MfaInitSkipped: time.Now().UTC().Add(-10 * time.Hour),
 					},
-				},
-				&iam_model.LoginPolicyView{
-					SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
 				},
 			},
 			true,
@@ -1109,9 +1123,6 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 						MfaInitSkipped: time.Now().UTC().Add(-40 * 24 * time.Hour),
 					},
 				},
-				&iam_model.LoginPolicyView{
-					SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
-				},
 			},
 			false,
 		},
@@ -1121,7 +1132,7 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 			repo := &AuthRequestRepo{
 				MfaInitSkippedLifeTime: tt.fields.MfaInitSkippedLifeTime,
 			}
-			if got := repo.mfaSkippedOrSetUp(tt.args.user, tt.args.policy); got != tt.want {
+			if got := repo.mfaSkippedOrSetUp(tt.args.user); got != tt.want {
 				t.Errorf("mfaSkippedOrSetUp() = %v, want %v", got, tt.want)
 			}
 		})
