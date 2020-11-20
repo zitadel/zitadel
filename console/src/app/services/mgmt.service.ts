@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
+import { BehaviorSubject } from 'rxjs';
 
 import {
     AddMachineKeyRequest,
@@ -39,6 +40,7 @@ import {
     IdpSearchResponse,
     IdpUpdate,
     IdpView,
+    InitialMailRequest,
     LoginName,
     LoginPolicy,
     LoginPolicyRequest,
@@ -48,7 +50,6 @@ import {
     MachineKeySearchResponse,
     MachineKeyType,
     MachineResponse,
-    MultiFactors,
     NotificationType,
     OIDCApplicationCreate,
     OIDCConfig,
@@ -142,6 +143,7 @@ import {
     UserMembershipSearchQuery,
     UserMembershipSearchRequest,
     UserMembershipSearchResponse,
+    UserMultiFactors,
     UserPhone,
     UserProfile,
     UserResponse,
@@ -160,6 +162,9 @@ export type ResponseMapper<TResp, TMappedResp> = (resp: TResp) => TMappedResp;
     providedIn: 'root',
 })
 export class ManagementService {
+    public ownedProjectsCount: BehaviorSubject<number> = new BehaviorSubject(0);
+    public grantedProjectsCount: BehaviorSubject<number> = new BehaviorSubject(0);
+
     constructor(private readonly grpcService: GrpcService) { }
 
     public SearchIdps(
@@ -393,11 +398,9 @@ export class ManagementService {
         return this.grpcService.mgmt.removeMyOrgDomain(req);
     }
 
-    public SearchMyOrgDomains(offset: number, limit: number, queryList?: OrgDomainSearchQuery[]):
+    public SearchMyOrgDomains(queryList?: OrgDomainSearchQuery[]):
         Promise<OrgDomainSearchResponse> {
         const req: OrgDomainSearchRequest = new OrgDomainSearchRequest();
-        req.setLimit(limit);
-        req.setOffset(offset);
         if (queryList) {
             req.setQueriesList(queryList);
         }
@@ -668,7 +671,7 @@ export class ManagementService {
         return this.grpcService.mgmt.getUserProfile(req);
     }
 
-    public getUserMfas(id: string): Promise<MultiFactors> {
+    public getUserMfas(id: string): Promise<UserMultiFactors> {
         const req = new UserID();
         req.setId(id);
         return this.grpcService.mgmt.getUserMfas(req);
@@ -784,6 +787,16 @@ export class ManagementService {
         return this.grpcService.mgmt.resendEmailVerificationMail(req);
     }
 
+    public ResendInitialMail(userId: string, newemail: string): Promise<Empty> {
+        const req = new InitialMailRequest();
+        if (newemail) {
+            req.setEmail(newemail);
+        }
+        req.setId(userId);
+
+        return this.grpcService.mgmt.resendInitialMail(req);
+    }
+
     public ResendPhoneVerification(id: string): Promise<any> {
         const req = new UserID();
         req.setId(id);
@@ -834,13 +847,17 @@ export class ManagementService {
     // USER GRANTS
 
     public SearchUserGrants(
-        limit: number,
-        offset: number,
+        limit?: number,
+        offset?: number,
         queryList?: UserGrantSearchQuery[],
     ): Promise<UserGrantSearchResponse> {
         const req = new UserGrantSearchRequest();
-        req.setLimit(limit);
-        req.setOffset(offset);
+        if (limit) {
+            req.setLimit(limit);
+        }
+        if (offset) {
+            req.setOffset(offset);
+        }
         if (queryList) {
             req.setQueriesList(queryList);
         }
@@ -929,14 +946,26 @@ export class ManagementService {
     // project
 
     public SearchProjects(
-        limit: number, offset: number, queryList?: ProjectSearchQuery[]): Promise<ProjectSearchResponse> {
+        limit?: number, offset?: number, queryList?: ProjectSearchQuery[]): Promise<ProjectSearchResponse> {
         const req = new ProjectSearchRequest();
-        req.setLimit(limit);
-        req.setOffset(offset);
+        if (limit) {
+            req.setLimit(limit);
+        }
+        if (offset) {
+            req.setOffset(offset);
+        }
+
         if (queryList) {
             req.setQueriesList(queryList);
         }
-        return this.grpcService.mgmt.searchProjects(req);
+        return this.grpcService.mgmt.searchProjects(req).then(value => {
+            const count = value.toObject().resultList.length;
+            if (count >= 0) {
+                this.ownedProjectsCount.next(count);
+            }
+
+            return value;
+        });
     }
 
     public SearchGrantedProjects(
@@ -947,9 +976,11 @@ export class ManagementService {
         if (queryList) {
             req.setQueriesList(queryList);
         }
-        return this.grpcService.mgmt.searchGrantedProjects(req);
+        return this.grpcService.mgmt.searchGrantedProjects(req).then(value => {
+            this.grantedProjectsCount.next(value.toObject().resultList.length);
+            return value;
+        });
     }
-
 
     public GetZitadelDocs(): Promise<ZitadelDocs> {
         const req = new Empty();
@@ -972,7 +1003,11 @@ export class ManagementService {
     public CreateProject(project: ProjectCreateRequest.AsObject): Promise<Project> {
         const req = new ProjectCreateRequest();
         req.setName(project.name);
-        return this.grpcService.mgmt.createProject(req);
+        return this.grpcService.mgmt.createProject(req).then(value => {
+            const current = this.ownedProjectsCount.getValue();
+            this.ownedProjectsCount.next(current + 1);
+            return value;
+        });
     }
 
     public UpdateProject(id: string, projectView: ProjectView.AsObject): Promise<Project> {
@@ -1221,7 +1256,11 @@ export class ManagementService {
     public RemoveProject(id: string): Promise<Empty> {
         const req = new ProjectID();
         req.setId(id);
-        return this.grpcService.mgmt.removeProject(req);
+        return this.grpcService.mgmt.removeProject(req).then(value => {
+            const current = this.ownedProjectsCount.getValue();
+            this.ownedProjectsCount.next(current > 0 ? current - 1 : 0);
+            return value;
+        });
     }
 
 

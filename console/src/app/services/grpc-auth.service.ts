@@ -249,6 +249,12 @@ export class GrpcAuthService {
         return this.grpcService.auth.changeMyUserEmail(req);
     }
 
+    public ResendMyEmailVerificationMail(): Promise<Empty> {
+        return this.grpcService.auth.resendMyEmailVerificationMail(
+            new Empty(),
+        );
+    }
+
     public RemoveMyUserPhone(): Promise<Empty> {
         return this.grpcService.auth.removeMyUserPhone(
             new Empty(),

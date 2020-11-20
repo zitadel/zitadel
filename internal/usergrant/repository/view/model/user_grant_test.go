@@ -2,12 +2,13 @@ package model
 
 import (
 	"encoding/json"
+	"reflect"
+	"testing"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/usergrant/model"
 	es_model "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
 	"github.com/lib/pq"
-	"reflect"
-	"testing"
 )
 
 func mockUserGrantData(grant *es_model.UserGrant) []byte {

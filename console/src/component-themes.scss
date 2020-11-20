@@ -1,5 +1,6 @@
 @import 'src/app/modules/card/card';
 @import './styles/table';
+@import './styles/link.scss';
 @import './styles/sidenav-list';
 @import 'src/app/modules/avatar/avatar.component';
 @import 'src/app/modules/changes/changes.component';
@@ -22,4 +23,5 @@
   @include meta-theme($theme);
   @include theme-card($theme);
   @include textvar($theme);
+  @include link-theme($theme);
 }

@@ -4,6 +4,7 @@
   padding: 1.5rem;
   border-radius: .5rem;
   padding-top: 1rem;
+  min-width: 350px;
 
   .header {
     margin-top: 0;
@@ -42,5 +43,6 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    height: 100%;
   }
 }

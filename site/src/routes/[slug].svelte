@@ -1,19 +1,19 @@
 <script context="module">
     export async function preload({params}) {
         const {lang, slug} = params;
-        const sections = await this.fetch(`${slug}.json`).then(r => r.json());
-        const tags = [];
-        return { sections, slug, tags };
+        const {docs, seo} = await this.fetch(`${slug}.json`).then(r => r.json());
+        return { sections: docs, seo, slug };
     }
 </script>
 
 <script>
+    import DocsHeader from '../components/DocsHeader.svelte';
     import manifest from '../../static/manifest.json';
     import Docs from "../components/Docs.svelte";
     export let slug;
     export let sections;
+    export let seo;
     import { onMount } from 'svelte';
-    export let tags;
     import { initPhotoSwipeFromDOM } from '../utils/photoswipe.js';
 
     onMount(() => {
@@ -21,12 +21,21 @@
     });
 </script>
 
+<style>
+    @media (min-width: 832px) {
+        :global(main) {
+            padding: 0 !important;
+        }
+    }
+</style>
+
 <svelte:head>
   <title>{manifest.name} • {slug}</title>    
 
-    {#each tags as { name, content }, i}
-     <meta name={name} content={content} />
-	{/each}
+    {#if seo}
+    { @html seo}
+   {/if}
 </svelte:head>
 
-<Docs {sections} project="zitadel/site" dir="{slug}"/>
+<DocsHeader {slug}></DocsHeader>
+<Docs {sections} dir="{slug}"/>

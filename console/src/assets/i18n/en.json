@@ -5,14 +5,26 @@
         "SECURITYANDPRIVACY": "Data Protection and Personalisation",
         "SECURITYANDPRIVACY_DESC": "Manage Your Information and Security Settings",
         "SECURITYANDPRIVACY_BUTTON": "Personalise Information and Security",
+        "CHANGE_PWD":"Change Password",
         "PROTECTION": "Organisational Policies",
         "PROTECTION_DESC": "Manage your organisational guidelines. Explore some pre-packaged solutions that save you time and ensure security.",
         "PROTECTION_BUTTON": "Explore",
         "PROJECTS": "Create and Manage Your Applications and Projects",
         "PROJECTS_DESC": "Authorize others to use your projects or define custom roles on eligible projects.",
         "PROJECTS_BUTTON": "Project Overview",
+        "PROJECTS_NEW_LINK":"Create new project",
+        "ORG_POLICY_COMPLEXITY":"Password Complexity Settings",
+        "ORG_POLICY_IAM":"Organisation Access Properties",
+        "ORG_POLICY_LOGIN":"Login Policy",
+        "IAM_CREATE_ORG":"Create organisation",
+        "IAM_POLICY_COMPLEXITY":"System Password Complexity Settings",
+        "IAM_POLICY_IAM":"System Access Properties",
+        "IAM_POLICY_LOGIN":"System Login Policy",
         "USERS": "Create and Manage Your Users",
         "USERS_DESC": "Monitor your role concept in real time. Take immediate action.",
+        "USERS_HUMANS":"Show human users",
+        "USERS_MACHINES": "Show machine users",
+        "USERS_CREATE":"Create User",
         "USERS_BUTTON": "Show Users",
         "IAM": "Identity and Access Management",
         "IAM_DESC": "Manage your organisations and administrators.",
@@ -26,6 +38,7 @@
         "PERSONAL_INFO": "Personal Information",
         "IAM":"Administration",
         "ORGANIZATION": "Organisation",
+        "ADMINSECTION":"Administration",
         "PROJECTSSECTION":"Projects Section",
         "PROJECT": "Projects",
         "GRANTEDPROJECT":"Granted Projects",
@@ -64,12 +77,14 @@
         "LOGIN":"Login",
         "EDIT":"Edit",
         "PIN":"Pin / Unpin",
-        "CONFIGURE":"Configure"
+        "CONFIGURE":"Configure",
+        "SEND":"Send",
+        "NEWVALUE":"New Value"
     },
     "ERRORS": {
         "REQUIRED": "Some required fields are missing.",
         "TOKENINVALID": {
-            "TITLE":"Your authorisation token has expired.",
+            "TITLE":"Your authorization token has expired.",
             "DESCRIPTION":"Click the button below to log in again."
         }
     },
@@ -99,6 +114,11 @@
             "DELETE_TITLE":"Delete User",
             "DELETE_DESCRIPTION":"You are about to permanently delete a user. Are you sure?"
         },
+        "SENDEMAILDIALOG":{
+            "TITLE":"Send Email Notification",
+            "DESCRIPTION":"Click the button below to send a notification to the current email address or change the email address in the field.",
+            "NEWEMAIL":"New email address"
+        },
         "TABLE":{
             "DEACTIVATE":"Deactivate",
             "ACTIVATE":"Activate",
@@ -106,8 +126,11 @@
                 "1":"Filter for Username",
                 "2":"filter for Firstname",
                 "3":"filter for Lastname",
+                "4":"filter for role Key",
                 "5":"filter for DisplayName",
-                "6":"filter for email"
+                "6":"filter for email",
+                "10":"filter for organisation name",
+                "12":"filter for project name"
             }
         },
         "MFA": {
@@ -224,7 +247,11 @@
             "NOTEQUAL":"The passwords provided do not match."
         },
         "EMAIL": "E-mail",
-        "PHONE": "Phone Number",
+        "PHONE": "Phonenumber",
+        "PHONEEMPTY":"No phonenumber defined",
+        "PHONEVERIFIED":"Phonenumber verified.",
+        "EMAILVERIFIED":"Email verified",
+        "NOTVERIFIED":"not verified",
         "PREFERRED_LOGINNAME":"Preferred Loginname",
         "LOGINMETHODS": {
             "TITLE": "Contact Information",
@@ -232,12 +259,18 @@
             "EMAIL": {
                 "TITLE": "E-mail",
                 "VALID": "validated",
-                "RESEND": "Resend Verification E-mail"
+                "RESEND": "Resend Verification E-mail",
+                "EDITTITLE":"Change Email",
+                "EDITDESC":"Enter the new email in the field below."
             },
             "PHONE": {
                 "TITLE": "Phone",
                 "VALID": "validated",
-                "RESEND": "Resend Verification Text Message"
+                "RESEND": "Resend Verification Text Message",
+                "EDITTITLE":"Change number",
+                "EDITDESC":"Enter the new phonenumber in the field below.",
+                "DELETETITLE":"Delete Phonenumber",
+                "DELETEDESC":"Do you really want to delete the phonenumber"
             },
             "RESENDCODE": "Resend Code",
             "ENTERCODE":"Verify",
@@ -278,10 +311,13 @@
         "SIGNEDOUT_BTN":"Sign In",
         "EDITACCOUNT":"Edit Account",
         "ADDACCOUNT":"Log in With Another Account",
+        "RESENDINITIALEMAIL":"Send new initialisation mail",
+        "RESENDEMAILNOTIFICATION":"Resend Email notification",
         "TOAST": {
             "CREATED":"User created successfully.",
             "SAVED":"Profile saved successfully.",
             "EMAILSAVED":"E-mail saved successfully.",
+            "INITEMAILSENT":"Initializing mail sent.",
             "PHONESAVED":"Phone saved successfully.",
             "PHONEREMOVED":"Phone has been removed.",
             "PHONEVERIFIED":"Phone verified successfully.",
@@ -384,6 +420,7 @@
                 "VERIFICATION_NEWTOKEN_DESC":"If you want to request a new token, select you preferred method. If you want to validate a persisting token, click the button above.",
                 "VERIFICATION_VALIDATION_ONGOING":"A verification token has already been requested. Click on the button to trigger a verification check.",
                 "VERIFICATION_VALIDATION_ONGOING_TYPE":"Type of the token:",
+                "VERIFICATION_SUCCESSFUL":"Domain successfully verified!",
                 "REQUESTNEWTOKEN":"Request new Token",
                 "TYPES": {
                     "1":"HTTP",
@@ -872,26 +909,26 @@
     },
     "ROLESLABEL":"Roles",
     "GRANTS": {
-        "TITLE":"Authorisations",
+        "TITLE":"Authorizations",
         "DESC":"Here you can manage authorizations of your organization users.",
-        "DELETE":"Delete Authorisation",
-        "ADD":"Create Authorisation",
+        "DELETE":"Delete Authorization",
+        "ADD":"Create Authorization",
         "ADD_BTN":"New",
         "PROJECT": {
-            "TITLE": "Authorisations",
-            "DESCRIPTION": "Define authorisations for the specified project. Note that you can only see entries of projects and users for which you have the permissions."
+            "TITLE": "Authorization",
+            "DESCRIPTION": "Define authorizations for the specified project. Note that you can only see entries of projects and users for which you have the permissions."
         },
         "USER": {
-            "TITLE": "Authorisations",
-            "DESCRIPTION": "Define authorisations for the specified user. Note that you can only see entries of projects and users for which you have the permissions."
+            "TITLE": "Authorization",
+            "DESCRIPTION": "Define authorizations for the specified user. Note that you can only see entries of projects and users for which you have the permissions."
         },
         "CREATE": {
-            "TITLE": "Create authorisation",
+            "TITLE": "Create authorization",
             "DESCRIPTION": "Search for the orgnanisation, the project, and the corresponding roles."
         },
         "DETAIL": {
-            "TITLE":"Authorisation Detail",
-            "DESCRIPTION":"Here you can see all the details of the authorisation."
+            "TITLE":"Authorization Detail",
+            "DESCRIPTION":"Here you can see all the details of the authorization."
         },
         "TOAST": {
             "UPDATED":"Grant updated.",
