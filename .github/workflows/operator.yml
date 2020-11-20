@@ -131,7 +131,7 @@ jobs:
       - name: Docker Pull short-sha
         run: docker pull $REGISTRY/$DOCKER_IMAGE_NAME:${{ steps.vars.outputs.sha_short }}
       - name: Download binaries
-        uses: download-artifact@v2
+        uses: actions/download-artifact@v2
         with:
           path: .artifacts
       - name: Semantic Release
