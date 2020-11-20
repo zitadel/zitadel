@@ -5,11 +5,17 @@
 
   .col {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
 
     .desc {
       font-size: .8rem;
       color: var(--grey);
+      margin-right: 1rem;
+
+      span {
+          display: block;
+      }
     }
 
     .count {

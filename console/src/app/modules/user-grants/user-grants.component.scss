@@ -38,11 +38,6 @@
         }
       }
     }
-
-    .selection {
-      width: 50px;
-      max-width: 50px;
-    }
   }
 }
 
@@ -95,6 +90,7 @@
 .date-block {
   margin: .5rem 0;
   display: block;
+  min-width: 120px;
 
   .date-sub {
     font-size: 13px;

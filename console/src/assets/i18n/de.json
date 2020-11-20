@@ -676,6 +676,7 @@
             "GRANTEDORGNAME":"Name der Organisation",
             "CREATIONDATE": "Erstelldatum",
             "CHANGEDATE": "Letzte Änderung",
+            "DATES":"Datum",
             "ROLENAMESLIST": "Rollen",
             "NOROLES":"Keine Rollen",
             "TOAST":{

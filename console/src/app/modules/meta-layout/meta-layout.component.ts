@@ -15,7 +15,7 @@ export class MetaLayoutComponent {
     }
     public hidden: boolean = false;
     public isSmallScreen$: Observable<boolean> = this.breakpointObserver
-        .observe('(max-width: 899px)')
+        .observe('(max-width: 1000px)')
         .pipe(map(result => {
             return result.matches;
         }));
