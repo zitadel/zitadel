@@ -47,7 +47,7 @@ jobs:
         name: onylbuild
         with:
           context: .
-          file: ./build/operator/dockerfile
+          file: ./build/operator/Dockerfile
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.branch.outputs.short_ref }}
           push: false
@@ -100,7 +100,7 @@ jobs:
         name: buildandpush
         with:
           context: .
-          file: ./build/operator/dockerfile
+          file: ./build/operator/Dockerfile
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.branch.outputs.short_ref }}
           push: true
