@@ -23,7 +23,9 @@ COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
 
 ## Go prod build
 FROM go-test as prod-go-build
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadelctl-linux-amd64 cmd/zitadelctl/main.go
+ARG ARCH=amd64
+ARG OS=linux
+RUN CGO_ENABLED=0 GOOS=${OS} GOARCH=${ARCH} go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadelctl cmd/zitadelctl/main.go
 
 ## Go dev build
 FROM go-base as dev-go-build
@@ -35,7 +37,9 @@ RUN go get github.com/go-delve/delve/cmd/dlv
 FROM alpine:latest as artifact
 RUN adduser -D zitadel
 
-COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadelctl-linux-amd64 /app/zitadelctl
+ARG ARCH=amd64
+ARG OS=linux
+COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadelctl /app/zitadelctl
 RUN chmod a+x /app/zitadelctl
 
 #Migrations for cockroach-secure

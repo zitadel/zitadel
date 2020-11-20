@@ -4,80 +4,119 @@ on: push
 env:
   GITHUB_TOKEN: ${{ secrets.CR_PAT }}
   REGISTRY: ghcr.io
-  GO_VERSION: '1.14'
+  GO_VERSION: '1.15'
   DOCKER_IMAGE_NAME: ${{ github.repository }}-operator
 
 jobs:
-
-  go-test:
+  binary:
     runs-on: ubuntu-18.04
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2-beta
-        with:
-          go-version: ${{ env.GO_VERSION }}
-      - run: go test -race -v -coverprofile=profile.cov ./...
-      - uses: actions/upload-artifact@v2
-        with:
-          name: go-coverage
-          path: profile.cov
-      - uses: codecov/codecov-action@v1
-        with:
-          file: ./profile.cov
-          name: codecov-go
-
-  go-build:
-    runs-on: ubuntu-18.04
-    needs: go-test
     name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
     strategy:
       matrix:
-        goos: [ 'linux', 'darwin', 'windows' ]
+        goos: [ 'darwin', 'windows' ]
         goarch: [ 'amd64' ]
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2-beta
-        with:
-          go-version: ${{ env.GO_VERSION }}
-      - run: echo "::set-env name=CAOS_NEXT_VERSION::${GITHUB_REF##*/}"
-      - name: Semantic Release
-        id: semantic
-        uses: cycjimmy/semantic-release-action@v2
-        with:
-          dry_run: true
-          semantic_version: 17.1.2
-      - name: Tag semantic
-        if: steps.semantic.outputs.new_release_published == 'true'
-        run: echo "::set-env name=CAOS_NEXT_VERSION::${{ steps.semantic.outputs.new_release_version }}"
-      - run: CGO_ENABLED=0 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -a -installsuffix cgo -ldflags "-X main.version=$CAOS_NEXT_VERSION" -o zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }} cmd/zitadelctl/main.go
-      - uses: actions/upload-artifact@v2
-        with:
-          name: zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
-
-  container-prod:
-    runs-on: ubuntu-18.04
-    needs: go-build
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - name: Set output
+        id: branch
+        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+      - name: Check output
+        run: echo ${{ steps.branch.outputs.short_ref }}
+      - name: Generate Short SHA Container Tag
+        id: vars
+        run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
+      - name: Cache Docker layers
+        uses: actions/cache@v2
         with:
-          name: zitadelctl-linux-amd64
-          path: .artifacts
-      - uses: docker/build-push-action@v1
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
         with:
-          dockerfile: build/docker/operator/Dockerfile
           username: ${{ github.actor }}
           password: ${{ secrets.CR_PAT }}
           registry: ${{ env.REGISTRY }}
-          repository: ${{ env.DOCKER_IMAGE_NAME }}
-          tag_with_ref: true
-          tag_with_sha: true
+      - uses: docker/build-push-action@v2
+        name: onylbuild
+        with:
+          context: .
+          file: ./build/operator/dockerfile
+          platforms: linux/amd64
+          tags: ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.branch.outputs.short_ref }}
+          push: false
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
+          build-args: |
+            OS=${{ matrix.goos }}
+            ARCH=${{ matrix.goarch }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: zitadelctl
+
+  container:
+    runs-on: ubuntu-18.04
+      name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
+    strategy:
+      matrix:
+        goos: [ 'linux' ]
+        goarch: [ 'amd64' ]
+    steps:
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - name: Set output
+        id: branch
+        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+      - name: Check output
+        run: echo ${{ steps.branch.outputs.short_ref }}
+      - name: Generate Short SHA Container Tag
+        id: vars
+        run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT }}
+          registry: ${{ env.REGISTRY }}
+      - uses: docker/build-push-action@v2
+        name: buildandpush
+        with:
+          context: .
+          file: ./build/operator/dockerfile
+          platforms: linux/amd64
+          tags: ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.branch.outputs.short_ref }}
+          push: true
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
+          build-args: |
+            OS=${{ matrix.goos }}
+            ARCH=${{ matrix.goarch }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: zitadelctl
 
   release:
     runs-on: ubuntu-18.04
-    needs: [container-prod]
+    needs: [ container ]
     env:
       DOCKER_USERNAME: ${{ github.actor }}
       DOCKER_PASSWORD: ${{ secrets.CR_PAT }}
@@ -87,22 +126,27 @@ jobs:
       - name: Generate Short SHA Container Tag
         id: vars
         run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
-      - uses: actions/download-artifact@v2
-        with:
-          path: .artifacts
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: .artifacts
       - name: Docker Login
         run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
       - name: Docker Pull short-sha
         run: docker pull $REGISTRY/$DOCKER_IMAGE_NAME:${{ steps.vars.outputs.sha_short }}
+      - name: Download binaries
+        uses: download-artifact@v2
+        with:
+          path: .artifacts
       - name: Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v2
         with:
           dry_run: false
-          semantic_version: 17.1.2
+          semantic_version: 17.0.4
+      - name: Do something when a new release published
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: |
+          echo ${{ steps.semantic.outputs.new_release_version }}
+          echo ${{ steps.semantic.outputs.new_release_major_version }}
+          echo ${{ steps.semantic.outputs.new_release_minor_version }}
+          echo ${{ steps.semantic.outputs.new_release_patch_version }}
       - name: Docker Tag Version
         run: docker tag $REGISTRY/$DOCKER_IMAGE_NAME:${{ steps.vars.outputs.sha_short }} $REGISTRY/$DOCKER_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
         if: steps.semantic.outputs.new_release_published == 'true'
