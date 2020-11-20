@@ -1,15 +1,12 @@
 <div class="table-header-row">
     <div class="col">
-
-
-        <div class="desc">
-            <span *ngIf="timestamp">{{timestamp | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}</span>
-            <span *ngIf="!selection.hasValue()">{{'ORG_DETAIL.TABLE.TOTAL' | translate}}</span>
-            <span *ngIf="selection.hasValue()">{{'ORG_DETAIL.TABLE.SELECTION' | translate}}:</span>
-        </div>
-
         <span *ngIf="!selection.hasValue()" class="count">{{dataSize}}</span>
         <span *ngIf="selection.hasValue()" class="count">{{selection?.selected?.length}}</span>
+        <div class="desc">
+            <span *ngIf="!selection.hasValue()">{{'ORG_DETAIL.TABLE.TOTAL' | translate}}</span>
+            <span *ngIf="selection.hasValue()">{{'ORG_DETAIL.TABLE.SELECTION' | translate}}</span>
+            <span *ngIf="timestamp">{{timestamp | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}</span>
+        </div>
     </div>
     <span class="fill-space"></span>
     <mat-spinner class="spinner" *ngIf="loading" diameter="20"></mat-spinner>

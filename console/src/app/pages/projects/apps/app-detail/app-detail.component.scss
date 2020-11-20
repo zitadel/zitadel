@@ -127,6 +127,11 @@
   }
 }
 
+.chip {
+    border-radius: 4px;
+    height: 40px;
+}
+
 .chip[color='green'] {
   background-color: #56a392 !important;
 }

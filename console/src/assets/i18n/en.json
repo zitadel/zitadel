@@ -573,7 +573,7 @@
             "ADDDESCRIPTION": "Enter the e-mail addresses of the users to be added."
         },
         "TABLE": {
-            "TOTAL": "Entries total:",
+            "TOTAL": "Entries total",
             "SELECTION": "Selected Elements",
             "DEACTIVATE": "Deactivate User",
             "ACTIVATE": "Activate User",
