@@ -136,6 +136,10 @@
             <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"> </tr>
 
         </table>
+        <div *ngIf="(loading$ | async) == false && !dataSource?.data?.length" class="no-content-row">
+            <i class="las la-exclamation"></i>
+            <span>{{'USER.TABLE.EMPTY' | translate}}</span>
+        </div>
         <mat-paginator #paginator class="paginator" [length]="userResult?.totalResult || 0" [pageSize]="10"
             [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
     </div>

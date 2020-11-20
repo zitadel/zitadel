@@ -3,6 +3,8 @@
 @mixin table-theme($theme) {
   /* stylelint-disable */
   $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $warn-color: mat-color($warn, 500);
   $primary-dark: mat-color($primary, A900);
   $secondary-dark: mat-color($primary, A800);
   $inv-color: mat-color($primary, A600);
@@ -29,6 +31,7 @@
     text-transform: uppercase;
     letter-spacing: .05em;
     font-weight: bold;
+    white-space: nowrap;
   }
 
   td {
@@ -52,9 +55,16 @@
         }
       }
     }
+  }
 
-    &.no-data-row {
-        text-align: center;
-    }
+  .no-content-row {
+    background-color: rgba( $warn-color, .1 );
+    color: $warn-color;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    display: flex;
+    align-items: center;
+    padding: .5rem;
+    font-size: 14px;
   }
 }

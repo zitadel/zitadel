@@ -38,7 +38,8 @@
         "PERSONAL_INFO": "Persönliche Informationen",
         "IAM":"Administration",
         "ORGANIZATION": "Organisation",
-        "ADMINSECTION":"Administration",
+        "ADMINSECTION":"ZITADEL Administration",
+        "ORGSECTION":"Organisation",
         "PROJECTSSECTION":"Projektsektion",
         "PROJECT": "Projekte",
         "GRANTEDPROJECT":"Berechtigte Projekte",
@@ -134,7 +135,8 @@
                 "6":"Nach Email filtern",
                 "10":"Nach Organisationsname filtern",
                 "12":"Project Name"
-            }
+            },
+            "EMPTY":"Keine Einträge"
         },
         "MFA": {
             "TABLETYPE":"Typ",
@@ -715,7 +717,10 @@
             "TYPE":"Typ",
             "CREATIONDATE":"Erstelldatum",
             "CHANGEDATE":"Letzte Änderung",
-            "RESOURCEOWNER":"Besitzer"
+            "RESOURCEOWNER":"Besitzer",
+            "SHOWTABLE":"Tabellendarstellung",
+            "SHOWGRID":"Rasterdarstellung",
+            "EMPTY":"Kein Projekt gefunden"
         },
         "TOAST":{
             "MEMBERREMOVED":"Manager entfernt.",
@@ -915,6 +920,7 @@
         "TITLE":"Berechtigungen",
         "DESC":"Hier kannst Du die Berechtigungen Deiner Organisation verwalten.",
         "DELETE":"Berechtigung löschen",
+        "EMPTY":"Keine Berechtigungen gefunden",
         "ADD":"Berechtigung erstellen",
         "ADD_BTN":"Neu",
         "PROJECT": {

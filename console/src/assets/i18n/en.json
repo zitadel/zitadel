@@ -38,7 +38,8 @@
         "PERSONAL_INFO": "Personal Information",
         "IAM":"Administration",
         "ORGANIZATION": "Organisation",
-        "ADMINSECTION":"Administration",
+        "ADMINSECTION":"ZITADEL Administration",
+        "ORGSECTION":"Organisation",
         "PROJECTSSECTION":"Projects Section",
         "PROJECT": "Projects",
         "GRANTEDPROJECT":"Granted Projects",
@@ -134,7 +135,8 @@
                 "6":"filter for email",
                 "10":"filter for organisation name",
                 "12":"filter for project name"
-            }
+            },
+            "EMPTY":"No entries"
         },
         "MFA": {
             "TABLETYPE":"Type",
@@ -715,7 +717,10 @@
             "TYPE":"Type",
             "CREATIONDATE":"Created at",
             "CHANGEDATE":"Last modified",
-            "RESOURCEOWNER":"Owner"
+            "RESOURCEOWNER":"Owner",
+            "SHOWTABLE":"Show table",
+            "SHOWGRID":"Show grid",
+            "EMPTY":"No project found"
         },
         "TOAST":{
             "MEMBERREMOVED":"Manager removed.",
@@ -915,6 +920,7 @@
         "TITLE":"Authorizations",
         "DESC":"Here you can manage authorizations of your organization users.",
         "DELETE":"Delete Authorization",
+        "EMPTY":"No authorization found",
         "ADD":"Create Authorization",
         "ADD_BTN":"New",
         "PROJECT": {

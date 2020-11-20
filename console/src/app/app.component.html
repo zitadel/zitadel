@@ -86,6 +86,12 @@
 
                         <div *ngIf="org" [@navAnimation]="org">
                             <ng-template appHasRole [appHasRole]="['org.read']">
+                                <div @navitem class="divider">
+                                    <div class="line"></div>
+                                    <span>{{'MENU.ORGSECTION' | translate}}</span>
+                                    <div class="hiddenline"></div>
+                                </div>
+
                                 <a @navitem class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/org']">
                                     <i class="icon las la-archway"></i>
                                     <span
@@ -94,13 +100,13 @@
                             </ng-template>
 
                             <ng-template appHasRole [appHasRole]="['project.read(:[0-9]*)?']">
-                                <div @navitem class="divider">
+                                <!-- <div @navitem class="divider">
                                     <div class="line"></div>
                                     <span>{{'MENU.PROJECTSSECTION' | translate}}</span>
                                     <div class="hiddenline"></div>
-                                </div>
+                                </div> -->
 
-                                <a @navitem class="nav-item" [routerLinkActive]="['active']"
+                                <a @navitem class="nav-item indented" [routerLinkActive]="['active']"
                                     [routerLink]="[ '/projects']">
                                     <i class="icon las la-layer-group"></i>
 
@@ -114,7 +120,7 @@
 
                                 <a @navitem
                                     *ngIf="mgmtService?.grantedProjectsCount && (mgmtService?.grantedProjectsCount | async)"
-                                    class="nav-item" [routerLinkActive]="['active']"
+                                    class="nav-item indented" [routerLinkActive]="['active']"
                                     [routerLink]="[ '/granted-projects']">
                                     <i class="icon las la-layer-group"></i>
                                     <div class="c_label">
@@ -125,20 +131,20 @@
                             </ng-template>
 
                             <ng-template appHasRole [appHasRole]="['user.read(:[0-9]*)?']">
-                                <div @navitem class="divider">
+                                <!-- <div @navitem class="divider">
                                     <div class="line"></div>
                                     <span class="label">
                                         {{ 'MENU.USERSECTION' | translate }}</span>
                                     <div class="hiddenline"></div>
-                                </div>
+                                </div> -->
 
-                                <a @navitem class="nav-item" [routerLinkActive]="['active']"
+                                <a @navitem class="nav-item indented" [routerLinkActive]="['active']"
                                     [routerLink]="[ '/users/list/humans']" [routerLinkActiveOptions]="{ exact: true }">
                                     <i class="icon las la-user-friends"></i>
                                     <span class="label">{{ 'MENU.HUMANUSERS' | translate }}</span>
                                 </a>
 
-                                <a @navitem class="nav-item" [routerLinkActive]="['active']"
+                                <a @navitem class="nav-item indented" [routerLinkActive]="['active']"
                                     [routerLink]="[ '/users/list/machines']"
                                     [routerLinkActiveOptions]="{ exact: true }">
                                     <i class="icon las la-users-cog"></i>
@@ -147,15 +153,15 @@
                             </ng-template>
 
                             <ng-template appHasRole [appHasRole]="['user.grant.read(:[0-9]*)?']">
-                                <div @navitem class="divider">
+                                <!-- <div @navitem class="divider">
                                     <div class="line"></div>
                                     <span class="label">
                                         {{ 'MENU.GRANTSECTION' | translate }}</span>
                                     <div class="hiddenline"></div>
-                                </div>
+                                </div> -->
 
-                                <a @navitem class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/grants']"
-                                    [routerLinkActiveOptions]="{ exact: true }">
+                                <a @navitem class="nav-item indented" [routerLinkActive]="['active']"
+                                    [routerLink]="[ '/grants']" [routerLinkActiveOptions]="{ exact: true }">
                                     <i class="icon las la-shield-alt"></i>
                                     <span class="label">{{ 'MENU.GRANTS' | translate }}</span>
                                 </a>
