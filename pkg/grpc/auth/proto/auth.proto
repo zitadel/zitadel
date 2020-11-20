@@ -652,8 +652,8 @@ message PasswordChange {
 
 enum MfaType {
   MFATYPE_UNSPECIFIED = 0;
-  MFATYPE_SMS = 1;
-  MFATYPE_OTP = 2;
+  MFATYPE_OTP = 1;
+  MFATYPE_U2F = 2;
 }
 
 message VerifyMfaOtp {

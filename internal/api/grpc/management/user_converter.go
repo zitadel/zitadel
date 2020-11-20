@@ -577,7 +577,7 @@ func mfaTypeFromModel(mfatype usr_model.MfaType) management.MfaType {
 	case usr_model.MfaTypeOTP:
 		return management.MfaType_MFATYPE_OTP
 	case usr_model.MfaTypeU2F:
-		return management.MfaType_MFATYPE_SMS
+		return management.MfaType_MFATYPE_U2F
 	default:
 		return management.MfaType_MFATYPE_UNSPECIFIED
 	}
