@@ -142,9 +142,10 @@
                             {{redirect}}
                             <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
                         </mat-chip>
-                        <input cnslInput [matChipInputFor]="chipRedirectList"
-                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
-                            [formControl]="redirectControl" (matChipInputTokenEnd)="add($event, RedirectType.REDIRECT)">
+                        <input cnslInput placeholder="{{'APP.OIDC.COMMAORENTERSEPERATION' | translate}}"
+                            [matChipInputFor]="chipRedirectList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                            [matChipInputAddOnBlur]="addOnBlur" [formControl]="redirectControl"
+                            (matChipInputTokenEnd)="add($event, RedirectType.REDIRECT)">
                     </mat-chip-list>
                 </cnsl-form-field>
 
@@ -161,7 +162,8 @@
                             {{redirect}}
                             <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
                         </mat-chip>
-                        <input cnslInput [matChipInputFor]="chipPostRedirectList"
+                        <input cnslInput placeholder="{{'APP.OIDC.COMMAORENTERSEPERATION' | translate}}"
+                            [matChipInputFor]="chipPostRedirectList"
                             [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
                             (matChipInputTokenEnd)="add($event, RedirectType.POSTREDIRECT)"
                             [formControl]="postRedirectControl">

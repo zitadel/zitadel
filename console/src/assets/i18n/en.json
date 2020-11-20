@@ -641,6 +641,7 @@
             "USERID":"User ID"
         },
         "GRANT": {
+            "EMPTY":"No granted organisation.",
             "TITLE": "Granted Organisations",
             "DESCRIPTION": "Allow an other organisation to use your project.",
             "CREATE": {
@@ -695,6 +696,7 @@
             "NAMEREQUIRED":"A name ist required."
         },
         "ROLE": {
+            "EMPTY":"No role has been created yet.",
             "ADDNEWLINE":"Add additional role",
             "KEY":"Key",
             "TITLE": "Roles",
@@ -856,6 +858,7 @@
             "REDIRECTDESCRIPTIONWEB":"Redirect URIs must begin with https://. http:// is only valid with enabled development mode.",
             "REDIRECTDESCRIPTIONNATIVE":"Redirect URIs must begin with your own protocol or http://localhost.",
             "REDIRECTNOTVALID":"This redirect URI is not valid.",
+            "COMMAORENTERSEPERATION":"seperate with , or ↵",
             "TYPEREQUIRED":"The type is required.",
             "TITLE": "OIDC Configuration",
             "CLIENTID": "Client ID",
