@@ -114,7 +114,8 @@
                                 </mat-option>
                             </mat-select>
                         </cnsl-form-field>
-                        <button *ngIf="context === UserGrantContext.USER || context === UserGrantContext.NONE"
+                        <button matTooltip="{{'ACTIONS.CLOSE' | translate}}"
+                            *ngIf="context === UserGrantContext.USER || context === UserGrantContext.NONE"
                             mat-icon-button (click)="grantToEdit=''">
                             <mat-icon>close</mat-icon>
                         </button>
@@ -132,7 +133,8 @@
                                 </mat-option>
                             </mat-select>
                         </cnsl-form-field>
-                        <button *ngIf="context === UserGrantContext.USER || context === UserGrantContext.NONE"
+                        <button matTooltip="{{'ACTIONS.CLOSE' | translate}}"
+                            *ngIf="context === UserGrantContext.USER || context === UserGrantContext.NONE"
                             mat-icon-button (click)="grantToEdit=''">
                             <mat-icon>close</mat-icon>
                         </button>

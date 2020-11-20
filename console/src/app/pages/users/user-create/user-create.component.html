@@ -57,7 +57,7 @@
                         {{ 'GENDERS.'+gender | translate }}
                     </mat-option>
                 </mat-select>
-                <span cnslError *ngIf="gender?.invalid && gender?.errors?.required">
+                <span cnsl-error *ngIf="gender?.invalid && gender?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                 </span>
             </cnsl-form-field>
@@ -67,7 +67,7 @@
                     <mat-option *ngFor="let language of languages" [value]="language">
                         {{ 'LANGUAGES.'+language | translate }}
                     </mat-option>
-                    <span cnslError *ngIf="preferredLanguage?.invalid && preferredLanguage?.errors?.required">
+                    <span cnsl-error *ngIf="preferredLanguage?.invalid && preferredLanguage?.errors?.required">
                         {{ 'USER.VALIDATION.REQUIRED' | translate }}
                     </span>
                 </mat-select>
@@ -78,7 +78,7 @@
             <cnsl-form-field class="formfield" appearance="fill">
                 <cnsl-label>{{ 'USER.PROFILE.PHONE' | translate }}</cnsl-label>
                 <input cnslInput formControlName="phone" />
-                <span cnslError *ngIf="phone?.invalid && phone?.errors?.required">
+                <span cnsl-error *ngIf="phone?.invalid && phone?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                 </span>
             </cnsl-form-field>

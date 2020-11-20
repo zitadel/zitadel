@@ -51,7 +51,17 @@
         "IAMADMIN":"Du bist ein IAM-Administrator. Beachte, dass Du erhöhte Rechte besitzt.",
         "SHOWORGS":"Alle Organisationen anzeigen",
         "GRANTSECTION":"Berechtigungssektion",
-        "GRANTS":"Berechtigungen"
+        "GRANTS":"Berechtigungen",
+        "TOOLTIP": {
+            "PERSONAL":"Zeige deinen persönlichen Account, deine IDPs, Login Methoden, Mfa and Berechtigungen",
+            "IAM":"Zeige ZITADELs globale Zugangsrichtlinien, bereinige views und fehlerhafte events",
+            "ORG":"Zeige Zugangsrichtlinien und Domains deiner Organisation ",
+            "SELFPROJECTS":"Zeige Projekte deiner Organisation",
+            "GRANTEDPROJECTS":"Zeige berechtigte Projekte von anderen Organisationen",
+            "HUMANUSERS":"Zeige alle Human users deiner Organisation",
+            "MACHINEUSERS":"Zeige Service User deiner your organisation",
+            "AUTHZ":"Zeige gültige Berechtigungen deiner Organisationsbenutzer"
+        }
     },
     "ACTIONS": {
         "SAVE": "Speichern",

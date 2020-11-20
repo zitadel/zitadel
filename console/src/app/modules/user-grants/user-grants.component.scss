@@ -73,7 +73,9 @@
 
   button {
     margin: .5rem 0;
+    display: block;
     max-width: 120px;
+    box-sizing: border-box;
 
     i {
       font-size: 1.2rem;

@@ -8,6 +8,8 @@
   $inv-color: mat-color($primary, A600);
   $primary-color: mat-color($primary, 500);
   $primary-light-color: mat-color($primary, 200);
+  $warn: map-get($theme, warn);
+  $warn-color: mat-color($warn, 500);
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
 
@@ -42,6 +44,10 @@
     &:active,
     &:focus {
         border-color: $primary-color;
+    }
+
+    &.ng-invalid {
+        border-color: $warn-color;
     }
 
     &[disabled] {

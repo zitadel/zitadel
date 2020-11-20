@@ -38,7 +38,8 @@
                             <cnsl-label>{{'PROJECT.NAME' | translate}}</cnsl-label>
                             <input cnslInput [(ngModel)]="project.name" name="name" />
                         </cnsl-form-field>
-                        <button class="icon-button" *ngIf="editstate" mat-icon-button (click)="updateName()">
+                        <button matTooltip="{{'ACTIONS.SAVE' | translate}}" class="icon-button" *ngIf="editstate"
+                            mat-icon-button (click)="updateName()">
                             <mat-icon>check</mat-icon>
                         </button>
                     </ng-container>
