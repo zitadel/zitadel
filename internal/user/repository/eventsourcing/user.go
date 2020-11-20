@@ -846,7 +846,7 @@ func MFAU2FSignCountAggregate(aggCreator *es_models.AggregateCreator, user *mode
 	}
 }
 
-func MFAPasswordlessSignCountAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNSignCount, check *model.AuthRequest, checkSucceeded bool) es_sdk.AggregateFunc {
+func MFAPasswordlessSignCountAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNSignCount, check *model.AuthRequest, checkSucceeded bool) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if webauthN == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-4N90s", "Errors.Internal")

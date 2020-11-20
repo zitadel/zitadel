@@ -122,7 +122,6 @@ func (w *WebAuthN) BeginLogin(user *usr_model.User, userVerification usr_model.U
 		User:        user,
 		credentials: WebAuthNsToCredentials(webAuthNs),
 	}, webauthn.WithUserVerification(UserVerificationFromModel(userVerification)))
-
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "WEBAU-4G8sw", "Errors.User.WebAuthN.BeginLoginFailed")
 	}
@@ -140,6 +139,9 @@ func (w *WebAuthN) BeginLogin(user *usr_model.User, userVerification usr_model.U
 
 func (w *WebAuthN) FinishLogin(user *usr_model.User, webAuthN *usr_model.WebAuthNLogin, credData []byte, webAuthNs ...*usr_model.WebAuthNToken) ([]byte, uint32, error) {
 	assertionData, err := protocol.ParseCredentialRequestResponseBody(bytes.NewReader(credData))
+	if err != nil {
+		return nil, 0, caos_errs.ThrowInternal(err, "WEBAU-ADgv4", "Errors.User.WebAuthN.ValidateLoginFailed")
+	}
 	webUser := &webUser{
 		User:        user,
 		credentials: WebAuthNsToCredentials(webAuthNs),
@@ -150,7 +152,7 @@ func (w *WebAuthN) FinishLogin(user *usr_model.User, webAuthN *usr_model.WebAuth
 	}
 
 	if credential.Authenticator.CloneWarning {
-		return nil, 0, caos_errs.ThrowInternal(err, "WEBAU-4M90s", "Errors.User.WebAuthN.CloneWarning")
+		return credential.ID, credential.Authenticator.SignCount, caos_errs.ThrowInternal(err, "WEBAU-4M90s", "Errors.User.WebAuthN.CloneWarning")
 	}
 	return credential.ID, credential.Authenticator.SignCount, nil
 }

@@ -1312,11 +1312,11 @@ func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model
 	if err != nil {
 		return nil, err
 	}
-	id, err := es.idGenerator.Next()
+	tokenID, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
-	webAuthN.WebAuthNTokenID = id
+	webAuthN.WebAuthNTokenID = tokenID
 	repoUser := model.UserFromModel(user)
 	repoWebAuthN := model.WebAuthNFromModel(webAuthN)
 
@@ -1394,8 +1394,8 @@ func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID string, crede
 	}
 	_, u2f := user.GetU2FLogin(authRequest.ID)
 	keyID, signCount, finishErr := es.webauthn.FinishLogin(user, u2f, credentialData, user.U2FTokens...)
-	if err != nil {
-		return err
+	if finishErr != nil && keyID == nil {
+		return finishErr
 	}
 
 	_, token := user.GetU2FByKeyID(keyID)
@@ -1403,7 +1403,11 @@ func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID string, crede
 	repoAuthRequest := model.AuthRequestFromModel(authRequest)
 
 	signAgg := MFAU2FSignCountAggregate(es.AggregateCreator(), repoUser, &model.WebAuthNSignCount{WebauthNTokenID: token.WebAuthNTokenID, SignCount: signCount}, repoAuthRequest, finishErr == nil)
-	return es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, signAgg)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, signAgg)
+	if err != nil {
+		return err
+	}
+	return finishErr
 }
 
 func (es *UserEventstore) AddPasswordless(ctx context.Context, userID string) (*usr_model.WebAuthNToken, error) {
@@ -1415,11 +1419,11 @@ func (es *UserEventstore) AddPasswordless(ctx context.Context, userID string) (*
 	if err != nil {
 		return nil, err
 	}
-	id, err := es.idGenerator.Next()
+	tokenID, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
-	webAuthN.WebAuthNTokenID = id
+	webAuthN.WebAuthNTokenID = tokenID
 	repoUser := model.UserFromModel(user)
 	repoWebAuthN := model.WebAuthNFromModel(webAuthN)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAPasswordlessAddAggregate(es.AggregateCreator(), repoUser, repoWebAuthN))
@@ -1495,15 +1499,19 @@ func (es *UserEventstore) VerifyPasswordless(ctx context.Context, userID string,
 	}
 	_, passwordless := user.GetPasswordlessLogin(authRequest.ID)
 	keyID, signCount, finishErr := es.webauthn.FinishLogin(user, passwordless, credentialData, user.PasswordlessTokens...)
-	if err != nil {
-		return err
+	if finishErr != nil && keyID == nil {
+		return finishErr
 	}
 	_, token := user.GetPasswordlessByKeyID(keyID)
 	repoUser := model.UserFromModel(user)
 	repoAuthRequest := model.AuthRequestFromModel(authRequest)
 
-	signAgg := MFAU2FSignCountAggregate(es.AggregateCreator(), repoUser, &model.WebAuthNSignCount{WebauthNTokenID: token.WebAuthNTokenID, SignCount: signCount}, repoAuthRequest, finishErr == nil)
-	return es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, signAgg)
+	signAgg := MFAPasswordlessSignCountAggregate(es.AggregateCreator(), repoUser, &model.WebAuthNSignCount{WebauthNTokenID: token.WebAuthNTokenID, SignCount: signCount}, repoAuthRequest, finishErr == nil)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, signAgg)
+	if err != nil {
+		return err
+	}
+	return finishErr
 }
 
 func (es *UserEventstore) SignOut(ctx context.Context, agentID string, userIDs []string) error {
