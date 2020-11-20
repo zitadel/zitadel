@@ -547,7 +547,11 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 
 	if (request.SelectedIDPConfigID != "" || userSession.SelectedIDPConfigID != "") && (request.LinkingUsers == nil || len(request.LinkingUsers) == 0) {
 		if !checkVerificationTime(userSession.ExternalLoginVerification, repo.ExternalLoginCheckLifeTime) {
-			return append(steps, &model.ExternalLoginStep{}), nil
+			selectedIDPConfigID := request.SelectedIDPConfigID
+			if selectedIDPConfigID == "" {
+				selectedIDPConfigID = userSession.SelectedIDPConfigID
+			}
+			return append(steps, &model.ExternalLoginStep{SelectedIDPConfigID: selectedIDPConfigID}), nil
 		}
 	} else if (request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == "") || (request.SelectedIDPConfigID != "" && request.LinkingUsers != nil && len(request.LinkingUsers) > 0) {
 		if user.InitRequired {
