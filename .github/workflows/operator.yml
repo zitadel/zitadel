@@ -53,7 +53,7 @@ jobs:
           push: false
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
-          output: type=local,dest=/tmp/operator
+          outputs: type=local,dest=/tmp/operator
           build-args: |
             OS=${{ matrix.goos }}
             ARCH=${{ matrix.goarch }}
@@ -107,7 +107,7 @@ jobs:
           push: true
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
-          output: type=local,dest=/tmp/operator
+          outputs: type=local,dest=/tmp/operator
           build-args: |
             OS=${{ matrix.goos }}
             ARCH=${{ matrix.goarch }}
