@@ -16,7 +16,7 @@ type ConfigChangedEvent struct {
 
 func NewConfigChangedEvent(
 	base *eventstore.BaseEvent,
-	current *ConfigAggregate,
+	current,
 	changed *ConfigAggregate,
 ) (*ConfigChangedEvent, error) {
 

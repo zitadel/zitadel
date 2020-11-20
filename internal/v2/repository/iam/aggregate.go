@@ -21,6 +21,8 @@ type Aggregate struct {
 
 	SetUpStarted Step
 	SetUpDone    Step
+
+	Members MembersAggregate
 }
 
 func NewAggregate(

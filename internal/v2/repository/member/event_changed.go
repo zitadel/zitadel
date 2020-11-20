@@ -34,7 +34,7 @@ func (e *ChangedEvent) Data() interface{} {
 func NewChangedEvent(
 	base *eventstore.BaseEvent,
 	current,
-	changed *WriteModel,
+	changed *Aggregate,
 ) (*ChangedEvent, error) {
 
 	change := &ChangedEvent{

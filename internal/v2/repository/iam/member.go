@@ -13,10 +13,6 @@ var (
 	MemberRemovedEventType = iamEventTypePrefix + member.RemovedEventType
 )
 
-type MemberWriteModel struct {
-	member.WriteModel
-}
-
 type MemberReadModel struct {
 	member.ReadModel
 }
@@ -67,7 +63,7 @@ func NewMemberAddedEvent(
 func NewMemberChangedEvent(
 	ctx context.Context,
 	current,
-	changed *MemberWriteModel,
+	changed *MemberAggregate,
 ) (*MemberChangedEvent, error) {
 
 	m, err := member.NewChangedEvent(

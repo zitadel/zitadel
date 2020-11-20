@@ -26,7 +26,6 @@ func (r *Repository) AddIAMMember(ctx context.Context, member *iam_model.IAMMemb
 
 	iamAgg := iam_repo.AggregateFromReadModel(iam).
 		PushMemberAdded(ctx, member.UserID, member.Roles...)
-		// PushEvents(iam_repo.NewMemberAddedEvent(ctx, member.UserID, member.Roles...))
 
 	events, err := r.eventstore.PushAggregates(ctx, iamAgg)
 	if err != nil {

@@ -13,7 +13,7 @@ type ConfigAggregate struct {
 	Name        string
 	StylingType StylingType
 	State       ConfigState
-	OIDCConfig  *oidc.ConfigReadModel
+	// OIDCConfig  *oidc.ConfigReadModel
 }
 
 type ConfigReadModel struct {
