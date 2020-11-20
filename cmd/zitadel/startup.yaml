@@ -11,6 +11,11 @@ Tracing:
     Fraction: $ZITADEL_TRACING_FRACTION
     Endpoint: $ZITADEL_TRACING_ENDPOINT
 
+Metrics:
+  Type: 'otel'
+  Config:
+    MeterName: 'github.com/caos/zitadel'
+
 AuthZ:
   Repository:
     Eventstore:

@@ -10,8 +10,9 @@ import (
 )
 
 type Meter struct {
-	meter    metric.Meter
-	counters map[string]metric.Int64Counter
+	meter         metric.Meter
+	counters      map[string]metric.Int64Counter
+	upDownCounter map[string]metric.Int64UpDownCounter
 }
 
 func NewMeter(name string) metrics.Meter {
@@ -38,5 +39,9 @@ func (m *Meter) AddCount(ctx context.Context, name string, value int64, labels m
 }
 
 func mapToKeyValue(labels map[string]interface{}) []label.KeyValue {
-	return nil
+	keyValues := make([]label.KeyValue, 0)
+	for key, value := range labels {
+		keyValues = append(keyValues, label.Any(key, value))
+	}
+	return keyValues
 }
