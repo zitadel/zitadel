@@ -94,4 +94,6 @@ SetUp:
   Step6:
     DefaultLabelPolicy:
       PrimaryColor: '#222324'
-      SecondaryColor: '#ffffff'  
+      SecondaryColor: '#ffffff'
+  Step7:
+    DefaultSecondFactor: 1 #SecondFactorTypeOTP
