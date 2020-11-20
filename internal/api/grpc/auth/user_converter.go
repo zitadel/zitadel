@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/pkg/grpc/auth"
 	"github.com/caos/zitadel/pkg/grpc/message"
@@ -96,7 +98,7 @@ func profileViewFromModel(profile *usr_model.Profile) *auth.UserProfileView {
 
 func updateProfileToModel(ctx context.Context, u *auth.UpdateUserProfileRequest) *usr_model.Profile {
 	preferredLanguage, err := language.Parse(u.PreferredLanguage)
-	logging.Log("GRPC-lk73L").OnError(err).Debug("language malformed")
+	logging.Log("GRPC-lk73L").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("language malformed")
 
 	return &usr_model.Profile{
 		ObjectRoot:        models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
