@@ -8,12 +8,12 @@ env:
   DOCKER_IMAGE_NAME: ${{ github.repository }}-operator
 
 jobs:
-  binary:
+  container:
     runs-on: ubuntu-18.04
     name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
     strategy:
       matrix:
-        goos: [ 'darwin', 'windows' ]
+        goos: [ 'linux' 'darwin', 'windows']
         goarch: [ 'amd64' ]
     steps:
       - name: Source checkout
@@ -44,7 +44,7 @@ jobs:
           password: ${{ secrets.CR_PAT }}
           registry: ${{ env.REGISTRY }}
       - uses: docker/build-push-action@v2
-        name: onylbuild
+        name: onlybuild
         with:
           context: .
           file: ./build/operator/Dockerfile
@@ -61,43 +61,8 @@ jobs:
         with:
           name: zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
           path: /tmp/operator/zitadelctl
-
-  container:
-    runs-on: ubuntu-18.04
-    name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
-    strategy:
-      matrix:
-        goos: [ 'linux' ]
-        goarch: [ 'amd64' ]
-    steps:
-      - name: Source checkout
-        uses: actions/checkout@v2
-      - name: Set output
-        id: branch
-        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
-      - name: Check output
-        run: echo ${{ steps.branch.outputs.short_ref }}
-      - name: Generate Short SHA Container Tag
-        id: vars
-        run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
-      - name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ github.actor }}
-          password: ${{ secrets.CR_PAT }}
-          registry: ${{ env.REGISTRY }}
       - uses: docker/build-push-action@v2
+        if: ${{ matrix.goos == 'linux' && matrix.goarch == 'amd64' }}
         name: buildandpush
         with:
           context: .
@@ -107,14 +72,9 @@ jobs:
           push: true
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
-          outputs: type=local,dest=/tmp/operator
           build-args: |
             OS=${{ matrix.goos }}
             ARCH=${{ matrix.goarch }}
-      - uses: actions/upload-artifact@v2
-        with:
-          name: zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: /tmp/operator/zitadelctl
 
   release:
     runs-on: ubuntu-18.04
