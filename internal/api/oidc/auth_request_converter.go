@@ -15,9 +15,10 @@ import (
 )
 
 const (
-	amrPassword = "password"
-	amrMFA      = "mfa"
-	amrOTP      = "otp"
+	amrPassword     = "password"
+	amrMFA          = "mfa"
+	amrOTP          = "otp"
+	amrUserPresence = "user"
 )
 
 type AuthRequest struct {
@@ -247,10 +248,9 @@ func AMRFromMFAType(mfaType model.MFAType) string {
 	switch mfaType {
 	case model.MFATypeOTP:
 		return amrOTP
-	//case model.MFATypeU2F:
-	//return amr
-	//case model.MFATypeU2FUserVerification:
-	//return amrHWK
+	case model.MFATypeU2F,
+		model.MFATypeU2FUserVerification:
+		return amrUserPresence
 	default:
 		return ""
 	}
