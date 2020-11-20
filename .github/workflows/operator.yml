@@ -13,7 +13,7 @@ jobs:
     name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
     strategy:
       matrix:
-        goos: [ 'linux' 'darwin', 'windows']
+        goos: [ 'linux', 'darwin', 'windows']
         goarch: [ 'amd64' ]
     steps:
       - name: Source checkout
