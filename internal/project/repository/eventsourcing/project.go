@@ -513,7 +513,7 @@ func addProjectValidation(projectName string) func(...*es_models.Event) error {
 			case model.ProjectChanged:
 				_, project := model.GetProject(projects, event.AggregateID)
 				project.AppendAddProjectEvent(event)
-			case model.ProjectRoleRemoved:
+			case model.ProjectRemoved:
 				for i, project := range projects {
 					if project.AggregateID == event.AggregateID {
 						projects[i] = projects[len(projects)-1]
