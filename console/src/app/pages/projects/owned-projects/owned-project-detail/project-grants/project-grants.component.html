@@ -56,8 +56,9 @@
             </ng-container>
 
             <ng-container matColumnDef="roleNamesList">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }} </th>
-                <td class="pointer" mat-cell *matCellDef="let grant">
+                <th mat-header-cell *matHeaderCellDef class="role-row"> {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}
+                </th>
+                <td class="pointer role-row" mat-cell *matCellDef="let grant">
                     <cnsl-form-field class="form-field" appearance="outline" *ngIf="grant.roleKeysList">
                         <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
                         <mat-select [(ngModel)]="grant.roleKeysList" multiple [disabled]="disabled"

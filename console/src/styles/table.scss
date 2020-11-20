@@ -48,9 +48,13 @@
 
       &:hover {
         td {
-          background: var(--table-row-back); // rgba($inv-color, .05);
+          background: if($is-dark-theme,  #292a2b ,#f4f4f4); // rgba($inv-color, .05);
         }
       }
+    }
+
+    &.no-data-row {
+        text-align: center;
     }
   }
 }

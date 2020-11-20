@@ -168,7 +168,6 @@ $custom-typography:
   @include angular-material-theme($light-theme);
 
   --grey: #697386;
-  --table-row-back: #e7ebf0;
   --color-main: #5469d4;
 
   .sidenav,
@@ -206,7 +205,6 @@ $custom-typography:
   @include component-themes($dark-theme);
   @include angular-material-theme($dark-theme);
 
-  --table-row-back: #292a2b;
   --color-main: #5282c1;
 
   .sidenav,

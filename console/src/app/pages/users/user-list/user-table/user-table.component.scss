@@ -22,18 +22,27 @@
 
     th {
       .search-button {
-        display: none;
+        visibility: hidden;
+        width: 30px;
+
+        .icon {
+            font-size: 1.2rem;
+        }
       }
 
       &:hover,
       &.search-active {
         .search-button {
-          display: inline-block;
+          visibility: visible;
         }
       }
     }
 
     tr {
+      .dlt-button {
+        visibility: hidden;
+      }
+
       &:hover {
         .dlt-button {
           visibility: visible;

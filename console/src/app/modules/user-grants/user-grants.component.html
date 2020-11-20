@@ -153,7 +153,7 @@
 
 <ng-template #templateRef let-key="key">
     <button class="search-button" mat-icon-button (click)="setFilter(key)">
-        <mat-icon *ngIf="this.userGrantSearchKey != key">search</mat-icon>
-        <mat-icon *ngIf="this.userGrantSearchKey == key">search_off</mat-icon>
+        <mat-icon class="icon" *ngIf="this.userGrantSearchKey != key">search</mat-icon>
+        <mat-icon class="icon" *ngIf="this.userGrantSearchKey == key">search_off</mat-icon>
     </button>
 </ng-template>

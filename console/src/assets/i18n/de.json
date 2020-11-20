@@ -81,6 +81,9 @@
         "SEND":"Senden",
         "NEWVALUE":"Neuer Wert"
     },
+    "TABLE": {
+        "NOROWS":"Keine Daten"
+    },
     "ERRORS": {
         "REQUIRED": "Bitte fülle alle benötigten Felder aus.",
         "TOKENINVALID": {
