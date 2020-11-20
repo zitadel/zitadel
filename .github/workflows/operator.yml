@@ -53,13 +53,14 @@ jobs:
           push: false
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
+          output: type=local,dest=/tmp/operator
           build-args: |
             OS=${{ matrix.goos }}
             ARCH=${{ matrix.goarch }}
       - uses: actions/upload-artifact@v2
         with:
           name: zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: zitadelctl
+          path: /tmp/operator/zitadelctl
 
   container:
     runs-on: ubuntu-18.04
@@ -106,13 +107,14 @@ jobs:
           push: true
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
+          output: type=local,dest=/tmp/operator
           build-args: |
             OS=${{ matrix.goos }}
             ARCH=${{ matrix.goarch }}
       - uses: actions/upload-artifact@v2
         with:
           name: zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: zitadelctl
+          path: /tmp/operator/zitadelctl
 
   release:
     runs-on: ubuntu-18.04
