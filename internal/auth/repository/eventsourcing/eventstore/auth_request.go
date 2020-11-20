@@ -239,10 +239,6 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 		return err
 	}
 	request.SetUserInfo(user.ID, user.PreferredLoginName, user.DisplayName, user.ResourceOwner)
-	err = repo.fillLoginPolicy(ctx, request)
-	if err != nil {
-		return err
-	}
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
