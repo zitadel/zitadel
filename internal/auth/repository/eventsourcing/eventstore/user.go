@@ -110,7 +110,7 @@ func (repo *UserRepo) ChangeMyProfile(ctx context.Context, profile *model.Profil
 func (repo *UserRepo) SearchMyExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, seqErr := repo.View.GetLatestExternalIDPSequence()
-	logging.Log("EVENT-5Jsi8").OnError(seqErr).Warn("could not read latest user sequence")
+	logging.Log("EVENT-5Jsi8").OnError(seqErr).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest user sequence")
 	request.AppendUserQuery(authz.GetCtxData(ctx).UserID)
 	externalIDPS, count, err := repo.View.SearchExternalIDPs(request)
 	if err != nil {
@@ -268,7 +268,7 @@ func (repo *UserRepo) AddMfaOTP(ctx context.Context, userID string) (*model.OTP,
 	accountName := ""
 	user, err := repo.UserByID(ctx, userID)
 	if err != nil {
-		logging.Log("EVENT-Fk93s").WithError(err).Debug("unable to get user for loginname")
+		logging.Log("EVENT-Fk93s").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get user for loginname")
 	} else {
 		accountName = user.PreferredLoginName
 	}
@@ -279,7 +279,7 @@ func (repo *UserRepo) AddMyMfaOTP(ctx context.Context) (*model.OTP, error) {
 	accountName := ""
 	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
-		logging.Log("EVENT-Ml0sd").WithError(err).Debug("unable to get user for loginname")
+		logging.Log("EVENT-Ml0sd").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get user for loginname")
 	} else {
 		accountName = user.PreferredLoginName
 	}
@@ -370,7 +370,7 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*model.UserView,
 	}
 	events, err := repo.UserEvents.UserEventsByID(ctx, id, user.Sequence)
 	if err != nil {
-		logging.Log("EVENT-PSoc3").WithError(err).Debug("error retrieving new events")
+		logging.Log("EVENT-PSoc3").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
 		return usr_view_model.UserToModel(user), nil
 	}
 	userCopy := *user
