@@ -12,6 +12,10 @@
   $is-dark-theme: map-get($theme, is-dark);
   /* stylelint-enable */
 
+  .meta {
+    box-shadow: inset 1px 0 if($is-dark-theme, #303131, #e3e8ee);
+  }
+
   .nav-item {
     color: mat-color($foreground, text) !important;
 

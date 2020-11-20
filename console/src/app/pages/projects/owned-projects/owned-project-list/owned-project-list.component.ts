@@ -73,7 +73,6 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
 
     public ngOnInit(): void {
         this.route.queryParams.pipe(take(1)).subscribe(params => {
-            console.log(params);
             this.getData();
             if (params.deferredReload) {
                 setTimeout(() => {

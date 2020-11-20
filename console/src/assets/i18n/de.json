@@ -425,6 +425,7 @@
             "ACTIVE":"Aktiv",
             "CREATE":"Organisation erstellen",
             "ORGDETAIL_TITLE":"Gebe den Namen und die Domain für die neue Organisation ein.",
+            "ORGDETAIL_TITLE_WITHOUT_DOMAIN":"Geben Sie den Namen der neuen Organisation ein.",
             "ORGDETAILUSER_TITLE":"Organisationsbesitzer hinzufügen",
             "ORGDOMAIN": {
                 "TITLE":"Verifikation der Domain der Organisation",
