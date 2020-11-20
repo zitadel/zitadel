@@ -63,7 +63,7 @@ jobs:
 
   container:
     runs-on: ubuntu-18.04
-      name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
+    name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
     strategy:
       matrix:
         goos: [ 'linux' ]
