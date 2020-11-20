@@ -6,15 +6,9 @@ import (
 )
 
 type Config struct {
-	Endpoint string
 }
 
 func (c *Config) NewMetrics() error {
-	exporter, err := otlp.NewExporter(otlp.WithAddress(c.Endpoint), otlp.WithInsecure())
-	if err != nil {
-		return err
-	}
-
-	metrics.M = NewMeter(exporter)
+	metrics.M = NewMeter()
 	return nil
 }
