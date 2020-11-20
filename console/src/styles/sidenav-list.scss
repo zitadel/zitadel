@@ -102,11 +102,11 @@
 
   .divider {
     .span {
-      border-color: if($is-dark-theme, #303131,#e3e8ee);
+      border-color: if($is-dark-theme, #303131, #e3e8ee);
     }
 
     .line {
-      background-color: if($is-dark-theme, #303131,#e3e8ee);
+      background-color: if($is-dark-theme, #303131, #e3e8ee);
     }
   }
 }

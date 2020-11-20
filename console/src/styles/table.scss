@@ -32,9 +32,9 @@
     letter-spacing: .05em;
     font-weight: bold;
     white-space: nowrap;
-    
+
     &.mat-header-cell {
-        color: var(--grey);
+      color: var(--grey);
     }
   }
 
@@ -55,18 +55,18 @@
 
       &:hover {
         td {
-          background: if($is-dark-theme,  #292a2b ,#f4f4f4); // rgba($inv-color, .05);
+          background: if($is-dark-theme, #292a2b, #f4f4f4); // rgba($inv-color, .05);
         }
       }
     }
   }
 
   .mat-checkbox {
-      margin-left: 1rem;
+    margin-left: 1rem;
   }
 
   .no-content-row {
-    background-color: rgba( $warn-color, .1 );
+    background-color: rgba($warn-color, .1);
     color: $warn-color;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
