@@ -109,12 +109,10 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 		return nil, err
 	}
 	request.Audience = appIDs
-	projectIDAud := request.GetScopeProjectIDsForAud()
-	request.Audience = append(request.Audience, projectIDAud...)
 	request.AppendAudIfNotExisting(app.ProjectID)
 	if request.LoginHint != "" {
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
-		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID).OnError(err).Debug("login hint invalid")
+		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Debug("login hint invalid")
 	}
 	err = repo.AuthRequests.SaveAuthRequest(ctx, request)
 	if err != nil {
@@ -549,7 +547,11 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 
 	if (request.SelectedIDPConfigID != "" || userSession.SelectedIDPConfigID != "") && (request.LinkingUsers == nil || len(request.LinkingUsers) == 0) {
 		if !checkVerificationTime(userSession.ExternalLoginVerification, repo.ExternalLoginCheckLifeTime) {
-			return append(steps, &model.ExternalLoginStep{}), nil
+			selectedIDPConfigID := request.SelectedIDPConfigID
+			if selectedIDPConfigID == "" {
+				selectedIDPConfigID = userSession.SelectedIDPConfigID
+			}
+			return append(steps, &model.ExternalLoginStep{SelectedIDPConfigID: selectedIDPConfigID}), nil
 		}
 	} else if (request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == "") || (request.SelectedIDPConfigID != "" && request.LinkingUsers != nil && len(request.LinkingUsers) > 0) {
 		if user.InitRequired {
@@ -624,11 +626,15 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *model.AuthRequest) (
 
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *model.AuthRequest, user *user_model.UserView) (model.NextStep, bool, error) {
 	mfaLevel := request.MfaLevel()
-	promptRequired := (user.MfaMaxSetUp < mfaLevel) || !user.HasRequiredOrgMFALevel(request.LoginPolicy)
-	if promptRequired || !repo.mfaSkippedOrSetUp(user, request.LoginPolicy) {
+	allowedProviders, required := user.MfaTypesAllowed(mfaLevel, request.LoginPolicy)
+	promptRequired := (user.MfaMaxSetUp < mfaLevel) || (len(allowedProviders) == 0 && required)
+	if promptRequired || !repo.mfaSkippedOrSetUp(user) {
 		types := user.MfaTypesSetupPossible(mfaLevel, request.LoginPolicy)
 		if promptRequired && len(types) == 0 {
 			return nil, false, errors.ThrowPreconditionFailed(nil, "LOGIN-5Hm8s", "Errors.Login.LoginPolicy.MFA.ForceAndNotConfigured")
+		}
+		if len(types) == 0 {
+			return nil, true, nil
 		}
 		return &model.MfaPromptStep{
 			Required:     promptRequired,
@@ -639,7 +645,7 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 	default:
 		fallthrough
 	case model.MFALevelNotSetUp:
-		if user.MfaMaxSetUp == model.MFALevelNotSetUp {
+		if len(allowedProviders) == 0 {
 			return nil, true, nil
 		}
 		fallthrough
@@ -658,11 +664,11 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 		}
 	}
 	return &model.MfaVerificationStep{
-		MfaProviders: user.MfaTypesAllowed(mfaLevel, request.LoginPolicy),
+		MfaProviders: allowedProviders,
 	}, false, nil
 }
 
-func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView, policy *iam_model.LoginPolicyView) bool {
+func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
 	if user.MfaMaxSetUp > model.MFALevelNotSetUp {
 		return true
 	}
@@ -721,7 +727,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 	}
 	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence)
 	if err != nil {
-		logging.Log("EVENT-Hse6s").WithError(err).Debug("error retrieving new events")
+		logging.Log("EVENT-Hse6s").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
 		return user_view_model.UserSessionToModel(session), nil
 	}
 	sessionCopy := *session
@@ -742,7 +748,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			es_model.HumanSignedOut:
 			eventData, err := user_view_model.UserSessionFromEvent(event)
 			if err != nil {
-				logging.Log("EVENT-sdgT3").WithError(err).Debug("error getting event data")
+				logging.Log("EVENT-sdgT3").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error getting event data")
 				return user_view_model.UserSessionToModel(session), nil
 			}
 			if eventData.UserAgentID != agentID {
@@ -791,7 +797,7 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	}
 	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence)
 	if err != nil {
-		logging.Log("EVENT-dfg42").WithError(err).Debug("error retrieving new events")
+		logging.Log("EVENT-dfg42").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
 		return user_view_model.UserToModel(user), nil
 	}
 	if len(events) == 0 {

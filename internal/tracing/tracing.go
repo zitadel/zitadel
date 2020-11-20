@@ -4,18 +4,18 @@ import (
 	"context"
 	"net/http"
 
-	"go.opencensus.io/trace"
+	api_trace "go.opentelemetry.io/otel/api/trace"
+	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 type Tracer interface {
-	Start() error
 	NewSpan(ctx context.Context, caller string) (context.Context, *Span)
 	NewClientSpan(ctx context.Context, caller string) (context.Context, *Span)
 	NewServerSpan(ctx context.Context, caller string) (context.Context, *Span)
 	NewClientInterceptorSpan(ctx context.Context, name string) (context.Context, *Span)
 	NewServerInterceptorSpan(ctx context.Context, name string) (context.Context, *Span)
 	NewSpanHTTP(r *http.Request, caller string) (*http.Request, *Span)
-	Sampler() trace.Sampler
+	Sampler() sdk_trace.Sampler
 }
 
 type Config interface {
@@ -24,9 +24,9 @@ type Config interface {
 
 var T Tracer
 
-func Sampler() trace.Sampler {
+func Sampler() sdk_trace.Sampler {
 	if T == nil {
-		return trace.NeverSample()
+		return sdk_trace.NeverSample()
 	}
 	return T.Sampler()
 }
@@ -78,4 +78,8 @@ func NewSpanHTTP(r *http.Request) (*http.Request, *Span) {
 		return r, CreateSpan(nil)
 	}
 	return T.NewSpanHTTP(r, GetCaller())
+}
+
+func TraceIDFromCtx(ctx context.Context) string {
+	return api_trace.SpanFromContext(ctx).SpanContext().TraceID.String()
 }

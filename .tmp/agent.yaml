@@ -1,0 +1,20 @@
+server:
+  log_level: debug
+  http_listen_port: 12345
+
+tempo:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: ":9096"
+  attributes:
+    actions:
+    - action: upsert
+      key: env
+      value: prod
+  push_config:
+    endpoint: tempo-us-central1.grafana.net:443
+    basic_auth:
+      username: $(gopass show caos-secrets/technical/boom/grafana-cloud/tempo-user)
+      password: $(gopass show caos-secrets/technical/boom/grafana-cloud/tempo-password)
