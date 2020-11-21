@@ -56,6 +56,8 @@ func (m *LoginPolicy) processLoginPolicy(event *models.Event) (err error) {
 			return err
 		}
 		err = policy.AppendEvent(event)
+	case model.LoginPolicyRemoved:
+		return m.view.DeleteLoginPolicy(event.AggregateID, event.Sequence)
 	default:
 		return m.view.ProcessedLoginPolicySequence(event.Sequence)
 	}

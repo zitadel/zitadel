@@ -5,8 +5,9 @@ import (
 
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/tracing"
-	tracing_g "github.com/caos/zitadel/internal/tracing/google"
-	tracing_log "github.com/caos/zitadel/internal/tracing/log"
+	"github.com/caos/zitadel/internal/tracing/google"
+	"github.com/caos/zitadel/internal/tracing/log"
+	"github.com/caos/zitadel/internal/tracing/otel"
 )
 
 type TracingConfig struct {
@@ -15,8 +16,9 @@ type TracingConfig struct {
 }
 
 var tracer = map[string]func() tracing.Config{
-	"google": func() tracing.Config { return &tracing_g.Config{} },
-	"log":    func() tracing.Config { return &tracing_log.Config{} },
+	"otel":   func() tracing.Config { return &otel.Config{} },
+	"google": func() tracing.Config { return &google.Config{} },
+	"log":    func() tracing.Config { return &log.Config{} },
 	"none":   func() tracing.Config { return &NoTracing{} },
 	"":       func() tracing.Config { return &NoTracing{} },
 }

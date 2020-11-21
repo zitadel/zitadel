@@ -15,7 +15,6 @@
     export let seo;
     import { onMount } from 'svelte';
     import { initPhotoSwipeFromDOM } from '../utils/photoswipe.js';
-    import SearchSelector from '../components/SearchSelector.svelte';
 
     onMount(() => {
         initPhotoSwipeFromDOM('.zitadel-gallery');
@@ -33,10 +32,10 @@
 <svelte:head>
   <title>{manifest.name} • {slug}</title>    
 
-   { @html seo}
+    {#if seo}
+    { @html seo}
+   {/if}
 </svelte:head>
 
 <DocsHeader {slug}></DocsHeader>
-<Docs {sections} project="zitadel/site" dir="{slug}"/>
-
-<!-- <SearchSelector></SearchSelector> -->
+<Docs {sections} dir="{slug}"/>

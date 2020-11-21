@@ -43,6 +43,7 @@ type UserGrantView struct {
 	DisplayName      string         `json:"-" gorm:"column:display_name"`
 	Email            string         `json:"-" gorm:"column:email"`
 	ProjectName      string         `json:"-" gorm:"column:project_name"`
+	ProjectOwner     string         `json:"-" gorm:"column:project_owner"`
 	OrgName          string         `json:"-" gorm:"column:org_name"`
 	OrgPrimaryDomain string         `json:"-" gorm:"column:org_primary_domain"`
 	RoleKeys         pq.StringArray `json:"roleKeys" gorm:"column:role_keys"`

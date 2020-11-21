@@ -19,6 +19,10 @@
             locale.set(language);
         }
     }
+
+    locale.subscribe(l => {
+        console.log(l);
+    })
 </script>
 
 <style>
@@ -206,7 +210,8 @@
         <div class="section">
             <div class="left">
                 <blockquote>
-                    <p>{$_('languagealsoavailable')}: 
+                
+                    <p>{$_('languagealsoavailable')}:
                     {#each LANGUAGES as lang}
                         {#if lang != $locale}
                             <a href="/" on:click="{() => reload(lang)}" class="{lang == $locale ? 'current': ''}">{lang == 'de'? 'Deutsch (WIP)' : 'English'}</a>
@@ -259,12 +264,6 @@
                             <a class="link" href="integrate#Server_Side_Application">{$_('integratelink_ssr')}</a>
                             <a class="link" href="integrate#Mobile_App_Native_App">{$_('integratelink_nativeapp')}</a>
                         </div>
-                    <!-- {:else if $locale == 'de'}
-                        <div class="sectionlinks">
-                            <a class="link" href="integrate#Single_Page_Application">{$_('integratelink_spa')}</a>
-                            <a class="link" href="integrate#Server_Side_Application">{$_('integratelink_ssr')}</a>
-                            <a class="link" href="integrate#Mobile_App_Native_App">{$_('integratelink_nativeapp')}</a>
-                        </div> -->
                     {/if}
                 </div>
                 <img src="img/develop2.png" alt="Develop" />

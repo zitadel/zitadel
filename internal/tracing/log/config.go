@@ -1,21 +1,28 @@
 package log
 
 import (
-	"go.opencensus.io/trace"
-
 	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/tracing/otel"
+	"go.opentelemetry.io/otel/exporters/stdout"
+	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 type Config struct {
-	Fraction float64
+	Fraction     float64
+	MetricPrefix string
+}
+
+type Tracer struct {
+	otel.Tracer
 }
 
 func (c *Config) NewTracer() error {
-	if c.Fraction < 1 {
-		c.Fraction = 1
+	sampler := sdk_trace.ParentBased(sdk_trace.TraceIDRatioBased(c.Fraction))
+	exporter, err := stdout.NewExporter(stdout.WithPrettyPrint())
+	if err != nil {
+		return err
 	}
 
-	tracing.T = &Tracer{trace.ProbabilitySampler(c.Fraction)}
-
-	return tracing.T.Start()
+	tracing.T = &Tracer{Tracer: *(otel.NewTracer(c.MetricPrefix, sampler, exporter))}
+	return nil
 }

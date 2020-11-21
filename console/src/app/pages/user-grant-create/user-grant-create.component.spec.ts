@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { UserGrantCreateComponent } from './user-grant-create.component';
 
@@ -6,7 +6,7 @@ describe('UserGrantCreateComponent', () => {
     let component: UserGrantCreateComponent;
     let fixture: ComponentFixture<UserGrantCreateComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [UserGrantCreateComponent],
         })
