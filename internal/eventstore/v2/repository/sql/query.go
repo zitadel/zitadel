@@ -3,6 +3,7 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -137,6 +138,10 @@ func prepareCondition(criteria querier, filters []*repository.Filter) (clause st
 		switch value.(type) {
 		case []bool, []float64, []int64, []string, []repository.AggregateType, []repository.EventType, *[]bool, *[]float64, *[]int64, *[]string, *[]repository.AggregateType, *[]repository.EventType:
 			value = pq.Array(value)
+		case map[string]interface{}:
+			var err error
+			value, err = json.Marshal(value)
+			logging.Log("SQL-BSsNy").OnError(err).Warn("unable to marshal search value")
 		}
 
 		clauses[i] = getCondition(criteria, filter)

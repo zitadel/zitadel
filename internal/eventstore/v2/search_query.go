@@ -15,6 +15,7 @@ type SearchQueryFactory struct {
 	aggregateIDs   []string
 	eventSequence  uint64
 	eventTypes     []EventType
+	eventData      map[string]interface{}
 	resourceOwner  string
 }
 
@@ -83,6 +84,11 @@ func (factory *SearchQueryFactory) OrderAsc() *SearchQueryFactory {
 	return factory
 }
 
+func (factory *SearchQueryFactory) EventData(query map[string]interface{}) *SearchQueryFactory {
+	factory.eventData = query
+	return factory
+}
+
 func (factory *SearchQueryFactory) build() (*repository.SearchQuery, error) {
 	if factory == nil ||
 		len(factory.aggregateTypes) < 1 ||
@@ -98,6 +104,7 @@ func (factory *SearchQueryFactory) build() (*repository.SearchQuery, error) {
 		factory.eventSequenceFilter,
 		factory.eventTypeFilter,
 		factory.resourceOwnerFilter,
+		factory.eventDataFilter,
 	} {
 		if filter := f(); filter != nil {
 			if err := filter.Validate(); err != nil {
@@ -158,4 +165,11 @@ func (factory *SearchQueryFactory) resourceOwnerFilter() *repository.Filter {
 		return nil
 	}
 	return repository.NewFilter(repository.FieldResourceOwner, factory.resourceOwner, repository.OperationEquals)
+}
+
+func (factory *SearchQueryFactory) eventDataFilter() *repository.Filter {
+	if len(factory.eventData) == 0 {
+		return nil
+	}
+	return repository.NewFilter(repository.FieldEventData, factory.eventData, repository.OperationJSONContains)
 }

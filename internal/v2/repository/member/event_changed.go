@@ -31,25 +31,21 @@ func (e *ChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewChangedEvent(
+func ChangeEventFromExisting(
 	base *eventstore.BaseEvent,
-	current,
-	changed *WriteModel,
+	current *WriteModel,
+	roles ...string,
 ) (*ChangedEvent, error) {
 
 	change := &ChangedEvent{
 		BaseEvent: *base,
-	}
-
-	if current.UserID != changed.UserID {
-		change.UserID = changed.UserID
-		change.hasChanged = true
+		UserID:    current.UserID,
 	}
 
 	sort.Strings(current.Roles)
-	sort.Strings(changed.Roles)
-	if !reflect.DeepEqual(current.Roles, changed.Roles) {
-		change.Roles = changed.Roles
+	sort.Strings(roles)
+	if !reflect.DeepEqual(current.Roles, roles) {
+		change.Roles = roles
 		change.hasChanged = true
 	}
 
@@ -58,7 +54,19 @@ func NewChangedEvent(
 	}
 
 	return change, nil
+}
 
+func NewChangedEvent(
+	base *eventstore.BaseEvent,
+	userID string,
+	roles ...string,
+) *ChangedEvent {
+
+	return &ChangedEvent{
+		BaseEvent: *base,
+		UserID:    userID,
+		Roles:     roles,
+	}
 }
 
 func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {

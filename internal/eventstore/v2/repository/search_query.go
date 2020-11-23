@@ -48,6 +48,8 @@ const (
 	OperationLess
 	//OperationIn checks if a stored value matches one of the passed value list
 	OperationIn
+	//OperationJSONContains checks if a stored value matches the given json
+	OperationJSONContains
 
 	operationCount
 )
@@ -70,6 +72,8 @@ const (
 	FieldEditorUser
 	//FieldEventType represents the event type field
 	FieldEventType
+	//FieldEventData represents the event data field
+	FieldEventData
 
 	fieldCount
 )

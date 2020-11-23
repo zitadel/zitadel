@@ -108,10 +108,28 @@ func readModelToObjectRoot(readModel eventstore.ReadModel) models.ObjectRoot {
 	}
 }
 
+func writeModelToObjectRoot(readModel eventstore.WriteModel) models.ObjectRoot {
+	return models.ObjectRoot{
+		AggregateID: readModel.AggregateID,
+		// ChangeDate:    readModel.ChangeDate,
+		// CreationDate:  readModel.CreationDate,
+		ResourceOwner: readModel.ResourceOwner,
+		Sequence:      readModel.ProcessedSequence,
+	}
+}
+
 func readModelToMember(readModel *member.ReadModel) *model.IAMMember {
 	return &model.IAMMember{
 		ObjectRoot: readModelToObjectRoot(readModel.ReadModel),
 		Roles:      readModel.Roles,
 		UserID:     readModel.UserID,
+	}
+}
+
+func writeModelToMember(writeModel *iam.MemberWriteModel) *model.IAMMember {
+	return &model.IAMMember{
+		ObjectRoot: writeModelToObjectRoot(writeModel.WriteModel.WriteModel),
+		Roles:      writeModel.Roles,
+		UserID:     writeModel.UserID,
 	}
 }

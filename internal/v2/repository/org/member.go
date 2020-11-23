@@ -92,26 +92,45 @@ func NewMemberAddedEvent(
 	}
 }
 
-func NewMemberChangedEvent(
+func MemberChangedEventFromExisting(
 	ctx context.Context,
-	current,
-	changed *MemberWriteModel,
+	current *MemberWriteModel,
+	roles ...string,
 ) (*MemberChangedEvent, error) {
 
-	event, err := member.NewChangedEvent(
+	m, err := member.ChangeEventFromExisting(
 		eventstore.NewBaseEventForPush(
 			ctx,
 			MemberChangedEventType,
 		),
 		&current.WriteModel,
-		&changed.WriteModel,
+		roles...,
 	)
 	if err != nil {
 		return nil, err
 	}
+
 	return &MemberChangedEvent{
-		ChangedEvent: *event,
+		ChangedEvent: *m,
 	}, nil
+}
+
+func NewMemberChangedEvent(
+	ctx context.Context,
+	userID string,
+	roles ...string,
+) *MemberChangedEvent {
+
+	return &MemberChangedEvent{
+		ChangedEvent: *member.NewChangedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				MemberChangedEventType,
+			),
+			userID,
+			roles...,
+		),
+	}
 }
 
 func NewMemberRemovedEvent(

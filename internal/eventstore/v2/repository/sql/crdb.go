@@ -252,6 +252,8 @@ func (db *CRDB) columnName(col repository.Field) string {
 		return "editor_user"
 	case repository.FieldEventType:
 		return "event_type"
+	case repository.FieldEventData:
+		return "event_data"
 	default:
 		return ""
 	}
@@ -272,6 +274,8 @@ func (db *CRDB) operation(operation repository.Operation) string {
 		return ">"
 	case repository.OperationLess:
 		return "<"
+	case repository.OperationJSONContains:
+		return "@>"
 	}
 	return ""
 }

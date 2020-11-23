@@ -48,6 +48,9 @@ func (wm *WriteModel) Reduce() error {
 			wm.UserID = e.UserID
 			wm.Roles = e.Roles
 		case *RemovedEvent:
+			if e.UserID != wm.userID {
+				continue
+			}
 			wm.Roles = nil
 			wm.IsRemoved = true
 		}

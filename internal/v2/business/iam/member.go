@@ -5,7 +5,9 @@ import (
 
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/tracing"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
@@ -55,25 +57,20 @@ func (r *Repository) ChangeIAMMember(ctx context.Context, member *iam_model.IAMM
 		return nil, err
 	}
 
-	changedMember := *existingMember
-	changedMember.Roles = member.Roles
-
 	iam := iam_repo.AggregateFromWriteModel(&existingMember.WriteModel.WriteModel).
-		PushMemberChanged(ctx, existingMember, &changedMember)
+		PushMemberChangedFromExisting(ctx, existingMember, member.Roles...)
 
-	events, err := r.eventstore.PushAggregates(ctx, iam)
+	_, err = r.eventstore.PushAggregates(ctx, iam)
 	if err != nil {
 		return nil, err
 	}
 
-	if err = existingMember.AppendEvents(events...); err != nil {
-		return nil, err
-	}
-	if err = existingMember.Reduce(); err != nil {
+	updatedMember, err := r.MemberByID(ctx, member.AggregateID, member.UserID)
+	if err != nil {
 		return nil, err
 	}
 
-	return nil, nil
+	return readModelToMember(&updatedMember.ReadModel), nil
 }
 
 func (r *Repository) RemoveIAMMember(ctx context.Context, member *iam_model.IAMMember) error {
@@ -96,4 +93,23 @@ func (r *Repository) RemoveIAMMember(ctx context.Context, member *iam_model.IAMM
 	}
 
 	return iam.AppendAndReduce(events...)
+}
+
+func (r *Repository) MemberByID(ctx context.Context, iamID, userID string) (member *iam_repo.MemberReadModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query := eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, iam_repo.AggregateType).
+		AggregateIDs(iamID).
+		EventData(map[string]interface{}{
+			"userId": userID,
+		})
+
+	member = new(iam_repo.MemberReadModel)
+	err = r.eventstore.FilterToReducer(ctx, query, member)
+	if err != nil {
+		return nil, err
+	}
+
+	return member, nil
 }
