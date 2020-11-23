@@ -106,6 +106,8 @@ jobs:
       - name: Generate Short SHA Container Tag
         id: vars
         run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
+      - name: Check output
+        run: echo ${{ steps.vars.outputs.sha_short }}
       - name: Docker Login
         run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
       - name: Docker Pull short-sha
