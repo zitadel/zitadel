@@ -66,6 +66,20 @@ p.desc {
     color: var(--grey);
   }
 
+  .chip-form {
+    width: 100%;
+    display: flex;
+    align-items: center;
+
+    .formfield {
+        flex: 1;
+    }
+
+    button {
+        margin-top: 1rem;
+    }
+  }
+
   .error {
     font-size: 13px;
     color: #f44336;

@@ -70,7 +70,7 @@ const _MatInputMixinBase: CanUpdateErrorStateCtor & typeof MatInputBase =
         '[required]': 'required',
         '[attr.readonly]': 'readonly && !_isNativeSelect || null',
         '[attr.aria-invalid]': 'errorState',
-        '[attr.aria-required]': 'required.toString()',
+        '[attr.aria-required]': 'required.toString()'
     },
     providers: [{ provide: MatFormFieldControl, useExisting: InputDirective }],
 })
