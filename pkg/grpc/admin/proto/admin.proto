@@ -4,7 +4,6 @@ syntax = "proto3";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
-import "google/protobuf/struct.proto";
 import "validate/validate.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 import "authoption/options.proto";
@@ -40,19 +39,6 @@ service AdminService {
     rpc Healthz(google.protobuf.Empty) returns (google.protobuf.Empty) {
         option (google.api.http) = {
            get: "/healthz"
-        };
-    }
-
-    // Ready returns status OK as soon as all dependent services are available
-    rpc Ready(google.protobuf.Empty) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-           get: "/ready"
-        };
-    }
-
-    rpc Validate(google.protobuf.Empty) returns (google.protobuf.Struct) {
-        option (google.api.http) = {
-            get: "/validate"
         };
     }
 

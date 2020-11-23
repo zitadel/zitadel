@@ -513,9 +513,9 @@ func addProjectValidation(projectName string) func(...*es_models.Event) error {
 			case model.ProjectChanged:
 				_, project := model.GetProject(projects, event.AggregateID)
 				project.AppendAddProjectEvent(event)
-			case model.ProjectRoleRemoved:
-				for i, project := range projects {
-					if project.AggregateID == event.AggregateID {
+			case model.ProjectRemoved:
+				for i := len(projects) - 1; i >= 0; i-- {
+					if projects[i].AggregateID == event.AggregateID {
 						projects[i] = projects[len(projects)-1]
 						projects[len(projects)-1] = nil
 						projects = projects[:len(projects)-1]
