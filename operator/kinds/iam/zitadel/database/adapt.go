@@ -31,6 +31,8 @@ func AdaptFunc(
 
 		SetDatabaseInQueried(queried, curr)
 
-		return nil, nil
+		return func(k8sClient kubernetes.ClientInt) error {
+			return nil
+		}, nil
 	}, nil
 }

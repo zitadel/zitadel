@@ -191,10 +191,10 @@ func AdaptFunc(
 			switch feature {
 			case "migration":
 				queriers = append(queriers,
+					queryDB,
 					//configuration
 					queryC,
 					//migration
-					queryDB,
 					queryM,
 				)
 				destroyers = append(destroyers,
@@ -203,10 +203,10 @@ func AdaptFunc(
 			case "iam":
 				queriers = append(queriers,
 					operator.ResourceQueryToZitadelQuery(queryNS),
+					queryDB,
 					//configuration
 					queryC,
 					//migration
-					queryDB,
 					queryM,
 					//services
 					queryS,
