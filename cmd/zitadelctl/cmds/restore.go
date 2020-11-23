@@ -78,7 +78,7 @@ func RestoreCommand(rv RootValues) *cobra.Command {
 				return errors.New("Choosen Backup is not existing")
 			}
 
-			return start.Restore(monitor, gitClient, k8sClient, backup, migrationsPath)
+			return start.Restore(monitor, gitClient, k8sClient, backup, "", migrationsPath)
 		}
 		return nil
 	}
