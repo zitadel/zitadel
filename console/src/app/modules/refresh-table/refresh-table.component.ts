@@ -48,7 +48,6 @@ export class RefreshTableComponent implements OnInit {
         if (this.emitRefreshOnPreviousRoutes.length && this.refreshService.previousUrls
             .some(url => this.emitRefreshOnPreviousRoutes.includes(url))) {
             setTimeout(() => {
-                console.log('refresh now');
                 this.emitRefresh();
             }, 1000);
         }

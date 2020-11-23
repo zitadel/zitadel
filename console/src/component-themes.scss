@@ -1,15 +1,18 @@
 @import 'src/app/modules/card/card';
 @import './styles/table';
+@import './styles/input.scss';
+@import './styles/error.scss';
 @import './styles/link.scss';
 @import './styles/sidenav-list';
 @import 'src/app/modules/avatar/avatar.component';
 @import 'src/app/modules/changes/changes.component';
 @import 'src/app/modules/detail-layout/detail-layout.component';
 @import 'src/app/pages/projects/owned-projects/owned-project-detail/application-grid/application-grid.component';
-@import 'src/app/modules/meta-layout/meta';
 @import 'src/app/pages/users/user-detail/auth-user-detail/theme-setting/theme-card';
 @import 'src/app/pages/users/user-detail/memberships/memberships.component';
 @import 'src/app/app.component.scss';
+@import 'src/app/modules/form-field/form-field.component.scss';
+@import 'src/app/modules/label/label.component.scss';
 
 @mixin component-themes($theme) {
   @include avatar-theme($theme);
@@ -20,8 +23,11 @@
   @include application-grid-theme($theme);
   @include membership-theme($theme);
   @include changes-theme($theme);
-  @include meta-theme($theme);
   @include theme-card($theme);
+  @include input-theme($theme);
   @include textvar($theme);
+  @include cnsl-form-field-theme($theme);
+  @include cnsl-label-theme($theme);
+  @include cnsl-error-theme($theme);
   @include link-theme($theme);
 }

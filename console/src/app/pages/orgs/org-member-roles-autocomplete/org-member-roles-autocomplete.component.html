@@ -1,6 +1,6 @@
 <form>
-    <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Role Name</mat-label>
+    <cnsl-form-field appearance="outline" class="full-width">
+        <cnsl-label>Role Name</cnsl-label>
 
         <mat-select [formControl]="myControl" multiple>
             <mat-option *ngIf="isLoading" class="is-loading">
@@ -10,5 +10,5 @@
                 {{ role }}
             </mat-option>
         </mat-select>
-    </mat-form-field>
+    </cnsl-form-field>
 </form>

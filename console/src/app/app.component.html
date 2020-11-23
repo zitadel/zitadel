@@ -24,10 +24,11 @@
                     </mat-spinner>
                 </div>
 
-                <mat-form-field class="filter-form" appearance="fill">
-                    <input matInput [formControl]="filterControl" autocomplete="off" (click)="$event.stopPropagation()"
-                        placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}" #input>
-                </mat-form-field>
+                <div class="filter-wrapper">
+                    <input cnslInput class="filter-input" [formControl]="filterControl" autocomplete="off"
+                        (click)="$event.stopPropagation()" placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}"
+                        #input>
+                </div>
 
                 <div class="org-wrapper">
                     <button [ngClass]="{'active': temporg.id === org?.id}" [disabled]="!temporg.id"
@@ -64,8 +65,9 @@
                 <div class="side-column">
                     <div class="list">
                         <ng-container *ngIf="authenticationService.authenticationChanged | async">
-                            <a @navitem class="nav-item" [routerLinkActive]="['active']"
-                                [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/users/me']">
+                            <a @navitem matTooltip="{{'MENU.TOOLTIP.PERSONAL' | translate}}" class="nav-item"
+                                [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: true }"
+                                [routerLink]="['/users/me']">
                                 <i class="icon las la-user-circle"></i>
                                 <span class="label">{{ 'MENU.PERSONAL_INFO' | translate }}</span>
                             </a>
@@ -77,7 +79,8 @@
                                 <span>{{'MENU.ADMINSECTION' | translate}}</span>
                                 <div class="hiddenline"></div>
                             </div>
-                            <a @navitem class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/iam']">
+                            <a @navitem matTooltip="{{'MENU.TOOLTIP.IAM' | translate}}" class="nav-item"
+                                [routerLinkActive]="['active']" [routerLink]="[ '/iam']">
                                 <i class="icon las la-gem"></i>
                                 <span class="label">{{'MENU.IAM' | translate}}</span>
                             </a>
@@ -85,7 +88,14 @@
 
                         <div *ngIf="org" [@navAnimation]="org">
                             <ng-template appHasRole [appHasRole]="['org.read']">
-                                <a @navitem class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/org']">
+                                <div @navitem class="divider">
+                                    <div class="line"></div>
+                                    <span>{{'MENU.ORGSECTION' | translate}}</span>
+                                    <div class="hiddenline"></div>
+                                </div>
+
+                                <a @navitem matTooltip="{{'MENU.TOOLTIP.ORG' | translate}}" class="nav-item"
+                                    [routerLinkActive]="['active']" [routerLink]="[ '/org']">
                                     <i class="icon las la-archway"></i>
                                     <span
                                         class="label">{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}</span>
@@ -93,13 +103,8 @@
                             </ng-template>
 
                             <ng-template appHasRole [appHasRole]="['project.read(:[0-9]*)?']">
-                                <div @navitem class="divider">
-                                    <div class="line"></div>
-                                    <span>{{'MENU.PROJECTSSECTION' | translate}}</span>
-                                    <div class="hiddenline"></div>
-                                </div>
-
-                                <a @navitem class="nav-item" [routerLinkActive]="['active']"
+                                <a @navitem matTooltip="{{'MENU.TOOLTIP.SELFPROJECTS' | translate}}"
+                                    class="nav-item indented" [routerLinkActive]="['active']"
                                     [routerLink]="[ '/projects']">
                                     <i class="icon las la-layer-group"></i>
 
@@ -111,9 +116,9 @@
                                     </div>
                                 </a>
 
-                                <a @navitem
+                                <a @navitem matTooltip="{{'MENU.TOOLTIP.GRANTEDPROJECTS' | translate}}"
                                     *ngIf="mgmtService?.grantedProjectsCount && (mgmtService?.grantedProjectsCount | async)"
-                                    class="nav-item" [routerLinkActive]="['active']"
+                                    class="nav-item indented" [routerLinkActive]="['active']"
                                     [routerLink]="[ '/granted-projects']">
                                     <i class="icon las la-layer-group"></i>
                                     <div class="c_label">
@@ -124,20 +129,15 @@
                             </ng-template>
 
                             <ng-template appHasRole [appHasRole]="['user.read(:[0-9]*)?']">
-                                <div @navitem class="divider">
-                                    <div class="line"></div>
-                                    <span class="label">
-                                        {{ 'MENU.USERSECTION' | translate }}</span>
-                                    <div class="hiddenline"></div>
-                                </div>
-
-                                <a @navitem class="nav-item" [routerLinkActive]="['active']"
+                                <a @navitem matTooltip="{{'MENU.TOOLTIP.HUMANUSERS' | translate}}"
+                                    class="nav-item indented" [routerLinkActive]="['active']"
                                     [routerLink]="[ '/users/list/humans']" [routerLinkActiveOptions]="{ exact: true }">
                                     <i class="icon las la-user-friends"></i>
                                     <span class="label">{{ 'MENU.HUMANUSERS' | translate }}</span>
                                 </a>
 
-                                <a @navitem class="nav-item" [routerLinkActive]="['active']"
+                                <a @navitem matTooltip="{{'MENU.TOOLTIP.MACHINEUSERS' | translate}}"
+                                    class="nav-item indented" [routerLinkActive]="['active']"
                                     [routerLink]="[ '/users/list/machines']"
                                     [routerLinkActiveOptions]="{ exact: true }">
                                     <i class="icon las la-users-cog"></i>
@@ -146,15 +146,15 @@
                             </ng-template>
 
                             <ng-template appHasRole [appHasRole]="['user.grant.read(:[0-9]*)?']">
-                                <div @navitem class="divider">
+                                <!-- <div @navitem class="divider">
                                     <div class="line"></div>
                                     <span class="label">
                                         {{ 'MENU.GRANTSECTION' | translate }}</span>
                                     <div class="hiddenline"></div>
-                                </div>
+                                </div> -->
 
-                                <a @navitem class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/grants']"
-                                    [routerLinkActiveOptions]="{ exact: true }">
+                                <a @navitem class="nav-item indented" [routerLinkActive]="['active']"
+                                    [routerLink]="[ '/grants']" [routerLinkActiveOptions]="{ exact: true }">
                                     <i class="icon las la-shield-alt"></i>
                                     <span class="label">{{ 'MENU.GRANTS' | translate }}</span>
                                 </a>
@@ -172,7 +172,7 @@
                 </div>
             </mat-drawer-content>
         </mat-drawer-container>
-        <div @toolbar *ngIf="iamuser$ | async" class="admin-line" [ngClass]="{'expanded': !hideAdminWarn}"
+        <div @adminline *ngIf="iamuser$ | async" class="admin-line" [ngClass]="{'expanded': !hideAdminWarn}"
             matTooltip="IAM Administrator">
             <button [matTooltip]="!hideAdminWarn ? 'Unpin': 'Pin'" (click)="toggleAdminHide()" mat-icon-button>
                 <mat-icon *ngIf="!hideAdminWarn" svgIcon="mdi_pin"></mat-icon>

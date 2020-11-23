@@ -144,7 +144,6 @@ export class UserDetailComponent implements OnInit {
     }
 
     public resendPhoneVerification(): void {
-        console.log('resend phone ver', this.user.id);
         this.mgmtUserService.ResendPhoneVerification(this.user.id).then(() => {
             this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
         }).catch(error => {

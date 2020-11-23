@@ -59,7 +59,6 @@ export class IamMembersComponent {
     }
 
     public removeMemberSelection(): void {
-        console.log(this.selection);
         Promise.all(this.selection.map(member => {
             return this.adminService.RemoveIamMember(member.userId).then(() => {
                 this.toast.showInfo('IAM.TOAST.MEMBERREMOVED', true);

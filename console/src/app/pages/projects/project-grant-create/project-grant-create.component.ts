@@ -59,8 +59,6 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
     }
 
     public addGrant(): void {
-
-        console.log(this.org.id, this.projectId, this.rolesKeyList);
         this.mgmtService
             .CreateProjectGrant(this.org.id, this.projectId, this.rolesKeyList)
             .then((data) => {

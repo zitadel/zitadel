@@ -15,18 +15,18 @@
     <form @list (ngSubmit)="addRole()">
         <div @animate *ngFor="let formGroup of formArray.controls; index as i" class="content">
             <ng-container [formGroup]="formGroup">
-                <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'PROJECT.ROLE.KEY' | translate }}</mat-label>
-                    <input matInput formControlName="key" />
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'PROJECT.ROLE.DISPLAY_NAME' | translate }}</mat-label>
-                    <input matInput formControlName="displayName" />
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'PROJECT.ROLE.GROUP' | translate }}</mat-label>
-                    <input matInput formControlName="group" />
-                </mat-form-field>
+                <cnsl-form-field appearance="outline" class="formfield">
+                    <cnsl-label>{{ 'PROJECT.ROLE.KEY' | translate }}</cnsl-label>
+                    <input cnslInput formControlName="key" />
+                </cnsl-form-field>
+                <cnsl-form-field appearance="outline" class="formfield">
+                    <cnsl-label>{{ 'PROJECT.ROLE.DISPLAY_NAME' | translate }}</cnsl-label>
+                    <input cnslInput formControlName="displayName" />
+                </cnsl-form-field>
+                <cnsl-form-field appearance="outline" class="formfield">
+                    <cnsl-label>{{ 'PROJECT.ROLE.GROUP' | translate }}</cnsl-label>
+                    <input cnslInput formControlName="group" />
+                </cnsl-form-field>
                 <button *ngIf="i !== 0" mat-icon-button (click)="removeEntry(i)" type="button" color="warn"
                     matTooltip="{{ 'ACTIONS.REMOVE' | translate }}">
                     <i class="las la-trash"></i>

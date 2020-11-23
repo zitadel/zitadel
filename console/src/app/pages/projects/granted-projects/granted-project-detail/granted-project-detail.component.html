@@ -17,7 +17,7 @@
                 description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
                 <app-user-grants *ngIf="projectId && grantId" [context]="UserGrantContext.GRANTED_PROJECT"
                     [projectId]="projectId" [grantId]="grantId"
-                    [displayedColumns]="['select','user', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']"
+                    [displayedColumns]="['select','user', 'projectId', 'dates', 'roleNamesList']"
                     [disableWrite]="(['user.grant.write$','user.grant.write:'+grantId] | hasRole | async) == false"
                     [disableDelete]="(['user.grant.delete$','user.grant.delete:'+grantId] | hasRole | async) == false"
                     refreshOnPreviousRoutes="['/grant-create/project/{{projectId}}/grant/{{grantId}}']">

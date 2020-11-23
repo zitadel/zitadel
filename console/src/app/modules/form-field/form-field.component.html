@@ -1,0 +1,17 @@
+<div class="cnsl-form-field-wrapper" (click)="_control.onContainerClick && _control.onContainerClick($event)">
+    <ng-content select="cnsl-label"></ng-content>
+    <div class="cnsl-rel" #inputContainer>
+        <ng-content></ng-content>
+        <ng-content select="cnslSuffix"></ng-content>
+    </div>
+    <div class="cnsl-form-field-subscript-wrapper" [ngSwitch]="_getDisplayedMessages()">
+        <div *ngSwitchCase="'error'" class="cnsl-form-field-error-wrapper"
+            [@transitionMessages]="_subscriptAnimationState">
+            <ng-content select="cnsl-error"></ng-content>
+        </div>
+        <div *ngSwitchCase="'hint'" class="cnsl-form-field-hint-wrapper"
+            [@transitionMessages]="_subscriptAnimationState">
+            <ng-content select="cnsl-hint"></ng-content>
+        </div>
+    </div>
+</div>

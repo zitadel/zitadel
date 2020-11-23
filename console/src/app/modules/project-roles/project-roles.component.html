@@ -60,6 +60,11 @@
             <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
 
+        <div *ngIf="(dataSource.loading$ | async) == false && !dataSource?.totalResult" class="no-content-row">
+            <i class="las la-exclamation"></i>
+            <span>{{'PROJECT.ROLE.EMPTY' | translate}}</span>
+        </div>
+
         <mat-paginator #paginator [length]="dataSource.totalResult" [pageSize]="50"
             [pageSizeOptions]="[25, 50, 100, 250]">
         </mat-paginator>

@@ -5,13 +5,12 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { CardModule } from 'src/app/modules/card/card.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
@@ -26,8 +25,7 @@ import { ProjectGrantCreateComponent } from './project-grant-create.component';
         MatAutocompleteModule,
         MatChipsModule,
         MatButtonModule,
-        MatFormFieldModule,
-        MatInputModule,
+        InputModule,
         CardModule,
         MatCheckboxModule,
         ProjectRolesModule,

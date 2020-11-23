@@ -1,7 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatInput } from '@angular/material/input';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { TranslateService } from '@ngx-translate/core';
@@ -30,7 +29,7 @@ export class UserTableComponent implements OnInit {
     @Input() refreshOnPreviousRoutes: string[] = [];
     @Input() disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    @ViewChild('input') public filter!: MatInput;
+    @ViewChild('input') public filter!: Input;
     public dataSource: MatTableDataSource<UserView.AsObject> = new MatTableDataSource<UserView.AsObject>();
     public selection: SelectionModel<UserView.AsObject> = new SelectionModel<UserView.AsObject>(true, []);
     public userResult!: UserSearchResponse.AsObject;
