@@ -6,10 +6,6 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/members"
 )
 
-type MembersAggregate struct {
-	members.Aggregate
-}
-
 type MembersReadModel struct {
 	members.ReadModel
 }

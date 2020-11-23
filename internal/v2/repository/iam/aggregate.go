@@ -21,8 +21,6 @@ type Aggregate struct {
 
 	SetUpStarted Step
 	SetUpDone    Step
-
-	Members MembersAggregate
 }
 
 func NewAggregate(
@@ -39,6 +37,12 @@ func NewAggregate(
 			AggregateVersion,
 			previousSequence,
 		),
+	}
+}
+
+func AggregateFromWriteModel(wm *eventstore.WriteModel) *Aggregate {
+	return &Aggregate{
+		Aggregate: *eventstore.AggregateFromWriteModel(wm, AggregateType, AggregateVersion),
 	}
 }
 

@@ -167,6 +167,26 @@ func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQu
 	return es.repo.LatestSequence(ctx, query)
 }
 
+type queryReducer interface {
+	reducer
+	//Query returns the SearchQueryFactory for the events needed in reducer
+	Query() *SearchQueryFactory
+}
+
+//FilterToQueryReducer filters the events based on the search query of the query function,
+// appends all events to the reducer and calls it's reduce function
+func (es *Eventstore) FilterToQueryReducer(ctx context.Context, r queryReducer) error {
+	events, err := es.FilterEvents(ctx, r.Query())
+	if err != nil {
+		return err
+	}
+	if err = r.AppendEvents(events...); err != nil {
+		return err
+	}
+
+	return r.Reduce()
+}
+
 //RegisterFilterEventMapper registers a function for mapping an eventstore event to an event
 func (es *Eventstore) RegisterFilterEventMapper(eventType EventType, mapper func(*repository.Event) (EventReader, error)) *Eventstore {
 	if mapper == nil || eventType == "" {

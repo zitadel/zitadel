@@ -8,7 +8,6 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/tracing"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
-	"github.com/caos/zitadel/internal/v2/repository/member"
 )
 
 type Repository struct {
@@ -53,47 +52,15 @@ func (r *Repository) memberWriteModelByID(ctx context.Context, iamID, userID str
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query := eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, iam_repo.AggregateType).AggregateIDs(iamID)
-
-	writeModel := new(memberWriteModel)
-	err = r.eventstore.FilterToReducer(ctx, query, writeModel)
+	writeModel := iam_repo.PrepareMemberWriteModel(iamID, userID)
+	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}
 
-	if writeModel.isDeleted {
+	if writeModel.IsRemoved {
 		return nil, errors.ThrowNotFound(nil, "IAM-D8JxR", "Errors.NotFound")
 	}
 
-	return &writeModel.MemberWriteModel, nil
-}
-
-type memberWriteModel struct {
-	iam_repo.MemberWriteModel
-
-	userID    string
-	isDeleted bool
-}
-
-func (wm *memberWriteModel) AppendEvents(events ...eventstore.EventReader) error {
-	for _, event := range events {
-		switch e := event.(type) {
-		case *member.AddedEvent:
-			if e.UserID == wm.userID {
-				wm.isDeleted = false
-				wm.MemberWriteModel.AppendEvents(event)
-			}
-		case *member.ChangedEvent:
-			if e.UserID == wm.userID {
-				wm.MemberWriteModel.AppendEvents(event)
-			}
-		case *member.RemovedEvent:
-			if e.UserID == wm.userID {
-				wm.isDeleted = true
-				wm.MemberWriteModel = iam_repo.MemberWriteModel{}
-			}
-		}
-	}
-
-	return nil
+	return writeModel, nil
 }

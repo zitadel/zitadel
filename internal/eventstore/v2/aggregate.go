@@ -17,6 +17,21 @@ func NewAggregate(
 	}
 }
 
+func AggregateFromWriteModel(
+	wm *WriteModel,
+	typ AggregateType,
+	version Version,
+) *Aggregate {
+	return &Aggregate{
+		id:               wm.AggregateID,
+		typ:              typ,
+		resourceOwner:    wm.ResourceOwner,
+		version:          version,
+		previousSequence: wm.ProcessedSequence,
+		events:           []EventPusher{},
+	}
+}
+
 //Aggregate is the basic implementation of aggregater
 type Aggregate struct {
 	id               string        `json:"-"`

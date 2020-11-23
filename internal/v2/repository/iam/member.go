@@ -31,6 +31,32 @@ func (rm *MemberReadModel) AppendEvents(events ...eventstore.EventReader) (err e
 	return nil
 }
 
+type MemberWriteModel struct {
+	member.WriteModel
+}
+
+func PrepareMemberWriteModel(iamID, userID string) *MemberWriteModel {
+	return &MemberWriteModel{
+		WriteModel: *member.PrepareWriteModel(userID, AggregateType, iamID),
+	}
+}
+
+func (wm *MemberWriteModel) AppendEvents(events ...eventstore.EventReader) (err error) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *MemberAddedEvent:
+			wm.WriteModel.AppendEvents(&e.AddedEvent)
+		case *MemberChangedEvent:
+			wm.WriteModel.AppendEvents(&e.ChangedEvent)
+		case *MemberRemovedEvent:
+			wm.WriteModel.AppendEvents(&e.RemovedEvent)
+		default:
+			wm.WriteModel.AppendEvents(e)
+		}
+	}
+	return nil
+}
+
 type MemberAddedEvent struct {
 	member.AddedEvent
 }
@@ -63,7 +89,7 @@ func NewMemberAddedEvent(
 func NewMemberChangedEvent(
 	ctx context.Context,
 	current,
-	changed *MemberAggregate,
+	changed *MemberWriteModel,
 ) (*MemberChangedEvent, error) {
 
 	m, err := member.NewChangedEvent(

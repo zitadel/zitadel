@@ -43,14 +43,11 @@ func (r *Repository) AddIAMMember(ctx context.Context, member *iam_model.IAMMemb
 	return readModelToMember(addedMember), nil
 }
 
+//ChangeIAMMember updates an existing member
+//TODO: refactor to ChangeMember
 func (r *Repository) ChangeIAMMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-LiaZi", "Errors.IAM.MemberInvalid")
-	}
-
-	iam, err := r.iamByID(ctx, member.AggregateID)
-	if err != nil {
-		return nil, err
 	}
 
 	existingMember, err := r.memberWriteModelByID(ctx, member.AggregateID, member.UserID)
@@ -58,23 +55,25 @@ func (r *Repository) ChangeIAMMember(ctx context.Context, member *iam_model.IAMM
 		return nil, err
 	}
 
-	iamAgg := iam_repo.AggregateFromReadModel(iam).
-		PushMemberChanged(ctx, existingMember, nil)
+	changedMember := *existingMember
+	changedMember.Roles = member.Roles
 
-	events, err := r.eventstore.PushAggregates(ctx, iamAgg)
+	iam := iam_repo.AggregateFromWriteModel(&existingMember.WriteModel.WriteModel).
+		PushMemberChanged(ctx, existingMember, &changedMember)
+
+	events, err := r.eventstore.PushAggregates(ctx, iam)
 	if err != nil {
 		return nil, err
 	}
 
-	if err = iam.AppendAndReduce(events...); err != nil {
+	if err = existingMember.AppendEvents(events...); err != nil {
+		return nil, err
+	}
+	if err = existingMember.Reduce(); err != nil {
 		return nil, err
 	}
 
-	_, addedMember := iam.Members.MemberByUserID(member.UserID)
-	if member == nil {
-		return nil, errors.ThrowInternal(nil, "IAM-E5nTQ", "member not saved")
-	}
-	return readModelToMember(addedMember), nil
+	return nil, nil
 }
 
 func (r *Repository) RemoveIAMMember(ctx context.Context, member *iam_model.IAMMember) error {

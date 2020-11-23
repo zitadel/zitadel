@@ -8,21 +8,54 @@ import "github.com/caos/zitadel/internal/eventstore/v2"
 type WriteModel struct {
 	eventstore.WriteModel
 
-	UserID string
-	Roles  []string
+	UserID    string
+	Roles     []string
+	IsRemoved bool
+
+	userID        string
+	aggregateType eventstore.AggregateType
+	aggregateID   string
+}
+
+func PrepareWriteModel(
+	userID string,
+	aggregateType eventstore.AggregateType,
+	aggregateID string,
+) *WriteModel {
+
+	return &WriteModel{
+		WriteModel:    *eventstore.NewWriteModel(),
+		userID:        userID,
+		aggregateType: aggregateType,
+		aggregateID:   aggregateID,
+	}
 }
 
 //Reduce extends eventstore.ReadModel
-func (rm *WriteModel) Reduce() error {
-	for _, event := range rm.Events {
+func (wm *WriteModel) Reduce() error {
+	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *AddedEvent:
-			rm.UserID = e.UserID
-			rm.Roles = e.Roles
+			if e.UserID != wm.userID {
+				continue
+			}
+			wm.UserID = e.UserID
+			wm.Roles = e.Roles
 		case *ChangedEvent:
-			rm.UserID = e.UserID
-			rm.Roles = e.Roles
+			if e.UserID != wm.userID {
+				continue
+			}
+			wm.UserID = e.UserID
+			wm.Roles = e.Roles
+		case *RemovedEvent:
+			wm.Roles = nil
+			wm.IsRemoved = true
 		}
 	}
-	return rm.ReadModel.Reduce()
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *WriteModel) Query() *eventstore.SearchQueryFactory {
+	return eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, wm.aggregateType).
+		AggregateIDs(wm.aggregateID)
 }
