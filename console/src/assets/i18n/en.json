@@ -859,7 +859,7 @@
             "REDIRECTDESCRIPTIONWEB":"Redirect URIs must begin with https://. http:// is only valid with enabled development mode.",
             "REDIRECTDESCRIPTIONNATIVE":"Redirect URIs must begin with your own protocol or http://localhost.",
             "REDIRECTNOTVALID":"This redirect URI is not valid.",
-            "COMMAORENTERSEPERATION":"seperate with , or ↵",
+            "COMMAORENTERSEPERATION":"seperate with ↵",
             "TYPEREQUIRED":"The type is required.",
             "TITLE": "OIDC Configuration",
             "CLIENTID": "Client ID",

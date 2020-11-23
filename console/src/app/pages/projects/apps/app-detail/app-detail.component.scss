@@ -60,6 +60,20 @@
     }
   }
 
+  .chip-form {
+      width: 100%;
+      display: flex;
+      align-items: center;
+
+      .formfield {
+          flex: 1;
+      }
+
+      button {
+          margin-top: 1rem;
+      }
+  }
+
   .section-title {
     margin-bottom: 1.5rem;
   }

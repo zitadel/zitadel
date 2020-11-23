@@ -858,7 +858,7 @@
             "REDIRECTDESCRIPTIONWEB":"Die Weiterleitung muss mit https:// beginnen. http:// ist nur im Entwicklermodus zulässig.",
             "REDIRECTDESCRIPTIONNATIVE":"Die Weiterleitung muss mit einem eigenen Protokoll oder http://localhost beginnen.",
             "REDIRECTNOTVALID":"Diese Weiterleitung ist nicht zulässig.",
-            "COMMAORENTERSEPERATION":"mit , oder ↵ trennen",
+            "COMMAORENTERSEPERATION":"mit ↵ trennen",
             "POSTREDIRECTTITLE":"Das ist die Weiterleitung nach einem Log-out.",
             "TYPEREQUIRED":"Der Typ ist notwendig.",
             "TITLE": "OIDC-Konfiguration",

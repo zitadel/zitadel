@@ -132,43 +132,49 @@
                     *ngIf="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB || applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT">
                     {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</p>
 
-                <cnsl-form-field class="formfield full-width" appearance="outline">
-                    <cnsl-label>{{ 'APP.OIDC.REDIRECT' | translate }}</cnsl-label>
-                    <mat-chip-list [disabled]="!canWrite" #chipRedirectList>
-                        <mat-chip class="chip" *ngFor="let redirect of redirectUrisList" selected
-                            [matTooltip]="!redirect.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
-                            [color]="!redirect.startsWith('https://') ? 'warn': 'green'"
-                            (removed)="remove(redirect, RedirectType.REDIRECT)">
-                            {{redirect}}
-                            <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-                        </mat-chip>
-                        <input cnslInput placeholder="{{'APP.OIDC.COMMAORENTERSEPERATION' | translate}}"
-                            [matChipInputFor]="chipRedirectList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                            [matChipInputAddOnBlur]="addOnBlur" [formControl]="redirectControl"
-                            (matChipInputTokenEnd)="add($event, RedirectType.REDIRECT)">
-                    </mat-chip-list>
-                </cnsl-form-field>
+                <form class="chip-form" (ngSubmit)="add(redInput, RedirectType.REDIRECT)">
+                    <cnsl-form-field class="formfield full-width">
+                        <cnsl-label>{{ 'APP.OIDC.REDIRECT' | translate }}</cnsl-label>
+
+                        <input #redInput cnslInput placeholder="{{'APP.OIDC.COMMAORENTERSEPERATION' | translate}}"
+                            [formControl]="redirectControl">
+                    </cnsl-form-field>
+                    <button matTooltip="{{'ACTIONS.ADD' | translate}}" type="submit" mat-icon-button>
+                        <mat-icon>add</mat-icon>
+                    </button>
+                </form>
+                <mat-chip-list class="formfield full-width" [disabled]="!canWrite" #chipRedirectList>
+                    <mat-chip class="chip" *ngFor="let redirect of redirectUrisList" selected
+                        [matTooltip]="!redirect?.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
+                        [color]="!redirect?.startsWith('https://') ? 'warn': 'green'"
+                        (removed)="remove(redirect, RedirectType.REDIRECT)">
+                        {{redirect}}
+                        <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                    </mat-chip>
+                </mat-chip-list>
 
                 <p *ngIf="redirectControl.value && redirectControl.invalid" class="error">
                     {{'APP.OIDC.REDIRECTNOTVALID' | translate}}</p>
 
-                <cnsl-form-field class="formfield full-width" appearance="outline">
-                    <cnsl-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</cnsl-label>
-                    <mat-chip-list [disabled]="!canWrite" #chipPostRedirectList>
-                        <mat-chip class="chip" *ngFor="let redirect of postLogoutRedirectUrisList" selected
-                            (removed)="remove(redirect, RedirectType.POSTREDIRECT)"
-                            [matTooltip]="!redirect.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
-                            [color]="!redirect.startsWith('https://') ? 'warn': 'green'">
-                            {{redirect}}
-                            <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-                        </mat-chip>
-                        <input cnslInput placeholder="{{'APP.OIDC.COMMAORENTERSEPERATION' | translate}}"
-                            [matChipInputFor]="chipPostRedirectList"
-                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
-                            (matChipInputTokenEnd)="add($event, RedirectType.POSTREDIRECT)"
+                <form class="chip-form" (ngSubmit)="add(postInput, RedirectType.POSTREDIRECT)">
+                    <cnsl-form-field class="formfield full-width">
+                        <cnsl-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</cnsl-label>
+                        <input #postInput cnslInput placeholder="{{'APP.OIDC.COMMAORENTERSEPERATION' | translate}}"
                             [formControl]="postRedirectControl">
-                    </mat-chip-list>
-                </cnsl-form-field>
+                    </cnsl-form-field>
+                    <button matTooltip="{{'ACTIONS.ADD' | translate}}" type="submit" mat-icon-button>
+                        <mat-icon>add</mat-icon>
+                    </button>
+                </form>
+                <mat-chip-list class="formfield full-width" [disabled]="!canWrite" #chipPostRedirectList>
+                    <mat-chip class="chip" *ngFor="let redirect of postLogoutRedirectUrisList" selected
+                        (removed)="remove(redirect, RedirectType.POSTREDIRECT)"
+                        [matTooltip]="!redirect?.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
+                        [color]="!redirect?.startsWith('https://') ? 'warn': 'green'">
+                        {{redirect}}
+                        <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                    </mat-chip>
+                </mat-chip-list>
 
                 <p *ngIf="postRedirectControl.value && postRedirectControl.invalid" class="error">
                     {{'APP.OIDC.REDIRECTNOTVALID' | translate}}</p>

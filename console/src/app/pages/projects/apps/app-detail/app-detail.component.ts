@@ -3,7 +3,6 @@ import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
-import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -180,19 +179,17 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         }
     }
 
-    public add(event: MatChipInputEvent, target: RedirectType): void {
+    public add(input: any, target: RedirectType): void {
         if (target === RedirectType.POSTREDIRECT && this.postRedirectControl.valid) {
-            const input = event.input;
-            if (event.value !== '' && event.value !== ' ' && event.value !== '/') {
-                this.postLogoutRedirectUrisList.push(event.value);
+            if (input.value !== '' && input.value !== ' ' && input.value !== '/') {
+                this.postLogoutRedirectUrisList.push(input.value);
             }
             if (input) {
                 input.value = '';
             }
         } else if (target === RedirectType.REDIRECT && this.redirectControl.valid) {
-            const input = event.input;
-            if (event.value !== '' && event.value !== ' ' && event.value !== '/') {
-                this.redirectUrisList.push(event.value);
+            if (input.value !== '' && input.value !== ' ' && input.value !== '/') {
+                this.redirectUrisList.push(input.value);
             }
             if (input) {
                 input.value = '';
