@@ -46,8 +46,10 @@
         border-color: $primary-color;
     }
 
-    &.ng-invalid {
-        border-color: $warn-color;
+    &.ng-touched {
+        &.ng-invalid {
+            border-color: $warn-color;
+        }
     }
 
     &[disabled] {

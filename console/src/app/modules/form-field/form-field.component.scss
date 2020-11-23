@@ -6,6 +6,13 @@
   $primary-color: mat-color($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
 
+  .ng-untouched {
+    .cnsl-error {
+      visibility: hidden;
+      transition: visibility .2 ease;
+    }
+  }
+
   .cnsl-form-field-wrapper {
     width: 100%;
     margin: 10px 0;
