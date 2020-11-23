@@ -19,7 +19,7 @@ RUN go test -race -v -coverprofile=profile.cov ./operator/...
 
 ## Go test
 FROM scratch as go-codecov
-COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile-operator.cov
+COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
 
 ## Go prod build
 FROM go-test as prod-go-build

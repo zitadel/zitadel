@@ -93,7 +93,7 @@ RUN go test -race -v -coverprofile=profile.cov $(go list ./... | grep -v /operat
 
 ## Go test
 FROM scratch as go-codecov
-COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile-zitadel.cov
+COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
 
 ## Go prod build
 FROM go-test as prod-go-build
