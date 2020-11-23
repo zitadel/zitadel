@@ -13,7 +13,7 @@
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
 
-  input,
+  [cnslInput],
   .mat-select {
     display: block;
     box-sizing: border-box;
@@ -56,9 +56,15 @@
     }
   }
 
-  input::placeholder {
+  [cnslInput]::placeholder {
     font-size: 14px;
     color: var(--grey);
     font-style: italic;
+  }
+
+  .mat-paginator {
+    .mat-select {
+        background-color: inherit;
+    }
   }
 }

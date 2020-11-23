@@ -143,7 +143,7 @@
                         <mat-icon>add</mat-icon>
                     </button>
                 </form>
-                <mat-chip-list class="formfield full-width" [disabled]="!canWrite" #chipRedirectList>
+                <mat-chip-list class="chiplist formfield full-width" [disabled]="!canWrite" #chipRedirectList>
                     <mat-chip class="chip" *ngFor="let redirect of redirectUrisList" selected
                         [matTooltip]="!redirect?.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
                         [color]="!redirect?.startsWith('https://') ? 'warn': 'green'"
@@ -166,7 +166,7 @@
                         <mat-icon>add</mat-icon>
                     </button>
                 </form>
-                <mat-chip-list class="formfield full-width" [disabled]="!canWrite" #chipPostRedirectList>
+                <mat-chip-list class="chiplist formfield full-width" [disabled]="!canWrite" #chipPostRedirectList>
                     <mat-chip class="chip" *ngFor="let redirect of postLogoutRedirectUrisList" selected
                         (removed)="remove(redirect, RedirectType.POSTREDIRECT)"
                         [matTooltip]="!redirect?.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"

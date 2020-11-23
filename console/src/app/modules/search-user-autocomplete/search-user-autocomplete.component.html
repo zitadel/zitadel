@@ -29,20 +29,20 @@
             </mat-option>
         </mat-autocomplete>
 
-        <mat-hint class="target-desc">
+        <span class="target-desc">
             {{'USER.TARGET.SELF'| translate}}
             <a (click)="changeTarget()">{{'USER.TARGET.CLICKHERE' | translate}}</a>
-        </mat-hint>
+        </span>
     </cnsl-form-field>
 
     <div *ngIf="target && target == UserTarget.EXTERNAL" class="line">
         <cnsl-form-field class="form-field" appearance="outline">
             <cnsl-label>Global User Loginname</cnsl-label>
             <input cnslInput type="text" [formControl]="globalLoginNameControl" />
-            <mat-hint class="target-desc">
+            <span class="target-desc">
                 {{(target == UserTarget.SELF ? 'USER.TARGET.SELF' : 'USER.TARGET.EXTERNAL') | translate}}
                 <a (click)="changeTarget()">{{'USER.TARGET.CLICKHERE' | translate}}</a>
-            </mat-hint>
+            </span>
         </cnsl-form-field>
 
         <button color="primary" mat-icon-button (click)="getGlobalUser()">
