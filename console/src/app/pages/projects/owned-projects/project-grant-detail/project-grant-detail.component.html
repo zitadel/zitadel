@@ -25,14 +25,14 @@
         </div>
     </div>
 
-    <mat-form-field class="formfield" appearance="outline" *ngIf="grant && grant.roleKeysList">
-        <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
+    <cnsl-form-field class="formfield" appearance="outline" *ngIf="grant && grant.roleKeysList">
+        <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
         <mat-select [(ngModel)]="grant.roleKeysList" multiple (selectionChange)="updateRoles($event)">
             <mat-option *ngFor="let role of projectRoleOptions" [value]="role.key">
                 {{role.key}}
             </mat-option>
         </mat-select>
-    </mat-form-field>
+    </cnsl-form-field>
 
     <div class="divider"></div>
 

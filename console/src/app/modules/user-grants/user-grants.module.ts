@@ -3,9 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
@@ -18,10 +16,10 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
+import { InputModule } from '../../modules/input/input.module';
 import { AvatarModule } from '../avatar/avatar.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
 import { UserGrantsComponent } from './user-grants.component';
-
 
 
 @NgModule({
@@ -40,13 +38,12 @@ import { UserGrantsComponent } from './user-grants.component';
         MatCheckboxModule,
         MatTooltipModule,
         MatSelectModule,
-        MatInputModule,
-        MatFormFieldModule,
         TranslateModule,
         HasRolePipeModule,
         TimestampToDatePipeModule,
         RefreshTableModule,
         LocalizedDatePipeModule,
+        InputModule,
     ],
     exports: [
         UserGrantsComponent,

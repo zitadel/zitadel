@@ -2,15 +2,15 @@
     [description]="'POLICY.LABEL.DESCRIPTION' | translate">
 
     <div class="content" *ngIf="labelData">
-        <mat-form-field class="form-field" appearance="outline">
-            <mat-label>{{'POLICY.LABEL.PRIMARYCOLOR' | translate}}</mat-label>
-            <input [(ngModel)]="labelData.primaryColor" matInput />
-        </mat-form-field>
+        <cnsl-form-field class="form-field" appearance="outline">
+            <cnsl-label>{{'POLICY.LABEL.PRIMARYCOLOR' | translate}}</cnsl-label>
+            <input cnslInput [(ngModel)]="labelData.primaryColor" />
+        </cnsl-form-field>
 
-        <mat-form-field class="form-field" appearance="outline">
-            <mat-label>{{'POLICY.LABEL.SECONDARYCOLOR' | translate}}</mat-label>
-            <input [(ngModel)]="labelData.secondaryColor" matInput />
-        </mat-form-field>
+        <cnsl-form-field class="form-field" appearance="outline">
+            <cnsl-label>{{'POLICY.LABEL.SECONDARYCOLOR' | translate}}</cnsl-label>
+            <input cnslInput [(ngModel)]="labelData.secondaryColor" />
+        </cnsl-form-field>
     </div>
 
     <div class="btn-container">

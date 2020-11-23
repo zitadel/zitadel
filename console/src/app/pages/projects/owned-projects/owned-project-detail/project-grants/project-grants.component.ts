@@ -34,7 +34,7 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
     public memberRoleOptions: ProjectRoleView.AsObject[] = [];
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-    public displayedColumns: string[] = ['select', 'grantedOrgName', 'creationDate', 'changeDate', 'roleNamesList'];
+    public displayedColumns: string[] = ['select', 'grantedOrgName', 'dates'];
 
     constructor(private mgmtService: ManagementService, private toast: ToastService) { }
 

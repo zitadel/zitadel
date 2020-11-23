@@ -2,11 +2,10 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
+import { InputModule } from 'src/app/modules/input/input.module';
 
 import { DetailFormMachineComponent } from './detail-form-machine.component';
 
@@ -20,8 +19,7 @@ import { DetailFormMachineComponent } from './detail-form-machine.component';
         FormsModule,
         ReactiveFormsModule,
         TranslateModule,
-        MatFormFieldModule,
-        MatInputModule,
+        InputModule,
         MatSelectModule,
         MatButtonModule,
         MatIconModule,

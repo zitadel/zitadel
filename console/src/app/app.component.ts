@@ -11,7 +11,7 @@ import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import { catchError, debounceTime, finalize, map, take } from 'rxjs/operators';
 
-import { accountCard, navAnimations, routeAnimations, toolbarAnimation } from './animations';
+import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import {
     MyProjectOrgSearchKey,
     MyProjectOrgSearchQuery,
@@ -34,6 +34,7 @@ import { UpdateService } from './services/update.service';
         ...navAnimations,
         accountCard,
         routeAnimations,
+        adminLineAnimation,
     ],
 })
 export class AppComponent implements OnDestroy {

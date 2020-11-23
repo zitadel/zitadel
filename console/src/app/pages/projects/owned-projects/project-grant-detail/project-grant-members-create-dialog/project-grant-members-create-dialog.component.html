@@ -6,14 +6,14 @@
     <app-search-user-autocomplete (selectionChanged)="selectUsers($event)">
     </app-search-user-autocomplete>
 
-    <mat-form-field class="full-width" appearance="outline">
-        <mat-label>{{ 'PROJECT.MEMBER.ROLES' | translate }}</mat-label>
+    <cnsl-form-field class="full-width" appearance="outline">
+        <cnsl-label>{{ 'PROJECT.MEMBER.ROLES' | translate }}</cnsl-label>
         <mat-select [(ngModel)]="roleKeyList" multiple>
             <mat-option *ngFor="let key of data.roleKeysList" [value]="key">
                 {{ key }}
             </mat-option>
         </mat-select>
-    </mat-form-field>
+    </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">
     <button mat-button (click)="closeDialog()">

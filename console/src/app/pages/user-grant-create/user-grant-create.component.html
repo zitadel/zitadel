@@ -46,14 +46,14 @@
 
         <ng-container
             *ngIf="(context === UserGrantContext.GRANTED_PROJECT || ((context === UserGrantContext.USER || context === UserGrantContext.NONE) && $any(project)?.id)) && grantRolesKeyList">
-            <mat-form-field class="form-field" appearance="outline">
-                <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
+            <cnsl-form-field class="form-field" appearance="outline">
+                <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
                 <mat-select multiple (selectionChange)="rolesList = $event.value">
                     <mat-option *ngFor="let role of grantRolesKeyList" [value]="role">
                         {{role}}
                     </mat-option>
                 </mat-select>
-            </mat-form-field>
+            </cnsl-form-field>
         </ng-container>
     </ng-container>
 

@@ -33,12 +33,13 @@
             <div class="full-width">
                 <div class="line">
                     <ng-container *ngIf="editstate">
-                        <mat-form-field *ngIf="editstate && project?.name" class="formfield"
+                        <cnsl-form-field *ngIf="editstate && project?.name" class="formfield"
                             hintLabel="The name is required!">
-                            <mat-label>{{'PROJECT.NAME' | translate}}</mat-label>
-                            <input matInput [(ngModel)]="project.name" name="name" />
-                        </mat-form-field>
-                        <button class="icon-button" *ngIf="editstate" mat-icon-button (click)="updateName()">
+                            <cnsl-label>{{'PROJECT.NAME' | translate}}</cnsl-label>
+                            <input cnslInput [(ngModel)]="project.name" name="name" />
+                        </cnsl-form-field>
+                        <button matTooltip="{{'ACTIONS.SAVE' | translate}}" class="icon-button" *ngIf="editstate"
+                            mat-icon-button (click)="updateName()">
                             <mat-icon>check</mat-icon>
                         </button>
                     </ng-container>

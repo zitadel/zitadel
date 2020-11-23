@@ -3,10 +3,10 @@
 </h1>
 <p class="desc">{{'USER.SENDEMAILDIALOG.DESCRIPTION' | translate}}</p>
 <div mat-dialog-content>
-    <mat-form-field class="formfield">
-        <mat-label>{{ 'USER.SENDEMAILDIALOG.NEWEMAIL' | translate }}</mat-label>
-        <input matInput [(ngModel)]="email" />
-    </mat-form-field>
+    <cnsl-form-field class="formfield">
+        <cnsl-label>{{ 'USER.SENDEMAILDIALOG.NEWEMAIL' | translate }}</cnsl-label>
+        <input cnslInput [(ngModel)]="email" />
+    </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">
     <button color="primary" mat-button class="ok-button" (click)="closeDialog()">

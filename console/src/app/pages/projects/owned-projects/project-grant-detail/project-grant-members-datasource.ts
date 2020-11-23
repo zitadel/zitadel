@@ -32,7 +32,6 @@ export class ProjectGrantMembersDataSource extends DataSource<ProjectMember.AsOb
             grantId, pageSize, offset)).pipe(
                 map(resp => {
                     const response = resp.toObject();
-                    console.log(response.resultList);
                     this.totalResult = response.totalResult;
                     if (response.viewTimestamp) {
                         this.viewTimestamp = response.viewTimestamp;

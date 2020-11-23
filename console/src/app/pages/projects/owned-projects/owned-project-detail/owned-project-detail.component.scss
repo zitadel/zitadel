@@ -41,6 +41,19 @@
   }
 }
 
+.line {
+  .formfield {
+    flex: 1;
+  }
+
+  button {
+    margin-top: 1rem;
+  }
+
+  display: flex;
+  align-items: center;
+}
+
 .side {
   .details {
     margin-bottom: 1rem;

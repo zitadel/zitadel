@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSelectModule } from '@angular/material/select';
@@ -12,6 +11,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { InputModule } from 'src/app/modules/input/input.module';
 
 import { AvatarModule } from '../avatar/avatar.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
@@ -23,7 +23,7 @@ import { MembersTableComponent } from './members-table.component';
     ],
     imports: [
         CommonModule,
-        MatFormFieldModule,
+        InputModule,
         MatSelectModule,
         MatCheckboxModule,
         MatIconModule,

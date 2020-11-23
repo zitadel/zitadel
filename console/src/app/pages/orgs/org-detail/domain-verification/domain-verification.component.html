@@ -38,7 +38,6 @@
                     color="primary">{{ 'ORG.PAGES.DOWNLOAD_FILE' | translate }}</button>
                 <button color="primary" class="verify-button" type="submit" mat-raised-button (click)="validate()">
                     <span>{{ 'ACTIONS.VERIFY' | translate }}</span>
-                    <mat-spinner class="spinner" *ngIf="!validating" diameter="20" mode="indeterminate"></mat-spinner>
                 </button>
                 <mat-spinner class="spinner" *ngIf="validating" diameter="20" mode="indeterminate"></mat-spinner>
             </div>
