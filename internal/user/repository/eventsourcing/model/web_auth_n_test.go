@@ -66,7 +66,7 @@ func TestAppendMfaU2FVerifyEvent(t *testing.T) {
 						{WebauthNTokenID: "WebauthNTokenID", Challenge: "Challenge", State: int32(auth.MFAState_MFASTATE_NOT_READY)},
 					},
 				},
-				u2f:   &WebAuthNVerify{WebauthNTokenID: "WebauthNTokenID", KeyID: []byte("KeyID"), PublicKey: []byte("PublicKey"), AttestationType: "AttestationType", AAGUID: []byte("AAGUID"), SignCount: 1},
+				u2f:   &WebAuthNVerify{WebAuthNTokenID: "WebauthNTokenID", KeyID: []byte("KeyID"), PublicKey: []byte("PublicKey"), AttestationType: "AttestationType", AAGUID: []byte("AAGUID"), SignCount: 1},
 				event: &es_models.Event{},
 			},
 			result: &Human{

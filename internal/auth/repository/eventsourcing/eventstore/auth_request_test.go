@@ -16,8 +16,6 @@ import (
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	proj_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
@@ -116,14 +114,14 @@ func (m *mockEventErrUser) BulkAddExternalIDPs(ctx context.Context, userID strin
 }
 
 type mockViewUser struct {
-	InitRequired            bool
-	PasswordSet             bool
-	PasswordChangeRequired  bool
-	IsEmailVerified         bool
-	OTPState                int32
-	MfaMaxSetUp             int32
-	MfaInitSkipped          time.Time
-	PasswordLessVerifiedIDs []string
+	InitRequired           bool
+	PasswordSet            bool
+	PasswordChangeRequired bool
+	IsEmailVerified        bool
+	OTPState               int32
+	MfaMaxSetUp            int32
+	MfaInitSkipped         time.Time
+	PasswordLessTokens     user_view_model.WebAuthNTokens
 }
 
 type mockLoginPolicy struct {
@@ -139,15 +137,15 @@ func (m *mockViewUser) UserByID(string) (*user_view_model.UserView, error) {
 		State:    int32(user_model.UserStateActive),
 		UserName: "UserName",
 		HumanView: &user_view_model.HumanView{
-			FirstName:               "FirstName",
-			InitRequired:            m.InitRequired,
-			PasswordSet:             m.PasswordSet,
-			PasswordChangeRequired:  m.PasswordChangeRequired,
-			IsEmailVerified:         m.IsEmailVerified,
-			OTPState:                m.OTPState,
-			MfaMaxSetUp:             m.MfaMaxSetUp,
-			MfaInitSkipped:          m.MfaInitSkipped,
-			PasswordLessVerifiedIDs: m.PasswordLessVerifiedIDs,
+			FirstName:              "FirstName",
+			InitRequired:           m.InitRequired,
+			PasswordSet:            m.PasswordSet,
+			PasswordChangeRequired: m.PasswordChangeRequired,
+			IsEmailVerified:        m.IsEmailVerified,
+			OTPState:               m.OTPState,
+			MfaMaxSetUp:            m.MfaMaxSetUp,
+			MfaInitSkipped:         m.MfaInitSkipped,
+			PasswordLessTokens:     m.PasswordLessTokens,
 		},
 	}, nil
 }
@@ -426,8 +424,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			fields{
 				userSessionViewProvider: &mockViewUserSession{},
 				userViewProvider: &mockViewUser{
-					PasswordSet:             true,
-					PasswordLessVerifiedIDs: []string{"id"},
+					PasswordSet:        true,
+					PasswordLessTokens: user_view_model.WebAuthNTokens{&user_view_model.WebAuthNView{ID: "id", State: int32(user_model.MfaStateReady)}},
 				},
 				userEventProvider:        &mockEventUser{},
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
@@ -445,11 +443,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					MultiFactorVerification:  time.Now().Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
-					PasswordSet:             true,
-					PasswordLessVerifiedIDs: []string{"id"},
-					PasswordChangeRequired:  false,
-					IsEmailVerified:         false,
-					MfaMaxSetUp:             int32(model.MFALevelMultiFactor),
+					PasswordSet:            true,
+					PasswordLessTokens:     user_view_model.WebAuthNTokens{&user_view_model.WebAuthNView{ID: "id", State: int32(user_model.MfaStateReady)}},
+					PasswordChangeRequired: false,
+					IsEmailVerified:        false,
+					MfaMaxSetUp:            int32(model.MFALevelMultiFactor),
 				},
 				userEventProvider:        &mockEventUser{},
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},

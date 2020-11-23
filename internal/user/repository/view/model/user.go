@@ -196,6 +196,9 @@ func UsersToModel(users []*UserView) []*model.UserView {
 }
 
 func WebauthnTokensToModel(tokens []*WebAuthNView) []*model.WebAuthNView {
+	if tokens == nil {
+		return nil
+	}
 	result := make([]*model.WebAuthNView, len(tokens))
 	for i, t := range tokens {
 		result[i] = WebauthnTokenToModel(t)
