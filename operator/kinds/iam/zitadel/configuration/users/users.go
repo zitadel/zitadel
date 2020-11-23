@@ -7,89 +7,34 @@ import (
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/database"
 )
 
-func AdaptFunc(
-	monitor mntr.Monitor,
-	users map[string]string,
-	repoURL string,
-	repoKey string,
-) (
-	operator.QueryFunc,
-	operator.DestroyFunc,
-	error,
-) {
-	internalMonitor := monitor.WithField("component", "db-users")
-	destroyers := make([]operator.DestroyFunc, 0)
-
-	destroyers = append(destroyers, func(k8sClient *kubernetes.Client) error {
-		list, err := database.ListUsers(internalMonitor, k8sClient, repoURL, repoKey)
-		if err != nil {
-			return err
+func createIfNecessary(monitor mntr.Monitor, user string, list []string, dbClient database.ClientInt) operator.EnsureFunc {
+	existing := false
+	for _, listedUser := range list {
+		if listedUser == user {
+			existing = true
 		}
-		for _, listedUser := range list {
-			if err := database.DeleteUser(internalMonitor, listedUser, k8sClient, repoURL, repoKey); err != nil {
-				return err
-			}
+	}
+	if !existing {
+		return func(k8sClient kubernetes.ClientInt) error {
+			return dbClient.AddUser(monitor, user, k8sClient)
 		}
-		return nil
-	})
-
-	usernames := []string{}
-	for username := range users {
-		usernames = append(usernames, username)
 	}
 
-	return func(k8sClient *kubernetes.Client, queried map[string]interface{}) (operator.EnsureFunc, error) {
-
-			queriers := make([]operator.QueryFunc, 0)
-			list, err := database.ListUsers(internalMonitor, k8sClient, repoURL, repoKey)
-			if err != nil {
-				return nil, err
-			}
-
-			for _, username := range usernames {
-				queriers = append(queriers, createIfNecessary(monitor, username, list, repoURL, repoKey))
-			}
-			for _, listedUser := range list {
-				queriers = append(queriers, deleteIfNotRequired(monitor, listedUser, usernames, repoURL, repoKey))
-			}
-
-			return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
-		}, operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
-		nil
+	return nil
 }
 
-func createIfNecessary(monitor mntr.Monitor, user string, list []string, repoURL, repoKey string) operator.QueryFunc {
-	addUser := func(k8sClient *kubernetes.Client) error {
-		existing := false
-		for _, listedUser := range list {
-			if listedUser == user {
-				existing = true
-			}
+func deleteIfNotRequired(monitor mntr.Monitor, listedUser string, list []string, dbClient database.ClientInt) operator.EnsureFunc {
+	required := false
+	for _, user := range list {
+		if user == listedUser {
+			required = true
 		}
-		if !existing {
-			return database.AddUser(monitor, user, k8sClient, repoURL, repoKey)
+	}
+	if !required {
+		return func(k8sClient kubernetes.ClientInt) error {
+			return dbClient.DeleteUser(monitor, listedUser, k8sClient)
 		}
-		return nil
 	}
-	return func(k8sClient *kubernetes.Client, queried map[string]interface{}) (operator.EnsureFunc, error) {
-		return addUser, nil
-	}
-}
 
-func deleteIfNotRequired(monitor mntr.Monitor, listedUser string, list []string, repoURL, repoKey string) operator.QueryFunc {
-	deleteUser := func(k8sClient *kubernetes.Client) error {
-		required := false
-		for _, user := range list {
-			if user == listedUser {
-				required = true
-			}
-		}
-		if !required {
-			return database.DeleteUser(monitor, listedUser, k8sClient, repoURL, repoKey)
-		}
-		return nil
-	}
-	return func(k8sClient *kubernetes.Client, queried map[string]interface{}) (operator.EnsureFunc, error) {
-		return deleteUser, nil
-	}
+	return nil
 }

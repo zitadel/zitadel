@@ -3,7 +3,7 @@ package zitadel
 import (
 	"github.com/caos/orbos/pkg/orb"
 	"github.com/caos/orbos/pkg/secret"
-	"sort"
+	"github.com/caos/zitadel/operator/kinds/iam/zitadel/database"
 	"strconv"
 
 	core "k8s.io/api/core/v1"
@@ -55,16 +55,6 @@ func AdaptFunc(
 		}
 
 		namespaceStr := "caos-zitadel"
-		labels := map[string]string{
-			"app.kubernetes.io/managed-by": "zitadel.caos.ch",
-			"app.kubernetes.io/part-of":    "zitadel",
-		}
-		internalLabels := map[string]string{}
-		for k, v := range labels {
-			internalLabels[k] = v
-		}
-		internalLabels["app.kubernetes.io/component"] = "iam"
-
 		// shared elements
 		cmName := "zitadel-vars"
 		secretName := "zitadel-secret"
@@ -82,25 +72,13 @@ func AdaptFunc(
 		uiServiceName := "ui-v1"
 		uiPort := 80
 
-		users, migrationUser := getUsers(desiredKind)
-
-		allZitadelUsers := make([]string, 0)
-		for k := range users {
-			if k != migrationUser {
-				allZitadelUsers = append(allZitadelUsers, k)
-			}
+		labels := getLabels()
+		users := getAllUsers(desiredKind)
+		allZitadelUsers := getZitadelUserList()
+		dbClient, err := database.NewClient(monitor, orbconfig.URL, orbconfig.Repokey)
+		if err != nil {
+			return nil, nil, allSecrets, err
 		}
-		sort.Slice(allZitadelUsers, func(i, j int) bool {
-			return allZitadelUsers[i] < allZitadelUsers[j]
-		})
-
-		allUsers := make([]string, 0)
-		for k := range users {
-			allUsers = append(allUsers, k)
-		}
-		sort.Slice(allUsers, func(i, j int) bool {
-			return allUsers[i] < allUsers[j]
-		})
 
 		queryNS, err := namespace.AdaptFuncToEnsure(namespaceStr)
 		if err != nil {
@@ -111,12 +89,21 @@ func AdaptFunc(
 			return nil, nil, allSecrets, err
 		}
 
-		queryS, destroyS, getClientID, err := services.AdaptFunc(internalMonitor, namespaceStr, internalLabels, grpcServiceName, grpcPort, httpServiceName, httpPort, uiServiceName, uiPort)
+		queryS, destroyS, err := services.AdaptFunc(
+			internalMonitor,
+			namespaceStr,
+			labels,
+			grpcServiceName,
+			grpcPort,
+			httpServiceName,
+			httpPort,
+			uiServiceName,
+			uiPort)
 		if err != nil {
 			return nil, nil, allSecrets, err
 		}
 
-		queryC, destroyC, configurationDone, getConfigurationHashes, err := configuration.AdaptFunc(
+		queryC, destroyC, getConfigurationHashes, err := configuration.AdaptFunc(
 			internalMonitor,
 			namespaceStr,
 			labels,
@@ -129,9 +116,16 @@ func AdaptFunc(
 			secretVarsName,
 			secretPasswordName,
 			users,
-			getClientID,
-			orbconfig.URL,
-			orbconfig.Repokey,
+			services.GetClientIDFunc(namespaceStr, httpServiceName, httpPort),
+			dbClient,
+		)
+		if err != nil {
+			return nil, nil, allSecrets, err
+		}
+
+		queryDB, err := database.AdaptFunc(
+			monitor,
+			dbClient,
 		)
 		if err != nil {
 			return nil, nil, allSecrets, err
@@ -141,14 +135,12 @@ func AdaptFunc(
 			internalMonitor,
 			namespaceStr,
 			action,
-			internalLabels,
+			labels,
 			secretPasswordName,
 			migrationUser,
 			allZitadelUsers,
 			nodeselector,
 			tolerations,
-			orbconfig.URL,
-			orbconfig.Repokey,
 			migrationsPath,
 		)
 		if err != nil {
@@ -158,7 +150,7 @@ func AdaptFunc(
 		queryD, destroyD, deploymentReady, scaleDeployment, ensureInit, err := deployment.AdaptFunc(
 			internalMonitor,
 			namespaceStr,
-			internalLabels,
+			labels,
 			desiredKind.Spec.ReplicaCount,
 			desiredKind.Spec.Affinity,
 			cmName,
@@ -173,7 +165,7 @@ func AdaptFunc(
 			desiredKind.Spec.Tolerations,
 			desiredKind.Spec.Resources,
 			migrationDone,
-			configurationDone,
+			configuration.GetReadyFunc(monitor, namespaceStr, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName),
 			getConfigurationHashes,
 		)
 		if err != nil {
@@ -202,6 +194,7 @@ func AdaptFunc(
 					//configuration
 					queryC,
 					//migration
+					queryDB,
 					queryM,
 				)
 				destroyers = append(destroyers,
@@ -213,6 +206,7 @@ func AdaptFunc(
 					//configuration
 					queryC,
 					//migration
+					queryDB,
 					queryM,
 					//services
 					queryS,
@@ -240,70 +234,11 @@ func AdaptFunc(
 			}
 		}
 
-		return func(k8sClient *kubernetes.Client, queried map[string]interface{}) (operator.EnsureFunc, error) {
+		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 				return operator.QueriersToEnsureFunc(internalMonitor, true, queriers, k8sClient, queried)
 			},
 			operator.DestroyersToDestroyFunc(monitor, destroyers),
 			allSecrets,
 			nil
 	}
-}
-
-func getUsers(desired *DesiredV0) (map[string]string, string) {
-	passwords := &configuration.Passwords{}
-	if desired.Spec != nil && desired.Spec.Configuration != nil && desired.Spec.Configuration.Passwords != nil {
-		passwords = desired.Spec.Configuration.Passwords
-	}
-	users := make(map[string]string, 0)
-
-	migrationUser := "flyway"
-	migrationPassword := migrationUser
-	if passwords.Migration != nil {
-		migrationPassword = passwords.Migration.Value
-	}
-	users[migrationUser] = migrationPassword
-
-	mgmtUser := "management"
-	mgmtPassword := mgmtUser
-	if passwords != nil && passwords.Management != nil {
-		mgmtPassword = passwords.Management.Value
-	}
-	users[mgmtUser] = mgmtPassword
-
-	adminUser := "adminapi"
-	adminPassword := adminUser
-	if passwords != nil && passwords.Adminapi != nil {
-		adminPassword = passwords.Adminapi.Value
-	}
-	users[adminUser] = adminPassword
-
-	authUser := "auth"
-	authPassword := authUser
-	if passwords != nil && passwords.Auth != nil {
-		authPassword = passwords.Auth.Value
-	}
-	users[authUser] = authPassword
-
-	authzUser := "authz"
-	authzPassword := authzUser
-	if passwords != nil && passwords.Authz != nil {
-		authzPassword = passwords.Authz.Value
-	}
-	users[authzUser] = authzPassword
-
-	notUser := "notification"
-	notPassword := notUser
-	if passwords != nil && passwords.Notification != nil {
-		notPassword = passwords.Notification.Value
-	}
-	users[notUser] = notPassword
-
-	esUser := "eventstore"
-	esPassword := esUser
-	if passwords != nil && passwords.Eventstore != nil {
-		esPassword = passwords.Notification.Value
-	}
-	users[esUser] = esPassword
-
-	return users, migrationUser
 }

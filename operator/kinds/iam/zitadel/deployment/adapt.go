@@ -1,8 +1,7 @@
 package deployment
 
 import (
-	"strings"
-
+	"github.com/caos/zitadel/operator/helpers"
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/caos/orbos/mntr"
@@ -14,10 +13,14 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 const (
+	rootSecret    = "client-root"
+	dbSecrets     = "db-secrets"
+	deployName    = "zitadel"
+	containerName = "zitadel"
+	runAsUser     = int64(1000)
 	//zitadelImage can be found in github.com/caos/zitadel repo
 	zitadelImage = "ghcr.io/caos/zitadel:0.101.0"
 )
@@ -41,7 +44,7 @@ func AdaptFunc(
 	resources *k8s.Resources,
 	migrationDone operator.EnsureFunc,
 	configurationDone operator.EnsureFunc,
-	getConfigurationHashes func(k8sClient *kubernetes.Client) map[string]string,
+	getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) map[string]string,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
@@ -51,18 +54,6 @@ func AdaptFunc(
 	error,
 ) {
 	internalMonitor := monitor.WithField("component", "deployment")
-
-	secretMode := int32(384)
-	replicas := int32(replicaCount)
-	runAsUser := int64(1000)
-
-	rootSecret := "client-root"
-	dbSecrets := "db-secrets"
-
-	deployName := "zitadel"
-	containerName := "zitadel"
-	maxUnavailable := intstr.FromInt(1)
-	maxSurge := intstr.FromInt(1)
 
 	if resources == nil {
 		resources = &k8s.Resources{
@@ -77,56 +68,6 @@ func AdaptFunc(
 		}
 	}
 
-	volumes := []corev1.Volume{{
-		Name: secretName,
-		VolumeSource: corev1.VolumeSource{
-			Secret: &corev1.SecretVolumeSource{
-				SecretName: secretName,
-			},
-		},
-	}, {
-		Name: rootSecret,
-		VolumeSource: corev1.VolumeSource{
-			Secret: &corev1.SecretVolumeSource{
-				SecretName:  "cockroachdb.client.root",
-				DefaultMode: &secretMode,
-			},
-		},
-	}, {
-		Name: secretPasswordsName,
-		VolumeSource: corev1.VolumeSource{
-			Secret: &corev1.SecretVolumeSource{
-				SecretName: secretPasswordsName,
-			},
-		},
-	}, {
-		Name: consoleCMName,
-		VolumeSource: corev1.VolumeSource{
-			ConfigMap: &corev1.ConfigMapVolumeSource{
-				LocalObjectReference: corev1.LocalObjectReference{Name: consoleCMName},
-			},
-		},
-	}, {
-		Name: dbSecrets,
-		VolumeSource: corev1.VolumeSource{
-			EmptyDir: &corev1.EmptyDirVolumeSource{},
-		},
-	}}
-
-	for _, user := range users {
-		userReplaced := strings.ReplaceAll(user, "_", "-")
-		internalName := "client-" + userReplaced
-		volumes = append(volumes, corev1.Volume{
-			Name: internalName,
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName:  "cockroachdb.client." + userReplaced,
-					DefaultMode: &secretMode,
-				},
-			},
-		})
-	}
-
 	deploymentDef := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        deployName,
@@ -135,15 +76,15 @@ func AdaptFunc(
 			Annotations: map[string]string{},
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: &replicas,
+			Replicas: helpers.PointerInt32(int32(replicaCount)),
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
 			},
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.RollingUpdateDeploymentStrategyType,
 				RollingUpdate: &appsv1.RollingUpdateDeployment{
-					MaxUnavailable: &maxUnavailable,
-					MaxSurge:       &maxSurge,
+					MaxUnavailable: helpers.IntToIntStr(1),
+					MaxSurge:       helpers.IntToIntStr(1),
 				},
 			},
 			Template: corev1.PodTemplateSpec{
@@ -180,7 +121,12 @@ func AdaptFunc(
 							dbSecrets,
 						),
 					},
-					Volumes: volumes,
+					Volumes: getVolumes(
+						secretName,
+						secretPasswordsName,
+						consoleCMName,
+						users,
+					),
 				},
 			},
 		},
@@ -194,7 +140,7 @@ func AdaptFunc(
 		operator.ResourceDestroyToZitadelDestroy(destroy),
 	}
 
-	checkDeployRunning := func(k8sClient *kubernetes.Client) error {
+	checkDeployRunning := func(k8sClient kubernetes.ClientInt) error {
 		internalMonitor.Info("waiting for deployment to be running")
 		if err := k8sClient.WaitUntilDeploymentReady(namespace, deployName, true, false, 60); err != nil {
 			internalMonitor.Error(errors.Wrap(err, "error while waiting for deployment to be running"))
@@ -204,7 +150,7 @@ func AdaptFunc(
 		return nil
 	}
 
-	checkDeployNotReady := func(k8sClient *kubernetes.Client) error {
+	checkDeployNotReady := func(k8sClient kubernetes.ClientInt) error {
 		internalMonitor.Info("checking for deployment to not be ready")
 		if err := k8sClient.WaitUntilDeploymentReady(namespace, deployName, true, true, 1); err != nil {
 			internalMonitor.Info("deployment is not ready")
@@ -214,8 +160,8 @@ func AdaptFunc(
 		return errors.New("deployment is ready")
 	}
 
-	return func(k8sClient *kubernetes.Client, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			hashes := getConfigurationHashes(k8sClient)
+	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
+			hashes := getConfigurationHashes(k8sClient, queried)
 			if hashes != nil && len(hashes) != 0 {
 				for k, v := range hashes {
 					deploymentDef.Annotations[k] = v
@@ -237,7 +183,7 @@ func AdaptFunc(
 			return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
 		},
 		operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
-		func(k8sClient *kubernetes.Client) error {
+		func(k8sClient kubernetes.ClientInt) error {
 			internalMonitor.Info("waiting for deployment to be ready")
 			if err := k8sClient.WaitUntilDeploymentReady(namespace, deployName, true, true, 300); err != nil {
 				internalMonitor.Error(errors.Wrap(err, "error while waiting for deployment to be ready"))
@@ -247,12 +193,12 @@ func AdaptFunc(
 			return nil
 		},
 		func(replicaCount int) operator.EnsureFunc {
-			return func(k8sClient *kubernetes.Client) error {
+			return func(k8sClient kubernetes.ClientInt) error {
 				internalMonitor.Info("Scaling deployment")
 				return k8sClient.ScaleDeployment(namespace, deployName, replicaCount)
 			}
 		},
-		func(k8sClient *kubernetes.Client) error {
+		func(k8sClient kubernetes.ClientInt) error {
 			if err := checkDeployRunning(k8sClient); err != nil {
 				return err
 			}

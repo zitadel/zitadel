@@ -82,12 +82,12 @@ func AdaptFunc(
 			IAM: iamCurrent,
 		}
 
-		return func(k8sClient *kubernetes.Client, _ map[string]interface{}) (operator.EnsureFunc, error) {
+		return func(k8sClient kubernetes.ClientInt, _ map[string]interface{}) (operator.EnsureFunc, error) {
 				queried := map[string]interface{}{}
 				monitor.WithField("queriers", len(queriers)).Info("Querying")
 				return operator.QueriersToEnsureFunc(monitor, true, queriers, k8sClient, queried)
 			},
-			func(k8sClient *kubernetes.Client) error {
+			func(k8sClient kubernetes.ClientInt) error {
 				monitor.WithField("destroyers", len(queriers)).Info("Destroy")
 				return operator.DestroyersToDestroyFunc(monitor, destroyers)(k8sClient)
 			},

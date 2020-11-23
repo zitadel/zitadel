@@ -13,11 +13,11 @@ import (
 
 type AdaptFunc func(monitor mntr.Monitor, desired *tree.Tree, current *tree.Tree) (QueryFunc, DestroyFunc, map[string]*secret.Secret, error)
 
-type EnsureFunc func(k8sClient *kubernetes.Client) error
+type EnsureFunc func(k8sClient kubernetes.ClientInt) error
 
-type DestroyFunc func(k8sClient *kubernetes.Client) error
+type DestroyFunc func(k8sClient kubernetes.ClientInt) error
 
-type QueryFunc func(k8sClient *kubernetes.Client, queried map[string]interface{}) (EnsureFunc, error)
+type QueryFunc func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (EnsureFunc, error)
 
 func Parse(gitClient *git.Client, file string) (*tree.Tree, error) {
 	if err := gitClient.Clone(); err != nil {
@@ -33,34 +33,34 @@ func Parse(gitClient *git.Client, file string) (*tree.Tree, error) {
 }
 
 func ResourceDestroyToZitadelDestroy(destroyFunc resources.DestroyFunc) DestroyFunc {
-	return func(k8sClient *kubernetes.Client) error {
+	return func(k8sClient kubernetes.ClientInt) error {
 		return destroyFunc(k8sClient)
 	}
 }
 
 func ResourceQueryToZitadelQuery(queryFunc resources.QueryFunc) QueryFunc {
-	return func(k8sClient *kubernetes.Client, _ map[string]interface{}) (EnsureFunc, error) {
+	return func(k8sClient kubernetes.ClientInt, _ map[string]interface{}) (EnsureFunc, error) {
 		ensure, err := queryFunc(k8sClient)
 		ensureInternal := ResourceEnsureToZitadelEnsure(ensure)
 
-		return func(k8sClient *kubernetes.Client) error {
+		return func(k8sClient kubernetes.ClientInt) error {
 			return ensureInternal(k8sClient)
 		}, err
 	}
 }
 
 func ResourceEnsureToZitadelEnsure(ensureFunc resources.EnsureFunc) EnsureFunc {
-	return func(k8sClient *kubernetes.Client) error {
+	return func(k8sClient kubernetes.ClientInt) error {
 		return ensureFunc(k8sClient)
 	}
 }
 func EnsureFuncToQueryFunc(ensure EnsureFunc) QueryFunc {
-	return func(k8sClient *kubernetes.Client, queried map[string]interface{}) (ensureFunc EnsureFunc, err error) {
+	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (ensureFunc EnsureFunc, err error) {
 		return ensure, err
 	}
 }
 
-func QueriersToEnsureFunc(monitor mntr.Monitor, infoLogs bool, queriers []QueryFunc, k8sClient *kubernetes.Client, queried map[string]interface{}) (EnsureFunc, error) {
+func QueriersToEnsureFunc(monitor mntr.Monitor, infoLogs bool, queriers []QueryFunc, k8sClient kubernetes.ClientInt, queried map[string]interface{}) (EnsureFunc, error) {
 	if infoLogs {
 		monitor.Info("querying...")
 	} else {
@@ -79,7 +79,7 @@ func QueriersToEnsureFunc(monitor mntr.Monitor, infoLogs bool, queriers []QueryF
 	} else {
 		monitor.Debug("queried")
 	}
-	return func(k8sClient *kubernetes.Client) error {
+	return func(k8sClient kubernetes.ClientInt) error {
 		if infoLogs {
 			monitor.Info("ensuring...")
 		} else {
@@ -100,7 +100,7 @@ func QueriersToEnsureFunc(monitor mntr.Monitor, infoLogs bool, queriers []QueryF
 }
 
 func DestroyersToDestroyFunc(monitor mntr.Monitor, destroyers []DestroyFunc) DestroyFunc {
-	return func(k8sClient *kubernetes.Client) error {
+	return func(k8sClient kubernetes.ClientInt) error {
 		monitor.Info("destroying...")
 		for _, destroyer := range destroyers {
 			if err := destroyer(k8sClient); err != nil {

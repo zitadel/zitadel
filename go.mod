@@ -16,7 +16,7 @@ require (
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.12.5
-	github.com/caos/orbos v1.0.7-0.20201103151833-6ead82b08a6a
+	github.com/caos/orbos v1.3.2-0.20201119164747-e7f1303ee34c
 	github.com/cockroachdb/cockroach-go/v2 v2.0.8
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
@@ -70,6 +70,8 @@ require (
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/square/go-jose.v2 v2.5.1
 	gopkg.in/yaml.v3 v3.0.0-20200605160147-a5ece683394c
+	gotest.tools v2.2.0+incompatible
 	k8s.io/api v0.18.5
+	k8s.io/apiextensions-apiserver v0.18.5
 	k8s.io/apimachinery v0.18.5
 )

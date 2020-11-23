@@ -13,7 +13,7 @@ import (
 
 func EnsureZitadelOperatorArtifacts(
 	monitor mntr.Monitor,
-	client *kubernetes.Client,
+	client kubernetes.ClientInt,
 	version string,
 	nodeselector map[string]string,
 	tolerations []core.Toleration) error {

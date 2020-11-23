@@ -8,6 +8,13 @@ import (
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/configuration"
 )
 
+const (
+	AccountsHostName = "accounts"
+	ApiHostName      = "api"
+	ConsoleHostName  = "console"
+	IssuerHostName   = "issuer"
+)
+
 func AdaptFunc(
 	monitor mntr.Monitor,
 	namespace string,
@@ -20,27 +27,22 @@ func AdaptFunc(
 ) {
 	internalMonitor := monitor.WithField("part", "hosts")
 
-	accountsHostName := "accounts"
-	apiHostName := "api"
-	consoleHostName := "console"
-	issuerHostName := "issuer"
-
-	destroyAccounts, err := host.AdaptFuncToDestroy(namespace, accountsHostName)
+	destroyAccounts, err := host.AdaptFuncToDestroy(namespace, AccountsHostName)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyAPI, err := host.AdaptFuncToDestroy(namespace, apiHostName)
+	destroyAPI, err := host.AdaptFuncToDestroy(namespace, ApiHostName)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyConsole, err := host.AdaptFuncToDestroy(namespace, consoleHostName)
+	destroyConsole, err := host.AdaptFuncToDestroy(namespace, ConsoleHostName)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyIssuer, err := host.AdaptFuncToDestroy(namespace, issuerHostName)
+	destroyIssuer, err := host.AdaptFuncToDestroy(namespace, IssuerHostName)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -52,10 +54,10 @@ func AdaptFunc(
 		operator.ResourceDestroyToZitadelDestroy(destroyIssuer),
 	}
 
-	return func(k8sClient *kubernetes.Client, queried map[string]interface{}) (operator.EnsureFunc, error) {
+	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 			crd, err := k8sClient.CheckCRD("hosts.getambassador.io")
 			if crd == nil || err != nil {
-				return func(k8sClient *kubernetes.Client) error { return nil }, nil
+				return func(k8sClient kubernetes.ClientInt) error { return nil }, nil
 			}
 
 			accountsDomain := dns.Subdomains.Accounts + "." + dns.Domain
@@ -67,7 +69,7 @@ func AdaptFunc(
 			accountsSelector := map[string]string{
 				"hostname": accountsDomain,
 			}
-			queryAccounts, err := host.AdaptFuncToEnsure(namespace, accountsHostName, labels, accountsDomain, "none", "", accountsSelector, originCASecretName)
+			queryAccounts, err := host.AdaptFuncToEnsure(namespace, AccountsHostName, labels, accountsDomain, "none", "", accountsSelector, originCASecretName)
 			if err != nil {
 				return nil, err
 			}
@@ -75,7 +77,7 @@ func AdaptFunc(
 			apiSelector := map[string]string{
 				"hostname": apiDomain,
 			}
-			queryAPI, err := host.AdaptFuncToEnsure(namespace, apiHostName, labels, apiDomain, "none", "", apiSelector, originCASecretName)
+			queryAPI, err := host.AdaptFuncToEnsure(namespace, ApiHostName, labels, apiDomain, "none", "", apiSelector, originCASecretName)
 			if err != nil {
 				return nil, err
 			}
@@ -83,7 +85,7 @@ func AdaptFunc(
 			consoleSelector := map[string]string{
 				"hostname": consoleDomain,
 			}
-			queryConsole, err := host.AdaptFuncToEnsure(namespace, consoleHostName, labels, consoleDomain, "none", "", consoleSelector, originCASecretName)
+			queryConsole, err := host.AdaptFuncToEnsure(namespace, ConsoleHostName, labels, consoleDomain, "none", "", consoleSelector, originCASecretName)
 			if err != nil {
 				return nil, err
 			}
@@ -91,7 +93,7 @@ func AdaptFunc(
 			issuerSelector := map[string]string{
 				"hostname": issuerDomain,
 			}
-			queryIssuer, err := host.AdaptFuncToEnsure(namespace, issuerHostName, labels, issuerDomain, "none", "", issuerSelector, originCASecretName)
+			queryIssuer, err := host.AdaptFuncToEnsure(namespace, IssuerHostName, labels, issuerDomain, "none", "", issuerSelector, originCASecretName)
 			if err != nil {
 				return nil, err
 			}
