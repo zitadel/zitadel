@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	api_trace "go.opentelemetry.io/otel/api/trace"
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
+	api_trace "go.opentelemetry.io/otel/trace"
 )
 
 type Tracer interface {

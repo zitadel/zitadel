@@ -5,11 +5,11 @@ import (
 	"net/http"
 
 	"github.com/caos/zitadel/internal/tracing"
-	"go.opentelemetry.io/otel/api/global"
-	api_trace "go.opentelemetry.io/otel/api/trace"
-	"go.opentelemetry.io/otel/propagators"
+	global "go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/export/trace"
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
+	api_trace "go.opentelemetry.io/otel/trace"
 )
 
 type Tracer struct {
@@ -24,7 +24,7 @@ func NewTracer(name string, sampler sdk_trace.Sampler, exporter trace.SpanExport
 	)
 
 	global.SetTracerProvider(tp)
-	tc := propagators.TraceContext{}
+	tc := propagation.TraceContext{}
 	global.SetTextMapPropagator(tc)
 
 	return &Tracer{Exporter: tp.Tracer(name), sampler: sampler}

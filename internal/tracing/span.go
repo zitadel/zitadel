@@ -1,12 +1,9 @@
 package tracing
 
 import (
-	"context"
-
 	grpc_errs "github.com/caos/zitadel/internal/api/grpc/errors"
-	api_trace "go.opentelemetry.io/otel/api/trace"
-	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/label"
+	api_trace "go.opentelemetry.io/otel/trace"
 )
 
 type Span struct {
@@ -22,7 +19,6 @@ func (s *Span) End() {
 	if s.span == nil {
 		return
 	}
-
 	s.span.End(s.opts...)
 }
 
@@ -36,9 +32,13 @@ func (s *Span) SetStatusByError(err error) {
 		return
 	}
 	if err != nil {
-		s.span.RecordError(context.TODO(), err, api_trace.WithErrorStatus(codes.Error))
+		s.span.RecordError(err)
 	}
 
 	code, msg, id, _ := grpc_errs.ExtractCaosError(err)
-	s.span.SetAttributes(label.Uint32("grpc_code", uint32(code)), label.String("grpc_msg", msg), label.String("error_id", id))
+	s.span.SetAttributes(
+		label.Uint32("grpc_code", uint32(code)),
+		label.String("grpc_msg", msg),
+		label.String("error_id", id),
+	)
 }
