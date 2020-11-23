@@ -9,6 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
+	"github.com/caos/zitadel/internal/tracing"
 	"github.com/caos/zitadel/internal/view/repository"
 
 	"time"
@@ -74,7 +75,7 @@ func (s *spooledHandler) load(workerID string) {
 			errs <- err
 		} else {
 			errs <- s.process(ctx, events, workerID)
-			logging.Log("SPOOL-0pV8o").WithField("view", s.ViewModel()).WithField("worker", workerID).Debug("process done")
+			logging.Log("SPOOL-0pV8o").WithField("view", s.ViewModel()).WithField("worker", workerID).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("process done")
 		}
 	}
 	<-ctx.Done()
@@ -92,7 +93,7 @@ func (s *spooledHandler) process(ctx context.Context, events []*models.Event, wo
 	for _, event := range events {
 		select {
 		case <-ctx.Done():
-			logging.LogWithFields("SPOOL-FTKwH", "view", s.ViewModel(), "worker", workerID).Debug("context canceled")
+			logging.LogWithFields("SPOOL-FTKwH", "view", s.ViewModel(), "worker", workerID, "traceID", tracing.TraceIDFromCtx(ctx)).Debug("context canceled")
 			return nil
 		default:
 			if err := s.Reduce(event); err != nil {
@@ -110,7 +111,7 @@ func (s *spooledHandler) query(ctx context.Context) ([]*models.Event, error) {
 	}
 	factory := models.FactoryFromSearchQuery(query)
 	sequence, err := s.eventstore.LatestSequence(ctx, factory)
-	logging.Log("SPOOL-7SciK").OnError(err).Debug("unable to query latest sequence")
+	logging.Log("SPOOL-7SciK").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to query latest sequence")
 	var processedSequence uint64
 	for _, filter := range query.Filters {
 		if filter.GetField() == models.Field_LatestSequence {

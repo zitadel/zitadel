@@ -6,6 +6,9 @@ import (
 	"testing"
 	"time"
 
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
@@ -488,7 +491,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{&model.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID"}, false},
-			[]model.NextStep{&model.ExternalLoginStep{}},
+			[]model.NextStep{&model.ExternalLoginStep{SelectedIDPConfigID: "IDPConfigID"}},
 			nil,
 		},
 		{
@@ -1345,7 +1348,6 @@ func Test_userSessionByIDs(t *testing.T) {
 
 func Test_userByID(t *testing.T) {
 	type args struct {
-		ctx           context.Context
 		viewProvider  userViewProvider
 		eventProvider userEventProvider
 		userID        string
@@ -1443,7 +1445,7 @@ func Test_userByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := userByID(tt.args.ctx, tt.args.viewProvider, tt.args.eventProvider, tt.args.userID)
+			got, err := userByID(context.Background(), tt.args.viewProvider, tt.args.eventProvider, tt.args.userID)
 			if (err != nil && tt.wantErr == nil) || (tt.wantErr != nil && !tt.wantErr(err)) {
 				t.Errorf("nextSteps() wrong error = %v", err)
 				return

@@ -42,18 +42,6 @@ service ManagementService {
     };
   }
 
-  rpc Ready(google.protobuf.Empty) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      get: "/ready"
-    };
-  }
-
-  rpc Validate(google.protobuf.Empty) returns (google.protobuf.Struct) {
-    option (google.api.http) = {
-      get: "/validate"
-    };
-  }
-
   rpc GetZitadelDocs(google.protobuf.Empty) returns (ZitadelDocs) {
     option (google.api.http) = {
       get: "/zitadel/docs"
@@ -2863,7 +2851,7 @@ message UserGrantSearchRequest {
 
 message UserGrantSearchQuery {
   UserGrantSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
-  SearchMethod method = 2 [(validate.rules).enum = {in: [0]}];
+  SearchMethod method = 2 [(validate.rules).enum.defined_only = true];
   string value = 3;
 }
 
@@ -2871,7 +2859,7 @@ enum UserGrantSearchKey {
   USERGRANTSEARCHKEY_UNSPECIFIED = 0;
   USERGRANTSEARCHKEY_PROJECT_ID = 1;
   USERGRANTSEARCHKEY_USER_ID = 2;
-  USERGRANTSEARCHKEY_ORG_ID = 3;
+  USERGRANTSEARCHKEY_WITH_GRANTED = 3;
   USERGRANTSEARCHKEY_ROLE_KEY = 4;
   USERGRANTSEARCHKEY_GRANT_ID = 5;
   USERGRANTSEARCHKEY_USER_NAME = 6;

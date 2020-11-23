@@ -39,18 +39,6 @@ service AuthService {
     };
   }
 
-  rpc Ready(google.protobuf.Empty) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      get: "/ready"
-    };
-  }
-
-  rpc Validate(google.protobuf.Empty) returns (google.protobuf.Struct) {
-    option (google.api.http) = {
-      get: "/validate"
-    };
-  }
-
   // Authorization
   rpc GetMyUserSessions(google.protobuf.Empty) returns (UserSessionViews) {
     option (google.api.http) = {

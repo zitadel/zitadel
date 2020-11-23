@@ -1,28 +1,24 @@
-package log
+package otel
 
 import (
 	"github.com/caos/zitadel/internal/tracing"
-	"github.com/caos/zitadel/internal/tracing/otel"
-	"go.opentelemetry.io/otel/exporters/stdout"
+	"go.opentelemetry.io/otel/exporters/otlp"
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 type Config struct {
 	Fraction     float64
 	MetricPrefix string
-}
-
-type Tracer struct {
-	otel.Tracer
+	Endpoint     string
 }
 
 func (c *Config) NewTracer() error {
 	sampler := sdk_trace.ParentBased(sdk_trace.TraceIDRatioBased(c.Fraction))
-	exporter, err := stdout.NewExporter(stdout.WithPrettyPrint())
+	exporter, err := otlp.NewExporter(otlp.WithAddress(c.Endpoint), otlp.WithInsecure())
 	if err != nil {
 		return err
 	}
 
-	tracing.T = &Tracer{Tracer: *(otel.NewTracer(c.MetricPrefix, sampler, exporter))}
+	tracing.T = NewTracer(c.MetricPrefix, sampler, exporter)
 	return nil
 }
