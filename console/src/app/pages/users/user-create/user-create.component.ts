@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -46,6 +46,7 @@ export class UserCreateComponent implements OnDestroy {
     public userLoginMustBeDomain: boolean = false;
     public loading: boolean = false;
 
+    @ViewChild('suffix') public suffix!: any;
     private primaryDomain!: OrgDomain.AsObject;
 
     constructor(
@@ -53,6 +54,7 @@ export class UserCreateComponent implements OnDestroy {
         private toast: ToastService,
         private fb: FormBuilder,
         private mgmtService: ManagementService,
+        private changeDetRef: ChangeDetectorRef,
     ) {
         this.loading = true;
         this.loadOrg();
@@ -60,10 +62,12 @@ export class UserCreateComponent implements OnDestroy {
             this.userLoginMustBeDomain = iampolicy.toObject().userLoginMustBeDomain;
             this.initForm();
             this.loading = false;
+            this.changeDetRef.detectChanges();
         }).catch(error => {
             console.error(error);
             this.initForm();
             this.loading = false;
+            this.changeDetRef.detectChanges();
         });
     }
 
@@ -92,6 +96,11 @@ export class UserCreateComponent implements OnDestroy {
             preferredLanguage: [''],
             phone: [''],
         });
+
+    }
+
+    public logsuff(): void {
+        console.log((this.suffix.nativeElement as HTMLElement), (this.suffix.nativeElement as HTMLElement).offsetWidth);
     }
 
     public createUser(): void {
@@ -123,7 +132,6 @@ export class UserCreateComponent implements OnDestroy {
     }
 
     ngOnDestroy(): void {
-
         this.sub.unsubscribe();
     }
 
@@ -172,6 +180,12 @@ export class UserCreateComponent implements OnDestroy {
             return `@${this.primaryDomain.domain}`;
         } else {
             return '';
+        }
+    }
+
+    public get suffixPadding(): string | undefined {
+        if (this.suffix?.nativeElement.offsetWidth) {
+            return `${(this.suffix.nativeElement as HTMLElement).offsetWidth + 10}px`;
         }
     }
 }

@@ -95,7 +95,6 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
     public ngAfterViewInit(): void {
         // Avoid animations on load.
         this._subscriptAnimationState = 'enter';
-        console.log('enter');
         this._changeDetectorRef.detectChanges();
     }
 

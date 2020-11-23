@@ -79,6 +79,15 @@
   }
 }
 
+.row-form {
+    display: flex;
+    align-items: center;
+
+    .form-field {
+        flex: 1;
+    }
+}
+
 .fill-space {
   flex: 1;
 }

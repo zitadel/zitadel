@@ -102,43 +102,45 @@
                         </div>
                     </ng-container>
 
-                    <ng-container
-                        *ngIf="(context === UserGrantContext.OWNED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE) && grantToEdit == grant.id && loadedProjectId && loadedProjectId === grant.projectId">
-                        <cnsl-form-field class="form-field" appearance="outline">
-                            <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
-                            <mat-select [(ngModel)]="grant.roleKeysList" multiple
-                                [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.grantId] : []) | hasRole | async))"
-                                (selectionChange)="updateRoles(grant, $event)">
-                                <mat-option *ngFor="let role of projectRoleOptions" [value]="role.key">
-                                    {{role.key}}
-                                </mat-option>
-                            </mat-select>
-                        </cnsl-form-field>
-                        <button matTooltip="{{'ACTIONS.CLOSE' | translate}}"
-                            *ngIf="context === UserGrantContext.USER || context === UserGrantContext.NONE"
-                            mat-icon-button (click)="grantToEdit=''">
-                            <mat-icon>close</mat-icon>
-                        </button>
-                    </ng-container>
+                    <div class="row-form">
+                        <ng-container
+                            *ngIf="(context === UserGrantContext.OWNED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE) && grantToEdit == grant.id && loadedProjectId && loadedProjectId === grant.projectId">
+                            <cnsl-form-field class="form-field" appearance="outline">
+                                <!-- <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label> -->
+                                <mat-select [(ngModel)]="grant.roleKeysList" multiple
+                                    [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.grantId] : []) | hasRole | async))"
+                                    (selectionChange)="updateRoles(grant, $event)">
+                                    <mat-option *ngFor="let role of projectRoleOptions" [value]="role.key">
+                                        {{role.key}}
+                                    </mat-option>
+                                </mat-select>
+                            </cnsl-form-field>
+                            <button matTooltip="{{'ACTIONS.CLOSE' | translate}}"
+                                *ngIf="context === UserGrantContext.USER || context === UserGrantContext.NONE"
+                                mat-icon-button (click)="grantToEdit=''">
+                                <mat-icon>close</mat-icon>
+                            </button>
+                        </ng-container>
 
-                    <ng-container
-                        *ngIf="(context === UserGrantContext.GRANTED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE) && loadedGrantId && loadedGrantId === grant.grantId && grantToEdit == grant.id">
-                        <cnsl-form-field class="form-field" appearance="outline">
-                            <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
-                            <mat-select [(ngModel)]="grant.roleKeysList" multiple
-                                [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.grantId] : []) | hasRole | async))"
-                                (selectionChange)="updateRoles(grant, $event)">
-                                <mat-option *ngFor="let role of grantRoleOptions" [value]="role">
-                                    {{role}}
-                                </mat-option>
-                            </mat-select>
-                        </cnsl-form-field>
-                        <button matTooltip="{{'ACTIONS.CLOSE' | translate}}"
-                            *ngIf="context === UserGrantContext.USER || context === UserGrantContext.NONE"
-                            mat-icon-button (click)="grantToEdit=''">
-                            <mat-icon>close</mat-icon>
-                        </button>
-                    </ng-container>
+                        <ng-container
+                            *ngIf="(context === UserGrantContext.GRANTED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE) && loadedGrantId && loadedGrantId === grant.grantId && grantToEdit == grant.id">
+                            <cnsl-form-field class="form-field" appearance="outline">
+                                <!-- <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label> -->
+                                <mat-select [(ngModel)]="grant.roleKeysList" multiple
+                                    [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.grantId] : []) | hasRole | async))"
+                                    (selectionChange)="updateRoles(grant, $event)">
+                                    <mat-option *ngFor="let role of grantRoleOptions" [value]="role">
+                                        {{role}}
+                                    </mat-option>
+                                </mat-select>
+                            </cnsl-form-field>
+                            <button matTooltip="{{'ACTIONS.CLOSE' | translate}}"
+                                *ngIf="context === UserGrantContext.USER || context === UserGrantContext.NONE"
+                                mat-icon-button (click)="grantToEdit=''">
+                                <mat-icon>close</mat-icon>
+                            </button>
+                        </ng-container>
+                    </div>
                 </td>
             </ng-container>
 
