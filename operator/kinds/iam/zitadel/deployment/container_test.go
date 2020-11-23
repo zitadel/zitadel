@@ -12,6 +12,7 @@ import (
 
 func TestDeployment_GetContainer(t *testing.T) {
 	secretVarsName := "testVars"
+	version := "test"
 	secretPasswordsName := "testPasswords"
 	secretPath := "testSecretPath"
 	certPath := "testCert"
@@ -93,7 +94,7 @@ func TestDeployment_GetContainer(t *testing.T) {
 			RunAsNonRoot: helpers.PointerBool(true),
 		},
 		Name:            containerName,
-		Image:           zitadelImage,
+		Image:           zitadelImage + ":" + version,
 		ImagePullPolicy: "IfNotPresent",
 		Ports: []corev1.ContainerPort{
 			{Name: "grpc", ContainerPort: 50001},
@@ -133,6 +134,7 @@ func TestDeployment_GetContainer(t *testing.T) {
 
 	container := getContainer(
 		containerName,
+		version,
 		runAsUser,
 		true,
 		resources,

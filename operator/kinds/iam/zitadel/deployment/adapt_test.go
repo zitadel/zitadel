@@ -17,6 +17,7 @@ import (
 
 func TestDeployment_Adapt(t *testing.T) {
 	monitor := mntr.Monitor{}
+	version := "test"
 	namespace := "test"
 	labels := map[string]string{"test": "test"}
 	replicaCount := 1
@@ -82,6 +83,7 @@ func TestDeployment_Adapt(t *testing.T) {
 					Containers: []corev1.Container{
 						getContainer(
 							containerName,
+							version,
 							runAsUser,
 							true,
 							resources,
@@ -120,6 +122,7 @@ func TestDeployment_Adapt(t *testing.T) {
 
 	query, _, _, _, _, err := AdaptFunc(
 		monitor,
+		version,
 		namespace,
 		labels,
 		replicaCount,
