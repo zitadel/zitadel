@@ -22,11 +22,12 @@ const (
 	containerName = "zitadel"
 	runAsUser     = int64(1000)
 	//zitadelImage can be found in github.com/caos/zitadel repo
-	zitadelImage = "ghcr.io/caos/zitadel:0.101.0"
+	zitadelImage = "ghcr.io/caos/zitadel"
 )
 
 func AdaptFunc(
 	monitor mntr.Monitor,
+	version string,
 	namespace string,
 	labels map[string]string,
 	replicaCount int,
@@ -107,6 +108,7 @@ func AdaptFunc(
 					Containers: []corev1.Container{
 						getContainer(
 							containerName,
+							version,
 							runAsUser,
 							true,
 							resources,

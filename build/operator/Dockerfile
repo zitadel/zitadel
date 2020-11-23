@@ -25,7 +25,8 @@ COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
 FROM go-test as prod-go-build
 ARG ARCH=amd64
 ARG OS=linux
-RUN CGO_ENABLED=0 GOOS=${OS} GOARCH=${ARCH} go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadelctl cmd/zitadelctl/main.go
+ARG VERSION=none
+RUN CGO_ENABLED=0 GOOS=${OS} GOARCH=${ARCH} go build -a -installsuffix cgo -ldflags '-extldflags "-static" -X main.Version=${VERSION}' -o zitadelctl cmd/zitadelctl/main.go
 
 ## Go dev build
 FROM go-base as dev-go-build

@@ -13,7 +13,7 @@ jobs:
     name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
     strategy:
       matrix:
-        goos: [ 'linux', 'darwin', 'windows']
+        goos: [ 'linux', 'darwin', 'windows' ]
         goarch: [ 'amd64' ]
     steps:
       - name: Source checkout
@@ -21,8 +21,24 @@ jobs:
       - name: Set output
         id: branch
         run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
-      - name: Check output
-        run: echo ${{ steps.branch.outputs.short_ref }}
+      - name: Semantic Release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v2
+        with:
+          dry_run: true
+          semantic_version: 17.0.4
+      - name: Set version
+        id: version
+        run: |
+          if ${{ steps.semantic.outputs.new_release_published == 'true' }}; then
+            echo ::set-output name=version::${{ steps.semantic.outputs.new_release_version }}
+          else
+            echo ::set-output name=version::${{ steps.branch.outputs.short_ref }}
+          fi
+      - name: Check outputs
+        run: |
+          echo ${{ steps.branch.outputs.short_ref }}
+          echo ${{ steps.version.outputs.version }}
       - name: Generate Short SHA Container Tag
         id: vars
         run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
@@ -57,6 +73,7 @@ jobs:
           build-args: |
             OS=${{ matrix.goos }}
             ARCH=${{ matrix.goarch }}
+            VERSION=${{ steps.version.outputs.version }}
       - uses: actions/upload-artifact@v2
         with:
           name: zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
@@ -75,6 +92,7 @@ jobs:
           build-args: |
             OS=${{ matrix.goos }}
             ARCH=${{ matrix.goarch }}
+            VERSION=${{ steps.version.outputs.version }}
 
   release:
     runs-on: ubuntu-18.04

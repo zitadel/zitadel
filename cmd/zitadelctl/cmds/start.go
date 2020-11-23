@@ -21,7 +21,7 @@ func StartOperator(rv RootValues) *cobra.Command {
 	flags.StringVar(&migrationsPath, "migrations", "./migrations/", "Path to the migration files")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		_, monitor, orbConfig, _, _, errFunc := rv()
+		_, monitor, orbConfig, _, version, errFunc := rv()
 		if errFunc != nil {
 			return errFunc(cmd)
 		}
@@ -32,7 +32,7 @@ func StartOperator(rv RootValues) *cobra.Command {
 		}
 
 		if k8sClient.Available() {
-			return start.Operator(monitor, orbConfig.Path, k8sClient, migrationsPath)
+			return start.Operator(monitor, orbConfig.Path, k8sClient, migrationsPath, version)
 		}
 		return nil
 	}

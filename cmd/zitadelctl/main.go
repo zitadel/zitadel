@@ -7,12 +7,12 @@ import (
 )
 
 var (
-	version = "none"
+	Version = "none"
 )
 
 func main() {
-	rootCmd, rootValues := cmds.RootCommand(version)
-	rootCmd.Version = fmt.Sprintf("%s\n", version)
+	rootCmd, rootValues := cmds.RootCommand(Version)
+	rootCmd.Version = fmt.Sprintf("%s\n", Version)
 
 	startCmd := cmds.StartOperator(rootValues)
 	takeoffCmd := cmds.TakeoffCommand(rootValues)

@@ -9,6 +9,7 @@ import (
 
 func getContainer(
 	containerName string,
+	version string,
 	runAsUser int64,
 	runAsNonRoot bool,
 	resources *k8s.Resources,
@@ -88,7 +89,7 @@ func getContainer(
 			RunAsNonRoot: &runAsNonRoot,
 		},
 		Name:            containerName,
-		Image:           zitadelImage,
+		Image:           zitadelImage + ":" + version,
 		ImagePullPolicy: "IfNotPresent",
 		Ports: []corev1.ContainerPort{
 			{Name: "grpc", ContainerPort: 50001},

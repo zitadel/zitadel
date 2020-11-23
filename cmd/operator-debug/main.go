@@ -36,6 +36,7 @@ func main() {
 		helpers.PruneHome(*orbconfig),
 		kubernetes.NewK8sClient(monitor, strPtr(string(kc))),
 		"./migrations/cockroach/",
+		"operator",
 	); err != nil {
 		panic(err)
 	}

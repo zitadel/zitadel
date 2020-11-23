@@ -27,6 +27,7 @@ func AdaptFunc(
 	orbconfig *orb.Orb,
 	action string,
 	migrationsPath string,
+	version string,
 	features []string,
 ) operator.AdaptFunc {
 	return func(
@@ -149,6 +150,7 @@ func AdaptFunc(
 
 		queryD, destroyD, deploymentReady, scaleDeployment, ensureInit, err := deployment.AdaptFunc(
 			internalMonitor,
+			version,
 			namespaceStr,
 			labels,
 			desiredKind.Spec.ReplicaCount,

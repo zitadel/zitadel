@@ -15,6 +15,7 @@ func AdaptFunc(
 	orbconfig *orb.Orb,
 	action string,
 	migrationsPath string,
+	version string,
 	features []string,
 ) operator.AdaptFunc {
 	return func(
@@ -56,6 +57,7 @@ func AdaptFunc(
 			orbconfig,
 			action,
 			migrationsPath,
+			version,
 			features,
 		)
 		if err != nil {

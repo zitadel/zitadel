@@ -22,6 +22,7 @@ func GetQueryAndDestroyFuncs(
 	orbconfig *orb.Orb,
 	action string,
 	migrationsPath string,
+	version string,
 	features []string,
 ) (
 	query operator.QueryFunc,
@@ -38,7 +39,7 @@ func GetQueryAndDestroyFuncs(
 
 	switch desiredTree.Common.Kind {
 	case "zitadel.caos.ch/Zitadel":
-		return zitadel.AdaptFunc(nodeselector, tolerations, orbconfig, action, migrationsPath, features)(monitor, desiredTree, currentTree)
+		return zitadel.AdaptFunc(nodeselector, tolerations, orbconfig, action, migrationsPath, version, features)(monitor, desiredTree, currentTree)
 	default:
 		return nil, nil, nil, errors.Errorf("unknown iam kind %s", desiredTree.Common.Kind)
 	}
