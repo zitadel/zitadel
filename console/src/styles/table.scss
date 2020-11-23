@@ -5,6 +5,7 @@
   $primary: map-get($theme, primary);
   $warn: map-get($theme, warn);
   $warn-color: mat-color($warn, 500);
+  $primary-color: mat-color($primary, 500);
   $primary-dark: mat-color($primary, A900);
   $secondary-dark: mat-color($primary, A800);
   $inv-color: mat-color($primary, A600);
@@ -66,14 +67,15 @@
   }
 
   .no-content-row {
-    background-color: rgba($warn-color, .1);
-    color: $warn-color;
+    background-color: if($is-dark-theme, #00000030, #f4f4f470);
+    // color: $primary-color;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     display: flex;
     align-items: center;
     padding: .5rem;
     font-size: 14px;
+    justify-content: center;
   }
 
   .selection {

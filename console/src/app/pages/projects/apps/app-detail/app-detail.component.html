@@ -109,10 +109,10 @@
                 </cnsl-form-field>
 
                 <mat-checkbox *ngIf="accessTokenType?.value === OIDCTokenType.OIDCTOKENTYPE_JWT" class="full-width"
-                    formControlName="accessTokenRoleAssertion">
+                    formControlName="accessTokenRoleAssertion" color="primary">
                     {{'APP.OIDC.ACCESSTOKENROLEASSERTION' | translate}}</mat-checkbox>
                 <p class="full-width desc">{{'APP.OIDC.ACCESSTOKENROLEASSERTION_DESCRIPTION' | translate}}</p>
-                <mat-checkbox class="full-width" formControlName="idTokenRoleAssertion">
+                <mat-checkbox class="full-width" formControlName="idTokenRoleAssertion" color="primary">
                     {{'APP.OIDC.IDTOKENROLEASSERTION' | translate}}</mat-checkbox>
                 <p class="full-width desc">{{'APP.OIDC.IDTOKENROLEASSERTION_DESCRIPTION' | translate}}</p>
 

@@ -81,10 +81,11 @@
                     <app-card title="{{ 'PROJECT.ROLE.TITLE' | translate }}"
                         description="{{ 'PROJECT.ROLE.DESCRIPTION' | translate }}">
                         <p>{{'PROJECT.ROLE.OPTIONS' | translate}}</p>
-                        <mat-checkbox [(ngModel)]="project.projectRoleAssertion" (change)="saveProject()">
+                        <mat-checkbox [(ngModel)]="project.projectRoleAssertion" (change)="saveProject()"
+                            color="primary">
                             {{'PROJECT.ROLE.ASSERTION' | translate}}</mat-checkbox>
                         <p class="desc">{{'PROJECT.ROLE.ASSERTION_DESCRIPTION' | translate}}</p>
-                        <mat-checkbox [(ngModel)]="project.projectRoleCheck" (change)="saveProject()">
+                        <mat-checkbox [(ngModel)]="project.projectRoleCheck" (change)="saveProject()" color="primary">
                             {{'PROJECT.ROLE.CHECK' | translate}}</mat-checkbox>
                         <p class="desc">{{'PROJECT.ROLE.CHECK_DESCRIPTION' | translate}}</p>
                         <div class="divider"></div>
