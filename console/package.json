@@ -30,7 +30,7 @@
     "angular-oauth2-oidc": "^10.0.3",
     "angularx-qrcode": "^10.0.11",
     "cors": "^2.8.5",
-    "file-saver": "^2.0.2",
+    "file-saver": "^2.0.5",
     "google-proto-files": "^2.3.0",
     "google-protobuf": "^3.13.0",
     "grpc": "^1.24.3",
