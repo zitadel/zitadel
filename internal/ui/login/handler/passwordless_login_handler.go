@@ -34,7 +34,7 @@ func (l *Login) handlePasswordLessVerification(w http.ResponseWriter, r *http.Re
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	if formData.Resend {
+	if formData.Recreate {
 		l.renderPasswordLessVerification(w, r, authReq)
 		return
 	}

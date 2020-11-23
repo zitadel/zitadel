@@ -34,7 +34,7 @@ func (l *Login) handleU2FVerification(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	if formData.Resend {
+	if formData.Recreate {
 		l.renderU2FVerification(w, r, authReq)
 		return
 	}

@@ -84,11 +84,19 @@ MfaInitU2F:
   Title: Multifactor Setup U2F / WebAuthN
   Description: Add your Token by providing a name and then clicking on the 'Register Token' button below.
 
+MfaVerifyU2F:
+  Title: Multifactor Verification
+  Description: Verify your multifactor U2F / WebAuthN token
+
 WebAuthn:
   Name: Name of the tokens / machine
   NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
   Error:
     Retry: Retry, create a new challenge or choose a different method.
+
+Passwordless:
+  Title: Login passwordles
+  Description: Verify your token
 
 PasswordChange:
   Title: Change Password

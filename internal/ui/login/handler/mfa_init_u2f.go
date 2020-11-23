@@ -36,7 +36,7 @@ func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	if data.Resend {
+	if data.Recreate {
 		l.renderRegisterU2F(w, r, authReq, nil)
 		return
 	}

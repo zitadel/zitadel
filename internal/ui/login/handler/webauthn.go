@@ -10,5 +10,5 @@ type webAuthNFormData struct {
 	CredentialData string `schema:"credentialData"`
 	SessionID      string `schema:"sessionID"`
 	Name           string `schema:"name"`
-	Resend         bool   `schema:"recreate"`
+	Recreate       bool   `schema:"recreate"`
 }
