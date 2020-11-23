@@ -7,7 +7,7 @@
 </div>
 <div class="app-container">
     <div class="sp-container" *ngIf="(loading$ | async)">
-        <mat-spinner color="accent" diameter="50"></mat-spinner>
+        <mat-spinner color="primary" diameter="50"></mat-spinner>
     </div>
 
     <div [routerLink]="['/projects', projectId, 'apps', app.id ]" class="app-wrap"

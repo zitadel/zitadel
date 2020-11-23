@@ -3,9 +3,9 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
+import { InputModule } from 'src/app/modules/input/input.module';
 
 import { AddIdpDialogComponent } from './add-idp-dialog.component';
 
@@ -16,7 +16,7 @@ import { AddIdpDialogComponent } from './add-idp-dialog.component';
         MatDialogModule,
         MatButtonModule,
         TranslateModule,
-        MatFormFieldModule,
+        InputModule,
         MatSelectModule,
         FormsModule,
     ],

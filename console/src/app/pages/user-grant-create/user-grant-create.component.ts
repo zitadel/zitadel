@@ -72,7 +72,6 @@ export class UserGrantCreateComponent implements OnDestroy {
                 this.context = UserGrantContext.USER;
                 this.mgmtService.GetUserByID(this.userId).then(resp => {
                     this.user = resp.toObject();
-                    console.log(this.user);
                 }).catch((error: any) => {
                     this.toast.showError(error);
                 });

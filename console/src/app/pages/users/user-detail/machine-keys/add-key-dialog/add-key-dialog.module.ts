@@ -4,11 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
+import { InputModule } from 'src/app/modules/input/input.module';
 
 import { AddKeyDialogComponent } from './add-key-dialog.component';
 
@@ -18,9 +17,8 @@ import { AddKeyDialogComponent } from './add-key-dialog.component';
         CommonModule,
         TranslateModule,
         MatButtonModule,
-        MatFormFieldModule,
+        InputModule,
         MatSelectModule,
-        MatInputModule,
         MatIconModule,
         FormsModule,
         MatDatepickerModule,

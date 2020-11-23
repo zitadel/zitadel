@@ -5,10 +5,10 @@
         <qrcode *ngIf="data" class="qrcode" [qrdata]="data" [width]="150" [errorCorrectionLevel]="'M'"></qrcode>
     </div>
 
-    <mat-form-field class="form-field" label="Access Code" required="true">
-        <mat-label>Code</mat-label>
-        <input matInput [(ngModel)]="code" />
-    </mat-form-field>
+    <cnsl-form-field class="form-field" label="Access Code" required="true">
+        <cnsl-label>Code</cnsl-label>
+        <input cnslInput [(ngModel)]="code" />
+    </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">
     <button mat-button (click)="closeDialog()"><span translate>ACTIONS.CLOSE</span></button>

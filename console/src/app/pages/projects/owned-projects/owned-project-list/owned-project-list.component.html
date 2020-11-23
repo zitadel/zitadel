@@ -4,7 +4,8 @@
 </app-owned-project-grid>
 
 <div *ngIf="!grid" class="view-toggle">
-    <button (click)="grid = true" mat-icon-button class="icon-button">
+    <button (click)="grid = true" mat-icon-button class="icon-button"
+        matTooltip="{{'PROJECT.TABLE.SHOWGRID' | translate}}">
         <i matTooltip="show grid view" class="las la-th-large"></i>
     </button>
 </div>
@@ -77,6 +78,10 @@
                     [routerLink]="['/projects', row.projectId]"></tr>
 
             </table>
+            <div *ngIf="(loading$ | async) == false && !dataSource?.data?.length" class="no-content-row">
+                <i class="las la-exclamation"></i>
+                <span>{{'PROJECT.TABLE.EMPTY' | translate}}</span>
+            </div>
             <mat-paginator class="paginator" [length]="totalResult" [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"
                 (page)="changePage($event)"></mat-paginator>
         </div>

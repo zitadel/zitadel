@@ -38,7 +38,8 @@
         "PERSONAL_INFO": "Personal Information",
         "IAM":"Administration",
         "ORGANIZATION": "Organisation",
-        "ADMINSECTION":"Administration",
+        "ADMINSECTION":"ZITADEL Administration",
+        "ORGSECTION":"Organisation",
         "PROJECTSSECTION":"Projects Section",
         "PROJECT": "Projects",
         "GRANTEDPROJECT":"Granted Projects",
@@ -50,7 +51,17 @@
         "IAMADMIN":"You are an IAM Administrator. Note that you have extended permissions.",
         "SHOWORGS":"Show All Organisations",
         "GRANTSECTION":"Authorization Section",
-        "GRANTS":"Authorizations"
+        "GRANTS":"Authorizations",
+        "TOOLTIP": {
+            "PERSONAL":"Show your Personal Account, your IDPs, Login methods, Mfa and Authorisations",
+            "IAM":"Show ZITADELs global access policies, clear views and failed events",
+            "ORG":"Show your organisations access policies, and set your domains",
+            "SELFPROJECTS":"Show your organisations own projects",
+            "GRANTEDPROJECTS":"Show projects your organisation was granted on",
+            "HUMANUSERS":"Show all registered human Users on your organisation",
+            "MACHINEUSERS":"Show service users of your organisation",
+            "AUTHZ":"Show authorizations available to your organisation users"
+        }
     },
     "ACTIONS": {
         "SAVE": "Save",
@@ -80,6 +91,9 @@
         "CONFIGURE":"Configure",
         "SEND":"Send",
         "NEWVALUE":"New Value"
+    },
+    "TABLE": {
+        "NOROWS":"No data"
     },
     "ERRORS": {
         "REQUIRED": "Some required fields are missing.",
@@ -131,7 +145,8 @@
                 "6":"filter for email",
                 "10":"filter for organisation name",
                 "12":"filter for project name"
-            }
+            },
+            "EMPTY":"No entries"
         },
         "MFA": {
             "TABLETYPE":"Type",
@@ -176,9 +191,9 @@
             "DESCRIPTION": "Please provide the necesary information.",
             "NAMEANDEMAILSECTION":"Name and E-mail",
             "GENDERLANGSECTION":"Gender and Language",
-            "PHONESECTION":"Phonen Numbers",
+            "PHONESECTION":"Phonenumbers",
             "PASSWORDSECTION":"Initial Password",
-            "ADDRESSANDPHONESECTION":"Phone Number"
+            "ADDRESSANDPHONESECTION":"Phonenumber"
         },
         "CODEDIALOG": {
             "TITLE":"Verify Phone Number",
@@ -198,7 +213,7 @@
         "PROFILE": {
             "TITLE": "Profile",
             "EMAIL": "E-mail",
-            "PHONE": "Phonen Number",
+            "PHONE": "Phonenumber",
             "USERNAME": "User Name",
             "FIRSTNAME": "First Name",
             "LASTNAME": "Last Name",
@@ -410,6 +425,7 @@
             "ACTIVE":"Active",
             "CREATE":"Create Organisation",
             "ORGDETAIL_TITLE":"Enter the name and domain of your new organisation.",
+            "ORGDETAIL_TITLE_WITHOUT_DOMAIN":"Enter the name of your new organisation.",
             "ORGDETAILUSER_TITLE":"Configure Organisation Owner",
             "ORGDOMAIN": {
                 "TITLE":"Organisation Domain Ownership Verification",
@@ -558,7 +574,7 @@
             "ADDDESCRIPTION": "Enter the e-mail addresses of the users to be added."
         },
         "TABLE": {
-            "TOTAL": "Entries total:",
+            "TOTAL": "Entries total",
             "SELECTION": "Selected Elements",
             "DEACTIVATE": "Deactivate User",
             "ACTIVATE": "Activate User",
@@ -626,6 +642,7 @@
             "USERID":"User ID"
         },
         "GRANT": {
+            "EMPTY":"No granted organisation.",
             "TITLE": "Granted Organisations",
             "DESCRIPTION": "Allow an other organisation to use your project.",
             "CREATE": {
@@ -661,6 +678,7 @@
             "GRANTEDORGNAME":"Organisation Name",
             "CREATIONDATE": "Creation Date",
             "CHANGEDATE": "Last modified",
+            "DATES":"Dates",
             "ROLENAMESLIST": "Roles",
             "NOROLES":"No roles",
             "TOAST": {
@@ -679,6 +697,7 @@
             "NAMEREQUIRED":"A name ist required."
         },
         "ROLE": {
+            "EMPTY":"No role has been created yet.",
             "ADDNEWLINE":"Add additional role",
             "KEY":"Key",
             "TITLE": "Roles",
@@ -712,7 +731,10 @@
             "TYPE":"Type",
             "CREATIONDATE":"Created at",
             "CHANGEDATE":"Last modified",
-            "RESOURCEOWNER":"Owner"
+            "RESOURCEOWNER":"Owner",
+            "SHOWTABLE":"Show table",
+            "SHOWGRID":"Show grid",
+            "EMPTY":"No project found"
         },
         "TOAST":{
             "MEMBERREMOVED":"Manager removed.",
@@ -837,6 +859,7 @@
             "REDIRECTDESCRIPTIONWEB":"Redirect URIs must begin with https://. http:// is only valid with enabled development mode.",
             "REDIRECTDESCRIPTIONNATIVE":"Redirect URIs must begin with your own protocol or http://localhost.",
             "REDIRECTNOTVALID":"This redirect URI is not valid.",
+            "COMMAORENTERSEPERATION":"seperate with , or ↵",
             "TYPEREQUIRED":"The type is required.",
             "TITLE": "OIDC Configuration",
             "CLIENTID": "Client ID",
@@ -912,6 +935,7 @@
         "TITLE":"Authorizations",
         "DESC":"Here you can manage authorizations of your organization users.",
         "DELETE":"Delete Authorization",
+        "EMPTY":"No authorization found",
         "ADD":"Create Authorization",
         "ADD_BTN":"New",
         "PROJECT": {

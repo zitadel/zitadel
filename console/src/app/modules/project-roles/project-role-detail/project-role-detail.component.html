@@ -4,18 +4,18 @@
 <p class="desc"> {{'PROJECT.ROLE.EDITDESCRIPTION' | translate}}</p>
 <div mat-dialog-content>
     <form *ngIf="formGroup" class="full-width" [formGroup]="formGroup" (ngSubmit)="submitForm()">
-        <mat-form-field class="formfield" appearance="outline">
-            <mat-label>{{ 'PROJECT.ROLE.KEY' | translate }}</mat-label>
-            <input matInput formControlName="key" />
-        </mat-form-field>
-        <mat-form-field class="formfield" appearance="outline">
-            <mat-label>{{ 'PROJECT.ROLE.DISPLAY_NAME' | translate }}</mat-label>
-            <input matInput formControlName="displayName" />
-        </mat-form-field>
-        <mat-form-field class="formfield" appearance="outline">
-            <mat-label>{{ 'PROJECT.ROLE.GROUP' | translate }}</mat-label>
-            <input matInput formControlName="group" />
-        </mat-form-field>
+        <cnsl-form-field class="formfield" appearance="outline">
+            <cnsl-label>{{ 'PROJECT.ROLE.KEY' | translate }}</cnsl-label>
+            <input cnslInput formControlName="key" />
+        </cnsl-form-field>
+        <cnsl-form-field class="formfield" appearance="outline">
+            <cnsl-label>{{ 'PROJECT.ROLE.DISPLAY_NAME' | translate }}</cnsl-label>
+            <input cnslInput formControlName="displayName" />
+        </cnsl-form-field>
+        <cnsl-form-field class="formfield" appearance="outline">
+            <cnsl-label>{{ 'PROJECT.ROLE.GROUP' | translate }}</cnsl-label>
+            <input cnslInput formControlName="group" />
+        </cnsl-form-field>
     </form>
 </div>
 
