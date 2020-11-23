@@ -845,6 +845,88 @@
         ]
       }
     },
+    "/policies/mailtemplate": {
+      "get": {
+        "operationId": "GetDefaultMailTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultMailTemplateView"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "operationId": "UpdateDefaultMailTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultMailTemplate"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DefaultMailTemplateUpdate"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/mailtext": {
+      "put": {
+        "operationId": "UpdateDefaultMailText",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultMailText"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DefaultMailTextUpdate"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/policies/mailtexts": {
+      "get": {
+        "operationId": "GetDefaultMailTexts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DefaultMailTextsView"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/policies/password/age": {
       "get": {
         "operationId": "GetDefaultPasswordAgePolicy",
@@ -960,88 +1042,6 @@
             }
           }
         ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
-    "/policies/template": {
-      "get": {
-        "operationId": "GetDefaultTemplate",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1DefaultTemplateView"
-            }
-          }
-        },
-        "tags": [
-          "AdminService"
-        ]
-      },
-      "put": {
-        "operationId": "UpdateDefaultTemplate",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1DefaultTemplate"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1DefaultTemplateUpdate"
-            }
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
-    "/policies/text": {
-      "put": {
-        "operationId": "UpdateDefaultText",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1DefaultText"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1DefaultTextUpdate"
-            }
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
-    "/policies/texts": {
-      "get": {
-        "operationId": "GetDefaultTexts",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1DefaultTextsView"
-            }
-          }
-        },
         "tags": [
           "AdminService"
         ]
@@ -1368,6 +1368,163 @@
         }
       }
     },
+    "v1DefaultMailTemplate": {
+      "type": "object",
+      "properties": {
+        "template": {
+          "type": "string",
+          "format": "byte"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultMailTemplateUpdate": {
+      "type": "object",
+      "properties": {
+        "template": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "v1DefaultMailTemplateView": {
+      "type": "object",
+      "properties": {
+        "template": {
+          "type": "string",
+          "format": "byte"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultMailText": {
+      "type": "object",
+      "properties": {
+        "mail_text_type": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "pre_header": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "greeting": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "button_text": {
+          "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultMailTextUpdate": {
+      "type": "object",
+      "properties": {
+        "mail_text_type": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "pre_header": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "greeting": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "button_text": {
+          "type": "string"
+        }
+      }
+    },
+    "v1DefaultMailTextView": {
+      "type": "object",
+      "properties": {
+        "mail_text_type": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "pre_header": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "greeting": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "button_text": {
+          "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1DefaultMailTextsView": {
+      "type": "object",
+      "properties": {
+        "texts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1DefaultMailTextView"
+          }
+        }
+      }
+    },
     "v1DefaultPasswordAgePolicy": {
       "type": "object",
       "properties": {
@@ -1566,163 +1723,6 @@
         "change_date": {
           "type": "string",
           "format": "date-time"
-        }
-      }
-    },
-    "v1DefaultTemplate": {
-      "type": "object",
-      "properties": {
-        "template": {
-          "type": "string",
-          "format": "byte"
-        },
-        "creation_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "change_date": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "v1DefaultTemplateUpdate": {
-      "type": "object",
-      "properties": {
-        "template": {
-          "type": "string",
-          "format": "byte"
-        }
-      }
-    },
-    "v1DefaultTemplateView": {
-      "type": "object",
-      "properties": {
-        "template": {
-          "type": "string",
-          "format": "byte"
-        },
-        "creation_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "change_date": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "v1DefaultText": {
-      "type": "object",
-      "properties": {
-        "mail_text_type": {
-          "type": "string"
-        },
-        "language": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
-        },
-        "pre_header": {
-          "type": "string"
-        },
-        "subject": {
-          "type": "string"
-        },
-        "greeting": {
-          "type": "string"
-        },
-        "text": {
-          "type": "string"
-        },
-        "button_text": {
-          "type": "string"
-        },
-        "creation_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "change_date": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "v1DefaultTextUpdate": {
-      "type": "object",
-      "properties": {
-        "mail_text_type": {
-          "type": "string"
-        },
-        "language": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
-        },
-        "pre_header": {
-          "type": "string"
-        },
-        "subject": {
-          "type": "string"
-        },
-        "greeting": {
-          "type": "string"
-        },
-        "text": {
-          "type": "string"
-        },
-        "button_text": {
-          "type": "string"
-        }
-      }
-    },
-    "v1DefaultTextView": {
-      "type": "object",
-      "properties": {
-        "mail_text_type": {
-          "type": "string"
-        },
-        "language": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
-        },
-        "pre_header": {
-          "type": "string"
-        },
-        "subject": {
-          "type": "string"
-        },
-        "greeting": {
-          "type": "string"
-        },
-        "text": {
-          "type": "string"
-        },
-        "button_text": {
-          "type": "string"
-        },
-        "creation_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "change_date": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "v1DefaultTextsView": {
-      "type": "object",
-      "properties": {
-        "texts": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1DefaultTextView"
-          }
         }
       }
     },

@@ -26,7 +26,7 @@ type Org struct {
 	OrgIAMPolicy             *iam_es_model.OrgIAMPolicy             `json:"-"`
 	LabelPolicy              *iam_es_model.LabelPolicy              `json:"-"`
 	MailTemplate             *iam_es_model.MailTemplate             `json:"-"`
-	MailText                 *iam_es_model.MailText                 `json:"-"`
+	MailTexts                []*iam_es_model.MailText               `json:"-"`
 	IDPs                     []*iam_es_model.IDPConfig              `json:"-"`
 	LoginPolicy              *iam_es_model.LoginPolicy              `json:"-"`
 	PasswordComplexityPolicy *iam_es_model.PasswordComplexityPolicy `json:"-"`
@@ -38,11 +38,13 @@ func OrgFromModel(org *org_model.Org) *Org {
 	members := OrgMembersFromModel(org.Members)
 	domains := OrgDomainsFromModel(org.Domains)
 	idps := iam_es_model.IDPConfigsFromModel(org.IDPs)
+	mailTexts := iam_es_model.MailTextsFromModel(org.MailTexts)
 	converted := &Org{
 		ObjectRoot: org.ObjectRoot,
 		Name:       org.Name,
 		State:      int32(org.State),
 		Domains:    domains,
+		MailTexts:  mailTexts,
 		Members:    members,
 		IDPs:       idps,
 	}
@@ -57,9 +59,6 @@ func OrgFromModel(org *org_model.Org) *Org {
 	}
 	if org.MailTemplate != nil {
 		converted.MailTemplate = iam_es_model.MailTemplateFromModel(org.MailTemplate)
-	}
-	if org.MailText != nil {
-		converted.MailText = iam_es_model.MailTextFromModel(org.MailText)
 	}
 	if org.PasswordComplexityPolicy != nil {
 		converted.PasswordComplexityPolicy = iam_es_model.PasswordComplexityPolicyFromModel(org.PasswordComplexityPolicy)

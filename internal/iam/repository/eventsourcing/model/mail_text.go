@@ -31,49 +31,49 @@ func GetDefaultMailText(mailTexts []*MailText, mailTextType string, language str
 	return -1, nil
 }
 
-func MailTextsToModel(members []*MailText) []*iam_model.MailText {
-	convertedMailTexts := make([]*iam_model.MailText, len(members))
-	for i, m := range members {
+func MailTextsToModel(mailTexts []*MailText) []*iam_model.MailText {
+	convertedMailTexts := make([]*iam_model.MailText, len(mailTexts))
+	for i, m := range mailTexts {
 		convertedMailTexts[i] = MailTextToModel(m)
 	}
 	return convertedMailTexts
 }
 
-func MailTextToModel(policy *MailText) *iam_model.MailText {
+func MailTextToModel(mailText *MailText) *iam_model.MailText {
 	return &iam_model.MailText{
-		ObjectRoot:   policy.ObjectRoot,
-		State:        iam_model.PolicyState(policy.State),
-		MailTextType: policy.MailTextType,
-		Language:     policy.Language,
-		Title:        policy.Title,
-		PreHeader:    policy.PreHeader,
-		Subject:      policy.Subject,
-		Greeting:     policy.Greeting,
-		Text:         policy.Text,
-		ButtonText:   policy.ButtonText,
+		ObjectRoot:   mailText.ObjectRoot,
+		State:        iam_model.PolicyState(mailText.State),
+		MailTextType: mailText.MailTextType,
+		Language:     mailText.Language,
+		Title:        mailText.Title,
+		PreHeader:    mailText.PreHeader,
+		Subject:      mailText.Subject,
+		Greeting:     mailText.Greeting,
+		Text:         mailText.Text,
+		ButtonText:   mailText.ButtonText,
 	}
 }
 
-func MailTextsFromModel(members []*iam_model.MailText) []*MailText {
-	convertedMailTexts := make([]*MailText, len(members))
-	for i, m := range members {
+func MailTextsFromModel(mailTexts []*iam_model.MailText) []*MailText {
+	convertedMailTexts := make([]*MailText, len(mailTexts))
+	for i, m := range mailTexts {
 		convertedMailTexts[i] = MailTextFromModel(m)
 	}
 	return convertedMailTexts
 }
 
-func MailTextFromModel(policy *iam_model.MailText) *MailText {
+func MailTextFromModel(mailText *iam_model.MailText) *MailText {
 	return &MailText{
-		ObjectRoot:   policy.ObjectRoot,
-		State:        int32(policy.State),
-		MailTextType: policy.MailTextType,
-		Language:     policy.Language,
-		Title:        policy.Title,
-		PreHeader:    policy.PreHeader,
-		Subject:      policy.Subject,
-		Greeting:     policy.Greeting,
-		Text:         policy.Text,
-		ButtonText:   policy.ButtonText,
+		ObjectRoot:   mailText.ObjectRoot,
+		State:        int32(mailText.State),
+		MailTextType: mailText.MailTextType,
+		Language:     mailText.Language,
+		Title:        mailText.Title,
+		PreHeader:    mailText.PreHeader,
+		Subject:      mailText.Subject,
+		Greeting:     mailText.Greeting,
+		Text:         mailText.Text,
+		ButtonText:   mailText.ButtonText,
 	}
 }
 
@@ -134,6 +134,20 @@ func (i *IAM) appendChangeMailTextEvent(event *es_models.Event) error {
 	}
 	if n, m := GetDefaultMailText(i.DefaultMailTexts, mailText.MailTextType, mailText.Language); m != nil {
 		i.DefaultMailTexts[n] = mailText
+	}
+	return nil
+}
+
+func (i *IAM) appendRemoveMailTextEvent(event *es_models.Event) error {
+	mailText := &MailText{}
+	err := mailText.SetDataLabel(event)
+	if err != nil {
+		return err
+	}
+	if n, m := GetDefaultMailText(i.DefaultMailTexts, mailText.MailTextType, mailText.Language); m != nil {
+		i.DefaultMailTexts[n] = i.DefaultMailTexts[len(i.DefaultMailTexts)-1]
+		i.DefaultMailTexts[len(i.DefaultMailTexts)-1] = nil
+		i.DefaultMailTexts = i.DefaultMailTexts[:len(i.DefaultMailTexts)-1]
 	}
 	return nil
 }

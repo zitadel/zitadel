@@ -7,7 +7,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 )
 
-func textToModel(text *admin.DefaultTextUpdate) *iam_model.MailText {
+func textToModel(text *admin.DefaultMailTextUpdate) *iam_model.MailText {
 	return &iam_model.MailText{
 		MailTextType: text.MailTextType,
 		Language:     text.Language,
@@ -20,14 +20,14 @@ func textToModel(text *admin.DefaultTextUpdate) *iam_model.MailText {
 	}
 }
 
-func textFromModel(text *iam_model.MailText) *admin.DefaultText {
+func textFromModel(text *iam_model.MailText) *admin.DefaultMailText {
 	creationDate, err := ptypes.TimestampProto(text.CreationDate)
 	logging.Log("ADMIN-Jlzsj").OnError(err).Debug("date parse failed")
 
 	changeDate, err := ptypes.TimestampProto(text.ChangeDate)
 	logging.Log("ADMIN-mw5b8").OnError(err).Debug("date parse failed")
 
-	return &admin.DefaultText{
+	return &admin.DefaultMailText{
 		MailTextType: text.MailTextType,
 		Language:     text.Language,
 		Title:        text.Title,
@@ -41,18 +41,18 @@ func textFromModel(text *iam_model.MailText) *admin.DefaultText {
 	}
 }
 
-// func textsViewFromModel(text *iam_model.MailTextsView) *admin.DefaultTextsView {
+// func textsViewFromModel(text *iam_model.MailTextsView) *admin.DefaultMailTextsView {
 
 // }
 
-func textsViewFromModel(textsin *iam_model.MailTextsView) *admin.DefaultTextsView {
-	return &admin.DefaultTextsView{
+func textsViewFromModel(textsin *iam_model.MailTextsView) *admin.DefaultMailTextsView {
+	return &admin.DefaultMailTextsView{
 		Texts: textsViewToModel(textsin.Texts),
 	}
 }
 
-func textsViewToModel(queries []*iam_model.MailTextView) []*admin.DefaultTextView {
-	modelQueries := make([]*admin.DefaultTextView, len(queries))
+func textsViewToModel(queries []*iam_model.MailTextView) []*admin.DefaultMailTextView {
+	modelQueries := make([]*admin.DefaultMailTextView, len(queries))
 	for i, query := range queries {
 		modelQueries[i] = textViewFromModel(query)
 	}
@@ -60,14 +60,14 @@ func textsViewToModel(queries []*iam_model.MailTextView) []*admin.DefaultTextVie
 	return modelQueries
 }
 
-func textViewFromModel(text *iam_model.MailTextView) *admin.DefaultTextView {
+func textViewFromModel(text *iam_model.MailTextView) *admin.DefaultMailTextView {
 	creationDate, err := ptypes.TimestampProto(text.CreationDate)
 	logging.Log("ADMIN-7RyJc").OnError(err).Debug("date parse failed")
 
 	changeDate, err := ptypes.TimestampProto(text.ChangeDate)
 	logging.Log("ADMIN-fTFgY").OnError(err).Debug("date parse failed")
 
-	return &admin.DefaultTextView{
+	return &admin.DefaultMailTextView{
 		MailTextType: text.MailTextType,
 		Language:     text.Language,
 		Title:        text.Title,

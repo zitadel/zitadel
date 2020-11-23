@@ -1469,26 +1469,26 @@ func local_request_AdminService_UpdateDefaultLabelPolicy_0(ctx context.Context, 
 
 }
 
-func request_AdminService_GetDefaultTemplate_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_AdminService_GetDefaultMailTemplate_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq empty.Empty
 	var metadata runtime.ServerMetadata
 
-	msg, err := client.GetDefaultTemplate(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.GetDefaultMailTemplate(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_AdminService_GetDefaultTemplate_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_AdminService_GetDefaultMailTemplate_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq empty.Empty
 	var metadata runtime.ServerMetadata
 
-	msg, err := server.GetDefaultTemplate(ctx, &protoReq)
+	msg, err := server.GetDefaultMailTemplate(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
-func request_AdminService_UpdateDefaultTemplate_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq DefaultTemplateUpdate
+func request_AdminService_UpdateDefaultMailTemplate_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq DefaultMailTemplateUpdate
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -1499,13 +1499,13 @@ func request_AdminService_UpdateDefaultTemplate_0(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.UpdateDefaultTemplate(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.UpdateDefaultMailTemplate(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_AdminService_UpdateDefaultTemplate_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq DefaultTemplateUpdate
+func local_request_AdminService_UpdateDefaultMailTemplate_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq DefaultMailTemplateUpdate
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -1516,31 +1516,31 @@ func local_request_AdminService_UpdateDefaultTemplate_0(ctx context.Context, mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.UpdateDefaultTemplate(ctx, &protoReq)
+	msg, err := server.UpdateDefaultMailTemplate(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
-func request_AdminService_GetDefaultTexts_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_AdminService_GetDefaultMailTexts_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq empty.Empty
 	var metadata runtime.ServerMetadata
 
-	msg, err := client.GetDefaultTexts(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.GetDefaultMailTexts(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_AdminService_GetDefaultTexts_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_AdminService_GetDefaultMailTexts_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq empty.Empty
 	var metadata runtime.ServerMetadata
 
-	msg, err := server.GetDefaultTexts(ctx, &protoReq)
+	msg, err := server.GetDefaultMailTexts(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
-func request_AdminService_UpdateDefaultText_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq DefaultTextUpdate
+func request_AdminService_UpdateDefaultMailText_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq DefaultMailTextUpdate
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -1551,13 +1551,13 @@ func request_AdminService_UpdateDefaultText_0(ctx context.Context, marshaler run
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.UpdateDefaultText(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.UpdateDefaultMailText(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_AdminService_UpdateDefaultText_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq DefaultTextUpdate
+func local_request_AdminService_UpdateDefaultMailText_0(ctx context.Context, marshaler runtime.Marshaler, server AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq DefaultMailTextUpdate
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -1568,7 +1568,7 @@ func local_request_AdminService_UpdateDefaultText_0(ctx context.Context, marshal
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.UpdateDefaultText(ctx, &protoReq)
+	msg, err := server.UpdateDefaultMailText(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -2548,7 +2548,7 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 
 	})
 
-	mux.Handle("GET", pattern_AdminService_GetDefaultTemplate_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_AdminService_GetDefaultMailTemplate_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -2557,18 +2557,18 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AdminService_GetDefaultTemplate_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_AdminService_GetDefaultMailTemplate_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_GetDefaultTemplate_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_GetDefaultMailTemplate_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("PUT", pattern_AdminService_UpdateDefaultTemplate_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_AdminService_UpdateDefaultMailTemplate_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -2577,18 +2577,18 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AdminService_UpdateDefaultTemplate_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_AdminService_UpdateDefaultMailTemplate_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_UpdateDefaultTemplate_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_UpdateDefaultMailTemplate_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_AdminService_GetDefaultTexts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_AdminService_GetDefaultMailTexts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -2597,18 +2597,18 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AdminService_GetDefaultTexts_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_AdminService_GetDefaultMailTexts_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_GetDefaultTexts_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_GetDefaultMailTexts_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("PUT", pattern_AdminService_UpdateDefaultText_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_AdminService_UpdateDefaultMailText_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -2617,14 +2617,14 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AdminService_UpdateDefaultText_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_AdminService_UpdateDefaultMailText_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_UpdateDefaultText_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_UpdateDefaultMailText_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -3529,7 +3529,7 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 
 	})
 
-	mux.Handle("GET", pattern_AdminService_GetDefaultTemplate_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_AdminService_GetDefaultMailTemplate_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -3538,18 +3538,18 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AdminService_GetDefaultTemplate_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_AdminService_GetDefaultMailTemplate_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_GetDefaultTemplate_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_GetDefaultMailTemplate_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("PUT", pattern_AdminService_UpdateDefaultTemplate_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_AdminService_UpdateDefaultMailTemplate_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -3558,18 +3558,18 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AdminService_UpdateDefaultTemplate_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_AdminService_UpdateDefaultMailTemplate_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_UpdateDefaultTemplate_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_UpdateDefaultMailTemplate_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_AdminService_GetDefaultTexts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_AdminService_GetDefaultMailTexts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -3578,18 +3578,18 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AdminService_GetDefaultTexts_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_AdminService_GetDefaultMailTexts_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_GetDefaultTexts_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_GetDefaultMailTexts_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("PUT", pattern_AdminService_UpdateDefaultText_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_AdminService_UpdateDefaultMailText_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -3598,14 +3598,14 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AdminService_UpdateDefaultText_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_AdminService_UpdateDefaultMailText_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_UpdateDefaultText_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdminService_UpdateDefaultMailText_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -3897,13 +3897,13 @@ var (
 
 	pattern_AdminService_UpdateDefaultLabelPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"policies", "label"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_GetDefaultTemplate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"policies", "template"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_AdminService_GetDefaultMailTemplate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"policies", "mailtemplate"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_UpdateDefaultTemplate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"policies", "template"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_AdminService_UpdateDefaultMailTemplate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"policies", "mailtemplate"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_GetDefaultTexts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"policies", "texts"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_AdminService_GetDefaultMailTexts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"policies", "mailtexts"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_UpdateDefaultText_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"policies", "text"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_AdminService_UpdateDefaultMailText_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"policies", "mailtext"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_AdminService_GetDefaultLoginPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"policies", "login"}, "", runtime.AssumeColonVerbOpt(true)))
 
@@ -3993,13 +3993,13 @@ var (
 
 	forward_AdminService_UpdateDefaultLabelPolicy_0 = runtime.ForwardResponseMessage
 
-	forward_AdminService_GetDefaultTemplate_0 = runtime.ForwardResponseMessage
+	forward_AdminService_GetDefaultMailTemplate_0 = runtime.ForwardResponseMessage
 
-	forward_AdminService_UpdateDefaultTemplate_0 = runtime.ForwardResponseMessage
+	forward_AdminService_UpdateDefaultMailTemplate_0 = runtime.ForwardResponseMessage
 
-	forward_AdminService_GetDefaultTexts_0 = runtime.ForwardResponseMessage
+	forward_AdminService_GetDefaultMailTexts_0 = runtime.ForwardResponseMessage
 
-	forward_AdminService_UpdateDefaultText_0 = runtime.ForwardResponseMessage
+	forward_AdminService_UpdateDefaultMailText_0 = runtime.ForwardResponseMessage
 
 	forward_AdminService_GetDefaultLoginPolicy_0 = runtime.ForwardResponseMessage
 

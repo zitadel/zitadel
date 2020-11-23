@@ -3,6 +3,8 @@ package eventsourcing
 import (
 	"encoding/json"
 
+	b64 "encoding/base64"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/id"
 
@@ -189,6 +191,34 @@ func GetMockManipulateIAMWithLabelPolicy(ctrl *gomock.Controller) *IAMEventstore
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.IAMSetupStarted},
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.LabelPolicyAdded, Data: policyData},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
+func GetMockManipulateIAMWithMailTemplate(ctrl *gomock.Controller) *IAMEventstore {
+	var fritzli = make([]byte, 10000)
+	b64.StdEncoding.Encode(fritzli, []byte("<!doctypeX html>"))
+	policyData, _ := json.Marshal(model.MailTemplate{Template: fritzli})
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.IAMSetupStarted},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.MailTemplateAdded, Data: policyData},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
+func GetMockManipulateIAMWithMailText(ctrl *gomock.Controller) *IAMEventstore {
+	policyData, _ := json.Marshal(model.MailText{MailTextType: "Type", Language: "DE"})
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.IAMSetupStarted},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.MailTextAdded, Data: policyData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)

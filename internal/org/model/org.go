@@ -20,7 +20,7 @@ type Org struct {
 	LoginPolicy              *iam_model.LoginPolicy
 	LabelPolicy              *iam_model.LabelPolicy
 	MailTemplate             *iam_model.MailTemplate
-	MailText                 *iam_model.MailText
+	MailTexts                []*iam_model.MailText
 	PasswordComplexityPolicy *iam_model.PasswordComplexityPolicy
 	PasswordAgePolicy        *iam_model.PasswordAgePolicy
 	PasswordLockoutPolicy    *iam_model.PasswordLockoutPolicy

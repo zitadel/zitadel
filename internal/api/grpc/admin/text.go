@@ -7,7 +7,7 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
-func (s *Server) GetDefaultTexts(ctx context.Context, _ *empty.Empty) (*admin.DefaultTextsView, error) {
+func (s *Server) GetDefaultMailTexts(ctx context.Context, _ *empty.Empty) (*admin.DefaultMailTextsView, error) {
 	result, err := s.iam.GetDefaultMailTexts(ctx)
 	if err != nil {
 		return nil, err
@@ -15,7 +15,7 @@ func (s *Server) GetDefaultTexts(ctx context.Context, _ *empty.Empty) (*admin.De
 	return textsViewFromModel(result), nil
 }
 
-func (s *Server) GetDefaultText(ctx context.Context, _ *empty.Empty) (*admin.DefaultTextView, error) {
+func (s *Server) GetDefaultMailText(ctx context.Context, _ *empty.Empty) (*admin.DefaultMailTextView, error) {
 	result, err := s.iam.GetDefaultMailText(ctx, "type", "language") // todo wag
 	if err != nil {
 		return nil, err
@@ -23,7 +23,7 @@ func (s *Server) GetDefaultText(ctx context.Context, _ *empty.Empty) (*admin.Def
 	return textViewFromModel(result), nil
 }
 
-func (s *Server) UpdateDefaultText(ctx context.Context, text *admin.DefaultTextUpdate) (*admin.DefaultText, error) {
+func (s *Server) UpdateDefaultMailText(ctx context.Context, text *admin.DefaultMailTextUpdate) (*admin.DefaultMailText, error) {
 	result, err := s.iam.ChangeDefaultMailText(ctx, textToModel(text))
 	if err != nil {
 		return nil, err

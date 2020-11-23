@@ -172,3 +172,31 @@ func GetMockChangesOrgWithLabelPolicy(ctrl *gomock.Controller) *OrgEventstore {
 	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
 	return GetMockedEventstore(ctrl, mockEs)
 }
+
+func GetMockChangesOrgWithMailTemplate(ctrl *gomock.Controller) *OrgEventstore {
+	orgData, _ := json.Marshal(model.Org{Name: "MusterOrg"})
+	labelPolicy, _ := json.Marshal(iam_es_model.MailTemplate{Template: []byte("<!doctype html>")})
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.OrgAdded, Data: orgData},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.MailTemplateAdded, Data: labelPolicy},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
+func GetMockChangesOrgWithMailText(ctrl *gomock.Controller) *OrgEventstore {
+	orgData, _ := json.Marshal(model.Org{Name: "MusterOrg"})
+	labelPolicy, _ := json.Marshal(iam_es_model.MailText{MailTextType: "Type", Language: "DE"})
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.OrgAdded, Data: orgData},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.MailTextAdded, Data: labelPolicy},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}

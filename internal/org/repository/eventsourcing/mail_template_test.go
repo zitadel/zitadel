@@ -11,11 +11,11 @@ import (
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
-func TestLabelPolicyAddedAggregate(t *testing.T) {
+func TestMailTemplateAddedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Org
-		new        *iam_es_model.LabelPolicy
+		new        *iam_es_model.MailTemplate
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -30,21 +30,21 @@ func TestLabelPolicyAddedAggregate(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "add label policiy",
+			name: "add mailtemplate",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
 				existing: &model.Org{
 					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 				},
-				new: &iam_es_model.LabelPolicy{
-					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
-					PrimaryColor: "000000",
+				new: &iam_es_model.MailTemplate{
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
+					Template:   []byte("<!doctype html>"),
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.LabelPolicyAdded},
+				eventTypes: []models.EventType{model.MailTemplateAdded},
 			},
 		},
 		{
@@ -60,7 +60,7 @@ func TestLabelPolicyAddedAggregate(t *testing.T) {
 			},
 		},
 		{
-			name: "label policy config nil",
+			name: "mailtemplate config nil",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   &model.Org{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
@@ -75,7 +75,7 @@ func TestLabelPolicyAddedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LabelPolicyAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := MailTemplateAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -96,11 +96,11 @@ func TestLabelPolicyAddedAggregate(t *testing.T) {
 	}
 }
 
-func TestLabelPolicyChangedAggregate(t *testing.T) {
+func TestMailTemplateChangedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Org
-		new        *iam_es_model.LabelPolicy
+		new        *iam_es_model.MailTemplate
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -115,25 +115,24 @@ func TestLabelPolicyChangedAggregate(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "change label policy",
+			name: "change mailtemplate",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
 				existing: &model.Org{
 					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
-					LabelPolicy: &iam_es_model.LabelPolicy{
+					MailTemplate: &iam_es_model.MailTemplate{
 						ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					},
 				},
-				new: &iam_es_model.LabelPolicy{
-					ObjectRoot:     models.ObjectRoot{AggregateID: "AggregateID"},
-					PrimaryColor:   "000000",
-					SecondaryColor: "FFFFFF",
+				new: &iam_es_model.MailTemplate{
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
+					Template:   []byte("<!doctype html>"),
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.LabelPolicyChanged},
+				eventTypes: []models.EventType{model.MailTemplateChanged},
 			},
 		},
 		{
@@ -149,7 +148,7 @@ func TestLabelPolicyChangedAggregate(t *testing.T) {
 			},
 		},
 		{
-			name: "label policy config nil",
+			name: "mailtemplate config nil",
 			args: args{
 				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   &model.Org{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
@@ -164,7 +163,7 @@ func TestLabelPolicyChangedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LabelPolicyChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := MailTemplateChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
