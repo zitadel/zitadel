@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"go.opentelemetry.io/otel/api/global"
 	api_trace "go.opentelemetry.io/otel/api/trace"
 	"go.opentelemetry.io/otel/propagators"

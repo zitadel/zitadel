@@ -1,7 +1,7 @@
 package otel
 
 import (
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"go.opentelemetry.io/otel/exporters/otlp"
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 )

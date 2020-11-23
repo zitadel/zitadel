@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 
 	auth_model "github.com/caos/zitadel/internal/auth/model"
 	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"

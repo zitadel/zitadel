@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
 
 	"github.com/caos/logging"
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
@@ -21,7 +22,7 @@ import (
 	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/notification"
 	"github.com/caos/zitadel/internal/setup"
-	tracing "github.com/caos/zitadel/internal/tracing/config"
+	tracing "github.com/caos/zitadel/internal/telemetry/tracing/config"
 	"github.com/caos/zitadel/internal/ui"
 	"github.com/caos/zitadel/internal/ui/console"
 	"github.com/caos/zitadel/internal/ui/login"
@@ -30,6 +31,7 @@ import (
 type Config struct {
 	Log            logging.Config
 	Tracing        tracing.TracingConfig
+	Metrics        metrics.MetricsConfig
 	InternalAuthZ  internal_authz.Config
 	SystemDefaults sd.SystemDefaults
 

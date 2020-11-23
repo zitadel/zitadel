@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/metrics"
-	"github.com/caos/zitadel/internal/metrics/otel"
+	"github.com/caos/zitadel/internal/telemetry/metrics"
+	"github.com/caos/zitadel/internal/telemetry/metrics/otel"
 )
 
 type MetricsConfig struct {
@@ -15,8 +15,6 @@ type MetricsConfig struct {
 
 var tracer = map[string]func() metrics.Config{
 	"otel": func() metrics.Config { return &otel.Config{} },
-	//"google": func() metrics.Config { return &google.Config{} },
-	//"log":    func() metrics.Config { return &log.Config{} },
 	"none": func() metrics.Config { return &NoMetrics{} },
 	"":     func() metrics.Config { return &NoMetrics{} },
 }

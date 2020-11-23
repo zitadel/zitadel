@@ -12,7 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/id"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 type OPHandlerConfig struct {
@@ -60,7 +60,7 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, repo repository.Re
 		config.OPConfig,
 		newStorage(config.StorageConfig, repo),
 		op.WithHttpInterceptors(
-			middleware.TraceHandler(),
+			middleware.TelemetryHandler(),
 			middleware.NoCacheInterceptor,
 			cookieHandler,
 			http_utils.CopyHeadersToContext,

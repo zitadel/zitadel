@@ -2,6 +2,11 @@ package api
 
 import (
 	"context"
+	"fmt"
+	"go.opentelemetry.io/otel/exporters/metric/prometheus"
+	"go.opentelemetry.io/otel/label"
+	"go.opentelemetry.io/otel/sdk/metric/controller/pull"
+	"go.opentelemetry.io/otel/sdk/resource"
 	"net/http"
 
 	"github.com/caos/logging"
@@ -16,7 +21,7 @@ import (
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 type Config struct {
@@ -92,6 +97,7 @@ func (a *API) healthHandler() http.Handler {
 	handler.HandleFunc("/ready", handleReadiness(checks))
 	handler.HandleFunc("/validate", handleValidate(checks))
 	handler.HandleFunc("/clientID", a.handleClientID)
+	handler.Handle("/metrics", a.handleMetrics())
 
 	return handler
 }
@@ -130,6 +136,19 @@ func (a *API) handleClientID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http_util.MarshalJSON(w, id, nil, http.StatusOK)
+}
+
+func (a *API) handleMetrics() *prometheus.Exporter {
+	res := resource.New(label.String("R", "V"))
+
+	exporter, err := prometheus.NewExportPipeline(
+		prometheus.Config{},
+		pull.WithResource(res),
+	)
+	if err != nil {
+		fmt.Printf("Metrics Errot: %v", err)
+	}
+	return exporter
 }
 
 type ValidationFunction func(ctx context.Context) error
