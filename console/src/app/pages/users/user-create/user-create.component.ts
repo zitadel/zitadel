@@ -40,7 +40,7 @@ export class UserCreateComponent implements OnDestroy {
     public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
     public languages: string[] = ['de', 'en'];
     public userForm!: FormGroup;
-
+    public envSuffixLabel: string = '';
     private sub: Subscription = new Subscription();
 
     public userLoginMustBeDomain: boolean = false;
@@ -62,11 +62,13 @@ export class UserCreateComponent implements OnDestroy {
             this.userLoginMustBeDomain = iampolicy.toObject().userLoginMustBeDomain;
             this.initForm();
             this.loading = false;
+            this.envSuffixLabel = this.envSuffix();
             this.changeDetRef.detectChanges();
         }).catch(error => {
             console.error(error);
             this.initForm();
             this.loading = false;
+            this.envSuffixLabel = this.envSuffix();
             this.changeDetRef.detectChanges();
         });
     }
@@ -175,7 +177,7 @@ export class UserCreateComponent implements OnDestroy {
         return this.userForm.get('country');
     }
 
-    public get envSuffix(): string {
+    private envSuffix(): string {
         if (this.userLoginMustBeDomain && this.primaryDomain?.domain) {
             return `@${this.primaryDomain.domain}`;
         } else {

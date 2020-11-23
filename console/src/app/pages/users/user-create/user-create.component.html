@@ -16,7 +16,7 @@
                 <cnsl-label>{{ 'USER.PROFILE.USERNAME' | translate }}</cnsl-label>
                 <input cnslInput formControlName="userName" required
                     [ngStyle]="{'padding-right': suffixPadding ? suffixPadding : '10px'}" />
-                <span #suffix *ngIf="envSuffix" cnslSuffix (click)="logsuff()">{{envSuffix}}</span>
+                <span #suffix *ngIf="envSuffixLabel" cnslSuffix (click)="logsuff()">{{envSuffixLabel}}</span>
 
                 <span cnsl-error *ngIf="userName?.invalid && userName?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
