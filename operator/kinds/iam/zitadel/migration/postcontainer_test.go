@@ -8,7 +8,6 @@ import (
 
 func TestMigration_DropUserCommand(t *testing.T) {
 	user := "test"
-	pw := "test"
 	file := "test"
 	equals := strings.Join([]string{
 		"echo -n 'DROP USER IF EXISTS ' > " + file,
@@ -16,6 +15,6 @@ func TestMigration_DropUserCommand(t *testing.T) {
 		"echo -n ';' >> " + file,
 	}, ";")
 
-	cmd := createUserCommand(user, pw, file)
+	cmd := deleteUserCommand(user, file)
 	assert.Equal(t, cmd, equals)
 }

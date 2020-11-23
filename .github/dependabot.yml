@@ -17,7 +17,7 @@ updates:
     prefix: chore
     include: scope
 - package-ecosystem: "docker"
-  directory: "/build/docker/zitadel"
+  directory: "/build"
   schedule:
     interval: "weekly"
   open-pull-requests-limit: 10
@@ -25,7 +25,7 @@ updates:
     prefix: chore
     include: scope
 - package-ecosystem: "docker"
-  directory: "/build/docker/operator"
+  directory: "/build/operator"
   schedule:
     interval: "weekly"
   open-pull-requests-limit: 10

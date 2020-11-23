@@ -50,7 +50,6 @@ func TestMigration_CreateUserCommand(t *testing.T) {
 
 func TestMigration_GrantUserCommand(t *testing.T) {
 	user := "test"
-	pw := "test"
 	file := "test"
 	equals := strings.Join([]string{
 		"echo -n 'GRANT admin TO ' > " + file,
@@ -58,6 +57,6 @@ func TestMigration_GrantUserCommand(t *testing.T) {
 		"echo -n ' WITH ADMIN OPTION;'  >> " + file,
 	}, ";")
 
-	cmd := createUserCommand(user, pw, file)
+	cmd := grantUserCommand(user, file)
 	assert.Equal(t, cmd, equals)
 }

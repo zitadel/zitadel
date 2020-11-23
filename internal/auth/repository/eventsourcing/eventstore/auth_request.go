@@ -112,7 +112,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 	request.AppendAudIfNotExisting(app.ProjectID)
 	if request.LoginHint != "" {
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
-		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID).OnError(err).Debug("login hint invalid")
+		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Debug("login hint invalid")
 	}
 	err = repo.AuthRequests.SaveAuthRequest(ctx, request)
 	if err != nil {
@@ -723,7 +723,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 	}
 	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence)
 	if err != nil {
-		logging.Log("EVENT-Hse6s").WithError(err).Debug("error retrieving new events")
+		logging.Log("EVENT-Hse6s").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
 		return user_view_model.UserSessionToModel(session), nil
 	}
 	sessionCopy := *session
@@ -744,7 +744,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			es_model.HumanSignedOut:
 			eventData, err := user_view_model.UserSessionFromEvent(event)
 			if err != nil {
-				logging.Log("EVENT-sdgT3").WithError(err).Debug("error getting event data")
+				logging.Log("EVENT-sdgT3").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error getting event data")
 				return user_view_model.UserSessionToModel(session), nil
 			}
 			if eventData.UserAgentID != agentID {
@@ -793,7 +793,7 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	}
 	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence)
 	if err != nil {
-		logging.Log("EVENT-dfg42").WithError(err).Debug("error retrieving new events")
+		logging.Log("EVENT-dfg42").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
 		return user_view_model.UserToModel(user), nil
 	}
 	if len(events) == 0 {

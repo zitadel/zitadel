@@ -344,7 +344,7 @@ func TestConfiguration_LiteralsConsoleCM(t *testing.T) {
 		Data: map[string]string{"environment.json": "{\"authServiceUrl\":\"https://.\",\"mgmtServiceUrl\":\"https://.\",\"issuer\":\"https://.\",\"clientid\":\"\"}"},
 	}
 
-	equals := map[string]string{}
+	equals := map[string]string{"environment.json": "{\"authServiceUrl\":\"https://.\",\"mgmtServiceUrl\":\"https://.\",\"issuer\":\"https://.\",\"clientid\":\"\"}"}
 	k8sClient.EXPECT().GetConfigMap(namespace, cmName).Times(1).Return(cm, nil)
 
 	literals := literalsConsoleCM(clientID, desiredEmpty.DNS, k8sClient, namespace, cmName)

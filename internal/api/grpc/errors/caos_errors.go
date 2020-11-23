@@ -2,6 +2,7 @@ package errors
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/pkg/grpc/message"
