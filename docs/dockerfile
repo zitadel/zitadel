@@ -1,0 +1,9 @@
+FROM node:15
+
+COPY . docs/
+
+WORKDIR docs
+
+RUN npm ci
+
+CMD npx sapper export --legacy
