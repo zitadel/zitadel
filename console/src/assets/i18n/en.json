@@ -232,7 +232,7 @@
             "KEYSDESC":"Define your keys and add an optional expiration date.",
             "ID":"Key ID",
             "TYPE":"Type",
-            "EXPIRYDATE":"Expiration date",
+            "EXPIRATIONDATE":"Expiration date",
             "CHOOSEEXPIRY":"Select an expiration date",
             "CREATIONDATE":"Creation Date",
             "KEYDETAILS":"Key Details",

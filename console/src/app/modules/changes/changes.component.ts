@@ -38,10 +38,12 @@ export class ChangesComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.init();
-        this.refresh.pipe(takeUntil(this.destroyed$), debounceTime(2000)).subscribe(() => {
-            console.log('asdf');
-            this.init();
-        });
+        if (this.refresh) {
+            this.refresh.pipe(takeUntil(this.destroyed$), debounceTime(2000)).subscribe(() => {
+                console.log('asdf');
+                this.init();
+            });
+        }
     }
 
     ngOnDestroy(): void {

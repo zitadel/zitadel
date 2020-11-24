@@ -232,7 +232,7 @@
             "KEYSDESC":"Definiere Deine Schlüssel mit einem optionalen Ablaufdatum.",
             "ID":"Schlüssel-ID",
             "TYPE":"Typ",
-            "EXPIRYDATE":"Ablaufdatum",
+            "EXPIRATIONDATE":"Ablaufdatum",
             "CHOOSEEXPIRY":"Definiere ein Ablaufdatum",
             "CREATIONDATE":"Erstelldatum",
             "KEYDETAILS":"Schlüssel Details",
