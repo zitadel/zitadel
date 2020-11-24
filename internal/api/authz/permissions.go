@@ -7,11 +7,10 @@ import (
 	"github.com/caos/zitadel/internal/tracing"
 )
 
-func getUserMethodPermissions(ctx context.Context, t *TokenVerifier, requiredPerm string, authConfig Config) (_ context.Context, _ []string, err error) {
+func getUserMethodPermissions(ctx context.Context, t *TokenVerifier, requiredPerm string, authConfig Config, ctxData CtxData) (requestedPermissions, allPermissions []string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	ctxData := GetCtxData(ctx)
 	if ctxData.IsZero() {
 		return nil, nil, errors.ThrowUnauthenticated(nil, "AUTH-rKLWEH", "context missing")
 	}
@@ -20,16 +19,15 @@ func getUserMethodPermissions(ctx context.Context, t *TokenVerifier, requiredPer
 		return nil, nil, err
 	}
 	if grant == nil {
-		return context.WithValue(ctx, requestPermissionsKey, []string{}), []string{}, nil
+		return requestedPermissions, nil, nil
 	}
-	requestPermissions, allPermissions := mapGrantToPermissions(requiredPerm, grant, authConfig)
-	ctx = context.WithValue(ctx, allPermissionsKey, allPermissions)
-	return context.WithValue(ctx, requestPermissionsKey, requestPermissions), requestPermissions, nil
+	requestedPermissions, allPermissions = mapGrantToPermissions(requiredPerm, grant, authConfig)
+	return requestedPermissions, allPermissions, nil
 }
 
-func mapGrantToPermissions(requiredPerm string, grant *Grant, authConfig Config) ([]string, []string) {
-	requestPermissions := make([]string, 0)
-	allPermissions := make([]string, 0)
+func mapGrantToPermissions(requiredPerm string, grant *Grant, authConfig Config) (requestPermissions []string, allPermissions []string) {
+	requestPermissions = make([]string, 0)
+	allPermissions = make([]string, 0)
 	for _, role := range grant.Roles {
 		requestPermissions, allPermissions = mapRoleToPerm(requiredPerm, role, authConfig, requestPermissions, allPermissions)
 	}

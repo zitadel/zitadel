@@ -15,31 +15,32 @@ const (
 )
 
 func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID string, verifier *TokenVerifier, authConfig Config, requiredAuthOption Option, method string) (_ context.Context, err error) {
-	ctx, span := tracing.NewServerInterceptorSpan(ctx)
+	methodCtx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	ctx, err = VerifyTokenAndWriteCtxData(ctx, token, orgID, verifier, method)
+	ctxData, err := VerifyTokenAndCreateCtxData(methodCtx, token, orgID, verifier, method)
 	if err != nil {
 		return nil, err
 	}
+	ctx = context.WithValue(ctx, dataKey, ctxData)
 
-	var perms []string
 	if requiredAuthOption.Permission == authenticated {
 		return ctx, nil
 	}
 
-	ctx, perms, err = getUserMethodPermissions(ctx, verifier, requiredAuthOption.Permission, authConfig)
+	requestedPermissions, allPermissions, err := getUserMethodPermissions(methodCtx, verifier, requiredAuthOption.Permission, authConfig, ctxData)
 	if err != nil {
 		return nil, err
 	}
+	ctx = context.WithValue(ctx, allPermissionsKey, allPermissions)
+	ctx = context.WithValue(ctx, requestPermissionsKey, requestedPermissions)
 
-	ctx, userPermissionSpan := tracing.NewNamedSpan(ctx, "checkUserPermissions")
-	err = checkUserPermissions(req, perms, requiredAuthOption)
+	methodCtx, userPermissionSpan := tracing.NewNamedSpan(methodCtx, "checkUserPermissions")
+	err = checkUserPermissions(req, requestedPermissions, requiredAuthOption)
 	userPermissionSpan.EndWithError(err)
 	if err != nil {
 		return nil, err
 	}
-
 	return ctx, nil
 }
 
