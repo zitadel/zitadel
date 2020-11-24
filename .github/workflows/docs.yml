@@ -20,9 +20,9 @@ jobs:
     - uses: docker/build-push-action@v2
       with:
         context: .
-        file: ./build/dockerfile
+        file: ./site/dockerfile
         platforms: linux/amd64
-        tags: ${{ env.REGISTRY }}/${{ github.repository }}:coverage
+        tags: zitadel:docs
         push: false
         outputs: type=local,dest=site/__sapper__/export
     - name: Archive Production Artifact
