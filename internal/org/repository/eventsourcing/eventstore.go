@@ -435,7 +435,7 @@ func (es *OrgEventstore) ChangeOrgMember(ctx context.Context, member *org_model.
 	}
 	existingMember, _ := org.MemeberByUserID(member.UserID)
 	if existingMember == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-VB2Pn", "Errors.Org.MemberNotExisting")
+		return nil, errors.ThrowNotFound(nil, "EVENT-VB2Pn", "Errors.Org.MemberNotExisting")
 	}
 
 	repoOrg := model.OrgFromModel(org)

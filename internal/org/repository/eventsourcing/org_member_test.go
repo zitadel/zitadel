@@ -125,6 +125,7 @@ func TestOrgMemberChangedAggregate(t *testing.T) {
 				existingMember: &model.OrgMember{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "asdf", Sequence: 234},
 				},
+				org: &model.Org{},
 			},
 			res: res{
 				isErr: errors.IsErrorInvalidArgument,
@@ -142,6 +143,9 @@ func TestOrgMemberChangedAggregate(t *testing.T) {
 				existingMember: &model.OrgMember{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "asdf", Sequence: 234},
 					Roles:      []string{"asdf", "woeri"},
+				},
+				org: &model.Org{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "asdf", Sequence: 234},
 				},
 			},
 			res: res{
