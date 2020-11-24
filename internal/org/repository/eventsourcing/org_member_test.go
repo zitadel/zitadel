@@ -78,6 +78,7 @@ func TestOrgMemberChangedAggregate(t *testing.T) {
 	}
 	type args struct {
 		aggCreator     *es_models.AggregateCreator
+		org            *model.Org
 		existingMember *model.OrgMember
 		member         *model.OrgMember
 		ctx            context.Context
@@ -92,6 +93,7 @@ func TestOrgMemberChangedAggregate(t *testing.T) {
 			args: args{
 				aggCreator:     es_models.NewAggregateCreator("test"),
 				ctx:            authz.NewMockContext("org", "user"),
+				org:            &model.Org{},
 				member:         nil,
 				existingMember: &model.OrgMember{},
 			},
@@ -104,6 +106,7 @@ func TestOrgMemberChangedAggregate(t *testing.T) {
 			args: args{
 				aggCreator:     es_models.NewAggregateCreator("test"),
 				ctx:            authz.NewMockContext("org", "user"),
+				org:            &model.Org{},
 				existingMember: nil,
 				member:         &model.OrgMember{},
 			},
@@ -149,7 +152,7 @@ func TestOrgMemberChangedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			aggregateCreator := orgMemberChangedAggregate(tt.args.aggCreator, tt.args.existingMember, tt.args.member)
+			aggregateCreator := orgMemberChangedAggregate(tt.args.aggCreator, tt.args.org, tt.args.existingMember, tt.args.member)
 			aggregate, err := aggregateCreator(tt.args.ctx)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got: %v", err)
@@ -174,6 +177,7 @@ func TestOrgMemberRemovedAggregate(t *testing.T) {
 	}
 	type args struct {
 		aggCreator *es_models.AggregateCreator
+		org        *model.Org
 		member     *model.OrgMember
 		ctx        context.Context
 	}
@@ -187,6 +191,7 @@ func TestOrgMemberRemovedAggregate(t *testing.T) {
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
 				ctx:        authz.NewMockContext("org", "user"),
+				org:        &model.Org{},
 				member:     nil,
 			},
 			res: res{
@@ -198,6 +203,7 @@ func TestOrgMemberRemovedAggregate(t *testing.T) {
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
 				ctx:        authz.NewMockContext("org", "user"),
+				org:        &model.Org{},
 				member: &model.OrgMember{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "asdf", Sequence: 234},
 				},
@@ -210,7 +216,7 @@ func TestOrgMemberRemovedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			aggregateCreator := orgMemberRemovedAggregate(tt.args.aggCreator, tt.args.member)
+			aggregateCreator := orgMemberRemovedAggregate(tt.args.aggCreator, tt.args.org, tt.args.member)
 			aggregate, err := aggregateCreator(tt.args.ctx)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got: %v", err)
