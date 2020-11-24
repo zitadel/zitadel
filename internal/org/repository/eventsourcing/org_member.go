@@ -34,7 +34,7 @@ func orgMemberAddedAggregate(ctx context.Context, aggCreator *es_models.Aggregat
 
 func orgMemberChangedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org, existingMember, member *model.OrgMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if member == nil || org == nil {
+		if member == nil || org == nil || existingMember == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d34fs", "Errors.Internal")
 		}
 
