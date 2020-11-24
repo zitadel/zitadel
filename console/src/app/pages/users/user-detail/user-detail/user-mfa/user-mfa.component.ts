@@ -1,9 +1,12 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { MFAState, MfaType, UserMultiFactor, UserView } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 
 export interface MFAItem {
@@ -17,7 +20,7 @@ export interface MFAItem {
     styleUrls: ['./user-mfa.component.scss'],
 })
 export class UserMfaComponent implements OnInit, OnDestroy {
-    public displayedColumns: string[] = ['type', 'state'];
+    public displayedColumns: string[] = ['type', 'state', 'actions'];
     @Input() private user!: UserView.AsObject;
     public mfaSubject: BehaviorSubject<UserMultiFactor.AsObject[]> = new BehaviorSubject<UserMultiFactor.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -31,7 +34,7 @@ export class UserMfaComponent implements OnInit, OnDestroy {
     public MFAState: any = MFAState;
 
     public error: string = '';
-    constructor(private mgmtUserService: ManagementService) { }
+    constructor(private mgmtUserService: ManagementService, private dialog: MatDialog, private toast: ToastService) { }
 
     public ngOnInit(): void {
         this.getOTP();
@@ -48,6 +51,36 @@ export class UserMfaComponent implements OnInit, OnDestroy {
             this.dataSource.sort = this.sort;
         }).catch(error => {
             this.error = error.message;
+        });
+    }
+
+    public deleteMFA(type: MfaType): void {
+        const dialogRef = this.dialog.open(WarnDialogComponent, {
+            data: {
+                confirmKey: 'ACTIONS.DELETE',
+                cancelKey: 'ACTIONS.CANCEL',
+                titleKey: 'USER.MFA.DIALOG.OTP_DELETE_TITLE',
+                descriptionKey: 'USER.MFA.DIALOG.OTP_DELETE_DESCRIPTION',
+            },
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                if (type === MfaType.MFATYPE_OTP) {
+                    this.mgmtUserService.removeMfaOTP(this.user.id).then(() => {
+                        this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
+
+                        const index = this.dataSource.data.findIndex(mfa => mfa.type === type);
+                        if (index > -1) {
+                            this.dataSource.data.splice(index, 1);
+                        }
+                        this.getOTP();
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
+                }
+            }
         });
     }
 }

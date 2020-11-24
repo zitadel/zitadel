@@ -221,6 +221,11 @@ func (s *Server) GetUserMfas(ctx context.Context, userID *management.UserID) (*m
 	return &management.UserMultiFactors{Mfas: mfasFromModel(mfas)}, nil
 }
 
+func (s *Server) RemoveMfaOTP(ctx context.Context, userID *management.UserID) (*empty.Empty, error) {
+	err := s.user.RemoveOTP(ctx, userID.Id)
+	return &empty.Empty{}, err
+}
+
 func (s *Server) SearchUserMemberships(ctx context.Context, in *management.UserMembershipSearchRequest) (*management.UserMembershipSearchResponse, error) {
 	request := userMembershipSearchRequestsToModel(in)
 	request.AppendUserIDQuery(in.UserId)
