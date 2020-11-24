@@ -46,6 +46,21 @@ func TestMigration_CreateUserCommand(t *testing.T) {
 
 	cmd = createUserCommand(user, pw, file)
 	assert.Equal(t, cmd, equals)
+
+	user = "test2"
+	pw = ""
+	file = ""
+
+	cmd = createUserCommand(user, pw, file)
+	assert.Equal(t, cmd, "")
+
+	user = ""
+	pw = ""
+	file = "test"
+
+	cmd = createUserCommand(user, pw, file)
+	assert.Equal(t, cmd, "")
+
 }
 
 func TestMigration_GrantUserCommand(t *testing.T) {

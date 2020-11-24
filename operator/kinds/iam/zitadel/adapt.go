@@ -4,6 +4,7 @@ import (
 	"github.com/caos/orbos/pkg/orb"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/database"
+	"github.com/caos/zitadel/operator/kinds/iam/zitadel/setup"
 	"strconv"
 
 	core "k8s.io/api/core/v1"
@@ -132,7 +133,7 @@ func AdaptFunc(
 			return nil, nil, allSecrets, err
 		}
 
-		queryM, destroyM, migrationDone, _, err := migration.AdaptFunc(
+		queryM, destroyM, err := migration.AdaptFunc(
 			internalMonitor,
 			namespaceStr,
 			action,
@@ -148,7 +149,29 @@ func AdaptFunc(
 			return nil, nil, allSecrets, err
 		}
 
-		queryD, destroyD, deploymentReady, scaleDeployment, ensureInit, err := deployment.AdaptFunc(
+		querySetup, destroySetup, err := setup.AdaptFunc(
+			internalMonitor,
+			namespaceStr,
+			action,
+			labels,
+			desiredKind.Spec.NodeSelector,
+			desiredKind.Spec.Tolerations,
+			desiredKind.Spec.Resources,
+			version,
+			cmName,
+			certPath,
+			secretName,
+			secretPath,
+			consoleCMName,
+			secretVarsName,
+			secretPasswordName,
+			allZitadelUsers,
+			migration.GetDoneFunc(monitor, namespaceStr, action),
+			configuration.GetReadyFunc(monitor, namespaceStr, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName),
+			getConfigurationHashes,
+		)
+
+		queryD, destroyD, err := deployment.AdaptFunc(
 			internalMonitor,
 			version,
 			namespaceStr,
@@ -166,8 +189,9 @@ func AdaptFunc(
 			desiredKind.Spec.NodeSelector,
 			desiredKind.Spec.Tolerations,
 			desiredKind.Spec.Resources,
-			migrationDone,
+			migration.GetDoneFunc(monitor, namespaceStr, action),
 			configuration.GetReadyFunc(monitor, namespaceStr, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName),
+			setup.GetDoneFunc(monitor, namespaceStr, action),
 			getConfigurationHashes,
 		)
 		if err != nil {
@@ -212,9 +236,9 @@ func AdaptFunc(
 					queryM,
 					//services
 					queryS,
+					querySetup,
 					queryD,
-					operator.EnsureFuncToQueryFunc(ensureInit),
-					operator.EnsureFuncToQueryFunc(deploymentReady),
+					operator.EnsureFuncToQueryFunc(deployment.GetReadyFunc(monitor, namespaceStr)),
 					queryAmbassador,
 				)
 				destroyers = append(destroyers,
@@ -222,16 +246,17 @@ func AdaptFunc(
 					destroyS,
 					destroyM,
 					destroyD,
+					destroySetup,
 					destroyC,
 					operator.ResourceDestroyToZitadelDestroy(destroyNS),
 				)
 			case "scaledown":
 				queriers = append(queriers,
-					operator.EnsureFuncToQueryFunc(scaleDeployment(0)),
+					operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespaceStr)(0)),
 				)
 			case "scaleup":
 				queriers = append(queriers,
-					operator.EnsureFuncToQueryFunc(scaleDeployment(desiredKind.Spec.ReplicaCount)),
+					operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespaceStr)(desiredKind.Spec.ReplicaCount)),
 				)
 			}
 		}

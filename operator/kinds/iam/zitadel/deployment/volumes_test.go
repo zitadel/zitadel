@@ -56,7 +56,7 @@ func TestDeployment_Volumes(t *testing.T) {
 		},
 	}}
 
-	assert.ElementsMatch(t, equals, getVolumes(secretName, secretPasswordsName, consoleCMName, users))
+	assert.ElementsMatch(t, equals, GetVolumes(secretName, secretPasswordsName, consoleCMName, users))
 
 }
 

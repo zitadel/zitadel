@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/configuration/users"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/database"
+	"time"
 )
 
 type ConsoleEnv struct {
@@ -18,8 +19,9 @@ type ConsoleEnv struct {
 }
 
 const (
-	googleServiceAccountJSONPath = "google-serviceaccount-key.json"
-	zitadelKeysPath              = "zitadel-keys.yaml"
+	googleServiceAccountJSONPath               = "google-serviceaccount-key.json"
+	zitadelKeysPath                            = "zitadel-keys.yaml"
+	timeout                      time.Duration = 60
 )
 
 func AdaptFunc(

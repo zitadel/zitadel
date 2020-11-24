@@ -8,7 +8,7 @@ import (
 
 func AdaptFunc(
 	monitor mntr.Monitor,
-	dbClient *Client,
+	dbClient ClientInt,
 ) (
 	operator.QueryFunc,
 	error,
@@ -22,6 +22,9 @@ func AdaptFunc(
 		}
 
 		users, err := dbClient.ListUsers(monitor, k8sClient)
+		if err != nil {
+			return nil, err
+		}
 
 		curr := &Current{
 			Host:  dbHost,

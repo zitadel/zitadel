@@ -90,7 +90,7 @@ func TestDeployment_GetContainer(t *testing.T) {
 		//Args:      []string{"tail -f /dev/null;"},
 		Args: []string{"start"},
 		SecurityContext: &corev1.SecurityContext{
-			RunAsUser:    helpers.PointerInt64(runAsUser),
+			RunAsUser:    helpers.PointerInt64(RunAsUser),
 			RunAsNonRoot: helpers.PointerBool(true),
 		},
 		Name:            containerName,
@@ -132,10 +132,10 @@ func TestDeployment_GetContainer(t *testing.T) {
 		},
 	}
 
-	container := getContainer(
+	container := GetContainer(
 		containerName,
 		version,
-		runAsUser,
+		RunAsUser,
 		true,
 		resources,
 		cmName,
@@ -147,6 +147,7 @@ func TestDeployment_GetContainer(t *testing.T) {
 		secretPasswordsName,
 		users,
 		dbSecrets,
+		"start",
 	)
 
 	assert.Equal(t, equals, container)

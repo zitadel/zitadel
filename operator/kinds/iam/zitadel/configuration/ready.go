@@ -17,23 +17,23 @@ func GetReadyFunc(
 ) func(k8sClient kubernetes.ClientInt) error {
 	return func(k8sClient kubernetes.ClientInt) error {
 		monitor.Debug("Waiting for configuration to be created")
-		if err := k8sClient.WaitForSecret(namespace, secretName, 60); err != nil {
+		if err := k8sClient.WaitForSecret(namespace, secretName, timeout); err != nil {
 			return errors.Wrap(err, "error while waiting for secret")
 		}
 
-		if err := k8sClient.WaitForSecret(namespace, secretVarsName, 60); err != nil {
+		if err := k8sClient.WaitForSecret(namespace, secretVarsName, timeout); err != nil {
 			return errors.Wrap(err, "error while waiting for vars secret ")
 		}
 
-		if err := k8sClient.WaitForSecret(namespace, secretPasswordName, 60); err != nil {
+		if err := k8sClient.WaitForSecret(namespace, secretPasswordName, timeout); err != nil {
 			return errors.Wrap(err, "error while waiting for password secret")
 		}
 
-		if err := k8sClient.WaitForConfigMap(namespace, cmName, 60); err != nil {
+		if err := k8sClient.WaitForConfigMap(namespace, cmName, timeout); err != nil {
 			return errors.Wrap(err, "error while waiting for configmap")
 		}
 
-		if err := k8sClient.WaitForConfigMap(namespace, consoleCMName, 60); err != nil {
+		if err := k8sClient.WaitForConfigMap(namespace, consoleCMName, timeout); err != nil {
 			return errors.Wrap(err, "error while waiting for console configmap")
 		}
 		monitor.Debug("configuration is created")

@@ -73,18 +73,18 @@ func TestDeployment_Adapt(t *testing.T) {
 					Tolerations:  nil,
 					Affinity:     nil,
 					InitContainers: []corev1.Container{
-						getInitContainer(
+						GetInitContainer(
 							rootSecret,
 							dbSecrets,
 							users,
-							runAsUser,
+							RunAsUser,
 						),
 					},
 					Containers: []corev1.Container{
-						getContainer(
+						GetContainer(
 							containerName,
 							version,
-							runAsUser,
+							RunAsUser,
 							true,
 							resources,
 							cmName,
@@ -96,9 +96,10 @@ func TestDeployment_Adapt(t *testing.T) {
 							secretPasswordsName,
 							users,
 							dbSecrets,
+							"start",
 						),
 					},
-					Volumes: getVolumes(
+					Volumes: GetVolumes(
 						secretName,
 						secretPasswordsName,
 						consoleCMName,
@@ -119,8 +120,11 @@ func TestDeployment_Adapt(t *testing.T) {
 	configurationDone := func(k8sClient kubernetes.ClientInt) error {
 		return nil
 	}
+	setupDone := func(k8sClient kubernetes.ClientInt) error {
+		return nil
+	}
 
-	query, _, _, _, _, err := AdaptFunc(
+	query, _, err := AdaptFunc(
 		monitor,
 		version,
 		namespace,
@@ -140,6 +144,7 @@ func TestDeployment_Adapt(t *testing.T) {
 		resources,
 		migrationDone,
 		configurationDone,
+		setupDone,
 		getConfigurationHashes,
 	)
 	assert.NoError(t, err)

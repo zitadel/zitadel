@@ -11,7 +11,7 @@ const (
 	certTempMountPath = "/tmp/dbsecrets"
 )
 
-func getInitContainer(
+func GetInitContainer(
 	rootSecret string,
 	dbSecrets string,
 	users []string,

@@ -32,7 +32,7 @@ func TestDeployment_GetInitContainer(t *testing.T) {
 		VolumeMounts: initVolumeMounts,
 	}
 
-	init := getInitContainer(rootSecret, dbSecrets, users, runAsUser)
+	init := GetInitContainer(rootSecret, dbSecrets, users, RunAsUser)
 
 	assert.Equal(t, equals, init)
 }
@@ -62,7 +62,7 @@ func TestDeployment_GetInitContainer1(t *testing.T) {
 		VolumeMounts: initVolumeMounts,
 	}
 
-	init := getInitContainer(rootSecret, dbSecrets, users, runAsUser)
+	init := GetInitContainer(rootSecret, dbSecrets, users, RunAsUser)
 
 	assert.Equal(t, equals, init)
 }
@@ -95,7 +95,7 @@ func TestDeployment_GetInitContainer2(t *testing.T) {
 		VolumeMounts: initVolumeMounts,
 	}
 
-	init := getInitContainer(rootSecret, dbSecrets, users, runAsUser)
+	init := GetInitContainer(rootSecret, dbSecrets, users, RunAsUser)
 
 	assert.Equal(t, equals, init)
 }

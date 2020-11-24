@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func getContainer(
+func GetContainer(
 	containerName string,
 	version string,
 	runAsUser int64,
@@ -22,6 +22,7 @@ func getContainer(
 	secretPasswordsName string,
 	users []string,
 	dbSecrets string,
+	command string,
 ) corev1.Container {
 
 	envVars := []corev1.EnvVar{
@@ -83,7 +84,7 @@ func getContainer(
 		Resources: corev1.ResourceRequirements(*resources),
 		//Command:   []string{"/bin/sh", "-c"},
 		//Args:      []string{"tail -f /dev/null;"},
-		Args: []string{"start"},
+		Args: []string{command},
 		SecurityContext: &corev1.SecurityContext{
 			RunAsUser:    &runAsUser,
 			RunAsNonRoot: &runAsNonRoot,

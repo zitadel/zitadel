@@ -141,10 +141,10 @@ func TestMigration_AdaptFunc(t *testing.T) {
 		Data: allScriptsMap,
 	}
 	client.EXPECT().ApplyJob(jobDef).Times(1)
-	client.EXPECT().GetJob(namespace, jobNamePrefix+reason).Return(nil, macherrs.NewNotFound(schema.GroupResource{"batch", "jobs"}, jobNamePrefix+reason))
+	client.EXPECT().GetJob(namespace, getJobName(reason)).Times(1).Return(nil, macherrs.NewNotFound(schema.GroupResource{"batch", "jobs"}, jobNamePrefix+reason))
 	client.EXPECT().ApplyConfigmap(cm).Times(1)
 
-	query, _, _, _, err := AdaptFunc(
+	query, _, err := AdaptFunc(
 		mntr.Monitor{},
 		namespace,
 		reason,

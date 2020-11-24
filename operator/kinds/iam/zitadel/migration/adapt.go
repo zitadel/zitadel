@@ -11,7 +11,6 @@ import (
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/helpers"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/database"
-	"github.com/pkg/errors"
 	"io/ioutil"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -49,22 +48,18 @@ func AdaptFunc(
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
-	operator.EnsureFunc,
-	operator.EnsureFunc,
 	error,
 ) {
 	internalMonitor := monitor.WithField("component", "migration")
 
-	jobName := jobNamePrefix + reason
-
 	destroyCM, err := configmap.AdaptFuncToDestroy(namespace, migrationConfigmap)
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return nil, nil, err
 	}
 
-	destroyJ, err := job.AdaptFuncToDestroy(jobName, namespace)
+	destroyJ, err := job.AdaptFuncToDestroy(getJobName(reason), namespace)
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	destroyers := []operator.DestroyFunc{
@@ -93,7 +88,7 @@ func AdaptFunc(
 
 			jobDef := &batchv1.Job{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      jobName,
+					Name:      getJobName(reason),
 					Namespace: namespace,
 					Labels:    internalLabels,
 					Annotations: map[string]string{
@@ -162,24 +157,6 @@ func AdaptFunc(
 			return operator.QueriersToEnsureFunc(internalMonitor, true, queriers, k8sClient, queried)
 		},
 		operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
-		func(k8sClient kubernetes.ClientInt) error {
-			internalMonitor.Info("waiting for migration to be completed")
-			if err := k8sClient.WaitUntilJobCompleted(namespace, jobName, 300); err != nil {
-				internalMonitor.Error(errors.Wrap(err, "error while waiting for migration to be completed"))
-				return err
-			}
-			internalMonitor.Info("migration is completed")
-			return nil
-		},
-		func(k8sClient kubernetes.ClientInt) error {
-			internalMonitor.Info("cleanup migration job")
-			if err := k8sClient.DeleteJob(namespace, jobName); err != nil {
-				internalMonitor.Error(errors.Wrap(err, "error during job deletion"))
-				return err
-			}
-			internalMonitor.Info("migration cleanup is completed")
-			return nil
-		},
 		nil
 }
 
@@ -252,4 +229,8 @@ func getMigrationFiles(root string) []migration {
 	}
 
 	return migrations
+}
+
+func getJobName(reason string) string {
+	return jobNamePrefix + reason
 }

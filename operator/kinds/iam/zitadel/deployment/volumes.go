@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func getVolumes(
+func GetVolumes(
 	secretName string,
 	secretPasswordsName string,
 	consoleCMName string,
