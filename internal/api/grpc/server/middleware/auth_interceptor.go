@@ -35,11 +35,10 @@ func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 
 	orgID := grpc_util.GetHeader(authCtx, http.ZitadelOrgID)
 
-	ctx, err = authz.CheckUserAuthorization(ctx, req, authToken, orgID, verifier, authConfig, authOpt, info.FullMethod)
+	ctxSetter, err := authz.CheckUserAuthorization(authCtx, req, authToken, orgID, verifier, authConfig, authOpt, info.FullMethod)
 	if err != nil {
 		return nil, err
 	}
 	span.End()
-	// span grpc
-	return handler(ctx, req)
+	return handler(ctxSetter(ctx), req)
 }

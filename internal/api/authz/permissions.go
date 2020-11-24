@@ -14,6 +14,8 @@ func getUserMethodPermissions(ctx context.Context, t *TokenVerifier, requiredPer
 	if ctxData.IsZero() {
 		return nil, nil, errors.ThrowUnauthenticated(nil, "AUTH-rKLWEH", "context missing")
 	}
+
+	ctx = context.WithValue(ctx, dataKey, ctxData)
 	grant, err := t.ResolveGrant(ctx)
 	if err != nil {
 		return nil, nil, err

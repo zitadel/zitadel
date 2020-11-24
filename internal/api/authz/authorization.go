@@ -14,34 +14,39 @@ const (
 	authenticated = "authenticated"
 )
 
-func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID string, verifier *TokenVerifier, authConfig Config, requiredAuthOption Option, method string) (_ context.Context, err error) {
-	methodCtx, span := tracing.NewServerInterceptorSpan(ctx)
+func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID string, verifier *TokenVerifier, authConfig Config, requiredAuthOption Option, method string) (ctxSetter func(context.Context) context.Context, err error) {
+	ctx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	ctxData, err := VerifyTokenAndCreateCtxData(methodCtx, token, orgID, verifier, method)
+	ctxData, err := VerifyTokenAndCreateCtxData(ctx, token, orgID, verifier, method)
 	if err != nil {
 		return nil, err
 	}
-	ctx = context.WithValue(ctx, dataKey, ctxData)
 
 	if requiredAuthOption.Permission == authenticated {
-		return ctx, nil
+		return func(parent context.Context) context.Context {
+			return context.WithValue(parent, dataKey, ctxData)
+		}, nil
 	}
 
-	requestedPermissions, allPermissions, err := getUserMethodPermissions(methodCtx, verifier, requiredAuthOption.Permission, authConfig, ctxData)
+	requestedPermissions, allPermissions, err := getUserMethodPermissions(ctx, verifier, requiredAuthOption.Permission, authConfig, ctxData)
 	if err != nil {
 		return nil, err
 	}
-	ctx = context.WithValue(ctx, allPermissionsKey, allPermissions)
-	ctx = context.WithValue(ctx, requestPermissionsKey, requestedPermissions)
 
-	methodCtx, userPermissionSpan := tracing.NewNamedSpan(methodCtx, "checkUserPermissions")
+	ctx, userPermissionSpan := tracing.NewNamedSpan(ctx, "checkUserPermissions")
 	err = checkUserPermissions(req, requestedPermissions, requiredAuthOption)
 	userPermissionSpan.EndWithError(err)
 	if err != nil {
 		return nil, err
 	}
-	return ctx, nil
+
+	return func(parent context.Context) context.Context {
+		parent = context.WithValue(parent, dataKey, ctxData)
+		parent = context.WithValue(parent, allPermissionsKey, allPermissions)
+		parent = context.WithValue(parent, requestPermissionsKey, requestedPermissions)
+		return parent
+	}, nil
 }
 
 func checkUserPermissions(req interface{}, userPerms []string, authOpt Option) error {
