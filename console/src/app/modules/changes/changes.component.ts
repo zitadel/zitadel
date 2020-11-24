@@ -1,6 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { BehaviorSubject, from, Observable, of } from 'rxjs';
-import { catchError, scan, take, tap } from 'rxjs/operators';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
+import { catchError, debounceTime, scan, take, takeUntil, tap } from 'rxjs/operators';
 import { Change, Changes } from 'src/app/proto/generated/management_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -17,10 +17,11 @@ export enum ChangeType {
     templateUrl: './changes.component.html',
     styleUrls: ['./changes.component.scss'],
 })
-export class ChangesComponent implements OnInit {
+export class ChangesComponent implements OnInit, OnDestroy {
     @Input() public changeType: ChangeType = ChangeType.USER;
     @Input() public id: string = '';
     @Input() public sortDirectionAsc: boolean = true;
+    @Input() public refresh!: Observable<void>;
     public bottom: boolean = false;
 
     private _done: BehaviorSubject<any> = new BehaviorSubject(false);
@@ -30,10 +31,21 @@ export class ChangesComponent implements OnInit {
     loading: Observable<boolean> = this._loading.asObservable();
     public data!: Observable<Change.AsObject[]>;
     public changes!: Changes.AsObject;
-    constructor(private mgmtUserService: ManagementService, private authUserService: GrpcAuthService) { }
+    private destroyed$: Subject<void> = new Subject();
+    constructor(private mgmtUserService: ManagementService, private authUserService: GrpcAuthService) {
+
+    }
 
     ngOnInit(): void {
         this.init();
+        this.refresh.pipe(takeUntil(this.destroyed$), debounceTime(2000)).subscribe(() => {
+            console.log('asdf');
+            this.init();
+        });
+    }
+
+    ngOnDestroy(): void {
+        this.destroyed$.next();
     }
 
     public scrollHandler(e: any): void {
@@ -42,7 +54,7 @@ export class ChangesComponent implements OnInit {
         }
     }
 
-    private init(): void {
+    public init(): void {
         let first: Promise<Changes>;
         switch (this.changeType) {
             case ChangeType.MYUSER: first = this.authUserService.GetMyUserChanges(20, 0);

@@ -48,7 +48,11 @@
 
       .refresh-img {
         float: left;
-        margin: 0 8px 0 -15px;
+        margin: 0 0 0 -15px;
+        
+        .icon {
+          font-size: 1.2rem;
+        }
       }
 
       .avatar-circle {

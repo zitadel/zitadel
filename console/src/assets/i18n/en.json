@@ -301,6 +301,7 @@
         },
         "VALIDATION": {
             "INVALIDPATTERN": "The password does not fulfil the defined rules.",
+            "NOTANEMAIL":"The given value is not an e-mail address",
             "REQUIRED": "The input field is empty.",
             "MINLENGTH":"The password has to be at least {{requiredLength}} characters long.",
             "NOEMAIL":"The user name cannot be an e-mail address.",

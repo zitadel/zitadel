@@ -118,7 +118,9 @@
             <ng-container matColumnDef="state">
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.DATA.STATE' | translate }} </th>
                 <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    {{ 'USER.DATA.STATE'+user.state | translate }} </td>
+                    <span class="state"
+                        [ngClass]="{'active': user.state === UserState.USERSTATE_ACTIVE, 'inactive': user.state === UserState.USERSTATE_INACTIVE}">{{ 'USER.DATA.STATE'+user.state | translate }}</span>
+                </td>
             </ng-container>
 
             <ng-container matColumnDef="actions" stickyEnd>

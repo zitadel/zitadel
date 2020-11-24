@@ -14,7 +14,7 @@
     <cnsl-form-field class="form-field" appearance="outline">
         <cnsl-label>{{'USER.MACHINE.CHOOSEEXPIRY' | translate}}</cnsl-label>
         <input cnslInput [matDatepicker]="picker" [(ngModel)]="date">
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker-toggle style="top: 0;" cnslSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
     </cnsl-form-field>
 </div>

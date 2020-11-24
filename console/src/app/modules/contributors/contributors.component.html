@@ -34,8 +34,8 @@
                 <mat-icon>add</mat-icon>
             </button>
             <span class="fill-space"></span>
-            <button class="refresh-img" (click)="emitRefresh()" [disabled]="disabled" mat-icon-button
-                aria-label="refresh contributors">
+            <button matTooltip="{{'ACTIONS.REFRESH' | translate}}" class="refresh-img" (click)="emitRefresh()"
+                [disabled]="disabled" mat-icon-button aria-label="refresh contributors">
                 <mat-icon>refresh</mat-icon>
             </button>
         </div>

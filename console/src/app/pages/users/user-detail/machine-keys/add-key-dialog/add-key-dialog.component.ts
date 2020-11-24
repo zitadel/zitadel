@@ -1,6 +1,5 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Moment } from 'moment';
 import { MachineKeyType } from 'src/app/proto/generated/management_pb';
 
 @Component({
@@ -12,7 +11,7 @@ export class AddKeyDialogComponent {
     types: MachineKeyType[] = [
         MachineKeyType.MACHINEKEY_JSON,
     ];
-    date!: Moment;
+    date!: Date;
     public type: MachineKeyType = MachineKeyType.MACHINEKEY_JSON;
 
     constructor(

@@ -74,6 +74,7 @@
             <app-memberships [user]="user"></app-memberships>
         </ng-template>
 
-        <app-changes class="changes" [changeType]="ChangeType.MYUSER" [id]="user.id"></app-changes>
+        <app-changes class="changes" [refresh]="refreshChanges$" [changeType]="ChangeType.MYUSER" [id]="user.id">
+        </app-changes>
     </div>
 </app-meta-layout>

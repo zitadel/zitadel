@@ -108,6 +108,7 @@
             <app-memberships [user]="user" [disabled]="(canWrite$ | async) == false"></app-memberships>
         </ng-template>
 
-        <app-changes class="changes" [changeType]="ChangeType.USER" [id]="user.id"></app-changes>
+        <app-changes class="changes" [refresh]="refreshChanges$" [changeType]="ChangeType.USER" [id]="user.id">
+        </app-changes>
     </div>
 </app-meta-layout>

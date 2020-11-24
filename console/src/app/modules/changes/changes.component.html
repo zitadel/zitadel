@@ -1,4 +1,9 @@
-<span class="ch-header">{{ 'CHANGES.LISTTITLE' | translate }}</span>
+<div class="change-header">
+    <span class="ch-header">{{ 'CHANGES.LISTTITLE' | translate }}</span>
+    <button matTooltip="{{'ACTIONS.REFRESH' | translate}}" (click)="init()" mat-icon-button>
+        <mat-icon class="icon">refresh</mat-icon>
+    </button>
+</div>
 
 <div class="scroll-container" appScrollable (scrollPosition)="scrollHandler($event)">
     <li class="item change-item-back" *ngFor="let event of data | async">
