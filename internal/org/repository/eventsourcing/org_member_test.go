@@ -207,7 +207,9 @@ func TestOrgMemberRemovedAggregate(t *testing.T) {
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
 				ctx:        authz.NewMockContext("org", "user"),
-				org:        &model.Org{},
+				org: &model.Org{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "asdf", Sequence: 234},
+				},
 				member: &model.OrgMember{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "asdf", Sequence: 234},
 				},
