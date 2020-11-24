@@ -24,12 +24,12 @@ jobs:
         platforms: linux/amd64
         tags: zitadel:docs
         push: false
-        outputs: type=local,dest=site/__sapper__/export
+        outputs: type=local,dest=output
     - name: Archive Production Artifact
       uses: actions/upload-artifact@master
       with:
         name: export
-        path: site/__sapper__/export
+        path: output
   deploydocs:
     name: Deploy
     needs: builddocs

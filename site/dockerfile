@@ -1,9 +1,13 @@
-FROM node:15
+FROM node:15 as builder
 
 COPY site/ /site/
 
 WORKDIR /site
 
-RUN npm ci
+RUN npm install
 
-CMD npx sapper export --legacy
+RUN npx sapper export --legacy
+
+FROM scratch as final
+
+COPY --from=builder /site/__sapper__/export .
