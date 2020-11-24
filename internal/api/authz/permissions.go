@@ -27,7 +27,7 @@ func getUserMethodPermissions(ctx context.Context, t *TokenVerifier, requiredPer
 	return requestedPermissions, allPermissions, nil
 }
 
-func mapGrantToPermissions(requiredPerm string, grant *Grant, authConfig Config) (requestPermissions []string, allPermissions []string) {
+func mapGrantToPermissions(requiredPerm string, grant *Grant, authConfig Config) (requestPermissions, allPermissions []string) {
 	requestPermissions = make([]string, 0)
 	allPermissions = make([]string, 0)
 	for _, role := range grant.Roles {
