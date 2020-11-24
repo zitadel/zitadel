@@ -1,8 +1,8 @@
 FROM node:15
 
-COPY . docs/
+COPY site/ /site/
 
-WORKDIR docs
+WORKDIR /site
 
 RUN npm ci
 

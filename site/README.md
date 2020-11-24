@@ -11,6 +11,14 @@ You can simply run the static site by using the docker-compose command below.
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f site/docker-compose.yml up --build
 ```
 
+## Building locally
+
+You can simply run the static site by using the docker-compose command below.
+
+```Bash
+DOCKER_BUILDKIT=1 docker build -f site/dockerfile . -t zitadel:docs
+```
+
 ## Honorable Mentions
 
 This project was created with the help of some components from [svelte](https://github.com/sveltejs/svelte)([MIT](https://github.com/sveltejs/svelte/blob/master/LICENSE)) as well as [site-kit](https://github.com/sveltejs/site-kit)([MIT](https://github.com/sveltejs/site-kit/blob/master/LICENSE)).
