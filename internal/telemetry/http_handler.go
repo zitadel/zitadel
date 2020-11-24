@@ -1,6 +1,7 @@
 package telemetry
 
 import (
+	"github.com/caos/zitadel/internal/telemetry/metrics"
 	"net/http"
 	"strings"
 
@@ -23,7 +24,8 @@ func TelemetryHandler(handler http.Handler, ignoredEndpoints ...string) http.Han
 		"zitadel",
 		otelhttp.WithFilter(shouldNotIgnore(ignoredEndpoints...)),
 		otelhttp.WithPublicEndpoint(),
-		otelhttp.WithSpanNameFormatter(spanNameFormatter))
+		otelhttp.WithSpanNameFormatter(spanNameFormatter),
+		otelhttp.WithMeterProvider(metrics.M.GetMetricsProvider()))
 }
 
 func spanNameFormatter(_ string, r *http.Request) string {

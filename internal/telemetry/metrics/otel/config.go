@@ -5,10 +5,9 @@ import (
 )
 
 type Config struct {
-	MeterName string
 }
 
-func (c *Config) NewMetrics() error {
-	metrics.M = NewMeter(c.MeterName)
-	return nil
+func (c *Config) NewMetrics() (err error) {
+	metrics.M, err = NewMetrics()
+	return err
 }

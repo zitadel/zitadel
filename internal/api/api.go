@@ -2,11 +2,7 @@ package api
 
 import (
 	"context"
-	"fmt"
-	"go.opentelemetry.io/otel/exporters/metric/prometheus"
-	"go.opentelemetry.io/otel/label"
-	"go.opentelemetry.io/otel/sdk/metric/controller/pull"
-	"go.opentelemetry.io/otel/sdk/resource"
+	"github.com/caos/zitadel/internal/telemetry/metrics"
 	"net/http"
 
 	"github.com/caos/logging"
@@ -138,17 +134,8 @@ func (a *API) handleClientID(w http.ResponseWriter, r *http.Request) {
 	http_util.MarshalJSON(w, id, nil, http.StatusOK)
 }
 
-func (a *API) handleMetrics() *prometheus.Exporter {
-	res := resource.New(label.String("R", "V"))
-
-	exporter, err := prometheus.NewExportPipeline(
-		prometheus.Config{},
-		pull.WithResource(res),
-	)
-	if err != nil {
-		fmt.Printf("Metrics Errot: %v", err)
-	}
-	return exporter
+func (a *API) handleMetrics() http.Handler {
+	return metrics.M.GetExporter()
 }
 
 type ValidationFunction func(ctx context.Context) error

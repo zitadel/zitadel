@@ -4,20 +4,21 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/errors"
 	"go.opentelemetry.io/otel/api/metric"
+	"net/http"
 )
 
-type Meter interface {
+type Metrics interface {
+	GetExporter() http.Handler
 	GetMetricsProvider() metric.MeterProvider
-	RegisterCounter(name string) error
+	RegisterCounter(name, description string) error
 	AddCount(ctx context.Context, name string, value int64, labels map[string]interface{}) error
-	PrintCounters()
 }
 
 type Config interface {
 	NewMetrics() error
 }
 
-var M Meter
+var M Metrics
 
 func GetMetricsProvider(name string) metric.MeterProvider {
 	if M == nil {
@@ -26,11 +27,11 @@ func GetMetricsProvider(name string) metric.MeterProvider {
 	return M.GetMetricsProvider()
 }
 
-func RegisterCounter(name string) error {
+func RegisterCounter(name, description string) error {
 	if M == nil {
 		return errors.ThrowPreconditionFailed(nil, "METER-3m9si", "No Meter implemented")
 	}
-	return M.RegisterCounter(name)
+	return M.RegisterCounter(name, description)
 }
 
 func AddCount(ctx context.Context, name string, value int64, labels map[string]interface{}) error {
@@ -38,11 +39,4 @@ func AddCount(ctx context.Context, name string, value int64, labels map[string]i
 		return errors.ThrowPreconditionFailed(nil, "METER-3m9si", "No Meter implemented")
 	}
 	return M.AddCount(ctx, name, value, labels)
-}
-
-func PrintCounters() {
-	if M == nil {
-		return
-	}
-	M.PrintCounters()
 }
