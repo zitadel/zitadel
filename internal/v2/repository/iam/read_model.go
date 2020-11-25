@@ -89,9 +89,7 @@ func (rm *ReadModel) Reduce() (err error) {
 }
 
 func (rm *ReadModel) AppendAndReduce(events ...eventstore.EventReader) error {
-	if err := rm.AppendEvents(events...); err != nil {
-		return err
-	}
+	rm.AppendEvents(events...)
 	return rm.Reduce()
 }
 

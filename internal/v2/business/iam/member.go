@@ -11,7 +11,9 @@ import (
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
-func (r *Repository) AddIAMMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
+func (r *Repository) AddMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
+	//TODO: check if roles valid
+
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-W8m4l", "Errors.IAM.MemberInvalid")
 	}
@@ -40,14 +42,15 @@ func (r *Repository) AddIAMMember(ctx context.Context, member *iam_model.IAMMemb
 
 	_, addedMember := iam.Members.MemberByUserID(member.UserID)
 	if member == nil {
-		return nil, errors.ThrowInternal(nil, "IAM-nuoDN", "member not saved")
+		return nil, errors.ThrowInternal(nil, "IAM-nuoDN", "Errors.Internal")
 	}
 	return readModelToMember(addedMember), nil
 }
 
-//ChangeIAMMember updates an existing member
-//TODO: refactor to ChangeMember
-func (r *Repository) ChangeIAMMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
+//ChangeMember updates an existing member
+func (r *Repository) ChangeMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
+	//TODO: check if roles valid
+
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-LiaZi", "Errors.IAM.MemberInvalid")
 	}
@@ -66,16 +69,14 @@ func (r *Repository) ChangeIAMMember(ctx context.Context, member *iam_model.IAMM
 	}
 
 	existingMember.AppendEvents(events...)
-
-	updatedMember, err := r.MemberByID(ctx, member.AggregateID, member.UserID)
-	if err != nil {
+	if err = existingMember.Reduce(); err != nil {
 		return nil, err
 	}
 
-	return readModelToMember(&updatedMember.ReadModel), nil
+	return writeModelToMember(existingMember), nil
 }
 
-func (r *Repository) RemoveIAMMember(ctx context.Context, member *iam_model.IAMMember) error {
+func (r *Repository) RemoveMember(ctx context.Context, member *iam_model.IAMMember) error {
 	iam, err := r.iamByID(ctx, member.AggregateID)
 	if err != nil {
 		return err
@@ -114,4 +115,21 @@ func (r *Repository) MemberByID(ctx context.Context, iamID, userID string) (memb
 	}
 
 	return member, nil
+}
+
+func (r *Repository) memberWriteModelByID(ctx context.Context, iamID, userID string) (member *iam_repo.MemberWriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	writeModel := iam_repo.NewMemberReadModel(iamID, userID)
+	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
+	if err != nil {
+		return nil, err
+	}
+
+	if writeModel.IsRemoved {
+		return nil, errors.ThrowNotFound(nil, "IAM-D8JxR", "Errors.NotFound")
+	}
+
+	return writeModel, nil
 }

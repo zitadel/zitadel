@@ -5,7 +5,7 @@ import (
 
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+	es_repo "github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
 const (
@@ -40,7 +40,7 @@ func NewAddedEvent(
 	}
 }
 
-func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func AddedEventMapper(event *es_repo.Event) (eventstore.EventReader, error) {
 	e := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

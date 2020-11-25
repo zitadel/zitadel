@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
+	"github.com/caos/zitadel/internal/v2/repository/idp"
 	"github.com/caos/zitadel/internal/v2/repository/member"
 )
 
@@ -131,5 +132,26 @@ func writeModelToMember(writeModel *iam.MemberWriteModel) *model.IAMMember {
 		ObjectRoot: writeModelToObjectRoot(writeModel.WriteModel.WriteModel),
 		Roles:      writeModel.Roles,
 		UserID:     writeModel.UserID,
+	}
+}
+
+func readModelToIDPConfigView(rm *iam.IDPConfigReadModel) *model.IDPConfigView {
+	return &model.IDPConfigView{
+		AggregateID:               rm.AggregateID,
+		ChangeDate:                rm.ChangeDate,
+		CreationDate:              rm.CreationDate,
+		IDPConfigID:               rm.ConfigID,
+		IDPProviderType:           model.IDPProviderType(rm.ProviderType),
+		IsOIDC:                    rm.Type == idp.ConfigTypeOIDC,
+		Name:                      rm.Name,
+		OIDCClientID:              rm.OIDCConfig.ClientID,
+		OIDCClientSecret:          rm.OIDCConfig.ClientSecret,
+		OIDCIDPDisplayNameMapping: model.OIDCMappingField(rm.OIDCConfig.IDPDisplayNameMapping),
+		OIDCIssuer:                rm.OIDCConfig.Issuer,
+		OIDCScopes:                rm.OIDCConfig.Scopes,
+		OIDCUsernameMapping:       model.OIDCMappingField(rm.OIDCConfig.UserNameMapping),
+		Sequence:                  rm.ProcessedSequence,
+		State:                     model.IDPConfigState(rm.State),
+		StylingType:               model.IDPStylingType(rm.StylingType),
 	}
 }

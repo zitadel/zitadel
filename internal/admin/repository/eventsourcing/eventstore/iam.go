@@ -33,8 +33,8 @@ type IAMRepository struct {
 	IAMV2 *iam_business.Repository
 }
 
-func (repo *IAMRepository) IAMMemberByID(ctx context.Context, orgID, userID string) (*iam_model.IAMMemberView, error) {
-	member, err := repo.View.IAMMemberByIDs(orgID, userID)
+func (repo *IAMRepository) IAMMemberByID(ctx context.Context, iamID, userID string) (*iam_model.IAMMemberView, error) {
+	member, err := repo.View.IAMMemberByIDs(iamID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (repo *IAMRepository) IAMMemberByID(ctx context.Context, orgID, userID stri
 func (repo *IAMRepository) AddIAMMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
 	member.AggregateID = repo.SystemDefaults.IamID
 	if repo.IAMV2 != nil {
-		return repo.IAMV2.AddIAMMember(ctx, member)
+		return repo.IAMV2.AddMember(ctx, member)
 	}
 	return repo.IAMEventstore.AddIAMMember(ctx, member)
 }
@@ -52,7 +52,7 @@ func (repo *IAMRepository) AddIAMMember(ctx context.Context, member *iam_model.I
 func (repo *IAMRepository) ChangeIAMMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
 	member.AggregateID = repo.SystemDefaults.IamID
 	if repo.IAMV2 != nil {
-		return repo.IAMV2.ChangeIAMMember(ctx, member)
+		return repo.IAMV2.ChangeMember(ctx, member)
 	}
 	return repo.IAMEventstore.ChangeIAMMember(ctx, member)
 }
@@ -60,7 +60,7 @@ func (repo *IAMRepository) ChangeIAMMember(ctx context.Context, member *iam_mode
 func (repo *IAMRepository) RemoveIAMMember(ctx context.Context, userID string) error {
 	member := iam_model.NewIAMMember(repo.SystemDefaults.IamID, userID)
 	if repo.IAMV2 != nil {
-		return repo.IAMV2.RemoveIAMMember(ctx, member)
+		return repo.IAMV2.RemoveMember(ctx, member)
 	}
 	return repo.IAMEventstore.RemoveIAMMember(ctx, member)
 }
@@ -97,12 +97,17 @@ func (repo *IAMRepository) GetIAMMemberRoles() []string {
 }
 
 func (repo *IAMRepository) IDPConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IDPConfigView, error) {
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.IDPConfigByID(ctx, idpConfigID)
+	}
+
 	idp, err := repo.View.IDPConfigByID(idpConfigID)
 	if err != nil {
 		return nil, err
 	}
 	return iam_es_model.IDPConfigViewToModel(idp), nil
 }
+
 func (repo *IAMRepository) AddOIDCIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
 	idp.AggregateID = repo.SystemDefaults.IamID
 	return repo.IAMEventstore.AddIDPConfig(ctx, idp)

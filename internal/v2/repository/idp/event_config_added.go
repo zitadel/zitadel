@@ -1,17 +1,23 @@
 package idp
 
-import "github.com/caos/zitadel/internal/eventstore/v2"
+import (
+	"encoding/json"
+
+	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+)
 
 type ConfigAddedEvent struct {
-	eventstore.BaseEvent
+	eventstore.BaseEvent `json:"-"`
 
-	ID          string      `json:"idpConfigId"`
+	ConfigID    string      `json:"idpConfigId"`
 	Name        string      `json:"name"`
-	Type        ConfigType  `json:"idpType,omitempty"`
+	Typ         ConfigType  `json:"idpType,omitempty"`
 	StylingType StylingType `json:"stylingType,omitempty"`
 }
 
-func NewAddedEvent(
+func NewConfigAddedEvent(
 	base *eventstore.BaseEvent,
 	configID string,
 	name string,
@@ -21,10 +27,10 @@ func NewAddedEvent(
 
 	return &ConfigAddedEvent{
 		BaseEvent:   *base,
-		ID:          configID,
+		ConfigID:    configID,
 		Name:        name,
 		StylingType: stylingType,
-		Type:        configType,
+		Typ:         configType,
 	}
 }
 
@@ -36,6 +42,15 @@ func (e *ConfigAddedEvent) Data() interface{} {
 	return e
 }
 
-type ConfigType uint32
+func ConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &ConfigAddedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
 
-type StylingType uint32
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
+	}
+
+	return e, nil
+}

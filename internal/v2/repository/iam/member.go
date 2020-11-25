@@ -87,7 +87,7 @@ func MemberChangedEventFromExisting(
 	roles ...string,
 ) (*MemberChangedEvent, error) {
 
-	m, err := member.ChangeEventFromExisting(
+	event, err := member.ChangeEventFromExisting(
 		eventstore.NewBaseEventForPush(
 			ctx,
 			MemberChangedEventType,
@@ -100,7 +100,7 @@ func MemberChangedEventFromExisting(
 	}
 
 	return &MemberChangedEvent{
-		ChangedEvent: *m,
+		ChangedEvent: *event,
 	}, nil
 }
 

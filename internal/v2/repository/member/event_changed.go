@@ -19,8 +19,6 @@ type ChangedEvent struct {
 
 	Roles  []string `json:"roles,omitempty"`
 	UserID string   `json:"userId,omitempty"`
-
-	hasChanged bool
 }
 
 func (e *ChangedEvent) CheckPrevious() bool {
@@ -38,15 +36,16 @@ func ChangeEventFromExisting(
 ) (*ChangedEvent, error) {
 
 	change := NewChangedEvent(base, current.userID)
+	hasChanged := false
 
 	sort.Strings(current.Roles)
 	sort.Strings(roles)
 	if !reflect.DeepEqual(current.Roles, roles) {
 		change.Roles = roles
-		change.hasChanged = true
+		hasChanged = true
 	}
 
-	if !change.hasChanged {
+	if !hasChanged {
 		return nil, errors.ThrowPreconditionFailed(nil, "MEMBE-SeKlD", "Errors.NoChanges")
 	}
 
