@@ -27,7 +27,7 @@ func (rm *ReadModel) MemberByUserID(id string) (idx int, member *member.ReadMode
 	return -1, nil
 }
 
-func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) (err error) {
+func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *member.AddedEvent:
@@ -40,14 +40,13 @@ func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) (err error) 
 		case *member.RemovedEvent:
 			idx, _ := rm.MemberByUserID(e.UserID)
 			if idx < 0 {
-				return nil
+				continue
 			}
 			copy(rm.Members[idx:], rm.Members[idx+1:])
 			rm.Members[len(rm.Members)-1] = nil
 			rm.Members = rm.Members[:len(rm.Members)-1]
 		}
 	}
-	return err
 }
 
 func (rm *ReadModel) Reduce() (err error) {

@@ -37,10 +37,8 @@ func (r *Repository) iamByID(ctx context.Context, id string) (_ *iam_repo.ReadMo
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query := eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, iam_repo.AggregateType).AggregateIDs(id)
-
-	readModel := new(iam_repo.ReadModel)
-	err = r.eventstore.FilterToReducer(ctx, query, readModel)
+	readModel := iam_repo.NewReadModel(id)
+	err = r.eventstore.FilterToQueryReducer(ctx, readModel)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +50,7 @@ func (r *Repository) memberWriteModelByID(ctx context.Context, iamID, userID str
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := iam_repo.PrepareMemberWriteModel(iamID, userID)
+	writeModel := iam_repo.NewMemberReadModel(iamID, userID)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

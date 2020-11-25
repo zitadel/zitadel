@@ -18,8 +18,8 @@ const (
 type Aggregate struct {
 	eventstore.Aggregate
 
-	SetUpStarted Step
-	SetUpDone    Step
+	// SetUpStarted Step
+	// SetUpDone    Step
 }
 
 func NewAggregate(
@@ -47,9 +47,15 @@ func AggregateFromWriteModel(wm *eventstore.WriteModel) *Aggregate {
 
 func AggregateFromReadModel(rm *ReadModel) *Aggregate {
 	return &Aggregate{
-		Aggregate:    *eventstore.NewAggregate(rm.AggregateID, AggregateType, rm.ResourceOwner, AggregateVersion, rm.ProcessedSequence),
-		SetUpDone:    rm.SetUpDone,
-		SetUpStarted: rm.SetUpStarted,
+		Aggregate: *eventstore.NewAggregate(
+			rm.AggregateID,
+			AggregateType,
+			rm.ResourceOwner,
+			AggregateVersion,
+			rm.ProcessedSequence,
+		),
+		// SetUpDone:    rm.SetUpDone,
+		// SetUpStarted: rm.SetUpStarted,
 	}
 }
 

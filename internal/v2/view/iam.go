@@ -17,9 +17,8 @@ type IAM struct {
 	// TODO: how to implement queries?
 }
 
-func (rm *IAM) AppendEvents(events ...eventstore.EventReader) (err error) {
+func (rm *IAM) AppendEvents(events ...eventstore.EventReader) {
 	rm.ReadModel.AppendEvents(events...)
-	return err
 }
 
 //Reduce implements eventstore.ReadModel

@@ -60,10 +60,12 @@ func (r *Repository) ChangeIAMMember(ctx context.Context, member *iam_model.IAMM
 	iam := iam_repo.AggregateFromWriteModel(&existingMember.WriteModel.WriteModel).
 		PushMemberChangedFromExisting(ctx, existingMember, member.Roles...)
 
-	_, err = r.eventstore.PushAggregates(ctx, iam)
+	events, err := r.eventstore.PushAggregates(ctx, iam)
 	if err != nil {
 		return nil, err
 	}
+
+	existingMember.AppendEvents(events...)
 
 	updatedMember, err := r.MemberByID(ctx, member.AggregateID, member.UserID)
 	if err != nil {

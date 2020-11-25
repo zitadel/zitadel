@@ -17,7 +17,7 @@ type MemberReadModel struct {
 	member.ReadModel
 }
 
-func (rm *MemberReadModel) AppendEvents(events ...eventstore.EventReader) (err error) {
+func (rm *MemberReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *MemberAddedEvent:
@@ -28,20 +28,19 @@ func (rm *MemberReadModel) AppendEvents(events ...eventstore.EventReader) (err e
 			rm.ReadModel.AppendEvents(e)
 		}
 	}
-	return nil
 }
 
 type MemberWriteModel struct {
 	member.WriteModel
 }
 
-func PrepareMemberWriteModel(iamID, userID string) *MemberWriteModel {
+func NewMemberReadModel(iamID, userID string) *MemberWriteModel {
 	return &MemberWriteModel{
-		WriteModel: *member.PrepareWriteModel(userID, AggregateType, iamID),
+		WriteModel: *member.NewWriteModel(userID, AggregateType, iamID),
 	}
 }
 
-func (wm *MemberWriteModel) AppendEvents(events ...eventstore.EventReader) (err error) {
+func (wm *MemberWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *MemberAddedEvent:
@@ -54,18 +53,10 @@ func (wm *MemberWriteModel) AppendEvents(events ...eventstore.EventReader) (err 
 			wm.WriteModel.AppendEvents(e)
 		}
 	}
-	return nil
 }
 
 type MemberAddedEvent struct {
 	member.AddedEvent
-}
-
-type MemberChangedEvent struct {
-	member.ChangedEvent
-}
-type MemberRemovedEvent struct {
-	member.RemovedEvent
 }
 
 func NewMemberAddedEvent(
@@ -84,6 +75,10 @@ func NewMemberAddedEvent(
 			roles...,
 		),
 	}
+}
+
+type MemberChangedEvent struct {
+	member.ChangedEvent
 }
 
 func MemberChangedEventFromExisting(
@@ -125,6 +120,10 @@ func NewMemberChangedEvent(
 			roles...,
 		),
 	}
+}
+
+type MemberRemovedEvent struct {
+	member.RemovedEvent
 }
 
 func NewMemberRemovedEvent(

@@ -12,7 +12,7 @@ var (
 
 type LoginPolicyReadModel struct{ policy.LoginPolicyReadModel }
 
-func (rm *LoginPolicyReadModel) AppendEvents(events ...eventstore.EventReader) (err error) {
+func (rm *LoginPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *LoginPolicyAddedEvent:
@@ -23,7 +23,6 @@ func (rm *LoginPolicyReadModel) AppendEvents(events ...eventstore.EventReader) (
 			rm.ReadModel.AppendEvents(e)
 		}
 	}
-	return nil
 }
 
 type LoginPolicyAddedEvent struct {

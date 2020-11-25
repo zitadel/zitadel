@@ -18,8 +18,8 @@ type ConfigReadModel struct {
 	UsernameMapping       MappingField
 }
 
-func (rm *ConfigReadModel) AppendEvents(events ...eventstore.EventReader) error {
-	return nil
+func (rm *ConfigReadModel) AppendEvents(events ...eventstore.EventReader) {
+	rm.ReadModel.AppendEvents(events...)
 }
 
 func (rm *ConfigReadModel) Reduce() error {

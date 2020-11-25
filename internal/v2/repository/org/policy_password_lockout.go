@@ -14,7 +14,7 @@ type PasswordLockoutPolicyReadModel struct {
 	policy.PasswordLockoutPolicyReadModel
 }
 
-func (rm *PasswordLockoutPolicyReadModel) AppendEvents(events ...eventstore.EventReader) (err error) {
+func (rm *PasswordLockoutPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *PasswordLockoutPolicyAddedEvent:
@@ -25,7 +25,6 @@ func (rm *PasswordLockoutPolicyReadModel) AppendEvents(events ...eventstore.Even
 			rm.ReadModel.AppendEvents(e)
 		}
 	}
-	return nil
 }
 
 type PasswordLockoutPolicyAddedEvent struct {

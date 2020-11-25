@@ -11,7 +11,7 @@ var (
 
 type OrgIAMPolicyReadModel struct{ policy.OrgIAMPolicyReadModel }
 
-func (rm *OrgIAMPolicyReadModel) AppendEvents(events ...eventstore.EventReader) (err error) {
+func (rm *OrgIAMPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *OrgIAMPolicyAddedEvent:
@@ -20,7 +20,6 @@ func (rm *OrgIAMPolicyReadModel) AppendEvents(events ...eventstore.EventReader) 
 			rm.ReadModel.AppendEvents(e)
 		}
 	}
-	return nil
 }
 
 type OrgIAMPolicyAddedEvent struct {

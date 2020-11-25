@@ -25,7 +25,15 @@ type ReadModel struct {
 	DefaultPasswordLockoutPolicy    PasswordLockoutPolicyReadModel
 }
 
-func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) (err error) {
+func NewReadModel(id string) *ReadModel {
+	return &ReadModel{
+		ReadModel: eventstore.ReadModel{
+			AggregateID: id,
+		},
+	}
+}
+
+func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 	rm.ReadModel.AppendEvents(events...)
 	for _, event := range events {
 		switch event.(type) {
@@ -45,7 +53,6 @@ func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) (err error) 
 			rm.DefaultPasswordLockoutPolicy.AppendEvents(event)
 		}
 	}
-	return err
 }
 
 func (rm *ReadModel) Reduce() (err error) {
@@ -86,4 +93,8 @@ func (rm *ReadModel) AppendAndReduce(events ...eventstore.EventReader) error {
 		return err
 	}
 	return rm.Reduce()
+}
+
+func (rm *ReadModel) Query() *eventstore.SearchQueryFactory {
+	return eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, AggregateType).AggregateIDs(rm.AggregateID)
 }

@@ -27,10 +27,8 @@ type ConfigReadModel struct {
 	OIDCConfig  *oidc.ConfigReadModel
 }
 
-func (rm *ConfigReadModel) AppendEvents(events ...eventstore.EventReader) error {
+func (rm *ConfigReadModel) AppendEvents(events ...eventstore.EventReader) {
 	rm.ReadModel.AppendEvents(events...)
-
-	return nil
 }
 
 func (rm *ConfigReadModel) Reduce() error {

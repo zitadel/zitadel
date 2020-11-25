@@ -17,7 +17,7 @@ type WriteModel struct {
 	aggregateID   string
 }
 
-func PrepareWriteModel(
+func NewWriteModel(
 	userID string,
 	aggregateType eventstore.AggregateType,
 	aggregateID string,

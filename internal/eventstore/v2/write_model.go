@@ -1,5 +1,7 @@
 package eventstore
 
+import "time"
+
 func NewWriteModel() *WriteModel {
 	return &WriteModel{
 		Events: []EventReader{},
@@ -14,6 +16,7 @@ type WriteModel struct {
 	ProcessedSequence uint64        `json:"-"`
 	Events            []EventReader `json:"-"`
 	ResourceOwner     string        `json:"-"`
+	ChangeDate        time.Time     `json:"-"`
 }
 
 //AppendEvents adds all the events to the read model.
@@ -38,6 +41,7 @@ func (wm *WriteModel) Reduce() error {
 	}
 
 	wm.ProcessedSequence = wm.Events[len(wm.Events)-1].Sequence()
+	wm.ChangeDate = wm.Events[len(wm.Events)-1].CreationDate()
 
 	// all events processed and not needed anymore
 	wm.Events = nil

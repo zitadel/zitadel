@@ -142,7 +142,7 @@ type reducer interface {
 	// it only appends the newly added events
 	Reduce() error
 	//AppendEvents appends the passed events to an internal list of events
-	AppendEvents(...EventReader) error
+	AppendEvents(...EventReader)
 }
 
 //FilterToReducer filters the events based on the search query, appends all events to the reducer and calls it's reduce function
@@ -151,9 +151,8 @@ func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQu
 	if err != nil {
 		return err
 	}
-	if err = r.AppendEvents(events...); err != nil {
-		return err
-	}
+
+	r.AppendEvents(events...)
 
 	return r.Reduce()
 }
@@ -180,9 +179,7 @@ func (es *Eventstore) FilterToQueryReducer(ctx context.Context, r queryReducer) 
 	if err != nil {
 		return err
 	}
-	if err = r.AppendEvents(events...); err != nil {
-		return err
-	}
+	r.AppendEvents(events...)
 
 	return r.Reduce()
 }

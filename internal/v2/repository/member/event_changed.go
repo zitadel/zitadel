@@ -37,10 +37,7 @@ func ChangeEventFromExisting(
 	roles ...string,
 ) (*ChangedEvent, error) {
 
-	change := &ChangedEvent{
-		BaseEvent: *base,
-		UserID:    current.UserID,
-	}
+	change := NewChangedEvent(base, current.userID)
 
 	sort.Strings(current.Roles)
 	sort.Strings(roles)

@@ -35,7 +35,7 @@ type MembersReadModel struct {
 	members.ReadModel
 }
 
-func (rm *MembersReadModel) AppendEvents(events ...eventstore.EventReader) (err error) {
+func (rm *MembersReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *MemberAddedEvent:
@@ -46,12 +46,11 @@ func (rm *MembersReadModel) AppendEvents(events ...eventstore.EventReader) (err 
 			rm.ReadModel.AppendEvents(&e.RemovedEvent)
 		}
 	}
-	return nil
 }
 
 type MemberReadModel member.ReadModel
 
-func (rm *MemberReadModel) AppendEvents(events ...eventstore.EventReader) (err error) {
+func (rm *MemberReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *MemberAddedEvent:
@@ -60,7 +59,6 @@ func (rm *MemberReadModel) AppendEvents(events ...eventstore.EventReader) (err e
 			rm.ReadModel.AppendEvents(&e.ChangedEvent)
 		}
 	}
-	return nil
 }
 
 type MemberAddedEvent struct {

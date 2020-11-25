@@ -12,7 +12,7 @@ var (
 
 type LabelPolicyReadModel struct{ policy.LabelPolicyReadModel }
 
-func (rm *LabelPolicyReadModel) AppendEvents(events ...eventstore.EventReader) (err error) {
+func (rm *LabelPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *LabelPolicyAddedEvent:
@@ -23,7 +23,6 @@ func (rm *LabelPolicyReadModel) AppendEvents(events ...eventstore.EventReader) (
 			rm.ReadModel.AppendEvents(e)
 		}
 	}
-	return nil
 }
 
 type LabelPolicyAddedEvent struct {
