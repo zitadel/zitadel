@@ -8,7 +8,7 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 )
 
-func TestAppendMfaU2FAddedEvent(t *testing.T) {
+func TestAppendMFAU2FAddedEvent(t *testing.T) {
 	type args struct {
 		user  *Human
 		u2f   *WebAuthNToken
@@ -47,7 +47,7 @@ func TestAppendMfaU2FAddedEvent(t *testing.T) {
 	}
 }
 
-func TestAppendMfaU2FVerifyEvent(t *testing.T) {
+func TestAppendMFAU2FVerifyEvent(t *testing.T) {
 	type args struct {
 		user  *Human
 		u2f   *WebAuthNVerify
@@ -102,7 +102,7 @@ func TestAppendMfaU2FVerifyEvent(t *testing.T) {
 	}
 }
 
-func TestAppendMfaU2FRemoveEvent(t *testing.T) {
+func TestAppendMFAU2FRemoveEvent(t *testing.T) {
 	type args struct {
 		user  *Human
 		u2f   *WebAuthNTokenID

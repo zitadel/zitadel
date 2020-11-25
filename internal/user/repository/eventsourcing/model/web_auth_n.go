@@ -95,7 +95,7 @@ func WebAuthNToModel(webAuthN *WebAuthNToken) *model.WebAuthNToken {
 		ObjectRoot:      webAuthN.ObjectRoot,
 		WebAuthNTokenID: webAuthN.WebauthNTokenID,
 		Challenge:       webAuthN.Challenge,
-		State:           model.MfaState(webAuthN.State),
+		State:           model.MFAState(webAuthN.State),
 		KeyID:           webAuthN.KeyID,
 		PublicKey:       webAuthN.PublicKey,
 		AAGUID:          webAuthN.AAGUID,
@@ -155,9 +155,9 @@ func (u *Human) appendU2FAddedEvent(event *es_models.Event) error {
 		return err
 	}
 	webauthn.ObjectRoot.CreationDate = event.CreationDate
-	webauthn.State = int32(model.MfaStateNotReady)
+	webauthn.State = int32(model.MFAStateNotReady)
 	for i, token := range u.U2FTokens {
-		if token.State == int32(model.MfaStateNotReady) {
+		if token.State == int32(model.MFAStateNotReady) {
 			u.U2FTokens[i] = webauthn
 			return nil
 		}
@@ -177,10 +177,10 @@ func (u *Human) appendU2FVerifiedEvent(event *es_models.Event) error {
 		if err != nil {
 			return err
 		}
-		token.State = int32(model.MfaStateReady)
+		token.State = int32(model.MFAStateReady)
 		return nil
 	}
-	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-4hu9s", "Errors.Users.Mfa.U2F.NotExisting")
+	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-4hu9s", "Errors.Users.MFA.U2F.NotExisting")
 }
 
 func (u *Human) appendU2FChangeSignCountEvent(event *es_models.Event) error {
@@ -193,7 +193,7 @@ func (u *Human) appendU2FChangeSignCountEvent(event *es_models.Event) error {
 		token.setData(event)
 		return nil
 	}
-	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-5Ms8h", "Errors.Users.Mfa.U2F.NotExisting")
+	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-5Ms8h", "Errors.Users.MFA.U2F.NotExisting")
 }
 
 func (u *Human) appendU2FRemovedEvent(event *es_models.Event) error {
@@ -220,9 +220,9 @@ func (u *Human) appendPasswordlessAddedEvent(event *es_models.Event) error {
 		return err
 	}
 	webauthn.ObjectRoot.CreationDate = event.CreationDate
-	webauthn.State = int32(model.MfaStateNotReady)
+	webauthn.State = int32(model.MFAStateNotReady)
 	for i, token := range u.PasswordlessTokens {
-		if token.State == int32(model.MfaStateNotReady) {
+		if token.State == int32(model.MFAStateNotReady) {
 			u.PasswordlessTokens[i] = webauthn
 			return nil
 		}
@@ -242,10 +242,10 @@ func (u *Human) appendPasswordlessVerifiedEvent(event *es_models.Event) error {
 		if err != nil {
 			return err
 		}
-		token.State = int32(model.MfaStateReady)
+		token.State = int32(model.MFAStateReady)
 		return nil
 	}
-	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-mKns8", "Errors.Users.Mfa.Passwordless.NotExisting")
+	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-mKns8", "Errors.Users.MFA.Passwordless.NotExisting")
 }
 
 func (u *Human) appendPasswordlessChangeSignCountEvent(event *es_models.Event) error {
@@ -261,7 +261,7 @@ func (u *Human) appendPasswordlessChangeSignCountEvent(event *es_models.Event) e
 		}
 		return nil
 	}
-	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-2Mv9s", "Errors.Users.Mfa.Passwordless.NotExisting")
+	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-2Mv9s", "Errors.Users.MFA.Passwordless.NotExisting")
 }
 
 func (u *Human) appendPasswordlessRemovedEvent(event *es_models.Event) error {

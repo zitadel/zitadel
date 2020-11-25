@@ -9,7 +9,7 @@ import (
 func WebAuthNsToCredentials(webAuthNs []*model.WebAuthNToken) []webauthn.Credential {
 	creds := make([]webauthn.Credential, 0)
 	for _, webAuthN := range webAuthNs {
-		if webAuthN.State == model.MfaStateReady {
+		if webAuthN.State == model.MFAStateReady {
 			creds = append(creds, webauthn.Credential{
 				ID:              webAuthN.KeyID,
 				PublicKey:       webAuthN.PublicKey,

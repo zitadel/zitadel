@@ -34,7 +34,7 @@ type AuthRequest struct {
 	LinkingUsers        []*ExternalUser
 	PossibleSteps       []NextStep
 	PasswordVerified    bool
-	MfasVerified        []MFAType
+	MFAsVerified        []MFAType
 	Audience            []string
 	AuthTime            time.Time
 	Code                string
@@ -109,7 +109,7 @@ func (a *AuthRequest) IsValid() bool {
 		a.Request != nil && a.Request.IsValid()
 }
 
-func (a *AuthRequest) MfaLevel() MFALevel {
+func (a *AuthRequest) MFALevel() MFALevel {
 	return -1
 	//PLANNED: check a.PossibleLOAs (and Prompt Login?)
 }

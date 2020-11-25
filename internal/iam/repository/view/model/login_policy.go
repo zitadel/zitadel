@@ -118,7 +118,7 @@ func (p *LoginPolicyView) AppendEvent(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		p.SecondFactors = append(p.SecondFactors, int64(mfa.MfaType))
+		p.SecondFactors = append(p.SecondFactors, int64(mfa.MFAType))
 	case es_model.LoginPolicySecondFactorRemoved, org_es_model.LoginPolicySecondFactorRemoved:
 		err = p.removeSecondFactor(event)
 	case es_model.LoginPolicyMultiFactorAdded, org_es_model.LoginPolicyMultiFactorAdded:
@@ -127,7 +127,7 @@ func (p *LoginPolicyView) AppendEvent(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		p.MultiFactors = append(p.MultiFactors, int64(mfa.MfaType))
+		p.MultiFactors = append(p.MultiFactors, int64(mfa.MFAType))
 	case es_model.LoginPolicyMultiFactorRemoved, org_es_model.LoginPolicyMultiFactorRemoved:
 		err = p.removeMultiFactor(event)
 	}
@@ -153,7 +153,7 @@ func (p *LoginPolicyView) removeSecondFactor(event *models.Event) error {
 		return err
 	}
 	for i := len(p.SecondFactors) - 1; i >= 0; i-- {
-		if p.SecondFactors[i] == int64(mfa.MfaType) {
+		if p.SecondFactors[i] == int64(mfa.MFAType) {
 			copy(p.SecondFactors[i:], p.SecondFactors[i+1:])
 			p.SecondFactors[len(p.SecondFactors)-1] = 0
 			p.SecondFactors = p.SecondFactors[:len(p.SecondFactors)-1]
@@ -170,7 +170,7 @@ func (p *LoginPolicyView) removeMultiFactor(event *models.Event) error {
 		return err
 	}
 	for i := len(p.MultiFactors) - 1; i >= 0; i-- {
-		if p.MultiFactors[i] == int64(mfa.MfaType) {
+		if p.MultiFactors[i] == int64(mfa.MFAType) {
 			copy(p.MultiFactors[i:], p.MultiFactors[i+1:])
 			p.MultiFactors[len(p.MultiFactors)-1] = 0
 			p.MultiFactors = p.MultiFactors[:len(p.MultiFactors)-1]

@@ -28,19 +28,19 @@ func OTPToModel(otp *OTP) *model.OTP {
 	return &model.OTP{
 		ObjectRoot: otp.ObjectRoot,
 		Secret:     otp.Secret,
-		State:      model.MfaState(otp.State),
+		State:      model.MFAState(otp.State),
 	}
 }
 
 func (u *Human) appendOTPAddedEvent(event *es_models.Event) error {
 	u.OTP = &OTP{
-		State: int32(model.MfaStateNotReady),
+		State: int32(model.MFAStateNotReady),
 	}
 	return u.OTP.setData(event)
 }
 
 func (u *Human) appendOTPVerifiedEvent() {
-	u.OTP.State = int32(model.MfaStateReady)
+	u.OTP.State = int32(model.MFAStateReady)
 }
 
 func (u *Human) appendOTPRemovedEvent() {

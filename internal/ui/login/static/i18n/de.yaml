@@ -35,7 +35,7 @@ UsernameChangeDone:
   Title: Username geändert
   Description: Der Username wurde erfolgreich geändert.
 
-MfaVerify:
+MFAVerify:
   Title: Multifaktor verifizieren
   Description: Verifiziere deinen Multifaktor
   OTP: OTP
@@ -63,28 +63,28 @@ InitUserDone:
   Title: User aktiviert
   Description: EMail verifiziert und Passwort erfolgreich gesetzt
 
-MfaPrompt:
+MFAPrompt:
   Title: Multifaktor hinzufügen
   Description: Möchtest du einen Mulitfaktor hinzufügen?
   Provider0: OTP (One Time Password)
   Provider1: U2F (Universal 2nd Factor)
 
-MfaInitVerify:
+MFAInitVerify:
   Title: Multifaktor Verifizierung
   Description: Verifiziere deinen Multifaktor
-  OtpDescription: Scanne den Code mit einem Authentifizierungs-App (z.B Google Authentificator) oder kopiere das Secret und gib anschliessend den Code ein.
+  OTPDescription: Scanne den Code mit einem Authentifizierungs-App (z.B Google Authentificator) oder kopiere das Secret und gib anschliessend den Code ein.
   Secret: Secret
   Code: Code
 
-MfaInitDone:
+MFAInitDone:
   Title: Multifaktor Verifizierung erstellt
   Description: Multifikator Verifizierung erfolgreich abgeschlossen. Der Multifaktor muss bei jeder Anmeldung eingegeben werden, dies beinhaltet auch den aktuellen Authentifizierungs Prozess.
 
-MfaInitU2F:
+MFAInitU2F:
   Title: Multifaktor U2F / WebAuthN hinzufügen
   Description: Füge dein Token hinzu, indem du einen Namen eingibst und den 'Token registrieren' Button drückst.
 
-MfaVerifyU2F:
+MFAVerifyU2F:
   Title: Multifaktor Verifizierung
   Description: Verifiziere deinen Multifaktor U2F / WebAuthN Token
 
@@ -236,9 +236,9 @@ Errors:
       GeneratorAlgNotSupported: Generator Algorithums wird nicht unterstützt
     EmailVerify:
       UserIDEmpty: UserID ist leer
-    Mfa:
+    MFA:
       NoProviders: Es stehen keine Multifaktorprovider zur Verfügung
-      Otp:
+      OTP:
         AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet
         NotExisting: Multifaktor OTP (OneTimePassword) existiert nicht
         InvalidCode: Code ist ungültig

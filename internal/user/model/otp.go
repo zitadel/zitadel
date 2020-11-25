@@ -11,27 +11,27 @@ type OTP struct {
 	Secret       *crypto.CryptoValue
 	SecretString string
 	Url          string
-	State        MfaState
+	State        MFAState
 }
 
-type MfaState int32
+type MFAState int32
 
 const (
-	MfaStateUnspecified MfaState = iota
-	MfaStateNotReady
-	MfaStateReady
+	MFAStateUnspecified MFAState = iota
+	MFAStateNotReady
+	MFAStateReady
 )
 
 type MultiFactor struct {
-	Type      MfaType
-	State     MfaState
+	Type      MFAType
+	State     MFAState
 	Attribute string
 }
 
-type MfaType int32
+type MFAType int32
 
 const (
-	MfaTypeUnspecified MfaType = iota
-	MfaTypeOTP
-	MfaTypeU2F
+	MFATypeUnspecified MFAType = iota
+	MFATypeOTP
+	MFATypeU2F
 )

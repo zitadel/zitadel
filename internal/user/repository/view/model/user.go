@@ -87,8 +87,8 @@ type HumanView struct {
 	StreetAddress     string         `json:"streetAddress" gorm:"column:street_address"`
 	OTPState          int32          `json:"-" gorm:"column:otp_state"`
 	U2FTokens         WebAuthNTokens `json:"-" gorm:"column:u2f_tokens"`
-	MfaMaxSetUp       int32          `json:"-" gorm:"column:mfa_max_set_up"`
-	MfaInitSkipped    time.Time      `json:"-" gorm:"column:mfa_init_skipped"`
+	MFAMaxSetUp       int32          `json:"-" gorm:"column:mfa_max_set_up"`
+	MFAInitSkipped    time.Time      `json:"-" gorm:"column:mfa_init_skipped"`
 	InitRequired      bool           `json:"-" gorm:"column:init_required"`
 
 	PasswordSet            bool           `json:"-" gorm:"column:password_set"`
@@ -171,9 +171,9 @@ func UserToModel(user *UserView) *model.UserView {
 			PostalCode:             user.PostalCode,
 			Region:                 user.Region,
 			StreetAddress:          user.StreetAddress,
-			OTPState:               model.MfaState(user.OTPState),
-			MfaMaxSetUp:            req_model.MFALevel(user.MfaMaxSetUp),
-			MfaInitSkipped:         user.MfaInitSkipped,
+			OTPState:               model.MFAState(user.OTPState),
+			MFAMaxSetUp:            req_model.MFALevel(user.MFAMaxSetUp),
+			MFAInitSkipped:         user.MFAInitSkipped,
 			InitRequired:           user.InitRequired,
 		}
 	}
@@ -210,7 +210,7 @@ func WebauthnTokenToModel(token *WebAuthNView) *model.WebAuthNView {
 	return &model.WebAuthNView{
 		TokenID: token.ID,
 		Name:    token.Name,
-		State:   model.MfaState(token.State),
+		State:   model.MFAState(token.State),
 	}
 }
 
@@ -308,14 +308,14 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		u.State = int32(model.UserStateLocked)
 	case es_model.MFAOTPAdded,
 		es_model.HumanMFAOTPAdded:
-		u.OTPState = int32(model.MfaStateNotReady)
+		u.OTPState = int32(model.MFAStateNotReady)
 	case es_model.MFAOTPVerified,
 		es_model.HumanMFAOTPVerified:
-		u.OTPState = int32(model.MfaStateReady)
-		u.MfaInitSkipped = time.Time{}
+		u.OTPState = int32(model.MFAStateReady)
+		u.MFAInitSkipped = time.Time{}
 	case es_model.MFAOTPRemoved,
 		es_model.HumanMFAOTPRemoved:
-		u.OTPState = int32(model.MfaStateUnspecified)
+		u.OTPState = int32(model.MFAStateUnspecified)
 	case es_model.HumanMFAU2FTokenAdded:
 		err = u.addU2FToken(event)
 	case es_model.HumanMFAU2FTokenVerified:
@@ -323,12 +323,12 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		u.MfaInitSkipped = time.Time{}
+		u.MFAInitSkipped = time.Time{}
 	case es_model.HumanMFAU2FTokenRemoved:
 		err = u.removeU2FToken(event)
 	case es_model.MFAInitSkipped,
 		es_model.HumanMFAInitSkipped:
-		u.MfaInitSkipped = event.CreationDate
+		u.MFAInitSkipped = event.CreationDate
 	case es_model.InitializedUserCodeAdded,
 		es_model.InitializedHumanCodeAdded:
 		u.InitRequired = true
@@ -371,7 +371,7 @@ func (u *UserView) addPasswordlessToken(event *models.Event) error {
 		return err
 	}
 	for _, t := range u.PasswordlessTokens {
-		if t.State == int32(model.MfaStateNotReady) {
+		if t.State == int32(model.MFAStateNotReady) {
 			t = token
 			return nil
 		}
@@ -388,7 +388,7 @@ func (u *UserView) updatePasswordlessToken(event *models.Event) error {
 	for i, t := range u.PasswordlessTokens {
 		if t.ID == token.ID {
 			u.PasswordlessTokens[i].Name = token.Name
-			u.PasswordlessTokens[i].State = int32(model.MfaStateReady)
+			u.PasswordlessTokens[i].State = int32(model.MFAStateReady)
 			return nil
 		}
 	}
@@ -417,7 +417,7 @@ func (u *UserView) addU2FToken(event *models.Event) error {
 		return err
 	}
 	for _, t := range u.U2FTokens {
-		if t.State == int32(model.MfaStateNotReady) {
+		if t.State == int32(model.MFAStateNotReady) {
 			t = token
 			return nil
 		}
@@ -434,7 +434,7 @@ func (u *UserView) updateU2FToken(event *models.Event) error {
 	for i, t := range u.U2FTokens {
 		if t.ID == token.ID {
 			u.U2FTokens[i].Name = token.Name
-			u.U2FTokens[i].State = int32(model.MfaStateReady)
+			u.U2FTokens[i].State = int32(model.MFAStateReady)
 			return nil
 		}
 	}
@@ -484,20 +484,20 @@ func (u *UserView) ComputeObject() {
 
 func (u *UserView) ComputeMFAMaxSetUp() {
 	for _, token := range u.PasswordlessTokens {
-		if token.State == int32(model.MfaStateReady) {
-			u.MfaMaxSetUp = int32(req_model.MFALevelMultiFactor)
+		if token.State == int32(model.MFAStateReady) {
+			u.MFAMaxSetUp = int32(req_model.MFALevelMultiFactor)
 			return
 		}
 	}
 	for _, token := range u.U2FTokens {
-		if token.State == int32(model.MfaStateReady) {
-			u.MfaMaxSetUp = int32(req_model.MFALevelSecondFactor)
+		if token.State == int32(model.MFAStateReady) {
+			u.MFAMaxSetUp = int32(req_model.MFALevelSecondFactor)
 			return
 		}
 	}
-	if u.OTPState == int32(model.MfaStateReady) {
-		u.MfaMaxSetUp = int32(req_model.MFALevelSecondFactor)
+	if u.OTPState == int32(model.MFAStateReady) {
+		u.MFAMaxSetUp = int32(req_model.MFALevelSecondFactor)
 		return
 	}
-	u.MfaMaxSetUp = int32(req_model.MFALevelNotSetUp)
+	u.MFAMaxSetUp = int32(req_model.MFALevelNotSetUp)
 }

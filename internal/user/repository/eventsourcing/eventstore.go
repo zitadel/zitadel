@@ -69,7 +69,7 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 	emailVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.EmailVerificationCode, aesCrypto)
 	phoneVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.PhoneVerificationCode, aesCrypto)
 	passwordVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.PasswordVerificationCode, aesCrypto)
-	aesOtpCrypto, err := crypto.NewAESCrypto(systemDefaults.Multifactors.OTP.VerificationKey)
+	aesOTPCrypto, err := crypto.NewAESCrypto(systemDefaults.Multifactors.OTP.VerificationKey)
 	passwordAlg := crypto.NewBCrypt(systemDefaults.SecretGenerators.PasswordSaltCost)
 	web, err := webauthn_helper.StartServer("zitadel", "localhost", "http://localhost:50003")
 	if err != nil {
@@ -86,7 +86,7 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 		PasswordVerificationCode: passwordVerificationCode,
 		Multifactors: global_model.Multifactors{
 			OTP: global_model.OTP{
-				CryptoMFA: aesOtpCrypto,
+				CryptoMFA: aesOTPCrypto,
 				Issuer:    systemDefaults.Multifactors.OTP.Issuer,
 			},
 		},
@@ -510,14 +510,14 @@ func (es *UserEventstore) VerifyInitCode(ctx context.Context, policy *iam_model.
 	return nil
 }
 
-func (es *UserEventstore) SkipMfaInit(ctx context.Context, userID string) error {
+func (es *UserEventstore) SkipMFAInit(ctx context.Context, userID string) error {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
 	}
 
 	repoUser := model.UserFromModel(user)
-	agg := SkipMfaAggregate(es.AggregateCreator(), repoUser)
+	agg := SkipMFAAggregate(es.AggregateCreator(), repoUser)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
 	if err != nil {
 		return err
@@ -1186,7 +1186,7 @@ func (es *UserEventstore) AddOTP(ctx context.Context, userID, accountName string
 		return nil, err
 	}
 	if user.IsOTPReady() {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-do9se", "Errors.User.Mfa.Otp.AlreadyReady")
+		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-do9se", "Errors.User.MFA.OTP.AlreadyReady")
 	}
 	if accountName == "" {
 		accountName = user.UserName
@@ -1223,7 +1223,7 @@ func (es *UserEventstore) RemoveOTP(ctx context.Context, userID string) error {
 		return err
 	}
 	if user.OTP == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp0de", "Errors.User.Mfa.Otp.NotExisting")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp0de", "Errors.User.MFA.OTP.NotExisting")
 	}
 	repoUser := model.UserFromModel(user)
 	updateAggregate := MFAOTPRemoveAggregate(es.AggregateCreator(), repoUser)
@@ -1236,18 +1236,18 @@ func (es *UserEventstore) RemoveOTP(ctx context.Context, userID string) error {
 	return nil
 }
 
-func (es *UserEventstore) CheckMfaOTPSetup(ctx context.Context, userID, code string) error {
+func (es *UserEventstore) CheckMFAOTPSetup(ctx context.Context, userID, code string) error {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
 	}
 	if user.OTP == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-yERHV", "Errors.Users.Mfa.Otp.NotExisting")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-yERHV", "Errors.Users.MFA.OTP.NotExisting")
 	}
 	if user.IsOTPReady() {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-qx4ls", "Errors.Users.Mfa.Otp.AlreadyReady")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-qx4ls", "Errors.Users.MFA.OTP.AlreadyReady")
 	}
-	if err := es.verifyMfaOTP(user.OTP, code); err != nil {
+	if err := es.verifyMFAOTP(user.OTP, code); err != nil {
 		return err
 	}
 	repoUser := model.UserFromModel(user)
@@ -1260,20 +1260,20 @@ func (es *UserEventstore) CheckMfaOTPSetup(ctx context.Context, userID, code str
 	return nil
 }
 
-func (es *UserEventstore) CheckMfaOTP(ctx context.Context, userID, code string, authRequest *req_model.AuthRequest) error {
+func (es *UserEventstore) CheckMFAOTP(ctx context.Context, userID, code string, authRequest *req_model.AuthRequest) error {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
 	}
 	if !user.IsOTPReady() {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sd5NJ", "Errors.User.Mfa.Otp.NotReady")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sd5NJ", "Errors.User.MFA.OTP.NotReady")
 	}
 
 	repoUser := model.UserFromModel(user)
 	repoAuthReq := model.AuthRequestFromModel(authRequest)
 	var aggregate func(*es_models.AggregateCreator, *model.User, *model.AuthRequest) es_sdk.AggregateFunc
 	var checkErr error
-	if checkErr = es.verifyMfaOTP(user.OTP, code); checkErr != nil {
+	if checkErr = es.verifyMFAOTP(user.OTP, code); checkErr != nil {
 		aggregate = MFAOTPCheckFailedAggregate
 	} else {
 		aggregate = MFAOTPCheckSucceededAggregate
@@ -1290,7 +1290,7 @@ func (es *UserEventstore) CheckMfaOTP(ctx context.Context, userID, code string, 
 	return nil
 }
 
-func (es *UserEventstore) verifyMfaOTP(otp *usr_model.OTP, code string) error {
+func (es *UserEventstore) verifyMFAOTP(otp *usr_model.OTP, code string) error {
 	decrypt, err := crypto.DecryptString(otp.Secret, es.Multifactors.OTP.CryptoMFA)
 	if err != nil {
 		return err
@@ -1298,7 +1298,7 @@ func (es *UserEventstore) verifyMfaOTP(otp *usr_model.OTP, code string) error {
 
 	valid := es.validateTOTP(code, decrypt)
 	if !valid {
-		return caos_errs.ThrowInvalidArgument(nil, "EVENT-8isk2", "Errors.User.Mfa.Otp.InvalidCode")
+		return caos_errs.ThrowInvalidArgument(nil, "EVENT-8isk2", "Errors.User.MFA.OTP.InvalidCode")
 	}
 	return nil
 }
@@ -1370,7 +1370,7 @@ func (es *UserEventstore) BeginU2FLogin(ctx context.Context, userID string, auth
 		return nil, err
 	}
 	if user.U2FTokens == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5Mk8s", "Errors.User.Mfa.U2F.NotExisting")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5Mk8s", "Errors.User.MFA.U2F.NotExisting")
 	}
 
 	webAuthNLogin, err := es.webauthn.BeginLogin(user, usr_model.UserVerificationRequirementDiscouraged, user.U2FTokens...)
@@ -1387,7 +1387,7 @@ func (es *UserEventstore) BeginU2FLogin(ctx context.Context, userID string, auth
 	return webAuthNLogin, nil
 }
 
-func (es *UserEventstore) VerifyMfaU2F(ctx context.Context, userID string, credentialData []byte, authRequest *req_model.AuthRequest) error {
+func (es *UserEventstore) VerifyMFAU2F(ctx context.Context, userID string, credentialData []byte, authRequest *req_model.AuthRequest) error {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
@@ -1476,7 +1476,7 @@ func (es *UserEventstore) BeginPasswordlessLogin(ctx context.Context, userID str
 		return nil, err
 	}
 	if user.PasswordlessTokens == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5M9sd", "Errors.User.Mfa.Passwordless.NotExisting")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5M9sd", "Errors.User.MFA.Passwordless.NotExisting")
 	}
 	webAuthNLogin, err := es.webauthn.BeginLogin(user, usr_model.UserVerificationRequirementRequired, user.PasswordlessTokens...)
 	if err != nil {

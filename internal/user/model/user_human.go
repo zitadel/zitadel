@@ -59,7 +59,7 @@ func (u *Human) IsInitialState() bool {
 }
 
 func (u *Human) IsOTPReady() bool {
-	return u.OTP != nil && u.OTP.State == MfaStateReady
+	return u.OTP != nil && u.OTP.State == MFAStateReady
 }
 
 func (u *Human) HashPasswordIfExisting(policy *iam_model.PasswordComplexityPolicyView, passwordAlg crypto.HashAlgorithm, onetime bool) error {
@@ -132,7 +132,7 @@ func (u *Human) GetU2FByKeyID(keyID []byte) (int, *WebAuthNToken) {
 
 func (u *Human) GetU2FToVerify() (int, *WebAuthNToken) {
 	for i, u2f := range u.U2FTokens {
-		if u2f.State == MfaStateNotReady {
+		if u2f.State == MFAStateNotReady {
 			return i, u2f
 		}
 	}
@@ -159,7 +159,7 @@ func (u *Human) GetPasswordlessByKeyID(keyID []byte) (int, *WebAuthNToken) {
 
 func (u *Human) GetPasswordlessToVerify() (int, *WebAuthNToken) {
 	for i, u2f := range u.PasswordlessTokens {
-		if u2f.State == MfaStateNotReady {
+		if u2f.State == MFAStateNotReady {
 			return i, u2f
 		}
 	}

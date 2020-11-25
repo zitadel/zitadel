@@ -209,7 +209,7 @@ func (repo *UserRepo) IsUserUnique(ctx context.Context, userName, email string) 
 	return repo.View.IsUserUnique(userName, email)
 }
 
-func (repo *UserRepo) UserMfas(ctx context.Context, userID string) ([]*usr_model.MultiFactor, error) {
+func (repo *UserRepo) UserMFAs(ctx context.Context, userID string) ([]*usr_model.MultiFactor, error) {
 	user, err := repo.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -217,10 +217,10 @@ func (repo *UserRepo) UserMfas(ctx context.Context, userID string) ([]*usr_model
 	if user.HumanView == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-xx0hV", "Errors.User.NotHuman")
 	}
-	if user.OTPState == usr_model.MfaStateUnspecified {
+	if user.OTPState == usr_model.MFAStateUnspecified {
 		return []*usr_model.MultiFactor{}, nil
 	}
-	return []*usr_model.MultiFactor{{Type: usr_model.MfaTypeOTP, State: user.OTPState}}, nil
+	return []*usr_model.MultiFactor{{Type: usr_model.MFATypeOTP, State: user.OTPState}}, nil
 }
 
 func (repo *UserRepo) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {

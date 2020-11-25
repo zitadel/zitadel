@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	tmplMfaU2FInit = "mfainitu2f"
+	tmplMFAU2FInit = "mfainitu2f"
 )
 
 func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
@@ -26,7 +26,7 @@ func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authRe
 		CredentialCreationData: base64.RawURLEncoding.EncodeToString(u2f.CredentialCreationData),
 		SessionID:              u2f.WebAuthNTokenID,
 	}
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMfaU2FInit], data, nil)
+	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMFAU2FInit], data, nil)
 }
 
 func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +51,7 @@ func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	done := &mfaDoneData{
-		MfaType: model.MFATypeU2F,
+		MFAType: model.MFATypeU2F,
 	}
-	l.renderMfaInitDone(w, r, authReq, done)
+	l.renderMFAInitDone(w, r, authReq, done)
 }

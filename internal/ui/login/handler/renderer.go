@@ -39,12 +39,12 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		tmplUserSelection:            "select_user.html",
 		tmplPassword:                 "password.html",
 		tmplPasswordlessVerification: "passwordless.html",
-		tmplMfaVerify:                "mfa_verify.html",
-		tmplMfaPrompt:                "mfa_prompt.html",
-		tmplMfaInitVerify:            "mfa_init_verify.html",
-		tmplMfaU2FInit:               "mfa_init_u2f.html",
+		tmplMFAVerify:                "mfa_verify.html",
+		tmplMFAPrompt:                "mfa_prompt.html",
+		tmplMFAInitVerify:            "mfa_init_verify.html",
+		tmplMFAU2FInit:               "mfa_init_u2f.html",
 		tmplU2FVerification:          "mfa_verification_u2f.html",
-		tmplMfaInitDone:              "mfa_init_done.html",
+		tmplMFAInitDone:              "mfa_init_done.html",
 		tmplMailVerification:         "mail_verification.html",
 		tmplMailVerified:             "mail_verified.html",
 		tmplInitPassword:             "init_password.html",
@@ -101,19 +101,19 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 			return path.Join(r.pathPrefix, EndpointPassword)
 		},
 		"mfaVerifyUrl": func() string {
-			return path.Join(r.pathPrefix, EndpointMfaVerify)
+			return path.Join(r.pathPrefix, EndpointMFAVerify)
 		},
 		"mfaPromptUrl": func() string {
-			return path.Join(r.pathPrefix, EndpointMfaPrompt)
+			return path.Join(r.pathPrefix, EndpointMFAPrompt)
 		},
 		"mfaPromptChangeUrl": func(id string, provider model.MFAType) string {
-			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s;%s=%v", EndpointMfaPrompt, queryAuthRequestID, id, "provider", provider))
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s;%s=%v", EndpointMFAPrompt, queryAuthRequestID, id, "provider", provider))
 		},
 		"mfaInitVerifyUrl": func() string {
-			return path.Join(r.pathPrefix, EndpointMfaInitVerify)
+			return path.Join(r.pathPrefix, EndpointMFAInitVerify)
 		},
 		"mfaInitU2FVerifyUrl": func() string {
-			return path.Join(r.pathPrefix, EndpointMfaInitU2FVerify)
+			return path.Join(r.pathPrefix, EndpointMFAInitU2FVerify)
 		},
 		"mfaInitU2FLoginUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointU2FVerification)
@@ -206,8 +206,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderPassword(w, r, authReq, nil)
 	case *model.PasswordlessStep:
 		l.renderPasswordlessVerification(w, r, authReq)
-	case *model.MfaVerificationStep:
-		l.renderMfaVerify(w, r, authReq, step, err)
+	case *model.MFAVerificationStep:
+		l.renderMFAVerify(w, r, authReq, step, err)
 	case *model.RedirectToCallbackStep:
 		if len(authReq.PossibleSteps) > 1 {
 			l.chooseNextStep(w, r, authReq, 1, err)
@@ -218,8 +218,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderChangePassword(w, r, authReq, err)
 	case *model.VerifyEMailStep:
 		l.renderMailVerification(w, r, authReq, "", err)
-	case *model.MfaPromptStep:
-		l.renderMfaPrompt(w, r, authReq, step, err)
+	case *model.MFAPromptStep:
+		l.renderMFAPrompt(w, r, authReq, step, err)
 	case *model.InitUserStep:
 		l.renderInitUser(w, r, authReq, "", "", step.PasswordSet, nil)
 	case *model.ChangeUsernameStep:
@@ -372,8 +372,8 @@ type userData struct {
 	baseData
 	profileData
 	PasswordChecked     string
-	MfaProviders        []model.MFAType
-	SelectedMfaProvider model.MFAType
+	MFAProviders        []model.MFAType
+	SelectedMFAProvider model.MFAType
 	Linking             bool
 }
 
@@ -402,21 +402,21 @@ type userSelectionData struct {
 type mfaData struct {
 	baseData
 	profileData
-	MfaProviders []model.MFAType
-	MfaRequired  bool
+	MFAProviders []model.MFAType
+	MFARequired  bool
 }
 
 type mfaVerifyData struct {
 	baseData
 	profileData
-	MfaType model.MFAType
+	MFAType model.MFAType
 	otpData
 }
 
 type mfaDoneData struct {
 	baseData
 	profileData
-	MfaType model.MFAType
+	MFAType model.MFAType
 }
 
 type otpData struct {

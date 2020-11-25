@@ -259,11 +259,11 @@ func (repo *UserRepo) MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, err
 		return nil, err
 	}
 	mfas := make([]*model.MultiFactor, 0)
-	if user.OTPState != model.MfaStateUnspecified {
-		mfas = append(mfas, &model.MultiFactor{Type: model.MfaTypeOTP, State: user.OTPState})
+	if user.OTPState != model.MFAStateUnspecified {
+		mfas = append(mfas, &model.MultiFactor{Type: model.MFATypeOTP, State: user.OTPState})
 	}
 	for _, u2f := range user.U2FTokens {
-		mfas = append(mfas, &model.MultiFactor{Type: model.MfaTypeU2F, State: u2f.State, Attribute: u2f.Name})
+		mfas = append(mfas, &model.MultiFactor{Type: model.MFATypeU2F, State: u2f.State, Attribute: u2f.Name})
 	}
 	return mfas, nil
 }
@@ -291,11 +291,11 @@ func (repo *UserRepo) AddMyMFAOTP(ctx context.Context) (*model.OTP, error) {
 }
 
 func (repo *UserRepo) VerifyMFAOTPSetup(ctx context.Context, userID, code string) error {
-	return repo.UserEvents.CheckMfaOTPSetup(ctx, userID, code)
+	return repo.UserEvents.CheckMFAOTPSetup(ctx, userID, code)
 }
 
 func (repo *UserRepo) VerifyMyMFAOTPSetup(ctx context.Context, code string) error {
-	return repo.UserEvents.CheckMfaOTPSetup(ctx, authz.GetCtxData(ctx).UserID, code)
+	return repo.UserEvents.CheckMFAOTPSetup(ctx, authz.GetCtxData(ctx).UserID, code)
 }
 
 func (repo *UserRepo) RemoveMyMFAOTP(ctx context.Context) error {
@@ -379,8 +379,8 @@ func (repo *UserRepo) VerifyInitCode(ctx context.Context, userID, code, password
 	return repo.UserEvents.VerifyInitCode(ctx, pwPolicyView, userID, code, password)
 }
 
-func (repo *UserRepo) SkipMfaInit(ctx context.Context, userID string) error {
-	return repo.UserEvents.SkipMfaInit(ctx, userID)
+func (repo *UserRepo) SkipMFAInit(ctx context.Context, userID string) error {
+	return repo.UserEvents.SkipMFAInit(ctx, userID)
 }
 
 func (repo *UserRepo) RequestPasswordReset(ctx context.Context, loginname string) error {

@@ -53,8 +53,8 @@ Errors:
       IDPConfigNotExisting: IDP provider invalid for this organisation
       NotAllowed: External IDP not allowed on this organisation
       MinimumExternalIDPNeeded: At least one IDP must be added
-    Mfa:
-      Otp:
+    MFA:
+      OTP:
         AlreadyReady: Multifactor OTP (OneTimePassword) is already set up
         NotExisting: Multifactor OTP (OneTimePassword) doesn't exist
         NotReady: Multifactor OTP (OneTimePassword) isn't ready

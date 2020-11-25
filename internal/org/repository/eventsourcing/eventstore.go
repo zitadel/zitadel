@@ -900,7 +900,7 @@ func (es *OrgEventstore) AddSecondFactorToLoginPolicy(ctx context.Context, aggre
 	if err != nil {
 		return 0, err
 	}
-	if _, m := iam_es_model.GetMFA(repoOrg.LoginPolicy.SecondFactors, repoMFA.MfaType); m != 0 {
+	if _, m := iam_es_model.GetMFA(repoOrg.LoginPolicy.SecondFactors, repoMFA.MFAType); m != 0 {
 		return iam_model.SecondFactorType(m), nil
 	}
 	return 0, errors.ThrowInternal(nil, "EVENT-rM9so", "Errors.Internal")
@@ -945,7 +945,7 @@ func (es *OrgEventstore) AddMultiFactorToLoginPolicy(ctx context.Context, aggreg
 	if err != nil {
 		return 0, err
 	}
-	if _, m := iam_es_model.GetMFA(repoOrg.LoginPolicy.MultiFactors, repoMFA.MfaType); m != 0 {
+	if _, m := iam_es_model.GetMFA(repoOrg.LoginPolicy.MultiFactors, repoMFA.MFAType); m != 0 {
 		return iam_model.MultiFactorType(m), nil
 	}
 	return 0, errors.ThrowInternal(nil, "EVENT-2fMo0", "Errors.Internal")

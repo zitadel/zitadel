@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/caos/logging"
-	webauthn2 "github.com/duo-labs/webauthn/webauthn"
 	"github.com/gorilla/csrf"
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
@@ -21,23 +20,18 @@ import (
 	"github.com/caos/zitadel/internal/form"
 	"github.com/caos/zitadel/internal/id"
 	_ "github.com/caos/zitadel/internal/ui/login/statik"
-	"github.com/caos/zitadel/internal/webauthn"
 )
 
 type Login struct {
-	endpoint              string
-	router                http.Handler
-	renderer              *Renderer
-	parser                *form.Parser
-	authRepo              auth_repository.Repository
-	baseURL               string
-	zitadelURL            string
-	oidcAuthCallbackURL   string
-	IDPConfigAesCrypto    crypto.EncryptionAlgorithm
-	webAuthN              *webauthn.WebAuthN
-	sessionData           webauthn2.SessionData
-	creds                 []webauthn2.Credential
-	webAuthnCookieHandler *http_utils.CookieHandler
+	endpoint            string
+	router              http.Handler
+	renderer            *Renderer
+	parser              *form.Parser
+	authRepo            auth_repository.Repository
+	baseURL             string
+	zitadelURL          string
+	oidcAuthCallbackURL string
+	IDPConfigAesCrypto  crypto.EncryptionAlgorithm
 }
 
 type Config struct {
@@ -67,17 +61,12 @@ func CreateLogin(config Config, authRepo *eventsourcing.EsRepository, systemDefa
 	if err != nil {
 		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")
 	}
-	web, err := webauthn.StartServer("zitadel", "localhost", "http://localhost:50003")
-	if err != nil {
-		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")
-	}
 	login := &Login{
 		oidcAuthCallbackURL: config.OidcAuthCallbackURL,
 		baseURL:             config.BaseURL,
 		zitadelURL:          config.ZitadelURL,
 		authRepo:            authRepo,
 		IDPConfigAesCrypto:  aesCrypto,
-		webAuthN:            web,
 	}
 	prefix := ""
 	if localDevMode {
@@ -95,7 +84,6 @@ func CreateLogin(config Config, authRepo *eventsourcing.EsRepository, systemDefa
 	logging.Log("CONFI-Dvwf2").OnError(err).Panic("unable to create userAgentInterceptor")
 	login.router = CreateRouter(login, statikFS, csrf, cache, security, userAgentCookie, middleware.TraceHandler(EndpointResources))
 	login.renderer = CreateRenderer(prefix, statikFS, config.LanguageCookieName, config.DefaultLanguage)
-	login.webAuthnCookieHandler = http_utils.NewCookieHandler(http_utils.WithEncryption([]byte("test"), []byte("test1234test1234")))
 	login.parser = form.NewParser()
 	return login, handlerPrefix
 }

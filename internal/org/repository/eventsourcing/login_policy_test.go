@@ -472,7 +472,7 @@ func TestLoginPolicySecondFactorAddedAggregate(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 				},
 				new: &iam_es_model.MFA{
-					MfaType: int32(iam_model.SecondFactorTypeOTP),
+					MFAType: int32(iam_model.SecondFactorTypeOTP),
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -562,7 +562,7 @@ func TestLoginPolicySecondFactorRemovedAggregate(t *testing.T) {
 						},
 					}},
 				new: &iam_es_model.MFA{
-					MfaType: int32(iam_model.SecondFactorTypeOTP),
+					MFAType: int32(iam_model.SecondFactorTypeOTP),
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -645,7 +645,7 @@ func TestLoginPolicyMultiFactorAddedAggregate(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 				},
 				new: &iam_es_model.MFA{
-					MfaType: int32(iam_model.MultiFactorTypeU2FWithPIN),
+					MFAType: int32(iam_model.MultiFactorTypeU2FWithPIN),
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -735,7 +735,7 @@ func TestLoginPolicyMultiFactorRemovedAggregate(t *testing.T) {
 						},
 					}},
 				new: &iam_es_model.MFA{
-					MfaType: int32(iam_model.MultiFactorTypeU2FWithPIN),
+					MFAType: int32(iam_model.MultiFactorTypeU2FWithPIN),
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},

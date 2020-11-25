@@ -47,18 +47,18 @@ type HumanView struct {
 	PostalCode             string
 	Region                 string
 	StreetAddress          string
-	OTPState               MfaState
+	OTPState               MFAState
 	U2FTokens              []*WebAuthNView
 	PasswordlessTokens     []*WebAuthNView
-	MfaMaxSetUp            req_model.MFALevel
-	MfaInitSkipped         time.Time
+	MFAMaxSetUp            req_model.MFALevel
+	MFAInitSkipped         time.Time
 	InitRequired           bool
 }
 
 type WebAuthNView struct {
 	TokenID string
 	Name    string
-	State   MfaState
+	State   MFAState
 }
 
 type MachineView struct {
@@ -117,7 +117,7 @@ func (r *UserSearchRequest) AppendMyOrgQuery(orgID string) {
 	r.Queries = append(r.Queries, &UserSearchQuery{Key: UserSearchKeyResourceOwner, Method: model.SearchMethodEquals, Value: orgID})
 }
 
-func (u *UserView) MfaTypesSetupPossible(level req_model.MFALevel, policy *iam_model.LoginPolicyView) []req_model.MFAType {
+func (u *UserView) MFATypesSetupPossible(level req_model.MFALevel, policy *iam_model.LoginPolicyView) []req_model.MFAType {
 	types := make([]req_model.MFAType, 0)
 	switch level {
 	default:
@@ -127,7 +127,7 @@ func (u *UserView) MfaTypesSetupPossible(level req_model.MFALevel, policy *iam_m
 			for _, mfaType := range policy.SecondFactors {
 				switch mfaType {
 				case iam_model.SecondFactorTypeOTP:
-					if u.OTPState != MfaStateReady {
+					if u.OTPState != MFAStateReady {
 						types = append(types, req_model.MFATypeOTP)
 					}
 				case iam_model.SecondFactorTypeU2F:
@@ -150,7 +150,7 @@ func (u *UserView) MfaTypesSetupPossible(level req_model.MFALevel, policy *iam_m
 	return types
 }
 
-func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.LoginPolicyView) ([]req_model.MFAType, bool) {
+func (u *UserView) MFATypesAllowed(level req_model.MFALevel, policy *iam_model.LoginPolicyView) ([]req_model.MFAType, bool) {
 	types := make([]req_model.MFAType, 0)
 	required := true
 	switch level {
@@ -162,7 +162,7 @@ func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.L
 			for _, mfaType := range policy.SecondFactors {
 				switch mfaType {
 				case iam_model.SecondFactorTypeOTP:
-					if u.OTPState == MfaStateReady {
+					if u.OTPState == MFAStateReady {
 						types = append(types, req_model.MFATypeOTP)
 					}
 				case iam_model.SecondFactorTypeU2F:
@@ -192,7 +192,7 @@ func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.L
 
 func (u *UserView) IsU2FReady() bool {
 	for _, token := range u.U2FTokens {
-		if token.State == MfaStateReady {
+		if token.State == MFAStateReady {
 			return true
 		}
 	}
@@ -201,7 +201,7 @@ func (u *UserView) IsU2FReady() bool {
 
 func (u *UserView) IsPasswordlessReady() bool {
 	for _, token := range u.PasswordlessTokens {
-		if token.State == MfaStateReady {
+		if token.State == MFAStateReady {
 			return true
 		}
 	}
@@ -212,7 +212,7 @@ func (u *UserView) HasRequiredOrgMFALevel(policy *iam_model.LoginPolicyView) boo
 	if !policy.ForceMFA {
 		return true
 	}
-	switch u.MfaMaxSetUp {
+	switch u.MFAMaxSetUp {
 	case req_model.MFALevelSecondFactor:
 		return policy.HasSecondFactors()
 	case req_model.MFALevelMultiFactor:

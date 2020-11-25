@@ -52,7 +52,7 @@ type OTPConfig struct {
 type VerificationLifetimes struct {
 	PasswordCheck      types.Duration
 	ExternalLoginCheck types.Duration
-	MfaInitSkip        types.Duration
+	MFAInitSkip        types.Duration
 	SecondFactorCheck  types.Duration
 	MultiFactorCheck   types.Duration
 }

@@ -358,11 +358,11 @@ func genderToModel(gender auth.Gender) usr_model.Gender {
 	}
 }
 
-func mfaStateFromModel(state usr_model.MfaState) auth.MFAState {
+func mfaStateFromModel(state usr_model.MFAState) auth.MFAState {
 	switch state {
-	case usr_model.MfaStateReady:
+	case usr_model.MFAStateReady:
 		return auth.MFAState_MFASTATE_READY
-	case usr_model.MfaStateNotReady:
+	case usr_model.MFAStateNotReady:
 		return auth.MFAState_MFASTATE_NOT_READY
 	default:
 		return auth.MFAState_MFASTATE_UNSPECIFIED
@@ -385,11 +385,11 @@ func mfaFromModel(mfa *usr_model.MultiFactor) *auth.MultiFactor {
 	}
 }
 
-func mfaTypeFromModel(mfatype usr_model.MfaType) auth.MfaType {
+func mfaTypeFromModel(mfatype usr_model.MFAType) auth.MfaType {
 	switch mfatype {
-	case usr_model.MfaTypeOTP:
+	case usr_model.MFATypeOTP:
 		return auth.MfaType_MFATYPE_OTP
-	case usr_model.MfaTypeU2F:
+	case usr_model.MFATypeU2F:
 		return auth.MfaType_MFATYPE_U2F
 	default:
 		return auth.MfaType_MFATYPE_UNSPECIFIED

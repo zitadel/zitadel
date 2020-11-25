@@ -14,7 +14,7 @@ type LoginPolicy struct {
 	AllowUsernamePassword bool           `json:"allowUsernamePassword"`
 	AllowRegister         bool           `json:"allowRegister"`
 	AllowExternalIdp      bool           `json:"allowExternalIdp"`
-	ForceMFA              bool           `json:"forceMfa"`
+	ForceMFA              bool           `json:"forceMfa"` //TODO: replace by forceMFA
 	PasswordlessType      int32          `json:"passwordlessType"`
 	IDPProviders          []*IDPProvider `json:"-"`
 	SecondFactors         []int32        `json:"-"`
@@ -32,7 +32,7 @@ type IDPProviderID struct {
 }
 
 type MFA struct {
-	MfaType int32 `json:"mfaType"`
+	MFAType int32 `json:"mfaType"`
 }
 
 func GetIDPProvider(providers []*IDPProvider, id string) (int, *IDPProvider) {
@@ -129,7 +129,7 @@ func SecondFactorsFromModel(mfas []iam_model.SecondFactorType) []int32 {
 }
 
 func SecondFactorFromModel(mfa iam_model.SecondFactorType) *MFA {
-	return &MFA{MfaType: int32(mfa)}
+	return &MFA{MFAType: int32(mfa)}
 }
 
 func SecondFactorsToModel(mfas []int32) []iam_model.SecondFactorType {
@@ -149,7 +149,7 @@ func MultiFactorsFromModel(mfas []iam_model.MultiFactorType) []int32 {
 }
 
 func MultiFactorFromModel(mfa iam_model.MultiFactorType) *MFA {
-	return &MFA{MfaType: int32(mfa)}
+	return &MFA{MFAType: int32(mfa)}
 }
 
 func MultiFactorsToModel(mfas []int32) []iam_model.MultiFactorType {
@@ -227,7 +227,7 @@ func (iam *IAM) appendAddSecondFactorToLoginPolicyEvent(event *es_models.Event) 
 	if err != nil {
 		return err
 	}
-	iam.DefaultLoginPolicy.SecondFactors = append(iam.DefaultLoginPolicy.SecondFactors, mfa.MfaType)
+	iam.DefaultLoginPolicy.SecondFactors = append(iam.DefaultLoginPolicy.SecondFactors, mfa.MFAType)
 	return nil
 }
 
@@ -237,7 +237,7 @@ func (iam *IAM) appendRemoveSecondFactorFromLoginPolicyEvent(event *es_models.Ev
 	if err != nil {
 		return err
 	}
-	if i, m := GetMFA(iam.DefaultLoginPolicy.SecondFactors, mfa.MfaType); m != 0 {
+	if i, m := GetMFA(iam.DefaultLoginPolicy.SecondFactors, mfa.MFAType); m != 0 {
 		iam.DefaultLoginPolicy.SecondFactors[i] = iam.DefaultLoginPolicy.SecondFactors[len(iam.DefaultLoginPolicy.SecondFactors)-1]
 		iam.DefaultLoginPolicy.SecondFactors[len(iam.DefaultLoginPolicy.SecondFactors)-1] = 0
 		iam.DefaultLoginPolicy.SecondFactors = iam.DefaultLoginPolicy.SecondFactors[:len(iam.DefaultLoginPolicy.SecondFactors)-1]
@@ -252,7 +252,7 @@ func (iam *IAM) appendAddMultiFactorToLoginPolicyEvent(event *es_models.Event) e
 	if err != nil {
 		return err
 	}
-	iam.DefaultLoginPolicy.MultiFactors = append(iam.DefaultLoginPolicy.MultiFactors, mfa.MfaType)
+	iam.DefaultLoginPolicy.MultiFactors = append(iam.DefaultLoginPolicy.MultiFactors, mfa.MFAType)
 	return nil
 }
 
@@ -262,7 +262,7 @@ func (iam *IAM) appendRemoveMultiFactorFromLoginPolicyEvent(event *es_models.Eve
 	if err != nil {
 		return err
 	}
-	if i, m := GetMFA(iam.DefaultLoginPolicy.MultiFactors, mfa.MfaType); m != 0 {
+	if i, m := GetMFA(iam.DefaultLoginPolicy.MultiFactors, mfa.MFAType); m != 0 {
 		iam.DefaultLoginPolicy.MultiFactors[i] = iam.DefaultLoginPolicy.MultiFactors[len(iam.DefaultLoginPolicy.MultiFactors)-1]
 		iam.DefaultLoginPolicy.MultiFactors[len(iam.DefaultLoginPolicy.MultiFactors)-1] = 0
 		iam.DefaultLoginPolicy.MultiFactors = iam.DefaultLoginPolicy.MultiFactors[:len(iam.DefaultLoginPolicy.MultiFactors)-1]

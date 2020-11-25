@@ -13,7 +13,7 @@ type UserRepository interface {
 	RegisterExternalUser(ctx context.Context, user *model.User, externalIDP *model.ExternalIDP, member *org_model.OrgMember, resourceOwner string) (*model.User, error)
 
 	myUserRepo
-	SkipMfaInit(ctx context.Context, userID string) error
+	SkipMFAInit(ctx context.Context, userID string) error
 
 	RequestPasswordReset(ctx context.Context, username string) error
 	SetPassword(ctx context.Context, userID, code, password string) error

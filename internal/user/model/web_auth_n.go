@@ -10,7 +10,7 @@ type WebAuthNToken struct {
 
 	WebAuthNTokenID        string
 	CredentialCreationData []byte
-	State                  MfaState
+	State                  MFAState
 	Challenge              string
 	AllowedCredentialIDs   [][]byte
 	UserVerification       UserVerificationRequirement
