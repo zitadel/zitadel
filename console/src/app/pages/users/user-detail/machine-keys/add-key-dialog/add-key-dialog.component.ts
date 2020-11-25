@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MachineKeyType } from 'src/app/proto/generated/management_pb';
 
@@ -14,7 +14,7 @@ export class AddKeyDialogComponent {
         MachineKeyType.MACHINEKEY_JSON,
     ];
     public type: MachineKeyType = MachineKeyType.MACHINEKEY_JSON;
-    public dateControl: FormControl = new FormControl('', [Validators.required]);
+    public dateControl: FormControl = new FormControl('', []);
 
     constructor(
         public dialogRef: MatDialogRef<AddKeyDialogComponent>,
