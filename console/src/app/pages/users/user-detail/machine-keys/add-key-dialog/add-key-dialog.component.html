@@ -13,9 +13,12 @@
 
     <cnsl-form-field class="form-field" appearance="outline">
         <cnsl-label>{{'USER.MACHINE.CHOOSEEXPIRY' | translate}}</cnsl-label>
-        <input cnslInput [matDatepicker]="picker" [(ngModel)]="date">
+        <input cnslInput [matDatepicker]="picker" [formControl]="dateControl">
         <mat-datepicker-toggle style="top: 0;" cnslSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
+        <span cnsl-error *ngIf="dateControl?.errors?.forbiddenDate">
+
+        </span>
     </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">
@@ -23,7 +26,7 @@
         {{'ACTIONS.CANCEL' | translate}}
     </button>
 
-    <button color="primary" mat-raised-button class="ok-button" [disabled]="type == undefined"
+    <button color="primary" mat-raised-button class="ok-button" [disabled]="type == undefined || dateControl.invalid"
         (click)="closeDialogWithSuccess()">
         {{'ACTIONS.ADD' | translate}}
     </button>

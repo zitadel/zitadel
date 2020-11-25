@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -23,6 +23,7 @@ import { AddKeyDialogComponent } from './add-key-dialog.component';
         FormsModule,
         MatDatepickerModule,
         MatMomentDateModule,
+        ReactiveFormsModule,
     ],
 })
 export class AddKeyDialogModule { }
