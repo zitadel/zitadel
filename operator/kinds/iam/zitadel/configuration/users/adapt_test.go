@@ -49,7 +49,8 @@ func TestUsers_Adapt_DoNothing(t *testing.T) {
 	assert.NoError(t, err)
 	ensure, err := query(client, queried)
 	assert.NoError(t, err)
-	assert.Nil(t, ensure)
+	assert.NotNil(t, ensure)
+	assert.NoError(t, ensure(client))
 }
 
 func TestUsers_Adapt_Add(t *testing.T) {
