@@ -677,6 +677,12 @@ export class ManagementService {
         return this.grpcService.mgmt.getUserMfas(req);
     }
 
+    public removeMfaOTP(id: string): Promise<Empty> {
+        const req = new UserID();
+        req.setId(id);
+        return this.grpcService.mgmt.removeMfaOTP(req);
+    }
+
     public SaveUserProfile(
         id: string,
         firstName?: string,
