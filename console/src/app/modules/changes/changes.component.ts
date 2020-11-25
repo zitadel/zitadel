@@ -67,6 +67,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
                 break;
             case ChangeType.ORG: first = this.mgmtUserService.OrgChanges(this.id, 20, 0);
                 break;
+            case C
         }
 
         this.mapAndUpdate(first);

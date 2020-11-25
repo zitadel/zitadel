@@ -34,18 +34,12 @@
             </div>
         </div>
 
-        <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
-            <mat-tab label="Details">
-                <app-contributors *ngIf="project" [totalResult]="totalMemberResult" [loading]="loading$ | async"
-                    [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
-                    description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
-                    (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()"
-                    [disabled]="(['project.grant.member.write$', 'project.grant.member.write:'+ project.projectId]| hasRole | async) == false">
-                </app-contributors>
-            </mat-tab>
-            <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="flex-col">
-                <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.id"></app-changes>
-            </mat-tab>
-        </mat-tab-group>
+        <app-contributors *ngIf="project" [totalResult]="totalMemberResult" [loading]="loading$ | async"
+            [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+            description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
+            (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()"
+            [disabled]="(['project.grant.member.write$', 'project.grant.member.write:'+ project.projectId]| hasRole | async) == false">
+        </app-contributors>
+        <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.id"></app-changes>
     </div>
 </app-meta-layout>

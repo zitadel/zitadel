@@ -11,7 +11,6 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
-import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
@@ -46,7 +45,6 @@ import { IamComponent } from './iam.component';
         MatCheckboxModule,
         MetaLayoutModule,
         MatIconModule,
-        MatTabsModule,
         MatTableModule,
         MatPaginatorModule,
         InputModule,

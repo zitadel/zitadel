@@ -10,7 +10,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
-import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
@@ -60,7 +59,6 @@ import { GrantedProjectsComponent } from './granted-projects.component';
         MatProgressSpinnerModule,
         MetaLayoutModule,
         MatProgressBarModule,
-        MatTabsModule,
         ProjectRolesModule,
         MatCheckboxModule,
         CardModule,
