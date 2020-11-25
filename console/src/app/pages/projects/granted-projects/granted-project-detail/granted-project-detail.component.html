@@ -29,8 +29,8 @@
         <div class="details">
             <div class="row">
                 <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
-                <span *ngIf="project && project.state !== undefined"
-                    class="second">{{'PROJECT.STATE.'+project.state | translate}}</span>
+                <span *ngIf="project && project.state !== undefined" class="state"
+                    [ngClass]="{'active': project.state === ProjectState.PROJECTSTATE_ACTIVE, 'inactive': project.state === ProjectState.PROJECTSTATE_INACTIVE}">{{'PROJECT.STATE.'+project.state | translate}}</span>
             </div>
         </div>
 

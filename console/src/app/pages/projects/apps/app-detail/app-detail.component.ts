@@ -8,6 +8,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { ChangeType } from 'src/app/modules/changes/changes.component';
 import {
     Application,
     AppState,
@@ -90,7 +91,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public redirectControl: FormControl = new FormControl({ value: '', disabled: true });
     public postRedirectControl: FormControl = new FormControl({ value: '', disabled: true });
 
-
+    public ChangeType: any = ChangeType;
     constructor(
         public translate: TranslateService,
         private route: ActivatedRoute,

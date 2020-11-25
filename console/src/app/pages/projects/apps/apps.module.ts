@@ -19,7 +19,9 @@ import { TranslateModule } from '@ngx-translate/core';
 import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
+import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { InputModule } from 'src/app/modules/input/input.module';
+import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 
 import { AppCreateComponent } from './app-create/app-create.component';
 import { AppDetailComponent } from './app-detail/app-detail.component';
@@ -57,6 +59,8 @@ import { AppsRoutingModule } from './apps-routing.module';
         CopyToClipboardModule,
         MatSlideToggleModule,
         InputModule,
+        MetaLayoutModule,
+        ChangesModule,
     ],
     exports: [TranslateModule],
 })

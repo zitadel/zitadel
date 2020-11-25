@@ -10,6 +10,7 @@ export enum ChangeType {
     USER = 'user',
     ORG = 'org',
     PROJECT = 'project',
+    APP = 'app',
 }
 
 @Component({
@@ -20,6 +21,7 @@ export enum ChangeType {
 export class ChangesComponent implements OnInit, OnDestroy {
     @Input() public changeType: ChangeType = ChangeType.USER;
     @Input() public id: string = '';
+    @Input() public secId: string = '';
     @Input() public sortDirectionAsc: boolean = true;
     @Input() public refresh!: Observable<void>;
     public bottom: boolean = false;
@@ -67,7 +69,8 @@ export class ChangesComponent implements OnInit, OnDestroy {
                 break;
             case ChangeType.ORG: first = this.mgmtUserService.OrgChanges(this.id, 20, 0);
                 break;
-            case C
+            case ChangeType.APP: first = this.mgmtUserService.ApplicationChanges(this.id, this.secId, 20, 0);
+                break;
         }
 
         this.mapAndUpdate(first);
@@ -92,6 +95,8 @@ export class ChangesComponent implements OnInit, OnDestroy {
             case ChangeType.PROJECT: more = this.mgmtUserService.ProjectChanges(this.id, 20, cursor);
                 break;
             case ChangeType.ORG: more = this.mgmtUserService.OrgChanges(this.id, 20, cursor);
+                break;
+            case ChangeType.APP: more = this.mgmtUserService.ApplicationChanges(this.id, this.secId, 20, cursor);
                 break;
         }
 
