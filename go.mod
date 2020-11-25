@@ -17,7 +17,7 @@ require (
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.12.5
 	github.com/cockroachdb/cockroach-go/v2 v2.0.8
-	github.com/envoyproxy/protoc-gen-validate v0.1.0
+	github.com/envoyproxy/protoc-gen-validate v0.4.1
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.4.4

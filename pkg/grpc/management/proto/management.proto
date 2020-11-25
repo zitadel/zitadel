@@ -4,6 +4,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 import "validate/validate.proto";
 import "authoption/options.proto";
@@ -2500,6 +2501,7 @@ message OIDCConfig {
   OIDCTokenType access_token_type = 13;
   bool access_token_role_assertion = 14;
   bool id_token_role_assertion = 15;
+  google.protobuf.Duration clock_skew = 16;
 }
 
 message OIDCApplicationCreate {
@@ -2516,6 +2518,7 @@ message OIDCApplicationCreate {
   OIDCTokenType access_token_type = 11;
   bool access_token_role_assertion = 12;
   bool id_token_role_assertion = 13;
+  google.protobuf.Duration clock_skew = 14 [(validate.rules).duration = {gte: {}, lte: {seconds: 5}}];
 }
 
 enum OIDCVersion {
@@ -2540,6 +2543,7 @@ message OIDCConfigUpdate {
   OIDCTokenType access_token_type = 10;
   bool access_token_role_assertion = 11;
   bool id_token_role_assertion = 12;
+  google.protobuf.Duration clock_skew = 13 [(validate.rules).duration = {gte: {}, lte: {seconds: 5}}];
 }
 
 enum OIDCResponseType {

@@ -110,6 +110,10 @@ func (c *Client) IsScopeAllowed(scope string) bool {
 	return false
 }
 
+func (c *Client) ClockSkew() time.Duration {
+	return c.ApplicationView.ClockSkew
+}
+
 func accessTokenTypeToOIDC(tokenType model.OIDCTokenType) op.AccessTokenType {
 	switch tokenType {
 	case model.OIDCTokenTypeBearer:
