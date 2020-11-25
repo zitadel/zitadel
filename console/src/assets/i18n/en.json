@@ -53,7 +53,7 @@
         "GRANTSECTION":"Authorization Section",
         "GRANTS":"Authorizations",
         "TOOLTIP": {
-            "PERSONAL":"Show your Personal Account, your IDPs, Login methods, Mfa and Authorisations",
+            "PERSONAL":"Show your Personal Account, your IDPs, Login methods, Factors and Authorisations",
             "IAM":"Show ZITADELs global access policies, clear views and failed events",
             "ORG":"Show your organisations access policies, and set your domains",
             "SELFPROJECTS":"Show your organisations own projects",
