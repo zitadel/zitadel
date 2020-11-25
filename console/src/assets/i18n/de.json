@@ -233,6 +233,7 @@
             "ID":"Schlüssel-ID",
             "TYPE":"Typ",
             "EXPIRATIONDATE":"Ablaufdatum",
+            "CHOOSEDATEAFTER":"Geben Sie ein valides Ablaufdatum an. Ab",
             "CHOOSEEXPIRY":"Definiere ein Ablaufdatum",
             "CREATIONDATE":"Erstelldatum",
             "KEYDETAILS":"Schlüssel Details",

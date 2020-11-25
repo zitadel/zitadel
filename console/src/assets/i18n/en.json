@@ -233,6 +233,7 @@
             "ID":"Key ID",
             "TYPE":"Type",
             "EXPIRATIONDATE":"Expiration date",
+            "CHOOSEDATEAFTER":"Enter a valid expiration after",
             "CHOOSEEXPIRY":"Select an expiration date",
             "CREATIONDATE":"Creation Date",
             "KEYDETAILS":"Key Details",

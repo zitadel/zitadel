@@ -13,15 +13,16 @@
 
     <cnsl-form-field class="form-field" appearance="outline">
         <cnsl-label>{{'USER.MACHINE.CHOOSEEXPIRY' | translate}}</cnsl-label>
-        <input cnslInput [matDatepicker]="picker" [formControl]="dateControl">
+        <input cnslInput [matDatepicker]="picker" [min]="startDate" [formControl]="dateControl">
         <mat-datepicker-toggle style="top: 0;" cnslSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker startView="year" [startAt]="startDate"></mat-datepicker>
-        <span cnsl-error *ngIf="dateControl?.errors?.forbiddenDate">
-
+        <span cnsl-error *ngIf="dateControl?.errors?.matDatepickerMin?.min">
+            {{'USER.MACHINE.CHOOSEDATEAFTER' | translate}}:
+            {{dateControl?.errors?.matDatepickerMin.min.toDate() | localizedDate: 'EEE dd. MMM'}}
         </span>
     </cnsl-form-field>
 </div>
-<div mat-dialog-actions class="action">
+<div mat-dialog-actions class=" action">
     <button mat-button (click)="closeDialog()">
         {{'ACTIONS.CANCEL' | translate}}
     </button>

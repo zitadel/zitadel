@@ -12,11 +12,13 @@
         </div>
         <div class="row">
             <p class="left">{{'USER.MACHINE.CREATIONDATE' | translate}}</p>
-            <p class="right">{{addedKey?.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</p>
+            <p class="right">{{addedKey?.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm' }}
+            </p>
         </div>
         <div class="row">
             <p class="left">{{'USER.MACHINE.EXPIRATIONDATE' | translate}}</p>
-            <p class="right">{{addedKey?.expirationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}</p>
+            <p class="right">{{addedKey?.expirationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm'}}
+            </p>
         </div>
         <button class="download-button" mat-stroked-button color="primary" (click)="saveFile()">Download</button>
     </ng-container>

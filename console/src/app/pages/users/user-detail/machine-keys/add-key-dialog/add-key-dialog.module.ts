@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
 import { InputModule } from 'src/app/modules/input/input.module';
+import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 
 import { AddKeyDialogComponent } from './add-key-dialog.component';
 
@@ -24,6 +25,7 @@ import { AddKeyDialogComponent } from './add-key-dialog.component';
         MatDatepickerModule,
         MatMomentDateModule,
         ReactiveFormsModule,
+        LocalizedDatePipeModule,
     ],
 })
 export class AddKeyDialogModule { }
