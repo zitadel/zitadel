@@ -71,7 +71,7 @@ func AdaptFunc(
 		return nil, nil, nil, err
 	}
 
-	queryUser, destroyUser, err := users.AdaptFunc(internalMonitor, necessaryUsers, dbClient)
+	_, destroyUser, err := users.AdaptFunc(internalMonitor, necessaryUsers, dbClient)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -86,7 +86,10 @@ func AdaptFunc(
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-
+			queryUser, _, err := users.AdaptFunc(internalMonitor, necessaryUsers, dbClient)
+			if err != nil {
+				return nil, err
+			}
 			queryS, err := secret.AdaptFuncToEnsure(namespace, secretName, labels, literalsSecret)
 			if err != nil {
 				return nil, err

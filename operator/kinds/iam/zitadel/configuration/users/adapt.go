@@ -58,7 +58,7 @@ func AdaptFunc(
 			}
 
 			if queriers == nil || len(queriers) == 0 {
-				return nil, nil
+				return func(k8sClient kubernetes.ClientInt) error { return nil }, nil
 			}
 			return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
 		}, operator.DestroyersToDestroyFunc(internalMonitor, destroyers),

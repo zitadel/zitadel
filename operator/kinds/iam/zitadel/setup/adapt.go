@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	jobNamePrefix               = "zitadel-setup"
+	jobNamePrefix               = "zitadel-setup-"
 	containerName               = "zitadel"
 	rootSecret                  = "client-root"
 	dbSecrets                   = "db-secrets"
@@ -63,7 +63,7 @@ func AdaptFunc(
 			version,
 			deployment.RunAsUser,
 			true,
-			resources,
+			deployment.GetResourcesFromDefault(resources),
 			cmName,
 			certPath,
 			secretName,
@@ -92,10 +92,11 @@ func AdaptFunc(
 					Annotations: map[string]string{},
 				},
 				Spec: corev1.PodSpec{
-					NodeSelector:   nodeselector,
-					Tolerations:    tolerations,
-					InitContainers: initContainers,
-					Containers:     containers,
+					NodeSelector:    nodeselector,
+					Tolerations:     tolerations,
+					InitContainers:  initContainers,
+					Containers:      containers,
+					SecurityContext: &corev1.PodSecurityContext{},
 
 					RestartPolicy:                 "Never",
 					DNSPolicy:                     "ClusterFirst",
