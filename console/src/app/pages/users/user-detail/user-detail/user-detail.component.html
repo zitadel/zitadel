@@ -102,6 +102,11 @@
                 <span class="first">{{'USER.PREFERRED_LOGINNAME' | translate}}</span>
                 <span class="second"><span style="display: block;">{{user.preferredLoginName}}</span></span>
             </div>
+            <div class="row">
+                <span class="first">{{'ORG.PAGES.STATE'  | translate}}</span>
+                <span *ngIf="user && user.state !== undefined" class="state"
+                    [ngClass]="{'active': user.state === UserState.USERSTATE_ACTIVE, 'inactive': user.state === UserState.USERSTATE_INACTIVE}">{{'USER.DATA.STATE'+user.state | translate}}</span>
+            </div>
         </div>
 
         <ng-template appHasRole [appHasRole]="['user.membership.read']">

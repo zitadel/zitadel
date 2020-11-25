@@ -15,7 +15,7 @@
         <cnsl-label>{{'USER.MACHINE.CHOOSEEXPIRY' | translate}}</cnsl-label>
         <input cnslInput [matDatepicker]="picker" [formControl]="dateControl">
         <mat-datepicker-toggle style="top: 0;" cnslSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
+        <mat-datepicker #picker startView="year" [startAt]="startDate"></mat-datepicker>
         <span cnsl-error *ngIf="dateControl?.errors?.forbiddenDate">
 
         </span>

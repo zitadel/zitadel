@@ -19,6 +19,7 @@ export function afterNowValidator(): ValidatorFn {
     styleUrls: ['./add-key-dialog.component.scss'],
 })
 export class AddKeyDialogComponent {
+    public startDate: Date = new Date();
     types: MachineKeyType[] = [
         MachineKeyType.MACHINEKEY_JSON,
     ];
