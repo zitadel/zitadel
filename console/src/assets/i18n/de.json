@@ -53,7 +53,7 @@
         "GRANTSECTION":"Berechtigungssektion",
         "GRANTS":"Berechtigungen",
         "TOOLTIP": {
-            "PERSONAL":"Zeige deinen persönlichen Account, deine IDPs, Login Methoden, Mfa and Berechtigungen",
+            "PERSONAL":"Verwalte deinen persönlichen Account, deine IDPs, Login Methoden, Faktoren und Berechtigungen",
             "IAM":"Zeige ZITADELs globale Zugangsrichtlinien, bereinige views und fehlerhafte events",
             "ORG":"Zeige Zugangsrichtlinien und Domains deiner Organisation ",
             "SELFPROJECTS":"Zeige Projekte deiner Organisation",
