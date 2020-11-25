@@ -60,7 +60,7 @@
             "GRANTEDPROJECTS":"Verwalte die berechtigten Projekte von anderen Organisationen",
             "HUMANUSERS":"Zeige alle Human users deiner Organisation",
             "MACHINEUSERS":"Verwalte die  Service Benutzer deiner Organisation",
-            "AUTHZ":"Zeige gültige Berechtigungen deiner Organisationsbenutzer"
+            "AUTHZ":"Verwalte die Berechtigungen deiner Organisationsbenutzer"
         }
     },
     "ACTIONS": {
