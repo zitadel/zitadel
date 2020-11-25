@@ -56,7 +56,7 @@
             "PERSONAL":"Verwalte deinen persönlichen Account, deine IDPs, Login Methoden, Faktoren und Berechtigungen",
             "IAM":"Zeige ZITADELs globale Zugangsrichtlinien, bereinige views und fehlerhafte events",
             "ORG":"Zeige Zugangsrichtlinien und Domains deiner Organisation ",
-            "SELFPROJECTS":"Zeige Projekte deiner Organisation",
+            "SELFPROJECTS":"Verwalte die Projekte deiner Organisation",
             "GRANTEDPROJECTS":"Zeige berechtigte Projekte von anderen Organisationen",
             "HUMANUSERS":"Zeige alle Human users deiner Organisation",
             "MACHINEUSERS":"Zeige Service User deiner your organisation",
