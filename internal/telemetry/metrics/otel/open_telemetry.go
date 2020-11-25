@@ -17,7 +17,7 @@ type Metrics struct {
 	UpDownSumObserver map[string]metric.Int64UpDownSumObserver
 }
 
-func NewMetrics() (metrics.Metrics, error) {
+func NewMetrics(meterName string) (metrics.Metrics, error) {
 	exporter, err := prometheus.NewExportPipeline(
 		prometheus.Config{},
 	)
@@ -26,7 +26,7 @@ func NewMetrics() (metrics.Metrics, error) {
 	}
 	return &Metrics{
 		Exporter:          exporter,
-		Meter:             exporter.MeterProvider().Meter("hodor"),
+		Meter:             exporter.MeterProvider().Meter(meterName),
 		Counters:          make(map[string]metric.Int64Counter),
 		UpDownSumObserver: make(map[string]metric.Int64UpDownSumObserver),
 	}, nil
