@@ -55,7 +55,7 @@
         "TOOLTIP": {
             "PERSONAL":"Show your Personal Account, your IDPs, Login methods, Factors and Authorisations",
             "IAM":"Show ZITADELs global access policies, clear views and failed events",
-            "ORG":"Show your organisations access policies, and set your domains",
+            "ORG":"Show your organisations access policies, and manage your domain names",
             "SELFPROJECTS":"Show your organisations own projects",
             "GRANTEDPROJECTS":"Show projects your organisation was granted access",
             "HUMANUSERS":"Show all registered human Users on your organisation",
