@@ -59,7 +59,7 @@
             "SELFPROJECTS":"Verwalte die Projekte deiner Organisation",
             "GRANTEDPROJECTS":"Verwalte die berechtigten Projekte von anderen Organisationen",
             "HUMANUSERS":"Zeige alle Human users deiner Organisation",
-            "MACHINEUSERS":"Zeige Service User deiner your organisation",
+            "MACHINEUSERS":"Verwalte die  Service Benutzer deiner Organisation",
             "AUTHZ":"Zeige gültige Berechtigungen deiner Organisationsbenutzer"
         }
     },
