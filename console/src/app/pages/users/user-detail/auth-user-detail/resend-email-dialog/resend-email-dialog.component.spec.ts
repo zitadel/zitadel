@@ -1,20 +1,20 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { CodeDialogComponent } from './code-dialog.component';
+import { ResendEmailDialogComponent } from './resend-email-dialog.component';
 
-describe('CodeDialogComponent', () => {
-    let component: CodeDialogComponent;
-    let fixture: ComponentFixture<CodeDialogComponent>;
+describe('ResendEmailDialogComponent', () => {
+    let component: ResendEmailDialogComponent;
+    let fixture: ComponentFixture<ResendEmailDialogComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-            declarations: [CodeDialogComponent],
+            declarations: [ResendEmailDialogComponent],
         })
             .compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(CodeDialogComponent);
+        fixture = TestBed.createComponent(ResendEmailDialogComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

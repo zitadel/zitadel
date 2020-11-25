@@ -41,17 +41,35 @@
 
       .first {
         flex: 1;
-        font-size: .8rem;
+        font-size: 13px;
         margin-right: .5rem;
         white-space: nowrap;
       }
 
       .second {
-        font-size: .8rem;
+        font-size: .13px;
         text-overflow: ellipsis;
         overflow: hidden;
         margin-left: 1rem;
         text-align: right;
+      }
+
+      .state {
+        border-radius: 50vw;
+        padding: 2px .5rem;
+        letter-spacing: .05em;
+        font-size: 11px;
+        background-color: #8795a120;
+
+        &.active {
+          background-color: #85d996;
+          color: black;
+        }
+
+        &.inactive {
+          background-color: #ff8981;
+          color: black;
+        }
       }
     }
   }

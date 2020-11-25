@@ -9,12 +9,13 @@
     </div>
 
     <h1>{{'PROJECT.PAGES.CREATE_DESC' | translate}}</h1>
-    <form (ngSubmit)="saveProject()">
+    <form cdkFocusRegionStart (ngSubmit)="saveProject()">
         <div class="column">
-            <mat-form-field class="formfield" hintLabel="The name is required!">
-                <mat-label>{{'PROJECT.NAME' | translate}}</mat-label>
-                <input matInput autofocus [(ngModel)]="project.name" [ngModelOptions]="{ standalone: true }" />
-            </mat-form-field>
+            <cnsl-form-field class="formfield" hintLabel="The name is required!">
+                <cnsl-label>{{'PROJECT.NAME' | translate}}</cnsl-label>
+                <input cnslInput cdkFocusInitial autofocus [(ngModel)]="project.name"
+                    [ngModelOptions]="{ standalone: true }" />
+            </cnsl-form-field>
         </div>
 
         <button color="primary" mat-raised-button class="continue-button" [disabled]="!project.name" cdkFocusInitial

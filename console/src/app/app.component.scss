@@ -103,8 +103,12 @@
           align-items: center;
           text-decoration: none;
           cursor: pointer;
-          padding: .2rem 1rem;
+          padding: 0 1rem;
           margin-right: .5rem;
+
+          &.indented {
+            padding-left: 2rem;
+          }
 
           .icon {
             margin: .5rem 1rem;
@@ -112,8 +116,8 @@
 
           .label {
             margin-bottom: 0;
-            font-weight: 500;
-            font-size: .9rem;
+            font-size: 14px;
+            letter-spacing: .05em;
           }
 
           .c_label {
@@ -121,7 +125,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: .9rem;
+            font-size: 14px;
+            letter-spacing: .03em;
 
             .count {
               font-size: 12px;
@@ -198,7 +203,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  margin: .5rem 0;
+  margin: 5px 0;
 
   span {
     border: 1px solid #81868a40;
@@ -219,7 +224,6 @@
   .hiddenline {
     display: block;
     visibility: hidden;
-    // flex: 1;
     width: 4rem;
   }
 }
@@ -228,7 +232,6 @@
   .filter-form {
     margin: 0 .5rem;
     /* stylelint-disable */
-
     $foreground: map-get($theme, foreground);
     color: mat-color($foreground, text) !important;
   }
@@ -244,6 +247,10 @@
 
 .menu {
   position: relative;
+
+  .filter-wrapper {
+    padding: 4px;
+  }
 
   .spinner-w {
     top: 1rem;
