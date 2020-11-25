@@ -87,10 +87,11 @@ func TestSetup_AdaptFunc(t *testing.T) {
 					Annotations: annotations,
 				},
 				Spec: corev1.PodSpec{
-					NodeSelector:   nodeselector,
-					Tolerations:    tolerations,
-					InitContainers: initContainers,
-					Containers:     containers,
+					NodeSelector:    nodeselector,
+					Tolerations:     tolerations,
+					InitContainers:  initContainers,
+					Containers:      containers,
+					SecurityContext: &corev1.PodSecurityContext{},
 
 					RestartPolicy:                 "Never",
 					DNSPolicy:                     "ClusterFirst",
