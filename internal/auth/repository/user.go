@@ -25,12 +25,12 @@ type UserRepository interface {
 	VerifyInitCode(ctx context.Context, userID, code, password string) error
 	ResendInitVerificationMail(ctx context.Context, userID string) error
 
-	AddMfaOTP(ctx context.Context, userID string) (*model.OTP, error)
-	VerifyMfaOTPSetup(ctx context.Context, userID, code string) error
+	AddMFAOTP(ctx context.Context, userID string) (*model.OTP, error)
+	VerifyMFAOTPSetup(ctx context.Context, userID, code string) error
 
-	AddMfaU2F(ctx context.Context, id string) (*model.WebAuthNToken, error)
-	VerifyMfaU2FSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error
-	RemoveMfaU2F(ctx context.Context, userID, webAuthNTokenID string) error
+	AddMFAU2F(ctx context.Context, id string) (*model.WebAuthNToken, error)
+	VerifyMFAU2FSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error
+	RemoveMFAU2F(ctx context.Context, userID, webAuthNTokenID string) error
 
 	AddPasswordless(ctx context.Context, id string) (*model.WebAuthNToken, error)
 	VerifyPasswordlessSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error
@@ -71,14 +71,14 @@ type myUserRepo interface {
 	AddMyExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) (*model.ExternalIDP, error)
 	RemoveMyExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) error
 
-	MyUserMfas(ctx context.Context) ([]*model.MultiFactor, error)
-	AddMyMfaOTP(ctx context.Context) (*model.OTP, error)
-	VerifyMyMfaOTPSetup(ctx context.Context, code string) error
-	RemoveMyMfaOTP(ctx context.Context) error
+	MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, error)
+	AddMyMFAOTP(ctx context.Context) (*model.OTP, error)
+	VerifyMyMFAOTPSetup(ctx context.Context, code string) error
+	RemoveMyMFAOTP(ctx context.Context) error
 
-	AddMyMfaU2F(ctx context.Context) (*model.WebAuthNToken, error)
-	VerifyMyMfaU2FSetup(ctx context.Context, tokenName string, data []byte) error
-	RemoveMyMfaU2F(ctx context.Context, webAuthNTokenID string) error
+	AddMyMFAU2F(ctx context.Context) (*model.WebAuthNToken, error)
+	VerifyMyMFAU2FSetup(ctx context.Context, tokenName string, data []byte) error
+	RemoveMyMFAU2F(ctx context.Context, webAuthNTokenID string) error
 
 	AddMyPasswordless(ctx context.Context) (*model.WebAuthNToken, error)
 	VerifyMyPasswordlessSetup(ctx context.Context, tokenName string, data []byte) error

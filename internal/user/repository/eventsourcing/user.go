@@ -788,7 +788,7 @@ func MFAU2FAddAggregate(aggCreator *es_models.AggregateCreator, user *model.User
 }
 
 func MFAPasswordlessAddAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNToken) es_sdk.AggregateFunc {
-	return MFAWebauthNAddAggregate(aggCreator, user, webauthN, model.HumanMFAPasswordlessTokenAdded)
+	return MFAWebauthNAddAggregate(aggCreator, user, webauthN, model.HumanPasswordlessTokenAdded)
 }
 
 func MFAWebauthNAddAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNToken, event es_models.EventType) es_sdk.AggregateFunc {
@@ -809,7 +809,7 @@ func MFAU2FVerifyAggregate(aggCreator *es_models.AggregateCreator, user *model.U
 }
 
 func MFAPasswordlessVerifyAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNVerify) es_sdk.AggregateFunc {
-	return MFAWebauthNVerifyAggregate(aggCreator, user, webauthN, model.HumanMFAPasswordlessTokenVerified)
+	return MFAWebauthNVerifyAggregate(aggCreator, user, webauthN, model.HumanPasswordlessTokenVerified)
 }
 
 func MFAWebauthNVerifyAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNVerify, event es_models.EventType) es_sdk.AggregateFunc {
@@ -855,14 +855,14 @@ func MFAPasswordlessSignCountAggregate(aggCreator *es_models.AggregateCreator, u
 		if err != nil {
 			return nil, err
 		}
-		agg, err = agg.AppendEvent(model.HumanMFAPasswordlessTokenChangeSignCount, webauthN)
+		agg, err = agg.AppendEvent(model.HumanPasswordlessTokenChangeSignCount, webauthN)
 		if err != nil {
 			return nil, err
 		}
 		if checkSucceeded {
-			return agg.AppendEvent(model.HumanMFAPasswordlessTokenCheckSucceeded, check)
+			return agg.AppendEvent(model.HumanPasswordlessTokenCheckSucceeded, check)
 		} else {
-			return agg.AppendEvent(model.HumanMFAPasswordlessTokenCheckFailed, check)
+			return agg.AppendEvent(model.HumanPasswordlessTokenCheckFailed, check)
 		}
 	}
 }
@@ -872,7 +872,7 @@ func MFAU2FRemoveAggregate(aggCreator *es_models.AggregateCreator, user *model.U
 }
 
 func MFAPasswordlessRemoveAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNTokenID) es_sdk.AggregateFunc {
-	return MFAWebauthNRemoveAggregate(aggCreator, user, webauthN, model.HumanMFAPasswordlessTokenRemoved)
+	return MFAWebauthNRemoveAggregate(aggCreator, user, webauthN, model.HumanPasswordlessTokenRemoved)
 }
 
 func MFAWebauthNRemoveAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNTokenID, event es_models.EventType) es_sdk.AggregateFunc {
@@ -893,7 +893,7 @@ func MFAU2FBeginLoginAggregate(aggCreator *es_models.AggregateCreator, user *mod
 }
 
 func MFAPasswordlessBeginLoginAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNLogin) es_sdk.AggregateFunc {
-	return MFAWebauthNBeginLoginAggregate(aggCreator, user, webauthN, model.HumanMFAPasswordlessTokenBeginLogin)
+	return MFAWebauthNBeginLoginAggregate(aggCreator, user, webauthN, model.HumanPasswordlessTokenBeginLogin)
 }
 
 func MFAWebauthNBeginLoginAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNLogin, event es_models.EventType) es_sdk.AggregateFunc {

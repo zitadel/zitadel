@@ -53,7 +53,7 @@ func (s *Server) GetMyUserAddress(ctx context.Context, _ *empty.Empty) (*auth.Us
 }
 
 func (s *Server) GetMyMfas(ctx context.Context, _ *empty.Empty) (*auth.MultiFactors, error) {
-	mfas, err := s.repo.MyUserMfas(ctx)
+	mfas, err := s.repo.MyUserMFAs(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +143,7 @@ func (s *Server) GetMyPasswordComplexityPolicy(ctx context.Context, _ *empty.Emp
 }
 
 func (s *Server) AddMfaOTP(ctx context.Context, _ *empty.Empty) (_ *auth.MfaOtpResponse, err error) {
-	otp, err := s.repo.AddMyMfaOTP(ctx)
+	otp, err := s.repo.AddMyMFAOTP(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -151,27 +151,27 @@ func (s *Server) AddMfaOTP(ctx context.Context, _ *empty.Empty) (_ *auth.MfaOtpR
 }
 
 func (s *Server) VerifyMfaOTP(ctx context.Context, request *auth.VerifyMfaOtp) (*empty.Empty, error) {
-	err := s.repo.VerifyMyMfaOTPSetup(ctx, request.Code)
+	err := s.repo.VerifyMyMFAOTPSetup(ctx, request.Code)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) RemoveMfaOTP(ctx context.Context, _ *empty.Empty) (_ *empty.Empty, err error) {
-	err = s.repo.RemoveMyMfaOTP(ctx)
+	err = s.repo.RemoveMyMFAOTP(ctx)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) AddMyMfaU2F(ctx context.Context, _ *empty.Empty) (_ *auth.WebAuthNResponse, err error) {
-	u2f, err := s.repo.AddMyMfaU2F(ctx)
+	u2f, err := s.repo.AddMyMFAU2F(ctx)
 	return verifyWebAuthNFromModel(u2f), err
 }
 
 func (s *Server) VerifyMyMfaU2F(ctx context.Context, request *auth.VerifyWebAuthN) (*empty.Empty, error) {
-	err := s.repo.VerifyMyMfaU2FSetup(ctx, request.TokenName, request.PublicKeyCredential)
+	err := s.repo.VerifyMyMFAU2FSetup(ctx, request.TokenName, request.PublicKeyCredential)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) RemoveMyMfaU2F(ctx context.Context, id *auth.WebAuthNTokenID) (*empty.Empty, error) {
-	err := s.repo.RemoveMyMfaU2F(ctx, id.Id)
+	err := s.repo.RemoveMyMFAU2F(ctx, id.Id)
 	return &empty.Empty{}, err
 }
 

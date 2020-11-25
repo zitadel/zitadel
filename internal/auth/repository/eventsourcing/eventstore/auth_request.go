@@ -255,7 +255,7 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, pas
 	return repo.UserEvents.CheckPassword(ctx, userID, password, request.WithCurrentInfo(info))
 }
 
-func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, userID, code, userAgentID string, info *model.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) VerifyMFAOTP(ctx context.Context, authRequestID, userID, code, userAgentID string, info *model.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authRequestID, userAgentID)
@@ -268,7 +268,7 @@ func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, us
 	return repo.UserEvents.CheckMfaOTP(ctx, userID, code, request.WithCurrentInfo(info))
 }
 
-func (repo *AuthRequestRepo) BeginMfaU2FLogin(ctx context.Context, userID, authRequestID, userAgentID string) (login *user_model.WebAuthNLogin, err error) {
+func (repo *AuthRequestRepo) BeginMFAU2FLogin(ctx context.Context, userID, authRequestID, userAgentID string) (login *user_model.WebAuthNLogin, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authRequestID, userAgentID)
@@ -281,7 +281,7 @@ func (repo *AuthRequestRepo) BeginMfaU2FLogin(ctx context.Context, userID, authR
 	return repo.UserEvents.BeginU2FLogin(ctx, userID, request)
 }
 
-func (repo *AuthRequestRepo) VerifyMfaU2F(ctx context.Context, userID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) VerifyMFAU2F(ctx context.Context, userID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authRequestID, userAgentID)
@@ -289,7 +289,7 @@ func (repo *AuthRequestRepo) VerifyMfaU2F(ctx context.Context, userID, authReque
 		return err
 	}
 	if request.UserID != userID {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-5M09s", "Errors.User.NotMatchingUserID")
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Ggf24", "Errors.User.NotMatchingUserID")
 	}
 	return repo.UserEvents.VerifyMfaU2F(ctx, userID, credentialData, request)
 }
@@ -302,7 +302,7 @@ func (repo *AuthRequestRepo) BeginPasswordlessLogin(ctx context.Context, userID,
 		return nil, err
 	}
 	if request.UserID != userID {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5M09s", "Errors.User.NotMatchingUserID")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-454b1", "Errors.User.NotMatchingUserID")
 	}
 	return repo.UserEvents.BeginPasswordlessLogin(ctx, userID, request)
 }
@@ -675,11 +675,11 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *model.AuthRequest, user
 		return &model.InitUserStep{PasswordSet: user.PasswordSet}
 	}
 
-	if user.IsPasswordLessReady() {
-		if !checkVerificationTime(userSession.PasswordLessVerification, repo.MultiFactorCheckLifeTime) {
-			return &model.PasswordLessStep{}
+	if user.IsPasswordlessReady() {
+		if !checkVerificationTime(userSession.PasswordlessVerification, repo.MultiFactorCheckLifeTime) {
+			return &model.PasswordlessStep{}
 		}
-		request.AuthTime = userSession.PasswordLessVerification
+		request.AuthTime = userSession.PasswordlessVerification
 		return nil
 	}
 
@@ -818,8 +818,8 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			es_model.HumanMFAOTPCheckSucceeded,
 			es_model.HumanMFAOTPCheckFailed,
 			es_model.HumanSignedOut,
-			es_model.HumanMFAPasswordlessTokenCheckSucceeded,
-			es_model.HumanMFAPasswordlessTokenCheckFailed,
+			es_model.HumanPasswordlessTokenCheckSucceeded,
+			es_model.HumanPasswordlessTokenCheckFailed,
 			es_model.HumanMFAU2FTokenCheckSucceeded,
 			es_model.HumanMFAU2FTokenCheckFailed:
 			eventData, err := user_view_model.UserSessionFromEvent(event)

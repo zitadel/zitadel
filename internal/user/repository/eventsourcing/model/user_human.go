@@ -210,17 +210,17 @@ func (h *Human) AppendEvent(event *es_models.Event) (err error) {
 		err = h.appendU2FChangeSignCountEvent(event)
 	case HumanMFAU2FTokenRemoved:
 		err = h.appendU2FRemovedEvent(event)
-	case HumanMFAPasswordlessTokenAdded:
+	case HumanPasswordlessTokenAdded:
 		err = h.appendPasswordlessAddedEvent(event)
-	case HumanMFAPasswordlessTokenVerified:
+	case HumanPasswordlessTokenVerified:
 		err = h.appendPasswordlessVerifiedEvent(event)
-	case HumanMFAPasswordlessTokenChangeSignCount:
+	case HumanPasswordlessTokenChangeSignCount:
 		err = h.appendPasswordlessChangeSignCountEvent(event)
-	case HumanMFAPasswordlessTokenRemoved:
+	case HumanPasswordlessTokenRemoved:
 		err = h.appendPasswordlessRemovedEvent(event)
 	case HumanMFAU2FTokenBeginLogin:
 		err = h.appendU2FLoginEvent(event)
-	case HumanMFAPasswordlessTokenBeginLogin:
+	case HumanPasswordlessTokenBeginLogin:
 		err = h.appendPasswordlessLoginEvent(event)
 	}
 	if err != nil {

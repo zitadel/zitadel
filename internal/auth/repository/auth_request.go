@@ -21,9 +21,9 @@ type AuthRequestRepository interface {
 	SelectExternalIDP(ctx context.Context, authReqID, idpConfigID, userAgentID string) error
 	VerifyPassword(ctx context.Context, id, userID, password, userAgentID string, info *model.BrowserInfo) error
 
-	VerifyMfaOTP(ctx context.Context, agentID, authRequestID, code, userAgentID string, info *model.BrowserInfo) error
-	BeginMfaU2FLogin(ctx context.Context, userID, authRequestID, userAgentID string) (*user_model.WebAuthNLogin, error)
-	VerifyMfaU2F(ctx context.Context, userID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) error
+	VerifyMFAOTP(ctx context.Context, agentID, authRequestID, code, userAgentID string, info *model.BrowserInfo) error
+	BeginMFAU2FLogin(ctx context.Context, userID, authRequestID, userAgentID string) (*user_model.WebAuthNLogin, error)
+	VerifyMFAU2F(ctx context.Context, userID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) error
 	BeginPasswordlessLogin(ctx context.Context, userID, authRequestID, userAgentID string) (*user_model.WebAuthNLogin, error)
 	VerifyPasswordless(ctx context.Context, userID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) error
 

@@ -9,10 +9,10 @@ import (
 )
 
 const (
-	tmplPasswordLessVerification = "passwordlessverification"
+	tmplPasswordlessVerification = "passwordlessverification"
 )
 
-func (l *Login) renderPasswordLessVerification(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
+func (l *Login) renderPasswordlessVerification(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	webAuthNLogin, err := l.authRepo.BeginPasswordlessLogin(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.ID, userAgentID)
 	if err != nil {
@@ -20,14 +20,14 @@ func (l *Login) renderPasswordLessVerification(w http.ResponseWriter, r *http.Re
 		return
 	}
 	data := &webAuthNData{
-		userData:               l.getUserData(r, authReq, "Login PasswordLess", "", ""),
+		userData:               l.getUserData(r, authReq, "Login Passwordless", "", ""),
 		CredentialCreationData: base64.URLEncoding.EncodeToString(webAuthNLogin.CredentialAssertionData),
 		SessionID:              webAuthNLogin.Challenge,
 	}
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplPasswordLessVerification], data, nil)
+	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplPasswordlessVerification], data, nil)
 }
 
-func (l *Login) handlePasswordLessVerification(w http.ResponseWriter, r *http.Request) {
+func (l *Login) handlePasswordlessVerification(w http.ResponseWriter, r *http.Request) {
 	formData := new(webAuthNFormData)
 	authReq, err := l.getAuthRequestAndParseData(r, formData)
 	if err != nil {
@@ -35,7 +35,7 @@ func (l *Login) handlePasswordLessVerification(w http.ResponseWriter, r *http.Re
 		return
 	}
 	if formData.Recreate {
-		l.renderPasswordLessVerification(w, r, authReq)
+		l.renderPasswordlessVerification(w, r, authReq)
 		return
 	}
 	credData, err := base64.URLEncoding.DecodeString(formData.CredentialData)

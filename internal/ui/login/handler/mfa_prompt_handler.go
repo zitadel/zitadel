@@ -89,7 +89,7 @@ func (l *Login) handleMfaCreation(w http.ResponseWriter, r *http.Request, authRe
 }
 
 func (l *Login) handleOtpCreation(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *mfaVerifyData) {
-	otp, err := l.authRepo.AddMfaOTP(setContext(r.Context(), authReq.UserOrgID), authReq.UserID)
+	otp, err := l.authRepo.AddMFAOTP(setContext(r.Context(), authReq.UserOrgID), authReq.UserID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

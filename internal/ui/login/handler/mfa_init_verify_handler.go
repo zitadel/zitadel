@@ -47,7 +47,7 @@ func (l *Login) handleMfaInitVerify(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) handleOtpVerify(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *mfaInitVerifyData) *mfaVerifyData {
-	err := l.authRepo.VerifyMfaOTPSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.Code)
+	err := l.authRepo.VerifyMFAOTPSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.Code)
 	if err == nil {
 		return nil
 	}

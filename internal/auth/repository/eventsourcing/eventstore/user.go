@@ -253,7 +253,7 @@ func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new strin
 	return err
 }
 
-func (repo *UserRepo) MyUserMfas(ctx context.Context) ([]*model.MultiFactor, error) {
+func (repo *UserRepo) MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, error) {
 	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
@@ -268,7 +268,7 @@ func (repo *UserRepo) MyUserMfas(ctx context.Context) ([]*model.MultiFactor, err
 	return mfas, nil
 }
 
-func (repo *UserRepo) AddMfaOTP(ctx context.Context, userID string) (*model.OTP, error) {
+func (repo *UserRepo) AddMFAOTP(ctx context.Context, userID string) (*model.OTP, error) {
 	accountName := ""
 	user, err := repo.UserByID(ctx, userID)
 	if err != nil {
@@ -279,7 +279,7 @@ func (repo *UserRepo) AddMfaOTP(ctx context.Context, userID string) (*model.OTP,
 	return repo.UserEvents.AddOTP(ctx, userID, accountName)
 }
 
-func (repo *UserRepo) AddMyMfaOTP(ctx context.Context) (*model.OTP, error) {
+func (repo *UserRepo) AddMyMFAOTP(ctx context.Context) (*model.OTP, error) {
 	accountName := ""
 	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
@@ -290,39 +290,39 @@ func (repo *UserRepo) AddMyMfaOTP(ctx context.Context) (*model.OTP, error) {
 	return repo.UserEvents.AddOTP(ctx, authz.GetCtxData(ctx).UserID, accountName)
 }
 
-func (repo *UserRepo) VerifyMfaOTPSetup(ctx context.Context, userID, code string) error {
+func (repo *UserRepo) VerifyMFAOTPSetup(ctx context.Context, userID, code string) error {
 	return repo.UserEvents.CheckMfaOTPSetup(ctx, userID, code)
 }
 
-func (repo *UserRepo) VerifyMyMfaOTPSetup(ctx context.Context, code string) error {
+func (repo *UserRepo) VerifyMyMFAOTPSetup(ctx context.Context, code string) error {
 	return repo.UserEvents.CheckMfaOTPSetup(ctx, authz.GetCtxData(ctx).UserID, code)
 }
 
-func (repo *UserRepo) RemoveMyMfaOTP(ctx context.Context) error {
+func (repo *UserRepo) RemoveMyMFAOTP(ctx context.Context) error {
 	return repo.UserEvents.RemoveOTP(ctx, authz.GetCtxData(ctx).UserID)
 }
 
-func (repo *UserRepo) AddMfaU2F(ctx context.Context, userID string) (*model.WebAuthNToken, error) {
+func (repo *UserRepo) AddMFAU2F(ctx context.Context, userID string) (*model.WebAuthNToken, error) {
 	return repo.UserEvents.AddU2F(ctx, userID)
 }
 
-func (repo *UserRepo) AddMyMfaU2F(ctx context.Context) (*model.WebAuthNToken, error) {
+func (repo *UserRepo) AddMyMFAU2F(ctx context.Context) (*model.WebAuthNToken, error) {
 	return repo.UserEvents.AddU2F(ctx, authz.GetCtxData(ctx).UserID)
 }
 
-func (repo *UserRepo) VerifyMfaU2FSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error {
+func (repo *UserRepo) VerifyMFAU2FSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error {
 	return repo.UserEvents.VerifyU2FSetup(ctx, userID, tokenName, credentialData)
 }
 
-func (repo *UserRepo) VerifyMyMfaU2FSetup(ctx context.Context, tokenName string, credentialData []byte) error {
+func (repo *UserRepo) VerifyMyMFAU2FSetup(ctx context.Context, tokenName string, credentialData []byte) error {
 	return repo.UserEvents.VerifyU2FSetup(ctx, authz.GetCtxData(ctx).UserID, tokenName, credentialData)
 }
 
-func (repo *UserRepo) RemoveMfaU2F(ctx context.Context, userID, webAuthNTokenID string) error {
+func (repo *UserRepo) RemoveMFAU2F(ctx context.Context, userID, webAuthNTokenID string) error {
 	return repo.UserEvents.RemoveU2FToken(ctx, userID, webAuthNTokenID)
 }
 
-func (repo *UserRepo) RemoveMyMfaU2F(ctx context.Context, webAuthNTokenID string) error {
+func (repo *UserRepo) RemoveMyMFAU2F(ctx context.Context, webAuthNTokenID string) error {
 	return repo.UserEvents.RemoveU2FToken(ctx, authz.GetCtxData(ctx).UserID, webAuthNTokenID)
 }
 

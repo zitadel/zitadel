@@ -49,7 +49,7 @@ type HumanView struct {
 	StreetAddress          string
 	OTPState               MfaState
 	U2FTokens              []*WebAuthNView
-	PasswordLessTokens     []*WebAuthNView
+	PasswordlessTokens     []*WebAuthNView
 	MfaMaxSetUp            req_model.MFALevel
 	MfaInitSkipped         time.Time
 	InitRequired           bool
@@ -179,7 +179,7 @@ func (u *UserView) MfaTypesAllowed(level req_model.MFALevel, policy *iam_model.L
 			for _, mfaType := range policy.MultiFactors {
 				switch mfaType {
 				case iam_model.MultiFactorTypeU2FWithPIN:
-					if u.IsPasswordLessReady() {
+					if u.IsPasswordlessReady() {
 						types = append(types, req_model.MFATypeU2FUserVerification)
 					}
 				}
@@ -199,8 +199,8 @@ func (u *UserView) IsU2FReady() bool {
 	return false
 }
 
-func (u *UserView) IsPasswordLessReady() bool {
-	for _, token := range u.PasswordLessTokens {
+func (u *UserView) IsPasswordlessReady() bool {
+	for _, token := range u.PasswordlessTokens {
 		if token.State == MfaStateReady {
 			return true
 		}

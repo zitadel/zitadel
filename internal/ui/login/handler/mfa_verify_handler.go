@@ -25,7 +25,7 @@ func (l *Login) handleMfaVerify(w http.ResponseWriter, r *http.Request) {
 	}
 	if data.MfaType == model.MFATypeOTP {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-		err = l.authRepo.VerifyMfaOTP(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, data.Code, userAgentID, model.BrowserInfoFromRequest(r))
+		err = l.authRepo.VerifyMFAOTP(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, data.Code, userAgentID, model.BrowserInfoFromRequest(r))
 	}
 	if err != nil {
 		l.renderError(w, r, authReq, err)

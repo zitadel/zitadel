@@ -32,7 +32,7 @@ type UserSessionView struct {
 	DisplayName                  string    `json:"-" gorm:"column:user_display_name"`
 	SelectedIDPConfigID          string    `json:"selectedIDPConfigID" gorm:"column:selected_idp_config_id"`
 	PasswordVerification         time.Time `json:"-" gorm:"column:password_verification"`
-	PasswordLessVerification     time.Time `json:"-" gorm:"column:passwordless_verification"`
+	PasswordlessVerification     time.Time `json:"-" gorm:"column:passwordless_verification"`
 	ExternalLoginVerification    time.Time `json:"-" gorm:"column:external_login_verification"`
 	SecondFactorVerification     time.Time `json:"-" gorm:"column:second_factor_verification"`
 	SecondFactorVerificationType int32     `json:"-" gorm:"column:second_factor_verification_type"`
@@ -63,7 +63,7 @@ func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 		DisplayName:                  userSession.DisplayName,
 		SelectedIDPConfigID:          userSession.SelectedIDPConfigID,
 		PasswordVerification:         userSession.PasswordVerification,
-		PasswordLessVerification:     userSession.PasswordLessVerification,
+		PasswordlessVerification:     userSession.PasswordlessVerification,
 		ExternalLoginVerification:    userSession.ExternalLoginVerification,
 		SecondFactorVerification:     userSession.SecondFactorVerification,
 		SecondFactorVerificationType: req_model.MFAType(userSession.SecondFactorVerificationType),
@@ -95,13 +95,13 @@ func (v *UserSessionView) AppendEvent(event *models.Event) {
 		v.ExternalLoginVerification = event.CreationDate
 		v.SelectedIDPConfigID = data.SelectedIDPConfigID
 		v.State = int32(req_model.UserSessionStateActive)
-	case es_model.HumanMFAPasswordlessTokenCheckSucceeded:
-		v.PasswordLessVerification = event.CreationDate
+	case es_model.HumanPasswordlessTokenCheckSucceeded:
+		v.PasswordlessVerification = event.CreationDate
 		v.MultiFactorVerification = event.CreationDate
 		v.MultiFactorVerificationType = int32(req_model.MFATypeU2FUserVerification)
 		v.State = int32(req_model.UserSessionStateActive)
-	case es_model.HumanMFAPasswordlessTokenCheckFailed:
-		v.PasswordLessVerification = time.Time{}
+	case es_model.HumanPasswordlessTokenCheckFailed:
+		v.PasswordlessVerification = time.Time{}
 		v.MultiFactorVerification = time.Time{}
 	case es_model.UserPasswordCheckFailed,
 		es_model.UserPasswordChanged,

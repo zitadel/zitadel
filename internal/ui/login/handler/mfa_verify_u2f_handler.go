@@ -14,7 +14,7 @@ const (
 
 func (l *Login) renderU2FVerification(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	webAuthNLogin, err := l.authRepo.BeginMfaU2FLogin(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.ID, userAgentID)
+	webAuthNLogin, err := l.authRepo.BeginMFAU2FLogin(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.ID, userAgentID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -44,7 +44,7 @@ func (l *Login) handleU2FVerification(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.VerifyMfaU2F(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.ID, userAgentID, credData, model.BrowserInfoFromRequest(r))
+	err = l.authRepo.VerifyMFAU2F(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.ID, userAgentID, credData, model.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

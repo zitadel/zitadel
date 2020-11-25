@@ -38,7 +38,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		tmplLogin:                    "login.html",
 		tmplUserSelection:            "select_user.html",
 		tmplPassword:                 "password.html",
-		tmplPasswordLessVerification: "passwordless.html",
+		tmplPasswordlessVerification: "passwordless.html",
 		tmplMfaVerify:                "mfa_verify.html",
 		tmplMfaPrompt:                "mfa_prompt.html",
 		tmplMfaInitVerify:            "mfa_init_verify.html",
@@ -92,7 +92,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 			return path.Join(r.pathPrefix, EndpointUserSelection)
 		},
 		"passwordLessVerificationUrl": func() string {
-			return path.Join(r.pathPrefix, EndpointPasswordLessLogin)
+			return path.Join(r.pathPrefix, EndpointPasswordlessLogin)
 		},
 		"passwordResetUrl": func(id string) string {
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointPasswordReset, queryAuthRequestID, id))
@@ -204,8 +204,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 	case *model.PasswordStep:
 		l.renderPassword(w, r, authReq, nil)
-	case *model.PasswordLessStep:
-		l.renderPasswordLessVerification(w, r, authReq)
+	case *model.PasswordlessStep:
+		l.renderPasswordlessVerification(w, r, authReq)
 	case *model.MfaVerificationStep:
 		l.renderMfaVerify(w, r, authReq, step, err)
 	case *model.RedirectToCallbackStep:

@@ -48,7 +48,7 @@ func (m *mockViewErrUserSession) UserSessionsByAgentID(string) ([]*user_view_mod
 
 type mockViewUserSession struct {
 	ExternalLoginVerification time.Time
-	PasswordLessVerification  time.Time
+	PasswordlessVerification  time.Time
 	PasswordVerification      time.Time
 	SecondFactorVerification  time.Time
 	MultiFactorVerification   time.Time
@@ -63,7 +63,7 @@ type mockUser struct {
 func (m *mockViewUserSession) UserSessionByIDs(string, string) (*user_view_model.UserSessionView, error) {
 	return &user_view_model.UserSessionView{
 		ExternalLoginVerification: m.ExternalLoginVerification,
-		PasswordLessVerification:  m.PasswordLessVerification,
+		PasswordlessVerification:  m.PasswordlessVerification,
 		PasswordVerification:      m.PasswordVerification,
 		SecondFactorVerification:  m.SecondFactorVerification,
 		MultiFactorVerification:   m.MultiFactorVerification,
@@ -121,7 +121,7 @@ type mockViewUser struct {
 	OTPState               int32
 	MfaMaxSetUp            int32
 	MfaInitSkipped         time.Time
-	PasswordLessTokens     user_view_model.WebAuthNTokens
+	PasswordlessTokens     user_view_model.WebAuthNTokens
 }
 
 type mockLoginPolicy struct {
@@ -145,7 +145,7 @@ func (m *mockViewUser) UserByID(string) (*user_view_model.UserView, error) {
 			OTPState:               m.OTPState,
 			MfaMaxSetUp:            m.MfaMaxSetUp,
 			MfaInitSkipped:         m.MfaInitSkipped,
-			PasswordLessTokens:     m.PasswordLessTokens,
+			PasswordlessTokens:     m.PasswordlessTokens,
 		},
 	}, nil
 }
@@ -425,26 +425,26 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userSessionViewProvider: &mockViewUserSession{},
 				userViewProvider: &mockViewUser{
 					PasswordSet:        true,
-					PasswordLessTokens: user_view_model.WebAuthNTokens{&user_view_model.WebAuthNView{ID: "id", State: int32(user_model.MfaStateReady)}},
+					PasswordlessTokens: user_view_model.WebAuthNTokens{&user_view_model.WebAuthNView{ID: "id", State: int32(user_model.MfaStateReady)}},
 				},
 				userEventProvider:        &mockEventUser{},
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
 				MultiFactorCheckLifeTime: 10 * time.Hour,
 			},
 			args{&model.AuthRequest{UserID: "UserID"}, false},
-			[]model.NextStep{&model.PasswordLessStep{}},
+			[]model.NextStep{&model.PasswordlessStep{}},
 			nil,
 		},
 		{
 			"passwordless verified, email not verified, email verification step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					PasswordLessVerification: time.Now().Add(-5 * time.Minute),
+					PasswordlessVerification: time.Now().Add(-5 * time.Minute),
 					MultiFactorVerification:  time.Now().Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet:            true,
-					PasswordLessTokens:     user_view_model.WebAuthNTokens{&user_view_model.WebAuthNView{ID: "id", State: int32(user_model.MfaStateReady)}},
+					PasswordlessTokens:     user_view_model.WebAuthNTokens{&user_view_model.WebAuthNView{ID: "id", State: int32(user_model.MfaStateReady)}},
 					PasswordChangeRequired: false,
 					IsEmailVerified:        false,
 					MfaMaxSetUp:            int32(model.MFALevelMultiFactor),

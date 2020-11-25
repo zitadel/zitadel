@@ -95,7 +95,7 @@ type HumanView struct {
 	PasswordChangeRequired bool           `json:"-" gorm:"column:password_change_required"`
 	UsernameChangeRequired bool           `json:"-" gorm:"column:username_change_required"`
 	PasswordChanged        time.Time      `json:"-" gorm:"column:password_change"`
-	PasswordLessTokens     WebAuthNTokens `json:"-" gorm:"column:passwordless_verified_ids"`
+	PasswordlessTokens     WebAuthNTokens `json:"-" gorm:"column:passwordless_tokens"`
 }
 
 type WebAuthNTokens []*WebAuthNView
@@ -154,7 +154,7 @@ func UserToModel(user *UserView) *model.UserView {
 			PasswordSet:            user.PasswordSet,
 			PasswordChangeRequired: user.PasswordChangeRequired,
 			PasswordChanged:        user.PasswordChanged,
-			PasswordLessTokens:     WebauthnTokensToModel(user.PasswordLessTokens),
+			PasswordlessTokens:     WebauthnTokensToModel(user.PasswordlessTokens),
 			U2FTokens:              WebauthnTokensToModel(user.U2FTokens),
 			FirstName:              user.FirstName,
 			LastName:               user.LastName,
@@ -263,13 +263,12 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	case es_model.UserPasswordChanged,
 		es_model.HumanPasswordChanged:
 		err = u.setPasswordData(event)
-	case es_model.HumanMFAPasswordlessTokenVerified:
-		err = u.addPasswordLessToken(event)
-	case es_model.HumanMFAPasswordlessTokenRemoved:
-		err = u.updatePasswordLessToken(event)
-		if err != nil {
-			return err
-		}
+	case es_model.HumanPasswordlessTokenAdded:
+		err = u.addPasswordlessToken(event)
+	case es_model.HumanPasswordlessTokenVerified:
+		err = u.updatePasswordlessToken(event)
+	case es_model.HumanPasswordlessTokenRemoved:
+		err = u.removePasswordlessToken(event)
 	case es_model.UserProfileChanged,
 		es_model.HumanProfileChanged,
 		es_model.UserAddressChanged,
@@ -366,12 +365,12 @@ func (u *UserView) setPasswordData(event *models.Event) error {
 	return nil
 }
 
-func (u *UserView) addPasswordLessToken(event *models.Event) error {
+func (u *UserView) addPasswordlessToken(event *models.Event) error {
 	token, err := webAuthNViewFromEvent(event)
 	if err != nil {
 		return err
 	}
-	for _, t := range u.PasswordLessTokens {
+	for _, t := range u.PasswordlessTokens {
 		if t.State == int32(model.MfaStateNotReady) {
 			t = token
 			return nil
@@ -381,15 +380,31 @@ func (u *UserView) addPasswordLessToken(event *models.Event) error {
 	return nil
 }
 
-func (u *UserView) updatePasswordLessToken(event *models.Event) error {
+func (u *UserView) updatePasswordlessToken(event *models.Event) error {
 	token, err := webAuthNViewFromEvent(event)
 	if err != nil {
 		return err
 	}
-	for i, t := range u.PasswordLessTokens {
+	for i, t := range u.PasswordlessTokens {
 		if t.ID == token.ID {
-			u.PasswordLessTokens[i].Name = token.Name
-			u.PasswordLessTokens[i].State = int32(model.MfaStateReady)
+			u.PasswordlessTokens[i].Name = token.Name
+			u.PasswordlessTokens[i].State = int32(model.MfaStateReady)
+			return nil
+		}
+	}
+	return nil
+}
+
+func (u *UserView) removePasswordlessToken(event *models.Event) error {
+	token, err := webAuthNViewFromEvent(event)
+	if err != nil {
+		return err
+	}
+	for i, t := range u.PasswordlessTokens {
+		if t.ID == token.ID {
+			u.PasswordlessTokens[i] = u.PasswordlessTokens[len(u.PasswordlessTokens)-1]
+			u.PasswordlessTokens[len(u.PasswordlessTokens)-1] = nil
+			u.PasswordlessTokens = u.PasswordlessTokens[:len(u.PasswordlessTokens)-1]
 			return nil
 		}
 	}
@@ -468,7 +483,7 @@ func (u *UserView) ComputeObject() {
 }
 
 func (u *UserView) ComputeMFAMaxSetUp() {
-	for _, token := range u.PasswordLessTokens {
+	for _, token := range u.PasswordlessTokens {
 		if token.State == int32(model.MfaStateReady) {
 			u.MfaMaxSetUp = int32(req_model.MFALevelMultiFactor)
 			return
