@@ -57,7 +57,7 @@
             "IAM":"Zeige ZITADELs globale Zugangsrichtlinien, bereinige views und fehlerhafte events",
             "ORG":"Zeige Zugangsrichtlinien und Domains deiner Organisation ",
             "SELFPROJECTS":"Verwalte die Projekte deiner Organisation",
-            "GRANTEDPROJECTS":"Zeige berechtigte Projekte von anderen Organisationen",
+            "GRANTEDPROJECTS":"Verwalte die berechtigten Projekte von anderen Organisationen",
             "HUMANUSERS":"Zeige alle Human users deiner Organisation",
             "MACHINEUSERS":"Zeige Service User deiner your organisation",
             "AUTHZ":"Zeige gültige Berechtigungen deiner Organisationsbenutzer"
