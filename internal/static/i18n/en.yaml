@@ -282,6 +282,7 @@ EventTypes:
         code:
           added: Phone number code generated
           sent: Phone number code sent
+        removed: Phone number removed
       profile:
         changed: User profile changed
       address:

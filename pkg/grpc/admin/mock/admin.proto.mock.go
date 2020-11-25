@@ -10,7 +10,6 @@ import (
 	gomock "github.com/golang/mock/gomock"
 	grpc "google.golang.org/grpc"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
 )
 
@@ -577,26 +576,6 @@ func (mr *MockAdminServiceClientMockRecorder) ReactivateIdpConfig(arg0, arg1 int
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReactivateIdpConfig", reflect.TypeOf((*MockAdminServiceClient)(nil).ReactivateIdpConfig), varargs...)
 }
 
-// Ready mocks base method
-func (m *MockAdminServiceClient) Ready(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "Ready", varargs...)
-	ret0, _ := ret[0].(*emptypb.Empty)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Ready indicates an expected call of Ready
-func (mr *MockAdminServiceClientMockRecorder) Ready(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ready", reflect.TypeOf((*MockAdminServiceClient)(nil).Ready), varargs...)
-}
-
 // RemoveFailedEvent mocks base method
 func (m *MockAdminServiceClient) RemoveFailedEvent(arg0 context.Context, arg1 *admin.FailedEventID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
@@ -995,24 +974,4 @@ func (mr *MockAdminServiceClientMockRecorder) UpdateOrgIamPolicy(arg0, arg1 inte
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateOrgIamPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).UpdateOrgIamPolicy), varargs...)
-}
-
-// Validate mocks base method
-func (m *MockAdminServiceClient) Validate(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*structpb.Struct, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "Validate", varargs...)
-	ret0, _ := ret[0].(*structpb.Struct)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Validate indicates an expected call of Validate
-func (mr *MockAdminServiceClientMockRecorder) Validate(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Validate", reflect.TypeOf((*MockAdminServiceClient)(nil).Validate), varargs...)
 }

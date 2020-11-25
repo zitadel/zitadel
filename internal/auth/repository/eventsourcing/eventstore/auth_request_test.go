@@ -440,7 +440,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{&model.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID"}, false},
-			[]model.NextStep{&model.ExternalLoginStep{}},
+			[]model.NextStep{&model.ExternalLoginStep{SelectedIDPConfigID: "IDPConfigID"}},
 			nil,
 		},
 		{

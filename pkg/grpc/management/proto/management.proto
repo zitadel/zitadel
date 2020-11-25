@@ -42,18 +42,6 @@ service ManagementService {
     };
   }
 
-  rpc Ready(google.protobuf.Empty) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      get: "/ready"
-    };
-  }
-
-  rpc Validate(google.protobuf.Empty) returns (google.protobuf.Struct) {
-    option (google.api.http) = {
-      get: "/validate"
-    };
-  }
-
   rpc GetZitadelDocs(google.protobuf.Empty) returns (ZitadelDocs) {
     option (google.api.http) = {
       get: "/zitadel/docs"
@@ -397,6 +385,16 @@ rpc GetUserByID(UserID) returns (UserView) {
 
     option (caos.zitadel.utils.v1.auth_option) = {
       permission: "user.read"
+    };
+  }
+
+  rpc RemoveMfaOTP(UserID) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/users/{id}/mfas/otp"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.write"
     };
   }
 

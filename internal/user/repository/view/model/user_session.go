@@ -116,5 +116,8 @@ func (v *UserSessionView) AppendEvent(event *models.Event) {
 		v.SecondFactorVerification = time.Time{}
 		v.ExternalLoginVerification = time.Time{}
 		v.State = int32(req_model.UserSessionStateTerminated)
+	case es_model.HumanExternalIDPRemoved, es_model.HumanExternalIDPCascadeRemoved:
+		v.ExternalLoginVerification = time.Time{}
+		v.SelectedIDPConfigID = ""
 	}
 }

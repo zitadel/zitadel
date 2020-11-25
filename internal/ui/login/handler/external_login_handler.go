@@ -45,6 +45,7 @@ func (l *Login) handleExternalLoginStep(w http.ResponseWriter, r *http.Request, 
 	for _, idp := range authReq.AllowedExternalIDPs {
 		if idp.IDPConfigID == selectedIDPConfigID {
 			l.handleIDP(w, r, authReq, selectedIDPConfigID)
+			return
 		}
 	}
 	l.renderLogin(w, r, authReq, errors.ThrowInvalidArgument(nil, "VIEW-Fsj7f", "Errors.User.ExternalIDP.NotAllowed"))
