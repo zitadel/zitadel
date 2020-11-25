@@ -54,7 +54,7 @@
         "GRANTS":"Berechtigungen",
         "TOOLTIP": {
             "PERSONAL":"Verwalte deinen persönlichen Account, deine IDPs, Login Methoden, Faktoren und Berechtigungen",
-            "IAM":"Zeige ZITADELs globale Zugangsrichtlinien, bereinige views und fehlerhafte events",
+            "IAM":"Verwalte ZITADELs globale Zugangsrichtlinien, bereinige views und fehlerhafte events",
             "ORG":"Zeige Zugangsrichtlinien und Domains deiner Organisation ",
             "SELFPROJECTS":"Verwalte die Projekte deiner Organisation",
             "GRANTEDPROJECTS":"Verwalte die berechtigten Projekte von anderen Organisationen",
