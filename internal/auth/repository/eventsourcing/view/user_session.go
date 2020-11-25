@@ -22,6 +22,10 @@ func (v *View) UserSessionsByAgentID(agentID string) ([]*model.UserSessionView, 
 	return view.UserSessionsByAgentID(v.Db, userSessionTable, agentID)
 }
 
+func (v *View) ActiveUserSessions() ([]*model.UserSessionView, error) {
+	return view.ActiveUserSessions(v.Db, userSessionTable)
+}
+
 func (v *View) PutUserSession(userSession *model.UserSessionView) error {
 	err := view.PutUserSession(v.Db, userSessionTable, userSession)
 	if err != nil {

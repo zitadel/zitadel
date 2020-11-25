@@ -11,9 +11,6 @@ import (
 )
 
 func CaosToGRPCError(ctx context.Context, err error) error {
-	if err == nil {
-		return nil
-	}
 	code, key, id, ok := ExtractCaosError(err)
 	if !ok {
 		return status.Convert(err).Err()

@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/telemetry/metrics"
 	"time"
 
 	"github.com/caos/logging"
@@ -55,11 +56,13 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, repo repository.Re
 	cookieHandler, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator, localDevMode)
 	logging.Log("OIDC-sd4fd").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot user agent handler")
 	config.OPConfig.CodeMethodS256 = true
+	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 	provider, err := op.NewOpenIDProvider(
 		ctx,
 		config.OPConfig,
 		newStorage(config.StorageConfig, repo),
 		op.WithHttpInterceptors(
+			middleware.MetricsHandler(metricTypes),
 			middleware.TelemetryHandler(),
 			middleware.NoCacheInterceptor,
 			cookieHandler,

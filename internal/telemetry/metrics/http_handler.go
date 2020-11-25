@@ -6,31 +6,60 @@ import (
 )
 
 const (
-	RequestCount                 = "http.server.request_count"
+	RequestCounter               = "http.server.request_count"
 	RequestCountDescription      = "Request counter"
+	TotalRequestCounter          = "http.server.total_request_count"
+	TotalRequestDescription      = "Total return code counter"
 	ReturnCodeCounter            = "http.server.return_code_counter"
 	ReturnCodeCounterDescription = "Return code counter"
 	Method                       = "method"
 	URI                          = "uri"
+	ReturnCode                   = "return_code"
 )
 
 type Handler struct {
 	handler http.Handler
+	methods []MetricType
 	filters []Filter
+}
+
+type MetricType int32
+
+const (
+	MetricTypeTotalCount MetricType = iota
+	MetricTypeStatusCode
+	MetricTypeRequestCount
+)
+
+type StatusRecorder struct {
+	http.ResponseWriter
+	Status int
+}
+
+func (r *StatusRecorder) WriteHeader(status int) {
+	r.Status = status
+	r.ResponseWriter.WriteHeader(status)
 }
 
 type Filter func(*http.Request) bool
 
-func NewMetricsHandler(handler http.Handler, ignoredEndpoints ...string) http.Handler {
+func NewMetricsHandler(handler http.Handler, metricMethods []MetricType, ignoredEndpoints ...string) http.Handler {
 	h := Handler{
 		handler: handler,
+		methods: metricMethods,
 	}
-	h.filters = append(h.filters, shouldNotIgnore(ignoredEndpoints...))
+	if len(ignoredEndpoints) > 0 {
+		h.filters = append(h.filters, shouldNotIgnore(ignoredEndpoints...))
+	}
 	return &h
 }
 
 // ServeHTTP serves HTTP requests (http.Handler)
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if len(h.methods) == 0 {
+		h.handler.ServeHTTP(w, r)
+		return
+	}
 	for _, f := range h.filters {
 		if !f(r) {
 			// Simply pass through to the handler if a filter rejects the request
@@ -38,16 +67,53 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	registerRequestCounter(r)
+	recorder := &StatusRecorder{
+		ResponseWriter: w,
+		Status:         200,
+	}
+	h.handler.ServeHTTP(recorder, r)
+	if h.containsMetricsMethod(MetricTypeRequestCount) {
+		RegisterRequestCounter(r)
+	}
+	if h.containsMetricsMethod(MetricTypeTotalCount) {
+		RegisterTotalRequestCounter(r)
+	}
+	if h.containsMetricsMethod(MetricTypeStatusCode) {
+		RegisterRequestCodeCounter(recorder, r)
+	}
 }
 
-func registerRequestCounter(r *http.Request) {
+func (h *Handler) containsMetricsMethod(method MetricType) bool {
+	for _, m := range h.methods {
+		if m == method {
+			return true
+		}
+	}
+	return false
+}
+
+func RegisterRequestCounter(r *http.Request) {
 	var labels = map[string]interface{}{
 		URI:    r.RequestURI,
-		Method: r.Method,
+		Method: strings.Split(r.Method, "?")[0],
 	}
-	M.RegisterCounter(RequestCount, RequestCountDescription)
-	M.AddCount(r.Context(), RequestCount, 1, labels)
+	M.RegisterCounter(RequestCounter, RequestCountDescription)
+	M.AddCount(r.Context(), RequestCounter, 1, labels)
+}
+
+func RegisterTotalRequestCounter(r *http.Request) {
+	M.RegisterCounter(TotalRequestCounter, TotalRequestDescription)
+	M.AddCount(r.Context(), TotalRequestCounter, 1, nil)
+}
+
+func RegisterRequestCodeCounter(recorder *StatusRecorder, r *http.Request) {
+	var labels = map[string]interface{}{
+		URI:        r.RequestURI,
+		Method:     strings.Split(r.Method, "?")[0],
+		ReturnCode: recorder.Status,
+	}
+	M.RegisterCounter(ReturnCodeCounter, ReturnCodeCounterDescription)
+	M.AddCount(r.Context(), ReturnCode, 1, labels)
 }
 
 func shouldNotIgnore(endpoints ...string) func(r *http.Request) bool {

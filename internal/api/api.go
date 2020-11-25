@@ -2,7 +2,9 @@ package api
 
 import (
 	"context"
+	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/telemetry/metrics"
+	"go.opentelemetry.io/otel/api/metric"
 	"net/http"
 
 	"github.com/caos/logging"
@@ -31,19 +33,26 @@ type API struct {
 	verifier       *authz.TokenVerifier
 	serverPort     string
 	health         health
+	auth           auth
 }
+
 type health interface {
 	Health(ctx context.Context) error
 	IamByID(ctx context.Context) (*iam_model.IAM, error)
 	VerifierClientID(ctx context.Context, appName string) (string, error)
 }
 
-func Create(config Config, authZ authz.Config, authZRepo *authz_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
+type auth interface {
+	ActiveUserSessionCount() int64
+}
+
+func Create(config Config, authZ authz.Config, authZRepo *authz_es.EsRepository, authRepo *auth_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
 	api := &API{
 		serverPort: config.GRPC.ServerPort,
 	}
 	api.verifier = authz.Start(authZRepo)
 	api.health = authZRepo
+	api.auth = authRepo
 	api.grpcServer = server.CreateServer(api.verifier, authZ, sd.DefaultLanguage)
 	api.gatewayHandler = server.CreateGatewayHandler(config.GRPC)
 	api.RegisterHandler("", api.healthHandler())
@@ -135,6 +144,15 @@ func (a *API) handleClientID(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) handleMetrics() http.Handler {
+	metrics.M.RegisterUpDownSumObserver(
+		metrics.ActiveSessionCounter,
+		metrics.ActiveSessionCounterDescription,
+		func(ctx context.Context, result metric.Int64ObserverResult) {
+			result.Observe(
+				a.auth.ActiveUserSessionCount(),
+			)
+		},
+	)
 	return metrics.M.GetExporter()
 }
 

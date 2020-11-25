@@ -1,6 +1,7 @@
 package view
 
 import (
+	auth_model "github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/view/repository"
 	"github.com/jinzhu/gorm"
@@ -53,6 +54,20 @@ func UserSessionsByAgentID(db *gorm.DB, table, agentID string) ([]*model.UserSes
 	}
 	query := repository.PrepareSearchQuery(table, model.UserSessionSearchRequest{
 		Queries: []*usr_model.UserSessionSearchQuery{userAgentQuery},
+	})
+	_, err := query(db, &userSessions)
+	return userSessions, err
+}
+
+func ActiveUserSessions(db *gorm.DB, table string) ([]*model.UserSessionView, error) {
+	userSessions := make([]*model.UserSessionView, 0)
+	activeQuery := &usr_model.UserSessionSearchQuery{
+		Key:    usr_model.UserSessionSearchKeyState,
+		Method: global_model.SearchMethodEquals,
+		Value:  auth_model.UserSessionStateActive,
+	}
+	query := repository.PrepareSearchQuery(table, model.UserSessionSearchRequest{
+		Queries: []*usr_model.UserSessionSearchQuery{activeQuery},
 	})
 	_, err := query(db, &userSessions)
 	return userSessions, err

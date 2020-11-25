@@ -7,11 +7,17 @@ import (
 	"net/http"
 )
 
+const (
+	ActiveSessionCounter            = "active_session_counter"
+	ActiveSessionCounterDescription = "Active session counter"
+)
+
 type Metrics interface {
 	GetExporter() http.Handler
 	GetMetricsProvider() metric.MeterProvider
 	RegisterCounter(name, description string) error
 	AddCount(ctx context.Context, name string, value int64, labels map[string]interface{}) error
+	RegisterUpDownSumObserver(name, description string, callbackFunc metric.Int64ObserverFunc) error
 }
 
 type Config interface {

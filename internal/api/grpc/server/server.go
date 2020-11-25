@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/telemetry/metrics"
 
 	"github.com/caos/logging"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -27,10 +28,12 @@ type Server interface {
 }
 
 func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, lang language.Tag) *grpc.Server {
+	metricTypes := []metrics.MetricType{metrics.MetricTypeTotalCount, metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode}
 	return grpc.NewServer(
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
 				middleware.DefaultTracingServer(),
+				middleware.MetricsHandler(metricTypes),
 				middleware.ErrorHandler(),
 				middleware.AuthorizationInterceptor(verifier, authConfig),
 				middleware.TranslationHandler(lang),
