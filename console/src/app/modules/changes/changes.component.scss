@@ -1,23 +1,23 @@
 @import '~@angular/material/theming';
 
 .change-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-    .ch-header {
-        display: block;
-        margin-bottom: 1rem;
-        font-weight: 400;
-        margin-top: 1rem;
-        font-size: 14px;
-        letter-spacing: .05em;
-        text-transform: uppercase;
-    }
+  .ch-header {
+    display: block;
+    margin-bottom: 1rem;
+    font-weight: 400;
+    margin-top: 1rem;
+    font-size: 14px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
 
-    .icon {
-        font-size: 1.2rem;
-    }
+  .icon {
+    font-size: 1.2rem;
+  }
 }
 
 @mixin changes-theme($theme) {
