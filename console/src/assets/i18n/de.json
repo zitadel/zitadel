@@ -58,7 +58,7 @@
             "ORG":"Zeige Zugangsrichtlinien und Domains deiner Organisation ",
             "SELFPROJECTS":"Verwalte die Projekte deiner Organisation",
             "GRANTEDPROJECTS":"Verwalte die berechtigten Projekte von anderen Organisationen",
-            "HUMANUSERS":"Zeige alle Human users deiner Organisation",
+            "HUMANUSERS":"Verwalte die Menschlichen Benutzer deiner Organisation",
             "MACHINEUSERS":"Verwalte die  Service Benutzer deiner Organisation",
             "AUTHZ":"Verwalte die Berechtigungen deiner Organisationsbenutzer"
         }
