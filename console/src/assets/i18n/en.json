@@ -57,7 +57,7 @@
             "IAM":"Show ZITADELs global access policies, clear views and failed events",
             "ORG":"Show your organisations access policies, and set your domains",
             "SELFPROJECTS":"Show your organisations own projects",
-            "GRANTEDPROJECTS":"Show projects your organisation was granted on",
+            "GRANTEDPROJECTS":"Show projects your organisation was granted access",
             "HUMANUSERS":"Show all registered human Users on your organisation",
             "MACHINEUSERS":"Show service users of your organisation",
             "AUTHZ":"Show authorizations available to your organisation users"
