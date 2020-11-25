@@ -14,7 +14,7 @@ type LoginPolicy struct {
 	AllowUsernamePassword bool           `json:"allowUsernamePassword"`
 	AllowRegister         bool           `json:"allowRegister"`
 	AllowExternalIdp      bool           `json:"allowExternalIdp"`
-	ForceMFA              bool           `json:"forceMfa"` //TODO: replace by forceMFA
+	ForceMFA              bool           `json:"forceMFA"`
 	PasswordlessType      int32          `json:"passwordlessType"`
 	IDPProviders          []*IDPProvider `json:"-"`
 	SecondFactors         []int32        `json:"-"`

@@ -23,6 +23,7 @@ type SystemDefaults struct {
 	DomainVerification       DomainVerification
 	IamID                    string
 	Notifications            Notifications
+	WebAuthN                 WebAuthN
 }
 
 type ZitadelDocs struct {
@@ -88,4 +89,10 @@ type TemplateData struct {
 	VerifyEmail   templates.TemplateData
 	VerifyPhone   templates.TemplateData
 	DomainClaimed templates.TemplateData
+}
+
+type WebAuthN struct {
+	ID          string
+	Origin      string
+	DisplayName string
 }

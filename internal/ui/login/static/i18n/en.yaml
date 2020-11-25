@@ -88,7 +88,7 @@ MFAVerifyU2F:
   Title: Multifactor Verification
   Description: Verify your multifactor U2F / WebAuthN token
 
-WebAuthn:
+WebAuthN:
   Name: Name of the tokens / machine
   NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
   Error:

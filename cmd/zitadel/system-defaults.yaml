@@ -125,3 +125,7 @@ SystemDefaults:
         Greeting: 'DomainClaimed.Greeting'
         Text: 'DomainClaimed.Text'
         ButtonText: 'DomainClaimed.ButtonText'
+  WebAuthN:
+    ID: $ZITADEL_COOKIE_DOMAIN
+    Origin: $ZITADEL_ACCOUNTS
+    DisplayName: ZITADEL

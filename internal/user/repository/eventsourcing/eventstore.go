@@ -47,7 +47,6 @@ type UserEventstore struct {
 	Multifactors             global_model.Multifactors
 	validateTOTP             func(string, string) bool
 	webauthn                 *webauthn_helper.WebAuthN
-	//creds                    []webauthn.Credential //TODO: remove
 }
 
 type UserConfig struct {
@@ -71,7 +70,7 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 	passwordVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.PasswordVerificationCode, aesCrypto)
 	aesOTPCrypto, err := crypto.NewAESCrypto(systemDefaults.Multifactors.OTP.VerificationKey)
 	passwordAlg := crypto.NewBCrypt(systemDefaults.SecretGenerators.PasswordSaltCost)
-	web, err := webauthn_helper.StartServer("zitadel", "localhost", "http://localhost:50003")
+	web, err := webauthn_helper.StartServer(systemDefaults.WebAuthN.DisplayName, systemDefaults.WebAuthN.ID, systemDefaults.WebAuthN.Origin)
 	if err != nil {
 		return nil, err
 	}

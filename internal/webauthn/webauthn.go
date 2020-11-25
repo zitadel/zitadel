@@ -3,10 +3,11 @@ package webauthn
 import (
 	"bytes"
 	"encoding/json"
-	caos_errs "github.com/caos/zitadel/internal/errors"
+
 	"github.com/duo-labs/webauthn/protocol"
 	"github.com/duo-labs/webauthn/webauthn"
 
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 )
 
@@ -19,7 +20,6 @@ func StartServer(displayName, id, origin string) (*WebAuthN, error) {
 		RPDisplayName: displayName,
 		RPID:          id,
 		RPOrigin:      origin,
-		Debug:         true,
 	})
 	if err != nil {
 		return nil, err
