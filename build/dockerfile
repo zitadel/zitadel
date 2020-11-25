@@ -114,7 +114,7 @@ RUN go get github.com/go-delve/delve/cmd/dlv
 #######################
 FROM alpine:latest as artifact
 RUN adduser -D zitadel
-COPY cmd/zitadel/*.yaml /
+COPY cmd/zitadel/*.yaml /app/
 COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadel-linux-amd64 /app/zitadel
 RUN chmod a+x /app/zitadel
 RUN ls -la /
