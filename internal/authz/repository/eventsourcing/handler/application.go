@@ -54,9 +54,9 @@ func (a *Application) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return a.view.DeleteApplication(app.ID, event.Sequence)
+		return a.view.DeleteApplication(app.ID, event.Sequence, event.CreationDate)
 	default:
-		return a.view.ProcessedApplicationSequence(event.Sequence)
+		return a.view.ProcessedApplicationSequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
@@ -67,4 +67,8 @@ func (a *Application) Reduce(event *models.Event) (err error) {
 func (a *Application) OnError(event *models.Event, spoolerError error) error {
 	logging.LogWithFields("SPOOL-sjZw", "id", event.AggregateID).WithError(spoolerError).Warn("something went wrong in project app handler")
 	return spooler.HandleError(event, spoolerError, a.view.GetLatestApplicationFailedEvent, a.view.ProcessedApplicationFailedEvent, a.view.ProcessedApplicationSequence, a.errorCountUntilSkip)
+}
+
+func (a *Application) OnSuccess() error {
+	return spooler.HandleSuccess(a.view.UpdateApplicationSpoolerRunTimestamp)
 }
