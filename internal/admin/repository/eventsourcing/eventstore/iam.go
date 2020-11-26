@@ -68,7 +68,7 @@ func (repo *IAMRepository) SearchIAMMembers(ctx context.Context, request *iam_mo
 	}
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.EventTimestamp
 	}
 	return result, nil
 }
@@ -170,7 +170,7 @@ func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_mo
 	}
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.EventTimestamp
 	}
 	return result, nil
 }
@@ -262,7 +262,7 @@ func (repo *IAMRepository) SearchDefaultIDPProviders(ctx context.Context, reques
 	}
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.EventTimestamp
 	}
 	return result, nil
 }

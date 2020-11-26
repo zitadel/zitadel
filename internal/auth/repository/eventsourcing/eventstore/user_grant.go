@@ -44,7 +44,7 @@ func (repo *UserGrantRepo) SearchMyUserGrants(ctx context.Context, request *gran
 	}
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.EventTimestamp
 	}
 	return result, nil
 }

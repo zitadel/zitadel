@@ -67,3 +67,7 @@ func (m *PasswordAgePolicy) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Bs89f", "id", event.AggregateID).WithError(err).Warn("something went wrong in passwordAge policy handler")
 	return spooler.HandleError(event, err, m.view.GetLatestPasswordAgePolicyFailedEvent, m.view.ProcessedPasswordAgePolicyFailedEvent, m.view.ProcessedPasswordAgePolicySequence, m.errorCountUntilSkip)
 }
+
+func (m *PasswordAgePolicy) OnSuccess() error {
+	return spooler.HandleSuccess(m.view.UpdatePasswordAgePolicySpoolerRunTimestamp)
+}

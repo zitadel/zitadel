@@ -202,3 +202,7 @@ func (u *User) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-is8wa", "id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
 	return spooler.HandleError(event, err, u.view.GetLatestUserFailedEvent, u.view.ProcessedUserFailedEvent, u.view.ProcessedUserSequence, u.errorCountUntilSkip)
 }
+
+func (u *User) OnSuccess() error {
+	return spooler.HandleSuccess(u.view.UpdateUserSpoolerRunTimestamp)
+}

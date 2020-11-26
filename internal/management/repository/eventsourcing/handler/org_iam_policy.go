@@ -67,3 +67,7 @@ func (m *OrgIAMPolicy) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-3Gf9s", "id", event.AggregateID).WithError(err).Warn("something went wrong in orgIAM policy handler")
 	return spooler.HandleError(event, err, m.view.GetLatestOrgIAMPolicyFailedEvent, m.view.ProcessedOrgIAMPolicyFailedEvent, m.view.ProcessedOrgIAMPolicySequence, m.errorCountUntilSkip)
 }
+
+func (o *OrgIAMPolicy) OnSuccess() error {
+	return spooler.HandleSuccess(o.view.UpdateOrgIAMPolicySpoolerRunTimestamp)
+}

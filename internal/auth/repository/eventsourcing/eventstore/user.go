@@ -124,7 +124,7 @@ func (repo *UserRepo) SearchMyExternalIDPs(ctx context.Context, request *model.E
 	}
 	if seqErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.EventTimestamp
 	}
 	return result, nil
 }

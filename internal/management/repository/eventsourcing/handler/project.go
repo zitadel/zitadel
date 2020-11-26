@@ -60,3 +60,7 @@ func (p *Project) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-dLsop3", "id", event.AggregateID).WithError(err).Warn("something went wrong in projecthandler")
 	return spooler.HandleError(event, err, p.view.GetLatestProjectFailedEvent, p.view.ProcessedProjectFailedEvent, p.view.ProcessedProjectSequence, p.errorCountUntilSkip)
 }
+
+func (p *Project) OnSuccess() error {
+	return spooler.HandleSuccess(p.view.UpdateProjectSpoolerRunTimestamp)
+}

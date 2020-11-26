@@ -50,7 +50,7 @@ func (repo *OrgRepository) SearchOrgs(ctx context.Context, request *org_model.Or
 	}
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.EventTimestamp
 	}
 	return result, nil
 }

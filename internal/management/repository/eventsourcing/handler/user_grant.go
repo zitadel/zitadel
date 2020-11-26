@@ -79,14 +79,14 @@ func (u *UserGrant) processUserGrant(event *models.Event) (err error) {
 		}
 		err = grant.AppendEvent(event)
 	case grant_es_model.UserGrantRemoved, grant_es_model.UserGrantCascadeRemoved:
-		return u.view.DeleteUserGrant(event.AggregateID, event.Sequence)
+		return u.view.DeleteUserGrant(event.AggregateID, event.Sequence, event.CreationDate)
 	default:
-		return u.view.ProcessedUserGrantSequence(event.Sequence)
+		return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return u.view.PutUserGrant(grant, grant.Sequence)
+	return u.view.PutUserGrant(grant, grant.Sequence, event.CreationDate)
 }
 
 func (u *UserGrant) processUser(event *models.Event) (err error) {
@@ -101,7 +101,7 @@ func (u *UserGrant) processUser(event *models.Event) (err error) {
 			return err
 		}
 		if len(grants) == 0 {
-			return u.view.ProcessedUserGrantSequence(event.Sequence)
+			return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
 		}
 		user, err := u.userEvents.UserByID(context.Background(), event.AggregateID)
 		if err != nil {
@@ -110,9 +110,9 @@ func (u *UserGrant) processUser(event *models.Event) (err error) {
 		for _, grant := range grants {
 			u.fillUserData(grant, user)
 		}
-		return u.view.PutUserGrants(grants, event.Sequence)
+		return u.view.PutUserGrants(grants, event.Sequence, event.CreationDate)
 	default:
-		return u.view.ProcessedUserGrantSequence(event.Sequence)
+		return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
 	}
 	return nil
 }
@@ -125,7 +125,7 @@ func (u *UserGrant) processProject(event *models.Event) (err error) {
 			return err
 		}
 		if len(grants) == 0 {
-			return u.view.ProcessedUserGrantSequence(event.Sequence)
+			return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
 		}
 		project, err := u.projectEvents.ProjectByID(context.Background(), event.AggregateID)
 		if err != nil {
@@ -134,9 +134,9 @@ func (u *UserGrant) processProject(event *models.Event) (err error) {
 		for _, grant := range grants {
 			u.fillProjectData(grant, project)
 		}
-		return u.view.PutUserGrants(grants, event.Sequence)
+		return u.view.PutUserGrants(grants, event.Sequence, event.CreationDate)
 	default:
-		return u.view.ProcessedUserGrantSequence(event.Sequence)
+		return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
 	}
 	return nil
 }
@@ -192,4 +192,8 @@ func (u *UserGrant) fillOrgData(grant *view_model.UserGrantView, org *org_model.
 func (u *UserGrant) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-8is4s", "id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
 	return spooler.HandleError(event, err, u.view.GetLatestUserGrantFailedEvent, u.view.ProcessedUserGrantFailedEvent, u.view.ProcessedUserGrantSequence, u.errorCountUntilSkip)
+}
+
+func (u *UserGrant) OnSuccess() error {
+	return spooler.HandleSuccess(u.view.UpdateUserGrantSpoolerRunTimestamp)
 }

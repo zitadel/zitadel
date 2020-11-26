@@ -77,6 +77,7 @@ func (s *spooledHandler) load(workerID string) {
 			errs <- s.process(ctx, events, workerID)
 			logging.Log("SPOOL-0pV8o").WithField("view", s.ViewModel()).WithField("worker", workerID).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("process done")
 		}
+
 	}
 	<-ctx.Done()
 }
@@ -101,6 +102,8 @@ func (s *spooledHandler) process(ctx context.Context, events []*models.Event, wo
 			}
 		}
 	}
+	err := s.OnSuccess()
+	logging.LogWithFields("SPOOL-49ods", "view", s.ViewModel(), "worker", workerID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Warn("could not process on success func")
 	return nil
 }
 
@@ -163,7 +166,7 @@ func (s *spooledHandler) lock(ctx context.Context, errs chan<- error, workerID s
 func HandleError(event *models.Event, failedErr error,
 	latestFailedEvent func(sequence uint64) (*repository.FailedEvent, error),
 	processFailedEvent func(*repository.FailedEvent) error,
-	processSequence func(uint64) error, errorCountUntilSkip uint64) error {
+	processSequence func(uint64, time.Time) error, errorCountUntilSkip uint64) error {
 	failedEvent, err := latestFailedEvent(event.Sequence)
 	if err != nil {
 		return err
@@ -175,7 +178,11 @@ func HandleError(event *models.Event, failedErr error,
 		return err
 	}
 	if errorCountUntilSkip <= failedEvent.FailureCount {
-		return processSequence(event.Sequence)
+		return processSequence(event.Sequence, event.CreationDate)
 	}
 	return nil
+}
+
+func HandleSuccess(updateSpoolerRunTimestamp func() error) error {
+	return updateSpoolerRunTimestamp()
 }

@@ -72,16 +72,16 @@ func (p *ProjectGrantMember) processProjectGrantMember(event *models.Event) (err
 		if err != nil {
 			return err
 		}
-		return p.view.DeleteProjectGrantMember(member.GrantID, member.UserID, event.Sequence)
+		return p.view.DeleteProjectGrantMember(member.GrantID, member.UserID, event.Sequence, event.CreationDate)
 	case proj_es_model.ProjectRemoved:
 		return p.view.DeleteProjectGrantMembersByProjectID(event.AggregateID)
 	default:
-		return p.view.ProcessedProjectGrantMemberSequence(event.Sequence)
+		return p.view.ProcessedProjectGrantMemberSequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutProjectGrantMember(member, member.Sequence)
+	return p.view.PutProjectGrantMember(member, member.Sequence, event.CreationDate)
 }
 
 func (p *ProjectGrantMember) processUser(event *models.Event) (err error) {
@@ -96,7 +96,7 @@ func (p *ProjectGrantMember) processUser(event *models.Event) (err error) {
 			return err
 		}
 		if len(members) == 0 {
-			return p.view.ProcessedProjectGrantMemberSequence(event.Sequence)
+			return p.view.ProcessedProjectGrantMemberSequence(event.Sequence, event.CreationDate)
 		}
 		user, err := p.userEvents.UserByID(context.Background(), event.AggregateID)
 		if err != nil {
@@ -105,9 +105,9 @@ func (p *ProjectGrantMember) processUser(event *models.Event) (err error) {
 		for _, member := range members {
 			p.fillUserData(member, user)
 		}
-		return p.view.PutProjectGrantMembers(members, event.Sequence)
+		return p.view.PutProjectGrantMembers(members, event.Sequence, event.CreationDate)
 	default:
-		return p.view.ProcessedProjectGrantMemberSequence(event.Sequence)
+		return p.view.ProcessedProjectGrantMemberSequence(event.Sequence, event.CreationDate)
 	}
 	return nil
 }
@@ -137,4 +137,8 @@ func (p *ProjectGrantMember) fillUserData(member *view_model.ProjectGrantMemberV
 func (p *ProjectGrantMember) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-kls93", "id", event.AggregateID).WithError(err).Warn("something went wrong in projectmember handler")
 	return spooler.HandleError(event, err, p.view.GetLatestProjectGrantMemberFailedEvent, p.view.ProcessedProjectGrantMemberFailedEvent, p.view.ProcessedProjectGrantMemberSequence, p.errorCountUntilSkip)
+}
+
+func (p *ProjectGrantMember) OnSuccess() error {
+	return spooler.HandleSuccess(p.view.UpdateProjectGrantSpoolerRunTimestamp)
 }

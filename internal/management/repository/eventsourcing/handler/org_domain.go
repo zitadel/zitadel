@@ -96,3 +96,7 @@ func (d *OrgDomain) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-us4sj", "id", event.AggregateID).WithError(err).Warn("something went wrong in orgdomain handler")
 	return spooler.HandleError(event, err, d.view.GetLatestOrgDomainFailedEvent, d.view.ProcessedOrgDomainFailedEvent, d.view.ProcessedOrgDomainSequence, d.errorCountUntilSkip)
 }
+
+func (o *OrgDomain) OnSuccess() error {
+	return spooler.HandleSuccess(o.view.UpdateOrgDomainSpoolerRunTimestamp)
+}

@@ -19,12 +19,12 @@ const (
 	passwordLockoutPolicyTable = "management.password_lockout_policies"
 )
 
-func (m *PasswordLockoutPolicy) ViewModel() string {
+func (p *PasswordLockoutPolicy) ViewModel() string {
 	return passwordLockoutPolicyTable
 }
 
-func (m *PasswordLockoutPolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestPasswordLockoutPolicySequence()
+func (p *PasswordLockoutPolicy) EventQuery() (*models.SearchQuery, error) {
+	sequence, err := p.view.GetLatestPasswordLockoutPolicySequence()
 	if err != nil {
 		return nil, err
 	}
@@ -33,37 +33,41 @@ func (m *PasswordLockoutPolicy) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (m *PasswordLockoutPolicy) Reduce(event *models.Event) (err error) {
+func (p *PasswordLockoutPolicy) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
 	case model.OrgAggregate, iam_es_model.IAMAggregate:
-		err = m.processPasswordLockoutPolicy(event)
+		err = p.processPasswordLockoutPolicy(event)
 	}
 	return err
 }
 
-func (m *PasswordLockoutPolicy) processPasswordLockoutPolicy(event *models.Event) (err error) {
+func (p *PasswordLockoutPolicy) processPasswordLockoutPolicy(event *models.Event) (err error) {
 	policy := new(iam_model.PasswordLockoutPolicyView)
 	switch event.Type {
 	case iam_es_model.PasswordLockoutPolicyAdded, model.PasswordLockoutPolicyAdded:
 		err = policy.AppendEvent(event)
 	case iam_es_model.PasswordLockoutPolicyChanged, model.PasswordLockoutPolicyChanged:
-		policy, err = m.view.PasswordLockoutPolicyByAggregateID(event.AggregateID)
+		policy, err = p.view.PasswordLockoutPolicyByAggregateID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		err = policy.AppendEvent(event)
 	case model.PasswordLockoutPolicyRemoved:
-		return m.view.DeletePasswordLockoutPolicy(event.AggregateID, event.Sequence)
+		return p.view.DeletePasswordLockoutPolicy(event.AggregateID, event.Sequence)
 	default:
-		return m.view.ProcessedPasswordLockoutPolicySequence(event.Sequence)
+		return p.view.ProcessedPasswordLockoutPolicySequence(event.Sequence)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutPasswordLockoutPolicy(policy, policy.Sequence)
+	return p.view.PutPasswordLockoutPolicy(policy, policy.Sequence)
 }
 
-func (m *PasswordLockoutPolicy) OnError(event *models.Event, err error) error {
+func (p *PasswordLockoutPolicy) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Bms8f", "id", event.AggregateID).WithError(err).Warn("something went wrong in passwordLockout policy handler")
-	return spooler.HandleError(event, err, m.view.GetLatestPasswordLockoutPolicyFailedEvent, m.view.ProcessedPasswordLockoutPolicyFailedEvent, m.view.ProcessedPasswordLockoutPolicySequence, m.errorCountUntilSkip)
+	return spooler.HandleError(event, err, p.view.GetLatestPasswordLockoutPolicyFailedEvent, p.view.ProcessedPasswordLockoutPolicyFailedEvent, p.view.ProcessedPasswordLockoutPolicySequence, p.errorCountUntilSkip)
+}
+
+func (p *PasswordLockoutPolicy) OnSuccess() error {
+	return spooler.HandleSuccess(p.view.UpdatePasswordLockoutPolicySpoolerRunTimestamp)
 }

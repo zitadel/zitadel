@@ -141,7 +141,7 @@ func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model
 				}
 				if sequenceErr == nil {
 					result.Sequence = sequence.CurrentSequence
-					result.Timestamp = sequence.CurrentTimestamp
+					result.Timestamp = sequence.EventTimestamp
 				}
 				return result, nil
 			}
@@ -162,7 +162,7 @@ func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.EventTimestamp
 	}
 	return result, nil
 }
@@ -212,7 +212,7 @@ func (repo *ProjectRepo) SearchProjectMembers(ctx context.Context, request *proj
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.EventTimestamp
 	}
 	return result, nil
 }
@@ -285,7 +285,7 @@ func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, projectID strin
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.EventTimestamp
 	}
 	return result, nil
 }
@@ -380,7 +380,7 @@ func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_m
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.EventTimestamp
 	}
 	return result, nil
 }
@@ -437,7 +437,7 @@ func (repo *ProjectRepo) SearchProjectGrants(ctx context.Context, request *proj_
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.EventTimestamp
 	}
 	return result, nil
 }
@@ -467,7 +467,7 @@ func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *pro
 				}
 				if sequenceErr == nil {
 					result.Sequence = sequence.CurrentSequence
-					result.Timestamp = sequence.CurrentTimestamp
+					result.Timestamp = sequence.EventTimestamp
 				}
 				return result, nil
 			}
@@ -488,7 +488,7 @@ func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *pro
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.EventTimestamp
 	}
 	return result, nil
 }
@@ -626,7 +626,7 @@ func (repo *ProjectRepo) SearchProjectGrantMembers(ctx context.Context, request 
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.EventTimestamp
 	}
 	return result, nil
 }

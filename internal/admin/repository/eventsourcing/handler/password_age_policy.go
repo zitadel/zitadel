@@ -19,12 +19,12 @@ const (
 	passwordAgePolicyTable = "adminapi.password_age_policies"
 )
 
-func (m *PasswordAgePolicy) ViewModel() string {
+func (p *PasswordAgePolicy) ViewModel() string {
 	return passwordAgePolicyTable
 }
 
-func (m *PasswordAgePolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestPasswordAgePolicySequence()
+func (p *PasswordAgePolicy) EventQuery() (*models.SearchQuery, error) {
+	sequence, err := p.view.GetLatestPasswordAgePolicySequence()
 	if err != nil {
 		return nil, err
 	}
@@ -33,37 +33,41 @@ func (m *PasswordAgePolicy) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (m *PasswordAgePolicy) Reduce(event *models.Event) (err error) {
+func (p *PasswordAgePolicy) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
 	case model.OrgAggregate, iam_es_model.IAMAggregate:
-		err = m.processPasswordAgePolicy(event)
+		err = p.processPasswordAgePolicy(event)
 	}
 	return err
 }
 
-func (m *PasswordAgePolicy) processPasswordAgePolicy(event *models.Event) (err error) {
+func (p *PasswordAgePolicy) processPasswordAgePolicy(event *models.Event) (err error) {
 	policy := new(iam_model.PasswordAgePolicyView)
 	switch event.Type {
 	case iam_es_model.PasswordAgePolicyAdded, model.PasswordAgePolicyAdded:
 		err = policy.AppendEvent(event)
 	case iam_es_model.PasswordAgePolicyChanged, model.PasswordAgePolicyChanged:
-		policy, err = m.view.PasswordAgePolicyByAggregateID(event.AggregateID)
+		policy, err = p.view.PasswordAgePolicyByAggregateID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		err = policy.AppendEvent(event)
 	case model.PasswordAgePolicyRemoved:
-		return m.view.DeletePasswordAgePolicy(event.AggregateID, event.Sequence)
+		return p.view.DeletePasswordAgePolicy(event.AggregateID, event.Sequence, event.CreationDate)
 	default:
-		return m.view.ProcessedPasswordAgePolicySequence(event.Sequence)
+		return p.view.ProcessedPasswordAgePolicySequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutPasswordAgePolicy(policy, policy.Sequence)
+	return p.view.PutPasswordAgePolicy(policy, policy.Sequence, event.CreationDate)
 }
 
-func (m *PasswordAgePolicy) OnError(event *models.Event, err error) error {
+func (p *PasswordAgePolicy) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-nD8sie", "id", event.AggregateID).WithError(err).Warn("something went wrong in passwordAge policy handler")
-	return spooler.HandleError(event, err, m.view.GetLatestPasswordAgePolicyFailedEvent, m.view.ProcessedPasswordAgePolicyFailedEvent, m.view.ProcessedPasswordAgePolicySequence, m.errorCountUntilSkip)
+	return spooler.HandleError(event, err, p.view.GetLatestPasswordAgePolicyFailedEvent, p.view.ProcessedPasswordAgePolicyFailedEvent, p.view.ProcessedPasswordAgePolicySequence, p.errorCountUntilSkip)
+}
+
+func (p *PasswordAgePolicy) OnSuccess() error {
+	return spooler.HandleSuccess(p.view.UpdateExternalIDPSpoolerRunTimestamp)
 }

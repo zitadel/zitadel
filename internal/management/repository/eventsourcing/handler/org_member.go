@@ -137,3 +137,7 @@ func (m *OrgMember) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-u73es", "id", event.AggregateID).WithError(err).Warn("something went wrong in orgmember handler")
 	return spooler.HandleError(event, err, m.view.GetLatestOrgMemberFailedEvent, m.view.ProcessedOrgMemberFailedEvent, m.view.ProcessedOrgMemberSequence, m.errorCountUntilSkip)
 }
+
+func (o *OrgMember) OnSuccess() error {
+	return spooler.HandleSuccess(o.view.UpdateOrgMemberSpoolerRunTimestamp)
+}
