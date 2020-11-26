@@ -132,6 +132,7 @@ func OIDCConfigToModel(config *OIDCConfig) *model.OIDCConfig {
 		AccessTokenType:          model.OIDCTokenType(config.AccessTokenType),
 		AccessTokenRoleAssertion: config.AccessTokenRoleAssertion,
 		IDTokenRoleAssertion:     config.IDTokenRoleAssertion,
+		IDTokenUserinfoAssertion: config.IDTokenUserinfoAssertion,
 		ClockSkew:                config.ClockSkew,
 	}
 	oidcConfig.FillCompliance()
