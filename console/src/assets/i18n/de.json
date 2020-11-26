@@ -375,11 +375,11 @@
     "IAM": {
         "POLICIES": {
             "TITLE":"IAM Administration",
-            "DESCRIPTION":"Verwalte die Einstellungen von ZITADEL."
+            "DESCRIPTION":"Verwalte Richtlinen und Zugangseinstellungen von ZITADEL."
         },
         "EVENTSTORE": {
             "TITLE":"IAM Speicher Administration",
-            "DESCRIPTION":"Verwalte die Einstellungen von ZITADEL."
+            "DESCRIPTION":"Verwalte Speicher Einstellungen von ZITADEL."
         },
         "MEMBER": {
             "TITLE":"Manager",
