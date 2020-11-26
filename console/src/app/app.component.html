@@ -76,13 +76,16 @@
                         </ng-container>
 
                         <div *ngIf="org" [@navAnimation]="org">
-                            <ng-template appHasRole [appHasRole]="['org.read']">
+                            <ng-template appHasRole
+                                [appHasRole]="['org.read', 'project.read(:[0-9]*)?', 'user.read(:[0-9]*)?', 'user.grant.read(:[0-9]*)?']">
                                 <div @navitem class="divider">
                                     <div class="line"></div>
                                     <span>{{org?.name ? org.name : ('MENU.ORGSECTION' | translate)}}</span>
                                     <div class="hiddenline"></div>
                                 </div>
+                            </ng-template>
 
+                            <ng-template appHasRole [appHasRole]="['org.read']">
                                 <a @navitem matTooltip="{{'MENU.TOOLTIP.ORG' | translate}}" class="nav-item"
                                     [routerLinkActive]="['active']" [routerLink]="[ '/org']">
                                     <i class="icon las la-archway"></i>
@@ -132,13 +135,6 @@
                             </ng-template>
 
                             <ng-template appHasRole [appHasRole]="['user.grant.read(:[0-9]*)?']">
-                                <!-- <div @navitem class="divider">
-                                    <div class="line"></div>
-                                    <span class="label">
-                                        {{ 'MENU.GRANTSECTION' | translate }}</span>
-                                    <div class="hiddenline"></div>
-                                </div> -->
-
                                 <a @navitem class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/grants']"
                                     [routerLinkActiveOptions]="{ exact: true }">
                                     <i class="icon las la-shield-alt"></i>
@@ -153,10 +149,16 @@
                                 <span>{{'MENU.ADMINSECTION' | translate}}</span>
                                 <div class="hiddenline"></div>
                             </div>
-                            <a @navitem matTooltip="{{'MENU.TOOLTIP.IAM' | translate}}" class="nav-item"
-                                [routerLinkActive]="['active']" [routerLink]="[ '/iam']">
+                            <a @navitem matTooltip="{{'MENU.TOOLTIP.IAMPOLICIES' | translate}}" class="nav-item"
+                                [routerLinkActive]="['active']" [routerLink]="[ '/iam','policies']">
                                 <i class="icon las la-gem"></i>
-                                <span class="label">{{'MENU.IAM' | translate}}</span>
+                                <span class="label">{{'MENU.IAMPOLICIES' | translate}}</span>
+                            </a>
+
+                            <a @navitem matTooltip="{{'MENU.TOOLTIP.IAMEVENTSTORE' | translate}}" class="nav-item"
+                                [routerLinkActive]="['active']" [routerLink]="[ '/iam', 'eventstore']">
+                                <i class="icon las la-gem"></i>
+                                <span class="label">{{'MENU.IAMEVENTSTORE' | translate}}</span>
                             </a>
                         </ng-container>
 
