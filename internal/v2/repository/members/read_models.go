@@ -11,13 +11,6 @@ type ReadModel struct {
 	Members []*member.ReadModel
 }
 
-func NewMembersReadModel() *ReadModel {
-	return &ReadModel{
-		ReadModel: *eventstore.NewReadModel(),
-		Members:   []*member.ReadModel{},
-	}
-}
-
 func (rm *ReadModel) MemberByUserID(id string) (idx int, member *member.ReadModel) {
 	for idx, member = range rm.Members {
 		if member.UserID == id {
@@ -31,12 +24,12 @@ func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *member.AddedEvent:
-			member := member.NewMemberReadModel(e.UserID)
-			rm.Members = append(rm.Members, member)
-			member.AppendEvents(e)
+			m := member.NewMemberReadModel(e.UserID)
+			rm.Members = append(rm.Members, m)
+			m.AppendEvents(e)
 		case *member.ChangedEvent:
-			_, member := rm.MemberByUserID(e.UserID)
-			member.AppendEvents(e)
+			_, m := rm.MemberByUserID(e.UserID)
+			m.AppendEvents(e)
 		case *member.RemovedEvent:
 			idx, _ := rm.MemberByUserID(e.UserID)
 			if idx < 0 {
@@ -50,8 +43,8 @@ func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 }
 
 func (rm *ReadModel) Reduce() (err error) {
-	for _, member := range rm.Members {
-		err = member.Reduce()
+	for _, m := range rm.Members {
+		err = m.Reduce()
 		if err != nil {
 			return err
 		}

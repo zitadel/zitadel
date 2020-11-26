@@ -3,7 +3,6 @@ package eventstore_test
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -209,14 +208,7 @@ type UsersReadModel struct {
 	Users []*UserReadModel
 }
 
-func NewUsersReadModel() *UsersReadModel {
-	return &UsersReadModel{
-		ReadModel: *eventstore.NewReadModel(),
-		Users:     []*UserReadModel{},
-	}
-}
-
-func (rm *UsersReadModel) AppendEvents(events ...eventstore.EventReader) (err error) {
+func (rm *UsersReadModel) AppendEvents(events ...eventstore.EventReader) {
 	rm.ReadModel.AppendEvents(events...)
 	for _, event := range events {
 		switch e := event.(type) {
@@ -224,29 +216,24 @@ func (rm *UsersReadModel) AppendEvents(events ...eventstore.EventReader) (err er
 			//insert
 			user := NewUserReadModel(e.AggregateID())
 			rm.Users = append(rm.Users, user)
-			err = user.AppendEvents(e)
+			user.AppendEvents(e)
 		case *UserFirstNameChangedEvent, *UserPasswordCheckedEvent:
 			//update
 			_, user := rm.userByID(e.AggregateID())
 			if user == nil {
-				return errors.New("user not found")
+				return
 			}
-			err = user.AppendEvents(e)
+			user.AppendEvents(e)
 		case *UserDeletedEvent:
 			idx, _ := rm.userByID(e.AggregateID())
 			if idx < 0 {
-				return nil
+				return
 			}
 			copy(rm.Users[idx:], rm.Users[idx+1:])
 			rm.Users[len(rm.Users)-1] = nil // or the zero value of T
 			rm.Users = rm.Users[:len(rm.Users)-1]
 		}
-		if err != nil {
-			return err
-		}
 	}
-
-	return nil
 }
 
 func (rm *UsersReadModel) Reduce() error {
@@ -285,14 +272,8 @@ type UserReadModel struct {
 
 func NewUserReadModel(id string) *UserReadModel {
 	return &UserReadModel{
-		ReadModel: *eventstore.NewReadModel(),
-		ID:        id,
+		ID: id,
 	}
-}
-
-func (rm *UserReadModel) AppendEvents(events ...eventstore.EventReader) error {
-	rm.ReadModel.AppendEvents(events...)
-	return nil
 }
 
 func (rm *UserReadModel) Reduce() error {
@@ -335,8 +316,8 @@ func TestUserReadModel(t *testing.T) {
 
 	fmt.Printf("%+v\n", events)
 
-	users := NewUsersReadModel()
-	err = es.FilterToReducer(context.Background(), eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, "test.user"), users)
+	users := UsersReadModel{}
+	err = es.FilterToReducer(context.Background(), eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, "test.user"), &users)
 	if err != nil {
 		t.Errorf("unexpected error on filter to reducer: %v", err)
 	}

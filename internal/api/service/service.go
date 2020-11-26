@@ -6,8 +6,8 @@ type serviceKey struct{}
 
 var key *serviceKey = (*serviceKey)(nil)
 
-func WithService(partent context.Context, serviceName string) context.Context {
-	return context.WithValue(partent, key, serviceName)
+func WithService(parent context.Context, serviceName string) context.Context {
+	return context.WithValue(parent, key, serviceName)
 }
 
 func FromContext(ctx context.Context) string {

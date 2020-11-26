@@ -110,6 +110,9 @@ func (repo *IAMRepository) IDPConfigByID(ctx context.Context, idpConfigID string
 
 func (repo *IAMRepository) AddOIDCIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
 	idp.AggregateID = repo.SystemDefaults.IamID
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.AddIDPConfig(ctx, idp)
+	}
 	return repo.IAMEventstore.AddIDPConfig(ctx, idp)
 }
 

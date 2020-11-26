@@ -125,8 +125,8 @@ func (es *Eventstore) mapEvents(events []*repository.Event) (mappedEvents []Even
 		interceptors, ok := es.eventInterceptors[EventType(event.Type)]
 		if !ok || interceptors.eventMapper == nil {
 			mappedEvents[i] = BaseEventFromRepo(event)
-			continue
-			// return nil, errors.ThrowPreconditionFailed(nil, "V2-usujB", "event mapper not defined")
+			// continue
+			return nil, errors.ThrowPreconditionFailed(nil, "V2-usujB", "event mapper not defined")
 		}
 		mappedEvents[i], err = interceptors.eventMapper(event)
 		if err != nil {

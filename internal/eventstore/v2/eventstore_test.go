@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/api/service"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
@@ -57,7 +58,7 @@ func newTestEvent(description string, data func() interface{}, checkPrevious boo
 		data:                data,
 		shouldCheckPrevious: checkPrevious,
 		BaseEvent: *NewBaseEventForPush(
-			authz.NewMockContext("resourceOwner", "editorUser"),
+			service.WithService(authz.NewMockContext("resourceOwner", "editorUser"), "editorService"),
 			"test.event",
 		),
 	}
@@ -1142,12 +1143,8 @@ func (r *testReducer) Reduce() error {
 	return nil
 }
 
-func (r *testReducer) AppendEvents(e ...EventReader) error {
-	if r.err != nil {
-		return r.err
-	}
+func (r *testReducer) AppendEvents(e ...EventReader) {
 	r.events = append(r.events, e...)
-	return nil
 }
 
 func TestEventstore_FilterToReducer(t *testing.T) {
@@ -1234,10 +1231,7 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 		{
 			name: "found events",
 			args: args{
-				query: &SearchQueryFactory{
-					aggregateTypes: []AggregateType{"test.aggregate"},
-					columns:        repository.ColumnsEvent,
-				},
+				query: NewSearchQueryFactory(repository.ColumnsEvent, "test.aggregate"),
 				readModel: &testReducer{
 					t:              t,
 					expectedLength: 1,
@@ -1268,8 +1262,9 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 					columns:        repository.ColumnsEvent,
 				},
 				readModel: &testReducer{
-					t:   t,
-					err: errors.ThrowInvalidArgument(nil, "V2-W06TG", "test err"),
+					t:              t,
+					err:            errors.ThrowInvalidArgument(nil, "V2-W06TG", "test err"),
+					expectedLength: 1,
 				},
 			},
 			fields: fields{
@@ -1399,6 +1394,8 @@ func TestEventstore_mapEvents(t *testing.T) {
 				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){},
 			},
 			res: res{
+				//TODO: as long as not all events are implemented in v2 eventstore doesn't return an error
+				// afterwards it will return an error on un
 				wantErr: true,
 			},
 		},

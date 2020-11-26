@@ -14,8 +14,7 @@ type ReadModel struct {
 //NewMemberReadModel is the default constructor of ReadModel
 func NewMemberReadModel(userID string) *ReadModel {
 	return &ReadModel{
-		ReadModel: *eventstore.NewReadModel(),
-		UserID:    userID,
+		UserID: userID,
 	}
 }
 

@@ -28,3 +28,12 @@ func (r *Repository) IDPConfigByID(ctx context.Context, idpConfigID string) (*ia
 
 	return readModelToIDPConfigView(idpConfig), nil
 }
+
+func (r *Repository) AddIDPConfig(ctx context.Context, config *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
+	iam, err := r.iamByID(ctx, config.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}

@@ -2,12 +2,6 @@ package eventstore
 
 import "time"
 
-func NewReadModel() *ReadModel {
-	return &ReadModel{
-		Events: []EventReader{},
-	}
-}
-
 //ReadModel is the minimum representation of a View model.
 // It implements a basic reducer
 // it might be saved in a database or in memory
