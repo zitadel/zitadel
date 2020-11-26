@@ -32,6 +32,7 @@ type ApplicationView struct {
 	AccessTokenType            OIDCTokenType
 	IDTokenRoleAssertion       bool
 	AccessTokenRoleAssertion   bool
+	IDTokenUserinfoAssertion   bool
 	ClockSkew                  time.Duration
 
 	Sequence uint64

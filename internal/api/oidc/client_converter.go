@@ -114,6 +114,10 @@ func (c *Client) ClockSkew() time.Duration {
 	return c.ApplicationView.ClockSkew
 }
 
+func (c *Client) UserInfoInIDToken() bool {
+	return c.ApplicationView.IDTokenUserinfoAssertion
+}
+
 func accessTokenTypeToOIDC(tokenType model.OIDCTokenType) op.AccessTokenType {
 	switch tokenType {
 	case model.OIDCTokenTypeBearer:

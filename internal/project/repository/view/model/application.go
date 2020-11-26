@@ -48,6 +48,7 @@ type ApplicationView struct {
 	AccessTokenType            int32          `json:"accessTokenType" gorm:"column:access_token_type"`
 	AccessTokenRoleAssertion   bool           `json:"accessTokenRoleAssertion" gorm:"column:access_token_role_assertion"`
 	IDTokenRoleAssertion       bool           `json:"idTokenRoleAssertion" gorm:"column:id_token_role_assertion"`
+	IDTokenUserinfoAssertion   bool           `json:"idTokenUserinfoAssertion" gorm:"column:id_token_userinfo_assertion"`
 	ClockSkew                  time.Duration  `json:"clockSkew" gorm:"column:clock_skew"`
 
 	Sequence uint64 `json:"-" gorm:"sequence"`
@@ -81,6 +82,7 @@ func ApplicationViewToModel(app *ApplicationView) *model.ApplicationView {
 		AccessTokenType:            model.OIDCTokenType(app.AccessTokenType),
 		AccessTokenRoleAssertion:   app.AccessTokenRoleAssertion,
 		IDTokenRoleAssertion:       app.IDTokenRoleAssertion,
+		IDTokenUserinfoAssertion:   app.IDTokenUserinfoAssertion,
 		ClockSkew:                  app.ClockSkew,
 	}
 }

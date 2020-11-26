@@ -38,6 +38,7 @@ type OIDCConfig struct {
 	AccessTokenType          OIDCTokenType
 	AccessTokenRoleAssertion bool
 	IDTokenRoleAssertion     bool
+	IDTokenUserinfoAssertion bool
 	ClockSkew                time.Duration
 }
 
