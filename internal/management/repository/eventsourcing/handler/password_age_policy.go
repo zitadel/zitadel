@@ -53,14 +53,14 @@ func (m *PasswordAgePolicy) processPasswordAgePolicy(event *models.Event) (err e
 		}
 		err = policy.AppendEvent(event)
 	case model.PasswordAgePolicyRemoved:
-		return m.view.DeletePasswordAgePolicy(event.AggregateID, event.Sequence)
+		return m.view.DeletePasswordAgePolicy(event.AggregateID, event.Sequence, event.CreationDate)
 	default:
-		return m.view.ProcessedPasswordAgePolicySequence(event.Sequence)
+		return m.view.ProcessedPasswordAgePolicySequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutPasswordAgePolicy(policy, policy.Sequence)
+	return m.view.PutPasswordAgePolicy(policy, policy.Sequence, event.CreationDate)
 }
 
 func (m *PasswordAgePolicy) OnError(event *models.Event, err error) error {

@@ -74,7 +74,7 @@ func (p *ProjectMember) processProjectMember(event *models.Event) (err error) {
 		}
 		return p.view.DeleteProjectMember(event.AggregateID, member.UserID, event.Sequence, event.CreationDate)
 	case proj_es_model.ProjectRemoved:
-		return p.view.DeleteProjectMembersByProjectID(event.AggregateID, event.CreationDate)
+		return p.view.DeleteProjectMembersByProjectID(event.AggregateID)
 	default:
 		return p.view.ProcessedProjectMemberSequence(event.Sequence, event.CreationDate)
 	}
@@ -91,7 +91,7 @@ func (p *ProjectMember) processUser(event *models.Event) (err error) {
 		usr_es_model.HumanProfileChanged,
 		usr_es_model.HumanEmailChanged,
 		usr_es_model.MachineChanged:
-		members, err := p.view.ProjectMembersByUserID(event.AggregateID, event.CreationDate)
+		members, err := p.view.ProjectMembersByUserID(event.AggregateID)
 		if err != nil {
 			return err
 		}

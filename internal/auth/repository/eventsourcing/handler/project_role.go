@@ -61,7 +61,7 @@ func (p *ProjectRole) Reduce(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	return p.view.PutProjectRole(role)
+	return p.view.PutProjectRole(role, event.CreationDate)
 }
 
 func (p *ProjectRole) OnError(event *models.Event, err error) error {

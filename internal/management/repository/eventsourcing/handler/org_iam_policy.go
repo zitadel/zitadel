@@ -53,14 +53,14 @@ func (m *OrgIAMPolicy) processOrgIAMPolicy(event *models.Event) (err error) {
 		}
 		err = policy.AppendEvent(event)
 	case model.OrgIAMPolicyRemoved:
-		return m.view.DeleteOrgIAMPolicy(event.AggregateID, event.Sequence)
+		return m.view.DeleteOrgIAMPolicy(event.AggregateID, event.Sequence, event.CreationDate)
 	default:
-		return m.view.ProcessedOrgIAMPolicySequence(event.Sequence)
+		return m.view.ProcessedOrgIAMPolicySequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutOrgIAMPolicy(policy, policy.Sequence)
+	return m.view.PutOrgIAMPolicy(policy, policy.Sequence, event.CreationDate)
 }
 
 func (m *OrgIAMPolicy) OnError(event *models.Event, err error) error {

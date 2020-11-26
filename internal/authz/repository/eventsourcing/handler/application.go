@@ -61,7 +61,7 @@ func (a *Application) Reduce(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	return a.view.PutApplication(app)
+	return a.view.PutApplication(app, event.CreationDate)
 }
 
 func (a *Application) OnError(event *models.Event, spoolerError error) error {

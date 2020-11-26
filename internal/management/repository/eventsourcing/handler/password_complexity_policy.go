@@ -53,14 +53,14 @@ func (p *PasswordComplexityPolicy) processPasswordComplexityPolicy(event *models
 		}
 		err = policy.AppendEvent(event)
 	case model.PasswordComplexityPolicyRemoved:
-		return p.view.DeletePasswordComplexityPolicy(event.AggregateID, event.Sequence)
+		return p.view.DeletePasswordComplexityPolicy(event.AggregateID, event.Sequence, event.CreationDate)
 	default:
-		return p.view.ProcessedPasswordComplexityPolicySequence(event.Sequence)
+		return p.view.ProcessedPasswordComplexityPolicySequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutPasswordComplexityPolicy(policy, policy.Sequence)
+	return p.view.PutPasswordComplexityPolicy(policy, policy.Sequence, event.CreationDate)
 }
 
 func (p *PasswordComplexityPolicy) OnError(event *models.Event, err error) error {

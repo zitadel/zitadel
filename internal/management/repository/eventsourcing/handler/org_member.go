@@ -72,14 +72,14 @@ func (m *OrgMember) processOrgMember(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return m.view.DeleteOrgMember(event.AggregateID, member.UserID, event.Sequence)
+		return m.view.DeleteOrgMember(event.AggregateID, member.UserID, event.Sequence, event.CreationDate)
 	default:
-		return m.view.ProcessedOrgMemberSequence(event.Sequence)
+		return m.view.ProcessedOrgMemberSequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutOrgMember(member, member.Sequence)
+	return m.view.PutOrgMember(member, member.Sequence, event.CreationDate)
 }
 
 func (m *OrgMember) processUser(event *models.Event) (err error) {
@@ -94,7 +94,7 @@ func (m *OrgMember) processUser(event *models.Event) (err error) {
 			return err
 		}
 		if len(members) == 0 {
-			return m.view.ProcessedOrgMemberSequence(event.Sequence)
+			return m.view.ProcessedOrgMemberSequence(event.Sequence, event.CreationDate)
 		}
 		user, err := m.userEvents.UserByID(context.Background(), event.AggregateID)
 		if err != nil {
@@ -103,11 +103,11 @@ func (m *OrgMember) processUser(event *models.Event) (err error) {
 		for _, member := range members {
 			m.fillUserData(member, user)
 		}
-		return m.view.PutOrgMembers(members, event.Sequence)
+		return m.view.PutOrgMembers(members, event.Sequence, event.CreationDate)
 	case usr_es_model.UserRemoved:
-		return m.view.DeleteOrgMembersByUserID(event.AggregateID, event.Sequence)
+		return m.view.DeleteOrgMembersByUserID(event.AggregateID, event.Sequence, event.CreationDate)
 	default:
-		return m.view.ProcessedOrgMemberSequence(event.Sequence)
+		return m.view.ProcessedOrgMemberSequence(event.Sequence, event.CreationDate)
 	}
 	return nil
 }
