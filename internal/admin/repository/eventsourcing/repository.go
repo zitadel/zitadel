@@ -16,8 +16,6 @@ import (
 	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	iam_business "github.com/caos/zitadel/internal/v2/business/iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
-	"github.com/caos/zitadel/internal/v2/repository/idp"
-	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
 	"github.com/caos/zitadel/internal/v2/repository/member"
 )
 
@@ -46,13 +44,13 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 	esV2.RegisterFilterEventMapper(iam.MemberAddedEventType, member.AddedEventMapper).
 		RegisterFilterEventMapper(iam.MemberChangedEventType, member.ChangedEventMapper).
 		RegisterFilterEventMapper(iam.MemberRemovedEventType, member.RemovedEventMapper).
-		RegisterFilterEventMapper(iam.IDPConfigAddedEventType, idp.ConfigAddedEventMapper).
-		RegisterFilterEventMapper(iam.IDPConfigChangedEventType, idp.ConfigChangedEventMapper).
-		RegisterFilterEventMapper(iam.IDPConfigDeactivatedEventType, idp.ConfigDeactivatedEventMapper).
-		RegisterFilterEventMapper(iam.IDPConfigReactivatedEventType, idp.ConfigReactivatedEventMapper).
-		RegisterFilterEventMapper(iam.IDPConfigRemovedEventType, idp.ConfigRemovedEventMapper).
-		RegisterFilterEventMapper(iam.IDPOIDCConfigAddedEventType, oidc.ConfigAddedEventMapper).
-		RegisterFilterEventMapper(iam.IDPOIDCConfigChangedEventType, oidc.ConfigChangedEventMapper)
+		RegisterFilterEventMapper(iam.IDPConfigAddedEventType, iam.IDPConfigAddedEventMapper).
+		RegisterFilterEventMapper(iam.IDPConfigChangedEventType, iam.IDPConfigChangedEventMapper).
+		RegisterFilterEventMapper(iam.IDPConfigDeactivatedEventType, iam.IDPConfigDeactivatedEventMapper).
+		RegisterFilterEventMapper(iam.IDPConfigReactivatedEventType, iam.IDPConfigReactivatedEventMapper).
+		RegisterFilterEventMapper(iam.IDPConfigRemovedEventType, iam.IDPConfigRemovedEventMapper).
+		RegisterFilterEventMapper(iam.IDPOIDCConfigAddedEventType, iam.IDPOIDCConfigAddedEventMapper).
+		RegisterFilterEventMapper(iam.IDPOIDCConfigChangedEventType, iam.IDPOIDCConfigChangedEventMapper)
 
 	iam, err := es_iam.StartIAM(es_iam.IAMConfig{
 		Eventstore: es,
@@ -79,6 +77,10 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 	if err != nil {
 		return nil, err
 	}
+	iamV2, err := iam_business.StartRepository(&iam_business.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
+	if err != nil {
+		return nil, err
+	}
 
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, handler.EventstoreRepos{UserEvents: user, OrgEvents: org, IamEvents: iam}, systemDefaults)
 
@@ -100,7 +102,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 			SystemDefaults: systemDefaults,
 			SearchLimit:    conf.SearchLimit,
 			Roles:          roles,
-			IAMV2:          iam_business.StartRepository(&iam_business.Config{Eventstore: esV2}),
+			IAMV2:          iamV2,
 		},
 		AdministratorRepo: eventstore.AdministratorRepo{
 			View: view,

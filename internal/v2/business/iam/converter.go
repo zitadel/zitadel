@@ -7,6 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/iam"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 	"github.com/caos/zitadel/internal/v2/repository/idp"
+	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
 	"github.com/caos/zitadel/internal/v2/repository/member"
 )
 
@@ -153,5 +154,31 @@ func readModelToIDPConfigView(rm *iam.IDPConfigReadModel) *model.IDPConfigView {
 		Sequence:                  rm.ProcessedSequence,
 		State:                     model.IDPConfigState(rm.State),
 		StylingType:               model.IDPStylingType(rm.StylingType),
+	}
+}
+
+func readModelToIDPConfig(rm *iam.IDPConfigReadModel) *model.IDPConfig {
+	return &model.IDPConfig{
+		ObjectRoot:  readModelToObjectRoot(rm.ReadModel),
+		OIDCConfig:  readModelToIDPOIDCConfig(rm.OIDCConfig),
+		Type:        model.IdpConfigType(rm.Type),
+		IDPConfigID: rm.ConfigID,
+		Name:        rm.Name,
+		State:       model.IDPConfigState(rm.State),
+		StylingType: model.IDPStylingType(rm.StylingType),
+	}
+}
+
+func readModelToIDPOIDCConfig(rm *oidc.ConfigReadModel) *model.OIDCIDPConfig {
+	return &model.OIDCIDPConfig{
+		ObjectRoot:            readModelToObjectRoot(rm.ReadModel),
+		ClientID:              rm.ClientID,
+		ClientSecret:          rm.ClientSecret,
+		ClientSecretString:    string(rm.ClientSecret.Crypted),
+		IDPConfigID:           rm.IDPConfigID,
+		IDPDisplayNameMapping: model.OIDCMappingField(rm.IDPDisplayNameMapping),
+		Issuer:                rm.Issuer,
+		Scopes:                rm.Scopes,
+		UsernameMapping:       model.OIDCMappingField(rm.UserNameMapping),
 	}
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
 )
 
@@ -64,6 +65,15 @@ func NewIDPOIDCConfigAddedEvent(
 	}
 }
 
+func IDPOIDCConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := oidc.ConfigAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &IDPOIDCConfigAddedEvent{ConfigAddedEvent: *e}, nil
+}
+
 type IDPOIDCConfigChangedEvent struct {
 	oidc.ConfigChangedEvent
 }
@@ -101,4 +111,13 @@ func NewIDPOIDCConfigChangedEvent(
 	return &IDPOIDCConfigChangedEvent{
 		ConfigChangedEvent: *event,
 	}, nil
+}
+
+func IDPOIDCConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := oidc.ConfigChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &IDPOIDCConfigChangedEvent{ConfigChangedEvent: *e}, nil
 }

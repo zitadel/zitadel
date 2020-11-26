@@ -91,7 +91,7 @@ func NewConfigChangedEvent(
 	return event, nil
 }
 
-func ConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ConfigChangedEventMapper(event *repository.Event) (*ConfigChangedEvent, error) {
 	e := &ConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

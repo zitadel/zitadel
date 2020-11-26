@@ -42,7 +42,7 @@ func (e *ConfigAddedEvent) Data() interface{} {
 	return e
 }
 
-func ConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ConfigAddedEventMapper(event *repository.Event) (*ConfigAddedEvent, error) {
 	e := &ConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

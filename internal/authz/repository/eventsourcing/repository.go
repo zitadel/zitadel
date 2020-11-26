@@ -100,6 +100,11 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults) (*
 	if err != nil {
 		return nil, err
 	}
+	iamV2, err := iam_business.StartRepository(&iam_business.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
+	if err != nil {
+		return nil, err
+	}
+
 	repos := handler.EventstoreRepos{IamEvents: iam}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos, systemDefaults)
 
@@ -114,7 +119,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults) (*
 		eventstore.IamRepo{
 			IAMID:     systemDefaults.IamID,
 			IAMEvents: iam,
-			IAMV2:     iam_business.StartRepository(&iam_business.Config{Eventstore: esV2}),
+			IAMV2:     iamV2,
 		},
 		eventstore.TokenVerifierRepo{
 			//TODO: Add Token Verification Key

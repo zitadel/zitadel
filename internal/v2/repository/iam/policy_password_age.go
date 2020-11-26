@@ -21,7 +21,9 @@ func (rm *PasswordAgePolicyReadModel) AppendEvents(events ...eventstore.EventRea
 			rm.ReadModel.AppendEvents(&e.PasswordAgePolicyAddedEvent)
 		case *PasswordAgePolicyChangedEvent:
 			rm.ReadModel.AppendEvents(&e.PasswordAgePolicyChangedEvent)
-		case *policy.PasswordAgePolicyAddedEvent, *policy.PasswordAgePolicyChangedEvent:
+		case *policy.PasswordAgePolicyAddedEvent,
+			*policy.PasswordAgePolicyChangedEvent:
+
 			rm.ReadModel.AppendEvents(e)
 		}
 	}

@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/repository/idp"
-	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
 )
 
 const (
@@ -33,15 +33,10 @@ func (rm *IDPConfigReadModel) AppendEvents(events ...eventstore.EventReader) {
 			rm.ConfigReadModel.AppendEvents(&e.ConfigReactivatedEvent)
 		case *IDPConfigRemovedEvent:
 			rm.ConfigReadModel.AppendEvents(&e.ConfigRemovedEvent)
-		case *idp.ConfigAddedEvent,
-			*idp.ConfigChangedEvent,
-			*idp.ConfigDeactivatedEvent,
-			*idp.ConfigReactivatedEvent,
-			*idp.ConfigRemovedEvent,
-			*oidc.ConfigAddedEvent,
-			*oidc.ConfigChangedEvent:
-
-			rm.ConfigReadModel.AppendEvents(e)
+		case *IDPOIDCConfigAddedEvent:
+			rm.ConfigReadModel.AppendEvents(&e.ConfigAddedEvent)
+		case *IDPOIDCConfigChangedEvent:
+			rm.ConfigReadModel.AppendEvents(&e.ConfigChangedEvent)
 		}
 	}
 }
@@ -100,6 +95,15 @@ func NewIDPConfigAddedEvent(
 	}
 }
 
+func IDPConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := idp.ConfigAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &IDPConfigAddedEvent{ConfigAddedEvent: *e}, nil
+}
+
 type IDPConfigChangedEvent struct {
 	idp.ConfigChangedEvent
 }
@@ -131,6 +135,15 @@ func NewIDPConfigChangedEvent(
 	}, nil
 }
 
+func IDPConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := idp.ConfigChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &IDPConfigChangedEvent{ConfigChangedEvent: *e}, nil
+}
+
 type IDPConfigRemovedEvent struct {
 	idp.ConfigRemovedEvent
 }
@@ -149,6 +162,15 @@ func NewIDPConfigRemovedEvent(
 			configID,
 		),
 	}
+}
+
+func IDPConfigRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := idp.ConfigRemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &IDPConfigRemovedEvent{ConfigRemovedEvent: *e}, nil
 }
 
 type IDPConfigDeactivatedEvent struct {
@@ -171,6 +193,15 @@ func NewIDPConfigDeactivatedEvent(
 	}
 }
 
+func IDPConfigDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := idp.ConfigDeactivatedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &IDPConfigDeactivatedEvent{ConfigDeactivatedEvent: *e}, nil
+}
+
 type IDPConfigReactivatedEvent struct {
 	idp.ConfigReactivatedEvent
 }
@@ -189,4 +220,13 @@ func NewIDPConfigReactivatedEvent(
 			configID,
 		),
 	}
+}
+
+func IDPConfigReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := idp.ConfigReactivatedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &IDPConfigReactivatedEvent{ConfigReactivatedEvent: *e}, nil
 }

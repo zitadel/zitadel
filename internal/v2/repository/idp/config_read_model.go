@@ -19,6 +19,12 @@ type ConfigReadModel struct {
 	OIDCConfig *oidc.ConfigReadModel
 }
 
+func NewConfigReadModel(configID string) *ConfigReadModel {
+	return &ConfigReadModel{
+		ConfigID: configID,
+	}
+}
+
 func (rm *ConfigReadModel) AppendEvents(events ...eventstore.EventReader) {
 	rm.ReadModel.AppendEvents(events...)
 	for _, event := range events {
@@ -57,6 +63,7 @@ func (rm *ConfigReadModel) Reduce() error {
 			rm.Type = ConfigTypeOIDC
 		}
 	}
+
 	if err := rm.OIDCConfig.Reduce(); err != nil {
 		return err
 	}

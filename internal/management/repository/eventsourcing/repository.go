@@ -96,6 +96,10 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 	if err != nil {
 		return nil, err
 	}
+	iamV2, err := iam_business.StartRepository(&iam_business.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
+	if err != nil {
+		return nil, err
+	}
 	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain}, systemDefaults)
 
 	iam, err := es_iam.StartIAM(es_iam.IAMConfig{
@@ -115,7 +119,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, user, org, usergrant, view, systemDefaults},
 		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
 		IAMRepository: eventstore.IAMRepository{
-			IAMV2: iam_business.StartRepository(&iam_business.Config{Eventstore: esV2}),
+			IAMV2: iamV2,
 		},
 	}, nil
 }

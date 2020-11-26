@@ -21,7 +21,9 @@ func (rm *PasswordComplexityPolicyReadModel) AppendEvents(events ...eventstore.E
 			rm.ReadModel.AppendEvents(&e.PasswordComplexityPolicyAddedEvent)
 		case *PasswordComplexityPolicyChangedEvent:
 			rm.ReadModel.AppendEvents(&e.PasswordComplexityPolicyChangedEvent)
-		case *policy.PasswordComplexityPolicyAddedEvent, *policy.PasswordComplexityPolicyChangedEvent:
+		case *policy.PasswordComplexityPolicyAddedEvent,
+			*policy.PasswordComplexityPolicyChangedEvent:
+
 			rm.ReadModel.AppendEvents(e)
 		}
 	}

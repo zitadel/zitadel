@@ -33,7 +33,7 @@ func (e *ConfigRemovedEvent) Data() interface{} {
 	return e
 }
 
-func ConfigRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ConfigRemovedEventMapper(event *repository.Event) (*ConfigRemovedEvent, error) {
 	e := &ConfigRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

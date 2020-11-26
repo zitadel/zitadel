@@ -132,6 +132,11 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 		return nil, err
 	}
 
+	iamV2, err := iam_business.StartRepository(&iam_business.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
+	if err != nil {
+		return nil, err
+	}
+
 	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain}, systemDefaults)
 
 	repos := handler.EventstoreRepos{UserEvents: user, ProjectEvents: project, OrgEvents: org, IamEvents: iam}
@@ -200,7 +205,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 		},
 		eventstore.IAMRepository{
 			IAMID: systemDefaults.IamID,
-			IAMV2: iam_business.StartRepository(&iam_business.Config{Eventstore: esV2}),
+			IAMV2: iamV2,
 		},
 	}, nil
 }

@@ -13,6 +13,7 @@ type ReadModel struct {
 	SetUpDone    Step
 
 	Members MembersReadModel
+	IDPs    IDPConfigsReadModel
 
 	GlobalOrgID string
 	ProjectID   string
@@ -33,23 +34,53 @@ func NewReadModel(id string) *ReadModel {
 	}
 }
 
+func (rm *ReadModel) IDPByID(idpID string) *IDPConfigReadModel {
+	_, config := rm.IDPs.ConfigByID(idpID)
+	if config == nil {
+		return nil
+	}
+	return &IDPConfigReadModel{ConfigReadModel: *config}
+}
+
 func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 	rm.ReadModel.AppendEvents(events...)
 	for _, event := range events {
 		switch event.(type) {
-		case *member.AddedEvent, *member.ChangedEvent, *member.RemovedEvent:
+		case *member.AddedEvent,
+			*member.ChangedEvent,
+			*member.RemovedEvent:
+
 			rm.Members.AppendEvents(event)
-		case *policy.LabelPolicyAddedEvent, *policy.LabelPolicyChangedEvent:
+		case *IDPConfigAddedEvent,
+			*IDPConfigChangedEvent,
+			*IDPConfigDeactivatedEvent,
+			*IDPConfigReactivatedEvent,
+			*IDPConfigRemovedEvent,
+			*IDPOIDCConfigAddedEvent,
+			*IDPOIDCConfigChangedEvent:
+
+			rm.IDPs.AppendEvents(event)
+		case *policy.LabelPolicyAddedEvent,
+			*policy.LabelPolicyChangedEvent:
+
 			rm.DefaultLabelPolicy.AppendEvents(event)
-		case *policy.LoginPolicyAddedEvent, *policy.LoginPolicyChangedEvent:
+		case *policy.LoginPolicyAddedEvent,
+			*policy.LoginPolicyChangedEvent:
+
 			rm.DefaultLoginPolicy.AppendEvents(event)
 		case *policy.OrgIAMPolicyAddedEvent:
 			rm.DefaultOrgIAMPolicy.AppendEvents(event)
-		case *policy.PasswordComplexityPolicyAddedEvent, *policy.PasswordComplexityPolicyChangedEvent:
+		case *policy.PasswordComplexityPolicyAddedEvent,
+			*policy.PasswordComplexityPolicyChangedEvent:
+
 			rm.DefaultPasswordComplexityPolicy.AppendEvents(event)
-		case *policy.PasswordAgePolicyAddedEvent, *policy.PasswordAgePolicyChangedEvent:
+		case *policy.PasswordAgePolicyAddedEvent,
+			*policy.PasswordAgePolicyChangedEvent:
+
 			rm.DefaultPasswordAgePolicy.AppendEvents(event)
-		case *policy.PasswordLockoutPolicyAddedEvent, *policy.PasswordLockoutPolicyChangedEvent:
+		case *policy.PasswordLockoutPolicyAddedEvent,
+			*policy.PasswordLockoutPolicyChangedEvent:
+
 			rm.DefaultPasswordLockoutPolicy.AppendEvents(event)
 		}
 	}
@@ -72,6 +103,7 @@ func (rm *ReadModel) Reduce() (err error) {
 	}
 	for _, reduce := range []func() error{
 		rm.Members.Reduce,
+		rm.IDPs.Reduce,
 		rm.DefaultLoginPolicy.Reduce,
 		rm.DefaultLabelPolicy.Reduce,
 		rm.DefaultOrgIAMPolicy.Reduce,
