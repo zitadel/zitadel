@@ -46,7 +46,7 @@ func (l *Login) renderMFAVerify(w http.ResponseWriter, r *http.Request, authReq 
 	}
 	switch verificationStep.MFAProviders[len(verificationStep.MFAProviders)-1] {
 	case model.MFATypeU2F:
-		l.renderU2FVerification(w, r, authReq)
+		l.renderU2FVerification(w, r, authReq, nil)
 		return
 	case model.MFATypeOTP:
 		data.MFAProviders = verificationStep.MFAProviders
