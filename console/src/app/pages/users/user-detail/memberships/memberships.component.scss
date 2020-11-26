@@ -9,11 +9,14 @@
   /* stylelint-enable */
 
   .membership-groups {
-    .header {
+    .me-header {
       display: block;
       margin-bottom: 1rem;
       font-weight: 400;
       margin-top: 0;
+      font-size: 14px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
     }
 
     .sub-header {
@@ -33,7 +36,6 @@
 
       .img-list {
         width: 100%;
-        margin-top: .5rem;
         margin-left: 1rem;
         display: flex;
         align-items: center;
@@ -54,7 +56,11 @@
 
         .refresh-img {
           float: left;
-          margin: 0 8px 0 -15px;
+          margin: 0 0 0 -15px;
+
+          .icon {
+            font-size: 1.2rem;
+          }
         }
 
         .avatar-circle {
@@ -97,6 +103,7 @@
               display: block;
               white-space: nowrap;
               overflow: hidden;
+              letter-spacing: .05em;
             }
 
             i {

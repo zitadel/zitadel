@@ -10,7 +10,6 @@
 .domain {
   display: flex;
   align-items: center;
-  padding: .5rem 0;
   flex-wrap: wrap;
 
   .title {
@@ -55,6 +54,7 @@
   &:hover {
     .rem-button {
       visibility: visible;
+      transition: none;
     }
   }
 }

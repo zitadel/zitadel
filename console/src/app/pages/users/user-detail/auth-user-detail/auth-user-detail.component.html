@@ -56,7 +56,7 @@
         <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
             description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
             <app-user-grants [userId]="user.id" [context]="USERGRANTCONTEXT"
-                [displayedColumns]="['select', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']"
+                [displayedColumns]="['select', 'projectId', 'dates', 'roleNamesList']"
                 [disableWrite]="((['user.grant.write$'] | hasRole) | async) == false"
                 [disableDelete]="((['user.grant.delete$'] | hasRole) | async) == false">
             </app-user-grants>
@@ -74,6 +74,7 @@
             <app-memberships [user]="user"></app-memberships>
         </ng-template>
 
-        <app-changes class="changes" [changeType]="ChangeType.MYUSER" [id]="user.id"></app-changes>
+        <app-changes class="changes" [refresh]="refreshChanges$" [changeType]="ChangeType.MYUSER" [id]="user.id">
+        </app-changes>
     </div>
 </app-meta-layout>

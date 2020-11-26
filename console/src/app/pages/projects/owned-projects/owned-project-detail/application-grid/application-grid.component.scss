@@ -5,7 +5,7 @@
   $primary: map-get($theme, primary);
   $primary-dark: mat-color($primary, A900);
   $accent: map-get($theme, accent);
-  $accent-color: mat-color($accent, 500);
+  $accent-color: mat-color($primary, 500);
   /* stylelint-enable */
 
   .app-grid-header {
@@ -48,8 +48,9 @@
         height: 80px;
         width: 80px;
         margin: 1rem;
+        text-transform: uppercase;
         border-radius: .5rem;
-        border: 1px solid $accent-color;
+        border: 2px solid $accent-color;
         font-weight: 800;
         background-color: $primary-dark;
         transition: background-color box-shadow .3s ease-in;
@@ -59,12 +60,12 @@
         background-size: 100% 12px, 12px 100%;
 
         &:hover {
-          background-color: rgba($accent-color, .2);
-          box-shadow: 0 5px 10px rgba(0, 0, 0, .12);
+          background-color: rgba($accent-color, .1);
         }
 
         &.add {
           background: $accent-color;
+          color: white;
 
           &:hover {
             background-color: rgba($accent-color, .8);
