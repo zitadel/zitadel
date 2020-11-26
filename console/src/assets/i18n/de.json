@@ -37,8 +37,8 @@
     "MENU": {
         "PERSONAL_INFO": "Persönliche Informationen",
         "DOCUMENTATION":"Dokumentation",
-        "IAMPOLICIES":"Richtlinien und Zugriffseinstellungen",
-        "IAMEVENTSTORE":"Eventstore",
+        "IAMPOLICIES":"IAM",
+        "IAMEVENTSTORE":"Speicher",
         "ORGANIZATION": "Organisation",
         "ADMINSECTION":"ZITADEL Administration",
         "ORGSECTION":"Organisation",

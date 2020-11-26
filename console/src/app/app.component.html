@@ -99,8 +99,7 @@
                                     <i class="icon las la-layer-group"></i>
 
                                     <div class="c_label">
-                                        <span>{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}
-                                            {{'MENU.PROJECT' | translate}} </span>
+                                        <span> {{'MENU.PROJECT' | translate}} </span>
                                         <span *ngIf="(mgmtService?.ownedProjectsCount | async)"
                                             class="count">{{mgmtService?.ownedProjectsCount | async}}</span>
                                     </div>
