@@ -36,6 +36,7 @@
     },
     "MENU": {
         "PERSONAL_INFO": "Personal Information",
+        "DOCUMENTATION":"Documentation",
         "IAM":"Administration",
         "ORGANIZATION": "Organisation",
         "ADMINSECTION":"ZITADEL Administration",

@@ -34,6 +34,10 @@
     flex: 1;
   }
 
+  .doc-link {
+      margin-right: 1rem;
+  }
+
   .icon-container {
     display: flex;
     justify-content: space-between;
@@ -105,10 +109,6 @@
           cursor: pointer;
           padding: 0 1rem;
           margin-right: .5rem;
-
-          &.indented {
-            padding-left: 2rem;
-          }
 
           .icon {
             margin: .5rem 1rem;
