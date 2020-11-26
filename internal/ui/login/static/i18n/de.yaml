@@ -38,7 +38,7 @@ UsernameChangeDone:
 MFAVerify:
   Title: Multifaktor verifizieren
   Description: Verifiziere deinen Multifaktor
-  OTP: OTP
+  OTP: OTP (One Time Password)
   Code: Code
   
 InitPassword: 
