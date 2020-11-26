@@ -57,7 +57,7 @@
         "TOOLTIP": {
             "PERSONAL":"Verwalte deinen persönlichen Account, deine IDPs, Login Methoden, Faktoren und Berechtigungen",
             "IAMPOLICIES":"Verwalte ZITADELs globale Zugangsrichtlinien und verwalte ZITADEL Manager",
-            "IAMEVENTSTORE":"Bereinige Eventstore views und fehlerhafte Events",
+            "IAMEVENTSTORE":"Bereinige views und fehlerhafte Events",
             "ORG":"Verwalte die Zugangsrichtlinien und Domains deiner Organisation ",
             "SELFPROJECTS":"Verwalte die Projekte deiner Organisation",
             "GRANTEDPROJECTS":"Verwalte die berechtigten Projekte von anderen Organisationen",
@@ -374,11 +374,11 @@
     },
     "IAM": {
         "POLICIES": {
-            "TITLE":"Administration Identity- und Access-Management Administration",
+            "TITLE":"IAM Administration",
             "DESCRIPTION":"Verwalte die Einstellungen von ZITADEL."
         },
         "EVENTSTORE": {
-            "TITLE":"Administration Identity- und Access-Management Administration",
+            "TITLE":"IAM Speicher Administration",
             "DESCRIPTION":"Verwalte die Einstellungen von ZITADEL."
         },
         "MEMBER": {

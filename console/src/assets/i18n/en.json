@@ -57,7 +57,7 @@
         "TOOLTIP": {
             "PERSONAL":"Show your Personal Account, your IDPs, Login methods, Factors and Authorisations",
             "IAMPOLICIES":"Manage ZITADELs global Access policies und elect ZITADEL Managers",
-            "IAMEVENTSTORE":"Clear eventstore views and failed events",
+            "IAMEVENTSTORE":"Clear views and failed events",
             "ORG":"Show your organisations access policies, and manage your domain names",
             "SELFPROJECTS":"Show your organisations own projects",
             "GRANTEDPROJECTS":"Show projects your organisation was granted access",
@@ -378,8 +378,8 @@
             "DESCRIPTION":"Manage your ZITADEL Policies and Management Access Settings."
         },
         "EVENTSTORE": {
-            "TITLE":"IAM Eventstore Administration",
-            "DESCRIPTION":"Manage your ZITADEL Eventstore views and failed events."
+            "TITLE":"IAM Storage Administration",
+            "DESCRIPTION":"Manage your ZITADEL views and failed events."
         },
         "MEMBER": {
             "TITLE":"Managers",
