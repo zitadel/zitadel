@@ -1,10 +1,13 @@
 .groups {
   padding-top: 1rem;
 
-  .header {
+  .co-header {
     display: block;
     margin-bottom: 1rem;
     font-weight: 400;
+    font-size: 14px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
   }
 
   .sub-header {
@@ -45,7 +48,11 @@
 
       .refresh-img {
         float: left;
-        margin: 0 8px 0 -15px;
+        margin: 0 0 0 -15px;
+
+        .icon {
+          font-size: 1.2rem;
+        }
       }
 
       .avatar-circle {

@@ -2,7 +2,13 @@
   width: 100%;
 }
 
+.more-space {
+  margin-bottom: 1rem;
+}
+
 .target-desc {
+  font-size: 14px;
+
   a {
     color: #4072b4;
 
@@ -23,7 +29,7 @@
   }
 
   button {
-    margin-top: 1rem;
+    margin-top: 30px;
   }
 }
 

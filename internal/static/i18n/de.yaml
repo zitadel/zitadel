@@ -307,6 +307,7 @@ EventTypes:
         code:
           added: Telefon Code hinzugefügt
           sent: Telefon Code versendet
+        removed: Telefonnummer gelöscht
       profile:
         changed: Benutzerprofil geändert
       address:

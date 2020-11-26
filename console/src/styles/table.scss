@@ -3,10 +3,14 @@
 @mixin table-theme($theme) {
   /* stylelint-disable */
   $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $warn-color: mat-color($warn, 500);
+  $primary-color: mat-color($primary, 500);
   $primary-dark: mat-color($primary, A900);
   $secondary-dark: mat-color($primary, A800);
   $inv-color: mat-color($primary, A600);
   $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
 
   .mat-table,
   .mat-paginator {
@@ -24,21 +28,60 @@
     padding: 3px 1rem;
   }
 
+  th {
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    font-weight: bold;
+    white-space: nowrap;
+
+    &.mat-header-cell {
+      color: var(--grey);
+      font-size: 11px;
+      font-weight: 400;
+    }
+  }
+
   td {
-    .mat-form-field-wrapper {
+    .cnsl-form-field-wrapper {
       padding-bottom: 0;
     }
   }
 
   tr {
+    &.mat-header-row {
+      height: 40px;
+      padding-bottom: 4px;
+    }
+
     &.highlight {
       cursor: pointer;
 
       &:hover {
         td {
-          background: var(--table-row-back); // rgba($inv-color, .05);
+          background: if($is-dark-theme, #292a2b, #f4f4f4); // rgba($inv-color, .05);
         }
       }
     }
+  }
+
+  .mat-checkbox {
+    margin-left: 1rem;
+  }
+
+  .no-content-row {
+    background-color: if($is-dark-theme, #00000030, #f4f4f470);
+    // color: $primary-color;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    display: flex;
+    align-items: center;
+    padding: .5rem;
+    font-size: 14px;
+    justify-content: center;
+  }
+
+  .selection {
+    width: 65px;
+    max-width: 65px;
   }
 }

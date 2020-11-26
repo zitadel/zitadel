@@ -6,7 +6,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -16,6 +15,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 import { MembersTableModule } from 'src/app/modules/members-table/members-table.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
@@ -39,7 +39,7 @@ import {
         MatIconModule,
         MatTableModule,
         MatPaginatorModule,
-        MatFormFieldModule,
+        InputModule,
         MatTooltipModule,
         ReactiveFormsModule,
         MatProgressSpinnerModule,

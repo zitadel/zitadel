@@ -223,6 +223,10 @@ func (repo *UserRepo) UserMFAs(ctx context.Context, userID string) ([]*usr_model
 	return []*usr_model.MultiFactor{{Type: usr_model.MFATypeOTP, State: user.OTPState}}, nil
 }
 
+func (repo *UserRepo) RemoveOTP(ctx context.Context, userID string) error {
+	return repo.UserEvents.RemoveOTP(ctx, userID)
+}
+
 func (repo *UserRepo) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
 	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if err != nil && caos_errs.IsNotFound(err) {
