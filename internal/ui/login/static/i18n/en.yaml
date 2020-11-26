@@ -38,7 +38,7 @@ UsernameChangeDone:
 MFAVerify:
   Title: Verify Multificator
   Description: Verify your multifactor
-  OTP: OTP
+  OTP: OTP (One Time Password)
   Code: Code
 
 InitPassword: 
