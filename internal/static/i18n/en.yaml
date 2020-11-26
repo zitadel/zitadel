@@ -60,9 +60,9 @@ Errors:
         NotReady: Multifactor OTP (OneTimePassword) isn't ready
         InvalidCode: Invalid code
       U2F:
-        NotExisting: U2F existiert nicht
+        NotExisting: U2F does not exist
       Passwordless:
-        NotExisting: Passwordless existiert nicht
+        NotExisting: Passwordless does not exist
     WebAuthN:
       NotFound: WebAuthN Token could not be found
       BeginRegisterFailed: WebAuthN begin registration failed
