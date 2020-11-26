@@ -271,6 +271,7 @@ func (repo *AuthRequestRepo) VerifyMFAOTP(ctx context.Context, authRequestID, us
 func (repo *AuthRequestRepo) BeginMFAU2FLogin(ctx context.Context, userID, authRequestID, userAgentID string) (login *user_model.WebAuthNLogin, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
 	request, err := repo.getAuthRequest(ctx, authRequestID, userAgentID)
 	if err != nil {
 		return nil, err

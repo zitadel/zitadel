@@ -385,8 +385,8 @@ func mfaFromModel(mfa *usr_model.MultiFactor) *auth.MultiFactor {
 	}
 }
 
-func mfaTypeFromModel(mfatype usr_model.MFAType) auth.MfaType {
-	switch mfatype {
+func mfaTypeFromModel(mfaType usr_model.MFAType) auth.MfaType {
+	switch mfaType {
 	case usr_model.MFATypeOTP:
 		return auth.MfaType_MFATYPE_OTP
 	case usr_model.MFATypeU2F:

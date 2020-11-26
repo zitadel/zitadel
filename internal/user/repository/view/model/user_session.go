@@ -100,7 +100,8 @@ func (v *UserSessionView) AppendEvent(event *models.Event) {
 		v.MultiFactorVerification = event.CreationDate
 		v.MultiFactorVerificationType = int32(req_model.MFATypeU2FUserVerification)
 		v.State = int32(req_model.UserSessionStateActive)
-	case es_model.HumanPasswordlessTokenCheckFailed:
+	case es_model.HumanPasswordlessTokenCheckFailed,
+		es_model.HumanPasswordlessTokenRemoved:
 		v.PasswordlessVerification = time.Time{}
 		v.MultiFactorVerification = time.Time{}
 	case es_model.UserPasswordCheckFailed,
@@ -117,7 +118,8 @@ func (v *UserSessionView) AppendEvent(event *models.Event) {
 		es_model.MFAOTPRemoved,
 		es_model.HumanMFAOTPCheckFailed,
 		es_model.HumanMFAOTPRemoved,
-		es_model.HumanMFAU2FTokenCheckFailed: //TODO: token removed?
+		es_model.HumanMFAU2FTokenCheckFailed,
+		es_model.HumanMFAU2FTokenRemoved:
 		v.SecondFactorVerification = time.Time{}
 	case es_model.HumanMFAU2FTokenCheckSucceeded:
 		v.SecondFactorVerification = event.CreationDate

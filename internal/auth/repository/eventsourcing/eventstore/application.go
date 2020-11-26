@@ -26,6 +26,7 @@ func (a *ApplicationRepo) ApplicationByClientID(ctx context.Context, clientID st
 func (a *ApplicationRepo) AuthorizeOIDCApplication(ctx context.Context, clientID, secret string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
 	app, err := a.View.ApplicationByClientID(ctx, clientID)
 	if err != nil {
 		return err
