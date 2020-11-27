@@ -2,8 +2,11 @@ package api
 
 import (
 	"context"
+	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/telemetry/metrics"
+	"github.com/caos/zitadel/internal/telemetry/metrics/otel"
+	view_model "github.com/caos/zitadel/internal/view/model"
 	"go.opentelemetry.io/otel/api/metric"
 	"net/http"
 
@@ -34,6 +37,7 @@ type API struct {
 	serverPort     string
 	health         health
 	auth           auth
+	admin          admin
 }
 
 type health interface {
@@ -46,13 +50,19 @@ type auth interface {
 	ActiveUserSessionCount() int64
 }
 
-func Create(config Config, authZ authz.Config, authZRepo *authz_es.EsRepository, authRepo *auth_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
+type admin interface {
+	GetViews() ([]*view_model.View, error)
+	GetSpoolerDiv(database, viewName string) int64
+}
+
+func Create(config Config, authZ authz.Config, authZRepo *authz_es.EsRepository, authRepo *auth_es.EsRepository, adminRepo *admin_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
 	api := &API{
 		serverPort: config.GRPC.ServerPort,
 	}
 	api.verifier = authz.Start(authZRepo)
 	api.health = authZRepo
 	api.auth = authRepo
+	api.admin = adminRepo
 	api.grpcServer = server.CreateServer(api.verifier, authZ, sd.DefaultLanguage)
 	api.gatewayHandler = server.CreateGatewayHandler(config.GRPC)
 	api.RegisterHandler("", api.healthHandler())
@@ -153,7 +163,32 @@ func (a *API) handleMetrics() http.Handler {
 			)
 		},
 	)
+	a.registerSpoolerDivCounters()
 	return metrics.M.GetExporter()
+}
+
+func (a *API) registerSpoolerDivCounters() {
+	views, err := a.admin.GetViews()
+	if err != nil {
+		logging.Log("API-3M8sd").WithError(err).Error("could not read views for metrics")
+		return
+	}
+	metrics.M.RegisterUpDownSumObserver(
+		metrics.SpoolerDivCounter,
+		metrics.SpoolerDivCounterDescription,
+		func(ctx context.Context, result metric.Int64ObserverResult) {
+			for _, view := range views {
+				labels := map[string]interface{}{
+					metrics.Database: view.Database,
+					metrics.ViewName: view.ViewName,
+				}
+				result.Observe(
+					a.admin.GetSpoolerDiv(view.Database, view.ViewName),
+					otel.MapToKeyValue(labels)...,
+				)
+			}
+		},
+	)
 }
 
 type ValidationFunction func(ctx context.Context) error

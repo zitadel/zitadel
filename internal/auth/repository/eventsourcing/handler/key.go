@@ -55,5 +55,7 @@ func (k *Key) OnError(event *models.Event, err error) error {
 }
 
 func (k *Key) OnSuccess() error {
-	return spooler.HandleSuccess(k.view.UpdateKeySpoolerRunTimestamp)
+	err := spooler.HandleSuccess(k.view.UpdateKeySpoolerRunTimestamp)
+	logging.LogWithFields("SPOOL-vM9sd", "table", keyTable).OnError(err).Warn("could not process on success func")
+	return err
 }

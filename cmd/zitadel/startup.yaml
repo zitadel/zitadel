@@ -229,7 +229,7 @@ UI:
   Login:
     Handler:
       BaseURL: '$ZITADEL_ACCOUNTS'
-      OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/'
+      OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/callback?id='
       ZitadelURL: '$ZITADEL_CONSOLE'
       LanguageCookieName: 'caos.zitadel.login.lang'
       DefaultLanguage: 'de'

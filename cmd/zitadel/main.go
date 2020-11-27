@@ -127,14 +127,16 @@ func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository) 
 }
 
 func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsRepository, authRepo *auth_es.EsRepository) {
-	apis := api.Create(conf.API, conf.InternalAuthZ, authZRepo, authRepo, conf.SystemDefaults)
 	roles := make([]string, len(conf.InternalAuthZ.RolePermissionMappings))
 	for i, role := range conf.InternalAuthZ.RolePermissionMappings {
 		roles[i] = role.Role
 	}
+	adminRepo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, roles)
+	logging.Log("API-D42tq").OnError(err).Fatal("error starting auth repo")
+
+	apis := api.Create(conf.API, conf.InternalAuthZ, authZRepo, authRepo, adminRepo, conf.SystemDefaults)
+
 	if *adminEnabled {
-		adminRepo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, roles)
-		logging.Log("API-D42tq").OnError(err).Fatal("error starting auth repo")
 		apis.RegisterServer(ctx, admin.CreateServer(adminRepo))
 	}
 	if *managementEnabled {

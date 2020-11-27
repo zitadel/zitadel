@@ -22,6 +22,9 @@ func (v *View) updateSpoolerRunSequence(viewName string) error {
 	if err != nil {
 		return err
 	}
+	if currentSequence.ViewName == "" {
+		currentSequence.ViewName = viewName
+	}
 	currentSequence.LastSuccessfulSpoolerRun = time.Now()
 	return repository.UpdateCurrentSequence(v.Db, sequencesTable, currentSequence)
 }

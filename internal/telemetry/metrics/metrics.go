@@ -8,8 +8,12 @@ import (
 )
 
 const (
-	ActiveSessionCounter            = "active_session_counter"
+	ActiveSessionCounter            = "zitadel.active_session_counter"
 	ActiveSessionCounterDescription = "Active session counter"
+	SpoolerDivCounter               = "zitadel.spooler_div_nanoseconds"
+	SpoolerDivCounterDescription    = "Spooler div from last successful run to now in nanoseconds"
+	Database                        = "database"
+	ViewName                        = "view_name"
 )
 
 type Metrics interface {

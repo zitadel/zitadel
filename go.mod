@@ -75,3 +75,5 @@ require (
 )
 
 replace github.com/caos/oidc => /Users/fabi/go/src/github.com/caos/oidc
+
+replace github.com/caos/oidc => /Users/fabi/go/src/github.com/caos/oidc

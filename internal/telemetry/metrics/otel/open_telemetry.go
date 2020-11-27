@@ -54,14 +54,11 @@ func (m *Metrics) AddCount(ctx context.Context, name string, value int64, labels
 	if _, exists := m.Counters[name]; !exists {
 		return caos_errs.ThrowNotFound(nil, "METER-4u8fs", "Errors.Metrics.Counter.NotFound")
 	}
-	m.Counters[name].Add(ctx, value, mapToKeyValue(labels)...)
+	m.Counters[name].Add(ctx, value, MapToKeyValue(labels)...)
 	return nil
 }
 
 func (m *Metrics) RegisterUpDownSumObserver(name, description string, callbackFunc metric.Int64ObserverFunc) error {
-	//callbackFunc := func(_ context.Context, result metric.Int64ObserverResult) {
-	//	result.Observe(data, mapToKeyValue(labels)...)
-	//}
 	if _, exists := m.UpDownSumObserver[name]; exists {
 		return nil
 	}
@@ -72,7 +69,7 @@ func (m *Metrics) RegisterUpDownSumObserver(name, description string, callbackFu
 	return nil
 }
 
-func mapToKeyValue(labels map[string]interface{}) []label.KeyValue {
+func MapToKeyValue(labels map[string]interface{}) []label.KeyValue {
 	keyValues := make([]label.KeyValue, 0)
 	if labels == nil {
 		return keyValues

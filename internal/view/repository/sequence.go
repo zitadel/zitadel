@@ -36,10 +36,11 @@ func (key sequenceSearchKey) ToColumnName() string {
 func CurrentSequenceToModel(sequence *CurrentSequence) *model.View {
 	dbView := strings.Split(sequence.ViewName, ".")
 	return &model.View{
-		Database:         dbView[0],
-		ViewName:         dbView[1],
-		CurrentSequence:  sequence.CurrentSequence,
-		CurrentTimestamp: sequence.EventTimestamp,
+		Database:                 dbView[0],
+		ViewName:                 dbView[1],
+		CurrentSequence:          sequence.CurrentSequence,
+		EventTimestamp:           sequence.EventTimestamp,
+		LastSuccessfulSpoolerRun: sequence.LastSuccessfulSpoolerRun,
 	}
 }
 
