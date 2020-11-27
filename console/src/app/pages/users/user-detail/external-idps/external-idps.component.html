@@ -40,7 +40,7 @@
             <ng-container matColumnDef="actions" stickyEnd>
                 <th mat-header-cell *matHeaderCellDef></th>
                 <td mat-cell *matCellDef="let idp">
-                    <button mat-icon-button matTooltip="{{'ACTIONS.REMOVE' | translate}}"
+                    <button color="warn" mat-icon-button matTooltip="{{'ACTIONS.REMOVE' | translate}}"
                         (click)="removeExternalIdp(idp)">
                         <i class="las la-trash"></i>
                     </button>

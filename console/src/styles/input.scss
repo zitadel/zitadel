@@ -54,7 +54,11 @@
 
     &[disabled] {
         border-color: if($is-dark-theme,#36373850,#cccdce50);
-        cursor: not-allowed;
+        color: if($is-dark-theme, #ffffff80 ,#00000061);
+
+        &::placeholder {
+            color: if($is-dark-theme, #ffffff80 ,#00000061);
+        }
     }
   }
 

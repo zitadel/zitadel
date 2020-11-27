@@ -95,6 +95,7 @@
         "SEND":"Send",
         "NEWVALUE":"New Value"
     },
+    "RESOURCEID":"Resource Id",
     "TABLE": {
         "NOROWS":"No data"
     },
