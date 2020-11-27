@@ -26,6 +26,11 @@ type PasswordCode struct {
 	NotificationType int32               `json:"notificationType,omitempty"`
 }
 
+type PasswordChange struct {
+	*Password
+	UserAgentID string `json:"userAgentID,omitempty"`
+}
+
 func PasswordFromModel(password *model.Password) *Password {
 	return &Password{
 		ObjectRoot:     password.ObjectRoot,
@@ -48,6 +53,17 @@ func PasswordCodeToModel(code *PasswordCode) *model.PasswordCode {
 		Expiry:           code.Expiry,
 		Code:             code.Code,
 		NotificationType: model.NotificationType(code.NotificationType),
+	}
+}
+
+func PasswordChangeFromModel(password *model.Password, userAgentID string) *PasswordChange {
+	return &PasswordChange{
+		Password: &Password{
+			ObjectRoot:     password.ObjectRoot,
+			Secret:         password.SecretCrypto,
+			ChangeRequired: password.ChangeRequired,
+		},
+		UserAgentID: userAgentID,
 	}
 }
 
@@ -82,5 +98,14 @@ func (c *PasswordCode) SetData(event *es_models.Event) error {
 		logging.Log("EVEN-lo0y2").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-q21dr", "could not unmarshal event")
 	}
+	return nil
+}
+
+func (pw *PasswordChange) SetData(event *es_models.Event) error {
+	if err := json.Unmarshal(event.Data, pw); err != nil {
+		logging.Log("EVEN-ADs31").WithError(err).Error("could not unmarshal event data")
+		return caos_errs.ThrowInternal(err, "MODEL-BDd32", "could not unmarshal event")
+	}
+	pw.ObjectRoot.AppendEvent(event)
 	return nil
 }

@@ -757,7 +757,9 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 		case es_model.UserRemoved:
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dG2fe", "Errors.User.NotActive")
 		}
-		sessionCopy.AppendEvent(event)
+		if err := sessionCopy.AppendEvent(event); err != nil {
+			return user_view_model.UserSessionToModel(&sessionCopy), nil
+		}
 	}
 	return user_view_model.UserSessionToModel(&sessionCopy), nil
 }

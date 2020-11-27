@@ -1678,7 +1678,7 @@ func TestSetPassword(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.es.SetPassword(tt.args.ctx, tt.args.policy, tt.args.userID, tt.args.code, tt.args.password)
+			err := tt.args.es.SetPassword(tt.args.ctx, tt.args.policy, tt.args.userID, tt.args.code, tt.args.password, "")
 
 			if tt.res.errFunc == nil && err != nil {
 				t.Errorf("result has error: %v", err)
@@ -1838,7 +1838,7 @@ func TestChangePassword(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.ChangePassword(tt.args.ctx, tt.args.policy, tt.args.userID, tt.args.old, tt.args.new)
+			result, err := tt.args.es.ChangePassword(tt.args.ctx, tt.args.policy, tt.args.userID, tt.args.old, tt.args.new, "")
 
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")

@@ -16,8 +16,8 @@ type UserRepository interface {
 	SkipMfaInit(ctx context.Context, userID string) error
 
 	RequestPasswordReset(ctx context.Context, username string) error
-	SetPassword(ctx context.Context, userID, code, password string) error
-	ChangePassword(ctx context.Context, userID, old, new string) error
+	SetPassword(ctx context.Context, userID, code, password, userAgentID string) error
+	ChangePassword(ctx context.Context, userID, old, new, userAgentID string) error
 
 	VerifyEmail(ctx context.Context, userID, code string) error
 	ResendEmailVerificationMail(ctx context.Context, userID string) error

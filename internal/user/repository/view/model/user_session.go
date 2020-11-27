@@ -79,7 +79,7 @@ func UserSessionsToModel(userSessions []*UserSessionView) []*model.UserSessionVi
 	return result
 }
 
-func (v *UserSessionView) AppendEvent(event *models.Event) {
+func (v *UserSessionView) AppendEvent(event *models.Event) error {
 	v.Sequence = event.Sequence
 	v.ChangeDate = event.CreationDate
 	switch event.Type {
@@ -89,15 +89,26 @@ func (v *UserSessionView) AppendEvent(event *models.Event) {
 		v.State = int32(req_model.UserSessionStateActive)
 	case es_model.HumanExternalLoginCheckSucceeded:
 		data := new(es_model.AuthRequest)
-		data.SetData(event)
+		err := data.SetData(event)
+		if err != nil {
+			return err
+		}
 		v.ExternalLoginVerification = event.CreationDate
 		v.SelectedIDPConfigID = data.SelectedIDPConfigID
 		v.State = int32(req_model.UserSessionStateActive)
 	case es_model.UserPasswordCheckFailed,
 		es_model.UserPasswordChanged,
-		es_model.HumanPasswordCheckFailed,
-		es_model.HumanPasswordChanged:
+		es_model.HumanPasswordCheckFailed:
 		v.PasswordVerification = time.Time{}
+	case es_model.HumanPasswordChanged:
+		data := new(es_model.PasswordChange)
+		err := data.SetData(event)
+		if err != nil {
+			return err
+		}
+		if v.UserAgentID != data.UserAgentID {
+			v.PasswordVerification = time.Time{}
+		}
 	case es_model.MFAOTPCheckSucceeded,
 		es_model.HumanMFAOTPCheckSucceeded:
 		v.SecondFactorVerification = event.CreationDate
@@ -120,4 +131,5 @@ func (v *UserSessionView) AppendEvent(event *models.Event) {
 		v.ExternalLoginVerification = time.Time{}
 		v.SelectedIDPConfigID = ""
 	}
+	return nil
 }

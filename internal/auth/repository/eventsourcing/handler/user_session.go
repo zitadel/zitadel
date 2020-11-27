@@ -87,7 +87,9 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 			return u.view.ProcessedUserSessionSequence(event.Sequence)
 		}
 		for _, session := range sessions {
-			session.AppendEvent(event)
+			if err := session.AppendEvent(event); err != nil {
+				return err
+			}
 			if err := u.fillUserInfo(session, event.AggregateID); err != nil {
 				return err
 			}
@@ -106,7 +108,9 @@ func (u *UserSession) OnError(event *models.Event, err error) error {
 }
 
 func (u *UserSession) updateSession(session *view_model.UserSessionView, event *models.Event) error {
-	session.AppendEvent(event)
+	if err := session.AppendEvent(event); err != nil {
+		return err
+	}
 	if err := u.fillUserInfo(session, event.AggregateID); err != nil {
 		return err
 	}

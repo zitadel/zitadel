@@ -601,10 +601,10 @@ func (es *UserEventstore) SetOneTimePassword(ctx context.Context, policy *iam_mo
 	if user.Human == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-PjDfJ", "Errors.User.NotHuman")
 	}
-	return es.changedPassword(ctx, user, policy, password.SecretString, true)
+	return es.changedPassword(ctx, user, policy, password.SecretString, true, "")
 }
 
-func (es *UserEventstore) SetPassword(ctx context.Context, policy *iam_model.PasswordComplexityPolicyView, userID, code, password string) error {
+func (es *UserEventstore) SetPassword(ctx context.Context, policy *iam_model.PasswordComplexityPolicyView, userID, code, password, userAgentID string) error {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
@@ -618,7 +618,7 @@ func (es *UserEventstore) SetPassword(ctx context.Context, policy *iam_model.Pas
 	if err := crypto.VerifyCode(user.PasswordCode.CreationDate, user.PasswordCode.Expiry, user.PasswordCode.Code, code, es.PasswordVerificationCode); err != nil {
 		return err
 	}
-	_, err = es.changedPassword(ctx, user, policy, password, false)
+	_, err = es.changedPassword(ctx, user, policy, password, false, userAgentID)
 	return err
 }
 
@@ -684,7 +684,7 @@ func (es *UserEventstore) ChangeMachine(ctx context.Context, machine *usr_model.
 	return model.MachineToModel(repoUser.Machine), nil
 }
 
-func (es *UserEventstore) ChangePassword(ctx context.Context, policy *iam_model.PasswordComplexityPolicyView, userID, old, new string) (_ *usr_model.Password, err error) {
+func (es *UserEventstore) ChangePassword(ctx context.Context, policy *iam_model.PasswordComplexityPolicyView, userID, old, new, userAgentID string) (_ *usr_model.Password, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	user, err := es.UserByID(ctx, userID)
@@ -703,10 +703,10 @@ func (es *UserEventstore) ChangePassword(ctx context.Context, policy *iam_model.
 	if err != nil {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-s56a3", "Errors.User.Password.Invalid")
 	}
-	return es.changedPassword(ctx, user, policy, new, false)
+	return es.changedPassword(ctx, user, policy, new, false, userAgentID)
 }
 
-func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.User, policy *iam_model.PasswordComplexityPolicyView, password string, onetime bool) (_ *usr_model.Password, err error) {
+func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.User, policy *iam_model.PasswordComplexityPolicyView, password string, onetime bool, userAgentID string) (_ *usr_model.Password, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	pw := &usr_model.Password{SecretString: password}
@@ -714,7 +714,7 @@ func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.U
 	if err != nil {
 		return nil, err
 	}
-	repoPassword := model.PasswordFromModel(pw)
+	repoPassword := model.PasswordChangeFromModel(pw, userAgentID)
 	repoUser := model.UserFromModel(user)
 	agg := PasswordChangeAggregate(es.AggregateCreator(), repoUser, repoPassword)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)

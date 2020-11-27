@@ -1060,10 +1060,10 @@ func TestSkipMfaAggregate(t *testing.T) {
 
 func TestChangePasswordAggregate(t *testing.T) {
 	type args struct {
-		ctx        context.Context
-		user       *model.User
-		password   *model.Password
-		aggCreator *models.AggregateCreator
+		ctx            context.Context
+		user           *model.User
+		passwordChange *model.PasswordChange
+		aggCreator     *models.AggregateCreator
 	}
 	type res struct {
 		eventLen  int
@@ -1086,8 +1086,8 @@ func TestChangePasswordAggregate(t *testing.T) {
 						Profile: &model.Profile{DisplayName: "DisplayName"},
 					},
 				},
-				password:   &model.Password{ChangeRequired: true},
-				aggCreator: models.NewAggregateCreator("Test"),
+				passwordChange: &model.PasswordChange{Password: &model.Password{ChangeRequired: true}},
+				aggCreator:     models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
@@ -1113,7 +1113,7 @@ func TestChangePasswordAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := PasswordChangeAggregate(tt.args.aggCreator, tt.args.user, tt.args.password)(tt.args.ctx)
+			agg, err := PasswordChangeAggregate(tt.args.aggCreator, tt.args.user, tt.args.passwordChange)(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

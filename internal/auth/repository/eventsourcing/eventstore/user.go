@@ -234,11 +234,11 @@ func (repo *UserRepo) ChangeMyPassword(ctx context.Context, old, new string) err
 		return err
 	}
 	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(policy)
-	_, err = repo.UserEvents.ChangePassword(ctx, pwPolicyView, authz.GetCtxData(ctx).UserID, old, new)
+	_, err = repo.UserEvents.ChangePassword(ctx, pwPolicyView, authz.GetCtxData(ctx).UserID, old, new, "")
 	return err
 }
 
-func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new string) (err error) {
+func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new, userAgentID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
@@ -249,7 +249,7 @@ func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new strin
 		return err
 	}
 	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(policy)
-	_, err = repo.UserEvents.ChangePassword(ctx, pwPolicyView, userID, old, new)
+	_, err = repo.UserEvents.ChangePassword(ctx, pwPolicyView, userID, old, new, userAgentID)
 	return err
 }
 
@@ -339,7 +339,7 @@ func (repo *UserRepo) RequestPasswordReset(ctx context.Context, loginname string
 	return repo.UserEvents.RequestSetPassword(ctx, user.ID, model.NotificationTypeEmail)
 }
 
-func (repo *UserRepo) SetPassword(ctx context.Context, userID, code, password string) error {
+func (repo *UserRepo) SetPassword(ctx context.Context, userID, code, password, userAgentID string) error {
 	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if errors.IsNotFound(err) {
 		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
@@ -348,7 +348,7 @@ func (repo *UserRepo) SetPassword(ctx context.Context, userID, code, password st
 		return err
 	}
 	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(policy)
-	return repo.UserEvents.SetPassword(ctx, pwPolicyView, userID, code, password)
+	return repo.UserEvents.SetPassword(ctx, pwPolicyView, userID, code, password, userAgentID)
 }
 
 func (repo *UserRepo) SignOut(ctx context.Context, agentID string) error {
