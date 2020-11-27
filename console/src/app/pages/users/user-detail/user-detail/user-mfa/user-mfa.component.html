@@ -17,6 +17,16 @@
                 </td>
             </ng-container>
 
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.TABLEACTIONS' | translate }} </th>
+                <td mat-cell *matCellDef="let mfa">
+                    <button matTooltip="{{'ACTIONS.REMOVE' | translate}}" color="warn" mat-icon-button
+                        (click)="deleteMFA(mfa.type)">
+                        <i class="las la-trash"></i>
+                    </button>
+                </td>
+            </ng-container>
+
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;">
             </tr>

@@ -27,6 +27,23 @@ export const toolbarAnimation: AnimationTriggerMetadata =
         ]),
     ]);
 
+export const adminLineAnimation: AnimationTriggerMetadata =
+    trigger('adminline', [
+        transition(':enter', [
+            style({
+                transform: 'translateY(100%)',
+                opacity: 0.5,
+            }),
+            animate(
+                '.2s ease-out',
+                style({
+                    transform: 'translateY(0%)',
+                    opacity: 1,
+                }),
+            ),
+        ]),
+    ]);
+
 export const accountCard: AnimationTriggerMetadata = trigger('accounts', [
     transition(':enter', [
         style({

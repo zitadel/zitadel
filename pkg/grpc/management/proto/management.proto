@@ -389,6 +389,16 @@ service ManagementService {
     };
   }
 
+  rpc RemoveMfaOTP(UserID) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/users/{id}/mfas/otp"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.write"
+    };
+  }
+
   // Sends an Notification (Email/SMS) with a password reset Link
   rpc SendSetPasswordNotification(SetPasswordNotificationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {

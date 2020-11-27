@@ -76,7 +76,7 @@ export class GrpcService {
                 }
                 return Promise.resolve(data);
             }).catch(() => {
-                console.log('Failed to load environment from assets');
+                console.error('Failed to load environment from assets');
             });
     }
 }

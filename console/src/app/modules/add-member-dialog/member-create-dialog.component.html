@@ -6,15 +6,15 @@
 <div mat-dialog-content>
     <!-- if no context -->
     <ng-container *ngIf="showCreationTypeSelector">
-        <mat-form-field class="full-width" appearance="outline">
-            <mat-label>{{ 'MEMBER.CREATIONTYPE' | translate }}</mat-label>
+        <cnsl-form-field class="full-width" appearance="outline">
+            <cnsl-label>{{ 'MEMBER.CREATIONTYPE' | translate }}</cnsl-label>
             <mat-select [(ngModel)]="creationType" (selectionChange)="loadRoles()">
                 <mat-option *ngFor="let type of creationTypes" [value]="type.type"
                     [disabled]="(type.disabled$ | async) == false">
                     {{ 'MEMBER.CREATIONTYPES.'+type.type | translate}}
                 </mat-option>
             </mat-select>
-        </mat-form-field>
+        </cnsl-form-field>
 
         <ng-container
             *ngIf="creationType === CreationType.PROJECT_OWNED || creationType === CreationType.PROJECT_GRANTED">
@@ -30,15 +30,15 @@
     <app-search-user-autocomplete [users]="preselectedUsers" (selectionChanged)="users = $event">
     </app-search-user-autocomplete>
 
-    <mat-form-field class="full-width" appearance="outline"
+    <cnsl-form-field class="full-width" appearance="outline"
         *ngIf="creationType === CreationType.PROJECT_OWNED || creationType === CreationType.PROJECT_GRANTED || creationType === CreationType.IAM">
-        <mat-label>{{ 'ROLESLABEL' | translate }}</mat-label>
+        <cnsl-label>{{ 'ROLESLABEL' | translate }}</cnsl-label>
         <mat-select [(ngModel)]="roles" multiple>
             <mat-option *ngFor="let role of memberRoleOptions" [value]="role">
                 {{ role }}
             </mat-option>
         </mat-select>
-    </mat-form-field>
+    </cnsl-form-field>
 
     <ng-container *ngIf="creationType === CreationType.ORG">
         <app-org-member-roles-autocomplete (selectionChanged)="setOrgMemberRoles($event)">
