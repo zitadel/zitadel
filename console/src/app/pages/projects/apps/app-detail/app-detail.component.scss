@@ -64,24 +64,24 @@
 }
 
 .docs-line {
-    flex-basis: 100%;
-    margin: 0.5rem 0;
+  flex-basis: 100%;
+  margin: .5rem 0;
 
-    p {
-        margin: 0;
-        margin-bottom: .5rem
-    }
-
-    p:last-child {
-        margin: 0;
-    }
+  p {
+    margin: 0;
+    margin-bottom: .5rem;
   }
+
+  p:last-child {
+    margin: 0;
+  }
+}
 
 .content {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  margin: 0 -0.5rem;
+  margin: 0 -.5rem;
 
   &.nowrap {
     flex-wrap: nowrap;
@@ -172,5 +172,5 @@
   flex-basis: 100%;
   margin: 1.5rem .5rem;
   height: 1px;
-  background-color: rgba( #8795a1,.2);
+  background-color: rgba(#8795a1, .2);
 }
