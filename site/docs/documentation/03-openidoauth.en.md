@@ -73,12 +73,12 @@ ZITADEL supports the usage of scopes as way of requesting information from the I
 
 In addition to the standard compliant scopes we utilize the following scopes.
 
-| Scopes   | Example    | Description    |
-|:------------------------------------------------|:---------------|--------------------------------------------|
-| urn:zitadel:iam:org:project:role:{rolename}     | `urn:zitadel:iam:org:project:role:user` | By using this scope a [client](administrate#clients) can request the claim urn:zitadel:iam:roles:rolename} to be asserted when possible. As an alternative approach you can enable all [roles](administrate#Roles) to be asserted from the [project](administrate#projects) a [client](administrate#clients) belongs to. See details [here](administrate#RBAC_Settings) |
-| urn:zitadel:iam:org:domain:primary:{domainname} | `urn:zitadel:iam:org:domain:primary:acme.ch` |When requesting this scope **ZITADEL** will enforce that the user is a member of the selected organization. If the organization does not exist a failure is displayed |
-| urn:zitadel:iam:role:{rolename}                 | | |
-| urn:zitadel:iam:org:project:id:{projectid}:aud  | ZITADEL's Project id is `urn:zitadel:iam:org:project:id:69234237810729019:aud` | By adding this scope, the requested projectid will be added to the audience of the access and id token |
+| Scopes                                          | Example                                                                        | Description                                                                                                                                                                                                                                                                                                                                                             |
+|:------------------------------------------------|:-------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| urn:zitadel:iam:org:project:role:{rolename}     | `urn:zitadel:iam:org:project:role:user`                                        | By using this scope a [client](administrate#clients) can request the claim urn:zitadel:iam:roles:rolename} to be asserted when possible. As an alternative approach you can enable all [roles](administrate#Roles) to be asserted from the [project](administrate#projects) a [client](administrate#clients) belongs to. See details [here](administrate#RBAC_Settings) |
+| urn:zitadel:iam:org:domain:primary:{domainname} | `urn:zitadel:iam:org:domain:primary:acme.ch`                                   | When requesting this scope **ZITADEL** will enforce that the user is a member of the selected organization. If the organization does not exist a failure is displayed                                                                                                                                                                                                   |
+| urn:zitadel:iam:role:{rolename}                 |                                                                                |                                                                                                                                                                                                                                                                                                                                                                         |
+| urn:zitadel:iam:org:project:id:{projectid}:aud  | ZITADEL's Project id is `urn:zitadel:iam:org:project:id:69234237810729019:aud` | By adding this scope, the requested projectid will be added to the audience of the access and id token                                                                                                                                                                                                                                                                  |
 
 > If access to ZITADEL's API's is needed with a service user the scope `urn:zitadel:iam:org:project:id:69234237810729019:aud` needs to be used with the JWT Profile request
 
@@ -117,8 +117,8 @@ Please check below the matrix for an overview where which scope is asserted.
 | Claims             | Example                                  | Description                                                                                   |
 |:-------------------|:-----------------------------------------|-----------------------------------------------------------------------------------------------|
 | acr                | TBA                                      | TBA                                                                                           |
-| address            | `Teufener Strasse 19, 9000 St. Gallen`   |                                                                                               |
-| amr                | `"amr": "pwd mfa"`                       | Authentication Method References as defined in [RFC8176](https://tools.ietf.org/html/rfc8176) |
+| address            | `Teufener Strasse 19, 9000 St. Gallen`   | TBA                                                                                           |
+| amr                | `pwd mfa`                                | Authentication Method References as defined in [RFC8176](https://tools.ietf.org/html/rfc8176) |
 | aud                | `69234237810729019`                      | By default all client id's and the project id is included                                     |
 | auth_time          | `1311280969`                             | Unix time of the authentication                                                               |
 | azp                | `69234237810729234`                      | Client id of the client who requested the token                                               |
@@ -129,12 +129,12 @@ Please check below the matrix for an overview where which scope is asserted.
 | gender             | `other`                                  | Gender of the subject                                                                         |
 | given_name         | `Road`                                   | Given name of the subject                                                                     |
 | iat                | `1311280970`                             | Issued at time of the token as unix time                                                      |
-| iss                | `"iss": "https://issuer.zitadel.ch"`     | Issuing domain of a token                                                                     |
+| iss                | `https://issuer.zitadel.ch`              | Issuing domain of a token                                                                     |
 | locale             | `en`                                     | Language from the subject                                                                     |
 | name               | `Road Runner`                            | The subjects full name                                                                        |
 | nonce              | `blQtVEJHNTF0WHhFQmhqZ0RqeHJsdzdkd2d...` | The nonce provided by the client                                                              |
-| phone              | `+41 71 XXX XX XX`                       |                                                                                               |
-| preferred_username | `road.runner@acme.caos.ch`               |                                                                                               |
+| phone              | `+41 79 XXX XX XX`                       | Phone number provided by the user                                                             |
+| preferred_username | `road.runner@acme.caos.ch`               | ZITADEL's login name of the user. Consist of `username@primarydomain`                         |
 | sub                | `77776025198584418`                      | Subject ID of the user                                                                        |
 
 #### Custom Claims
@@ -206,8 +206,8 @@ Our service user work with the JWT profile to authenticate them against ZITADEL.
 
 Key JSON
 
-| Key    | Example                                                           | Description                                                        |
-|:-------|:------------------------------------------------------------------|:-------------------------------------------------------------------|
+| Key    | Example                                                             | Description                                                        |
+|:-------|:--------------------------------------------------------------------|:-------------------------------------------------------------------|
 | type   | `"serviceaccount"`                                                  | The type of account, right now only serviceaccount is valid        |
 | keyId  | `"81693565968772648"`                                               | This is unique ID of the key                                       |
 | key    | `"-----BEGIN RSA PRIVATE KEY-----...-----END RSA PRIVATE KEY-----"` | The private key generated by ZITADEL, this can not be regenerated! |
@@ -248,8 +248,8 @@ JWT
 
 Access Token Request
 
-| Parameter    | Example                                                                   | Description                                   |
-|:-------------|:--------------------------------------------------------------------------|:----------------------------------------------|
+| Parameter    | Example                                                                     | Description                                   |
+|:-------------|:----------------------------------------------------------------------------|:----------------------------------------------|
 | Content-Type | `application/x-www-form-urlencoded`                                         |                                               |
 | grant_type   | `urn:ietf:params:oauth:grant-type:jwt-bearer`                               | Using JWTs as Authorization Grants            |
 | assertion    | `eyJhbGciOiJSUzI1Ni...`                                                     | The base64 encoded JWT created above          |
