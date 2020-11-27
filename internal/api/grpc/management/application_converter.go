@@ -6,6 +6,7 @@ import (
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -59,6 +60,8 @@ func oidcConfigFromModel(config *proj_model.OIDCConfig) *management.OIDCConfig {
 		AccessTokenType:          oidcTokenTypeFromModel(config.AccessTokenType),
 		AccessTokenRoleAssertion: config.AccessTokenRoleAssertion,
 		IdTokenRoleAssertion:     config.IDTokenRoleAssertion,
+		IdTokenUserinfoAssertion: config.IDTokenUserinfoAssertion,
+		ClockSkew:                durationpb.New(config.ClockSkew),
 	}
 }
 
@@ -78,6 +81,8 @@ func oidcConfigFromApplicationViewModel(app *proj_model.ApplicationView) *manage
 		AccessTokenType:          oidcTokenTypeFromModel(app.AccessTokenType),
 		AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
 		IdTokenRoleAssertion:     app.IDTokenRoleAssertion,
+		IdTokenUserinfoAssertion: app.IDTokenUserinfoAssertion,
+		ClockSkew:                durationpb.New(app.ClockSkew),
 	}
 }
 
@@ -109,6 +114,8 @@ func oidcAppCreateToModel(app *management.OIDCApplicationCreate) *proj_model.App
 			AccessTokenType:          oidcTokenTypeToModel(app.AccessTokenType),
 			AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
 			IDTokenRoleAssertion:     app.IdTokenRoleAssertion,
+			IDTokenUserinfoAssertion: app.IdTokenUserinfoAssertion,
+			ClockSkew:                app.ClockSkew.AsDuration(),
 		},
 	}
 }
@@ -139,6 +146,8 @@ func oidcConfigUpdateToModel(app *management.OIDCConfigUpdate) *proj_model.OIDCC
 		AccessTokenType:          oidcTokenTypeToModel(app.AccessTokenType),
 		AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
 		IDTokenRoleAssertion:     app.IdTokenRoleAssertion,
+		IDTokenUserinfoAssertion: app.IdTokenUserinfoAssertion,
+		ClockSkew:                app.ClockSkew.AsDuration(),
 	}
 }
 
