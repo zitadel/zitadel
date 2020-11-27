@@ -114,7 +114,7 @@ func (c *Client) ClockSkew() time.Duration {
 	return c.ApplicationView.ClockSkew
 }
 
-func (c *Client) UserInfoInIDToken() bool {
+func (c *Client) IDTokenUserinfoClaimsAssertion() bool {
 	return c.ApplicationView.IDTokenUserinfoAssertion
 }
 
