@@ -101,7 +101,7 @@ func (repo *OrgRepo) SearchOrgs(ctx context.Context, query *org_model.OrgSearchR
 	}
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.EventTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }

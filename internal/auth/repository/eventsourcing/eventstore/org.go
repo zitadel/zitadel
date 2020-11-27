@@ -50,7 +50,7 @@ func (repo *OrgRepository) SearchOrgs(ctx context.Context, request *org_model.Or
 	}
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.EventTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }

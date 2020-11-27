@@ -172,7 +172,7 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.EventTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -274,7 +274,7 @@ func (repo *UserRepo) SearchExternalIDPs(ctx context.Context, request *usr_model
 	}
 	if seqErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.EventTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -311,7 +311,7 @@ func (repo *UserRepo) SearchMachineKeys(ctx context.Context, request *usr_model.
 	}
 	if seqErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.EventTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -419,7 +419,7 @@ func (repo *UserRepo) SearchUserMemberships(ctx context.Context, request *usr_mo
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.EventTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -459,7 +459,7 @@ func handleSearchUserMembershipsPermissions(ctx context.Context, request *usr_mo
 			}
 			if sequence != nil {
 				result.Sequence = sequence.CurrentSequence
-				result.Timestamp = sequence.EventTimestamp
+				result.Timestamp = sequence.LastSuccessfulSpoolerRun
 			}
 			return result
 		}

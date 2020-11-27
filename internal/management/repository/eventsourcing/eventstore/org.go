@@ -122,7 +122,7 @@ func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.EventTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -219,7 +219,7 @@ func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.EventTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -306,7 +306,7 @@ func (repo *OrgRepository) SearchIDPConfigs(ctx context.Context, request *iam_mo
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.EventTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -428,7 +428,7 @@ func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.EventTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
