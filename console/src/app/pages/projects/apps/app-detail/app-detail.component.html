@@ -14,7 +14,7 @@
 
         <app-card title="{{ 'APP.PAGES.DETAIL.TITLE' | translate }}" *ngIf="app">
             <form [formGroup]="appNameForm" (ngSubmit)="saveApp()">
-                <div class="content">
+                <div class="name-content">
                     <mat-button-toggle-group formControlName="state" class="toggle" (change)="changeState($event)">
                         <mat-button-toggle [value]="AppState.APPSTATE_INACTIVE"
                             matTooltip="{{ 'ACTIONS.DEACTIVATE' | translate}}">
@@ -26,18 +26,18 @@
                         </mat-button-toggle>
                     </mat-button-toggle-group>
 
-                    <cnsl-form-field class="formfield">
+                    <cnsl-form-field class="name-field">
                         <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>
                         <input cnslInput formControlName="name" />
                     </cnsl-form-field>
 
-                    <p class="docs-line" *ngIf="docs?.discoveryEndpoint">Discovery Endpoint: {{docs.discoveryEndpoint}}
-                    </p>
-                    <p class="docs-line" *ngIf="docs?.issuer">Issuer: {{docs.issuer}}</p>
+                    <cnsl-info-section class="docs-line" *ngIf="docs?.discoveryEndpoint">
+                        <p><strong>Discovery Endpoint:</strong> {{docs.discoveryEndpoint}}</p>
+                        <p><strong>Issuer:</strong> {{docs.issuer}}</p>
+                    </cnsl-info-section>
                 </div>
                 <div class="btn-container">
-                    <button class="submit-button" type="submit" color="primary"
-                        [disabled]="appNameForm.invalid || name?.disabled"
+                    <button type="submit" color="primary" [disabled]="appNameForm.invalid || name?.disabled"
                         mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
                 </div>
             </form>
@@ -50,9 +50,12 @@
             </div>
 
             <div class="compliance">
-                <p class="problem" *ngFor="let problem of app.oidcConfig.complianceProblemsList">
-                    {{problem.localizedMessage}}
-                </p>
+                <cnsl-info-section class="problem">
+                    <ul style="margin: 0;">
+                        <li style="margin: 0 0 .5rem 0;" *ngFor="let problem of app.oidcConfig.complianceProblemsList">
+                            {{problem.localizedMessage}}</li>
+                    </ul>
+                </cnsl-info-section>
             </div>
             <form *ngIf="appForm" [formGroup]="appForm" (ngSubmit)="saveOIDCApp()">
                 <div class="content">
@@ -113,10 +116,16 @@
                     <mat-checkbox *ngIf="accessTokenType?.value === OIDCTokenType.OIDCTOKENTYPE_JWT" class="full-width"
                         formControlName="accessTokenRoleAssertion" color="primary">
                         {{'APP.OIDC.ACCESSTOKENROLEASSERTION' | translate}}</mat-checkbox>
-                    <p class="full-width desc">{{'APP.OIDC.ACCESSTOKENROLEASSERTION_DESCRIPTION' | translate}}</p>
-                    <mat-checkbox class="full-width" formControlName="idTokenRoleAssertion" color="primary">
+
+                    <cnsl-info-section class="full-width desc">
+                        <span>{{'APP.OIDC.ACCESSTOKENROLEASSERTION_DESCRIPTION' | translate}}</span>
+                    </cnsl-info-section>
+                    <mat-checkbox class="full-width" style="margin-bottom: .5rem" formControlName="idTokenRoleAssertion"
+                        color="primary">
                         {{'APP.OIDC.IDTOKENROLEASSERTION' | translate}}</mat-checkbox>
-                    <p class="full-width desc">{{'APP.OIDC.IDTOKENROLEASSERTION_DESCRIPTION' | translate}}</p>
+                    <cnsl-info-section class="full-width desc">
+                        <span>{{'APP.OIDC.IDTOKENROLEASSERTION_DESCRIPTION' | translate}}</span>
+                    </cnsl-info-section>
 
                     <div class="divider"></div>
 
@@ -126,10 +135,15 @@
                         {{ 'APP.OIDC.DEVMODE' | translate }}
                     </mat-slide-toggle>
 
-                    <p class="step-description" style="margin-bottom: 2rem;">{{'APP.OIDC.DEVMODEDESC' | translate}}</p>
-                    <p class="step-description"
+                    <cnsl-info-section class="step-description">
+                        <span style="margin-bottom: 2rem;">{{'APP.OIDC.DEVMODEDESC' | translate}}</span>
+                    </cnsl-info-section>
+
+                    <cnsl-info-section class="step-description"
                         *ngIf="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
-                        {{'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate}}</p>
+                        <span>{{'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate}}</span>
+                    </cnsl-info-section>
+
                     <p class="step-description"
                         *ngIf="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB || applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT">
                         {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</p>
@@ -141,7 +155,8 @@
                             <input #redInput cnslInput placeholder="{{'APP.OIDC.COMMAORENTERSEPERATION' | translate}}"
                                 [formControl]="redirectControl">
                         </cnsl-form-field>
-                        <button matTooltip="{{'ACTIONS.ADD' | translate}}" type="submit" mat-icon-button>
+                        <button matTooltip="{{'ACTIONS.ADD' | translate}}" type="submit" mat-icon-button
+                            [disabled]="redirectControl.invalid || !canWrite">
                             <mat-icon>add</mat-icon>
                         </button>
                     </form>
@@ -164,7 +179,8 @@
                             <input #postInput cnslInput placeholder="{{'APP.OIDC.COMMAORENTERSEPERATION' | translate}}"
                                 [formControl]="postRedirectControl">
                         </cnsl-form-field>
-                        <button matTooltip="{{'ACTIONS.ADD' | translate}}" type="submit" mat-icon-button>
+                        <button matTooltip="{{'ACTIONS.ADD' | translate}}" type="submit" mat-icon-button
+                            [disabled]="postRedirectControl.invalid || !canWrite">
                             <mat-icon>add</mat-icon>
                         </button>
                     </form>

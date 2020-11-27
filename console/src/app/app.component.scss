@@ -36,6 +36,10 @@
 
   .doc-link {
     margin-right: 1rem;
+
+    @media only screen and (max-width: 500px) {
+        display: none;
+    }
   }
 
   .icon-container {

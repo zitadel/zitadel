@@ -1,0 +1,31 @@
+@import '~@angular/material/theming';
+
+@mixin info-section-theme($theme) {
+  $primary: map-get($theme, primary);
+  $primary-color: mat-color($primary, 500);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  .info-section-row {
+    padding: 1rem;
+    display: flex;
+    background-color: if($is-dark-theme,#ffffff13,#f3f3f3);
+    border-radius: 4px;
+    padding: .5rem 0;
+    padding-right: 1rem;
+    color: if($is-dark-theme,#d6d6d6,#3c4257);
+    font-size: 14px;
+
+    .icon {
+        margin-right: 1rem;
+        height: 1.2rem;
+        line-height: 1.2rem;
+        font-size: 1.2rem;
+        margin-left: .5rem;
+        color: $primary-color;
+    }
+
+    .info-section-content {
+        flex: 1;
+    }
+  }
+}

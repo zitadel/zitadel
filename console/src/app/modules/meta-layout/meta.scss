@@ -2,56 +2,56 @@
 @import '~@angular/material/theming';
 
 @mixin meta-theme($theme) {
-    .meta-details {
-        margin-bottom: 1rem;
-        border-bottom: 1px solid #81868a40;
-        padding-bottom: 1rem;
+  .meta-details {
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #81868a40;
+    padding-bottom: 1rem;
 
-        .meta-row {
-            display: flex;
-            margin-bottom: .5rem;
-            align-items: center;
+    .meta-row {
+      display: flex;
+      margin-bottom: .5rem;
+      align-items: center;
 
-            .first {
-                flex: 1;
-                font-size: 13px;
-                margin-right: .5rem;
-            }
+      .first {
+        flex: 1;
+        font-size: 13px;
+        margin-right: .5rem;
+      }
 
-            .fill-space {
-                flex: 1;
-            }
+      .fill-space {
+        flex: 1;
+      }
 
-            .second {
-                font-size: 13px;
-            }
+      .second {
+        font-size: 13px;
+      }
 
-            .state {
-                border-radius: 50vw;
-                padding: 2px .5rem;
-                letter-spacing: .05em;
-                font-size: 13px;
-                background-color: #8795a120;
+      .state {
+        border-radius: 50vw;
+        padding: 2px .5rem;
+        letter-spacing: .05em;
+        font-size: 13px;
+        background-color: #8795a120;
 
-                &.active {
-                background-color: #85d996;
-                color: black;
-                }
-
-                &.inactive {
-                background-color: #ff8981;
-                color: black;
-                }
-            }
+        &.active {
+          background-color: #85d996;
+          color: black;
         }
-    }
 
-    .mat-tab-label {
-        min-width: 100px !important;
+        &.inactive {
+          background-color: #ff8981;
+          color: black;
+        }
+      }
     }
-    
-    .meta-flex-col {
-        display: flex;
-        flex-direction: column;
-    }
+  }
+
+  .mat-tab-label {
+    min-width: 100px !important;
+  }
+
+  .meta-flex-col {
+    display: flex;
+    flex-direction: column;
+  }
 }
