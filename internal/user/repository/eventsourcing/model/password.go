@@ -27,7 +27,7 @@ type PasswordCode struct {
 }
 
 type PasswordChange struct {
-	*Password
+	Password
 	UserAgentID string `json:"userAgentID,omitempty"`
 }
 
@@ -58,7 +58,7 @@ func PasswordCodeToModel(code *PasswordCode) *model.PasswordCode {
 
 func PasswordChangeFromModel(password *model.Password, userAgentID string) *PasswordChange {
 	return &PasswordChange{
-		Password: &Password{
+		Password: Password{
 			ObjectRoot:     password.ObjectRoot,
 			Secret:         password.SecretCrypto,
 			ChangeRequired: password.ChangeRequired,

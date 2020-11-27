@@ -737,13 +737,13 @@ func MFAOTPAddAggregate(aggCreator *es_models.AggregateCreator, user *model.User
 	}
 }
 
-func MFAOTPVerifyAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+func MFAOTPVerifyAggregate(aggCreator *es_models.AggregateCreator, user *model.User, userAgentID string) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.HumanMFAOTPVerified, nil)
+		return agg.AppendEvent(model.HumanMFAOTPVerified, &model.OTPVerified{UserAgentID: userAgentID})
 	}
 }
 

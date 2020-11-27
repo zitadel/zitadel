@@ -97,10 +97,10 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 		v.SelectedIDPConfigID = data.SelectedIDPConfigID
 		v.State = int32(req_model.UserSessionStateActive)
 	case es_model.UserPasswordCheckFailed,
-		es_model.UserPasswordChanged,
 		es_model.HumanPasswordCheckFailed:
 		v.PasswordVerification = time.Time{}
-	case es_model.HumanPasswordChanged:
+	case es_model.UserPasswordChanged,
+		es_model.HumanPasswordChanged:
 		data := new(es_model.PasswordChange)
 		err := data.SetData(event)
 		if err != nil {
@@ -108,6 +108,18 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 		}
 		if v.UserAgentID != data.UserAgentID {
 			v.PasswordVerification = time.Time{}
+		}
+	case es_model.MFAOTPVerified,
+		es_model.HumanMFAOTPVerified:
+		data := new(es_model.OTPVerified)
+		err := data.SetData(event)
+		if err != nil {
+			return err
+		}
+		if v.UserAgentID == data.UserAgentID {
+			v.SecondFactorVerification = event.CreationDate
+			v.SecondFactorVerificationType = int32(req_model.MFATypeOTP)
+			v.State = int32(req_model.UserSessionStateActive)
 		}
 	case es_model.MFAOTPCheckSucceeded,
 		es_model.HumanMFAOTPCheckSucceeded:

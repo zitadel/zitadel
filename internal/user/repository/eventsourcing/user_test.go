@@ -1086,7 +1086,7 @@ func TestChangePasswordAggregate(t *testing.T) {
 						Profile: &model.Profile{DisplayName: "DisplayName"},
 					},
 				},
-				passwordChange: &model.PasswordChange{Password: &model.Password{ChangeRequired: true}},
+				passwordChange: &model.PasswordChange{Password: model.Password{ChangeRequired: true}},
 				aggCreator:     models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -2329,7 +2329,7 @@ func TestOTPVerifyAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := MFAOTPVerifyAggregate(tt.args.aggCreator, tt.args.user)(tt.args.ctx)
+			agg, err := MFAOTPVerifyAggregate(tt.args.aggCreator, tt.args.user, "")(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

@@ -1365,7 +1365,7 @@ func (es *UserEventstore) RemoveOTP(ctx context.Context, userID string) error {
 	return nil
 }
 
-func (es *UserEventstore) CheckMfaOTPSetup(ctx context.Context, userID, code string) error {
+func (es *UserEventstore) CheckMfaOTPSetup(ctx context.Context, userID, code, userAgentID string) error {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
@@ -1383,7 +1383,7 @@ func (es *UserEventstore) CheckMfaOTPSetup(ctx context.Context, userID, code str
 		return err
 	}
 	repoUser := model.UserFromModel(user)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAOTPVerifyAggregate(es.AggregateCreator(), repoUser))
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAOTPVerifyAggregate(es.AggregateCreator(), repoUser, userAgentID))
 	if err != nil {
 		return err
 	}

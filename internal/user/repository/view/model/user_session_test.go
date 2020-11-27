@@ -61,10 +61,19 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append user password changed event",
 			args: args{
-				event:    &es_models.Event{CreationDate: now(), Type: es_model.UserPasswordChanged},
-				userView: &UserSessionView{PasswordVerification: now()},
+				event: &es_models.Event{
+					CreationDate: now(),
+					Type:         es_model.UserPasswordChanged,
+					Data: func() []byte {
+						d, _ := json.Marshal(&es_model.Password{
+							Secret: &crypto.CryptoValue{Crypted: []byte("test")},
+						})
+						return d
+					}(),
+				},
+				userView: &UserSessionView{UserAgentID: "id", PasswordVerification: now()},
 			},
-			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}},
+			result: &UserSessionView{UserAgentID: "id", ChangeDate: now(), PasswordVerification: time.Time{}},
 		},
 		{
 			name: "append human password changed event",
@@ -74,27 +83,26 @@ func TestAppendEvent(t *testing.T) {
 					Type:         es_model.HumanPasswordChanged,
 					Data: func() []byte {
 						d, _ := json.Marshal(&es_model.PasswordChange{
-							Password: &es_model.Password{
+							Password: es_model.Password{
 								Secret: &crypto.CryptoValue{Crypted: []byte("test")},
 							},
 						})
 						return d
 					}(),
 				},
-				userView: &UserSessionView{PasswordVerification: now(), UserAgentID: "id"},
+				userView: &UserSessionView{UserAgentID: "id", PasswordVerification: now()},
 			},
-			result: &UserSessionView{ChangeDate: now(), UserAgentID: "id", PasswordVerification: time.Time{}},
+			result: &UserSessionView{UserAgentID: "id", ChangeDate: now(), PasswordVerification: time.Time{}},
 		},
 		{
 			name: "append human password changed event same user agent",
 			args: args{
 				event: &es_models.Event{
-					AggregateID:  "id",
 					CreationDate: now(),
 					Type:         es_model.HumanPasswordChanged,
 					Data: func() []byte {
 						d, _ := json.Marshal(&es_model.PasswordChange{
-							Password: &es_model.Password{
+							Password: es_model.Password{
 								Secret: &crypto.CryptoValue{Crypted: []byte("test")},
 							},
 							UserAgentID: "id",
@@ -102,9 +110,38 @@ func TestAppendEvent(t *testing.T) {
 						return d
 					}(),
 				},
-				userView: &UserSessionView{PasswordVerification: now(), UserAgentID: "id"},
+				userView: &UserSessionView{UserAgentID: "id", PasswordVerification: now()},
 			},
-			result: &UserSessionView{ChangeDate: now(), UserAgentID: "id", PasswordVerification: now()},
+			result: &UserSessionView{UserAgentID: "id", ChangeDate: now(), PasswordVerification: now()},
+		},
+		{
+			name: "append user otp verified event",
+			args: args{
+				event: &es_models.Event{
+					CreationDate: now(),
+					Type:         es_model.MFAOTPVerified,
+					Data:         nil,
+				},
+				userView: &UserSessionView{UserAgentID: "id"},
+			},
+			result: &UserSessionView{UserAgentID: "id", ChangeDate: now()},
+		},
+		{
+			name: "append user otp verified event same user agent",
+			args: args{
+				event: &es_models.Event{
+					CreationDate: now(),
+					Type:         es_model.MFAOTPVerified,
+					Data: func() []byte {
+						d, _ := json.Marshal(&es_model.OTPVerified{
+							UserAgentID: "id",
+						})
+						return d
+					}(),
+				},
+				userView: &UserSessionView{UserAgentID: "id"},
+			},
+			result: &UserSessionView{UserAgentID: "id", ChangeDate: now(), SecondFactorVerification: now()},
 		},
 		{
 			name: "append user otp check succeeded event",

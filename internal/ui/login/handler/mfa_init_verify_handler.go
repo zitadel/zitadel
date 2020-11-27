@@ -7,6 +7,7 @@ import (
 	svg "github.com/ajstarks/svgo"
 	"github.com/boombuler/barcode/qr"
 
+	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/qrcode"
 )
@@ -47,7 +48,8 @@ func (l *Login) handleMfaInitVerify(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) handleOtpVerify(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *mfaInitVerifyData) *mfaVerifyData {
-	err := l.authRepo.VerifyMfaOTPSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.Code)
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	err := l.authRepo.VerifyMfaOTPSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.Code, userAgentID)
 	if err == nil {
 		return nil
 	}

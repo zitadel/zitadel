@@ -26,7 +26,7 @@ type UserRepository interface {
 	ResendInitVerificationMail(ctx context.Context, userID string) error
 
 	AddMfaOTP(ctx context.Context, userID string) (*model.OTP, error)
-	VerifyMfaOTPSetup(ctx context.Context, userID, code string) error
+	VerifyMfaOTPSetup(ctx context.Context, userID, code, userAgentID string) error
 
 	ChangeUsername(ctx context.Context, userID, username string) error
 

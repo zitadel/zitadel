@@ -286,12 +286,12 @@ func (repo *UserRepo) AddMyMfaOTP(ctx context.Context) (*model.OTP, error) {
 	return repo.UserEvents.AddOTP(ctx, authz.GetCtxData(ctx).UserID, accountName)
 }
 
-func (repo *UserRepo) VerifyMfaOTPSetup(ctx context.Context, userID, code string) error {
-	return repo.UserEvents.CheckMfaOTPSetup(ctx, userID, code)
+func (repo *UserRepo) VerifyMfaOTPSetup(ctx context.Context, userID, code, userAgentID string) error {
+	return repo.UserEvents.CheckMfaOTPSetup(ctx, userID, code, userAgentID)
 }
 
 func (repo *UserRepo) VerifyMyMfaOTPSetup(ctx context.Context, code string) error {
-	return repo.UserEvents.CheckMfaOTPSetup(ctx, authz.GetCtxData(ctx).UserID, code)
+	return repo.UserEvents.CheckMfaOTPSetup(ctx, authz.GetCtxData(ctx).UserID, code, "")
 }
 
 func (repo *UserRepo) RemoveMyMfaOTP(ctx context.Context) error {
