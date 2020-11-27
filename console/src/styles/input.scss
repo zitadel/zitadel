@@ -1,0 +1,72 @@
+@import '~@angular/material/theming';
+
+@mixin input-theme($theme) {
+  /* stylelint-disable */
+  $primary: map-get($theme, primary);
+  $primary-dark: mat-color($primary, A900);
+  $secondary-dark: mat-color($primary, A800);
+  $inv-color: mat-color($primary, A600);
+  $primary-color: mat-color($primary, 500);
+  $primary-light-color: mat-color($primary, 200);
+  $warn: map-get($theme, warn);
+  $warn-color: mat-color($warn, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  [cnslInput],
+  .mat-select {
+    display: block;
+    box-sizing: border-box;
+    padding-inline-start: 10px;
+    outline: none;
+    display: inline-block;
+    text-align: start;
+    background-color: inherit;
+    cursor: text;
+    border-radius: 8px;
+    transform: all .2 linear;
+    font-size: 1rem;
+    border: none;
+    border: 1px solid if($is-dark-theme, #403e3e, #00000040);
+    background-color:if($is-dark-theme, #00000020, #fafafa50);
+    border-radius: 4px;
+    height: 40px;
+    padding: 10px;
+    transition: border-color .2s ease-in-out;
+    width: 100%;
+    color: mat-color($foreground, text);
+    margin-bottom: 2px;
+
+    &:hover {
+        border-color: if($is-dark-theme,#aeafb1, #1a1b1b);
+    }
+
+    &:active,
+    &:focus {
+        border-color: $primary-color;
+    }
+
+    &.ng-touched {
+        &.ng-invalid {
+            border-color: $warn-color;
+        }
+    }
+
+    &[disabled] {
+        border-color: if($is-dark-theme,#36373850,#cccdce50);
+        cursor: not-allowed;
+    }
+  }
+
+  [cnslInput]::placeholder {
+    font-size: 14px;
+    color: var(--grey);
+    font-style: italic;
+  }
+
+  .mat-paginator {
+    .mat-select {
+        background-color: inherit;
+    }
+  }
+}

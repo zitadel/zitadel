@@ -13,7 +13,10 @@
     text-transform: uppercase;
     background-color: $primary-color;
     box-sizing: border-box;
+    letter-spacing: .05em;
+    font-size: 14px;
     outline: none;
     color: white;
+    font-weight: bold;
   }
 }

@@ -4,25 +4,25 @@
 <p class="desc"> {{'LOGINPOLICY.ADDIDP.DESCRIPTION' | translate}}</p>
 
 <div mat-dialog-content>
-    <mat-form-field *ngIf="serviceType == PolicyComponentServiceType.MGMT" class="full-width" appearance="outline">
-        <mat-label>{{ 'IDP.TYPE' | translate }}</mat-label>
+    <cnsl-form-field *ngIf="serviceType == PolicyComponentServiceType.MGMT" class="full-width" appearance="outline">
+        <cnsl-label>{{ 'IDP.TYPE' | translate }}</cnsl-label>
         <mat-select [(ngModel)]="idpType" (selectionChange)="loadIdps()">
             <mat-option *ngFor="let type of idpTypes" [value]="type">
                 {{ 'IDP.TYPES.'+type | translate}}
             </mat-option>
         </mat-select>
-    </mat-form-field>
+    </cnsl-form-field>
 
     <p>{{'LOGINPOLICY.ADDIDP.SELECTIDPS' | translate}}</p>
 
-    <mat-form-field class="full-width" appearance="outline">
-        <mat-label>{{ 'LOGINPOLICY.ADDIDP.SELECTIDPS' | translate }}</mat-label>
+    <cnsl-form-field class="full-width" appearance="outline">
+        <cnsl-label>{{ 'LOGINPOLICY.ADDIDP.SELECTIDPS' | translate }}</cnsl-label>
         <mat-select [(ngModel)]="idp">
             <mat-option *ngFor="let idp of availableIdps" [value]="idp">
                 {{ idp.name }}
             </mat-option>
         </mat-select>
-    </mat-form-field>
+    </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">
     <button mat-button (click)="closeDialog()">

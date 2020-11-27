@@ -1,0 +1,16 @@
+
+@import '~@angular/material/theming';
+
+@mixin cnsl-label-theme($theme) {
+  $primary: map-get($theme, primary);
+  $primary-color: mat-color($primary, 500);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  .cnsl-label {
+    display: block;
+    font-size: 12px;
+    color: if($is-dark-theme, var(--grey), var(--grey));
+    margin-bottom: 4px;
+    font-weight: 400;
+  }
+}

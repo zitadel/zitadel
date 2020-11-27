@@ -1,7 +1,7 @@
 import { Location } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
@@ -47,6 +47,7 @@ export class UserDetailComponent implements OnInit {
     public USERGRANTCONTEXT: UserGrantContext = UserGrantContext.USER;
 
     public EditDialogType: any = EditDialogType;
+    public refreshChanges$: EventEmitter<void> = new EventEmitter();
 
     constructor(
         public translate: TranslateService,
@@ -55,9 +56,11 @@ export class UserDetailComponent implements OnInit {
         public mgmtUserService: ManagementService,
         private _location: Location,
         private dialog: MatDialog,
+        private router: Router,
     ) { }
 
     refreshUser(): void {
+        this.refreshChanges$.emit();
         this.route.params.pipe(take(1)).subscribe(params => {
             const { id } = params;
             this.mgmtUserService.GetUserByID(id).then(user => {
@@ -109,6 +112,7 @@ export class UserDetailComponent implements OnInit {
                 .then((data: UserProfile) => {
                     this.toast.showInfo('USER.TOAST.SAVED', true);
                     this.user = Object.assign(this.user, data.toObject());
+                    this.refreshChanges$.emit();
                 })
                 .catch(error => {
                     this.toast.showError(error);
@@ -128,6 +132,7 @@ export class UserDetailComponent implements OnInit {
                 .then((data: MachineResponse) => {
                     this.toast.showInfo('USER.TOAST.SAVED', true);
                     this.user = Object.assign(this.user, data.toObject());
+                    this.refreshChanges$.emit();
                 })
                 .catch(error => {
                     this.toast.showError(error);
@@ -138,15 +143,16 @@ export class UserDetailComponent implements OnInit {
     public resendEmailVerification(): void {
         this.mgmtUserService.ResendEmailVerification(this.user.id).then(() => {
             this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
+            this.refreshChanges$.emit();
         }).catch(error => {
             this.toast.showError(error);
         });
     }
 
     public resendPhoneVerification(): void {
-        console.log('resend phone ver', this.user.id);
         this.mgmtUserService.ResendPhoneVerification(this.user.id).then(() => {
             this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
+            this.refreshChanges$.emit();
         }).catch(error => {
             this.toast.showError(error);
         });
@@ -201,6 +207,7 @@ export class UserDetailComponent implements OnInit {
         this.mgmtUserService.SendSetPasswordNotification(this.user.id, NotificationType.NOTIFICATIONTYPE_EMAIL)
             .then(() => {
                 this.toast.showInfo('USER.TOAST.PASSWORDNOTIFICATIONSENT', true);
+                this.refreshChanges$.emit();
             }).catch(error => {
                 this.toast.showError(error);
             });
@@ -220,7 +227,10 @@ export class UserDetailComponent implements OnInit {
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
                 this.mgmtUserService.DeleteUser(this.user.id).then(() => {
-                    this.navigateBack();
+                    const params: Params = {
+                        'deferredReload': true,
+                    };
+                    this.router.navigate(['/users/list', this.user.human ? 'humans' : 'machines'], { queryParams: params });
                     this.toast.showInfo('USER.TOAST.DELETED', true);
                 }).catch(error => {
                     this.toast.showError(error);
@@ -238,6 +248,7 @@ export class UserDetailComponent implements OnInit {
             if (resp.send && this.user.id) {
                 this.mgmtUserService.ResendInitialMail(this.user.id, resp.email ?? '').then(() => {
                     this.toast.showInfo('USER.TOAST.INITEMAILSENT', true);
+                    this.refreshChanges$.emit();
                 }).catch(error => {
                     this.toast.showError(error);
                 });

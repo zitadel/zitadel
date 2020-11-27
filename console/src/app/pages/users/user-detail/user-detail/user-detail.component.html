@@ -89,7 +89,7 @@
         <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
             description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
             <app-user-grants [userId]="user.id" [context]="USERGRANTCONTEXT"
-                [displayedColumns]="['select', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']"
+                [displayedColumns]="['select', 'projectId', 'dates', 'roleNamesList']"
                 [disableWrite]="((['user.grant.write$'] | hasRole) | async) == false"
                 [disableDelete]="((['user.grant.delete$'] | hasRole) | async) == false">
             </app-user-grants>
@@ -102,12 +102,18 @@
                 <span class="first">{{'USER.PREFERRED_LOGINNAME' | translate}}</span>
                 <span class="second"><span style="display: block;">{{user.preferredLoginName}}</span></span>
             </div>
+            <div class="row">
+                <span class="first">{{'ORG.PAGES.STATE'  | translate}}</span>
+                <span *ngIf="user && user.state !== undefined" class="state"
+                    [ngClass]="{'active': user.state === UserState.USERSTATE_ACTIVE, 'inactive': user.state === UserState.USERSTATE_INACTIVE}">{{'USER.DATA.STATE'+user.state | translate}}</span>
+            </div>
         </div>
 
         <ng-template appHasRole [appHasRole]="['user.membership.read']">
             <app-memberships [user]="user" [disabled]="(canWrite$ | async) == false"></app-memberships>
         </ng-template>
 
-        <app-changes class="changes" [changeType]="ChangeType.USER" [id]="user.id"></app-changes>
+        <app-changes class="changes" [refresh]="refreshChanges$" [changeType]="ChangeType.USER" [id]="user.id">
+        </app-changes>
     </div>
 </app-meta-layout>

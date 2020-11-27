@@ -60,6 +60,24 @@
     }
   }
 
+  .chiplist {
+    margin-bottom: 1rem;
+  }
+
+  .chip-form {
+    width: 100%;
+    display: flex;
+    align-items: center;
+
+    .formfield {
+      flex: 1;
+    }
+
+    button {
+      margin-top: 1rem;
+    }
+  }
+
   .section-title {
     margin-bottom: 1.5rem;
   }
@@ -103,7 +121,7 @@
   .toggle {
     outline: none;
     align-self: flex-start;
-    margin-bottom: 1rem;
+    margin-top: 1rem;
     margin-right: 1rem;
     border-radius: .5rem;
 
@@ -127,6 +145,11 @@
   }
 }
 
+.chip {
+  border-radius: 4px;
+  height: 40px;
+}
+
 .chip[color='green'] {
   background-color: #56a392 !important;
 }
@@ -136,4 +159,55 @@
   margin: 1.5rem .5rem;
   height: 1px;
   background-color: var(--grey);
+}
+
+.side {
+  .details {
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #81868a40;
+    padding-bottom: 1rem;
+
+    .row {
+      display: flex;
+      margin-bottom: .5rem;
+      align-items: center;
+
+      .first {
+        flex: 1;
+        font-size: 13px;
+        margin-right: .5rem;
+      }
+
+      .fill-space {
+        flex: 1;
+      }
+
+      .state {
+        border-radius: 50vw;
+        padding: 2px .5rem;
+        letter-spacing: .05em;
+        font-size: 13px;
+        background-color: #8795a120;
+
+        &.active {
+          background-color: #85d996;
+          color: black;
+        }
+
+        &.inactive {
+          background-color: #ff8981;
+          color: black;
+        }
+      }
+    }
+  }
+
+  .mat-tab-label {
+    min-width: 100px !important;
+  }
+
+  .flex-col {
+    display: flex;
+    flex-direction: column;
+  }
 }
