@@ -74,6 +74,3 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 )
 
-replace github.com/caos/oidc => /Users/fabi/go/src/github.com/caos/oidc
-
-replace github.com/caos/oidc => /Users/fabi/go/src/github.com/caos/oidc
