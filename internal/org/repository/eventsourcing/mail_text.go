@@ -29,22 +29,23 @@ func MailTextAddedAggregate(aggCreator *es_models.AggregateCreator, existing *mo
 }
 
 // ToDo Michi
-// func MailTextChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, policy *iam_es_model.MailText) func(ctx context.Context) (*es_models.Aggregate, error) {
-// 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-// 		if policy == nil {
-// 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-yzXO0", "Errors.Internal")
-// 		}
-// 		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		changes := existing.MailTexts.Changes(policy)
-// 		if len(changes) == 0 {
-// 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-erTCI", "Errors.NoChangesFound")
-// 		}
-// 		return agg.AppendEvent(model.MailTextChanged, changes)
-// 	}
-// }
+func MailTextChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, policy *iam_es_model.MailText) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if policy == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-yzXO0", "Errors.Internal")
+		}
+		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
+		if err != nil {
+			return nil, err
+		}
+		// ToDo Michi
+		changes := existing.MailTexts[0].Changes(policy)
+		if len(changes) == 0 {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-erTCI", "Errors.NoChangesFound")
+		}
+		return agg.AppendEvent(model.MailTextChanged, changes)
+	}
+}
 
 func MailTextRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {

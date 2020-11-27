@@ -1092,42 +1092,58 @@ func (es *OrgEventstore) ChangeMailTemplate(ctx context.Context, template *iam_m
 }
 
 // ToDo Michi
-// func (es *OrgEventstore) AddMailText(ctx context.Context, mailtext *iam_model.MailText) (*iam_model.MailText, error) {
-// 	if mailtext == nil || !mailtext.IsValid() {
-// 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-108Iz", "Errors.Org.MailTextInvalid")
-// 	}
-// 	org, err := es.OrgByID(ctx, org_model.NewOrg(mailtext.AggregateID))
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func (es *OrgEventstore) AddMailText(ctx context.Context, mailtext *iam_model.MailText) (*iam_model.MailText, error) {
+	if mailtext == nil || !mailtext.IsValid() {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-108Iz", "Errors.Org.MailTextInvalid")
+	}
+	org, err := es.OrgByID(ctx, org_model.NewOrg(mailtext.AggregateID))
+	if err != nil {
+		return nil, err
+	}
 
-// 	repoOrg := model.OrgFromModel(org)
-// 	repoMailText := iam_es_model.MailTextFromModel(mailtext)
+	repoOrg := model.OrgFromModel(org)
+	repoMailText := iam_es_model.MailTextFromModel(mailtext)
 
-// 	addAggregate := MailTextAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMailText)
-// 	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return iam_es_model.MailTextToModel(repoOrg.MailText), nil
-// }
+	addAggregate := MailTextAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMailText)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	// ToDo Michi
+	return iam_es_model.MailTextToModel(repoOrg.MailTexts[0]), nil
+}
 
-// func (es *OrgEventstore) ChangeMailText(ctx context.Context, mailtext *iam_model.MailText) (*iam_model.MailText, error) {
-// 	if mailtext == nil || !mailtext.IsValid() {
-// 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-fdbqE", "Errors.Org.MailTextInvalid")
-// 	}
-// 	org, err := es.OrgByID(ctx, org_model.NewOrg(mailtext.AggregateID))
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func (es *OrgEventstore) ChangeMailText(ctx context.Context, mailtext *iam_model.MailText) (*iam_model.MailText, error) {
+	if mailtext == nil || !mailtext.IsValid() {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-fdbqE", "Errors.Org.MailTextInvalid")
+	}
+	org, err := es.OrgByID(ctx, org_model.NewOrg(mailtext.AggregateID))
+	if err != nil {
+		return nil, err
+	}
 
-// 	repoOrg := model.OrgFromModel(org)
-// 	repoMailText := iam_es_model.MailTextFromModel(mailtext)
+	repoOrg := model.OrgFromModel(org)
+	repoMailText := iam_es_model.MailTextFromModel(mailtext)
 
-// 	addAggregate := MailTextChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMailText)
-// 	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return iam_es_model.MailTextToModel(repoOrg.MailText), nil
-// }
+	addAggregate := MailTextChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMailText)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	// ToDo Michi
+	return iam_es_model.MailTextToModel(repoOrg.MailTexts[0]), nil
+}
+
+func (es *OrgEventstore) RemoveMailTemplate(ctx context.Context, policy *iam_model.MailTemplate) error {
+	if policy == nil || !policy.IsValid() {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-LulaW", "Errors.Org.MailTemplate.Invalid")
+	}
+	org, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	if err != nil {
+		return err
+	}
+	repoOrg := model.OrgFromModel(org)
+
+	addAggregate := MailTemplateRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg)
+	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+}

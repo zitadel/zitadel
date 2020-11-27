@@ -15210,3 +15210,612 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = PasswordLockoutPolicyViewValidationError{}
+
+// Validate checks the field values on MailTemplate with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *MailTemplate) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Template
+
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MailTemplateValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MailTemplateValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// MailTemplateValidationError is the validation error returned by
+// MailTemplate.Validate if the designated constraints aren't met.
+type MailTemplateValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MailTemplateValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MailTemplateValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MailTemplateValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MailTemplateValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MailTemplateValidationError) ErrorName() string { return "MailTemplateValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MailTemplateValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMailTemplate.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MailTemplateValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MailTemplateValidationError{}
+
+// Validate checks the field values on MailTemplateUpdate with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MailTemplateUpdate) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Template
+
+	return nil
+}
+
+// MailTemplateUpdateValidationError is the validation error returned by
+// MailTemplateUpdate.Validate if the designated constraints aren't met.
+type MailTemplateUpdateValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MailTemplateUpdateValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MailTemplateUpdateValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MailTemplateUpdateValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MailTemplateUpdateValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MailTemplateUpdateValidationError) ErrorName() string {
+	return "MailTemplateUpdateValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MailTemplateUpdateValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMailTemplateUpdate.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MailTemplateUpdateValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MailTemplateUpdateValidationError{}
+
+// Validate checks the field values on MailTemplateView with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *MailTemplateView) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Default
+
+	// no validation rules for Template
+
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MailTemplateViewValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MailTemplateViewValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// MailTemplateViewValidationError is the validation error returned by
+// MailTemplateView.Validate if the designated constraints aren't met.
+type MailTemplateViewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MailTemplateViewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MailTemplateViewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MailTemplateViewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MailTemplateViewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MailTemplateViewValidationError) ErrorName() string { return "MailTemplateViewValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MailTemplateViewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMailTemplateView.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MailTemplateViewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MailTemplateViewValidationError{}
+
+// Validate checks the field values on MailText with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *MailText) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for MailTextType
+
+	// no validation rules for Language
+
+	// no validation rules for Title
+
+	// no validation rules for PreHeader
+
+	// no validation rules for Subject
+
+	// no validation rules for Greeting
+
+	// no validation rules for Text
+
+	// no validation rules for ButtonText
+
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MailTextValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MailTextValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// MailTextValidationError is the validation error returned by
+// MailText.Validate if the designated constraints aren't met.
+type MailTextValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MailTextValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MailTextValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MailTextValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MailTextValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MailTextValidationError) ErrorName() string { return "MailTextValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MailTextValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMailText.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MailTextValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MailTextValidationError{}
+
+// Validate checks the field values on MailTextUpdate with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *MailTextUpdate) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for MailTextType
+
+	// no validation rules for Language
+
+	// no validation rules for Title
+
+	// no validation rules for PreHeader
+
+	// no validation rules for Subject
+
+	// no validation rules for Greeting
+
+	// no validation rules for Text
+
+	// no validation rules for ButtonText
+
+	return nil
+}
+
+// MailTextUpdateValidationError is the validation error returned by
+// MailTextUpdate.Validate if the designated constraints aren't met.
+type MailTextUpdateValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MailTextUpdateValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MailTextUpdateValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MailTextUpdateValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MailTextUpdateValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MailTextUpdateValidationError) ErrorName() string { return "MailTextUpdateValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MailTextUpdateValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMailTextUpdate.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MailTextUpdateValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MailTextUpdateValidationError{}
+
+// Validate checks the field values on MailTextsView with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *MailTextsView) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetTexts() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MailTextsViewValidationError{
+					field:  fmt.Sprintf("Texts[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// MailTextsViewValidationError is the validation error returned by
+// MailTextsView.Validate if the designated constraints aren't met.
+type MailTextsViewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MailTextsViewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MailTextsViewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MailTextsViewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MailTextsViewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MailTextsViewValidationError) ErrorName() string { return "MailTextsViewValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MailTextsViewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMailTextsView.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MailTextsViewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MailTextsViewValidationError{}
+
+// Validate checks the field values on MailTextView with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *MailTextView) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Default
+
+	// no validation rules for MailTextType
+
+	// no validation rules for Language
+
+	// no validation rules for Title
+
+	// no validation rules for PreHeader
+
+	// no validation rules for Subject
+
+	// no validation rules for Greeting
+
+	// no validation rules for Text
+
+	// no validation rules for ButtonText
+
+	if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MailTextViewValidationError{
+				field:  "CreationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetChangeDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MailTextViewValidationError{
+				field:  "ChangeDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// MailTextViewValidationError is the validation error returned by
+// MailTextView.Validate if the designated constraints aren't met.
+type MailTextViewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MailTextViewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MailTextViewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MailTextViewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MailTextViewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MailTextViewValidationError) ErrorName() string { return "MailTextViewValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MailTextViewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMailTextView.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MailTextViewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MailTextViewValidationError{}

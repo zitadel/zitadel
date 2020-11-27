@@ -370,7 +370,7 @@ func (repo *IAMRepository) GetDefaultMailTexts(ctx context.Context) (*iam_model.
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.MailTextsViewToModel(text), err
+	return iam_es_model.MailTextsViewToModel(text, true), err
 }
 
 func (repo *IAMRepository) GetDefaultMailText(ctx context.Context, textType string, language string) (*iam_model.MailTextView, error) {
@@ -378,6 +378,7 @@ func (repo *IAMRepository) GetDefaultMailText(ctx context.Context, textType stri
 	if err != nil {
 		return nil, err
 	}
+	text.Default = true
 	return iam_es_model.MailTextViewToModel(text), err
 }
 

@@ -683,4 +683,54 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		Permission: "policy.delete",
 		CheckParam: "",
 	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GetMailTemplate": authz.Option{
+		Permission: "policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GetDefaultMailTemplate": authz.Option{
+		Permission: "policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/CreateMailTemplate": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/UpdateMailTemplate": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveMailTemplate": authz.Option{
+		Permission: "policy.delete",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GetMailTexts": authz.Option{
+		Permission: "policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GetDefaultMailTexts": authz.Option{
+		Permission: "policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/CreateMailText": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/UpdateMailText": authz.Option{
+		Permission: "policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveMailText": authz.Option{
+		Permission: "policy.delete",
+		CheckParam: "",
+	},
 }

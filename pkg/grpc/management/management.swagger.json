@@ -203,6 +203,38 @@
         ]
       }
     },
+    "/orgs/default/policies/mailtemplate": {
+      "get": {
+        "operationId": "GetDefaultMailTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MailTemplateView"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/default/policies/mailtexts": {
+      "get": {
+        "operationId": "GetDefaultMailTexts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MailTextsView"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/orgs/default/policies/password/age": {
       "get": {
         "operationId": "GetDefaultPasswordAgePolicy",
@@ -978,6 +1010,164 @@
             "type": "string"
           }
         ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/policies/mailtemplate": {
+      "get": {
+        "operationId": "GetMailTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MailTemplateView"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "delete": {
+        "operationId": "RemoveMailTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "post": {
+        "operationId": "CreateMailTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MailTemplate"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1MailTemplateUpdate"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "put": {
+        "operationId": "UpdateMailTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MailTemplate"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1MailTemplateUpdate"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/policies/mailtext": {
+      "delete": {
+        "operationId": "RemoveMailText",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "post": {
+        "operationId": "CreateMailText",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MailText"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1MailTextUpdate"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "put": {
+        "operationId": "UpdateMailText",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MailText"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1MailTextUpdate"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/policies/mailtexts": {
+      "get": {
+        "operationId": "GetMailTexts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MailTextsView"
+            }
+          }
+        },
         "tags": [
           "ManagementService"
         ]
@@ -4991,6 +5181,171 @@
         },
         "description": {
           "type": "string"
+        }
+      }
+    },
+    "v1MailTemplate": {
+      "type": "object",
+      "properties": {
+        "template": {
+          "type": "string",
+          "format": "byte"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1MailTemplateUpdate": {
+      "type": "object",
+      "properties": {
+        "template": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "v1MailTemplateView": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "template": {
+          "type": "string",
+          "format": "byte"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1MailText": {
+      "type": "object",
+      "properties": {
+        "mail_text_type": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "pre_header": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "greeting": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "button_text": {
+          "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1MailTextUpdate": {
+      "type": "object",
+      "properties": {
+        "mail_text_type": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "pre_header": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "greeting": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "button_text": {
+          "type": "string"
+        }
+      }
+    },
+    "v1MailTextView": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "mail_text_type": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "pre_header": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "greeting": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "button_text": {
+          "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1MailTextsView": {
+      "type": "object",
+      "properties": {
+        "texts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1MailTextView"
+          }
         }
       }
     },

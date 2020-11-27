@@ -62,6 +62,8 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 		&IDPConfig{handler: handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount}},
 		&LoginPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount}},
 		&LabelPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount}},
+		&MailTemplate{handler: handler{view, bulkLimit, configs.cycleDuration("MailTemplate"), errorCount}},
+		&MailText{handler: handler{view, bulkLimit, configs.cycleDuration("MailText"), errorCount}},
 		&IDPProvider{handler: handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount},
 			systemDefaults: defaults, iamEvents: repos.IamEvents, orgEvents: repos.OrgEvents},
 		&ExternalIDP{handler: handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount},

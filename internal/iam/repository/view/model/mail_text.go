@@ -57,15 +57,16 @@ func MailTextViewFromModel(template *model.MailTextView) *MailTextView {
 	}
 }
 
-func MailTextsViewToModel(textsin []*MailTextView) *model.MailTextsView {
+func MailTextsViewToModel(textsIn []*MailTextView, defaultIn bool) *model.MailTextsView {
 	return &model.MailTextsView{
-		Texts: mailTextsViewToModelArr(textsin),
+		Texts: mailTextsViewToModelArr(textsIn, defaultIn),
 	}
 }
 
-func mailTextsViewToModelArr(texts []*MailTextView) []*model.MailTextView {
+func mailTextsViewToModelArr(texts []*MailTextView, defaultIn bool) []*model.MailTextView {
 	result := make([]*model.MailTextView, len(texts))
 	for i, r := range texts {
+		r.Default = defaultIn
 		result[i] = MailTextViewToModel(r)
 	}
 	return result

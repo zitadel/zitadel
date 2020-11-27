@@ -7,7 +7,8 @@ import (
 )
 
 type MailTextsView struct {
-	Texts []*MailTextView
+	Texts   []*MailTextView
+	Default bool
 }
 type MailTextView struct {
 	AggregateID  string

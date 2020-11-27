@@ -4,6 +4,10 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 )
 
+type MailTexts struct {
+	Texts   []*MailText
+	Default bool
+}
 type MailText struct {
 	models.ObjectRoot
 
