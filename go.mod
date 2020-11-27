@@ -15,7 +15,7 @@ require (
 	github.com/allegro/bigcache v1.2.1
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.12.5
+	github.com/caos/oidc v0.13.0
 	github.com/cockroachdb/cockroach-go/v2 v2.0.8
 	github.com/envoyproxy/protoc-gen-validate v0.4.1
 	github.com/ghodss/yaml v1.0.0
