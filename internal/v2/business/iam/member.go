@@ -102,13 +102,16 @@ func (r *Repository) MemberByID(ctx context.Context, iamID, userID string) (memb
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	member = new(iam_repo.MemberReadModel)
+
+	//query view
+
 	query := eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, iam_repo.AggregateType).
 		AggregateIDs(iamID).
 		EventData(map[string]interface{}{
 			"userId": userID,
-		})
+		}).SequenceGreater(member.ProcessedSequence)
 
-	member = new(iam_repo.MemberReadModel)
 	err = r.eventstore.FilterToReducer(ctx, query, member)
 	if err != nil {
 		return nil, err

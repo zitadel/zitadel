@@ -98,7 +98,8 @@ func (repo *IAMRepository) GetIAMMemberRoles() []string {
 
 func (repo *IAMRepository) IDPConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IDPConfigView, error) {
 	if repo.IAMV2 != nil {
-		return repo.IAMV2.IDPConfigByID(ctx, idpConfigID)
+
+		return repo.IAMV2.IDPConfigByID(ctx, repo.SystemDefaults.IamID, idpConfigID)
 	}
 
 	idp, err := repo.View.IDPConfigByID(idpConfigID)
@@ -118,6 +119,9 @@ func (repo *IAMRepository) AddOIDCIDPConfig(ctx context.Context, idp *iam_model.
 
 func (repo *IAMRepository) ChangeIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
 	idp.AggregateID = repo.SystemDefaults.IamID
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.ChangeIDPConfig(ctx, idp)
+	}
 	return repo.IAMEventstore.ChangeIDPConfig(ctx, idp)
 }
 
@@ -172,6 +176,9 @@ func (repo *IAMRepository) RemoveIDPConfig(ctx context.Context, idpConfigID stri
 
 func (repo *IAMRepository) ChangeOidcIDPConfig(ctx context.Context, oidcConfig *iam_model.OIDCIDPConfig) (*iam_model.OIDCIDPConfig, error) {
 	oidcConfig.AggregateID = repo.SystemDefaults.IamID
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.ChangeIDPOIDCConfig(ctx, oidcConfig)
+	}
 	return repo.IAMEventstore.ChangeIDPOIDCConfig(ctx, oidcConfig)
 }
 

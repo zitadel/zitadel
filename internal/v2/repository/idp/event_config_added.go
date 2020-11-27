@@ -12,7 +12,7 @@ type ConfigAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ConfigID    string      `json:"idpConfigId"`
-	Name        string      `json:"name"`
+	Name        string      `json:"name,omitempty"`
 	Typ         ConfigType  `json:"idpType,omitempty"`
 	StylingType StylingType `json:"stylingType,omitempty"`
 }

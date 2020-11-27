@@ -4,78 +4,48 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v2"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
-	"github.com/caos/zitadel/internal/v2/repository/idp"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
 )
 
-func (r *Repository) IDPConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IDPConfigView, error) {
-	query := eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, iam.AggregateType).
-		EventData(map[string]interface{}{
-			"idpConfigId": idpConfigID,
-		})
+func (r *Repository) ChangeIDPOIDCConfig(ctx context.Context, config *iam_model.OIDCIDPConfig) (*iam_model.OIDCIDPConfig, error) {
+	writeModel := iam.NewIDPOIDCConfigWriteModel(config.AggregateID, config.IDPConfigID)
 
-	idpConfig := new(iam.IDPConfigReadModel)
-
-	events, err := r.eventstore.FilterEvents(ctx, query)
+	err := r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}
 
-	idpConfig.AppendEvents(events...)
-	if err = idpConfig.Reduce(); err != nil {
-		return nil, err
-	}
+	var clientSecret *crypto.CryptoValue
 
-	return readModelToIDPConfigView(idpConfig), nil
-}
-
-func (r *Repository) AddIDPConfig(ctx context.Context, config *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
-	readModel, err := r.iamByID(ctx, config.AggregateID)
-	if err != nil {
-		return nil, err
-	}
-
-	idpConfigID, err := r.idGenerator.Next()
-	if err != nil {
-		return nil, err
-	}
-
-	aggregate := iam.AggregateFromReadModel(readModel).
-		PushIDPConfigAdded(ctx, idpConfigID, config.Name, idp.ConfigType(config.Type), idp.StylingType(config.StylingType))
-
-	if config.OIDCConfig != nil {
-		clientSecret, err := crypto.Crypt([]byte(config.OIDCConfig.ClientSecretString), r.secretCrypto)
+	if config.ClientSecretString != "" {
+		clientSecret, err = crypto.Crypt([]byte(config.ClientSecretString), r.secretCrypto)
 		if err != nil {
 			return nil, err
 		}
-		aggregate = aggregate.PushIDPOIDCConfigAdded(
-			ctx,
-			config.OIDCConfig.ClientID,
-			idpConfigID,
-			config.OIDCConfig.Issuer,
-			clientSecret,
-			oidc.MappingField(config.OIDCConfig.IDPDisplayNameMapping),
-			oidc.MappingField(config.OIDCConfig.UsernameMapping),
-			config.OIDCConfig.Scopes...)
 	}
+
+	aggregate := iam.AggregateFromWriteModel(&writeModel.ConfigWriteModel.WriteModel).
+		PushIDPOIDCConfigChanged(
+			ctx,
+			writeModel,
+			config.ClientID,
+			config.Issuer,
+			clientSecret,
+			oidc.MappingField(config.IDPDisplayNameMapping),
+			oidc.MappingField(config.UsernameMapping),
+			config.Scopes...)
 
 	events, err := r.eventstore.PushAggregates(ctx, aggregate)
 	if err != nil {
 		return nil, err
 	}
 
-	if err = readModel.AppendAndReduce(events...); err != nil {
+	writeModel.AppendEvents(events...)
+	if err = writeModel.Reduce(); err != nil {
 		return nil, err
 	}
 
-	idpConfig := readModel.IDPByID(idpConfigID)
-	if idpConfig == nil {
-		return nil, errors.ThrowInternal(nil, "IAM-stZYB", "Errors.Internal")
-	}
-
-	return readModelToIDPConfig(idpConfig), nil
+	return writeModelToIDPOIDCConfig(&writeModel.ConfigWriteModel), nil
 }

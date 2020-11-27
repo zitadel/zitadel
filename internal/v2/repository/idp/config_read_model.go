@@ -8,8 +8,6 @@ import (
 type ConfigReadModel struct {
 	eventstore.ReadModel
 
-	Type ConfigType
-
 	State        ConfigState
 	ConfigID     string
 	Name         string
@@ -26,13 +24,24 @@ func NewConfigReadModel(configID string) *ConfigReadModel {
 }
 
 func (rm *ConfigReadModel) AppendEvents(events ...eventstore.EventReader) {
-	rm.ReadModel.AppendEvents(events...)
 	for _, event := range events {
-		switch event.(type) {
+		switch e := event.(type) {
+		case *ConfigAddedEvent:
+			rm.ReadModel.AppendEvents(e)
+		case *ConfigChangedEvent:
+			rm.ReadModel.AppendEvents(e)
+		case *ConfigDeactivatedEvent:
+			rm.ReadModel.AppendEvents(e)
+		case *ConfigReactivatedEvent:
+			rm.ReadModel.AppendEvents(e)
+		case *ConfigRemovedEvent:
+			rm.ReadModel.AppendEvents(e)
 		case *oidc.ConfigAddedEvent:
 			rm.OIDCConfig = &oidc.ConfigReadModel{}
+			rm.ReadModel.AppendEvents(e)
 			rm.OIDCConfig.AppendEvents(event)
 		case *oidc.ConfigChangedEvent:
+			rm.ReadModel.AppendEvents(e)
 			rm.OIDCConfig.AppendEvents(event)
 		}
 	}
@@ -42,30 +51,42 @@ func (rm *ConfigReadModel) Reduce() error {
 	for _, event := range rm.Events {
 		switch e := event.(type) {
 		case *ConfigAddedEvent:
-			rm.ConfigID = e.ConfigID
-			rm.Name = e.Name
-			rm.StylingType = e.StylingType
-			rm.State = ConfigStateActive
+			rm.reduceConfigAddedEvent(e)
 		case *ConfigChangedEvent:
-			if e.Name != "" {
-				rm.Name = e.Name
-			}
-			if e.StylingType.Valid() {
-				rm.StylingType = e.StylingType
-			}
+			rm.reduceConfigChangedEvent(e)
 		case *ConfigDeactivatedEvent:
-			rm.State = ConfigStateInactive
+			rm.reduceConfigStateChanged(e.ConfigID, ConfigStateInactive)
 		case *ConfigReactivatedEvent:
-			rm.State = ConfigStateActive
+			rm.reduceConfigStateChanged(e.ConfigID, ConfigStateActive)
 		case *ConfigRemovedEvent:
-			rm.State = ConfigStateRemoved
-		case *oidc.ConfigAddedEvent:
-			rm.Type = ConfigTypeOIDC
+			rm.reduceConfigStateChanged(e.ConfigID, ConfigStateRemoved)
 		}
 	}
 
-	if err := rm.OIDCConfig.Reduce(); err != nil {
-		return err
+	if rm.OIDCConfig != nil {
+		if err := rm.OIDCConfig.Reduce(); err != nil {
+			return err
+		}
 	}
 	return rm.ReadModel.Reduce()
+}
+
+func (rm *ConfigReadModel) reduceConfigAddedEvent(e *ConfigAddedEvent) {
+	rm.ConfigID = e.ConfigID
+	rm.Name = e.Name
+	rm.StylingType = e.StylingType
+	rm.State = ConfigStateActive
+}
+
+func (rm *ConfigReadModel) reduceConfigChangedEvent(e *ConfigChangedEvent) {
+	if e.Name != "" {
+		rm.Name = e.Name
+	}
+	if e.StylingType.Valid() {
+		rm.StylingType = e.StylingType
+	}
+}
+
+func (rm *ConfigReadModel) reduceConfigStateChanged(configID string, state ConfigState) {
+	rm.State = state
 }

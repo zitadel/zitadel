@@ -58,7 +58,7 @@ func (rm *PasswordComplexityPolicyReadModel) Reduce() error {
 type PasswordComplexityPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	MinLength    uint8 `json:"minLength"`
+	MinLength    uint8 `json:"minLength,omitempty"`
 	HasLowercase bool  `json:"hasLowercase"`
 	HasUpperCase bool  `json:"hasUppercase"`
 	HasNumber    bool  `json:"hasNumber"`

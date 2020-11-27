@@ -46,8 +46,8 @@ func (rm *LabelPolicyReadModel) Reduce() error {
 type LabelPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	PrimaryColor   string `json:"primaryColor"`
-	SecondaryColor string `json:"secondaryColor"`
+	PrimaryColor   string `json:"primaryColor,omitempty"`
+	SecondaryColor string `json:"secondaryColor,omitempty"`
 }
 
 func (e *LabelPolicyAddedEvent) CheckPrevious() bool {

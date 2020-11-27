@@ -153,14 +153,13 @@ func (a *Aggregate) PushIDPOIDCConfigChanged(
 	ctx context.Context,
 	current *IDPOIDCConfigWriteModel,
 	clientID,
-	idpConfigID,
 	issuer string,
 	clientSecret *crypto.CryptoValue,
 	idpDisplayNameMapping,
 	userNameMapping oidc.MappingField,
 	scopes ...string,
 ) *Aggregate {
-	event, err := NewIDPOIDCConfigChangedEvent(ctx, current, clientID, idpConfigID, issuer, clientSecret, idpDisplayNameMapping, userNameMapping, scopes...)
+	event, err := NewIDPOIDCConfigChangedEvent(ctx, current, clientID, issuer, clientSecret, idpDisplayNameMapping, userNameMapping, scopes...)
 	if err != nil {
 		return a
 	}

@@ -16,13 +16,13 @@ type ConfigChangedEvent struct {
 
 	IDPConfigID string `json:"idpConfigId"`
 
-	ClientID     string              `json:"clientId"`
-	ClientSecret *crypto.CryptoValue `json:"clientSecret"`
-	Issuer       string              `json:"issuer"`
-	Scopes       []string            `json:"scpoes"`
+	ClientID     string              `json:"clientId,omitempty"`
+	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	Issuer       string              `json:"issuer,omitempty"`
+	Scopes       []string            `json:"scpoes,omitempty"`
 
-	IDPDisplayNameMapping MappingField `json:"idpDisplayNameMapping"`
-	UserNameMapping       MappingField `json:"usernameMapping"`
+	IDPDisplayNameMapping MappingField `json:"idpDisplayNameMapping,omitempty"`
+	UserNameMapping       MappingField `json:"usernameMapping,omitempty"`
 }
 
 func (e *ConfigChangedEvent) CheckPrevious() bool {
@@ -60,7 +60,7 @@ func NewConfigChangedEvent(
 		hasChanged = true
 	}
 
-	if clientSecret != nil && clientSecret != current.ClientSecret {
+	if clientSecret != nil {
 		event.ClientSecret = clientSecret
 		hasChanged = true
 	}

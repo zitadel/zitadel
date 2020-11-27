@@ -6,7 +6,6 @@ import (
 	"github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
-	"github.com/caos/zitadel/internal/v2/repository/idp"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
 	"github.com/caos/zitadel/internal/v2/repository/member"
 )
@@ -143,7 +142,7 @@ func readModelToIDPConfigView(rm *iam.IDPConfigReadModel) *model.IDPConfigView {
 		CreationDate:              rm.CreationDate,
 		IDPConfigID:               rm.ConfigID,
 		IDPProviderType:           model.IDPProviderType(rm.ProviderType),
-		IsOIDC:                    rm.Type == idp.ConfigTypeOIDC,
+		IsOIDC:                    rm.OIDCConfig != nil,
 		Name:                      rm.Name,
 		OIDCClientID:              rm.OIDCConfig.ClientID,
 		OIDCClientSecret:          rm.OIDCConfig.ClientSecret,
@@ -161,7 +160,6 @@ func readModelToIDPConfig(rm *iam.IDPConfigReadModel) *model.IDPConfig {
 	return &model.IDPConfig{
 		ObjectRoot:  readModelToObjectRoot(rm.ReadModel),
 		OIDCConfig:  readModelToIDPOIDCConfig(rm.OIDCConfig),
-		Type:        model.IdpConfigType(rm.Type),
 		IDPConfigID: rm.ConfigID,
 		Name:        rm.Name,
 		State:       model.IDPConfigState(rm.State),
@@ -180,5 +178,28 @@ func readModelToIDPOIDCConfig(rm *oidc.ConfigReadModel) *model.OIDCIDPConfig {
 		Issuer:                rm.Issuer,
 		Scopes:                rm.Scopes,
 		UsernameMapping:       model.OIDCMappingField(rm.UserNameMapping),
+	}
+}
+
+func writeModelToIDPConfig(wm *iam.IDPConfigWriteModel) *model.IDPConfig {
+	return &model.IDPConfig{
+		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
+		OIDCConfig:  writeModelToIDPOIDCConfig(wm.OIDCConfig),
+		IDPConfigID: wm.ConfigID,
+		Name:        wm.Name,
+		State:       model.IDPConfigState(wm.State),
+		StylingType: model.IDPStylingType(wm.StylingType),
+	}
+}
+
+func writeModelToIDPOIDCConfig(wm *oidc.ConfigWriteModel) *model.OIDCIDPConfig {
+	return &model.OIDCIDPConfig{
+		ObjectRoot:            writeModelToObjectRoot(wm.WriteModel),
+		ClientID:              wm.ClientID,
+		IDPConfigID:           wm.IDPConfigID,
+		IDPDisplayNameMapping: model.OIDCMappingField(wm.IDPDisplayNameMapping),
+		Issuer:                wm.Issuer,
+		Scopes:                wm.Scopes,
+		UsernameMapping:       model.OIDCMappingField(wm.UserNameMapping),
 	}
 }

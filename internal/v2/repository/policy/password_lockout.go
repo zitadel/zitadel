@@ -46,7 +46,7 @@ func (rm *PasswordLockoutPolicyReadModel) Reduce() error {
 type PasswordLockoutPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	MaxAttempts         uint8 `json:"maxAttempts"`
+	MaxAttempts         uint8 `json:"maxAttempts,omitempty"`
 	ShowLockOutFailures bool  `json:"showLockOutFailures"`
 }
 

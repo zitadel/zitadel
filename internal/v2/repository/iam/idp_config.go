@@ -18,6 +18,16 @@ const (
 
 type IDPConfigReadModel struct {
 	idp.ConfigReadModel
+
+	iamID    string
+	configID string
+}
+
+func NewIDPConfigReadModel(iamID, configID string) *IDPConfigReadModel {
+	return &IDPConfigReadModel{
+		iamID:    iamID,
+		configID: configID,
+	}
 }
 
 func (rm *IDPConfigReadModel) AppendEvents(events ...eventstore.EventReader) {
@@ -41,32 +51,87 @@ func (rm *IDPConfigReadModel) AppendEvents(events ...eventstore.EventReader) {
 	}
 }
 
-type IDPConfigWriteModel struct {
-	idp.ConfigWriteModel
+func (rm *IDPConfigReadModel) Query() *eventstore.SearchQueryFactory {
+	return eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, AggregateType).
+		AggregateIDs(rm.iamID).
+		EventData(map[string]interface{}{
+			"idpConfigId": rm.configID,
+		})
 }
 
-func (rm *IDPConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
+type IDPConfigWriteModel struct {
+	eventstore.WriteModel
+	idp.ConfigWriteModel
+
+	iamID    string
+	configID string
+}
+
+func NewIDPConfigWriteModel(iamID, configID string) *IDPConfigWriteModel {
+	return &IDPConfigWriteModel{
+		iamID:    iamID,
+		configID: configID,
+	}
+}
+
+func (wm *IDPConfigWriteModel) Query() *eventstore.SearchQueryFactory {
+	return eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, AggregateType).
+		AggregateIDs(wm.iamID)
+}
+
+func (wm *IDPConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
+	wm.WriteModel.AppendEvents(events...)
 	for _, event := range events {
 		switch e := event.(type) {
 		case *IDPConfigAddedEvent:
-			rm.ConfigWriteModel.AppendEvents(&e.ConfigAddedEvent)
+			if wm.configID != e.ConfigID {
+				continue
+			}
+			wm.ConfigWriteModel.AppendEvents(&e.ConfigAddedEvent)
 		case *IDPConfigChangedEvent:
-			rm.ConfigWriteModel.AppendEvents(&e.ConfigChangedEvent)
+			if wm.configID != e.ConfigID {
+				continue
+			}
+			wm.ConfigWriteModel.AppendEvents(&e.ConfigChangedEvent)
 		case *IDPConfigDeactivatedEvent:
-			rm.ConfigWriteModel.AppendEvents(&e.ConfigDeactivatedEvent)
+			if wm.configID != e.ConfigID {
+				continue
+			}
+			wm.ConfigWriteModel.AppendEvents(&e.ConfigDeactivatedEvent)
 		case *IDPConfigReactivatedEvent:
-			rm.ConfigWriteModel.AppendEvents(&e.ConfigReactivatedEvent)
+			if wm.configID != e.ConfigID {
+				continue
+			}
+			wm.ConfigWriteModel.AppendEvents(&e.ConfigReactivatedEvent)
 		case *IDPConfigRemovedEvent:
-			rm.ConfigWriteModel.AppendEvents(&e.ConfigRemovedEvent)
-		case *idp.ConfigAddedEvent,
-			*idp.ConfigChangedEvent,
-			*idp.ConfigDeactivatedEvent,
-			*idp.ConfigReactivatedEvent,
-			*idp.ConfigRemovedEvent:
-
-			rm.ConfigWriteModel.AppendEvents(e)
+			if wm.configID != e.ConfigID {
+				continue
+			}
+			wm.ConfigWriteModel.AppendEvents(&e.ConfigRemovedEvent)
+		case *IDPOIDCConfigAddedEvent:
+			if wm.configID != e.IDPConfigID {
+				continue
+			}
+			wm.ConfigWriteModel.AppendEvents(&e.ConfigAddedEvent)
+		case *IDPOIDCConfigChangedEvent:
+			if wm.configID != e.IDPConfigID {
+				continue
+			}
+			wm.ConfigWriteModel.AppendEvents(&e.ConfigChangedEvent)
 		}
 	}
+}
+
+func (wm *IDPConfigWriteModel) Reduce() error {
+	if err := wm.ConfigWriteModel.Reduce(); err != nil {
+		return err
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *IDPConfigWriteModel) AppendAndReduce(events ...eventstore.EventReader) error {
+	wm.AppendEvents(events...)
+	return wm.Reduce()
 }
 
 type IDPConfigAddedEvent struct {

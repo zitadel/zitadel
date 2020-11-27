@@ -16,19 +16,38 @@ const (
 
 type IDPOIDCConfigWriteModel struct {
 	oidc.ConfigWriteModel
+
+	iamID       string
+	idpConfigID string
 }
 
-func (rm *IDPOIDCConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func NewIDPOIDCConfigWriteModel(iamID, idpConfigID string) *IDPOIDCConfigWriteModel {
+	return &IDPOIDCConfigWriteModel{
+		iamID:       iamID,
+		idpConfigID: idpConfigID,
+	}
+}
+
+func (wm *IDPOIDCConfigWriteModel) Query() *eventstore.SearchQueryFactory {
+	return eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, AggregateType).
+		AggregateIDs(wm.iamID)
+}
+
+func (wm *IDPOIDCConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *IDPOIDCConfigAddedEvent:
-			rm.ConfigWriteModel.AppendEvents(&e.ConfigAddedEvent)
+			if wm.idpConfigID != e.IDPConfigID {
+				continue
+			}
+			wm.ConfigWriteModel.AppendEvents(&e.ConfigAddedEvent)
 		case *IDPOIDCConfigChangedEvent:
-			rm.ConfigWriteModel.AppendEvents(&e.ConfigChangedEvent)
-		case *oidc.ConfigAddedEvent,
-			*oidc.ConfigChangedEvent:
-
-			rm.ConfigWriteModel.AppendEvents(e)
+			if wm.idpConfigID != e.IDPConfigID {
+				continue
+			}
+			wm.ConfigWriteModel.AppendEvents(&e.ConfigChangedEvent)
+		default:
+			wm.ConfigWriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -82,7 +101,6 @@ func NewIDPOIDCConfigChangedEvent(
 	ctx context.Context,
 	current *IDPOIDCConfigWriteModel,
 	clientID,
-	idpConfigID,
 	issuer string,
 	clientSecret *crypto.CryptoValue,
 	idpDisplayNameMapping,
@@ -93,7 +111,7 @@ func NewIDPOIDCConfigChangedEvent(
 	event, err := oidc.NewConfigChangedEvent(
 		eventstore.NewBaseEventForPush(
 			ctx,
-			IDPOIDCConfigAddedEventType,
+			IDPOIDCConfigChangedEventType,
 		),
 		&current.ConfigWriteModel,
 		clientID,

@@ -50,10 +50,12 @@ func (s *Spooler) Start() {
 			}
 		}(i)
 	}
-	for _, handler := range s.handlers {
-		handler := &spooledHandler{Handler: handler, locker: s.locker, queuedAt: time.Now(), eventstore: s.eventstore}
-		s.queue <- handler
-	}
+	go func() {
+		for _, handler := range s.handlers {
+			handler := &spooledHandler{Handler: handler, locker: s.locker, queuedAt: time.Now(), eventstore: s.eventstore}
+			s.queue <- handler
+		}
+	}()
 }
 
 func requeueTask(task *spooledHandler, queue chan<- *spooledHandler) {
