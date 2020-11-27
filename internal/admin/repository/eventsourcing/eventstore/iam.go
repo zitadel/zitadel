@@ -98,7 +98,6 @@ func (repo *IAMRepository) GetIAMMemberRoles() []string {
 
 func (repo *IAMRepository) IDPConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IDPConfigView, error) {
 	if repo.IAMV2 != nil {
-
 		return repo.IAMV2.IDPConfigByID(ctx, repo.SystemDefaults.IamID, idpConfigID)
 	}
 
@@ -126,14 +125,23 @@ func (repo *IAMRepository) ChangeIDPConfig(ctx context.Context, idp *iam_model.I
 }
 
 func (repo *IAMRepository) DeactivateIDPConfig(ctx context.Context, idpConfigID string) (*iam_model.IDPConfig, error) {
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.DeactivateIDPConfig(ctx, repo.SystemDefaults.IamID, idpConfigID)
+	}
 	return repo.IAMEventstore.DeactivateIDPConfig(ctx, repo.SystemDefaults.IamID, idpConfigID)
 }
 
 func (repo *IAMRepository) ReactivateIDPConfig(ctx context.Context, idpConfigID string) (*iam_model.IDPConfig, error) {
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.ReactivateIDPConfig(ctx, repo.SystemDefaults.IamID, idpConfigID)
+	}
 	return repo.IAMEventstore.ReactivateIDPConfig(ctx, repo.SystemDefaults.IamID, idpConfigID)
 }
 
 func (repo *IAMRepository) RemoveIDPConfig(ctx context.Context, idpConfigID string) error {
+	// if repo.IAMV2 != nil {
+	// 	return repo.IAMV2.
+	// }
 	aggregates := make([]*es_models.Aggregate, 0)
 	idp := iam_model.NewIDPConfig(repo.SystemDefaults.IamID, idpConfigID)
 	_, agg, err := repo.IAMEventstore.PrepareRemoveIDPConfig(ctx, idp)

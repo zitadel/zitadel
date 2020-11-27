@@ -26,7 +26,7 @@ func (r *Repository) ChangeIDPOIDCConfig(ctx context.Context, config *iam_model.
 		}
 	}
 
-	aggregate := iam.AggregateFromWriteModel(&writeModel.ConfigWriteModel.WriteModel).
+	aggregate := iam.AggregateFromWriteModel(&writeModel.WriteModel).
 		PushIDPOIDCConfigChanged(
 			ctx,
 			writeModel,

@@ -36,24 +36,20 @@ func (es *Eventstore) Health(ctx context.Context) error {
 	return es.repo.Health(ctx)
 }
 
-type aggregater interface {
-	//ID returns the aggreagte id
-	ID() string
-	//Type returns the aggregate type
-	Type() AggregateType
-	//Events returns the events which will be pushed
-	Events() []EventPusher
-	//ResourceOwner returns the organisation id which manages this aggregate
-	// resource owner is only on the inital push needed
-	// afterwards the resource owner of the previous event is taken
-	ResourceOwner() string
-	//Version represents the semantic version of the aggregate
-	Version() Version
-	//PreviouseSequence should return the sequence of the latest event of this aggregate
-	// stored in the eventstore
-	// it's set to the first event of this push transaction,
-	// later events consume the sequence of the previously pushed event of the aggregate
-	PreviousSequence() uint64
+//PushAggregate pushes the aggregate and reduces the new events on the aggregate
+func (es *Eventstore) PushAggregate(ctx context.Context, writeModel queryReducer, aggregate aggregater) error {
+	err := es.FilterToQueryReducer(ctx, writeModel)
+	if err != nil {
+		return err
+	}
+
+	events, err := es.PushAggregates(ctx, aggregate)
+	if err != nil {
+		return err
+	}
+
+	writeModel.AppendEvents(events...)
+	return writeModel.Reduce()
 }
 
 //PushAggregates maps the events of all aggregates to an eventstore event

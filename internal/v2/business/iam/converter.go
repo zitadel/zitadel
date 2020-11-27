@@ -109,13 +109,12 @@ func readModelToObjectRoot(readModel eventstore.ReadModel) models.ObjectRoot {
 	}
 }
 
-func writeModelToObjectRoot(readModel eventstore.WriteModel) models.ObjectRoot {
+func writeModelToObjectRoot(writeModel eventstore.WriteModel) models.ObjectRoot {
 	return models.ObjectRoot{
-		AggregateID: readModel.AggregateID,
-		// ChangeDate:    readModel.ChangeDate,
-		// CreationDate:  readModel.CreationDate,
-		ResourceOwner: readModel.ResourceOwner,
-		Sequence:      readModel.ProcessedSequence,
+		AggregateID:   writeModel.AggregateID,
+		ChangeDate:    writeModel.ChangeDate,
+		ResourceOwner: writeModel.ResourceOwner,
+		Sequence:      writeModel.ProcessedSequence,
 	}
 }
 

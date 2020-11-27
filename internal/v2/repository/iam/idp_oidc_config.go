@@ -15,6 +15,7 @@ const (
 )
 
 type IDPOIDCConfigWriteModel struct {
+	eventstore.WriteModel
 	oidc.ConfigWriteModel
 
 	iamID       string
@@ -28,12 +29,8 @@ func NewIDPOIDCConfigWriteModel(iamID, idpConfigID string) *IDPOIDCConfigWriteMo
 	}
 }
 
-func (wm *IDPOIDCConfigWriteModel) Query() *eventstore.SearchQueryFactory {
-	return eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, AggregateType).
-		AggregateIDs(wm.iamID)
-}
-
 func (wm *IDPOIDCConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
+	wm.WriteModel.AppendEvents(events...)
 	for _, event := range events {
 		switch e := event.(type) {
 		case *IDPOIDCConfigAddedEvent:
@@ -50,6 +47,18 @@ func (wm *IDPOIDCConfigWriteModel) AppendEvents(events ...eventstore.EventReader
 			wm.ConfigWriteModel.AppendEvents(e)
 		}
 	}
+}
+
+func (wm *IDPOIDCConfigWriteModel) Reduce() error {
+	if err := wm.ConfigWriteModel.Reduce(); err != nil {
+		return err
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *IDPOIDCConfigWriteModel) Query() *eventstore.SearchQueryFactory {
+	return eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, AggregateType).
+		AggregateIDs(wm.iamID)
 }
 
 type IDPOIDCConfigAddedEvent struct {

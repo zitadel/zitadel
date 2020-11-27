@@ -1,5 +1,25 @@
 package eventstore
 
+type aggregater interface {
+	//ID returns the aggreagte id
+	ID() string
+	//Type returns the aggregate type
+	Type() AggregateType
+	//Events returns the events which will be pushed
+	Events() []EventPusher
+	//ResourceOwner returns the organisation id which manages this aggregate
+	// resource owner is only on the inital push needed
+	// afterwards the resource owner of the previous event is taken
+	ResourceOwner() string
+	//Version represents the semantic version of the aggregate
+	Version() Version
+	//PreviouseSequence should return the sequence of the latest event of this aggregate
+	// stored in the eventstore
+	// it's set to the first event of this push transaction,
+	// later events consume the sequence of the previously pushed event of the aggregate
+	PreviousSequence() uint64
+}
+
 func NewAggregate(
 	id string,
 	typ AggregateType,

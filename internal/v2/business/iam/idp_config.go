@@ -30,20 +30,14 @@ func (r *Repository) AddIDPConfig(ctx context.Context, config *iam_model.IDPConf
 	if err != nil {
 		return nil, err
 	}
-	wm := iam.NewIDPConfigWriteModel(config.AggregateID, idpConfigID)
-	err = r.eventstore.FilterToQueryReducer(ctx, wm)
-	if err != nil {
-		return nil, err
-	}
 
 	clientSecret, err := crypto.Crypt([]byte(config.OIDCConfig.ClientSecretString), r.secretCrypto)
 	if err != nil {
 		return nil, err
 	}
 
-	aggregate := iam.AggregateFromWriteModel(&wm.WriteModel).
-		PushIDPConfigAdded(ctx, idpConfigID, config.Name, idp.ConfigType(config.Type), idp.StylingType(config.StylingType)).
-		PushIDPOIDCConfigAdded(
+	writeModel, err := r.pushIDPWriteModel(ctx, config.AggregateID, idpConfigID, func(a *iam.Aggregate, _ *iam.IDPConfigWriteModel) *iam.Aggregate {
+		return a.PushIDPOIDCConfigAdded(
 			ctx,
 			config.OIDCConfig.ClientID,
 			idpConfigID,
@@ -52,43 +46,77 @@ func (r *Repository) AddIDPConfig(ctx context.Context, config *iam_model.IDPConf
 			oidc.MappingField(config.OIDCConfig.IDPDisplayNameMapping),
 			oidc.MappingField(config.OIDCConfig.UsernameMapping),
 			config.OIDCConfig.Scopes...)
-
-	events, err := r.eventstore.PushAggregates(ctx, aggregate)
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	if err = wm.AppendAndReduce(events...); err != nil {
-		return nil, err
-	}
-
-	return writeModelToIDPConfig(wm), nil
+	return writeModelToIDPConfig(writeModel), nil
 }
 
 func (r *Repository) ChangeIDPConfig(ctx context.Context, config *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
-	writeModel := iam.NewIDPConfigWriteModel(config.AggregateID, config.IDPConfigID)
-	err := r.eventstore.FilterToQueryReducer(ctx, writeModel)
-	if err != nil {
-		return nil, err
-	}
-
-	aggregate := iam.AggregateFromWriteModel(&writeModel.WriteModel).
-		PushIDPConfigChanged(
+	writeModel, err := r.pushIDPWriteModel(ctx, config.AggregateID, config.IDPConfigID, func(a *iam.Aggregate, writeModel *iam.IDPConfigWriteModel) *iam.Aggregate {
+		return a.PushIDPConfigChanged(
 			ctx,
 			writeModel,
 			config.IDPConfigID,
 			config.Name,
 			idp.ConfigType(config.Type),
 			idp.StylingType(config.StylingType))
-
-	events, err := r.eventstore.PushAggregates(ctx, aggregate)
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	if err = writeModel.AppendAndReduce(events...); err != nil {
+	return writeModelToIDPConfig(writeModel), nil
+}
+
+func (r *Repository) DeactivateIDPConfig(ctx context.Context, iamID, idpID string) (*iam_model.IDPConfig, error) {
+	writeModel, err := r.pushIDPWriteModel(ctx, iamID, idpID, func(a *iam.Aggregate, _ *iam.IDPConfigWriteModel) *iam.Aggregate {
+		return a.PushIDPConfigDeactivated(ctx, idpID)
+	})
+	if err != nil {
 		return nil, err
 	}
 
 	return writeModelToIDPConfig(writeModel), nil
+}
+
+func (r *Repository) ReactivateIDPConfig(ctx context.Context, iamID, idpID string) (*iam_model.IDPConfig, error) {
+	writeModel, err := r.pushIDPWriteModel(ctx, iamID, idpID, func(a *iam.Aggregate, _ *iam.IDPConfigWriteModel) *iam.Aggregate {
+		return a.PushIDPConfigReactivated(ctx, idpID)
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return writeModelToIDPConfig(writeModel), nil
+}
+
+func (r *Repository) RemoveIDPConfig(ctx context.Context, iamID, idpID string) (*iam_model.IDPConfig, error) {
+	writeModel, err := r.pushIDPWriteModel(ctx, iamID, idpID, func(a *iam.Aggregate, _ *iam.IDPConfigWriteModel) *iam.Aggregate {
+		return a.PushIDPConfigRemoved(ctx, idpID)
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return writeModelToIDPConfig(writeModel), nil
+}
+
+func (r *Repository) pushIDPWriteModel(ctx context.Context, iamID, idpID string, eventSetter func(*iam.Aggregate, *iam.IDPConfigWriteModel) *iam.Aggregate) (*iam.IDPConfigWriteModel, error) {
+	writeModel := iam.NewIDPConfigWriteModel(iamID, idpID)
+	err := r.eventstore.FilterToQueryReducer(ctx, writeModel)
+	if err != nil {
+		return nil, err
+	}
+
+	aggregate := eventSetter(iam.AggregateFromWriteModel(&writeModel.WriteModel), writeModel)
+
+	err = r.eventstore.PushAggregate(ctx, writeModel, aggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	return writeModel, nil
 }
