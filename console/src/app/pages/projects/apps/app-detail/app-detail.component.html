@@ -193,8 +193,12 @@
     </div>
 
     <div class="side" metainfo>
-        <div class="details">
-            <div class="row">
+        <div class="meta-details">
+            <div class="meta-row">
+                <span class="first">{{'RESOURCEID' | translate}}:</span>
+                <span *ngIf="app?.id" class="second">{{ app.id }}</span>
+            </div>
+            <div class="meta-row">
                 <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
                 <span *ngIf="app && app.state !== undefined"
                     [ngClass]="{'active': app.state === AppState.APPSTATE_ACTIVE, 'inactive': app.state === AppState.APPSTATE_INACTIVE}"

@@ -110,8 +110,12 @@
         </ng-container>
     </div>
     <div class="side" metainfo>
-        <div class="details">
-            <div class="row">
+        <div class="meta-details">
+            <div class="meta-row">
+                <span class="first">{{'RESOURCEID' | translate}}:</span>
+                <span *ngIf="projectId" class="second">{{ projectId }}</span>
+            </div>
+            <div class="meta-row">
                 <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
                 <span *ngIf="project && project.state !== undefined" class="state"
                     [ngClass]="{'active': project.state === ProjectState.PROJECTSTATE_ACTIVE, 'inactive': project.state === ProjectState.PROJECTSTATE_INACTIVE}">{{'PROJECT.STATE.'+project.state | translate}}</span>
@@ -127,7 +131,7 @@
                     [disabled]="(['project.member.write$', 'project.member.write:'+ project.projectId]| hasRole | async) == false">
                 </app-contributors>
             </mat-tab>
-            <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="flex-col">
+            <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="meta-flex-col">
                 <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.projectId"></app-changes>
             </mat-tab>
         </mat-tab-group>

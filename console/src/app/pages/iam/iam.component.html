@@ -6,7 +6,7 @@
         <app-policy-grid [type]="PolicyGridType.IAM"></app-policy-grid>
     </div>
 
-    <div class="side" metainfo>
+    <div metainfo>
         <app-contributors [totalResult]="totalMemberResult" [loading]="loading$ | async"
             [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
             description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"

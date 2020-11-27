@@ -13,6 +13,7 @@
 @import 'src/app/app.component.scss';
 @import 'src/app/modules/form-field/form-field.component.scss';
 @import 'src/app/modules/label/label.component.scss';
+@import 'src/app/modules/meta-layout/meta.scss';
 
 @mixin component-themes($theme) {
   @include avatar-theme($theme);
@@ -30,4 +31,5 @@
   @include cnsl-label-theme($theme);
   @include cnsl-error-theme($theme);
   @include link-theme($theme);
+  @include meta-theme($theme);
 }

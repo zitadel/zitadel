@@ -134,7 +134,8 @@
                             </ng-template>
 
                             <ng-template appHasRole [appHasRole]="['user.grant.read(:[0-9]*)?']">
-                                <a @navitem class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/grants']"
+                                <a @navitem matTooltip="{{'MENU.TOOLTIP.AUTHZ' | translate}}" class="nav-item"
+                                    [routerLinkActive]="['active']" [routerLink]="[ '/grants']"
                                     [routerLinkActiveOptions]="{ exact: true }">
                                     <i class="icon las la-shield-alt"></i>
                                     <span class="label">{{ 'MENU.GRANTS' | translate }}</span>
