@@ -130,6 +130,9 @@ Congratulations your are done! You can check this by visiting [https://console.z
 
 You can assign users [management roles](https://docs.zitadel.ch/administrate#ZITADEL_s_management_Roles) to your new organization.
 
+[//]: # (@fforootd screenshot sais "projects" - bit confusing)
+[//]: # (@fforootd Is a "Manager" another "Organisation owner", or is this a special role?)
+
 <div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
         <a href="img/console_org_manage_roles_1.png" itemprop="contentUrl" data-size="1920x1080">
