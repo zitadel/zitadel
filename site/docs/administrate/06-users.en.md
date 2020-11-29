@@ -13,11 +13,7 @@ The major difference between human vs. machine [users](administrate#Users) is th
 
 > TODO Link to “JWT as Authorization Grant” explanation.
 
-[//]: # (maybe add own section with concepts / knowledge. Same would go for concepts such as "authorization server"... see okta docs)
-
 ### How ZITADEL handles usernames
-
-[//]: # (this part is convoluted an needs some more structure)
 
 **ZITADEL** is built around the concept of [organisations](administrate#Organisations). Each [organisation](administrate#Organisations) has its own pool of usernames which includes human and service [users](administrate#Users).
 

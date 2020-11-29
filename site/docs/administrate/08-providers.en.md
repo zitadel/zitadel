@@ -33,10 +33,13 @@ Some examples include:
 
 ### What is Identity Brokering
 
-ZITADEL supports the usage as identity broker, by linking multiple external idps into one user.
+ZITADEL supports the usage as identity broker, by linking multiple external IDPs into one user.
 With identity brokering the client, that relies on ZITADEL, doesn't need to care about the linking of identity.
 
-[//]: # (needs an example)
+<details>
+    <summary>Example</summary>
+    tbd.
+</details>
 
 ### Manage Identity Providers
 

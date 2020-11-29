@@ -66,8 +66,6 @@ Create a new project with a name which explains what's the intended use of this 
 
 #### RBAC Settings
 
-[//]: # (@fforootd I don't get the connection here...)
-
 - Authorisation Check option (Check if the user at least has one role granted)
 - Enable Project_Role Assertion (if this is enabled assert project_roles, with the config of the corresponding client)
 
