@@ -17,10 +17,6 @@ const (
 	LoginPolicyIDPProviderRemovedEventType = "policy.login." + provider.RemovedEventType
 )
 
-type LoginPolicyAggregate struct {
-	eventstore.Aggregate
-}
-
 type LoginPolicyReadModel struct {
 	eventstore.ReadModel
 

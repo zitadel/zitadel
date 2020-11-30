@@ -11,6 +11,10 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
+const (
+	ConfigChangedEventType eventstore.EventType = "oidc.config.changed"
+)
+
 type ConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 

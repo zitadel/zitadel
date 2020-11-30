@@ -14,10 +14,6 @@ const (
 	LabelPolicyRemovedEventType = "policy.label.removed"
 )
 
-type LabelPolicyAggregate struct {
-	eventstore.Aggregate
-}
-
 type LabelPolicyReadModel struct {
 	eventstore.ReadModel
 

@@ -39,15 +39,22 @@ func (r *Repository) AddIDPConfig(ctx context.Context, config *iam_model.IDPConf
 	}
 
 	writeModel, err := r.pushIDPWriteModel(ctx, config.AggregateID, idpConfigID, func(a *iam.Aggregate, _ *iam.IDPConfigWriteModel) *iam.Aggregate {
-		return a.PushIDPOIDCConfigAdded(
-			ctx,
-			config.OIDCConfig.ClientID,
-			idpConfigID,
-			config.OIDCConfig.Issuer,
-			clientSecret,
-			oidc.MappingField(config.OIDCConfig.IDPDisplayNameMapping),
-			oidc.MappingField(config.OIDCConfig.UsernameMapping),
-			config.OIDCConfig.Scopes...)
+		return a.
+			PushIDPConfigAdded(
+				ctx,
+				idpConfigID,
+				config.Name,
+				idp.ConfigType(config.Type),
+				idp.StylingType(config.StylingType)).
+			PushIDPOIDCConfigAdded(
+				ctx,
+				config.OIDCConfig.ClientID,
+				idpConfigID,
+				config.OIDCConfig.Issuer,
+				clientSecret,
+				oidc.MappingField(config.OIDCConfig.IDPDisplayNameMapping),
+				oidc.MappingField(config.OIDCConfig.UsernameMapping),
+				config.OIDCConfig.Scopes...)
 	})
 	if err != nil {
 		return nil, err
@@ -114,7 +121,6 @@ func (r *Repository) pushIDPWriteModel(ctx context.Context, iamID, idpID string,
 	}
 
 	aggregate := eventSetter(iam.AggregateFromWriteModel(&writeModel.WriteModel), writeModel)
-
 	err = r.eventstore.PushAggregate(ctx, writeModel, aggregate)
 	if err != nil {
 		return nil, err

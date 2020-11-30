@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	IDPOIDCConfigAddedEventType   eventstore.EventType = "iam.idp.oidc.config.added"
-	IDPOIDCConfigChangedEventType eventstore.EventType = "iam.idp.oidc.config.changed"
+	IDPOIDCConfigAddedEventType   eventstore.EventType = "iam.idp." + oidc.ConfigAddedEventType
+	IDPOIDCConfigChangedEventType eventstore.EventType = "iam.idp." + oidc.ConfigChangedEventType
 )
 
 type IDPOIDCConfigWriteModel struct {

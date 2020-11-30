@@ -9,6 +9,10 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
+const (
+	ConfigAddedEventType eventstore.EventType = "oidc.config.added"
+)
+
 type ConfigAddedEvent struct {
 	eventstore.BaseEvent
 

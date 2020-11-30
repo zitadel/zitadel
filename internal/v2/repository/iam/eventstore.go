@@ -22,5 +22,12 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(PasswordLockoutPolicyChangedEventType, PasswordLockoutPolicyChangedEventMapper).
 		RegisterFilterEventMapper(MemberAddedEventType, MemberAddedEventMapper).
 		RegisterFilterEventMapper(MemberChangedEventType, MemberChangedEventMapper).
-		RegisterFilterEventMapper(MemberRemovedEventType, MemberRemovedEventMapper)
+		RegisterFilterEventMapper(MemberRemovedEventType, MemberRemovedEventMapper).
+		RegisterFilterEventMapper(IDPConfigAddedEventType, IDPConfigAddedEventMapper).
+		RegisterFilterEventMapper(IDPConfigChangedEventType, IDPConfigChangedEventMapper).
+		RegisterFilterEventMapper(IDPConfigRemovedEventType, IDPConfigRemovedEventMapper).
+		RegisterFilterEventMapper(IDPConfigDeactivatedEventType, IDPConfigDeactivatedEventMapper).
+		RegisterFilterEventMapper(IDPConfigReactivatedEventType, IDPConfigReactivatedEventMapper).
+		RegisterFilterEventMapper(IDPOIDCConfigAddedEventType, IDPOIDCConfigAddedEventMapper).
+		RegisterFilterEventMapper(IDPOIDCConfigChangedEventType, IDPOIDCConfigChangedEventMapper)
 }

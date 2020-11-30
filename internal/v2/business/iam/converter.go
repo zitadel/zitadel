@@ -24,7 +24,7 @@ func readModelToIAM(readModel *iam_repo.ReadModel) *model.IAM {
 		DefaultPasswordAgePolicy:        readModelToPasswordAgePolicy(&readModel.DefaultPasswordAgePolicy),
 		DefaultPasswordComplexityPolicy: readModelToPasswordComplexityPolicy(&readModel.DefaultPasswordComplexityPolicy),
 		DefaultPasswordLockoutPolicy:    readModelToPasswordLockoutPolicy(&readModel.DefaultPasswordLockoutPolicy),
-		// TODO: IDPs: []*model.IDPConfig,
+		IDPs:                            readModelToIDPConfigs(&readModel.IDPs),
 	}
 }
 
@@ -153,6 +153,14 @@ func readModelToIDPConfigView(rm *iam.IDPConfigReadModel) *model.IDPConfigView {
 		State:                     model.IDPConfigState(rm.State),
 		StylingType:               model.IDPStylingType(rm.StylingType),
 	}
+}
+
+func readModelToIDPConfigs(rm *iam.IDPConfigsReadModel) []*model.IDPConfig {
+	configs := make([]*model.IDPConfig, len(rm.Configs))
+	for i, config := range rm.Configs {
+		configs[i] = readModelToIDPConfig(&iam.IDPConfigReadModel{ConfigReadModel: *config})
+	}
+	return configs
 }
 
 func readModelToIDPConfig(rm *iam.IDPConfigReadModel) *model.IDPConfig {
