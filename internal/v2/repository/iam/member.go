@@ -39,7 +39,7 @@ type MemberWriteModel struct {
 	iamID  string
 }
 
-func NewMemberReadModel(iamID, userID string) *MemberWriteModel {
+func NewMemberWriteModel(iamID, userID string) *MemberWriteModel {
 	return &MemberWriteModel{
 		userID: userID,
 		iamID:  iamID,
@@ -67,6 +67,13 @@ func (wm *MemberWriteModel) AppendEvents(events ...eventstore.EventReader) {
 			wm.Member.AppendEvents(&e.RemovedEvent)
 		}
 	}
+}
+
+func (wm *MemberWriteModel) Reduce() error {
+	if err := wm.Member.Reduce(); err != nil {
+		return err
+	}
+	return wm.WriteModel.Reduce()
 }
 
 func (wm *MemberWriteModel) Query() *eventstore.SearchQueryFactory {

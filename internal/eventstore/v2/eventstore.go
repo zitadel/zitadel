@@ -38,11 +38,6 @@ func (es *Eventstore) Health(ctx context.Context) error {
 
 //PushAggregate pushes the aggregate and reduces the new events on the aggregate
 func (es *Eventstore) PushAggregate(ctx context.Context, writeModel queryReducer, aggregate aggregater) error {
-	err := es.FilterToQueryReducer(ctx, writeModel)
-	if err != nil {
-		return err
-	}
-
 	events, err := es.PushAggregates(ctx, aggregate)
 	if err != nil {
 		return err

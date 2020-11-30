@@ -8,9 +8,9 @@ import "github.com/caos/zitadel/internal/eventstore/v2"
 type WriteModel struct {
 	eventstore.WriteModel
 
-	UserID    string
-	Roles     []string
-	IsRemoved bool
+	UserID   string
+	Roles    []string
+	IsActive bool
 }
 
 func NewWriteModel(userID string) *WriteModel {
@@ -26,11 +26,12 @@ func (wm *WriteModel) Reduce() error {
 		case *AddedEvent:
 			wm.UserID = e.UserID
 			wm.Roles = e.Roles
+			wm.IsActive = true
 		case *ChangedEvent:
 			wm.Roles = e.Roles
 		case *RemovedEvent:
 			wm.Roles = nil
-			wm.IsRemoved = true
+			wm.IsActive = false
 		}
 	}
 	return wm.WriteModel.Reduce()

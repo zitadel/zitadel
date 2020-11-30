@@ -18,33 +18,24 @@ func (r *Repository) AddMember(ctx context.Context, member *iam_model.IAMMember)
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-W8m4l", "Errors.IAM.MemberInvalid")
 	}
 
-	iam, err := r.iamByID(ctx, member.AggregateID)
+	addedMember := iam_repo.NewMemberWriteModel(member.AggregateID, member.UserID)
+	err := r.eventstore.FilterToQueryReducer(ctx, addedMember)
 	if err != nil {
 		return nil, err
 	}
-
-	idx, _ := iam.Members.MemberByUserID(member.UserID)
-	if idx > -1 {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-GPhuz", "Errors.IAM.MemberAlreadyExisting")
+	if addedMember.Member.IsActive {
+		return nil, errors.ThrowAlreadyExists(nil, "IAM-PtXi1", "Errors.IAM.Member.AlreadyExists")
 	}
 
-	iamAgg := iam_repo.AggregateFromReadModel(iam).
+	iamAgg := iam_repo.AggregateFromWriteModel(&addedMember.WriteModel).
 		PushMemberAdded(ctx, member.UserID, member.Roles...)
 
-	events, err := r.eventstore.PushAggregates(ctx, iamAgg)
+	err = r.eventstore.PushAggregate(ctx, addedMember, iamAgg)
 	if err != nil {
 		return nil, err
 	}
 
-	if err = iam.AppendAndReduce(events...); err != nil {
-		return nil, err
-	}
-
-	_, addedMember := iam.Members.MemberByUserID(member.UserID)
-	if member == nil {
-		return nil, errors.ThrowInternal(nil, "IAM-nuoDN", "Errors.Internal")
-	}
-	return readModelToMember(addedMember), nil
+	return writeModelToMember(addedMember), nil
 }
 
 //ChangeMember updates an existing member
@@ -60,7 +51,7 @@ func (r *Repository) ChangeMember(ctx context.Context, member *iam_model.IAMMemb
 		return nil, err
 	}
 
-	iam := iam_repo.AggregateFromWriteModel(&existingMember.Member.WriteModel).
+	iam := iam_repo.AggregateFromWriteModel(&existingMember.WriteModel).
 		PushMemberChangedFromExisting(ctx, existingMember, member.Roles...)
 
 	events, err := r.eventstore.PushAggregates(ctx, iam)
@@ -77,25 +68,18 @@ func (r *Repository) ChangeMember(ctx context.Context, member *iam_model.IAMMemb
 }
 
 func (r *Repository) RemoveMember(ctx context.Context, member *iam_model.IAMMember) error {
-	iam, err := r.iamByID(ctx, member.AggregateID)
-	if err != nil {
+	m, err := r.memberWriteModelByID(ctx, member.AggregateID, member.UserID)
+	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-
-	i, _ := iam.Members.MemberByUserID(member.UserID)
-	if i == -1 {
+	if errors.IsNotFound(err) {
 		return nil
 	}
 
-	iamAgg := iam_repo.AggregateFromReadModel(iam).
+	iamAgg := iam_repo.AggregateFromWriteModel(&m.WriteModel).
 		PushEvents(iam_repo.NewMemberRemovedEvent(ctx, member.UserID))
 
-	events, err := r.eventstore.PushAggregates(ctx, iamAgg)
-	if err != nil {
-		return err
-	}
-
-	return iam.AppendAndReduce(events...)
+	return r.eventstore.PushAggregate(ctx, m, iamAgg)
 }
 
 func (r *Repository) MemberByID(ctx context.Context, iamID, userID string) (member *iam_repo.MemberReadModel, err error) {
@@ -124,13 +108,13 @@ func (r *Repository) memberWriteModelByID(ctx context.Context, iamID, userID str
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := iam_repo.NewMemberReadModel(iamID, userID)
+	writeModel := iam_repo.NewMemberWriteModel(iamID, userID)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}
 
-	if writeModel.Member.IsRemoved {
+	if !writeModel.Member.IsActive {
 		return nil, errors.ThrowNotFound(nil, "IAM-D8JxR", "Errors.NotFound")
 	}
 
