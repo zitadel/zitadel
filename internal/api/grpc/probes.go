@@ -1,15 +1,11 @@
 package grpc
 
 const (
-	Healthz                 = "/Healthz"
-	Readiness               = "/Ready"
-	Validation              = "/Validate"
-	HealthZMethodAdmin      = ""
-	HealthZMethodManagement = ""
-	HealthZMethodAuth       = ""
+	Healthz    = "/Healthz"
+	Readiness  = "/Ready"
+	Validation = "/Validate"
 )
 
 var (
-	Probes     = []string{Healthz, Readiness, Validation}
-	GRPCProbes = []string{HealthZMethodAdmin, HealthZMethodManagement, HealthZMethodAuth}
+	Probes = []string{Healthz, Readiness, Validation}
 )

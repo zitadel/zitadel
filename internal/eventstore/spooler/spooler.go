@@ -106,7 +106,7 @@ func (s *spooledHandler) process(ctx context.Context, events []*models.Event, wo
 	}
 	err := s.OnSuccess()
 	logging.LogWithFields("SPOOL-49ods", "view", s.ViewModel(), "worker", workerID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Warn("could not process on success func")
-	return nil
+	return err
 }
 
 func (s *spooledHandler) query(ctx context.Context) ([]*models.Event, error) {

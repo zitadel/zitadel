@@ -8,13 +8,14 @@ import (
 	"go.opentelemetry.io/otel/exporters/metric/prometheus"
 	"go.opentelemetry.io/otel/label"
 	"net/http"
+	"sync"
 )
 
 type Metrics struct {
 	Exporter          *prometheus.Exporter
 	Meter             metric.Meter
-	Counters          map[string]metric.Int64Counter
-	UpDownSumObserver map[string]metric.Int64UpDownSumObserver
+	Counters          sync.Map
+	UpDownSumObserver sync.Map
 }
 
 func NewMetrics(meterName string) (metrics.Metrics, error) {
@@ -25,10 +26,10 @@ func NewMetrics(meterName string) (metrics.Metrics, error) {
 		return &Metrics{}, err
 	}
 	return &Metrics{
-		Exporter:          exporter,
-		Meter:             exporter.MeterProvider().Meter(meterName),
-		Counters:          make(map[string]metric.Int64Counter),
-		UpDownSumObserver: make(map[string]metric.Int64UpDownSumObserver),
+		Exporter: exporter,
+		Meter:    exporter.MeterProvider().Meter(meterName),
+		//Counters:          make(map[string]metric.Int64Counter),
+		//UpDownSumObserver: make(map[string]metric.Int64UpDownSumObserver),
 	}, nil
 }
 
@@ -41,39 +42,39 @@ func (m *Metrics) GetMetricsProvider() metric.MeterProvider {
 }
 
 func (m *Metrics) RegisterCounter(name, description string) error {
-	if _, exists := m.Counters[name]; exists {
+	if _, exists := m.Counters.Load(name); exists {
 		return nil
 	}
-	counter := metric.Must(m.Meter).NewInt64Counter(name, metric.WithDescription(description), metric.WithInstrumentationName("test"))
-
-	m.Counters[name] = counter
+	counter := metric.Must(m.Meter).NewInt64Counter(name, metric.WithDescription(description))
+	m.Counters.Store(name, counter)
 	return nil
 }
 
 func (m *Metrics) AddCount(ctx context.Context, name string, value int64, labels map[string]interface{}) error {
-	if _, exists := m.Counters[name]; !exists {
+	counter, exists := m.Counters.Load(name)
+	if !exists {
 		return caos_errs.ThrowNotFound(nil, "METER-4u8fs", "Errors.Metrics.Counter.NotFound")
 	}
-	m.Counters[name].Add(ctx, value, MapToKeyValue(labels)...)
+	counter.(metric.Int64Counter).Add(ctx, value, MapToKeyValue(labels)...)
 	return nil
 }
 
 func (m *Metrics) RegisterUpDownSumObserver(name, description string, callbackFunc metric.Int64ObserverFunc) error {
-	if _, exists := m.UpDownSumObserver[name]; exists {
+	if _, exists := m.UpDownSumObserver.Load(name); exists {
 		return nil
 	}
 	sumObserver := metric.Must(m.Meter).NewInt64UpDownSumObserver(
-		name, callbackFunc, metric.WithDescription(description), metric.WithInstrumentationName("test"))
+		name, callbackFunc, metric.WithDescription(description))
 
-	m.UpDownSumObserver[name] = sumObserver
+	m.UpDownSumObserver.Store(name, sumObserver)
 	return nil
 }
 
 func MapToKeyValue(labels map[string]interface{}) []label.KeyValue {
-	keyValues := make([]label.KeyValue, 0)
 	if labels == nil {
-		return keyValues
+		return nil
 	}
+	keyValues := make([]label.KeyValue, 0, len(labels))
 	for key, value := range labels {
 		keyValues = append(keyValues, label.Any(key, value))
 	}

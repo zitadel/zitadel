@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/telemetry/metrics"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"strings"
 
 	"github.com/caos/zitadel/internal/api/grpc/errors"
 	"google.golang.org/grpc"
@@ -22,22 +23,20 @@ const (
 	GrpcStatusCodeCounterDescription   = "Grpc status code counter"
 )
 
-func MetricsHandler(metricTypes []metrics.MetricType, ignoredMethods ...string) grpc.UnaryServerInterceptor {
+func MetricsHandler(metricTypes []metrics.MetricType, ignoredMethodSuffixes ...string) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		return RegisterMetrics(ctx, req, info, handler, metricTypes, ignoredMethods...)
+		return RegisterMetrics(ctx, req, info, handler, metricTypes, ignoredMethodSuffixes...)
 	}
 }
 
-func RegisterMetrics(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, metricTypes []metrics.MetricType, ignoredMethods ...string) (_ interface{}, err error) {
+func RegisterMetrics(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, metricTypes []metrics.MetricType, ignoredMethodSuffixes ...string) (_ interface{}, err error) {
 	if len(metricTypes) == 0 {
-		handler(ctx, req)
-		return
+		return handler(ctx, req)
 	}
 
-	for _, ignore := range ignoredMethods {
-		if info.FullMethod == ignore {
-			handler(ctx, req)
-			return
+	for _, ignore := range ignoredMethodSuffixes {
+		if strings.HasSuffix(info.FullMethod, ignore) {
+			return handler(ctx, req)
 		}
 	}
 

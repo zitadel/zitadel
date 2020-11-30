@@ -113,7 +113,7 @@ func RegisterRequestCodeCounter(recorder *StatusRecorder, r *http.Request) {
 		ReturnCode: recorder.Status,
 	}
 	RegisterCounter(ReturnCodeCounter, ReturnCodeCounterDescription)
-	AddCount(r.Context(), ReturnCode, 1, labels)
+	AddCount(r.Context(), ReturnCodeCounter, 1, labels)
 }
 
 func shouldNotIgnore(endpoints ...string) func(r *http.Request) bool {
