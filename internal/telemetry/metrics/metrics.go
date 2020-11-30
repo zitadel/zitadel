@@ -21,6 +21,7 @@ type Metrics interface {
 	RegisterCounter(name, description string) error
 	AddCount(ctx context.Context, name string, value int64, labels map[string]interface{}) error
 	RegisterUpDownSumObserver(name, description string, callbackFunc metric.Int64ObserverFunc) error
+	RegisterValueObserver(name, description string, callbackFunc metric.Int64ObserverFunc) error
 }
 
 type Config interface {
@@ -62,4 +63,11 @@ func RegisterUpDownSumObserver(name, description string, callbackFunc metric.Int
 		return nil
 	}
 	return M.RegisterUpDownSumObserver(name, description, callbackFunc)
+}
+
+func RegisterValueObserver(name, description string, callbackFunc metric.Int64ObserverFunc) error {
+	if M == nil {
+		return nil
+	}
+	return M.RegisterValueObserver(name, description, callbackFunc)
 }

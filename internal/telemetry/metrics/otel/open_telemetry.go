@@ -16,6 +16,7 @@ type Metrics struct {
 	Meter             metric.Meter
 	Counters          sync.Map
 	UpDownSumObserver sync.Map
+	ValueObservers    sync.Map
 }
 
 func NewMetrics(meterName string) (metrics.Metrics, error) {
@@ -28,8 +29,6 @@ func NewMetrics(meterName string) (metrics.Metrics, error) {
 	return &Metrics{
 		Exporter: exporter,
 		Meter:    exporter.MeterProvider().Meter(meterName),
-		//Counters:          make(map[string]metric.Int64Counter),
-		//UpDownSumObserver: make(map[string]metric.Int64UpDownSumObserver),
 	}, nil
 }
 
@@ -64,6 +63,17 @@ func (m *Metrics) RegisterUpDownSumObserver(name, description string, callbackFu
 		return nil
 	}
 	sumObserver := metric.Must(m.Meter).NewInt64UpDownSumObserver(
+		name, callbackFunc, metric.WithDescription(description))
+
+	m.UpDownSumObserver.Store(name, sumObserver)
+	return nil
+}
+
+func (m *Metrics) RegisterValueObserver(name, description string, callbackFunc metric.Int64ObserverFunc) error {
+	if _, exists := m.UpDownSumObserver.Load(name); exists {
+		return nil
+	}
+	sumObserver := metric.Must(m.Meter).NewInt64ValueObserver(
 		name, callbackFunc, metric.WithDescription(description))
 
 	m.UpDownSumObserver.Store(name, sumObserver)

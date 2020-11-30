@@ -160,7 +160,7 @@ func (a *API) handleMetrics() http.Handler {
 }
 
 func (a *API) registerActiveSessionCounters() {
-	metrics.RegisterUpDownSumObserver(
+	metrics.RegisterValueObserver(
 		metrics.ActiveSessionCounter,
 		metrics.ActiveSessionCounterDescription,
 		func(ctx context.Context, result metric.Int64ObserverResult) {
@@ -177,7 +177,7 @@ func (a *API) registerSpoolerDivCounters() {
 		logging.Log("API-3M8sd").WithError(err).Error("could not read views for metrics")
 		return
 	}
-	metrics.RegisterUpDownSumObserver(
+	metrics.RegisterValueObserver(
 		metrics.SpoolerDivCounter,
 		metrics.SpoolerDivCounterDescription,
 		func(ctx context.Context, result metric.Int64ObserverResult) {

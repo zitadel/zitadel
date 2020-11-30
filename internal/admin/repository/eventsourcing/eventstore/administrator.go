@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"fmt"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	view_model "github.com/caos/zitadel/internal/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
@@ -52,7 +53,9 @@ func (repo *AdministratorRepo) GetSpoolerDiv(database, view string) int64 {
 
 		return 0
 	}
-	divDuration := time.Now().Sub(sequence.LastSuccessfulSpoolerRun)
+	now := time.Now()
+	divDuration := now.Sub(sequence.LastSuccessfulSpoolerRun)
+	fmt.Printf("%v.%v\nSpooler Time now: %v\n LastSuccessfulSpoolerRun: %v\n DivDuration Miliseconds: %v\nDivDuration Seconds: %v \n---------------------------------------- \n", database, view, now, sequence.LastSuccessfulSpoolerRun, divDuration.Milliseconds(), divDuration.Seconds())
 	return divDuration.Milliseconds()
 }
 
