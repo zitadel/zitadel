@@ -26,13 +26,14 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
+import { EventstoreComponent } from './eventstore/eventstore.component';
 import { FailedEventsComponent } from './failed-events/failed-events.component';
 import { IamRoutingModule } from './iam-routing.module';
 import { IamViewsComponent } from './iam-views/iam-views.component';
 import { IamComponent } from './iam.component';
 
 @NgModule({
-    declarations: [IamComponent, IamViewsComponent, FailedEventsComponent],
+    declarations: [IamComponent, EventstoreComponent, IamViewsComponent, FailedEventsComponent],
     imports: [
         CommonModule,
         IamRoutingModule,

@@ -20,6 +20,7 @@ import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
+import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 
@@ -61,6 +62,7 @@ import { AppsRoutingModule } from './apps-routing.module';
         InputModule,
         MetaLayoutModule,
         ChangesModule,
+        InfoSectionModule,
     ],
     exports: [TranslateModule],
 })
