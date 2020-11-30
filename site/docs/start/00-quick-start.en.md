@@ -5,8 +5,6 @@ description: A quick-start reference for the impatient reader.
 
 > All documentations are under active work and subject to change soon!
 
-Hi there, 
-
 ### Trying out ZITADEL
 
 You can either use our cloud-instance [ZITADEL.ch](https://zitadel.ch) or deploy a dedicated **ZITADEL** instance. To get started, we recommend you try out our free tier on [ZITADEL.ch](https://zitadel.ch).
