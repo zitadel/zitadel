@@ -166,7 +166,7 @@ func IDPConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader,
 		return nil, err
 	}
 
-	return &IDPConfigAddedEvent{ConfigAddedEvent: *e}, nil
+	return &IDPConfigAddedEvent{ConfigAddedEvent: *e.(*idp.ConfigAddedEvent)}, nil
 }
 
 type IDPConfigChangedEvent struct {
@@ -206,7 +206,7 @@ func IDPConfigChangedEventMapper(event *repository.Event) (eventstore.EventReade
 		return nil, err
 	}
 
-	return &IDPConfigChangedEvent{ConfigChangedEvent: *e}, nil
+	return &IDPConfigChangedEvent{ConfigChangedEvent: *e.(*idp.ConfigChangedEvent)}, nil
 }
 
 type IDPConfigRemovedEvent struct {
@@ -235,7 +235,7 @@ func IDPConfigRemovedEventMapper(event *repository.Event) (eventstore.EventReade
 		return nil, err
 	}
 
-	return &IDPConfigRemovedEvent{ConfigRemovedEvent: *e}, nil
+	return &IDPConfigRemovedEvent{ConfigRemovedEvent: *e.(*idp.ConfigRemovedEvent)}, nil
 }
 
 type IDPConfigDeactivatedEvent struct {
@@ -264,7 +264,7 @@ func IDPConfigDeactivatedEventMapper(event *repository.Event) (eventstore.EventR
 		return nil, err
 	}
 
-	return &IDPConfigDeactivatedEvent{ConfigDeactivatedEvent: *e}, nil
+	return &IDPConfigDeactivatedEvent{ConfigDeactivatedEvent: *e.(*idp.ConfigDeactivatedEvent)}, nil
 }
 
 type IDPConfigReactivatedEvent struct {
@@ -293,5 +293,5 @@ func IDPConfigReactivatedEventMapper(event *repository.Event) (eventstore.EventR
 		return nil, err
 	}
 
-	return &IDPConfigReactivatedEvent{ConfigReactivatedEvent: *e}, nil
+	return &IDPConfigReactivatedEvent{ConfigReactivatedEvent: *e.(*idp.ConfigReactivatedEvent)}, nil
 }

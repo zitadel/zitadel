@@ -35,7 +35,7 @@ func ChangeEventFromExisting(
 	roles ...string,
 ) (*ChangedEvent, error) {
 
-	change := NewChangedEvent(base, current.userID)
+	change := NewChangedEvent(base, current.UserID)
 	hasChanged := false
 
 	sort.Strings(current.Roles)

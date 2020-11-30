@@ -2,6 +2,7 @@ package iam
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
@@ -24,4 +25,13 @@ func (rm *OrgIAMPolicyReadModel) AppendEvents(events ...eventstore.EventReader) 
 
 type OrgIAMPolicyAddedEvent struct {
 	policy.OrgIAMPolicyAddedEvent
+}
+
+func OrgIAMPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := policy.OrgIAMPolicyAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &OrgIAMPolicyAddedEvent{OrgIAMPolicyAddedEvent: *e.(*policy.OrgIAMPolicyAddedEvent)}, nil
 }

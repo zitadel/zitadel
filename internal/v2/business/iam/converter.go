@@ -128,9 +128,9 @@ func readModelToMember(readModel *member.ReadModel) *model.IAMMember {
 
 func writeModelToMember(writeModel *iam.MemberWriteModel) *model.IAMMember {
 	return &model.IAMMember{
-		ObjectRoot: writeModelToObjectRoot(writeModel.WriteModel.WriteModel),
-		Roles:      writeModel.Roles,
-		UserID:     writeModel.UserID,
+		ObjectRoot: writeModelToObjectRoot(writeModel.Member.WriteModel),
+		Roles:      writeModel.Member.Roles,
+		UserID:     writeModel.Member.UserID,
 	}
 }
 
@@ -200,5 +200,13 @@ func writeModelToIDPOIDCConfig(wm *oidc.ConfigWriteModel) *model.OIDCIDPConfig {
 		Issuer:                wm.Issuer,
 		Scopes:                wm.Scopes,
 		UsernameMapping:       model.OIDCMappingField(wm.UserNameMapping),
+	}
+}
+
+func writeModelToIDPProvider(wm *iam.LoginPolicyIDPProviderWriteModel) *model.IDPProvider {
+	return &model.IDPProvider{
+		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
+		IdpConfigID: wm.IDPConfigID,
+		Type:        model.IDPProviderType(wm.IDPProviderType),
 	}
 }

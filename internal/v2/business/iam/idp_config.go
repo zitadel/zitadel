@@ -31,6 +31,8 @@ func (r *Repository) AddIDPConfig(ctx context.Context, config *iam_model.IDPConf
 		return nil, err
 	}
 
+	//TODO: check name unique on aggregate
+
 	clientSecret, err := crypto.Crypt([]byte(config.OIDCConfig.ClientSecretString), r.secretCrypto)
 	if err != nil {
 		return nil, err

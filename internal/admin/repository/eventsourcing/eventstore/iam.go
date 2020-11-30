@@ -305,6 +305,9 @@ func (repo *IAMRepository) SearchDefaultIDPProviders(ctx context.Context, reques
 
 func (repo *IAMRepository) AddIDPProviderToLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) (*iam_model.IDPProvider, error) {
 	provider.AggregateID = repo.SystemDefaults.IamID
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.AddIDPProviderToLoginPolicy(ctx, provider)
+	}
 	return repo.IAMEventstore.AddIDPProviderToLoginPolicy(ctx, provider)
 }
 

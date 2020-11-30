@@ -3,6 +3,7 @@ package idp
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
+	"github.com/caos/zitadel/internal/v2/repository/idp/provider"
 )
 
 type ConfigReadModel struct {
@@ -12,7 +13,7 @@ type ConfigReadModel struct {
 	ConfigID     string
 	Name         string
 	StylingType  StylingType
-	ProviderType ProviderType
+	ProviderType provider.Type
 
 	OIDCConfig *oidc.ConfigReadModel
 }

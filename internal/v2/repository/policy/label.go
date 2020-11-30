@@ -1,7 +1,6 @@
 package policy
 
 import (
-	"context"
 	"encoding/json"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -17,9 +16,6 @@ const (
 
 type LabelPolicyAggregate struct {
 	eventstore.Aggregate
-
-	PrimaryColor   string
-	SecondaryColor string
 }
 
 type LabelPolicyReadModel struct {
@@ -43,6 +39,17 @@ func (rm *LabelPolicyReadModel) Reduce() error {
 	return rm.ReadModel.Reduce()
 }
 
+type LabelPolicyWriteModel struct {
+	eventstore.WriteModel
+
+	PrimaryColor   string
+	SecondaryColor string
+}
+
+func (wm *LabelPolicyWriteModel) Reduce() error {
+	return errors.ThrowUnimplemented(nil, "POLIC-xJjvN", "reduce unimpelemnted")
+}
+
 type LabelPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
@@ -59,16 +66,13 @@ func (e *LabelPolicyAddedEvent) Data() interface{} {
 }
 
 func NewLabelPolicyAddedEvent(
-	ctx context.Context,
+	base *eventstore.BaseEvent,
 	primaryColor,
 	secondaryColor string,
 ) *LabelPolicyAddedEvent {
 
 	return &LabelPolicyAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			LabelPolicyAddedEventType,
-		),
+		BaseEvent:      *base,
 		PrimaryColor:   primaryColor,
 		SecondaryColor: secondaryColor,
 	}
@@ -103,22 +107,20 @@ func (e *LabelPolicyChangedEvent) Data() interface{} {
 }
 
 func NewLabelPolicyChangedEvent(
-	ctx context.Context,
-	current,
-	changed *LabelPolicyAggregate,
+	base *eventstore.BaseEvent,
+	current *LabelPolicyWriteModel,
+	primaryColor,
+	secondaryColor string,
 ) *LabelPolicyChangedEvent {
 
 	e := &LabelPolicyChangedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			LabelPolicyChangedEventType,
-		),
+		BaseEvent: *base,
 	}
-	if current.PrimaryColor != changed.PrimaryColor {
-		e.PrimaryColor = changed.PrimaryColor
+	if primaryColor != "" && current.PrimaryColor != primaryColor {
+		e.PrimaryColor = primaryColor
 	}
-	if current.SecondaryColor != changed.SecondaryColor {
-		e.SecondaryColor = changed.SecondaryColor
+	if secondaryColor != "" && current.SecondaryColor != secondaryColor {
+		e.SecondaryColor = secondaryColor
 	}
 
 	return e
@@ -149,12 +151,9 @@ func (e *LabelPolicyRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewLabelPolicyRemovedEvent(ctx context.Context) *LabelPolicyRemovedEvent {
+func NewLabelPolicyRemovedEvent(base *eventstore.BaseEvent) *LabelPolicyRemovedEvent {
 	return &LabelPolicyRemovedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			LabelPolicyRemovedEventType,
-		),
+		BaseEvent: *base,
 	}
 }
 

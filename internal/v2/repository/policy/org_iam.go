@@ -1,7 +1,6 @@
 package policy
 
 import (
-	"context"
 	"encoding/json"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -15,8 +14,6 @@ const (
 
 type OrgIAMPolicyAggregate struct {
 	eventstore.Aggregate
-
-	UserLoginMustBeDomain bool
 }
 
 type OrgIAMPolicyReadModel struct {
@@ -35,6 +32,16 @@ func (rm *OrgIAMPolicyReadModel) Reduce() error {
 	return rm.ReadModel.Reduce()
 }
 
+type OrgIAMPolicyWriteModel struct {
+	eventstore.WriteModel
+
+	UserLoginMustBeDomain bool
+}
+
+func (wm *OrgIAMPolicyWriteModel) Reduce() error {
+	return errors.ThrowUnimplemented(nil, "POLIC-xJjvN", "reduce unimpelemnted")
+}
+
 type OrgIAMPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
@@ -50,15 +57,12 @@ func (e *OrgIAMPolicyAddedEvent) Data() interface{} {
 }
 
 func NewOrgIAMPolicyAddedEvent(
-	ctx context.Context,
+	base *eventstore.BaseEvent,
 	userLoginMustBeDomain bool,
 ) *OrgIAMPolicyAddedEvent {
 
 	return &OrgIAMPolicyAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			OrgIAMPolicyAddedEventType,
-		),
+		BaseEvent:             *base,
 		UserLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }

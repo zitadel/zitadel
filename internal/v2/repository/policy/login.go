@@ -1,26 +1,24 @@
 package policy
 
 import (
-	"context"
 	"encoding/json"
 
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+	"github.com/caos/zitadel/internal/v2/repository/idp/provider"
 )
 
 const (
-	LoginPolicyAddedEventType   = "policy.login.added"
-	LoginPolicyChangedEventType = "policy.login.changed"
-	LoginPolicyRemovedEventType = "policy.login.removed"
+	LoginPolicyAddedEventType              = "policy.login.added"
+	LoginPolicyChangedEventType            = "policy.login.changed"
+	LoginPolicyRemovedEventType            = "policy.login.removed"
+	LoginPolicyIDPProviderAddedEventType   = "policy.login." + provider.AddedEventType
+	LoginPolicyIDPProviderRemovedEventType = "policy.login." + provider.RemovedEventType
 )
 
 type LoginPolicyAggregate struct {
 	eventstore.Aggregate
-
-	AllowUserNamePassword bool
-	AllowRegister         bool
-	AllowExternalIDP      bool
 }
 
 type LoginPolicyReadModel struct {
@@ -47,13 +45,24 @@ func (rm *LoginPolicyReadModel) Reduce() error {
 	return rm.ReadModel.Reduce()
 }
 
+type LoginPolicyWriteModel struct {
+	eventstore.WriteModel
+
+	AllowUserNamePassword bool
+	AllowRegister         bool
+	AllowExternalIDP      bool
+}
+
+func (wm *LoginPolicyWriteModel) Reduce() error {
+	return errors.ThrowUnimplemented(nil, "POLIC-xJjvN", "reduce unimpelemnted")
+}
+
 type LoginPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	AllowUserNamePassword bool `json:"allowUsernamePassword"`
 	AllowRegister         bool `json:"allowRegister"`
 	AllowExternalIDP      bool `json:"allowExternalIdp"`
-	// TODO: IDPProviders
 }
 
 func (e *LoginPolicyAddedEvent) CheckPrevious() bool {
@@ -65,17 +74,14 @@ func (e *LoginPolicyAddedEvent) Data() interface{} {
 }
 
 func NewLoginPolicyAddedEvent(
-	ctx context.Context,
+	base *eventstore.BaseEvent,
 	allowUserNamePassword,
 	allowRegister,
 	allowExternalIDP bool,
 ) *LoginPolicyAddedEvent {
 
 	return &LoginPolicyAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			LoginPolicyAddedEventType,
-		),
+		BaseEvent:             *base,
 		AllowExternalIDP:      allowExternalIDP,
 		AllowRegister:         allowRegister,
 		AllowUserNamePassword: allowUserNamePassword,
@@ -112,26 +118,25 @@ func (e *LoginPolicyChangedEvent) Data() interface{} {
 }
 
 func NewLoginPolicyChangedEvent(
-	ctx context.Context,
-	current,
-	changed *LoginPolicyAggregate,
+	base *eventstore.BaseEvent,
+	current *LoginPolicyWriteModel,
+	allowUserNamePassword,
+	allowRegister,
+	allowExternalIDP bool,
 ) *LoginPolicyChangedEvent {
 
 	e := &LoginPolicyChangedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			LoginPolicyChangedEventType,
-		),
+		BaseEvent: *base,
 	}
 
-	if current.AllowUserNamePassword != changed.AllowUserNamePassword {
-		e.AllowUserNamePassword = changed.AllowUserNamePassword
+	if current.AllowUserNamePassword != allowUserNamePassword {
+		e.AllowUserNamePassword = allowUserNamePassword
 	}
-	if current.AllowRegister != changed.AllowRegister {
-		e.AllowRegister = changed.AllowRegister
+	if current.AllowRegister != allowRegister {
+		e.AllowRegister = allowRegister
 	}
-	if current.AllowExternalIDP != changed.AllowExternalIDP {
-		e.AllowExternalIDP = changed.AllowExternalIDP
+	if current.AllowExternalIDP != allowExternalIDP {
+		e.AllowExternalIDP = allowExternalIDP
 	}
 
 	return e
@@ -162,17 +167,81 @@ func (e *LoginPolicyRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewLoginPolicyRemovedEvent(ctx context.Context) *LoginPolicyRemovedEvent {
+func NewLoginPolicyRemovedEvent(base *eventstore.BaseEvent) *LoginPolicyRemovedEvent {
 	return &LoginPolicyRemovedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			LoginPolicyRemovedEventType,
-		),
+		BaseEvent: *base,
 	}
 }
 
 func LoginPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &LoginPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
+}
+
+type IDPProviderWriteModel struct {
+	provider.WriteModel
+}
+
+func (wm *IDPProviderWriteModel) AppendEvents(events ...eventstore.EventReader) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *IDPProviderAddedEvent:
+			wm.WriteModel.AppendEvents(&e.AddedEvent)
+		}
+	}
+}
+
+type IDPProviderAddedEvent struct {
+	provider.AddedEvent
+}
+
+func NewIDPProviderAddedEvent(
+	base *eventstore.BaseEvent,
+	idpConfigID string,
+	idpProviderType provider.Type,
+) *IDPProviderAddedEvent {
+
+	return &IDPProviderAddedEvent{
+		AddedEvent: *provider.NewAddedEvent(
+			base,
+			idpConfigID,
+			idpProviderType),
+	}
+}
+
+func IDPProviderAddedEventEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := provider.AddedEventEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &IDPProviderAddedEvent{
+		AddedEvent: *e.(*provider.AddedEvent),
+	}, nil
+}
+
+type IDPProviderRemovedEvent struct {
+	provider.RemovedEvent
+}
+
+func NewIDPProviderRemovedEvent(
+	base *eventstore.BaseEvent,
+	idpConfigID string,
+) *IDPProviderRemovedEvent {
+
+	return &IDPProviderRemovedEvent{
+		RemovedEvent: *provider.NewRemovedEvent(base, idpConfigID),
+	}
+}
+
+func IDPProviderRemovedEventEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := provider.RemovedEventEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &IDPProviderRemovedEvent{
+		RemovedEvent: *e.(*provider.RemovedEvent),
 	}, nil
 }

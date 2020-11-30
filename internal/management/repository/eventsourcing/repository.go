@@ -18,9 +18,7 @@ import (
 	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_grant "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 	iam_business "github.com/caos/zitadel/internal/v2/business/iam"
-	"github.com/caos/zitadel/internal/v2/repository/iam"
-	"github.com/caos/zitadel/internal/v2/repository/member"
-	"github.com/caos/zitadel/internal/v2/repository/policy"
+	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
 type Config struct {
@@ -47,24 +45,8 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 		return nil, err
 	}
 	esV2 := es.V2()
-	esV2.RegisterFilterEventMapper(iam.SetupStartedEventType, iam.SetupStepMapper).
-		RegisterFilterEventMapper(iam.SetupDoneEventType, iam.SetupStepMapper).
-		RegisterFilterEventMapper(iam.GlobalOrgSetEventType, iam.GlobalOrgSetMapper).
-		RegisterFilterEventMapper(iam.ProjectSetEventType, iam.ProjectSetMapper).
-		RegisterFilterEventMapper(iam.LabelPolicyAddedEventType, policy.LabelPolicyAddedEventMapper).
-		RegisterFilterEventMapper(iam.LabelPolicyChangedEventType, policy.LabelPolicyChangedEventMapper).
-		RegisterFilterEventMapper(iam.LoginPolicyAddedEventType, policy.LoginPolicyAddedEventMapper).
-		RegisterFilterEventMapper(iam.LoginPolicyChangedEventType, policy.LoginPolicyChangedEventMapper).
-		RegisterFilterEventMapper(iam.OrgIAMPolicyAddedEventType, policy.OrgIAMPolicyAddedEventMapper).
-		RegisterFilterEventMapper(iam.PasswordAgePolicyAddedEventType, policy.PasswordAgePolicyAddedEventMapper).
-		RegisterFilterEventMapper(iam.PasswordAgePolicyChangedEventType, policy.PasswordAgePolicyChangedEventMapper).
-		RegisterFilterEventMapper(iam.PasswordComplexityPolicyAddedEventType, policy.PasswordComplexityPolicyAddedEventMapper).
-		RegisterFilterEventMapper(iam.PasswordComplexityPolicyChangedEventType, policy.PasswordComplexityPolicyChangedEventMapper).
-		RegisterFilterEventMapper(iam.PasswordLockoutPolicyAddedEventType, policy.PasswordLockoutPolicyAddedEventMapper).
-		RegisterFilterEventMapper(iam.PasswordLockoutPolicyChangedEventType, policy.PasswordLockoutPolicyChangedEventMapper).
-		RegisterFilterEventMapper(iam.MemberAddedEventType, member.AddedEventMapper).
-		RegisterFilterEventMapper(iam.MemberChangedEventType, member.ChangedEventMapper).
-		RegisterFilterEventMapper(iam.MemberRemovedEventType, member.RemovedEventMapper)
+	//TODO: should it be iam repo or iam business?
+	iam_repo.RegisterEventMappers(esV2)
 
 	sqlClient, err := conf.View.Start()
 	if err != nil {

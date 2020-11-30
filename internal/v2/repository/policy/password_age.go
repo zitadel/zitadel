@@ -1,7 +1,6 @@
 package policy
 
 import (
-	"context"
 	"encoding/json"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -17,9 +16,6 @@ const (
 
 type PasswordAgePolicyAggregate struct {
 	eventstore.Aggregate
-
-	ExpireWarnDays uint16
-	MaxAgeDays     uint16
 }
 
 type PasswordAgePolicyReadModel struct {
@@ -43,6 +39,17 @@ func (rm *PasswordAgePolicyReadModel) Reduce() error {
 	return rm.ReadModel.Reduce()
 }
 
+type PasswordAgePolicyWriteModel struct {
+	eventstore.WriteModel
+
+	ExpireWarnDays uint16
+	MaxAgeDays     uint16
+}
+
+func (wm *PasswordAgePolicyWriteModel) Reduce() error {
+	return errors.ThrowUnimplemented(nil, "POLIC-xJjvN", "reduce unimpelemnted")
+}
+
 type PasswordAgePolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
@@ -59,16 +66,13 @@ func (e *PasswordAgePolicyAddedEvent) Data() interface{} {
 }
 
 func NewPasswordAgePolicyAddedEvent(
-	ctx context.Context,
+	base *eventstore.BaseEvent,
 	expireWarnDays,
 	maxAgeDays uint16,
 ) *PasswordAgePolicyAddedEvent {
 
 	return &PasswordAgePolicyAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			PasswordAgePolicyAddedEventType,
-		),
+		BaseEvent:      *base,
 		ExpireWarnDays: expireWarnDays,
 		MaxAgeDays:     maxAgeDays,
 	}
@@ -103,23 +107,21 @@ func (e *PasswordAgePolicyChangedEvent) Data() interface{} {
 }
 
 func NewPasswordAgePolicyChangedEvent(
-	ctx context.Context,
-	current,
-	changed *PasswordAgePolicyAggregate,
+	base *eventstore.BaseEvent,
+	current *PasswordAgePolicyWriteModel,
+	expireWarnDays,
+	maxAgeDays uint16,
 ) *PasswordAgePolicyChangedEvent {
 
 	e := &PasswordAgePolicyChangedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			PasswordAgePolicyChangedEventType,
-		),
+		BaseEvent: *base,
 	}
 
-	if current.ExpireWarnDays != changed.ExpireWarnDays {
-		e.ExpireWarnDays = changed.ExpireWarnDays
+	if current.ExpireWarnDays != expireWarnDays {
+		e.ExpireWarnDays = expireWarnDays
 	}
-	if current.MaxAgeDays != changed.MaxAgeDays {
-		e.MaxAgeDays = changed.ExpireWarnDays
+	if current.MaxAgeDays != maxAgeDays {
+		e.MaxAgeDays = maxAgeDays
 	}
 
 	return e
@@ -151,16 +153,13 @@ func (e *PasswordAgePolicyRemovedEvent) Data() interface{} {
 }
 
 func NewPasswordAgePolicyRemovedEvent(
-	ctx context.Context,
+	base *eventstore.BaseEvent,
 	current,
 	changed *PasswordAgePolicyRemovedEvent,
 ) *PasswordAgePolicyChangedEvent {
 
 	return &PasswordAgePolicyChangedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			PasswordAgePolicyRemovedEventType,
-		),
+		BaseEvent: *base,
 	}
 }
 

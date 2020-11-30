@@ -1,7 +1,6 @@
 package policy
 
 import (
-	"context"
 	"encoding/json"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -17,12 +16,6 @@ const (
 
 type PasswordComplexityPolicyAggregate struct {
 	eventstore.Aggregate
-
-	MinLength    uint8
-	HasLowercase bool
-	HasUpperCase bool
-	HasNumber    bool
-	HasSymbol    bool
 }
 
 type PasswordComplexityPolicyReadModel struct {
@@ -55,6 +48,20 @@ func (rm *PasswordComplexityPolicyReadModel) Reduce() error {
 	return rm.ReadModel.Reduce()
 }
 
+type PasswordComplexityPolicyWriteModel struct {
+	eventstore.WriteModel
+
+	MinLength    uint8
+	HasLowercase bool
+	HasUpperCase bool
+	HasNumber    bool
+	HasSymbol    bool
+}
+
+func (wm *PasswordComplexityPolicyWriteModel) Reduce() error {
+	return errors.ThrowUnimplemented(nil, "POLIC-xJjvN", "reduce unimpelemnted")
+}
+
 type PasswordComplexityPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
@@ -74,7 +81,7 @@ func (e *PasswordComplexityPolicyAddedEvent) Data() interface{} {
 }
 
 func NewPasswordComplexityPolicyAddedEvent(
-	ctx context.Context,
+	base *eventstore.BaseEvent,
 	hasLowerCase,
 	hasUpperCase,
 	hasNumber,
@@ -83,10 +90,7 @@ func NewPasswordComplexityPolicyAddedEvent(
 ) *PasswordComplexityPolicyAddedEvent {
 
 	return &PasswordComplexityPolicyAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			PasswordComplexityPolicyAddedEventType,
-		),
+		BaseEvent:    *base,
 		HasLowercase: hasLowerCase,
 		HasNumber:    hasNumber,
 		HasSymbol:    hasSymbol,
@@ -127,32 +131,33 @@ func (e *PasswordComplexityPolicyChangedEvent) Data() interface{} {
 }
 
 func NewPasswordComplexityPolicyChangedEvent(
-	ctx context.Context,
-	current,
-	changed *PasswordComplexityPolicyAggregate,
+	base *eventstore.BaseEvent,
+	current *PasswordComplexityPolicyWriteModel,
+	minLength uint8,
+	hasLowerCase,
+	hasUpperCase,
+	hasNumber,
+	hasSymbol bool,
 ) *PasswordComplexityPolicyChangedEvent {
 
 	e := &PasswordComplexityPolicyChangedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			PasswordComplexityPolicyChangedEventType,
-		),
+		BaseEvent: *base,
 	}
 
-	if current.MinLength != changed.MinLength {
-		e.MinLength = changed.MinLength
+	if current.MinLength != minLength {
+		e.MinLength = minLength
 	}
-	if current.HasLowercase != changed.HasLowercase {
-		e.HasLowercase = changed.HasLowercase
+	if current.HasLowercase != hasLowerCase {
+		e.HasLowercase = hasLowerCase
 	}
-	if current.HasUpperCase != changed.HasUpperCase {
-		e.HasUpperCase = changed.HasUpperCase
+	if current.HasUpperCase != hasUpperCase {
+		e.HasUpperCase = hasUpperCase
 	}
-	if current.HasNumber != changed.HasNumber {
-		e.HasNumber = changed.HasNumber
+	if current.HasNumber != hasNumber {
+		e.HasNumber = hasNumber
 	}
-	if current.HasSymbol != changed.HasSymbol {
-		e.HasSymbol = changed.HasSymbol
+	if current.HasSymbol != hasSymbol {
+		e.HasSymbol = hasSymbol
 	}
 
 	return e
@@ -183,15 +188,9 @@ func (e *PasswordComplexityPolicyRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewPasswordComplexityPolicyRemovedEvent(
-	ctx context.Context,
-) *PasswordComplexityPolicyRemovedEvent {
-
+func NewPasswordComplexityPolicyRemovedEvent(base *eventstore.BaseEvent) *PasswordComplexityPolicyRemovedEvent {
 	return &PasswordComplexityPolicyRemovedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			PasswordComplexityPolicyRemovedEventType,
-		),
+		BaseEvent: *base,
 	}
 }
 

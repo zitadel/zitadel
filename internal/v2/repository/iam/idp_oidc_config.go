@@ -99,7 +99,7 @@ func IDPOIDCConfigAddedEventMapper(event *repository.Event) (eventstore.EventRea
 		return nil, err
 	}
 
-	return &IDPOIDCConfigAddedEvent{ConfigAddedEvent: *e}, nil
+	return &IDPOIDCConfigAddedEvent{ConfigAddedEvent: *e.(*oidc.ConfigAddedEvent)}, nil
 }
 
 type IDPOIDCConfigChangedEvent struct {
@@ -146,5 +146,5 @@ func IDPOIDCConfigChangedEventMapper(event *repository.Event) (eventstore.EventR
 		return nil, err
 	}
 
-	return &IDPOIDCConfigChangedEvent{ConfigChangedEvent: *e}, nil
+	return &IDPOIDCConfigChangedEvent{ConfigChangedEvent: *e.(*oidc.ConfigChangedEvent)}, nil
 }

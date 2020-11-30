@@ -2,12 +2,6 @@ package eventstore
 
 import "time"
 
-func NewWriteModel() *WriteModel {
-	return &WriteModel{
-		Events: []EventReader{},
-	}
-}
-
 //WriteModel is the minimum representation of a command side view model.
 // It implements a basic reducer
 // it's purpose is to reduce events to create new ones

@@ -60,7 +60,7 @@ func (r *Repository) ChangeMember(ctx context.Context, member *iam_model.IAMMemb
 		return nil, err
 	}
 
-	iam := iam_repo.AggregateFromWriteModel(&existingMember.WriteModel.WriteModel).
+	iam := iam_repo.AggregateFromWriteModel(&existingMember.Member.WriteModel).
 		PushMemberChangedFromExisting(ctx, existingMember, member.Roles...)
 
 	events, err := r.eventstore.PushAggregates(ctx, iam)
@@ -130,7 +130,7 @@ func (r *Repository) memberWriteModelByID(ctx context.Context, iamID, userID str
 		return nil, err
 	}
 
-	if writeModel.IsRemoved {
+	if writeModel.Member.IsRemoved {
 		return nil, errors.ThrowNotFound(nil, "IAM-D8JxR", "Errors.NotFound")
 	}
 

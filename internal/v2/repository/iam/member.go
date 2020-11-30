@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/repository/member"
 )
 
@@ -31,28 +32,46 @@ func (rm *MemberReadModel) AppendEvents(events ...eventstore.EventReader) {
 }
 
 type MemberWriteModel struct {
-	member.WriteModel
+	eventstore.WriteModel
+	Member member.WriteModel
+
+	userID string
+	iamID  string
 }
 
 func NewMemberReadModel(iamID, userID string) *MemberWriteModel {
 	return &MemberWriteModel{
-		WriteModel: *member.NewWriteModel(userID, AggregateType, iamID),
+		userID: userID,
+		iamID:  iamID,
 	}
 }
 
 func (wm *MemberWriteModel) AppendEvents(events ...eventstore.EventReader) {
+	wm.WriteModel.AppendEvents(events...)
 	for _, event := range events {
 		switch e := event.(type) {
 		case *MemberAddedEvent:
-			wm.WriteModel.AppendEvents(&e.AddedEvent)
+			if e.UserID != wm.userID {
+				continue
+			}
+			wm.Member.AppendEvents(&e.AddedEvent)
 		case *MemberChangedEvent:
-			wm.WriteModel.AppendEvents(&e.ChangedEvent)
+			if e.UserID != wm.userID {
+				continue
+			}
+			wm.Member.AppendEvents(&e.ChangedEvent)
 		case *MemberRemovedEvent:
-			wm.WriteModel.AppendEvents(&e.RemovedEvent)
-		default:
-			wm.WriteModel.AppendEvents(e)
+			if e.UserID != wm.userID {
+				continue
+			}
+			wm.Member.AppendEvents(&e.RemovedEvent)
 		}
 	}
+}
+
+func (wm *MemberWriteModel) Query() *eventstore.SearchQueryFactory {
+	return eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, AggregateType).
+		AggregateIDs(wm.iamID)
 }
 
 type MemberAddedEvent struct {
@@ -77,6 +96,15 @@ func NewMemberAddedEvent(
 	}
 }
 
+func MemberAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := member.AddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &MemberAddedEvent{AddedEvent: *e.(*member.AddedEvent)}, nil
+}
+
 type MemberChangedEvent struct {
 	member.ChangedEvent
 }
@@ -92,7 +120,7 @@ func MemberChangedEventFromExisting(
 			ctx,
 			MemberChangedEventType,
 		),
-		&current.WriteModel,
+		&current.Member,
 		roles...,
 	)
 	if err != nil {
@@ -104,22 +132,13 @@ func MemberChangedEventFromExisting(
 	}, nil
 }
 
-func NewMemberChangedEvent(
-	ctx context.Context,
-	userID string,
-	roles ...string,
-) *MemberChangedEvent {
-
-	return &MemberChangedEvent{
-		ChangedEvent: *member.NewChangedEvent(
-			eventstore.NewBaseEventForPush(
-				ctx,
-				MemberChangedEventType,
-			),
-			userID,
-			roles...,
-		),
+func MemberChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := member.ChangedEventMapper(event)
+	if err != nil {
+		return nil, err
 	}
+
+	return &MemberChangedEvent{ChangedEvent: *e.(*member.ChangedEvent)}, nil
 }
 
 type MemberRemovedEvent struct {
@@ -140,4 +159,13 @@ func NewMemberRemovedEvent(
 			userID,
 		),
 	}
+}
+
+func MemberRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := member.RemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &MemberRemovedEvent{RemovedEvent: *e.(*member.RemovedEvent)}, nil
 }

@@ -11,8 +11,8 @@ type ReadModel struct {
 	Roles  []string
 }
 
-//NewMemberReadModel is the default constructor of ReadModel
-func NewMemberReadModel(userID string) *ReadModel {
+//NewReadModel is the default constructor of ReadModel
+func NewReadModel(userID string) *ReadModel {
 	return &ReadModel{
 		UserID: userID,
 	}
@@ -23,10 +23,8 @@ func (rm *ReadModel) Reduce() error {
 	for _, event := range rm.Events {
 		switch e := event.(type) {
 		case *AddedEvent:
-			rm.UserID = e.UserID
 			rm.Roles = e.Roles
 		case *ChangedEvent:
-			rm.UserID = e.UserID
 			rm.Roles = e.Roles
 		}
 	}

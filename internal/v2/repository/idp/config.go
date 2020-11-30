@@ -47,16 +47,3 @@ const (
 func (f StylingType) Valid() bool {
 	return f >= 0 && f < stylingTypeCount
 }
-
-type ProviderType int8
-
-const (
-	ProviderTypeSystem ProviderType = iota
-	ProviderTypeOrg
-
-	providerTypeCount
-)
-
-func (f ProviderType) Valid() bool {
-	return f >= 0 && f < providerTypeCount
-}

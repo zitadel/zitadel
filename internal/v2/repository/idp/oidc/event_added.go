@@ -53,7 +53,7 @@ func NewConfigAddedEvent(
 	}
 }
 
-func ConfigAddedEventMapper(event *repository.Event) (*ConfigAddedEvent, error) {
+func ConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &ConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

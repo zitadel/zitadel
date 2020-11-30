@@ -2,6 +2,7 @@ package iam
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
@@ -29,8 +30,26 @@ type LabelPolicyAddedEvent struct {
 	policy.LabelPolicyAddedEvent
 }
 
+func LabelPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := policy.LabelPolicyAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LabelPolicyAddedEvent{LabelPolicyAddedEvent: *e.(*policy.LabelPolicyAddedEvent)}, nil
+}
+
 type LabelPolicyChangedEvent struct {
 	policy.LabelPolicyChangedEvent
+}
+
+func LabelPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := policy.LabelPolicyChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LabelPolicyChangedEvent{LabelPolicyChangedEvent: *e.(*policy.LabelPolicyChangedEvent)}, nil
 }
 
 // func NewLabelPolicyAddedEvent(

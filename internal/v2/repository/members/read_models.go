@@ -24,7 +24,7 @@ func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *member.AddedEvent:
-			m := member.NewMemberReadModel(e.UserID)
+			m := member.NewReadModel(e.UserID)
 			rm.Members = append(rm.Members, m)
 			m.AppendEvents(e)
 		case *member.ChangedEvent:

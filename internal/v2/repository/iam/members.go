@@ -2,7 +2,6 @@ package iam
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/repository/member"
 	"github.com/caos/zitadel/internal/v2/repository/members"
 )
 
@@ -19,11 +18,6 @@ func (rm *MembersReadModel) AppendEvents(events ...eventstore.EventReader) {
 			rm.ReadModel.AppendEvents(&e.ChangedEvent)
 		case *MemberRemovedEvent:
 			rm.ReadModel.AppendEvents(&e.RemovedEvent)
-		case *member.AddedEvent,
-			*member.ChangedEvent,
-			*member.RemovedEvent:
-
-			rm.ReadModel.AppendEvents(e)
 		}
 	}
 }

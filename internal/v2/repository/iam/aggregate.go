@@ -7,6 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/idp"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
+	"github.com/caos/zitadel/internal/v2/repository/idp/provider"
 )
 
 const (
@@ -59,11 +60,6 @@ func AggregateFromReadModel(rm *ReadModel) *Aggregate {
 
 func (a *Aggregate) PushMemberAdded(ctx context.Context, userID string, roles ...string) *Aggregate {
 	a.Aggregate = *a.PushEvents(NewMemberAddedEvent(ctx, userID, roles...))
-	return a
-}
-
-func (a *Aggregate) PushMemberChanged(ctx context.Context, changed *MemberWriteModel) *Aggregate {
-	a.Aggregate = *a.PushEvents(NewMemberChangedEvent(ctx, changed.UserID, changed.Roles...))
 	return a
 }
 
@@ -165,5 +161,23 @@ func (a *Aggregate) PushIDPOIDCConfigChanged(
 	}
 
 	a.Aggregate = *a.PushEvents(event)
+	return a
+}
+
+func (a *Aggregate) PushLoginPolicyIDPProviderAddedEvent(
+	ctx context.Context,
+	idpConfigID string,
+	providerType provider.Type,
+) *Aggregate {
+	a.Aggregate = *a.PushEvents(NewLoginPolicyIDPProviderAddedEvent(ctx, idpConfigID, providerType))
+	return a
+}
+
+func (a *Aggregate) PushLoginPolicyIDPProviderRemovedEvent(
+	ctx context.Context,
+	idpConfigID string,
+	providerType provider.Type,
+) *Aggregate {
+	a.Aggregate = *a.PushEvents(NewLoginPolicyIDPProviderRemovedEvent(ctx, idpConfigID))
 	return a
 }

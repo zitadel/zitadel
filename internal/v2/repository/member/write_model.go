@@ -11,23 +11,11 @@ type WriteModel struct {
 	UserID    string
 	Roles     []string
 	IsRemoved bool
-
-	userID        string
-	aggregateType eventstore.AggregateType
-	aggregateID   string
 }
 
-func NewWriteModel(
-	userID string,
-	aggregateType eventstore.AggregateType,
-	aggregateID string,
-) *WriteModel {
-
+func NewWriteModel(userID string) *WriteModel {
 	return &WriteModel{
-		WriteModel:    *eventstore.NewWriteModel(),
-		userID:        userID,
-		aggregateType: aggregateType,
-		aggregateID:   aggregateID,
+		UserID: userID,
 	}
 }
 
@@ -36,21 +24,11 @@ func (wm *WriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *AddedEvent:
-			if e.UserID != wm.userID {
-				continue
-			}
 			wm.UserID = e.UserID
 			wm.Roles = e.Roles
 		case *ChangedEvent:
-			if e.UserID != wm.userID {
-				continue
-			}
-			wm.UserID = e.UserID
 			wm.Roles = e.Roles
 		case *RemovedEvent:
-			if e.UserID != wm.userID {
-				continue
-			}
 			wm.Roles = nil
 			wm.IsRemoved = true
 		}
@@ -58,7 +36,7 @@ func (wm *WriteModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *WriteModel) Query() *eventstore.SearchQueryFactory {
-	return eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, wm.aggregateType).
-		AggregateIDs(wm.aggregateID)
-}
+// func (wm *WriteModel) Query() *eventstore.SearchQueryFactory {
+// 	return eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, wm.aggregateType).
+// 		AggregateIDs(wm.aggregateID)
+// }

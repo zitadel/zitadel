@@ -5,8 +5,6 @@ import (
 
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
-	"github.com/caos/zitadel/internal/v2/repository/member"
-	"github.com/caos/zitadel/internal/v2/repository/policy"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
@@ -50,20 +48,20 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults) (*
 		RegisterFilterEventMapper(iam.SetupDoneEventType, iam.SetupStepMapper).
 		RegisterFilterEventMapper(iam.GlobalOrgSetEventType, iam.GlobalOrgSetMapper).
 		RegisterFilterEventMapper(iam.ProjectSetEventType, iam.ProjectSetMapper).
-		RegisterFilterEventMapper(iam.LabelPolicyAddedEventType, policy.LabelPolicyAddedEventMapper).
-		RegisterFilterEventMapper(iam.LabelPolicyChangedEventType, policy.LabelPolicyChangedEventMapper).
-		RegisterFilterEventMapper(iam.LoginPolicyAddedEventType, policy.LoginPolicyAddedEventMapper).
-		RegisterFilterEventMapper(iam.LoginPolicyChangedEventType, policy.LoginPolicyChangedEventMapper).
-		RegisterFilterEventMapper(iam.OrgIAMPolicyAddedEventType, policy.OrgIAMPolicyAddedEventMapper).
-		RegisterFilterEventMapper(iam.PasswordAgePolicyAddedEventType, policy.PasswordAgePolicyAddedEventMapper).
-		RegisterFilterEventMapper(iam.PasswordAgePolicyChangedEventType, policy.PasswordAgePolicyChangedEventMapper).
-		RegisterFilterEventMapper(iam.PasswordComplexityPolicyAddedEventType, policy.PasswordComplexityPolicyAddedEventMapper).
-		RegisterFilterEventMapper(iam.PasswordComplexityPolicyChangedEventType, policy.PasswordComplexityPolicyChangedEventMapper).
-		RegisterFilterEventMapper(iam.PasswordLockoutPolicyAddedEventType, policy.PasswordLockoutPolicyAddedEventMapper).
-		RegisterFilterEventMapper(iam.PasswordLockoutPolicyChangedEventType, policy.PasswordLockoutPolicyChangedEventMapper).
-		RegisterFilterEventMapper(iam.MemberAddedEventType, member.AddedEventMapper).
-		RegisterFilterEventMapper(iam.MemberChangedEventType, member.ChangedEventMapper).
-		RegisterFilterEventMapper(iam.MemberRemovedEventType, member.RemovedEventMapper)
+		RegisterFilterEventMapper(iam.LabelPolicyAddedEventType, iam.LabelPolicyAddedEventMapper).
+		RegisterFilterEventMapper(iam.LabelPolicyChangedEventType, iam.LabelPolicyChangedEventMapper).
+		RegisterFilterEventMapper(iam.LoginPolicyAddedEventType, iam.LoginPolicyAddedEventMapper).
+		RegisterFilterEventMapper(iam.LoginPolicyChangedEventType, iam.LoginPolicyChangedEventMapper).
+		RegisterFilterEventMapper(iam.OrgIAMPolicyAddedEventType, iam.OrgIAMPolicyAddedEventMapper).
+		RegisterFilterEventMapper(iam.PasswordAgePolicyAddedEventType, iam.PasswordAgePolicyAddedEventMapper).
+		RegisterFilterEventMapper(iam.PasswordAgePolicyChangedEventType, iam.PasswordAgePolicyChangedEventMapper).
+		RegisterFilterEventMapper(iam.PasswordComplexityPolicyAddedEventType, iam.PasswordComplexityPolicyAddedEventMapper).
+		RegisterFilterEventMapper(iam.PasswordComplexityPolicyChangedEventType, iam.PasswordComplexityPolicyChangedEventMapper).
+		RegisterFilterEventMapper(iam.PasswordLockoutPolicyAddedEventType, iam.PasswordLockoutPolicyAddedEventMapper).
+		RegisterFilterEventMapper(iam.PasswordLockoutPolicyChangedEventType, iam.PasswordLockoutPolicyChangedEventMapper).
+		RegisterFilterEventMapper(iam.MemberAddedEventType, iam.MemberAddedEventMapper).
+		RegisterFilterEventMapper(iam.MemberChangedEventType, iam.MemberChangedEventMapper).
+		RegisterFilterEventMapper(iam.MemberRemovedEventType, iam.MemberRemovedEventMapper)
 
 	sqlClient, err := conf.View.Start()
 	if err != nil {

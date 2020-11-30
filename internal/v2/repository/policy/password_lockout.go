@@ -1,7 +1,6 @@
 package policy
 
 import (
-	"context"
 	"encoding/json"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -17,9 +16,6 @@ const (
 
 type PasswordLockoutPolicyAggregate struct {
 	eventstore.Aggregate
-
-	MaxAttempts         uint8
-	ShowLockOutFailures bool
 }
 
 type PasswordLockoutPolicyReadModel struct {
@@ -43,6 +39,17 @@ func (rm *PasswordLockoutPolicyReadModel) Reduce() error {
 	return rm.ReadModel.Reduce()
 }
 
+type PasswordLockoutPolicyWriteModel struct {
+	eventstore.WriteModel
+
+	MaxAttempts         uint8
+	ShowLockOutFailures bool
+}
+
+func (wm *PasswordLockoutPolicyWriteModel) Reduce() error {
+	return errors.ThrowUnimplemented(nil, "POLIC-xJjvN", "reduce unimpelemnted")
+}
+
 type PasswordLockoutPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
@@ -59,16 +66,13 @@ func (e *PasswordLockoutPolicyAddedEvent) Data() interface{} {
 }
 
 func NewPasswordLockoutPolicyAddedEvent(
-	ctx context.Context,
+	base *eventstore.BaseEvent,
 	maxAttempts uint8,
 	showLockOutFailures bool,
 ) *PasswordLockoutPolicyAddedEvent {
 
 	return &PasswordLockoutPolicyAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			PasswordLockoutPolicyAddedEventType,
-		),
+		BaseEvent:           *base,
 		MaxAttempts:         maxAttempts,
 		ShowLockOutFailures: showLockOutFailures,
 	}
@@ -103,23 +107,21 @@ func (e *PasswordLockoutPolicyChangedEvent) Data() interface{} {
 }
 
 func NewPasswordLockoutPolicyChangedEvent(
-	ctx context.Context,
-	current,
-	changed *PasswordLockoutPolicyAggregate,
+	base *eventstore.BaseEvent,
+	current *PasswordLockoutPolicyWriteModel,
+	maxAttempts uint8,
+	showLockOutFailures bool,
 ) *PasswordLockoutPolicyChangedEvent {
 
 	e := &PasswordLockoutPolicyChangedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			PasswordLockoutPolicyChangedEventType,
-		),
+		BaseEvent: *base,
 	}
 
-	if current.MaxAttempts != changed.MaxAttempts {
-		e.MaxAttempts = changed.MaxAttempts
+	if current.MaxAttempts != maxAttempts {
+		e.MaxAttempts = maxAttempts
 	}
-	if current.ShowLockOutFailures != changed.ShowLockOutFailures {
-		e.ShowLockOutFailures = changed.ShowLockOutFailures
+	if current.ShowLockOutFailures != showLockOutFailures {
+		e.ShowLockOutFailures = showLockOutFailures
 	}
 
 	return e
@@ -151,14 +153,11 @@ func (e *PasswordLockoutPolicyRemovedEvent) Data() interface{} {
 }
 
 func NewPasswordLockoutPolicyRemovedEvent(
-	ctx context.Context,
+	base *eventstore.BaseEvent,
 ) *PasswordLockoutPolicyRemovedEvent {
 
 	return &PasswordLockoutPolicyRemovedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			PasswordLockoutPolicyRemovedEventType,
-		),
+		BaseEvent: *base,
 	}
 }
 
