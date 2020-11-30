@@ -26,7 +26,7 @@ As example, if [user](administrate#Users) has two roles, `admin` and `user` in a
 
 With ZITADEL it is possible to give third parties (other organisations) the possibility to manage certain roles on their own. As a service provider, you will find this feature useful, as it allows you to establish a self-service culture for your business customers.
 
-The owner of a project can grant (some would say "delegate") certain roles or all roles to another organisation. The target organisaton can then indipendently manage the assignment of their users to  the role within the [granted project](administrate#Project_vs_granted_Project).
+The owner of a project can grant (some would say "delegate") certain roles or all roles to another organisation. The target organization can then indipendently manage the assignment of their users to  the role within the [granted project](administrate#Project_vs_granted_Project).
 
 **Authorizations**
 
