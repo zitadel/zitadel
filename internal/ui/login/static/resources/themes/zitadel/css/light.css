@@ -75,7 +75,7 @@
   font-family: Lato;
   font-size: 16px;
   font-weight: 400;
-  cursor: copy !important;
+  cursor: default !important;
 }
 
 body {
