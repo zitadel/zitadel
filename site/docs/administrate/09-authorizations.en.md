@@ -8,7 +8,7 @@ ZITADEL's own role model is built around the IAM resource. The roles have some h
 
 #### How to give a user ZITADEL Roles
 
-With ZITADEL Conso
+With ZITADEL Console
 
 > Screenshots
 
