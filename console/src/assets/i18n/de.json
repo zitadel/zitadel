@@ -392,7 +392,7 @@
             "DATABASE":"Datenbank",
             "SEQUENCE":"Sequenz",
             "EVENTTIMESTAMP":"Event Zeitstempel",
-            "LASTSPOOL": "Erfolgreicher Spool",
+            "LASTSPOOL": "Erfolgreicher Durchlauf",
             "ACTIONS":"Aktionen",
             "CLEAR":"Aufräumen",
             "CLEARED":"View wurde erfolgreich zurückgesetzt!",
