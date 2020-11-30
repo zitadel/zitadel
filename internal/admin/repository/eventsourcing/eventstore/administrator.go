@@ -53,7 +53,7 @@ func (repo *AdministratorRepo) GetSpoolerDiv(database, view string) int64 {
 		return 0
 	}
 	divDuration := time.Now().Sub(sequence.LastSuccessfulSpoolerRun)
-	return divDuration.Nanoseconds()
+	return divDuration.Milliseconds()
 }
 
 func (repo *AdministratorRepo) ClearView(ctx context.Context, database, view string) error {

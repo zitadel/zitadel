@@ -41,7 +41,7 @@ func (v *View) ProcessedLoginPolicySequence(eventSequence uint64, eventTimestamp
 }
 
 func (v *View) UpdateLoginPolicySpoolerRunTimestamp() error {
-	return v.updateSpoolerRunSequence(labelPolicyTable)
+	return v.updateSpoolerRunSequence(loginPolicyTable)
 }
 
 func (v *View) GetLatestLoginPolicyFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {

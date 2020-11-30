@@ -69,5 +69,5 @@ func (p *PasswordAgePolicy) OnError(event *models.Event, err error) error {
 }
 
 func (p *PasswordAgePolicy) OnSuccess() error {
-	return spooler.HandleSuccess(p.view.UpdateExternalIDPSpoolerRunTimestamp)
+	return spooler.HandleSuccess(p.view.UpdateProcessedPasswordAgePolicySpoolerRunTimestamp)
 }

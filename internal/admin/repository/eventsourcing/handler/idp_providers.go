@@ -120,5 +120,5 @@ func (i *IDPProvider) OnError(event *models.Event, err error) error {
 }
 
 func (i *IDPProvider) OnSuccess() error {
-	return spooler.HandleSuccess(i.view.UpdateIDPConfigSpoolerRunTimestamp)
+	return spooler.HandleSuccess(i.view.UpdateIDPProviderSpoolerRunTimestamp)
 }
