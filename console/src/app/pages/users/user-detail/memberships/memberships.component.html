@@ -30,7 +30,7 @@
                 </div>
             </ng-template>
             <button [disabled]="disabled" class="add-img" (click)="addMember()" mat-icon-button
-                aria-label="add membership">
+                matTooltip="{{'ACTIONS.ADD' | translate}}" aria-label="add membership">
                 <mat-icon>add</mat-icon>
             </button>
             <span class="fill-space"></span>

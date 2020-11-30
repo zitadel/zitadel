@@ -45,4 +45,14 @@ h1 {
 
 tr {
   outline: none;
+
+  .dlt-button {
+    visibility: hidden;
+  }
+
+  &:hover {
+    .dlt-button {
+      visibility: visible;
+    }
+  }
 }
