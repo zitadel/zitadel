@@ -181,6 +181,7 @@ func NewIDPConfigChangedEvent(
 	configType idp.ConfigType,
 	stylingType idp.StylingType,
 ) (*IDPConfigChangedEvent, error) {
+
 	event, err := idp.NewConfigChangedEvent(
 		eventstore.NewBaseEventForPush(
 			ctx,

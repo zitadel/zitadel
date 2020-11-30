@@ -155,6 +155,7 @@ func (a *Aggregate) PushIDPOIDCConfigChanged(
 	userNameMapping oidc.MappingField,
 	scopes ...string,
 ) *Aggregate {
+
 	event, err := NewIDPOIDCConfigChangedEvent(ctx, current, clientID, issuer, clientSecret, idpDisplayNameMapping, userNameMapping, scopes...)
 	if err != nil {
 		return a
@@ -169,6 +170,7 @@ func (a *Aggregate) PushLoginPolicyIDPProviderAddedEvent(
 	idpConfigID string,
 	providerType provider.Type,
 ) *Aggregate {
+
 	a.Aggregate = *a.PushEvents(NewLoginPolicyIDPProviderAddedEvent(ctx, idpConfigID, providerType))
 	return a
 }
@@ -178,6 +180,7 @@ func (a *Aggregate) PushLoginPolicyIDPProviderRemovedEvent(
 	idpConfigID string,
 	providerType provider.Type,
 ) *Aggregate {
+
 	a.Aggregate = *a.PushEvents(NewLoginPolicyIDPProviderRemovedEvent(ctx, idpConfigID))
 	return a
 }

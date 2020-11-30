@@ -5,7 +5,6 @@ import (
 
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v2"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/tracing"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
@@ -86,17 +85,8 @@ func (r *Repository) MemberByID(ctx context.Context, iamID, userID string) (memb
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	member = new(iam_repo.MemberReadModel)
-
-	//query view
-
-	query := eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, iam_repo.AggregateType).
-		AggregateIDs(iamID).
-		EventData(map[string]interface{}{
-			"userId": userID,
-		}).SequenceGreater(member.ProcessedSequence)
-
-	err = r.eventstore.FilterToReducer(ctx, query, member)
+	member = iam_repo.NewMemberReadModel(iamID, userID)
+	err = r.eventstore.FilterToQueryReducer(ctx, member)
 	if err != nil {
 		return nil, err
 	}

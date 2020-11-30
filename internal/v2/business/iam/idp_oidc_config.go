@@ -11,14 +11,12 @@ import (
 
 func (r *Repository) ChangeIDPOIDCConfig(ctx context.Context, config *iam_model.OIDCIDPConfig) (*iam_model.OIDCIDPConfig, error) {
 	writeModel := iam.NewIDPOIDCConfigWriteModel(config.AggregateID, config.IDPConfigID)
-
 	err := r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}
 
 	var clientSecret *crypto.CryptoValue
-
 	if config.ClientSecretString != "" {
 		clientSecret, err = crypto.Crypt([]byte(config.ClientSecretString), r.secretCrypto)
 		if err != nil {
@@ -37,13 +35,8 @@ func (r *Repository) ChangeIDPOIDCConfig(ctx context.Context, config *iam_model.
 			oidc.MappingField(config.UsernameMapping),
 			config.Scopes...)
 
-	events, err := r.eventstore.PushAggregates(ctx, aggregate)
+	err = r.eventstore.PushAggregate(ctx, writeModel, aggregate)
 	if err != nil {
-		return nil, err
-	}
-
-	writeModel.AppendEvents(events...)
-	if err = writeModel.Reduce(); err != nil {
 		return nil, err
 	}
 

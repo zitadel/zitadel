@@ -14,6 +14,7 @@ func (r *Repository) AddIDPProviderToLoginPolicy(ctx context.Context, idpProvide
 	if err != nil {
 		return nil, err
 	}
+
 	aggregate := iam.AggregateFromWriteModel(&writeModel.WriteModel).
 		PushLoginPolicyIDPProviderAddedEvent(ctx, idpProvider.IdpConfigID, provider.Type(idpProvider.Type))
 

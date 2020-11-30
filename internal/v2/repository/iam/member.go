@@ -16,6 +16,16 @@ var (
 
 type MemberReadModel struct {
 	member.ReadModel
+
+	userID string
+	iamID  string
+}
+
+func NewMemberReadModel(iamID, userID string) *MemberReadModel {
+	return &MemberReadModel{
+		iamID:  iamID,
+		userID: userID,
+	}
 }
 
 func (rm *MemberReadModel) AppendEvents(events ...eventstore.EventReader) {
@@ -29,6 +39,14 @@ func (rm *MemberReadModel) AppendEvents(events ...eventstore.EventReader) {
 			rm.ReadModel.AppendEvents(e)
 		}
 	}
+}
+
+func (rm *MemberReadModel) Query() *eventstore.SearchQueryFactory {
+	return eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, AggregateType).
+		AggregateIDs(rm.iamID).
+		EventData(map[string]interface{}{
+			"userId": rm.userID,
+		})
 }
 
 type MemberWriteModel struct {
