@@ -13,7 +13,7 @@ Below is a list of available policies
 
 #### Password complexity
 
-This policy enforces passwords of users within the organisation to be compliant.
+This policy enforces passwords of users within the organization to be compliant.
 
 - min length
 - has number
