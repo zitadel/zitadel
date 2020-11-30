@@ -36,7 +36,9 @@
     },
     "MENU": {
         "PERSONAL_INFO": "Personal Information",
-        "IAM":"Administration",
+        "DOCUMENTATION":"Documentation",
+        "IAMPOLICIES":"IAM",
+        "IAMEVENTSTORE":"Storage",
         "ORGANIZATION": "Organisation",
         "ADMINSECTION":"ZITADEL Administration",
         "ORGSECTION":"Organisation",
@@ -54,7 +56,8 @@
         "GRANTS":"Authorizations",
         "TOOLTIP": {
             "PERSONAL":"Show your Personal Account, your IDPs, Login methods, Factors and Authorisations",
-            "IAM":"Show ZITADELs global access policies, clear views and failed events",
+            "IAMPOLICIES":"Manage ZITADELs global Access policies und elect ZITADEL Managers",
+            "IAMEVENTSTORE":"Clear views and failed events",
             "ORG":"Show your organisations access policies, and manage your domain names",
             "SELFPROJECTS":"Show your organisations own projects",
             "GRANTEDPROJECTS":"Show projects your organisation was granted access",
@@ -370,9 +373,13 @@
         }
     },
     "IAM": {
-        "DETAIL": {
-            "TITLE":"Identity and Access Management Administration",
-            "DESCRIPTION":"Manage the ZITADEL settings."
+        "POLICIES": {
+            "TITLE":"IAM Policies and Access Settings",
+            "DESCRIPTION":"Manage your ZITADEL Policies and Management Access Settings."
+        },
+        "EVENTSTORE": {
+            "TITLE":"IAM Storage Administration",
+            "DESCRIPTION":"Manage your ZITADEL views and failed events."
         },
         "MEMBER": {
             "TITLE":"Managers",
