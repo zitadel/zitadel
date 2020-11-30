@@ -25,7 +25,7 @@ func TelemetryHandler(handler http.Handler, ignoredEndpoints ...string) http.Han
 		otelhttp.WithFilter(shouldNotIgnore(ignoredEndpoints...)),
 		otelhttp.WithPublicEndpoint(),
 		otelhttp.WithSpanNameFormatter(spanNameFormatter),
-		otelhttp.WithMeterProvider(metrics.M.GetMetricsProvider()))
+		otelhttp.WithMeterProvider(metrics.GetMetricsProvider()))
 }
 
 func spanNameFormatter(_ string, r *http.Request) string {

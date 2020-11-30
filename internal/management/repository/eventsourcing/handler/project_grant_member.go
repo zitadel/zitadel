@@ -140,5 +140,5 @@ func (p *ProjectGrantMember) OnError(event *models.Event, err error) error {
 }
 
 func (p *ProjectGrantMember) OnSuccess() error {
-	return spooler.HandleSuccess(p.view.UpdateProjectGrantSpoolerRunTimestamp)
+	return spooler.HandleSuccess(p.view.UpdateProjectGrantMemberSpoolerRunTimestamp)
 }

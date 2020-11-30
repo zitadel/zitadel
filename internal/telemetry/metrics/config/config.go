@@ -13,7 +13,7 @@ type MetricsConfig struct {
 	Config metrics.Config
 }
 
-var tracer = map[string]func() metrics.Config{
+var meter = map[string]func() metrics.Config{
 	"otel": func() metrics.Config { return &otel.Config{} },
 	"none": func() metrics.Config { return &NoMetrics{} },
 	"":     func() metrics.Config { return &NoMetrics{} },
@@ -41,7 +41,7 @@ func (c *MetricsConfig) UnmarshalJSON(data []byte) error {
 }
 
 func newMetricsConfig(tracerType string, configData []byte) (metrics.Config, error) {
-	t, ok := tracer[tracerType]
+	t, ok := meter[tracerType]
 	if !ok {
 		return nil, errors.ThrowInternalf(nil, "METER-3M0ps", "config type %s not supported", tracerType)
 	}

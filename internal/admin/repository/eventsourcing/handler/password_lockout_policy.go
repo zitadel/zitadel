@@ -69,5 +69,5 @@ func (p *PasswordLockoutPolicy) OnError(event *models.Event, err error) error {
 }
 
 func (p *PasswordLockoutPolicy) OnSuccess() error {
-	return spooler.HandleSuccess(p.view.UpdateExternalIDPSpoolerRunTimestamp)
+	return spooler.HandleSuccess(p.view.UpdatePasswordLockoutPolicySpoolerRunTimestamp)
 }

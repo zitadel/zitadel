@@ -79,5 +79,5 @@ func (i *IDPConfig) OnError(event *models.Event, err error) error {
 }
 
 func (i *IDPConfig) OnSuccess() error {
-	return spooler.HandleSuccess(i.view.UpdateIDPConfigPSpoolerRunTimestamp)
+	return spooler.HandleSuccess(i.view.UpdateIDPConfigSpoolerRunTimestamp)
 }

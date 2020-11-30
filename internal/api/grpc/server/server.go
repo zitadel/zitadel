@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	grpc_api "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/telemetry/metrics"
 
 	"github.com/caos/logging"
@@ -33,7 +34,7 @@ func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, lang l
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
 				middleware.DefaultTracingServer(),
-				middleware.MetricsHandler(metricTypes),
+				middleware.MetricsHandler(metricTypes, grpc_api.GRPCProbes...),
 				middleware.ErrorHandler(),
 				middleware.AuthorizationInterceptor(verifier, authConfig),
 				middleware.TranslationHandler(lang),

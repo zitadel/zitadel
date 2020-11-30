@@ -97,13 +97,13 @@ func RegisterRequestCounter(r *http.Request) {
 		URI:    r.RequestURI,
 		Method: strings.Split(r.Method, "?")[0],
 	}
-	M.RegisterCounter(RequestCounter, RequestCountDescription)
-	M.AddCount(r.Context(), RequestCounter, 1, labels)
+	RegisterCounter(RequestCounter, RequestCountDescription)
+	AddCount(r.Context(), RequestCounter, 1, labels)
 }
 
 func RegisterTotalRequestCounter(r *http.Request) {
-	M.RegisterCounter(TotalRequestCounter, TotalRequestDescription)
-	M.AddCount(r.Context(), TotalRequestCounter, 1, nil)
+	RegisterCounter(TotalRequestCounter, TotalRequestDescription)
+	AddCount(r.Context(), TotalRequestCounter, 1, nil)
 }
 
 func RegisterRequestCodeCounter(recorder *StatusRecorder, r *http.Request) {
@@ -112,8 +112,8 @@ func RegisterRequestCodeCounter(recorder *StatusRecorder, r *http.Request) {
 		Method:     strings.Split(r.Method, "?")[0],
 		ReturnCode: recorder.Status,
 	}
-	M.RegisterCounter(ReturnCodeCounter, ReturnCodeCounterDescription)
-	M.AddCount(r.Context(), ReturnCode, 1, labels)
+	RegisterCounter(ReturnCodeCounter, ReturnCodeCounterDescription)
+	AddCount(r.Context(), ReturnCode, 1, labels)
 }
 
 func shouldNotIgnore(endpoints ...string) func(r *http.Request) bool {

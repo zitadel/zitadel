@@ -45,7 +45,7 @@ func (v *View) ProcessedIDPConfigSequence(eventSequence uint64, eventTimestamp t
 	return v.saveCurrentSequence(idpConfigTable, eventSequence, eventTimestamp)
 }
 
-func (v *View) UpdateIDPConfigPSpoolerRunTimestamp() error {
+func (v *View) UpdateIDPConfigSpoolerRunTimestamp() error {
 	return v.updateSpoolerRunSequence(idpConfigTable)
 }
 

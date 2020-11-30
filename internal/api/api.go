@@ -154,7 +154,13 @@ func (a *API) handleClientID(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) handleMetrics() http.Handler {
-	metrics.M.RegisterUpDownSumObserver(
+	a.registerActiveSessionCounters()
+	a.registerSpoolerDivCounters()
+	return metrics.GetExporter()
+}
+
+func (a *API) registerActiveSessionCounters() {
+	metrics.RegisterUpDownSumObserver(
 		metrics.ActiveSessionCounter,
 		metrics.ActiveSessionCounterDescription,
 		func(ctx context.Context, result metric.Int64ObserverResult) {
@@ -163,8 +169,6 @@ func (a *API) handleMetrics() http.Handler {
 			)
 		},
 	)
-	a.registerSpoolerDivCounters()
-	return metrics.M.GetExporter()
 }
 
 func (a *API) registerSpoolerDivCounters() {
@@ -173,7 +177,7 @@ func (a *API) registerSpoolerDivCounters() {
 		logging.Log("API-3M8sd").WithError(err).Error("could not read views for metrics")
 		return
 	}
-	metrics.M.RegisterUpDownSumObserver(
+	metrics.RegisterUpDownSumObserver(
 		metrics.SpoolerDivCounter,
 		metrics.SpoolerDivCounterDescription,
 		func(ctx context.Context, result metric.Int64ObserverResult) {

@@ -61,5 +61,5 @@ func (o *Org) OnError(event *es_models.Event, spoolerErr error) error {
 }
 
 func (o *Org) OnSuccess() error {
-	return spooler.HandleSuccess(o.view.UpdateOrgDomainSpoolerRunTimestamp)
+	return spooler.HandleSuccess(o.view.UpdateOrgSpoolerRunTimestamp)
 }

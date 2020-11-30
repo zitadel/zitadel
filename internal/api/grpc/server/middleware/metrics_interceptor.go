@@ -34,6 +34,13 @@ func RegisterMetrics(ctx context.Context, req interface{}, info *grpc.UnaryServe
 		return
 	}
 
+	for _, ignore := range ignoredMethods {
+		if info.FullMethod == ignore {
+			handler(ctx, req)
+			return
+		}
+	}
+
 	resp, err := handler(ctx, req)
 	if containsMetricsMethod(metrics.MetricTypeRequestCount, metricTypes) {
 		RegisterGrpcRequestCounter(ctx, info)
@@ -51,13 +58,13 @@ func RegisterGrpcRequestCounter(ctx context.Context, info *grpc.UnaryServerInfo)
 	var labels = map[string]interface{}{
 		GrpcMethod: info.FullMethod,
 	}
-	metrics.M.RegisterCounter(GrpcRequestCounter, GrpcRequestCounterDescription)
-	metrics.M.AddCount(ctx, GrpcRequestCounter, 1, labels)
+	metrics.RegisterCounter(GrpcRequestCounter, GrpcRequestCounterDescription)
+	metrics.AddCount(ctx, GrpcRequestCounter, 1, labels)
 }
 
 func RegisterGrpcTotalRequestCounter(ctx context.Context) {
-	metrics.M.RegisterCounter(TotalGrpcRequestCounter, TotalGrpcRequestCounterDescription)
-	metrics.M.AddCount(ctx, TotalGrpcRequestCounter, 1, nil)
+	metrics.RegisterCounter(TotalGrpcRequestCounter, TotalGrpcRequestCounterDescription)
+	metrics.AddCount(ctx, TotalGrpcRequestCounter, 1, nil)
 }
 
 func RegisterGrpcRequestCodeCounter(ctx context.Context, info *grpc.UnaryServerInfo, err error) {
@@ -66,8 +73,8 @@ func RegisterGrpcRequestCodeCounter(ctx context.Context, info *grpc.UnaryServerI
 		GrpcMethod: info.FullMethod,
 		ReturnCode: runtime.HTTPStatusFromCode(statusCode),
 	}
-	metrics.M.RegisterCounter(GrpcStatusCodeCounter, GrpcStatusCodeCounterDescription)
-	metrics.M.AddCount(ctx, GrpcStatusCodeCounter, 1, labels)
+	metrics.RegisterCounter(GrpcStatusCodeCounter, GrpcStatusCodeCounterDescription)
+	metrics.AddCount(ctx, GrpcStatusCodeCounter, 1, labels)
 }
 
 func containsMetricsMethod(metricType metrics.MetricType, metricTypes []metrics.MetricType) bool {
