@@ -28,6 +28,7 @@ func StartRepository(config *Config) (repo *Repository, err error) {
 		eventstore:  config.Eventstore,
 		idGenerator: id.SonyFlakeGenerator,
 	}
+	iam_repo.RegisterEventMappers(repo.eventstore)
 
 	repo.secretCrypto, err = crypto.NewAESCrypto(config.SystemDefaults.IDPConfigVerificationKey)
 	if err != nil {

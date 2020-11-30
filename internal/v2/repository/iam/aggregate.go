@@ -107,6 +107,7 @@ func (a *Aggregate) PushIDPConfigChanged(
 	configType idp.ConfigType,
 	stylingType idp.StylingType,
 ) *Aggregate {
+
 	event, err := NewIDPConfigChangedEvent(ctx, current, configID, name, configType, stylingType)
 	if err != nil {
 		return a

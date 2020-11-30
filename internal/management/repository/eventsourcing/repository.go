@@ -18,7 +18,6 @@ import (
 	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_grant "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 	iam_business "github.com/caos/zitadel/internal/v2/business/iam"
-	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
 type Config struct {
@@ -45,8 +44,6 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 		return nil, err
 	}
 	esV2 := es.V2()
-	//TODO: should it be iam repo or iam business?
-	iam_repo.RegisterEventMappers(esV2)
 
 	sqlClient, err := conf.View.Start()
 	if err != nil {

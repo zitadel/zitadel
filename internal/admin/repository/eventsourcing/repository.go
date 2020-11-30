@@ -15,7 +15,6 @@ import (
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	iam_business "github.com/caos/zitadel/internal/v2/business/iam"
-	"github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
 type Config struct {
@@ -40,16 +39,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 		return nil, err
 	}
 	esV2 := es.V2()
-	esV2.RegisterFilterEventMapper(iam.MemberAddedEventType, iam.MemberAddedEventMapper).
-		RegisterFilterEventMapper(iam.MemberChangedEventType, iam.MemberChangedEventMapper).
-		RegisterFilterEventMapper(iam.MemberRemovedEventType, iam.MemberRemovedEventMapper).
-		RegisterFilterEventMapper(iam.IDPConfigAddedEventType, iam.IDPConfigAddedEventMapper).
-		RegisterFilterEventMapper(iam.IDPConfigChangedEventType, iam.IDPConfigChangedEventMapper).
-		RegisterFilterEventMapper(iam.IDPConfigDeactivatedEventType, iam.IDPConfigDeactivatedEventMapper).
-		RegisterFilterEventMapper(iam.IDPConfigReactivatedEventType, iam.IDPConfigReactivatedEventMapper).
-		RegisterFilterEventMapper(iam.IDPConfigRemovedEventType, iam.IDPConfigRemovedEventMapper).
-		RegisterFilterEventMapper(iam.IDPOIDCConfigAddedEventType, iam.IDPOIDCConfigAddedEventMapper).
-		RegisterFilterEventMapper(iam.IDPOIDCConfigChangedEventType, iam.IDPOIDCConfigChangedEventMapper)
 
 	iam, err := es_iam.StartIAM(es_iam.IAMConfig{
 		Eventstore: es,
