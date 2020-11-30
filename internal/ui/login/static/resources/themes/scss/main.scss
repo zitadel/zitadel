@@ -5,10 +5,15 @@
     font-family: $standardFont;
     font-size: 16px;
     font-weight: 400;
+    cursor: copy !important;
 }
 
 body {
     margin: 0 0 100px 0;
+
+    &.waiting * {
+        cursor: wait !important;
+    }
 }
 
 html {
