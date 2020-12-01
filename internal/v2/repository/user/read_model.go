@@ -46,6 +46,6 @@ func (rm *ReadModel) AppendAndReduce(events ...eventstore.EventReader) error {
 	return rm.Reduce()
 }
 
-func (rm *ReadModel) Query() *eventstore.SearchQueryFactory {
-	return eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, AggregateType).AggregateIDs(rm.AggregateID)
+func (rm *ReadModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).AggregateIDs(rm.AggregateID)
 }
