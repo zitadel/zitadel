@@ -52,8 +52,7 @@ func (s *Spooler) Start() {
 	}
 	go func() {
 		for _, handler := range s.handlers {
-			handler := &spooledHandler{Handler: handler, locker: s.locker, queuedAt: time.Now(), eventstore: s.eventstore}
-			s.queue <- handler
+			s.queue <- &spooledHandler{Handler: handler, locker: s.locker, queuedAt: time.Now(), eventstore: s.eventstore}
 		}
 	}()
 }
