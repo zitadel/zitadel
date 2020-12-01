@@ -5,9 +5,9 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
-//SearchQueryFactory represents the builder for your filter
+//SearchQueryBuilder represents the builder for your filter
 // if invalid data are set the filter will fail
-type SearchQueryFactory struct {
+type SearchQueryBuilder struct {
 	columns        repository.Columns
 	limit          uint64
 	desc           bool
@@ -35,61 +35,61 @@ type AggregateType repository.AggregateType
 // EventType is the description of the change
 type EventType repository.EventType
 
-// NewSearchQueryFactory creates a new factory for event filters
+// NewSearchQueryBuilder creates a new factory for event filters
 // aggregateTypes must contain at least one aggregate type
-func NewSearchQueryFactory(columns Columns, aggregateTypes ...AggregateType) *SearchQueryFactory {
-	return &SearchQueryFactory{
+func NewSearchQueryBuilder(columns Columns, aggregateTypes ...AggregateType) *SearchQueryBuilder {
+	return &SearchQueryBuilder{
 		columns:        repository.Columns(columns),
 		aggregateTypes: aggregateTypes,
 	}
 }
 
-func (factory *SearchQueryFactory) Columns(columns Columns) *SearchQueryFactory {
+func (factory *SearchQueryBuilder) Columns(columns Columns) *SearchQueryBuilder {
 	factory.columns = repository.Columns(columns)
 	return factory
 }
 
-func (factory *SearchQueryFactory) Limit(limit uint64) *SearchQueryFactory {
+func (factory *SearchQueryBuilder) Limit(limit uint64) *SearchQueryBuilder {
 	factory.limit = limit
 	return factory
 }
 
-func (factory *SearchQueryFactory) SequenceGreater(sequence uint64) *SearchQueryFactory {
+func (factory *SearchQueryBuilder) SequenceGreater(sequence uint64) *SearchQueryBuilder {
 	factory.eventSequence = sequence
 	return factory
 }
 
-func (factory *SearchQueryFactory) AggregateIDs(ids ...string) *SearchQueryFactory {
+func (factory *SearchQueryBuilder) AggregateIDs(ids ...string) *SearchQueryBuilder {
 	factory.aggregateIDs = ids
 	return factory
 }
 
-func (factory *SearchQueryFactory) EventTypes(types ...EventType) *SearchQueryFactory {
+func (factory *SearchQueryBuilder) EventTypes(types ...EventType) *SearchQueryBuilder {
 	factory.eventTypes = types
 	return factory
 }
 
-func (factory *SearchQueryFactory) ResourceOwner(resourceOwner string) *SearchQueryFactory {
+func (factory *SearchQueryBuilder) ResourceOwner(resourceOwner string) *SearchQueryBuilder {
 	factory.resourceOwner = resourceOwner
 	return factory
 }
 
-func (factory *SearchQueryFactory) OrderDesc() *SearchQueryFactory {
+func (factory *SearchQueryBuilder) OrderDesc() *SearchQueryBuilder {
 	factory.desc = true
 	return factory
 }
 
-func (factory *SearchQueryFactory) OrderAsc() *SearchQueryFactory {
+func (factory *SearchQueryBuilder) OrderAsc() *SearchQueryBuilder {
 	factory.desc = false
 	return factory
 }
 
-func (factory *SearchQueryFactory) EventData(query map[string]interface{}) *SearchQueryFactory {
+func (factory *SearchQueryBuilder) EventData(query map[string]interface{}) *SearchQueryBuilder {
 	factory.eventData = query
 	return factory
 }
 
-func (factory *SearchQueryFactory) build() (*repository.SearchQuery, error) {
+func (factory *SearchQueryBuilder) build() (*repository.SearchQuery, error) {
 	if factory == nil ||
 		len(factory.aggregateTypes) < 1 ||
 		factory.columns.Validate() != nil {
@@ -122,7 +122,7 @@ func (factory *SearchQueryFactory) build() (*repository.SearchQuery, error) {
 	}, nil
 }
 
-func (factory *SearchQueryFactory) aggregateIDFilter() *repository.Filter {
+func (factory *SearchQueryBuilder) aggregateIDFilter() *repository.Filter {
 	if len(factory.aggregateIDs) < 1 {
 		return nil
 	}
@@ -132,7 +132,7 @@ func (factory *SearchQueryFactory) aggregateIDFilter() *repository.Filter {
 	return repository.NewFilter(repository.FieldAggregateID, factory.aggregateIDs, repository.OperationIn)
 }
 
-func (factory *SearchQueryFactory) eventTypeFilter() *repository.Filter {
+func (factory *SearchQueryBuilder) eventTypeFilter() *repository.Filter {
 	if len(factory.eventTypes) < 1 {
 		return nil
 	}
@@ -142,14 +142,14 @@ func (factory *SearchQueryFactory) eventTypeFilter() *repository.Filter {
 	return repository.NewFilter(repository.FieldEventType, factory.eventTypes, repository.OperationIn)
 }
 
-func (factory *SearchQueryFactory) aggregateTypeFilter() *repository.Filter {
+func (factory *SearchQueryBuilder) aggregateTypeFilter() *repository.Filter {
 	if len(factory.aggregateTypes) == 1 {
 		return repository.NewFilter(repository.FieldAggregateType, factory.aggregateTypes[0], repository.OperationEquals)
 	}
 	return repository.NewFilter(repository.FieldAggregateType, factory.aggregateTypes, repository.OperationIn)
 }
 
-func (factory *SearchQueryFactory) eventSequenceFilter() *repository.Filter {
+func (factory *SearchQueryBuilder) eventSequenceFilter() *repository.Filter {
 	if factory.eventSequence == 0 {
 		return nil
 	}
@@ -160,14 +160,14 @@ func (factory *SearchQueryFactory) eventSequenceFilter() *repository.Filter {
 	return repository.NewFilter(repository.FieldSequence, factory.eventSequence, sortOrder)
 }
 
-func (factory *SearchQueryFactory) resourceOwnerFilter() *repository.Filter {
+func (factory *SearchQueryBuilder) resourceOwnerFilter() *repository.Filter {
 	if factory.resourceOwner == "" {
 		return nil
 	}
 	return repository.NewFilter(repository.FieldResourceOwner, factory.resourceOwner, repository.OperationEquals)
 }
 
-func (factory *SearchQueryFactory) eventDataFilter() *repository.Filter {
+func (factory *SearchQueryBuilder) eventDataFilter() *repository.Filter {
 	if len(factory.eventData) == 0 {
 		return nil
 	}

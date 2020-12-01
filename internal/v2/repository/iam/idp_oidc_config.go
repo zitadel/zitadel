@@ -56,8 +56,8 @@ func (wm *IDPOIDCConfigWriteModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *IDPOIDCConfigWriteModel) Query() *eventstore.SearchQueryFactory {
-	return eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, AggregateType).
+func (wm *IDPOIDCConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).
 		AggregateIDs(wm.iamID)
 }
 

@@ -51,8 +51,8 @@ func (rm *IDPConfigReadModel) AppendEvents(events ...eventstore.EventReader) {
 	}
 }
 
-func (rm *IDPConfigReadModel) Query() *eventstore.SearchQueryFactory {
-	return eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, AggregateType).
+func (rm *IDPConfigReadModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).
 		AggregateIDs(rm.iamID).
 		EventData(map[string]interface{}{
 			"idpConfigId": rm.configID,
@@ -74,8 +74,8 @@ func NewIDPConfigWriteModel(iamID, configID string) *IDPConfigWriteModel {
 	}
 }
 
-func (wm *IDPConfigWriteModel) Query() *eventstore.SearchQueryFactory {
-	return eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, AggregateType).
+func (wm *IDPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).
 		AggregateIDs(wm.iamID)
 }
 
