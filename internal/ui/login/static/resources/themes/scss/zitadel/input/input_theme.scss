@@ -1,0 +1,16 @@
+@import '../theming/theming.scss';
+
+@mixin lgn-input-theme($theme-or-color-config) {
+    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
+    // @include lgn-private-check-duplicate-theme-styles($theme, 'mat-button') {
+      $color: lgn-get-color-config($theme);
+      $density: lgn-get-density-config($theme);
+
+      @if $color != null {
+        @include lgn-button-color($color);
+      }
+    //   @if $density != null {
+    //     @include _lgn-button-density($density);
+    //   }
+    // }
+}

@@ -1,0 +1,14 @@
+@import '../core/core.scss';
+@import '../button/button_theme.scss';
+@import '../input/input_theme.scss';
+// @import '../font/fonts.scss';
+@import './theming';
+
+@mixin zitadel-lgn-theme($theme-or-color-config) {
+    // $dedupe-key: 'lgn-theme';
+    // @include mat-private-check-duplicate-theme-styles($theme-or-color-config, $dedupe-key) {
+      @include lgn-core-theme($theme-or-color-config);
+      @include lgn-button-theme($theme-or-color-config);
+      @include lgn-input-theme($theme-or-color-config);
+    // }
+}

@@ -1,0 +1,274 @@
+$dark-primary-text: rgba(black, 0.87);
+$dark-secondary-text: rgba(black, 0.54);
+$dark-disabled-text: rgba(black, 0.38);
+$dark-dividers: rgba(black, 0.12);
+$dark-focused: rgba(black, 0.12);
+$light-primary-text: white;
+$light-secondary-text: rgba(white, 0.7);
+$light-disabled-text: rgba(white, 0.5);
+$light-dividers: rgba(white, 0.12);
+$light-focused: rgba(white, 0.12);
+
+$lgn-dark-brand: (
+    50: #fff,
+    100: #dde6f3,
+    200: #b4c9e4,
+    300: #7fa3d1,
+    400: #6992c9,
+    500: #5282c1,
+    600: #4072b4,
+    700: #38649d,
+    800: #305687,
+    900: #284770,
+    A100: #fff,
+    A200: #dde6f3,
+    A300: #6992c9,
+    A400: #38649d,
+    A500: #666,
+    A600: #fff,
+    A700: #8795a1,
+    A800: #2d2e30,
+    A900: #212224,
+    contrast: (
+        50: $dark-primary-text,
+        100: $dark-primary-text,
+        200: $dark-primary-text,
+        300: $dark-primary-text,
+        400: $dark-primary-text,
+        500: $light-primary-text,
+        600: $light-primary-text,
+        700: $light-primary-text,
+        800: $light-primary-text,
+        900: $light-primary-text,
+        A100: $dark-primary-text,
+        A200: $light-primary-text,
+        A400: $light-primary-text,
+        A700: $light-primary-text,
+    )
+);
+  
+$lgn-light-brand: (
+    50: #eaedfa,
+    100: #ccd2f2,
+    200: #aab4ea,
+    300: #8796e1,
+    400: #6e80da,
+    500: #5469d4,
+    600: #4d61cf,
+    700: #4356c9,
+    800: #3a4cc3,
+    900: #293bb9,
+    A100: #f9faff,
+    A200: #c6ccff,
+    A300: #939fff,
+    A400: #7a88ff,
+    A500: #333,
+    A600: #000,
+    A700: #8795a1,
+    A800: white,
+    A900: #fafafa,
+    contrast: (
+        50: $dark-primary-text,
+        100: $dark-primary-text,
+        200: $dark-primary-text,
+        300: $dark-primary-text,
+        400: $dark-primary-text,
+        500: $light-primary-text,
+        600: $light-primary-text,
+        700: $light-primary-text,
+        800: $light-primary-text,
+        900: $light-primary-text,
+        A100: $dark-primary-text,
+        A200: $light-primary-text,
+        A400: $light-primary-text,
+        A700: $light-primary-text,
+    )
+);
+  
+$lgn-accent-color: (
+    50: #ebf4f2,
+    100: #cce3de,
+    200: #abd1c9,
+    300: #89bfb3,
+    400: #6fb1a2,
+    500: #56a392,
+    600: #4f9b8a,
+    700: #45917f,
+    800: #3c8875,
+    900: #2b7763,
+    A100: #beffed,
+    A200: #8bffde,
+    A400: #58ffd0,
+    A700: #3effc9,
+    contrast: (
+        50: $dark-primary-text,
+        100: $dark-primary-text,
+        200: $dark-primary-text,
+        300: $dark-primary-text,
+        400: $dark-primary-text,
+        500: $light-primary-text,
+        600: $light-primary-text,
+        700: $light-primary-text,
+        800: $light-primary-text,
+        900: $light-primary-text,
+        A100: $dark-primary-text,
+        A200: $light-primary-text,
+        A400: $light-primary-text,
+        A700: $light-primary-text,
+    )
+);
+  
+$lgn-warn: (
+    50: #ffebee,
+    100: #ffcdd2,
+    200: #ef9a9a,
+    300: #e57373,
+    400: #ef5350,
+    500: #f44336,
+    600: #e53935,
+    700: #d32f2f,
+    800: #c62828,
+    900: #b71c1c,
+    A100: #ff8a80,
+    A200: #ff5252,
+    A400: #ff1744,
+    A700: #d50000,
+    contrast: (
+        50: $dark-primary-text,
+        100: $dark-primary-text,
+        200: $dark-primary-text,
+        300: $dark-primary-text,
+        400: $dark-primary-text,
+        500: $light-primary-text,
+        600: $light-primary-text,
+        700: $light-primary-text,
+        800: $light-primary-text,
+        900: $light-primary-text,
+        A100: $dark-primary-text,
+        A200: $light-primary-text,
+        A400: $light-primary-text,
+        A700: $light-primary-text,
+    )
+);
+
+// $light-primary: lgn-palette($lgn-light-brand);
+// $light-accent: lgn-palette($lgn-accent-color);
+// $light-warn: lgn-palette($lgn-red);
+  
+// $dark-primary: lgn-palette($lgn-dark-brand);
+// $dark-accent: lgn-palette($lgn-accent-color);
+// $dark-warn: lgn-palette($lgn-red);
+  
+//   $light-theme: lgn-light-theme($light-primary, $light-accent, $light-warn);
+  
+//   $dark-theme: lgn-dark-theme($dark-primary, $dark-accent, $dark-warn);
+  
+  // general text and divider colors
+  
+  $lgn-grey: (
+    50: #fafafa,
+    100: #f5f5f5,
+    200: #eeeeee,
+    300: #e0e0e0,
+    400: #bdbdbd,
+    500: #9e9e9e,
+    600: #757575,
+    700: #616161,
+    800: #424242,
+    900: #212121,
+    A100: #ffffff,
+    A200: #eeeeee,
+    A400: #bdbdbd,
+    A700: #616161,
+    contrast: (
+        50: $dark-primary-text,
+        100: $dark-primary-text,
+        200: $dark-primary-text,
+        300: $dark-primary-text,
+        400: $dark-primary-text,
+        500: $dark-primary-text,
+        600: $light-primary-text,
+        700: $light-primary-text,
+        800: $light-primary-text,
+        900: $light-primary-text,
+        A100: $dark-primary-text,
+        A200: $dark-primary-text,
+        A400: $dark-primary-text,
+        A700: $light-primary-text,
+    )
+);
+
+  // Background palette for light themes.
+  $lgn-light-theme-background: (
+    status-bar: map-get($lgn-grey, 300),
+    app-bar:    map-get($lgn-grey, 100),
+    background: map-get($lgn-grey, 50),
+    hover:      rgba(black, 0.04), // TODO(kara): check style with Material Design UX
+    card:       white,
+    dialog:     white,
+    disabled-button: rgba(black, 0.12),
+    raised-button: white,
+    focused-button: $dark-focused,
+    selected-button: map-get($lgn-grey, 300),
+    selected-disabled-button: map-get($lgn-grey, 400),
+    disabled-button-toggle: map-get($lgn-grey, 200),
+    unselected-chip: map-get($lgn-grey, 300),
+    disabled-list-option: map-get($lgn-grey, 200),
+    tooltip: map-get($lgn-grey, 700),
+  );
+  
+  // Background palette for dark themes.
+  $lgn-dark-theme-background: (
+    status-bar: black,
+    app-bar:    map-get($lgn-grey, 900),
+    background: #303030,
+    hover:      rgba(white, 0.04), // TODO(kara): check style with Material Design UX
+    card:       map-get($lgn-grey, 800),
+    dialog:     map-get($lgn-grey, 800),
+    disabled-button: rgba(white, 0.12),
+    raised-button: map-get($lgn-grey, 800),
+    focused-button: $light-focused,
+    selected-button: map-get($lgn-grey, 900),
+    selected-disabled-button: map-get($lgn-grey, 800),
+    disabled-button-toggle: black,
+    unselected-chip: map-get($lgn-grey, 700),
+    disabled-list-option: black,
+    tooltip: map-get($lgn-grey, 700),
+  );
+  
+  // Foreground palette for light themes.
+  $lgn-light-theme-foreground: (
+    base:              black,
+    divider:           $dark-dividers,
+    dividers:          $dark-dividers,
+    disabled:          $dark-disabled-text,
+    disabled-button:   rgba(black, 0.26),
+    disabled-text:     $dark-disabled-text,
+    elevation:         black,
+    hint-text:         $dark-disabled-text,
+    secondary-text:    $dark-secondary-text,
+    icon:              rgba(black, 0.54),
+    icons:             rgba(black, 0.54),
+    text:              rgba(black, 0.87),
+    slider-min:        rgba(black, 0.87),
+    slider-off:        rgba(black, 0.26),
+    slider-off-active: rgba(black, 0.38),
+  );
+  
+  $lgn-dark-theme-foreground: (
+    base:              white,
+    divider:           $light-dividers,
+    dividers:          $light-dividers,
+    disabled:          $light-disabled-text,
+    disabled-button:   rgba(white, 0.3),
+    disabled-text:     $light-disabled-text,
+    elevation:         black,
+    hint-text:         $light-disabled-text,
+    secondary-text:    $light-secondary-text,
+    icon:              white,
+    icons:             white,
+    text:              white,
+    slider-min:        white,
+    slider-off:        rgba(white, 0.3),
+    slider-off-active: rgba(white, 0.3),
+  );

@@ -1,0 +1,25 @@
+@import './theming/all';
+
+// Include non-theme styles for core.
+@include lgn-core();
+
+$light-primary: lgn-palette($lgn-light-brand);
+$light-accent: lgn-palette($lgn-accent-color);
+$light-warn: lgn-palette($lgn-warn);
+
+$dark-primary: lgn-palette($lgn-dark-brand);
+$dark-accent: lgn-palette($lgn-accent-color);
+$dark-warn: lgn-palette($lgn-warn);
+
+$light-theme: lgn-light-theme($light-primary, $light-accent, $light-warn);
+$dark-theme: lgn-dark-theme($dark-primary, $dark-accent, $dark-warn);
+
+$light-theme: lgn-light-theme((
+  color: (
+    primary: $light-primary,
+    accent: $light-accent,
+  )
+));
+
+// Include all theme styles for the components.
+@include zitadel-lgn-theme($light-theme);

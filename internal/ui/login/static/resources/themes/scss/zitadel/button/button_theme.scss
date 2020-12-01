@@ -1,0 +1,149 @@
+@import '../theming/theming.scss';
+
+@mixin lgn-button-theme($theme-or-color-config) {
+    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
+    // @include lgn-private-check-duplicate-theme-styles($theme, 'mat-button') {
+      $color: lgn-get-color-config($theme);
+      $density: lgn-get-density-config($theme);
+
+      @if $color != null {
+        @include lgn-button-color($color);
+      }
+    //   @if $density != null {
+    //     @include _lgn-button-density($density);
+    //   }
+    // }
+}
+
+@mixin lgn-button-color($config-or-theme) {
+    $config: lgn-get-color-config($config-or-theme);
+    $primary: map-get($config, primary);
+    $accent: map-get($config, accent);
+    $warn: map-get($config, warn);
+    $background: map-get($config, background);
+    $foreground: map-get($config, foreground);
+  
+    .lgn-button, .lgn-stroked-button {
+      // Buttons without a background color should inherit the font color. This is necessary to
+      // ensure that the button is readable on custom background colors. It's wrong to always assume
+      // that those buttons are always placed inside of containers with the default background
+      // color of the theme (e.g. themed toolbars).
+      color: inherit;
+      background: transparent;
+  
+      @include _lgn-button-theme-property($config, 'color', text);
+      @include _lgn-button-focus-overlay-color($config);
+    }
+  
+    .lgn-button-focus-overlay {
+      background: map-get($foreground, base);
+    }
+  
+    // Note: this needs a bit extra specificity, because we're not guaranteed the inclusion
+    // order of the theme styles and the button reset may end up resetting this as well.
+    .lgn-stroked-button:not(.lgn-button-disabled) {
+      border-color: lgn-color($foreground, divider);
+    }
+  
+    .lgn-button, .lgn-raised-button {
+      // Default font and background color when not using any color palette.
+      color: lgn-color($foreground, text);
+      background-color: lgn-color($background, raised-button);
+  
+      @include _lgn-button-theme-property($config, 'color', default-contrast);
+      @include _lgn-button-theme-property($config, 'background-color', default);
+    }
+  
+    // .lgn-stroked-button, .lgn-button {
+    //   @include lgn-private-theme-overridable-elevation(0, $config);
+    // }
+  
+    // .lgn-raised-button {
+    //   @include lgn-private-theme-overridable-elevation(2, $config);
+  
+    //   &:not(.lgn-button-disabled):active {
+    //     @include lgn-private-theme-overridable-elevation(8, $config);
+    //   }
+  
+    //   &.lgn-button-disabled {
+    //     @include lgn-private-theme-overridable-elevation(0, $config);
+    //   }
+    // }
+  }
+  
+  @mixin _lgn-button-density($config-or-theme) {}
+
+  @mixin _lgn-button-theme-property($theme, $property, $hue) {
+    $primary: map-get($theme, primary);
+    $accent: map-get($theme, accent);
+    $warn: map-get($theme, warn);
+    $background: map-get($theme, background);
+    $foreground: map-get($theme, foreground);
+  
+    &.lgn-primary {
+      #{$property}: lgn-color($primary, $hue);
+    }
+    &.lgn-accent {
+      #{$property}: lgn-color($accent, $hue);
+    }
+    &.lgn-warn {
+      #{$property}: lgn-color($warn, $hue);
+    }
+  
+    &.lgn-primary, &.lgn-accent, &.lgn-warn, &.lgn-button-disabled {
+      &.lgn-button-disabled {
+        $palette: if($property == 'color', $foreground, $background);
+        #{$property}: lgn-color($palette, disabled-button);
+      }
+    }
+  }
+
+  // Applies a property to an mat-button element for each of the supported palettes.
+@mixin _lgn-button-theme-property($theme, $property, $hue) {
+    $primary: map-get($theme, primary);
+    $accent: map-get($theme, accent);
+    $warn: map-get($theme, warn);
+    $background: map-get($theme, background);
+    $foreground: map-get($theme, foreground);
+  
+    &.lgn-primary {
+      #{$property}: lgn-color($primary, $hue);
+    }
+    &.lgn-accent {
+      #{$property}: lgn-color($accent, $hue);
+    }
+    &.lgn-warn {
+      #{$property}: lgn-color($warn, $hue);
+    }
+  
+    &.lgn-primary, &.lgn-accent, &.lgn-warn, &.lgn-button-disabled {
+      &.lgn-button-disabled {
+        $palette: if($property == 'color', $foreground, $background);
+        #{$property}: lgn-color($palette, disabled-button);
+      }
+    }
+  }
+
+  // Applies a focus style to an mat-button element for each of the supported palettes.
+@mixin _lgn-button-focus-overlay-color($config-or-theme) {
+    $config: lgn-get-color-config($config-or-theme);
+    $primary: map-get($config, primary);
+    $accent: map-get($config, accent);
+    $warn: map-get($config, warn);
+  
+    &.lgn-primary .lgn-button-focus-overlay {
+      background-color: lgn-color($primary);
+    }
+  
+    &.lgn-accent .lgn-button-focus-overlay {
+      background-color: lgn-color($accent);
+    }
+  
+    &.lgn-warn .lgn-button-focus-overlay {
+      background-color: lgn-color($warn);
+    }
+  
+    &.lgn-button-disabled .lgn-button-focus-overlay {
+      background-color: transparent;
+    }
+  }

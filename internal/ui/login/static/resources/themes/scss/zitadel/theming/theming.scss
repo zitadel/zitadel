@@ -1,0 +1,216 @@
+@import 'palette';
+
+// For a given hue in a palette, return the contrast color from the map of contrast palettes.
+// @param $color-map
+// @param $hue
+@function lgn-contrast($palette, $hue) {
+    @return map-get(map-get($palette, contrast), $hue);
+}
+
+@function lgn-palette($base-palette, $default: 500, $lighter: 100, $darker: 700, $text: $default) {
+    $result: map-merge($base-palette, (
+      default: map-get($base-palette, $default),
+      lighter: map-get($base-palette, $lighter),
+      darker: map-get($base-palette, $darker),
+      text: map-get($base-palette, $text),
+  
+      default-contrast: lgn-contrast($base-palette, $default),
+      lighter-contrast: lgn-contrast($base-palette, $lighter),
+      darker-contrast: lgn-contrast($base-palette, $darker)
+    ));
+  
+    // For each hue in the palette, add a "-contrast" color to the map.
+    @each $hue, $color in $base-palette {
+      $result: map-merge($result, (
+        '#{$hue}-contrast': lgn-contrast($base-palette, $hue)
+      ));
+    }
+  
+    @return $result;
+  }
+
+@function _lgn-create-light-color-config($primary, $accent, $warn: null) {
+    @return (
+      primary: $primary,
+      accent: $accent,
+      warn: if($warn != null, $warn, lgn-palette($lgn-warn)),
+      is-dark: false,
+      foreground: $lgn-light-theme-foreground,
+      background: $lgn-light-theme-background,
+    );
+}
+
+@function _lgn-create-dark-color-config($primary, $accent, $warn: null) {
+    @return (
+      primary: $primary,
+      accent: $accent,
+      warn: if($warn != null, $warn, lgn-palette($lgn-warn)),
+      is-dark: true,
+      foreground: $lgn-dark-theme-foreground,
+      background: $lgn-dark-theme-background,
+    );
+  }
+  
+@function lgn-light-theme($primary, $accent: null, $warn: lgn-palette($lgn-warn)) {
+    @if $accent != null {
+      @return lgn-private-create-backwards-compatibility-theme(_lgn-validate-theme((
+        _is-legacy-theme: true,
+        color: _lgn-create-light-color-config($primary, $accent, $warn),
+      )));
+    }
+
+    $result: $primary;
+    @if map-get($primary, color) {
+      $color-settings: map-get($primary, color);
+      $primary: map-get($color-settings, primary);
+      $accent: map-get($color-settings, accent);
+      $warn: map-get($color-settings, warn);
+      $result: map-merge($result, (color: _lgn-create-light-color-config($primary, $accent, $warn)));
+    }
+    @return lgn-private-create-backwards-compatibility-theme(_lgn-validate-theme($result));
+  }
+
+@function lgn-dark-theme($primary, $accent: null, $warn: lgn-palette($lgn-red)) {
+    @if $accent != null {
+      @return lgn-private-create-backwards-compatibility-theme(_lgn-validate-theme((
+        _is-legacy-theme: true,
+        color: _lgn-create-dark-color-config($primary, $accent, $warn),
+      )));
+    }
+  
+    $result: $primary;
+    @if map-get($primary, color) {
+      $color-settings: map-get($primary, color);
+      $primary: map-get($color-settings, primary);
+      $accent: map-get($color-settings, accent);
+      $warn: map-get($color-settings, warn);
+      $result: map-merge($result, (color: _lgn-create-dark-color-config($primary, $accent, $warn)));
+    }
+    @return lgn-private-create-backwards-compatibility-theme(_lgn-validate-theme($result));
+}
+
+/// Gets the color configuration from the given theme or configuration.
+@function lgn-get-color-config($theme, $default: null) {
+    // If a configuration has been passed, return the config directly.
+    @if not lgn-private-is-theme-object($theme) {
+      @return $theme;
+    }
+    @if lgn-private-is-legacy-constructed-theme($theme) {
+      @return $theme;
+    }
+    @if map-has-key($theme, color) {
+      @return map-get($theme, color);
+    }
+    @return $default;
+  }
+  
+/// Gets the density configuration from the given theme or configuration.
+@function lgn-get-density-config($theme-or-config, $default: 0) {
+    // If a configuration has been passed, return the config directly.
+    @if not lgn-private-is-theme-object($theme-or-config) {
+        @return $theme-or-config;
+    }
+    // In case a theme has been passed, extract the configuration if present,
+    // or fall back to the default density config.
+    @if map-has-key($theme-or-config, density) {
+        @return map-get($theme-or-config, density);
+    }
+    @return $default;
+}
+
+@function lgn-private-create-backwards-compatibility-theme($theme) {
+    @if not map-get($theme, color) {
+        @return $theme;
+    }
+    $color: map-get($theme, color);
+    @return map-merge($theme, $color);
+}
+
+// Checks whether the given value resolves to a theme object. Theme objects are always
+// of type `map` and can optionally only specify `color`, `density` or `typography`.
+@function lgn-private-is-theme-object($value) {
+    @return type-of($value) == 'map' and (
+      map-has-key($value, color) or
+      map-has-key($value, density) or
+      map-has-key($value, typography) or
+      length($value) == 0
+    );
+  }
+
+// Gets the theme from the given value that is either already a theme, or a color configuration.
+// This handles the legacy case where developers pass a color configuration directly to the
+// theme mixin. Before we introduced the new pattern for constructing a theme, developers passed
+// the color configuration directly to the theme mixins. This can be still the case if developers
+// construct a theme manually and pass it to a theme. We support this for backwards compatibility.
+// TODO(devversion): remove this in the future. Constructing themes manually is rare,
+// and the code can be easily updated to the new API.
+@function lgn-private-legacy-get-theme($theme-or-color-config) {
+    @if lgn-private-is-theme-object($theme-or-color-config) {
+      @return $theme-or-color-config;
+    }
+    @return lgn-private-create-backwards-compatibility-theme((
+      _is-legacy-theme: true,
+      color: $theme-or-color-config
+    ));
+  }
+
+// Note that the `$theme.primary` key does usually not exist since the color configuration
+// is stored in `$theme.color` which contains a property for `primary`. This method copies
+// the map from `$theme.color` to `$theme` for backwards compatibility.
+@function lgn-private-create-backwards-compatibility-theme($theme) {
+    @if not map-get($theme, color) {
+      @return $theme;
+    }
+    $color: map-get($theme, color);
+    @return map-merge($theme, $color);
+  }
+  
+  // Validates the specified theme by ensuring that the optional color config defines
+// a primary, accent and warn palette. Returns the theme if no failures were found.
+@function _lgn-validate-theme($theme) {
+    @if map-get($theme, color) {
+      $color: map-get($theme, color);
+      @if not map-get($color, primary) {
+        @error 'Theme does not define a valid "primary" palette.';
+      }
+      @else if not map-get($color, accent) {
+        @error 'Theme does not define a valid "accent" palette.';
+      }
+      @else if not map-get($color, warn) {
+        @error 'Theme does not define a valid "warn" palette.';
+      }
+    }
+    @return $theme;
+  }
+
+  // Checks whether a given value corresponds to a legacy constructed theme.
+@function lgn-private-is-legacy-constructed-theme($value) {
+    @return type-of($value) == 'map' and map-get($value, '_is-legacy-theme');
+  }
+
+// Gets a color from a theme palette (the output of mat-palette).
+// The hue can be one of the standard values (500, A400, etc.), one of the three preconfigured
+// hues (default, lighter, darker), or any of the aforementioned prefixed with "-contrast".
+//
+// @param $color-map The theme palette (output of mat-palette).
+// @param $hue The hue from the palette to use. If this is a value between 0 and 1, it will
+//     be treated as opacity.
+// @param $opacity The alpha channel value for the color.
+@function lgn-color($palette, $hue: default, $opacity: null) {
+    // If hueKey is a number between zero and one, then it actually contains an
+    // opacity value, so recall this function with the default hue and that given opacity.
+    @if type-of($hue) == number and $hue >= 0 and $hue <= 1 {
+      @return lgn-color($palette, default, $hue);
+    }
+  
+    $color: map-get($palette, $hue);
+  
+    @if (type-of($color) != color) {
+      // If the $color resolved to something different from a color (e.g. a CSS variable),
+      // we can't apply the opacity anyway so we return the value as is, otherwise Sass can
+      // throw an error or output something invalid.
+      @return $color;
+    }
+  
+    @return rgba($color, if($opacity == null, opacity($color), $opacity));
+  }

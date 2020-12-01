@@ -1,0 +1,18 @@
+@import '../theming/all.scss';
+@import '../theming/theming.scss';
+
+// Includes all of the color styles.
+@mixin zitadel-lgn-color($config-or-theme) {
+    // In case a theme object has been passed instead of a configuration for
+    // the color system, extract the color config from the theme object.
+    $config: if(lgn-private-is-theme-object($config-or-theme),
+        lgn-get-color-config($config-or-theme), $config-or-theme);
+  
+    @if $config == null {
+      @error 'No color configuration specified.';
+    }
+  
+    @include zitadel-lgn-theme((
+      color: $config,
+    ));
+  }
