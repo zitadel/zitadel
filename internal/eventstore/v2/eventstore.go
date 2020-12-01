@@ -93,7 +93,7 @@ func (es *Eventstore) aggregatesToEvents(aggregates []aggregater) ([]*repository
 
 //FilterEvents filters the stored events based on the searchQuery
 // and maps the events to the defined event structs
-func (es *Eventstore) FilterEvents(ctx context.Context, queryFactory *SearchQueryFactory) ([]EventReader, error) {
+func (es *Eventstore) FilterEvents(ctx context.Context, queryFactory *SearchQueryBuilder) ([]EventReader, error) {
 	query, err := queryFactory.build()
 	if err != nil {
 		return nil, err
@@ -138,7 +138,7 @@ type reducer interface {
 }
 
 //FilterToReducer filters the events based on the search query, appends all events to the reducer and calls it's reduce function
-func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQueryFactory, r reducer) error {
+func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQueryBuilder, r reducer) error {
 	events, err := es.FilterEvents(ctx, searchQuery)
 	if err != nil {
 		return err
@@ -150,7 +150,7 @@ func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQu
 }
 
 //LatestSequence filters the latest sequence for the given search query
-func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQueryFactory) (uint64, error) {
+func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (uint64, error) {
 	query, err := queryFactory.build()
 	if err != nil {
 		return 0, err
@@ -161,7 +161,7 @@ func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQu
 type queryReducer interface {
 	reducer
 	//Query returns the SearchQueryFactory for the events needed in reducer
-	Query() *SearchQueryFactory
+	Query() *SearchQueryBuilder
 }
 
 //FilterToQueryReducer filters the events based on the search query of the query function,

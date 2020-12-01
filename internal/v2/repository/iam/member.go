@@ -41,8 +41,8 @@ func (rm *MemberReadModel) AppendEvents(events ...eventstore.EventReader) {
 	}
 }
 
-func (rm *MemberReadModel) Query() *eventstore.SearchQueryFactory {
-	return eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, AggregateType).
+func (rm *MemberReadModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).
 		AggregateIDs(rm.iamID).
 		EventData(map[string]interface{}{
 			"userId": rm.userID,
@@ -94,8 +94,8 @@ func (wm *MemberWriteModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *MemberWriteModel) Query() *eventstore.SearchQueryFactory {
-	return eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, AggregateType).
+func (wm *MemberWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).
 		AggregateIDs(wm.iamID)
 }
 

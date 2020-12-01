@@ -109,8 +109,8 @@ func (wm *LoginPolicyIDPProviderWriteModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *LoginPolicyIDPProviderWriteModel) Query() *eventstore.SearchQueryFactory {
-	return eventstore.NewSearchQueryFactory(eventstore.ColumnsEvent, AggregateType).
+func (wm *LoginPolicyIDPProviderWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).
 		AggregateIDs(wm.iamID)
 }
 

@@ -9,50 +9,50 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
-func testSetColumns(columns Columns) func(factory *SearchQueryFactory) *SearchQueryFactory {
-	return func(factory *SearchQueryFactory) *SearchQueryFactory {
+func testSetColumns(columns Columns) func(factory *SearchQueryBuilder) *SearchQueryBuilder {
+	return func(factory *SearchQueryBuilder) *SearchQueryBuilder {
 		factory = factory.Columns(columns)
 		return factory
 	}
 }
 
-func testSetLimit(limit uint64) func(factory *SearchQueryFactory) *SearchQueryFactory {
-	return func(factory *SearchQueryFactory) *SearchQueryFactory {
+func testSetLimit(limit uint64) func(factory *SearchQueryBuilder) *SearchQueryBuilder {
+	return func(factory *SearchQueryBuilder) *SearchQueryBuilder {
 		factory = factory.Limit(limit)
 		return factory
 	}
 }
 
-func testSetSequence(sequence uint64) func(factory *SearchQueryFactory) *SearchQueryFactory {
-	return func(factory *SearchQueryFactory) *SearchQueryFactory {
+func testSetSequence(sequence uint64) func(factory *SearchQueryBuilder) *SearchQueryBuilder {
+	return func(factory *SearchQueryBuilder) *SearchQueryBuilder {
 		factory = factory.SequenceGreater(sequence)
 		return factory
 	}
 }
 
-func testSetAggregateIDs(aggregateIDs ...string) func(factory *SearchQueryFactory) *SearchQueryFactory {
-	return func(factory *SearchQueryFactory) *SearchQueryFactory {
+func testSetAggregateIDs(aggregateIDs ...string) func(factory *SearchQueryBuilder) *SearchQueryBuilder {
+	return func(factory *SearchQueryBuilder) *SearchQueryBuilder {
 		factory = factory.AggregateIDs(aggregateIDs...)
 		return factory
 	}
 }
 
-func testSetEventTypes(eventTypes ...EventType) func(factory *SearchQueryFactory) *SearchQueryFactory {
-	return func(factory *SearchQueryFactory) *SearchQueryFactory {
+func testSetEventTypes(eventTypes ...EventType) func(factory *SearchQueryBuilder) *SearchQueryBuilder {
+	return func(factory *SearchQueryBuilder) *SearchQueryBuilder {
 		factory = factory.EventTypes(eventTypes...)
 		return factory
 	}
 }
 
-func testSetResourceOwner(resourceOwner string) func(factory *SearchQueryFactory) *SearchQueryFactory {
-	return func(factory *SearchQueryFactory) *SearchQueryFactory {
+func testSetResourceOwner(resourceOwner string) func(factory *SearchQueryBuilder) *SearchQueryBuilder {
+	return func(factory *SearchQueryBuilder) *SearchQueryBuilder {
 		factory = factory.ResourceOwner(resourceOwner)
 		return factory
 	}
 }
 
-func testSetSortOrder(asc bool) func(factory *SearchQueryFactory) *SearchQueryFactory {
-	return func(factory *SearchQueryFactory) *SearchQueryFactory {
+func testSetSortOrder(asc bool) func(factory *SearchQueryBuilder) *SearchQueryBuilder {
+	return func(factory *SearchQueryBuilder) *SearchQueryBuilder {
 		if asc {
 			factory = factory.OrderAsc()
 		} else {
@@ -66,12 +66,12 @@ func TestSearchQueryFactorySetters(t *testing.T) {
 	type args struct {
 		columns        Columns
 		aggregateTypes []AggregateType
-		setters        []func(*SearchQueryFactory) *SearchQueryFactory
+		setters        []func(*SearchQueryBuilder) *SearchQueryBuilder
 	}
 	tests := []struct {
 		name string
 		args args
-		res  *SearchQueryFactory
+		res  *SearchQueryBuilder
 	}{
 		{
 			name: "New factory",
@@ -79,7 +79,7 @@ func TestSearchQueryFactorySetters(t *testing.T) {
 				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user", "org"},
 			},
-			res: &SearchQueryFactory{
+			res: &SearchQueryBuilder{
 				columns:        repository.Columns(ColumnsEvent),
 				aggregateTypes: []AggregateType{"user", "org"},
 			},
@@ -87,54 +87,54 @@ func TestSearchQueryFactorySetters(t *testing.T) {
 		{
 			name: "set columns",
 			args: args{
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{testSetColumns(repository.ColumnsMaxSequence)},
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testSetColumns(repository.ColumnsMaxSequence)},
 			},
-			res: &SearchQueryFactory{
+			res: &SearchQueryBuilder{
 				columns: repository.ColumnsMaxSequence,
 			},
 		},
 		{
 			name: "set limit",
 			args: args{
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{testSetLimit(100)},
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testSetLimit(100)},
 			},
-			res: &SearchQueryFactory{
+			res: &SearchQueryBuilder{
 				limit: 100,
 			},
 		},
 		{
 			name: "set sequence",
 			args: args{
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{testSetSequence(90)},
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testSetSequence(90)},
 			},
-			res: &SearchQueryFactory{
+			res: &SearchQueryBuilder{
 				eventSequence: 90,
 			},
 		},
 		{
 			name: "set aggregateIDs",
 			args: args{
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{testSetAggregateIDs("1235", "09824")},
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testSetAggregateIDs("1235", "09824")},
 			},
-			res: &SearchQueryFactory{
+			res: &SearchQueryBuilder{
 				aggregateIDs: []string{"1235", "09824"},
 			},
 		},
 		{
 			name: "set eventTypes",
 			args: args{
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{testSetEventTypes("user.created", "user.updated")},
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testSetEventTypes("user.created", "user.updated")},
 			},
-			res: &SearchQueryFactory{
+			res: &SearchQueryBuilder{
 				eventTypes: []EventType{"user.created", "user.updated"},
 			},
 		},
 		{
 			name: "set resource owner",
 			args: args{
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{testSetResourceOwner("hodor")},
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testSetResourceOwner("hodor")},
 			},
-			res: &SearchQueryFactory{
+			res: &SearchQueryBuilder{
 				resourceOwner: "hodor",
 			},
 		},
@@ -142,9 +142,9 @@ func TestSearchQueryFactorySetters(t *testing.T) {
 			name: "default search query",
 			args: args{
 				aggregateTypes: []AggregateType{"user"},
-				setters:        []func(*SearchQueryFactory) *SearchQueryFactory{testSetAggregateIDs("1235", "024"), testSetSortOrder(false)},
+				setters:        []func(*SearchQueryBuilder) *SearchQueryBuilder{testSetAggregateIDs("1235", "024"), testSetSortOrder(false)},
 			},
-			res: &SearchQueryFactory{
+			res: &SearchQueryBuilder{
 				aggregateTypes: []AggregateType{"user"},
 				aggregateIDs:   []string{"1235", "024"},
 				desc:           true,
@@ -153,7 +153,7 @@ func TestSearchQueryFactorySetters(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			factory := NewSearchQueryFactory(tt.args.columns, tt.args.aggregateTypes...)
+			factory := NewSearchQueryBuilder(tt.args.columns, tt.args.aggregateTypes...)
 			for _, setter := range tt.args.setters {
 				factory = setter(factory)
 			}
@@ -168,7 +168,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 	type args struct {
 		columns        Columns
 		aggregateTypes []AggregateType
-		setters        []func(*SearchQueryFactory) *SearchQueryFactory
+		setters        []func(*SearchQueryBuilder) *SearchQueryBuilder
 	}
 	type res struct {
 		isErr func(err error) bool
@@ -184,7 +184,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			args: args{
 				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{},
-				setters:        []func(*SearchQueryFactory) *SearchQueryFactory{},
+				setters:        []func(*SearchQueryBuilder) *SearchQueryBuilder{},
 			},
 			res: res{
 				isErr: errors.IsPreconditionFailed,
@@ -196,7 +196,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			args: args{
 				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
 					testSetColumns(Columns(-1)),
 				},
 			},
@@ -209,7 +209,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			args: args{
 				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
 					testSetColumns(math.MaxInt32),
 				},
 			},
@@ -222,7 +222,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			args: args{
 				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
-				setters:        []func(*SearchQueryFactory) *SearchQueryFactory{},
+				setters:        []func(*SearchQueryBuilder) *SearchQueryBuilder{},
 			},
 			res: res{
 				isErr: nil,
@@ -241,7 +241,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			args: args{
 				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user", "org"},
-				setters:        []func(*SearchQueryFactory) *SearchQueryFactory{},
+				setters:        []func(*SearchQueryBuilder) *SearchQueryBuilder{},
 			},
 			res: res{
 				isErr: nil,
@@ -260,7 +260,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			args: args{
 				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
 					testSetLimit(5),
 					testSetSortOrder(false),
 					testSetSequence(100),
@@ -284,7 +284,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			args: args{
 				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
 					testSetLimit(5),
 					testSetSortOrder(true),
 					testSetSequence(100),
@@ -308,7 +308,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			args: args{
 				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
 					testSetLimit(5),
 					testSetSortOrder(false),
 					testSetSequence(100),
@@ -333,7 +333,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			args: args{
 				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
 					testSetAggregateIDs("1234"),
 				},
 			},
@@ -355,7 +355,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			args: args{
 				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
 					testSetAggregateIDs("1234", "0815"),
 				},
 			},
@@ -377,7 +377,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			args: args{
 				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
 					testSetSequence(8),
 				},
 			},
@@ -399,7 +399,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			args: args{
 				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
 					testSetEventTypes("user.created"),
 				},
 			},
@@ -421,7 +421,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			args: args{
 				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
 					testSetEventTypes("user.created", "user.changed"),
 				},
 			},
@@ -443,7 +443,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			args: args{
 				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
 					testSetResourceOwner("hodor"),
 				},
 			},
@@ -473,7 +473,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			factory := NewSearchQueryFactory(tt.args.columns, tt.args.aggregateTypes...)
+			factory := NewSearchQueryBuilder(tt.args.columns, tt.args.aggregateTypes...)
 			for _, f := range tt.args.setters {
 				factory = f(factory)
 			}
