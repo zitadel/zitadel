@@ -5,10 +5,18 @@ import (
 )
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
-	es.RegisterFilterEventMapper(HumanAddedEventType, HumanAddedMapper).
-		RegisterFilterEventMapper(HumanRegisteredEventType, HumanRegisteredMapper).
-		RegisterFilterEventMapper(HumanInitialCodeAddedType, HumanInitialCodeAddedMapper).
-		RegisterFilterEventMapper(HumanInitialCodeSentType, HumanInitialCodeSentMapper).
-		RegisterFilterEventMapper(HumanInitializedCheckSucceededType, HumanInitializedCheckSucceededMapper).
-		RegisterFilterEventMapper(HumanInitializedCheckFailedType, HumanInitializedCheckFailedEventMapper)
+	es.RegisterFilterEventMapper(HumanAddedEventType, HumanAddedEventMapper).
+		RegisterFilterEventMapper(HumanRegisteredEventType, HumanRegisteredEventMapper).
+		RegisterFilterEventMapper(HumanInitialCodeAddedType, HumanInitialCodeAddedEventMapper).
+		RegisterFilterEventMapper(HumanInitialCodeSentType, HumanInitialCodeSentEventMapper).
+		RegisterFilterEventMapper(HumanInitializedCheckSucceededType, HumanInitializedCheckSucceededEventMapper).
+		RegisterFilterEventMapper(HumanInitializedCheckFailedType, HumanInitializedCheckFailedEventMapper).
+		RegisterFilterEventMapper(HumanPasswordChangedType, HumanPasswordChangedEventMapper).
+		RegisterFilterEventMapper(HumanPasswordCodeAddedType, HumanPasswordCodeAddedEventMapper).
+		RegisterFilterEventMapper(HumanPasswordCodeSentType, HumanPasswordCodeSentEventMapper).
+		RegisterFilterEventMapper(HumanPasswordCheckSucceededType, HumanPasswordCheckSucceededEventMapper).
+		RegisterFilterEventMapper(HumanPasswordCheckFailedType, HumanPasswordCheckFailedEventMapper).
+		RegisterFilterEventMapper(HumanExternalIDPAddedType, HumanExternalIDPAddedEventMapper).
+		RegisterFilterEventMapper(HumanExternalIDPRemovedType, HumanExternalIDPRemovedEventMapper).
+		RegisterFilterEventMapper(HumanExternalIDPCascadeRemovedType, HumanExternalIDPCascadeRemovedEventMapper)
 }

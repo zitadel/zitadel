@@ -11,13 +11,13 @@ import (
 )
 
 const (
-	humanEventPrefix                   = "human."
-	HumanAddedEventType                = userEventTypePrefix + humanEventPrefix + "added"
-	HumanRegisteredEventType           = userEventTypePrefix + humanEventPrefix + "selfregistered"
-	HumanInitialCodeAddedType          = userEventTypePrefix + humanEventPrefix + "initialization.code.added"
-	HumanInitialCodeSentType           = userEventTypePrefix + humanEventPrefix + "initialization.code.sent"
-	HumanInitializedCheckSucceededType = userEventTypePrefix + humanEventPrefix + "initialization.check.succeeded"
-	HumanInitializedCheckFailedType    = userEventTypePrefix + humanEventPrefix + "initialization.check.failed"
+	humanEventPrefix                   = userEventTypePrefix + "human."
+	HumanAddedEventType                = humanEventPrefix + "added"
+	HumanRegisteredEventType           = humanEventPrefix + "selfregistered"
+	HumanInitialCodeAddedType          = humanEventPrefix + "initialization.code.added"
+	HumanInitialCodeSentType           = humanEventPrefix + "initialization.code.sent"
+	HumanInitializedCheckSucceededType = humanEventPrefix + "initialization.check.succeeded"
+	HumanInitializedCheckFailedType    = humanEventPrefix + "initialization.check.failed"
 )
 
 type HumanAddedEvent struct {
@@ -51,7 +51,7 @@ func (e *HumanAddedEvent) Data() interface{} {
 	return e
 }
 
-func HumanAddedMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	humanAdded := &HumanAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -94,7 +94,7 @@ func (e *HumanRegisteredEvent) Data() interface{} {
 	return e
 }
 
-func HumanRegisteredMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanRegisteredEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	humanRegistered := &HumanRegisteredEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -120,7 +120,7 @@ func (e *HumanInitialCodeAddedEvent) Data() interface{} {
 	return e
 }
 
-func HumanInitialCodeAddedMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanInitialCodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	humanRegistered := &HumanInitialCodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -144,7 +144,7 @@ func (e *HumanInitialCodeSentEvent) Data() interface{} {
 	return nil
 }
 
-func HumanInitialCodeSentMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanInitialCodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &HumanInitialCodeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -162,7 +162,7 @@ func (e *HumanInitializedCheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
-func HumanInitializedCheckSucceededMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanInitializedCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &HumanInitializedCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
