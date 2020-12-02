@@ -17,7 +17,7 @@ type WebAuthNToken struct {
 	Challenge       string `json:"challenge"`
 	State           int32  `json:"-"`
 
-	KeyID           []byte `json:"keyID"`
+	KeyID           []byte `json:"keyId"`
 	PublicKey       []byte `json:"publicKey"`
 	AttestationType string `json:"attestationType"`
 	AAGUID          []byte `json:"aaguid"`
@@ -26,7 +26,7 @@ type WebAuthNToken struct {
 
 type WebAuthNVerify struct {
 	WebAuthNTokenID   string `json:"webAuthNTokenId"`
-	KeyID             []byte `json:"keyID"`
+	KeyID             []byte `json:"keyId"`
 	PublicKey         []byte `json:"publicKey"`
 	AttestationType   string `json:"attestationType"`
 	AAGUID            []byte `json:"aaguid"`
