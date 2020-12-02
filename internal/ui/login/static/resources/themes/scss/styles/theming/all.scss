@@ -1,4 +1,5 @@
 @import '../core/core.scss';
+@import '../footer/footer_theme.scss';
 @import '../button/button_theme.scss';
 @import '../input/input_theme.scss';
 @import '../typography/typography.scss';
@@ -10,5 +11,6 @@
       @include lgn-core-theme($theme-or-color-config);
       @include lgn-button-theme($theme-or-color-config);
       @include lgn-input-theme($theme-or-color-config);
+      @include lgn-footer-theme($theme-or-color-config);
     // }
 }

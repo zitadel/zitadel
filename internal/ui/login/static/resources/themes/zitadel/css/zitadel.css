@@ -1,3 +1,13 @@
+footer {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #00000020;
+  min-height: 50px;
+}
+
 .lgn-button:focus {
   opacity: 0;
 }
@@ -330,8 +340,12 @@ input:not([disabled]), .lgn-input:not([disabled]) {
 
 input, .lgn-input {
   color: white;
-  background-color: rgba(0, 0, 0, 0.1254901961);
+  background-color: rgba(0, 0, 0, 0.2);
   border-color: rgba(0, 0, 0, 0.12);
+}
+
+footer {
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 .lgn-dark-theme .lgn-app-background, .lgn-dark-theme.lgn-app-background {
@@ -409,8 +423,11 @@ input, .lgn-input {
 }
 .lgn-dark-theme input, .lgn-dark-theme .lgn-input {
   color: white;
-  background-color: rgba(0, 0, 0, 0.1254901961);
+  background-color: rgba(0, 0, 0, 0.2);
   border-color: rgba(0, 0, 0, 0.12);
+}
+.lgn-dark-theme footer {
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 .lgn-light-theme .lgn-app-background, .lgn-light-theme.lgn-app-background {
@@ -490,6 +507,9 @@ input, .lgn-input {
   color: rgba(0, 0, 0, 0.87);
   background-color: rgba(250, 250, 250, 0.3137254902);
   border-color: rgba(255, 255, 255, 0.12);
+}
+.lgn-light-theme footer {
+  background-color: rgba(250, 250, 250, 0.3137254902);
 }
 
 /*# sourceMappingURL=zitadel.css.map */

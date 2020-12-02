@@ -14,9 +14,9 @@
 
 @mixin lgn-input-color($config-or-theme) {
     $config: lgn-get-color-config($config-or-theme);
-    $primary: map-get($config, primary);
-    $accent: map-get($config, accent);
-    $warn: map-get($config, warn);
+    // $primary: map-get($config, primary);
+    // $accent: map-get($config, accent);
+    // $warn: map-get($config, warn);
     $background: map-get($config, background);
     $foreground: map-get($config, foreground);
   
@@ -36,18 +36,21 @@
   
     input, .lgn-input {
       color: lgn-color($foreground, text);
-      background-color: lgn-color($background, input-background);
+      background-color: lgn-color($background, input);
       border-color: lgn-color($foreground, input-border);
+
+    //   @include _lgn-input-theme-property($config, 'background-color');
+
     //   @include _lgn-input-theme-property($config, 'color');
     //   @include _lgn-input-theme-property($config, 'background-color');
     //   @include _lgn-input-theme-property($config, 'color');
     }
   }
   
-//   @mixin _lgn-input-theme-property($theme, $property) {
-//     $background: map-get($theme, background);
+  @mixin _lgn-input-theme-property($theme, $property) {
+    $background: map-get($theme, background);
   
-//     &[disabled] {
-//         #{$property}: lgn-color($background, input-background);
-//     }
-//   }
+    &[disabled] {
+        #{$property}: lgn-color($background, input);
+    }
+  }

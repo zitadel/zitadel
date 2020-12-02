@@ -205,7 +205,8 @@ $lgn-warn: (
     unselected-chip: map-get($lgn-grey, 300),
     disabled-list-option: map-get($lgn-grey, 200),
     tooltip: map-get($lgn-grey, 700),
-    input-background: #fafafa50,
+    input: #fafafa50,
+    footer:  #fafafa50,
   );
   
   $lgn-dark-theme-background: (
@@ -224,7 +225,8 @@ $lgn-warn: (
     unselected-chip: map-get($lgn-grey, 700),
     disabled-list-option: black,
     tooltip: map-get($lgn-grey, 700),
-    input-background: #00000020,
+    input: rgba(black, .2),
+    footer: rgba(black, .2)
   );
 
   $lgn-light-theme-foreground: (

@@ -1,0 +1,21 @@
+@import './footer.scss';
+
+@mixin lgn-footer-theme($theme-or-color-config) {
+    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
+    // @include lgn-private-check-duplicate-theme-styles($theme, 'mat-button') {
+      $color: lgn-get-color-config($theme);
+
+      @if $color != null {
+        @include lgn-footer-color($color);
+      }
+    // }
+}
+
+@mixin lgn-footer-color($config-or-theme) {
+    $config: lgn-get-color-config($config-or-theme);
+    $background: map-get($config, background);
+  
+    footer {
+      background-color: lgn-color($background, footer);
+    }
+}

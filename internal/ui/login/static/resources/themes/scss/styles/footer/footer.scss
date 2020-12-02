@@ -1,0 +1,13 @@
+$container-max-width: 350px;
+$footer-height: 50px;
+$footer-width: 100%;
+
+footer {
+    width: $footer-width;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #00000020;
+    min-height: $footer-height;
+}
