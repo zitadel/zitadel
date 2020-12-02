@@ -4,14 +4,10 @@
     $theme: lgn-private-legacy-get-theme($theme-or-color-config);
     // @include lgn-private-check-duplicate-theme-styles($theme, 'mat-button') {
       $color: lgn-get-color-config($theme);
-      $density: lgn-get-density-config($theme);
 
       @if $color != null {
         @include lgn-button-color($color);
       }
-    //   @if $density != null {
-    //     @include _lgn-button-density($density);
-    //   }
     // }
 }
 
@@ -35,13 +31,13 @@
       @include _lgn-button-focus-overlay-color($config);
     }
   
-    .lgn-button-focus-overlay {
+    .lgn-button:focus, .lgn-stroked-button:focus {
       background: map-get($foreground, base);
     }
   
     // Note: this needs a bit extra specificity, because we're not guaranteed the inclusion
     // order of the theme styles and the button reset may end up resetting this as well.
-    .lgn-stroked-button:not(.lgn-button-disabled) {
+    .lgn-stroked-button:not([disabled]) {
       border-color: lgn-color($foreground, divider);
     }
   
@@ -53,26 +49,8 @@
       @include _lgn-button-theme-property($config, 'color', default-contrast);
       @include _lgn-button-theme-property($config, 'background-color', default);
     }
-  
-    // .lgn-stroked-button, .lgn-button {
-    //   @include lgn-private-theme-overridable-elevation(0, $config);
-    // }
-  
-    // .lgn-raised-button {
-    //   @include lgn-private-theme-overridable-elevation(2, $config);
-  
-    //   &:not(.lgn-button-disabled):active {
-    //     @include lgn-private-theme-overridable-elevation(8, $config);
-    //   }
-  
-    //   &.lgn-button-disabled {
-    //     @include lgn-private-theme-overridable-elevation(0, $config);
-    //   }
-    // }
   }
   
-  @mixin _lgn-button-density($config-or-theme) {}
-
   @mixin _lgn-button-theme-property($theme, $property, $hue) {
     $primary: map-get($theme, primary);
     $accent: map-get($theme, accent);
@@ -90,34 +68,8 @@
       #{$property}: lgn-color($warn, $hue);
     }
   
-    &.lgn-primary, &.lgn-accent, &.lgn-warn, &.lgn-button-disabled {
-      &.lgn-button-disabled {
-        $palette: if($property == 'color', $foreground, $background);
-        #{$property}: lgn-color($palette, disabled-button);
-      }
-    }
-  }
-
-  // Applies a property to an mat-button element for each of the supported palettes.
-@mixin _lgn-button-theme-property($theme, $property, $hue) {
-    $primary: map-get($theme, primary);
-    $accent: map-get($theme, accent);
-    $warn: map-get($theme, warn);
-    $background: map-get($theme, background);
-    $foreground: map-get($theme, foreground);
-  
-    &.lgn-primary {
-      #{$property}: lgn-color($primary, $hue);
-    }
-    &.lgn-accent {
-      #{$property}: lgn-color($accent, $hue);
-    }
-    &.lgn-warn {
-      #{$property}: lgn-color($warn, $hue);
-    }
-  
-    &.lgn-primary, &.lgn-accent, &.lgn-warn, &.lgn-button-disabled {
-      &.lgn-button-disabled {
+    &.lgn-primary, &.lgn-accent, &.lgn-warn, &[disabled] {
+      &[disabled] {
         $palette: if($property == 'color', $foreground, $background);
         #{$property}: lgn-color($palette, disabled-button);
       }
@@ -131,19 +83,19 @@
     $accent: map-get($config, accent);
     $warn: map-get($config, warn);
   
-    &.lgn-primary .lgn-button-focus-overlay {
+    &.lgn-primary:focus {
       background-color: lgn-color($primary);
     }
   
-    &.lgn-accent .lgn-button-focus-overlay {
+    &.lgn-accent:focus {
       background-color: lgn-color($accent);
     }
   
-    &.lgn-warn .lgn-button-focus-overlay {
+    &.lgn-warn:focus {
       background-color: lgn-color($warn);
     }
   
-    &.lgn-button-disabled .lgn-button-focus-overlay {
+    &.lgn-button-disabled:focus {
       background-color: transparent;
     }
   }

@@ -22,4 +22,12 @@ $light-theme: lgn-light-theme((
 ));
 
 // Include all theme styles for the components.
-@include zitadel-lgn-theme($light-theme);
+@include zitadel-lgn-theme($dark-theme);
+
+.lgn-dark-theme {
+    @include zitadel-lgn-theme($dark-theme);
+}
+
+.lgn-light-theme {
+    @include zitadel-lgn-theme($light-theme);
+}

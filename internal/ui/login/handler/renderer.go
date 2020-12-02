@@ -3,13 +3,14 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"html/template"
+	"net/http"
+	"path"
+
 	"github.com/caos/logging"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/gorilla/csrf"
 	"golang.org/x/text/language"
-	"html/template"
-	"net/http"
-	"path"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
@@ -290,7 +291,7 @@ func (l *Login) getTheme(r *http.Request) string {
 }
 
 func (l *Login) getThemeMode(r *http.Request) string {
-	return "" //TODO: impl
+	return "lgn-dark-theme" //TODO: impl
 }
 
 func (l *Login) getOrgID(authReq *model.AuthRequest) string {

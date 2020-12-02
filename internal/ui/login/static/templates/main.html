@@ -1,32 +1,30 @@
 {{define "main-top"}}
 <!DOCTYPE html>
 <html lang="{{ .Lang }}" class="{{.ThemeMode}}">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    {{if .ThemeMode}}
-    <link rel="stylesheet" href="{{ resourceThemeUrl (printf "css/%s.css" .ThemeMode) .Theme }}" type="text/css" media="all">
-    {{else}}
-    <link rel="stylesheet" href="{{ resourceThemeUrl "css/dark.css" .Theme }}" type="text/css" media="(prefers-color-scheme: dark), (prefers-color-scheme: no-preference)">
-    <link rel="stylesheet" href="{{ resourceThemeUrl "css/light.css" .Theme }}" type="text/css" media="(prefers-color-scheme: light)">
+    <link rel="stylesheet" href="{{ resourceThemeUrl "css/zitadel.css" .Theme }}" type="text/css">
     {{end}}
     <link rel="icon" type="image/x-icon" href="{{ resourceThemeUrl "favicon.ico" .Theme }}">
 
     <title>{{ .Title }}</title>
 </head>
+
 <body>
     <header>
         {{template "header" .}}
     </header>
     <div class="content">
-{{end}}
+        {{end}}
 
-<!-- here goes the content -->
+        <!-- here goes the content -->
 
-{{define "main-bottom"}}
-</div>
+        {{define "main-bottom"}}
+    </div>
 </body>
 <footer>
     {{template "footer" .}}

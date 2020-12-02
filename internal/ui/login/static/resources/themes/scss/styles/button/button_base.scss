@@ -1,0 +1,68 @@
+$lgn-button-padding: 0 16px !default;
+$lgn-button-min-width: 64px !default;
+$lgn-button-margin: 0 !default;
+$lgn-button-line-height: 36px !default;
+$lgn-button-border-radius: 4px !default;
+$lgn-button-focus-transition: opacity 200ms $swift-ease-in-out-timing-function,
+                              background-color 200ms $swift-ease-in-out-timing-function !default;
+
+// Stroked button padding is 1px less horizontally than default/flat/raised
+// button's padding.
+$lgn-stroked-button-line-height: $lgn-button-line-height - 2;
+$lgn-stroked-button-padding: 0 15px;
+$lgn-stroked-button-border-width: 1px;
+
+// Icon Button standards
+$lgn-icon-button-size: 40px !default;
+$lgn-icon-button-border-radius: 50% !default;
+$lgn-icon-button-line-height: 24px !default;
+
+// Fab standards
+$lgn-fab-border-radius: 50% !default;
+$lgn-fab-size: 56px !default;
+$lgn-fab-padding: 16px !default;
+
+$lgn-mini-fab-size: 40px !default;
+$lgn-mini-fab-padding: 8px !default;
+
+// Applies base styles to all button types.
+@mixin lgn-button-base {
+  box-sizing: border-box;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  border: none;
+  -webkit-tap-highlight-color: transparent;
+
+  // Make anchors render like buttons.
+  display: inline-block;
+  white-space: nowrap;
+  text-decoration: none;
+  vertical-align: baseline;
+  text-align: center;
+
+  // Sizing.
+  margin: $lgn-button-margin;
+  min-width: $lgn-button-min-width;
+  line-height: $lgn-button-line-height;
+  padding: $lgn-button-padding;
+  border-radius: $lgn-button-border-radius;
+
+  overflow: visible;
+
+  &.lgn-button-disabled {
+    cursor: default;
+  }
+
+  &::-moz-focus-inner {
+    border: 0;
+  }
+}
+
+// Applies styles to buttons with backgrounds: raised
+@mixin lgn-raised-button {
+  @include lgn-button-base;
+
+  // Force hardware acceleration.
+  transform: translate3d(0, 0, 0);
+}
