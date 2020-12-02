@@ -26,14 +26,17 @@ func failedEventsFromModel(failedEvents []*view_model.FailedEvent) []*admin.Fail
 }
 
 func viewFromModel(view *view_model.View) *admin.View {
-	timestamp, err := ptypes.TimestampProto(view.CurrentTimestamp)
+	eventTimestamp, err := ptypes.TimestampProto(view.EventTimestamp)
+	logging.Log("GRPC-KSo03").OnError(err).Debug("unable to parse timestamp")
+	lastSpool, err := ptypes.TimestampProto(view.EventTimestamp)
 	logging.Log("GRPC-KSo03").OnError(err).Debug("unable to parse timestamp")
 
 	return &admin.View{
-		Database:          view.Database,
-		ViewName:          view.ViewName,
-		ProcessedSequence: view.CurrentSequence,
-		ViewTimestamp:     timestamp,
+		Database:                 view.Database,
+		ViewName:                 view.ViewName,
+		ProcessedSequence:        view.CurrentSequence,
+		EventTimestamp:           eventTimestamp,
+		LastSuccessfulSpoolerRun: lastSpool,
 	}
 }
 

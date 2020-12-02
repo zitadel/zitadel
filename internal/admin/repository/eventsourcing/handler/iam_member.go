@@ -72,14 +72,14 @@ func (m *IamMember) processIamMember(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return m.view.DeleteIAMMember(event.AggregateID, member.UserID, event.Sequence)
+		return m.view.DeleteIAMMember(event.AggregateID, member.UserID, event.Sequence, event.CreationDate)
 	default:
-		return m.view.ProcessedIAMMemberSequence(event.Sequence)
+		return m.view.ProcessedIAMMemberSequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutIAMMember(member, member.Sequence)
+	return m.view.PutIAMMember(member, member.Sequence, event.CreationDate)
 }
 
 func (m *IamMember) processUser(event *models.Event) (err error) {
@@ -94,7 +94,7 @@ func (m *IamMember) processUser(event *models.Event) (err error) {
 			return err
 		}
 		if len(members) == 0 {
-			return m.view.ProcessedIAMMemberSequence(event.Sequence)
+			return m.view.ProcessedIAMMemberSequence(event.Sequence, event.CreationDate)
 		}
 		user, err := m.userEvents.UserByID(context.Background(), event.AggregateID)
 		if err != nil {
@@ -103,11 +103,11 @@ func (m *IamMember) processUser(event *models.Event) (err error) {
 		for _, member := range members {
 			m.fillUserData(member, user)
 		}
-		return m.view.PutIAMMembers(members, event.Sequence)
+		return m.view.PutIAMMembers(members, event.Sequence, event.CreationDate)
 	case usr_es_model.UserRemoved:
-		return m.view.DeleteIAMMembersByUserID(event.AggregateID, event.Sequence)
+		return m.view.DeleteIAMMembersByUserID(event.AggregateID, event.Sequence, event.CreationDate)
 	default:
-		return m.view.ProcessedIAMMemberSequence(event.Sequence)
+		return m.view.ProcessedIAMMemberSequence(event.Sequence, event.CreationDate)
 	}
 	return nil
 }
@@ -136,4 +136,8 @@ func (m *IamMember) fillUserData(member *iam_model.IAMMemberView, user *usr_mode
 func (m *IamMember) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Ld9ow", "id", event.AggregateID).WithError(err).Warn("something went wrong in iammember handler")
 	return spooler.HandleError(event, err, m.view.GetLatestIAMMemberFailedEvent, m.view.ProcessedIAMMemberFailedEvent, m.view.ProcessedIAMMemberSequence, m.errorCountUntilSkip)
+}
+
+func (m *IamMember) OnSuccess() error {
+	return spooler.HandleSuccess(m.view.UpdateIAMMemberSpoolerRunTimestamp)
 }

@@ -53,13 +53,17 @@ func (o *Org) Reduce(event *es_models.Event) error {
 			return err
 		}
 	default:
-		return o.view.ProcessedOrgSequence(event.Sequence)
+		return o.view.ProcessedOrgSequence(event.Sequence, event.CreationDate)
 	}
 
-	return o.view.PutOrg(org)
+	return o.view.PutOrg(org, event.CreationDate)
 }
 
 func (o *Org) OnError(event *es_models.Event, spoolerErr error) error {
 	logging.LogWithFields("SPOOL-8siWS", "id", event.AggregateID).WithError(spoolerErr).Warn("something went wrong in org handler")
 	return spooler.HandleError(event, spoolerErr, o.view.GetLatestOrgFailedEvent, o.view.ProcessedOrgFailedEvent, o.view.ProcessedOrgSequence, o.errorCountUntilSkip)
+}
+
+func (o *Org) OnSuccess() error {
+	return spooler.HandleSuccess(o.view.UpdateOrgSpoolerRunTimestamp)
 }

@@ -71,12 +71,12 @@ func (n *Notification) Reduce(event *models.Event) (err error) {
 	case es_model.DomainClaimed:
 		err = n.handleDomainClaimed(event)
 	default:
-		return n.view.ProcessedNotificationSequence(event.Sequence)
+		return n.view.ProcessedNotificationSequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return n.view.ProcessedNotificationSequence(event.Sequence)
+	return n.view.ProcessedNotificationSequence(event.Sequence, event.CreationDate)
 }
 
 func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
@@ -240,6 +240,10 @@ func (n *Notification) getUserEvents(userID string, sequence uint64) ([]*models.
 func (n *Notification) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-s9opc", "id", event.AggregateID, "sequence", event.Sequence).WithError(err).Warn("something went wrong in notification handler")
 	return spooler.HandleError(event, err, n.view.GetLatestNotificationFailedEvent, n.view.ProcessedNotificationFailedEvent, n.view.ProcessedNotificationSequence, n.errorCountUntilSkip)
+}
+
+func (n *Notification) OnSuccess() error {
+	return spooler.HandleSuccess(n.view.UpdateNotificationSpoolerRunTimestamp)
 }
 
 func getSetNotifyContextData(orgID string) context.Context {

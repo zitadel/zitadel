@@ -53,15 +53,19 @@ func (m *LabelPolicy) processLabelPolicy(event *models.Event) (err error) {
 		}
 		err = policy.AppendEvent(event)
 	default:
-		return m.view.ProcessedLabelPolicySequence(event.Sequence)
+		return m.view.ProcessedLabelPolicySequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutLabelPolicy(policy, policy.Sequence)
+	return m.view.PutLabelPolicy(policy, policy.Sequence, event.CreationDate)
 }
 
 func (m *LabelPolicy) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-4Djo9", "id", event.AggregateID).WithError(err).Warn("something went wrong in label policy handler")
 	return spooler.HandleError(event, err, m.view.GetLatestLabelPolicyFailedEvent, m.view.ProcessedLabelPolicyFailedEvent, m.view.ProcessedLabelPolicySequence, m.errorCountUntilSkip)
+}
+
+func (m *LabelPolicy) OnSuccess() error {
+	return spooler.HandleSuccess(m.view.UpdateLabelPolicySpoolerRunTimestamp)
 }

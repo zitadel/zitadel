@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/view/repository"
 
 	"time"
@@ -52,8 +52,7 @@ func (s *Spooler) Start() {
 	}
 	go func() {
 		for _, handler := range s.handlers {
-			handler := &spooledHandler{Handler: handler, locker: s.locker, queuedAt: time.Now(), eventstore: s.eventstore}
-			s.queue <- handler
+			s.queue <- &spooledHandler{Handler: handler, locker: s.locker, queuedAt: time.Now(), eventstore: s.eventstore}
 		}
 	}()
 }
@@ -79,6 +78,7 @@ func (s *spooledHandler) load(workerID string) {
 			errs <- s.process(ctx, events, workerID)
 			logging.Log("SPOOL-0pV8o").WithField("view", s.ViewModel()).WithField("worker", workerID).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("process done")
 		}
+
 	}
 	<-ctx.Done()
 }
@@ -103,7 +103,9 @@ func (s *spooledHandler) process(ctx context.Context, events []*models.Event, wo
 			}
 		}
 	}
-	return nil
+	err := s.OnSuccess()
+	logging.LogWithFields("SPOOL-49ods", "view", s.ViewModel(), "worker", workerID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Warn("could not process on success func")
+	return err
 }
 
 func (s *spooledHandler) query(ctx context.Context) ([]*models.Event, error) {
@@ -165,7 +167,7 @@ func (s *spooledHandler) lock(ctx context.Context, errs chan<- error, workerID s
 func HandleError(event *models.Event, failedErr error,
 	latestFailedEvent func(sequence uint64) (*repository.FailedEvent, error),
 	processFailedEvent func(*repository.FailedEvent) error,
-	processSequence func(uint64) error, errorCountUntilSkip uint64) error {
+	processSequence func(uint64, time.Time) error, errorCountUntilSkip uint64) error {
 	failedEvent, err := latestFailedEvent(event.Sequence)
 	if err != nil {
 		return err
@@ -177,7 +179,11 @@ func HandleError(event *models.Event, failedErr error,
 		return err
 	}
 	if errorCountUntilSkip <= failedEvent.FailureCount {
-		return processSequence(event.Sequence)
+		return processSequence(event.Sequence, event.CreationDate)
 	}
 	return nil
+}
+
+func HandleSuccess(updateSpoolerRunTimestamp func() error) error {
+	return updateSpoolerRunTimestamp()
 }

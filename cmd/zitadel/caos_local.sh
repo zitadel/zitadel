@@ -11,6 +11,8 @@ export ZITADEL_TRACING_FRACTION=0.1
 export ZITADEL_TRACING_ENDPOINT=localhost:9096
 export ZITADEL_TRACING_TYPE=google
 
+export ZITADEL_METRICS_TYPE=otel
+
 # Log
 export ZITADEL_LOG_LEVEL=debug
 
