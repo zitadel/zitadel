@@ -5,13 +5,19 @@ The documentation is built according to the structure of a docs `folder`[Folder]
 
 ## Running locally
 
-Set up the project:
+You can simply run the static site by using the docker-compose command below.
 
-```bash
-npm i
+```Bash
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f site/docker-compose.yml up --build
 ```
 
-Start the server with `npm run dev`, and navigate to [localhost:3000](http://localhost:3000).
+## Building locally
+
+You can simply run the static site by using the docker-compose command below.
+
+```Bash
+DOCKER_BUILDKIT=1 docker build -f site/dockerfile . -t zitadel:docs -o docs
+```
 
 ## Honorable Mentions
 

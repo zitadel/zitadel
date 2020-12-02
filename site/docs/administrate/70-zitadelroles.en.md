@@ -42,7 +42,7 @@ PROJECT_GRANT_OWNER_VIEWER
 
 ### Manage ZITADEL Roles
 
-You can grant ZITADEL Roles directly on a resource like organisation or project. Or, if the user is in your organisation, by applying in the roles to the user directly.
+You can grant ZITADEL Roles directly on a resource like organisation or project. Or, if the user is in your organisation, by applying the roles to the user directly:
 
 - [Manage Organisation ZITADEL Roles](administrate#Manage_Organisation_ZITADEL_Roles)
 - [Manage Project ZITADEL Roles](administrate#Manage_Organisation_ZITADEL_Roles)

@@ -166,6 +166,11 @@
             max-width: 500px;
             flex: 1 0 auto;
             max-height: 350px;
+            transition: box-shadow .2 ease;
+        }
+
+        .doc-container .doc:hover {
+            box-shadow: 0 1px 8px rgba(0,0,0,0.2);
         }
 
         .doc-container .doc img{

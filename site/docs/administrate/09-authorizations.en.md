@@ -1,12 +1,12 @@
 ---
-title: Authorisations
+title: Authorizations
 ---
 
-### What are Authorisations
+### What are Authorizations
 
-**ZITADEL** thinks of authorisations as resource who clearly defines which user has what roles. Authorisations are also called "user grant".
+**ZITADEL** thinks of authorizations as resource who clearly defines which user has what roles. Authorizations are also called "user grant".
 
-### Manage Authorisations
+### Manage Authorizations
 
 You can grant Roles directly on a project. Or, if the user is in your organisation, by apply in the roles to the user directly.
 Additionaly you can use the authorization menu item to search for a user and project.

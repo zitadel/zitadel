@@ -17,15 +17,19 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v2
-    - name: Install and Build
-      run: |
-        npm install
-        npx sapper export --legacy
+    - uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ./site/dockerfile
+        platforms: linux/amd64
+        tags: zitadel:docs
+        push: false
+        outputs: type=local,dest=output
     - name: Archive Production Artifact
       uses: actions/upload-artifact@master
       with:
         name: export
-        path: site/__sapper__/export
+        path: output
   deploydocs:
     name: Deploy
     needs: builddocs
