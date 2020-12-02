@@ -72,7 +72,7 @@ MFAPrompt:
 MFAInitVerify:
   Title: Multifaktor Verifizierung
   Description: Verifiziere deinen Multifaktor
-  OTPDescription: Scanne den Code mit einem Authentifizierungs-App (z.B Google Authentificator) oder kopiere das Secret und gib anschliessend den Code ein.
+  OTPDescription: Scanne den Code mit einem Authentifizierungs-App (z.B Google Authenticator) oder kopiere das Secret und gib anschliessend den Code ein.
   Secret: Secret
   Code: Code
 

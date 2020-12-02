@@ -5,17 +5,14 @@ import (
 	"encoding/json"
 	"time"
 
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-
-	"github.com/lib/pq"
-
-	org_model "github.com/caos/zitadel/internal/org/model"
-
 	"github.com/caos/logging"
+	"github.com/lib/pq"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/user/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )

@@ -11,12 +11,11 @@ import (
 	"github.com/gorilla/csrf"
 	"golang.org/x/text/language"
 
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/renderer"
 )
 

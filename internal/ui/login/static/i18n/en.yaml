@@ -72,7 +72,7 @@ MFAPrompt:
 MFAInitVerify:
   Title: Multifactor Verification
   Description: Verify your multifactor.
-  OTPDescription: Scan the code with your authenticator app (e.g Google-Authenticator) or copy the secret and insert the generated code below.
+  OTPDescription: Scan the code with your authenticator app (e.g Google Authenticator) or copy the secret and insert the generated code below.
   Secret: Secret
   Code: Code
 
