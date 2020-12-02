@@ -55,7 +55,7 @@ func EnsureZitadelOperatorArtifacts(
 
 	if err := client.ApplyClusterRoleBinding(&rbac.ClusterRoleBinding{
 		ObjectMeta: mach.ObjectMeta{
-			Name: "zitadel-clusterrolebinding",
+			Name: "zitadel-operator-clusterrolebinding",
 			Labels: map[string]string{
 				"app.kubernetes.io/instance":  "zitadel-operator",
 				"app.kubernetes.io/part-of":   "zitadel",
