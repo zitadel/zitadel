@@ -1,7 +1,7 @@
 @import '../core/core.scss';
 @import '../button/button_theme.scss';
 @import '../input/input_theme.scss';
-// @import '../font/fonts.scss';
+@import '../typography/typography.scss';
 @import './theming';
 
 @mixin zitadel-lgn-theme($theme-or-color-config) {

@@ -214,3 +214,17 @@
   
     @return rgba($color, if($opacity == null, opacity($color), $opacity));
   }
+
+/// Gets the typography configuration from the given theme or configuration.
+@function lgn-get-typography-config($theme-or-config, $default: null) {
+    // If a configuration has been passed, return the config directly.
+    @if not lgn-private-is-theme-object($theme-or-config) {
+      @return $theme-or-config;
+    }
+    // In case a theme has been passed, extract the configuration if present,
+    // or fall back to the default typography config.
+    @if (map-has-key($theme-or-config, typography)) {
+      @return map-get($theme-or-config, typography);
+    }
+    @return $default;
+}

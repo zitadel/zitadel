@@ -1,7 +1,6 @@
   
-  @mixin lgn-core() {
-    // @include lgn-typography($typography-config);
-    // @include mat-ripple();
+  @mixin lgn-core($typography-config: null) {
+    @include zitadel-lgn-typography($typography-config);
   }
   
   @mixin lgn-core-color($config-or-theme) {

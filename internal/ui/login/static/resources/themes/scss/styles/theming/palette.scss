@@ -221,7 +221,7 @@ $lgn-warn: (
   $lgn-dark-theme-background: (
     status-bar: black,
     app-bar:    map-get($lgn-grey, 900),
-    background: #303030,
+    background: #212224,
     hover:      rgba(white, 0.04), // TODO(kara): check style with Material Design UX
     card:       map-get($lgn-grey, 800),
     dialog:     map-get($lgn-grey, 800),

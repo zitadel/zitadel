@@ -86,8 +86,146 @@
   vertical-align: middle;
 }
 
+@font-face {
+  font-family: Aileron;
+  src: url(../../../fonts/ailerons/ailerons.otf) format("opentype");
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Thin.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 100;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-ThinItalic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 100;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Light.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 200;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-LightItalic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 200;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Regular.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Italic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 400;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Bold.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 700;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-BoldItalic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 700;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Black.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 800;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-BlackItalic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 800;
+}
+@font-face {
+  font-family: "Material Icons";
+  font-style: normal;
+  font-weight: 400;
+  src: url(../../../fonts/material/MaterialIcons-Regular.eot);
+  /* For IE6-8 */
+  src: local("Material Icons"), local("MaterialIcons-Regular"), url(../../../fonts/material/MaterialIcons-Regular.woff2) format("woff2"), url(../../../fonts/material/MaterialIcons-Regular.woff) format("woff"), url(../../../fonts/material/MaterialIcons-Regular.ttf) format("truetype");
+}
+h1, .lgn-headline, .lgn-typography h1 {
+  font: 400 24px/32px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: normal;
+  margin: 0 0 16px;
+}
+
+h2, .lgn-title, .lgn-typography h2 {
+  font: 500 20px/32px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: normal;
+  margin: 0 0 16px;
+}
+
+h3, .lgn-subheading-2, .lgn-typography h3 {
+  font: 400 16px/28px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: normal;
+  margin: 0 0 16px;
+}
+
+h4, .lgn-subheading-1, .lgn-typography h4 {
+  font: 400 15px/24px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: normal;
+  margin: 0 0 16px;
+}
+
+.lgn-body-strong, .lgn-body-2 {
+  font: 500 14px/24px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: normal;
+}
+
+p, .lgn-body, .lgn-body-1, .lgn-typography {
+  font: 400 14px/20px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: normal;
+}
+p p, .lgn-body p, .lgn-body-1 p, .lgn-typography p {
+  margin: 0 0 12px;
+}
+
+small .lgn-small, .lgn-caption {
+  font: 400 12px/20px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: normal;
+}
+
+.lgn-display-4, .lgn-typography .lgn-display-4 {
+  font: 300 112px/112px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: -0.05em;
+  margin: 0 0 56px;
+}
+
+.lgn-display-3, .lgn-typography .lgn-display-3 {
+  font: 400 56px/56px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: -0.02em;
+  margin: 0 0 64px;
+}
+
+.lgn-display-2, .lgn-typography .lgn-display-2 {
+  font: 400 45px/48px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: -0.005em;
+  margin: 0 0 64px;
+}
+
+.lgn-display-1, .lgn-typography .lgn-display-1 {
+  font: 400 34px/40px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: normal;
+  margin: 0 0 64px;
+}
+
 .lgn-app-background {
-  background-color: #303030;
+  background-color: #212224;
   color: white;
 }
 
@@ -228,7 +366,7 @@
 }
 
 .lgn-dark-theme .lgn-app-background, .lgn-dark-theme.lgn-app-background {
-  background-color: #303030;
+  background-color: #212224;
   color: white;
 }
 .lgn-theme-loaded-marker {
