@@ -1,13 +1,12 @@
-
 {{template "main-top" .}}
 
 <div class="head">
     {{if .Linking}}
-        <h1>{{t "Login.TitleLinking"}}</h1>
-        <p>{{t "Login.DescriptionLinking"}}</p>
+    <h1>{{t "Login.TitleLinking"}}</h1>
+    <p>{{t "Login.DescriptionLinking"}}</p>
     {{else}}
-        <h1>{{t "Login.Title"}}</h1>
-        <p>{{t "Login.Description"}}</p>
+    <h1>{{t "Login.Title"}}</h1>
+    <p>{{t "Login.Description"}}</p>
     {{end}}
 </div>
 
@@ -22,7 +21,9 @@
     <div class="fields">
         <div class="field">
             <label class="label" for="loginName">{{t "Login.Loginname"}}</label>
-            <input class="input" type="text" id="loginName" name="loginName" placeholder="{{t "Login.LoginnamePlaceHolder"}}" value="{{ .LoginName }}" autocomplete="username" autofocus required>
+            <input class="input" type="text" id="loginName" name="loginName"
+                placeholder="{{t "Login.LoginnamePlaceHolder"}}" value="{{ .LoginName }}" autocomplete="username"
+                autofocus required>
         </div>
     </div>
     {{end}}
@@ -30,24 +31,26 @@
     {{template "error-message" .}}
 
     <div class="actions">
-        <button class="primary" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
+        <button class="lgn-stroked-button lgn-primary" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
         {{if .LoginPolicy.AllowRegister}}
-            <button class="secondary" name="register" value="true" formnovalidate>{{t "Actions.Register"}}</button>
+        <button class="lgn-raised-button lgn-primary secondary" name="register" value="true"
+            formnovalidate>{{t "Actions.Register"}}</button>
         {{end}}
     </div>
 
     {{if hasExternalLogin }}
-        <div class="actions idp-providers">
-            <p>{{t "Login.ExternalLogin"}}</p>
+    <div class="actions idp-providers">
+        <p>{{t "Login.ExternalLogin"}}</p>
 
-            {{ $reqid := .AuthReqID}}
-            {{range $provider := .IDPProviders}}
-                <a href="{{ externalIDPAuthURL $reqid $provider.IDPConfigID}}" class="button secondary idp-provider {{idpProviderClass $provider.StylingType}}">
-                    <span class="logo"></span>
-                    <span class="provider-name">{{$provider.Name}}</span>
-                </a>
-            {{end}}
-        </div>
+        {{ $reqid := .AuthReqID}}
+        {{range $provider := .IDPProviders}}
+        <a href="{{ externalIDPAuthURL $reqid $provider.IDPConfigID}}"
+            class="button secondary idp-provider {{idpProviderClass $provider.StylingType}}">
+            <span class="logo"></span>
+            <span class="provider-name">{{$provider.Name}}</span>
+        </a>
+        {{end}}
+    </div>
     {{end}}
 </form>
 
@@ -56,4 +59,3 @@
 <script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
 
 {{template "main-bottom" .}}
- 

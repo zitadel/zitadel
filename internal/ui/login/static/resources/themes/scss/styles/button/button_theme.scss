@@ -1,4 +1,5 @@
 @import '../theming/theming.scss';
+@import './button.scss';
 
 @mixin lgn-button-theme($theme-or-color-config) {
     $theme: lgn-private-legacy-get-theme($theme-or-color-config);

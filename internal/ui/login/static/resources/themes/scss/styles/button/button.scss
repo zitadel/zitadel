@@ -1,0 +1,56 @@
+@import './button_base.scss';
+
+.lgn-button:focus {
+    opacity: 0;
+}
+
+.lgn-button,
+.lgn-stroked-button {
+  &:hover:not([disabled]):focus {
+    opacity: 0.04;
+  }
+}
+
+// Disable the hover styles on non-hover devices. Since this is more of a progressive
+// enhancement and not all desktop browsers support this kind of media query, we can't
+// use something like `@media (hover)`.
+@media (hover: none) {
+  .lgn-button,
+  .lgn-stroked-button {
+    &:hover:not([disabled]):focus {
+      opacity: 0;
+    }
+  }
+}
+
+// Should be placed after the `:hover` styles so the focused
+// styling coming in from `lgn-button-base` takes precedence.
+.lgn-button, .lgn-stroked-button {
+  @include lgn-button-base;
+}
+
+.lgn-raised-button {
+  @include lgn-raised-button;
+}
+
+.lgn-stroked-button {
+  border: $lgn-stroked-button-border-width solid currentColor;
+  padding: $lgn-stroked-button-padding;
+  line-height: $lgn-stroked-button-line-height;
+}
+
+.lgn-button:focus {
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.lgn-button:focus {
+  opacity: 0;
+  transition: $lgn-button-focus-transition;
+}
+
+.lgn-button, .lgn-stroked-button, .lgn-raised-button {
+  * {
+    vertical-align: middle;
+  }
+}
