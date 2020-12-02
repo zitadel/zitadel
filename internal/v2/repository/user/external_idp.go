@@ -21,6 +21,42 @@ const (
 	HumanExternalLoginCheckSucceededType = externalLoginEventPrefix + "check.succeeded"
 )
 
+type HumanExternalIDPReserved struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanExternalIDPReserved) CheckPrevious() bool {
+	return true
+}
+
+func (e *HumanExternalIDPReserved) Data() interface{} {
+	return nil
+}
+
+func NewHumanExternalIDPReservedEvent(base *eventstore.BaseEvent) *HumanExternalIDPReserved {
+	return &HumanExternalIDPReserved{
+		BaseEvent: *base,
+	}
+}
+
+type HumanExternalIDPReleased struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanExternalIDPReleased) CheckPrevious() bool {
+	return true
+}
+
+func (e *HumanExternalIDPReleased) Data() interface{} {
+	return nil
+}
+
+func NewHumanExternalIDPReleasedEvent(base *eventstore.BaseEvent) *HumanExternalIDPReleased {
+	return &HumanExternalIDPReleased{
+		BaseEvent: *base,
+	}
+}
+
 type HumanExternalIDPAdded struct {
 	eventstore.BaseEvent `json:"-"`
 
@@ -98,7 +134,7 @@ type HumanExternalIDPCascadeRemoved struct {
 }
 
 func (e *HumanExternalIDPCascadeRemoved) CheckPrevious() bool {
-	return true
+	return false
 }
 
 func (e *HumanExternalIDPCascadeRemoved) Data() interface{} {

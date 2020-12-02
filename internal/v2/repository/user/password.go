@@ -33,6 +33,17 @@ func (e *HumanPasswordChangedEvent) Data() interface{} {
 	return e
 }
 
+func NewHumanPasswordChangedEvent(
+	base *eventstore.BaseEvent,
+	secret *crypto.CryptoValue,
+	changeRequired bool) *HumanPasswordChangedEvent {
+	return &HumanPasswordChangedEvent{
+		BaseEvent:      *base,
+		Secret:         secret,
+		ChangeRequired: changeRequired,
+	}
+}
+
 func HumanPasswordChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	humanAdded := &HumanPasswordChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -61,6 +72,19 @@ func (e *HumanPasswordCodeAddedEvent) Data() interface{} {
 	return e
 }
 
+func NewHumanPasswordCodeAddedEvent(
+	base *eventstore.BaseEvent,
+	code *crypto.CryptoValue,
+	expiry time.Duration,
+	notificationType int32) *HumanPasswordCodeAddedEvent {
+	return &HumanPasswordCodeAddedEvent{
+		BaseEvent:        *base,
+		Code:             code,
+		Expiry:           expiry,
+		NotificationType: notificationType,
+	}
+}
+
 func HumanPasswordCodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	humanAdded := &HumanPasswordCodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -85,6 +109,12 @@ func (e *HumanPasswordCodeSentEvent) Data() interface{} {
 	return nil
 }
 
+func NewHumanPasswordCodeSentEvent(base *eventstore.BaseEvent) *HumanPasswordCodeSentEvent {
+	return &HumanPasswordCodeSentEvent{
+		BaseEvent: *base,
+	}
+}
+
 func HumanPasswordCodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &HumanPasswordCodeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -103,6 +133,12 @@ func (e *HumanPasswordCheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
+func NewHumanPasswordCheckSucceededEvent(base *eventstore.BaseEvent) *HumanPasswordCheckSucceededEvent {
+	return &HumanPasswordCheckSucceededEvent{
+		BaseEvent: *base,
+	}
+}
+
 func HumanPasswordCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &HumanPasswordCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -119,6 +155,12 @@ func (e *HumanPasswordCheckFailedEvent) CheckPrevious() bool {
 
 func (e *HumanPasswordCheckFailedEvent) Data() interface{} {
 	return nil
+}
+
+func NewHumanPasswordCheckFailedEvent(base *eventstore.BaseEvent) *HumanPasswordCheckFailedEvent {
+	return &HumanPasswordCheckFailedEvent{
+		BaseEvent: *base,
+	}
 }
 
 func HumanPasswordCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {

@@ -51,6 +51,41 @@ func (e *HumanAddedEvent) Data() interface{} {
 	return e
 }
 
+func NewHumanAddedEvent(
+	base *eventstore.BaseEvent,
+	userName,
+	firstName,
+	lastName,
+	nickName,
+	displayName string,
+	preferredLanguage language.Tag,
+	gender int32,
+	emailAddress,
+	phoneNumber,
+	country,
+	locality,
+	postalCode,
+	region,
+	streetAddress string) *HumanAddedEvent {
+	return &HumanAddedEvent{
+		BaseEvent:         *base,
+		UserName:          userName,
+		FirstName:         firstName,
+		LastName:          lastName,
+		NickName:          nickName,
+		DisplayName:       displayName,
+		PreferredLanguage: preferredLanguage,
+		Gender:            gender,
+		EmailAddress:      emailAddress,
+		PhoneNumber:       phoneNumber,
+		Country:           country,
+		Locality:          locality,
+		PostalCode:        postalCode,
+		Region:            region,
+		StreetAddress:     streetAddress,
+	}
+}
+
 func HumanAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	humanAdded := &HumanAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -94,6 +129,41 @@ func (e *HumanRegisteredEvent) Data() interface{} {
 	return e
 }
 
+func NewHumanRegisteredEvent(
+	base *eventstore.BaseEvent,
+	userName,
+	firstName,
+	lastName,
+	nickName,
+	displayName string,
+	preferredLanguage language.Tag,
+	gender int32,
+	emailAddress,
+	phoneNumber,
+	country,
+	locality,
+	postalCode,
+	region,
+	streetAddress string) *HumanRegisteredEvent {
+	return &HumanRegisteredEvent{
+		BaseEvent:         *base,
+		UserName:          userName,
+		FirstName:         firstName,
+		LastName:          lastName,
+		NickName:          nickName,
+		DisplayName:       displayName,
+		PreferredLanguage: preferredLanguage,
+		Gender:            gender,
+		EmailAddress:      emailAddress,
+		PhoneNumber:       phoneNumber,
+		Country:           country,
+		Locality:          locality,
+		PostalCode:        postalCode,
+		Region:            region,
+		StreetAddress:     streetAddress,
+	}
+}
+
 func HumanRegisteredEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	humanRegistered := &HumanRegisteredEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -120,6 +190,17 @@ func (e *HumanInitialCodeAddedEvent) Data() interface{} {
 	return e
 }
 
+func NewHumanInitialCodeAddedEvent(
+	base *eventstore.BaseEvent,
+	code *crypto.CryptoValue,
+	expiry time.Duration) *HumanInitialCodeAddedEvent {
+	return &HumanInitialCodeAddedEvent{
+		BaseEvent: *base,
+		Code:      code,
+		Expiry:    expiry,
+	}
+}
+
 func HumanInitialCodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	humanRegistered := &HumanInitialCodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -144,6 +225,12 @@ func (e *HumanInitialCodeSentEvent) Data() interface{} {
 	return nil
 }
 
+func NewHumanInitialCodeSentEvent(base *eventstore.BaseEvent) *HumanInitialCodeSentEvent {
+	return &HumanInitialCodeSentEvent{
+		BaseEvent: *base,
+	}
+}
+
 func HumanInitialCodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &HumanInitialCodeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -162,6 +249,12 @@ func (e *HumanInitializedCheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
+func NewHumanInitializedCheckSucceededEvent(base *eventstore.BaseEvent) *HumanInitializedCheckSucceededEvent {
+	return &HumanInitializedCheckSucceededEvent{
+		BaseEvent: *base,
+	}
+}
+
 func HumanInitializedCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &HumanInitializedCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -178,6 +271,12 @@ func (e *HumanInitializedCheckFailedEvent) CheckPrevious() bool {
 
 func (e *HumanInitializedCheckFailedEvent) Data() interface{} {
 	return nil
+}
+
+func NewHumanInitializedCheckFailedEvent(base *eventstore.BaseEvent) *HumanInitializedCheckFailedEvent {
+	return &HumanInitializedCheckFailedEvent{
+		BaseEvent: *base,
+	}
 }
 
 func HumanInitializedCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
