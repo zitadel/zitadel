@@ -1,0 +1,30 @@
+@import './input_base.scss';
+
+// input, .lgn-input {
+//     &:focus {
+//         opacity: 0;
+//     }
+// }
+
+// input, .lgn-input {
+//   &:hover:not([disabled]):focus {
+//     opacity: 0.04;
+//   }
+// }
+
+// Disable the hover styles on non-hover devices. Since this is more of a progressive
+// enhancement and not all desktop browsers support this kind of media query, we can't
+// use something like `@media (hover)`.
+@media (hover: none) {
+  input, .lgn-input {
+    &:hover:not([disabled]):focus {
+      opacity: 0;
+    }
+  }
+}
+
+// Should be placed after the `:hover` styles so the focused
+// styling coming in from `lgn-input-base` takes precedence.
+input, .lgn-input {
+  @include lgn-input-base;
+}

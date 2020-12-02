@@ -3,11 +3,15 @@ $dark-secondary-text: rgba(black, 0.54);
 $dark-disabled-text: rgba(black, 0.38);
 $dark-dividers: rgba(black, 0.12);
 $dark-focused: rgba(black, 0.12);
+$dark-input-border: rgba(black, 0.12);
+
 $light-primary-text: white;
 $light-secondary-text: rgba(white, 0.7);
 $light-disabled-text: rgba(white, 0.5);
 $light-dividers: rgba(white, 0.12);
 $light-focused: rgba(white, 0.12);
+$light-input-border: rgba(white, 0.12);
+
 
 $lgn-dark-brand: (
     50: #fff,
@@ -151,19 +155,6 @@ $lgn-warn: (
     )
 );
 
-// $light-primary: lgn-palette($lgn-light-brand);
-// $light-accent: lgn-palette($lgn-accent-color);
-// $light-warn: lgn-palette($lgn-red);
-  
-// $dark-primary: lgn-palette($lgn-dark-brand);
-// $dark-accent: lgn-palette($lgn-accent-color);
-// $dark-warn: lgn-palette($lgn-red);
-  
-//   $light-theme: lgn-light-theme($light-primary, $light-accent, $light-warn);
-  
-//   $dark-theme: lgn-dark-theme($dark-primary, $dark-accent, $dark-warn);
-  
-  // general text and divider colors
   
   $lgn-grey: (
     50: #fafafa,
@@ -198,7 +189,6 @@ $lgn-warn: (
     )
 );
 
-  // Background palette for light themes.
   $lgn-light-theme-background: (
     status-bar: map-get($lgn-grey, 300),
     app-bar:    map-get($lgn-grey, 100),
@@ -215,9 +205,9 @@ $lgn-warn: (
     unselected-chip: map-get($lgn-grey, 300),
     disabled-list-option: map-get($lgn-grey, 200),
     tooltip: map-get($lgn-grey, 700),
+    input-background: #fafafa50,
   );
   
-  // Background palette for dark themes.
   $lgn-dark-theme-background: (
     status-bar: black,
     app-bar:    map-get($lgn-grey, 900),
@@ -234,11 +224,12 @@ $lgn-warn: (
     unselected-chip: map-get($lgn-grey, 700),
     disabled-list-option: black,
     tooltip: map-get($lgn-grey, 700),
+    input-background: #00000020,
   );
-  
-  // Foreground palette for light themes.
+
   $lgn-light-theme-foreground: (
     base:              black,
+    input-border:      $light-input-border,
     divider:           $dark-dividers,
     dividers:          $dark-dividers,
     disabled:          $dark-disabled-text,
@@ -257,6 +248,7 @@ $lgn-warn: (
   
   $lgn-dark-theme-foreground: (
     base:              white,
+    input-border:      $dark-input-border,
     divider:           $light-dividers,
     dividers:          $light-dividers,
     disabled:          $light-disabled-text,

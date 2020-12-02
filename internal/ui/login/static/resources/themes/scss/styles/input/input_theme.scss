@@ -1,16 +1,53 @@
 @import '../theming/theming.scss';
+@import './input.scss';
 
 @mixin lgn-input-theme($theme-or-color-config) {
     $theme: lgn-private-legacy-get-theme($theme-or-color-config);
     // @include lgn-private-check-duplicate-theme-styles($theme, 'mat-button') {
       $color: lgn-get-color-config($theme);
-      $density: lgn-get-density-config($theme);
 
       @if $color != null {
-        @include lgn-button-color($color);
+        @include lgn-input-color($color);
       }
-    //   @if $density != null {
-    //     @include _lgn-button-density($density);
-    //   }
     // }
 }
+
+@mixin lgn-input-color($config-or-theme) {
+    $config: lgn-get-color-config($config-or-theme);
+    $primary: map-get($config, primary);
+    $accent: map-get($config, accent);
+    $warn: map-get($config, warn);
+    $background: map-get($config, background);
+    $foreground: map-get($config, foreground);
+  
+    // input, .lgn-input {
+    //     &:focus {
+    //         background: map-get($foreground, base);
+    //     }
+    // }
+
+    // .lgn-button:focus, .lgn-stroked-button:focus {
+    //     border-color: map-get($foreground, base);
+    // }
+  
+    input:not([disabled]), .lgn-input:not([disabled]) {
+      border-color: lgn-color($foreground, input-border);
+    }
+  
+    input, .lgn-input {
+      color: lgn-color($foreground, text);
+      background-color: lgn-color($background, input-background);
+      border-color: lgn-color($foreground, input-border);
+    //   @include _lgn-input-theme-property($config, 'color');
+    //   @include _lgn-input-theme-property($config, 'background-color');
+    //   @include _lgn-input-theme-property($config, 'color');
+    }
+  }
+  
+//   @mixin _lgn-input-theme-property($theme, $property) {
+//     $background: map-get($theme, background);
+  
+//     &[disabled] {
+//         #{$property}: lgn-color($background, input-background);
+//     }
+//   }

@@ -12,19 +12,6 @@ $lgn-stroked-button-line-height: $lgn-button-line-height - 2;
 $lgn-stroked-button-padding: 0 15px;
 $lgn-stroked-button-border-width: 1px;
 
-// Icon Button standards
-$lgn-icon-button-size: 40px !default;
-$lgn-icon-button-border-radius: 50% !default;
-$lgn-icon-button-line-height: 24px !default;
-
-// Fab standards
-$lgn-fab-border-radius: 50% !default;
-$lgn-fab-size: 56px !default;
-$lgn-fab-padding: 16px !default;
-
-$lgn-mini-fab-size: 40px !default;
-$lgn-mini-fab-padding: 8px !default;
-
 // Applies base styles to all button types.
 @mixin lgn-button-base {
   box-sizing: border-box;
@@ -50,7 +37,7 @@ $lgn-mini-fab-padding: 8px !default;
 
   overflow: visible;
 
-  &.lgn-button-disabled {
+  &[disabled] {
     cursor: default;
   }
 

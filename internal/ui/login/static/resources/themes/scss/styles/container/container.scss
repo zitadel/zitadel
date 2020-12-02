@@ -1,0 +1,10 @@
+$container-max-width: 350px;
+$container-padding: 20px;
+
+.content-container {
+    display: block;
+    margin: 0 auto;
+    max-width: $container-max-width;
+    padding: $container-padding;
+    width: 100%;
+}
