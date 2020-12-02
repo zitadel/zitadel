@@ -37,7 +37,7 @@ Go check it out under [zitadel.ch](https://zitadel.ch)
 ### Run your own IAM
 
 Stay tuned, we will soon publish a guide how you can deploy a **hyperconverged** system with our automation tooling called [**ORBOS**](https://github.com/caos/orbos/).
-With [**ORBOS**](https://github.com/caos/orbos/) you will be able to run [**Kubernetes**](https://kubernetes.io/) with Google on **[GCEProvider](https://cloud.google.com/compute)**, on **[StaticProvider](https://github.com/caos/orbos/blob/master/docs/orbiter/static.md)** for in-house scenarios or on the purely Swiss **[CloudscaleProvider](https://www.cloudscale.ch/)** within 20 minutes. To achieve this, [**ORBOS**](https://github.com/caos/orbos/) will bootstrap and maintain a [**Kubernetes**](https://kubernetes.io/) cluster, essential platform components (logging, metrics, ingress, ...), a secure [**CockroachDB**](https://www.cockroachlabs.com/) cluster and **ZITADEL** itself.
+With [**ORBOS**](https://github.com/caos/orbos/) you will be able to run [**Kubernetes**](https://kubernetes.io/) with Google on **[GCEProvider](https://cloud.google.com/compute)**, on **[StaticProvider](https://github.com/caos/orbos/blob/master/docs/orbiter/static.md)** for in-house scenarios or on the Swiss based **[CloudscaleProvider](https://www.cloudscale.ch/)** within 20 minutes. To achieve this, [**ORBOS**](https://github.com/caos/orbos/) will bootstrap and maintain a [**Kubernetes**](https://kubernetes.io/) cluster, essential platform components (logging, metrics, ingress, ...), a secure [**CockroachDB**](https://www.cockroachlabs.com/) cluster and **ZITADEL** itself.
 
 The combination of the tools [**ORBOS**](https://github.com/caos/orbos/) and **ZITADEL** is what makes the operation easy and scalable.
 
