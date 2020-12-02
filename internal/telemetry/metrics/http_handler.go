@@ -94,8 +94,8 @@ func (h *Handler) containsMetricsMethod(method MetricType) bool {
 
 func RegisterRequestCounter(r *http.Request) {
 	var labels = map[string]interface{}{
-		URI:    r.RequestURI,
-		Method: strings.Split(r.Method, "?")[0],
+		URI:    strings.Split(r.RequestURI, "?")[0],
+		Method: r.Method,
 	}
 	RegisterCounter(RequestCounter, RequestCountDescription)
 	AddCount(r.Context(), RequestCounter, 1, labels)
@@ -108,8 +108,8 @@ func RegisterTotalRequestCounter(r *http.Request) {
 
 func RegisterRequestCodeCounter(recorder *StatusRecorder, r *http.Request) {
 	var labels = map[string]interface{}{
-		URI:        r.RequestURI,
-		Method:     strings.Split(r.Method, "?")[0],
+		URI:        strings.Split(r.RequestURI, "?")[0],
+		Method:     r.Method,
 		ReturnCode: recorder.Status,
 	}
 	RegisterCounter(ReturnCodeCounter, ReturnCodeCounterDescription)

@@ -2,14 +2,14 @@ package middleware
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/telemetry/metrics"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"strings"
 
-	"github.com/caos/zitadel/internal/api/grpc/errors"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
 
 	_ "github.com/caos/zitadel/internal/statik"
+	"github.com/caos/zitadel/internal/telemetry/metrics"
 )
 
 const (
@@ -67,7 +67,7 @@ func RegisterGrpcTotalRequestCounter(ctx context.Context) {
 }
 
 func RegisterGrpcRequestCodeCounter(ctx context.Context, info *grpc.UnaryServerInfo, err error) {
-	statusCode, _, _, _ := errors.ExtractCaosError(err)
+	statusCode := status.Code(err)
 	var labels = map[string]interface{}{
 		GrpcMethod: info.FullMethod,
 		ReturnCode: runtime.HTTPStatusFromCode(statusCode),
