@@ -358,11 +358,11 @@ func genderToModel(gender auth.Gender) usr_model.Gender {
 	}
 }
 
-func mfaStateFromModel(state usr_model.MfaState) auth.MFAState {
+func mfaStateFromModel(state usr_model.MFAState) auth.MFAState {
 	switch state {
-	case usr_model.MfaStateReady:
+	case usr_model.MFAStateReady:
 		return auth.MFAState_MFASTATE_READY
-	case usr_model.MfaStateNotReady:
+	case usr_model.MFAStateNotReady:
 		return auth.MFAState_MFASTATE_NOT_READY
 	default:
 		return auth.MFAState_MFASTATE_UNSPECIFIED
@@ -379,17 +379,18 @@ func mfasFromModel(mfas []*usr_model.MultiFactor) []*auth.MultiFactor {
 
 func mfaFromModel(mfa *usr_model.MultiFactor) *auth.MultiFactor {
 	return &auth.MultiFactor{
-		State: mfaStateFromModel(mfa.State),
-		Type:  mfaTypeFromModel(mfa.Type),
+		State:     mfaStateFromModel(mfa.State),
+		Type:      mfaTypeFromModel(mfa.Type),
+		Attribute: mfa.Attribute,
 	}
 }
 
-func mfaTypeFromModel(mfatype usr_model.MfaType) auth.MfaType {
-	switch mfatype {
-	case usr_model.MfaTypeOTP:
+func mfaTypeFromModel(mfaType usr_model.MFAType) auth.MfaType {
+	switch mfaType {
+	case usr_model.MFATypeOTP:
 		return auth.MfaType_MFATYPE_OTP
-	case usr_model.MfaTypeSMS:
-		return auth.MfaType_MFATYPE_SMS
+	case usr_model.MFATypeU2F:
+		return auth.MfaType_MFATYPE_U2F
 	default:
 		return auth.MfaType_MFATYPE_UNSPECIFIED
 	}
@@ -425,4 +426,12 @@ func userChangesToAPI(changes *usr_model.UserChanges) (_ []*auth.Change) {
 	}
 
 	return result
+}
+
+func verifyWebAuthNFromModel(u2f *usr_model.WebAuthNToken) *auth.WebAuthNResponse {
+	return &auth.WebAuthNResponse{
+		Id:        u2f.WebAuthNTokenID,
+		PublicKey: u2f.PublicKey,
+		State:     mfaStateFromModel(u2f.State),
+	}
 }

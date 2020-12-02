@@ -142,15 +142,15 @@ func IsUserUnique(db *gorm.DB, table, userName, email string) (bool, error) {
 	return user.UserName == "", nil
 }
 
-func UserMfas(db *gorm.DB, table, userID string) ([]*usr_model.MultiFactor, error) {
+func UserMFAs(db *gorm.DB, table, userID string) ([]*usr_model.MultiFactor, error) {
 	user, err := UserByID(db, table, userID)
 	if err != nil {
 		return nil, err
 	}
-	if user.OTPState == int32(usr_model.MfaStateUnspecified) {
+	if user.OTPState == int32(usr_model.MFAStateUnspecified) {
 		return []*usr_model.MultiFactor{}, nil
 	}
-	return []*usr_model.MultiFactor{{Type: usr_model.MfaTypeOTP, State: usr_model.MfaState(user.OTPState)}}, nil
+	return []*usr_model.MultiFactor{{Type: usr_model.MFATypeOTP, State: usr_model.MFAState(user.OTPState)}}, nil
 }
 
 func PutUsers(db *gorm.DB, table string, users ...*model.UserView) error {

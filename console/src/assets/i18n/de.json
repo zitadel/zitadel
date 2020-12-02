@@ -164,8 +164,8 @@
             "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator App und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
             "TYPE": {
                 "0":"Keine MFA definiert",
-                "1":"SMS",
-                "2":"OTP"
+                "1":"OTP",
+                "2":"U2F"
             },
             "STATE": {
                 "0": "Kein Status",

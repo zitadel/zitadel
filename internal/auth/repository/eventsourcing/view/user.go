@@ -48,8 +48,8 @@ func (v *View) IsUserUnique(userName, email string) (bool, error) {
 	return view.IsUserUnique(v.Db, userTable, userName, email)
 }
 
-func (v *View) UserMfas(userID string) ([]*usr_model.MultiFactor, error) {
-	return view.UserMfas(v.Db, userTable, userID)
+func (v *View) UserMFAs(userID string) ([]*usr_model.MultiFactor, error) {
+	return view.UserMFAs(v.Db, userTable, userID)
 }
 
 func (v *View) PutUser(user *model.UserView, sequence uint64, eventTimestamp time.Time) error {

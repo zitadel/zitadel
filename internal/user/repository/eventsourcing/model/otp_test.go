@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/user/model"
 )
 
-func TestAppendMfaOTPAddedEvent(t *testing.T) {
+func TestAppendMFAOTPAddedEvent(t *testing.T) {
 	type args struct {
 		user  *Human
 		otp   *OTP
@@ -27,7 +27,7 @@ func TestAppendMfaOTPAddedEvent(t *testing.T) {
 				otp:   &OTP{Secret: &crypto.CryptoValue{KeyID: "KeyID"}},
 				event: &es_models.Event{},
 			},
-			result: &Human{OTP: &OTP{Secret: &crypto.CryptoValue{KeyID: "KeyID"}, State: int32(model.MfaStateNotReady)}},
+			result: &Human{OTP: &OTP{Secret: &crypto.CryptoValue{KeyID: "KeyID"}, State: int32(model.MFAStateNotReady)}},
 		},
 	}
 	for _, tt := range tests {
@@ -44,7 +44,7 @@ func TestAppendMfaOTPAddedEvent(t *testing.T) {
 	}
 }
 
-func TestAppendMfaOTPVerifyEvent(t *testing.T) {
+func TestAppendMFAOTPVerifyEvent(t *testing.T) {
 	type args struct {
 		user  *Human
 		otp   *OTP
@@ -62,7 +62,7 @@ func TestAppendMfaOTPVerifyEvent(t *testing.T) {
 				otp:   &OTP{Secret: &crypto.CryptoValue{KeyID: "KeyID"}},
 				event: &es_models.Event{},
 			},
-			result: &Human{OTP: &OTP{Secret: &crypto.CryptoValue{KeyID: "KeyID"}, State: int32(model.MfaStateReady)}},
+			result: &Human{OTP: &OTP{Secret: &crypto.CryptoValue{KeyID: "KeyID"}, State: int32(model.MFAStateReady)}},
 		},
 	}
 	for _, tt := range tests {
@@ -79,7 +79,7 @@ func TestAppendMfaOTPVerifyEvent(t *testing.T) {
 	}
 }
 
-func TestAppendMfaOTPRemoveEvent(t *testing.T) {
+func TestAppendMFAOTPRemoveEvent(t *testing.T) {
 	type args struct {
 		user  *Human
 		otp   *OTP

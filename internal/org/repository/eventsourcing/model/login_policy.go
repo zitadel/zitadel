@@ -55,7 +55,7 @@ func (o *Org) appendAddSecondFactorToLoginPolicyEvent(event *es_models.Event) er
 	if err != nil {
 		return err
 	}
-	o.LoginPolicy.SecondFactors = append(o.LoginPolicy.SecondFactors, mfa.MfaType)
+	o.LoginPolicy.SecondFactors = append(o.LoginPolicy.SecondFactors, mfa.MFAType)
 	return nil
 }
 
@@ -65,7 +65,7 @@ func (o *Org) appendRemoveSecondFactorFromLoginPolicyEvent(event *es_models.Even
 	if err != nil {
 		return err
 	}
-	if i, m := iam_es_model.GetMFA(o.LoginPolicy.SecondFactors, mfa.MfaType); m != 0 {
+	if i, m := iam_es_model.GetMFA(o.LoginPolicy.SecondFactors, mfa.MFAType); m != 0 {
 		o.LoginPolicy.SecondFactors[i] = o.LoginPolicy.SecondFactors[len(o.LoginPolicy.SecondFactors)-1]
 		o.LoginPolicy.SecondFactors[len(o.LoginPolicy.SecondFactors)-1] = 0
 		o.LoginPolicy.SecondFactors = o.LoginPolicy.SecondFactors[:len(o.LoginPolicy.SecondFactors)-1]
@@ -80,7 +80,7 @@ func (o *Org) appendAddMultiFactorToLoginPolicyEvent(event *es_models.Event) err
 	if err != nil {
 		return err
 	}
-	o.LoginPolicy.MultiFactors = append(o.LoginPolicy.MultiFactors, mfa.MfaType)
+	o.LoginPolicy.MultiFactors = append(o.LoginPolicy.MultiFactors, mfa.MFAType)
 	return nil
 }
 
@@ -90,7 +90,7 @@ func (o *Org) appendRemoveMultiFactorFromLoginPolicyEvent(event *es_models.Event
 	if err != nil {
 		return err
 	}
-	if i, m := iam_es_model.GetMFA(o.LoginPolicy.MultiFactors, mfa.MfaType); m != 0 {
+	if i, m := iam_es_model.GetMFA(o.LoginPolicy.MultiFactors, mfa.MFAType); m != 0 {
 		o.LoginPolicy.MultiFactors[i] = o.LoginPolicy.MultiFactors[len(o.LoginPolicy.MultiFactors)-1]
 		o.LoginPolicy.MultiFactors[len(o.LoginPolicy.MultiFactors)-1] = 0
 		o.LoginPolicy.MultiFactors = o.LoginPolicy.MultiFactors[:len(o.LoginPolicy.MultiFactors)-1]

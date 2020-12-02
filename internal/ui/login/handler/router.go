@@ -13,6 +13,7 @@ const (
 	EndpointLogin                    = "/login"
 	EndpointExternalLogin            = "/login/externalidp"
 	EndpointExternalLoginCallback    = "/login/externalidp/callback"
+	EndpointPasswordlessLogin        = "/login/passwordless"
 	EndpointLoginName                = "/loginname"
 	EndpointUserSelection            = "/userselection"
 	EndpointChangeUsername           = "/username/change"
@@ -21,9 +22,11 @@ const (
 	EndpointChangePassword           = "/password/change"
 	EndpointPasswordReset            = "/password/reset"
 	EndpointInitUser                 = "/user/init"
-	EndpointMfaVerify                = "/mfa/verify"
-	EndpointMfaPrompt                = "/mfa/prompt"
-	EndpointMfaInitVerify            = "/mfa/init/verify"
+	EndpointMFAVerify                = "/mfa/verify"
+	EndpointMFAPrompt                = "/mfa/prompt"
+	EndpointMFAInitVerify            = "/mfa/init/verify"
+	EndpointMFAInitU2FVerify         = "/mfa/init/u2f/verify"
+	EndpointU2FVerification          = "/mfa/u2f/verify"
 	EndpointMailVerification         = "/mail/verification"
 	EndpointMailVerified             = "/mail/verified"
 	EndpointRegisterOption           = "/register/option"
@@ -46,6 +49,7 @@ func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.M
 	router.HandleFunc(EndpointLogin, login.handleLogin).Methods(http.MethodGet, http.MethodPost)
 	router.HandleFunc(EndpointExternalLogin, login.handleExternalLogin).Methods(http.MethodGet)
 	router.HandleFunc(EndpointExternalLoginCallback, login.handleExternalLoginCallback).Methods(http.MethodGet)
+	router.HandleFunc(EndpointPasswordlessLogin, login.handlePasswordlessVerification).Methods(http.MethodPost)
 	router.HandleFunc(EndpointLoginName, login.handleLoginName).Methods(http.MethodGet)
 	router.HandleFunc(EndpointLoginName, login.handleLoginNameCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointUserSelection, login.handleSelectUser).Methods(http.MethodPost)
@@ -56,10 +60,12 @@ func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.M
 	router.HandleFunc(EndpointPasswordReset, login.handlePasswordReset).Methods(http.MethodGet)
 	router.HandleFunc(EndpointInitUser, login.handleInitUser).Methods(http.MethodGet)
 	router.HandleFunc(EndpointInitUser, login.handleInitUserCheck).Methods(http.MethodPost)
-	router.HandleFunc(EndpointMfaVerify, login.handleMfaVerify).Methods(http.MethodPost)
-	router.HandleFunc(EndpointMfaPrompt, login.handleMfaPromptSelection).Methods(http.MethodGet)
-	router.HandleFunc(EndpointMfaPrompt, login.handleMfaPrompt).Methods(http.MethodPost)
-	router.HandleFunc(EndpointMfaInitVerify, login.handleMfaInitVerify).Methods(http.MethodPost)
+	router.HandleFunc(EndpointMFAVerify, login.handleMFAVerify).Methods(http.MethodPost)
+	router.HandleFunc(EndpointMFAPrompt, login.handleMFAPromptSelection).Methods(http.MethodGet)
+	router.HandleFunc(EndpointMFAPrompt, login.handleMFAPrompt).Methods(http.MethodPost)
+	router.HandleFunc(EndpointMFAInitVerify, login.handleMFAInitVerify).Methods(http.MethodPost)
+	router.HandleFunc(EndpointMFAInitU2FVerify, login.handleRegisterU2F).Methods(http.MethodPost)
+	router.HandleFunc(EndpointU2FVerification, login.handleU2FVerification).Methods(http.MethodPost)
 	router.HandleFunc(EndpointMailVerification, login.handleMailVerification).Methods(http.MethodGet)
 	router.HandleFunc(EndpointMailVerification, login.handleMailVerificationCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointChangePassword, login.handleChangePassword).Methods(http.MethodPost)

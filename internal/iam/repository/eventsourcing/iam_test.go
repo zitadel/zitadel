@@ -1497,7 +1497,7 @@ func TestLoginPolicySecondFactorAddedAggregate(t *testing.T) {
 						AllowUsernamePassword: true,
 					}},
 				newMFA: &model.MFA{
-					MfaType: int32(iam_model.SecondFactorTypeOTP),
+					MFAType: int32(iam_model.SecondFactorTypeOTP),
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1587,7 +1587,7 @@ func TestLoginPolicySecondFactorRemovedAggregate(t *testing.T) {
 						},
 					}},
 				mfa: &model.MFA{
-					MfaType: int32(iam_model.SecondFactorTypeOTP),
+					MFAType: int32(iam_model.SecondFactorTypeOTP),
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1674,7 +1674,7 @@ func TestLoginPolicyMultiFactorAddedAggregate(t *testing.T) {
 						AllowUsernamePassword: true,
 					}},
 				newMFA: &model.MFA{
-					MfaType: int32(iam_model.MultiFactorTypeU2FWithPIN),
+					MFAType: int32(iam_model.MultiFactorTypeU2FWithPIN),
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1764,7 +1764,7 @@ func TestLoginPolicyMultiFactorRemovedAggregate(t *testing.T) {
 						},
 					}},
 				mfa: &model.MFA{
-					MfaType: int32(iam_model.SecondFactorTypeOTP),
+					MFAType: int32(iam_model.SecondFactorTypeOTP),
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
