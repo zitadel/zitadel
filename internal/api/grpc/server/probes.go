@@ -9,7 +9,7 @@ import (
 
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/proto"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 type ValidationFunction func(ctx context.Context) error

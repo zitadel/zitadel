@@ -110,6 +110,14 @@ func (c *Client) IsScopeAllowed(scope string) bool {
 	return false
 }
 
+func (c *Client) ClockSkew() time.Duration {
+	return c.ApplicationView.ClockSkew
+}
+
+func (c *Client) IDTokenUserinfoClaimsAssertion() bool {
+	return c.ApplicationView.IDTokenUserinfoAssertion
+}
+
 func accessTokenTypeToOIDC(tokenType model.OIDCTokenType) op.AccessTokenType {
 	switch tokenType {
 	case model.OIDCTokenTypeBearer:

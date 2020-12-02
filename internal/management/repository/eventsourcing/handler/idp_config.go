@@ -66,17 +66,21 @@ func (m *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 		if err != nil {
 			return err
 		}
-		return m.view.DeleteIDPConfig(idp.IDPConfigID, event.Sequence)
+		return m.view.DeleteIDPConfig(idp.IDPConfigID, event.Sequence, event.CreationDate)
 	default:
-		return m.view.ProcessedIDPConfigSequence(event.Sequence)
+		return m.view.ProcessedIDPConfigSequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutIDPConfig(idp, idp.Sequence)
+	return m.view.PutIDPConfig(idp, idp.Sequence, event.CreationDate)
 }
 
-func (m *IDPConfig) OnError(event *models.Event, err error) error {
+func (i *IDPConfig) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Nxu8s", "id", event.AggregateID).WithError(err).Warn("something went wrong in idp config handler")
-	return spooler.HandleError(event, err, m.view.GetLatestIDPConfigFailedEvent, m.view.ProcessedIDPConfigFailedEvent, m.view.ProcessedIDPConfigSequence, m.errorCountUntilSkip)
+	return spooler.HandleError(event, err, i.view.GetLatestIDPConfigFailedEvent, i.view.ProcessedIDPConfigFailedEvent, i.view.ProcessedIDPConfigSequence, i.errorCountUntilSkip)
+}
+
+func (i *IDPConfig) OnSuccess() error {
+	return spooler.HandleSuccess(i.view.UpdateIDPConfigSpoolerRunTimestamp)
 }

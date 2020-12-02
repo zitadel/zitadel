@@ -36,7 +36,9 @@
     },
     "MENU": {
         "PERSONAL_INFO": "Persönliche Informationen",
-        "IAM":"Administration",
+        "DOCUMENTATION":"Dokumentation",
+        "IAMPOLICIES":"IAM",
+        "IAMEVENTSTORE":"Speicher",
         "ORGANIZATION": "Organisation",
         "ADMINSECTION":"ZITADEL Administration",
         "ORGSECTION":"Organisation",
@@ -54,7 +56,8 @@
         "GRANTS":"Berechtigungen",
         "TOOLTIP": {
             "PERSONAL":"Verwalte deinen persönlichen Account, deine IDPs, Login Methoden, Faktoren und Berechtigungen",
-            "IAM":"Verwalte ZITADELs globale Zugangsrichtlinien, bereinige views und fehlerhafte events",
+            "IAMPOLICIES":"Verwalte ZITADELs globale Zugangsrichtlinien und verwalte ZITADEL Manager",
+            "IAMEVENTSTORE":"Bereinige views und fehlerhafte Events",
             "ORG":"Verwalte die Zugangsrichtlinien und Domains deiner Organisation ",
             "SELFPROJECTS":"Verwalte die Projekte deiner Organisation",
             "GRANTEDPROJECTS":"Verwalte die berechtigten Projekte von anderen Organisationen",
@@ -92,6 +95,7 @@
         "SEND":"Senden",
         "NEWVALUE":"Neuer Wert"
     },
+    "RESOURCEID":"Ressourcen-ID",
     "TABLE": {
         "NOROWS":"Keine Daten"
     },
@@ -370,9 +374,13 @@
         }
     },
     "IAM": {
-        "DETAIL": {
-            "TITLE":"Administration Identity- und Access-Management Administration",
-            "DESCRIPTION":"Verwalte die Einstellungen von ZITADEL."
+        "POLICIES": {
+            "TITLE":"IAM Administration",
+            "DESCRIPTION":"Verwalte Richtlinen und Zugangseinstellungen von ZITADEL."
+        },
+        "EVENTSTORE": {
+            "TITLE":"IAM Speicher Administration",
+            "DESCRIPTION":"Verwalte Speicher Einstellungen von ZITADEL."
         },
         "MEMBER": {
             "TITLE":"Manager",
@@ -384,7 +392,8 @@
             "VIEWNAME":"Name",
             "DATABASE":"Datenbank",
             "SEQUENCE":"Sequenz",
-            "TIMESTAMP":"Zeitstempel",
+            "EVENTTIMESTAMP":"Event Zeitstempel",
+            "LASTSPOOL": "Erfolgreicher Durchlauf",
             "ACTIONS":"Aktionen",
             "CLEAR":"Aufräumen",
             "CLEARED":"View wurde erfolgreich zurückgesetzt!",

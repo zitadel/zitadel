@@ -4,6 +4,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 import "validate/validate.proto";
 import "authoption/options.proto";
@@ -69,7 +70,7 @@ service ManagementService {
     };
   }
 
-rpc GetUserByID(UserID) returns (UserView) {
+  rpc GetUserByID(UserID) returns (UserView) {
     option (google.api.http) = {
       get: "/users/{id}"
     };
@@ -1198,93 +1199,93 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-        permission: "user.grant.delete"
+      permission: "user.grant.delete"
     };
   }
 
   rpc IdpByID(IdpID) returns (IdpView) {
     option (google.api.http) = {
-        get: "/orgs/me/idps/{id}"
+      get: "/orgs/me/idps/{id}"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-        permission: "org.idp.read"
+      permission: "org.idp.read"
     };
   }
 
   rpc CreateOidcIdp(OidcIdpConfigCreate) returns (Idp) {
     option (google.api.http) = {
-        post: "/orgs/me/idps/oidc"
-        body: "*"
+      post: "/orgs/me/idps/oidc"
+      body: "*"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-        permission: "org.idp.write"
+      permission: "org.idp.write"
     };
   }
 
   rpc UpdateIdpConfig(IdpUpdate) returns (Idp) {
     option (google.api.http) = {
-        put: "/orgs/me/idps/{id}"
-        body: "*"
+      put: "/orgs/me/idps/{id}"
+      body: "*"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-        permission: "org.idp.write"
+      permission: "org.idp.write"
     };
   }
 
   rpc DeactivateIdpConfig(IdpID) returns (Idp) {
     option (google.api.http) = {
-        put: "/orgs/me/idps/{id}/_deactivate"
-        body: "*"
+      put: "/orgs/me/idps/{id}/_deactivate"
+      body: "*"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-        permission: "org.idp.write"
+      permission: "org.idp.write"
     };
   }
 
   rpc ReactivateIdpConfig(IdpID) returns (Idp) {
     option (google.api.http) = {
-        put: "/orgs/me/idps/{id}/_reactivate"
-        body: "*"
+      put: "/orgs/me/idps/{id}/_reactivate"
+      body: "*"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-        permission: "org.idp.write"
+      permission: "org.idp.write"
     };
   }
 
   rpc RemoveIdpConfig(IdpID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-        delete: "/orgs/me/idps/{id}"
+      delete: "/orgs/me/idps/{id}"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-        permission: "org.idp.write"
+      permission: "org.idp.write"
     };
   }
 
   rpc UpdateOidcIdpConfig(OidcIdpConfigUpdate) returns (OidcIdpConfig) {
     option (google.api.http) = {
-        put: "/orgs/me/idps/{idp_id}/oidcconfig"
-        body: "*"
+      put: "/orgs/me/idps/{idp_id}/oidcconfig"
+      body: "*"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-        permission: "org.idp.write"
+      permission: "org.idp.write"
     };
   }
 
   rpc SearchIdps(IdpSearchRequest) returns (IdpSearchResponse) {
     option (google.api.http) = {
-        post: "/orgs/me/idps/_search"
-        body: "*"
+      post: "/orgs/me/idps/_search"
+      body: "*"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-        permission: "org.idp.read"
+      permission: "org.idp.read"
     };
   }
 
@@ -1374,64 +1375,64 @@ rpc GetUserByID(UserID) returns (UserView) {
 
   rpc GetLoginPolicySecondFactors(google.protobuf.Empty) returns (SecondFactorsResult) {
     option (google.api.http) = {
-            get: "/orgs/me/policies/login/secondfactors/_search"
-        };
+      get: "/orgs/me/policies/login/secondfactors/_search"
+    };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "iam.policy.read"
-        };
+      permission: "iam.policy.read"
+    };
   }
 
   rpc AddSecondFactorToLoginPolicy(SecondFactor) returns (SecondFactor) {
     option (google.api.http) = {
-            post: "/orgs/me/policies/login/secondfactors"
-            body: "*"
-        };
+      post: "/orgs/me/policies/login/secondfactors"
+      body: "*"
+    };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "iam.policy.write"
-        };
+      permission: "iam.policy.write"
+    };
   }
 
   rpc RemoveSecondFactorFromLoginPolicy(SecondFactor) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-            delete: "/orgs/me/policies/login/secondfactors/{second_factor}"
-        };
+      delete: "/orgs/me/policies/login/secondfactors/{second_factor}"
+    };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "iam.policy.write"
-        };
+      permission: "iam.policy.write"
+    };
   }
 
   rpc GetLoginPolicyMultiFactors(google.protobuf.Empty) returns (MultiFactorsResult) {
     option (google.api.http) = {
-            get: "/orgs/me/policies/login/multifactors/_search"
-        };
+      get: "/orgs/me/policies/login/multifactors/_search"
+    };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "iam.policy.read"
-        };
+      permission: "iam.policy.read"
+    };
   }
 
   rpc AddMultiFactorToLoginPolicy(MultiFactor) returns (MultiFactor) {
     option (google.api.http) = {
-            post: "/orgs/me/policies/login/multifactors"
-            body: "*"
-        };
+      post: "/orgs/me/policies/login/multifactors"
+      body: "*"
+    };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "iam.policy.write"
-        };
+      permission: "iam.policy.write"
+    };
   }
 
   rpc RemoveMultiFactorFromLoginPolicy(MultiFactor) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-            delete: "/orgs/me/policies/login/multifactors/{multi_factor}"
-        };
+      delete: "/orgs/me/policies/login/multifactors/{multi_factor}"
+    };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "iam.policy.write"
-        };
+      permission: "iam.policy.write"
+    };
   }
 
   rpc GetPasswordComplexityPolicy(google.protobuf.Empty) returns (PasswordComplexityPolicyView) {
@@ -2000,7 +2001,7 @@ message UserAddress {
   google.protobuf.Timestamp change_date = 9;
 }
 
-message UserAddressView { 
+message UserAddressView {
   string id = 1;
   string country = 2;
   string locality = 3;
@@ -2510,6 +2511,8 @@ message OIDCConfig {
   OIDCTokenType access_token_type = 13;
   bool access_token_role_assertion = 14;
   bool id_token_role_assertion = 15;
+  bool id_token_userinfo_assertion = 16;
+  google.protobuf.Duration clock_skew = 17;
 }
 
 message OIDCApplicationCreate {
@@ -2526,6 +2529,8 @@ message OIDCApplicationCreate {
   OIDCTokenType access_token_type = 11;
   bool access_token_role_assertion = 12;
   bool id_token_role_assertion = 13;
+  bool id_token_userinfo_assertion = 14;
+  google.protobuf.Duration clock_skew = 15 [(validate.rules).duration = {gte: {}, lte: {seconds: 5}}];
 }
 
 enum OIDCVersion {
@@ -2533,8 +2538,8 @@ enum OIDCVersion {
 }
 
 enum OIDCTokenType {
-    OIDCTokenType_Bearer = 0;
-    OIDCTokenType_JWT = 1;
+  OIDCTokenType_Bearer = 0;
+  OIDCTokenType_JWT = 1;
 }
 
 message OIDCConfigUpdate {
@@ -2550,6 +2555,8 @@ message OIDCConfigUpdate {
   OIDCTokenType access_token_type = 10;
   bool access_token_role_assertion = 11;
   bool id_token_role_assertion = 12;
+  bool id_token_userinfo_assertion = 13;
+  google.protobuf.Duration clock_skew = 14 [(validate.rules).duration = {gte: {}, lte: {seconds: 5}}];
 }
 
 enum OIDCResponseType {
@@ -2931,35 +2938,35 @@ enum MemberType {
 }
 
 message IdpID {
-    string id = 1 [(validate.rules).string = {min_len: 1}];
+  string id = 1 [(validate.rules).string = {min_len: 1}];
 }
 
 message Idp {
-    string id = 1;
-    IdpState state = 2;
-    google.protobuf.Timestamp creation_date = 3;
-    google.protobuf.Timestamp change_date = 4;
-    string name = 5;
-    IdpStylingType styling_type = 6;
-    oneof idp_config {
-        OidcIdpConfig oidc_config = 7;
-    }
-    uint64 sequence = 8;
+  string id = 1;
+  IdpState state = 2;
+  google.protobuf.Timestamp creation_date = 3;
+  google.protobuf.Timestamp change_date = 4;
+  string name = 5;
+  IdpStylingType styling_type = 6;
+  oneof idp_config {
+    OidcIdpConfig oidc_config = 7;
+  }
+  uint64 sequence = 8;
 }
 
 message IdpUpdate {
-    string id = 1 [(validate.rules).string = {min_len: 1}];
-    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    IdpStylingType styling_type = 3;
+  string id = 1 [(validate.rules).string = {min_len: 1}];
+  string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  IdpStylingType styling_type = 3;
 }
 
 message OidcIdpConfig {
-    string client_id = 1;
-    string client_secret = 2;
-    string issuer = 3;
-    repeated string scopes = 4;
-    OIDCMappingField idp_display_name_mapping = 5;
-    OIDCMappingField username_mapping = 6;
+  string client_id = 1;
+  string client_secret = 2;
+  string issuer = 3;
+  repeated string scopes = 4;
+  OIDCMappingField idp_display_name_mapping = 5;
+  OIDCMappingField username_mapping = 6;
 }
 
 enum IdpStylingType {
@@ -2968,9 +2975,9 @@ enum IdpStylingType {
 }
 
 enum IdpState {
-    IDPCONFIGSTATE_UNSPECIFIED = 0;
-    IDPCONFIGSTATE_ACTIVE = 1;
-    IDPCONFIGSTATE_INACTIVE = 2;
+  IDPCONFIGSTATE_UNSPECIFIED = 0;
+  IDPCONFIGSTATE_ACTIVE = 1;
+  IDPCONFIGSTATE_INACTIVE = 2;
 }
 
 enum OIDCMappingField {
@@ -2980,84 +2987,84 @@ enum OIDCMappingField {
 }
 
 message OidcIdpConfigCreate {
-    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    IdpStylingType styling_type = 2;
-    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string issuer = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string scopes = 6;
-    OIDCMappingField idp_display_name_mapping = 7;
-    OIDCMappingField username_mapping = 8;
+  string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  IdpStylingType styling_type = 2;
+  string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string issuer = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  repeated string scopes = 6;
+  OIDCMappingField idp_display_name_mapping = 7;
+  OIDCMappingField username_mapping = 8;
 }
 
 message OidcIdpConfigUpdate {
-    string idp_id = 1 [(validate.rules).string = {min_len: 1}];
-    string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_secret = 3;
-    string issuer = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string scopes = 5;
-    OIDCMappingField idp_display_name_mapping = 6;
-    OIDCMappingField username_mapping = 7;
+  string idp_id = 1 [(validate.rules).string = {min_len: 1}];
+  string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string client_secret = 3;
+  string issuer = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  repeated string scopes = 5;
+  OIDCMappingField idp_display_name_mapping = 6;
+  OIDCMappingField username_mapping = 7;
 }
 
 message IdpSearchResponse {
-    uint64 offset = 1;
-    uint64 limit = 2;
-    uint64 total_result = 3;
-    repeated IdpView result = 4;
-    uint64 processed_sequence = 5;
-    google.protobuf.Timestamp view_timestamp = 6;
+  uint64 offset = 1;
+  uint64 limit = 2;
+  uint64 total_result = 3;
+  repeated IdpView result = 4;
+  uint64 processed_sequence = 5;
+  google.protobuf.Timestamp view_timestamp = 6;
 }
 
 message IdpView {
-    string id = 1;
-    IdpState state = 2;
-    google.protobuf.Timestamp creation_date = 3;
-    google.protobuf.Timestamp change_date = 4;
-    string name = 5;
-    IdpStylingType styling_type = 6;
-    IdpProviderType provider_type = 7;
-    oneof idp_config_view {
-        OidcIdpConfigView oidc_config = 8;
-    }
-    uint64 sequence = 9;
+  string id = 1;
+  IdpState state = 2;
+  google.protobuf.Timestamp creation_date = 3;
+  google.protobuf.Timestamp change_date = 4;
+  string name = 5;
+  IdpStylingType styling_type = 6;
+  IdpProviderType provider_type = 7;
+  oneof idp_config_view {
+    OidcIdpConfigView oidc_config = 8;
+  }
+  uint64 sequence = 9;
 }
 
 message OidcIdpConfigView {
-    string client_id = 1;
-    string issuer = 2;
-    repeated string scopes = 3;
-    OIDCMappingField idp_display_name_mapping = 4;
-    OIDCMappingField username_mapping = 5;
+  string client_id = 1;
+  string issuer = 2;
+  repeated string scopes = 3;
+  OIDCMappingField idp_display_name_mapping = 4;
+  OIDCMappingField username_mapping = 5;
 }
 
 message IdpSearchRequest {
-    uint64 offset = 1;
-    uint64 limit = 2;
-    repeated IdpSearchQuery queries = 3;
+  uint64 offset = 1;
+  uint64 limit = 2;
+  repeated IdpSearchQuery queries = 3;
 }
 
 message IdpSearchQuery {
-    IdpSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
-    SearchMethod method = 2;
-    string value = 3;
+  IdpSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
+  SearchMethod method = 2;
+  string value = 3;
 }
 
 enum IdpSearchKey {
-    IDPSEARCHKEY_UNSPECIFIED = 0;
-    IDPSEARCHKEY_IDP_CONFIG_ID = 1;
-    IDPSEARCHKEY_NAME = 2;
-    IDPSEARCHKEY_PROVIDER_TYPE = 3;
+  IDPSEARCHKEY_UNSPECIFIED = 0;
+  IDPSEARCHKEY_IDP_CONFIG_ID = 1;
+  IDPSEARCHKEY_NAME = 2;
+  IDPSEARCHKEY_PROVIDER_TYPE = 3;
 }
 
 message LoginPolicy {
-    bool allow_username_password = 1;
-    bool allow_register = 2;
-    bool allow_external_idp = 3;
-    google.protobuf.Timestamp creation_date = 4;
-    google.protobuf.Timestamp change_date = 5;
-    bool force_mfa = 6;
-    PasswordlessType passwordless_type = 7;
+  bool allow_username_password = 1;
+  bool allow_register = 2;
+  bool allow_external_idp = 3;
+  google.protobuf.Timestamp creation_date = 4;
+  google.protobuf.Timestamp change_date = 5;
+  bool force_mfa = 6;
+  PasswordlessType passwordless_type = 7;
 }
 
 message LoginPolicyRequest {
@@ -3074,7 +3081,7 @@ enum PasswordlessType {
 }
 
 message IdpProviderID {
-    string idp_config_id = 1 [(validate.rules).string = {min_len: 1}];
+  string idp_config_id = 1 [(validate.rules).string = {min_len: 1}];
 }
 
 message IdpProviderAdd {
@@ -3088,26 +3095,26 @@ message IdpProvider {
 }
 
 message LoginPolicyView {
-    bool default = 1;
-    bool allow_username_password = 2;
-    bool allow_register = 3;
-    bool allow_external_idp = 4;
-    google.protobuf.Timestamp creation_date = 5;
-    google.protobuf.Timestamp change_date = 6;
-    bool force_mfa = 7;
-    PasswordlessType passwordless_type = 8;
+  bool default = 1;
+  bool allow_username_password = 2;
+  bool allow_register = 3;
+  bool allow_external_idp = 4;
+  google.protobuf.Timestamp creation_date = 5;
+  google.protobuf.Timestamp change_date = 6;
+  bool force_mfa = 7;
+  PasswordlessType passwordless_type = 8;
 }
 
 message IdpProviderView {
-    string idp_config_id = 1;
-    string name = 2;
-    IdpType type = 3;
+  string idp_config_id = 1;
+  string name = 2;
+  IdpType type = 3;
 }
 
 enum IdpType {
-    IDPTYPE_UNSPECIFIED = 0;
-    IDPTYPE_OIDC = 1;
-    IDPTYPE_SAML = 2;
+  IDPTYPE_UNSPECIFIED = 0;
+  IDPTYPE_OIDC = 1;
+  IDPTYPE_SAML = 2;
 }
 
 enum IdpProviderType {
@@ -3117,17 +3124,17 @@ enum IdpProviderType {
 }
 
 message IdpProviderSearchResponse {
-    uint64 offset = 1;
-    uint64 limit = 2;
-    uint64 total_result = 3;
-    repeated IdpProviderView result = 4;
-    uint64 processed_sequence = 5;
-    google.protobuf.Timestamp view_timestamp = 6;
+  uint64 offset = 1;
+  uint64 limit = 2;
+  uint64 total_result = 3;
+  repeated IdpProviderView result = 4;
+  uint64 processed_sequence = 5;
+  google.protobuf.Timestamp view_timestamp = 6;
 }
 
 message IdpProviderSearchRequest {
-    uint64 offset = 1;
-    uint64 limit = 2;
+  uint64 offset = 1;
+  uint64 limit = 2;
 }
 
 //ProjectType is deprecated, remove as soon as console is ready 

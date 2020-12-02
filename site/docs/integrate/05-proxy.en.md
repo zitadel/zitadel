@@ -94,7 +94,7 @@ spec:
 ```toml
 provider = "oidc"
 user_id_claim = "sub" #uses the subject as ID instead of the email
-provider_display_name "ZITADEL"
+provider_display_name = "ZITADEL"
 redirect_url = "http://127.0.0.1:4180/oauth2/callback"
 oidc_issuer_url = "https://issuer.zitadel.ch"
 upstreams = [

@@ -52,19 +52,23 @@ func (p *ProjectRole) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return p.view.DeleteProjectRole(event.AggregateID, event.ResourceOwner, role.Key, event.Sequence)
+		return p.view.DeleteProjectRole(event.AggregateID, event.ResourceOwner, role.Key, event.Sequence, event.CreationDate)
 	case es_model.ProjectRemoved:
 		return p.view.DeleteProjectRolesByProjectID(event.AggregateID)
 	default:
-		return p.view.ProcessedProjectRoleSequence(event.Sequence)
+		return p.view.ProcessedProjectRoleSequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutProjectRole(role)
+	return p.view.PutProjectRole(role, event.CreationDate)
 }
 
 func (p *ProjectRole) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-lso9w", "id", event.AggregateID).WithError(err).Warn("something went wrong in project role handler")
 	return spooler.HandleError(event, err, p.view.GetLatestProjectRoleFailedEvent, p.view.ProcessedProjectRoleFailedEvent, p.view.ProcessedProjectRoleSequence, p.errorCountUntilSkip)
+}
+
+func (p *ProjectRole) OnSuccess() error {
+	return spooler.HandleSuccess(p.view.UpdateProjectRoleSpoolerRunTimestamp)
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	global_view "github.com/caos/zitadel/internal/view/repository"
+	"time"
 )
 
 const (
@@ -32,44 +33,48 @@ func (v *View) SearchExternalIDPs(request *usr_model.ExternalIDPSearchRequest) (
 	return view.SearchExternalIDPs(v.Db, externalIDPTable, request)
 }
 
-func (v *View) PutExternalIDP(externalIDP *model.ExternalIDPView, sequence uint64) error {
+func (v *View) PutExternalIDP(externalIDP *model.ExternalIDPView, sequence uint64, eventTimestamp time.Time) error {
 	err := view.PutExternalIDP(v.Db, externalIDPTable, externalIDP)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedExternalIDPSequence(sequence)
+	return v.ProcessedExternalIDPSequence(sequence, eventTimestamp)
 }
 
-func (v *View) PutExternalIDPs(sequence uint64, externalIDPs ...*model.ExternalIDPView) error {
+func (v *View) PutExternalIDPs(sequence uint64, eventTimestamp time.Time, externalIDPs ...*model.ExternalIDPView) error {
 	err := view.PutExternalIDPs(v.Db, externalIDPTable, externalIDPs...)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedExternalIDPSequence(sequence)
+	return v.ProcessedExternalIDPSequence(sequence, eventTimestamp)
 }
 
-func (v *View) DeleteExternalIDP(externalUserID, idpConfigID string, eventSequence uint64) error {
+func (v *View) DeleteExternalIDP(externalUserID, idpConfigID string, eventSequence uint64, eventTimestamp time.Time) error {
 	err := view.DeleteExternalIDP(v.Db, externalIDPTable, externalUserID, idpConfigID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedExternalIDPSequence(eventSequence)
+	return v.ProcessedExternalIDPSequence(eventSequence, eventTimestamp)
 }
 
-func (v *View) DeleteExternalIDPsByUserID(userID string, eventSequence uint64) error {
+func (v *View) DeleteExternalIDPsByUserID(userID string, eventSequence uint64, eventTimestamp time.Time) error {
 	err := view.DeleteExternalIDPsByUserID(v.Db, externalIDPTable, userID)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedExternalIDPSequence(eventSequence)
+	return v.ProcessedExternalIDPSequence(eventSequence, eventTimestamp)
 }
 
 func (v *View) GetLatestExternalIDPSequence() (*global_view.CurrentSequence, error) {
 	return v.latestSequence(externalIDPTable)
 }
 
-func (v *View) ProcessedExternalIDPSequence(eventSequence uint64) error {
-	return v.saveCurrentSequence(externalIDPTable, eventSequence)
+func (v *View) ProcessedExternalIDPSequence(eventSequence uint64, eventTimestamp time.Time) error {
+	return v.saveCurrentSequence(externalIDPTable, eventSequence, eventTimestamp)
+}
+
+func (v *View) UpdateExternalIDPSpoolerRunTimestamp() error {
+	return v.updateSpoolerRunSequence(externalIDPTable)
 }
 
 func (v *View) GetLatestExternalIDPFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {

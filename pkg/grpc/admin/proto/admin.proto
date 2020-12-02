@@ -853,7 +853,8 @@ message View {
     string database = 1;
     string view_name = 2;
     uint64 processed_sequence = 3;
-    google.protobuf.Timestamp view_timestamp = 4;
+    google.protobuf.Timestamp event_timestamp = 4;
+    google.protobuf.Timestamp last_successful_spooler_run = 5;
 }
 
 message IdpID {
