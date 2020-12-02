@@ -74,7 +74,7 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 			if err != nil {
 				return err
 			}
-			if err := orb.Reconcile(monitor, desiredTree)(k8sClient); err != nil {
+			if err := orb.Reconcile(monitor, desiredTree, true)(k8sClient); err != nil {
 				return err
 			}
 		}

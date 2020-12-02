@@ -69,7 +69,7 @@ func AdaptFunc(
 			queryIAM,
 		}
 		if desiredKind.Spec.SelfReconciling {
-			queriers = append(queriers, operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredTree)))
+			queriers = append(queriers, operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredTree, false)))
 		}
 
 		destroyers := []operator.DestroyFunc{
