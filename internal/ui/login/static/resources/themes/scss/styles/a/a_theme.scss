@@ -1,0 +1,26 @@
+@import './a.scss';
+
+@mixin lgn-a-theme($theme-or-color-config) {
+    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
+    // @include lgn-private-check-duplicate-theme-styles($theme, 'mat-button') {
+      $color: lgn-get-color-config($theme);
+
+      @if $color != null {
+        @include lgn-a-color($color);
+      }
+    // }
+}
+
+@mixin lgn-a-color($config-or-theme) {
+    $config: lgn-get-color-config($config-or-theme);
+    $primary: map-get($config, primary);
+  
+    a {
+      color: lgn-color($primary, default);
+    
+      &:hover,
+      &:active {
+          color: lgn-color($primary, 400);
+      }
+    }
+}

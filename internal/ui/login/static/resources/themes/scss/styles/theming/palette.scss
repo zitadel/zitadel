@@ -191,12 +191,8 @@ $lgn-warn: (
 );
 
   $lgn-light-theme-background: (
-    status-bar: map-get($lgn-grey, 300),
-    app-bar:    map-get($lgn-grey, 100),
     background: map-get($lgn-grey, 50),
     hover:      rgba(black, 0.04), // TODO(kara): check style with Material Design UX
-    card:       white,
-    dialog:     white,
     disabled-button: rgba(black, 0.12),
     raised-button: white,
     focused-button: $dark-focused,
@@ -207,16 +203,12 @@ $lgn-warn: (
     disabled-list-option: map-get($lgn-grey, 200),
     tooltip: map-get($lgn-grey, 700),
     input: #fafafa50,
-    footer:  #fafafa50,
+    footer:  #fafafa,
   );
   
   $lgn-dark-theme-background: (
-    status-bar: black,
-    app-bar:    map-get($lgn-grey, 900),
     background: #212224,
     hover:      rgba(white, 0.04), // TODO(kara): check style with Material Design UX
-    card:       map-get($lgn-grey, 800),
-    dialog:     map-get($lgn-grey, 800),
     disabled-button: rgba(white, 0.12),
     raised-button: map-get($lgn-grey, 800),
     focused-button: $light-focused,
@@ -227,10 +219,11 @@ $lgn-warn: (
     disabled-list-option: black,
     tooltip: map-get($lgn-grey, 700),
     input: rgba(black, .2),
-    footer: rgba(black, .2)
+    footer: #212224,
   );
 
   $lgn-light-theme-foreground: (
+    footer-links:      map-get($lgn-light-brand, 500),
     base:              black,
     input-border:      $light-input-border,
     input-border-hover: $light-input-border-hover,
@@ -253,6 +246,7 @@ $lgn-warn: (
   );
   
   $lgn-dark-theme-foreground: (
+    footer-links:      map-get($lgn-grey, 500),
     base:              white,
     input-border:      $dark-input-border,
     input-border-hover: $dark-input-border-hover,

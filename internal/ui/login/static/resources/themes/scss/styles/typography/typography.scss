@@ -177,6 +177,10 @@
         margin: 0 0 12px;
       }
     }
+
+    a, .lgn-a {
+        @include lgn-typography-level-to-styles($config, body-1);
+    }
   
     small .lgn-small, .lgn-caption {
       @include lgn-typography-level-to-styles($config, caption-1);

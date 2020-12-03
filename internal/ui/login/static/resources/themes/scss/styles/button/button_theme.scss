@@ -29,7 +29,7 @@
       background: transparent;
   
       @include _lgn-button-theme-property($config, 'color', text);
-      @include _lgn-button-focus-overlay-color($config);
+    //   @include _lgn-button-focus-overlay-color($config);
     }
   
     .lgn-button:focus, .lgn-stroked-button:focus {
@@ -43,7 +43,7 @@
     }
 
     .lgn-button {
-        @include _lgn-button-theme-property($config, 'color', default-contrast);
+        @include _lgn-button-theme-property($config, 'color', text);
         &:hover {
             $primary: map-get($config, primary);
             background-color: rgba(lgn-color($primary, 500), .1);
@@ -54,7 +54,7 @@
         }
 
         &:active {
-            background-color: rgba(lgn-color($primary, 500), .5);
+            background-color: rgba(lgn-color($primary, 500), .25);
         }
     }
   
@@ -64,6 +64,10 @@
   
       @include _lgn-button-theme-property($config, 'color', default-contrast);
       @include _lgn-button-theme-property($config, 'background-color', default);
+
+      &:active {
+        background-color: rgba(lgn-color($primary, 500), .8);
+      }
     }
   }
   

@@ -1,11 +1,19 @@
 footer {
-  width: 100%;
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   background: #00000020;
   min-height: 50px;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+}
+footer .fill-space {
+  flex: 1;
+}
+footer a {
+  font-size: 12px;
 }
 
 .lgn-button, .lgn-stroked-button {
@@ -130,6 +138,11 @@ label, .lgn-label {
   transition: color 0.2s ease;
   margin: 0 0 2px 0;
   font-weight: 400;
+}
+
+a {
+  text-decoration: none;
+  outline: none;
 }
 
 @font-face {
@@ -205,13 +218,21 @@ label, .lgn-label {
   src: local("Material Icons"), local("MaterialIcons-Regular"), url(../../../fonts/material/MaterialIcons-Regular.woff2) format("woff2"), url(../../../fonts/material/MaterialIcons-Regular.woff) format("woff"), url(../../../fonts/material/MaterialIcons-Regular.ttf) format("truetype");
 }
 footer {
-  width: 100%;
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   background: #00000020;
   min-height: 50px;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+}
+footer .fill-space {
+  flex: 1;
+}
+footer a {
+  font-size: 12px;
 }
 
 .lgn-button, .lgn-stroked-button {
@@ -336,6 +357,11 @@ label, .lgn-label {
   transition: color 0.2s ease;
   margin: 0 0 2px 0;
   font-weight: 400;
+}
+
+a {
+  text-decoration: none;
+  outline: none;
 }
 
 @font-face {

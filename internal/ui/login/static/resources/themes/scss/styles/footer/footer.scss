@@ -1,13 +1,25 @@
 $container-max-width: 350px;
 $footer-height: 50px;
-$footer-width: 100%;
+// $footer-width: 100%;
+$footer-padding: 0 1rem;
 
 footer {
-    width: $footer-width;
+    // width: $footer-width;
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     background: #00000020;
     min-height: $footer-height;
+    display: flex;
+    align-items: center;
+    padding: $footer-padding;
+
+    .fill-space {
+        flex: 1;
+    }
+
+    a {
+        font-size: 12px;
+    }
 }

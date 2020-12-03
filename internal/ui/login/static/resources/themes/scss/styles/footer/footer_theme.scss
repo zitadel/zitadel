@@ -17,5 +17,9 @@
   
     footer {
       background-color: lgn-color($background, footer);
+
+      a {
+        color: lgn-color($background, footer-links);
+      }
     }
 }
