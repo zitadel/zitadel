@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
@@ -33,9 +34,12 @@ func (e *HumanExternalIDPReservedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanExternalIDPReservedEvent(base *eventstore.BaseEvent) *HumanExternalIDPReservedEvent {
+func NewHumanExternalIDPReservedEvent(ctx context.Context) *HumanExternalIDPReservedEvent {
 	return &HumanExternalIDPReservedEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanExternalIDPReservedType,
+		),
 	}
 }
 
@@ -51,9 +55,12 @@ func (e *HumanExternalIDPReleasedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanExternalIDPReleasedEvent(base *eventstore.BaseEvent) *HumanExternalIDPReleasedEvent {
+func NewHumanExternalIDPReleasedEvent(ctx context.Context) *HumanExternalIDPReleasedEvent {
 	return &HumanExternalIDPReleasedEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanExternalIDPReleasedType,
+		),
 	}
 }
 
@@ -72,9 +79,12 @@ func (e *HumanExternalIDPAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanExternalIDPAddedEvent(base *eventstore.BaseEvent, idpConfigID, displayName string) *HumanExternalIDPAddedEvent {
+func NewHumanExternalIDPAddedEvent(ctx context.Context, idpConfigID, displayName string) *HumanExternalIDPAddedEvent {
 	return &HumanExternalIDPAddedEvent{
-		BaseEvent:   *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanExternalIDPAddedType,
+		),
 		IDPConfigID: idpConfigID,
 		DisplayName: displayName,
 	}
@@ -107,9 +117,12 @@ func (e *HumanExternalIDPRemovedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanExternalIDPRemovedEvent(base *eventstore.BaseEvent, idpConfigID string) *HumanExternalIDPRemovedEvent {
+func NewHumanExternalIDPRemovedEvent(ctx context.Context, idpConfigID string) *HumanExternalIDPRemovedEvent {
 	return &HumanExternalIDPRemovedEvent{
-		BaseEvent:   *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanExternalIDPRemovedType,
+		),
 		IDPConfigID: idpConfigID,
 	}
 }
@@ -141,9 +154,12 @@ func (e *HumanExternalIDPCascadeRemovedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanExternalIDPCascadeRemovedEvent(base *eventstore.BaseEvent, idpConfigID string) *HumanExternalIDPCascadeRemovedEvent {
+func NewHumanExternalIDPCascadeRemovedEvent(ctx context.Context, idpConfigID string) *HumanExternalIDPCascadeRemovedEvent {
 	return &HumanExternalIDPCascadeRemovedEvent{
-		BaseEvent:   *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanExternalIDPCascadeRemovedType,
+		),
 		IDPConfigID: idpConfigID,
 	}
 }
@@ -173,9 +189,12 @@ func (e *HumanExternalLoginCheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanExternalLoginCheckSucceededEvent(base *eventstore.BaseEvent) *HumanExternalLoginCheckSucceededEvent {
+func NewHumanExternalLoginCheckSucceededEvent(ctx context.Context) *HumanExternalLoginCheckSucceededEvent {
 	return &HumanExternalLoginCheckSucceededEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanExternalLoginCheckSucceededType,
+		),
 	}
 }
 

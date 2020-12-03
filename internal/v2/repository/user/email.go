@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
@@ -32,9 +33,12 @@ func (e *HumanEmailChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanHumanEmailChangedEvent(base *eventstore.BaseEvent, emailAddress string) *HumanEmailChangedEvent {
+func NewHumanEmailChangedEvent(ctx context.Context, emailAddress string) *HumanEmailChangedEvent {
 	return &HumanEmailChangedEvent{
-		BaseEvent:    *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanEmailChangedType,
+		),
 		EmailAddress: emailAddress,
 	}
 }
@@ -65,9 +69,12 @@ func (e *HumanEmailVerifiedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanEmailVerifiedEvent(base *eventstore.BaseEvent) *HumanEmailVerifiedEvent {
+func NewHumanEmailVerifiedEvent(ctx context.Context) *HumanEmailVerifiedEvent {
 	return &HumanEmailVerifiedEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanEmailVerifiedType,
+		),
 	}
 }
 
@@ -91,9 +98,12 @@ func (e *HumanEmailVerificationFailedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanEmailVerificationFailedEvent(base *eventstore.BaseEvent) *HumanEmailVerificationFailedEvent {
+func NewHumanEmailVerificationFailedEvent(ctx context.Context) *HumanEmailVerificationFailedEvent {
 	return &HumanEmailVerificationFailedEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanEmailVerificationFailedType,
+		),
 	}
 }
 
@@ -119,13 +129,16 @@ func (e *HumanEmailCodeAddedEvent) Data() interface{} {
 }
 
 func NewHumanEmailCodeAddedEvent(
-	base *eventstore.BaseEvent,
+	ctx context.Context,
 	code *crypto.CryptoValue,
 	expiry time.Duration) *HumanEmailCodeAddedEvent {
 	return &HumanEmailCodeAddedEvent{
-		BaseEvent: *base,
-		Code:      code,
-		Expiry:    expiry,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanEmailCodeAddedType,
+		),
+		Code:   code,
+		Expiry: expiry,
 	}
 }
 
@@ -153,10 +166,12 @@ func (e *HumanEmailCodeSentEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanEmailCodeSentEvent(
-	base *eventstore.BaseEvent) *HumanEmailCodeSentEvent {
+func NewHumanEmailCodeSentEvent(ctx context.Context) *HumanEmailCodeSentEvent {
 	return &HumanEmailCodeSentEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanEmailCodeSentType,
+		),
 	}
 }
 

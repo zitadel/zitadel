@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
@@ -34,11 +35,14 @@ func (e *HumanPasswordChangedEvent) Data() interface{} {
 }
 
 func NewHumanPasswordChangedEvent(
-	base *eventstore.BaseEvent,
+	ctx context.Context,
 	secret *crypto.CryptoValue,
 	changeRequired bool) *HumanPasswordChangedEvent {
 	return &HumanPasswordChangedEvent{
-		BaseEvent:      *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanPasswordChangedType,
+		),
 		Secret:         secret,
 		ChangeRequired: changeRequired,
 	}
@@ -73,12 +77,15 @@ func (e *HumanPasswordCodeAddedEvent) Data() interface{} {
 }
 
 func NewHumanPasswordCodeAddedEvent(
-	base *eventstore.BaseEvent,
+	ctx context.Context,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
 	notificationType NotificationType) *HumanPasswordCodeAddedEvent {
 	return &HumanPasswordCodeAddedEvent{
-		BaseEvent:        *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanPasswordCodeAddedType,
+		),
 		Code:             code,
 		Expiry:           expiry,
 		NotificationType: notificationType,
@@ -109,9 +116,12 @@ func (e *HumanPasswordCodeSentEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanPasswordCodeSentEvent(base *eventstore.BaseEvent) *HumanPasswordCodeSentEvent {
+func NewHumanPasswordCodeSentEvent(ctx context.Context) *HumanPasswordCodeSentEvent {
 	return &HumanPasswordCodeSentEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanPasswordCodeSentType,
+		),
 	}
 }
 
@@ -133,9 +143,12 @@ func (e *HumanPasswordCheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanPasswordCheckSucceededEvent(base *eventstore.BaseEvent) *HumanPasswordCheckSucceededEvent {
+func NewHumanPasswordCheckSucceededEvent(ctx context.Context) *HumanPasswordCheckSucceededEvent {
 	return &HumanPasswordCheckSucceededEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanPasswordCheckSucceededType,
+		),
 	}
 }
 
@@ -157,9 +170,12 @@ func (e *HumanPasswordCheckFailedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanPasswordCheckFailedEvent(base *eventstore.BaseEvent) *HumanPasswordCheckFailedEvent {
+func NewHumanPasswordCheckFailedEvent(ctx context.Context) *HumanPasswordCheckFailedEvent {
 	return &HumanPasswordCheckFailedEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanPasswordCheckFailedType,
+		),
 	}
 }
 

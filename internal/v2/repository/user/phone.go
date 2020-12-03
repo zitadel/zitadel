@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
@@ -33,9 +34,12 @@ func (e *HumanPhoneChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanPhoneChangedEvent(base *eventstore.BaseEvent, phone string) *HumanPhoneChangedEvent {
+func NewHumanPhoneChangedEvent(ctx context.Context, phone string) *HumanPhoneChangedEvent {
 	return &HumanPhoneChangedEvent{
-		BaseEvent:   *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanPhoneChangedType,
+		),
 		PhoneNumber: phone,
 	}
 }
@@ -64,9 +68,12 @@ func (e *HumanPhoneRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanPhoneRemovedEvent(base *eventstore.BaseEvent) *HumanPhoneRemovedEvent {
+func NewHumanPhoneRemovedEvent(ctx context.Context) *HumanPhoneRemovedEvent {
 	return &HumanPhoneRemovedEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanPhoneRemovedType,
+		),
 	}
 }
 
@@ -90,9 +97,12 @@ func (e *HumanPhoneVerifiedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanPhoneVerifiedEvent(base *eventstore.BaseEvent) *HumanPhoneVerifiedEvent {
+func NewHumanPhoneVerifiedEvent(ctx context.Context) *HumanPhoneVerifiedEvent {
 	return &HumanPhoneVerifiedEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanPhoneVerifiedType,
+		),
 	}
 }
 
@@ -115,9 +125,12 @@ func (e *HumanPhoneVerificationFailedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanPhoneVerificationFailedEvent(base *eventstore.BaseEvent) *HumanPhoneVerificationFailedEvent {
+func NewHumanPhoneVerificationFailedEvent(ctx context.Context) *HumanPhoneVerificationFailedEvent {
 	return &HumanPhoneVerificationFailedEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanPhoneVerificationFailedType,
+		),
 	}
 }
 
@@ -143,13 +156,16 @@ func (e *HumanPhoneCodeAddedEvent) Data() interface{} {
 }
 
 func NewHumanPhoneCodeAddedEvent(
-	base *eventstore.BaseEvent,
+	ctx context.Context,
 	code *crypto.CryptoValue,
 	expiry time.Duration) *HumanPhoneCodeAddedEvent {
 	return &HumanPhoneCodeAddedEvent{
-		BaseEvent: *base,
-		Code:      code,
-		Expiry:    expiry,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanPhoneCodeAddedType,
+		),
+		Code:   code,
+		Expiry: expiry,
 	}
 }
 
@@ -177,10 +193,12 @@ func (e *HumanPhoneCodeSentEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanPhoneCodeSentEvent(
-	base *eventstore.BaseEvent) *HumanPhoneCodeSentEvent {
+func NewHumanPhoneCodeSentEvent(ctx context.Context) *HumanPhoneCodeSentEvent {
 	return &HumanPhoneCodeSentEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanPhoneCodeSentType,
+		),
 	}
 }
 

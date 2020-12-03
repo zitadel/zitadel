@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
@@ -33,7 +34,7 @@ func (e *HumanProfileChangedEvent) Data() interface{} {
 }
 
 func NewHumanProfileChangedEvent(
-	base *eventstore.BaseEvent,
+	ctx context.Context,
 	firstName,
 	lastName,
 	nickName,
@@ -41,7 +42,10 @@ func NewHumanProfileChangedEvent(
 	preferredLanguage language.Tag,
 	gender Gender) *HumanProfileChangedEvent {
 	return &HumanProfileChangedEvent{
-		BaseEvent:         *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanProfileChangedType,
+		),
 		FirstName:         firstName,
 		LastName:          lastName,
 		NickName:          nickName,

@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
@@ -31,14 +32,17 @@ func (e *HumanAddressChangedEvent) Data() interface{} {
 }
 
 func NewHumanAddressChangedEvent(
-	base *eventstore.BaseEvent,
+	ctx context.Context,
 	country,
 	locality,
 	postalCode,
 	region,
 	streetAddress string) *HumanAddressChangedEvent {
 	return &HumanAddressChangedEvent{
-		BaseEvent:     *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanAddressChangedType,
+		),
 		Country:       country,
 		Locality:      locality,
 		PostalCode:    postalCode,

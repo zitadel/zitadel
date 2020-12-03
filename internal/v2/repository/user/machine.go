@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
@@ -31,12 +32,15 @@ func (e *MachineAddedEvent) Data() interface{} {
 }
 
 func NewMachineAddedEvent(
-	base *eventstore.BaseEvent,
+	ctx context.Context,
 	userName,
 	name,
 	description string) *MachineAddedEvent {
 	return &MachineAddedEvent{
-		BaseEvent:   *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			MachineAddedEventType,
+		),
 		UserName:    userName,
 		Name:        name,
 		Description: description,
@@ -73,12 +77,15 @@ func (e *MachineChangedEvent) Data() interface{} {
 }
 
 func NewMachineChangedEvent(
-	base *eventstore.BaseEvent,
+	ctx context.Context,
 	userName,
 	name,
 	description string) *MachineChangedEvent {
 	return &MachineChangedEvent{
-		BaseEvent:   *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			MachineChangedEventType,
+		),
 		UserName:    userName,
 		Name:        name,
 		Description: description,

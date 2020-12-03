@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
@@ -32,11 +33,14 @@ func (e *HumanMFAOTPAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanMFAOTPAddedEvent(base *eventstore.BaseEvent,
+func NewHumanMFAOTPAddedEvent(ctx context.Context,
 	secret *crypto.CryptoValue) *HumanMFAOTPAddedEvent {
 	return &HumanMFAOTPAddedEvent{
-		BaseEvent: *base,
-		Secret:    secret,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanMFAOTPAddedType,
+		),
+		Secret: secret,
 	}
 }
 
@@ -65,9 +69,12 @@ func (e *HumanMFAOTPVerifiedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanMFAOTPVerifiedEvent(base *eventstore.BaseEvent) *HumanMFAOTPVerifiedEvent {
+func NewHumanMFAOTPVerifiedEvent(ctx context.Context) *HumanMFAOTPVerifiedEvent {
 	return &HumanMFAOTPVerifiedEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanMFAOTPVerifiedType,
+		),
 	}
 }
 
@@ -90,9 +97,12 @@ func (e *HumanMFAOTPRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanMFAOTPRemovedEvent(base *eventstore.BaseEvent) *HumanMFAOTPRemovedEvent {
+func NewHumanMFAOTPRemovedEvent(ctx context.Context) *HumanMFAOTPRemovedEvent {
 	return &HumanMFAOTPRemovedEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanMFAOTPRemovedType,
+		),
 	}
 }
 
@@ -114,9 +124,12 @@ func (e *HumanMFAOTPCheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanMFAOTPCheckSucceededEvent(base *eventstore.BaseEvent) *HumanMFAOTPCheckSucceededEvent {
+func NewHumanMFAOTPCheckSucceededEvent(ctx context.Context) *HumanMFAOTPCheckSucceededEvent {
 	return &HumanMFAOTPCheckSucceededEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanMFAOTPCheckSucceededType,
+		),
 	}
 }
 
@@ -138,9 +151,12 @@ func (e *HumanMFAOTPCheckFailedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanMFAOTPCheckFailedEvent(base *eventstore.BaseEvent) *HumanMFAOTPCheckFailedEvent {
+func NewHumanMFAOTPCheckFailedEvent(ctx context.Context) *HumanMFAOTPCheckFailedEvent {
 	return &HumanMFAOTPCheckFailedEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanMFAOTPCheckFailedType,
+		),
 	}
 }
 

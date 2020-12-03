@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
@@ -32,13 +33,16 @@ func (e *MachineKeyAddedEvent) Data() interface{} {
 }
 
 func NewMachineKeyAddedEvent(
-	base *eventstore.BaseEvent,
+	ctx context.Context,
 	keyID string,
-	keyType int32,
+	keyType MachineKeyType,
 	expirationDate time.Time,
 	publicKey []byte) *MachineKeyAddedEvent {
 	return &MachineKeyAddedEvent{
-		BaseEvent:      *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			MachineKeyAddedEventType,
+		),
 		KeyID:          keyID,
 		Type:           keyType,
 		ExpirationDate: expirationDate,
@@ -73,12 +77,14 @@ func (e *MachineKeyRemovedEvent) Data() interface{} {
 }
 
 func NewMachineKeyRemovedEvent(
-	base *eventstore.BaseEvent,
-	keyID string,
-) *MachineKeyRemovedEvent {
+	ctx context.Context,
+	keyID string) *MachineKeyRemovedEvent {
 	return &MachineKeyRemovedEvent{
-		BaseEvent: *base,
-		KeyID:     keyID,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			MachineKeyRemovedEventType,
+		),
+		KeyID: keyID,
 	}
 }
 

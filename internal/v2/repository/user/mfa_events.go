@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
@@ -22,9 +23,12 @@ func (e *HumanMFAInitSkippedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanMFAInitSkippedEvent(base *eventstore.BaseEvent) *HumanMFAInitSkippedEvent {
+func NewHumanMFAInitSkippedEvent(ctx context.Context) *HumanMFAInitSkippedEvent {
 	return &HumanMFAInitSkippedEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanMFAInitSkippedType,
+		),
 	}
 }
 

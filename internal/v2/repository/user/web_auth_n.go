@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
@@ -43,11 +44,29 @@ func (e *HumanWebAuthNAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanWebAuthNAddedEvent(base *eventstore.BaseEvent,
+func NewHumanWebAuthNU2FAddedEvent(
+	ctx context.Context,
 	webAuthNTokenID,
 	challenge string) *HumanWebAuthNAddedEvent {
 	return &HumanWebAuthNAddedEvent{
-		BaseEvent:       *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanU2FTokenAddedType,
+		),
+		WebAuthNTokenID: webAuthNTokenID,
+		Challenge:       challenge,
+	}
+}
+
+func NewHumanWebAuthNPasswordlessAddedEvent(
+	ctx context.Context,
+	webAuthNTokenID,
+	challenge string) *HumanWebAuthNAddedEvent {
+	return &HumanWebAuthNAddedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanPasswordlessTokenAddedType,
+		),
 		WebAuthNTokenID: webAuthNTokenID,
 		Challenge:       challenge,
 	}
@@ -86,7 +105,8 @@ func (e *HumanWebAuthNVerifiedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanWebAuthNVerifiedEvent(base *eventstore.BaseEvent,
+func NewHumanWebAuthNU2FVerifiedEvent(
+	ctx context.Context,
 	webAuthNTokenID,
 	webAuthNTokenName,
 	attestationType string,
@@ -95,7 +115,34 @@ func NewHumanWebAuthNVerifiedEvent(base *eventstore.BaseEvent,
 	aaguid []byte,
 	signCount uint32) *HumanWebAuthNVerifiedEvent {
 	return &HumanWebAuthNVerifiedEvent{
-		BaseEvent:         *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanU2FTokenVerifiedType,
+		),
+		WebAuthNTokenID:   webAuthNTokenID,
+		KeyID:             keyID,
+		PublicKey:         publicKey,
+		AttestationType:   attestationType,
+		AAGUID:            aaguid,
+		SignCount:         signCount,
+		WebAuthNTokenName: webAuthNTokenName,
+	}
+}
+
+func NewHumanWebAuthNPasswordlessVerifiedEvent(
+	ctx context.Context,
+	webAuthNTokenID,
+	webAuthNTokenName,
+	attestationType string,
+	keyID,
+	publicKey,
+	aaguid []byte,
+	signCount uint32) *HumanWebAuthNVerifiedEvent {
+	return &HumanWebAuthNVerifiedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanPasswordlessTokenVerifiedType,
+		),
 		WebAuthNTokenID:   webAuthNTokenID,
 		KeyID:             keyID,
 		PublicKey:         publicKey,
@@ -134,11 +181,27 @@ func (e *HumanWebAuthNSignCountChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanWebAuthNSignCountChangedEvent(base *eventstore.BaseEvent,
+func NewHumanWebAuthNU2FSignCountChangedEvent(ctx context.Context,
 	webAuthNTokenID string,
 	signCount uint32) *HumanWebAuthNSignCountChangedEvent {
 	return &HumanWebAuthNSignCountChangedEvent{
-		BaseEvent:       *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanU2FTokenSignCountChangedType,
+		),
+		WebAuthNTokenID: webAuthNTokenID,
+		SignCount:       signCount,
+	}
+}
+
+func NewHumanWebAuthNPasswordlessSignCountChangedEvent(ctx context.Context,
+	webAuthNTokenID string,
+	signCount uint32) *HumanWebAuthNSignCountChangedEvent {
+	return &HumanWebAuthNSignCountChangedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanPasswordlessTokenSignCountChangedType,
+		),
 		WebAuthNTokenID: webAuthNTokenID,
 		SignCount:       signCount,
 	}
@@ -170,10 +233,24 @@ func (e *HumanWebAuthNRemovedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanWebAuthNRemovedEvent(base *eventstore.BaseEvent,
+func NewHumanWebAuthNU2FRemovedEvent(ctx context.Context,
 	webAuthNTokenID string) *HumanWebAuthNRemovedEvent {
 	return &HumanWebAuthNRemovedEvent{
-		BaseEvent:       *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanU2FTokenRemovedType,
+		),
+		WebAuthNTokenID: webAuthNTokenID,
+	}
+}
+
+func NewHumanWebAuthNPasswordlessRemovedEvent(ctx context.Context,
+	webAuthNTokenID string) *HumanWebAuthNRemovedEvent {
+	return &HumanWebAuthNRemovedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanPasswordlessTokenRemovedType,
+		),
 		WebAuthNTokenID: webAuthNTokenID,
 	}
 }
@@ -206,11 +283,27 @@ func (e *HumanWebAuthNBeginLoginEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanWebAuthNBeginLoginEvent(base *eventstore.BaseEvent,
+func NewHumanWebAuthNU2FBeginLoginEvent(ctx context.Context,
 	webAuthNTokenID,
 	challenge string) *HumanWebAuthNBeginLoginEvent {
 	return &HumanWebAuthNBeginLoginEvent{
-		BaseEvent:       *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanU2FTokenRemovedType,
+		),
+		WebAuthNTokenID: webAuthNTokenID,
+		Challenge:       challenge,
+	}
+}
+
+func NewHumanWebAuthNPasswordlessBeginLoginEvent(ctx context.Context,
+	webAuthNTokenID,
+	challenge string) *HumanWebAuthNBeginLoginEvent {
+	return &HumanWebAuthNBeginLoginEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanPasswordlessTokenRemovedType,
+		),
 		WebAuthNTokenID: webAuthNTokenID,
 		Challenge:       challenge,
 	}
@@ -242,9 +335,21 @@ func (e *HumanWebAuthNCheckSucceededEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanWebAuthNCheckSucceededEvent(base *eventstore.BaseEvent) *HumanWebAuthNCheckSucceededEvent {
+func NewHumanWebAuthNU2FCheckSucceededEvent(ctx context.Context) *HumanWebAuthNCheckSucceededEvent {
 	return &HumanWebAuthNCheckSucceededEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanU2FTokenCheckSucceededType,
+		),
+	}
+}
+
+func NewHumanWebAuthNPasswordlessCheckSucceededEvent(ctx context.Context) *HumanWebAuthNCheckSucceededEvent {
+	return &HumanWebAuthNCheckSucceededEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanPasswordlessTokenCheckSucceededType,
+		),
 	}
 }
 
@@ -274,9 +379,21 @@ func (e *HumanWebAuthNCheckFailedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanWebAuthNCheckFailedEvent(base *eventstore.BaseEvent) *HumanWebAuthNCheckFailedEvent {
+func NewHumanWebAuthNU2FCheckFailedEvent(ctx context.Context) *HumanWebAuthNCheckFailedEvent {
 	return &HumanWebAuthNCheckFailedEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanU2FTokenCheckFailedType,
+		),
+	}
+}
+
+func NewHumanWebAuthNPasswordlessCheckFailedEvent(ctx context.Context) *HumanWebAuthNCheckFailedEvent {
+	return &HumanWebAuthNCheckFailedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanPasswordlessTokenCheckFailedType,
+		),
 	}
 }
 

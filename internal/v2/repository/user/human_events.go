@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
@@ -53,7 +54,7 @@ func (e *HumanAddedEvent) Data() interface{} {
 }
 
 func NewHumanAddedEvent(
-	base *eventstore.BaseEvent,
+	ctx context.Context,
 	userName,
 	firstName,
 	lastName,
@@ -69,7 +70,10 @@ func NewHumanAddedEvent(
 	region,
 	streetAddress string) *HumanAddedEvent {
 	return &HumanAddedEvent{
-		BaseEvent:         *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanAddedEventType,
+		),
 		UserName:          userName,
 		FirstName:         firstName,
 		LastName:          lastName,
@@ -131,7 +135,7 @@ func (e *HumanRegisteredEvent) Data() interface{} {
 }
 
 func NewHumanRegisteredEvent(
-	base *eventstore.BaseEvent,
+	ctx context.Context,
 	userName,
 	firstName,
 	lastName,
@@ -147,7 +151,10 @@ func NewHumanRegisteredEvent(
 	region,
 	streetAddress string) *HumanRegisteredEvent {
 	return &HumanRegisteredEvent{
-		BaseEvent:         *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanRegisteredEventType,
+		),
 		UserName:          userName,
 		FirstName:         firstName,
 		LastName:          lastName,
@@ -192,13 +199,16 @@ func (e *HumanInitialCodeAddedEvent) Data() interface{} {
 }
 
 func NewHumanInitialCodeAddedEvent(
-	base *eventstore.BaseEvent,
+	ctx context.Context,
 	code *crypto.CryptoValue,
 	expiry time.Duration) *HumanInitialCodeAddedEvent {
 	return &HumanInitialCodeAddedEvent{
-		BaseEvent: *base,
-		Code:      code,
-		Expiry:    expiry,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanInitialCodeAddedType,
+		),
+		Code:   code,
+		Expiry: expiry,
 	}
 }
 
@@ -226,9 +236,12 @@ func (e *HumanInitialCodeSentEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanInitialCodeSentEvent(base *eventstore.BaseEvent) *HumanInitialCodeSentEvent {
+func NewHumanInitialCodeSentEvent(ctx context.Context) *HumanInitialCodeSentEvent {
 	return &HumanInitialCodeSentEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanInitialCodeSentType,
+		),
 	}
 }
 
@@ -250,9 +263,12 @@ func (e *HumanInitializedCheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanInitializedCheckSucceededEvent(base *eventstore.BaseEvent) *HumanInitializedCheckSucceededEvent {
+func NewHumanInitializedCheckSucceededEvent(ctx context.Context) *HumanInitializedCheckSucceededEvent {
 	return &HumanInitializedCheckSucceededEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanInitializedCheckSucceededType,
+		),
 	}
 }
 
@@ -274,9 +290,12 @@ func (e *HumanInitializedCheckFailedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanInitializedCheckFailedEvent(base *eventstore.BaseEvent) *HumanInitializedCheckFailedEvent {
+func NewHumanInitializedCheckFailedEvent(ctx context.Context) *HumanInitializedCheckFailedEvent {
 	return &HumanInitializedCheckFailedEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanInitializedCheckFailedType,
+		),
 	}
 }
 
@@ -298,9 +317,12 @@ func (e *HumanSignedOutEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanSignedOutEvent(base *eventstore.BaseEvent) *HumanSignedOutEvent {
+func NewHumanSignedOutEvent(ctx context.Context) *HumanSignedOutEvent {
 	return &HumanSignedOutEvent{
-		BaseEvent: *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			HumanSignedOutType,
+		),
 	}
 }
 
