@@ -1,3 +1,4 @@
+
 CREATE SEQUENCE eventstore.event_seq;
 
 GRANT UPDATE ON TABLE eventstore.event_seq TO management;
@@ -19,7 +20,7 @@ CREATE TABLE eventstore.events (
     previous_sequence BIGINT,
     creation_date TIMESTAMPTZ NOT NULL DEFAULT now(),
     event_data JSONB,
-    editor_user TEXT NOT NULL, 
+    editor_user TEXT NOT NULL,
     editor_service TEXT NOT NULL,
     resource_owner TEXT NOT NULL,
 
@@ -27,3 +28,4 @@ CREATE TABLE eventstore.events (
     INDEX agg_type_agg_id (aggregate_type, aggregate_id),
     CONSTRAINT previous_sequence_unique UNIQUE (previous_sequence DESC)
 );
+ALTER SEQUENCE eventstore.event_seq OWNED BY eventstore.events.event_sequence;
