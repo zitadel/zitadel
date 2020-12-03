@@ -1326,7 +1326,7 @@ func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model
 	return webAuthN, nil
 }
 
-func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error {
+func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
@@ -1337,7 +1337,7 @@ func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID, tokenName 
 		return err
 	}
 	repoUser := model.UserFromModel(user)
-	repoWebAuthN := model.WebAuthNVerifyFromModel(webAuthN)
+	repoWebAuthN := model.WebAuthNVerifyFromModel(webAuthN, userAgentID)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAU2FVerifyAggregate(es.AggregateCreator(), repoUser, repoWebAuthN))
 	if err != nil {
 		return err
@@ -1432,7 +1432,7 @@ func (es *UserEventstore) AddPasswordless(ctx context.Context, userID string) (*
 	return webAuthN, nil
 }
 
-func (es *UserEventstore) VerifyPasswordlessSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error {
+func (es *UserEventstore) VerifyPasswordlessSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
@@ -1443,7 +1443,7 @@ func (es *UserEventstore) VerifyPasswordlessSetup(ctx context.Context, userID, t
 		return err
 	}
 	repoUser := model.UserFromModel(user)
-	repoWebAuthN := model.WebAuthNVerifyFromModel(webAuthN)
+	repoWebAuthN := model.WebAuthNVerifyFromModel(webAuthN, userAgentID)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAPasswordlessVerifyAggregate(es.AggregateCreator(), repoUser, repoWebAuthN))
 	if err != nil {
 		return err

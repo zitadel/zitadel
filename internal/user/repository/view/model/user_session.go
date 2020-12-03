@@ -128,15 +128,11 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 			return err
 		}
 		if v.UserAgentID == data.UserAgentID {
-			v.SecondFactorVerification = event.CreationDate
-			v.SecondFactorVerificationType = int32(req_model.MFATypeOTP)
-			v.State = int32(req_model.UserSessionStateActive)
+			v.setSecondFactorVerification(event.CreationDate, req_model.MFATypeOTP)
 		}
 	case es_model.MFAOTPCheckSucceeded,
 		es_model.HumanMFAOTPCheckSucceeded:
-		v.SecondFactorVerification = event.CreationDate
-		v.SecondFactorVerificationType = int32(req_model.MFATypeOTP)
-		v.State = int32(req_model.UserSessionStateActive)
+		v.setSecondFactorVerification(event.CreationDate, req_model.MFATypeOTP)
 	case es_model.MFAOTPCheckFailed,
 		es_model.MFAOTPRemoved,
 		es_model.HumanMFAOTPCheckFailed,
@@ -144,10 +140,17 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 		es_model.HumanMFAU2FTokenCheckFailed,
 		es_model.HumanMFAU2FTokenRemoved:
 		v.SecondFactorVerification = time.Time{}
+	case es_model.HumanMFAU2FTokenVerified:
+		data := new(es_model.WebAuthNVerify)
+		err := data.SetData(event)
+		if err != nil {
+			return err
+		}
+		if v.UserAgentID == data.UserAgentID {
+			v.setSecondFactorVerification(event.CreationDate, req_model.MFATypeU2F)
+		}
 	case es_model.HumanMFAU2FTokenCheckSucceeded:
-		v.SecondFactorVerification = event.CreationDate
-		v.SecondFactorVerificationType = int32(req_model.MFATypeU2F)
-		v.State = int32(req_model.UserSessionStateActive)
+		v.setSecondFactorVerification(event.CreationDate, req_model.MFATypeU2F)
 	case es_model.SignedOut,
 		es_model.HumanSignedOut,
 		es_model.UserLocked,
@@ -161,4 +164,10 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 		v.SelectedIDPConfigID = ""
 	}
 	return nil
+}
+
+func (v *UserSessionView) setSecondFactorVerification(verificationTime time.Time, mfaType req_model.MFAType) {
+	v.SecondFactorVerification = verificationTime
+	v.SecondFactorVerificationType = int32(mfaType)
+	v.State = int32(req_model.UserSessionStateActive)
 }

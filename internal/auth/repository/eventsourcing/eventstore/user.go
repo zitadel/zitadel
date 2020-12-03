@@ -310,12 +310,12 @@ func (repo *UserRepo) AddMyMFAU2F(ctx context.Context) (*model.WebAuthNToken, er
 	return repo.UserEvents.AddU2F(ctx, authz.GetCtxData(ctx).UserID)
 }
 
-func (repo *UserRepo) VerifyMFAU2FSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error {
-	return repo.UserEvents.VerifyU2FSetup(ctx, userID, tokenName, credentialData)
+func (repo *UserRepo) VerifyMFAU2FSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error {
+	return repo.UserEvents.VerifyU2FSetup(ctx, userID, tokenName, userAgentID, credentialData)
 }
 
 func (repo *UserRepo) VerifyMyMFAU2FSetup(ctx context.Context, tokenName string, credentialData []byte) error {
-	return repo.UserEvents.VerifyU2FSetup(ctx, authz.GetCtxData(ctx).UserID, tokenName, credentialData)
+	return repo.UserEvents.VerifyU2FSetup(ctx, authz.GetCtxData(ctx).UserID, tokenName, "", credentialData)
 }
 
 func (repo *UserRepo) RemoveMFAU2F(ctx context.Context, userID, webAuthNTokenID string) error {
@@ -334,12 +334,12 @@ func (repo *UserRepo) AddMyPasswordless(ctx context.Context) (*model.WebAuthNTok
 	return repo.UserEvents.AddPasswordless(ctx, authz.GetCtxData(ctx).UserID)
 }
 
-func (repo *UserRepo) VerifyPasswordlessSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error {
-	return repo.UserEvents.VerifyPasswordlessSetup(ctx, userID, tokenName, credentialData)
+func (repo *UserRepo) VerifyPasswordlessSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error {
+	return repo.UserEvents.VerifyPasswordlessSetup(ctx, userID, tokenName, userAgentID, credentialData)
 }
 
 func (repo *UserRepo) VerifyMyPasswordlessSetup(ctx context.Context, tokenName string, credentialData []byte) error {
-	return repo.UserEvents.VerifyPasswordlessSetup(ctx, authz.GetCtxData(ctx).UserID, tokenName, credentialData)
+	return repo.UserEvents.VerifyPasswordlessSetup(ctx, authz.GetCtxData(ctx).UserID, tokenName, "", credentialData)
 }
 
 func (repo *UserRepo) RemovePasswordless(ctx context.Context, userID, webAuthNTokenID string) error {

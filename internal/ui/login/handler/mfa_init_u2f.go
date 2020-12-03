@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"net/http"
 
+	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	user_model "github.com/caos/zitadel/internal/user/model"
 )
@@ -48,7 +49,8 @@ func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = l.authRepo.VerifyMFAU2FSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.Name, credData); err != nil {
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	if err = l.authRepo.VerifyMFAU2FSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.Name, userAgentID, credData); err != nil {
 		l.renderRegisterU2F(w, r, authReq, err)
 		return
 	}

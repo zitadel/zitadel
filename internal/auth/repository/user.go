@@ -29,11 +29,11 @@ type UserRepository interface {
 	VerifyMFAOTPSetup(ctx context.Context, userID, code, userAgentID string) error
 
 	AddMFAU2F(ctx context.Context, id string) (*model.WebAuthNToken, error)
-	VerifyMFAU2FSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error
+	VerifyMFAU2FSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error
 	RemoveMFAU2F(ctx context.Context, userID, webAuthNTokenID string) error
 
 	AddPasswordless(ctx context.Context, id string) (*model.WebAuthNToken, error)
-	VerifyPasswordlessSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error
+	VerifyPasswordlessSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error
 	RemovePasswordless(ctx context.Context, userID, webAuthNTokenID string) error
 
 	ChangeUsername(ctx context.Context, userID, username string) error
