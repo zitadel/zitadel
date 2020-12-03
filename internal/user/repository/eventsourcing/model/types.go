@@ -52,9 +52,6 @@ const (
 	MFAInitSkipped       models.EventType = "user.mfa.init.skipped"
 
 	SignedOut models.EventType = "user.signed.out"
-
-	DomainClaimed     models.EventType = "user.domain.claimed"
-	DomainClaimedSent models.EventType = "user.domain.claimed.sent"
 )
 
 //the following consts are for user(v2)
@@ -69,6 +66,9 @@ const (
 	UserRemoved     models.EventType = "user.removed"
 
 	UserTokenAdded models.EventType = "user.token.added"
+
+	DomainClaimed     models.EventType = "user.domain.claimed"
+	DomainClaimedSent models.EventType = "user.domain.claimed.sent"
 )
 
 // the following consts are for user(v2).human
