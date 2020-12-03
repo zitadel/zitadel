@@ -2,9 +2,11 @@ package user
 
 import (
 	"encoding/json"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+	"time"
 )
 
 const (
@@ -68,10 +70,10 @@ func NewHumanPhoneRemovedEvent(base *eventstore.BaseEvent) *HumanPhoneRemovedEve
 	}
 }
 
-func HumanPhoneRemovedEventMapper(event *repository.Event) eventstore.EventReader {
+func HumanPhoneRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &HumanPhoneChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
+	}, nil
 }
 
 type HumanPhoneVerifiedEvent struct {
@@ -94,9 +96,96 @@ func NewHumanPhoneVerifiedEvent(base *eventstore.BaseEvent) *HumanPhoneVerifiedE
 	}
 }
 
-func HumanPhoneVerifiedEventMapper(event *repository.Event) eventstore.EventReader {
+func HumanPhoneVerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &HumanPhoneVerifiedEvent{
 		BaseEvent:       *eventstore.BaseEventFromRepo(event),
 		IsPhoneVerified: true,
+	}, nil
+}
+
+type HumanPhoneVerificationFailedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanPhoneVerificationFailedEvent) CheckPrevious() bool {
+	return false
+}
+
+func (e *HumanPhoneVerificationFailedEvent) Data() interface{} {
+	return nil
+}
+
+func NewHumanPhoneVerificationFailedEvent(base *eventstore.BaseEvent) *HumanPhoneVerificationFailedEvent {
+	return &HumanPhoneVerificationFailedEvent{
+		BaseEvent: *base,
 	}
+}
+
+func HumanPhoneVerificationFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &HumanPhoneVerificationFailedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
+}
+
+type HumanPhoneCodeAddedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Code   *crypto.CryptoValue `json:"code,omitempty"`
+	Expiry time.Duration       `json:"expiry,omitempty"`
+}
+
+func (e *HumanPhoneCodeAddedEvent) CheckPrevious() bool {
+	return false
+}
+
+func (e *HumanPhoneCodeAddedEvent) Data() interface{} {
+	return e
+}
+
+func NewHumanPhoneCodeAddedEvent(
+	base *eventstore.BaseEvent,
+	code *crypto.CryptoValue,
+	expiry time.Duration) *HumanPhoneCodeAddedEvent {
+	return &HumanPhoneCodeAddedEvent{
+		BaseEvent: *base,
+		Code:      code,
+		Expiry:    expiry,
+	}
+}
+
+func HumanPhoneCodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	codeAdded := &HumanPhoneCodeAddedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, codeAdded)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "USER-6Ms9d", "unable to unmarshal human phone code added")
+	}
+
+	return codeAdded, nil
+}
+
+type HumanPhoneCodeSentEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanPhoneCodeSentEvent) CheckPrevious() bool {
+	return false
+}
+
+func (e *HumanPhoneCodeSentEvent) Data() interface{} {
+	return e
+}
+
+func NewHumanPhoneCodeSentEvent(
+	base *eventstore.BaseEvent) *HumanPhoneCodeSentEvent {
+	return &HumanPhoneCodeSentEvent{
+		BaseEvent: *base,
+	}
+}
+
+func HumanPhoneCodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &HumanPhoneCodeSentEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
 }

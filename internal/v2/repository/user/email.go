@@ -2,9 +2,11 @@ package user
 
 import (
 	"encoding/json"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+	"time"
 )
 
 const (
@@ -75,4 +77,91 @@ func HumanEmailVerifiedEventMapper(event *repository.Event) (eventstore.EventRea
 		IsEmailVerified: true,
 	}
 	return emailVerified, nil
+}
+
+type HumanEmailVerificationFailedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanEmailVerificationFailedEvent) CheckPrevious() bool {
+	return false
+}
+
+func (e *HumanEmailVerificationFailedEvent) Data() interface{} {
+	return nil
+}
+
+func NewHumanEmailVerificationFailedEvent(base *eventstore.BaseEvent) *HumanEmailVerificationFailedEvent {
+	return &HumanEmailVerificationFailedEvent{
+		BaseEvent: *base,
+	}
+}
+
+func HumanEmailVerificationFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &HumanEmailVerificationFailedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
+}
+
+type HumanEmailCodeAddedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Code   *crypto.CryptoValue `json:"code,omitempty"`
+	Expiry time.Duration       `json:"expiry,omitempty"`
+}
+
+func (e *HumanEmailCodeAddedEvent) CheckPrevious() bool {
+	return true
+}
+
+func (e *HumanEmailCodeAddedEvent) Data() interface{} {
+	return e
+}
+
+func NewHumanEmailCodeAddedEvent(
+	base *eventstore.BaseEvent,
+	code *crypto.CryptoValue,
+	expiry time.Duration) *HumanEmailCodeAddedEvent {
+	return &HumanEmailCodeAddedEvent{
+		BaseEvent: *base,
+		Code:      code,
+		Expiry:    expiry,
+	}
+}
+
+func HumanEmailCodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	codeAdded := &HumanEmailCodeAddedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, codeAdded)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "USER-3M0sd", "unable to unmarshal human email code added")
+	}
+
+	return codeAdded, nil
+}
+
+type HumanEmailCodeSentEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanEmailCodeSentEvent) CheckPrevious() bool {
+	return true
+}
+
+func (e *HumanEmailCodeSentEvent) Data() interface{} {
+	return nil
+}
+
+func NewHumanEmailCodeSentEvent(
+	base *eventstore.BaseEvent) *HumanEmailCodeSentEvent {
+	return &HumanEmailCodeSentEvent{
+		BaseEvent: *base,
+	}
+}
+
+func HumanEmailCodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &HumanEmailCodeSentEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
 }
