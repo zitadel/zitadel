@@ -1,0 +1,18 @@
+$lgn-header-max-width: 350px;
+$lgn-header-padding: 0;
+$lgn-header-margin: 100px auto .5rem auto;
+
+.lgn-header {
+    display: block;
+    margin: $lgn-header-margin;
+    max-width: $lgn-header-max-width;
+    padding: $lgn-header-padding;
+    width: 100%;
+
+    img {
+        width: 100%;
+        display: block;
+        margin: 0 auto;
+        max-width: 200px;
+    }
+}

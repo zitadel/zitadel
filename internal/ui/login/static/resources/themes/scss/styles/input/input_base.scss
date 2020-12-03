@@ -3,9 +3,8 @@ $lgn-input-padding: 10px !default;
 $lgn-input-margin: 0 0 2px 0 !default;
 $lgn-input-line-height: 40px !default;
 $lgn-input-border-radius: 4px !default;
-// $lgn-input-focus-transition: opacity 200ms cubic-bezier(0.35, 0, 0.25, 1),
-//                               background-color 200ms cubic-bezier(0.35, 0, 0.25, 1) !default;
-
+$lgn-input-border-width: 1px !default;
+$lgn-input-placeholder-font-size: 14px !default;
 
 @mixin lgn-input-base {
     display: block;
@@ -18,11 +17,16 @@ $lgn-input-border-radius: 4px !default;
     border-radius: $lgn-input-border-radius;
     transform: all .2 linear;
     font-size: 1rem;
-    border: none;
-    border-radius: 4px;
-    height: $lgn-button-line-height;
+    border-style: solid;
+    border-width: $lgn-input-border-width;
+    height: $lgn-input-line-height;
     padding: $lgn-input-padding;
     transition: border-color .2s ease-in-out;
     width: 100%;
     margin: $lgn-input-margin;
+
+    &::placeholder {
+        font-size: $lgn-input-placeholder-font-size;
+        font-style: italic;
+    }  
 }

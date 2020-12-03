@@ -39,7 +39,7 @@ footer {
   min-width: 64px;
   line-height: 36px;
   padding: 0 16px;
-  border-radius: 4px;
+  border-radius: 6px;
   overflow: visible;
 }
 .lgn-button[disabled], .lgn-stroked-button[disabled] {
@@ -65,7 +65,7 @@ footer {
   min-width: 64px;
   line-height: 36px;
   padding: 0 16px;
-  border-radius: 4px;
+  border-radius: 6px;
   overflow: visible;
   transform: translate3d(0, 0, 0);
 }
@@ -96,11 +96,6 @@ footer {
   vertical-align: middle;
 }
 
-@media (hover: none) {
-  input:hover:not([disabled]):focus, .lgn-input:hover:not([disabled]):focus {
-    opacity: 0;
-  }
-}
 input, .lgn-input {
   display: block;
   box-sizing: border-box;
@@ -112,13 +107,25 @@ input, .lgn-input {
   border-radius: 4px;
   transform: all 0.2 linear;
   font-size: 1rem;
-  border: none;
-  border-radius: 4px;
-  height: 36px;
+  border-style: solid;
+  border-width: 1px;
+  height: 40px;
   padding: 10px;
   transition: border-color 0.2s ease-in-out;
   width: 100%;
   margin: 0 0 2px 0;
+}
+input::placeholder, .lgn-input::placeholder {
+  font-size: 14px;
+  font-style: italic;
+}
+
+label, .lgn-label {
+  display: block;
+  font-size: 12px;
+  transition: color 0.2s ease;
+  margin: 0 0 2px 0;
+  font-weight: 400;
 }
 
 @font-face {
@@ -234,7 +241,7 @@ footer {
   min-width: 64px;
   line-height: 36px;
   padding: 0 16px;
-  border-radius: 4px;
+  border-radius: 6px;
   overflow: visible;
 }
 .lgn-button[disabled], .lgn-stroked-button[disabled] {
@@ -260,7 +267,7 @@ footer {
   min-width: 64px;
   line-height: 36px;
   padding: 0 16px;
-  border-radius: 4px;
+  border-radius: 6px;
   overflow: visible;
   transform: translate3d(0, 0, 0);
 }
@@ -291,11 +298,6 @@ footer {
   vertical-align: middle;
 }
 
-@media (hover: none) {
-  input:hover:not([disabled]):focus, .lgn-input:hover:not([disabled]):focus {
-    opacity: 0;
-  }
-}
 input, .lgn-input {
   display: block;
   box-sizing: border-box;
@@ -307,13 +309,25 @@ input, .lgn-input {
   border-radius: 4px;
   transform: all 0.2 linear;
   font-size: 1rem;
-  border: none;
-  border-radius: 4px;
-  height: 36px;
+  border-style: solid;
+  border-width: 1px;
+  height: 40px;
   padding: 10px;
   transition: border-color 0.2s ease-in-out;
   width: 100%;
   margin: 0 0 2px 0;
+}
+input::placeholder, .lgn-input::placeholder {
+  font-size: 14px;
+  font-style: italic;
+}
+
+label, .lgn-label {
+  display: block;
+  font-size: 12px;
+  transition: color 0.2s ease;
+  margin: 0 0 2px 0;
+  font-weight: 400;
 }
 
 @font-face {
@@ -462,10 +476,24 @@ input, .lgn-input {
 }
 .content-container {
   display: block;
-  margin: 0 auto;
+  margin: 100px auto 50px auto;
   max-width: 350px;
   padding: 20px;
   width: 100%;
+}
+
+.lgn-header {
+  display: block;
+  margin: 100px auto 0.5rem auto;
+  max-width: 350px;
+  padding: 0;
+  width: 100%;
+}
+.lgn-header img {
+  width: 100%;
+  display: block;
+  margin: 0 auto;
+  max-width: 200px;
 }
 
 /*# sourceMappingURL=bundle.css.map */

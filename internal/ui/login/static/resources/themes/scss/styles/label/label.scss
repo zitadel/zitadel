@@ -1,4 +1,4 @@
-@import './input_base.scss';
+@import './label_base.scss';
 
 // Disable the hover styles on non-hover devices. Since this is more of a progressive
 // enhancement and not all desktop browsers support this kind of media query, we can't
@@ -11,6 +11,8 @@
 //   }
 // }
 
-input, .lgn-input {
-  @include lgn-input-base;
+// Should be placed after the `:hover` styles so the focused
+// styling coming in from `lgn-input-base` takes precedence.
+label, .lgn-label {
+  @include lgn-label-base;
 }

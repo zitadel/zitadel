@@ -14,22 +14,11 @@
 
 @mixin lgn-input-color($config-or-theme) {
     $config: lgn-get-color-config($config-or-theme);
-    // $primary: map-get($config, primary);
-    // $accent: map-get($config, accent);
-    // $warn: map-get($config, warn);
+    $primary: map-get($config, primary);
+    $warn: map-get($config, warn);
     $background: map-get($config, background);
     $foreground: map-get($config, foreground);
-  
-    // input, .lgn-input {
-    //     &:focus {
-    //         background: map-get($foreground, base);
-    //     }
-    // }
 
-    // .lgn-button:focus, .lgn-stroked-button:focus {
-    //     border-color: map-get($foreground, base);
-    // }
-  
     input:not([disabled]), .lgn-input:not([disabled]) {
       border-color: lgn-color($foreground, input-border);
     }
@@ -37,20 +26,27 @@
     input, .lgn-input {
       color: lgn-color($foreground, text);
       background-color: lgn-color($background, input);
-      border-color: lgn-color($foreground, input-border);
 
-    //   @include _lgn-input-theme-property($config, 'background-color');
+      &:hover {
+        border-color: lgn-color($foreground, input-border-hover);
+      }
 
-    //   @include _lgn-input-theme-property($config, 'color');
-    //   @include _lgn-input-theme-property($config, 'background-color');
-    //   @include _lgn-input-theme-property($config, 'color');
+      &:active {
+        @include _lgn-input-theme-property($config, 'border-color', default);
+      }
+
+      &:focus {
+        @include _lgn-input-theme-property($config, 'border-color', default);
+      }
     }
+
+    input::placeholder,
+    .lgn-input::placeholder {
+        color: lgn-color($foreground, input-placeholder);
+    }    
   }
   
-  @mixin _lgn-input-theme-property($theme, $property) {
-    $background: map-get($theme, background);
-  
-    &[disabled] {
-        #{$property}: lgn-color($background, input);
-    }
+  @mixin _lgn-input-theme-property($theme, $property, $hue) {
+    $primary: map-get($theme, primary);
+    #{$property}: lgn-color($primary, $hue);
   }

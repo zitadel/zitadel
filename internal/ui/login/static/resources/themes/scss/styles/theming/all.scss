@@ -2,6 +2,7 @@
 @import '../footer/footer_theme.scss';
 @import '../button/button_theme.scss';
 @import '../input/input_theme.scss';
+@import '../label/label_theme.scss';
 @import '../typography/typography.scss';
 @import './theming';
 
@@ -11,6 +12,8 @@
       @include lgn-core-theme($theme-or-color-config);
       @include lgn-button-theme($theme-or-color-config);
       @include lgn-input-theme($theme-or-color-config);
+      @include lgn-label-theme($theme-or-color-config);
       @include lgn-footer-theme($theme-or-color-config);
+
     // }
 }

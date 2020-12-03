@@ -3,15 +3,16 @@ $dark-secondary-text: rgba(black, 0.54);
 $dark-disabled-text: rgba(black, 0.38);
 $dark-dividers: rgba(black, 0.12);
 $dark-focused: rgba(black, 0.12);
-$dark-input-border: rgba(black, 0.12);
+$dark-input-border: #403e3e;
+$dark-input-border-hover: #aeafb1;
 
 $light-primary-text: white;
 $light-secondary-text: rgba(white, 0.7);
 $light-disabled-text: rgba(white, 0.5);
 $light-dividers: rgba(white, 0.12);
 $light-focused: rgba(white, 0.12);
-$light-input-border: rgba(white, 0.12);
-
+$light-input-border: #00000040;
+$light-input-border-hover: #1a1b1b;
 
 $lgn-dark-brand: (
     50: #fff,
@@ -232,6 +233,9 @@ $lgn-warn: (
   $lgn-light-theme-foreground: (
     base:              black,
     input-border:      $light-input-border,
+    input-border-hover: $light-input-border-hover,
+    input-placeholder: map-get($lgn-grey, 600),
+    label:             map-get($lgn-grey, 600),//#697386
     divider:           $dark-dividers,
     dividers:          $dark-dividers,
     disabled:          $dark-disabled-text,
@@ -251,6 +255,9 @@ $lgn-warn: (
   $lgn-dark-theme-foreground: (
     base:              white,
     input-border:      $dark-input-border,
+    input-border-hover: $dark-input-border-hover,
+    input-placeholder: map-get($lgn-grey, 600),
+    label:             map-get($lgn-grey, 600),// #8795a1,
     divider:           $light-dividers,
     dividers:          $light-dividers,
     disabled:          $light-disabled-text,

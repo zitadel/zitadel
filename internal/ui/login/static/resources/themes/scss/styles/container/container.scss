@@ -1,10 +1,11 @@
-$container-max-width: 350px;
-$container-padding: 20px;
+$lgn-container-max-width: 350px;
+$lgn-container-padding: 20px;
+$lgn-container-margin: 0px auto 50px auto;
 
 .content-container {
     display: block;
-    margin: 0 auto;
-    max-width: $container-max-width;
-    padding: $container-padding;
+    margin: $lgn-container-margin;
+    max-width: $lgn-container-max-width;
+    padding: $lgn-container-padding;
     width: 100%;
 }

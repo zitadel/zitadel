@@ -39,7 +39,7 @@ footer {
   min-width: 64px;
   line-height: 36px;
   padding: 0 16px;
-  border-radius: 4px;
+  border-radius: 6px;
   overflow: visible;
 }
 .lgn-button[disabled], .lgn-stroked-button[disabled] {
@@ -65,7 +65,7 @@ footer {
   min-width: 64px;
   line-height: 36px;
   padding: 0 16px;
-  border-radius: 4px;
+  border-radius: 6px;
   overflow: visible;
   transform: translate3d(0, 0, 0);
 }
@@ -96,11 +96,6 @@ footer {
   vertical-align: middle;
 }
 
-@media (hover: none) {
-  input:hover:not([disabled]):focus, .lgn-input:hover:not([disabled]):focus {
-    opacity: 0;
-  }
-}
 input, .lgn-input {
   display: block;
   box-sizing: border-box;
@@ -112,13 +107,25 @@ input, .lgn-input {
   border-radius: 4px;
   transform: all 0.2 linear;
   font-size: 1rem;
-  border: none;
-  border-radius: 4px;
-  height: 36px;
+  border-style: solid;
+  border-width: 1px;
+  height: 40px;
   padding: 10px;
   transition: border-color 0.2s ease-in-out;
   width: 100%;
   margin: 0 0 2px 0;
+}
+input::placeholder, .lgn-input::placeholder {
+  font-size: 14px;
+  font-style: italic;
+}
+
+label, .lgn-label {
+  display: block;
+  font-size: 12px;
+  transition: color 0.2s ease;
+  margin: 0 0 2px 0;
+  font-weight: 400;
 }
 
 @font-face {
@@ -235,6 +242,12 @@ small .lgn-small, .lgn-caption {
   letter-spacing: normal;
 }
 
+label .lgn-label, .lgn-typography .lgn-label, .lgn-typography label {
+  font: 400 12px/20px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: normal;
+  margin: 0 0 2px 0;
+}
+
 .lgn-display-4, .lgn-typography .lgn-display-4 {
   font: 300 112px/112px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: -0.05em;
@@ -335,13 +348,30 @@ small .lgn-small, .lgn-caption {
 }
 
 input:not([disabled]), .lgn-input:not([disabled]) {
-  border-color: rgba(0, 0, 0, 0.12);
+  border-color: #403e3e;
 }
 
 input, .lgn-input {
   color: white;
   background-color: rgba(0, 0, 0, 0.2);
-  border-color: rgba(0, 0, 0, 0.12);
+}
+input:hover, .lgn-input:hover {
+  border-color: #aeafb1;
+}
+input:active, .lgn-input:active {
+  border-color: #5282c1;
+}
+input:focus, .lgn-input:focus {
+  border-color: #5282c1;
+}
+
+input::placeholder,
+.lgn-input::placeholder {
+  color: #757575;
+}
+
+label, .lgn-label {
+  color: #757575;
 }
 
 footer {
@@ -419,12 +449,27 @@ footer {
   background-color: rgba(255, 255, 255, 0.12);
 }
 .lgn-dark-theme input:not([disabled]), .lgn-dark-theme .lgn-input:not([disabled]) {
-  border-color: rgba(0, 0, 0, 0.12);
+  border-color: #403e3e;
 }
 .lgn-dark-theme input, .lgn-dark-theme .lgn-input {
   color: white;
   background-color: rgba(0, 0, 0, 0.2);
-  border-color: rgba(0, 0, 0, 0.12);
+}
+.lgn-dark-theme input:hover, .lgn-dark-theme .lgn-input:hover {
+  border-color: #aeafb1;
+}
+.lgn-dark-theme input:active, .lgn-dark-theme .lgn-input:active {
+  border-color: #5282c1;
+}
+.lgn-dark-theme input:focus, .lgn-dark-theme .lgn-input:focus {
+  border-color: #5282c1;
+}
+.lgn-dark-theme input::placeholder,
+.lgn-dark-theme .lgn-input::placeholder {
+  color: #757575;
+}
+.lgn-dark-theme label, .lgn-dark-theme .lgn-label {
+  color: #757575;
 }
 .lgn-dark-theme footer {
   background-color: rgba(0, 0, 0, 0.2);
@@ -501,12 +546,27 @@ footer {
   background-color: rgba(0, 0, 0, 0.12);
 }
 .lgn-light-theme input:not([disabled]), .lgn-light-theme .lgn-input:not([disabled]) {
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(0, 0, 0, 0.2509803922);
 }
 .lgn-light-theme input, .lgn-light-theme .lgn-input {
   color: rgba(0, 0, 0, 0.87);
   background-color: rgba(250, 250, 250, 0.3137254902);
-  border-color: rgba(255, 255, 255, 0.12);
+}
+.lgn-light-theme input:hover, .lgn-light-theme .lgn-input:hover {
+  border-color: #1a1b1b;
+}
+.lgn-light-theme input:active, .lgn-light-theme .lgn-input:active {
+  border-color: #5469d4;
+}
+.lgn-light-theme input:focus, .lgn-light-theme .lgn-input:focus {
+  border-color: #5469d4;
+}
+.lgn-light-theme input::placeholder,
+.lgn-light-theme .lgn-input::placeholder {
+  color: #757575;
+}
+.lgn-light-theme label, .lgn-light-theme .lgn-label {
+  color: #757575;
 }
 .lgn-light-theme footer {
   background-color: rgba(250, 250, 250, 0.3137254902);

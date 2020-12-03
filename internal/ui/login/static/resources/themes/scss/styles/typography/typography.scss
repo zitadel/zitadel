@@ -23,7 +23,7 @@
   $subheading-1:  lgn-typography-level(15px, 24px, 400),
   $body-2:        lgn-typography-level(14px, 24px, 500),
   $body-1:        lgn-typography-level(14px, 20px, 400),
-  $caption:       lgn-typography-level(12px, 20px, 400),
+  $caption-1:     lgn-typography-level(12px, 20px, 400),
   $button:        lgn-typography-level(14px, 14px, 500),
   $input:         lgn-typography-level(inherit, 1.125, 400)
 ) {
@@ -38,7 +38,7 @@
     subheading-1:   $subheading-1,
     body-2:         $body-2,
     body-1:         $body-1,
-    caption:        $caption,
+    caption-1:      $caption-1,
     button:         $button,
     input:          $input,
   );
@@ -179,7 +179,12 @@
     }
   
     small .lgn-small, .lgn-caption {
-      @include lgn-typography-level-to-styles($config, caption);
+      @include lgn-typography-level-to-styles($config, caption-1);
+    }
+
+    label .lgn-label, #{$selector} .lgn-label, #{$selector} label {
+        @include lgn-typography-level-to-styles($config, caption-1);
+        margin: 0 0 2px 0;
     }
   
     .lgn-display-4, #{$selector} .lgn-display-4 {

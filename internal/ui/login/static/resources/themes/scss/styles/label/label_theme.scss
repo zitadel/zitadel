@@ -1,0 +1,25 @@
+@import '../theming/theming.scss';
+@import './label.scss';
+
+@mixin lgn-label-theme($theme-or-color-config) {
+    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
+    // @include lgn-private-check-duplicate-theme-styles($theme, 'lgn-label') {
+      $color: lgn-get-color-config($theme);
+
+      @if $color != null {
+        @include lgn-label-color($color);
+      }
+    // }
+}
+
+@mixin lgn-label-color($config-or-theme) {
+    $config: lgn-get-color-config($config-or-theme);
+    $primary: map-get($config, primary);
+    $warn: map-get($config, warn);
+    $background: map-get($config, background);
+    $foreground: map-get($config, foreground);
+
+    label, .lgn-label {
+      color: lgn-color($foreground, label);
+    }
+}
