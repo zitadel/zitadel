@@ -33,3 +33,7 @@ func (c *UserCache) cacheUser(user *model.User) {
 		logging.Log("EVENT-0V2gX").WithError(err).Debug("error in setting project cache")
 	}
 }
+
+type CacheUser struct{
+	
+}

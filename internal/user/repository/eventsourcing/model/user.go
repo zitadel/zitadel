@@ -2,6 +2,9 @@ package model
 
 import (
 	"encoding/json"
+	"encoding/gob"
+	"golang.org/x/text/language"
+	"bytes"
 	"strings"
 
 	"github.com/caos/logging"
@@ -143,4 +146,51 @@ func (u *User) appendUnlockedEvent() {
 
 func (u *User) appendRemovedEvent() {
 	u.State = int32(model.UserStateDeleted)
+}
+
+type CacheUser User
+
+func (u *User) MarshalBinary() ([]byte, error) {
+	s := &struct{
+		*CacheUser
+		PreferredLanguage string
+	}{
+		CacheUser: (*CacheUser)(u),
+	}
+
+	if u.Human != nil && u.Human.Profile != nil{
+s.PreferredLanguage= u.Human.PreferredLanguage.String()
+	}
+	var b bytes.Buffer
+	enc := gob.NewEncoder(&b)
+	if err := enc.Encode(s); err != nil {
+		return nil, err
+	}
+	return b.Bytes(), nil
+}
+
+// UnmarshalBinary modifies the receiver so it must take a pointer receiver.
+func (u *User) UnmarshalBinary(data []byte) error {
+	// A simple encoding: plain text.
+	s := &struct{
+		*CacheUser
+		PreferredLanguage string
+	}{}
+
+	b := bytes.NewBuffer(data)
+	dec := gob.NewDecoder(b)
+
+	err := dec.Decode(s)
+	if err != nil{
+		return err
+	}
+
+	if s.CacheUser.Human != nil && s.CacheUser.Human.Profile != nil{
+		s.CacheUser.Human.Profile.PreferredLanguage = language.Make(s.PreferredLanguage)
+	}
+
+	*u = User(*s.CacheUser)
+
+
+	return nil
 }
