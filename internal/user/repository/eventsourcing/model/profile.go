@@ -3,10 +3,9 @@ package model
 import (
 	"encoding/json"
 
-	"golang.org/x/text/language"
-
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
+	"golang.org/x/text/language"
 )
 
 type Profile struct {
@@ -70,7 +69,13 @@ func ProfileToModel(profile *Profile) *model.Profile {
 type LanguageTag language.Tag
 
 func (t *LanguageTag) UnmarshalJSON(data []byte) error {
-	return (*language.Tag)(t).UnmarshalText(data)
+	var tag string
+	err := json.Unmarshal(data, &tag)
+	if err != nil {
+		return err
+	}
+	*t = LanguageTag(language.Make(tag))
+	return nil
 }
 
 func (t LanguageTag) MarshalJSON() ([]byte, error) {
