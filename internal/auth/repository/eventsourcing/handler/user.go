@@ -67,7 +67,7 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		u.fillLoginNames(user)
+		err = u.fillLoginNames(user)
 	case es_model.UserProfileChanged,
 		es_model.UserEmailChanged,
 		es_model.UserEmailVerified,
@@ -94,6 +94,12 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 		es_model.HumanMFAOTPAdded,
 		es_model.HumanMFAOTPVerified,
 		es_model.HumanMFAOTPRemoved,
+		es_model.HumanMFAU2FTokenAdded,
+		es_model.HumanMFAU2FTokenVerified,
+		es_model.HumanMFAU2FTokenRemoved,
+		es_model.HumanPasswordlessTokenAdded,
+		es_model.HumanPasswordlessTokenVerified,
+		es_model.HumanPasswordlessTokenRemoved,
 		es_model.HumanMFAInitSkipped,
 		es_model.MachineChanged,
 		es_model.HumanPasswordChanged:

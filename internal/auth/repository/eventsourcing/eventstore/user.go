@@ -253,18 +253,22 @@ func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new, user
 	return err
 }
 
-func (repo *UserRepo) MyUserMfas(ctx context.Context) ([]*model.MultiFactor, error) {
+func (repo *UserRepo) MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, error) {
 	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
 	}
-	if user.OTPState == model.MfaStateUnspecified {
-		return []*model.MultiFactor{}, nil
+	mfas := make([]*model.MultiFactor, 0)
+	if user.OTPState != model.MFAStateUnspecified {
+		mfas = append(mfas, &model.MultiFactor{Type: model.MFATypeOTP, State: user.OTPState})
 	}
-	return []*model.MultiFactor{{Type: model.MfaTypeOTP, State: user.OTPState}}, nil
+	for _, u2f := range user.U2FTokens {
+		mfas = append(mfas, &model.MultiFactor{Type: model.MFATypeU2F, State: u2f.State, Attribute: u2f.Name})
+	}
+	return mfas, nil
 }
 
-func (repo *UserRepo) AddMfaOTP(ctx context.Context, userID string) (*model.OTP, error) {
+func (repo *UserRepo) AddMFAOTP(ctx context.Context, userID string) (*model.OTP, error) {
 	accountName := ""
 	user, err := repo.UserByID(ctx, userID)
 	if err != nil {
@@ -275,7 +279,7 @@ func (repo *UserRepo) AddMfaOTP(ctx context.Context, userID string) (*model.OTP,
 	return repo.UserEvents.AddOTP(ctx, userID, accountName)
 }
 
-func (repo *UserRepo) AddMyMfaOTP(ctx context.Context) (*model.OTP, error) {
+func (repo *UserRepo) AddMyMFAOTP(ctx context.Context) (*model.OTP, error) {
 	accountName := ""
 	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
@@ -286,16 +290,64 @@ func (repo *UserRepo) AddMyMfaOTP(ctx context.Context) (*model.OTP, error) {
 	return repo.UserEvents.AddOTP(ctx, authz.GetCtxData(ctx).UserID, accountName)
 }
 
-func (repo *UserRepo) VerifyMfaOTPSetup(ctx context.Context, userID, code, userAgentID string) error {
-	return repo.UserEvents.CheckMfaOTPSetup(ctx, userID, code, userAgentID)
+func (repo *UserRepo) VerifyMFAOTPSetup(ctx context.Context, userID, code, userAgentID string) error {
+	return repo.UserEvents.CheckMFAOTPSetup(ctx, userID, code, userAgentID)
 }
 
-func (repo *UserRepo) VerifyMyMfaOTPSetup(ctx context.Context, code string) error {
-	return repo.UserEvents.CheckMfaOTPSetup(ctx, authz.GetCtxData(ctx).UserID, code, "")
+func (repo *UserRepo) VerifyMyMFAOTPSetup(ctx context.Context, code string) error {
+	return repo.UserEvents.CheckMFAOTPSetup(ctx, authz.GetCtxData(ctx).UserID, code, "")
 }
 
-func (repo *UserRepo) RemoveMyMfaOTP(ctx context.Context) error {
+func (repo *UserRepo) RemoveMyMFAOTP(ctx context.Context) error {
 	return repo.UserEvents.RemoveOTP(ctx, authz.GetCtxData(ctx).UserID)
+}
+
+func (repo *UserRepo) AddMFAU2F(ctx context.Context, userID string) (*model.WebAuthNToken, error) {
+	return repo.UserEvents.AddU2F(ctx, userID)
+}
+
+func (repo *UserRepo) AddMyMFAU2F(ctx context.Context) (*model.WebAuthNToken, error) {
+	return repo.UserEvents.AddU2F(ctx, authz.GetCtxData(ctx).UserID)
+}
+
+func (repo *UserRepo) VerifyMFAU2FSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error {
+	return repo.UserEvents.VerifyU2FSetup(ctx, userID, tokenName, credentialData)
+}
+
+func (repo *UserRepo) VerifyMyMFAU2FSetup(ctx context.Context, tokenName string, credentialData []byte) error {
+	return repo.UserEvents.VerifyU2FSetup(ctx, authz.GetCtxData(ctx).UserID, tokenName, credentialData)
+}
+
+func (repo *UserRepo) RemoveMFAU2F(ctx context.Context, userID, webAuthNTokenID string) error {
+	return repo.UserEvents.RemoveU2FToken(ctx, userID, webAuthNTokenID)
+}
+
+func (repo *UserRepo) RemoveMyMFAU2F(ctx context.Context, webAuthNTokenID string) error {
+	return repo.UserEvents.RemoveU2FToken(ctx, authz.GetCtxData(ctx).UserID, webAuthNTokenID)
+}
+
+func (repo *UserRepo) AddPasswordless(ctx context.Context, userID string) (*model.WebAuthNToken, error) {
+	return repo.UserEvents.AddPasswordless(ctx, userID)
+}
+
+func (repo *UserRepo) AddMyPasswordless(ctx context.Context) (*model.WebAuthNToken, error) {
+	return repo.UserEvents.AddPasswordless(ctx, authz.GetCtxData(ctx).UserID)
+}
+
+func (repo *UserRepo) VerifyPasswordlessSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error {
+	return repo.UserEvents.VerifyPasswordlessSetup(ctx, userID, tokenName, credentialData)
+}
+
+func (repo *UserRepo) VerifyMyPasswordlessSetup(ctx context.Context, tokenName string, credentialData []byte) error {
+	return repo.UserEvents.VerifyPasswordlessSetup(ctx, authz.GetCtxData(ctx).UserID, tokenName, credentialData)
+}
+
+func (repo *UserRepo) RemovePasswordless(ctx context.Context, userID, webAuthNTokenID string) error {
+	return repo.UserEvents.RemovePasswordlessToken(ctx, userID, webAuthNTokenID)
+}
+
+func (repo *UserRepo) RemoveMyPasswordless(ctx context.Context, webAuthNTokenID string) error {
+	return repo.UserEvents.RemovePasswordlessToken(ctx, authz.GetCtxData(ctx).UserID, webAuthNTokenID)
 }
 
 func (repo *UserRepo) ChangeMyUsername(ctx context.Context, username string) error {
@@ -327,8 +379,8 @@ func (repo *UserRepo) VerifyInitCode(ctx context.Context, userID, code, password
 	return repo.UserEvents.VerifyInitCode(ctx, pwPolicyView, userID, code, password)
 }
 
-func (repo *UserRepo) SkipMfaInit(ctx context.Context, userID string) error {
-	return repo.UserEvents.SkipMfaInit(ctx, userID)
+func (repo *UserRepo) SkipMFAInit(ctx context.Context, userID string) error {
+	return repo.UserEvents.SkipMFAInit(ctx, userID)
 }
 
 func (repo *UserRepo) RequestPasswordReset(ctx context.Context, loginname string) error {

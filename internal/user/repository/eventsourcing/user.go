@@ -400,7 +400,7 @@ func InitCodeCheckFailedAggregate(aggCreator *es_models.AggregateCreator, user *
 	}
 }
 
-func SkipMfaAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+func SkipMFAAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
@@ -773,13 +773,139 @@ func MFAOTPCheckFailedAggregate(aggCreator *es_models.AggregateCreator, user *mo
 	}
 }
 
-func MFAOTPRemoveAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+func MFAOTPRemoveAggregate(aggCreator *es_models.AggregateCreator, user *model.User) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := UserAggregate(ctx, aggCreator, user)
 		if err != nil {
 			return nil, err
 		}
 		return agg.AppendEvent(model.HumanMFAOTPRemoved, nil)
+	}
+}
+
+func MFAU2FAddAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNToken) es_sdk.AggregateFunc {
+	return MFAWebauthNAddAggregate(aggCreator, user, webauthN, model.HumanMFAU2FTokenAdded)
+}
+
+func MFAPasswordlessAddAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNToken) es_sdk.AggregateFunc {
+	return MFAWebauthNAddAggregate(aggCreator, user, webauthN, model.HumanPasswordlessTokenAdded)
+}
+
+func MFAWebauthNAddAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNToken, event es_models.EventType) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if webauthN == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-4N90s", "Errors.Internal")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, user)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(event, webauthN)
+	}
+}
+
+func MFAU2FVerifyAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNVerify) es_sdk.AggregateFunc {
+	return MFAWebauthNVerifyAggregate(aggCreator, user, webauthN, model.HumanMFAU2FTokenVerified)
+}
+
+func MFAPasswordlessVerifyAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNVerify) es_sdk.AggregateFunc {
+	return MFAWebauthNVerifyAggregate(aggCreator, user, webauthN, model.HumanPasswordlessTokenVerified)
+}
+
+func MFAWebauthNVerifyAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNVerify, event es_models.EventType) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if webauthN == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-4N90s", "Errors.Internal")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, user)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(event, webauthN)
+	}
+}
+
+func MFAU2FSignCountAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNSignCount, check *model.AuthRequest, checkSucceeded bool) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if webauthN == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-4N90s", "Errors.Internal")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, user)
+		if err != nil {
+			return nil, err
+		}
+		agg, err = agg.AppendEvent(model.HumanMFAU2FTokenSignCountChanged, webauthN)
+		if err != nil {
+			return nil, err
+		}
+		if checkSucceeded {
+			return agg.AppendEvent(model.HumanMFAU2FTokenCheckSucceeded, check)
+		} else {
+			return agg.AppendEvent(model.HumanMFAU2FTokenCheckFailed, check)
+		}
+	}
+}
+
+func MFAPasswordlessSignCountAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNSignCount, check *model.AuthRequest, checkSucceeded bool) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if webauthN == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-4N90s", "Errors.Internal")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, user)
+		if err != nil {
+			return nil, err
+		}
+		agg, err = agg.AppendEvent(model.HumanPasswordlessTokenChangeSignCount, webauthN)
+		if err != nil {
+			return nil, err
+		}
+		if checkSucceeded {
+			return agg.AppendEvent(model.HumanPasswordlessTokenCheckSucceeded, check)
+		} else {
+			return agg.AppendEvent(model.HumanPasswordlessTokenCheckFailed, check)
+		}
+	}
+}
+
+func MFAU2FRemoveAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNTokenID) es_sdk.AggregateFunc {
+	return MFAWebauthNRemoveAggregate(aggCreator, user, webauthN, model.HumanMFAU2FTokenRemoved)
+}
+
+func MFAPasswordlessRemoveAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNTokenID) es_sdk.AggregateFunc {
+	return MFAWebauthNRemoveAggregate(aggCreator, user, webauthN, model.HumanPasswordlessTokenRemoved)
+}
+
+func MFAWebauthNRemoveAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNTokenID, event es_models.EventType) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if webauthN == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-4Ms9l", "Errors.Internal")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, user)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(event, webauthN)
+	}
+}
+
+func MFAU2FBeginLoginAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNLogin) es_sdk.AggregateFunc {
+	return MFAWebauthNBeginLoginAggregate(aggCreator, user, webauthN, model.HumanMFAU2FTokenBeginLogin)
+}
+
+func MFAPasswordlessBeginLoginAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNLogin) es_sdk.AggregateFunc {
+	return MFAWebauthNBeginLoginAggregate(aggCreator, user, webauthN, model.HumanPasswordlessTokenBeginLogin)
+}
+
+func MFAWebauthNBeginLoginAggregate(aggCreator *es_models.AggregateCreator, user *model.User, webauthN *model.WebAuthNLogin, event es_models.EventType) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if webauthN == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-4N90s", "Errors.Internal")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, user)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(event, webauthN)
 	}
 }
 

@@ -53,7 +53,7 @@ SystemDefaults:
   VerificationLifetimes:
     PasswordCheck: 240h #10d
     ExternalLoginCheck: 240h #10d
-    MfaInitSkip: 720h #30d
+    MFAInitSkip: 720h #30d
     SecondFactorCheck: 18h
     MultiFactorCheck: 12h
   IamID: 'IAM'
@@ -125,3 +125,7 @@ SystemDefaults:
         Greeting: 'DomainClaimed.Greeting'
         Text: 'DomainClaimed.Text'
         ButtonText: 'DomainClaimed.ButtonText'
+  WebAuthN:
+    ID: $ZITADEL_COOKIE_DOMAIN
+    Origin: $ZITADEL_ACCOUNTS
+    DisplayName: ZITADEL

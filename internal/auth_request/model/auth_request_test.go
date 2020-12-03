@@ -147,7 +147,7 @@ func TestAuthRequest_IsValid(t *testing.T) {
 	}
 }
 
-func TestAuthRequest_MfaLevel(t *testing.T) {
+func TestAuthRequest_MFALevel(t *testing.T) {
 	type fields struct {
 		Prompt       Prompt
 		PossibleLOAs []LevelOfAssurance
@@ -169,7 +169,7 @@ func TestAuthRequest_MfaLevel(t *testing.T) {
 				Prompt:       tt.fields.Prompt,
 				PossibleLOAs: tt.fields.PossibleLOAs,
 			}
-			if got := a.MfaLevel(); got != tt.want {
+			if got := a.MFALevel(); got != tt.want {
 				t.Errorf("MFALevel() = %v, want %v", got, tt.want)
 			}
 		})

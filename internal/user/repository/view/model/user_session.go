@@ -32,6 +32,7 @@ type UserSessionView struct {
 	DisplayName                  string    `json:"-" gorm:"column:user_display_name"`
 	SelectedIDPConfigID          string    `json:"selectedIDPConfigID" gorm:"column:selected_idp_config_id"`
 	PasswordVerification         time.Time `json:"-" gorm:"column:password_verification"`
+	PasswordlessVerification     time.Time `json:"-" gorm:"column:passwordless_verification"`
 	ExternalLoginVerification    time.Time `json:"-" gorm:"column:external_login_verification"`
 	SecondFactorVerification     time.Time `json:"-" gorm:"column:second_factor_verification"`
 	SecondFactorVerificationType int32     `json:"-" gorm:"column:second_factor_verification_type"`
@@ -62,6 +63,7 @@ func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 		DisplayName:                  userSession.DisplayName,
 		SelectedIDPConfigID:          userSession.SelectedIDPConfigID,
 		PasswordVerification:         userSession.PasswordVerification,
+		PasswordlessVerification:     userSession.PasswordlessVerification,
 		ExternalLoginVerification:    userSession.ExternalLoginVerification,
 		SecondFactorVerification:     userSession.SecondFactorVerification,
 		SecondFactorVerificationType: req_model.MFAType(userSession.SecondFactorVerificationType),
@@ -96,6 +98,15 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 		v.ExternalLoginVerification = event.CreationDate
 		v.SelectedIDPConfigID = data.SelectedIDPConfigID
 		v.State = int32(req_model.UserSessionStateActive)
+	case es_model.HumanPasswordlessTokenCheckSucceeded:
+		v.PasswordlessVerification = event.CreationDate
+		v.MultiFactorVerification = event.CreationDate
+		v.MultiFactorVerificationType = int32(req_model.MFATypeU2FUserVerification)
+		v.State = int32(req_model.UserSessionStateActive)
+	case es_model.HumanPasswordlessTokenCheckFailed,
+		es_model.HumanPasswordlessTokenRemoved:
+		v.PasswordlessVerification = time.Time{}
+		v.MultiFactorVerification = time.Time{}
 	case es_model.UserPasswordCheckFailed,
 		es_model.HumanPasswordCheckFailed:
 		v.PasswordVerification = time.Time{}
@@ -129,8 +140,14 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 	case es_model.MFAOTPCheckFailed,
 		es_model.MFAOTPRemoved,
 		es_model.HumanMFAOTPCheckFailed,
-		es_model.HumanMFAOTPRemoved:
+		es_model.HumanMFAOTPRemoved,
+		es_model.HumanMFAU2FTokenCheckFailed,
+		es_model.HumanMFAU2FTokenRemoved:
 		v.SecondFactorVerification = time.Time{}
+	case es_model.HumanMFAU2FTokenCheckSucceeded:
+		v.SecondFactorVerification = event.CreationDate
+		v.SecondFactorVerificationType = int32(req_model.MFATypeU2F)
+		v.State = int32(req_model.UserSessionStateActive)
 	case es_model.SignedOut,
 		es_model.HumanSignedOut,
 		es_model.UserLocked,

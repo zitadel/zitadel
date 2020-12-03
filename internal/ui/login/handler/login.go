@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"net"
 	"net/http"
 
@@ -16,6 +15,7 @@ import (
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	auth_repository "github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/form"
 	"github.com/caos/zitadel/internal/id"

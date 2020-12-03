@@ -999,6 +999,7 @@ message DefaultLoginPolicy {
     google.protobuf.Timestamp creation_date = 4;
     google.protobuf.Timestamp change_date = 5;
     bool force_mfa = 6;
+    PasswordlessType passwordless_type = 7;
 }
 
 message DefaultLoginPolicyRequest {
@@ -1006,6 +1007,12 @@ message DefaultLoginPolicyRequest {
     bool allow_register = 2;
     bool allow_external_idp = 3;
     bool force_mfa = 4;
+    PasswordlessType passwordless_type = 5;
+}
+
+enum PasswordlessType {
+    PASSWORDLESSTYPE_NOT_ALLOWED = 0;
+    PASSWORDLESSTYPE_ALLOWED = 1;
 }
 
 message IdpProviderID {
@@ -1019,6 +1026,7 @@ message DefaultLoginPolicyView {
     google.protobuf.Timestamp creation_date = 4;
     google.protobuf.Timestamp change_date = 5;
     bool force_mfa = 6;
+    PasswordlessType passwordless_type = 7;
 }
 
 message IdpProviderView {

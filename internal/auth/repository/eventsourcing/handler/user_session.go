@@ -48,6 +48,10 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		es_model.HumanExternalLoginCheckSucceeded,
 		es_model.HumanMFAOTPCheckSucceeded,
 		es_model.HumanMFAOTPCheckFailed,
+		es_model.HumanMFAU2FTokenCheckSucceeded,
+		es_model.HumanMFAU2FTokenCheckFailed,
+		es_model.HumanPasswordlessTokenCheckSucceeded,
+		es_model.HumanPasswordlessTokenCheckFailed,
 		es_model.HumanSignedOut:
 		eventData, err := view_model.UserSessionFromEvent(event)
 		if err != nil {
@@ -78,7 +82,9 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		es_model.DomainClaimed,
 		es_model.UserUserNameChanged,
 		es_model.HumanExternalIDPRemoved,
-		es_model.HumanExternalIDPCascadeRemoved:
+		es_model.HumanExternalIDPCascadeRemoved,
+		es_model.HumanPasswordlessTokenRemoved,
+		es_model.HumanMFAU2FTokenRemoved:
 		sessions, err := u.view.UserSessionsByUserID(event.AggregateID)
 		if err != nil {
 			return err

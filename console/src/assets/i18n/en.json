@@ -164,8 +164,8 @@
             "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
             "TYPE": {
                 "0": "No MFA defined",
-                "1": "SMS",
-                "2": "OTP"
+                "1": "OTP",
+                "2": "U2F"
             },
             "STATE": {
                 "0": "No State",
