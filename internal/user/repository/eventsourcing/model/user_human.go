@@ -215,7 +215,7 @@ func (h *Human) ComputeObject() {
 
 func (u *Human) setData(event *es_models.Event) error {
 	if err := json.Unmarshal(event.Data, u); err != nil {
-		logging.Log("EVEN-8ujgd").WithError(err).Error("could not unmarshal event data")
+		logging.Log("EVEN-33JHP").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-sj4jd", "could not unmarshal event")
 	}
 	return nil

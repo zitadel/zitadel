@@ -18,8 +18,6 @@ type Profile struct {
 	DisplayName       string      `json:"displayName,omitempty"`
 	PreferredLanguage LanguageTag `json:"preferredLanguage,omitempty"`
 	Gender            int32       `json:"gender,omitempty"`
-
-	isUserNameUnique bool
 }
 
 func (p *Profile) Changes(changed *Profile) map[string]interface{} {
@@ -72,14 +70,11 @@ func ProfileToModel(profile *Profile) *model.Profile {
 type LanguageTag language.Tag
 
 func (t *LanguageTag) UnmarshalJSON(data []byte) error {
-	return json.Unmarshal(data, (*language.Tag)(t))
+	return (*language.Tag)(t).UnmarshalText(data)
 }
 
-func (t *LanguageTag) MarshalJSON() ([]byte, error) {
-	if t == nil {
-		return json.Marshal(language.Und)
-	}
-	return json.Marshal(language.Tag(*t))
+func (t LanguageTag) MarshalJSON() ([]byte, error) {
+	return json.Marshal(language.Tag(t))
 }
 
 func (t *LanguageTag) MarshalBinary() ([]byte, error) {
