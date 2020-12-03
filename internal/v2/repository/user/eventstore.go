@@ -5,7 +5,13 @@ import (
 )
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
-	es.RegisterFilterEventMapper(HumanAddedEventType, HumanAddedEventMapper).
+	es.RegisterFilterEventMapper(UserLockedType, UserLockedEventMapper).
+		RegisterFilterEventMapper(UserUnlockedType, UserLockedEventMapper).
+		RegisterFilterEventMapper(UserDeactivatedType, UserDeactivatedEventMapper).
+		RegisterFilterEventMapper(UserReactivatedType, UserReactivatedEventMapper).
+		RegisterFilterEventMapper(UserRemovedType, UserRemovedEventMapper).
+		RegisterFilterEventMapper(UserTokenAddedType, UserTokenAddedEventMapper).
+		RegisterFilterEventMapper(HumanAddedEventType, HumanAddedEventMapper).
 		RegisterFilterEventMapper(HumanRegisteredEventType, HumanRegisteredEventMapper).
 		RegisterFilterEventMapper(HumanInitialCodeAddedType, HumanInitialCodeAddedEventMapper).
 		RegisterFilterEventMapper(HumanInitialCodeSentType, HumanInitialCodeSentEventMapper).

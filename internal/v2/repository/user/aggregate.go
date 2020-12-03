@@ -5,10 +5,6 @@ import (
 )
 
 const (
-	userEventTypePrefix = eventstore.EventType("user.")
-)
-
-const (
 	AggregateType    = "user"
 	AggregateVersion = "v2"
 )
