@@ -61,7 +61,7 @@ type HumanPasswordCodeAddedEvent struct {
 
 	Code             *crypto.CryptoValue `json:"code,omitempty"`
 	Expiry           time.Duration       `json:"expiry,omitempty"`
-	NotificationType int32               `json:"notificationType,omitempty"`
+	NotificationType NotificationType    `json:"notificationType,omitempty"`
 }
 
 func (e *HumanPasswordCodeAddedEvent) CheckPrevious() bool {
@@ -76,7 +76,7 @@ func NewHumanPasswordCodeAddedEvent(
 	base *eventstore.BaseEvent,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
-	notificationType int32) *HumanPasswordCodeAddedEvent {
+	notificationType NotificationType) *HumanPasswordCodeAddedEvent {
 	return &HumanPasswordCodeAddedEvent{
 		BaseEvent:        *base,
 		Code:             code,

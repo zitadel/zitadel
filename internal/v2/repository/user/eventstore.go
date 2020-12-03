@@ -20,6 +20,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(HumanExternalIDPAddedType, HumanExternalIDPAddedEventMapper).
 		RegisterFilterEventMapper(HumanExternalIDPRemovedType, HumanExternalIDPRemovedEventMapper).
 		RegisterFilterEventMapper(HumanExternalIDPCascadeRemovedType, HumanExternalIDPCascadeRemovedEventMapper).
+		RegisterFilterEventMapper(HumanExternalLoginCheckSucceededType, HumanExternalLoginCheckSucceededEventMapper).
 		RegisterFilterEventMapper(HumanEmailChangedType, HumanEmailChangedEventMapper).
 		RegisterFilterEventMapper(HumanEmailVerifiedType, HumanEmailVerifiedEventMapper).
 		RegisterFilterEventMapper(HumanEmailVerificationFailedType, HumanEmailVerificationFailedEventMapper).
@@ -52,5 +53,9 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(HumanPasswordlessTokenRemovedType, HumanWebAuthNRemovedEventMapper).
 		RegisterFilterEventMapper(HumanPasswordlessTokenBeginLoginType, HumanWebAuthNBeginLoginEventMapper).
 		RegisterFilterEventMapper(HumanPasswordlessTokenCheckSucceededType, HumanWebAuthNCheckSucceededEventMapper).
-		RegisterFilterEventMapper(HumanPasswordlessTokenCheckFailedType, HumanWebAuthNCheckFailedEventMapper)
+		RegisterFilterEventMapper(HumanPasswordlessTokenCheckFailedType, HumanWebAuthNCheckFailedEventMapper).
+		RegisterFilterEventMapper(MachineAddedEventType, MachineAddedEventMapper).
+		RegisterFilterEventMapper(MachineChangedEventType, MachineChangedEventMapper).
+		RegisterFilterEventMapper(MachineKeyAddedEventType, MachineKeyAddedEventMapper).
+		RegisterFilterEventMapper(MachineKeyRemovedEventType, MachineKeyRemovedEventMapper)
 }

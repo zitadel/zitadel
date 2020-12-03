@@ -21,59 +21,59 @@ const (
 	HumanExternalLoginCheckSucceededType = externalLoginEventPrefix + "check.succeeded"
 )
 
-type HumanExternalIDPReserved struct {
+type HumanExternalIDPReservedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanExternalIDPReserved) CheckPrevious() bool {
+func (e *HumanExternalIDPReservedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *HumanExternalIDPReserved) Data() interface{} {
+func (e *HumanExternalIDPReservedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanExternalIDPReservedEvent(base *eventstore.BaseEvent) *HumanExternalIDPReserved {
-	return &HumanExternalIDPReserved{
+func NewHumanExternalIDPReservedEvent(base *eventstore.BaseEvent) *HumanExternalIDPReservedEvent {
+	return &HumanExternalIDPReservedEvent{
 		BaseEvent: *base,
 	}
 }
 
-type HumanExternalIDPReleased struct {
+type HumanExternalIDPReleasedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanExternalIDPReleased) CheckPrevious() bool {
+func (e *HumanExternalIDPReleasedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *HumanExternalIDPReleased) Data() interface{} {
+func (e *HumanExternalIDPReleasedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanExternalIDPReleasedEvent(base *eventstore.BaseEvent) *HumanExternalIDPReleased {
-	return &HumanExternalIDPReleased{
+func NewHumanExternalIDPReleasedEvent(base *eventstore.BaseEvent) *HumanExternalIDPReleasedEvent {
+	return &HumanExternalIDPReleasedEvent{
 		BaseEvent: *base,
 	}
 }
 
-type HumanExternalIDPAdded struct {
+type HumanExternalIDPAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	IDPConfigID string `json:"idpConfigId,omitempty"`
 	DisplayName string `json:"displayName,omitempty"`
 }
 
-func (e *HumanExternalIDPAdded) CheckPrevious() bool {
+func (e *HumanExternalIDPAddedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *HumanExternalIDPAdded) Data() interface{} {
+func (e *HumanExternalIDPAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanExternalIDPAddedEvent(base *eventstore.BaseEvent, idpConfigID, displayName string) *HumanExternalIDPAdded {
-	return &HumanExternalIDPAdded{
+func NewHumanExternalIDPAddedEvent(base *eventstore.BaseEvent, idpConfigID, displayName string) *HumanExternalIDPAddedEvent {
+	return &HumanExternalIDPAddedEvent{
 		BaseEvent:   *base,
 		IDPConfigID: idpConfigID,
 		DisplayName: displayName,
@@ -81,7 +81,7 @@ func NewHumanExternalIDPAddedEvent(base *eventstore.BaseEvent, idpConfigID, disp
 }
 
 func HumanExternalIDPAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &HumanExternalIDPAdded{
+	e := &HumanExternalIDPAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -93,29 +93,29 @@ func HumanExternalIDPAddedEventMapper(event *repository.Event) (eventstore.Event
 	return e, nil
 }
 
-type HumanExternalIDPRemoved struct {
+type HumanExternalIDPRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	IDPConfigID string `json:"idpConfigId"`
 }
 
-func (e *HumanExternalIDPRemoved) CheckPrevious() bool {
+func (e *HumanExternalIDPRemovedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *HumanExternalIDPRemoved) Data() interface{} {
+func (e *HumanExternalIDPRemovedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanExternalIDPRemovedEvent(base *eventstore.BaseEvent, idpConfigID string) *HumanExternalIDPRemoved {
-	return &HumanExternalIDPRemoved{
+func NewHumanExternalIDPRemovedEvent(base *eventstore.BaseEvent, idpConfigID string) *HumanExternalIDPRemovedEvent {
+	return &HumanExternalIDPRemovedEvent{
 		BaseEvent:   *base,
 		IDPConfigID: idpConfigID,
 	}
 }
 
 func HumanExternalIDPRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &HumanExternalIDPRemoved{
+	e := &HumanExternalIDPRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -127,29 +127,29 @@ func HumanExternalIDPRemovedEventMapper(event *repository.Event) (eventstore.Eve
 	return e, nil
 }
 
-type HumanExternalIDPCascadeRemoved struct {
+type HumanExternalIDPCascadeRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	IDPConfigID string `json:"idpConfigId"`
 }
 
-func (e *HumanExternalIDPCascadeRemoved) CheckPrevious() bool {
+func (e *HumanExternalIDPCascadeRemovedEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *HumanExternalIDPCascadeRemoved) Data() interface{} {
+func (e *HumanExternalIDPCascadeRemovedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanExternalIDPCascadeRemovedEvent(base *eventstore.BaseEvent, idpConfigID string) *HumanExternalIDPCascadeRemoved {
-	return &HumanExternalIDPCascadeRemoved{
+func NewHumanExternalIDPCascadeRemovedEvent(base *eventstore.BaseEvent, idpConfigID string) *HumanExternalIDPCascadeRemovedEvent {
+	return &HumanExternalIDPCascadeRemovedEvent{
 		BaseEvent:   *base,
 		IDPConfigID: idpConfigID,
 	}
 }
 
 func HumanExternalIDPCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &HumanExternalIDPCascadeRemoved{
+	e := &HumanExternalIDPCascadeRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -159,4 +159,28 @@ func HumanExternalIDPCascadeRemovedEventMapper(event *repository.Event) (eventst
 	}
 
 	return e, nil
+}
+
+type HumanExternalLoginCheckSucceededEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanExternalLoginCheckSucceededEvent) CheckPrevious() bool {
+	return false
+}
+
+func (e *HumanExternalLoginCheckSucceededEvent) Data() interface{} {
+	return nil
+}
+
+func NewHumanExternalLoginCheckSucceededEvent(base *eventstore.BaseEvent) *HumanExternalLoginCheckSucceededEvent {
+	return &HumanExternalLoginCheckSucceededEvent{
+		BaseEvent: *base,
+	}
+}
+
+func HumanExternalLoginCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &HumanExternalLoginCheckSucceededEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
 }

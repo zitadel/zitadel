@@ -21,7 +21,7 @@ type HumanProfileChangedEvent struct {
 	NickName          string       `json:"nickName,omitempty"`
 	DisplayName       string       `json:"displayName,omitempty"`
 	PreferredLanguage language.Tag `json:"preferredLanguage,omitempty"`
-	Gender            int32        `json:"gender,omitempty"`
+	Gender            Gender       `json:"gender,omitempty"`
 }
 
 func (e *HumanProfileChangedEvent) CheckPrevious() bool {
@@ -39,7 +39,7 @@ func NewHumanProfileChangedEvent(
 	nickName,
 	displayName string,
 	preferredLanguage language.Tag,
-	gender int32) *HumanProfileChangedEvent {
+	gender Gender) *HumanProfileChangedEvent {
 	return &HumanProfileChangedEvent{
 		BaseEvent:         *base,
 		FirstName:         firstName,
