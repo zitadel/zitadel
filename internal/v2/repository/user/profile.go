@@ -1,6 +1,7 @@
 package user
 
 import (
+	"encoding/json"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
@@ -24,7 +25,7 @@ type HumanProfileChangedEvent struct {
 }
 
 func (e *HumanProfileChangedEvent) CheckPrevious() bool {
-	return false
+	return true
 }
 
 func (e *HumanProfileChangedEvent) Data() interface{} {
@@ -35,9 +36,9 @@ func NewHumanProfileChangedEvent(
 	base *eventstore.BaseEvent,
 	firstName,
 	lastName,
-	NickName,
+	nickName,
 	displayName string,
-	preferredLanguage langugage.Tag,
+	preferredLanguage language.Tag,
 	gender int32) *HumanProfileChangedEvent {
 	return &HumanProfileChangedEvent{
 		BaseEvent:         *base,

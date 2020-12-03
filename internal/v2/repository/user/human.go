@@ -18,6 +18,7 @@ const (
 	HumanInitialCodeSentType           = humanEventPrefix + "initialization.code.sent"
 	HumanInitializedCheckSucceededType = humanEventPrefix + "initialization.check.succeeded"
 	HumanInitializedCheckFailedType    = humanEventPrefix + "initialization.check.failed"
+	HumanSignedOutType                 = humanEventPrefix + "signed.out"
 )
 
 type HumanAddedEvent struct {
@@ -281,6 +282,30 @@ func NewHumanInitializedCheckFailedEvent(base *eventstore.BaseEvent) *HumanIniti
 
 func HumanInitializedCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &HumanInitializedCheckFailedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
+}
+
+type HumanSignedOutEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanSignedOutEvent) CheckPrevious() bool {
+	return false
+}
+
+func (e *HumanSignedOutEvent) Data() interface{} {
+	return nil
+}
+
+func NewHumanSignedOutEvent(base *eventstore.BaseEvent) *HumanSignedOutEvent {
+	return &HumanSignedOutEvent{
+		BaseEvent: *base,
+	}
+}
+
+func HumanSignedOutEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &HumanSignedOutEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

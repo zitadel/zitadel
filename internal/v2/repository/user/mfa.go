@@ -1,6 +1,9 @@
 package user
 
+type MFAState int32
+
 const (
-	mfaEventPrefix          = humanEventPrefix + "mfa."
-	HumanMFAInitSkippedType = mfaEventPrefix + "init.skiped"
+	MFAStateUnspecified MFAState = iota
+	MFAStateNotReady
+	MFAStateReady
 )

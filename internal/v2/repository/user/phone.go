@@ -26,7 +26,7 @@ type HumanPhoneChangedEvent struct {
 }
 
 func (e *HumanPhoneChangedEvent) CheckPrevious() bool {
-	return false
+	return true
 }
 
 func (e *HumanPhoneChangedEvent) Data() interface{} {
@@ -57,7 +57,7 @@ type HumanPhoneRemovedEvent struct {
 }
 
 func (e *HumanPhoneRemovedEvent) CheckPrevious() bool {
-	return false
+	return true
 }
 
 func (e *HumanPhoneRemovedEvent) Data() interface{} {
@@ -83,7 +83,7 @@ type HumanPhoneVerifiedEvent struct {
 }
 
 func (e *HumanPhoneVerifiedEvent) CheckPrevious() bool {
-	return false
+	return true
 }
 
 func (e *HumanPhoneVerifiedEvent) Data() interface{} {
@@ -108,7 +108,7 @@ type HumanPhoneVerificationFailedEvent struct {
 }
 
 func (e *HumanPhoneVerificationFailedEvent) CheckPrevious() bool {
-	return false
+	return true
 }
 
 func (e *HumanPhoneVerificationFailedEvent) Data() interface{} {
@@ -135,7 +135,7 @@ type HumanPhoneCodeAddedEvent struct {
 }
 
 func (e *HumanPhoneCodeAddedEvent) CheckPrevious() bool {
-	return false
+	return true
 }
 
 func (e *HumanPhoneCodeAddedEvent) Data() interface{} {

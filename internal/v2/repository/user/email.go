@@ -25,7 +25,7 @@ type HumanEmailChangedEvent struct {
 }
 
 func (e *HumanEmailChangedEvent) CheckPrevious() bool {
-	return false
+	return true
 }
 
 func (e *HumanEmailChangedEvent) Data() interface{} {
@@ -58,7 +58,7 @@ type HumanEmailVerifiedEvent struct {
 }
 
 func (e *HumanEmailVerifiedEvent) CheckPrevious() bool {
-	return false
+	return true
 }
 
 func (e *HumanEmailVerifiedEvent) Data() interface{} {

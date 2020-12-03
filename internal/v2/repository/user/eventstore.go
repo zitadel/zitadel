@@ -11,6 +11,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(HumanInitialCodeSentType, HumanInitialCodeSentEventMapper).
 		RegisterFilterEventMapper(HumanInitializedCheckSucceededType, HumanInitializedCheckSucceededEventMapper).
 		RegisterFilterEventMapper(HumanInitializedCheckFailedType, HumanInitializedCheckFailedEventMapper).
+		RegisterFilterEventMapper(HumanSignedOutType, HumanSignedOutEventMapper).
 		RegisterFilterEventMapper(HumanPasswordChangedType, HumanPasswordChangedEventMapper).
 		RegisterFilterEventMapper(HumanPasswordCodeAddedType, HumanPasswordCodeAddedEventMapper).
 		RegisterFilterEventMapper(HumanPasswordCodeSentType, HumanPasswordCodeSentEventMapper).
@@ -31,5 +32,19 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(HumanPhoneCodeAddedType, HumanPhoneCodeAddedEventMapper).
 		RegisterFilterEventMapper(HumanPhoneCodeSentType, HumanPhoneCodeSentEventMapper).
 		RegisterFilterEventMapper(HumanProfileChangedType, HumanProfileChangedEventMapper).
-		RegisterFilterEventMapper(HumanAddressChangedType, HumanAddressChangedEventMapper)
+		RegisterFilterEventMapper(HumanAddressChangedType, HumanAddressChangedEventMapper).
+		RegisterFilterEventMapper(HumanMFAInitSkippedType, HumanMFAInitSkippedEventMapper).
+		RegisterFilterEventMapper(HumanMFAOTPAddedType, HumanMFAOTPAddedEventMapper).
+		RegisterFilterEventMapper(HumanMFAOTPVerifiedType, HumanMFAOTPVerifiedEventMapper).
+		RegisterFilterEventMapper(HumanMFAOTPRemovedType, HumanMFAOTPRemovedEventMapper).
+		RegisterFilterEventMapper(HumanMFAOTPCheckSucceededType, HumanMFAOTPCheckSucceededEventMapper).
+		RegisterFilterEventMapper(HumanMFAOTPCheckFailedType, HumanMFAOTPCheckFailedEventMapper).
+		RegisterFilterEventMapper(HumanU2FTokenAddedType, HumanWebAuthNAddedEventMapper).
+		RegisterFilterEventMapper(HumanU2FTokenVerifiedType, HumanWebAuthNVerifiedEventMapper).
+		RegisterFilterEventMapper(HumanU2FTokenSignCountChangedType, HumanWebAuthNSignCountChangedEventMapper).
+		RegisterFilterEventMapper(HumanU2FTokenRemovedType, HumanWebAuthNRemovedEventMapper).
+		RegisterFilterEventMapper(HumanPasswordlessTokenAddedType, HumanWebAuthNAddedEventMapper).
+		RegisterFilterEventMapper(HumanPasswordlessTokenVerifiedType, HumanWebAuthNVerifiedEventMapper).
+		RegisterFilterEventMapper(HumanPasswordlessTokenSignCountChangedType, HumanWebAuthNSignCountChangedEventMapper).
+		RegisterFilterEventMapper(HumanPasswordlessTokenRemovedType, HumanWebAuthNRemovedEventMapper)
 }

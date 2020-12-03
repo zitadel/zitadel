@@ -23,7 +23,7 @@ type HumanAddressChangedEvent struct {
 }
 
 func (e *HumanAddressChangedEvent) CheckPrevious() bool {
-	return false
+	return true
 }
 
 func (e *HumanAddressChangedEvent) Data() interface{} {
