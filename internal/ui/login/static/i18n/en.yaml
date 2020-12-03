@@ -63,6 +63,11 @@ InitUserDone:
   Title: User activated
   Description: Email verified and Password successfully set
 
+MFA:
+  Provider0: OTP (One Time Password)
+  Provider1: U2F (Universal 2nd Factor)
+  ChooseOther: or choose an other option
+
 MFAPrompt:
   Title: Multifactor Setup
   Description: Would you like to setup multifactor authentication?

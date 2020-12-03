@@ -786,7 +786,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 		if !errors.IsNotFound(err) {
 			return nil, err
 		}
-		session = &user_view_model.UserSessionView{}
+		session = &user_view_model.UserSessionView{UserAgentID: agentID, UserID: user.ID}
 	}
 	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence)
 	if err != nil {

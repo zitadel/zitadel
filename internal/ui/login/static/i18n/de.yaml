@@ -63,6 +63,11 @@ InitUserDone:
   Title: User aktiviert
   Description: EMail verifiziert und Passwort erfolgreich gesetzt
 
+MFA:
+  Provider0: OTP (One Time Password)
+  Provider1: U2F (Universal 2nd Factor)
+  ChooseOther: oder wählen sie eine andere Option aus
+
 MFAPrompt:
   Title: Multifaktor hinzufügen
   Description: Möchtest du einen Mulitfaktor hinzufügen?
