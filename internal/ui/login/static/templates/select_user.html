@@ -1,12 +1,12 @@
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
     {{if .Linking}}
-        <h1>{{t "UserSelection.TitleLinking"}}</h1>
-        <p>{{t "UserSelection.DescriptionLinking"}}</p>
+    <h1>{{t "UserSelection.TitleLinking"}}</h1>
+    <p>{{t "UserSelection.DescriptionLinking"}}</p>
     {{else}}
-        <h1>{{t "UserSelection.Title"}}</h1>
-        <p>{{t "UserSelection.Description"}}</p>
+    <h1>{{t "UserSelection.Title"}}</h1>
+    <p>{{t "UserSelection.Description"}}</p>
     {{end}}
 </div>
 
@@ -17,7 +17,7 @@
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
-    <div class="actions">
+    <div class="lgn-actions">
         {{ if .Users }}
         <div class="user-selection-list">
             {{ range $user := .Users }}
@@ -44,4 +44,3 @@
 
 
 {{template "main-bottom" .}}
- 

@@ -1,6 +1,6 @@
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
     {{ template "user-profile" . }}
 
     <p>{{t "EmailVerification.Description"}}</p>
@@ -23,9 +23,11 @@
     {{ template "error-message" .}}
 
     <div class="actions">
-        <button type="submit" id="submit-button" name="resend" value="false" class="primary right">{{t "Actions.Next"}}</button>
+        <button type="submit" id="submit-button" name="resend" value="false"
+            class="primary right">{{t "Actions.Next"}}</button>
         {{ if .UserID }}
-        <button type="submit" name="resend" value="true" class="secondary right" formnovalidate>{{t "Actions.Resend"}}</button>
+        <button type="submit" name="resend" value="true" class="secondary right"
+            formnovalidate>{{t "Actions.Resend"}}</button>
         {{ end }}
         <a class="button secondary" href="{{ loginUrl }}">
             {{t "Actions.Cancel"}}
@@ -36,4 +38,3 @@
 <script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
 
 {{template "main-bottom" .}}
- 

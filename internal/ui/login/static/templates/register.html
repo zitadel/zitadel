@@ -1,6 +1,6 @@
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
     <h1>{{t "Registration.Title"}}</h1>
     <p>{{t "Registration.Description"}}</p>
 </div>
@@ -15,22 +15,27 @@
     <div class="fields">
         <div class="field">
             <label class="label" for="email">{{t "Registration.Email"}}</label>
-            <input class="input" type="text" id="email" name="email" autocomplete="email" value="{{ .Email }}" autofocus required>
+            <input class="input" type="text" id="email" name="email" autocomplete="email" value="{{ .Email }}" autofocus
+                required>
         </div>
         <div class="field">
             <label class="label" for="firstname">{{t "Registration.Firstname"}}</label>
-            <input class="input" type="text" id="firstname" name="firstname" autocomplete="given-name" value="{{ .Firstname }}" required>
+            <input class="input" type="text" id="firstname" name="firstname" autocomplete="given-name"
+                value="{{ .Firstname }}" required>
         </div>
         <div class="field">
             <label class="label" for="lastname">{{t "Registration.Lastname"}}</label>
-            <input class="input" type="text" id="lastname" name="lastname" autocomplete="family-name" value="{{ .Lastname }}" required>
+            <input class="input" type="text" id="lastname" name="lastname" autocomplete="family-name"
+                value="{{ .Lastname }}" required>
         </div>
         <div class="field">
             <label class="label" for="languages">{{t "Registration.Language"}}</label>
             <select id="languages" name="language">
                 <option value=""></option>
-                <option value="de" id="de" {{if (selectedLanguage "de")}} selected {{end}}>{{t "Registration.German"}}</option>
-                <option value="en" id="en" {{if (selectedLanguage "en")}} selected {{end}}>{{t "Registration.English"}}</option>
+                <option value="de" id="de" {{if (selectedLanguage "de")}} selected {{end}}>{{t "Registration.German"}}
+                </option>
+                <option value="en" id="en" {{if (selectedLanguage "en")}} selected {{end}}>{{t "Registration.English"}}
+                </option>
             </select>
         </div>
         <div class="field">
@@ -40,32 +45,36 @@
             </label>
             <select id="genders" name="gender">
                 <option value=""></option>
-                <option value="1" id="female" {{if (selectedGender 1)}} selected {{end}}>{{t "Registration.Female"}}</option>
-                <option value="2" id="male" {{if (selectedGender 2)}} selected {{end}}>{{t "Registration.Male"}}</option>
-                <option value="3" id="diverse" {{if (selectedGender 3)}} selected {{end}}>{{t "Registration.Diverse"}}</option>
+                <option value="1" id="female" {{if (selectedGender 1)}} selected {{end}}>{{t "Registration.Female"}}
+                </option>
+                <option value="2" id="male" {{if (selectedGender 2)}} selected {{end}}>{{t "Registration.Male"}}
+                </option>
+                <option value="3" id="diverse" {{if (selectedGender 3)}} selected {{end}}>{{t "Registration.Diverse"}}
+                </option>
             </select>
         </div>
         <div class="field">
             <label class="label" for="register-password">{{t "Registration.Password"}}</label>
-            <input data-minlength="{{ .MinLength }}"
-                   data-has-uppercase="{{ .HasUppercase }}"
-                   data-has-lowercase="{{ .HasLowercase }}"
-                   data-has-number="{{ .HasNumber }}"
-                   data-has-symbol="{{ .HasSymbol }}"
-                   class="input" type="password" id="register-password" name="register-password" autocomplete="new-password" required>
+            <input data-minlength="{{ .MinLength }}" data-has-uppercase="{{ .HasUppercase }}"
+                data-has-lowercase="{{ .HasLowercase }}" data-has-number="{{ .HasNumber }}"
+                data-has-symbol="{{ .HasSymbol }}" class="input" type="password" id="register-password"
+                name="register-password" autocomplete="new-password" required>
             {{ .PasswordPolicyDescription }}
         </div>
         <div class="field">
             <label class="label" for="register-password-confirmation">{{t "Registration.Password2"}}</label>
-            <input class="input" type="password" id="register-password-confirmation" name="register-password-confirmation" autocomplete="new-password" required>
+            <input class="input" type="password" id="register-password-confirmation"
+                name="register-password-confirmation" autocomplete="new-password" required>
         </div>
         <div class="field">
             <label class="label" for="register-term-confirmation">{{t "Registration.Tos"}}</label>
             <div class="field check-box">
-                <input class="input" type="checkbox" id="register-term-confirmation" name="register-term-confirmation" required>
+                <input class="input" type="checkbox" id="register-term-confirmation" name="register-term-confirmation"
+                    required>
                 <label for="register-term-confirmation">
                     {{t "Registration.TosConfirm"}}
-                    <a class="tos-link" target="_blank" href="{{t "Registration.TosLink"}}">{{t "Registration.TosLinkText"}}</a>
+                    <a class="tos-link" target="_blank"
+                        href="{{t "Registration.TosLink"}}">{{t "Registration.TosLinkText"}}</a>
                 </label>
             </div>
         </div>
@@ -73,11 +82,13 @@
 
     {{template "error-message" .}}
 
-    <div class="actions">
-        <button class="primary right" id="register-button" type="submit">{{t "Actions.Next"}}</button>
-        <a class="button secondary" href="{{ loginNameChangeUrl .AuthReqID }}">
+    <div class="lgn-actions">
+        <a class="lgn-button" href="{{ loginNameChangeUrl .AuthReqID }}">
             {{t "Actions.Back"}}
         </a>
+        <span class="fill-space"></span>
+        <button class="lgn-raised-button lgn-primary" id="register-button" type="submit">{{t "Actions.Next"}}</button>
+
     </div>
 </form>
 

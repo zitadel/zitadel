@@ -1,6 +1,6 @@
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
     {{ template "user-profile" . }}
 
     <p>{{t "MfaInitVerify.Description"}}</p>
@@ -16,23 +16,23 @@
     <input type="hidden" name="secret" value="{{ .Secret }}" />
 
     {{if (eq .MfaType 0) }}
-        <p>{{t "MfaInitVerify.OtpDescription"}}</p>
-        <div id="qrcode">
-            {{.QrCode}}
+    <p>{{t "MfaInitVerify.OtpDescription"}}</p>
+    <div id="qrcode">
+        {{.QrCode}}
+    </div>
+    <div class="fields">
+        <div class="field">
+            <span class="label" for="secret">{{t "MfaInitVerify.Secret"}}</span>
+            <span class="input" id="secret">
+                {{.Secret}}
+                <span class="copy material-icons" data-copy="{{ .Secret }}">content_copy</span>
+            </span>
         </div>
-        <div class="fields">
-            <div class="field">
-                <span class="label" for="secret">{{t "MfaInitVerify.Secret"}}</span>
-                <span class="input" id="secret">
-                    {{.Secret}}
-                    <span class="copy material-icons" data-copy="{{ .Secret }}" >content_copy</span>
-                </span>
-            </div>
-            <div class="field">
-               <label class="label" for="code">{{t "MfaInitVerify.Code"}}</label>
-                <input class="input" type="text" id="code" name="code" autocomplete="off" autofocus required>
-            </div>
+        <div class="field">
+            <label class="label" for="code">{{t "MfaInitVerify.Code"}}</label>
+            <input class="input" type="text" id="code" name="code" autocomplete="off" autofocus required>
         </div>
+    </div>
     {{end}}
 
     <div class="actions">
@@ -51,4 +51,3 @@
 <script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
 
 {{template "main-bottom" .}}
- 

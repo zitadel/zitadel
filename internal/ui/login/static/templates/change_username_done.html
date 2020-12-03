@@ -1,6 +1,6 @@
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
     {{ template "user-profile" . }}
 
     <p>{{t "UsernameChangeDone.Description"}}</p>
@@ -13,11 +13,10 @@
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
 
-    <div class="actions">
+    <div class="lgn-actions">
         <button class="primary right" type="submit">{{t "Actions.Next"}}</button>
     </div>
 </form>
 
 
 {{template "main-bottom" .}}
- 

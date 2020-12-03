@@ -1,6 +1,9 @@
 {{define "header"}}
 <header class="lgn-header">
-
+    {{if eq .ThemeMode "lgn-light-theme"}}
     <img src="resources/themes/zitadel/logo-dark.svg" alt="zitadel-logo" />
+    {{else if eq .ThemeMode "lgn-dark-theme"}}
+    <img src="resources/themes/zitadel/logo-light.svg" alt="zitadel-logo" />
+    {{end}}
 </header>
 {{end}}

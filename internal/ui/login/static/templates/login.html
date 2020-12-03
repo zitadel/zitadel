@@ -1,6 +1,6 @@
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
     {{if .Linking}}
     <h1>{{t "Login.TitleLinking"}}</h1>
     <p>{{t "Login.DescriptionLinking"}}</p>
@@ -20,7 +20,7 @@
     {{if .LoginPolicy.AllowUsernamePassword }}
     <div class="fields">
         <div class="field">
-            <label class="label" for="loginName">{{t "Login.Loginname"}}</label>
+            <label for="loginName">{{t "Login.Loginname"}}</label>
             <input class="input" type="text" id="loginName" name="loginName"
                 placeholder="{{t "Login.LoginnamePlaceHolder"}}" value="{{ .LoginName }}" autocomplete="username"
                 autofocus required>
@@ -30,16 +30,18 @@
 
     {{template "error-message" .}}
 
-    <div class="actions">
-        <button class="lgn-stroked-button lgn-primary" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
-        {{if .LoginPolicy.AllowRegister}}
-        <button class="lgn-raised-button lgn-primary secondary" name="register" value="true"
+    <div class="lgn-actions">
+        <button class="lgn-button lgn-primary" name="register" value="true"
             formnovalidate>{{t "Actions.Register"}}</button>
+        <span class="fill-space"></span>
+        <button class="lgn-raised-button lgn-primary" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
+        {{if .LoginPolicy.AllowRegister}}
+
         {{end}}
     </div>
 
     {{if hasExternalLogin }}
-    <div class="actions idp-providers">
+    <div class="lgn-actions idp-providers">
         <p>{{t "Login.ExternalLogin"}}</p>
 
         {{ $reqid := .AuthReqID}}

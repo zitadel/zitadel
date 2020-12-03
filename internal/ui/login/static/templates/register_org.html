@@ -1,6 +1,6 @@
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
     <h1>{{t "RegistrationOrg.Title"}}</h1>
     <p class="free-tier">{{t "RegistrationOrg.FreeTillEndOfYear"}}</p>
     <p>{{t "RegistrationOrg.Description"}}</p>
@@ -19,51 +19,54 @@
         </div>
 
         {{if .UserLoginMustBeDomain}}
-            <div class="field">
-                <label class="label" for="username">{{t "RegistrationOrg.Username"}}</label>
-                <span id="loginname">
-                    <input data-iam-domain="{{ .IamDomain }}"
-                       class="input" type="text" id="username" name="username"
-                       value="{{ .Username }}" autofocus required>
-                    <span id="default-login-suffix" class="loginname-suffix"></span>
+        <div class="field">
+            <label class="label" for="username">{{t "RegistrationOrg.Username"}}</label>
+            <span id="loginname">
+                <input data-iam-domain="{{ .IamDomain }}" class="input" type="text" id="username" name="username"
+                    value="{{ .Username }}" autofocus required>
+                <span id="default-login-suffix" class="loginname-suffix"></span>
 
-                </span>
-            </div>
+            </span>
+        </div>
         {{end}}
         <div class="field">
             <label class="label" for="email">{{t "RegistrationOrg.Email"}}</label>
-            <input class="input" type="text" id="email" name="email" autocomplete="email" value="{{ .Email }}" autofocus required>
+            <input class="input" type="text" id="email" name="email" autocomplete="email" value="{{ .Email }}" autofocus
+                required>
         </div>
 
         <div class="field">
             <label class="label" for="firstname">{{t "RegistrationOrg.Firstname"}}</label>
-            <input class="input" type="text" id="firstname" name="firstname" autocomplete="given-name" value="{{ .Firstname }}" required>
+            <input class="input" type="text" id="firstname" name="firstname" autocomplete="given-name"
+                value="{{ .Firstname }}" required>
         </div>
         <div class="field">
             <label class="label" for="lastname">{{t "RegistrationOrg.Lastname"}}</label>
-            <input class="input" type="text" id="lastname" name="lastname" autocomplete="family-name" value="{{ .Lastname }}" required>
+            <input class="input" type="text" id="lastname" name="lastname" autocomplete="family-name"
+                value="{{ .Lastname }}" required>
         </div>
         <div class="field">
             <label class="label" for="register-password">{{t "RegistrationOrg.Password"}}</label>
-            <input data-minlength="{{ .MinLength }}"
-                   data-has-uppercase="{{ .HasUppercase }}"
-                   data-has-lowercase="{{ .HasLowercase }}"
-                   data-has-number="{{ .HasNumber }}"
-                   data-has-symbol="{{ .HasSymbol }}"
-                   class="input" type="password" id="register-password" name="register-password" autocomplete="new-password" required>
+            <input data-minlength="{{ .MinLength }}" data-has-uppercase="{{ .HasUppercase }}"
+                data-has-lowercase="{{ .HasLowercase }}" data-has-number="{{ .HasNumber }}"
+                data-has-symbol="{{ .HasSymbol }}" class="input" type="password" id="register-password"
+                name="register-password" autocomplete="new-password" required>
             {{ .PasswordPolicyDescription }}
         </div>
         <div class="field">
             <label class="label" for="register-password-confirmation">{{t "RegistrationOrg.Password2"}}</label>
-            <input class="input" type="password" id="register-password-confirmation" name="register-password-confirmation" autocomplete="new-password" required>
+            <input class="input" type="password" id="register-password-confirmation"
+                name="register-password-confirmation" autocomplete="new-password" required>
         </div>
         <div class="field">
             <label class="label" for="register-term-confirmation">{{t "RegistrationOrg.Tos"}}</label>
             <div class="field check-box">
-                <input class="input" type="checkbox" id="register-term-confirmation" name="register-term-confirmation" required>
+                <input class="input" type="checkbox" id="register-term-confirmation" name="register-term-confirmation"
+                    required>
                 <label for="register-term-confirmation">
                     {{t "RegistrationOrg.TosConfirm"}}
-                    <a class="tos-link" target="_blank" href="{{t "RegistrationOrg.TosLink"}}">{{t "RegistrationOrg.TosLinkText"}}</a>
+                    <a class="tos-link" target="_blank"
+                        href="{{t "RegistrationOrg.TosLink"}}">{{t "RegistrationOrg.TosLinkText"}}</a>
                 </label>
             </div>
         </div>

@@ -1,6 +1,6 @@
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
     {{ template "user-profile" . }}
 
     <p>{{t "UsernameChange.Description"}}</p>
@@ -21,11 +21,14 @@
 
     {{ template "error-message" .}}
 
-    <div class="actions">
-        <button type="submit" id="submit-button" value="false" class="primary right">{{t "Actions.Next"}}</button>
-        <a class="button secondary" href="{{ loginUrl }}">
+    <div class="lgn-actions">
+        <a class="lgn-button" href="{{ loginUrl }}">
             {{t "Actions.Cancel"}}
         </a>
+        <span class="fill-space"></span>
+        <button type="submit" id="submit-button" value="false"
+            class="lgn-raised-button lgn-primary">{{t "Actions.Next"}}</button>
+
     </div>
 </form>
 
@@ -34,4 +37,3 @@
 
 
 {{template "main-bottom" .}}
- 

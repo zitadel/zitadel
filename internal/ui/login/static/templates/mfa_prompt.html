@@ -1,6 +1,6 @@
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
     {{ template "user-profile" . }}
 
     <p>{{t "MfaPrompt.Description"}}</p>
@@ -11,21 +11,22 @@
     {{ .CSRF }}
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
-    
+
     <div class="fields">
         {{ range $provider := .MfaProviders}}
         {{ $providerName := (t (printf "MfaPrompt.Provider%v" $provider)) }}
-            <div class="field radio-button">
-                <input id="{{ $provider }}" type="radio" name="provider" value="{{ $provider }}">
-                <label for="{{ $provider }}">{{ $providerName }}</label>
-            </div>
+        <div class="field radio-button">
+            <input id="{{ $provider }}" type="radio" name="provider" value="{{ $provider }}">
+            <label for="{{ $provider }}">{{ $providerName }}</label>
+        </div>
         {{ end }}
     </div>
 
     <div class="actions">
         <button class="primary right" type="submit">{{t "Actions.Next"}}</button>
         {{if not .MfaRequired}}
-        <button class="default right" name="skip" value="true" type="submit" formnovalidate>{{t "Actions.Skip"}}</button>
+        <button class="default right" name="skip" value="true" type="submit"
+            formnovalidate>{{t "Actions.Skip"}}</button>
         {{end}}
         <a class="button secondary" href="{{ loginUrl }}">
             {{t "Actions.Cancel"}}
@@ -35,4 +36,3 @@
 
 
 {{template "main-bottom" .}}
- 

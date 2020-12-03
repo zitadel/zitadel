@@ -1,7 +1,6 @@
-
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
     <h1>{{t "RegisterOption.Title"}}</h1>
     <p>{{t "RegisterOption.Description"}}</p>
 </div>
@@ -12,22 +11,26 @@
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
-    <div class="actions">
-        {{if .LoginPolicy.AllowUsernamePassword }}
-            <button class="secondary right" name="usernamepassword" value="true" formnovalidate>{{t "RegisterOption.RegisterUsernamePassword"}}</button>
-        {{end}}
-        {{if .LoginPolicy.AllowExternalIDP}}
-            {{ $reqid := .AuthReqID}}
-            {{range $provider := .IDPProviders}}
-                <a href="{{ externalIDPRegisterURL $reqid $provider.IDPConfigID}}" class="button secondary idp-provider {{idpProviderClass $provider.StylingType}}">
-                    <span class="logo"></span>
-                    <span class="provider-name">{{$provider.Name}}</span>
-                </a>
-            {{end}}
-        {{end}}
-        <a class="button secondary" href="{{ loginNameChangeUrl .AuthReqID }}">
+    <div class="lgn-actions">
+        <a class="lgn-button" href="{{ loginNameChangeUrl .AuthReqID }}">
             {{t "Actions.Back"}}
         </a>
+        <span class="fill-space"></span>
+
+        {{if .LoginPolicy.AllowUsernamePassword }}
+        <button class="lgn-raised-button lgn-primary" name="usernamepassword" value="true"
+            formnovalidate>{{t "RegisterOption.RegisterUsernamePassword"}}</button>
+        {{end}}
+        {{if .LoginPolicy.AllowExternalIDP}}
+        {{ $reqid := .AuthReqID}}
+        {{range $provider := .IDPProviders}}
+        <a href="{{ externalIDPRegisterURL $reqid $provider.IDPConfigID}}"
+            class="lgn-raised-button lgn-primary idp-provider {{idpProviderClass $provider.StylingType}}">
+            <span class="logo"></span>
+            <span class="provider-name">{{$provider.Name}}</span>
+        </a>
+        {{end}}
+        {{end}}
     </div>
 
     {{template "error-message" .}}
@@ -38,4 +41,3 @@
 <script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
 
 {{template "main-bottom" .}}
- 

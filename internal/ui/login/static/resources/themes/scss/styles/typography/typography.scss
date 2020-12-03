@@ -182,7 +182,7 @@
       @include lgn-typography-level-to-styles($config, caption-1);
     }
 
-    label .lgn-label, #{$selector} .lgn-label, #{$selector} label {
+    label, .lgn-label, #{$selector} .lgn-label, #{$selector} label {
         @include lgn-typography-level-to-styles($config, caption-1);
         margin: 0 0 2px 0;
     }

@@ -41,9 +41,24 @@
     .lgn-stroked-button:not([disabled]) {
       border-color: lgn-color($foreground, divider);
     }
+
+    .lgn-button {
+        @include _lgn-button-theme-property($config, 'color', default-contrast);
+        &:hover {
+            $primary: map-get($config, primary);
+            background-color: rgba(lgn-color($primary, 500), .1);
+        }
+
+        &:focus {
+            background-color: rgba(lgn-color($primary, 500), .2);
+        }
+
+        &:active {
+            background-color: rgba(lgn-color($primary, 500), .5);
+        }
+    }
   
-    .lgn-button, .lgn-raised-button {
-      // Default font and background color when not using any color palette.
+    .lgn-raised-button {
       color: lgn-color($foreground, text);
       background-color: lgn-color($background, raised-button);
   
@@ -77,8 +92,7 @@
     }
   }
 
-  // Applies a focus style to an mat-button element for each of the supported palettes.
-@mixin _lgn-button-focus-overlay-color($config-or-theme) {
+  @mixin _lgn-button-focus-overlay-color($config-or-theme) {
     $config: lgn-get-color-config($config-or-theme);
     $primary: map-get($config, primary);
     $accent: map-get($config, accent);
@@ -94,9 +108,5 @@
   
     &.lgn-warn:focus {
       background-color: lgn-color($warn);
-    }
-  
-    &.lgn-button-disabled:focus {
-      background-color: transparent;
     }
   }

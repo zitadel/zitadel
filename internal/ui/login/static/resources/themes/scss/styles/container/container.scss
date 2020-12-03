@@ -8,4 +8,20 @@ $lgn-container-margin: 0px auto 50px auto;
     max-width: $lgn-container-max-width;
     padding: $lgn-container-padding;
     width: 100%;
+
+    .lgn-head {
+        h1 {
+            text-align: center;
+        }
+    }
+
+    .lgn-actions {
+        display: flex;
+        align-items: center;
+        padding: .5rem 0;
+
+        .fill-space {
+            flex: 1;
+        }
+    }
 }

@@ -1,6 +1,6 @@
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
     {{ template "user-profile" . }}
 
     <p>{{t "EmailVerificationDone.Description"}}</p>
@@ -14,7 +14,8 @@
 
 
     <div class="actions">
-        <button class="primary right" type="submit">{{if .AuthReqID }}{{t "Actions.Next"}}{{else}}{{t "Actions.Login"}}{{end}}</button>
+        <button class="primary right"
+            type="submit">{{if .AuthReqID }}{{t "Actions.Next"}}{{else}}{{t "Actions.Login"}}{{end}}</button>
         <a class="button secondary" href="{{ loginUrl }}">
             {{t "Actions.Cancel"}}
         </a>
@@ -23,4 +24,3 @@
 
 
 {{template "main-bottom" .}}
- 
