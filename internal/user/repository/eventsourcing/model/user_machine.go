@@ -13,7 +13,7 @@ import (
 )
 
 type Machine struct {
-	*User `json:"-"`
+	user *User `json:"-"`
 
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`

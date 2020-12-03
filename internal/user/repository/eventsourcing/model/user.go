@@ -102,7 +102,7 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 		u.Human.user = u
 		return u.Human.AppendEvent(event)
 	} else if u.Machine != nil {
-		u.Machine.User = u
+		u.Machine.user = u
 		return u.Machine.AppendEvent(event)
 	}
 	if strings.HasPrefix(string(event.Type), "user.human") || event.AggregateVersion == "v1" {
@@ -110,7 +110,7 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 		return u.Human.AppendEvent(event)
 	}
 	if strings.HasPrefix(string(event.Type), "user.machine") {
-		u.Machine = &Machine{User: u}
+		u.Machine = &Machine{user: u}
 		return u.Machine.AppendEvent(event)
 	}
 
