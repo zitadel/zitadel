@@ -43,8 +43,10 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(HumanU2FTokenVerifiedType, HumanWebAuthNVerifiedEventMapper).
 		RegisterFilterEventMapper(HumanU2FTokenSignCountChangedType, HumanWebAuthNSignCountChangedEventMapper).
 		RegisterFilterEventMapper(HumanU2FTokenRemovedType, HumanWebAuthNRemovedEventMapper).
+		RegisterFilterEventMapper(HumanU2FTokenBeginLoginType, HumanWebAuthNBeginLoginEventMapper).
 		RegisterFilterEventMapper(HumanPasswordlessTokenAddedType, HumanWebAuthNAddedEventMapper).
 		RegisterFilterEventMapper(HumanPasswordlessTokenVerifiedType, HumanWebAuthNVerifiedEventMapper).
 		RegisterFilterEventMapper(HumanPasswordlessTokenSignCountChangedType, HumanWebAuthNSignCountChangedEventMapper).
-		RegisterFilterEventMapper(HumanPasswordlessTokenRemovedType, HumanWebAuthNRemovedEventMapper)
+		RegisterFilterEventMapper(HumanPasswordlessTokenRemovedType, HumanWebAuthNRemovedEventMapper).
+		RegisterFilterEventMapper(HumanPasswordlessTokenBeginLoginType, HumanWebAuthNBeginLoginEventMapper)
 }

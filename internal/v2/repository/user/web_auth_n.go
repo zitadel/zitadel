@@ -188,3 +188,41 @@ func HumanWebAuthNRemovedEventMapper(event *repository.Event) (eventstore.EventR
 	}
 	return webauthNVerified, nil
 }
+
+type HumanWebAuthNBeginLoginEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	WebAuthNTokenID string `json:"webAuthNTokenId"`
+	Challenge       string `json:"challenge"`
+	//TODO: Handle Auth Req??
+	//*AuthRequest
+}
+
+func (e *HumanWebAuthNBeginLoginEvent) CheckPrevious() bool {
+	return true
+}
+
+func (e *HumanWebAuthNBeginLoginEvent) Data() interface{} {
+	return e
+}
+
+func NewHumanWebAuthNBeginLoginEvent(base *eventstore.BaseEvent,
+	webAuthNTokenID,
+	challenge string) *HumanWebAuthNBeginLoginEvent {
+	return &HumanWebAuthNBeginLoginEvent{
+		BaseEvent:       *base,
+		WebAuthNTokenID: webAuthNTokenID,
+		Challenge:       challenge,
+	}
+}
+
+func HumanWebAuthNBeginLoginEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	webAuthNAdded := &HumanWebAuthNBeginLoginEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, webAuthNAdded)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "USER-rMb8x", "unable to unmarshal human webAuthN begin login")
+	}
+	return webAuthNAdded, nil
+}
