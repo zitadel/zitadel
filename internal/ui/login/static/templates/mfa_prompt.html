@@ -3,7 +3,7 @@
 <div class="head">
     {{ template "user-profile" . }}
 
-    <p>{{t "MfaPrompt.Description"}}</p>
+    <p>{{t "MFAPrompt.Description"}}</p>
 </div>
 
 <form action="{{ mfaPromptUrl }}" method="POST">
@@ -13,8 +13,8 @@
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
     
     <div class="fields">
-        {{ range $provider := .MfaProviders}}
-        {{ $providerName := (t (printf "MfaPrompt.Provider%v" $provider)) }}
+        {{ range $provider := .MFAProviders}}
+        {{ $providerName := (t (printf "MFAPrompt.Provider%v" $provider)) }}
             <div class="field radio-button">
                 <input id="{{ $provider }}" type="radio" name="provider" value="{{ $provider }}">
                 <label for="{{ $provider }}">{{ $providerName }}</label>
@@ -24,7 +24,7 @@
 
     <div class="actions">
         <button class="primary right" type="submit">{{t "Actions.Next"}}</button>
-        {{if not .MfaRequired}}
+        {{if not .MFARequired}}
         <button class="default right" name="skip" value="true" type="submit" formnovalidate>{{t "Actions.Skip"}}</button>
         {{end}}
         <a class="button secondary" href="{{ loginUrl }}">

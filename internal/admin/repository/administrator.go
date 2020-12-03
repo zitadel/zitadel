@@ -8,6 +8,7 @@ import (
 type AdministratorRepository interface {
 	GetFailedEvents(context.Context) ([]*model.FailedEvent, error)
 	RemoveFailedEvent(context.Context, *model.FailedEvent) error
-	GetViews(context.Context) ([]*model.View, error)
-	ClearView(ctx context.Context, db, view string) error
+	GetViews() ([]*model.View, error)
+	GetSpoolerDiv(db, viewName string) int64
+	ClearView(ctx context.Context, db, viewName string) error
 }

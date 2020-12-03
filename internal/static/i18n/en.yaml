@@ -53,12 +53,25 @@ Errors:
       IDPConfigNotExisting: IDP provider invalid for this organisation
       NotAllowed: External IDP not allowed on this organisation
       MinimumExternalIDPNeeded: At least one IDP must be added
-    Mfa:
-      Otp:
+    MFA:
+      OTP:
         AlreadyReady: Multifactor OTP (OneTimePassword) is already set up
         NotExisting: Multifactor OTP (OneTimePassword) doesn't exist
         NotReady: Multifactor OTP (OneTimePassword) isn't ready
         InvalidCode: Invalid code
+      U2F:
+        NotExisting: U2F does not exist
+      Passwordless:
+        NotExisting: Passwordless does not exist
+    WebAuthN:
+      NotFound: WebAuthN Token could not be found
+      BeginRegisterFailed: WebAuthN begin registration failed
+      MarshalError: Error on marshal data
+      ErrorOnParseCredential: Error on parse credential data
+      CreateCredentialFailed: Error on create credentials
+      BeginLoginFailed: WebAuthN begin login failed
+      ValidateLoginFailed: Error on validate login credentials
+      CloneWarning: Credentials may be cloned
   Org:
     Invalid: Organisation is invalid
     AlreadyDeactivated: Organisation is already deactivated

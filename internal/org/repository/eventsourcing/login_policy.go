@@ -105,7 +105,7 @@ func LoginPolicySecondFactorAddedAggregate(aggCreator *es_models.AggregateCreato
 			AggregateTypeFilter(model.OrgAggregate).
 			AggregateIDsFilter(org.AggregateID)
 
-		validation := checkExistingLoginPolicySecondFactorValidation(mfa.MfaType)
+		validation := checkExistingLoginPolicySecondFactorValidation(mfa.MFAType)
 		agg.SetPrecondition(validationQuery, validation)
 		return agg.AppendEvent(model.LoginPolicySecondFactorAdded, mfa)
 	}
@@ -137,7 +137,7 @@ func LoginPolicyMultiFactorAddedAggregate(aggCreator *es_models.AggregateCreator
 			AggregateTypeFilter(model.OrgAggregate).
 			AggregateIDsFilter(org.AggregateID)
 
-		validation := checkExistingLoginPolicyMultiFactorValidation(mfa.MfaType)
+		validation := checkExistingLoginPolicyMultiFactorValidation(mfa.MFAType)
 		agg.SetPrecondition(validationQuery, validation)
 		return agg.AppendEvent(model.LoginPolicyMultiFactorAdded, mfa)
 	}
@@ -261,7 +261,7 @@ func checkExistingLoginPolicySecondFactorValidation(mfaType int32) func(...*es_m
 				if err != nil {
 					return err
 				}
-				mfas = append(mfas, mfa.MfaType)
+				mfas = append(mfas, mfa.MFAType)
 			case model.LoginPolicySecondFactorRemoved:
 				idp := new(iam_es_model.IDPProvider)
 				err := idp.SetData(event)
@@ -301,7 +301,7 @@ func checkExistingLoginPolicyMultiFactorValidation(mfaType int32) func(...*es_mo
 				if err != nil {
 					return err
 				}
-				mfas = append(mfas, mfa.MfaType)
+				mfas = append(mfas, mfa.MFAType)
 			case model.LoginPolicyMultiFactorRemoved:
 				idp := new(iam_es_model.IDPProvider)
 				err := idp.SetData(event)

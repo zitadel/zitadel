@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  docs:
+    build:
+      context: ..
+      dockerfile: site/dockerfile
+    command: sh -c "npm run dev"
+    ports:
+      - 3000:3000

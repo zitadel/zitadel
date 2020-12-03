@@ -172,7 +172,7 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -209,7 +209,7 @@ func (repo *UserRepo) IsUserUnique(ctx context.Context, userName, email string) 
 	return repo.View.IsUserUnique(userName, email)
 }
 
-func (repo *UserRepo) UserMfas(ctx context.Context, userID string) ([]*usr_model.MultiFactor, error) {
+func (repo *UserRepo) UserMFAs(ctx context.Context, userID string) ([]*usr_model.MultiFactor, error) {
 	user, err := repo.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -217,10 +217,10 @@ func (repo *UserRepo) UserMfas(ctx context.Context, userID string) ([]*usr_model
 	if user.HumanView == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-xx0hV", "Errors.User.NotHuman")
 	}
-	if user.OTPState == usr_model.MfaStateUnspecified {
+	if user.OTPState == usr_model.MFAStateUnspecified {
 		return []*usr_model.MultiFactor{}, nil
 	}
-	return []*usr_model.MultiFactor{{Type: usr_model.MfaTypeOTP, State: user.OTPState}}, nil
+	return []*usr_model.MultiFactor{{Type: usr_model.MFATypeOTP, State: user.OTPState}}, nil
 }
 
 func (repo *UserRepo) RemoveOTP(ctx context.Context, userID string) error {
@@ -274,7 +274,7 @@ func (repo *UserRepo) SearchExternalIDPs(ctx context.Context, request *usr_model
 	}
 	if seqErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -311,7 +311,7 @@ func (repo *UserRepo) SearchMachineKeys(ctx context.Context, request *usr_model.
 	}
 	if seqErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -419,7 +419,7 @@ func (repo *UserRepo) SearchUserMemberships(ctx context.Context, request *usr_mo
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -459,7 +459,7 @@ func handleSearchUserMembershipsPermissions(ctx context.Context, request *usr_mo
 			}
 			if sequence != nil {
 				result.Sequence = sequence.CurrentSequence
-				result.Timestamp = sequence.CurrentTimestamp
+				result.Timestamp = sequence.LastSuccessfulSpoolerRun
 			}
 			return result
 		}

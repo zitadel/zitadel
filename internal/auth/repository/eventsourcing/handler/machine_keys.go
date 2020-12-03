@@ -48,26 +48,30 @@ func (d *MachineKeys) processMachineKeys(event *models.Event) (err error) {
 	case model.MachineKeyAdded:
 		err = key.AppendEvent(event)
 		if key.ExpirationDate.Before(time.Now()) {
-			return d.view.ProcessedMachineKeySequence(event.Sequence)
+			return d.view.ProcessedMachineKeySequence(event.Sequence, event.CreationDate)
 		}
 	case model.MachineKeyRemoved:
 		err = key.SetData(event)
 		if err != nil {
 			return err
 		}
-		return d.view.DeleteMachineKey(key.ID, event.Sequence)
+		return d.view.DeleteMachineKey(key.ID, event.Sequence, event.CreationDate)
 	case model.UserRemoved:
-		return d.view.DeleteMachineKeysByUserID(event.AggregateID, event.Sequence)
+		return d.view.DeleteMachineKeysByUserID(event.AggregateID, event.Sequence, event.CreationDate)
 	default:
-		return d.view.ProcessedMachineKeySequence(event.Sequence)
+		return d.view.ProcessedMachineKeySequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return d.view.PutMachineKey(key, key.Sequence)
+	return d.view.PutMachineKey(key, key.Sequence, event.CreationDate)
 }
 
 func (d *MachineKeys) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-S9fe", "id", event.AggregateID).WithError(err).Warn("something went wrong in machine key handler")
 	return spooler.HandleError(event, err, d.view.GetLatestMachineKeyFailedEvent, d.view.ProcessedMachineKeyFailedEvent, d.view.ProcessedMachineKeySequence, d.errorCountUntilSkip)
+}
+
+func (d *MachineKeys) OnSuccess() error {
+	return spooler.HandleSuccess(d.view.UpdateMachineKeySpoolerRunTimestamp)
 }

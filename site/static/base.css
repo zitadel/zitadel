@@ -372,9 +372,33 @@ a.no-underline {
 }
 
 /*  tables --------------------------------- */
+.table-wrapper {
+    max-width: var(--linemax);
+    overflow-x: auto;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: #00000010;
+    border-radius: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: #00000010;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background-color: #6c8eef30;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
 table {
 	width: 100%;
-	font-size: var(--h5);
+    font-size: var(--h5);
 }
 
 td,
@@ -563,6 +587,8 @@ input[type="checkbox"]:checked::after {
 .zitadel-gallery {
     display: flex;
     width: 100%;
+    max-width: 56em;
+    flex-wrap: wrap;
 }
 
 .zitadel-gallery img {
