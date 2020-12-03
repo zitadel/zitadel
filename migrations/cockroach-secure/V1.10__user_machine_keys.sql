@@ -14,4 +14,3 @@ CREATE TABLE management.machine_keys (
 
     PRIMARY KEY (id, user_id)
 )
-
