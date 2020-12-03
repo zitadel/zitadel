@@ -21,7 +21,7 @@ import (
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	project_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -47,7 +47,7 @@ type AuthRequestRepo struct {
 
 	PasswordCheckLifeTime      time.Duration
 	ExternalLoginCheckLifeTime time.Duration
-	MfaInitSkippedLifeTime     time.Duration
+	MFAInitSkippedLifeTime     time.Duration
 	SecondFactorCheckLifeTime  time.Duration
 	MultiFactorCheckLifeTime   time.Duration
 
@@ -245,27 +245,62 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, password, userAgentID string, info *model.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.getAuthRequest(ctx, id, userAgentID)
+	request, err := repo.getAuthRequestEnsureUser(ctx, id, userAgentID, userID)
 	if err != nil {
 		return err
-	}
-	if request.UserID != userID {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-ds35D", "Errors.User.NotMatchingUserID")
 	}
 	return repo.UserEvents.CheckPassword(ctx, userID, password, request.WithCurrentInfo(info))
 }
 
-func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, userID, code, userAgentID string, info *model.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) VerifyMFAOTP(ctx context.Context, authRequestID, userID, code, userAgentID string, info *model.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.getAuthRequest(ctx, authRequestID, userAgentID)
+	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
 	if err != nil {
 		return err
 	}
-	if request.UserID != userID {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-ADJ26", "Errors.User.NotMatchingUserID")
+	return repo.UserEvents.CheckMFAOTP(ctx, userID, code, request.WithCurrentInfo(info))
+}
+
+func (repo *AuthRequestRepo) BeginMFAU2FLogin(ctx context.Context, userID, authRequestID, userAgentID string) (login *user_model.WebAuthNLogin, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
+	if err != nil {
+		return nil, err
 	}
-	return repo.UserEvents.CheckMfaOTP(ctx, userID, code, request.WithCurrentInfo(info))
+	return repo.UserEvents.BeginU2FLogin(ctx, userID, request)
+}
+
+func (repo *AuthRequestRepo) VerifyMFAU2F(ctx context.Context, userID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
+	if err != nil {
+		return err
+	}
+	return repo.UserEvents.VerifyMFAU2F(ctx, userID, credentialData, request)
+}
+
+func (repo *AuthRequestRepo) BeginPasswordlessLogin(ctx context.Context, userID, authRequestID, userAgentID string) (login *user_model.WebAuthNLogin, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
+	if err != nil {
+		return nil, err
+	}
+	return repo.UserEvents.BeginPasswordlessLogin(ctx, userID, request)
+}
+
+func (repo *AuthRequestRepo) VerifyPasswordless(ctx context.Context, userID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
+	if err != nil {
+		return err
+	}
+	return repo.UserEvents.VerifyPasswordless(ctx, userID, credentialData, request)
 }
 
 func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, userAgentID string, info *model.BrowserInfo) (err error) {
@@ -362,6 +397,17 @@ func (repo *AuthRequestRepo) getAuthRequestNextSteps(ctx context.Context, id, us
 		return nil, err
 	}
 	request.PossibleSteps = steps
+	return request, nil
+}
+
+func (repo *AuthRequestRepo) getAuthRequestEnsureUser(ctx context.Context, authRequestID, userAgentID, userID string) (*model.AuthRequest, error) {
+	request, err := repo.getAuthRequest(ctx, authRequestID, userAgentID)
+	if err != nil {
+		return nil, err
+	}
+	if request.UserID != userID {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-GBH32", "Errors.User.NotMatchingUserID")
+	}
 	return request, nil
 }
 
@@ -545,27 +591,19 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 		return nil, err
 	}
 
-	if (request.SelectedIDPConfigID != "" || userSession.SelectedIDPConfigID != "") && (request.LinkingUsers == nil || len(request.LinkingUsers) == 0) {
-		if !checkVerificationTime(userSession.ExternalLoginVerification, repo.ExternalLoginCheckLifeTime) {
-			selectedIDPConfigID := request.SelectedIDPConfigID
-			if selectedIDPConfigID == "" {
-				selectedIDPConfigID = userSession.SelectedIDPConfigID
-			}
-			return append(steps, &model.ExternalLoginStep{SelectedIDPConfigID: selectedIDPConfigID}), nil
+	isInternalLogin := request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == ""
+	if !isInternalLogin && len(request.LinkingUsers) == 0 && !checkVerificationTime(userSession.ExternalLoginVerification, repo.ExternalLoginCheckLifeTime) {
+		selectedIDPConfigID := request.SelectedIDPConfigID
+		if selectedIDPConfigID == "" {
+			selectedIDPConfigID = userSession.SelectedIDPConfigID
 		}
-	} else if (request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == "") || (request.SelectedIDPConfigID != "" && request.LinkingUsers != nil && len(request.LinkingUsers) > 0) {
-		if user.InitRequired {
-			return append(steps, &model.InitUserStep{PasswordSet: user.PasswordSet}), nil
+		return append(steps, &model.ExternalLoginStep{SelectedIDPConfigID: selectedIDPConfigID}), nil
+	}
+	if isInternalLogin || (!isInternalLogin && len(request.LinkingUsers) > 0) {
+		step := repo.firstFactorChecked(request, user, userSession)
+		if step != nil {
+			return append(steps, step), nil
 		}
-		if !user.PasswordSet {
-			return append(steps, &model.InitPasswordStep{}), nil
-		}
-
-		if !checkVerificationTime(userSession.PasswordVerification, repo.PasswordCheckLifeTime) {
-			return append(steps, &model.PasswordStep{}), nil
-		}
-		request.PasswordVerified = true
-		request.AuthTime = userSession.PasswordVerification
 	}
 
 	step, ok, err := repo.mfaChecked(userSession, request, user)
@@ -624,21 +662,46 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *model.AuthRequest) (
 	return users, nil
 }
 
+func (repo *AuthRequestRepo) firstFactorChecked(request *model.AuthRequest, user *user_model.UserView, userSession *user_model.UserSessionView) model.NextStep {
+	if user.InitRequired {
+		return &model.InitUserStep{PasswordSet: user.PasswordSet}
+	}
+
+	if user.IsPasswordlessReady() {
+		if !checkVerificationTime(userSession.PasswordlessVerification, repo.MultiFactorCheckLifeTime) {
+			return &model.PasswordlessStep{}
+		}
+		request.AuthTime = userSession.PasswordlessVerification
+		return nil
+	}
+
+	if !user.PasswordSet {
+		return &model.InitPasswordStep{}
+	}
+
+	if !checkVerificationTime(userSession.PasswordVerification, repo.PasswordCheckLifeTime) {
+		return &model.PasswordStep{}
+	}
+	request.PasswordVerified = true
+	request.AuthTime = userSession.PasswordVerification
+	return nil
+}
+
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *model.AuthRequest, user *user_model.UserView) (model.NextStep, bool, error) {
-	mfaLevel := request.MfaLevel()
-	allowedProviders, required := user.MfaTypesAllowed(mfaLevel, request.LoginPolicy)
-	promptRequired := (user.MfaMaxSetUp < mfaLevel) || (len(allowedProviders) == 0 && required)
+	mfaLevel := request.MFALevel()
+	allowedProviders, required := user.MFATypesAllowed(mfaLevel, request.LoginPolicy)
+	promptRequired := (user.MFAMaxSetUp < mfaLevel) || (len(allowedProviders) == 0 && required)
 	if promptRequired || !repo.mfaSkippedOrSetUp(user) {
-		types := user.MfaTypesSetupPossible(mfaLevel, request.LoginPolicy)
+		types := user.MFATypesSetupPossible(mfaLevel, request.LoginPolicy)
 		if promptRequired && len(types) == 0 {
 			return nil, false, errors.ThrowPreconditionFailed(nil, "LOGIN-5Hm8s", "Errors.Login.LoginPolicy.MFA.ForceAndNotConfigured")
 		}
 		if len(types) == 0 {
 			return nil, true, nil
 		}
-		return &model.MfaPromptStep{
+		return &model.MFAPromptStep{
 			Required:     promptRequired,
-			MfaProviders: types,
+			MFAProviders: types,
 		}, false, nil
 	}
 	switch mfaLevel {
@@ -651,28 +714,28 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 		fallthrough
 	case model.MFALevelSecondFactor:
 		if checkVerificationTime(userSession.SecondFactorVerification, repo.SecondFactorCheckLifeTime) {
-			request.MfasVerified = append(request.MfasVerified, userSession.SecondFactorVerificationType)
+			request.MFAsVerified = append(request.MFAsVerified, userSession.SecondFactorVerificationType)
 			request.AuthTime = userSession.SecondFactorVerification
 			return nil, true, nil
 		}
 		fallthrough
 	case model.MFALevelMultiFactor:
 		if checkVerificationTime(userSession.MultiFactorVerification, repo.MultiFactorCheckLifeTime) {
-			request.MfasVerified = append(request.MfasVerified, userSession.MultiFactorVerificationType)
+			request.MFAsVerified = append(request.MFAsVerified, userSession.MultiFactorVerificationType)
 			request.AuthTime = userSession.MultiFactorVerification
 			return nil, true, nil
 		}
 	}
-	return &model.MfaVerificationStep{
-		MfaProviders: allowedProviders,
+	return &model.MFAVerificationStep{
+		MFAProviders: allowedProviders,
 	}, false, nil
 }
 
 func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
-	if user.MfaMaxSetUp > model.MFALevelNotSetUp {
+	if user.MFAMaxSetUp > model.MFALevelNotSetUp {
 		return true
 	}
-	return checkVerificationTime(user.MfaInitSkipped, repo.MfaInitSkippedLifeTime)
+	return checkVerificationTime(user.MFAInitSkipped, repo.MFAInitSkippedLifeTime)
 }
 
 func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (*iam_model.LoginPolicyView, error) {
@@ -745,7 +808,11 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			es_model.HumanExternalLoginCheckSucceeded,
 			es_model.HumanMFAOTPCheckSucceeded,
 			es_model.HumanMFAOTPCheckFailed,
-			es_model.HumanSignedOut:
+			es_model.HumanSignedOut,
+			es_model.HumanPasswordlessTokenCheckSucceeded,
+			es_model.HumanPasswordlessTokenCheckFailed,
+			es_model.HumanMFAU2FTokenCheckSucceeded,
+			es_model.HumanMFAU2FTokenCheckFailed:
 			eventData, err := user_view_model.UserSessionFromEvent(event)
 			if err != nil {
 				logging.Log("EVENT-sdgT3").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error getting event data")

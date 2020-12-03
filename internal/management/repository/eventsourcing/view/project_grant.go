@@ -5,6 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
+	"time"
 )
 
 const (
@@ -31,28 +32,28 @@ func (v *View) SearchProjectGrants(request *proj_model.ProjectGrantViewSearchReq
 	return view.SearchProjectGrants(v.Db, grantedProjectTable, request)
 }
 
-func (v *View) PutProjectGrant(grant *model.ProjectGrantView) error {
+func (v *View) PutProjectGrant(grant *model.ProjectGrantView, eventTimestamp time.Time) error {
 	err := view.PutProjectGrant(v.Db, grantedProjectTable, grant)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedProjectGrantSequence(grant.Sequence)
+	return v.ProcessedProjectGrantSequence(grant.Sequence, eventTimestamp)
 }
 
-func (v *View) PutProjectGrants(grants []*model.ProjectGrantView, sequence uint64) error {
+func (v *View) PutProjectGrants(grants []*model.ProjectGrantView, sequence uint64, eventTimestamp time.Time) error {
 	err := view.PutProjectGrants(v.Db, grantedProjectTable, grants...)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedProjectGrantSequence(sequence)
+	return v.ProcessedProjectGrantSequence(sequence, eventTimestamp)
 }
 
-func (v *View) DeleteProjectGrant(grantID string, eventSequence uint64) error {
+func (v *View) DeleteProjectGrant(grantID string, eventSequence uint64, eventTimestamp time.Time) error {
 	err := view.DeleteProjectGrant(v.Db, grantedProjectTable, grantID)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedProjectGrantSequence(eventSequence)
+	return v.ProcessedProjectGrantSequence(eventSequence, eventTimestamp)
 }
 
 func (v *View) DeleteProjectGrantsByProjectID(projectID string) error {
@@ -63,8 +64,12 @@ func (v *View) GetLatestProjectGrantSequence() (*repository.CurrentSequence, err
 	return v.latestSequence(grantedProjectTable)
 }
 
-func (v *View) ProcessedProjectGrantSequence(eventSequence uint64) error {
-	return v.saveCurrentSequence(grantedProjectTable, eventSequence)
+func (v *View) ProcessedProjectGrantSequence(eventSequence uint64, eventTimestamp time.Time) error {
+	return v.saveCurrentSequence(grantedProjectTable, eventSequence, eventTimestamp)
+}
+
+func (v *View) UpdateProjectGrantSpoolerRunTimestamp() error {
+	return v.updateSpoolerRunSequence(grantedProjectTable)
 }
 
 func (v *View) GetLatestProjectGrantFailedEvent(sequence uint64) (*repository.FailedEvent, error) {

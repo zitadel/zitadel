@@ -40,3 +40,11 @@ updates:
   commit-message:
     prefix: chore
     include: scope
+- package-ecosystem: "docker"
+  directory: "/site/"
+  schedule:
+    interval: "weekly"
+  open-pull-requests-limit: 10
+  commit-message:
+    prefix: chore
+    include: scope

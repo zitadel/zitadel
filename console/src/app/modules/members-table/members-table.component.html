@@ -73,17 +73,16 @@
             </ng-container>
 
             <ng-container matColumnDef="roles">
-                <th mat-header-cell *matHeaderCellDef> {{ 'ROLESLABEL' | translate }} </th>
-                <td mat-cell *matCellDef="let member">
-                    <mat-form-field class="form-field" appearance="outline">
-                        <mat-label>{{ 'ROLESLABEL' | translate }}</mat-label>
+                <th mat-header-cell *matHeaderCellDef class="role-row"> {{ 'ROLESLABEL' | translate }} </th>
+                <td mat-cell *matCellDef="let member" class="role-row">
+                    <cnsl-form-field class="form-field" appearance="outline">
                         <mat-select [(ngModel)]="member.rolesList" multiple [disabled]="!canWrite"
                             (selectionChange)="updateRoles.emit({member: member, change: $event})">
                             <mat-option *ngFor="let role of memberRoleOptions" [value]="role">
                                 {{ role }}
                             </mat-option>
                         </mat-select>
-                    </mat-form-field>
+                    </cnsl-form-field>
                 </td>
             </ng-container>
 

@@ -12,7 +12,7 @@ RUN wget -O protoc https://github.com/protocolbuffers/protobuf/releases/download
     && unzip protoc \
     && wget -O bin/protoc-gen-grpc-web https://github.com/grpc/grpc-web/releases/download/1.2.0/protoc-gen-grpc-web-1.2.0-linux-x86_64 \
     && chmod +x bin/protoc-gen-grpc-web
-RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.0/validate/validate.proto --create-dirs -o validate/validate.proto  \
+RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.1/validate/validate.proto --create-dirs -o validate/validate.proto  \
     && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/annotations.proto --create-dirs -o protoc-gen-swagger/options/annotations.proto \
     && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/openapiv2.proto --create-dirs -o protoc-gen-swagger/options/openapiv2.proto \
     && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/annotations.proto --create-dirs -o google/api/annotations.proto \
@@ -34,7 +34,7 @@ COPY internal/protoc/protoc-gen-authoption/authoption/options.proto authoption/o
 ## With this step we prepare all node_modules, this helps caching the build
 ## Speed up this step by mounting your local node_modules directory
 #######################
-FROM node:12 as npm-base
+FROM node:15 as npm-base
 WORKDIR console
 COPY console/package.json console/package-lock.json ./
 RUN npm install \

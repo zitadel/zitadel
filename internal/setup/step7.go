@@ -32,23 +32,23 @@ func (step *Step7) init(setup *Setup) {
 func (step *Step7) execute(ctx context.Context) (*iam_model.IAM, error) {
 	iam, agg, err := step.add2FAToPolicy(ctx, step.DefaultSecondFactor)
 	if err != nil {
-		logging.Log("SETUP-ZTuS1").WithField("step", step.step()).WithError(err).Error("unable to finish setup (add default mfa to login policy)")
+		logging.Log("SETUP-GBD32").WithField("step", step.step()).WithError(err).Error("unable to finish setup (add default mfa to login policy)")
 		return nil, err
 	}
 	iam, agg, push, err := step.setup.IamEvents.PrepareSetupDone(ctx, iam, agg, step.step())
 	if err != nil {
-		logging.Log("SETUP-OkF8o").WithField("step", step.step()).WithError(err).Error("unable to finish setup (prepare setup done)")
+		logging.Log("SETUP-BHrth").WithField("step", step.step()).WithError(err).Error("unable to finish setup (prepare setup done)")
 		return nil, err
 	}
 	err = es_sdk.PushAggregates(ctx, push, iam.AppendEvents, agg)
 	if err != nil {
-		logging.Log("SETUP-YbQ6T").WithField("step", step.step()).WithError(err).Error("unable to finish setup")
+		logging.Log("SETUP-k2fla").WithField("step", step.step()).WithError(err).Error("unable to finish setup")
 		return nil, err
 	}
 	return iam_es_model.IAMToModel(iam), nil
 }
 
 func (step *Step7) add2FAToPolicy(ctx context.Context, secondFactor iam_model.SecondFactorType) (*iam_es_model.IAM, *models.Aggregate, error) {
-	logging.Log("SETUP-geMGDuZ").Info("adding 2FA to loginPolicy")
+	logging.Log("SETUP-Bew1a").Info("adding 2FA to loginPolicy")
 	return step.setup.IamEvents.PrepareAddSecondFactorToLoginPolicy(ctx, step.setup.iamID, secondFactor)
 }

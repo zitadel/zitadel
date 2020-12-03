@@ -4,12 +4,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
+import { InputModule } from 'src/app/modules/input/input.module';
 
 import { SearchProjectAutocompleteComponent } from './search-project-autocomplete.component';
 
@@ -22,9 +21,8 @@ import { SearchProjectAutocompleteComponent } from './search-project-autocomplet
         MatAutocompleteModule,
         MatChipsModule,
         MatButtonModule,
-        MatFormFieldModule,
+        InputModule,
         MatIconModule,
-        MatInputModule,
         ReactiveFormsModule,
         MatProgressSpinnerModule,
         FormsModule,

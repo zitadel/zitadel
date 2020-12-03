@@ -917,9 +917,10 @@ export class ManagementService {
 
     //
 
-    public ApplicationChanges(id: string, limit: number, offset: number): Promise<Changes> {
+    public ApplicationChanges(id: string, secId: string, limit: number, offset: number): Promise<Changes> {
         const req = new ChangeRequest();
         req.setId(id);
+        req.setSecId(secId);
         req.setLimit(limit);
         req.setSequenceOffset(offset);
         return this.grpcService.mgmt.applicationChanges(req);

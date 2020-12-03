@@ -1,6 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Location } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -73,6 +73,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
         = new BehaviorSubject<ProjectMemberView.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
+    public refreshChanges$: EventEmitter<void> = new EventEmitter();
 
     constructor(
         public translate: TranslateService,
@@ -139,6 +140,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
                     this.mgmtService.ReactivateProject(this.projectId).then(() => {
                         this.toast.showInfo('PROJECT.TOAST.REACTIVATED', true);
                         this.project.state = ProjectState.PROJECTSTATE_ACTIVE;
+                        this.refreshChanges$.emit();
                     }).catch(error => {
                         this.toast.showError(error);
                     });
@@ -160,6 +162,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
                     this.mgmtService.DeactivateProject(this.projectId).then(() => {
                         this.toast.showInfo('PROJECT.TOAST.DEACTIVATED', true);
                         this.project.state = ProjectState.PROJECTSTATE_INACTIVE;
+                        this.refreshChanges$.emit();
                     }).catch(error => {
                         this.toast.showError(error);
                     });
@@ -194,9 +197,9 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     }
 
     public saveProject(): void {
-        console.log(this.project);
         this.mgmtService.UpdateProject(this.project.projectId, this.project).then(() => {
             this.toast.showInfo('PROJECT.TOAST.UPDATED', true);
+            this.refreshChanges$.emit();
         }).catch(error => {
             this.toast.showError(error);
         });

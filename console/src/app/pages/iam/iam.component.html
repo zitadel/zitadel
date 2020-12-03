@@ -1,21 +1,12 @@
 <app-meta-layout>
     <div class="enlarged-container">
-        <h1 class="h1">{{'IAM.DETAIL.TITLE' | translate}}</h1>
-        <p class="sub">{{'IAM.DETAIL.DESCRIPTION' | translate}} </p>
+        <h1 class="h1">{{'IAM.POLICIES.TITLE' | translate}}</h1>
+        <p class="sub">{{'IAM.POLICIES.DESCRIPTION' | translate}} </p>
 
         <app-policy-grid [type]="PolicyGridType.IAM"></app-policy-grid>
-
-        <app-card title="{{ 'IAM.VIEWS.TITLE' | translate }}" description="{{ 'IAM.VIEWS.DESCRIPTION' | translate }}">
-            <app-iam-views></app-iam-views>
-        </app-card>
-
-        <app-card title="{{ 'IAM.FAILEDEVENTS.TITLE' | translate }}"
-            description="{{ 'IAM.FAILEDEVENTS.DESCRIPTION' | translate }}">
-            <app-iam-failed-events></app-iam-failed-events>
-        </app-card>
     </div>
 
-    <div class="side" metainfo>
+    <div metainfo>
         <app-contributors [totalResult]="totalMemberResult" [loading]="loading$ | async"
             [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
             description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"

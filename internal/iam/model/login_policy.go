@@ -16,6 +16,7 @@ type LoginPolicy struct {
 	ForceMFA              bool
 	SecondFactors         []SecondFactorType
 	MultiFactors          []MultiFactorType
+	PasswordlessType      PasswordlessType
 }
 
 type IDPProvider struct {
@@ -51,6 +52,13 @@ type MultiFactorType int32
 const (
 	MultiFactorTypeUnspecified MultiFactorType = iota
 	MultiFactorTypeU2FWithPIN
+)
+
+type PasswordlessType int32
+
+const (
+	PasswordlessTypeNotAllowed PasswordlessType = iota
+	PasswordlessTypeAllowed
 )
 
 func (p *LoginPolicy) IsValid() bool {

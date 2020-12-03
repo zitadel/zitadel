@@ -30,7 +30,7 @@ type UserRepository interface {
 	ProfileByID(ctx context.Context, userID string) (*model.Profile, error)
 	ChangeProfile(ctx context.Context, profile *model.Profile) (*model.Profile, error)
 
-	UserMfas(ctx context.Context, userID string) ([]*model.MultiFactor, error)
+	UserMFAs(ctx context.Context, userID string) ([]*model.MultiFactor, error)
 	RemoveOTP(ctx context.Context, userID string) error
 
 	SearchExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error)

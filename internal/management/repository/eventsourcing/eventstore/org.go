@@ -22,7 +22,7 @@ import (
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
@@ -122,7 +122,7 @@ func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -219,7 +219,7 @@ func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -306,7 +306,7 @@ func (repo *OrgRepository) SearchIDPConfigs(ctx context.Context, request *iam_mo
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -414,9 +414,9 @@ func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_
 		request.AppendAggregateIDQuery(authz.GetCtxData(ctx).OrgID)
 	}
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, sequenceErr := repo.View.GetLatestIdpProviderSequence()
+	sequence, sequenceErr := repo.View.GetLatestIDPProviderSequence()
 	logging.Log("EVENT-Tuiks").OnError(sequenceErr).Warn("could not read latest iam sequence")
-	providers, count, err := repo.View.SearchIdpProviders(request)
+	providers, count, err := repo.View.SearchIDPProviders(request)
 	if err != nil {
 		return nil, err
 	}
@@ -428,7 +428,7 @@ func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }

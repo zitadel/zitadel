@@ -40,6 +40,9 @@ func (h *testHandler) Reduce(*models.Event) error {
 func (h *testHandler) OnError(event *models.Event, err error) error {
 	return err
 }
+func (h *testHandler) OnSuccess() error {
+	return nil
+}
 func (h *testHandler) MinimumCycleDuration() time.Duration {
 	return h.cycleDuration
 }
@@ -429,7 +432,7 @@ func TestHandleError(t *testing.T) {
 				func(*repository.FailedEvent) error {
 					return nil
 				},
-				func(uint64) error {
+				func(uint64, time.Time) error {
 					processedSequence = true
 					return nil
 				},

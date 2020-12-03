@@ -1,0 +1,31 @@
+
+@import '~@angular/material/theming';
+
+@mixin cnsl-label-theme($theme) {
+  $primary: map-get($theme, primary);
+  $primary-color: mat-color($primary, 500);
+  $is-dark-theme: map-get($theme, is-dark);
+  $warn: map-get($theme, warn);
+  $warn-color: mat-color($warn, 500);
+
+  .cnsl-label {
+    display: block;
+    font-size: 12px;
+    color: if($is-dark-theme, var(--grey), var(--grey));
+    transition: color .2s ease;
+    margin-bottom: 4px;
+    font-weight: 400;
+  }
+
+  .cnsl-form-field-disabled {
+    .cnsl-label {
+      color: if($is-dark-theme, #ffffff80, #00000061);
+    }
+  }
+
+  .cnsl-form-field-invalid {
+    .cnsl-label {
+      color: $warn-color;
+    }
+  }
+}

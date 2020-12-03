@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"reflect"
+	"time"
 
 	"github.com/caos/logging"
 
@@ -27,6 +28,8 @@ type OIDCConfig struct {
 	AccessTokenType          int32               `json:"accessTokenType,omitempty"`
 	AccessTokenRoleAssertion bool                `json:"accessTokenRoleAssertion,omitempty"`
 	IDTokenRoleAssertion     bool                `json:"idTokenRoleAssertion,omitempty"`
+	IDTokenUserinfoAssertion bool                `json:"idTokenUserinfoAssertion,omitempty"`
+	ClockSkew                time.Duration       `json:"clockSkew,omitempty"`
 }
 
 func (c *OIDCConfig) Changes(changed *OIDCConfig) map[string]interface{} {
@@ -65,6 +68,12 @@ func (c *OIDCConfig) Changes(changed *OIDCConfig) map[string]interface{} {
 	if c.IDTokenRoleAssertion != changed.IDTokenRoleAssertion {
 		changes["idTokenRoleAssertion"] = changed.IDTokenRoleAssertion
 	}
+	if c.IDTokenUserinfoAssertion != changed.IDTokenUserinfoAssertion {
+		changes["idTokenUserinfoAssertion"] = changed.IDTokenUserinfoAssertion
+	}
+	if c.ClockSkew != changed.ClockSkew {
+		changes["clockSkew"] = changed.ClockSkew
+	}
 	return changes
 }
 
@@ -93,6 +102,8 @@ func OIDCConfigFromModel(config *model.OIDCConfig) *OIDCConfig {
 		AccessTokenType:          int32(config.AccessTokenType),
 		AccessTokenRoleAssertion: config.AccessTokenRoleAssertion,
 		IDTokenRoleAssertion:     config.IDTokenRoleAssertion,
+		IDTokenUserinfoAssertion: config.IDTokenUserinfoAssertion,
+		ClockSkew:                config.ClockSkew,
 	}
 }
 
@@ -121,6 +132,8 @@ func OIDCConfigToModel(config *OIDCConfig) *model.OIDCConfig {
 		AccessTokenType:          model.OIDCTokenType(config.AccessTokenType),
 		AccessTokenRoleAssertion: config.AccessTokenRoleAssertion,
 		IDTokenRoleAssertion:     config.IDTokenRoleAssertion,
+		IDTokenUserinfoAssertion: config.IDTokenUserinfoAssertion,
+		ClockSkew:                config.ClockSkew,
 	}
 	oidcConfig.FillCompliance()
 	return oidcConfig

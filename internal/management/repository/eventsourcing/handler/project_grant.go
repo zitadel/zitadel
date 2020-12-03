@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"time"
 
 	"github.com/caos/logging"
 
@@ -47,7 +48,7 @@ func (p *ProjectGrant) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return p.updateExistingProjects(project, event.Sequence)
+		return p.updateExistingProjects(project, event.Sequence, event.CreationDate)
 	case es_model.ProjectGrantAdded:
 		err = grantedProject.AppendEvent(event)
 		if err != nil {
@@ -85,16 +86,16 @@ func (p *ProjectGrant) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return p.view.DeleteProjectGrant(grant.GrantID, event.Sequence)
+		return p.view.DeleteProjectGrant(grant.GrantID, event.Sequence, event.CreationDate)
 	case es_model.ProjectRemoved:
 		return p.view.DeleteProjectGrantsByProjectID(event.AggregateID)
 	default:
-		return p.view.ProcessedProjectGrantSequence(event.Sequence)
+		return p.view.ProcessedProjectGrantSequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutProjectGrant(grantedProject)
+	return p.view.PutProjectGrant(grantedProject, event.CreationDate)
 }
 
 func (p *ProjectGrant) fillOrgData(grantedProject *view_model.ProjectGrantView, org, resourceOwner *org_model.Org) {
@@ -106,7 +107,7 @@ func (p *ProjectGrant) getProject(projectID string) (*proj_model.Project, error)
 	return p.projectEvents.ProjectByID(context.Background(), projectID)
 }
 
-func (p *ProjectGrant) updateExistingProjects(project *view_model.ProjectView, sequence uint64) error {
+func (p *ProjectGrant) updateExistingProjects(project *view_model.ProjectView, sequence uint64, eventTimestamp time.Time) error {
 	projectGrants, err := p.view.ProjectGrantsByProjectID(project.ProjectID)
 	if err != nil {
 		logging.LogWithFields("SPOOL-los03", "id", project.ProjectID).WithError(err).Warn("could not update existing projects")
@@ -114,10 +115,14 @@ func (p *ProjectGrant) updateExistingProjects(project *view_model.ProjectView, s
 	for _, existingGrant := range projectGrants {
 		existingGrant.Name = project.Name
 	}
-	return p.view.PutProjectGrants(projectGrants, sequence)
+	return p.view.PutProjectGrants(projectGrants, sequence, eventTimestamp)
 }
 
 func (p *ProjectGrant) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-sQqOg", "id", event.AggregateID).WithError(err).Warn("something went wrong in granted projecthandler")
 	return spooler.HandleError(event, err, p.view.GetLatestProjectGrantFailedEvent, p.view.ProcessedProjectGrantFailedEvent, p.view.ProcessedProjectGrantSequence, p.errorCountUntilSkip)
+}
+
+func (p *ProjectGrant) OnSuccess() error {
+	return spooler.HandleSuccess(p.view.UpdateProjectGrantSpoolerRunTimestamp)
 }

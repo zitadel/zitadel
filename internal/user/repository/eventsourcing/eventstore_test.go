@@ -1207,7 +1207,7 @@ func TestInitCodeVerify(t *testing.T) {
 	}
 }
 
-func TestSkipMfaInit(t *testing.T) {
+func TestSkipMFAInit(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
 		es   *UserEventstore
@@ -1256,7 +1256,7 @@ func TestSkipMfaInit(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.es.SkipMfaInit(tt.args.ctx, tt.args.user.AggregateID)
+			err := tt.args.es.SkipMFAInit(tt.args.ctx, tt.args.user.AggregateID)
 
 			if tt.res.errFunc == nil && err != nil {
 				t.Errorf("rshould not get err")
@@ -3479,7 +3479,7 @@ func TestAddOTP(t *testing.T) {
 	}
 }
 
-func TestCheckMfaOTPSetup(t *testing.T) {
+func TestCheckMFAOTPSetup(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
 		es     *UserEventstore
@@ -3578,7 +3578,7 @@ func TestCheckMfaOTPSetup(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.es.CheckMfaOTPSetup(tt.args.ctx, tt.args.userID, tt.args.code)
+			err := tt.args.es.CheckMFAOTPSetup(tt.args.ctx, tt.args.userID, tt.args.code)
 
 			if tt.res.errFunc == nil && err != nil {
 				t.Errorf("result should not get err")
@@ -3590,7 +3590,7 @@ func TestCheckMfaOTPSetup(t *testing.T) {
 	}
 }
 
-func TestCheckMfaOTP(t *testing.T) {
+func TestCheckMFAOTP(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
 		es          *UserEventstore
@@ -3708,7 +3708,7 @@ func TestCheckMfaOTP(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.es.CheckMfaOTP(tt.args.ctx, tt.args.userID, tt.args.code, tt.args.authRequest)
+			err := tt.args.es.CheckMFAOTP(tt.args.ctx, tt.args.userID, tt.args.code, tt.args.authRequest)
 
 			if tt.res.errFunc == nil && err != nil {
 				t.Errorf("result should not get err, got : %v", err)

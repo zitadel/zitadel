@@ -109,8 +109,8 @@ func GetMockChangesOrgWithLoginPolicyWithMFA(ctrl *gomock.Controller) *OrgEvents
 	orgData, _ := json.Marshal(model.Org{Name: "MusterOrg"})
 	loginPolicy, _ := json.Marshal(iam_es_model.LoginPolicy{AllowRegister: true, AllowExternalIdp: true, AllowUsernamePassword: true})
 	idpData, _ := json.Marshal(iam_es_model.IDPProvider{IDPConfigID: "IDPConfigID", Type: int32(iam_model.IDPProviderTypeSystem)})
-	secondFactor, _ := json.Marshal(iam_es_model.MFA{MfaType: int32(iam_model.SecondFactorTypeOTP)})
-	multiFactor, _ := json.Marshal(iam_es_model.MFA{MfaType: int32(iam_model.MultiFactorTypeU2FWithPIN)})
+	secondFactor, _ := json.Marshal(iam_es_model.MFA{MFAType: int32(iam_model.SecondFactorTypeOTP)})
+	multiFactor, _ := json.Marshal(iam_es_model.MFA{MFAType: int32(iam_model.MultiFactorTypeU2FWithPIN)})
 	events := []*es_models.Event{
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.OrgAdded, Data: orgData},
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyAdded, Data: loginPolicy},

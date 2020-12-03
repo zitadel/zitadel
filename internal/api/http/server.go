@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 func Serve(ctx context.Context, handler http.Handler, port, servername string) {

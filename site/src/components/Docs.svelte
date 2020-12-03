@@ -84,6 +84,21 @@
 </script>
 
 <style>
+  .overlay {
+      position: fixed;
+      top: var(--nav-h);
+      right: 0;
+      left: 0;
+      bottom: 0;
+      background: #00000050;
+      backdrop-filter: blur(10px);
+      visibility: hidden;
+  }
+
+  .overlay.visible {
+      visibility: visible;
+  }
+
   aside {
     position: fixed;
     background-color: var(--side-nav-back);
@@ -108,7 +123,7 @@
 
   aside.open {
     width: calc(100vw - 1.5rem);
-    height: calc(100vh - var(--nav-h) - 9rem);
+    height: calc(100vh - var(--nav-h) - 15rem);
   }
 
   aside.open::before {
@@ -144,7 +159,7 @@
     overflow-y: auto;
     width: 100%;
     height: 100%;
-    padding: 4em 1.6rem 2em 3.2rem;
+    padding: 4em 1.6rem 2em 0;
     bottom: 2em;
   }
 
@@ -499,12 +514,15 @@
   {/each}
 </div>
 
+<div class="overlay {show_contents ? 'visible' : ''}"></div>
+
 <aside bind:this={aside} class="sidebar-container" class:open={show_contents}>
   <div class="sidebar" on:click={() => (show_contents = false)}>
     <a rel="prefetch" href="." class="home" title="Zitadel Docs">
       <img src="logos/zitadel-logo-light.svg" alt="zitadel-logo" />
       <span>DOCS</span>
     </a>
+
     <SearchTrigger on:click={handleSearch}/>
 
     <!-- scroll container -->
@@ -516,6 +534,7 @@
   <button on:click={() => (show_contents = !show_contents)}>
     <Icon name={show_contents ? 'las la-times' : 'las la-bars'} />
   </button>
+
 </aside>
 
 {#if searchEnabled == true}

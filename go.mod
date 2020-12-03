@@ -15,14 +15,16 @@ require (
 	github.com/allegro/bigcache v1.2.1
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.12.5
+	github.com/caos/oidc v0.13.1
 	github.com/caos/orbos v1.5.1-0.20201123140315-2d2be7cbab29
 	github.com/cockroachdb/cockroach-go/v2 v2.0.8
+	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.4.4
 	github.com/golang/protobuf v1.4.3
 	github.com/golang/snappy v0.0.2 // indirect
+	github.com/google/go-cmp v0.5.3 // indirect
 	github.com/gorilla/csrf v1.7.0
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/schema v1.2.0
@@ -46,6 +48,8 @@ require (
 	github.com/nicksnyder/go-i18n/v2 v2.1.1
 	github.com/pkg/errors v0.9.1
 	github.com/pquerna/otp v1.2.0
+	github.com/prometheus/client_golang v1.8.0 // indirect
+	github.com/prometheus/common v0.15.0 // indirect
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.7.0
 	github.com/sony/sonyflake v1.0.0
@@ -56,12 +60,13 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.13.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.13.0
 	go.opentelemetry.io/otel v0.13.0
+	go.opentelemetry.io/otel/exporters/metric/prometheus v0.13.0
 	go.opentelemetry.io/otel/exporters/otlp v0.13.0
 	go.opentelemetry.io/otel/exporters/stdout v0.13.0
 	go.opentelemetry.io/otel/sdk v0.13.0
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
 	golang.org/x/net v0.0.0-20201031054903-ff519b6c9102 // indirect
-	golang.org/x/sys v0.0.0-20201101102859-da207088b7d1 // indirect
+	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect
 	golang.org/x/text v0.3.4
 	golang.org/x/tools v0.0.0-20201103235415-b653051172e4
 	google.golang.org/appengine v1.6.7 // indirect
