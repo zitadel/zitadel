@@ -226,3 +226,67 @@ func HumanWebAuthNBeginLoginEventMapper(event *repository.Event) (eventstore.Eve
 	}
 	return webAuthNAdded, nil
 }
+
+type HumanWebAuthNCheckSucceededEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	//TODO: Handle Auth Req??
+	//*AuthRequest
+}
+
+func (e *HumanWebAuthNCheckSucceededEvent) CheckPrevious() bool {
+	return true
+}
+
+func (e *HumanWebAuthNCheckSucceededEvent) Data() interface{} {
+	return e
+}
+
+func NewHumanWebAuthNCheckSucceededEvent(base *eventstore.BaseEvent) *HumanWebAuthNCheckSucceededEvent {
+	return &HumanWebAuthNCheckSucceededEvent{
+		BaseEvent: *base,
+	}
+}
+
+func HumanWebAuthNCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	webAuthNAdded := &HumanWebAuthNCheckSucceededEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, webAuthNAdded)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "USER-2M0fg", "unable to unmarshal human webAuthN check succeeded")
+	}
+	return webAuthNAdded, nil
+}
+
+type HumanWebAuthNCheckFailedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	//TODO: Handle Auth Req??
+	//*AuthRequest
+}
+
+func (e *HumanWebAuthNCheckFailedEvent) CheckPrevious() bool {
+	return true
+}
+
+func (e *HumanWebAuthNCheckFailedEvent) Data() interface{} {
+	return e
+}
+
+func NewHumanWebAuthNCheckFailedEvent(base *eventstore.BaseEvent) *HumanWebAuthNCheckFailedEvent {
+	return &HumanWebAuthNCheckFailedEvent{
+		BaseEvent: *base,
+	}
+}
+
+func HumanWebAuthNCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	webAuthNAdded := &HumanWebAuthNCheckFailedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, webAuthNAdded)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "USER-O0dse", "unable to unmarshal human webAuthN check failed")
+	}
+	return webAuthNAdded, nil
+}
