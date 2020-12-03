@@ -20,7 +20,7 @@ CREATE TABLE eventstore.events (
     previous_sequence BIGINT,
     creation_date TIMESTAMPTZ NOT NULL DEFAULT now(),
     event_data JSONB,
-    editor_user TEXT NOT NULL,
+    editor_user TEXT NOT NULL, 
     editor_service TEXT NOT NULL,
     resource_owner TEXT NOT NULL,
 
