@@ -6,7 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 

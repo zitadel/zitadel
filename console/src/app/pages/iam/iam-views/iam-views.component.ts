@@ -21,7 +21,7 @@ export class IamViewsComponent implements AfterViewInit {
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     public dataSource!: MatTableDataSource<View.AsObject>;
 
-    public displayedColumns: string[] = ['viewName', 'database', 'sequence', 'timestamp', 'actions'];
+    public displayedColumns: string[] = ['viewName', 'database', 'sequence', 'eventTimestamp', 'lastSuccessfulSpoolerRun', 'actions'];
 
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();

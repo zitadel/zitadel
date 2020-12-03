@@ -41,15 +41,21 @@ func (k *Key) Reduce(event *models.Event) error {
 			return err
 		}
 		if privateKey.Expiry.Before(time.Now()) && publicKey.Expiry.Before(time.Now()) {
-			return k.view.ProcessedKeySequence(event.Sequence)
+			return k.view.ProcessedKeySequence(event.Sequence, event.CreationDate)
 		}
-		return k.view.PutKeys(privateKey, publicKey, event.Sequence)
+		return k.view.PutKeys(privateKey, publicKey, event.Sequence, event.CreationDate)
 	default:
-		return k.view.ProcessedKeySequence(event.Sequence)
+		return k.view.ProcessedKeySequence(event.Sequence, event.CreationDate)
 	}
 }
 
 func (k *Key) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-GHa3a", "id", event.AggregateID).WithError(err).Warn("something went wrong in key handler")
 	return spooler.HandleError(event, err, k.view.GetLatestKeyFailedEvent, k.view.ProcessedKeyFailedEvent, k.view.ProcessedKeySequence, k.errorCountUntilSkip)
+}
+
+func (k *Key) OnSuccess() error {
+	err := spooler.HandleSuccess(k.view.UpdateKeySpoolerRunTimestamp)
+	logging.LogWithFields("SPOOL-vM9sd", "table", keyTable).OnError(err).Warn("could not process on success func")
+	return err
 }

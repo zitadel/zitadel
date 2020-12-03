@@ -49,7 +49,7 @@ func (t *Token) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return t.view.PutToken(token)
+		return t.view.PutToken(token, event.CreationDate)
 	case user_es_model.UserProfileChanged,
 		user_es_model.HumanProfileChanged:
 		user := new(view_model.UserView)
@@ -61,25 +61,25 @@ func (t *Token) Reduce(event *models.Event) (err error) {
 		for _, token := range tokens {
 			token.PreferredLanguage = user.PreferredLanguage
 		}
-		return t.view.PutTokens(tokens, event.Sequence)
+		return t.view.PutTokens(tokens, event.Sequence, event.CreationDate)
 	case user_es_model.SignedOut,
 		user_es_model.HumanSignedOut:
 		id, err := agentIDFromSession(event)
 		if err != nil {
 			return err
 		}
-		return t.view.DeleteSessionTokens(id, event.AggregateID, event.Sequence)
+		return t.view.DeleteSessionTokens(id, event.AggregateID, event.Sequence, event.CreationDate)
 	case user_es_model.UserLocked,
 		user_es_model.UserDeactivated,
 		user_es_model.UserRemoved:
-		return t.view.DeleteUserTokens(event.AggregateID, event.Sequence)
+		return t.view.DeleteUserTokens(event.AggregateID, event.Sequence, event.CreationDate)
 	case project_es_model.ApplicationDeactivated,
 		project_es_model.ApplicationRemoved:
 		application, err := applicationFromSession(event)
 		if err != nil {
 			return err
 		}
-		return t.view.DeleteApplicationTokens(event.Sequence, application.AppID)
+		return t.view.DeleteApplicationTokens(event.Sequence, event.CreationDate, application.AppID)
 	case project_es_model.ProjectDeactivated,
 		project_es_model.ProjectRemoved:
 		project, err := t.ProjectEvents.ProjectByID(context.Background(), event.AggregateID)
@@ -90,9 +90,9 @@ func (t *Token) Reduce(event *models.Event) (err error) {
 		for _, app := range project.Applications {
 			applicationsIDs = append(applicationsIDs, app.AppID)
 		}
-		return t.view.DeleteApplicationTokens(event.Sequence, applicationsIDs...)
+		return t.view.DeleteApplicationTokens(event.Sequence, event.CreationDate, applicationsIDs...)
 	default:
-		return t.view.ProcessedTokenSequence(event.Sequence)
+		return t.view.ProcessedTokenSequence(event.Sequence, event.CreationDate)
 	}
 }
 
@@ -117,4 +117,8 @@ func applicationFromSession(event *models.Event) (*project_es_model.Application,
 		return nil, caos_errs.ThrowInternal(nil, "MODEL-Hrw1q", "could not unmarshal data")
 	}
 	return application, nil
+}
+
+func (t *Token) OnSuccess() error {
+	return spooler.HandleSuccess(t.view.UpdateTokenSpoolerRunTimestamp)
 }

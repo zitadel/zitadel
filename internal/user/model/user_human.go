@@ -1,8 +1,10 @@
 package model
 
 import (
-	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"bytes"
 	"time"
+
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -14,12 +16,16 @@ type Human struct {
 	*Email
 	*Phone
 	*Address
-	ExternalIDPs []*ExternalIDP
-	InitCode     *InitUserCode
-	EmailCode    *EmailCode
-	PhoneCode    *PhoneCode
-	PasswordCode *PasswordCode
-	OTP          *OTP
+	ExternalIDPs       []*ExternalIDP
+	InitCode           *InitUserCode
+	EmailCode          *EmailCode
+	PhoneCode          *PhoneCode
+	PasswordCode       *PasswordCode
+	OTP                *OTP
+	U2FTokens          []*WebAuthNToken
+	PasswordlessTokens []*WebAuthNToken
+	U2FLogins          []*WebAuthNLogin
+	PasswordlessLogins []*WebAuthNLogin
 }
 
 type InitUserCode struct {
@@ -53,7 +59,7 @@ func (u *Human) IsInitialState() bool {
 }
 
 func (u *Human) IsOTPReady() bool {
-	return u.OTP != nil && u.OTP.State == MfaStateReady
+	return u.OTP != nil && u.OTP.State == MFAStateReady
 }
 
 func (u *Human) HashPasswordIfExisting(policy *iam_model.PasswordComplexityPolicyView, passwordAlg crypto.HashAlgorithm, onetime bool) error {
@@ -101,6 +107,78 @@ func (u *Human) GetExternalIDP(externalIDP *ExternalIDP) (int, *ExternalIDP) {
 	for i, idp := range u.ExternalIDPs {
 		if idp.UserID == externalIDP.UserID {
 			return i, idp
+		}
+	}
+	return -1, nil
+}
+
+func (u *Human) GetU2F(webAuthNTokenID string) (int, *WebAuthNToken) {
+	for i, u2f := range u.U2FTokens {
+		if u2f.WebAuthNTokenID == webAuthNTokenID {
+			return i, u2f
+		}
+	}
+	return -1, nil
+}
+
+func (u *Human) GetU2FByKeyID(keyID []byte) (int, *WebAuthNToken) {
+	for i, u2f := range u.U2FTokens {
+		if bytes.Compare(u2f.KeyID, keyID) == 0 {
+			return i, u2f
+		}
+	}
+	return -1, nil
+}
+
+func (u *Human) GetU2FToVerify() (int, *WebAuthNToken) {
+	for i, u2f := range u.U2FTokens {
+		if u2f.State == MFAStateNotReady {
+			return i, u2f
+		}
+	}
+	return -1, nil
+}
+
+func (u *Human) GetPasswordless(webAuthNTokenID string) (int, *WebAuthNToken) {
+	for i, u2f := range u.PasswordlessTokens {
+		if u2f.WebAuthNTokenID == webAuthNTokenID {
+			return i, u2f
+		}
+	}
+	return -1, nil
+}
+
+func (u *Human) GetPasswordlessByKeyID(keyID []byte) (int, *WebAuthNToken) {
+	for i, pwl := range u.PasswordlessTokens {
+		if bytes.Compare(pwl.KeyID, keyID) == 0 {
+			return i, pwl
+		}
+	}
+	return -1, nil
+}
+
+func (u *Human) GetPasswordlessToVerify() (int, *WebAuthNToken) {
+	for i, u2f := range u.PasswordlessTokens {
+		if u2f.State == MFAStateNotReady {
+			return i, u2f
+		}
+	}
+	return -1, nil
+}
+
+func (u *Human) GetU2FLogin(authReqID string) (int, *WebAuthNLogin) {
+	for i, u2f := range u.U2FLogins {
+		if u2f.AuthRequest.ID == authReqID {
+			return i, u2f
+		}
+	}
+	return -1, nil
+}
+
+func (u *Human) GetPasswordlessLogin(authReqID string) (int, *WebAuthNLogin) {
+	for i, pw := range u.PasswordlessLogins {
+		if pw.AuthRequest.ID == authReqID {
+			return i, pw
 		}
 	}
 	return -1, nil

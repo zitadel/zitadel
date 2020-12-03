@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/tracing"
-	"github.com/caos/zitadel/internal/tracing/google"
-	"github.com/caos/zitadel/internal/tracing/log"
-	"github.com/caos/zitadel/internal/tracing/otel"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing/google"
+	"github.com/caos/zitadel/internal/telemetry/tracing/log"
+	"github.com/caos/zitadel/internal/telemetry/tracing/otel"
 )
 
 type TracingConfig struct {

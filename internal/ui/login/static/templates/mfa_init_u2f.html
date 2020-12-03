@@ -1,0 +1,42 @@
+{{template "main-top" .}}
+
+<div class="head">
+    {{ template "user-profile" . }}
+
+    <p>{{t "MFAInitU2F.Description"}}</p>
+</div>
+
+<form action="{{ mfaInitU2FVerifyUrl }}" method="POST">
+
+    {{ .CSRF }}
+
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+    <input type="hidden" name="credentialCreationData" value="{{ .CredentialCreationData }}" />
+    <input type="hidden" name="credentialData" />
+
+    <div class="fields">
+        <p class="wa-no-support error hidden">{{t "WebAuthN.NotSupported"}}</p>
+        <div class="field">
+            <label class="label" for="name">{{t "WebAuthN.Name"}}</label>
+            <input class="input" type="text" id="name" name="name" autocomplete="off" autofocus>
+        </div>
+        <a id="btn-register" class="button primary wa-support">{{t "Actions.RegisterToken"}}</a>
+        <div id="wa-error" class="error hidden">
+            <span class="cause"></span>
+            <span>{{t "WebAuthN.Error.Retry"}}</span>
+        </div>
+    </div>
+
+    {{ template "error-message" .}}
+
+    <div class="actions">
+        <button class="secondary right wa-support" id="submit-button" type="submit" name="recreate" value="true">{{t "Actions.Recreate"}}</button>
+    </div>
+</form>
+
+<script src="{{ resourceUrl "scripts/base64.js" }}"></script>
+<script src="{{ resourceUrl "scripts/webauthn.js" }}"></script>
+<script src="{{ resourceUrl "scripts/webauthn_register.js" }}"></script>
+
+{{template "main-bottom" .}}
+ 

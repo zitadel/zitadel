@@ -991,7 +991,7 @@ func TestInitCodeCheckFailedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := SkipMfaAggregate(tt.args.aggCreator, tt.args.user)(tt.args.ctx)
+			agg, err := SkipMFAAggregate(tt.args.aggCreator, tt.args.user)(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -1006,7 +1006,7 @@ func TestInitCodeCheckFailedAggregate(t *testing.T) {
 	}
 }
 
-func TestSkipMfaAggregate(t *testing.T) {
+func TestSkipMFAAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		user       *model.User

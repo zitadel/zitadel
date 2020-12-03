@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/id"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 

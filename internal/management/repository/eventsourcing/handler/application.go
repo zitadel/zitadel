@@ -65,33 +65,37 @@ func (a *Application) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return a.view.DeleteApplication(app.ID, event.Sequence)
+		return a.view.DeleteApplication(app.ID, event.Sequence, event.CreationDate)
 	case es_model.ProjectChanged:
 		apps, err := a.view.ApplicationsByProjectID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		if len(apps) == 0 {
-			return a.view.ProcessedApplicationSequence(event.Sequence)
+			return a.view.ProcessedApplicationSequence(event.Sequence, event.CreationDate)
 		}
 		for _, app := range apps {
 			if err := app.AppendEvent(event); err != nil {
 				return err
 			}
 		}
-		return a.view.PutApplications(apps, event.Sequence)
+		return a.view.PutApplications(apps, event.Sequence, event.CreationDate)
 	case es_model.ProjectRemoved:
 		return a.view.DeleteApplicationsByProjectID(event.AggregateID)
 	default:
-		return a.view.ProcessedApplicationSequence(event.Sequence)
+		return a.view.ProcessedApplicationSequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return a.view.PutApplication(app)
+	return a.view.PutApplication(app, event.CreationDate)
 }
 
 func (a *Application) OnError(event *models.Event, spoolerError error) error {
 	logging.LogWithFields("SPOOL-ls9ew", "id", event.AggregateID).WithError(spoolerError).Warn("something went wrong in project app handler")
 	return spooler.HandleError(event, spoolerError, a.view.GetLatestApplicationFailedEvent, a.view.ProcessedApplicationFailedEvent, a.view.ProcessedApplicationSequence, a.errorCountUntilSkip)
+}
+
+func (a *Application) OnSuccess() error {
+	return spooler.HandleSuccess(a.view.UpdateApplicationSpoolerRunTimestamp)
 }

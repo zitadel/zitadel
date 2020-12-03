@@ -3,7 +3,7 @@
 <div class="head">
     {{ template "user-profile" . }}
 
-    <p>{{t "MfaVerify.Description"}}</p>
+    <p>{{t "MFAVerify.Description"}}</p>
 </div>
 
 <form action="{{ mfaVerifyUrl }}" method="POST">
@@ -11,11 +11,11 @@
     {{ .CSRF }}
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
-    <input type="hidden" name="mfaType" value="{{ .SelectedMfaProvider }}" />
+    <input type="hidden" name="mfaType" value="{{ .SelectedMFAProvider }}" />
 
     <div class="fields">
         <div class="field">
-            <label class="label" for="code">{{t "MfaVerify.Code"}}</label>
+            <label class="label" for="code">{{t "MFAVerify.Code"}}</label>
             <input class="input" type="text" id="code" name="code" autocomplete="off" autofocus required>
         </div>
     </div>

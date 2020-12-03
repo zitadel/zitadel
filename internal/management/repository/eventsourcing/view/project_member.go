@@ -5,6 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
+	"time"
 )
 
 const (
@@ -27,28 +28,28 @@ func (v *View) ProjectMembersByUserID(userID string) ([]*model.ProjectMemberView
 	return view.ProjectMembersByUserID(v.Db, projectMemberTable, userID)
 }
 
-func (v *View) PutProjectMember(project *model.ProjectMemberView, sequence uint64) error {
+func (v *View) PutProjectMember(project *model.ProjectMemberView, sequence uint64, eventTimestamp time.Time) error {
 	err := view.PutProjectMember(v.Db, projectMemberTable, project)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedProjectMemberSequence(sequence)
+	return v.ProcessedProjectMemberSequence(sequence, eventTimestamp)
 }
 
-func (v *View) PutProjectMembers(project []*model.ProjectMemberView, sequence uint64) error {
+func (v *View) PutProjectMembers(project []*model.ProjectMemberView, sequence uint64, eventTimestamp time.Time) error {
 	err := view.PutProjectMembers(v.Db, projectMemberTable, project...)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedProjectMemberSequence(sequence)
+	return v.ProcessedProjectMemberSequence(sequence, eventTimestamp)
 }
 
-func (v *View) DeleteProjectMember(projectID, userID string, eventSequence uint64) error {
+func (v *View) DeleteProjectMember(projectID, userID string, eventSequence uint64, eventTimestamp time.Time) error {
 	err := view.DeleteProjectMember(v.Db, projectMemberTable, projectID, userID)
 	if err != nil {
 		return nil
 	}
-	return v.ProcessedProjectMemberSequence(eventSequence)
+	return v.ProcessedProjectMemberSequence(eventSequence, eventTimestamp)
 }
 
 func (v *View) DeleteProjectMembersByProjectID(projectID string) error {
@@ -59,8 +60,12 @@ func (v *View) GetLatestProjectMemberSequence() (*repository.CurrentSequence, er
 	return v.latestSequence(projectMemberTable)
 }
 
-func (v *View) ProcessedProjectMemberSequence(eventSequence uint64) error {
-	return v.saveCurrentSequence(projectMemberTable, eventSequence)
+func (v *View) ProcessedProjectMemberSequence(eventSequence uint64, eventTimestamp time.Time) error {
+	return v.saveCurrentSequence(projectMemberTable, eventSequence, eventTimestamp)
+}
+
+func (v *View) UpdateProjectMemberSpoolerRunTimestamp() error {
+	return v.updateSpoolerRunSequence(projectMemberTable)
 }
 
 func (v *View) GetLatestProjectMemberFailedEvent(sequence uint64) (*repository.FailedEvent, error) {

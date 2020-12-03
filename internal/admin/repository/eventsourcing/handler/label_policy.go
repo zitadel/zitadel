@@ -18,12 +18,12 @@ const (
 	labelPolicyTable = "adminapi.label_policies"
 )
 
-func (m *LabelPolicy) ViewModel() string {
+func (p *LabelPolicy) ViewModel() string {
 	return labelPolicyTable
 }
 
-func (m *LabelPolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestLabelPolicySequence()
+func (p *LabelPolicy) EventQuery() (*models.SearchQuery, error) {
+	sequence, err := p.view.GetLatestLabelPolicySequence()
 	if err != nil {
 		return nil, err
 	}
@@ -32,35 +32,39 @@ func (m *LabelPolicy) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (m *LabelPolicy) Reduce(event *models.Event) (err error) {
+func (p *LabelPolicy) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
 	case model.IAMAggregate:
-		err = m.processLabelPolicy(event)
+		err = p.processLabelPolicy(event)
 	}
 	return err
 }
 
-func (m *LabelPolicy) processLabelPolicy(event *models.Event) (err error) {
+func (p *LabelPolicy) processLabelPolicy(event *models.Event) (err error) {
 	policy := new(iam_model.LabelPolicyView)
 	switch event.Type {
 	case model.LabelPolicyAdded:
 		err = policy.AppendEvent(event)
 	case model.LabelPolicyChanged:
-		policy, err = m.view.LabelPolicyByAggregateID(event.AggregateID)
+		policy, err = p.view.LabelPolicyByAggregateID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		err = policy.AppendEvent(event)
 	default:
-		return m.view.ProcessedLabelPolicySequence(event.Sequence)
+		return p.view.ProcessedLabelPolicySequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutLabelPolicy(policy, policy.Sequence)
+	return p.view.PutLabelPolicy(policy, policy.Sequence, event.CreationDate)
 }
 
-func (m *LabelPolicy) OnError(event *models.Event, err error) error {
+func (p *LabelPolicy) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Wj8sf", "id", event.AggregateID).WithError(err).Warn("something went wrong in label policy handler")
-	return spooler.HandleError(event, err, m.view.GetLatestLabelPolicyFailedEvent, m.view.ProcessedLabelPolicyFailedEvent, m.view.ProcessedLabelPolicySequence, m.errorCountUntilSkip)
+	return spooler.HandleError(event, err, p.view.GetLatestLabelPolicyFailedEvent, p.view.ProcessedLabelPolicyFailedEvent, p.view.ProcessedLabelPolicySequence, p.errorCountUntilSkip)
+}
+
+func (p *LabelPolicy) OnSuccess() error {
+	return spooler.HandleSuccess(p.view.UpdateLabelPolicySpoolerRunTimestamp)
 }

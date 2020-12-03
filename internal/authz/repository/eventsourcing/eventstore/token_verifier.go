@@ -15,7 +15,7 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 type TokenVerifierRepo struct {

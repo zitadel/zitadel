@@ -6,8 +6,8 @@ import (
 
 	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/tracing"
-	"github.com/caos/zitadel/internal/tracing/otel"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing/otel"
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 )
 

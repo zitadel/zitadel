@@ -19,12 +19,12 @@ const (
 	passwordComplexityPolicyTable = "management.password_complexity_policies"
 )
 
-func (m *PasswordComplexityPolicy) ViewModel() string {
+func (p *PasswordComplexityPolicy) ViewModel() string {
 	return passwordComplexityPolicyTable
 }
 
-func (m *PasswordComplexityPolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestPasswordComplexityPolicySequence()
+func (p *PasswordComplexityPolicy) EventQuery() (*models.SearchQuery, error) {
+	sequence, err := p.view.GetLatestPasswordComplexityPolicySequence()
 	if err != nil {
 		return nil, err
 	}
@@ -33,37 +33,41 @@ func (m *PasswordComplexityPolicy) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (m *PasswordComplexityPolicy) Reduce(event *models.Event) (err error) {
+func (p *PasswordComplexityPolicy) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
 	case model.OrgAggregate, iam_es_model.IAMAggregate:
-		err = m.processPasswordComplexityPolicy(event)
+		err = p.processPasswordComplexityPolicy(event)
 	}
 	return err
 }
 
-func (m *PasswordComplexityPolicy) processPasswordComplexityPolicy(event *models.Event) (err error) {
+func (p *PasswordComplexityPolicy) processPasswordComplexityPolicy(event *models.Event) (err error) {
 	policy := new(iam_model.PasswordComplexityPolicyView)
 	switch event.Type {
 	case iam_es_model.PasswordComplexityPolicyAdded, model.PasswordComplexityPolicyAdded:
 		err = policy.AppendEvent(event)
 	case iam_es_model.PasswordComplexityPolicyChanged, model.PasswordComplexityPolicyChanged:
-		policy, err = m.view.PasswordComplexityPolicyByAggregateID(event.AggregateID)
+		policy, err = p.view.PasswordComplexityPolicyByAggregateID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		err = policy.AppendEvent(event)
 	case model.PasswordComplexityPolicyRemoved:
-		return m.view.DeletePasswordComplexityPolicy(event.AggregateID, event.Sequence)
+		return p.view.DeletePasswordComplexityPolicy(event.AggregateID, event.Sequence, event.CreationDate)
 	default:
-		return m.view.ProcessedPasswordComplexityPolicySequence(event.Sequence)
+		return p.view.ProcessedPasswordComplexityPolicySequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutPasswordComplexityPolicy(policy, policy.Sequence)
+	return p.view.PutPasswordComplexityPolicy(policy, policy.Sequence, event.CreationDate)
 }
 
-func (m *PasswordComplexityPolicy) OnError(event *models.Event, err error) error {
+func (p *PasswordComplexityPolicy) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-4Djo9", "id", event.AggregateID).WithError(err).Warn("something went wrong in passwordComplexity policy handler")
-	return spooler.HandleError(event, err, m.view.GetLatestPasswordComplexityPolicyFailedEvent, m.view.ProcessedPasswordComplexityPolicyFailedEvent, m.view.ProcessedPasswordComplexityPolicySequence, m.errorCountUntilSkip)
+	return spooler.HandleError(event, err, p.view.GetLatestPasswordComplexityPolicyFailedEvent, p.view.ProcessedPasswordComplexityPolicyFailedEvent, p.view.ProcessedPasswordComplexityPolicySequence, p.errorCountUntilSkip)
+}
+
+func (p *PasswordComplexityPolicy) OnSuccess() error {
+	return spooler.HandleSuccess(p.view.UpdatePasswordComplexityPolicySpoolerRunTimestamp)
 }

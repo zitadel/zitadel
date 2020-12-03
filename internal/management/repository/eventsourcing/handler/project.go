@@ -46,17 +46,21 @@ func (p *Project) Reduce(event *models.Event) (err error) {
 		}
 		err = project.AppendEvent(event)
 	case es_model.ProjectRemoved:
-		return p.view.DeleteProject(event.AggregateID, event.Sequence)
+		return p.view.DeleteProject(event.AggregateID, event.Sequence, event.CreationDate)
 	default:
-		return p.view.ProcessedProjectSequence(event.Sequence)
+		return p.view.ProcessedProjectSequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutProject(project)
+	return p.view.PutProject(project, event.CreationDate)
 }
 
 func (p *Project) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-dLsop3", "id", event.AggregateID).WithError(err).Warn("something went wrong in projecthandler")
 	return spooler.HandleError(event, err, p.view.GetLatestProjectFailedEvent, p.view.ProcessedProjectFailedEvent, p.view.ProcessedProjectSequence, p.errorCountUntilSkip)
+}
+
+func (p *Project) OnSuccess() error {
+	return spooler.HandleSuccess(p.view.UpdateProjectSpoolerRunTimestamp)
 }

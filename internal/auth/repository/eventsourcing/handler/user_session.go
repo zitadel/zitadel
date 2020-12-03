@@ -48,6 +48,10 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		es_model.HumanExternalLoginCheckSucceeded,
 		es_model.HumanMFAOTPCheckSucceeded,
 		es_model.HumanMFAOTPCheckFailed,
+		es_model.HumanMFAU2FTokenCheckSucceeded,
+		es_model.HumanMFAU2FTokenCheckFailed,
+		es_model.HumanPasswordlessTokenCheckSucceeded,
+		es_model.HumanPasswordlessTokenCheckFailed,
 		es_model.HumanSignedOut:
 		eventData, err := view_model.UserSessionFromEvent(event)
 		if err != nil {
@@ -78,13 +82,15 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		es_model.DomainClaimed,
 		es_model.UserUserNameChanged,
 		es_model.HumanExternalIDPRemoved,
-		es_model.HumanExternalIDPCascadeRemoved:
+		es_model.HumanExternalIDPCascadeRemoved,
+		es_model.HumanPasswordlessTokenRemoved,
+		es_model.HumanMFAU2FTokenRemoved:
 		sessions, err := u.view.UserSessionsByUserID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		if len(sessions) == 0 {
-			return u.view.ProcessedUserSessionSequence(event.Sequence)
+			return u.view.ProcessedUserSessionSequence(event.Sequence, event.CreationDate)
 		}
 		for _, session := range sessions {
 			session.AppendEvent(event)
@@ -92,11 +98,11 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 				return err
 			}
 		}
-		return u.view.PutUserSessions(sessions, event.Sequence)
+		return u.view.PutUserSessions(sessions, event.Sequence, event.CreationDate)
 	case es_model.UserRemoved:
-		return u.view.DeleteUserSessions(event.AggregateID, event.Sequence)
+		return u.view.DeleteUserSessions(event.AggregateID, event.Sequence, event.CreationDate)
 	default:
-		return u.view.ProcessedUserSessionSequence(event.Sequence)
+		return u.view.ProcessedUserSessionSequence(event.Sequence, event.CreationDate)
 	}
 }
 
@@ -105,12 +111,16 @@ func (u *UserSession) OnError(event *models.Event, err error) error {
 	return spooler.HandleError(event, err, u.view.GetLatestUserSessionFailedEvent, u.view.ProcessedUserSessionFailedEvent, u.view.ProcessedUserSessionSequence, u.errorCountUntilSkip)
 }
 
+func (u *UserSession) OnSuccess() error {
+	return spooler.HandleSuccess(u.view.UpdateUserSessionSpoolerRunTimestamp)
+}
+
 func (u *UserSession) updateSession(session *view_model.UserSessionView, event *models.Event) error {
 	session.AppendEvent(event)
 	if err := u.fillUserInfo(session, event.AggregateID); err != nil {
 		return err
 	}
-	return u.view.PutUserSession(session)
+	return u.view.PutUserSession(session, event.CreationDate)
 }
 
 func (u *UserSession) fillUserInfo(session *view_model.UserSessionView, id string) error {

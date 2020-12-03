@@ -35,10 +35,10 @@ UsernameChangeDone:
   Title: Username geändert
   Description: Der Username wurde erfolgreich geändert.
 
-MfaVerify:
+MFAVerify:
   Title: Multifaktor verifizieren
   Description: Verifiziere deinen Multifaktor
-  OTP: OTP
+  OTP: OTP (One Time Password)
   Code: Code
   
 InitPassword: 
@@ -63,22 +63,40 @@ InitUserDone:
   Title: User aktiviert
   Description: EMail verifiziert und Passwort erfolgreich gesetzt
 
-MfaPrompt:
+MFAPrompt:
   Title: Multifaktor hinzufügen
   Description: Möchtest du einen Mulitfaktor hinzufügen?
   Provider0: OTP (One Time Password)
   Provider1: U2F (Universal 2nd Factor)
 
-MfaInitVerify:
+MFAInitVerify:
   Title: Multifaktor Verifizierung
   Description: Verifiziere deinen Multifaktor
-  OtpDescription: Scanne den Code mit einem Authentifizierungs-App (z.B Google Authentificator) oder kopiere das Secret und gib anschliessend den Code ein.
+  OTPDescription: Scanne den Code mit einem Authentifizierungs-App (z.B Google Authenticator) oder kopiere das Secret und gib anschliessend den Code ein.
   Secret: Secret
   Code: Code
 
-MfaInitDone:
+MFAInitDone:
   Title: Multifaktor Verifizierung erstellt
   Description: Multifikator Verifizierung erfolgreich abgeschlossen. Der Multifaktor muss bei jeder Anmeldung eingegeben werden, dies beinhaltet auch den aktuellen Authentifizierungs Prozess.
+
+MFAInitU2F:
+  Title: Multifaktor U2F / WebAuthN hinzufügen
+  Description: Füge dein Token hinzu, indem du einen Namen eingibst und den 'Token registrieren' Button drückst.
+
+MFAVerifyU2F:
+  Title: Multifaktor Verifizierung
+  Description: Verifiziere deinen Multifaktor U2F / WebAuthN Token
+
+WebAuthN:
+  Name: Name des Tokens / Geräts
+  NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
+  Error:
+    Retry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
+
+Passwordless:
+  Title: Passwortlos einloggen
+  Description: Verifiziere dein Token
 
 PasswordChange:
   Title: Passwort ändern
@@ -181,6 +199,9 @@ Actions:
   ForgotPassword: Password zurücksetzen
   Cancel: Abbrechen
   Save: speichern
+  RegisterToken: Token registrieren
+  ValidateToken: Token validieren
+  Recreate: erneut erstellen
 
 Errors:
   Internal: Es ist ein interner Fehler aufgetreten
@@ -215,9 +236,9 @@ Errors:
       GeneratorAlgNotSupported: Generator Algorithums wird nicht unterstützt
     EmailVerify:
       UserIDEmpty: UserID ist leer
-    Mfa:
+    MFA:
       NoProviders: Es stehen keine Multifaktorprovider zur Verfügung
-      Otp:
+      OTP:
         AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet
         NotExisting: Multifaktor OTP (OneTimePassword) existiert nicht
         InvalidCode: Code ist ungültig

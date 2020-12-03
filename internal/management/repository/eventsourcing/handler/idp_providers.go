@@ -32,7 +32,7 @@ func (m *IDPProvider) ViewModel() string {
 }
 
 func (m *IDPProvider) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestIdpProviderSequence()
+	sequence, err := m.view.GetLatestIDPProviderSequence()
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (m *IDPProvider) processIdpProvider(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return m.view.DeleteIdpProvider(event.AggregateID, provider.IDPConfigID, event.Sequence)
+		return m.view.DeleteIDPProvider(event.AggregateID, provider.IDPConfigID, event.Sequence, event.CreationDate)
 	case model.IDPConfigChanged, org_es_model.IDPConfigChanged:
 		esConfig := new(iam_view_model.IDPConfigView)
 		providerType := iam_model.IDPProviderTypeSystem
@@ -72,7 +72,7 @@ func (m *IDPProvider) processIdpProvider(event *models.Event) (err error) {
 			providerType = iam_model.IDPProviderTypeOrg
 		}
 		esConfig.AppendEvent(providerType, event)
-		providers, err := m.view.IdpProvidersByIdpConfigID(event.AggregateID, esConfig.IDPConfigID)
+		providers, err := m.view.IDPProvidersByIdpConfigID(event.AggregateID, esConfig.IDPConfigID)
 		if err != nil {
 			return err
 		}
@@ -88,16 +88,16 @@ func (m *IDPProvider) processIdpProvider(event *models.Event) (err error) {
 		for _, provider := range providers {
 			m.fillConfigData(provider, config)
 		}
-		return m.view.PutIdpProviders(event.Sequence, providers...)
+		return m.view.PutIDPProviders(event.Sequence, event.CreationDate, providers...)
 	case org_es_model.LoginPolicyRemoved:
-		return m.view.DeleteIdpProvidersByAggregateID(event.AggregateID, event.Sequence)
+		return m.view.DeleteIDPProvidersByAggregateID(event.AggregateID, event.Sequence, event.CreationDate)
 	default:
-		return m.view.ProcessedIdpProviderSequence(event.Sequence)
+		return m.view.ProcessedIDPProviderSequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutIdpProvider(provider, provider.Sequence)
+	return m.view.PutIDPProvider(provider, provider.Sequence, event.CreationDate)
 }
 
 func (m *IDPProvider) fillData(provider *iam_view_model.IDPProviderView) (err error) {
@@ -123,5 +123,9 @@ func (m *IDPProvider) fillConfigData(provider *iam_view_model.IDPProviderView, c
 
 func (m *IDPProvider) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Msj8c", "id", event.AggregateID).WithError(err).Warn("something went wrong in idp provider handler")
-	return spooler.HandleError(event, err, m.view.GetLatestIdpProviderFailedEvent, m.view.ProcessedIdpProviderFailedEvent, m.view.ProcessedIdpProviderSequence, m.errorCountUntilSkip)
+	return spooler.HandleError(event, err, m.view.GetLatestIDPProviderFailedEvent, m.view.ProcessedIDPProviderFailedEvent, m.view.ProcessedIDPProviderSequence, m.errorCountUntilSkip)
+}
+
+func (m *IDPProvider) OnSuccess() error {
+	return spooler.HandleSuccess(m.view.UpdateIDPProviderSpoolerRunTimestamp)
 }
