@@ -19,6 +19,7 @@ const (
 	UserTokenAddedType        = userEventTypePrefix + "token.added"
 	UserDomainClaimedType     = userEventTypePrefix + "domain.claimed"
 	UserDomainClaimedSentType = userEventTypePrefix + "domain.claimed.sent"
+	UserUserNameChangedType   = userEventTypePrefix + "username.changed"
 )
 
 type UserLockedEvent struct {
@@ -276,4 +277,42 @@ func UserDomainClaimedSentEventMapper(event *repository.Event) (eventstore.Event
 	return &UserDomainClaimedSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
+}
+
+type UserUsernameChangedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	UserName string `json:"userName"`
+}
+
+func (e *UserUsernameChangedEvent) CheckPrevious() bool {
+	return false
+}
+
+func (e *UserUsernameChangedEvent) Data() interface{} {
+	return e
+}
+
+func NewUserUsernameChangedEvent(
+	ctx context.Context,
+	userName string) *UserUsernameChangedEvent {
+	return &UserUsernameChangedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			UserUserNameChangedType,
+		),
+		UserName: userName,
+	}
+}
+
+func UserUsernameChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	domainClaimed := &UserUsernameChangedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, domainClaimed)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "USER-4Bm9s", "unable to unmarshal username changed")
+	}
+
+	return domainClaimed, nil
 }

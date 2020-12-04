@@ -13,8 +13,8 @@ import (
 
 const (
 	humanEventPrefix                   = userEventTypePrefix + "human."
-	HumanAddedEventType                = humanEventPrefix + "added"
-	HumanRegisteredEventType           = humanEventPrefix + "selfregistered"
+	HumanAddedType                     = humanEventPrefix + "added"
+	HumanRegisteredType                = humanEventPrefix + "selfregistered"
 	HumanInitialCodeAddedType          = humanEventPrefix + "initialization.code.added"
 	HumanInitialCodeSentType           = humanEventPrefix + "initialization.code.sent"
 	HumanInitializedCheckSucceededType = humanEventPrefix + "initialization.check.succeeded"
@@ -72,7 +72,7 @@ func NewHumanAddedEvent(
 	return &HumanAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			HumanAddedEventType,
+			HumanAddedType,
 		),
 		UserName:          userName,
 		FirstName:         firstName,
@@ -153,7 +153,7 @@ func NewHumanRegisteredEvent(
 	return &HumanRegisteredEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			HumanRegisteredEventType,
+			HumanRegisteredType,
 		),
 		UserName:          userName,
 		FirstName:         firstName,

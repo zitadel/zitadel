@@ -5,14 +5,48 @@ import (
 )
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
-	es.RegisterFilterEventMapper(UserLockedType, UserLockedEventMapper).
+	es.RegisterFilterEventMapper(UserV1AddedType, HumanAddedEventMapper).
+		RegisterFilterEventMapper(UserV1RegisteredType, HumanRegisteredEventMapper).
+		RegisterFilterEventMapper(UserV1InitialCodeAddedType, HumanInitialCodeAddedEventMapper).
+		RegisterFilterEventMapper(UserV1InitialCodeSentType, HumanInitialCodeSentEventMapper).
+		RegisterFilterEventMapper(UserV1InitializedCheckSucceededType, HumanInitializedCheckSucceededEventMapper).
+		RegisterFilterEventMapper(UserV1InitializedCheckFailedType, HumanInitializedCheckFailedEventMapper).
+		RegisterFilterEventMapper(UserV1SignedOutType, HumanSignedOutEventMapper).
+		RegisterFilterEventMapper(UserV1PasswordChangedType, HumanPasswordChangedEventMapper).
+		RegisterFilterEventMapper(UserV1PasswordCodeAddedType, HumanPasswordCodeAddedEventMapper).
+		RegisterFilterEventMapper(UserV1PasswordCodeSentType, HumanPasswordCodeSentEventMapper).
+		RegisterFilterEventMapper(UserV1PasswordCheckSucceededType, HumanPasswordCheckSucceededEventMapper).
+		RegisterFilterEventMapper(UserV1PasswordCheckFailedType, HumanPasswordCheckFailedEventMapper).
+		RegisterFilterEventMapper(UserV1EmailChangedType, HumanEmailChangedEventMapper).
+		RegisterFilterEventMapper(UserV1EmailVerifiedType, HumanEmailVerifiedEventMapper).
+		RegisterFilterEventMapper(UserV1EmailVerificationFailedType, HumanEmailVerificationFailedEventMapper).
+		RegisterFilterEventMapper(UserV1EmailCodeAddedType, HumanEmailCodeAddedEventMapper).
+		RegisterFilterEventMapper(UserV1EmailCodeSentType, HumanEmailCodeSentEventMapper).
+		RegisterFilterEventMapper(UserV1PhoneChangedType, HumanPhoneChangedEventMapper).
+		RegisterFilterEventMapper(UserV1PhoneRemovedType, HumanPhoneRemovedEventMapper).
+		RegisterFilterEventMapper(UserV1PhoneVerifiedType, HumanPhoneVerifiedEventMapper).
+		RegisterFilterEventMapper(UserV1PhoneVerificationFailedType, HumanPhoneVerificationFailedEventMapper).
+		RegisterFilterEventMapper(UserV1PhoneCodeAddedType, HumanPhoneCodeAddedEventMapper).
+		RegisterFilterEventMapper(UserV1PhoneCodeSentType, HumanPhoneCodeSentEventMapper).
+		RegisterFilterEventMapper(UserV1ProfileChangedType, HumanProfileChangedEventMapper).
+		RegisterFilterEventMapper(UserV1AddressChangedType, HumanAddressChangedEventMapper).
+		RegisterFilterEventMapper(UserV1MFAInitSkippedType, HumanMFAInitSkippedEventMapper).
+		RegisterFilterEventMapper(UserV1MFAOTPAddedType, HumanMFAOTPAddedEventMapper).
+		RegisterFilterEventMapper(UserV1MFAOTPVerifiedType, HumanMFAOTPVerifiedEventMapper).
+		RegisterFilterEventMapper(UserV1MFAOTPRemovedType, HumanMFAOTPRemovedEventMapper).
+		RegisterFilterEventMapper(UserV1MFAOTPCheckSucceededType, HumanMFAOTPCheckSucceededEventMapper).
+		RegisterFilterEventMapper(UserV1MFAOTPCheckFailedType, HumanMFAOTPCheckFailedEventMapper).
+		RegisterFilterEventMapper(UserLockedType, UserLockedEventMapper).
 		RegisterFilterEventMapper(UserUnlockedType, UserLockedEventMapper).
 		RegisterFilterEventMapper(UserDeactivatedType, UserDeactivatedEventMapper).
 		RegisterFilterEventMapper(UserReactivatedType, UserReactivatedEventMapper).
 		RegisterFilterEventMapper(UserRemovedType, UserRemovedEventMapper).
 		RegisterFilterEventMapper(UserTokenAddedType, UserTokenAddedEventMapper).
-		RegisterFilterEventMapper(HumanAddedEventType, HumanAddedEventMapper).
-		RegisterFilterEventMapper(HumanRegisteredEventType, HumanRegisteredEventMapper).
+		RegisterFilterEventMapper(UserDomainClaimedType, UserDomainClaimedEventMapper).
+		RegisterFilterEventMapper(UserDomainClaimedSentType, UserDomainClaimedEventMapper).
+		RegisterFilterEventMapper(UserUserNameChangedType, UserUsernameChangedEventMapper).
+		RegisterFilterEventMapper(HumanAddedType, HumanAddedEventMapper).
+		RegisterFilterEventMapper(HumanRegisteredType, HumanRegisteredEventMapper).
 		RegisterFilterEventMapper(HumanInitialCodeAddedType, HumanInitialCodeAddedEventMapper).
 		RegisterFilterEventMapper(HumanInitialCodeSentType, HumanInitialCodeSentEventMapper).
 		RegisterFilterEventMapper(HumanInitializedCheckSucceededType, HumanInitializedCheckSucceededEventMapper).
