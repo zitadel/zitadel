@@ -328,6 +328,12 @@ export class GrpcAuthService {
         );
     }
 
+    public AddMfaOTP(): Promise<MfaOtpResponse> {
+        return this.grpcService.auth.add(
+            new Empty(),
+        );
+    }
+
     public RemoveMfaOTP(): Promise<Empty> {
         return this.grpcService.auth.removeMfaOTP(
             new Empty(),
