@@ -12,6 +12,7 @@ const (
 	externalIDPEventPrefix   = humanEventPrefix + "externalidp."
 	externalLoginEventPrefix = humanEventPrefix + "externallogin."
 
+	//TODO: Handle unique Aggregate
 	HumanExternalIDPReservedType = externalIDPEventPrefix + "reserved"
 	HumanExternalIDPReleasedType = externalIDPEventPrefix + "released"
 

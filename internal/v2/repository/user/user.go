@@ -10,13 +10,15 @@ import (
 )
 
 const (
-	userEventTypePrefix = eventstore.EventType("user.")
-	UserLockedType      = userEventTypePrefix + "locked"
-	UserUnlockedType    = userEventTypePrefix + "unlocked"
-	UserDeactivatedType = userEventTypePrefix + "deactivated"
-	UserReactivatedType = userEventTypePrefix + "reactivated"
-	UserRemovedType     = userEventTypePrefix + "removed"
-	UserTokenAddedType  = userEventTypePrefix + "token.added"
+	userEventTypePrefix       = eventstore.EventType("user.")
+	UserLockedType            = userEventTypePrefix + "locked"
+	UserUnlockedType          = userEventTypePrefix + "unlocked"
+	UserDeactivatedType       = userEventTypePrefix + "deactivated"
+	UserReactivatedType       = userEventTypePrefix + "reactivated"
+	UserRemovedType           = userEventTypePrefix + "removed"
+	UserTokenAddedType        = userEventTypePrefix + "token.added"
+	UserDomainClaimedType     = userEventTypePrefix + "domain.claimed"
+	UserDomainClaimedSentType = userEventTypePrefix + "domain.claimed.sent"
 )
 
 type UserLockedEvent struct {
@@ -207,4 +209,71 @@ func UserTokenAddedEventMapper(event *repository.Event) (eventstore.EventReader,
 	}
 
 	return tokenAdded, nil
+}
+
+type UserDomainClaimedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	UserName string `json:"userName"`
+}
+
+func (e *UserDomainClaimedEvent) CheckPrevious() bool {
+	return false
+}
+
+func (e *UserDomainClaimedEvent) Data() interface{} {
+	return e
+}
+
+func NewUserDomainClaimedEvent(
+	ctx context.Context,
+	userName string) *UserDomainClaimedEvent {
+	return &UserDomainClaimedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			UserDomainClaimedType,
+		),
+		UserName: userName,
+	}
+}
+
+func UserDomainClaimedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	domainClaimed := &UserDomainClaimedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, domainClaimed)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "USER-aR8jc", "unable to unmarshal domain claimed")
+	}
+
+	return domainClaimed, nil
+}
+
+type UserDomainClaimedSentEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *UserDomainClaimedSentEvent) CheckPrevious() bool {
+	return false
+}
+
+func (e *UserDomainClaimedSentEvent) Data() interface{} {
+	return nil
+}
+
+func NewUserDomainClaimedSentEvent(
+	ctx context.Context,
+	userName string) *UserDomainClaimedSentEvent {
+	return &UserDomainClaimedSentEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			UserDomainClaimedSentType,
+		),
+	}
+}
+
+func UserDomainClaimedSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &UserDomainClaimedSentEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
 }
