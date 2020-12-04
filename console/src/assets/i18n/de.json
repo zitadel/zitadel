@@ -174,8 +174,8 @@
                 "3": "Gelöscht"
             },
             "DIALOG": {
-                "OTP_DELETE_TITLE":"OTP Faktor entfernen",
-                "OTP_DELETE_DESCRIPTION":"Sie sind im Begriff OTP als Zweitfaktormethode zu entfernen. Sind sie sicher?"
+                "MFA_DELETE_TITLE":"Zweiten Faktor entfernen",
+                "MFA_DELETE_DESCRIPTION":"Sie sind im Begriff eine Zweitfaktormethode zu entfernen. Sind sie sicher?"
             }
         },
         "EXTERNALIDP": {
@@ -345,6 +345,7 @@
             "PHONEVERIFICATIONSENT":"Bestätigungscode per Telefonnummer gesendet.",
             "EMAILVERIFICATIONSENT":"Bestätigungscode per E-Mail gesendet.",
             "OTPREMOVED":"OTP entfernt.",
+            "U2FREMOVED":"U2F entfernt.",
             "INITIALPASSWORDSET":"Initiales Passwort gesetzt.",
             "PASSWORDNOTIFICATIONSENT":"Passwortänderung mittgeteilt.",
             "PASSWORDCHANGED":"Passwort geändert.",

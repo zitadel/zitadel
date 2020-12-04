@@ -174,8 +174,8 @@
                 "3": "Deleted"
             },
             "DIALOG": {
-                "OTP_DELETE_TITLE":"Remove OTP Factor",
-                "OTP_DELETE_DESCRIPTION":"You are about to delete OTP as second factor. Are you sure?"
+                "MFA_DELETE_TITLE":"Remove Secondfactor",
+                "MFA_DELETE_DESCRIPTION":"You are about to delete a second factor. Are you sure?"
             }
         },
         "EXTERNALIDP": {
@@ -345,6 +345,7 @@
             "PHONEVERIFICATIONSENT":"Phone verification code sent.",
             "EMAILVERIFICATIONSENT":"E-mail verification code sent.",
             "OTPREMOVED":"OTP removed.",
+            "U2FREMOVED":"U2F removed.",
             "INITIALPASSWORDSET":"Initial password set.",
             "PASSWORDNOTIFICATIONSENT":"Password change notification sent.",
             "PASSWORDCHANGED":"Password changed successfully.",

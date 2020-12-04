@@ -4,7 +4,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { MfaOtpResponse, MFAState, MfaType, MultiFactor } from 'src/app/proto/generated/auth_pb';
+import { MfaOtpResponse, MFAState, MfaType, MultiFactor, WebAuthNResponse, WebAuthNTokenID } from 'src/app/proto/generated/auth_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -32,7 +32,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     constructor(private service: GrpcAuthService, private toast: ToastService, private dialog: MatDialog) { }
 
     public ngOnInit(): void {
-        this.getOTP();
+        this.getMFAs();
     }
 
     public ngOnDestroy(): void {
@@ -50,7 +50,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
             dialogRef.afterClosed().subscribe((code) => {
                 if (code) {
                     this.service.VerifyMfaOTP(code).then(() => {
-                        this.getOTP();
+                        this.getMFAs();
                     });
                 }
             });
@@ -59,7 +59,21 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
         });
     }
 
-    public getOTP(): void {
+    public verifyU2f(): void {
+        this.service.VerifyMyMfaU2F('', '');
+    }
+
+    public addU2F(): void {
+        this.service.AddMyMfaU2F().then((u2fresp) => {
+            const webauthn: WebAuthNResponse.AsObject = u2fresp.toObject();
+            console.log(webauthn);
+
+        }, error => {
+            this.toast.showError(error);
+        });
+    }
+
+    public getMFAs(): void {
         this.service.GetMyMfas().then(mfas => {
             this.dataSource = new MatTableDataSource(mfas.toObject().mfasList);
             this.dataSource.sort = this.sort;
@@ -78,8 +92,8 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
             data: {
                 confirmKey: 'ACTIONS.DELETE',
                 cancelKey: 'ACTIONS.CANCEL',
-                titleKey: 'USER.MFA.DIALOG.OTP_DELETE_TITLE',
-                descriptionKey: 'USER.MFA.DIALOG.OTP_DELETE_DESCRIPTION',
+                titleKey: 'USER.MFA.DIALOG.MFA_DELETE_TITLE',
+                descriptionKey: 'USER.MFA.DIALOG.MFA_DELETE_DESCRIPTION',
             },
             width: '400px',
         });
@@ -94,7 +108,19 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
                         if (index > -1) {
                             this.dataSource.data.splice(index, 1);
                         }
-                        this.getOTP();
+                        this.getMFAs();
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
+                } else if (type === MfaType.MFATYPE_U2F) {
+                    this.service.RemoveMyMfaU2F().then(() => {
+                        this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
+
+                        const index = this.dataSource.data.findIndex(mfa => mfa.type === type);
+                        if (index > -1) {
+                            this.dataSource.data.splice(index, 1);
+                        }
+                        this.getMFAs();
                     }).catch(error => {
                         this.toast.showError(error);
                     });

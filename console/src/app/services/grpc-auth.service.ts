@@ -33,6 +33,7 @@ import {
     UserView,
     VerifyMfaOtp,
     VerifyUserPhoneRequest,
+    VerifyWebAuthN,
     WebAuthNResponse,
     WebAuthNTokenID,
 } from '../proto/generated/auth_pb';
@@ -339,6 +340,16 @@ export class GrpcAuthService {
     public RemoveMyMfaU2F(): Promise<Empty> {
         return this.grpcService.auth.removeMyMfaU2F(
             new WebAuthNTokenID(),
+        );
+    }
+
+    public VerifyMyMfaU2F(credential: string, tokenname: string): Promise<Empty> {
+        const req = new VerifyWebAuthN();
+        req.setPublicKeyCredential(credential);
+        req.setTokenName(tokenname);
+
+        return this.grpcService.auth.verifyMyMfaU2F(
+            req,
         );
     }
 

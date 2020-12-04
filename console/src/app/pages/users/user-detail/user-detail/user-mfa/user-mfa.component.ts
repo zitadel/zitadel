@@ -59,8 +59,8 @@ export class UserMfaComponent implements OnInit, OnDestroy {
             data: {
                 confirmKey: 'ACTIONS.DELETE',
                 cancelKey: 'ACTIONS.CANCEL',
-                titleKey: 'USER.MFA.DIALOG.OTP_DELETE_TITLE',
-                descriptionKey: 'USER.MFA.DIALOG.OTP_DELETE_DESCRIPTION',
+                titleKey: 'USER.MFA.DIALOG.MFA_DELETE_TITLE',
+                descriptionKey: 'USER.MFA.DIALOG.MFA_DELETE_DESCRIPTION',
             },
             width: '400px',
         });
