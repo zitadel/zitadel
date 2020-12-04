@@ -7,7 +7,6 @@
     "build": "ng build",
     "prodbuild": "ng build --prod",
     "lint": "ng lint && stylelint './src/**/*.scss' --syntax scss",
-    "postinstall": "../build/console/generate-grpc.sh"
   },
   "private": true,
   "dependencies": {
