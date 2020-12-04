@@ -33,6 +33,8 @@ import {
     UserView,
     VerifyMfaOtp,
     VerifyUserPhoneRequest,
+    WebAuthNResponse,
+    WebAuthNTokenID,
 } from '../proto/generated/auth_pb';
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageService } from './storage.service';
@@ -328,9 +330,15 @@ export class GrpcAuthService {
         );
     }
 
-    public AddMfaOTP(): Promise<MfaOtpResponse> {
-        return this.grpcService.auth.add(
+    public AddMyMfaU2F(): Promise<WebAuthNResponse> {
+        return this.grpcService.auth.addMyMfaU2F(
             new Empty(),
+        );
+    }
+
+    public RemoveMyMfaU2F(): Promise<Empty> {
+        return this.grpcService.auth.removeMyMfaU2F(
+            new WebAuthNTokenID(),
         );
     }
 
