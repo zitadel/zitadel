@@ -1,4 +1,4 @@
-<app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
+<app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="userResult.totalResult"
     [timestamp]="userResult?.viewTimestamp" [selection]="selection"
     [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes">
     <cnsl-form-field @appearfade *ngIf="userSearchKey != undefined" actions class="filtername">
