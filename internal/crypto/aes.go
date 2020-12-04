@@ -116,7 +116,9 @@ func DecryptAESString(data string, key string) (string, error) {
 	return string(decrypted), nil
 }
 
-func DecryptAES(cipherText []byte, key string) ([]byte, error) {
+func DecryptAES(text []byte, key string) ([]byte, error) {
+	cipherText := make([]byte, len(text))
+	copy(cipherText, text)
 	block, err := aes.NewCipher([]byte(key))
 	if err != nil {
 		return nil, err
