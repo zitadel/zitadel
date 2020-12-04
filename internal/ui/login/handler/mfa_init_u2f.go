@@ -13,6 +13,11 @@ const (
 	tmplMFAU2FInit = "mfainitu2f"
 )
 
+type u2fInitData struct {
+	webAuthNData
+	MFAType model.MFAType
+}
+
 func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
 	var errType, errMessage, credentialData string
 	var u2f *user_model.WebAuthNToken
@@ -25,9 +30,12 @@ func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authRe
 	if u2f != nil {
 		credentialData = base64.RawURLEncoding.EncodeToString(u2f.CredentialCreationData)
 	}
-	data := &webAuthNData{
-		userData:               l.getUserData(r, authReq, "Register WebAuthNToken", errType, errMessage),
-		CredentialCreationData: credentialData,
+	data := &u2fInitData{
+		webAuthNData: webAuthNData{
+			userData:               l.getUserData(r, authReq, "Register WebAuthNToken", errType, errMessage),
+			CredentialCreationData: credentialData,
+		},
+		MFAType: model.MFATypeU2F,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMFAU2FInit], data, nil)
 }
