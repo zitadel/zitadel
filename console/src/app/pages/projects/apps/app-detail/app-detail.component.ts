@@ -132,33 +132,34 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.mgmtService.GetIam().then(iam => {
             this.isZitadel = iam.toObject().iamProjectId === this.projectId;
         });
-        this.authService.isAllowed(['project.app.write$', 'project.app.write:' + id]).pipe(take(1)).subscribe((allowed) => {
-            this.canWrite = allowed;
-            this.mgmtService.GetApplicationById(projectid, id).then(app => {
-                this.app = app.toObject();
-                this.appNameForm.patchValue(this.app);
-                if (allowed) {
-                    this.appNameForm.enable();
-                    this.appForm.enable();
-                    this.redirectControl.enable();
-                    this.postRedirectControl.enable();
-                }
+        this.authService.isAllowed(['project.app.write$', 'project.app.write:' + projectid])
+            .pipe(take(1)).subscribe((allowed) => {
+                this.canWrite = allowed;
+                this.mgmtService.GetApplicationById(projectid, id).then(app => {
+                    this.app = app.toObject();
+                    this.appNameForm.patchValue(this.app);
+                    if (allowed) {
+                        this.appNameForm.enable();
+                        this.appForm.enable();
+                        this.redirectControl.enable();
+                        this.postRedirectControl.enable();
+                    }
 
-                if (this.app.oidcConfig?.redirectUrisList) {
-                    this.redirectUrisList = this.app.oidcConfig.redirectUrisList;
-                }
-                if (this.app.oidcConfig?.postLogoutRedirectUrisList) {
-                    this.postLogoutRedirectUrisList = this.app.oidcConfig.postLogoutRedirectUrisList;
-                }
-                if (this.app.oidcConfig) {
-                    this.appForm.patchValue(this.app.oidcConfig);
-                }
-            }).catch(error => {
-                console.error(error);
-                this.toast.showError(error);
-                this.errorMessage = error.message;
+                    if (this.app.oidcConfig?.redirectUrisList) {
+                        this.redirectUrisList = this.app.oidcConfig.redirectUrisList;
+                    }
+                    if (this.app.oidcConfig?.postLogoutRedirectUrisList) {
+                        this.postLogoutRedirectUrisList = this.app.oidcConfig.postLogoutRedirectUrisList;
+                    }
+                    if (this.app.oidcConfig) {
+                        this.appForm.patchValue(this.app.oidcConfig);
+                    }
+                }).catch(error => {
+                    console.error(error);
+                    this.toast.showError(error);
+                    this.errorMessage = error.message;
+                });
             });
-        });
 
 
         this.docs = (await this.mgmtService.GetZitadelDocs()).toObject();
