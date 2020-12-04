@@ -55,7 +55,7 @@
     </ng-template>
 
     <ng-template appHasRole
-        [appHasRole]="PolicyGridType.IAM ? ['iam.policy.read'] : PolicyGridType.ORG ?  ['policy.read'] : []">
+        [appHasRole]="type == PolicyGridType.IAM ? ['iam.policy.read'] : type == PolicyGridType.ORG ?  ['policy.read'] : []">
         <div class="p-item card">
             <div class="avatar">
                 <i class="icon las la-sign-in-alt"></i>
