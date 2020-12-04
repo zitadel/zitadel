@@ -66,7 +66,7 @@ InitUserDone:
 MFA:
   Provider0: OTP (One Time Password)
   Provider1: U2F (Universal 2nd Factor)
-  ChooseOther: oder wählen sie eine andere Option aus
+  ChooseOther: oder wähle eine andere Option aus
 
 MFAPrompt:
   Title: Multifaktor hinzufügen
@@ -83,7 +83,7 @@ MFAInitVerify:
 
 MFAInitDone:
   Title: Multifaktor Verifizierung erstellt
-  Description: Multifikator Verifizierung erfolgreich abgeschlossen. Der Multifaktor muss bei jeder Anmeldung eingegeben werden, dies beinhaltet auch den aktuellen Authentifizierungs Prozess.
+  Description: Multifikator Verifizierung erfolgreich abgeschlossen. Der Multifaktor muss bei jeder Anmeldung eingegeben werden.
 
 MFAInitU2F:
   Title: Multifaktor U2F / WebAuthN hinzufügen

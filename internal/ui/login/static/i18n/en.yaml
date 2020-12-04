@@ -83,7 +83,7 @@ MFAInitVerify:
 
 MFAInitDone:
   Title: Multifcator Verification done
-  Description: Multifactor verification successfully done. The multifactor has to be entered on each login, even in the actual authentification process.
+  Description: Multifactor verification successfully done. The multifactor has to be entered on each login.
 
 MFAInitU2F:
   Title: Multifactor Setup U2F / WebAuthN
