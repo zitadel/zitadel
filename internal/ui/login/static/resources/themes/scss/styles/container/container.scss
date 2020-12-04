@@ -24,4 +24,25 @@ $lgn-container-margin: 0px auto 50px auto;
             flex: 1;
         }
     }
+
+    .lgn-login-profile {
+        .lgn-profile-image {
+            display: block;
+            margin: .5rem;
+        }
+        .lgn-names {
+            border-width: 1px;
+            border-style: solid;
+            border-radius: 50vw;
+
+            .lgn-displayname{
+                margin: .5rem 1rem;
+            }
+            .lgn-loginname{
+                p {
+                    margin: .5rem 1rem;
+                }
+            }
+        }
+    }
 }

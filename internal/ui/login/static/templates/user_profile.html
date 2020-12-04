@@ -1,13 +1,17 @@
 {{define "user-profile"}}
-    {{if .LoginName}}
-    <div class="login-profile">
-        <div class="profile-image"></div>
-        <div class="names">
-            {{if .DisplayName}}
-            <div class="displayname">{{.DisplayName}}</div>
-            {{end}}
-            <div class="loginname">{{.LoginName}}</div>
+{{if .LoginName}}
+<div class="lgn-login-profile">
+    <div class="lgn-profile-image"></div>
+    <div class="lgn-names">
+        {{if .DisplayName}}
+        <div class="lgn-displayname">
+            <p>{{.DisplayName}}</p>
+        </div>
+        {{end}}
+        <div class="lgn-loginname">
+            <p>{{.LoginName}}</p>
         </div>
     </div>
-    {{end}}
+</div>
+{{end}}
 {{end}}

@@ -145,6 +145,40 @@ a {
   outline: none;
 }
 
+.content-container {
+  display: block;
+  margin: 0px auto 50px auto;
+  max-width: 350px;
+  padding: 20px;
+  width: 100%;
+}
+.content-container .lgn-head h1 {
+  text-align: center;
+}
+.content-container .lgn-actions {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+.content-container .lgn-actions .fill-space {
+  flex: 1;
+}
+.content-container .lgn-login-profile .lgn-profile-image {
+  display: block;
+  margin: 0.5rem;
+}
+.content-container .lgn-login-profile .lgn-names {
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 50vw;
+}
+.content-container .lgn-login-profile .lgn-names .lgn-displayname {
+  margin: 0.5rem 0;
+}
+.content-container .lgn-login-profile .lgn-names .lgn-loginname p {
+  margin: 0.5rem 0;
+}
+
 @font-face {
   font-family: Aileron;
   src: url(../../../fonts/ailerons/ailerons.otf) format("opentype");
@@ -426,6 +460,14 @@ a:hover, a:active {
   color: #6992c9;
 }
 
+.lgn-error .lgn-error-message {
+  color: #f44336;
+}
+
+.lgn-login-profile .lgn-names {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
 .lgn-dark-theme .lgn-app-background, .lgn-dark-theme.lgn-app-background {
   background-color: #212224;
   color: white;
@@ -546,6 +588,12 @@ a:hover, a:active {
 }
 .lgn-dark-theme a:hover, .lgn-dark-theme a:active {
   color: #6992c9;
+}
+.lgn-dark-theme .lgn-error .lgn-error-message {
+  color: #f44336;
+}
+.lgn-dark-theme .lgn-login-profile .lgn-names {
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .lgn-light-theme .lgn-app-background, .lgn-light-theme.lgn-app-background {
@@ -668,6 +716,12 @@ a:hover, a:active {
 }
 .lgn-light-theme a:hover, .lgn-light-theme a:active {
   color: #6e80da;
+}
+.lgn-light-theme .lgn-error .lgn-error-message {
+  color: #f44336;
+}
+.lgn-light-theme .lgn-login-profile .lgn-names {
+  border-color: rgba(0, 0, 0, 0.12);
 }
 
 /*# sourceMappingURL=zitadel.css.map */

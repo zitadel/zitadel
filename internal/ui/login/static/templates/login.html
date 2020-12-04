@@ -31,13 +31,13 @@
     {{template "error-message" .}}
 
     <div class="lgn-actions">
+        {{if .LoginPolicy.AllowRegister}}
         <button class="lgn-button lgn-primary" name="register" value="true"
             formnovalidate>{{t "Actions.Register"}}</button>
+        {{end}}
+
         <span class="fill-space"></span>
         <button class="lgn-raised-button lgn-primary" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
-        {{if .LoginPolicy.AllowRegister}}
-
-        {{end}}
     </div>
 
     {{if hasExternalLogin }}
