@@ -35,6 +35,11 @@
             matTooltip="{{'ACTIONS.NEW' | translate}}">
             <mat-icon class="icon" svgIcon="mdi_radar"></mat-icon>{{'USER.MFA.OTP' | translate}}
         </button>
+        <button class="button" *ngIf="otpAvailable" (click)="addU2F()" mat-stroked-button color="primary"
+        matTooltip="{{'ACTIONS.NEW' | translate}}">
+          <i class="las la-cube"></i>
+          {{'USER.MFA.U2F' | translate}}
+        </button>
     </div>
     <div class="table-wrapper">
         <div class="spinner-container" *ngIf="loading$ | async">

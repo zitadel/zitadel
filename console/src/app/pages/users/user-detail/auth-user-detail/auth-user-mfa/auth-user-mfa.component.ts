@@ -67,6 +67,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
       dialogRef.afterClosed().subscribe(tokenname => {
         if (tokenname) {
+          navigator.credentials.create();
           this.service.VerifyMyMfaU2F('', tokenname);
         }
       });
@@ -75,7 +76,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     public addU2F(): void {
         this.service.AddMyMfaU2F().then((u2fresp) => {
             const webauthn: WebAuthNResponse.AsObject = u2fresp.toObject();
-            console.log(webauthn);
+            console.log(webauthn.publicKey);
 
         }, error => {
             this.toast.showError(error);
