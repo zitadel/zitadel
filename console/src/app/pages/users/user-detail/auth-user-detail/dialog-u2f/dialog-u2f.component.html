@@ -1,13 +1,10 @@
-<h1 mat-dialog-title>{{'USER.MFA.OTP_DIALOG_TITLE' | translate}}</h1>
+<h1 mat-dialog-title>{{'USER.MFA.U2F_DIALOG_TITLE' | translate}}</h1>
 <div mat-dialog-content>
-    <p translate>{{'USER.MFA.OTP_DIALOG_DESCRIPTION' | translate}}</p>
-    <div class="qrcode-wrapper">
-        <qrcode *ngIf="data" class="qrcode" [qrdata]="data" [width]="150" [errorCorrectionLevel]="'M'"></qrcode>
-    </div>
+    <p>{{'USER.MFA.U2F_DIALOG_DESCRIPTION' | translate}}</p>
 
-    <cnsl-form-field class="form-field" label="Access Code" required="true">
-        <cnsl-label>Code</cnsl-label>
-        <input cnslInput [(ngModel)]="code" />
+    <cnsl-form-field class="form-field" label="Name" required="true">
+        <cnsl-label>{{'USER.MFA.U2F_NAME' | translate}}</cnsl-label>
+        <input cnslInput [(ngModel)]="name" />
     </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">

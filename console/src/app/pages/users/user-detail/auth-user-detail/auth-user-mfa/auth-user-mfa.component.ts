@@ -4,11 +4,12 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { MfaOtpResponse, MFAState, MfaType, MultiFactor, WebAuthNResponse, WebAuthNTokenID } from 'src/app/proto/generated/auth_pb';
+import { MfaOtpResponse, MFAState, MfaType, MultiFactor, WebAuthNResponse } from 'src/app/proto/generated/auth_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { DialogOtpComponent } from '../dialog-otp/dialog-otp.component';
+import { DialogU2FComponent } from '../dialog-u2f/dialog-u2f.component';
 
 @Component({
     selector: 'app-auth-user-mfa',
@@ -60,7 +61,15 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     }
 
     public verifyU2f(): void {
-        this.service.VerifyMyMfaU2F('', '');
+      const dialogRef = this.dialog.open(DialogU2FComponent, {
+        width: '400px',
+      });
+
+      dialogRef.afterClosed().subscribe(tokenname => {
+        if (tokenname) {
+          this.service.VerifyMyMfaU2F('', tokenname);
+        }
+      });
     }
 
     public addU2F(): void {

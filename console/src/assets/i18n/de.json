@@ -162,6 +162,9 @@
             "OTP": "OTP konfigurieren",
             "OTP_DIALOG_TITLE": "OTP hinzufügen",
             "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator App und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
+            "U2F_DIALOG_TITLE": "U2F hinzufügen",
+            "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Universellen Multifaktor an.",
+            "U2F_NAME":"U2F Name",
             "TYPE": {
                 "0":"Keine MFA definiert",
                 "1":"OTP",

@@ -7,7 +7,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
     styleUrls: ['./dialog-u2f.component.scss'],
 })
 export class DialogU2FComponent {
-    public code: string = '';
+    public name: string = '';
     constructor(public dialogRef: MatDialogRef<DialogU2FComponent>,
         @Inject(MAT_DIALOG_DATA) public data: string) { }
 
@@ -16,6 +16,6 @@ export class DialogU2FComponent {
     }
 
     public closeDialogWithCode(): void {
-        this.dialogRef.close(this.code);
+        this.dialogRef.close(this.name);
     }
 }
