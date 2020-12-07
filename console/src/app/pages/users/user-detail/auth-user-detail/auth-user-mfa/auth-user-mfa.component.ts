@@ -80,20 +80,26 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
             const credOptions: CredentialCreationOptions = JSON.parse(atob(webauthn.publicKey as string));
 
             console.log(credOptions);
-            const dialogRef = this.dialog.open(DialogU2FComponent, {
-              width: '400px',
-            });
+            if (credOptions.publicKey?.challenge) {
+              credOptions.publicKey.challenge = this._base64ToArrayBuffer(credOptions.publicKey.challenge as any);
+              credOptions.publicKey.user.id = this._base64ToArrayBuffer(credOptions.publicKey.user.id as any);
+              console.log(credOptions);
+              const dialogRef = this.dialog.open(DialogU2FComponent, {
+                width: '400px',
+              });
 
-            dialogRef.afterClosed().subscribe(tokenname => {
-              if (tokenname && credOptions.publicKey) {
-                navigator.credentials.create(credOptions.publicKey).then((resp) => {
-                  console.log(resp);
-                  if (resp) {
-                    this.service.VerifyMyMfaU2F(resp.id, tokenname);
-                  }
-                });
-              }
-            });
+              dialogRef.afterClosed().subscribe(tokenname => {
+                if (tokenname && credOptions.publicKey) {
+                  navigator.credentials.create(credOptions).then((resp) => {
+                    console.log(resp);
+                    if (resp) {
+                      this.service.VerifyMyMfaU2F(resp.id, tokenname);
+                    }
+                  });
+                }
+              });
+            }
+
         }, error => {
             this.toast.showError(error);
         });
@@ -154,5 +160,15 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
                 }
             }
         });
+    }
+
+    private _base64ToArrayBuffer(base64: string): any {
+      const binaryString = window.atob(base64);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+      }
+      return bytes.buffer;
     }
 }
