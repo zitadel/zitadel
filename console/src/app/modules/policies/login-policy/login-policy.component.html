@@ -1,4 +1,4 @@
-<app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam' : '/org']"
+<app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
     [title]="'POLICY.LOGIN_POLICY.TITLE' | translate"
     [description]="(serviceType==PolicyComponentServiceType.MGMT ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEMGMT' : PolicyComponentServiceType.ADMIN ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEADMIN' : '') | translate">
     <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
