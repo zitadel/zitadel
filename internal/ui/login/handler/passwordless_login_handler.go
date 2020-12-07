@@ -40,10 +40,6 @@ func (l *Login) handlePasswordlessVerification(w http.ResponseWriter, r *http.Re
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	if formData.Recreate {
-		l.renderPasswordlessVerification(w, r, authReq, nil)
-		return
-	}
 	credData, err := base64.URLEncoding.DecodeString(formData.CredentialData)
 	if err != nil {
 		l.renderPasswordlessVerification(w, r, authReq, err)

@@ -234,11 +234,11 @@ func (repo *UserRepo) ChangeMyPassword(ctx context.Context, old, new string) err
 		return err
 	}
 	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(policy)
-	_, err = repo.UserEvents.ChangePassword(ctx, pwPolicyView, authz.GetCtxData(ctx).UserID, old, new)
+	_, err = repo.UserEvents.ChangePassword(ctx, pwPolicyView, authz.GetCtxData(ctx).UserID, old, new, "")
 	return err
 }
 
-func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new string) (err error) {
+func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new, userAgentID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
@@ -249,7 +249,7 @@ func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new strin
 		return err
 	}
 	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(policy)
-	_, err = repo.UserEvents.ChangePassword(ctx, pwPolicyView, userID, old, new)
+	_, err = repo.UserEvents.ChangePassword(ctx, pwPolicyView, userID, old, new, userAgentID)
 	return err
 }
 
@@ -290,12 +290,12 @@ func (repo *UserRepo) AddMyMFAOTP(ctx context.Context) (*model.OTP, error) {
 	return repo.UserEvents.AddOTP(ctx, authz.GetCtxData(ctx).UserID, accountName)
 }
 
-func (repo *UserRepo) VerifyMFAOTPSetup(ctx context.Context, userID, code string) error {
-	return repo.UserEvents.CheckMFAOTPSetup(ctx, userID, code)
+func (repo *UserRepo) VerifyMFAOTPSetup(ctx context.Context, userID, code, userAgentID string) error {
+	return repo.UserEvents.CheckMFAOTPSetup(ctx, userID, code, userAgentID)
 }
 
 func (repo *UserRepo) VerifyMyMFAOTPSetup(ctx context.Context, code string) error {
-	return repo.UserEvents.CheckMFAOTPSetup(ctx, authz.GetCtxData(ctx).UserID, code)
+	return repo.UserEvents.CheckMFAOTPSetup(ctx, authz.GetCtxData(ctx).UserID, code, "")
 }
 
 func (repo *UserRepo) RemoveMyMFAOTP(ctx context.Context) error {
@@ -310,12 +310,12 @@ func (repo *UserRepo) AddMyMFAU2F(ctx context.Context) (*model.WebAuthNToken, er
 	return repo.UserEvents.AddU2F(ctx, authz.GetCtxData(ctx).UserID)
 }
 
-func (repo *UserRepo) VerifyMFAU2FSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error {
-	return repo.UserEvents.VerifyU2FSetup(ctx, userID, tokenName, credentialData)
+func (repo *UserRepo) VerifyMFAU2FSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error {
+	return repo.UserEvents.VerifyU2FSetup(ctx, userID, tokenName, userAgentID, credentialData)
 }
 
 func (repo *UserRepo) VerifyMyMFAU2FSetup(ctx context.Context, tokenName string, credentialData []byte) error {
-	return repo.UserEvents.VerifyU2FSetup(ctx, authz.GetCtxData(ctx).UserID, tokenName, credentialData)
+	return repo.UserEvents.VerifyU2FSetup(ctx, authz.GetCtxData(ctx).UserID, tokenName, "", credentialData)
 }
 
 func (repo *UserRepo) RemoveMFAU2F(ctx context.Context, userID, webAuthNTokenID string) error {
@@ -334,12 +334,12 @@ func (repo *UserRepo) AddMyPasswordless(ctx context.Context) (*model.WebAuthNTok
 	return repo.UserEvents.AddPasswordless(ctx, authz.GetCtxData(ctx).UserID)
 }
 
-func (repo *UserRepo) VerifyPasswordlessSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error {
-	return repo.UserEvents.VerifyPasswordlessSetup(ctx, userID, tokenName, credentialData)
+func (repo *UserRepo) VerifyPasswordlessSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error {
+	return repo.UserEvents.VerifyPasswordlessSetup(ctx, userID, tokenName, userAgentID, credentialData)
 }
 
 func (repo *UserRepo) VerifyMyPasswordlessSetup(ctx context.Context, tokenName string, credentialData []byte) error {
-	return repo.UserEvents.VerifyPasswordlessSetup(ctx, authz.GetCtxData(ctx).UserID, tokenName, credentialData)
+	return repo.UserEvents.VerifyPasswordlessSetup(ctx, authz.GetCtxData(ctx).UserID, tokenName, "", credentialData)
 }
 
 func (repo *UserRepo) RemovePasswordless(ctx context.Context, userID, webAuthNTokenID string) error {
@@ -391,7 +391,7 @@ func (repo *UserRepo) RequestPasswordReset(ctx context.Context, loginname string
 	return repo.UserEvents.RequestSetPassword(ctx, user.ID, model.NotificationTypeEmail)
 }
 
-func (repo *UserRepo) SetPassword(ctx context.Context, userID, code, password string) error {
+func (repo *UserRepo) SetPassword(ctx context.Context, userID, code, password, userAgentID string) error {
 	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if errors.IsNotFound(err) {
 		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
@@ -400,7 +400,7 @@ func (repo *UserRepo) SetPassword(ctx context.Context, userID, code, password st
 		return err
 	}
 	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(policy)
-	return repo.UserEvents.SetPassword(ctx, pwPolicyView, userID, code, password)
+	return repo.UserEvents.SetPassword(ctx, pwPolicyView, userID, code, password, userAgentID)
 }
 
 func (repo *UserRepo) SignOut(ctx context.Context, agentID string) error {

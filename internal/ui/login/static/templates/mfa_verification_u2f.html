@@ -26,7 +26,15 @@
     {{ template "error-message" .}}
 
     <div class="actions">
-        <button class="secondary right wa-support" id="submit-button" type="submit" name="recreate" value="true">{{t "Actions.Recreate"}}</button>
+        {{ if .MFAProviders }}
+            <div class="mfa-other">
+                <p>{{t "MFA.ChooseOther"}}</p>
+                {{ range $provider := .MFAProviders}}
+                    {{ $providerName := (t (printf "MFA.Provider%v" $provider)) }}
+                    <button class="secondary" type="submit" name="provider" value="{{$provider}}">{{$providerName}}</button>
+                {{ end }}
+            </div>
+        {{ end }}
     </div>
 </form>
 

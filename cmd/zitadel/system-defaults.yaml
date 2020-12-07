@@ -47,7 +47,7 @@ SystemDefaults:
     MachineKeySize: 2048
   Multifactors:
     OTP:
-      Issuer: 'Zitadel'
+      Issuer: 'ZITADEL'
       VerificationKey:
         EncryptionKeyID: $ZITADEL_OTP_VERIFICATION_KEY
   VerificationLifetimes:

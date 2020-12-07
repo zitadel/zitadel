@@ -578,10 +578,10 @@ func (es *UserEventstore) SetOneTimePassword(ctx context.Context, policy *iam_mo
 	if err != nil {
 		return nil, err
 	}
-	return es.changedPassword(ctx, user, policy, password.SecretString, true)
+	return es.changedPassword(ctx, user, policy, password.SecretString, true, "")
 }
 
-func (es *UserEventstore) SetPassword(ctx context.Context, policy *iam_model.PasswordComplexityPolicyView, userID, code, password string) error {
+func (es *UserEventstore) SetPassword(ctx context.Context, policy *iam_model.PasswordComplexityPolicyView, userID, code, password, userAgentID string) error {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
@@ -592,7 +592,7 @@ func (es *UserEventstore) SetPassword(ctx context.Context, policy *iam_model.Pas
 	if err := crypto.VerifyCode(user.PasswordCode.CreationDate, user.PasswordCode.Expiry, user.PasswordCode.Code, code, es.PasswordVerificationCode); err != nil {
 		return err
 	}
-	_, err = es.changedPassword(ctx, user, policy, password, false)
+	_, err = es.changedPassword(ctx, user, policy, password, false, userAgentID)
 	return err
 }
 
@@ -655,7 +655,7 @@ func (es *UserEventstore) ChangeMachine(ctx context.Context, machine *usr_model.
 	return model.MachineToModel(repoUser.Machine), nil
 }
 
-func (es *UserEventstore) ChangePassword(ctx context.Context, policy *iam_model.PasswordComplexityPolicyView, userID, old, new string) (_ *usr_model.Password, err error) {
+func (es *UserEventstore) ChangePassword(ctx context.Context, policy *iam_model.PasswordComplexityPolicyView, userID, old, new, userAgentID string) (_ *usr_model.Password, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -672,10 +672,10 @@ func (es *UserEventstore) ChangePassword(ctx context.Context, policy *iam_model.
 	if err != nil {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-s56a3", "Errors.User.Password.Invalid")
 	}
-	return es.changedPassword(ctx, user, policy, new, false)
+	return es.changedPassword(ctx, user, policy, new, false, userAgentID)
 }
 
-func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.User, policy *iam_model.PasswordComplexityPolicyView, password string, onetime bool) (_ *usr_model.Password, err error) {
+func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.User, policy *iam_model.PasswordComplexityPolicyView, password string, onetime bool, userAgentID string) (_ *usr_model.Password, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	pw := &usr_model.Password{SecretString: password}
@@ -683,7 +683,7 @@ func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.U
 	if err != nil {
 		return nil, err
 	}
-	repoPassword := model.PasswordFromModel(pw)
+	repoPassword := model.PasswordChangeFromModel(pw, userAgentID)
 	repoUser := model.UserFromModel(user)
 	agg := PasswordChangeAggregate(es.AggregateCreator(), repoUser, repoPassword)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
@@ -1235,7 +1235,7 @@ func (es *UserEventstore) RemoveOTP(ctx context.Context, userID string) error {
 	return nil
 }
 
-func (es *UserEventstore) CheckMFAOTPSetup(ctx context.Context, userID, code string) error {
+func (es *UserEventstore) CheckMFAOTPSetup(ctx context.Context, userID, code, userAgentID string) error {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
@@ -1250,7 +1250,7 @@ func (es *UserEventstore) CheckMFAOTPSetup(ctx context.Context, userID, code str
 		return err
 	}
 	repoUser := model.UserFromModel(user)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAOTPVerifyAggregate(es.AggregateCreator(), repoUser))
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAOTPVerifyAggregate(es.AggregateCreator(), repoUser, userAgentID))
 	if err != nil {
 		return err
 	}
@@ -1326,7 +1326,7 @@ func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model
 	return webAuthN, nil
 }
 
-func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error {
+func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
@@ -1337,7 +1337,7 @@ func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID, tokenName 
 		return err
 	}
 	repoUser := model.UserFromModel(user)
-	repoWebAuthN := model.WebAuthNVerifyFromModel(webAuthN)
+	repoWebAuthN := model.WebAuthNVerifyFromModel(webAuthN, userAgentID)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAU2FVerifyAggregate(es.AggregateCreator(), repoUser, repoWebAuthN))
 	if err != nil {
 		return err
@@ -1432,7 +1432,7 @@ func (es *UserEventstore) AddPasswordless(ctx context.Context, userID string) (*
 	return webAuthN, nil
 }
 
-func (es *UserEventstore) VerifyPasswordlessSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error {
+func (es *UserEventstore) VerifyPasswordlessSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
@@ -1443,7 +1443,7 @@ func (es *UserEventstore) VerifyPasswordlessSetup(ctx context.Context, userID, t
 		return err
 	}
 	repoUser := model.UserFromModel(user)
-	repoWebAuthN := model.WebAuthNVerifyFromModel(webAuthN)
+	repoWebAuthN := model.WebAuthNVerifyFromModel(webAuthN, userAgentID)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAPasswordlessVerifyAggregate(es.AggregateCreator(), repoUser, repoWebAuthN))
 	if err != nil {
 		return err

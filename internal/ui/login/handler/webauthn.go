@@ -8,5 +8,4 @@ type webAuthNData struct {
 type webAuthNFormData struct {
 	CredentialData string `schema:"credentialData"`
 	Name           string `schema:"name"`
-	Recreate       bool   `schema:"recreate"`
 }
