@@ -1,0 +1,22 @@
+.qrcode-wrapper {
+  display: flex;
+  align-content: center;
+
+  .qrcode {
+    margin: 1rem auto;
+  }
+}
+
+.form-field {
+  width: 100%;
+}
+
+.action {
+  display: flex;
+  justify-content: flex-end;
+
+  button {
+    margin-left: .5rem;
+    border-radius: .5rem;
+  }
+}
