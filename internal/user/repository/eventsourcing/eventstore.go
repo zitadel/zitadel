@@ -1316,6 +1316,7 @@ func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model
 		return nil, err
 	}
 	webAuthN.WebAuthNTokenID = tokenID
+	webAuthN.State = usr_model.MFAStateNotReady
 	repoUser := model.UserFromModel(user)
 	repoWebAuthN := model.WebAuthNFromModel(webAuthN)
 
