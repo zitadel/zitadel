@@ -11,6 +11,16 @@ import { ToastService } from 'src/app/services/toast.service';
 import { DialogOtpComponent } from '../dialog-otp/dialog-otp.component';
 import { DialogU2FComponent } from '../dialog-u2f/dialog-u2f.component';
 
+export interface WebAuthNOptions {
+  challenge: string;
+  rp: {name: string, id: string};
+  user: {name: string, id: string, displayName: string};
+  pubKeyCredParams: any;
+  authenticatorSelection: {userVerification: string};
+  timeout: number;
+  attestation: string;
+}
+
 @Component({
     selector: 'app-auth-user-mfa',
     templateUrl: './auth-user-mfa.component.html',
@@ -61,23 +71,29 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     }
 
     public verifyU2f(): void {
-      const dialogRef = this.dialog.open(DialogU2FComponent, {
-        width: '400px',
-      });
 
-      dialogRef.afterClosed().subscribe(tokenname => {
-        if (tokenname) {
-          navigator.credentials.create();
-          this.service.VerifyMyMfaU2F('', tokenname);
-        }
-      });
     }
 
     public addU2F(): void {
         this.service.AddMyMfaU2F().then((u2fresp) => {
             const webauthn: WebAuthNResponse.AsObject = u2fresp.toObject();
-            console.log(webauthn.publicKey);
+            const credOptions: CredentialCreationOptions = JSON.parse(atob(webauthn.publicKey as string));
 
+            console.log(credOptions);
+            const dialogRef = this.dialog.open(DialogU2FComponent, {
+              width: '400px',
+            });
+
+            dialogRef.afterClosed().subscribe(tokenname => {
+              if (tokenname && credOptions.publicKey) {
+                navigator.credentials.create(credOptions.publicKey).then((resp) => {
+                  console.log(resp);
+                  if (resp) {
+                    this.service.VerifyMyMfaU2F(resp.id, tokenname);
+                  }
+                });
+              }
+            });
         }, error => {
             this.toast.showError(error);
         });
@@ -85,6 +101,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
     public getMFAs(): void {
         this.service.GetMyMfas().then(mfas => {
+          console.log(mfas.toObject().mfasList);
             this.dataSource = new MatTableDataSource(mfas.toObject().mfasList);
             this.dataSource.sort = this.sort;
 
@@ -97,7 +114,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
         });
     }
 
-    public deleteMFA(type: MfaType): void {
+    public deleteMFA(type: MfaType, id?: string): void {
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
                 confirmKey: 'ACTIONS.DELETE',
@@ -122,8 +139,8 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
                     }).catch(error => {
                         this.toast.showError(error);
                     });
-                } else if (type === MfaType.MFATYPE_U2F) {
-                    this.service.RemoveMyMfaU2F().then(() => {
+                } else if (type === MfaType.MFATYPE_U2F && id) {
+                    this.service.RemoveMyMfaU2F(id).then(() => {
                         this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
 
                         const index = this.dataSource.data.findIndex(mfa => mfa.type === type);

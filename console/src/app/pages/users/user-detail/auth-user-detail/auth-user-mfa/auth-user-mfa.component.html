@@ -20,7 +20,7 @@
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.TABLEACTIONS' | translate }} </th>
                 <td mat-cell *matCellDef="let mfa">
                     <button matTooltip="{{'ACTIONS.REMOVE' | translate}}" color="warn" mat-icon-button
-                        (click)="deleteMFA(mfa.type)">
+                        (click)="deleteMFA(mfa.type, mfa.attribute)">
                         <i class="las la-trash"></i>
                     </button>
                 </td>
@@ -37,7 +37,7 @@
         </button>
         <button class="button" *ngIf="otpAvailable" (click)="addU2F()" mat-stroked-button color="primary"
         matTooltip="{{'ACTIONS.NEW' | translate}}">
-          <i class="las la-cube"></i>
+        <i class="las la-fingerprint"></i>
           {{'USER.MFA.U2F' | translate}}
         </button>
     </div>
