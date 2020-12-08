@@ -1,13 +1,8 @@
-package org
+package password_complexity
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/policy/password_complexity"
-)
-
-var (
-	PasswordComplexityPolicyAddedEventType   = orgEventTypePrefix + password_complexity.PasswordComplexityPolicyAddedEventType
-	PasswordComplexityPolicyChangedEventType = orgEventTypePrefix + password_complexity.PasswordComplexityPolicyChangedEventType
 )
 
 type PasswordComplexityPolicyReadModel struct {
@@ -21,16 +16,10 @@ func (rm *PasswordComplexityPolicyReadModel) AppendEvents(events ...eventstore.E
 			rm.ReadModel.AppendEvents(&e.PasswordComplexityPolicyAddedEvent)
 		case *PasswordComplexityPolicyChangedEvent:
 			rm.ReadModel.AppendEvents(&e.PasswordComplexityPolicyChangedEvent)
-		case *password_complexity.PasswordComplexityPolicyAddedEvent, *password_complexity.PasswordComplexityPolicyChangedEvent:
+		case *password_complexity.PasswordComplexityPolicyAddedEvent,
+			*password_complexity.PasswordComplexityPolicyChangedEvent:
+
 			rm.ReadModel.AppendEvents(e)
 		}
 	}
-}
-
-type PasswordComplexityPolicyAddedEvent struct {
-	password_complexity.PasswordComplexityPolicyAddedEvent
-}
-
-type PasswordComplexityPolicyChangedEvent struct {
-	password_complexity.PasswordComplexityPolicyChangedEvent
 }

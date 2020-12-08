@@ -2,15 +2,6 @@ package login
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/repository/idp/provider"
-)
-
-const (
-	LoginPolicyAddedEventType              = "policy.login.added"
-	LoginPolicyChangedEventType            = "policy.login.changed"
-	LoginPolicyRemovedEventType            = "policy.login.removed"
-	LoginPolicyIDPProviderAddedEventType   = "policy.login." + provider.AddedEventType
-	LoginPolicyIDPProviderRemovedEventType = "policy.login." + provider.RemovedEventType
 )
 
 type LoginPolicyReadModel struct {

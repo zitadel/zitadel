@@ -79,27 +79,6 @@ func LoginPolicyChangedEventFromExisting(
 	}, nil
 }
 
-func NewLoginPolicyChangedEvent(
-	ctx context.Context,
-	current *login.LoginPolicyWriteModel,
-	allowUsernamePassword,
-	allowRegister,
-	allowExternalIDP,
-	forceMFA bool,
-	passwordlessType login.PasswordlessType,
-) *LoginPolicyChangedEvent {
-	return &LoginPolicyChangedEvent{
-		LoginPolicyChangedEvent: *login.NewLoginPolicyChangedEvent(
-			eventstore.NewBaseEventForPush(ctx, login.LoginPolicyChangedEventType),
-			current,
-			allowUsernamePassword,
-			allowRegister,
-			allowExternalIDP,
-			forceMFA,
-			passwordlessType),
-	}
-}
-
 func LoginPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e, err := login.LoginPolicyChangedEventMapper(event)
 	if err != nil {

@@ -8,6 +8,7 @@ import (
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
+	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
 	"github.com/caos/zitadel/internal/v2/repository/member"
 )
@@ -81,7 +82,7 @@ func readModelToPasswordAgePolicy(readModel *iam.PasswordAgePolicyReadModel) *mo
 		//TODO: State: int32,
 	}
 }
-func readModelToPasswordComplexityPolicy(readModel *iam.PasswordComplexityPolicyReadModel) *model.PasswordComplexityPolicy {
+func readModelToPasswordComplexityPolicy(readModel *password_complexity.PasswordComplexityPolicyReadModel) *model.PasswordComplexityPolicy {
 	return &model.PasswordComplexityPolicy{
 		ObjectRoot:   readModelToObjectRoot(readModel.ReadModel),
 		HasLowercase: readModel.HasLowercase,
@@ -144,6 +145,17 @@ func writeModelToLoginPolicy(wm *login.LoginPolicyWriteModel) *model.LoginPolicy
 		AllowExternalIdp:      wm.Policy.AllowExternalIDP,
 		ForceMFA:              wm.Policy.ForceMFA,
 		PasswordlessType:      model.PasswordlessType(wm.Policy.PasswordlessType),
+	}
+}
+
+func writeModelToPasswordComplexityPolicy(wm *password_complexity.PasswordComplexityPolicyWriteModel) *model.PasswordComplexityPolicy {
+	return &model.PasswordComplexityPolicy{
+		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
+		MinLength:    wm.Policy.MinLength,
+		HasLowercase: wm.Policy.HasLowercase,
+		HasUppercase: wm.Policy.HasUpperCase,
+		HasNumber:    wm.Policy.HasNumber,
+		HasSymbol:    wm.Policy.HasSymbol,
 	}
 }
 

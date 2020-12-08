@@ -5,6 +5,16 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+	"github.com/caos/zitadel/internal/v2/repository/idp/provider"
+)
+
+const (
+	loginPolicyPrefix                      = "policy.login."
+	LoginPolicyAddedEventType              = loginPolicyPrefix + "added"
+	LoginPolicyChangedEventType            = loginPolicyPrefix + "changed"
+	LoginPolicyRemovedEventType            = loginPolicyPrefix + "removed"
+	LoginPolicyIDPProviderAddedEventType   = loginPolicyPrefix + provider.AddedEventType
+	LoginPolicyIDPProviderRemovedEventType = loginPolicyPrefix + provider.RemovedEventType
 )
 
 type LoginPolicyAddedEvent struct {
@@ -33,7 +43,6 @@ func NewLoginPolicyAddedEvent(
 	forceMFA bool,
 	passwordlessType PasswordlessType,
 ) *LoginPolicyAddedEvent {
-
 	return &LoginPolicyAddedEvent{
 		BaseEvent:             *base,
 		AllowExternalIDP:      allowExternalIDP,

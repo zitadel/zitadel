@@ -1,8 +1,7 @@
-package policy
+package password_complexity
 
 import (
 	"encoding/json"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
@@ -14,62 +13,14 @@ const (
 	PasswordComplexityPolicyRemovedEventType = "policy.password.complexity.removed"
 )
 
-type PasswordComplexityPolicyAggregate struct {
-	eventstore.Aggregate
-}
-
-type PasswordComplexityPolicyReadModel struct {
-	eventstore.ReadModel
-
-	MinLength    uint8
-	HasLowercase bool
-	HasUpperCase bool
-	HasNumber    bool
-	HasSymbol    bool
-}
-
-func (rm *PasswordComplexityPolicyReadModel) Reduce() error {
-	for _, event := range rm.Events {
-		switch e := event.(type) {
-		case *PasswordComplexityPolicyAddedEvent:
-			rm.MinLength = e.MinLength
-			rm.HasLowercase = e.HasLowercase
-			rm.HasUpperCase = e.HasUpperCase
-			rm.HasNumber = e.HasNumber
-			rm.HasSymbol = e.HasSymbol
-		case *PasswordComplexityPolicyChangedEvent:
-			rm.MinLength = e.MinLength
-			rm.HasLowercase = e.HasLowercase
-			rm.HasUpperCase = e.HasUpperCase
-			rm.HasNumber = e.HasNumber
-			rm.HasSymbol = e.HasSymbol
-		}
-	}
-	return rm.ReadModel.Reduce()
-}
-
-type PasswordComplexityPolicyWriteModel struct {
-	eventstore.WriteModel
-
-	MinLength    uint8
-	HasLowercase bool
-	HasUpperCase bool
-	HasNumber    bool
-	HasSymbol    bool
-}
-
-func (wm *PasswordComplexityPolicyWriteModel) Reduce() error {
-	return errors.ThrowUnimplemented(nil, "POLIC-mvS8d", "reduce unimpelemnted")
-}
-
 type PasswordComplexityPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	MinLength    uint8 `json:"minLength,omitempty"`
-	HasLowercase bool  `json:"hasLowercase"`
-	HasUpperCase bool  `json:"hasUppercase"`
-	HasNumber    bool  `json:"hasNumber"`
-	HasSymbol    bool  `json:"hasSymbol"`
+	MinLength    uint64 `json:"minLength,omitempty"`
+	HasLowercase bool   `json:"hasLowercase"`
+	HasUpperCase bool   `json:"hasUppercase"`
+	HasNumber    bool   `json:"hasNumber"`
+	HasSymbol    bool   `json:"hasSymbol"`
 }
 
 func (e *PasswordComplexityPolicyAddedEvent) CheckPrevious() bool {
@@ -82,20 +33,19 @@ func (e *PasswordComplexityPolicyAddedEvent) Data() interface{} {
 
 func NewPasswordComplexityPolicyAddedEvent(
 	base *eventstore.BaseEvent,
+	minLength uint64,
 	hasLowerCase,
 	hasUpperCase,
 	hasNumber,
 	hasSymbol bool,
-	minLength uint8,
 ) *PasswordComplexityPolicyAddedEvent {
-
 	return &PasswordComplexityPolicyAddedEvent{
 		BaseEvent:    *base,
+		MinLength:    minLength,
 		HasLowercase: hasLowerCase,
 		HasNumber:    hasNumber,
 		HasSymbol:    hasSymbol,
 		HasUpperCase: hasUpperCase,
-		MinLength:    minLength,
 	}
 }
 
@@ -115,11 +65,11 @@ func PasswordComplexityPolicyAddedEventMapper(event *repository.Event) (eventsto
 type PasswordComplexityPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	MinLength    uint8 `json:"minLength"`
-	HasLowercase bool  `json:"hasLowercase"`
-	HasUpperCase bool  `json:"hasUppercase"`
-	HasNumber    bool  `json:"hasNumber"`
-	HasSymbol    bool  `json:"hasSymbol"`
+	MinLength    uint64 `json:"minLength"`
+	HasLowercase bool   `json:"hasLowercase"`
+	HasUpperCase bool   `json:"hasUppercase"`
+	HasNumber    bool   `json:"hasNumber"`
+	HasSymbol    bool   `json:"hasSymbol"`
 }
 
 func (e *PasswordComplexityPolicyChangedEvent) CheckPrevious() bool {
@@ -133,7 +83,7 @@ func (e *PasswordComplexityPolicyChangedEvent) Data() interface{} {
 func NewPasswordComplexityPolicyChangedEvent(
 	base *eventstore.BaseEvent,
 	current *PasswordComplexityPolicyWriteModel,
-	minLength uint8,
+	minLength uint64,
 	hasLowerCase,
 	hasUpperCase,
 	hasNumber,
