@@ -165,6 +165,8 @@
             "U2F":"U2F hinzufügen",
             "U2F_DIALOG_TITLE": "U2F hinzufügen",
             "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Universellen Multifaktor an.",
+            "U2F_SUCCESS":"U2F erfolgreich erstellt!",
+            "U2F_ERROR":"Ein Fehler ist aufgetreten!",
             "U2F_NAME":"U2F Name",
             "TYPE": {
                 "0":"Keine MFA definiert",

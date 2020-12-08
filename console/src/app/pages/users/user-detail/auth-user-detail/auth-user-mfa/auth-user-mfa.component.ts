@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
+import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { MfaOtpResponse, MFAState, MfaType, MultiFactor, WebAuthNResponse } from 'src/app/proto/generated/auth_pb';
@@ -40,7 +41,10 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
     public error: string = '';
     public otpAvailable: boolean = false;
-    constructor(private service: GrpcAuthService, private toast: ToastService, private dialog: MatDialog) { }
+    constructor(private service: GrpcAuthService,
+      private toast: ToastService,
+      private dialog: MatDialog,
+      private translate: TranslateService) { }
 
     public ngOnInit(): void {
         this.getMFAs();
@@ -92,9 +96,42 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
                 if (tokenname && credOptions.publicKey) {
                   navigator.credentials.create(credOptions).then((resp) => {
                     console.log(resp);
-                    if (resp) {
-                      this.service.VerifyMyMfaU2F(resp.id, tokenname);
-                    }
+
+                      if (resp &&
+                        (resp as any).response.attestationObject &&
+                        (resp as any).response.clientDataJSON &&
+                        (resp as any).rawId) {
+
+                        const attestationObject = new Uint8Array((resp as any).response.attestationObject);
+                        const clientDataJSON = new Uint8Array((resp as any).response.clientDataJSON);
+                        const rawId = new Uint8Array((resp as any).rawId);
+
+                        const data = JSON.stringify({
+                            id: resp.id,
+                            rawId: this._arrayBufferToBase64(rawId),
+                            type: resp.type,
+                            response: {
+                                attestationObject: this._arrayBufferToBase64(attestationObject),
+                                clientDataJSON: this._arrayBufferToBase64(clientDataJSON),
+                            },
+                        });
+
+                        console.log(data);
+
+                        const base64 = btoa(data);
+                        console.log(base64);
+                        this.service.VerifyMyMfaU2F(base64, tokenname).then(() => {
+                          this.translate.get('USER.MFA.U2F_SUCCESS').subscribe(msg => {
+                            this.toast.showInfo(msg);
+                          });
+                        }).catch(error => {
+                          this.toast.showError(error);
+                        });
+                      } else {
+                        this.translate.get('USER.MFA.U2F_ERROR').subscribe(msg => {
+                          this.toast.showInfo(msg);
+                        });
+                      }
                   });
                 }
               });
@@ -171,4 +208,14 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
       }
       return bytes.buffer;
     }
+
+    private _arrayBufferToBase64( buffer: any): string {
+      let binary = '';
+      const bytes = new Uint8Array( buffer );
+      const len = bytes.byteLength;
+      for (let i = 0; i < len; i++) {
+          binary += String.fromCharCode( bytes[ i ] );
+      }
+      return window.btoa( binary );
+  }
 }

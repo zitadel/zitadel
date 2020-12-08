@@ -165,6 +165,8 @@
             "U2F":"Add U2F",
             "U2F_DIALOG_TITLE": "Verify U2F",
             "U2F_DIALOG_DESCRIPTION": "Enter a name for your used Universal Multifaktor.",
+            "U2F_SUCCESS":"U2F created successfully!",
+            "U2F_ERROR":"An error during U2F setup occurred!",
             "U2F_NAME":"U2F Name",
             "TYPE": {
                 "0": "No MFA defined",
