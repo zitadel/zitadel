@@ -46,7 +46,8 @@ func (s *Spooler) Start() {
 			workerID := s.lockID + "--" + strconv.Itoa(workerIdx)
 			for task := range s.queue {
 				lockSuccessful := task.load(workerID)
-				requeueTask(task, s.queue, lockSuccessful)
+				logging.LogWithFields("SPOOL-pvLJw", "successful", lockSuccessful).Info("loaded")
+				go requeueTask(task, s.queue, lockSuccessful)
 			}
 		}(i)
 	}
