@@ -45,8 +45,8 @@ func (s *Spooler) Start() {
 		go func(workerIdx int) {
 			workerID := s.lockID + "--" + strconv.Itoa(workerIdx)
 			for task := range s.queue {
-				go requeueTask(task, s.queue)
 				task.load(workerID)
+				requeueTask(task, s.queue)
 			}
 		}(i)
 	}
