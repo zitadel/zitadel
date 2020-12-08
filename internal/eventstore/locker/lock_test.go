@@ -55,6 +55,14 @@ func (db *dbMock) expectReleaseSavepoint() *dbMock {
 	return db
 }
 
+func (db *dbMock) expectQuery(lockerID, view string) *dbMock {
+	db.mock.ExpectQuery(`with l as \(select \* from table\.locks where view_name = \$1\) select case when \(select count\(\*\) from l\) = 0 then true else \(select case when \(locker_id = \$2 or locked_until < now\(\)\) then true else false end from l\) end`).
+		WithArgs(view, lockerID).
+		WillReturnRows(sqlmock.NewRows([]string{"col"}).AddRow(true))
+
+	return db
+}
+
 func (db *dbMock) expectRenew(lockerID, view string, affectedRows int64) *dbMock {
 	query := db.mock.
 		ExpectExec(`INSERT INTO table\.locks \(locker_id, locked_until, view_name\) VALUES \(\$1, now\(\)\+\$2::INTERVAL, \$3\) ON CONFLICT \(view_name\) DO UPDATE SET locker_id = \$4, locked_until = now\(\)\+\$5::INTERVAL WHERE locks\.view_name = \$6 AND \(locks\.locker_id = \$7 OR locks\.locked_until < now\(\)\)`).
@@ -90,6 +98,7 @@ func Test_locker_Renew(t *testing.T) {
 			name: "renew succeeded",
 			fields: fields{
 				db: mockDB(t).
+					expectQuery("locker", "view").
 					expectBegin().
 					expectSavepoint().
 					expectRenew("locker", "view", 1).
@@ -103,6 +112,7 @@ func Test_locker_Renew(t *testing.T) {
 			name: "renew now rows updated",
 			fields: fields{
 				db: mockDB(t).
+					expectQuery("locker", "view").
 					expectBegin().
 					expectSavepoint().
 					expectRenew("locker", "view", 0).
