@@ -70,7 +70,7 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 	passwordVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.PasswordVerificationCode, aesCrypto)
 	aesOTPCrypto, err := crypto.NewAESCrypto(systemDefaults.Multifactors.OTP.VerificationKey)
 	passwordAlg := crypto.NewBCrypt(systemDefaults.SecretGenerators.PasswordSaltCost)
-	web, err := webauthn_helper.StartServer(systemDefaults.WebAuthN.DisplayName, systemDefaults.WebAuthN.ID, systemDefaults.WebAuthN.Origin)
+	web, err := webauthn_helper.StartServer(systemDefaults.WebAuthN)
 	if err != nil {
 		return nil, err
 	}
@@ -1302,12 +1302,12 @@ func (es *UserEventstore) verifyMFAOTP(otp *usr_model.OTP, code string) error {
 	return nil
 }
 
-func (es *UserEventstore) AddU2F(ctx context.Context, userID string) (*usr_model.WebAuthNToken, error) {
+func (es *UserEventstore) AddU2F(ctx context.Context, userID string, isLoginUI bool) (*usr_model.WebAuthNToken, error) {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	webAuthN, err := es.webauthn.BeginRegistration(user, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementDiscouraged, user.U2FTokens...)
+	webAuthN, err := es.webauthn.BeginRegistration(user, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementDiscouraged, isLoginUI, user.U2FTokens...)
 	if err != nil {
 		return nil, err
 	}
@@ -1333,7 +1333,7 @@ func (es *UserEventstore) VerifyU2FSetup(ctx context.Context, userID, tokenName,
 		return err
 	}
 	_, token := user.Human.GetU2FToVerify()
-	webAuthN, err := es.webauthn.FinishRegistration(user, token, tokenName, credentialData)
+	webAuthN, err := es.webauthn.FinishRegistration(user, token, tokenName, credentialData, userAgentID != "")
 	if err != nil {
 		return err
 	}
@@ -1364,7 +1364,7 @@ func (es *UserEventstore) RemoveU2FToken(ctx context.Context, userID, webAuthNTo
 	return nil
 }
 
-func (es *UserEventstore) BeginU2FLogin(ctx context.Context, userID string, authRequest *req_model.AuthRequest) (*usr_model.WebAuthNLogin, error) {
+func (es *UserEventstore) BeginU2FLogin(ctx context.Context, userID string, authRequest *req_model.AuthRequest, isLoginUI bool) (*usr_model.WebAuthNLogin, error) {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -1373,7 +1373,7 @@ func (es *UserEventstore) BeginU2FLogin(ctx context.Context, userID string, auth
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5Mk8s", "Errors.User.MFA.U2F.NotExisting")
 	}
 
-	webAuthNLogin, err := es.webauthn.BeginLogin(user, usr_model.UserVerificationRequirementDiscouraged, user.U2FTokens...)
+	webAuthNLogin, err := es.webauthn.BeginLogin(user, usr_model.UserVerificationRequirementDiscouraged, isLoginUI, user.U2FTokens...)
 	if err != nil {
 		return nil, err
 	}
@@ -1387,13 +1387,13 @@ func (es *UserEventstore) BeginU2FLogin(ctx context.Context, userID string, auth
 	return webAuthNLogin, nil
 }
 
-func (es *UserEventstore) VerifyMFAU2F(ctx context.Context, userID string, credentialData []byte, authRequest *req_model.AuthRequest) error {
+func (es *UserEventstore) VerifyMFAU2F(ctx context.Context, userID string, credentialData []byte, authRequest *req_model.AuthRequest, isLoginUI bool) error {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
 	}
 	_, u2f := user.GetU2FLogin(authRequest.ID)
-	keyID, signCount, finishErr := es.webauthn.FinishLogin(user, u2f, credentialData, user.U2FTokens...)
+	keyID, signCount, finishErr := es.webauthn.FinishLogin(user, u2f, credentialData, isLoginUI, user.U2FTokens...)
 	if finishErr != nil && keyID == nil {
 		return finishErr
 	}
@@ -1410,12 +1410,12 @@ func (es *UserEventstore) VerifyMFAU2F(ctx context.Context, userID string, crede
 	return finishErr
 }
 
-func (es *UserEventstore) AddPasswordless(ctx context.Context, userID string) (*usr_model.WebAuthNToken, error) {
+func (es *UserEventstore) AddPasswordless(ctx context.Context, userID string, isLoginUI bool) (*usr_model.WebAuthNToken, error) {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	webAuthN, err := es.webauthn.BeginRegistration(user, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementRequired, user.PasswordlessTokens...)
+	webAuthN, err := es.webauthn.BeginRegistration(user, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementRequired, isLoginUI, user.PasswordlessTokens...)
 	if err != nil {
 		return nil, err
 	}
@@ -1439,7 +1439,7 @@ func (es *UserEventstore) VerifyPasswordlessSetup(ctx context.Context, userID, t
 		return err
 	}
 	_, token := user.Human.GetPasswordlessToVerify()
-	webAuthN, err := es.webauthn.FinishRegistration(user, token, tokenName, credentialData)
+	webAuthN, err := es.webauthn.FinishRegistration(user, token, tokenName, credentialData, userAgentID != "")
 	if err != nil {
 		return err
 	}
@@ -1470,7 +1470,7 @@ func (es *UserEventstore) RemovePasswordlessToken(ctx context.Context, userID, w
 	return nil
 }
 
-func (es *UserEventstore) BeginPasswordlessLogin(ctx context.Context, userID string, authRequest *req_model.AuthRequest) (*usr_model.WebAuthNLogin, error) {
+func (es *UserEventstore) BeginPasswordlessLogin(ctx context.Context, userID string, authRequest *req_model.AuthRequest, isLoginUI bool) (*usr_model.WebAuthNLogin, error) {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -1478,7 +1478,7 @@ func (es *UserEventstore) BeginPasswordlessLogin(ctx context.Context, userID str
 	if user.PasswordlessTokens == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5M9sd", "Errors.User.MFA.Passwordless.NotExisting")
 	}
-	webAuthNLogin, err := es.webauthn.BeginLogin(user, usr_model.UserVerificationRequirementRequired, user.PasswordlessTokens...)
+	webAuthNLogin, err := es.webauthn.BeginLogin(user, usr_model.UserVerificationRequirementRequired, isLoginUI, user.PasswordlessTokens...)
 	if err != nil {
 		return nil, err
 	}
@@ -1492,13 +1492,13 @@ func (es *UserEventstore) BeginPasswordlessLogin(ctx context.Context, userID str
 	return webAuthNLogin, nil
 }
 
-func (es *UserEventstore) VerifyPasswordless(ctx context.Context, userID string, credentialData []byte, authRequest *req_model.AuthRequest) error {
+func (es *UserEventstore) VerifyPasswordless(ctx context.Context, userID string, credentialData []byte, authRequest *req_model.AuthRequest, isLoginUI bool) error {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return err
 	}
 	_, passwordless := user.GetPasswordlessLogin(authRequest.ID)
-	keyID, signCount, finishErr := es.webauthn.FinishLogin(user, passwordless, credentialData, user.PasswordlessTokens...)
+	keyID, signCount, finishErr := es.webauthn.FinishLogin(user, passwordless, credentialData, isLoginUI, user.PasswordlessTokens...)
 	if finishErr != nil && keyID == nil {
 		return finishErr
 	}

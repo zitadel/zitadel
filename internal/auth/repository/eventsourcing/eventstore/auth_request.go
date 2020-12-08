@@ -270,7 +270,7 @@ func (repo *AuthRequestRepo) BeginMFAU2FLogin(ctx context.Context, userID, authR
 	if err != nil {
 		return nil, err
 	}
-	return repo.UserEvents.BeginU2FLogin(ctx, userID, request)
+	return repo.UserEvents.BeginU2FLogin(ctx, userID, request, true)
 }
 
 func (repo *AuthRequestRepo) VerifyMFAU2F(ctx context.Context, userID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) (err error) {
@@ -280,7 +280,7 @@ func (repo *AuthRequestRepo) VerifyMFAU2F(ctx context.Context, userID, authReque
 	if err != nil {
 		return err
 	}
-	return repo.UserEvents.VerifyMFAU2F(ctx, userID, credentialData, request)
+	return repo.UserEvents.VerifyMFAU2F(ctx, userID, credentialData, request, true)
 }
 
 func (repo *AuthRequestRepo) BeginPasswordlessLogin(ctx context.Context, userID, authRequestID, userAgentID string) (login *user_model.WebAuthNLogin, err error) {
@@ -290,7 +290,7 @@ func (repo *AuthRequestRepo) BeginPasswordlessLogin(ctx context.Context, userID,
 	if err != nil {
 		return nil, err
 	}
-	return repo.UserEvents.BeginPasswordlessLogin(ctx, userID, request)
+	return repo.UserEvents.BeginPasswordlessLogin(ctx, userID, request, true)
 }
 
 func (repo *AuthRequestRepo) VerifyPasswordless(ctx context.Context, userID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) (err error) {
@@ -300,7 +300,7 @@ func (repo *AuthRequestRepo) VerifyPasswordless(ctx context.Context, userID, aut
 	if err != nil {
 		return err
 	}
-	return repo.UserEvents.VerifyPasswordless(ctx, userID, credentialData, request)
+	return repo.UserEvents.VerifyPasswordless(ctx, userID, credentialData, request, true)
 }
 
 func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, userAgentID string, info *model.BrowserInfo) (err error) {
