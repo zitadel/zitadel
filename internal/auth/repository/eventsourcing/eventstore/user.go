@@ -303,11 +303,11 @@ func (repo *UserRepo) RemoveMyMFAOTP(ctx context.Context) error {
 }
 
 func (repo *UserRepo) AddMFAU2F(ctx context.Context, userID string) (*model.WebAuthNToken, error) {
-	return repo.UserEvents.AddU2F(ctx, userID)
+	return repo.UserEvents.AddU2F(ctx, userID, true)
 }
 
 func (repo *UserRepo) AddMyMFAU2F(ctx context.Context) (*model.WebAuthNToken, error) {
-	return repo.UserEvents.AddU2F(ctx, authz.GetCtxData(ctx).UserID)
+	return repo.UserEvents.AddU2F(ctx, authz.GetCtxData(ctx).UserID, false)
 }
 
 func (repo *UserRepo) VerifyMFAU2FSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error {
@@ -327,11 +327,11 @@ func (repo *UserRepo) RemoveMyMFAU2F(ctx context.Context, webAuthNTokenID string
 }
 
 func (repo *UserRepo) AddPasswordless(ctx context.Context, userID string) (*model.WebAuthNToken, error) {
-	return repo.UserEvents.AddPasswordless(ctx, userID)
+	return repo.UserEvents.AddPasswordless(ctx, userID, true)
 }
 
 func (repo *UserRepo) AddMyPasswordless(ctx context.Context) (*model.WebAuthNToken, error) {
-	return repo.UserEvents.AddPasswordless(ctx, authz.GetCtxData(ctx).UserID)
+	return repo.UserEvents.AddPasswordless(ctx, authz.GetCtxData(ctx).UserID, false)
 }
 
 func (repo *UserRepo) VerifyPasswordlessSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error {
