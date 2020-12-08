@@ -59,7 +59,7 @@ type PasswordComplexityPolicyWriteModel struct {
 }
 
 func (wm *PasswordComplexityPolicyWriteModel) Reduce() error {
-	return errors.ThrowUnimplemented(nil, "POLIC-xJjvN", "reduce unimpelemnted")
+	return errors.ThrowUnimplemented(nil, "POLIC-mvS8d", "reduce unimpelemnted")
 }
 
 type PasswordComplexityPolicyAddedEvent struct {

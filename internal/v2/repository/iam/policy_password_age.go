@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	PasswordAgePolicyAddedEventType   = iamEventTypePrefix + policy.PasswordAgePolicyAddedEventType
-	PasswordAgePolicyChangedEventType = iamEventTypePrefix + policy.PasswordAgePolicyChangedEventType
+	PasswordAgePolicyAddedEventType   = IamEventTypePrefix + policy.PasswordAgePolicyAddedEventType
+	PasswordAgePolicyChangedEventType = IamEventTypePrefix + policy.PasswordAgePolicyChangedEventType
 )
 
 type PasswordAgePolicyReadModel struct {

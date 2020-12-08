@@ -273,11 +273,17 @@ func (repo *IAMRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_mode
 
 func (repo *IAMRepository) AddDefaultLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
 	policy.AggregateID = repo.SystemDefaults.IamID
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.AddLoginPolicy(ctx, policy)
+	}
 	return repo.IAMEventstore.AddLoginPolicy(ctx, policy)
 }
 
 func (repo *IAMRepository) ChangeDefaultLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
 	policy.AggregateID = repo.SystemDefaults.IamID
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.ChangeLoginPolicy(ctx, policy)
+	}
 	return repo.IAMEventstore.ChangeLoginPolicy(ctx, policy)
 }
 

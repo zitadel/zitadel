@@ -6,6 +6,8 @@ import (
 	"github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
+	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
+	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
 	"github.com/caos/zitadel/internal/v2/repository/member"
 )
@@ -52,7 +54,7 @@ func readModelToLabelPolicy(readModel *iam.LabelPolicyReadModel) *model.LabelPol
 	}
 }
 
-func readModelToLoginPolicy(readModel *iam.LoginPolicyReadModel) *model.LoginPolicy {
+func readModelToLoginPolicy(readModel *login.LoginPolicyReadModel) *model.LoginPolicy {
 	return &model.LoginPolicy{
 		ObjectRoot:            readModelToObjectRoot(readModel.ReadModel),
 		AllowExternalIdp:      readModel.AllowExternalIDP,
@@ -134,6 +136,17 @@ func writeModelToMember(writeModel *iam.MemberWriteModel) *model.IAMMember {
 	}
 }
 
+func writeModelToLoginPolicy(wm *login.LoginPolicyWriteModel) *model.LoginPolicy {
+	return &model.LoginPolicy{
+		ObjectRoot:            writeModelToObjectRoot(wm.WriteModel),
+		AllowUsernamePassword: wm.Policy.AllowUserNamePassword,
+		AllowRegister:         wm.Policy.AllowRegister,
+		AllowExternalIdp:      wm.Policy.AllowExternalIDP,
+		ForceMFA:              wm.Policy.ForceMFA,
+		PasswordlessType:      model.PasswordlessType(wm.Policy.PasswordlessType),
+	}
+}
+
 func readModelToIDPConfigView(rm *iam.IDPConfigReadModel) *model.IDPConfigView {
 	return &model.IDPConfigView{
 		AggregateID:               rm.AggregateID,
@@ -211,7 +224,7 @@ func writeModelToIDPOIDCConfig(wm *oidc.ConfigWriteModel) *model.OIDCIDPConfig {
 	}
 }
 
-func writeModelToIDPProvider(wm *iam.LoginPolicyIDPProviderWriteModel) *model.IDPProvider {
+func writeModelToIDPProvider(wm *idpprovider.LoginPolicyIDPProviderWriteModel) *model.IDPProvider {
 	return &model.IDPProvider{
 		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
 		IdpConfigID: wm.IDPConfigID,

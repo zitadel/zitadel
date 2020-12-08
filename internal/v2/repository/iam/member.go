@@ -9,9 +9,9 @@ import (
 )
 
 var (
-	MemberAddedEventType   = iamEventTypePrefix + member.AddedEventType
-	MemberChangedEventType = iamEventTypePrefix + member.ChangedEventType
-	MemberRemovedEventType = iamEventTypePrefix + member.RemovedEventType
+	MemberAddedEventType   = IamEventTypePrefix + member.AddedEventType
+	MemberChangedEventType = IamEventTypePrefix + member.ChangedEventType
+	MemberRemovedEventType = IamEventTypePrefix + member.RemovedEventType
 )
 
 type MemberReadModel struct {

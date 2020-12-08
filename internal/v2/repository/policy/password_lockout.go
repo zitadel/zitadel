@@ -47,7 +47,7 @@ type PasswordLockoutPolicyWriteModel struct {
 }
 
 func (wm *PasswordLockoutPolicyWriteModel) Reduce() error {
-	return errors.ThrowUnimplemented(nil, "POLIC-xJjvN", "reduce unimpelemnted")
+	return errors.ThrowUnimplemented(nil, "POLIC-3M0df", "reduce unimpelemnted")
 }
 
 type PasswordLockoutPolicyAddedEvent struct {

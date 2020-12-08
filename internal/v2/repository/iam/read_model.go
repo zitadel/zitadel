@@ -2,8 +2,10 @@ package iam
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	login2 "github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/member"
 	"github.com/caos/zitadel/internal/v2/repository/policy"
+	"github.com/caos/zitadel/internal/v2/repository/policy/login"
 )
 
 type ReadModel struct {
@@ -18,7 +20,7 @@ type ReadModel struct {
 	GlobalOrgID string
 	ProjectID   string
 
-	DefaultLoginPolicy              LoginPolicyReadModel
+	DefaultLoginPolicy              login2.LoginPolicyReadModel
 	DefaultLabelPolicy              LabelPolicyReadModel
 	DefaultOrgIAMPolicy             OrgIAMPolicyReadModel
 	DefaultPasswordComplexityPolicy PasswordComplexityPolicyReadModel
@@ -64,8 +66,8 @@ func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 			*policy.LabelPolicyChangedEvent:
 
 			rm.DefaultLabelPolicy.AppendEvents(event)
-		case *policy.LoginPolicyAddedEvent,
-			*policy.LoginPolicyChangedEvent:
+		case *login.LoginPolicyAddedEvent,
+			*login.LoginPolicyChangedEvent:
 
 			rm.DefaultLoginPolicy.AppendEvents(event)
 		case *policy.OrgIAMPolicyAddedEvent:

@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	PasswordComplexityPolicyAddedEventType   = iamEventTypePrefix + policy.PasswordComplexityPolicyAddedEventType
-	PasswordComplexityPolicyChangedEventType = iamEventTypePrefix + policy.PasswordComplexityPolicyChangedEventType
+	PasswordComplexityPolicyAddedEventType   = IamEventTypePrefix + policy.PasswordComplexityPolicyAddedEventType
+	PasswordComplexityPolicyChangedEventType = IamEventTypePrefix + policy.PasswordComplexityPolicyChangedEventType
 )
 
 type PasswordComplexityPolicyReadModel struct {

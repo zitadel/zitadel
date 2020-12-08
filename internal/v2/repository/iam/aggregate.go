@@ -2,6 +2,9 @@ package iam
 
 import (
 	"context"
+	iam_login "github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
+	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
+	"github.com/caos/zitadel/internal/v2/repository/policy/login"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
@@ -11,7 +14,7 @@ import (
 )
 
 const (
-	iamEventTypePrefix = eventstore.EventType("iam.")
+	IamEventTypePrefix = eventstore.EventType("iam.")
 )
 
 const (
@@ -84,6 +87,20 @@ func (a *Aggregate) PushStepStarted(ctx context.Context, step Step) *Aggregate {
 
 func (a *Aggregate) PushStepDone(ctx context.Context, step Step) *Aggregate {
 	a.Aggregate = *a.PushEvents(NewSetupStepDoneEvent(ctx, step))
+	return a
+}
+
+func (a *Aggregate) PushLoginPolicyAddedEvent(ctx context.Context, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA bool, passwordlessType login.PasswordlessType) *Aggregate {
+	a.Aggregate = *a.PushEvents(iam_login.NewLoginPolicyAddedEventEvent(ctx, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA, passwordlessType))
+	return a
+}
+
+func (a *Aggregate) PushLoginPolicyChangedFromExisting(ctx context.Context, current *iam_login.LoginPolicyWriteModel, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA bool, passwordlessType login.PasswordlessType) *Aggregate {
+	e, err := iam_login.LoginPolicyChangedEventFromExisting(ctx, current, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA, passwordlessType)
+	if err != nil {
+		return a
+	}
+	a.Aggregate = *a.PushEvents(e)
 	return a
 }
 
@@ -172,7 +189,7 @@ func (a *Aggregate) PushLoginPolicyIDPProviderAddedEvent(
 	providerType provider.Type,
 ) *Aggregate {
 
-	a.Aggregate = *a.PushEvents(NewLoginPolicyIDPProviderAddedEvent(ctx, idpConfigID, providerType))
+	a.Aggregate = *a.PushEvents(idpprovider.NewLoginPolicyIDPProviderAddedEvent(ctx, idpConfigID, providerType))
 	return a
 }
 
@@ -182,6 +199,6 @@ func (a *Aggregate) PushLoginPolicyIDPProviderRemovedEvent(
 	providerType provider.Type,
 ) *Aggregate {
 
-	a.Aggregate = *a.PushEvents(NewLoginPolicyIDPProviderRemovedEvent(ctx, idpConfigID))
+	a.Aggregate = *a.PushEvents(idpprovider.NewLoginPolicyIDPProviderRemovedEvent(ctx, idpConfigID))
 	return a
 }

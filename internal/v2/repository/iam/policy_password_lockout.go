@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	PasswordLockoutPolicyAddedEventType   = iamEventTypePrefix + policy.PasswordLockoutPolicyAddedEventType
-	PasswordLockoutPolicyChangedEventType = iamEventTypePrefix + policy.PasswordLockoutPolicyChangedEventType
+	PasswordLockoutPolicyAddedEventType   = IamEventTypePrefix + policy.PasswordLockoutPolicyAddedEventType
+	PasswordLockoutPolicyChangedEventType = IamEventTypePrefix + policy.PasswordLockoutPolicyChangedEventType
 )
 
 type PasswordLockoutPolicyReadModel struct {

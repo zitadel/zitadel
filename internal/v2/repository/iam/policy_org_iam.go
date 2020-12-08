@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	OrgIAMPolicyAddedEventType = iamEventTypePrefix + policy.OrgIAMPolicyAddedEventType
+	OrgIAMPolicyAddedEventType = IamEventTypePrefix + policy.OrgIAMPolicyAddedEventType
 )
 
 type OrgIAMPolicyReadModel struct{ policy.OrgIAMPolicyReadModel }

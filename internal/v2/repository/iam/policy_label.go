@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	LabelPolicyAddedEventType   = iamEventTypePrefix + policy.LabelPolicyAddedEventType
-	LabelPolicyChangedEventType = iamEventTypePrefix + policy.LabelPolicyChangedEventType
+	LabelPolicyAddedEventType   = IamEventTypePrefix + policy.LabelPolicyAddedEventType
+	LabelPolicyChangedEventType = IamEventTypePrefix + policy.LabelPolicyChangedEventType
 )
 
 type LabelPolicyReadModel struct{ policy.LabelPolicyReadModel }

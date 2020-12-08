@@ -43,7 +43,7 @@ type LabelPolicyWriteModel struct {
 }
 
 func (wm *LabelPolicyWriteModel) Reduce() error {
-	return errors.ThrowUnimplemented(nil, "POLIC-xJjvN", "reduce unimpelemnted")
+	return errors.ThrowUnimplemented(nil, "POLIC-M0pdf", "reduce unimpelemnted")
 }
 
 type LabelPolicyAddedEvent struct {
