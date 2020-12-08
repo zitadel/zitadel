@@ -45,8 +45,8 @@ func (s *Spooler) Start() {
 		go func(workerIdx int) {
 			workerID := s.lockID + "--" + strconv.Itoa(workerIdx)
 			for task := range s.queue {
-				task.load(workerID)
-				requeueTask(task, s.queue)
+				lockSuccessful := task.load(workerID)
+				requeueTask(task, s.queue, lockSuccessful)
 			}
 		}(i)
 	}
@@ -56,20 +56,25 @@ func (s *Spooler) Start() {
 	}
 }
 
-func requeueTask(task *spooledHandler, queue chan<- *spooledHandler) {
-	time.Sleep(task.MinimumCycleDuration() - time.Since(task.queuedAt))
+func requeueTask(task *spooledHandler, queue chan<- *spooledHandler, lockSuccessful bool) {
+	minDuration := task.MinimumCycleDuration()
+	if !lockSuccessful {
+		minDuration = time.Second * 30
+	}
+	time.Sleep(minDuration - time.Since(task.queuedAt))
 	task.queuedAt = time.Now()
 	queue <- task
 }
 
-func (s *spooledHandler) load(workerID string) {
+func (s *spooledHandler) load(workerID string) bool {
 	errs := make(chan error)
 	defer close(errs)
 	ctx, cancel := context.WithCancel(context.Background())
 	go s.awaitError(cancel, errs, workerID)
 	hasLocked := s.lock(ctx, errs, workerID)
+	lockSuccessful := <-hasLocked
 
-	if <-hasLocked {
+	if lockSuccessful {
 		events, err := s.query(ctx)
 		if err != nil {
 			errs <- err
@@ -79,6 +84,7 @@ func (s *spooledHandler) load(workerID string) {
 		}
 	}
 	<-ctx.Done()
+	return lockSuccessful
 }
 
 func (s *spooledHandler) awaitError(cancel func(), errs chan error, workerID string) {
