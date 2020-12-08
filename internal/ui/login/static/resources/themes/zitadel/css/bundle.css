@@ -173,10 +173,10 @@ a {
   border-radius: 50vw;
 }
 .content-container .lgn-login-profile .lgn-names .lgn-displayname {
-  margin: 0.5rem 0;
+  margin: 0.5rem 1rem;
 }
 .content-container .lgn-login-profile .lgn-names .lgn-loginname p {
-  margin: 0.5rem 0;
+  margin: 0.5rem 1rem;
 }
 
 @font-face {
@@ -426,10 +426,10 @@ a {
   border-radius: 50vw;
 }
 .content-container .lgn-login-profile .lgn-names .lgn-displayname {
-  margin: 0.5rem 0;
+  margin: 0.5rem 1rem;
 }
 .content-container .lgn-login-profile .lgn-names .lgn-loginname p {
-  margin: 0.5rem 0;
+  margin: 0.5rem 1rem;
 }
 
 @font-face {
@@ -604,10 +604,10 @@ a {
   border-radius: 50vw;
 }
 .content-container .lgn-login-profile .lgn-names .lgn-displayname {
-  margin: 0.5rem 0;
+  margin: 0.5rem 1rem;
 }
 .content-container .lgn-login-profile .lgn-names .lgn-loginname p {
-  margin: 0.5rem 0;
+  margin: 0.5rem 1rem;
 }
 
 .lgn-header {
