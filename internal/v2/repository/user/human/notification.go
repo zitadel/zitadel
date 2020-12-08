@@ -1,4 +1,4 @@
-package user
+package human
 
 type NotificationType int32
 

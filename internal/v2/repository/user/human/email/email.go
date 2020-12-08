@@ -33,14 +33,21 @@ func (e *HumanEmailChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanEmailChangedEvent(ctx context.Context, emailAddress string) *HumanEmailChangedEvent {
-	return &HumanEmailChangedEvent{
+func NewHumanEmailChangedEvent(
+	ctx context.Context,
+	current *HumanEmailWriteModel,
+	emailAddress string,
+) *HumanEmailChangedEvent {
+	e := &HumanEmailChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanEmailChangedType,
 		),
-		EmailAddress: emailAddress,
 	}
+	if current.Email != emailAddress {
+		e.EmailAddress = emailAddress
+	}
+	return e
 }
 
 func HumanEmailChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {

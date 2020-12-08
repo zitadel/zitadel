@@ -36,6 +36,7 @@ func (e *HumanProfileChangedEvent) Data() interface{} {
 
 func NewHumanProfileChangedEvent(
 	ctx context.Context,
+	current *HumanProfileWriteModel,
 	firstName,
 	lastName,
 	nickName,
@@ -43,18 +44,31 @@ func NewHumanProfileChangedEvent(
 	preferredLanguage language.Tag,
 	gender human.Gender,
 ) *HumanProfileChangedEvent {
-	return &HumanProfileChangedEvent{
+	e := &HumanProfileChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanProfileChangedType,
 		),
-		FirstName:         firstName,
-		LastName:          lastName,
-		NickName:          nickName,
-		DisplayName:       displayName,
-		PreferredLanguage: preferredLanguage,
-		Gender:            gender,
 	}
+	if current.FirstName != firstName {
+		e.FirstName = firstName
+	}
+	if current.LastName != lastName {
+		e.LastName = lastName
+	}
+	if current.NickName != nickName {
+		e.NickName = nickName
+	}
+	if current.DisplayName != displayName {
+		e.DisplayName = displayName
+	}
+	if current.PreferredLanguage != preferredLanguage {
+		e.PreferredLanguage = preferredLanguage
+	}
+	if current.Gender != gender {
+		e.Gender = gender
+	}
+	return e
 }
 
 func HumanProfileChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {

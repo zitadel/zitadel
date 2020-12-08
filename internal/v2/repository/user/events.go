@@ -160,13 +160,13 @@ func UserRemovedEventMapper(event *repository.Event) (eventstore.EventReader, er
 type UserTokenAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	TokenID           string    `json:"tokenId" gorm:"column:token_id"`
-	ApplicationID     string    `json:"applicationId" gorm:"column:application_id"`
-	UserAgentID       string    `json:"userAgentId" gorm:"column:user_agent_id"`
-	Audience          []string  `json:"audience" gorm:"column:audience"`
-	Scopes            []string  `json:"scopes" gorm:"column:scopes"`
-	Expiration        time.Time `json:"expiration" gorm:"column:expiration"`
-	PreferredLanguage string    `json:"preferredLanguage" gorm:"column:preferred_language"`
+	TokenID           string    `json:"tokenId"`
+	ApplicationID     string    `json:"applicationId"`
+	UserAgentID       string    `json:"userAgentId"`
+	Audience          []string  `json:"audience"`
+	Scopes            []string  `json:"scopes""`
+	Expiration        time.Time `json:"expiration"`
+	PreferredLanguage string    `json:"preferredLanguage"`
 }
 
 func (e *UserTokenAddedEvent) CheckPrevious() bool {

@@ -1,4 +1,4 @@
-package user
+package v1
 
 import (
 	"context"
@@ -17,6 +17,7 @@ import (
 )
 
 const (
+	userEventTypePrefix                 = eventstore.EventType("user.")
 	UserV1AddedType                     = userEventTypePrefix + "added"
 	UserV1RegisteredType                = userEventTypePrefix + "selfregistered"
 	UserV1InitialCodeAddedType          = userEventTypePrefix + "initialization.code.added"
@@ -212,7 +213,7 @@ func NewUserV1PasswordCodeAddedEvent(
 	ctx context.Context,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
-	notificationType NotificationType,
+	notificationType human.NotificationType,
 ) *password.HumanPasswordCodeAddedEvent {
 	return &password.HumanPasswordCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(

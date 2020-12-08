@@ -33,23 +33,37 @@ func (e *HumanAddressChangedEvent) Data() interface{} {
 
 func NewHumanAddressChangedEvent(
 	ctx context.Context,
+	current *HumanAddressWriteModel,
 	country,
 	locality,
 	postalCode,
 	region,
 	streetAddress string,
 ) *HumanAddressChangedEvent {
-	return &HumanAddressChangedEvent{
+	e := &HumanAddressChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanAddressChangedType,
 		),
-		Country:       country,
-		Locality:      locality,
-		PostalCode:    postalCode,
-		Region:        region,
-		StreetAddress: streetAddress,
 	}
+
+	if current.Country != country {
+		e.Country = country
+	}
+	if current.Locality != locality {
+		e.Locality = locality
+	}
+	if current.PostalCode != postalCode {
+		e.PostalCode = postalCode
+	}
+	if current.Region != region {
+		e.Region = region
+	}
+	if current.StreetAddress != streetAddress {
+		e.StreetAddress = streetAddress
+	}
+
+	return e
 }
 
 func HumanAddressChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {

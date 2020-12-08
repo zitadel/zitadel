@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
-	"github.com/caos/zitadel/internal/v2/repository/user"
+	"github.com/caos/zitadel/internal/v2/repository/user/human"
 	"time"
 )
 
@@ -65,9 +65,9 @@ func HumanPasswordChangedEventMapper(event *repository.Event) (eventstore.EventR
 type HumanPasswordCodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Code             *crypto.CryptoValue   `json:"code,omitempty"`
-	Expiry           time.Duration         `json:"expiry,omitempty"`
-	NotificationType user.NotificationType `json:"notificationType,omitempty"`
+	Code             *crypto.CryptoValue    `json:"code,omitempty"`
+	Expiry           time.Duration          `json:"expiry,omitempty"`
+	NotificationType human.NotificationType `json:"notificationType,omitempty"`
 }
 
 func (e *HumanPasswordCodeAddedEvent) CheckPrevious() bool {
@@ -82,7 +82,7 @@ func NewHumanPasswordCodeAddedEvent(
 	ctx context.Context,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
-	notificationType user.NotificationType,
+	notificationType human.NotificationType,
 ) *HumanPasswordCodeAddedEvent {
 	return &HumanPasswordCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
