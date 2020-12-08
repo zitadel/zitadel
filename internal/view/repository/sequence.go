@@ -1,11 +1,15 @@
 package repository
 
 import (
+	"database/sql"
+	"errors"
+	"fmt"
+	"strings"
+	"time"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/view/model"
 	"github.com/jinzhu/gorm"
-	"strings"
-	"time"
 )
 
 type CurrentSequence struct {
@@ -53,15 +57,19 @@ func SaveCurrentSequence(db *gorm.DB, table, viewName string, sequence uint64) e
 }
 
 func LatestSequence(db *gorm.DB, table, viewName string) (*CurrentSequence, error) {
-	sequence := new(CurrentSequence)
-	query := PrepareGetByKey(table, sequenceSearchKey(SequenceSearchKeyViewName), viewName)
-	err := query(db, sequence)
+	sequence := &CurrentSequence{ViewName: viewName}
+	// query := PrepareGetByKey(table, sequenceSearchKey(SequenceSearchKeyViewName), viewName)
+	err := db.DB().QueryRow(
+		fmt.Sprintf("SELECT current_sequence, \"timestamp\" FROM %s WHERE view_name = $1", table),
+		viewName).
+		Scan(&sequence.CurrentSequence, &sequence.CurrentTimestamp)
+	// err := query(db, sequence)
 
 	if err == nil {
 		return sequence, nil
 	}
 
-	if caos_errs.IsNotFound(err) {
+	if caos_errs.IsNotFound(err) || errors.Is(err, sql.ErrNoRows) {
 		return sequence, nil
 	}
 	return nil, caos_errs.ThrowInternalf(err, "VIEW-9LyCB", "unable to get latest sequence of %s", viewName)
