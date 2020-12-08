@@ -37,7 +37,7 @@ export class UserMfaComponent implements OnInit, OnDestroy {
     constructor(private mgmtUserService: ManagementService, private dialog: MatDialog, private toast: ToastService) { }
 
     public ngOnInit(): void {
-        this.getOTP();
+        this.getMFAs();
     }
 
     public ngOnDestroy(): void {
@@ -45,7 +45,7 @@ export class UserMfaComponent implements OnInit, OnDestroy {
         this.loadingSubject.complete();
     }
 
-    public getOTP(): void {
+    public getMFAs(): void {
         this.mgmtUserService.getUserMfas(this.user.id).then(mfas => {
             this.dataSource = new MatTableDataSource(mfas.toObject().mfasList);
             this.dataSource.sort = this.sort;
@@ -54,7 +54,7 @@ export class UserMfaComponent implements OnInit, OnDestroy {
         });
     }
 
-    public deleteMFA(type: MfaType): void {
+    public deleteMFA(type: MfaType, id?: string): void {
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
                 confirmKey: 'ACTIONS.DELETE',
@@ -75,11 +75,23 @@ export class UserMfaComponent implements OnInit, OnDestroy {
                         if (index > -1) {
                             this.dataSource.data.splice(index, 1);
                         }
-                        this.getOTP();
+                        this.getMFAs();
                     }).catch(error => {
                         this.toast.showError(error);
                     });
-                }
+                } else if (type === MfaType.MFATYPE_U2F && id) {
+                  this.mgmtUserService.RemoveMyMfaU2F(id).then(() => {
+                      this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
+
+                      const index = this.dataSource.data.findIndex(mfa => mfa.type === type);
+                      if (index > -1) {
+                          this.dataSource.data.splice(index, 1);
+                      }
+                      this.getMFAs();
+                  }).catch(error => {
+                      this.toast.showError(error);
+                  });
+              }
             }
         });
     }
