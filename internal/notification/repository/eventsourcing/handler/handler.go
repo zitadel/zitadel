@@ -1,6 +1,9 @@
 package handler
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/caos/logging"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
@@ -12,8 +15,6 @@ import (
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/view"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	"net/http"
-	"time"
 )
 
 type Configs map[string]*Config
@@ -62,7 +63,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 func (configs Configs) cycleDuration(viewModel string) time.Duration {
 	c, ok := configs[viewModel]
 	if !ok {
-		return 1 * time.Second
+		return 2 * time.Second
 	}
 	return c.MinimumCycleDuration.Duration
 }

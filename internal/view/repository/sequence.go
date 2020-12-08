@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"strings"
 	"time"
 
@@ -58,12 +57,8 @@ func SaveCurrentSequence(db *gorm.DB, table, viewName string, sequence uint64) e
 
 func LatestSequence(db *gorm.DB, table, viewName string) (*CurrentSequence, error) {
 	sequence := &CurrentSequence{ViewName: viewName}
-	// query := PrepareGetByKey(table, sequenceSearchKey(SequenceSearchKeyViewName), viewName)
-	err := db.DB().QueryRow(
-		fmt.Sprintf("SELECT current_sequence, \"timestamp\" FROM %s WHERE view_name = $1", table),
-		viewName).
-		Scan(&sequence.CurrentSequence, &sequence.CurrentTimestamp)
-	// err := query(db, sequence)
+	query := PrepareGetByKey(table, sequenceSearchKey(SequenceSearchKeyViewName), viewName)
+	err := query(db, sequence)
 
 	if err == nil {
 		return sequence, nil

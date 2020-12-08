@@ -57,7 +57,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 func (configs Configs) cycleDuration(viewModel string) time.Duration {
 	c, ok := configs[viewModel]
 	if !ok {
-		return 1 * time.Second
+		return 2 * time.Second
 	}
 	return c.MinimumCycleDuration.Duration
 }
