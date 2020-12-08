@@ -16,8 +16,8 @@ type UserRepository interface {
 	SkipMFAInit(ctx context.Context, userID string) error
 
 	RequestPasswordReset(ctx context.Context, username string) error
-	SetPassword(ctx context.Context, userID, code, password string) error
-	ChangePassword(ctx context.Context, userID, old, new string) error
+	SetPassword(ctx context.Context, userID, code, password, userAgentID string) error
+	ChangePassword(ctx context.Context, userID, old, new, userAgentID string) error
 
 	VerifyEmail(ctx context.Context, userID, code string) error
 	ResendEmailVerificationMail(ctx context.Context, userID string) error
@@ -26,14 +26,14 @@ type UserRepository interface {
 	ResendInitVerificationMail(ctx context.Context, userID string) error
 
 	AddMFAOTP(ctx context.Context, userID string) (*model.OTP, error)
-	VerifyMFAOTPSetup(ctx context.Context, userID, code string) error
+	VerifyMFAOTPSetup(ctx context.Context, userID, code, userAgentID string) error
 
 	AddMFAU2F(ctx context.Context, id string) (*model.WebAuthNToken, error)
-	VerifyMFAU2FSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error
+	VerifyMFAU2FSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error
 	RemoveMFAU2F(ctx context.Context, userID, webAuthNTokenID string) error
 
 	AddPasswordless(ctx context.Context, id string) (*model.WebAuthNToken, error)
-	VerifyPasswordlessSetup(ctx context.Context, userID, tokenName string, credentialData []byte) error
+	VerifyPasswordlessSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error
 	RemovePasswordless(ctx context.Context, userID, webAuthNTokenID string) error
 
 	ChangeUsername(ctx context.Context, userID, username string) error

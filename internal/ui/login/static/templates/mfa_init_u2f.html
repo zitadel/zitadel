@@ -30,7 +30,9 @@
     {{ template "error-message" .}}
 
     <div class="actions">
-        <button class="secondary right wa-support" id="submit-button" type="submit" name="recreate" value="true">{{t "Actions.Recreate"}}</button>
+        <a class="button secondary" href="{{ mfaPromptChangeUrl .AuthReqID .MFAType }}">
+            {{t "Actions.Back"}}
+        </a>
     </div>
 </form>
 

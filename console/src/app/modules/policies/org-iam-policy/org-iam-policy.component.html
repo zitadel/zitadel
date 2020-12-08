@@ -1,5 +1,5 @@
-<app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam' : '/org']"
-    [title]="'POLICY.IAM_POLICY.TITLECREATE' | translate" [description]="'POLICY.IAM_POLICY.DESCRIPTION' | translate">
+<app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
+    [title]="'POLICY.IAM_POLICY.TITLE' | translate" [description]="'POLICY.IAM_POLICY.DESCRIPTION' | translate">
     <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
 
     <ng-template appHasRole [appHasRole]="['iam.policy.delete']">
