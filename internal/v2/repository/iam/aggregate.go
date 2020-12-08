@@ -4,6 +4,7 @@ import (
 	"context"
 	iam_login "github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
+	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
 	"github.com/caos/zitadel/internal/v2/repository/policy/login"
 
@@ -91,8 +92,22 @@ func (a *Aggregate) PushStepDone(ctx context.Context, step Step) *Aggregate {
 	return a
 }
 
+func (a *Aggregate) PushOrgIAMPolicyAddedEvent(ctx context.Context, userLoginMustBeDomain bool) *Aggregate {
+	a.Aggregate = *a.PushEvents(org_iam.NewOrgIAMPolicyAddedEventEvent(ctx, userLoginMustBeDomain))
+	return a
+}
+
+func (a *Aggregate) PushOrgIAMPolicyChangedFromExisting(ctx context.Context, current *org_iam.OrgIAMPolicyWriteModel, userLoginMustBeDomain bool) *Aggregate {
+	e, err := org_iam.OrgIAMPolicyChangedEventFromExisting(ctx, current, userLoginMustBeDomain)
+	if err != nil {
+		return a
+	}
+	a.Aggregate = *a.PushEvents(e)
+	return a
+}
+
 func (a *Aggregate) PushPasswordComplexityPolicyAddedEvent(ctx context.Context, minLength uint64, hasLowercase, hasUppercase, hasNumber, hasSymbol bool) *Aggregate {
-	a.Aggregate = *a.PushEvents(password_complexity.NewPasswordComplexityPolicyAddedEventEvent(ctx, minLength, hasLowercase, hasUppercase, hasNumber, hasSymbol))
+	a.Aggregate = *a.PushEvents(password_complexity.NewPasswordComplexityPolicyAddedEvent(ctx, minLength, hasLowercase, hasUppercase, hasNumber, hasSymbol))
 	return a
 }
 

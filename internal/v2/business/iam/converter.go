@@ -8,6 +8,7 @@ import (
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
+	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
 	"github.com/caos/zitadel/internal/v2/repository/member"
@@ -66,7 +67,7 @@ func readModelToLoginPolicy(readModel *login.LoginPolicyReadModel) *model.LoginP
 		//TODO: State: int32,
 	}
 }
-func readModelToOrgIAMPolicy(readModel *iam.OrgIAMPolicyReadModel) *model.OrgIAMPolicy {
+func readModelToOrgIAMPolicy(readModel *org_iam.OrgIAMPolicyReadModel) *model.OrgIAMPolicy {
 	return &model.OrgIAMPolicy{
 		ObjectRoot:            readModelToObjectRoot(readModel.ReadModel),
 		UserLoginMustBeDomain: readModel.UserLoginMustBeDomain,
@@ -145,6 +146,13 @@ func writeModelToLoginPolicy(wm *login.LoginPolicyWriteModel) *model.LoginPolicy
 		AllowExternalIdp:      wm.Policy.AllowExternalIDP,
 		ForceMFA:              wm.Policy.ForceMFA,
 		PasswordlessType:      model.PasswordlessType(wm.Policy.PasswordlessType),
+	}
+}
+
+func writeModelToOrgIAMPolicy(wm *org_iam.OrgIAMPolicyWriteModel) *model.OrgIAMPolicy {
+	return &model.OrgIAMPolicy{
+		ObjectRoot:            writeModelToObjectRoot(wm.WriteModel),
+		UserLoginMustBeDomain: wm.Policy.UserLoginMustBeDomain,
 	}
 }
 

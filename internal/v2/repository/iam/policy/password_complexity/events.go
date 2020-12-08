@@ -17,7 +17,7 @@ type PasswordComplexityPolicyAddedEvent struct {
 	password_complexity.PasswordComplexityPolicyAddedEvent
 }
 
-func NewPasswordComplexityPolicyAddedEventEvent(
+func NewPasswordComplexityPolicyAddedEvent(
 	ctx context.Context,
 	minLength uint64,
 	hasLowercase,

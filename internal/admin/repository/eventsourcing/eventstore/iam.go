@@ -407,11 +407,17 @@ func (repo *IAMRepository) GetDefaultPasswordComplexityPolicy(ctx context.Contex
 
 func (repo *IAMRepository) AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
 	policy.AggregateID = repo.SystemDefaults.IamID
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.AddPasswordComplexityPolicy(ctx, policy)
+	}
 	return repo.IAMEventstore.AddPasswordComplexityPolicy(ctx, policy)
 }
 
 func (repo *IAMRepository) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
 	policy.AggregateID = repo.SystemDefaults.IamID
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.ChangePasswordComplexityPolicy(ctx, policy)
+	}
 	return repo.IAMEventstore.ChangePasswordComplexityPolicy(ctx, policy)
 }
 
