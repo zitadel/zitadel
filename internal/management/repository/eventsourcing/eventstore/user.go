@@ -222,7 +222,7 @@ func (repo *UserRepo) UserMFAs(ctx context.Context, userID string) ([]*usr_model
 		mfas = append(mfas, &usr_model.MultiFactor{Type: usr_model.MFATypeOTP, State: user.OTPState})
 	}
 	for _, u2f := range user.U2FTokens {
-		mfas = append(mfas, &usr_model.MultiFactor{Type: usr_model.MFATypeU2F, State: u2f.State, Attribute: u2f.Name})
+		mfas = append(mfas, &usr_model.MultiFactor{Type: usr_model.MFATypeU2F, State: u2f.State, Attribute: u2f.Name, ID: u2f.TokenID})
 	}
 	return mfas, nil
 }

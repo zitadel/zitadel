@@ -263,7 +263,7 @@ func (repo *UserRepo) MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, err
 		mfas = append(mfas, &model.MultiFactor{Type: model.MFATypeOTP, State: user.OTPState})
 	}
 	for _, u2f := range user.U2FTokens {
-		mfas = append(mfas, &model.MultiFactor{Type: model.MFATypeU2F, State: u2f.State, Attribute: u2f.Name})
+		mfas = append(mfas, &model.MultiFactor{Type: model.MFATypeU2F, State: u2f.State, Attribute: u2f.Name, ID: u2f.TokenID})
 	}
 	return mfas, nil
 }

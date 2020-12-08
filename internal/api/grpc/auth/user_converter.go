@@ -382,6 +382,7 @@ func mfaFromModel(mfa *usr_model.MultiFactor) *auth.MultiFactor {
 		State:     mfaStateFromModel(mfa.State),
 		Type:      mfaTypeFromModel(mfa.Type),
 		Attribute: mfa.Attribute,
+		Id:        mfa.ID,
 	}
 }
 
