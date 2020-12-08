@@ -559,7 +559,9 @@
             "ALLOWREGISTER":"Register allowed",
             "ALLOWUSERNAMEPASSWORD_DESC":"The conventional login with user name and password is allowed.",
             "ALLOWEXTERNALIDP_DESC":"The login is allowed for the underlying identity providers",
-            "ALLOWREGISTER_DESC":"If the option is selected, an additional step for registering a user appears in the login."
+            "ALLOWREGISTER_DESC":"If the option is selected, an additional step for registering a user appears in the login.",
+            "FORCEMFA":"Force MFA",
+            "FORCEMFA_DESC":"If the option is selected, users have to configure a second factor for login."
         },
         "RESET":"Reset Policy",
         "CREATECUSTOM":"Create Custom Policy",

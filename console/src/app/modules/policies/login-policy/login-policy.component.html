@@ -44,6 +44,13 @@
             </mat-slide-toggle>
             <p> {{'POLICY.DATA.ALLOWEXTERNALIDP_DESC' | translate}} </p>
         </div>
+        <div class="row">
+          <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
+              [(ngModel)]="loginData.forceMfa">
+              {{'POLICY.DATA.FORCEMFA' | translate}}
+          </mat-slide-toggle>
+          <p> {{'POLICY.DATA.FORCEMFA_DESC' | translate}} </p>
+      </div>
     </div>
 
     <h3 class="subheader">{{'LOGINPOLICY.IDPS' | translate}}</h3>

@@ -29,7 +29,7 @@ export class DialogU2FComponent {
       this.error = '';
       this.loading = true;
       if (this.name && this.data.credOptions.publicKey) {
-        this.data.credOptions.publicKey.rp.id = 'localhost';
+        // this.data.credOptions.publicKey.rp.id = 'localhost';
         navigator.credentials.create(this.data.credOptions).then((resp) => {
             if (resp &&
               (resp as any).response.attestationObject &&
