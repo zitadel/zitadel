@@ -155,6 +155,7 @@
         "MFA": {
             "TABLETYPE":"Type",
             "TABLESTATE":"Status",
+            "ATTRIBUTE":"Attribut",
             "TABLEACTIONS":"Actions",
             "TITLE": "Multifactor Authentication",
             "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
@@ -164,7 +165,7 @@
             "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
             "U2F":"Add U2F",
             "U2F_DIALOG_TITLE": "Verify U2F",
-            "U2F_DIALOG_DESCRIPTION": "Enter a name for your used Universal Multifaktor.",
+            "U2F_DIALOG_DESCRIPTION": "Enter a name for your used universal Multifactor.",
             "U2F_SUCCESS":"U2F created successfully!",
             "U2F_ERROR":"An error during U2F setup occurred!",
             "U2F_NAME":"U2F Name",

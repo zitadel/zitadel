@@ -4,12 +4,15 @@
 
     <cnsl-form-field class="form-field" label="Name" required="true">
         <cnsl-label>{{'USER.MFA.U2F_NAME' | translate}}</cnsl-label>
-        <input cnslInput [(ngModel)]="name" />
+        <input cnslInput [(ngModel)]="name" required/>
     </cnsl-form-field>
+
+    <mat-spinner diameter="30" *ngIf="loading"></mat-spinner>
+
+    <p class="error">{{error}}</p>
 </div>
 <div mat-dialog-actions class="action">
-    <button mat-button (click)="closeDialog()"><span translate>ACTIONS.CLOSE</span></button>
-    <button mat-raised-button class="ok-button" color="primary" (click)="closeDialogWithCode()"><span
-            translate>ACTIONS.OK</span>
+    <button mat-button (click)="closeDialog()">{{'ACTIONS.CLOSE' | translate}}</button>
+    <button [disabled]="!name" mat-raised-button class="ok-button" color="primary" (click)="closeDialogWithCode()">{{'ACTIONS.VERIFY' | translate}}
     </button>
 </div>
