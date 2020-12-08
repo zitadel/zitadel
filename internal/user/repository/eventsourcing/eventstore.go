@@ -70,7 +70,7 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 	passwordVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.PasswordVerificationCode, aesCrypto)
 	aesOTPCrypto, err := crypto.NewAESCrypto(systemDefaults.Multifactors.OTP.VerificationKey)
 	passwordAlg := crypto.NewBCrypt(systemDefaults.SecretGenerators.PasswordSaltCost)
-	web, err := webauthn_helper.StartServer(systemDefaults.WebAuthN.DisplayName, systemDefaults.WebAuthN.ID, systemDefaults.WebAuthN.OriginLogin, systemDefaults.WebAuthN.OriginConsole)
+	web, err := webauthn_helper.StartServer(systemDefaults.WebAuthN)
 	if err != nil {
 		return nil, err
 	}

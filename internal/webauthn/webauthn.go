@@ -7,6 +7,7 @@ import (
 	"github.com/duo-labs/webauthn/protocol"
 	"github.com/duo-labs/webauthn/webauthn"
 
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 )
@@ -16,19 +17,19 @@ type WebAuthN struct {
 	webConsole *webauthn.WebAuthn
 }
 
-func StartServer(displayName, id, originLogin, originConsole string) (*WebAuthN, error) {
+func StartServer(sd systemdefaults.WebAuthN) (*WebAuthN, error) {
 	webLogin, err := webauthn.New(&webauthn.Config{
-		RPDisplayName: displayName,
-		RPID:          id,
-		RPOrigin:      originLogin,
+		RPDisplayName: sd.DisplayName,
+		RPID:          sd.ID,
+		RPOrigin:      sd.OriginLogin,
 	})
 	if err != nil {
 		return nil, err
 	}
 	webConsole, err := webauthn.New(&webauthn.Config{
-		RPDisplayName: displayName,
-		RPID:          id,
-		RPOrigin:      originConsole,
+		RPDisplayName: sd.DisplayName,
+		RPID:          sd.ID,
+		RPOrigin:      sd.OriginConsole,
 	})
 	if err != nil {
 		return nil, err
