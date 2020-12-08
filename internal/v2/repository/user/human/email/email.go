@@ -1,4 +1,4 @@
-package user
+package email
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	emailEventPrefix                 = humanEventPrefix + "email."
+	emailEventPrefix                 = eventstore.EventType("user.human.email.")
 	HumanEmailChangedType            = emailEventPrefix + "changed"
 	HumanEmailVerifiedType           = emailEventPrefix + "verified"
 	HumanEmailVerificationFailedType = emailEventPrefix + "verification.failed"

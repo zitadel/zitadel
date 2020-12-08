@@ -1,4 +1,4 @@
-package user
+package keys
 
 import (
 	"context"
@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	machineKeyEventPrefix      = machineEventPrefix + "key."
-	MachineKeyAddedEventType   = machineEventPrefix + "added"
-	MachineKeyRemovedEventType = machineEventPrefix + "removed"
+	machineKeyEventPrefix      = eventstore.EventType("user.machine.key.")
+	MachineKeyAddedEventType   = machineKeyEventPrefix + "added"
+	MachineKeyRemovedEventType = machineKeyEventPrefix + "removed"
 )
 
 type MachineKeyAddedEvent struct {
@@ -37,7 +37,8 @@ func NewMachineKeyAddedEvent(
 	keyID string,
 	keyType MachineKeyType,
 	expirationDate time.Time,
-	publicKey []byte) *MachineKeyAddedEvent {
+	publicKey []byte,
+) *MachineKeyAddedEvent {
 	return &MachineKeyAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -78,7 +79,8 @@ func (e *MachineKeyRemovedEvent) Data() interface{} {
 
 func NewMachineKeyRemovedEvent(
 	ctx context.Context,
-	keyID string) *MachineKeyRemovedEvent {
+	keyID string,
+) *MachineKeyRemovedEvent {
 	return &MachineKeyRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,

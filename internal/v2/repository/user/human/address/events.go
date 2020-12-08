@@ -1,4 +1,4 @@
-package user
+package address
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	addressEventPrefix      = humanEventPrefix + "address."
+	addressEventPrefix      = eventstore.EventType("user.human.address.")
 	HumanAddressChangedType = addressEventPrefix + "changed"
 )
 
@@ -37,7 +37,8 @@ func NewHumanAddressChangedEvent(
 	locality,
 	postalCode,
 	region,
-	streetAddress string) *HumanAddressChangedEvent {
+	streetAddress string,
+) *HumanAddressChangedEvent {
 	return &HumanAddressChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,

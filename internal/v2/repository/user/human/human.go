@@ -1,4 +1,4 @@
-package user
+package human
 
 type Gender int32
 

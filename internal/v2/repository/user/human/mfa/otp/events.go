@@ -1,4 +1,4 @@
-package user
+package otp
 
 import (
 	"context"
@@ -7,10 +7,11 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+	"github.com/caos/zitadel/internal/v2/repository/user/human/mfa"
 )
 
 const (
-	otpEventPrefix                = mfaEventPrefix + "otp."
+	otpEventPrefix                = eventstore.EventType("user.human.mfa.otp.")
 	HumanMFAOTPAddedType          = otpEventPrefix + "added"
 	HumanMFAOTPVerifiedType       = otpEventPrefix + "verified"
 	HumanMFAOTPRemovedType        = otpEventPrefix + "removed"
@@ -22,7 +23,7 @@ type HumanMFAOTPAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Secret *crypto.CryptoValue `json:"otpSecret,omitempty"`
-	State  MFAState            `json:"-"`
+	State  mfa.MFAState        `json:"-"`
 }
 
 func (e *HumanMFAOTPAddedEvent) CheckPrevious() bool {
@@ -47,7 +48,7 @@ func NewHumanMFAOTPAddedEvent(ctx context.Context,
 func HumanMFAOTPAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	otpAdded := &HumanMFAOTPAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-		State:     MFAStateNotReady,
+		State:     mfa.MFAStateNotReady,
 	}
 	err := json.Unmarshal(event.Data, otpAdded)
 	if err != nil {
@@ -58,7 +59,7 @@ func HumanMFAOTPAddedEventMapper(event *repository.Event) (eventstore.EventReade
 
 type HumanMFAOTPVerifiedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-	State                MFAState `json:"-"`
+	State                mfa.MFAState `json:"-"`
 }
 
 func (e *HumanMFAOTPVerifiedEvent) CheckPrevious() bool {
@@ -81,7 +82,7 @@ func NewHumanMFAOTPVerifiedEvent(ctx context.Context) *HumanMFAOTPVerifiedEvent 
 func HumanMFAOTPVerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &HumanMFAOTPVerifiedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-		State:     MFAStateReady,
+		State:     mfa.MFAStateReady,
 	}, nil
 }
 

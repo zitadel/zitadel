@@ -1,4 +1,4 @@
-package user
+package keys
 
 type MachineKeyType int32
 

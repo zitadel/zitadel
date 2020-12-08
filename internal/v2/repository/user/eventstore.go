@@ -2,40 +2,52 @@ package user
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/repository/user/human"
+	"github.com/caos/zitadel/internal/v2/repository/user/human/address"
+	"github.com/caos/zitadel/internal/v2/repository/user/human/email"
+	"github.com/caos/zitadel/internal/v2/repository/user/human/external_idp"
+	"github.com/caos/zitadel/internal/v2/repository/user/human/mfa"
+	"github.com/caos/zitadel/internal/v2/repository/user/human/mfa/otp"
+	"github.com/caos/zitadel/internal/v2/repository/user/human/mfa/web_auth_n"
+	"github.com/caos/zitadel/internal/v2/repository/user/human/password"
+	"github.com/caos/zitadel/internal/v2/repository/user/human/phone"
+	"github.com/caos/zitadel/internal/v2/repository/user/human/profile"
+	"github.com/caos/zitadel/internal/v2/repository/user/machine"
+	"github.com/caos/zitadel/internal/v2/repository/user/machine/keys"
 )
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
-	es.RegisterFilterEventMapper(UserV1AddedType, HumanAddedEventMapper).
-		RegisterFilterEventMapper(UserV1RegisteredType, HumanRegisteredEventMapper).
-		RegisterFilterEventMapper(UserV1InitialCodeAddedType, HumanInitialCodeAddedEventMapper).
-		RegisterFilterEventMapper(UserV1InitialCodeSentType, HumanInitialCodeSentEventMapper).
-		RegisterFilterEventMapper(UserV1InitializedCheckSucceededType, HumanInitializedCheckSucceededEventMapper).
-		RegisterFilterEventMapper(UserV1InitializedCheckFailedType, HumanInitializedCheckFailedEventMapper).
-		RegisterFilterEventMapper(UserV1SignedOutType, HumanSignedOutEventMapper).
-		RegisterFilterEventMapper(UserV1PasswordChangedType, HumanPasswordChangedEventMapper).
-		RegisterFilterEventMapper(UserV1PasswordCodeAddedType, HumanPasswordCodeAddedEventMapper).
-		RegisterFilterEventMapper(UserV1PasswordCodeSentType, HumanPasswordCodeSentEventMapper).
-		RegisterFilterEventMapper(UserV1PasswordCheckSucceededType, HumanPasswordCheckSucceededEventMapper).
-		RegisterFilterEventMapper(UserV1PasswordCheckFailedType, HumanPasswordCheckFailedEventMapper).
-		RegisterFilterEventMapper(UserV1EmailChangedType, HumanEmailChangedEventMapper).
-		RegisterFilterEventMapper(UserV1EmailVerifiedType, HumanEmailVerifiedEventMapper).
-		RegisterFilterEventMapper(UserV1EmailVerificationFailedType, HumanEmailVerificationFailedEventMapper).
-		RegisterFilterEventMapper(UserV1EmailCodeAddedType, HumanEmailCodeAddedEventMapper).
-		RegisterFilterEventMapper(UserV1EmailCodeSentType, HumanEmailCodeSentEventMapper).
-		RegisterFilterEventMapper(UserV1PhoneChangedType, HumanPhoneChangedEventMapper).
-		RegisterFilterEventMapper(UserV1PhoneRemovedType, HumanPhoneRemovedEventMapper).
-		RegisterFilterEventMapper(UserV1PhoneVerifiedType, HumanPhoneVerifiedEventMapper).
-		RegisterFilterEventMapper(UserV1PhoneVerificationFailedType, HumanPhoneVerificationFailedEventMapper).
-		RegisterFilterEventMapper(UserV1PhoneCodeAddedType, HumanPhoneCodeAddedEventMapper).
-		RegisterFilterEventMapper(UserV1PhoneCodeSentType, HumanPhoneCodeSentEventMapper).
-		RegisterFilterEventMapper(UserV1ProfileChangedType, HumanProfileChangedEventMapper).
-		RegisterFilterEventMapper(UserV1AddressChangedType, HumanAddressChangedEventMapper).
-		RegisterFilterEventMapper(UserV1MFAInitSkippedType, HumanMFAInitSkippedEventMapper).
-		RegisterFilterEventMapper(UserV1MFAOTPAddedType, HumanMFAOTPAddedEventMapper).
-		RegisterFilterEventMapper(UserV1MFAOTPVerifiedType, HumanMFAOTPVerifiedEventMapper).
-		RegisterFilterEventMapper(UserV1MFAOTPRemovedType, HumanMFAOTPRemovedEventMapper).
-		RegisterFilterEventMapper(UserV1MFAOTPCheckSucceededType, HumanMFAOTPCheckSucceededEventMapper).
-		RegisterFilterEventMapper(UserV1MFAOTPCheckFailedType, HumanMFAOTPCheckFailedEventMapper).
+	es.RegisterFilterEventMapper(UserV1AddedType, human.HumanAddedEventMapper).
+		RegisterFilterEventMapper(UserV1RegisteredType, human.HumanRegisteredEventMapper).
+		RegisterFilterEventMapper(UserV1InitialCodeAddedType, human.HumanInitialCodeAddedEventMapper).
+		RegisterFilterEventMapper(UserV1InitialCodeSentType, human.HumanInitialCodeSentEventMapper).
+		RegisterFilterEventMapper(UserV1InitializedCheckSucceededType, human.HumanInitializedCheckSucceededEventMapper).
+		RegisterFilterEventMapper(UserV1InitializedCheckFailedType, human.HumanInitializedCheckFailedEventMapper).
+		RegisterFilterEventMapper(UserV1SignedOutType, human.HumanSignedOutEventMapper).
+		RegisterFilterEventMapper(UserV1PasswordChangedType, password.HumanPasswordChangedEventMapper).
+		RegisterFilterEventMapper(UserV1PasswordCodeAddedType, password.HumanPasswordCodeAddedEventMapper).
+		RegisterFilterEventMapper(UserV1PasswordCodeSentType, password.HumanPasswordCodeSentEventMapper).
+		RegisterFilterEventMapper(UserV1PasswordCheckSucceededType, password.HumanPasswordCheckSucceededEventMapper).
+		RegisterFilterEventMapper(UserV1PasswordCheckFailedType, password.HumanPasswordCheckFailedEventMapper).
+		RegisterFilterEventMapper(UserV1EmailChangedType, email.HumanEmailChangedEventMapper).
+		RegisterFilterEventMapper(UserV1EmailVerifiedType, email.HumanEmailVerifiedEventMapper).
+		RegisterFilterEventMapper(UserV1EmailVerificationFailedType, email.HumanEmailVerificationFailedEventMapper).
+		RegisterFilterEventMapper(UserV1EmailCodeAddedType, email.HumanEmailCodeAddedEventMapper).
+		RegisterFilterEventMapper(UserV1EmailCodeSentType, email.HumanEmailCodeSentEventMapper).
+		RegisterFilterEventMapper(UserV1PhoneChangedType, phone.HumanPhoneChangedEventMapper).
+		RegisterFilterEventMapper(UserV1PhoneRemovedType, phone.HumanPhoneRemovedEventMapper).
+		RegisterFilterEventMapper(UserV1PhoneVerifiedType, phone.HumanPhoneVerifiedEventMapper).
+		RegisterFilterEventMapper(UserV1PhoneVerificationFailedType, phone.HumanPhoneVerificationFailedEventMapper).
+		RegisterFilterEventMapper(UserV1PhoneCodeAddedType, phone.HumanPhoneCodeAddedEventMapper).
+		RegisterFilterEventMapper(UserV1PhoneCodeSentType, phone.HumanPhoneCodeSentEventMapper).
+		RegisterFilterEventMapper(UserV1ProfileChangedType, profile.HumanProfileChangedEventMapper).
+		RegisterFilterEventMapper(UserV1AddressChangedType, address.HumanAddressChangedEventMapper).
+		RegisterFilterEventMapper(UserV1MFAInitSkippedType, mfa.HumanMFAInitSkippedEventMapper).
+		RegisterFilterEventMapper(UserV1MFAOTPAddedType, otp.HumanMFAOTPAddedEventMapper).
+		RegisterFilterEventMapper(UserV1MFAOTPVerifiedType, otp.HumanMFAOTPVerifiedEventMapper).
+		RegisterFilterEventMapper(UserV1MFAOTPRemovedType, otp.HumanMFAOTPRemovedEventMapper).
+		RegisterFilterEventMapper(UserV1MFAOTPCheckSucceededType, otp.HumanMFAOTPCheckSucceededEventMapper).
+		RegisterFilterEventMapper(UserV1MFAOTPCheckFailedType, otp.HumanMFAOTPCheckFailedEventMapper).
 		RegisterFilterEventMapper(UserLockedType, UserLockedEventMapper).
 		RegisterFilterEventMapper(UserUnlockedType, UserLockedEventMapper).
 		RegisterFilterEventMapper(UserDeactivatedType, UserDeactivatedEventMapper).
@@ -45,57 +57,57 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(UserDomainClaimedType, UserDomainClaimedEventMapper).
 		RegisterFilterEventMapper(UserDomainClaimedSentType, UserDomainClaimedEventMapper).
 		RegisterFilterEventMapper(UserUserNameChangedType, UserUsernameChangedEventMapper).
-		RegisterFilterEventMapper(HumanAddedType, HumanAddedEventMapper).
-		RegisterFilterEventMapper(HumanRegisteredType, HumanRegisteredEventMapper).
-		RegisterFilterEventMapper(HumanInitialCodeAddedType, HumanInitialCodeAddedEventMapper).
-		RegisterFilterEventMapper(HumanInitialCodeSentType, HumanInitialCodeSentEventMapper).
-		RegisterFilterEventMapper(HumanInitializedCheckSucceededType, HumanInitializedCheckSucceededEventMapper).
-		RegisterFilterEventMapper(HumanInitializedCheckFailedType, HumanInitializedCheckFailedEventMapper).
-		RegisterFilterEventMapper(HumanSignedOutType, HumanSignedOutEventMapper).
-		RegisterFilterEventMapper(HumanPasswordChangedType, HumanPasswordChangedEventMapper).
-		RegisterFilterEventMapper(HumanPasswordCodeAddedType, HumanPasswordCodeAddedEventMapper).
-		RegisterFilterEventMapper(HumanPasswordCodeSentType, HumanPasswordCodeSentEventMapper).
-		RegisterFilterEventMapper(HumanPasswordCheckSucceededType, HumanPasswordCheckSucceededEventMapper).
-		RegisterFilterEventMapper(HumanPasswordCheckFailedType, HumanPasswordCheckFailedEventMapper).
-		RegisterFilterEventMapper(HumanExternalIDPAddedType, HumanExternalIDPAddedEventMapper).
-		RegisterFilterEventMapper(HumanExternalIDPRemovedType, HumanExternalIDPRemovedEventMapper).
-		RegisterFilterEventMapper(HumanExternalIDPCascadeRemovedType, HumanExternalIDPCascadeRemovedEventMapper).
-		RegisterFilterEventMapper(HumanExternalLoginCheckSucceededType, HumanExternalLoginCheckSucceededEventMapper).
-		RegisterFilterEventMapper(HumanEmailChangedType, HumanEmailChangedEventMapper).
-		RegisterFilterEventMapper(HumanEmailVerifiedType, HumanEmailVerifiedEventMapper).
-		RegisterFilterEventMapper(HumanEmailVerificationFailedType, HumanEmailVerificationFailedEventMapper).
-		RegisterFilterEventMapper(HumanEmailCodeAddedType, HumanEmailCodeAddedEventMapper).
-		RegisterFilterEventMapper(HumanEmailCodeSentType, HumanEmailCodeSentEventMapper).
-		RegisterFilterEventMapper(HumanPhoneChangedType, HumanPhoneChangedEventMapper).
-		RegisterFilterEventMapper(HumanPhoneRemovedType, HumanPhoneRemovedEventMapper).
-		RegisterFilterEventMapper(HumanPhoneVerifiedType, HumanPhoneVerifiedEventMapper).
-		RegisterFilterEventMapper(HumanPhoneVerificationFailedType, HumanPhoneVerificationFailedEventMapper).
-		RegisterFilterEventMapper(HumanPhoneCodeAddedType, HumanPhoneCodeAddedEventMapper).
-		RegisterFilterEventMapper(HumanPhoneCodeSentType, HumanPhoneCodeSentEventMapper).
-		RegisterFilterEventMapper(HumanProfileChangedType, HumanProfileChangedEventMapper).
-		RegisterFilterEventMapper(HumanAddressChangedType, HumanAddressChangedEventMapper).
-		RegisterFilterEventMapper(HumanMFAInitSkippedType, HumanMFAInitSkippedEventMapper).
-		RegisterFilterEventMapper(HumanMFAOTPAddedType, HumanMFAOTPAddedEventMapper).
-		RegisterFilterEventMapper(HumanMFAOTPVerifiedType, HumanMFAOTPVerifiedEventMapper).
-		RegisterFilterEventMapper(HumanMFAOTPRemovedType, HumanMFAOTPRemovedEventMapper).
-		RegisterFilterEventMapper(HumanMFAOTPCheckSucceededType, HumanMFAOTPCheckSucceededEventMapper).
-		RegisterFilterEventMapper(HumanMFAOTPCheckFailedType, HumanMFAOTPCheckFailedEventMapper).
-		RegisterFilterEventMapper(HumanU2FTokenAddedType, HumanWebAuthNAddedEventMapper).
-		RegisterFilterEventMapper(HumanU2FTokenVerifiedType, HumanWebAuthNVerifiedEventMapper).
-		RegisterFilterEventMapper(HumanU2FTokenSignCountChangedType, HumanWebAuthNSignCountChangedEventMapper).
-		RegisterFilterEventMapper(HumanU2FTokenRemovedType, HumanWebAuthNRemovedEventMapper).
-		RegisterFilterEventMapper(HumanU2FTokenBeginLoginType, HumanWebAuthNBeginLoginEventMapper).
-		RegisterFilterEventMapper(HumanU2FTokenCheckSucceededType, HumanWebAuthNCheckSucceededEventMapper).
-		RegisterFilterEventMapper(HumanU2FTokenCheckFailedType, HumanWebAuthNCheckFailedEventMapper).
-		RegisterFilterEventMapper(HumanPasswordlessTokenAddedType, HumanWebAuthNAddedEventMapper).
-		RegisterFilterEventMapper(HumanPasswordlessTokenVerifiedType, HumanWebAuthNVerifiedEventMapper).
-		RegisterFilterEventMapper(HumanPasswordlessTokenSignCountChangedType, HumanWebAuthNSignCountChangedEventMapper).
-		RegisterFilterEventMapper(HumanPasswordlessTokenRemovedType, HumanWebAuthNRemovedEventMapper).
-		RegisterFilterEventMapper(HumanPasswordlessTokenBeginLoginType, HumanWebAuthNBeginLoginEventMapper).
-		RegisterFilterEventMapper(HumanPasswordlessTokenCheckSucceededType, HumanWebAuthNCheckSucceededEventMapper).
-		RegisterFilterEventMapper(HumanPasswordlessTokenCheckFailedType, HumanWebAuthNCheckFailedEventMapper).
-		RegisterFilterEventMapper(MachineAddedEventType, MachineAddedEventMapper).
-		RegisterFilterEventMapper(MachineChangedEventType, MachineChangedEventMapper).
-		RegisterFilterEventMapper(MachineKeyAddedEventType, MachineKeyAddedEventMapper).
-		RegisterFilterEventMapper(MachineKeyRemovedEventType, MachineKeyRemovedEventMapper)
+		RegisterFilterEventMapper(human.HumanAddedType, human.HumanAddedEventMapper).
+		RegisterFilterEventMapper(human.HumanRegisteredType, human.HumanRegisteredEventMapper).
+		RegisterFilterEventMapper(human.HumanInitialCodeAddedType, human.HumanInitialCodeAddedEventMapper).
+		RegisterFilterEventMapper(human.HumanInitialCodeSentType, human.HumanInitialCodeSentEventMapper).
+		RegisterFilterEventMapper(human.HumanInitializedCheckSucceededType, human.HumanInitializedCheckSucceededEventMapper).
+		RegisterFilterEventMapper(human.HumanInitializedCheckFailedType, human.HumanInitializedCheckFailedEventMapper).
+		RegisterFilterEventMapper(human.HumanSignedOutType, human.HumanSignedOutEventMapper).
+		RegisterFilterEventMapper(password.HumanPasswordChangedType, password.HumanPasswordChangedEventMapper).
+		RegisterFilterEventMapper(password.HumanPasswordCodeAddedType, password.HumanPasswordCodeAddedEventMapper).
+		RegisterFilterEventMapper(password.HumanPasswordCodeSentType, password.HumanPasswordCodeSentEventMapper).
+		RegisterFilterEventMapper(password.HumanPasswordCheckSucceededType, password.HumanPasswordCheckSucceededEventMapper).
+		RegisterFilterEventMapper(password.HumanPasswordCheckFailedType, password.HumanPasswordCheckFailedEventMapper).
+		RegisterFilterEventMapper(external_idp.HumanExternalIDPAddedType, external_idp.HumanExternalIDPAddedEventMapper).
+		RegisterFilterEventMapper(external_idp.HumanExternalIDPRemovedType, external_idp.HumanExternalIDPRemovedEventMapper).
+		RegisterFilterEventMapper(external_idp.HumanExternalIDPCascadeRemovedType, external_idp.HumanExternalIDPCascadeRemovedEventMapper).
+		RegisterFilterEventMapper(external_idp.HumanExternalLoginCheckSucceededType, external_idp.HumanExternalLoginCheckSucceededEventMapper).
+		RegisterFilterEventMapper(email.HumanEmailChangedType, email.HumanEmailChangedEventMapper).
+		RegisterFilterEventMapper(email.HumanEmailVerifiedType, email.HumanEmailVerifiedEventMapper).
+		RegisterFilterEventMapper(email.HumanEmailVerificationFailedType, email.HumanEmailVerificationFailedEventMapper).
+		RegisterFilterEventMapper(email.HumanEmailCodeAddedType, email.HumanEmailCodeAddedEventMapper).
+		RegisterFilterEventMapper(email.HumanEmailCodeSentType, email.HumanEmailCodeSentEventMapper).
+		RegisterFilterEventMapper(phone.HumanPhoneChangedType, phone.HumanPhoneChangedEventMapper).
+		RegisterFilterEventMapper(phone.HumanPhoneRemovedType, phone.HumanPhoneRemovedEventMapper).
+		RegisterFilterEventMapper(phone.HumanPhoneVerifiedType, phone.HumanPhoneVerifiedEventMapper).
+		RegisterFilterEventMapper(phone.HumanPhoneVerificationFailedType, phone.HumanPhoneVerificationFailedEventMapper).
+		RegisterFilterEventMapper(phone.HumanPhoneCodeAddedType, phone.HumanPhoneCodeAddedEventMapper).
+		RegisterFilterEventMapper(phone.HumanPhoneCodeSentType, phone.HumanPhoneCodeSentEventMapper).
+		RegisterFilterEventMapper(profile.HumanProfileChangedType, profile.HumanProfileChangedEventMapper).
+		RegisterFilterEventMapper(address.HumanAddressChangedType, address.HumanAddressChangedEventMapper).
+		RegisterFilterEventMapper(mfa.HumanMFAInitSkippedType, mfa.HumanMFAInitSkippedEventMapper).
+		RegisterFilterEventMapper(otp.HumanMFAOTPAddedType, otp.HumanMFAOTPAddedEventMapper).
+		RegisterFilterEventMapper(otp.HumanMFAOTPVerifiedType, otp.HumanMFAOTPVerifiedEventMapper).
+		RegisterFilterEventMapper(otp.HumanMFAOTPRemovedType, otp.HumanMFAOTPRemovedEventMapper).
+		RegisterFilterEventMapper(otp.HumanMFAOTPCheckSucceededType, otp.HumanMFAOTPCheckSucceededEventMapper).
+		RegisterFilterEventMapper(otp.HumanMFAOTPCheckFailedType, otp.HumanMFAOTPCheckFailedEventMapper).
+		RegisterFilterEventMapper(web_auth_n.HumanU2FTokenAddedType, web_auth_n.HumanWebAuthNAddedEventMapper).
+		RegisterFilterEventMapper(web_auth_n.HumanU2FTokenVerifiedType, web_auth_n.HumanWebAuthNVerifiedEventMapper).
+		RegisterFilterEventMapper(web_auth_n.HumanU2FTokenSignCountChangedType, web_auth_n.HumanWebAuthNSignCountChangedEventMapper).
+		RegisterFilterEventMapper(web_auth_n.HumanU2FTokenRemovedType, web_auth_n.HumanWebAuthNRemovedEventMapper).
+		RegisterFilterEventMapper(web_auth_n.HumanU2FTokenBeginLoginType, web_auth_n.HumanWebAuthNBeginLoginEventMapper).
+		RegisterFilterEventMapper(web_auth_n.HumanU2FTokenCheckSucceededType, web_auth_n.HumanWebAuthNCheckSucceededEventMapper).
+		RegisterFilterEventMapper(web_auth_n.HumanU2FTokenCheckFailedType, web_auth_n.HumanWebAuthNCheckFailedEventMapper).
+		RegisterFilterEventMapper(web_auth_n.HumanPasswordlessTokenAddedType, web_auth_n.HumanWebAuthNAddedEventMapper).
+		RegisterFilterEventMapper(web_auth_n.HumanPasswordlessTokenVerifiedType, web_auth_n.HumanWebAuthNVerifiedEventMapper).
+		RegisterFilterEventMapper(web_auth_n.HumanPasswordlessTokenSignCountChangedType, web_auth_n.HumanWebAuthNSignCountChangedEventMapper).
+		RegisterFilterEventMapper(web_auth_n.HumanPasswordlessTokenRemovedType, web_auth_n.HumanWebAuthNRemovedEventMapper).
+		RegisterFilterEventMapper(web_auth_n.HumanPasswordlessTokenBeginLoginType, web_auth_n.HumanWebAuthNBeginLoginEventMapper).
+		RegisterFilterEventMapper(web_auth_n.HumanPasswordlessTokenCheckSucceededType, web_auth_n.HumanWebAuthNCheckSucceededEventMapper).
+		RegisterFilterEventMapper(web_auth_n.HumanPasswordlessTokenCheckFailedType, web_auth_n.HumanWebAuthNCheckFailedEventMapper).
+		RegisterFilterEventMapper(machine.MachineAddedEventType, machine.MachineAddedEventMapper).
+		RegisterFilterEventMapper(machine.MachineChangedEventType, machine.MachineChangedEventMapper).
+		RegisterFilterEventMapper(keys.MachineKeyAddedEventType, keys.MachineKeyAddedEventMapper).
+		RegisterFilterEventMapper(keys.MachineKeyRemovedEventType, keys.MachineKeyRemovedEventMapper)
 }

@@ -1,4 +1,4 @@
-package user
+package mfa
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	mfaEventPrefix          = humanEventPrefix + "mfa."
+	mfaEventPrefix          = eventstore.EventType("user.human.mfa.")
 	HumanMFAInitSkippedType = mfaEventPrefix + "init.skiped"
 )
 

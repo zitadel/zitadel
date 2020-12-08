@@ -185,7 +185,8 @@ func NewUserTokenAddedEvent(
 	preferredLanguage string,
 	audience,
 	scopes []string,
-	expiration time.Time) *UserTokenAddedEvent {
+	expiration time.Time,
+) *UserTokenAddedEvent {
 	return &UserTokenAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -228,7 +229,8 @@ func (e *UserDomainClaimedEvent) Data() interface{} {
 
 func NewUserDomainClaimedEvent(
 	ctx context.Context,
-	userName string) *UserDomainClaimedEvent {
+	userName string,
+) *UserDomainClaimedEvent {
 	return &UserDomainClaimedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -264,7 +266,7 @@ func (e *UserDomainClaimedSentEvent) Data() interface{} {
 
 func NewUserDomainClaimedSentEvent(
 	ctx context.Context,
-	userName string) *UserDomainClaimedSentEvent {
+) *UserDomainClaimedSentEvent {
 	return &UserDomainClaimedSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -295,7 +297,8 @@ func (e *UserUsernameChangedEvent) Data() interface{} {
 
 func NewUserUsernameChangedEvent(
 	ctx context.Context,
-	userName string) *UserUsernameChangedEvent {
+	userName string,
+) *UserUsernameChangedEvent {
 	return &UserUsernameChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,

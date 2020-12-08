@@ -1,4 +1,4 @@
-package user
+package machine
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	machineEventPrefix      = userEventTypePrefix + "machine."
+	machineEventPrefix      = eventstore.EventType("user.machine.")
 	MachineAddedEventType   = machineEventPrefix + "added"
 	MachineChangedEventType = machineEventPrefix + "changed"
 )
@@ -35,7 +35,8 @@ func NewMachineAddedEvent(
 	ctx context.Context,
 	userName,
 	name,
-	description string) *MachineAddedEvent {
+	description string,
+) *MachineAddedEvent {
 	return &MachineAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -80,7 +81,8 @@ func NewMachineChangedEvent(
 	ctx context.Context,
 	userName,
 	name,
-	description string) *MachineChangedEvent {
+	description string,
+) *MachineChangedEvent {
 	return &MachineChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,

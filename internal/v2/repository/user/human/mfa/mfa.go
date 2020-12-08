@@ -1,4 +1,4 @@
-package user
+package mfa
 
 type MFAState int32
 

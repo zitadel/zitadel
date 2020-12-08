@@ -1,4 +1,4 @@
-package user
+package phone
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	phoneEventPrefix                 = humanEventPrefix + "phone."
+	phoneEventPrefix                 = eventstore.EventType("user.human.phone.")
 	HumanPhoneChangedType            = phoneEventPrefix + "changed"
 	HumanPhoneRemovedType            = phoneEventPrefix + "removed"
 	HumanPhoneVerifiedType           = phoneEventPrefix + "verified"
@@ -158,7 +158,8 @@ func (e *HumanPhoneCodeAddedEvent) Data() interface{} {
 func NewHumanPhoneCodeAddedEvent(
 	ctx context.Context,
 	code *crypto.CryptoValue,
-	expiry time.Duration) *HumanPhoneCodeAddedEvent {
+	expiry time.Duration,
+) *HumanPhoneCodeAddedEvent {
 	return &HumanPhoneCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,

@@ -1,4 +1,4 @@
-package user
+package profile
 
 import (
 	"context"
@@ -6,11 +6,12 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+	"github.com/caos/zitadel/internal/v2/repository/user/human"
 	"golang.org/x/text/language"
 )
 
 const (
-	profileEventPrefix      = humanEventPrefix + "profile."
+	profileEventPrefix      = eventstore.EventType("user.human.profile.")
 	HumanProfileChangedType = profileEventPrefix + "changed"
 )
 
@@ -22,7 +23,7 @@ type HumanProfileChangedEvent struct {
 	NickName          string       `json:"nickName,omitempty"`
 	DisplayName       string       `json:"displayName,omitempty"`
 	PreferredLanguage language.Tag `json:"preferredLanguage,omitempty"`
-	Gender            Gender       `json:"gender,omitempty"`
+	Gender            human.Gender `json:"gender,omitempty"`
 }
 
 func (e *HumanProfileChangedEvent) CheckPrevious() bool {
@@ -40,7 +41,8 @@ func NewHumanProfileChangedEvent(
 	nickName,
 	displayName string,
 	preferredLanguage language.Tag,
-	gender Gender) *HumanProfileChangedEvent {
+	gender human.Gender,
+) *HumanProfileChangedEvent {
 	return &HumanProfileChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,

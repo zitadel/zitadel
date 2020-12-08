@@ -1,4 +1,4 @@
-package user
+package password
 
 import (
 	"context"
@@ -7,11 +7,12 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+	"github.com/caos/zitadel/internal/v2/repository/user"
 	"time"
 )
 
 const (
-	passwordEventPrefix             = humanEventPrefix + "password."
+	passwordEventPrefix             = eventstore.EventType("user.human.password.")
 	HumanPasswordChangedType        = passwordEventPrefix + "changed"
 	HumanPasswordCodeAddedType      = passwordEventPrefix + "code.added"
 	HumanPasswordCodeSentType       = passwordEventPrefix + "code.sent"
@@ -37,7 +38,8 @@ func (e *HumanPasswordChangedEvent) Data() interface{} {
 func NewHumanPasswordChangedEvent(
 	ctx context.Context,
 	secret *crypto.CryptoValue,
-	changeRequired bool) *HumanPasswordChangedEvent {
+	changeRequired bool,
+) *HumanPasswordChangedEvent {
 	return &HumanPasswordChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -63,9 +65,9 @@ func HumanPasswordChangedEventMapper(event *repository.Event) (eventstore.EventR
 type HumanPasswordCodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Code             *crypto.CryptoValue `json:"code,omitempty"`
-	Expiry           time.Duration       `json:"expiry,omitempty"`
-	NotificationType NotificationType    `json:"notificationType,omitempty"`
+	Code             *crypto.CryptoValue   `json:"code,omitempty"`
+	Expiry           time.Duration         `json:"expiry,omitempty"`
+	NotificationType user.NotificationType `json:"notificationType,omitempty"`
 }
 
 func (e *HumanPasswordCodeAddedEvent) CheckPrevious() bool {
@@ -80,7 +82,8 @@ func NewHumanPasswordCodeAddedEvent(
 	ctx context.Context,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
-	notificationType NotificationType) *HumanPasswordCodeAddedEvent {
+	notificationType user.NotificationType,
+) *HumanPasswordCodeAddedEvent {
 	return &HumanPasswordCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,

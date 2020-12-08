@@ -1,4 +1,4 @@
-package user
+package human
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	humanEventPrefix                   = userEventTypePrefix + "human."
+	humanEventPrefix                   = eventstore.EventType("user.human.")
 	HumanAddedType                     = humanEventPrefix + "added"
 	HumanRegisteredType                = humanEventPrefix + "selfregistered"
 	HumanInitialCodeAddedType          = humanEventPrefix + "initialization.code.added"
@@ -68,7 +68,8 @@ func NewHumanAddedEvent(
 	locality,
 	postalCode,
 	region,
-	streetAddress string) *HumanAddedEvent {
+	streetAddress string,
+) *HumanAddedEvent {
 	return &HumanAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -149,7 +150,8 @@ func NewHumanRegisteredEvent(
 	locality,
 	postalCode,
 	region,
-	streetAddress string) *HumanRegisteredEvent {
+	streetAddress string,
+) *HumanRegisteredEvent {
 	return &HumanRegisteredEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -201,7 +203,8 @@ func (e *HumanInitialCodeAddedEvent) Data() interface{} {
 func NewHumanInitialCodeAddedEvent(
 	ctx context.Context,
 	code *crypto.CryptoValue,
-	expiry time.Duration) *HumanInitialCodeAddedEvent {
+	expiry time.Duration,
+) *HumanInitialCodeAddedEvent {
 	return &HumanInitialCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,

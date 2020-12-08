@@ -1,4 +1,4 @@
-package user
+package external_idp
 
 import (
 	"context"
@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	externalIDPEventPrefix   = humanEventPrefix + "externalidp."
-	externalLoginEventPrefix = humanEventPrefix + "externallogin."
+	externalIDPEventPrefix   = eventstore.EventType("user.human.externalidp.")
+	externalLoginEventPrefix = eventstore.EventType("user.human.externallogin.")
 
 	//TODO: Handle unique Aggregate
 	HumanExternalIDPReservedType = externalIDPEventPrefix + "reserved"
