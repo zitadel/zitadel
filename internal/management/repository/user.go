@@ -32,6 +32,7 @@ type UserRepository interface {
 
 	UserMFAs(ctx context.Context, userID string) ([]*model.MultiFactor, error)
 	RemoveOTP(ctx context.Context, userID string) error
+	RemoveU2F(ctx context.Context, userID, webAuthNTokenID string) error
 
 	SearchExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error)
 	RemoveExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) error

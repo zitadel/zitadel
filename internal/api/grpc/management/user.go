@@ -226,6 +226,11 @@ func (s *Server) RemoveMfaOTP(ctx context.Context, userID *management.UserID) (*
 	return &empty.Empty{}, err
 }
 
+func (s *Server) RemoveMfaU2F(ctx context.Context, webAuthNTokenID *management.WebAuthNTokenID) (*empty.Empty, error) {
+	err := s.user.RemoveU2F(ctx, webAuthNTokenID.UserId, webAuthNTokenID.Id)
+	return &empty.Empty{}, err
+}
+
 func (s *Server) SearchUserMemberships(ctx context.Context, in *management.UserMembershipSearchRequest) (*management.UserMembershipSearchResponse, error) {
 	request := userMembershipSearchRequestsToModel(in)
 	request.AppendUserIDQuery(in.UserId)

@@ -399,6 +399,16 @@ service ManagementService {
     };
   }
 
+  rpc RemoveMfaU2F(WebAuthNTokenID) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/users/{user_id}/mfas/u2f/{id}"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.write"
+    };
+  }
+
   // Sends an Notification (Email/SMS) with a password reset Link
   rpc SendSetPasswordNotification(SetPasswordNotificationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
@@ -1644,6 +1654,11 @@ message ProjectID {
 
 message UserID {
   string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message WebAuthNTokenID {
+  string user_id = 1 [(validate.rules).string.min_len = 1];
+  string id = 2 [(validate.rules).string.min_len = 1];
 }
 
 message LoginName {
