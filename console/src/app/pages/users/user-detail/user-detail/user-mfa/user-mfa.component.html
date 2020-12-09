@@ -1,5 +1,5 @@
 <app-card title="{{'USER.MFA.TITLE' | translate}}" description="{{'USER.MFA.DESCRIPTION' | translate}}">
-    <app-refresh-table [loading]="loading$ | async" (refreshed)="getOTP()" [dataSize]="dataSource?.data?.length">
+    <app-refresh-table [loading]="loading$ | async" (refreshed)="getMFAs()" [dataSize]="dataSource?.data?.length">
         <table class="table" mat-table [dataSource]="dataSource">
             <ng-container matColumnDef="type">
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.TABLETYPE' | translate }} </th>

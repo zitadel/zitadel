@@ -112,9 +112,11 @@ export class LoginPolicyComponent implements OnDestroy {
                 mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
                 mgmtreq.setAllowRegister(this.loginData.allowRegister);
                 mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
+                mgmtreq.setForceMfa(this.loginData.forceMfa);
                 if ((this.loginData as LoginPolicyView.AsObject).pb_default) {
                     return (this.service as ManagementService).CreateLoginPolicy(mgmtreq);
                 } else {
+                    console.log(mgmtreq.toObject());
                     return (this.service as ManagementService).UpdateLoginPolicy(mgmtreq);
                 }
             case PolicyComponentServiceType.ADMIN:
@@ -122,6 +124,8 @@ export class LoginPolicyComponent implements OnDestroy {
                 adminreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
                 adminreq.setAllowRegister(this.loginData.allowRegister);
                 adminreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
+                adminreq.setForceMfa(this.loginData.forceMfa);
+
                 return (this.service as AdminService).UpdateDefaultLoginPolicy(adminreq);
         }
     }

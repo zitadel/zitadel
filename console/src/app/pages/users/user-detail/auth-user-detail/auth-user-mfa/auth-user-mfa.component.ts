@@ -12,35 +12,35 @@ import { DialogOtpComponent } from '../dialog-otp/dialog-otp.component';
 import { DialogU2FComponent } from '../dialog-u2f/dialog-u2f.component';
 
 export function _base64ToArrayBuffer(base64: string): any {
-  const binaryString = atob(base64);
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-  }
-  return bytes.buffer;
+    const binaryString = atob(base64);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes.buffer;
 }
 
-export function _arrayBufferToBase64( buffer: any): string {
-  let binary = '';
-  const bytes = new Uint8Array( buffer );
-  const len = bytes.byteLength;
-  for (let i = 0; i < len; i++) {
-      binary += String.fromCharCode( bytes[ i ] );
-  }
-  return btoa( binary ).replace(/\+/g, '-')
-  .replace(/\//g, '_')
-  .replace(/=/g, '');
+export function _arrayBufferToBase64(buffer: any): string {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary).replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=/g, '');
 }
 
 export interface WebAuthNOptions {
-  challenge: string;
-  rp: {name: string, id: string};
-  user: {name: string, id: string, displayName: string};
-  pubKeyCredParams: any;
-  authenticatorSelection: {userVerification: string};
-  timeout: number;
-  attestation: string;
+    challenge: string;
+    rp: { name: string, id: string; };
+    user: { name: string, id: string, displayName: string; };
+    pubKeyCredParams: any;
+    authenticatorSelection: { userVerification: string; };
+    timeout: number;
+    attestation: string;
 }
 
 @Component({
@@ -63,8 +63,8 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     public error: string = '';
     public otpAvailable: boolean = false;
     constructor(private service: GrpcAuthService,
-      private toast: ToastService,
-      private dialog: MatDialog) { }
+        private toast: ToastService,
+        private dialog: MatDialog) { }
 
     public ngOnInit(): void {
         this.getMFAs();
@@ -104,22 +104,22 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
             const credOptions: CredentialCreationOptions = JSON.parse(atob(webauthn.publicKey as string));
 
             if (credOptions.publicKey?.challenge) {
-              credOptions.publicKey.challenge = _base64ToArrayBuffer(credOptions.publicKey.challenge as any);
-              credOptions.publicKey.user.id = _base64ToArrayBuffer(credOptions.publicKey.user.id as any);
-              const dialogRef = this.dialog.open(DialogU2FComponent, {
-                width: '400px',
-                data: {
-                  credOptions,
-                },
-              });
+                credOptions.publicKey.challenge = _base64ToArrayBuffer(credOptions.publicKey.challenge as any);
+                credOptions.publicKey.user.id = _base64ToArrayBuffer(credOptions.publicKey.user.id as any);
+                const dialogRef = this.dialog.open(DialogU2FComponent, {
+                    width: '400px',
+                    data: {
+                        credOptions,
+                    },
+                });
 
-              dialogRef.afterClosed().subscribe(done => {
-                if (done) {
-                  this.getMFAs();
-                } else {
-                  this.getMFAs();
-                }
-              });
+                dialogRef.afterClosed().subscribe(done => {
+                    if (done) {
+                        this.getMFAs();
+                    } else {
+                        this.getMFAs();
+                    }
+                });
             }
 
         }, error => {
@@ -129,7 +129,6 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
     public getMFAs(): void {
         this.service.GetMyMfas().then(mfas => {
-          console.log(mfas.toObject().mfasList);
             this.dataSource = new MatTableDataSource(mfas.toObject().mfasList);
             this.dataSource.sort = this.sort;
 
