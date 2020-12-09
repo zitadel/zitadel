@@ -116,7 +116,6 @@ export class LoginPolicyComponent implements OnDestroy {
                 if ((this.loginData as LoginPolicyView.AsObject).pb_default) {
                     return (this.service as ManagementService).CreateLoginPolicy(mgmtreq);
                 } else {
-                    console.log(mgmtreq.toObject());
                     return (this.service as ManagementService).UpdateLoginPolicy(mgmtreq);
                 }
             case PolicyComponentServiceType.ADMIN:
