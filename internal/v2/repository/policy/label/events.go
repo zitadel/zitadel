@@ -1,8 +1,7 @@
-package policy
+package label
 
 import (
 	"encoding/json"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
@@ -13,38 +12,6 @@ const (
 	LabelPolicyChangedEventType = "policy.label.changed"
 	LabelPolicyRemovedEventType = "policy.label.removed"
 )
-
-type LabelPolicyReadModel struct {
-	eventstore.ReadModel
-
-	PrimaryColor   string
-	SecondaryColor string
-}
-
-func (rm *LabelPolicyReadModel) Reduce() error {
-	for _, event := range rm.Events {
-		switch e := event.(type) {
-		case *LabelPolicyAddedEvent:
-			rm.PrimaryColor = e.PrimaryColor
-			rm.SecondaryColor = e.SecondaryColor
-		case *LabelPolicyChangedEvent:
-			rm.PrimaryColor = e.PrimaryColor
-			rm.SecondaryColor = e.SecondaryColor
-		}
-	}
-	return rm.ReadModel.Reduce()
-}
-
-type LabelPolicyWriteModel struct {
-	eventstore.WriteModel
-
-	PrimaryColor   string
-	SecondaryColor string
-}
-
-func (wm *LabelPolicyWriteModel) Reduce() error {
-	return errors.ThrowUnimplemented(nil, "POLIC-M0pdf", "reduce unimpelemnted")
-}
 
 type LabelPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`

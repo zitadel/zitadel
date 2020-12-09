@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/v2/repository/iam/policy/label"
 	iam_login "github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
@@ -113,6 +114,20 @@ func (a *Aggregate) PushPasswordComplexityPolicyAddedEvent(ctx context.Context, 
 
 func (a *Aggregate) PushPasswordComplexityPolicyChangedFromExisting(ctx context.Context, current *password_complexity.PasswordComplexityPolicyWriteModel, minLength uint64, hasLowercase, hasUppercase, hasNumber, hasSymbol bool) *Aggregate {
 	e, err := password_complexity.PasswordComplexityPolicyChangedEventFromExisting(ctx, current, minLength, hasLowercase, hasUppercase, hasNumber, hasSymbol)
+	if err != nil {
+		return a
+	}
+	a.Aggregate = *a.PushEvents(e)
+	return a
+}
+
+func (a *Aggregate) PushLabelPolicyAddedEvent(ctx context.Context, primaryColor, secondaryColor string) *Aggregate {
+	a.Aggregate = *a.PushEvents(label.NewLabelPolicyAddedEventEvent(ctx, primaryColor, secondaryColor))
+	return a
+}
+
+func (a *Aggregate) PushLabelPolicyChangedFromExisting(ctx context.Context, current *label.LabelPolicyWriteModel, primaryColor, secondaryColor string) *Aggregate {
+	e, err := label.LabelPolicyChangedEventFromExisting(ctx, current, primaryColor, secondaryColor)
 	if err != nil {
 		return a
 	}

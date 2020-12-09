@@ -2,15 +2,15 @@ package org
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/repository/policy"
+	"github.com/caos/zitadel/internal/v2/repository/policy/label"
 )
 
 var (
-	LabelPolicyAddedEventType   = orgEventTypePrefix + policy.LabelPolicyAddedEventType
-	LabelPolicyChangedEventType = orgEventTypePrefix + policy.LabelPolicyChangedEventType
+	LabelPolicyAddedEventType   = orgEventTypePrefix + label.LabelPolicyAddedEventType
+	LabelPolicyChangedEventType = orgEventTypePrefix + label.LabelPolicyChangedEventType
 )
 
-type LabelPolicyReadModel struct{ policy.LabelPolicyReadModel }
+type LabelPolicyReadModel struct{ label.LabelPolicyReadModel }
 
 func (rm *LabelPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
@@ -19,18 +19,18 @@ func (rm *LabelPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
 			rm.ReadModel.AppendEvents(&e.LabelPolicyAddedEvent)
 		case *LabelPolicyChangedEvent:
 			rm.ReadModel.AppendEvents(&e.LabelPolicyChangedEvent)
-		case *policy.LabelPolicyAddedEvent, *policy.LabelPolicyChangedEvent:
+		case *label.LabelPolicyAddedEvent, *label.LabelPolicyChangedEvent:
 			rm.ReadModel.AppendEvents(e)
 		}
 	}
 }
 
 type LabelPolicyAddedEvent struct {
-	policy.LabelPolicyAddedEvent
+	label.LabelPolicyAddedEvent
 }
 
 type LabelPolicyChangedEvent struct {
-	policy.LabelPolicyChangedEvent
+	label.LabelPolicyChangedEvent
 }
 
 // func NewLabelPolicyAddedEvent(

@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
+	"github.com/caos/zitadel/internal/v2/repository/iam/policy/label"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
@@ -46,7 +47,7 @@ func readModelToMembers(readModel *iam_repo.MembersReadModel) []*model.IAMMember
 	return members
 }
 
-func readModelToLabelPolicy(readModel *iam.LabelPolicyReadModel) *model.LabelPolicy {
+func readModelToLabelPolicy(readModel *label.LabelPolicyReadModel) *model.LabelPolicy {
 	return &model.LabelPolicy{
 		ObjectRoot:     readModelToObjectRoot(readModel.ReadModel),
 		PrimaryColor:   readModel.PrimaryColor,
@@ -146,6 +147,14 @@ func writeModelToLoginPolicy(wm *login.LoginPolicyWriteModel) *model.LoginPolicy
 		AllowExternalIdp:      wm.Policy.AllowExternalIDP,
 		ForceMFA:              wm.Policy.ForceMFA,
 		PasswordlessType:      model.PasswordlessType(wm.Policy.PasswordlessType),
+	}
+}
+
+func writeModelToLabelPolicy(wm *label.LabelPolicyWriteModel) *model.LabelPolicy {
+	return &model.LabelPolicy{
+		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel),
+		PrimaryColor:   wm.Policy.PrimaryColor,
+		SecondaryColor: wm.Policy.SecondaryColor,
 	}
 }
 
