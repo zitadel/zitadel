@@ -2045,6 +2045,7 @@ message UserMultiFactor {
   MfaType type = 1;
   MFAState state = 2;
   string attribute = 3;
+  string id = 4;
 }
 
 enum MfaType {
