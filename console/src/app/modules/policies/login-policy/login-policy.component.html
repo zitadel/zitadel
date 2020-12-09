@@ -53,9 +53,17 @@
         </div>
     </div>
 
-    <h3 class="subheader">{{ 'MFA.LIST.TITLE' | translate }}</h3>
-    <p class="subdesc">{{ 'MFA.LIST.DESCRIPTION' | translate }}</p>
+    <h3 class="subheader">{{ 'MFA.LIST.MULTIFACTORTITLE' | translate }}</h3>
+    <p class="subdesc">{{ 'MFA.LIST.MULTIFACTORDESCRIPTION' | translate }}</p>
     <app-mfa-table [service]="service" [serviceType]="serviceType"
+        [componentType]="LoginMethodComponentType.MultiFactor"
+        [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false">
+    </app-mfa-table>
+
+    <h3 class="subheader">{{ 'MFA.LIST.SECONDFACTORTITLE' | translate }}</h3>
+    <p class="subdesc">{{ 'MFA.LIST.SECONDFACTORDESCRIPTION' | translate }}</p>
+    <app-mfa-table [service]="service" [serviceType]="serviceType"
+        [componentType]="LoginMethodComponentType.SecondFactor"
         [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false">
     </app-mfa-table>
 

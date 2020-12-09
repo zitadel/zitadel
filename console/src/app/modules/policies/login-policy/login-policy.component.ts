@@ -22,6 +22,7 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component';
+import { LoginMethodComponentType } from 'src/app/modules/mfa-table/mfa-table.component';
 
 @Component({
     selector: 'app-login-policy',
@@ -29,6 +30,7 @@ import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component
     styleUrls: ['./login-policy.component.scss'],
 })
 export class LoginPolicyComponent implements OnDestroy {
+    public LoginMethodComponentType: any = LoginMethodComponentType;
     public loginData!: LoginPolicyView.AsObject | DefaultLoginPolicyView.AsObject;
 
     private sub: Subscription = new Subscription();

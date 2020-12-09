@@ -838,8 +838,10 @@
     },
     "MFA":{
         "LIST": {
-            "TITLE":"Multifaktoren",
-            "DESCRIPTION":"Definieren Sie hier Ihre zusätzlichen Multifaktoren, die sie für die Authentifizierung in Ihren Organisationen verwenden können."
+            "MULTIFACTORTITLE":"Multifactors",
+            "MULTIFACTORDESCRIPTION":"Define your Multifactors for Authentication here.",
+            "SECONDFACTORTITLE":"Secondfactors",
+            "SECONDFACTORDESCRIPTION":"Define your Secondfactors for Authentication here."
         },
         "CREATE": {
             "TITLE":"Neuer Multifaktor",
@@ -855,9 +857,14 @@
             "DELETED":"Removed successfully"
         },
         "TYPE":"Type",
-        "TYPES": {
+        "MULTIFACTORTYPES": {
             "0":"Unknown",
             "1":"U2F with Pin"
+        },
+        "SECONDFACTORTYPES": {
+            "0":"Unknown",
+            "1":"OTP",
+            "2":"U2F with Pin"
         }
     },
     "LOGINPOLICY": {

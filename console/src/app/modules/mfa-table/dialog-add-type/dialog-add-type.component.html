@@ -6,7 +6,7 @@
         <cnsl-label>{{'MFA.TYPE' | translate}}</cnsl-label>
         <mat-select [(ngModel)]="newMfaType">
             <mat-option *ngFor="let mfa of availableMfaTypes" [value]="mfa">
-                {{'MFA.TYPES.'+mfa | translate}}
+                {{(data.componentType == LoginMethodComponentType.SecondFactor ? 'MFA.SECONDFACTORTYPES.': LoginMethodComponentType.MultiFactor ? 'MFA.MULTIFACTORTYPES.': '')+mfa | translate}}
             </mat-option>
         </mat-select>
     </cnsl-form-field>

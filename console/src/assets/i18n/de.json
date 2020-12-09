@@ -838,8 +838,10 @@
     },
     "MFA":{
         "LIST": {
-            "TITLE":"Identitäts Providers",
-            "DESCRIPTION":"Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können."
+            "MULTIFACTORTITLE":"Multifaktoren",
+            "MULTIFACTORDESCRIPTION":"Definieren Sie hier Ihre Multifaktoren, die sie für die Authentifizierung verwenden können.",
+            "SECONDFACTORTITLE":"Zweitfaktoren",
+            "SECONDFACTORDESCRIPTION":"Definieren Sie hier Ihre Zweitfaktoren, die sie für die Authentifizierung verwenden können."
         },
         "CREATE": {
             "TITLE":"Neuer Multifaktor",
@@ -855,9 +857,14 @@
             "DELETED":"Mfa erfolgreich gelöscht!"
         },
         "TYPE":"Typ",
-        "TYPES": {
-            "0":"Unbekannt",
-            "1":"U2F mit Pin"
+        "MULTIFACTORTYPES": {
+            "0":"Unknown",
+            "1":"U2F with Pin"
+        },
+        "SECONDFACTORTYPES": {
+            "0":"Unknown",
+            "1":"OTP",
+            "2":"U2F with Pin"
         }
     },
     "LOGINPOLICY": {

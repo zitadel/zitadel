@@ -7,7 +7,7 @@
             <mat-icon matTooltip="{{'ACTIONS.REMOVE' | translate}}">
                 remove_circle</mat-icon>
         </button>
-        {{'MFA.TYPES.'+mfa | translate}}
+        {{(componentType == LoginMethodComponentType.SecondFactor ? 'MFA.SECONDFACTORTYPES.': LoginMethodComponentType.MultiFactor ? 'MFA.MULTIFACTORTYPES.': '')+mfa | translate}}
     </div>
     <div class="mfa" (click)="addMfa()">
         <mat-icon>add</mat-icon>

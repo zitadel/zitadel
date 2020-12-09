@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 import { MultiFactor as AdminMultiFactor, MultiFactorType as AdminMultiFactorType } from 'src/app/proto/generated/admin_pb';
 import { MultiFactor as MgmtMultiFactor, MultiFactorType as MgmtMultiFactorType } from 'src/app/proto/generated/management_pb';
+import { LoginMethodComponentType } from '../mfa-table.component';
 
 @Component({
     selector: 'app-dialog-add-type',
@@ -10,6 +11,7 @@ import { MultiFactor as MgmtMultiFactor, MultiFactorType as MgmtMultiFactorType 
     styleUrls: ['./dialog-add-type.component.scss'],
 })
 export class DialogAddTypeComponent {
+    public LoginMethodComponentType: any = LoginMethodComponentType;
     public newMfaType!: AdminMultiFactorType | MgmtMultiFactorType;
     public availableMfaTypes: Array<AdminMultiFactorType | MgmtMultiFactorType> = [];
     constructor(public dialogRef: MatDialogRef<DialogAddTypeComponent>,
