@@ -836,6 +836,25 @@
             "DELETED":"Idp removed successfully!"
         }
     },
+    "MFA":{
+        "LIST": {
+            "TITLE":"Multifaktoren",
+            "DESCRIPTION":"Definieren Sie hier Ihre zusätzlichen Multifaktoren, die sie für die Authentifizierung in Ihren Organisationen verwenden können."
+        },
+        "CREATE": {
+            "TITLE":"Neuer Multifaktor",
+            "DESCRIPTION":"Definieren Sie hier die Zugangsdaten des neuen Identitäts Providers"
+        },
+        "TOAST": {
+            "SAVED": "Erfolgreich gespeichert.",
+            "REACTIVATED":"Mfa reaktiviert.",
+            "DEACTIVATED":"Mfa deaktiviert.",
+            "SELECTEDREACTIVATED":"Selektierte Mfas reaktiviert.",
+            "SELECTEDDEACTIVATED":"Selektierte Mfas deaktiviert.",
+            "SELECTEDKEYSDELETED":"Selektierte Mfas gelöscht.",
+            "DELETED":"Mfa erfolgreich gelöscht!"
+        }
+    },
     "LOGINPOLICY": {
         "CREATE": {
             "TITLE":"Login Policy",

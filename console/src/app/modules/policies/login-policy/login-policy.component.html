@@ -45,12 +45,12 @@
             <p> {{'POLICY.DATA.ALLOWEXTERNALIDP_DESC' | translate}} </p>
         </div>
         <div class="row">
-          <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
-              [(ngModel)]="loginData.forceMfa">
-              {{'POLICY.DATA.FORCEMFA' | translate}}
-          </mat-slide-toggle>
-          <p> {{'POLICY.DATA.FORCEMFA_DESC' | translate}} </p>
-      </div>
+            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
+                [(ngModel)]="loginData.forceMfa">
+                {{'POLICY.DATA.FORCEMFA' | translate}}
+            </mat-slide-toggle>
+            <p> {{'POLICY.DATA.FORCEMFA_DESC' | translate}} </p>
+        </div>
     </div>
 
     <h3 class="subheader">{{'LOGINPOLICY.IDPS' | translate}}</h3>
@@ -74,10 +74,18 @@
         mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
 
     <ng-template appHasRole [appHasRole]="['org.idp.read']">
-        <h2>{{ 'IDP.LIST.TITLE' | translate }}</h2>
+        <!-- <h2>{{ 'IDP.LIST.TITLE' | translate }}</h2>
         <p>{{ 'IDP.LIST.DESCRIPTION' | translate }}</p>
         <app-idp-table [service]="service" [serviceType]="serviceType"
             [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false">
+        </app-idp-table> -->
+
+        <h2>{{ 'MFA.LIST.TITLE' | translate }}</h2>
+        <p>{{ 'MFA.LIST.DESCRIPTION' | translate }}</p>
+        <app-idp-table [service]="service" [serviceType]="serviceType"
+            [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false">
         </app-idp-table>
+
+
     </ng-template>
 </app-detail-layout>

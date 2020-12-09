@@ -17,6 +17,7 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { AddIdpDialogModule } from './add-idp-dialog/add-idp-dialog.module';
 import { LoginPolicyRoutingModule } from './login-policy-routing.module';
 import { LoginPolicyComponent } from './login-policy.component';
+import { MfaTableModule } from 'src/app/modules/mfa-table/mfa-table.module';
 
 @NgModule({
     declarations: [LoginPolicyComponent],
@@ -36,6 +37,7 @@ import { LoginPolicyComponent } from './login-policy.component';
         DetailLayoutModule,
         AddIdpDialogModule,
         IdpTableModule,
+        MfaTableModule,
         MatProgressSpinnerModule,
     ],
 })
