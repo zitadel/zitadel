@@ -107,6 +107,7 @@ func (step *Step1) orgs(ctx context.Context, orgs []Org) error {
 			return err
 		}
 		step.createdOrgs[iamOrg.Name] = org
+		logging.LogWithFields("SETUP-HR2gh", "name", org.Name, "ID", org.AggregateID).Info("created organisation")
 
 		var policy *iam_model.OrgIAMPolicyView
 		if iamOrg.OrgIamPolicy {

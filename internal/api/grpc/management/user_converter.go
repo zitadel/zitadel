@@ -501,8 +501,9 @@ func mfasFromModel(mfas []*usr_model.MultiFactor) []*management.UserMultiFactor 
 
 func mfaFromModel(mfa *usr_model.MultiFactor) *management.UserMultiFactor {
 	return &management.UserMultiFactor{
-		State: mfaStateFromModel(mfa.State),
-		Type:  mfaTypeFromModel(mfa.Type),
+		State:     mfaStateFromModel(mfa.State),
+		Type:      mfaTypeFromModel(mfa.Type),
+		Attribute: mfa.Attribute,
 	}
 }
 

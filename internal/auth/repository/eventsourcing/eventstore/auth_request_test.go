@@ -1208,7 +1208,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				eventProvider: &mockEventErrUser{},
 				user:          &user_model.UserView{ID: "id"},
 			},
-			&user_model.UserSessionView{},
+			&user_model.UserSessionView{UserID: "id"},
 			nil,
 		},
 		{

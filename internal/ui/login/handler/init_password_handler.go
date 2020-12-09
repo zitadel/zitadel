@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
 )
@@ -67,7 +68,8 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *mod
 	if authReq != nil {
 		userOrg = authReq.UserOrgID
 	}
-	err = l.authRepo.SetPassword(setContext(r.Context(), userOrg), data.UserID, data.Code, data.Password)
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	err = l.authRepo.SetPassword(setContext(r.Context(), userOrg), data.UserID, data.Code, data.Password, userAgentID)
 	if err != nil {
 		l.renderInitPassword(w, r, authReq, data.UserID, "", err)
 		return
