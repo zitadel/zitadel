@@ -84,6 +84,17 @@ footer a {
   vertical-align: middle;
 }
 
+@keyframes ripple {
+  0% {
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 15px rgba(0, 0, 0, 0.1);
+  }
+  100% {
+    box-shadow: 0 0 0 15px rgba(0, 0, 0, 0);
+  }
+}
 input, .lgn-input {
   display: block;
   box-sizing: border-box;
@@ -106,6 +117,41 @@ input, .lgn-input {
 input::placeholder, .lgn-input::placeholder {
   font-size: 14px;
   font-style: italic;
+}
+input[type=radio], .lgn-input[type=radio] {
+  opacity: 0;
+  margin: 0;
+  width: 0;
+  height: 0;
+  outline: 0;
+}
+input[type=radio]:checked + label::before, .lgn-input[type=radio]:checked + label::before {
+  border-color: grey;
+  animation: ripple 0.2s linear forwards;
+}
+input[type=radio]:checked + label::after, .lgn-input[type=radio]:checked + label::after {
+  transform: scale(1);
+}
+input[type=radio]:focus + label, .lgn-input[type=radio]:focus + label {
+  opacity: 1;
+  outline: 2px solid grey;
+  outline-offset: 2px;
+}
+input[type=radio]:disabled + label, .lgn-input[type=radio]:disabled + label {
+  cursor: not-allowed;
+  font-style: italic;
+}
+input[type=radio]:disabled + label::before, .lgn-input[type=radio]:disabled + label::before {
+  border-color: grey;
+}
+input[type=radio]:disabled:checked + label::before, .lgn-input[type=radio]:disabled:checked + label::before {
+  color: grey;
+}
+input[type=radio]:disabled:checked + label::after, .lgn-input[type=radio]:disabled:checked + label::after {
+  background: grey;
+}
+input[type=radio]:disabled:focus, .lgn-input[type=radio]:disabled:focus {
+  opacity: 0;
 }
 
 select, .lgn-select {
@@ -130,6 +176,41 @@ select, .lgn-select {
 select::placeholder, .lgn-select::placeholder {
   font-size: 14px;
   font-style: italic;
+}
+select[type=radio], .lgn-select[type=radio] {
+  opacity: 0;
+  margin: 0;
+  width: 0;
+  height: 0;
+  outline: 0;
+}
+select[type=radio]:checked + label::before, .lgn-select[type=radio]:checked + label::before {
+  border-color: grey;
+  animation: ripple 0.2s linear forwards;
+}
+select[type=radio]:checked + label::after, .lgn-select[type=radio]:checked + label::after {
+  transform: scale(1);
+}
+select[type=radio]:focus + label, .lgn-select[type=radio]:focus + label {
+  opacity: 1;
+  outline: 2px solid grey;
+  outline-offset: 2px;
+}
+select[type=radio]:disabled + label, .lgn-select[type=radio]:disabled + label {
+  cursor: not-allowed;
+  font-style: italic;
+}
+select[type=radio]:disabled + label::before, .lgn-select[type=radio]:disabled + label::before {
+  border-color: grey;
+}
+select[type=radio]:disabled:checked + label::before, .lgn-select[type=radio]:disabled:checked + label::before {
+  color: grey;
+}
+select[type=radio]:disabled:checked + label::after, .lgn-select[type=radio]:disabled:checked + label::after {
+  background: grey;
+}
+select[type=radio]:disabled:focus, .lgn-select[type=radio]:disabled:focus {
+  opacity: 0;
 }
 
 label, .lgn-label {
