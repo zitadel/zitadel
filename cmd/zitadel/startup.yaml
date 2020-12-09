@@ -48,7 +48,7 @@ AuthZ:
       FailureCountUntilSkip: 5
 
 Auth:
-  SearchLimit: 100
+  SearchLimit: 1000
   Domain: $ZITADEL_DEFAULT_DOMAIN
   Eventstore:
     ServiceName: 'authAPI'
@@ -104,7 +104,7 @@ Auth:
     SigningKeyRotation: 10s
 
 Admin:
-  SearchLimit: 100
+  SearchLimit: 1000
   Domain: $ZITADEL_DEFAULT_DOMAIN
   Eventstore:
     ServiceName: 'Admin'
@@ -141,7 +141,7 @@ Admin:
     FailureCountUntilSkip: 5
 
 Mgmt:
-  SearchLimit: 100
+  SearchLimit: 1000
   Domain: $ZITADEL_DEFAULT_DOMAIN
   Eventstore:
     ServiceName: 'ManagementAPI'
