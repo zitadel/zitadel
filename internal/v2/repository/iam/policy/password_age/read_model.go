@@ -1,13 +1,8 @@
-package org
+package password_age
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/policy/password_age"
-)
-
-var (
-	PasswordAgePolicyAddedEventType   = orgEventTypePrefix + password_age.PasswordAgePolicyAddedEventType
-	PasswordAgePolicyChangedEventType = orgEventTypePrefix + password_age.PasswordAgePolicyChangedEventType
 )
 
 type PasswordAgePolicyReadModel struct {
@@ -21,16 +16,10 @@ func (rm *PasswordAgePolicyReadModel) AppendEvents(events ...eventstore.EventRea
 			rm.ReadModel.AppendEvents(&e.PasswordAgePolicyAddedEvent)
 		case *PasswordAgePolicyChangedEvent:
 			rm.ReadModel.AppendEvents(&e.PasswordAgePolicyChangedEvent)
-		case *password_age.PasswordAgePolicyAddedEvent, *password_age.PasswordAgePolicyChangedEvent:
+		case *password_age.PasswordAgePolicyAddedEvent,
+			*password_age.PasswordAgePolicyChangedEvent:
+
 			rm.ReadModel.AppendEvents(e)
 		}
 	}
-}
-
-type PasswordAgePolicyAddedEvent struct {
-	password_age.PasswordAgePolicyAddedEvent
-}
-
-type PasswordAgePolicyChangedEvent struct {
-	password_age.PasswordAgePolicyChangedEvent
 }

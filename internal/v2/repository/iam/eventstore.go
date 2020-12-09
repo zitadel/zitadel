@@ -5,7 +5,9 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/label"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
+	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
+	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 )
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
@@ -18,12 +20,12 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(login.LoginPolicyAddedEventType, login.LoginPolicyAddedEventMapper).
 		RegisterFilterEventMapper(login.LoginPolicyChangedEventType, login.LoginPolicyChangedEventMapper).
 		RegisterFilterEventMapper(org_iam.OrgIAMPolicyAddedEventType, org_iam.OrgIAMPolicyAddedEventMapper).
-		RegisterFilterEventMapper(PasswordAgePolicyAddedEventType, PasswordAgePolicyAddedEventMapper).
-		RegisterFilterEventMapper(PasswordAgePolicyChangedEventType, PasswordAgePolicyChangedEventMapper).
+		RegisterFilterEventMapper(password_age.PasswordAgePolicyAddedEventType, password_age.PasswordAgePolicyAddedEventMapper).
+		RegisterFilterEventMapper(password_age.PasswordAgePolicyChangedEventType, password_age.PasswordAgePolicyChangedEventMapper).
 		RegisterFilterEventMapper(password_complexity.PasswordComplexityPolicyAddedEventType, password_complexity.PasswordComplexityPolicyAddedEventMapper).
 		RegisterFilterEventMapper(password_complexity.PasswordComplexityPolicyChangedEventType, password_complexity.PasswordComplexityPolicyChangedEventMapper).
-		RegisterFilterEventMapper(PasswordLockoutPolicyAddedEventType, PasswordLockoutPolicyAddedEventMapper).
-		RegisterFilterEventMapper(PasswordLockoutPolicyChangedEventType, PasswordLockoutPolicyChangedEventMapper).
+		RegisterFilterEventMapper(password_lockout.PasswordLockoutPolicyAddedEventType, password_lockout.PasswordLockoutPolicyAddedEventMapper).
+		RegisterFilterEventMapper(password_lockout.PasswordLockoutPolicyChangedEventType, password_lockout.PasswordLockoutPolicyChangedEventMapper).
 		RegisterFilterEventMapper(MemberAddedEventType, MemberAddedEventMapper).
 		RegisterFilterEventMapper(MemberChangedEventType, MemberChangedEventMapper).
 		RegisterFilterEventMapper(MemberRemovedEventType, MemberRemovedEventMapper).

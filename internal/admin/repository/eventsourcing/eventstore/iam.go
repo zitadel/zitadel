@@ -238,11 +238,17 @@ func (repo *IAMRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_mode
 
 func (repo *IAMRepository) AddDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
 	policy.AggregateID = repo.SystemDefaults.IamID
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.AddLabelPolicy(ctx, policy)
+	}
 	return repo.IAMEventstore.AddLabelPolicy(ctx, policy)
 }
 
 func (repo *IAMRepository) ChangeDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
 	policy.AggregateID = repo.SystemDefaults.IamID
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.ChangeLabelPolicy(ctx, policy)
+	}
 	return repo.IAMEventstore.ChangeLabelPolicy(ctx, policy)
 }
 
@@ -448,11 +454,17 @@ func (repo *IAMRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*ia
 
 func (repo *IAMRepository) AddDefaultPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
 	policy.AggregateID = repo.SystemDefaults.IamID
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.AddPasswordAgePolicy(ctx, policy)
+	}
 	return repo.IAMEventstore.AddPasswordAgePolicy(ctx, policy)
 }
 
 func (repo *IAMRepository) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
 	policy.AggregateID = repo.SystemDefaults.IamID
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.ChangePasswordAgePolicy(ctx, policy)
+	}
 	return repo.IAMEventstore.ChangePasswordAgePolicy(ctx, policy)
 }
 
@@ -483,11 +495,17 @@ func (repo *IAMRepository) GetDefaultPasswordLockoutPolicy(ctx context.Context) 
 
 func (repo *IAMRepository) AddDefaultPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
 	policy.AggregateID = repo.SystemDefaults.IamID
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.AddPasswordLockoutPolicy(ctx, policy)
+	}
 	return repo.IAMEventstore.AddPasswordLockoutPolicy(ctx, policy)
 }
 
 func (repo *IAMRepository) ChangeDefaultPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
 	policy.AggregateID = repo.SystemDefaults.IamID
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.ChangePasswordLockoutPolicy(ctx, policy)
+	}
 	return repo.IAMEventstore.ChangePasswordLockoutPolicy(ctx, policy)
 }
 
@@ -518,10 +536,16 @@ func (repo *IAMRepository) GetOrgIAMPolicy(ctx context.Context) (*iam_model.OrgI
 
 func (repo *IAMRepository) AddDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
 	policy.AggregateID = repo.SystemDefaults.IamID
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.AddOrgIAMPolicy(ctx, policy)
+	}
 	return repo.IAMEventstore.AddOrgIAMPolicy(ctx, policy)
 }
 
 func (repo *IAMRepository) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
 	policy.AggregateID = repo.SystemDefaults.IamID
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.ChangeOrgIAMPolicy(ctx, policy)
+	}
 	return repo.IAMEventstore.ChangeOrgIAMPolicy(ctx, policy)
 }

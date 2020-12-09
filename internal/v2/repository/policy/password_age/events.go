@@ -1,8 +1,7 @@
-package policy
+package password_age
 
 import (
 	"encoding/json"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
@@ -14,47 +13,11 @@ const (
 	PasswordAgePolicyRemovedEventType = "policy.password.age.removed"
 )
 
-type PasswordAgePolicyAggregate struct {
-	eventstore.Aggregate
-}
-
-type PasswordAgePolicyReadModel struct {
-	eventstore.ReadModel
-
-	ExpireWarnDays uint16
-	MaxAgeDays     uint16
-}
-
-func (rm *PasswordAgePolicyReadModel) Reduce() error {
-	for _, event := range rm.Events {
-		switch e := event.(type) {
-		case *PasswordAgePolicyAddedEvent:
-			rm.ExpireWarnDays = e.ExpireWarnDays
-			rm.MaxAgeDays = e.MaxAgeDays
-		case *PasswordAgePolicyChangedEvent:
-			rm.ExpireWarnDays = e.ExpireWarnDays
-			rm.MaxAgeDays = e.MaxAgeDays
-		}
-	}
-	return rm.ReadModel.Reduce()
-}
-
-type PasswordAgePolicyWriteModel struct {
-	eventstore.WriteModel
-
-	ExpireWarnDays uint16
-	MaxAgeDays     uint16
-}
-
-func (wm *PasswordAgePolicyWriteModel) Reduce() error {
-	return errors.ThrowUnimplemented(nil, "POLIC-3M9sd", "reduce unimpelemnted")
-}
-
 type PasswordAgePolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ExpireWarnDays uint16 `json:"expireWarnDays"`
-	MaxAgeDays     uint16 `json:"maxAgeDays"`
+	ExpireWarnDays uint64 `json:"expireWarnDays"`
+	MaxAgeDays     uint64 `json:"maxAgeDays"`
 }
 
 func (e *PasswordAgePolicyAddedEvent) CheckPrevious() bool {
@@ -68,7 +31,7 @@ func (e *PasswordAgePolicyAddedEvent) Data() interface{} {
 func NewPasswordAgePolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	expireWarnDays,
-	maxAgeDays uint16,
+	maxAgeDays uint64,
 ) *PasswordAgePolicyAddedEvent {
 
 	return &PasswordAgePolicyAddedEvent{
@@ -94,8 +57,8 @@ func PasswordAgePolicyAddedEventMapper(event *repository.Event) (eventstore.Even
 type PasswordAgePolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ExpireWarnDays uint16 `json:"expireWarnDays,omitempty"`
-	MaxAgeDays     uint16 `json:"maxAgeDays,omitempty"`
+	ExpireWarnDays uint64 `json:"expireWarnDays,omitempty"`
+	MaxAgeDays     uint64 `json:"maxAgeDays,omitempty"`
 }
 
 func (e *PasswordAgePolicyChangedEvent) CheckPrevious() bool {
@@ -110,7 +73,7 @@ func NewPasswordAgePolicyChangedEvent(
 	base *eventstore.BaseEvent,
 	current *PasswordAgePolicyWriteModel,
 	expireWarnDays,
-	maxAgeDays uint16,
+	maxAgeDays uint64,
 ) *PasswordAgePolicyChangedEvent {
 
 	e := &PasswordAgePolicyChangedEvent{

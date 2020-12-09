@@ -10,7 +10,9 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
+	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
+	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
 	"github.com/caos/zitadel/internal/v2/repository/member"
 )
@@ -76,7 +78,7 @@ func readModelToOrgIAMPolicy(readModel *org_iam.OrgIAMPolicyReadModel) *model.Or
 		//TODO: State: int32,
 	}
 }
-func readModelToPasswordAgePolicy(readModel *iam.PasswordAgePolicyReadModel) *model.PasswordAgePolicy {
+func readModelToPasswordAgePolicy(readModel *password_age.PasswordAgePolicyReadModel) *model.PasswordAgePolicy {
 	return &model.PasswordAgePolicy{
 		ObjectRoot:     readModelToObjectRoot(readModel.ReadModel),
 		ExpireWarnDays: uint64(readModel.ExpireWarnDays),
@@ -95,7 +97,7 @@ func readModelToPasswordComplexityPolicy(readModel *password_complexity.Password
 		//TODO: State: int32,
 	}
 }
-func readModelToPasswordLockoutPolicy(readModel *iam.PasswordLockoutPolicyReadModel) *model.PasswordLockoutPolicy {
+func readModelToPasswordLockoutPolicy(readModel *password_lockout.PasswordLockoutPolicyReadModel) *model.PasswordLockoutPolicy {
 	return &model.PasswordLockoutPolicy{
 		ObjectRoot:          readModelToObjectRoot(readModel.ReadModel),
 		MaxAttempts:         uint64(readModel.MaxAttempts),
@@ -165,6 +167,14 @@ func writeModelToOrgIAMPolicy(wm *org_iam.OrgIAMPolicyWriteModel) *model.OrgIAMP
 	}
 }
 
+func writeModelToPasswordAgePolicy(wm *password_age.PasswordAgePolicyWriteModel) *model.PasswordAgePolicy {
+	return &model.PasswordAgePolicy{
+		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel),
+		MaxAgeDays:     wm.Policy.MaxAgeDays,
+		ExpireWarnDays: wm.Policy.ExpireWarnDays,
+	}
+}
+
 func writeModelToPasswordComplexityPolicy(wm *password_complexity.PasswordComplexityPolicyWriteModel) *model.PasswordComplexityPolicy {
 	return &model.PasswordComplexityPolicy{
 		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
@@ -173,6 +183,14 @@ func writeModelToPasswordComplexityPolicy(wm *password_complexity.PasswordComple
 		HasUppercase: wm.Policy.HasUpperCase,
 		HasNumber:    wm.Policy.HasNumber,
 		HasSymbol:    wm.Policy.HasSymbol,
+	}
+}
+
+func writeModelToPasswordLockoutPolicy(wm *password_lockout.PasswordLockoutPolicyWriteModel) *model.PasswordLockoutPolicy {
+	return &model.PasswordLockoutPolicy{
+		ObjectRoot:          writeModelToObjectRoot(wm.WriteModel),
+		MaxAttempts:         wm.Policy.MaxAttempts,
+		ShowLockOutFailures: wm.Policy.ShowLockOutFailures,
 	}
 }
 

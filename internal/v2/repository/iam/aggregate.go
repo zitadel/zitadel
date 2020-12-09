@@ -6,7 +6,9 @@ import (
 	iam_login "github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
+	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
+	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 	"github.com/caos/zitadel/internal/v2/repository/policy/login"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -107,6 +109,20 @@ func (a *Aggregate) PushOrgIAMPolicyChangedFromExisting(ctx context.Context, cur
 	return a
 }
 
+func (a *Aggregate) PushPasswordAgePolicyAddedEvent(ctx context.Context, expireWarnDays, maxAgeDays uint64) *Aggregate {
+	a.Aggregate = *a.PushEvents(password_age.NewPasswordAgePolicyAddedEvent(ctx, expireWarnDays, maxAgeDays))
+	return a
+}
+
+func (a *Aggregate) PushPasswordAgePolicyChangedFromExisting(ctx context.Context, current *password_age.PasswordAgePolicyWriteModel, expireWarnDays, maxAgeDays uint64) *Aggregate {
+	e, err := password_age.PasswordAgePolicyChangedEventFromExisting(ctx, current, expireWarnDays, maxAgeDays)
+	if err != nil {
+		return a
+	}
+	a.Aggregate = *a.PushEvents(e)
+	return a
+}
+
 func (a *Aggregate) PushPasswordComplexityPolicyAddedEvent(ctx context.Context, minLength uint64, hasLowercase, hasUppercase, hasNumber, hasSymbol bool) *Aggregate {
 	a.Aggregate = *a.PushEvents(password_complexity.NewPasswordComplexityPolicyAddedEvent(ctx, minLength, hasLowercase, hasUppercase, hasNumber, hasSymbol))
 	return a
@@ -114,6 +130,20 @@ func (a *Aggregate) PushPasswordComplexityPolicyAddedEvent(ctx context.Context, 
 
 func (a *Aggregate) PushPasswordComplexityPolicyChangedFromExisting(ctx context.Context, current *password_complexity.PasswordComplexityPolicyWriteModel, minLength uint64, hasLowercase, hasUppercase, hasNumber, hasSymbol bool) *Aggregate {
 	e, err := password_complexity.PasswordComplexityPolicyChangedEventFromExisting(ctx, current, minLength, hasLowercase, hasUppercase, hasNumber, hasSymbol)
+	if err != nil {
+		return a
+	}
+	a.Aggregate = *a.PushEvents(e)
+	return a
+}
+
+func (a *Aggregate) PushPasswordLockoutPolicyAddedEvent(ctx context.Context, maxAttempts uint64, showLockoutFailure bool) *Aggregate {
+	a.Aggregate = *a.PushEvents(password_lockout.NewPasswordLockoutPolicyAddedEvent(ctx, maxAttempts, showLockoutFailure))
+	return a
+}
+
+func (a *Aggregate) PushPasswordLockoutPolicyChangedFromExisting(ctx context.Context, current *password_lockout.PasswordLockoutPolicyWriteModel, maxAttempts uint64, showLockoutFailure bool) *Aggregate {
+	e, err := password_lockout.PasswordLockoutPolicyChangedEventFromExisting(ctx, current, maxAttempts, showLockoutFailure)
 	if err != nil {
 		return a
 	}

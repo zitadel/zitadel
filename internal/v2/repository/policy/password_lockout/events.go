@@ -1,8 +1,7 @@
-package policy
+package password_lockout
 
 import (
 	"encoding/json"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
@@ -14,47 +13,11 @@ const (
 	PasswordLockoutPolicyRemovedEventType = "policy.password.lockout.removed"
 )
 
-type PasswordLockoutPolicyAggregate struct {
-	eventstore.Aggregate
-}
-
-type PasswordLockoutPolicyReadModel struct {
-	eventstore.ReadModel
-
-	MaxAttempts         uint8
-	ShowLockOutFailures bool
-}
-
-func (rm *PasswordLockoutPolicyReadModel) Reduce() error {
-	for _, event := range rm.Events {
-		switch e := event.(type) {
-		case *PasswordLockoutPolicyAddedEvent:
-			rm.MaxAttempts = e.MaxAttempts
-			rm.ShowLockOutFailures = e.ShowLockOutFailures
-		case *PasswordLockoutPolicyChangedEvent:
-			rm.MaxAttempts = e.MaxAttempts
-			rm.ShowLockOutFailures = e.ShowLockOutFailures
-		}
-	}
-	return rm.ReadModel.Reduce()
-}
-
-type PasswordLockoutPolicyWriteModel struct {
-	eventstore.WriteModel
-
-	MaxAttempts         uint8
-	ShowLockOutFailures bool
-}
-
-func (wm *PasswordLockoutPolicyWriteModel) Reduce() error {
-	return errors.ThrowUnimplemented(nil, "POLIC-3M0df", "reduce unimpelemnted")
-}
-
 type PasswordLockoutPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	MaxAttempts         uint8 `json:"maxAttempts,omitempty"`
-	ShowLockOutFailures bool  `json:"showLockOutFailures"`
+	MaxAttempts         uint64 `json:"maxAttempts,omitempty"`
+	ShowLockOutFailures bool   `json:"showLockOutFailures"`
 }
 
 func (e *PasswordLockoutPolicyAddedEvent) CheckPrevious() bool {
@@ -67,7 +30,7 @@ func (e *PasswordLockoutPolicyAddedEvent) Data() interface{} {
 
 func NewPasswordLockoutPolicyAddedEvent(
 	base *eventstore.BaseEvent,
-	maxAttempts uint8,
+	maxAttempts uint64,
 	showLockOutFailures bool,
 ) *PasswordLockoutPolicyAddedEvent {
 
@@ -94,8 +57,8 @@ func PasswordLockoutPolicyAddedEventMapper(event *repository.Event) (eventstore.
 type PasswordLockoutPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	MaxAttempts         uint8 `json:"maxAttempts,omitempty"`
-	ShowLockOutFailures bool  `json:"showLockOutFailures,omitempty"`
+	MaxAttempts         uint64 `json:"maxAttempts,omitempty"`
+	ShowLockOutFailures bool   `json:"showLockOutFailures,omitempty"`
 }
 
 func (e *PasswordLockoutPolicyChangedEvent) CheckPrevious() bool {
@@ -109,7 +72,7 @@ func (e *PasswordLockoutPolicyChangedEvent) Data() interface{} {
 func NewPasswordLockoutPolicyChangedEvent(
 	base *eventstore.BaseEvent,
 	current *PasswordLockoutPolicyWriteModel,
-	maxAttempts uint8,
+	maxAttempts uint64,
 	showLockOutFailures bool,
 ) *PasswordLockoutPolicyChangedEvent {
 

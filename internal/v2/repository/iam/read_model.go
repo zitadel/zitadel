@@ -5,13 +5,16 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/label"
 	login2 "github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
+	password_age2 "github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
+	password_lockout2 "github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 	"github.com/caos/zitadel/internal/v2/repository/member"
-	"github.com/caos/zitadel/internal/v2/repository/policy"
 	label2 "github.com/caos/zitadel/internal/v2/repository/policy/label"
 	"github.com/caos/zitadel/internal/v2/repository/policy/login"
 	org_iam2 "github.com/caos/zitadel/internal/v2/repository/policy/org_iam"
+	"github.com/caos/zitadel/internal/v2/repository/policy/password_age"
 	password_complexity2 "github.com/caos/zitadel/internal/v2/repository/policy/password_complexity"
+	"github.com/caos/zitadel/internal/v2/repository/policy/password_lockout"
 )
 
 type ReadModel struct {
@@ -30,8 +33,8 @@ type ReadModel struct {
 	DefaultLabelPolicy              label.LabelPolicyReadModel
 	DefaultOrgIAMPolicy             org_iam.OrgIAMPolicyReadModel
 	DefaultPasswordComplexityPolicy password_complexity.PasswordComplexityPolicyReadModel
-	DefaultPasswordAgePolicy        PasswordAgePolicyReadModel
-	DefaultPasswordLockoutPolicy    PasswordLockoutPolicyReadModel
+	DefaultPasswordAgePolicy        password_age2.PasswordAgePolicyReadModel
+	DefaultPasswordLockoutPolicy    password_lockout2.PasswordLockoutPolicyReadModel
 }
 
 func NewReadModel(id string) *ReadModel {
@@ -82,12 +85,12 @@ func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 			*password_complexity2.PasswordComplexityPolicyChangedEvent:
 
 			rm.DefaultPasswordComplexityPolicy.AppendEvents(event)
-		case *policy.PasswordAgePolicyAddedEvent,
-			*policy.PasswordAgePolicyChangedEvent:
+		case *password_age.PasswordAgePolicyAddedEvent,
+			*password_age.PasswordAgePolicyChangedEvent:
 
 			rm.DefaultPasswordAgePolicy.AppendEvents(event)
-		case *policy.PasswordLockoutPolicyAddedEvent,
-			*policy.PasswordLockoutPolicyChangedEvent:
+		case *password_lockout.PasswordLockoutPolicyAddedEvent,
+			*password_lockout.PasswordLockoutPolicyChangedEvent:
 
 			rm.DefaultPasswordLockoutPolicy.AppendEvents(event)
 		}
