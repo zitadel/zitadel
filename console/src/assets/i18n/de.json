@@ -844,12 +844,12 @@
             "SECONDFACTORDESCRIPTION":"Definieren Sie hier Ihre Zweitfaktoren, die sie für die Authentifizierung verwenden können."
         },
         "CREATE": {
-            "TITLE":"Neuer Multifaktor",
-            "DESCRIPTION":"Definieren Sie hier die Zugangsdaten des neuen Identitäts Providers"
+            "TITLE":"Neuer Faktor",
+            "DESCRIPTION":"Definieren Sie hier den gewünschten Typ."
         },
         "DELETE": {
-            "TITLE":"Mfa löschen",
-            "DESCRIPTION":"Sie sind im Begriff einen MFA zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?"
+            "TITLE":"Faktor löschen",
+            "DESCRIPTION":"Sie sind im Begriff einen Faktor zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?"
         },
         "TOAST": {
             "ADDED":"Erfolgreich hinzugefügt.",
@@ -864,7 +864,7 @@
         "SECONDFACTORTYPES": {
             "0":"Unknown",
             "1":"OTP",
-            "2":"U2F with Pin"
+            "2":"U2F"
         }
     },
     "LOGINPOLICY": {

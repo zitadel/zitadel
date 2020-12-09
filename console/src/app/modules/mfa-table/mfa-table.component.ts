@@ -1,13 +1,16 @@
-import { SelectionModel } from '@angular/cdk/collections';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { MatTableDataSource } from '@angular/material/table';
-import { RouterLink } from '@angular/router';
+import { MatPaginator } from '@angular/material/paginator';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { MultiFactor as AdminMultiFactor, MultiFactorType as AdminMultiFactorType, SecondFactor as AdminSecondFactor, SecondFactorType as AdminSecondFactorType } from 'src/app/proto/generated/admin_pb';
-import { MultiFactor as MgmtMultiFactor, MultiFactorType as MgmtMultiFactorType, SecondFactor as MgmtSecondFactor, SecondFactorType as MgmtSecondFactorType } from 'src/app/proto/generated/management_pb';
+import {
+    MultiFactor as AdminMultiFactor, MultiFactorType as AdminMultiFactorType,
+    SecondFactor as AdminSecondFactor, SecondFactorType as AdminSecondFactorType,
+} from 'src/app/proto/generated/admin_pb';
+import {
+    MultiFactor as MgmtMultiFactor, MultiFactorType as MgmtMultiFactorType,
+    SecondFactor as MgmtSecondFactor, SecondFactorType as MgmtSecondFactorType,
+} from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -97,17 +100,28 @@ export class MfaTableComponent implements OnInit {
     }
 
     public addMfa(): void {
+
+        let selection: any[] = [];
+
+        if (this.componentType === LoginMethodComponentType.MultiFactor) {
+            selection = this.serviceType === PolicyComponentServiceType.MGMT ?
+                [MgmtMultiFactorType.MULTIFACTORTYPE_U2F_WITH_PIN] :
+                this.serviceType === PolicyComponentServiceType.ADMIN ?
+                    [AdminMultiFactorType.MULTIFACTORTYPE_U2F_WITH_PIN] :
+                    [];
+        } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
+            selection = this.serviceType === PolicyComponentServiceType.MGMT ?
+                [MgmtSecondFactorType.SECONDFACTORTYPE_U2F, MgmtSecondFactorType.SECONDFACTORTYPE_U2F] :
+                this.serviceType === PolicyComponentServiceType.ADMIN ?
+                    [AdminSecondFactorType.SECONDFACTORTYPE_OTP, AdminSecondFactorType.SECONDFACTORTYPE_U2F] :
+                    [];
+        }
         const dialogRef = this.dialog.open(DialogAddTypeComponent, {
             data: {
                 title: 'MFA.CREATE.TITLE',
                 desc: 'MFA.CREATE.DESCRIPTION',
                 componentType: this.componentType,
-                types:
-                    this.serviceType === PolicyComponentServiceType.MGMT ?
-                        [MgmtMultiFactorType.MULTIFACTORTYPE_U2F_WITH_PIN] :
-                        this.serviceType === PolicyComponentServiceType.ADMIN ?
-                            [AdminMultiFactorType.MULTIFACTORTYPE_U2F_WITH_PIN] :
-                            [],
+                types: selection,
             },
             width: '400px',
         });

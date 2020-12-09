@@ -1,9 +1,13 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
-import { MultiFactor as AdminMultiFactor, MultiFactorType as AdminMultiFactorType } from 'src/app/proto/generated/admin_pb';
-import { MultiFactor as MgmtMultiFactor, MultiFactorType as MgmtMultiFactorType } from 'src/app/proto/generated/management_pb';
-import { LoginMethodComponentType } from '../mfa-table.component';
+import { MultiFactorType as AdminMultiFactorType } from 'src/app/proto/generated/admin_pb';
+import { MultiFactorType as MgmtMultiFactorType } from 'src/app/proto/generated/management_pb';
+
+enum LoginMethodComponentType {
+    MultiFactor = 1,
+    SecondFactor = 2,
+}
 
 @Component({
     selector: 'app-dialog-add-type',
