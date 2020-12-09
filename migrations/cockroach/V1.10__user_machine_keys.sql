@@ -1,3 +1,4 @@
+
 ALTER TABLE management.users ADD COLUMN machine_name STRING, ADD COLUMN machine_description STRING, ADD COLUMN user_type STRING;
 ALTER TABLE adminapi.users ADD COLUMN machine_name STRING, ADD COLUMN machine_description STRING, ADD COLUMN user_type STRING;
 ALTER TABLE auth.users ADD COLUMN machine_name STRING, ADD COLUMN machine_description STRING, ADD COLUMN user_type STRING;
