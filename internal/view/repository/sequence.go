@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"database/sql"
-	"errors"
 	"strings"
 	"time"
 
@@ -56,7 +54,7 @@ func SaveCurrentSequence(db *gorm.DB, table, viewName string, sequence uint64) e
 }
 
 func LatestSequence(db *gorm.DB, table, viewName string) (*CurrentSequence, error) {
-	sequence := &CurrentSequence{ViewName: viewName}
+	sequence := new(CurrentSequence)
 	query := PrepareGetByKey(table, sequenceSearchKey(SequenceSearchKeyViewName), viewName)
 	err := query(db, sequence)
 
@@ -64,7 +62,7 @@ func LatestSequence(db *gorm.DB, table, viewName string) (*CurrentSequence, erro
 		return sequence, nil
 	}
 
-	if caos_errs.IsNotFound(err) || errors.Is(err, sql.ErrNoRows) {
+	if caos_errs.IsNotFound(err) {
 		return sequence, nil
 	}
 	return nil, caos_errs.ThrowInternalf(err, "VIEW-9LyCB", "unable to get latest sequence of %s", viewName)
