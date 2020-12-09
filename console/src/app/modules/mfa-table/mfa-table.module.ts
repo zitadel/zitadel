@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
@@ -16,9 +17,12 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
 import { TruncatePipeModule } from 'src/app/pipes/truncate-pipe/truncate-pipe.module';
 
 import { MfaTableComponent } from './mfa-table.component';
+import { DialogAddTypeComponent } from './dialog-add-type/dialog-add-type.component';
+import { InputModule } from '../input/input.module';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
-    declarations: [MfaTableComponent],
+    declarations: [MfaTableComponent, DialogAddTypeComponent],
     imports: [
         CommonModule,
         FormsModule,
@@ -26,6 +30,8 @@ import { MfaTableComponent } from './mfa-table.component';
         MatButtonModule,
         MatCheckboxModule,
         MatIconModule,
+        InputModule,
+        MatSelectModule,
         MatTooltipModule,
         TranslateModule,
         LocalizedDatePipeModule,
@@ -36,6 +42,7 @@ import { MfaTableComponent } from './mfa-table.component';
         RefreshTableModule,
         HasRoleModule,
         TruncatePipeModule,
+        MatProgressSpinnerModule,
     ],
     exports: [
         MfaTableComponent,

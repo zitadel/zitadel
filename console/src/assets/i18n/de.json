@@ -845,14 +845,19 @@
             "TITLE":"Neuer Multifaktor",
             "DESCRIPTION":"Definieren Sie hier die Zugangsdaten des neuen Identitäts Providers"
         },
+        "DELETE": {
+            "TITLE":"Mfa löschen",
+            "DESCRIPTION":"Sie sind im Begriff einen MFA zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?"
+        },
         "TOAST": {
+            "ADDED":"Erfolgreich hinzugefügt.",
             "SAVED": "Erfolgreich gespeichert.",
-            "REACTIVATED":"Mfa reaktiviert.",
-            "DEACTIVATED":"Mfa deaktiviert.",
-            "SELECTEDREACTIVATED":"Selektierte Mfas reaktiviert.",
-            "SELECTEDDEACTIVATED":"Selektierte Mfas deaktiviert.",
-            "SELECTEDKEYSDELETED":"Selektierte Mfas gelöscht.",
             "DELETED":"Mfa erfolgreich gelöscht!"
+        },
+        "TYPE":"Typ",
+        "TYPES": {
+            "0":"Unbekannt",
+            "1":"U2F mit Pin"
         }
     },
     "LOGINPOLICY": {

@@ -53,6 +53,12 @@
         </div>
     </div>
 
+    <h3 class="subheader">{{ 'MFA.LIST.TITLE' | translate }}</h3>
+    <p class="subdesc">{{ 'MFA.LIST.DESCRIPTION' | translate }}</p>
+    <app-mfa-table [service]="service" [serviceType]="serviceType"
+        [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false">
+    </app-mfa-table>
+
     <h3 class="subheader">{{'LOGINPOLICY.IDPS' | translate}}</h3>
 
     <div class="idps">
@@ -74,18 +80,10 @@
         mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
 
     <ng-template appHasRole [appHasRole]="['org.idp.read']">
-        <!-- <h2>{{ 'IDP.LIST.TITLE' | translate }}</h2>
+        <h2>{{ 'IDP.LIST.TITLE' | translate }}</h2>
         <p>{{ 'IDP.LIST.DESCRIPTION' | translate }}</p>
         <app-idp-table [service]="service" [serviceType]="serviceType"
             [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false">
-        </app-idp-table> -->
-
-        <h2>{{ 'MFA.LIST.TITLE' | translate }}</h2>
-        <p>{{ 'MFA.LIST.DESCRIPTION' | translate }}</p>
-        <app-idp-table [service]="service" [serviceType]="serviceType"
-            [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false">
         </app-idp-table>
-
-
     </ng-template>
 </app-detail-layout>

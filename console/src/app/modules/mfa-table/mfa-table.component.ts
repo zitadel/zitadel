@@ -6,14 +6,15 @@ import { MatTableDataSource } from '@angular/material/table';
 import { RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { MultiFactorsResult as AdminMultiFactorsResult, , MultiFactorType as AdminMultiFactorType } from 'src/app/proto/generated/admin_pb';
-import { MultiFactorsResult as MgmtMultiFactorsResult, MultiFactorType as MgmtMultiFactorType } from 'src/app/proto/generated/management_pb';
+import { MultiFactor as AdminMultiFactor, MultiFactorType as AdminMultiFactorType } from 'src/app/proto/generated/admin_pb';
+import { MultiFactor as MgmtMultiFactor, MultiFactorType as MgmtMultiFactorType } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
+import { DialogAddTypeComponent } from './dialog-add-type/dialog-add-type.component';
 
 @Component({
     selector: 'app-mfa-table',
@@ -25,31 +26,22 @@ export class MfaTableComponent implements OnInit {
     @Input() service!: AdminService | ManagementService;
     @Input() disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    public dataSource: MatTableDataSource<AdminMultiFactorsResult.AsObject | MgmtMultiFactorsResult.AsObject>
-        = new MatTableDataSource<AdminMultiFactorsResult.AsObject | MgmtMultiFactorsResult.AsObject>();
-    public selection: SelectionModel<AdminMultiFactorsResult.AsObject | MgmtMultiFactorsResult.AsObject>
-        = new SelectionModel<MgmtMultiFactorType.AsObject | AdminMultiFactorType.AsObject>(true, []);
-    public mfaResult!: AdminMultiFactorsResult.AsObject;
+    public mfas: Array<AdminMultiFactorType | MgmtMultiFactorType> = [];
 
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
     public PolicyComponentServiceType: any = PolicyComponentServiceType;
-    @Input() public displayedColumns: string[] = ['select', 'name', 'config', 'creationDate', 'changeDate', 'state'];
+    @Input() public displayedColumns: string[] = ['type'];
 
-    @Output() public changedSelection: EventEmitter<Array<AdminMultiFactorsResult.AsObject | MgmtMultiFactorsResult.AsObject>>
-        = new EventEmitter();
-
-    constructor(public translate: TranslateService, private toast: ToastService, private dialog: MatDialog) {
-        this.selection.changed.subscribe(() => {
-            this.changedSelection.emit(this.selection.selected);
-        });
-    }
+    constructor(public translate: TranslateService, private toast: ToastService, private dialog: MatDialog) { }
 
     ngOnInit(): void {
-        this.getData(10, 0);
+        this.getData();
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
-            this.displayedColumns = ['select', 'name', 'config', 'creationDate', 'changeDate', 'state', 'type'];
+            this.displayedColumns = ['type'];
+        } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
+            this.displayedColumns = ['type'];
         }
 
         if (!this.disabled) {
@@ -57,134 +49,101 @@ export class MfaTableComponent implements OnInit {
         }
     }
 
-    public isAllSelected(): boolean {
-        const numSelected = this.selection.selected.length;
-        const numRows = this.dataSource.data.length;
-        return numSelected === numRows;
-    }
-
-    public masterToggle(): void {
-        this.isAllSelected() ?
-            this.selection.clear() :
-            this.dataSource.data.forEach(row => this.selection.select(row));
-    }
-
-
-    public changePage(event: PageEvent): void {
-        this.getData(event.pageSize, event.pageIndex * event.pageSize);
-    }
-
-    public deactivateSelectedIdps(): void {
-        this.selection.clear();
-        Promise.all(this.selection.selected.map(value => {
-            return this.service.DeactivateIdpConfig(value.id);
-        })).then(() => {
-            this.toast.showInfo('IDP.TOAST.SELECTEDDEACTIVATED', true);
-            this.refreshPage();
-        });
-    }
-
-    public reactivateSelectedIdps(): void {
-        this.selection.clear();
-        Promise.all(this.selection.selected.map(value => {
-            return this.service.ReactivateIdpConfig(value.id);
-        })).then(() => {
-            this.toast.showInfo('IDP.TOAST.SELECTEDREACTIVATED', true);
-            this.refreshPage();
-        });
-    }
-
-    public removeSelectedIdps(): void {
+    public removeMfa(type: MgmtMultiFactorType | AdminMultiFactorType): void {
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
                 confirmKey: 'ACTIONS.DELETE',
                 cancelKey: 'ACTIONS.CANCEL',
-                titleKey: 'IDP.DELETE_SELECTION_TITLE',
-                descriptionKey: 'IDP.DELETE_SELECTION_DESCRIPTION',
+                titleKey: 'MFA.DELETE.TITLE',
+                descriptionKey: 'MFA.DELETE.DESCRIPTION',
             },
             width: '400px',
         });
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                this.selection.clear();
-
-                Promise.all(this.selection.selected.map(value => {
-                    return this.service.RemoveIdpConfig(value.id);
-                })).then(() => {
-                    this.toast.showInfo('IDP.TOAST.SELECTEDDEACTIVATED', true);
-                    this.refreshPage();
-                });
+                if (this.serviceType === PolicyComponentServiceType.MGMT) {
+                    const req = new MgmtMultiFactor();
+                    req.setMultiFactor(type);
+                    (this.service as ManagementService).RemoveMultiFactorFromLoginPolicy(req).then(() => {
+                        this.toast.showInfo('MFA.TOAST.DELETED', true);
+                        this.refreshPageAfterTimout(2000);
+                    });
+                } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
+                    const req = new AdminMultiFactor();
+                    req.setMultiFactor(type);
+                    (this.service as AdminService).RemoveMultiFactorFromDefaultLoginPolicy(req).then(() => {
+                        this.toast.showInfo('MFA.TOAST.DELETED', true);
+                        this.refreshPageAfterTimout(2000);
+                    });
+                }
             }
         });
     }
 
-    public removeIdp(idp: AdminIdpView.AsObject | MgmtIdpView.AsObject): void {
-        const dialogRef = this.dialog.open(WarnDialogComponent, {
+    public addMfa(): void {
+        const dialogRef = this.dialog.open(DialogAddTypeComponent, {
             data: {
-                confirmKey: 'ACTIONS.DELETE',
-                cancelKey: 'ACTIONS.CANCEL',
-                titleKey: 'IDP.DELETE_TITLE',
-                descriptionKey: 'IDP.DELETE_DESCRIPTION',
+                title: 'MFA.CREATE.TITLE',
+                desc: 'MFA.CREATE.DESCRIPTION',
+                types:
+                    this.serviceType === PolicyComponentServiceType.MGMT ?
+                        [MgmtMultiFactorType.MULTIFACTORTYPE_U2F_WITH_PIN] :
+                        this.serviceType === PolicyComponentServiceType.ADMIN ?
+                            [AdminMultiFactorType.MULTIFACTORTYPE_U2F_WITH_PIN] :
+                            [],
             },
             width: '400px',
         });
 
-        dialogRef.afterClosed().subscribe(resp => {
-            if (resp) {
-                this.service.RemoveIdpConfig(idp.id).then(() => {
-                    this.toast.showInfo('IDP.TOAST.REMOVED', true);
-                    setTimeout(() => {
-                        this.refreshPage();
-                    }, 1000);
-                });
+        dialogRef.afterClosed().subscribe((mfaType: AdminMultiFactorType | MgmtMultiFactorType) => {
+            if (mfaType) {
+                if (this.serviceType === PolicyComponentServiceType.MGMT) {
+                    const req = new MgmtMultiFactor();
+                    req.setMultiFactor(mfaType);
+                    (this.service as ManagementService).AddMultiFactorToLoginPolicy(req).then(() => {
+                        this.refreshPageAfterTimout(2000);
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
+                } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
+                    const req = new AdminMultiFactor();
+                    req.setMultiFactor(mfaType);
+                    (this.service as AdminService).addMultiFactorToDefaultLoginPolicy(req).then(() => {
+                        this.refreshPageAfterTimout(2000);
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
+                }
             }
         });
     }
 
-    private async getData(limit: number, offset: number): Promise<void> {
+    private async getData(): Promise<void> {
         this.loadingSubject.next(true);
 
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
             (this.service as ManagementService).GetLoginPolicyMultiFactors().then(resp => {
-                this.idpResult = resp.toObject();
-                this.dataSource.data = this.idpResult.resultList;
+                this.mfas = resp.toObject().multiFactorsList;
                 this.loadingSubject.next(false);
             }).catch(error => {
                 this.toast.showError(error);
                 this.loadingSubject.next(false);
             });
-        } else {
-
+        } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
+            (this.service as AdminService).getDefaultLoginPolicyMultiFactors().then(resp => {
+                this.mfas = resp.toObject().multiFactorsList;
+                this.loadingSubject.next(false);
+            }).catch(error => {
+                this.toast.showError(error);
+                this.loadingSubject.next(false);
+            });
         }
     }
 
-    public refreshPage(): void {
-        this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
-    }
-
-    public get createRouterLink(): RouterLink | any {
-        if (this.service instanceof AdminService) {
-            return ['/iam', 'idp', 'create'];
-        } else if (this.service instanceof ManagementService) {
-            return ['/org', 'idp', 'create'];
-        }
-    }
-
-    public routerLinkForRow(row: MgmtIdpView.AsObject | AdminIdpView.AsObject): any {
-        if (row.id) {
-            switch (this.serviceType) {
-                case PolicyComponentServiceType.MGMT:
-                    switch ((row as MgmtIdpView.AsObject).providerType) {
-                        case IdpProviderType.IDPPROVIDERTYPE_SYSTEM:
-                            return ['/iam', 'idp', row.id];
-                        case IdpProviderType.IDPPROVIDERTYPE_ORG:
-                            return ['/org', 'idp', row.id];
-                    }
-                    break;
-                case PolicyComponentServiceType.ADMIN:
-                    return ['/iam', 'idp', row.id];
-            }
-        }
+    public refreshPageAfterTimout(to: number): void {
+        setTimeout(() => {
+            this.getData();
+        }, to);
     }
 }
