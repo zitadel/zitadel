@@ -3,6 +3,7 @@ package spooler
 import (
 	"context"
 	"strconv"
+	"time"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
@@ -11,8 +12,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/view/repository"
-
-	"time"
 )
 
 const (
@@ -186,7 +185,7 @@ func HandleError(
 	failedErr error,
 	latestFailedEvent func(sequence uint64) (*repository.FailedEvent, error),
 	processFailedEvent func(*repository.FailedEvent) error,
-	processSequence func(uint64) error,
+	processSequence func(uint64, time.Time) error,
 	errorCountUntilSkip uint64,
 ) error {
 	failedEvent, err := latestFailedEvent(event.Sequence)
