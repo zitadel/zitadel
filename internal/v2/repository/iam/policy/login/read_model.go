@@ -5,16 +5,16 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/policy/login"
 )
 
-type LoginPolicyReadModel struct{ login.LoginPolicyReadModel }
+type ReadModel struct{ login.ReadModel }
 
-func (rm *LoginPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *LoginPolicyAddedEvent:
-			rm.ReadModel.AppendEvents(&e.LoginPolicyAddedEvent)
-		case *LoginPolicyChangedEvent:
-			rm.ReadModel.AppendEvents(&e.LoginPolicyChangedEvent)
-		case *login.LoginPolicyAddedEvent, *login.LoginPolicyChangedEvent:
+		case *AddedEvent:
+			rm.ReadModel.AppendEvents(&e.AddedEvent)
+		case *ChangedEvent:
+			rm.ReadModel.AppendEvents(&e.ChangedEvent)
+		case *login.AddedEvent, *login.ChangedEvent:
 			rm.ReadModel.AppendEvents(e)
 		}
 	}

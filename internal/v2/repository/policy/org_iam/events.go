@@ -12,33 +12,33 @@ const (
 	OrgIAMPolicyChangedEventType = "policy.org.iam.changed"
 )
 
-type OrgIAMPolicyAddedEvent struct {
+type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserLoginMustBeDomain bool `json:"userLoginMustBeDomain"`
 }
 
-func (e *OrgIAMPolicyAddedEvent) CheckPrevious() bool {
+func (e *AddedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *OrgIAMPolicyAddedEvent) Data() interface{} {
+func (e *AddedEvent) Data() interface{} {
 	return e
 }
 
-func NewOrgIAMPolicyAddedEvent(
+func NewAddedEvent(
 	base *eventstore.BaseEvent,
 	userLoginMustBeDomain bool,
-) *OrgIAMPolicyAddedEvent {
+) *AddedEvent {
 
-	return &OrgIAMPolicyAddedEvent{
+	return &AddedEvent{
 		BaseEvent:             *base,
 		UserLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }
 
-func OrgIAMPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &OrgIAMPolicyAddedEvent{
+func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -50,26 +50,26 @@ func OrgIAMPolicyAddedEventMapper(event *repository.Event) (eventstore.EventRead
 	return e, nil
 }
 
-type OrgIAMPolicyChangedEvent struct {
+type ChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserLoginMustBeDomain bool `json:"userLoginMustBeDomain"`
 }
 
-func (e *OrgIAMPolicyChangedEvent) CheckPrevious() bool {
+func (e *ChangedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *OrgIAMPolicyChangedEvent) Data() interface{} {
+func (e *ChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewOrgIAMPolicyChangedEvent(
+func NewChangedEvent(
 	base *eventstore.BaseEvent,
-	current *OrgIAMPolicyWriteModel,
+	current *WriteModel,
 	userLoginMustBeDomain bool,
-) *OrgIAMPolicyChangedEvent {
-	e := &OrgIAMPolicyChangedEvent{
+) *ChangedEvent {
+	e := &ChangedEvent{
 		BaseEvent: *base,
 	}
 	if current.UserLoginMustBeDomain != userLoginMustBeDomain {
@@ -78,8 +78,8 @@ func NewOrgIAMPolicyChangedEvent(
 	return e
 }
 
-func OrgIAMPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &OrgIAMPolicyChangedEvent{
+func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &ChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 

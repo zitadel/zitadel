@@ -9,9 +9,9 @@ const (
 	AggregateType = "iam"
 )
 
-type LoginPolicyIDPProviderWriteModel struct {
+type WriteModel struct {
 	eventstore.WriteModel
-	idpprovider.IDPProviderWriteModel
+	Provider idpprovider.WriteModel
 
 	idpConfigID string
 	iamID       string
@@ -19,48 +19,48 @@ type LoginPolicyIDPProviderWriteModel struct {
 	IsRemoved bool
 }
 
-func NewLoginPolicyIDPProviderWriteModel(iamID, idpConfigID string) *LoginPolicyIDPProviderWriteModel {
-	return &LoginPolicyIDPProviderWriteModel{
+func NewWriteModel(iamID, idpConfigID string) *WriteModel {
+	return &WriteModel{
 		iamID:       iamID,
 		idpConfigID: idpConfigID,
 	}
 }
 
-func (wm *LoginPolicyIDPProviderWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *WriteModel) AppendEvents(events ...eventstore.EventReader) {
 	wm.WriteModel.AppendEvents(events...)
 	for _, event := range events {
 		switch e := event.(type) {
-		case *LoginPolicyIDPProviderAddedEvent:
+		case *AddedEvent:
 			if e.IDPConfigID != wm.idpConfigID {
 				continue
 			}
-			wm.IDPProviderWriteModel.AppendEvents(&e.IDPProviderAddedEvent)
+			wm.Provider.AppendEvents(&e.AddedEvent)
 		}
 	}
 }
 
-func (wm *LoginPolicyIDPProviderWriteModel) Reduce() error {
+func (wm *WriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *LoginPolicyIDPProviderAddedEvent:
+		case *AddedEvent:
 			if e.IDPConfigID != wm.idpConfigID {
 				continue
 			}
 			wm.IsRemoved = false
-		case *LoginPolicyIDPProviderRemovedEvent:
+		case *RemovedEvent:
 			if e.IDPConfigID != wm.idpConfigID {
 				continue
 			}
 			wm.IsRemoved = true
 		}
 	}
-	if err := wm.IDPProviderWriteModel.Reduce(); err != nil {
+	if err := wm.Provider.Reduce(); err != nil {
 		return err
 	}
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *LoginPolicyIDPProviderWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *WriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).
 		AggregateIDs(wm.iamID)
 }

@@ -17,7 +17,7 @@ const (
 	LoginPolicyIDPProviderRemovedEventType = loginPolicyPrefix + provider.RemovedEventType
 )
 
-type LoginPolicyAddedEvent struct {
+type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	AllowUserNamePassword bool             `json:"allowUsernamePassword"`
@@ -27,23 +27,23 @@ type LoginPolicyAddedEvent struct {
 	PasswordlessType      PasswordlessType `json:"passwordlessType"`
 }
 
-func (e *LoginPolicyAddedEvent) CheckPrevious() bool {
+func (e *AddedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *LoginPolicyAddedEvent) Data() interface{} {
+func (e *AddedEvent) Data() interface{} {
 	return e
 }
 
-func NewLoginPolicyAddedEvent(
+func NewAddedEvent(
 	base *eventstore.BaseEvent,
 	allowUserNamePassword,
 	allowRegister,
 	allowExternalIDP,
 	forceMFA bool,
 	passwordlessType PasswordlessType,
-) *LoginPolicyAddedEvent {
-	return &LoginPolicyAddedEvent{
+) *AddedEvent {
+	return &AddedEvent{
 		BaseEvent:             *base,
 		AllowExternalIDP:      allowExternalIDP,
 		AllowRegister:         allowRegister,
@@ -53,8 +53,8 @@ func NewLoginPolicyAddedEvent(
 	}
 }
 
-func LoginPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &LoginPolicyAddedEvent{
+func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -66,7 +66,7 @@ func LoginPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReade
 	return e, nil
 }
 
-type LoginPolicyChangedEvent struct {
+type ChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	AllowUserNamePassword bool             `json:"allowUsernamePassword,omitempty"`
@@ -76,25 +76,25 @@ type LoginPolicyChangedEvent struct {
 	PasswordlessType      PasswordlessType `json:"passwordlessType"`
 }
 
-func (e *LoginPolicyChangedEvent) CheckPrevious() bool {
+func (e *ChangedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *LoginPolicyChangedEvent) Data() interface{} {
+func (e *ChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewLoginPolicyChangedEvent(
+func NewChangedEvent(
 	base *eventstore.BaseEvent,
-	current *LoginPolicyWriteModel,
+	current *WriteModel,
 	allowUserNamePassword,
 	allowRegister,
 	allowExternalIDP,
 	forceMFA bool,
 	passwordlessType PasswordlessType,
-) *LoginPolicyChangedEvent {
+) *ChangedEvent {
 
-	e := &LoginPolicyChangedEvent{
+	e := &ChangedEvent{
 		BaseEvent: *base,
 	}
 
@@ -117,8 +117,8 @@ func NewLoginPolicyChangedEvent(
 	return e
 }
 
-func LoginPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &LoginPolicyChangedEvent{
+func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &ChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -130,26 +130,26 @@ func LoginPolicyChangedEventMapper(event *repository.Event) (eventstore.EventRea
 	return e, nil
 }
 
-type LoginPolicyRemovedEvent struct {
+type RemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *LoginPolicyRemovedEvent) CheckPrevious() bool {
+func (e *RemovedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *LoginPolicyRemovedEvent) Data() interface{} {
+func (e *RemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewLoginPolicyRemovedEvent(base *eventstore.BaseEvent) *LoginPolicyRemovedEvent {
-	return &LoginPolicyRemovedEvent{
+func NewRemovedEvent(base *eventstore.BaseEvent) *RemovedEvent {
+	return &RemovedEvent{
 		BaseEvent: *base,
 	}
 }
 
-func LoginPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &LoginPolicyRemovedEvent{
+func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &RemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

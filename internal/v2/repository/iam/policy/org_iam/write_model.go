@@ -9,39 +9,39 @@ const (
 	AggregateType = "iam"
 )
 
-type OrgIAMPolicyWriteModel struct {
+type WriteModel struct {
 	eventstore.WriteModel
-	Policy org_iam.OrgIAMPolicyWriteModel
+	Policy org_iam.WriteModel
 
 	iamID string
 }
 
-func NewOrgIAMPolicyWriteModel(iamID string) *OrgIAMPolicyWriteModel {
-	return &OrgIAMPolicyWriteModel{
+func NewWriteModel(iamID string) *WriteModel {
+	return &WriteModel{
 		iamID: iamID,
 	}
 }
 
-func (wm *OrgIAMPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *WriteModel) AppendEvents(events ...eventstore.EventReader) {
 	wm.WriteModel.AppendEvents(events...)
 	for _, event := range events {
 		switch e := event.(type) {
-		case *OrgIAMPolicyAddedEvent:
-			wm.Policy.AppendEvents(&e.OrgIAMPolicyAddedEvent)
-		case *OrgIAMPolicyChangedEvent:
-			wm.Policy.AppendEvents(&e.OrgIAMPolicyChangedEvent)
+		case *AddedEvent:
+			wm.Policy.AppendEvents(&e.AddedEvent)
+		case *ChangedEvent:
+			wm.Policy.AppendEvents(&e.ChangedEvent)
 		}
 	}
 }
 
-func (wm *OrgIAMPolicyWriteModel) Reduce() error {
+func (wm *WriteModel) Reduce() error {
 	if err := wm.Policy.Reduce(); err != nil {
 		return err
 	}
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *OrgIAMPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *WriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).
 		AggregateIDs(wm.iamID)
 }

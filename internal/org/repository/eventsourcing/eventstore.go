@@ -838,7 +838,7 @@ func (es *OrgEventstore) AddIDPProviderToLoginPolicy(ctx context.Context, provid
 	if org.LoginPolicy == nil {
 		return nil, errors.ThrowAlreadyExists(nil, "EVENT-sk9fW", "Errors.Org.LoginPolicy.NotExisting")
 	}
-	if _, m := org.LoginPolicy.GetIdpProvider(provider.IdpConfigID); m != nil {
+	if _, m := org.LoginPolicy.GetIdpProvider(provider.IDPConfigID); m != nil {
 		return nil, errors.ThrowAlreadyExists(nil, "EVENT-Lso9f", "Errors.Org.LoginPolicy.IdpProviderAlreadyExisting")
 	}
 	repoOrg := model.OrgFromModel(org)
@@ -849,7 +849,7 @@ func (es *OrgEventstore) AddIDPProviderToLoginPolicy(ctx context.Context, provid
 	if err != nil {
 		return nil, err
 	}
-	if _, m := iam_es_model.GetIDPProvider(repoOrg.LoginPolicy.IDPProviders, provider.IdpConfigID); m != nil {
+	if _, m := iam_es_model.GetIDPProvider(repoOrg.LoginPolicy.IDPProviders, provider.IDPConfigID); m != nil {
 		return iam_es_model.IDPProviderToModel(m), nil
 	}
 	return nil, errors.ThrowInternal(nil, "EVENT-Slf9s", "Errors.Internal")
@@ -863,11 +863,11 @@ func (es *OrgEventstore) PrepareRemoveIDPProviderFromLoginPolicy(ctx context.Con
 	if err != nil {
 		return nil, nil, err
 	}
-	if _, m := org.LoginPolicy.GetIdpProvider(provider.IdpConfigID); m == nil {
+	if _, m := org.LoginPolicy.GetIdpProvider(provider.IDPConfigID); m == nil {
 		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-29skr", "Errors.IAM.LoginPolicy.IdpProviderNotExisting")
 	}
 	repoOrg := model.OrgFromModel(org)
-	providerID := &iam_es_model.IDPProviderID{provider.IdpConfigID}
+	providerID := &iam_es_model.IDPProviderID{provider.IDPConfigID}
 	providerAggregates, err := LoginPolicyIDPProviderRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoOrg, providerID, cascade)
 	if err != nil {
 		return nil, nil, err

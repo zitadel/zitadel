@@ -10,7 +10,7 @@ import (
 )
 
 func (r *Repository) AddOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
-	addedPolicy := org_iam.NewOrgIAMPolicyWriteModel(policy.AggregateID)
+	addedPolicy := org_iam.NewWriteModel(policy.AggregateID)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -47,11 +47,11 @@ func (r *Repository) ChangeOrgIAMPolicy(ctx context.Context, policy *iam_model.O
 	return writeModelToOrgIAMPolicy(existingPolicy), nil
 }
 
-func (r *Repository) orgIAMPolicyWriteModelByID(ctx context.Context, iamID string) (policy *org_iam.OrgIAMPolicyWriteModel, err error) {
+func (r *Repository) orgIAMPolicyWriteModelByID(ctx context.Context, iamID string) (policy *org_iam.WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := org_iam.NewOrgIAMPolicyWriteModel(iamID)
+	writeModel := org_iam.NewWriteModel(iamID)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

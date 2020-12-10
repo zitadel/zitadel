@@ -16,20 +16,20 @@ var (
 	LoginPolicyIDPProviderRemovedEventType = iamEventPrefix + login.LoginPolicyIDPProviderRemovedEventType
 )
 
-type LoginPolicyAddedEvent struct {
-	login.LoginPolicyAddedEvent
+type AddedEvent struct {
+	login.AddedEvent
 }
 
-func NewLoginPolicyAddedEventEvent(
+func NewAddedEvent(
 	ctx context.Context,
 	allowUsernamePassword,
 	allowRegister,
 	allowExternalIDP,
 	forceMFA bool,
 	passwordlessType login.PasswordlessType,
-) *LoginPolicyAddedEvent {
-	return &LoginPolicyAddedEvent{
-		LoginPolicyAddedEvent: *login.NewLoginPolicyAddedEvent(
+) *AddedEvent {
+	return &AddedEvent{
+		AddedEvent: *login.NewAddedEvent(
 			eventstore.NewBaseEventForPush(ctx, login.LoginPolicyAddedEventType),
 			allowUsernamePassword,
 			allowRegister,
@@ -39,30 +39,30 @@ func NewLoginPolicyAddedEventEvent(
 	}
 }
 
-func LoginPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := login.LoginPolicyAddedEventMapper(event)
+func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := login.AddedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &LoginPolicyAddedEvent{LoginPolicyAddedEvent: *e.(*login.LoginPolicyAddedEvent)}, nil
+	return &AddedEvent{AddedEvent: *e.(*login.AddedEvent)}, nil
 }
 
-type LoginPolicyChangedEvent struct {
-	login.LoginPolicyChangedEvent
+type ChangedEvent struct {
+	login.ChangedEvent
 }
 
-func LoginPolicyChangedEventFromExisting(
+func ChangedEventFromExisting(
 	ctx context.Context,
-	current *LoginPolicyWriteModel,
+	current *WriteModel,
 	allowUsernamePassword,
 	allowRegister,
 	allowExternalIDP,
 	forceMFA bool,
 	passwordlessType login.PasswordlessType,
-) (*LoginPolicyChangedEvent, error) {
+) (*ChangedEvent, error) {
 
-	event := login.NewLoginPolicyChangedEvent(
+	event := login.NewChangedEvent(
 		eventstore.NewBaseEventForPush(
 			ctx,
 			LoginPolicyChangedEventType,
@@ -74,16 +74,16 @@ func LoginPolicyChangedEventFromExisting(
 		forceMFA,
 		passwordlessType,
 	)
-	return &LoginPolicyChangedEvent{
+	return &ChangedEvent{
 		*event,
 	}, nil
 }
 
-func LoginPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := login.LoginPolicyChangedEventMapper(event)
+func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := login.ChangedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &LoginPolicyChangedEvent{LoginPolicyChangedEvent: *e.(*login.LoginPolicyChangedEvent)}, nil
+	return &ChangedEvent{ChangedEvent: *e.(*login.ChangedEvent)}, nil
 }

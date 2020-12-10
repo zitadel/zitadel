@@ -13,43 +13,43 @@ var (
 	LabelPolicyChangedEventType = iamEventPrefix + label.LabelPolicyChangedEventType
 )
 
-type LabelPolicyAddedEvent struct {
-	label.LabelPolicyAddedEvent
+type AddedEvent struct {
+	label.AddedEvent
 }
 
-func NewLabelPolicyAddedEventEvent(
+func NewAddedEvent(
 	ctx context.Context,
 	primaryColor,
 	secondaryColor string,
-) *LabelPolicyAddedEvent {
-	return &LabelPolicyAddedEvent{
-		LabelPolicyAddedEvent: *label.NewLabelPolicyAddedEvent(
+) *AddedEvent {
+	return &AddedEvent{
+		AddedEvent: *label.NewAddedEvent(
 			eventstore.NewBaseEventForPush(ctx, LabelPolicyAddedEventType),
 			primaryColor,
 			secondaryColor),
 	}
 }
 
-func LabelPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := label.LabelPolicyAddedEventMapper(event)
+func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := label.AddedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &LabelPolicyAddedEvent{LabelPolicyAddedEvent: *e.(*label.LabelPolicyAddedEvent)}, nil
+	return &AddedEvent{AddedEvent: *e.(*label.AddedEvent)}, nil
 }
 
-type LabelPolicyChangedEvent struct {
-	label.LabelPolicyChangedEvent
+type ChangedEvent struct {
+	label.ChangedEvent
 }
 
-func LabelPolicyChangedEventFromExisting(
+func ChangedEventFromExisting(
 	ctx context.Context,
-	current *LabelPolicyWriteModel,
+	current *WriteModel,
 	primaryColor,
 	secondaryColor string,
-) (*LabelPolicyChangedEvent, error) {
-	event := label.NewLabelPolicyChangedEvent(
+) (*ChangedEvent, error) {
+	event := label.NewChangedEvent(
 		eventstore.NewBaseEventForPush(
 			ctx,
 			LabelPolicyChangedEventType,
@@ -58,16 +58,16 @@ func LabelPolicyChangedEventFromExisting(
 		primaryColor,
 		secondaryColor,
 	)
-	return &LabelPolicyChangedEvent{
+	return &ChangedEvent{
 		*event,
 	}, nil
 }
 
-func LabelPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := label.LabelPolicyChangedEventMapper(event)
+func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := label.ChangedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &LabelPolicyChangedEvent{LabelPolicyChangedEvent: *e.(*label.LabelPolicyChangedEvent)}, nil
+	return &ChangedEvent{ChangedEvent: *e.(*label.ChangedEvent)}, nil
 }

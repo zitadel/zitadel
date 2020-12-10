@@ -15,7 +15,7 @@ func (r *Repository) AddLabelPolicy(ctx context.Context, policy *iam_model.Label
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-5Mv0s", "Errors.IAM.LabelPolicyInvalid")
 	}
 
-	addedPolicy := label.NewLabelPolicyWriteModel(policy.AggregateID)
+	addedPolicy := label.NewWriteModel(policy.AggregateID)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -56,11 +56,11 @@ func (r *Repository) ChangeLabelPolicy(ctx context.Context, policy *iam_model.La
 	return writeModelToLabelPolicy(existingPolicy), nil
 }
 
-func (r *Repository) labelPolicyWriteModelByID(ctx context.Context, iamID string) (policy *label.LabelPolicyWriteModel, err error) {
+func (r *Repository) labelPolicyWriteModelByID(ctx context.Context, iamID string) (policy *label.WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := label.NewLabelPolicyWriteModel(iamID)
+	writeModel := label.NewWriteModel(iamID)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

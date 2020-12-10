@@ -4,20 +4,20 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 )
 
-type PasswordLockoutPolicyWriteModel struct {
+type WriteModel struct {
 	eventstore.WriteModel
 
 	MaxAttempts         uint64
 	ShowLockOutFailures bool
 }
 
-func (wm *PasswordLockoutPolicyWriteModel) Reduce() error {
+func (wm *WriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *PasswordLockoutPolicyAddedEvent:
+		case *AddedEvent:
 			wm.MaxAttempts = e.MaxAttempts
 			wm.ShowLockOutFailures = e.ShowLockOutFailures
-		case *PasswordLockoutPolicyChangedEvent:
+		case *ChangedEvent:
 			wm.MaxAttempts = e.MaxAttempts
 			wm.ShowLockOutFailures = e.ShowLockOutFailures
 		}

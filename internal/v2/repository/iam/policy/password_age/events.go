@@ -13,43 +13,43 @@ var (
 	PasswordAgePolicyChangedEventType = iamEventPrefix + password_age.PasswordAgePolicyChangedEventType
 )
 
-type PasswordAgePolicyAddedEvent struct {
-	password_age.PasswordAgePolicyAddedEvent
+type AddedEvent struct {
+	password_age.AddedEvent
 }
 
-func NewPasswordAgePolicyAddedEvent(
+func NewAddedEvent(
 	ctx context.Context,
 	expireWarnDays,
 	maxAgeDays uint64,
-) *PasswordAgePolicyAddedEvent {
-	return &PasswordAgePolicyAddedEvent{
-		PasswordAgePolicyAddedEvent: *password_age.NewPasswordAgePolicyAddedEvent(
+) *AddedEvent {
+	return &AddedEvent{
+		AddedEvent: *password_age.NewAddedEvent(
 			eventstore.NewBaseEventForPush(ctx, PasswordAgePolicyAddedEventType),
 			expireWarnDays,
 			maxAgeDays),
 	}
 }
 
-func PasswordAgePolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := password_age.PasswordAgePolicyAddedEventMapper(event)
+func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := password_age.AddedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &PasswordAgePolicyAddedEvent{PasswordAgePolicyAddedEvent: *e.(*password_age.PasswordAgePolicyAddedEvent)}, nil
+	return &AddedEvent{AddedEvent: *e.(*password_age.AddedEvent)}, nil
 }
 
-type PasswordAgePolicyChangedEvent struct {
-	password_age.PasswordAgePolicyChangedEvent
+type ChangedEvent struct {
+	password_age.ChangedEvent
 }
 
-func PasswordAgePolicyChangedEventFromExisting(
+func ChangedEventFromExisting(
 	ctx context.Context,
-	current *PasswordAgePolicyWriteModel,
+	current *WriteModel,
 	expireWarnDays,
 	maxAgeDays uint64,
-) (*PasswordAgePolicyChangedEvent, error) {
-	event := password_age.NewPasswordAgePolicyChangedEvent(
+) (*ChangedEvent, error) {
+	event := password_age.NewChangedEvent(
 		eventstore.NewBaseEventForPush(
 			ctx,
 			PasswordAgePolicyChangedEventType,
@@ -58,16 +58,16 @@ func PasswordAgePolicyChangedEventFromExisting(
 		expireWarnDays,
 		maxAgeDays,
 	)
-	return &PasswordAgePolicyChangedEvent{
+	return &ChangedEvent{
 		*event,
 	}, nil
 }
 
-func PasswordAgePolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := password_age.PasswordAgePolicyChangedEventMapper(event)
+func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := password_age.ChangedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &PasswordAgePolicyChangedEvent{PasswordAgePolicyChangedEvent: *e.(*password_age.PasswordAgePolicyChangedEvent)}, nil
+	return &ChangedEvent{ChangedEvent: *e.(*password_age.ChangedEvent)}, nil
 }

@@ -158,7 +158,7 @@ func (repo *IAMRepository) RemoveIDPConfig(ctx context.Context, idpConfigID stri
 		if p.AggregateID == repo.SystemDefaults.IamID {
 			continue
 		}
-		provider := &iam_model.IDPProvider{ObjectRoot: es_models.ObjectRoot{AggregateID: p.AggregateID}, IdpConfigID: p.IDPConfigID}
+		provider := &iam_model.IDPProvider{ObjectRoot: es_models.ObjectRoot{AggregateID: p.AggregateID}, IDPConfigID: p.IDPConfigID}
 		providerAgg := new(es_models.Aggregate)
 		_, providerAgg, err = repo.OrgEvents.PrepareRemoveIDPProviderFromLoginPolicy(ctx, provider, true)
 		if err != nil {
@@ -332,7 +332,7 @@ func (repo *IAMRepository) RemoveIDPProviderFromLoginPolicy(ctx context.Context,
 	}
 	aggregates = append(aggregates, removeAgg)
 
-	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(provider.IdpConfigID)
+	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(provider.IDPConfigID)
 	if err != nil {
 		return err
 	}

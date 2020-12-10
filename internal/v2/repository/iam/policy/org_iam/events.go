@@ -13,41 +13,41 @@ var (
 	OrgIAMPolicyChangedEventType = iamEventPrefix + org_iam.OrgIAMPolicyChangedEventType
 )
 
-type OrgIAMPolicyAddedEvent struct {
-	org_iam.OrgIAMPolicyAddedEvent
+type AddedEvent struct {
+	org_iam.AddedEvent
 }
 
-func NewOrgIAMPolicyAddedEventEvent(
+func NewAddedEvent(
 	ctx context.Context,
 	userLoginMustBeDomain bool,
-) *OrgIAMPolicyAddedEvent {
-	return &OrgIAMPolicyAddedEvent{
-		OrgIAMPolicyAddedEvent: *org_iam.NewOrgIAMPolicyAddedEvent(
+) *AddedEvent {
+	return &AddedEvent{
+		AddedEvent: *org_iam.NewAddedEvent(
 			eventstore.NewBaseEventForPush(ctx, OrgIAMPolicyAddedEventType),
 			userLoginMustBeDomain,
 		),
 	}
 }
 
-func OrgIAMPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := org_iam.OrgIAMPolicyAddedEventMapper(event)
+func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := org_iam.AddedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &OrgIAMPolicyAddedEvent{OrgIAMPolicyAddedEvent: *e.(*org_iam.OrgIAMPolicyAddedEvent)}, nil
+	return &AddedEvent{AddedEvent: *e.(*org_iam.AddedEvent)}, nil
 }
 
-type OrgIAMPolicyChangedEvent struct {
-	org_iam.OrgIAMPolicyChangedEvent
+type ChangedEvent struct {
+	org_iam.ChangedEvent
 }
 
-func OrgIAMPolicyChangedEventFromExisting(
+func ChangedEventFromExisting(
 	ctx context.Context,
-	current *OrgIAMPolicyWriteModel,
+	current *WriteModel,
 	userLoginMustBeDomain bool,
-) (*OrgIAMPolicyChangedEvent, error) {
-	event := org_iam.NewOrgIAMPolicyChangedEvent(
+) (*ChangedEvent, error) {
+	event := org_iam.NewChangedEvent(
 		eventstore.NewBaseEventForPush(
 			ctx,
 			OrgIAMPolicyChangedEventType,
@@ -55,16 +55,16 @@ func OrgIAMPolicyChangedEventFromExisting(
 		&current.Policy,
 		userLoginMustBeDomain,
 	)
-	return &OrgIAMPolicyChangedEvent{
+	return &ChangedEvent{
 		*event,
 	}, nil
 }
 
-func OrgIAMPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := org_iam.OrgIAMPolicyChangedEventMapper(event)
+func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := org_iam.ChangedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &OrgIAMPolicyChangedEvent{OrgIAMPolicyChangedEvent: *e.(*org_iam.OrgIAMPolicyChangedEvent)}, nil
+	return &ChangedEvent{ChangedEvent: *e.(*org_iam.ChangedEvent)}, nil
 }

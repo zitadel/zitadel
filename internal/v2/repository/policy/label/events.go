@@ -13,36 +13,36 @@ const (
 	LabelPolicyRemovedEventType = "policy.label.removed"
 )
 
-type LabelPolicyAddedEvent struct {
+type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	PrimaryColor   string `json:"primaryColor,omitempty"`
 	SecondaryColor string `json:"secondaryColor,omitempty"`
 }
 
-func (e *LabelPolicyAddedEvent) CheckPrevious() bool {
+func (e *AddedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *LabelPolicyAddedEvent) Data() interface{} {
+func (e *AddedEvent) Data() interface{} {
 	return e
 }
 
-func NewLabelPolicyAddedEvent(
+func NewAddedEvent(
 	base *eventstore.BaseEvent,
 	primaryColor,
 	secondaryColor string,
-) *LabelPolicyAddedEvent {
+) *AddedEvent {
 
-	return &LabelPolicyAddedEvent{
+	return &AddedEvent{
 		BaseEvent:      *base,
 		PrimaryColor:   primaryColor,
 		SecondaryColor: secondaryColor,
 	}
 }
 
-func LabelPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &LabelPolicyAddedEvent{
+func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -54,29 +54,29 @@ func LabelPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReade
 	return e, nil
 }
 
-type LabelPolicyChangedEvent struct {
+type ChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	PrimaryColor   string `json:"primaryColor,omitempty"`
 	SecondaryColor string `json:"secondaryColor,omitempty"`
 }
 
-func (e *LabelPolicyChangedEvent) CheckPrevious() bool {
+func (e *ChangedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *LabelPolicyChangedEvent) Data() interface{} {
+func (e *ChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewLabelPolicyChangedEvent(
+func NewChangedEvent(
 	base *eventstore.BaseEvent,
-	current *LabelPolicyWriteModel,
+	current *WriteModel,
 	primaryColor,
 	secondaryColor string,
-) *LabelPolicyChangedEvent {
+) *ChangedEvent {
 
-	e := &LabelPolicyChangedEvent{
+	e := &ChangedEvent{
 		BaseEvent: *base,
 	}
 	if primaryColor != "" && current.PrimaryColor != primaryColor {
@@ -89,8 +89,8 @@ func NewLabelPolicyChangedEvent(
 	return e
 }
 
-func LabelPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &LabelPolicyChangedEvent{
+func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &ChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -102,26 +102,26 @@ func LabelPolicyChangedEventMapper(event *repository.Event) (eventstore.EventRea
 	return e, nil
 }
 
-type LabelPolicyRemovedEvent struct {
+type RemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *LabelPolicyRemovedEvent) CheckPrevious() bool {
+func (e *RemovedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *LabelPolicyRemovedEvent) Data() interface{} {
+func (e *RemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewLabelPolicyRemovedEvent(base *eventstore.BaseEvent) *LabelPolicyRemovedEvent {
-	return &LabelPolicyRemovedEvent{
+func NewRemovedEvent(base *eventstore.BaseEvent) *RemovedEvent {
+	return &RemovedEvent{
 		BaseEvent: *base,
 	}
 }
 
-func LabelPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &LabelPolicyRemovedEvent{
+func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &RemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

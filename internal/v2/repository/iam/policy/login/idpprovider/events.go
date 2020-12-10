@@ -10,58 +10,57 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/idp/provider"
 )
 
-type LoginPolicyIDPProviderAddedEvent struct {
-	idpprovider.IDPProviderAddedEvent
+type AddedEvent struct {
+	idpprovider.AddedEvent
 }
 
-func NewLoginPolicyIDPProviderAddedEvent(
+func NewAddedEvent(
 	ctx context.Context,
 	idpConfigID string,
 	idpProviderType provider.Type,
-) *LoginPolicyIDPProviderAddedEvent {
+) *AddedEvent {
 
-	return &LoginPolicyIDPProviderAddedEvent{
-		IDPProviderAddedEvent: *idpprovider.NewIDPProviderAddedEvent(
+	return &AddedEvent{
+		AddedEvent: *idpprovider.NewAddedEvent(
 			eventstore.NewBaseEventForPush(ctx, login.LoginPolicyIDPProviderAddedEventType),
 			idpConfigID,
 			idpProviderType),
 	}
 }
 
-func IDPProviderAddedEventEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := idpprovider.IDPProviderAddedEventEventMapper(event)
+func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := idpprovider.AddedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &LoginPolicyIDPProviderAddedEvent{
-		IDPProviderAddedEvent: *e.(*idpprovider.IDPProviderAddedEvent),
+	return &AddedEvent{
+		AddedEvent: *e.(*idpprovider.AddedEvent),
 	}, nil
 }
 
-type LoginPolicyIDPProviderRemovedEvent struct {
-	idpprovider.IDPProviderRemovedEvent
+type RemovedEvent struct {
+	idpprovider.RemovedEvent
 }
 
-func NewLoginPolicyIDPProviderRemovedEvent(
+func NewRemovedEvent(
 	ctx context.Context,
 	idpConfigID string,
-) *LoginPolicyIDPProviderRemovedEvent {
-
-	return &LoginPolicyIDPProviderRemovedEvent{
-		IDPProviderRemovedEvent: *idpprovider.NewIDPProviderRemovedEvent(
+) *RemovedEvent {
+	return &RemovedEvent{
+		RemovedEvent: *idpprovider.NewRemovedEvent(
 			eventstore.NewBaseEventForPush(ctx, login.LoginPolicyIDPProviderRemovedEventType),
 			idpConfigID),
 	}
 }
 
-func IDPProviderRemovedEventEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := idpprovider.IDPProviderRemovedEventEventMapper(event)
+func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := idpprovider.RemovedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &LoginPolicyIDPProviderRemovedEvent{
-		IDPProviderRemovedEvent: *e.(*idpprovider.IDPProviderRemovedEvent),
+	return &RemovedEvent{
+		RemovedEvent: *e.(*idpprovider.RemovedEvent),
 	}, nil
 }

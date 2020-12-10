@@ -10,25 +10,25 @@ var (
 	LoginPolicyChangedEventType = orgEventTypePrefix + login.LoginPolicyChangedEventType
 )
 
-type LoginPolicyReadModel struct{ login.LoginPolicyReadModel }
+type LoginPolicyReadModel struct{ login.ReadModel }
 
 func (rm *LoginPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *LoginPolicyAddedEvent:
-			rm.ReadModel.AppendEvents(&e.LoginPolicyAddedEvent)
+			rm.ReadModel.AppendEvents(&e.AddedEvent)
 		case *LoginPolicyChangedEvent:
-			rm.ReadModel.AppendEvents(&e.LoginPolicyChangedEvent)
-		case *login.LoginPolicyAddedEvent, *login.LoginPolicyChangedEvent:
+			rm.ReadModel.AppendEvents(&e.ChangedEvent)
+		case *login.AddedEvent, *login.ChangedEvent:
 			rm.ReadModel.AppendEvents(e)
 		}
 	}
 }
 
 type LoginPolicyAddedEvent struct {
-	login.LoginPolicyAddedEvent
+	login.AddedEvent
 }
 
 type LoginPolicyChangedEvent struct {
-	login.LoginPolicyChangedEvent
+	login.ChangedEvent
 }

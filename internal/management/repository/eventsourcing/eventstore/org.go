@@ -446,7 +446,7 @@ func (repo *OrgRepository) RemoveIDPProviderFromIdpProvider(ctx context.Context,
 		return err
 	}
 	aggregates = append(aggregates, agg)
-	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(provider.IdpConfigID)
+	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(provider.IDPConfigID)
 	if err != nil {
 		return err
 	}

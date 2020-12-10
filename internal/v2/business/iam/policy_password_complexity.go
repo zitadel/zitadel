@@ -14,7 +14,7 @@ func (r *Repository) AddPasswordComplexityPolicy(ctx context.Context, policy *ia
 		return nil, err
 	}
 
-	addedPolicy := password_complexity.NewPasswordComplexityPolicyWriteModel(policy.AggregateID)
+	addedPolicy := password_complexity.NewWriteModel(policy.AggregateID)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -55,11 +55,11 @@ func (r *Repository) ChangePasswordComplexityPolicy(ctx context.Context, policy 
 	return writeModelToPasswordComplexityPolicy(existingPolicy), nil
 }
 
-func (r *Repository) passwordComplexityPolicyWriteModelByID(ctx context.Context, iamID string) (policy *password_complexity.PasswordComplexityPolicyWriteModel, err error) {
+func (r *Repository) passwordComplexityPolicyWriteModelByID(ctx context.Context, iamID string) (policy *password_complexity.WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := password_complexity.NewPasswordComplexityPolicyWriteModel(iamID)
+	writeModel := password_complexity.NewWriteModel(iamID)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

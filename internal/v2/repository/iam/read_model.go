@@ -29,12 +29,12 @@ type ReadModel struct {
 	GlobalOrgID string
 	ProjectID   string
 
-	DefaultLoginPolicy              login2.LoginPolicyReadModel
-	DefaultLabelPolicy              label.LabelPolicyReadModel
-	DefaultOrgIAMPolicy             org_iam.OrgIAMPolicyReadModel
-	DefaultPasswordComplexityPolicy password_complexity.PasswordComplexityPolicyReadModel
-	DefaultPasswordAgePolicy        password_age2.PasswordAgePolicyReadModel
-	DefaultPasswordLockoutPolicy    password_lockout2.PasswordLockoutPolicyReadModel
+	DefaultLoginPolicy              login2.ReadModel
+	DefaultLabelPolicy              label.ReadModel
+	DefaultOrgIAMPolicy             org_iam.ReadModel
+	DefaultPasswordComplexityPolicy password_complexity.ReadModel
+	DefaultPasswordAgePolicy        password_age2.ReadModel
+	DefaultPasswordLockoutPolicy    password_lockout2.ReadModel
 }
 
 func NewReadModel(id string) *ReadModel {
@@ -71,26 +71,26 @@ func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 			*IDPOIDCConfigChangedEvent:
 
 			rm.IDPs.AppendEvents(event)
-		case *label2.LabelPolicyAddedEvent,
-			*label2.LabelPolicyChangedEvent:
+		case *label2.AddedEvent,
+			*label2.ChangedEvent:
 
 			rm.DefaultLabelPolicy.AppendEvents(event)
-		case *login.LoginPolicyAddedEvent,
-			*login.LoginPolicyChangedEvent:
+		case *login.AddedEvent,
+			*login.ChangedEvent:
 
 			rm.DefaultLoginPolicy.AppendEvents(event)
-		case *org_iam2.OrgIAMPolicyAddedEvent:
+		case *org_iam2.AddedEvent:
 			rm.DefaultOrgIAMPolicy.AppendEvents(event)
-		case *password_complexity2.PasswordComplexityPolicyAddedEvent,
-			*password_complexity2.PasswordComplexityPolicyChangedEvent:
+		case *password_complexity2.AddedEvent,
+			*password_complexity2.ChangedEvent:
 
 			rm.DefaultPasswordComplexityPolicy.AppendEvents(event)
-		case *password_age.PasswordAgePolicyAddedEvent,
-			*password_age.PasswordAgePolicyChangedEvent:
+		case *password_age.AddedEvent,
+			*password_age.ChangedEvent:
 
 			rm.DefaultPasswordAgePolicy.AppendEvents(event)
-		case *password_lockout.PasswordLockoutPolicyAddedEvent,
-			*password_lockout.PasswordLockoutPolicyChangedEvent:
+		case *password_lockout.AddedEvent,
+			*password_lockout.ChangedEvent:
 
 			rm.DefaultPasswordLockoutPolicy.AppendEvents(event)
 		}

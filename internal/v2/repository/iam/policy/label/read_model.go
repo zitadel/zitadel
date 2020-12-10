@@ -5,16 +5,16 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/policy/label"
 )
 
-type LabelPolicyReadModel struct{ label.LabelPolicyReadModel }
+type ReadModel struct{ label.ReadModel }
 
-func (rm *LabelPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *LabelPolicyAddedEvent:
-			rm.ReadModel.AppendEvents(&e.LabelPolicyAddedEvent)
-		case *LabelPolicyChangedEvent:
-			rm.ReadModel.AppendEvents(&e.LabelPolicyChangedEvent)
-		case *label.LabelPolicyAddedEvent, *label.LabelPolicyChangedEvent:
+		case *AddedEvent:
+			rm.ReadModel.AppendEvents(&e.AddedEvent)
+		case *ChangedEvent:
+			rm.ReadModel.AppendEvents(&e.ChangedEvent)
+		case *label.AddedEvent, *label.ChangedEvent:
 			rm.ReadModel.AppendEvents(e)
 		}
 	}

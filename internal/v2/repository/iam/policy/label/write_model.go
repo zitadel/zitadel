@@ -9,39 +9,39 @@ const (
 	AggregateType = "iam"
 )
 
-type LabelPolicyWriteModel struct {
+type WriteModel struct {
 	eventstore.WriteModel
-	Policy label.LabelPolicyWriteModel
+	Policy label.WriteModel
 
 	iamID string
 }
 
-func NewLabelPolicyWriteModel(iamID string) *LabelPolicyWriteModel {
-	return &LabelPolicyWriteModel{
+func NewWriteModel(iamID string) *WriteModel {
+	return &WriteModel{
 		iamID: iamID,
 	}
 }
 
-func (wm *LabelPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *WriteModel) AppendEvents(events ...eventstore.EventReader) {
 	wm.WriteModel.AppendEvents(events...)
 	for _, event := range events {
 		switch e := event.(type) {
-		case *LabelPolicyAddedEvent:
-			wm.Policy.AppendEvents(&e.LabelPolicyAddedEvent)
-		case *LabelPolicyChangedEvent:
-			wm.Policy.AppendEvents(&e.LabelPolicyChangedEvent)
+		case *AddedEvent:
+			wm.Policy.AppendEvents(&e.AddedEvent)
+		case *ChangedEvent:
+			wm.Policy.AppendEvents(&e.ChangedEvent)
 		}
 	}
 }
 
-func (wm *LabelPolicyWriteModel) Reduce() error {
+func (wm *WriteModel) Reduce() error {
 	if err := wm.Policy.Reduce(); err != nil {
 		return err
 	}
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *LabelPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *WriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).
 		AggregateIDs(wm.iamID)
 }

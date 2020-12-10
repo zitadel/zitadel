@@ -5,18 +5,18 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/policy/password_lockout"
 )
 
-type PasswordLockoutPolicyReadModel struct {
-	password_lockout.PasswordLockoutPolicyReadModel
+type ReadModel struct {
+	password_lockout.ReadModel
 }
 
-func (rm *PasswordLockoutPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *PasswordLockoutPolicyAddedEvent:
-			rm.ReadModel.AppendEvents(&e.PasswordLockoutPolicyAddedEvent)
-		case *PasswordLockoutPolicyChangedEvent:
-			rm.ReadModel.AppendEvents(&e.PasswordLockoutPolicyChangedEvent)
-		case *password_lockout.PasswordLockoutPolicyAddedEvent, *password_lockout.PasswordLockoutPolicyChangedEvent:
+		case *AddedEvent:
+			rm.ReadModel.AppendEvents(&e.AddedEvent)
+		case *ChangedEvent:
+			rm.ReadModel.AppendEvents(&e.ChangedEvent)
+		case *password_lockout.AddedEvent, *password_lockout.ChangedEvent:
 			rm.ReadModel.AppendEvents(e)
 		}
 	}

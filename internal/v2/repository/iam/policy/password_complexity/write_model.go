@@ -9,39 +9,39 @@ const (
 	AggregateType = "iam"
 )
 
-type PasswordComplexityPolicyWriteModel struct {
+type WriteModel struct {
 	eventstore.WriteModel
-	Policy password_complexity.PasswordComplexityPolicyWriteModel
+	Policy password_complexity.WriteModel
 
 	iamID string
 }
 
-func NewPasswordComplexityPolicyWriteModel(iamID string) *PasswordComplexityPolicyWriteModel {
-	return &PasswordComplexityPolicyWriteModel{
+func NewWriteModel(iamID string) *WriteModel {
+	return &WriteModel{
 		iamID: iamID,
 	}
 }
 
-func (wm *PasswordComplexityPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *WriteModel) AppendEvents(events ...eventstore.EventReader) {
 	wm.WriteModel.AppendEvents(events...)
 	for _, event := range events {
 		switch e := event.(type) {
-		case *PasswordComplexityPolicyAddedEvent:
-			wm.Policy.AppendEvents(&e.PasswordComplexityPolicyAddedEvent)
-		case *PasswordComplexityPolicyChangedEvent:
-			wm.Policy.AppendEvents(&e.PasswordComplexityPolicyChangedEvent)
+		case *AddedEvent:
+			wm.Policy.AppendEvents(&e.AddedEvent)
+		case *ChangedEvent:
+			wm.Policy.AppendEvents(&e.ChangedEvent)
 		}
 	}
 }
 
-func (wm *PasswordComplexityPolicyWriteModel) Reduce() error {
+func (wm *WriteModel) Reduce() error {
 	if err := wm.Policy.Reduce(); err != nil {
 		return err
 	}
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *PasswordComplexityPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *WriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).
 		AggregateIDs(wm.iamID)
 }

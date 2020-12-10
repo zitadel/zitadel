@@ -72,27 +72,27 @@ func idpProviderSearchResponseFromModel(response *iam_model.IDPProviderSearchRes
 
 func idpProviderToModel(provider *management.IdpProviderID) *iam_model.IDPProvider {
 	return &iam_model.IDPProvider{
-		IdpConfigID: provider.IdpConfigId,
+		IDPConfigID: provider.IdpConfigId,
 		Type:        iam_model.IDPProviderTypeSystem,
 	}
 }
 
 func idpProviderAddToModel(provider *management.IdpProviderAdd) *iam_model.IDPProvider {
 	return &iam_model.IDPProvider{
-		IdpConfigID: provider.IdpConfigId,
+		IDPConfigID: provider.IdpConfigId,
 		Type:        idpProviderTypeToModel(provider.IdpProviderType),
 	}
 }
 
 func idpProviderIDFromModel(provider *iam_model.IDPProvider) *management.IdpProviderID {
 	return &management.IdpProviderID{
-		IdpConfigId: provider.IdpConfigID,
+		IdpConfigId: provider.IDPConfigID,
 	}
 }
 
 func idpProviderFromModel(provider *iam_model.IDPProvider) *management.IdpProvider {
 	return &management.IdpProvider{
-		IdpConfigId:      provider.IdpConfigID,
+		IdpConfigId:      provider.IDPConfigID,
 		IdpProvider_Type: idpProviderTypeFromModel(provider.Type),
 	}
 }

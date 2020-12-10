@@ -4,7 +4,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 )
 
-type LoginPolicyWriteModel struct {
+type WriteModel struct {
 	eventstore.WriteModel
 
 	AllowUserNamePassword bool
@@ -14,16 +14,16 @@ type LoginPolicyWriteModel struct {
 	PasswordlessType      PasswordlessType
 }
 
-func (wm *LoginPolicyWriteModel) Reduce() error {
+func (wm *WriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *LoginPolicyAddedEvent:
+		case *AddedEvent:
 			wm.AllowRegister = e.AllowRegister
 			wm.AllowUserNamePassword = e.AllowUserNamePassword
 			wm.AllowExternalIDP = e.AllowExternalIDP
 			wm.ForceMFA = e.ForceMFA
 			wm.PasswordlessType = e.PasswordlessType
-		case *LoginPolicyChangedEvent:
+		case *ChangedEvent:
 			wm.AllowRegister = e.AllowRegister
 			wm.AllowUserNamePassword = e.AllowUserNamePassword
 			wm.AllowExternalIDP = e.AllowExternalIDP

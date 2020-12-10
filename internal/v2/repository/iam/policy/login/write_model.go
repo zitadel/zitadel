@@ -9,39 +9,39 @@ const (
 	AggregateType = "iam"
 )
 
-type LoginPolicyWriteModel struct {
+type WriteModel struct {
 	eventstore.WriteModel
-	Policy login.LoginPolicyWriteModel
+	Policy login.WriteModel
 
 	iamID string
 }
 
-func NewLoginPolicyWriteModel(iamID string) *LoginPolicyWriteModel {
-	return &LoginPolicyWriteModel{
+func NewWriteModel(iamID string) *WriteModel {
+	return &WriteModel{
 		iamID: iamID,
 	}
 }
 
-func (wm *LoginPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *WriteModel) AppendEvents(events ...eventstore.EventReader) {
 	wm.WriteModel.AppendEvents(events...)
 	for _, event := range events {
 		switch e := event.(type) {
-		case *LoginPolicyAddedEvent:
-			wm.Policy.AppendEvents(&e.LoginPolicyAddedEvent)
-		case *LoginPolicyChangedEvent:
-			wm.Policy.AppendEvents(&e.LoginPolicyChangedEvent)
+		case *AddedEvent:
+			wm.Policy.AppendEvents(&e.AddedEvent)
+		case *ChangedEvent:
+			wm.Policy.AppendEvents(&e.ChangedEvent)
 		}
 	}
 }
 
-func (wm *LoginPolicyWriteModel) Reduce() error {
+func (wm *WriteModel) Reduce() error {
 	if err := wm.Policy.Reduce(); err != nil {
 		return err
 	}
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *LoginPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *WriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).
 		AggregateIDs(wm.iamID)
 }

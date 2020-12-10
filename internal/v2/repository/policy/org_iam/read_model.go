@@ -2,18 +2,18 @@ package org_iam
 
 import "github.com/caos/zitadel/internal/eventstore/v2"
 
-type OrgIAMPolicyReadModel struct {
+type ReadModel struct {
 	eventstore.ReadModel
 
 	UserLoginMustBeDomain bool
 }
 
-func (rm *OrgIAMPolicyReadModel) Reduce() error {
+func (rm *ReadModel) Reduce() error {
 	for _, event := range rm.Events {
 		switch e := event.(type) {
-		case *OrgIAMPolicyAddedEvent:
+		case *AddedEvent:
 			rm.UserLoginMustBeDomain = e.UserLoginMustBeDomain
-		case *OrgIAMPolicyChangedEvent:
+		case *ChangedEvent:
 			rm.UserLoginMustBeDomain = e.UserLoginMustBeDomain
 		}
 	}

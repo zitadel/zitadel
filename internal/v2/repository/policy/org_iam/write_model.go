@@ -2,18 +2,18 @@ package org_iam
 
 import "github.com/caos/zitadel/internal/eventstore/v2"
 
-type OrgIAMPolicyWriteModel struct {
+type WriteModel struct {
 	eventstore.WriteModel
 
 	UserLoginMustBeDomain bool
 }
 
-func (wm *OrgIAMPolicyWriteModel) Reduce() error {
+func (wm *WriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *OrgIAMPolicyAddedEvent:
+		case *AddedEvent:
 			wm.UserLoginMustBeDomain = e.UserLoginMustBeDomain
-		case *OrgIAMPolicyChangedEvent:
+		case *ChangedEvent:
 			wm.UserLoginMustBeDomain = e.UserLoginMustBeDomain
 		}
 	}

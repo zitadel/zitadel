@@ -13,43 +13,43 @@ var (
 	PasswordLockoutPolicyChangedEventType = iamEventPrefix + password_lockout.PasswordLockoutPolicyChangedEventType
 )
 
-type PasswordLockoutPolicyAddedEvent struct {
-	password_lockout.PasswordLockoutPolicyAddedEvent
+type AddedEvent struct {
+	password_lockout.AddedEvent
 }
 
-func NewPasswordLockoutPolicyAddedEvent(
+func NewAddedEvent(
 	ctx context.Context,
 	maxAttempts uint64,
 	showLockoutFailure bool,
-) *PasswordLockoutPolicyAddedEvent {
-	return &PasswordLockoutPolicyAddedEvent{
-		PasswordLockoutPolicyAddedEvent: *password_lockout.NewPasswordLockoutPolicyAddedEvent(
+) *AddedEvent {
+	return &AddedEvent{
+		AddedEvent: *password_lockout.NewAddedEvent(
 			eventstore.NewBaseEventForPush(ctx, PasswordLockoutPolicyAddedEventType),
 			maxAttempts,
 			showLockoutFailure),
 	}
 }
 
-func PasswordLockoutPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := password_lockout.PasswordLockoutPolicyAddedEventMapper(event)
+func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := password_lockout.AddedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &PasswordLockoutPolicyAddedEvent{PasswordLockoutPolicyAddedEvent: *e.(*password_lockout.PasswordLockoutPolicyAddedEvent)}, nil
+	return &AddedEvent{AddedEvent: *e.(*password_lockout.AddedEvent)}, nil
 }
 
-type PasswordLockoutPolicyChangedEvent struct {
-	password_lockout.PasswordLockoutPolicyChangedEvent
+type ChangedEvent struct {
+	password_lockout.ChangedEvent
 }
 
-func PasswordLockoutPolicyChangedEventFromExisting(
+func ChangedEventFromExisting(
 	ctx context.Context,
-	current *PasswordLockoutPolicyWriteModel,
+	current *WriteModel,
 	maxAttempts uint64,
 	showLockoutFailure bool,
-) (*PasswordLockoutPolicyChangedEvent, error) {
-	event := password_lockout.NewPasswordLockoutPolicyChangedEvent(
+) (*ChangedEvent, error) {
+	event := password_lockout.NewChangedEvent(
 		eventstore.NewBaseEventForPush(
 			ctx,
 			PasswordLockoutPolicyChangedEventType,
@@ -58,16 +58,16 @@ func PasswordLockoutPolicyChangedEventFromExisting(
 		maxAttempts,
 		showLockoutFailure,
 	)
-	return &PasswordLockoutPolicyChangedEvent{
+	return &ChangedEvent{
 		*event,
 	}, nil
 }
 
-func PasswordLockoutPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := password_lockout.PasswordLockoutPolicyChangedEventMapper(event)
+func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := password_lockout.ChangedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &PasswordLockoutPolicyChangedEvent{PasswordLockoutPolicyChangedEvent: *e.(*password_lockout.PasswordLockoutPolicyChangedEvent)}, nil
+	return &ChangedEvent{ChangedEvent: *e.(*password_lockout.ChangedEvent)}, nil
 }

@@ -11,26 +11,26 @@ var (
 )
 
 type PasswordAgePolicyReadModel struct {
-	password_age.PasswordAgePolicyReadModel
+	password_age.ReadModel
 }
 
 func (rm *PasswordAgePolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *PasswordAgePolicyAddedEvent:
-			rm.ReadModel.AppendEvents(&e.PasswordAgePolicyAddedEvent)
+			rm.ReadModel.AppendEvents(&e.AddedEvent)
 		case *PasswordAgePolicyChangedEvent:
-			rm.ReadModel.AppendEvents(&e.PasswordAgePolicyChangedEvent)
-		case *password_age.PasswordAgePolicyAddedEvent, *password_age.PasswordAgePolicyChangedEvent:
+			rm.ReadModel.AppendEvents(&e.ChangedEvent)
+		case *password_age.AddedEvent, *password_age.ChangedEvent:
 			rm.ReadModel.AppendEvents(e)
 		}
 	}
 }
 
 type PasswordAgePolicyAddedEvent struct {
-	password_age.PasswordAgePolicyAddedEvent
+	password_age.AddedEvent
 }
 
 type PasswordAgePolicyChangedEvent struct {
-	password_age.PasswordAgePolicyChangedEvent
+	password_age.ChangedEvent
 }

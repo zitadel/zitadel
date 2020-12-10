@@ -5,19 +5,19 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/policy/password_age"
 )
 
-type PasswordAgePolicyReadModel struct {
-	password_age.PasswordAgePolicyReadModel
+type ReadModel struct {
+	password_age.ReadModel
 }
 
-func (rm *PasswordAgePolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *PasswordAgePolicyAddedEvent:
-			rm.ReadModel.AppendEvents(&e.PasswordAgePolicyAddedEvent)
-		case *PasswordAgePolicyChangedEvent:
-			rm.ReadModel.AppendEvents(&e.PasswordAgePolicyChangedEvent)
-		case *password_age.PasswordAgePolicyAddedEvent,
-			*password_age.PasswordAgePolicyChangedEvent:
+		case *AddedEvent:
+			rm.ReadModel.AppendEvents(&e.AddedEvent)
+		case *ChangedEvent:
+			rm.ReadModel.AppendEvents(&e.ChangedEvent)
+		case *password_age.AddedEvent,
+			*password_age.ChangedEvent:
 
 			rm.ReadModel.AppendEvents(e)
 		}

@@ -554,7 +554,7 @@ func (es *IAMEventstore) AddIDPProviderToLoginPolicy(ctx context.Context, provid
 	if err != nil {
 		return nil, err
 	}
-	if _, m := iam.DefaultLoginPolicy.GetIdpProvider(provider.IdpConfigID); m != nil {
+	if _, m := iam.DefaultLoginPolicy.GetIdpProvider(provider.IDPConfigID); m != nil {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-idke6", "Errors.IAM.LoginPolicy.IdpProviderAlreadyExisting")
 	}
 	repoIam := model.IAMFromModel(iam)
@@ -566,7 +566,7 @@ func (es *IAMEventstore) AddIDPProviderToLoginPolicy(ctx context.Context, provid
 		return nil, err
 	}
 	es.iamCache.cacheIAM(repoIam)
-	if _, m := model.GetIDPProvider(repoIam.DefaultLoginPolicy.IDPProviders, provider.IdpConfigID); m != nil {
+	if _, m := model.GetIDPProvider(repoIam.DefaultLoginPolicy.IDPProviders, provider.IDPConfigID); m != nil {
 		return model.IDPProviderToModel(m), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-Slf9s", "Errors.Internal")
@@ -580,11 +580,11 @@ func (es *IAMEventstore) PrepareRemoveIDPProviderFromLoginPolicy(ctx context.Con
 	if err != nil {
 		return nil, nil, err
 	}
-	if _, m := iam.DefaultLoginPolicy.GetIdpProvider(provider.IdpConfigID); m == nil {
+	if _, m := iam.DefaultLoginPolicy.GetIdpProvider(provider.IDPConfigID); m == nil {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-29skr", "Errors.IAM.LoginPolicy.IdpProviderNotExisting")
 	}
 	repoIam := model.IAMFromModel(iam)
-	removeAgg, err := LoginPolicyIDPProviderRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoIam, &model.IDPProviderID{provider.IdpConfigID})
+	removeAgg, err := LoginPolicyIDPProviderRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoIam, &model.IDPProviderID{provider.IDPConfigID})
 	if err != nil {
 		return nil, nil, err
 	}

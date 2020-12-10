@@ -10,37 +10,37 @@ var (
 	LabelPolicyChangedEventType = orgEventTypePrefix + label.LabelPolicyChangedEventType
 )
 
-type LabelPolicyReadModel struct{ label.LabelPolicyReadModel }
+type LabelPolicyReadModel struct{ label.ReadModel }
 
 func (rm *LabelPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *LabelPolicyAddedEvent:
-			rm.ReadModel.AppendEvents(&e.LabelPolicyAddedEvent)
+			rm.ReadModel.AppendEvents(&e.AddedEvent)
 		case *LabelPolicyChangedEvent:
-			rm.ReadModel.AppendEvents(&e.LabelPolicyChangedEvent)
-		case *label.LabelPolicyAddedEvent, *label.LabelPolicyChangedEvent:
+			rm.ReadModel.AppendEvents(&e.ChangedEvent)
+		case *label.AddedEvent, *label.ChangedEvent:
 			rm.ReadModel.AppendEvents(e)
 		}
 	}
 }
 
 type LabelPolicyAddedEvent struct {
-	label.LabelPolicyAddedEvent
+	label.AddedEvent
 }
 
 type LabelPolicyChangedEvent struct {
-	label.LabelPolicyChangedEvent
+	label.ChangedEvent
 }
 
-// func NewLabelPolicyAddedEvent(
+// func NewAddedEvent(
 // 	ctx context.Context,
 // 	primaryColor,
 // 	secondaryColor string,
-// ) *LabelPolicyAddedEvent {
+// ) *AddedEvent {
 
-// 	return &LabelPolicyAddedEvent{
-// 		LabelPolicyAddedEvent: *policy.NewLabelPolicyAddedEvent(
+// 	return &AddedEvent{
+// 		AddedEvent: *policy.NewAddedEvent(
 // 			ctx,
 // 			primaryColor,
 // 			secondaryColor,
@@ -48,14 +48,14 @@ type LabelPolicyChangedEvent struct {
 // 	}
 // }
 
-// func NewLabelPolicyChangedEvent(
+// func NewChangedEvent(
 // 	ctx context.Context,
 // 	primaryColor,
 // 	secondaryColor string,
 // ) *MemberChangedEvent {
 
-// 	return &LabelPolicyChangedEvent{
-// 		LabelPolicyChangedEvent: *policy.NewLabelPolicyChangedEvent(
+// 	return &ChangedEvent{
+// 		ChangedEvent: *policy.NewChangedEvent(
 // 			ctx,
 // 			primaryColor,
 // 			secondaryColor,

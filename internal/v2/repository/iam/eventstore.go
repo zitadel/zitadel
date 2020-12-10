@@ -15,17 +15,17 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(SetupDoneEventType, SetupStepMapper).
 		RegisterFilterEventMapper(GlobalOrgSetEventType, GlobalOrgSetMapper).
 		RegisterFilterEventMapper(ProjectSetEventType, ProjectSetMapper).
-		RegisterFilterEventMapper(label.LabelPolicyAddedEventType, label.LabelPolicyAddedEventMapper).
-		RegisterFilterEventMapper(label.LabelPolicyChangedEventType, label.LabelPolicyChangedEventMapper).
-		RegisterFilterEventMapper(login.LoginPolicyAddedEventType, login.LoginPolicyAddedEventMapper).
-		RegisterFilterEventMapper(login.LoginPolicyChangedEventType, login.LoginPolicyChangedEventMapper).
-		RegisterFilterEventMapper(org_iam.OrgIAMPolicyAddedEventType, org_iam.OrgIAMPolicyAddedEventMapper).
-		RegisterFilterEventMapper(password_age.PasswordAgePolicyAddedEventType, password_age.PasswordAgePolicyAddedEventMapper).
-		RegisterFilterEventMapper(password_age.PasswordAgePolicyChangedEventType, password_age.PasswordAgePolicyChangedEventMapper).
-		RegisterFilterEventMapper(password_complexity.PasswordComplexityPolicyAddedEventType, password_complexity.PasswordComplexityPolicyAddedEventMapper).
-		RegisterFilterEventMapper(password_complexity.PasswordComplexityPolicyChangedEventType, password_complexity.PasswordComplexityPolicyChangedEventMapper).
-		RegisterFilterEventMapper(password_lockout.PasswordLockoutPolicyAddedEventType, password_lockout.PasswordLockoutPolicyAddedEventMapper).
-		RegisterFilterEventMapper(password_lockout.PasswordLockoutPolicyChangedEventType, password_lockout.PasswordLockoutPolicyChangedEventMapper).
+		RegisterFilterEventMapper(label.LabelPolicyAddedEventType, label.AddedEventMapper).
+		RegisterFilterEventMapper(label.LabelPolicyChangedEventType, label.ChangedEventMapper).
+		RegisterFilterEventMapper(login.LoginPolicyAddedEventType, login.AddedEventMapper).
+		RegisterFilterEventMapper(login.LoginPolicyChangedEventType, login.ChangedEventMapper).
+		RegisterFilterEventMapper(org_iam.OrgIAMPolicyAddedEventType, org_iam.AddedEventMapper).
+		RegisterFilterEventMapper(password_age.PasswordAgePolicyAddedEventType, password_age.AddedEventMapper).
+		RegisterFilterEventMapper(password_age.PasswordAgePolicyChangedEventType, password_age.ChangedEventMapper).
+		RegisterFilterEventMapper(password_complexity.PasswordComplexityPolicyAddedEventType, password_complexity.AddedEventMapper).
+		RegisterFilterEventMapper(password_complexity.PasswordComplexityPolicyChangedEventType, password_complexity.ChangedEventMapper).
+		RegisterFilterEventMapper(password_lockout.PasswordLockoutPolicyAddedEventType, password_lockout.AddedEventMapper).
+		RegisterFilterEventMapper(password_lockout.PasswordLockoutPolicyChangedEventType, password_lockout.ChangedEventMapper).
 		RegisterFilterEventMapper(MemberAddedEventType, MemberAddedEventMapper).
 		RegisterFilterEventMapper(MemberChangedEventType, MemberChangedEventMapper).
 		RegisterFilterEventMapper(MemberRemovedEventType, MemberRemovedEventMapper).

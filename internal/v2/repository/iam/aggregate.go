@@ -2,24 +2,22 @@ package iam
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/label"
 	iam_login "github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
+	factors2 "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/factors"
+	iam_factors "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/factors"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
-	iam_multi_factor "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/multi_factors"
-	iam_second_factor "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/second_factors"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
-	"github.com/caos/zitadel/internal/v2/repository/policy/login"
-	"github.com/caos/zitadel/internal/v2/repository/policy/login/multi_factors"
-	"github.com/caos/zitadel/internal/v2/repository/policy/login/second_factors"
-
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/idp"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
 	"github.com/caos/zitadel/internal/v2/repository/idp/provider"
+	"github.com/caos/zitadel/internal/v2/repository/policy/login"
+	"github.com/caos/zitadel/internal/v2/repository/policy/login/factors"
 )
 
 const (
@@ -100,12 +98,12 @@ func (a *Aggregate) PushStepDone(ctx context.Context, step Step) *Aggregate {
 }
 
 func (a *Aggregate) PushOrgIAMPolicyAddedEvent(ctx context.Context, userLoginMustBeDomain bool) *Aggregate {
-	a.Aggregate = *a.PushEvents(org_iam.NewOrgIAMPolicyAddedEventEvent(ctx, userLoginMustBeDomain))
+	a.Aggregate = *a.PushEvents(org_iam.NewAddedEvent(ctx, userLoginMustBeDomain))
 	return a
 }
 
-func (a *Aggregate) PushOrgIAMPolicyChangedFromExisting(ctx context.Context, current *org_iam.OrgIAMPolicyWriteModel, userLoginMustBeDomain bool) *Aggregate {
-	e, err := org_iam.OrgIAMPolicyChangedEventFromExisting(ctx, current, userLoginMustBeDomain)
+func (a *Aggregate) PushOrgIAMPolicyChangedFromExisting(ctx context.Context, current *org_iam.WriteModel, userLoginMustBeDomain bool) *Aggregate {
+	e, err := org_iam.ChangedEventFromExisting(ctx, current, userLoginMustBeDomain)
 	if err != nil {
 		return a
 	}
@@ -114,12 +112,12 @@ func (a *Aggregate) PushOrgIAMPolicyChangedFromExisting(ctx context.Context, cur
 }
 
 func (a *Aggregate) PushPasswordAgePolicyAddedEvent(ctx context.Context, expireWarnDays, maxAgeDays uint64) *Aggregate {
-	a.Aggregate = *a.PushEvents(password_age.NewPasswordAgePolicyAddedEvent(ctx, expireWarnDays, maxAgeDays))
+	a.Aggregate = *a.PushEvents(password_age.NewAddedEvent(ctx, expireWarnDays, maxAgeDays))
 	return a
 }
 
-func (a *Aggregate) PushPasswordAgePolicyChangedFromExisting(ctx context.Context, current *password_age.PasswordAgePolicyWriteModel, expireWarnDays, maxAgeDays uint64) *Aggregate {
-	e, err := password_age.PasswordAgePolicyChangedEventFromExisting(ctx, current, expireWarnDays, maxAgeDays)
+func (a *Aggregate) PushPasswordAgePolicyChangedFromExisting(ctx context.Context, current *password_age.WriteModel, expireWarnDays, maxAgeDays uint64) *Aggregate {
+	e, err := password_age.ChangedEventFromExisting(ctx, current, expireWarnDays, maxAgeDays)
 	if err != nil {
 		return a
 	}
@@ -128,12 +126,12 @@ func (a *Aggregate) PushPasswordAgePolicyChangedFromExisting(ctx context.Context
 }
 
 func (a *Aggregate) PushPasswordComplexityPolicyAddedEvent(ctx context.Context, minLength uint64, hasLowercase, hasUppercase, hasNumber, hasSymbol bool) *Aggregate {
-	a.Aggregate = *a.PushEvents(password_complexity.NewPasswordComplexityPolicyAddedEvent(ctx, minLength, hasLowercase, hasUppercase, hasNumber, hasSymbol))
+	a.Aggregate = *a.PushEvents(password_complexity.NewAddedEvent(ctx, minLength, hasLowercase, hasUppercase, hasNumber, hasSymbol))
 	return a
 }
 
-func (a *Aggregate) PushPasswordComplexityPolicyChangedFromExisting(ctx context.Context, current *password_complexity.PasswordComplexityPolicyWriteModel, minLength uint64, hasLowercase, hasUppercase, hasNumber, hasSymbol bool) *Aggregate {
-	e, err := password_complexity.PasswordComplexityPolicyChangedEventFromExisting(ctx, current, minLength, hasLowercase, hasUppercase, hasNumber, hasSymbol)
+func (a *Aggregate) PushPasswordComplexityPolicyChangedFromExisting(ctx context.Context, current *password_complexity.WriteModel, minLength uint64, hasLowercase, hasUppercase, hasNumber, hasSymbol bool) *Aggregate {
+	e, err := password_complexity.ChangedEventFromExisting(ctx, current, minLength, hasLowercase, hasUppercase, hasNumber, hasSymbol)
 	if err != nil {
 		return a
 	}
@@ -142,12 +140,12 @@ func (a *Aggregate) PushPasswordComplexityPolicyChangedFromExisting(ctx context.
 }
 
 func (a *Aggregate) PushPasswordLockoutPolicyAddedEvent(ctx context.Context, maxAttempts uint64, showLockoutFailure bool) *Aggregate {
-	a.Aggregate = *a.PushEvents(password_lockout.NewPasswordLockoutPolicyAddedEvent(ctx, maxAttempts, showLockoutFailure))
+	a.Aggregate = *a.PushEvents(password_lockout.NewAddedEvent(ctx, maxAttempts, showLockoutFailure))
 	return a
 }
 
-func (a *Aggregate) PushPasswordLockoutPolicyChangedFromExisting(ctx context.Context, current *password_lockout.PasswordLockoutPolicyWriteModel, maxAttempts uint64, showLockoutFailure bool) *Aggregate {
-	e, err := password_lockout.PasswordLockoutPolicyChangedEventFromExisting(ctx, current, maxAttempts, showLockoutFailure)
+func (a *Aggregate) PushPasswordLockoutPolicyChangedFromExisting(ctx context.Context, current *password_lockout.WriteModel, maxAttempts uint64, showLockoutFailure bool) *Aggregate {
+	e, err := password_lockout.ChangedEventFromExisting(ctx, current, maxAttempts, showLockoutFailure)
 	if err != nil {
 		return a
 	}
@@ -156,12 +154,12 @@ func (a *Aggregate) PushPasswordLockoutPolicyChangedFromExisting(ctx context.Con
 }
 
 func (a *Aggregate) PushLabelPolicyAddedEvent(ctx context.Context, primaryColor, secondaryColor string) *Aggregate {
-	a.Aggregate = *a.PushEvents(label.NewLabelPolicyAddedEventEvent(ctx, primaryColor, secondaryColor))
+	a.Aggregate = *a.PushEvents(label.NewAddedEvent(ctx, primaryColor, secondaryColor))
 	return a
 }
 
-func (a *Aggregate) PushLabelPolicyChangedFromExisting(ctx context.Context, current *label.LabelPolicyWriteModel, primaryColor, secondaryColor string) *Aggregate {
-	e, err := label.LabelPolicyChangedEventFromExisting(ctx, current, primaryColor, secondaryColor)
+func (a *Aggregate) PushLabelPolicyChangedFromExisting(ctx context.Context, current *label.WriteModel, primaryColor, secondaryColor string) *Aggregate {
+	e, err := label.ChangedEventFromExisting(ctx, current, primaryColor, secondaryColor)
 	if err != nil {
 		return a
 	}
@@ -170,12 +168,12 @@ func (a *Aggregate) PushLabelPolicyChangedFromExisting(ctx context.Context, curr
 }
 
 func (a *Aggregate) PushLoginPolicyAddedEvent(ctx context.Context, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA bool, passwordlessType login.PasswordlessType) *Aggregate {
-	a.Aggregate = *a.PushEvents(iam_login.NewLoginPolicyAddedEventEvent(ctx, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA, passwordlessType))
+	a.Aggregate = *a.PushEvents(iam_login.NewAddedEvent(ctx, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA, passwordlessType))
 	return a
 }
 
-func (a *Aggregate) PushLoginPolicyChangedFromExisting(ctx context.Context, current *iam_login.LoginPolicyWriteModel, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA bool, passwordlessType login.PasswordlessType) *Aggregate {
-	e, err := iam_login.LoginPolicyChangedEventFromExisting(ctx, current, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA, passwordlessType)
+func (a *Aggregate) PushLoginPolicyChangedFromExisting(ctx context.Context, current *iam_login.WriteModel, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA bool, passwordlessType login.PasswordlessType) *Aggregate {
+	e, err := iam_login.ChangedEventFromExisting(ctx, current, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA, passwordlessType)
 	if err != nil {
 		return a
 	}
@@ -183,23 +181,23 @@ func (a *Aggregate) PushLoginPolicyChangedFromExisting(ctx context.Context, curr
 	return a
 }
 
-func (a *Aggregate) PushLoginPolicySecondFactorAdded(ctx context.Context, mfaType second_factors.SecondFactorType) *Aggregate {
-	a.Aggregate = *a.PushEvents(iam_second_factor.NewLoginPolicySecondFactorAddedEvent(ctx, mfaType))
+func (a *Aggregate) PushLoginPolicySecondFactorAdded(ctx context.Context, mfaType factors.SecondFactorType) *Aggregate {
+	a.Aggregate = *a.PushEvents(iam_factors.NewLoginPolicySecondFactorAddedEvent(ctx, mfaType))
 	return a
 }
 
-func (a *Aggregate) PushLoginPolicySecondFactorRemoved(ctx context.Context, mfaType second_factors.SecondFactorType) *Aggregate {
-	a.Aggregate = *a.PushEvents(iam_second_factor.NewLoginPolicySecondFactorRemovedEvent(ctx, mfaType))
+func (a *Aggregate) PushLoginPolicySecondFactorRemoved(ctx context.Context, mfaType factors.SecondFactorType) *Aggregate {
+	a.Aggregate = *a.PushEvents(iam_factors.NewLoginPolicySecondFactorRemovedEvent(ctx, mfaType))
 	return a
 }
 
-func (a *Aggregate) PushLoginPolicyMultiFactorAdded(ctx context.Context, mfaType multi_factors.MultiFactorType) *Aggregate {
-	a.Aggregate = *a.PushEvents(iam_multi_factor.NewLoginPolicyMultiFactorAddedEvent(ctx, mfaType))
+func (a *Aggregate) PushLoginPolicyMultiFactorAdded(ctx context.Context, mfaType factors.MultiFactorType) *Aggregate {
+	a.Aggregate = *a.PushEvents(factors2.NewLoginPolicyMultiFactorAddedEvent(ctx, mfaType))
 	return a
 }
 
-func (a *Aggregate) PushLoginPolicyMultiFactorRemoved(ctx context.Context, mfaType multi_factors.MultiFactorType) *Aggregate {
-	a.Aggregate = *a.PushEvents(iam_multi_factor.NewLoginPolicyMultiFactorRemovedEvent(ctx, mfaType))
+func (a *Aggregate) PushLoginPolicyMultiFactorRemoved(ctx context.Context, mfaType factors.MultiFactorType) *Aggregate {
+	a.Aggregate = *a.PushEvents(factors2.NewLoginPolicyMultiFactorRemovedEvent(ctx, mfaType))
 	return a
 }
 
@@ -288,7 +286,7 @@ func (a *Aggregate) PushLoginPolicyIDPProviderAddedEvent(
 	providerType provider.Type,
 ) *Aggregate {
 
-	a.Aggregate = *a.PushEvents(idpprovider.NewLoginPolicyIDPProviderAddedEvent(ctx, idpConfigID, providerType))
+	a.Aggregate = *a.PushEvents(idpprovider.NewAddedEvent(ctx, idpConfigID, providerType))
 	return a
 }
 
@@ -298,6 +296,6 @@ func (a *Aggregate) PushLoginPolicyIDPProviderRemovedEvent(
 	providerType provider.Type,
 ) *Aggregate {
 
-	a.Aggregate = *a.PushEvents(idpprovider.NewLoginPolicyIDPProviderRemovedEvent(ctx, idpConfigID))
+	a.Aggregate = *a.PushEvents(idpprovider.NewRemovedEvent(ctx, idpConfigID))
 	return a
 }

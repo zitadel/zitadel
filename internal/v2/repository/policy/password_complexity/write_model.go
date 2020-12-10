@@ -4,7 +4,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 )
 
-type PasswordComplexityPolicyWriteModel struct {
+type WriteModel struct {
 	eventstore.WriteModel
 
 	MinLength    uint64
@@ -14,16 +14,16 @@ type PasswordComplexityPolicyWriteModel struct {
 	HasSymbol    bool
 }
 
-func (wm *PasswordComplexityPolicyWriteModel) Reduce() error {
+func (wm *WriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *PasswordComplexityPolicyAddedEvent:
+		case *AddedEvent:
 			wm.MinLength = e.MinLength
 			wm.HasLowercase = e.HasLowercase
 			wm.HasUpperCase = e.HasUpperCase
 			wm.HasNumber = e.HasNumber
 			wm.HasSymbol = e.HasSymbol
-		case *PasswordComplexityPolicyChangedEvent:
+		case *ChangedEvent:
 			wm.MinLength = e.MinLength
 			wm.HasLowercase = e.HasLowercase
 			wm.HasUpperCase = e.HasUpperCase

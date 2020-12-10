@@ -13,7 +13,7 @@ const (
 	PasswordComplexityPolicyRemovedEventType = "policy.password.complexity.removed"
 )
 
-type PasswordComplexityPolicyAddedEvent struct {
+type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	MinLength    uint64 `json:"minLength,omitempty"`
@@ -23,23 +23,23 @@ type PasswordComplexityPolicyAddedEvent struct {
 	HasSymbol    bool   `json:"hasSymbol"`
 }
 
-func (e *PasswordComplexityPolicyAddedEvent) CheckPrevious() bool {
+func (e *AddedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *PasswordComplexityPolicyAddedEvent) Data() interface{} {
+func (e *AddedEvent) Data() interface{} {
 	return e
 }
 
-func NewPasswordComplexityPolicyAddedEvent(
+func NewAddedEvent(
 	base *eventstore.BaseEvent,
 	minLength uint64,
 	hasLowerCase,
 	hasUpperCase,
 	hasNumber,
 	hasSymbol bool,
-) *PasswordComplexityPolicyAddedEvent {
-	return &PasswordComplexityPolicyAddedEvent{
+) *AddedEvent {
+	return &AddedEvent{
 		BaseEvent:    *base,
 		MinLength:    minLength,
 		HasLowercase: hasLowerCase,
@@ -49,8 +49,8 @@ func NewPasswordComplexityPolicyAddedEvent(
 	}
 }
 
-func PasswordComplexityPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &PasswordComplexityPolicyAddedEvent{
+func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -62,7 +62,7 @@ func PasswordComplexityPolicyAddedEventMapper(event *repository.Event) (eventsto
 	return e, nil
 }
 
-type PasswordComplexityPolicyChangedEvent struct {
+type ChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	MinLength    uint64 `json:"minLength"`
@@ -72,25 +72,25 @@ type PasswordComplexityPolicyChangedEvent struct {
 	HasSymbol    bool   `json:"hasSymbol"`
 }
 
-func (e *PasswordComplexityPolicyChangedEvent) CheckPrevious() bool {
+func (e *ChangedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *PasswordComplexityPolicyChangedEvent) Data() interface{} {
+func (e *ChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewPasswordComplexityPolicyChangedEvent(
+func NewChangedEvent(
 	base *eventstore.BaseEvent,
-	current *PasswordComplexityPolicyWriteModel,
+	current *WriteModel,
 	minLength uint64,
 	hasLowerCase,
 	hasUpperCase,
 	hasNumber,
 	hasSymbol bool,
-) *PasswordComplexityPolicyChangedEvent {
+) *ChangedEvent {
 
-	e := &PasswordComplexityPolicyChangedEvent{
+	e := &ChangedEvent{
 		BaseEvent: *base,
 	}
 
@@ -113,8 +113,8 @@ func NewPasswordComplexityPolicyChangedEvent(
 	return e
 }
 
-func PasswordComplexityPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &PasswordComplexityPolicyChangedEvent{
+func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &ChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -126,26 +126,26 @@ func PasswordComplexityPolicyChangedEventMapper(event *repository.Event) (events
 	return e, nil
 }
 
-type PasswordComplexityPolicyRemovedEvent struct {
+type RemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *PasswordComplexityPolicyRemovedEvent) CheckPrevious() bool {
+func (e *RemovedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *PasswordComplexityPolicyRemovedEvent) Data() interface{} {
+func (e *RemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewPasswordComplexityPolicyRemovedEvent(base *eventstore.BaseEvent) *PasswordComplexityPolicyRemovedEvent {
-	return &PasswordComplexityPolicyRemovedEvent{
+func NewRemovedEvent(base *eventstore.BaseEvent) *RemovedEvent {
+	return &RemovedEvent{
 		BaseEvent: *base,
 	}
 }
 
-func PasswordComplexityPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &PasswordComplexityPolicyRemovedEvent{
+func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &RemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

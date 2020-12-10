@@ -3,18 +3,15 @@ package iam
 import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 	iam_login "github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
+	iam_factor "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/factors"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
-	iam_multi_factor "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/multi_factors"
-	iam_second_factor "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/second_factors"
-	"github.com/caos/zitadel/internal/v2/repository/policy/login"
-	"github.com/caos/zitadel/internal/v2/repository/policy/login/multi_factors"
-	"github.com/caos/zitadel/internal/v2/repository/policy/login/second_factors"
-
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/repository/idp/provider"
+	"github.com/caos/zitadel/internal/v2/repository/policy/login"
+	"github.com/caos/zitadel/internal/v2/repository/policy/login/factors"
 )
 
 func (r *Repository) AddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
@@ -22,7 +19,7 @@ func (r *Repository) AddLoginPolicy(ctx context.Context, policy *iam_model.Login
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-5Mv0s", "Errors.IAM.LoginPolicyInvalid")
 	}
 
-	addedPolicy := iam_login.NewLoginPolicyWriteModel(policy.AggregateID)
+	addedPolicy := iam_login.NewWriteModel(policy.AggregateID)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -64,14 +61,14 @@ func (r *Repository) ChangeLoginPolicy(ctx context.Context, policy *iam_model.Lo
 }
 
 func (r *Repository) AddIDPProviderToLoginPolicy(ctx context.Context, idpProvider *iam_model.IDPProvider) (*iam_model.IDPProvider, error) {
-	writeModel := idpprovider.NewLoginPolicyIDPProviderWriteModel(idpProvider.AggregateID, idpProvider.IdpConfigID)
+	writeModel := idpprovider.NewWriteModel(idpProvider.AggregateID, idpProvider.IDPConfigID)
 	err := r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}
 
 	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.WriteModel).
-		PushLoginPolicyIDPProviderAddedEvent(ctx, idpProvider.IdpConfigID, provider.Type(idpProvider.Type))
+		PushLoginPolicyIDPProviderAddedEvent(ctx, idpProvider.IDPConfigID, provider.Type(idpProvider.Type))
 
 	if err = r.eventstore.PushAggregate(ctx, writeModel, aggregate); err != nil {
 		return nil, err
@@ -81,26 +78,26 @@ func (r *Repository) AddIDPProviderToLoginPolicy(ctx context.Context, idpProvide
 }
 
 func (r *Repository) RemoveIDPProviderFromLoginPolicy(ctx context.Context, idpProvider *iam_model.IDPProvider) error {
-	writeModel := idpprovider.NewLoginPolicyIDPProviderWriteModel(idpProvider.AggregateID, idpProvider.IdpConfigID)
+	writeModel := idpprovider.NewWriteModel(idpProvider.AggregateID, idpProvider.IDPConfigID)
 	err := r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return err
 	}
 	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.WriteModel).
-		PushLoginPolicyIDPProviderAddedEvent(ctx, idpProvider.IdpConfigID, provider.Type(idpProvider.Type))
+		PushLoginPolicyIDPProviderAddedEvent(ctx, idpProvider.IDPConfigID, provider.Type(idpProvider.Type))
 
 	return r.eventstore.PushAggregate(ctx, writeModel, aggregate)
 }
 
 func (r *Repository) AddSecondFactorToLoginPolicy(ctx context.Context, iamID string, secondFactor iam_model.SecondFactorType) (iam_model.SecondFactorType, error) {
-	writeModel := iam_second_factor.NewSecondFactorWriteModel(iamID)
+	writeModel := iam_factor.NewSecondFactorWriteModel(iamID)
 	err := r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return iam_model.SecondFactorTypeUnspecified, err
 	}
 
 	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.WriteModel).
-		PushLoginPolicySecondFactorAdded(ctx, second_factors.SecondFactorType(secondFactor))
+		PushLoginPolicySecondFactorAdded(ctx, factors.SecondFactorType(secondFactor))
 
 	if err = r.eventstore.PushAggregate(ctx, writeModel, aggregate); err != nil {
 		return iam_model.SecondFactorTypeUnspecified, err
@@ -110,26 +107,26 @@ func (r *Repository) AddSecondFactorToLoginPolicy(ctx context.Context, iamID str
 }
 
 func (r *Repository) RemoveSecondFactorFromLoginPolicy(ctx context.Context, iamID string, secondFactor iam_model.SecondFactorType) error {
-	writeModel := iam_second_factor.NewSecondFactorWriteModel(iamID)
+	writeModel := iam_factor.NewSecondFactorWriteModel(iamID)
 	err := r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return err
 	}
 	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.WriteModel).
-		PushLoginPolicySecondFactorRemoved(ctx, second_factors.SecondFactorType(secondFactor))
+		PushLoginPolicySecondFactorRemoved(ctx, factors.SecondFactorType(secondFactor))
 
 	return r.eventstore.PushAggregate(ctx, writeModel, aggregate)
 }
 
 func (r *Repository) AddMultiFactorToLoginPolicy(ctx context.Context, iamID string, secondFactor iam_model.MultiFactorType) (iam_model.MultiFactorType, error) {
-	writeModel := iam_multi_factor.NewMultiFactorWriteModel(iamID)
+	writeModel := iam_factor.NewMultiFactorWriteModel(iamID)
 	err := r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return iam_model.MultiFactorTypeUnspecified, err
 	}
 
 	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.WriteModel).
-		PushLoginPolicyMultiFactorAdded(ctx, multi_factors.MultiFactorType(secondFactor))
+		PushLoginPolicyMultiFactorAdded(ctx, factors.MultiFactorType(secondFactor))
 
 	if err = r.eventstore.PushAggregate(ctx, writeModel, aggregate); err != nil {
 		return iam_model.MultiFactorTypeUnspecified, err
@@ -139,22 +136,22 @@ func (r *Repository) AddMultiFactorToLoginPolicy(ctx context.Context, iamID stri
 }
 
 func (r *Repository) RemoveMultiFactorFromLoginPolicy(ctx context.Context, iamID string, secondFactor iam_model.MultiFactorType) error {
-	writeModel := iam_multi_factor.NewMultiFactorWriteModel(iamID)
+	writeModel := iam_factor.NewMultiFactorWriteModel(iamID)
 	err := r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return err
 	}
 	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.WriteModel).
-		PushLoginPolicyMultiFactorRemoved(ctx, multi_factors.MultiFactorType(secondFactor))
+		PushLoginPolicyMultiFactorRemoved(ctx, factors.MultiFactorType(secondFactor))
 
 	return r.eventstore.PushAggregate(ctx, writeModel, aggregate)
 }
 
-func (r *Repository) loginPolicyWriteModelByID(ctx context.Context, iamID string) (policy *iam_login.LoginPolicyWriteModel, err error) {
+func (r *Repository) loginPolicyWriteModelByID(ctx context.Context, iamID string) (policy *iam_login.WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := iam_login.NewLoginPolicyWriteModel(iamID)
+	writeModel := iam_login.NewWriteModel(iamID)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

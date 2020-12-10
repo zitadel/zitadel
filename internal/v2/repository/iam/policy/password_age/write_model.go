@@ -9,39 +9,39 @@ const (
 	AggregateType = "iam"
 )
 
-type PasswordAgePolicyWriteModel struct {
+type WriteModel struct {
 	eventstore.WriteModel
-	Policy password_age.PasswordAgePolicyWriteModel
+	Policy password_age.WriteModel
 
 	iamID string
 }
 
-func NewPasswordAgePolicyWriteModel(iamID string) *PasswordAgePolicyWriteModel {
-	return &PasswordAgePolicyWriteModel{
+func NewWriteModel(iamID string) *WriteModel {
+	return &WriteModel{
 		iamID: iamID,
 	}
 }
 
-func (wm *PasswordAgePolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *WriteModel) AppendEvents(events ...eventstore.EventReader) {
 	wm.WriteModel.AppendEvents(events...)
 	for _, event := range events {
 		switch e := event.(type) {
-		case *PasswordAgePolicyAddedEvent:
-			wm.Policy.AppendEvents(&e.PasswordAgePolicyAddedEvent)
-		case *PasswordAgePolicyChangedEvent:
-			wm.Policy.AppendEvents(&e.PasswordAgePolicyChangedEvent)
+		case *AddedEvent:
+			wm.Policy.AppendEvents(&e.AddedEvent)
+		case *ChangedEvent:
+			wm.Policy.AppendEvents(&e.ChangedEvent)
 		}
 	}
 }
 
-func (wm *PasswordAgePolicyWriteModel) Reduce() error {
+func (wm *WriteModel) Reduce() error {
 	if err := wm.Policy.Reduce(); err != nil {
 		return err
 	}
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *PasswordAgePolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *WriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).
 		AggregateIDs(wm.iamID)
 }

@@ -108,7 +108,7 @@ func IDPProviderToModel(provider *IDPProvider) *iam_model.IDPProvider {
 	return &iam_model.IDPProvider{
 		ObjectRoot:  provider.ObjectRoot,
 		Type:        iam_model.IDPProviderType(provider.Type),
-		IdpConfigID: provider.IDPConfigID,
+		IDPConfigID: provider.IDPConfigID,
 	}
 }
 
@@ -116,7 +116,7 @@ func IDPProviderFromModel(provider *iam_model.IDPProvider) *IDPProvider {
 	return &IDPProvider{
 		ObjectRoot:  provider.ObjectRoot,
 		Type:        int32(provider.Type),
-		IDPConfigID: provider.IdpConfigID,
+		IDPConfigID: provider.IDPConfigID,
 	}
 }
 

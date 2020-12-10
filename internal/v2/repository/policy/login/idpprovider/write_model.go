@@ -5,14 +5,14 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/idp/provider"
 )
 
-type IDPProviderWriteModel struct {
+type WriteModel struct {
 	provider.WriteModel
 }
 
-func (wm *IDPProviderWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *WriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *IDPProviderAddedEvent:
+		case *AddedEvent:
 			wm.WriteModel.AppendEvents(&e.AddedEvent)
 		}
 	}

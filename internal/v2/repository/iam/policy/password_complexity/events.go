@@ -13,20 +13,20 @@ const (
 	PasswordComplexityPolicyChangedEventType = iamEventPrefix + password_complexity.PasswordComplexityPolicyChangedEventType
 )
 
-type PasswordComplexityPolicyAddedEvent struct {
-	password_complexity.PasswordComplexityPolicyAddedEvent
+type AddedEvent struct {
+	password_complexity.AddedEvent
 }
 
-func NewPasswordComplexityPolicyAddedEvent(
+func NewAddedEvent(
 	ctx context.Context,
 	minLength uint64,
 	hasLowercase,
 	hasUppercase,
 	hasNumber,
 	hasSymbol bool,
-) *PasswordComplexityPolicyAddedEvent {
-	return &PasswordComplexityPolicyAddedEvent{
-		PasswordComplexityPolicyAddedEvent: *password_complexity.NewPasswordComplexityPolicyAddedEvent(
+) *AddedEvent {
+	return &AddedEvent{
+		AddedEvent: *password_complexity.NewAddedEvent(
 			eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyAddedEventType),
 			minLength,
 			hasLowercase,
@@ -36,29 +36,29 @@ func NewPasswordComplexityPolicyAddedEvent(
 	}
 }
 
-func PasswordComplexityPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := password_complexity.PasswordComplexityPolicyAddedEventMapper(event)
+func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := password_complexity.AddedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &PasswordComplexityPolicyAddedEvent{PasswordComplexityPolicyAddedEvent: *e.(*password_complexity.PasswordComplexityPolicyAddedEvent)}, nil
+	return &AddedEvent{AddedEvent: *e.(*password_complexity.AddedEvent)}, nil
 }
 
-type PasswordComplexityPolicyChangedEvent struct {
-	password_complexity.PasswordComplexityPolicyChangedEvent
+type ChangedEvent struct {
+	password_complexity.ChangedEvent
 }
 
-func PasswordComplexityPolicyChangedEventFromExisting(
+func ChangedEventFromExisting(
 	ctx context.Context,
-	current *PasswordComplexityPolicyWriteModel,
+	current *WriteModel,
 	minLength uint64,
 	hasLowerCase,
 	hasUpperCase,
 	hasNumber,
 	hasSymbol bool,
-) (*PasswordComplexityPolicyChangedEvent, error) {
-	event := password_complexity.NewPasswordComplexityPolicyChangedEvent(
+) (*ChangedEvent, error) {
+	event := password_complexity.NewChangedEvent(
 		eventstore.NewBaseEventForPush(
 			ctx,
 			PasswordComplexityPolicyChangedEventType,
@@ -70,16 +70,16 @@ func PasswordComplexityPolicyChangedEventFromExisting(
 		hasNumber,
 		hasSymbol,
 	)
-	return &PasswordComplexityPolicyChangedEvent{
+	return &ChangedEvent{
 		*event,
 	}, nil
 }
 
-func PasswordComplexityPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := password_complexity.PasswordComplexityPolicyChangedEventMapper(event)
+func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := password_complexity.ChangedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &PasswordComplexityPolicyChangedEvent{PasswordComplexityPolicyChangedEvent: *e.(*password_complexity.PasswordComplexityPolicyChangedEvent)}, nil
+	return &ChangedEvent{ChangedEvent: *e.(*password_complexity.ChangedEvent)}, nil
 }

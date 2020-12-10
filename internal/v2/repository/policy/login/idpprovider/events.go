@@ -6,17 +6,17 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/idp/provider"
 )
 
-type IDPProviderAddedEvent struct {
+type AddedEvent struct {
 	provider.AddedEvent
 }
 
-func NewIDPProviderAddedEvent(
+func NewAddedEvent(
 	base *eventstore.BaseEvent,
 	idpConfigID string,
 	idpProviderType provider.Type,
-) *IDPProviderAddedEvent {
+) *AddedEvent {
 
-	return &IDPProviderAddedEvent{
+	return &AddedEvent{
 		AddedEvent: *provider.NewAddedEvent(
 			base,
 			idpConfigID,
@@ -24,38 +24,37 @@ func NewIDPProviderAddedEvent(
 	}
 }
 
-func IDPProviderAddedEventEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e, err := provider.AddedEventEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &IDPProviderAddedEvent{
+	return &AddedEvent{
 		AddedEvent: *e.(*provider.AddedEvent),
 	}, nil
 }
 
-type IDPProviderRemovedEvent struct {
+type RemovedEvent struct {
 	provider.RemovedEvent
 }
 
-func NewIDPProviderRemovedEvent(
+func NewRemovedEvent(
 	base *eventstore.BaseEvent,
 	idpConfigID string,
-) *IDPProviderRemovedEvent {
-
-	return &IDPProviderRemovedEvent{
+) *RemovedEvent {
+	return &RemovedEvent{
 		RemovedEvent: *provider.NewRemovedEvent(base, idpConfigID),
 	}
 }
 
-func IDPProviderRemovedEventEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e, err := provider.RemovedEventEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &IDPProviderRemovedEvent{
+	return &RemovedEvent{
 		RemovedEvent: *e.(*provider.RemovedEvent),
 	}, nil
 }

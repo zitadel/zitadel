@@ -10,7 +10,7 @@ import (
 )
 
 func (r *Repository) AddPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
-	addedPolicy := password_lockout.NewPasswordLockoutPolicyWriteModel(policy.AggregateID)
+	addedPolicy := password_lockout.NewWriteModel(policy.AggregateID)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -47,11 +47,11 @@ func (r *Repository) ChangePasswordLockoutPolicy(ctx context.Context, policy *ia
 	return writeModelToPasswordLockoutPolicy(existingPolicy), nil
 }
 
-func (r *Repository) passwordLockoutPolicyWriteModelByID(ctx context.Context, iamID string) (policy *password_lockout.PasswordLockoutPolicyWriteModel, err error) {
+func (r *Repository) passwordLockoutPolicyWriteModelByID(ctx context.Context, iamID string) (policy *password_lockout.WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := password_lockout.NewPasswordLockoutPolicyWriteModel(iamID)
+	writeModel := password_lockout.NewWriteModel(iamID)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

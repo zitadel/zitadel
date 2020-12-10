@@ -10,7 +10,7 @@ import (
 )
 
 func (r *Repository) AddPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
-	addedPolicy := password_age.NewPasswordAgePolicyWriteModel(policy.AggregateID)
+	addedPolicy := password_age.NewWriteModel(policy.AggregateID)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -47,11 +47,11 @@ func (r *Repository) ChangePasswordAgePolicy(ctx context.Context, policy *iam_mo
 	return writeModelToPasswordAgePolicy(existingPolicy), nil
 }
 
-func (r *Repository) passwordAgePolicyWriteModelByID(ctx context.Context, iamID string) (policy *password_age.PasswordAgePolicyWriteModel, err error) {
+func (r *Repository) passwordAgePolicyWriteModelByID(ctx context.Context, iamID string) (policy *password_age.WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := password_age.NewPasswordAgePolicyWriteModel(iamID)
+	writeModel := password_age.NewWriteModel(iamID)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

@@ -2,20 +2,20 @@ package password_age
 
 import "github.com/caos/zitadel/internal/eventstore/v2"
 
-type PasswordAgePolicyReadModel struct {
+type ReadModel struct {
 	eventstore.ReadModel
 
 	ExpireWarnDays uint64
 	MaxAgeDays     uint64
 }
 
-func (rm *PasswordAgePolicyReadModel) Reduce() error {
+func (rm *ReadModel) Reduce() error {
 	for _, event := range rm.Events {
 		switch e := event.(type) {
-		case *PasswordAgePolicyAddedEvent:
+		case *AddedEvent:
 			rm.ExpireWarnDays = e.ExpireWarnDays
 			rm.MaxAgeDays = e.MaxAgeDays
-		case *PasswordAgePolicyChangedEvent:
+		case *ChangedEvent:
 			rm.ExpireWarnDays = e.ExpireWarnDays
 			rm.MaxAgeDays = e.MaxAgeDays
 		}
