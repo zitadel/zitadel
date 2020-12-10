@@ -7,21 +7,27 @@
 
     td,
     th {
-      padding: .5rem;
-      outline: none;
+      padding-left: .5rem;
+      padding-right: .5rem;
 
       &:first-child {
         padding-left: 0;
-        padding-right: 1rem;
+        padding-right: .5rem;
       }
 
       &:last-child {
         padding-right: 0;
       }
+    }
 
-      .search-button,
-      .dlt-button {
+    th {
+      .search-button {
         visibility: hidden;
+        width: 30px;
+
+        .icon {
+          font-size: 1.2rem;
+        }
       }
 
       &:hover,
@@ -33,16 +39,15 @@
     }
 
     tr {
+      .dlt-button {
+        visibility: hidden;
+      }
+
       &:hover {
         .dlt-button {
           visibility: visible;
         }
       }
-    }
-
-    .selection {
-      width: 50px;
-      max-width: 50px;
     }
   }
 }
@@ -58,5 +63,27 @@
 
   i {
     margin: auto;
+  }
+}
+
+td {
+  outline: none;
+}
+
+.state {
+  border-radius: 50vw;
+  padding: 2px .5rem;
+  letter-spacing: .05em;
+  font-size: 11px;
+  background-color: #8795a120;
+
+  &.active {
+    background-color: #85d996;
+    color: black;
+  }
+
+  &.inactive {
+    background-color: #ff8981;
+    color: black;
   }
 }

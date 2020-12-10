@@ -224,7 +224,7 @@ func TestAppendAddSecondFactorToPolicyEvent(t *testing.T) {
 			name: "append add second factor to login policy event",
 			args: args{
 				org:   &Org{LoginPolicy: &iam_es_model.LoginPolicy{AllowExternalIdp: true, AllowRegister: true, AllowUsernamePassword: true}},
-				mfa:   &iam_es_model.MFA{MfaType: int32(iam_model.SecondFactorTypeOTP)},
+				mfa:   &iam_es_model.MFA{MFAType: int32(iam_model.SecondFactorTypeOTP)},
 				event: &es_models.Event{},
 			},
 			result: &Org{LoginPolicy: &iam_es_model.LoginPolicy{
@@ -246,7 +246,7 @@ func TestAppendAddSecondFactorToPolicyEvent(t *testing.T) {
 			if len(tt.result.LoginPolicy.SecondFactors) != len(tt.args.org.LoginPolicy.SecondFactors) {
 				t.Errorf("got wrong second factor len: expected: %v, actual: %v ", len(tt.result.LoginPolicy.SecondFactors), len(tt.args.org.LoginPolicy.SecondFactors))
 			}
-			if tt.result.LoginPolicy.SecondFactors[0] != tt.args.mfa.MfaType {
+			if tt.result.LoginPolicy.SecondFactors[0] != tt.args.mfa.MFAType {
 				t.Errorf("got wrong second factor: expected: %v, actual: %v ", tt.result.LoginPolicy.SecondFactors[0], tt.args.mfa)
 			}
 		})
@@ -275,7 +275,7 @@ func TestRemoveSecondFactorFromPolicyEvent(t *testing.T) {
 						SecondFactors: []int32{
 							int32(iam_model.SecondFactorTypeOTP),
 						}}},
-				mfa:   &iam_es_model.MFA{MfaType: int32(iam_model.SecondFactorTypeOTP)},
+				mfa:   &iam_es_model.MFA{MFAType: int32(iam_model.SecondFactorTypeOTP)},
 				event: &es_models.Event{},
 			},
 			result: &Org{LoginPolicy: &iam_es_model.LoginPolicy{
@@ -314,7 +314,7 @@ func TestAppendAddMultiFactorToPolicyEvent(t *testing.T) {
 			name: "append add mfa to login policy event",
 			args: args{
 				org:   &Org{LoginPolicy: &iam_es_model.LoginPolicy{AllowExternalIdp: true, AllowRegister: true, AllowUsernamePassword: true}},
-				mfa:   &iam_es_model.MFA{MfaType: int32(iam_model.MultiFactorTypeU2FWithPIN)},
+				mfa:   &iam_es_model.MFA{MFAType: int32(iam_model.MultiFactorTypeU2FWithPIN)},
 				event: &es_models.Event{},
 			},
 			result: &Org{LoginPolicy: &iam_es_model.LoginPolicy{
@@ -336,7 +336,7 @@ func TestAppendAddMultiFactorToPolicyEvent(t *testing.T) {
 			if len(tt.result.LoginPolicy.MultiFactors) != len(tt.args.org.LoginPolicy.MultiFactors) {
 				t.Errorf("got wrong second factor len: expected: %v, actual: %v ", len(tt.result.LoginPolicy.MultiFactors), len(tt.args.org.LoginPolicy.MultiFactors))
 			}
-			if tt.result.LoginPolicy.MultiFactors[0] != tt.args.mfa.MfaType {
+			if tt.result.LoginPolicy.MultiFactors[0] != tt.args.mfa.MFAType {
 				t.Errorf("got wrong second factor: expected: %v, actual: %v ", tt.result.LoginPolicy.MultiFactors[0], tt.args.mfa)
 			}
 		})
@@ -365,7 +365,7 @@ func TestRemoveMultiFactorFromPolicyEvent(t *testing.T) {
 						MultiFactors: []int32{
 							int32(iam_model.MultiFactorTypeU2FWithPIN),
 						}}},
-				mfa:   &iam_es_model.MFA{MfaType: int32(iam_model.MultiFactorTypeU2FWithPIN)},
+				mfa:   &iam_es_model.MFA{MFAType: int32(iam_model.MultiFactorTypeU2FWithPIN)},
 				event: &es_models.Event{},
 			},
 			result: &Org{LoginPolicy: &iam_es_model.LoginPolicy{

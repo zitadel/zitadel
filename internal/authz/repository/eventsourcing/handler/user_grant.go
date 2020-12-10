@@ -75,7 +75,7 @@ func (u *UserGrant) processProject(event *models.Event) (err error) {
 		member.SetData(event)
 		return u.processMember(event, "PROJECT_GRANT", member.GrantID, member.UserID, member.Roles)
 	default:
-		return u.view.ProcessedUserGrantSequence(event.Sequence)
+		return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
 	}
 }
 
@@ -86,7 +86,7 @@ func (u *UserGrant) processOrg(event *models.Event) (err error) {
 		member.SetData(event)
 		return u.processMember(event, "ORG", "", member.UserID, member.Roles)
 	default:
-		return u.view.ProcessedUserGrantSequence(event.Sequence)
+		return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
 	}
 }
 
@@ -124,16 +124,16 @@ func (u *UserGrant) processIAMMember(event *models.Event, rolePrefix string, suf
 		}
 		grant.Sequence = event.Sequence
 		grant.ChangeDate = event.CreationDate
-		return u.view.PutUserGrant(grant, grant.Sequence)
+		return u.view.PutUserGrant(grant, grant.Sequence, event.CreationDate)
 	case iam_es_model.IAMMemberRemoved:
 		member.SetData(event)
 		grant, err := u.view.UserGrantByIDs(u.iamID, u.iamProjectID, member.UserID)
 		if err != nil {
 			return err
 		}
-		return u.view.DeleteUserGrant(grant.ID, event.Sequence)
+		return u.view.DeleteUserGrant(grant.ID, event.Sequence, event.CreationDate)
 	default:
-		return u.view.ProcessedUserGrantSequence(event.Sequence)
+		return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
 	}
 }
 
@@ -169,7 +169,7 @@ func (u *UserGrant) processMember(event *models.Event, rolePrefix, roleSuffix st
 		}
 		grant.Sequence = event.Sequence
 		grant.ChangeDate = event.CreationDate
-		return u.view.PutUserGrant(grant, event.Sequence)
+		return u.view.PutUserGrant(grant, event.Sequence, event.CreationDate)
 	case org_es_model.OrgMemberRemoved,
 		proj_es_model.ProjectMemberRemoved,
 		proj_es_model.ProjectGrantMemberRemoved:
@@ -179,18 +179,18 @@ func (u *UserGrant) processMember(event *models.Event, rolePrefix, roleSuffix st
 			return err
 		}
 		if errors.IsNotFound(err) {
-			return u.view.ProcessedUserGrantSequence(event.Sequence)
+			return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
 		}
 		if roleSuffix != "" {
 			roleKeys = suffixRoles(roleSuffix, roleKeys)
 		}
 		if grant.RoleKeys == nil {
-			return u.view.ProcessedUserGrantSequence(event.Sequence)
+			return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
 		}
 		grant.RoleKeys = mergeExistingRoles(rolePrefix, roleSuffix, grant.RoleKeys, nil)
-		return u.view.PutUserGrant(grant, event.Sequence)
+		return u.view.PutUserGrant(grant, event.Sequence, event.CreationDate)
 	default:
-		return u.view.ProcessedUserGrantSequence(event.Sequence)
+		return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
 	}
 }
 
@@ -234,4 +234,8 @@ func (u *UserGrant) setIamProjectID() error {
 func (u *UserGrant) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-VcVoJ", "id", event.AggregateID).WithError(err).Warn("something went wrong in user grant handler")
 	return spooler.HandleError(event, err, u.view.GetLatestUserGrantFailedEvent, u.view.ProcessedUserGrantFailedEvent, u.view.ProcessedUserGrantSequence, u.errorCountUntilSkip)
+}
+
+func (u *UserGrant) OnSuccess() error {
+	return spooler.HandleSuccess(u.view.UpdateUserGrantSpoolerRunTimestamp)
 }

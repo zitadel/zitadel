@@ -107,8 +107,15 @@ export class OrgCreateComponent {
 
         this.adminService
             .SetUpOrg(createOrgRequest, humanRequest)
-            .then((data: OrgSetUpResponse) => {
-                this.router.navigate(['orgs', data.toObject().org?.id]);
+            .then((org: OrgSetUpResponse) => {
+                this.router.navigate(['/org/overview']);
+                // const orgResp = org.getOrg();
+                // if (orgResp) {
+                //     this.authService.setActiveOrg(orgResp.toObject());
+                //     this.router.navigate(['/org']);
+                // } else {
+                //     this.router.navigate(['/org', 'overview']);
+                // }
             })
             .catch(error => {
                 this.toast.showError(error);
@@ -193,7 +200,12 @@ export class OrgCreateComponent {
     public createOrgForSelf(): void {
         if (this.name && this.name.value) {
             this.mgmtService.CreateOrg(this.name.value).then((org) => {
-                this.router.navigate(['orgs', org.toObject().id]);
+                this.router.navigate(['/org/overview']);
+                // const newOrg = org.toObject();
+                // setTimeout(() => {
+                //     this.authService.setActiveOrg(newOrg);
+                //     this.router.navigate(['/org']);
+                // }, 1000);
             }).catch(error => {
                 this.toast.showError(error);
             });

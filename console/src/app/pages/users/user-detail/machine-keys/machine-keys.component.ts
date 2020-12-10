@@ -87,18 +87,16 @@ export class MachineKeysComponent implements OnInit {
 
                 if (resp.date as Moment) {
                     const ts = new Timestamp();
-                    console.log(resp.date.toDate().getTime());
+                    console.log(resp.date.toDate());
                     const milliseconds = resp.date.toDate().getTime();
                     const seconds = Math.abs(milliseconds / 1000);
                     const nanos = (milliseconds - seconds * 1000) * 1000 * 1000;
                     ts.setSeconds(seconds);
                     ts.setNanos(nanos);
                     date = ts;
-                    console.log(date.toObject());
                 }
 
                 if (type) {
-                    console.log(this.userId, type, date);
                     return this.userService.AddMachineKey(this.userId, type, date).then((response) => {
                         if (response) {
                             setTimeout(() => {
@@ -126,7 +124,6 @@ export class MachineKeysComponent implements OnInit {
         this.userService.SearchMachineKeys(this.userId, limit, offset).then(resp => {
             this.keyResult = resp.toObject();
             this.dataSource.data = this.keyResult.resultList;
-            console.log(this.keyResult.resultList);
             this.loadingSubject.next(false);
         }).catch((error: any) => {
             this.toast.showError(error);

@@ -853,7 +853,8 @@ message View {
     string database = 1;
     string view_name = 2;
     uint64 processed_sequence = 3;
-    google.protobuf.Timestamp view_timestamp = 4;
+    google.protobuf.Timestamp event_timestamp = 4;
+    google.protobuf.Timestamp last_successful_spooler_run = 5;
 }
 
 message IdpID {
@@ -998,6 +999,7 @@ message DefaultLoginPolicy {
     google.protobuf.Timestamp creation_date = 4;
     google.protobuf.Timestamp change_date = 5;
     bool force_mfa = 6;
+    PasswordlessType passwordless_type = 7;
 }
 
 message DefaultLoginPolicyRequest {
@@ -1005,6 +1007,12 @@ message DefaultLoginPolicyRequest {
     bool allow_register = 2;
     bool allow_external_idp = 3;
     bool force_mfa = 4;
+    PasswordlessType passwordless_type = 5;
+}
+
+enum PasswordlessType {
+    PASSWORDLESSTYPE_NOT_ALLOWED = 0;
+    PASSWORDLESSTYPE_ALLOWED = 1;
 }
 
 message IdpProviderID {
@@ -1018,6 +1026,7 @@ message DefaultLoginPolicyView {
     google.protobuf.Timestamp creation_date = 4;
     google.protobuf.Timestamp change_date = 5;
     bool force_mfa = 6;
+    PasswordlessType passwordless_type = 7;
 }
 
 message IdpProviderView {

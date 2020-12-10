@@ -16,7 +16,7 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	proj_model "github.com/caos/zitadel/internal/project/model"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 )

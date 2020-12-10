@@ -1,15 +1,22 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatInput } from '@angular/material/input';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { UserView } from 'src/app/proto/generated/auth_pb';
-import { SearchMethod, UserSearchKey, UserSearchQuery, UserSearchResponse } from 'src/app/proto/generated/management_pb';
+import {
+    SearchMethod,
+    UserSearchKey,
+    UserSearchQuery,
+    UserSearchResponse,
+    UserState,
+} from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -30,7 +37,7 @@ export class UserTableComponent implements OnInit {
     @Input() refreshOnPreviousRoutes: string[] = [];
     @Input() disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    @ViewChild('input') public filter!: MatInput;
+    @ViewChild('input') public filter!: Input;
     public dataSource: MatTableDataSource<UserView.AsObject> = new MatTableDataSource<UserView.AsObject>();
     public selection: SelectionModel<UserView.AsObject> = new SelectionModel<UserView.AsObject>(true, []);
     public userResult!: UserSearchResponse.AsObject;
@@ -41,11 +48,14 @@ export class UserTableComponent implements OnInit {
     @Output() public changedSelection: EventEmitter<Array<UserView.AsObject>> = new EventEmitter();
     UserSearchKey: any = UserSearchKey;
 
+    public UserState: any = UserState;
+
     constructor(
         public translate: TranslateService,
         private userService: ManagementService,
         private toast: ToastService,
         private dialog: MatDialog,
+        private route: ActivatedRoute,
     ) {
         this.selection.changed.subscribe(() => {
             this.changedSelection.emit(this.selection.selected);
@@ -53,7 +63,14 @@ export class UserTableComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.getData(10, 0, this.userType);
+        this.route.queryParams.pipe(take(1)).subscribe(params => {
+            this.getData(10, 0, this.userType);
+            if (params.deferredReload) {
+                setTimeout(() => {
+                    this.getData(10, 0, this.userType);
+                }, 2000);
+            }
+        });
     }
 
     public isAllSelected(): boolean {
@@ -78,7 +95,12 @@ export class UserTableComponent implements OnInit {
             return this.userService.DeactivateUser(value.id);
         })).then(() => {
             this.toast.showInfo('USER.TOAST.SELECTEDDEACTIVATED', true);
-            this.getData(10, 0, this.userType);
+            this.selection.clear();
+            setTimeout(() => {
+                this.refreshPage();
+            }, 1000);
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 
@@ -87,7 +109,12 @@ export class UserTableComponent implements OnInit {
             return this.userService.ReactivateUser(value.id);
         })).then(() => {
             this.toast.showInfo('USER.TOAST.SELECTEDREACTIVATED', true);
-            this.getData(10, 0, this.userType);
+            this.selection.clear();
+            setTimeout(() => {
+                this.refreshPage();
+            }, 1000);
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 

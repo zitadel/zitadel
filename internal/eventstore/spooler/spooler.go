@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/view/repository"
 
 	"time"
@@ -200,7 +200,11 @@ func HandleError(
 		return err
 	}
 	if errorCountUntilSkip <= failedEvent.FailureCount {
-		return processSequence(event.Sequence)
+		return processSequence(event.Sequence, event.CreationDate)
 	}
 	return nil
+}
+
+func HandleSuccess(updateSpoolerRunTimestamp func() error) error {
+	return updateSpoolerRunTimestamp()
 }

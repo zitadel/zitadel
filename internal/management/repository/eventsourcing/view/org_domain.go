@@ -5,6 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/org/repository/view"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
+	"time"
 )
 
 const (
@@ -27,39 +28,43 @@ func (v *View) SearchOrgDomains(request *org_model.OrgDomainSearchRequest) ([]*m
 	return view.SearchOrgDomains(v.Db, orgDomainTable, request)
 }
 
-func (v *View) PutOrgDomain(org *model.OrgDomainView, sequence uint64) error {
+func (v *View) PutOrgDomain(org *model.OrgDomainView, sequence uint64, eventTimestamp time.Time) error {
 	err := view.PutOrgDomain(v.Db, orgDomainTable, org)
 	if err != nil {
 		return err
 	}
 	if sequence != 0 {
-		return v.ProcessedOrgDomainSequence(sequence)
+		return v.ProcessedOrgDomainSequence(sequence, eventTimestamp)
 	}
 	return nil
 }
 
-func (v *View) PutOrgDomains(domains []*model.OrgDomainView, sequence uint64) error {
+func (v *View) PutOrgDomains(domains []*model.OrgDomainView, sequence uint64, eventTimestamp time.Time) error {
 	err := view.PutOrgDomains(v.Db, orgDomainTable, domains...)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedUserSequence(sequence)
+	return v.ProcessedUserSequence(sequence, eventTimestamp)
 }
 
-func (v *View) DeleteOrgDomain(orgID, domain string, eventSequence uint64) error {
+func (v *View) DeleteOrgDomain(orgID, domain string, eventSequence uint64, eventTimestamp time.Time) error {
 	err := view.DeleteOrgDomain(v.Db, orgDomainTable, orgID, domain)
 	if err != nil {
 		return nil
 	}
-	return v.ProcessedOrgDomainSequence(eventSequence)
+	return v.ProcessedOrgDomainSequence(eventSequence, eventTimestamp)
 }
 
 func (v *View) GetLatestOrgDomainSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(orgDomainTable)
 }
 
-func (v *View) ProcessedOrgDomainSequence(eventSequence uint64) error {
-	return v.saveCurrentSequence(orgDomainTable, eventSequence)
+func (v *View) ProcessedOrgDomainSequence(eventSequence uint64, eventTimestamp time.Time) error {
+	return v.saveCurrentSequence(orgDomainTable, eventSequence, eventTimestamp)
+}
+
+func (v *View) UpdateOrgDomainSpoolerRunTimestamp() error {
+	return v.updateSpoolerRunSequence(orgDomainTable)
 }
 
 func (v *View) GetLatestOrgDomainFailedEvent(sequence uint64) (*repository.FailedEvent, error) {

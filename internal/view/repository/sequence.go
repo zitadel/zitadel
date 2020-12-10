@@ -10,9 +10,10 @@ import (
 )
 
 type CurrentSequence struct {
-	ViewName         string    `gorm:"column:view_name;primary_key"`
-	CurrentSequence  uint64    `gorm:"column:current_sequence"`
-	CurrentTimestamp time.Time `gorm:"column:timestamp"`
+	ViewName                 string    `gorm:"column:view_name;primary_key"`
+	CurrentSequence          uint64    `gorm:"column:current_sequence"`
+	EventTimestamp           time.Time `gorm:"column:event_timestamp"`
+	LastSuccessfulSpoolerRun time.Time `gorm:"column:last_successful_spooler_run"`
 }
 
 type SequenceSearchKey int32
@@ -36,16 +37,21 @@ func (key sequenceSearchKey) ToColumnName() string {
 func CurrentSequenceToModel(sequence *CurrentSequence) *model.View {
 	dbView := strings.Split(sequence.ViewName, ".")
 	return &model.View{
-		Database:         dbView[0],
-		ViewName:         dbView[1],
-		CurrentSequence:  sequence.CurrentSequence,
-		CurrentTimestamp: sequence.CurrentTimestamp,
+		Database:                 dbView[0],
+		ViewName:                 dbView[1],
+		CurrentSequence:          sequence.CurrentSequence,
+		EventTimestamp:           sequence.EventTimestamp,
+		LastSuccessfulSpoolerRun: sequence.LastSuccessfulSpoolerRun,
 	}
 }
 
-func SaveCurrentSequence(db *gorm.DB, table, viewName string, sequence uint64) error {
+func SaveCurrentSequence(db *gorm.DB, table, viewName string, sequence uint64, eventTimestamp time.Time) error {
+	return UpdateCurrentSequence(db, table, &CurrentSequence{viewName, sequence, eventTimestamp, time.Now()})
+}
+
+func UpdateCurrentSequence(db *gorm.DB, table string, currentSequence *CurrentSequence) error {
 	save := PrepareSave(table)
-	err := save(db, &CurrentSequence{viewName, sequence, time.Now()})
+	err := save(db, currentSequence)
 
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "VIEW-5kOhP", "unable to updated processed sequence")
@@ -84,5 +90,5 @@ func ClearView(db *gorm.DB, truncateView, sequenceTable string) error {
 	if err != nil {
 		return err
 	}
-	return SaveCurrentSequence(db, sequenceTable, truncateView, 0)
+	return SaveCurrentSequence(db, sequenceTable, truncateView, 0, time.Now())
 }

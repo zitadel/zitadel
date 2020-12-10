@@ -1,7 +1,7 @@
 <form>
-    <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Role Name</mat-label>
-        <input matInput *ngIf="singleOutput" type="text" placeholder="Search for the role name" #nameInput
+    <cnsl-form-field appearance="outline" class="full-width">
+        <cnsl-label>Role Name</cnsl-label>
+        <input cnslInput *ngIf="singleOutput" type="text" placeholder="Search for the role name" #nameInput
             [formControl]="myControl" [matAutocomplete]="auto" />
 
         <mat-chip-list *ngIf="!singleOutput" #chipList aria-label="name selection">
@@ -10,7 +10,7 @@
                 {{selectedRole.displayName}}
                 <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
             </mat-chip>
-            <input placeholder="Role Name" #nameInput [formControl]="myControl" [matAutocomplete]="auto"
+            <input cnslInput placeholder="Role Name" #nameInput [formControl]="myControl" [matAutocomplete]="auto"
                 [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
                 [matChipInputAddOnBlur]="addOnBlur" (matChipInputTokenEnd)="add($event)" />
         </mat-chip-list>
@@ -23,5 +23,5 @@
                 {{role.displayName}}
             </mat-option>
         </mat-autocomplete>
-    </mat-form-field>
+    </cnsl-form-field>
 </form>

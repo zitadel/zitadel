@@ -39,15 +39,26 @@
     tr.detail-row {
       height: 0;
     }
-
-    .selection {
-      width: 50px;
-      max-width: 50px;
-    }
   }
 }
 
 .pointer {
   outline: none;
   cursor: pointer;
+}
+
+.role-row {
+  min-width: 100px;
+}
+
+.date-block {
+  margin: .5rem 0;
+  display: block;
+  min-width: 120px;
+
+  .date-sub {
+    font-size: 13px;
+    color: var(--grey);
+    display: block;
+  }
 }

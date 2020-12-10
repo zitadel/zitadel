@@ -5,6 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/usergrant/repository/view"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
+	"time"
 )
 
 const (
@@ -31,28 +32,32 @@ func (v *View) SearchUserGrants(request *grant_model.UserGrantSearchRequest) ([]
 	return view.SearchUserGrants(v.Db, userGrantTable, request)
 }
 
-func (v *View) PutUserGrant(grant *model.UserGrantView, sequence uint64) error {
+func (v *View) PutUserGrant(grant *model.UserGrantView, sequence uint64, eventTimestamp time.Time) error {
 	err := view.PutUserGrant(v.Db, userGrantTable, grant)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedUserGrantSequence(sequence)
+	return v.ProcessedUserGrantSequence(sequence, eventTimestamp)
 }
 
-func (v *View) DeleteUserGrant(grantID string, eventSequence uint64) error {
+func (v *View) DeleteUserGrant(grantID string, eventSequence uint64, eventTimestamp time.Time) error {
 	err := view.DeleteUserGrant(v.Db, userGrantTable, grantID)
 	if err != nil {
 		return nil
 	}
-	return v.ProcessedUserGrantSequence(eventSequence)
+	return v.ProcessedUserGrantSequence(eventSequence, eventTimestamp)
 }
 
 func (v *View) GetLatestUserGrantSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(userGrantTable)
 }
 
-func (v *View) ProcessedUserGrantSequence(eventSequence uint64) error {
-	return v.saveCurrentSequence(userGrantTable, eventSequence)
+func (v *View) ProcessedUserGrantSequence(eventSequence uint64, eventTimestamp time.Time) error {
+	return v.saveCurrentSequence(userGrantTable, eventSequence, eventTimestamp)
+}
+
+func (v *View) UpdateUserGrantSpoolerRunTimestamp() error {
+	return v.updateSpoolerRunSequence(userGrantTable)
 }
 
 func (v *View) GetLatestUserGrantFailedEvent(sequence uint64) (*repository.FailedEvent, error) {

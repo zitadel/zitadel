@@ -1,20 +1,20 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { CodeDialogComponent } from './code-dialog.component';
+import { EditDialogComponent } from './edit-dialog.component';
 
 describe('CodeDialogComponent', () => {
-    let component: CodeDialogComponent;
-    let fixture: ComponentFixture<CodeDialogComponent>;
+    let component: EditDialogComponent;
+    let fixture: ComponentFixture<EditDialogComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-            declarations: [CodeDialogComponent],
+            declarations: [EditDialogComponent],
         })
             .compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(CodeDialogComponent);
+        fixture = TestBed.createComponent(EditDialogComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

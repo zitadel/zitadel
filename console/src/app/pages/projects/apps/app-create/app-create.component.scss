@@ -56,8 +56,9 @@ p.desc {
   margin: 0 -1.5rem;
 
   .step-title {
-    font-size: 1.2rem;
-    color: var(--grey);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
   }
 
   .step-description {
@@ -65,10 +66,29 @@ p.desc {
     color: var(--grey);
   }
 
+  .chip-form {
+    width: 100%;
+    display: flex;
+    align-items: center;
+
+    .formfield {
+      flex: 1;
+    }
+
+    button {
+      margin-top: 1rem;
+    }
+  }
+
   .error {
     font-size: 13px;
     color: #f44336;
     margin-top: 0;
+  }
+
+  .chip {
+    border-radius: 4px;
+    height: 40px;
   }
 
   .chip[color='white'] {

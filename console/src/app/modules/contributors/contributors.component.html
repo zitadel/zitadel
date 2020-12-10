@@ -1,5 +1,5 @@
 <div class="groups">
-    <span class="header">{{ title }}</span>
+    <span class="co-header">{{ title }}</span>
     <span class="sub-header">{{ description }}</span>
     <div class="people">
         <div class="img-list" [@cardAnimation]="totalResult">
@@ -30,13 +30,13 @@
                 </div>
             </ng-template>
             <button class="add-img" (click)="emitAddMember()" [disabled]="disabled" mat-icon-button
-                aria-label="Edit contributors">
+                matTooltip="{{'ACTIONS.ADD' | translate}}" aria-label="Edit contributors">
                 <mat-icon>add</mat-icon>
             </button>
             <span class="fill-space"></span>
-            <button class="refresh-img" (click)="emitRefresh()" [disabled]="disabled" mat-icon-button
-                aria-label="refresh contributors">
-                <mat-icon>refresh</mat-icon>
+            <button matTooltip="{{'ACTIONS.REFRESH' | translate}}" class="refresh-img" (click)="emitRefresh()"
+                [disabled]="disabled" mat-icon-button aria-label="refresh contributors">
+                <mat-icon class="icon">refresh</mat-icon>
             </button>
         </div>
     </div>

@@ -13,11 +13,11 @@ type UserRepository interface {
 	RegisterExternalUser(ctx context.Context, user *model.User, externalIDP *model.ExternalIDP, member *org_model.OrgMember, resourceOwner string) (*model.User, error)
 
 	myUserRepo
-	SkipMfaInit(ctx context.Context, userID string) error
+	SkipMFAInit(ctx context.Context, userID string) error
 
 	RequestPasswordReset(ctx context.Context, username string) error
-	SetPassword(ctx context.Context, userID, code, password string) error
-	ChangePassword(ctx context.Context, userID, old, new string) error
+	SetPassword(ctx context.Context, userID, code, password, userAgentID string) error
+	ChangePassword(ctx context.Context, userID, old, new, userAgentID string) error
 
 	VerifyEmail(ctx context.Context, userID, code string) error
 	ResendEmailVerificationMail(ctx context.Context, userID string) error
@@ -25,8 +25,16 @@ type UserRepository interface {
 	VerifyInitCode(ctx context.Context, userID, code, password string) error
 	ResendInitVerificationMail(ctx context.Context, userID string) error
 
-	AddMfaOTP(ctx context.Context, userID string) (*model.OTP, error)
-	VerifyMfaOTPSetup(ctx context.Context, userID, code string) error
+	AddMFAOTP(ctx context.Context, userID string) (*model.OTP, error)
+	VerifyMFAOTPSetup(ctx context.Context, userID, code, userAgentID string) error
+
+	AddMFAU2F(ctx context.Context, id string) (*model.WebAuthNToken, error)
+	VerifyMFAU2FSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error
+	RemoveMFAU2F(ctx context.Context, userID, webAuthNTokenID string) error
+
+	AddPasswordless(ctx context.Context, id string) (*model.WebAuthNToken, error)
+	VerifyPasswordlessSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error
+	RemovePasswordless(ctx context.Context, userID, webAuthNTokenID string) error
 
 	ChangeUsername(ctx context.Context, userID, username string) error
 
@@ -63,10 +71,18 @@ type myUserRepo interface {
 	AddMyExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) (*model.ExternalIDP, error)
 	RemoveMyExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) error
 
-	MyUserMfas(ctx context.Context) ([]*model.MultiFactor, error)
-	AddMyMfaOTP(ctx context.Context) (*model.OTP, error)
-	VerifyMyMfaOTPSetup(ctx context.Context, code string) error
-	RemoveMyMfaOTP(ctx context.Context) error
+	MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, error)
+	AddMyMFAOTP(ctx context.Context) (*model.OTP, error)
+	VerifyMyMFAOTPSetup(ctx context.Context, code string) error
+	RemoveMyMFAOTP(ctx context.Context) error
+
+	AddMyMFAU2F(ctx context.Context) (*model.WebAuthNToken, error)
+	VerifyMyMFAU2FSetup(ctx context.Context, tokenName string, data []byte) error
+	RemoveMyMFAU2F(ctx context.Context, webAuthNTokenID string) error
+
+	AddMyPasswordless(ctx context.Context) (*model.WebAuthNToken, error)
+	VerifyMyPasswordlessSetup(ctx context.Context, tokenName string, data []byte) error
+	RemoveMyPasswordless(ctx context.Context, webAuthNTokenID string) error
 
 	ChangeMyUsername(ctx context.Context, username string) error
 

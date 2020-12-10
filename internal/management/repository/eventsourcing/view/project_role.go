@@ -5,6 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
+	"time"
 )
 
 const (
@@ -31,20 +32,20 @@ func (v *View) SearchProjectRoles(request *proj_model.ProjectRoleSearchRequest) 
 	return view.SearchProjectRoles(v.Db, projectRoleTable, request)
 }
 
-func (v *View) PutProjectRole(project *model.ProjectRoleView) error {
+func (v *View) PutProjectRole(project *model.ProjectRoleView, eventTimestamp time.Time) error {
 	err := view.PutProjectRole(v.Db, projectRoleTable, project)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedProjectRoleSequence(project.Sequence)
+	return v.ProcessedProjectRoleSequence(project.Sequence, eventTimestamp)
 }
 
-func (v *View) DeleteProjectRole(projectID, orgID, key string, eventSequence uint64) error {
+func (v *View) DeleteProjectRole(projectID, orgID, key string, eventSequence uint64, eventTimestamp time.Time) error {
 	err := view.DeleteProjectRole(v.Db, projectRoleTable, projectID, orgID, key)
 	if err != nil {
 		return nil
 	}
-	return v.ProcessedProjectRoleSequence(eventSequence)
+	return v.ProcessedProjectRoleSequence(eventSequence, eventTimestamp)
 }
 
 func (v *View) DeleteProjectRolesByProjectID(projectID string) error {
@@ -55,8 +56,12 @@ func (v *View) GetLatestProjectRoleSequence() (*repository.CurrentSequence, erro
 	return v.latestSequence(projectRoleTable)
 }
 
-func (v *View) ProcessedProjectRoleSequence(eventSequence uint64) error {
-	return v.saveCurrentSequence(projectRoleTable, eventSequence)
+func (v *View) ProcessedProjectRoleSequence(eventSequence uint64, eventTimestamp time.Time) error {
+	return v.saveCurrentSequence(projectRoleTable, eventSequence, eventTimestamp)
+}
+
+func (v *View) UpdateProjectRoleSpoolerRunTimestamp() error {
+	return v.updateSpoolerRunSequence(projectRoleTable)
 }
 
 func (v *View) GetLatestProjectRoleFailedEvent(sequence uint64) (*repository.FailedEvent, error) {

@@ -9,7 +9,12 @@
   $primary-dark: mat-color($primary, A900);
   $foreground: map-get($theme, foreground);
   $sec-dark: mat-color($primary, A800);
+  $is-dark-theme: map-get($theme, is-dark);
   /* stylelint-enable */
+
+  .meta {
+    box-shadow: inset 1px 0 if($is-dark-theme, #303131, #e3e8ee);
+  }
 
   .nav-item {
     color: mat-color($foreground, text) !important;
@@ -27,10 +32,8 @@
 
     .c_label {
       .count {
-        background-color: $primary-color;
         padding: 3px 6px;
         border-radius: 50vw;
-        color: white;
       }
     }
   }
@@ -56,6 +59,8 @@
 
   .admin-line {
     position: fixed;
+    display: flex;
+    align-items: center;
     bottom: 0;
     left: 0;
     right: calc(100vw - 300px);
@@ -67,6 +72,7 @@
     transform: translateY(75%);
     transition: all .2s;
     border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
 
     span {
       display: none;
@@ -85,18 +91,6 @@
       }
     }
 
-    &::before {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 0;
-      top: 0;
-      left: 0;
-      border-bottom: 20px solid transparent;
-      border-left: 20px solid $primary-dark;
-      transition: border-color .3s cubic-bezier(.645, .045, .355, 1);
-    }
-
     &.expanded,
     &:hover {
       transform: translateY(0%);
@@ -105,6 +99,16 @@
       span {
         display: inline-block;
       }
+    }
+  }
+
+  .divider {
+    .span {
+      border-color: if($is-dark-theme, #303131, #e3e8ee);
+    }
+
+    .line {
+      background-color: if($is-dark-theme, #303131, #e3e8ee);
     }
   }
 }

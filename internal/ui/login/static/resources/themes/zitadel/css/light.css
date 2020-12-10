@@ -75,10 +75,14 @@
   font-family: Lato;
   font-size: 16px;
   font-weight: 400;
+  cursor: default !important;
 }
 
 body {
   margin: 0 0 100px 0;
+}
+body.waiting * {
+  cursor: wait !important;
 }
 
 html {
@@ -485,6 +489,14 @@ footer {
 
 .error {
   color: #F20D6B;
+}
+
+.hidden {
+  display: none;
+}
+
+#wa-error {
+  margin-top: 20px;
 }
 
 html {

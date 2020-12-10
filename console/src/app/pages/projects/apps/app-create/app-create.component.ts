@@ -1,8 +1,7 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { MatChipInputEvent } from '@angular/material/chips';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -216,9 +215,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         }
     }
 
-    public addUri(event: MatChipInputEvent, target: string): void {
-        const input = event.input;
-        const value = event.value.trim();
+    public addUri(input: any, target: string): void {
+        const value = input.value.trim();
 
         if (value !== '') {
             if (target === 'REDIRECT' && this.redirectControl.valid) {

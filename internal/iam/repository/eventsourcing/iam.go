@@ -359,7 +359,7 @@ func LoginPolicySecondFactorAddedAggregate(aggCreator *es_models.AggregateCreato
 			AggregateTypeFilter(model.IAMAggregate).
 			AggregateIDFilter(existing.AggregateID)
 
-		validation := checkExistingLoginPolicySecondFactorValidation(mfa.MfaType)
+		validation := checkExistingLoginPolicySecondFactorValidation(mfa.MFAType)
 		agg.SetPrecondition(validationQuery, validation)
 		return agg.AppendEvent(model.LoginPolicySecondFactorAdded, mfa)
 	}
@@ -391,7 +391,7 @@ func LoginPolicyMultiFactorAddedAggregate(aggCreator *es_models.AggregateCreator
 			AggregateTypeFilter(model.IAMAggregate).
 			AggregateIDFilter(existing.AggregateID)
 
-		validation := checkExistingLoginPolicyMultiFactorValidation(mfa.MfaType)
+		validation := checkExistingLoginPolicyMultiFactorValidation(mfa.MFAType)
 		agg.SetPrecondition(validationQuery, validation)
 		return agg.AppendEvent(model.LoginPolicyMultiFactorAdded, mfa)
 	}
@@ -689,7 +689,7 @@ func checkExistingLoginPolicySecondFactorValidation(mfaType int32) func(...*es_m
 				if err != nil {
 					return err
 				}
-				mfas = append(mfas, idp.MfaType)
+				mfas = append(mfas, idp.MFAType)
 			case model.LoginPolicySecondFactorRemoved:
 				mfa := new(model.MFA)
 				err := mfa.SetData(event)
@@ -697,7 +697,7 @@ func checkExistingLoginPolicySecondFactorValidation(mfaType int32) func(...*es_m
 					return err
 				}
 				for i := len(mfas) - 1; i >= 0; i-- {
-					if mfas[i] == mfa.MfaType {
+					if mfas[i] == mfa.MFAType {
 						mfas[i] = mfas[len(mfas)-1]
 						mfas[len(mfas)-1] = 0
 						mfas = mfas[:len(mfas)-1]
@@ -726,7 +726,7 @@ func checkExistingLoginPolicyMultiFactorValidation(mfaType int32) func(...*es_mo
 				if err != nil {
 					return err
 				}
-				mfas = append(mfas, idp.MfaType)
+				mfas = append(mfas, idp.MFAType)
 			case model.LoginPolicyMultiFactorRemoved:
 				mfa := new(model.MFA)
 				err := mfa.SetData(event)
@@ -734,7 +734,7 @@ func checkExistingLoginPolicyMultiFactorValidation(mfaType int32) func(...*es_mo
 					return err
 				}
 				for i := len(mfas) - 1; i >= 0; i-- {
-					if mfas[i] == mfa.MfaType {
+					if mfas[i] == mfa.MFAType {
 						mfas[i] = mfas[len(mfas)-1]
 						mfas[len(mfas)-1] = 0
 						mfas = mfas[:len(mfas)-1]

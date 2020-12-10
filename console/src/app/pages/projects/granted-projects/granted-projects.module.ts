@@ -3,9 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -20,6 +18,7 @@ import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/memb
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
@@ -53,16 +52,15 @@ import { GrantedProjectsComponent } from './granted-projects.component';
         HasRoleModule,
         MatTableModule,
         MatPaginatorModule,
-        MatFormFieldModule,
-        MatInputModule,
+        InputModule,
         ChangesModule,
         MatIconModule,
         MatSelectModule,
         MatButtonModule,
+        MatTabsModule,
         MatProgressSpinnerModule,
         MetaLayoutModule,
         MatProgressBarModule,
-        MatTabsModule,
         ProjectRolesModule,
         MatCheckboxModule,
         CardModule,

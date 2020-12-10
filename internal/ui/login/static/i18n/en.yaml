@@ -35,10 +35,10 @@ UsernameChangeDone:
   Title: Username changed
   Description: Your username was changed successfully.
 
-MfaVerify:
+MFAVerify:
   Title: Verify Multificator
   Description: Verify your multifactor
-  OTP: OTP
+  OTP: OTP (One Time Password)
   Code: Code
 
 InitPassword: 
@@ -63,22 +63,45 @@ InitUserDone:
   Title: User activated
   Description: Email verified and Password successfully set
 
-MfaPrompt:
+MFA:
+  Provider0: OTP (One Time Password)
+  Provider1: U2F (Universal 2nd Factor)
+  ChooseOther: or choose an other option
+
+MFAPrompt:
   Title: Multifactor Setup
   Description: Would you like to setup multifactor authentication?
   Provider0: OTP (One Time Password)
   Provider1: U2F (Universal 2nd Factor)
 
-MfaInitVerify:
+MFAInitVerify:
   Title: Multifactor Verification
   Description: Verify your multifactor.
-  OtpDescription: Scan the code with your authenticator app (e.g Google-Authenticator) or copy the secret and insert the generated code below.
+  OTPDescription: Scan the code with your authenticator app (e.g Google Authenticator) or copy the secret and insert the generated code below.
   Secret: Secret
   Code: Code
 
-MfaInitDone:
+MFAInitDone:
   Title: Multifcator Verification done
-  Description: Multifactor verification successfully done. The multifactor has to be entered on each login, even in the actual authentification process.
+  Description: Multifactor verification successfully done. The multifactor has to be entered on each login.
+
+MFAInitU2F:
+  Title: Multifactor Setup U2F / WebAuthN
+  Description: Add your Token by providing a name and then clicking on the 'Register Token' button below.
+
+MFAVerifyU2F:
+  Title: Multifactor Verification
+  Description: Verify your multifactor U2F / WebAuthN token
+
+WebAuthN:
+  Name: Name of the tokens / machine
+  NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
+  Error:
+    Retry: Retry, create a new challenge or choose a different method.
+
+Passwordless:
+  Title: Login passwordles
+  Description: Verify your token
 
 PasswordChange:
   Title: Change Password
@@ -181,6 +204,9 @@ Actions:
   ForgotPassword: reset password
   Cancel: cancel
   Save: save
+  RegisterToken: Register Token
+  ValidateToken: Validate Token
+  Recreate: recreate
 
 Errors:
   Internal: An internal error occured
@@ -215,9 +241,9 @@ Errors:
       GeneratorAlgNotSupported: Unsupported generator algorithm
     EmailVerify:
       UserIDEmpty: UserID is empty
-    Mfa:
+    MFA:
       NoProviders: No available multifactor providers
-      Otp:
+      OTP:
         AlreadyReady: Multifactor OTP (OneTimePassword) is already setup
         NotExisting: Multifactor OTP (OneTimePassword) doesn't exist
         InvalidCode: Invalid code

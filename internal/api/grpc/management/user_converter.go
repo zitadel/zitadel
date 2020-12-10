@@ -501,8 +501,9 @@ func mfasFromModel(mfas []*usr_model.MultiFactor) []*management.UserMultiFactor 
 
 func mfaFromModel(mfa *usr_model.MultiFactor) *management.UserMultiFactor {
 	return &management.UserMultiFactor{
-		State: mfaStateFromModel(mfa.State),
-		Type:  mfaTypeFromModel(mfa.Type),
+		State:     mfaStateFromModel(mfa.State),
+		Type:      mfaTypeFromModel(mfa.Type),
+		Attribute: mfa.Attribute,
 	}
 }
 
@@ -572,22 +573,22 @@ func genderToModel(gender management.Gender) usr_model.Gender {
 	}
 }
 
-func mfaTypeFromModel(mfatype usr_model.MfaType) management.MfaType {
+func mfaTypeFromModel(mfatype usr_model.MFAType) management.MfaType {
 	switch mfatype {
-	case usr_model.MfaTypeOTP:
+	case usr_model.MFATypeOTP:
 		return management.MfaType_MFATYPE_OTP
-	case usr_model.MfaTypeSMS:
-		return management.MfaType_MFATYPE_SMS
+	case usr_model.MFATypeU2F:
+		return management.MfaType_MFATYPE_U2F
 	default:
 		return management.MfaType_MFATYPE_UNSPECIFIED
 	}
 }
 
-func mfaStateFromModel(state usr_model.MfaState) management.MFAState {
+func mfaStateFromModel(state usr_model.MFAState) management.MFAState {
 	switch state {
-	case usr_model.MfaStateReady:
+	case usr_model.MFAStateReady:
 		return management.MFAState_MFASTATE_READY
-	case usr_model.MfaStateNotReady:
+	case usr_model.MFAStateNotReady:
 		return management.MFAState_MFASTATE_NOT_READY
 	default:
 		return management.MFAState_MFASTATE_UNSPECIFIED

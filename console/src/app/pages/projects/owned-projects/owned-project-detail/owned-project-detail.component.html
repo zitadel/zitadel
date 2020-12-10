@@ -33,12 +33,13 @@
             <div class="full-width">
                 <div class="line">
                     <ng-container *ngIf="editstate">
-                        <mat-form-field *ngIf="editstate && project?.name" class="formfield"
+                        <cnsl-form-field *ngIf="editstate && project?.name" class="formfield"
                             hintLabel="The name is required!">
-                            <mat-label>{{'PROJECT.NAME' | translate}}</mat-label>
-                            <input matInput [(ngModel)]="project.name" name="name" />
-                        </mat-form-field>
-                        <button class="icon-button" *ngIf="editstate" mat-icon-button (click)="updateName()">
+                            <cnsl-label>{{'PROJECT.NAME' | translate}}</cnsl-label>
+                            <input cnslInput [(ngModel)]="project.name" name="name" />
+                        </cnsl-form-field>
+                        <button matTooltip="{{'ACTIONS.SAVE' | translate}}" class="icon-button" *ngIf="editstate"
+                            mat-icon-button (click)="updateName()">
                             <mat-icon>check</mat-icon>
                         </button>
                     </ng-container>
@@ -80,10 +81,11 @@
                     <app-card title="{{ 'PROJECT.ROLE.TITLE' | translate }}"
                         description="{{ 'PROJECT.ROLE.DESCRIPTION' | translate }}">
                         <p>{{'PROJECT.ROLE.OPTIONS' | translate}}</p>
-                        <mat-checkbox [(ngModel)]="project.projectRoleAssertion" (change)="saveProject()">
+                        <mat-checkbox [(ngModel)]="project.projectRoleAssertion" (change)="saveProject()"
+                            color="primary">
                             {{'PROJECT.ROLE.ASSERTION' | translate}}</mat-checkbox>
                         <p class="desc">{{'PROJECT.ROLE.ASSERTION_DESCRIPTION' | translate}}</p>
-                        <mat-checkbox [(ngModel)]="project.projectRoleCheck" (change)="saveProject()">
+                        <mat-checkbox [(ngModel)]="project.projectRoleCheck" (change)="saveProject()" color="primary">
                             {{'PROJECT.ROLE.CHECK' | translate}}</mat-checkbox>
                         <p class="desc">{{'PROJECT.ROLE.CHECK_DESCRIPTION' | translate}}</p>
                         <div class="divider"></div>
@@ -108,11 +110,15 @@
         </ng-container>
     </div>
     <div class="side" metainfo>
-        <div class="details">
-            <div class="row">
+        <div class="meta-details">
+            <div class="meta-row">
+                <span class="first">{{'RESOURCEID' | translate}}:</span>
+                <span *ngIf="projectId" class="second">{{ projectId }}</span>
+            </div>
+            <div class="meta-row">
                 <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
-                <span *ngIf="project && project.state !== undefined"
-                    class="second">{{'PROJECT.STATE.'+project.state | translate}}</span>
+                <span *ngIf="project && project.state !== undefined" class="state"
+                    [ngClass]="{'active': project.state === ProjectState.PROJECTSTATE_ACTIVE, 'inactive': project.state === ProjectState.PROJECTSTATE_INACTIVE}">{{'PROJECT.STATE.'+project.state | translate}}</span>
             </div>
         </div>
 
@@ -125,7 +131,7 @@
                     [disabled]="(['project.member.write$', 'project.member.write:'+ project.projectId]| hasRole | async) == false">
                 </app-contributors>
             </mat-tab>
-            <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="flex-col">
+            <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="meta-flex-col">
                 <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.projectId"></app-changes>
             </mat-tab>
         </mat-tab-group>

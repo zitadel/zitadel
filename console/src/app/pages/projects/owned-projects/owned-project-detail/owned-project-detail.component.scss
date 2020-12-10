@@ -41,40 +41,17 @@
   }
 }
 
-.side {
-  .details {
-    margin-bottom: 1rem;
-    border-bottom: 1px solid #81868a40;
-    padding-bottom: 1rem;
-
-    .row {
-      display: flex;
-      margin-bottom: .5rem;
-      align-items: center;
-
-      .first {
-        flex: 1;
-        font-size: .8rem;
-        margin-right: .5rem;
-      }
-
-      .second {
-        font-size: .8rem;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        margin-left: 1rem;
-      }
-    }
+.line {
+  .formfield {
+    flex: 1;
   }
 
-  .mat-tab-label {
-    min-width: 100px !important;
+  button {
+    margin-top: 1rem;
   }
 
-  .flex-col {
-    display: flex;
-    flex-direction: column;
-  }
+  display: flex;
+  align-items: center;
 }
 
 .desc {

@@ -5,11 +5,11 @@
     <app-refresh-table *ngIf="dataSource" (refreshed)="refresh()" [dataSize]="dataSource.data.length"
         [loading]="loading$ | async">
 
-        <mat-form-field @appearfade *ngIf="orgSearchKey != undefined" actions class="filter">
-            <mat-label>{{'ORG.PAGES.FILTER' | translate}}</mat-label>
-            <input matInput (keyup)="applyFilter($event)" placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}"
+        <cnsl-form-field @appearfade *ngIf="orgSearchKey != undefined" actions class="filter">
+            <cnsl-label>{{'ORG.PAGES.FILTER' | translate}}</cnsl-label>
+            <input cnslInput (keyup)="applyFilter($event)" placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}"
                 #input>
-        </mat-form-field>
+        </cnsl-form-field>
 
         <table [dataSource]="dataSource" mat-table class="table" matSort aria-label="Elements">
 
