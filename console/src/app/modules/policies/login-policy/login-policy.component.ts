@@ -115,6 +115,7 @@ export class LoginPolicyComponent implements OnDestroy {
                 mgmtreq.setAllowRegister(this.loginData.allowRegister);
                 mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
                 mgmtreq.setForceMfa(this.loginData.forceMfa);
+                // console.log(mgmtreq.toObject());
                 if ((this.loginData as LoginPolicyView.AsObject).pb_default) {
                     return (this.service as ManagementService).CreateLoginPolicy(mgmtreq);
                 } else {
@@ -126,6 +127,7 @@ export class LoginPolicyComponent implements OnDestroy {
                 adminreq.setAllowRegister(this.loginData.allowRegister);
                 adminreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
                 adminreq.setForceMfa(this.loginData.forceMfa);
+                // console.log(adminreq.toObject());
 
                 return (this.service as AdminService).UpdateDefaultLoginPolicy(adminreq);
         }

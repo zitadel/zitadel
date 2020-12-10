@@ -53,6 +53,11 @@
         </div>
     </div>
 
+    <button [disabled]="disabled" class="save-button" (click)="savePolicy()" color="primary" type="submit"
+        mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+
+    <div class="divider"></div>
+
     <h3 class="subheader">{{ 'MFA.LIST.MULTIFACTORTITLE' | translate }}</h3>
     <p class="subdesc">{{ 'MFA.LIST.MULTIFACTORDESCRIPTION' | translate }}</p>
     <app-mfa-table [service]="service" [serviceType]="serviceType"
@@ -83,9 +88,6 @@
             <mat-icon>add</mat-icon>
         </div>
     </div>
-
-    <button [disabled]="disabled" class="save-button" (click)="savePolicy()" color="primary" type="submit"
-        mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
 
     <ng-template appHasRole [appHasRole]="['org.idp.read']">
         <h2>{{ 'IDP.LIST.TITLE' | translate }}</h2>
