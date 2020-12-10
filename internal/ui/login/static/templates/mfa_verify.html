@@ -14,10 +14,8 @@
     <input type="hidden" name="mfaType" value="{{ .SelectedMfaProvider }}" />
 
     <div class="fields">
-        <div class="field">
-            <label class="label" for="code">{{t "MfaVerify.Code"}}</label>
-            <input class="input" type="text" id="code" name="code" autocomplete="off" autofocus required>
-        </div>
+        <label class="lgn-label" for="code">{{t "MfaVerify.Code"}}</label>
+        <input class="lgn-input" type="text" id="code" name="code" autocomplete="off" autofocus required>
     </div>
 
     {{ template "error-message" .}}

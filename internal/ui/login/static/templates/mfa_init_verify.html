@@ -17,32 +17,34 @@
 
     {{if (eq .MfaType 0) }}
     <p>{{t "MfaInitVerify.OtpDescription"}}</p>
-    <div id="qrcode">
+    <div class="lgn-qrcode" id="qrcode">
         {{.QrCode}}
     </div>
     <div class="fields">
         <div class="field">
-            <span class="label" for="secret">{{t "MfaInitVerify.Secret"}}</span>
-            <span class="input" id="secret">
-                {{.Secret}}
-                <span class="copy material-icons" data-copy="{{ .Secret }}">content_copy</span>
-            </span>
+            <span class="lgn-label" for="secret">{{t "MfaInitVerify.Secret"}}</span>
+            <div class="lgn-actions">
+                <span id="secret"> {{.Secret}} </span>
+                <span class="fill-space"></span>
+                <i data-copy="{{ .Secret }}" class="las la-clipboard"></i>
+            </div>
         </div>
         <div class="field">
-            <label class="label" for="code">{{t "MfaInitVerify.Code"}}</label>
-            <input class="input" type="text" id="code" name="code" autocomplete="off" autofocus required>
+            <label class="lgn-label" for="code">{{t "MfaInitVerify.Code"}}</label>
+            <input class="lgn-input" type="text" id="code" name="code" autocomplete="off" autofocus required>
         </div>
     </div>
     {{end}}
 
-    <div class="actions">
-        <button class="primary right" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
-        <a class="button secondary" href="{{ mfaPromptChangeUrl .AuthReqID .MfaType }}">
+    <div class="lgn-actions">
+        <a class="lgn-button" href="{{ mfaPromptChangeUrl .AuthReqID .MfaType }}">
             {{t "Actions.Back"}}
         </a>
-        <a class="button secondary" href="{{ loginUrl }}">
+        <a class="lgn-button" href="{{ loginUrl }}">
             {{t "Actions.Cancel"}}
         </a>
+        <span class="fill-space"></span>
+        <button class="lgn-primary lgn-raised-button" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
     </div>
 </form>
 

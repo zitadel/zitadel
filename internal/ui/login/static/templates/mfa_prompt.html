@@ -15,8 +15,8 @@
     <div class="fields">
         {{ range $provider := .MfaProviders}}
         {{ $providerName := (t (printf "MfaPrompt.Provider%v" $provider)) }}
-        <div class="field radio-button">
-            <input class="lgn-input" id="{{ $provider }}" type="radio" name="provider" value="{{ $provider }}">
+        <div class="lgn-radio block">
+            <input id="{{ $provider }}" type="radio" name="provider" value="{{ $provider }}">
             <label for="{{ $provider }}">{{ $providerName }}</label>
         </div>
         {{ end }}
@@ -27,13 +27,10 @@
             {{t "Actions.Cancel"}}
         </a>
         {{if not .MfaRequired}}
-        <button class="lgn-button right" name="skip" value="true" type="submit"
-            formnovalidate>{{t "Actions.Skip"}}</button>
+        <button class="lgn-button" name="skip" value="true" type="submit" formnovalidate>{{t "Actions.Skip"}}</button>
         {{end}}
         <span class="fill-space"></span>
-        <button class="lgn-button lgn-primary" type="submit">{{t "Actions.Next"}}</button>
-
-
+        <button class="lgn-raised-button lgn-primary" type="submit">{{t "Actions.Next"}}</button>
     </div>
 </form>
 

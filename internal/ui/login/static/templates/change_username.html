@@ -12,11 +12,9 @@
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
-    <div class="fields">
-        <div class="field">
-            <label class="label" for="username">{{t "UsernameChange.Username"}}</label>
-            <input class="input" type="text" id="username" name="username" autocomplete="username" autofocus required>
-        </div>
+    <div class="field">
+        <label class="lgn-label" for="username">{{t "UsernameChange.Username"}}</label>
+        <input class="lgn-input" type="text" id="username" name="username" autocomplete="username" autofocus required>
     </div>
 
     {{ template "error-message" .}}

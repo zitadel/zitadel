@@ -25,6 +25,10 @@ $lgn-radio-label-padding: 0 0 0 ($lgn-radio-size + 10px);
     margin: 16px 0;
     display: inline-block;
 
+    &.block {
+        display: block;
+    }
+
     label {
         display: inline-block;
         height: $lgn-radio-size;
@@ -36,7 +40,7 @@ $lgn-radio-label-padding: 0 0 0 ($lgn-radio-size + 10px);
         padding-top: 2px;
         outline: none;
         font-size: $lgn-radio-font-size;
-        line-height: $lgn-radio-font-size;
+        line-height: 16px;
 
         &::before,
         &::after {

@@ -156,6 +156,9 @@ select::placeholder, .lgn-select::placeholder {
   margin: 16px 0;
   display: inline-block;
 }
+.lgn-radio.block {
+  display: block;
+}
 .lgn-radio label {
   display: inline-block;
   height: 20px;
@@ -167,7 +170,7 @@ select::placeholder, .lgn-select::placeholder {
   padding-top: 2px;
   outline: none;
   font-size: 14px;
-  line-height: 14px;
+  line-height: 16px;
 }
 .lgn-radio label::before, .lgn-radio label::after {
   position: absolute;
@@ -225,6 +228,16 @@ a {
   outline: none;
 }
 
+.lgn-qrcode {
+  display: block;
+  margin: auto;
+}
+.lgn-qrcode svg {
+  margin: auto;
+  display: block;
+  border-radius: 0.5rem;
+}
+
 .content-container {
   display: block;
   margin: 0px auto 50px auto;
@@ -257,6 +270,10 @@ a {
 }
 .content-container .lgn-login-profile .lgn-names .lgn-loginname p {
   margin: 0.5rem 1rem;
+}
+
+i {
+  font-size: 1.2rem;
 }
 
 @font-face {
@@ -593,6 +610,16 @@ a:hover, a:active {
   color: #6992c9;
 }
 
+.lgn-qrcode svg {
+  background: #212224;
+}
+.lgn-qrcode svg rect.color {
+  fill: #212224;
+}
+.lgn-qrcode svg rect.bg-color {
+  fill: #fafafa;
+}
+
 .lgn-error .lgn-error-message {
   color: #f44336;
 }
@@ -771,6 +798,15 @@ a:hover, a:active {
 .lgn-dark-theme a:hover, .lgn-dark-theme a:active {
   color: #6992c9;
 }
+.lgn-dark-theme .lgn-qrcode svg {
+  background: #212224;
+}
+.lgn-dark-theme .lgn-qrcode svg rect.color {
+  fill: #212224;
+}
+.lgn-dark-theme .lgn-qrcode svg rect.bg-color {
+  fill: #fafafa;
+}
 .lgn-dark-theme .lgn-error .lgn-error-message {
   color: #f44336;
 }
@@ -947,6 +983,15 @@ a:hover, a:active {
 }
 .lgn-light-theme a:hover, .lgn-light-theme a:active {
   color: #6e80da;
+}
+.lgn-light-theme .lgn-qrcode svg {
+  background: #212224;
+}
+.lgn-light-theme .lgn-qrcode svg rect.color {
+  fill: #212224;
+}
+.lgn-light-theme .lgn-qrcode svg rect.bg-color {
+  fill: #fafafa;
 }
 .lgn-light-theme .lgn-error .lgn-error-message {
   color: #f44336;

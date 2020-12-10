@@ -1,0 +1,53 @@
+@font-face {
+  font-family: $la-font-name-lab;
+  font-style: normal;
+  font-weight: normal;
+  font-display: auto;
+  src: url('#{$la-font-path}/la-brands-400.eot');
+  src: url("#{$la-font-path}/la-brands-400.eot?#iefix") format("embedded-opentype"),
+  url("#{$la-font-path}/la-brands-400.woff2") format("woff2"),
+  url("#{$la-font-path}/la-brands-400.woff") format("woff"),
+  url("#{$la-font-path}/la-brands-400.ttf") format("truetype"),
+  url("#{$la-font-path}/la-brands-400.svg#lineawesome") format("svg");
+}
+
+.#{$la-css-prefix-lab} {
+  font-family: $la-font-name-lab;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: $la-font-name-lar;
+  font-style: normal;
+  font-weight: 400;
+  font-display: auto;
+  src: url('#{$la-font-path}/la-regular-400.eot');
+  src: url("#{$la-font-path}/la-regular-400.eot?#iefix") format("embedded-opentype"),
+  url("#{$la-font-path}/la-regular-400.woff2") format("woff2"),
+  url("#{$la-font-path}/la-regular-400.woff") format("woff"),
+  url("#{$la-font-path}/la-regular-400.ttf") format("truetype"),
+  url("#{$la-font-path}/la-regular-400.svg#lineawesome") format("svg");
+}
+
+.#{$la-css-prefix-lar} {
+  font-family: $la-font-name-lar;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: $la-font-name-las;
+  font-style: normal;
+  font-weight: 900;
+  font-display: auto;
+  src: url('#{$la-font-path}/la-solid-900.eot');
+  src: url("#{$la-font-path}/la-solid-900.eot?#iefix") format("embedded-opentype"),
+  url("#{$la-font-path}/la-solid-900.woff2") format("woff2"),
+  url("#{$la-font-path}/la-solid-900.woff") format("woff"),
+  url("#{$la-font-path}/la-solid-900.ttf") format("truetype"),
+  url("#{$la-font-path}/la-solid-900.svg#lineawesome") format("svg");
+}
+
+.#{$la-css-prefix-las} {
+  font-family: $la-font-name-las;
+  font-weight: 900;
+}

@@ -12,13 +12,13 @@
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
-
-    <div class="actions">
-        <button class="primary right"
-            type="submit">{{if .AuthReqID }}{{t "Actions.Next"}}{{else}}{{t "Actions.Login"}}{{end}}</button>
-        <a class="button secondary" href="{{ loginUrl }}">
+    <div class="lgn-actions">
+        <a class="lgn-button" href="{{ loginUrl }}">
             {{t "Actions.Cancel"}}
         </a>
+        <span class="fill-space"></span>
+        <button class="lgn-raised-button lgn-primary"
+            type="submit">{{if .AuthReqID }}{{t "Actions.Next"}}{{else}}{{t "Actions.Login"}}{{end}}</button>
     </div>
 </form>
 
