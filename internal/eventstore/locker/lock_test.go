@@ -1,135 +1,135 @@
 package locker
 
-import (
-	"database/sql"
-	"testing"
-	"time"
+// import (
+// 	"database/sql"
+// 	"testing"
+// 	"time"
 
-	"github.com/DATA-DOG/go-sqlmock"
-)
+// 	"github.com/DATA-DOG/go-sqlmock"
+// )
 
-type dbMock struct {
-	db   *sql.DB
-	mock sqlmock.Sqlmock
-}
+// type dbMock struct {
+// 	db   *sql.DB
+// 	mock sqlmock.Sqlmock
+// }
 
-func mockDB(t *testing.T) *dbMock {
-	mockDB := dbMock{}
-	var err error
-	mockDB.db, mockDB.mock, err = sqlmock.New()
-	if err != nil {
-		t.Fatalf("error occured while creating stub db %v", err)
-	}
+// func mockDB(t *testing.T) *dbMock {
+// 	mockDB := dbMock{}
+// 	var err error
+// 	mockDB.db, mockDB.mock, err = sqlmock.New()
+// 	if err != nil {
+// 		t.Fatalf("error occured while creating stub db %v", err)
+// 	}
 
-	mockDB.mock.MatchExpectationsInOrder(true)
+// 	mockDB.mock.MatchExpectationsInOrder(true)
 
-	return &mockDB
-}
+// 	return &mockDB
+// }
 
-func (db *dbMock) expectCommit() *dbMock {
-	db.mock.ExpectCommit()
+// func (db *dbMock) expectCommit() *dbMock {
+// 	db.mock.ExpectCommit()
 
-	return db
-}
+// 	return db
+// }
 
-func (db *dbMock) expectRollback() *dbMock {
-	db.mock.ExpectRollback()
+// func (db *dbMock) expectRollback() *dbMock {
+// 	db.mock.ExpectRollback()
 
-	return db
-}
+// 	return db
+// }
 
-func (db *dbMock) expectBegin() *dbMock {
-	db.mock.ExpectBegin()
+// func (db *dbMock) expectBegin() *dbMock {
+// 	db.mock.ExpectBegin()
 
-	return db
-}
+// 	return db
+// }
 
-func (db *dbMock) expectSavepoint() *dbMock {
-	db.mock.ExpectExec("SAVEPOINT").WillReturnResult(sqlmock.NewResult(1, 1))
-	return db
-}
+// func (db *dbMock) expectSavepoint() *dbMock {
+// 	db.mock.ExpectExec("SAVEPOINT").WillReturnResult(sqlmock.NewResult(1, 1))
+// 	return db
+// }
 
-func (db *dbMock) expectReleaseSavepoint() *dbMock {
-	db.mock.ExpectExec("RELEASE SAVEPOINT").WillReturnResult(sqlmock.NewResult(1, 1))
+// func (db *dbMock) expectReleaseSavepoint() *dbMock {
+// 	db.mock.ExpectExec("RELEASE SAVEPOINT").WillReturnResult(sqlmock.NewResult(1, 1))
 
-	return db
-}
+// 	return db
+// }
 
-func (db *dbMock) expectQuery(lockerID, view string) *dbMock {
-	db.mock.ExpectQuery(`with l as \(select \* from table\.locks where view_name = \$1\) select case when \(select count\(\*\) from l\) = 0 then true else \(select case when \(locker_id = \$2 or locked_until < now\(\)\) then true else false end from l\) end`).
-		WithArgs(view, lockerID).
-		WillReturnRows(sqlmock.NewRows([]string{"col"}).AddRow(true))
+// func (db *dbMock) expectQuery(lockerID, view string) *dbMock {
+// 	db.mock.ExpectQuery(`with l as \(select \* from table\.locks where view_name = \$1\) select case when \(select count\(\*\) from l\) = 0 then true else \(select case when \(locker_id = \$2 or locked_until < now\(\)\) then true else false end from l\) end`).
+// 		WithArgs(view, lockerID).
+// 		WillReturnRows(sqlmock.NewRows([]string{"col"}).AddRow(true))
 
-	return db
-}
+// 	return db
+// }
 
-func (db *dbMock) expectRenew(lockerID, view string, affectedRows int64) *dbMock {
-	query := db.mock.
-		ExpectExec(`INSERT INTO table\.locks \(locker_id, locked_until, view_name\) VALUES \(\$1, now\(\)\+\$2::INTERVAL, \$3\) ON CONFLICT \(view_name\) DO UPDATE SET locker_id = \$4, locked_until = now\(\)\+\$5::INTERVAL WHERE locks\.view_name = \$6 AND \(locks\.locker_id = \$7 OR locks\.locked_until < now\(\)\)`).
-		WithArgs(lockerID, sqlmock.AnyArg(), view, lockerID, sqlmock.AnyArg(), view, lockerID).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+// func (db *dbMock) expectRenew(lockerID, view string, affectedRows int64) *dbMock {
+// 	query := db.mock.
+// 		ExpectExec(`INSERT INTO table\.locks \(locker_id, locked_until, view_name\) VALUES \(\$1, now\(\)\+\$2::INTERVAL, \$3\) ON CONFLICT \(view_name\) DO UPDATE SET locker_id = \$4, locked_until = now\(\)\+\$5::INTERVAL WHERE locks\.view_name = \$6 AND \(locks\.locker_id = \$7 OR locks\.locked_until < now\(\)\)`).
+// 		WithArgs(lockerID, sqlmock.AnyArg(), view, lockerID, sqlmock.AnyArg(), view, lockerID).
+// 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	if affectedRows == 0 {
-		query.WillReturnResult(sqlmock.NewResult(0, 0))
-	} else {
-		query.WillReturnResult(sqlmock.NewResult(1, affectedRows))
-	}
+// 	if affectedRows == 0 {
+// 		query.WillReturnResult(sqlmock.NewResult(0, 0))
+// 	} else {
+// 		query.WillReturnResult(sqlmock.NewResult(1, affectedRows))
+// 	}
 
-	return db
-}
+// 	return db
+// }
 
-func Test_locker_Renew(t *testing.T) {
-	type fields struct {
-		db *dbMock
-	}
-	type args struct {
-		tableName string
-		lockerID  string
-		viewModel string
-		waitTime  time.Duration
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		{
-			name: "renew succeeded",
-			fields: fields{
-				db: mockDB(t).
-					expectQuery("locker", "view").
-					expectBegin().
-					expectSavepoint().
-					expectRenew("locker", "view", 1).
-					expectReleaseSavepoint().
-					expectCommit(),
-			},
-			args:    args{tableName: "table.locks", lockerID: "locker", viewModel: "view", waitTime: 1 * time.Second},
-			wantErr: false,
-		},
-		{
-			name: "renew now rows updated",
-			fields: fields{
-				db: mockDB(t).
-					expectQuery("locker", "view").
-					expectBegin().
-					expectSavepoint().
-					expectRenew("locker", "view", 0).
-					expectRollback(),
-			},
-			args:    args{tableName: "table.locks", lockerID: "locker", viewModel: "view", waitTime: 1 * time.Second},
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := Renew(tt.fields.db.db, tt.args.tableName, tt.args.lockerID, tt.args.viewModel, tt.args.waitTime); (err != nil) != tt.wantErr {
-				t.Errorf("locker.Renew() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			if err := tt.fields.db.mock.ExpectationsWereMet(); err != nil {
-				t.Errorf("not all database expectations met: %v", err)
-			}
-		})
-	}
-}
+// func Test_locker_Renew(t *testing.T) {
+// 	type fields struct {
+// 		db *dbMock
+// 	}
+// 	type args struct {
+// 		tableName string
+// 		lockerID  string
+// 		viewModel string
+// 		waitTime  time.Duration
+// 	}
+// 	tests := []struct {
+// 		name    string
+// 		fields  fields
+// 		args    args
+// 		wantErr bool
+// 	}{
+// 		{
+// 			name: "renew succeeded",
+// 			fields: fields{
+// 				db: mockDB(t).
+// 					expectQuery("locker", "view").
+// 					expectBegin().
+// 					expectSavepoint().
+// 					expectRenew("locker", "view", 1).
+// 					expectReleaseSavepoint().
+// 					expectCommit(),
+// 			},
+// 			args:    args{tableName: "table.locks", lockerID: "locker", viewModel: "view", waitTime: 1 * time.Second},
+// 			wantErr: false,
+// 		},
+// 		{
+// 			name: "renew now rows updated",
+// 			fields: fields{
+// 				db: mockDB(t).
+// 					expectQuery("locker", "view").
+// 					expectBegin().
+// 					expectSavepoint().
+// 					expectRenew("locker", "view", 0).
+// 					expectRollback(),
+// 			},
+// 			args:    args{tableName: "table.locks", lockerID: "locker", viewModel: "view", waitTime: 1 * time.Second},
+// 			wantErr: true,
+// 		},
+// 	}
+// 	for _, tt := range tests {
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			if err := Renew(tt.fields.db.db, tt.args.tableName, tt.args.lockerID, tt.args.viewModel, tt.args.waitTime); (err != nil) != tt.wantErr {
+// 				t.Errorf("locker.Renew() error = %v, wantErr %v", err, tt.wantErr)
+// 			}
+// 			if err := tt.fields.db.mock.ExpectationsWereMet(); err != nil {
+// 				t.Errorf("not all database expectations met: %v", err)
+// 			}
+// 		})
+// 	}
+// }
