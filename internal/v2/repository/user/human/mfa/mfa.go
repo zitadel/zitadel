@@ -1,15 +1,15 @@
 package mfa
 
-type MFAState int32
+type State int32
 
 const (
-	MFAStateUnspecified MFAState = iota
-	MFAStateNotReady
-	MFAStateReady
+	StateUnspecified State = iota
+	StateNotReady
+	StateReady
 
-	mfaStateCount
+	stateCount
 )
 
-func (f MFAState) Valid() bool {
-	return f >= 0 && f < mfaStateCount
+func (f State) Valid() bool {
+	return f >= 0 && f < stateCount
 }

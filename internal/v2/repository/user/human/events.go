@@ -22,7 +22,7 @@ const (
 	HumanSignedOutType                 = humanEventPrefix + "signed.out"
 )
 
-type HumanAddedEvent struct {
+type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName string `json:"userName"`
@@ -45,11 +45,11 @@ type HumanAddedEvent struct {
 	StreetAddress string `json:"streetAddress,omitempty"`
 }
 
-func (e *HumanAddedEvent) CheckPrevious() bool {
+func (e *AddedEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *HumanAddedEvent) Data() interface{} {
+func (e *AddedEvent) Data() interface{} {
 	return e
 }
 
@@ -69,8 +69,8 @@ func NewHumanAddedEvent(
 	postalCode,
 	region,
 	streetAddress string,
-) *HumanAddedEvent {
-	return &HumanAddedEvent{
+) *AddedEvent {
+	return &AddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanAddedType,
@@ -93,7 +93,7 @@ func NewHumanAddedEvent(
 }
 
 func HumanAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	humanAdded := &HumanAddedEvent{
+	humanAdded := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, humanAdded)
@@ -104,7 +104,7 @@ func HumanAddedEventMapper(event *repository.Event) (eventstore.EventReader, err
 	return humanAdded, nil
 }
 
-type HumanRegisteredEvent struct {
+type RegisteredEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName string `json:"userName"`
@@ -127,11 +127,11 @@ type HumanRegisteredEvent struct {
 	StreetAddress string `json:"streetAddress,omitempty"`
 }
 
-func (e *HumanRegisteredEvent) CheckPrevious() bool {
+func (e *RegisteredEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *HumanRegisteredEvent) Data() interface{} {
+func (e *RegisteredEvent) Data() interface{} {
 	return e
 }
 
@@ -151,8 +151,8 @@ func NewHumanRegisteredEvent(
 	postalCode,
 	region,
 	streetAddress string,
-) *HumanRegisteredEvent {
-	return &HumanRegisteredEvent{
+) *RegisteredEvent {
+	return &RegisteredEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanRegisteredType,
@@ -175,7 +175,7 @@ func NewHumanRegisteredEvent(
 }
 
 func HumanRegisteredEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	humanRegistered := &HumanRegisteredEvent{
+	humanRegistered := &RegisteredEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, humanRegistered)
@@ -186,17 +186,17 @@ func HumanRegisteredEventMapper(event *repository.Event) (eventstore.EventReader
 	return humanRegistered, nil
 }
 
-type HumanInitialCodeAddedEvent struct {
+type InitialCodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	Code                 *crypto.CryptoValue `json:"code,omitempty"`
 	Expiry               time.Duration       `json:"expiry,omitempty"`
 }
 
-func (e *HumanInitialCodeAddedEvent) CheckPrevious() bool {
+func (e *InitialCodeAddedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *HumanInitialCodeAddedEvent) Data() interface{} {
+func (e *InitialCodeAddedEvent) Data() interface{} {
 	return e
 }
 
@@ -204,8 +204,8 @@ func NewHumanInitialCodeAddedEvent(
 	ctx context.Context,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
-) *HumanInitialCodeAddedEvent {
-	return &HumanInitialCodeAddedEvent{
+) *InitialCodeAddedEvent {
+	return &InitialCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanInitialCodeAddedType,
@@ -216,7 +216,7 @@ func NewHumanInitialCodeAddedEvent(
 }
 
 func HumanInitialCodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	humanRegistered := &HumanInitialCodeAddedEvent{
+	humanRegistered := &InitialCodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, humanRegistered)
@@ -227,20 +227,20 @@ func HumanInitialCodeAddedEventMapper(event *repository.Event) (eventstore.Event
 	return humanRegistered, nil
 }
 
-type HumanInitialCodeSentEvent struct {
+type InitialCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanInitialCodeSentEvent) CheckPrevious() bool {
+func (e *InitialCodeSentEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *HumanInitialCodeSentEvent) Data() interface{} {
+func (e *InitialCodeSentEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanInitialCodeSentEvent(ctx context.Context) *HumanInitialCodeSentEvent {
-	return &HumanInitialCodeSentEvent{
+func NewHumanInitialCodeSentEvent(ctx context.Context) *InitialCodeSentEvent {
+	return &InitialCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanInitialCodeSentType,
@@ -249,25 +249,25 @@ func NewHumanInitialCodeSentEvent(ctx context.Context) *HumanInitialCodeSentEven
 }
 
 func HumanInitialCodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &HumanInitialCodeSentEvent{
+	return &InitialCodeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type HumanInitializedCheckSucceededEvent struct {
+type InitializedCheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanInitializedCheckSucceededEvent) CheckPrevious() bool {
+func (e *InitializedCheckSucceededEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *HumanInitializedCheckSucceededEvent) Data() interface{} {
+func (e *InitializedCheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanInitializedCheckSucceededEvent(ctx context.Context) *HumanInitializedCheckSucceededEvent {
-	return &HumanInitializedCheckSucceededEvent{
+func NewHumanInitializedCheckSucceededEvent(ctx context.Context) *InitializedCheckSucceededEvent {
+	return &InitializedCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanInitializedCheckSucceededType,
@@ -276,25 +276,25 @@ func NewHumanInitializedCheckSucceededEvent(ctx context.Context) *HumanInitializ
 }
 
 func HumanInitializedCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &HumanInitializedCheckSucceededEvent{
+	return &InitializedCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type HumanInitializedCheckFailedEvent struct {
+type InitializedCheckFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanInitializedCheckFailedEvent) CheckPrevious() bool {
+func (e *InitializedCheckFailedEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *HumanInitializedCheckFailedEvent) Data() interface{} {
+func (e *InitializedCheckFailedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanInitializedCheckFailedEvent(ctx context.Context) *HumanInitializedCheckFailedEvent {
-	return &HumanInitializedCheckFailedEvent{
+func NewHumanInitializedCheckFailedEvent(ctx context.Context) *InitializedCheckFailedEvent {
+	return &InitializedCheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanInitializedCheckFailedType,
@@ -303,25 +303,25 @@ func NewHumanInitializedCheckFailedEvent(ctx context.Context) *HumanInitializedC
 }
 
 func HumanInitializedCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &HumanInitializedCheckFailedEvent{
+	return &InitializedCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type HumanSignedOutEvent struct {
+type SignedOutEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanSignedOutEvent) CheckPrevious() bool {
+func (e *SignedOutEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *HumanSignedOutEvent) Data() interface{} {
+func (e *SignedOutEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanSignedOutEvent(ctx context.Context) *HumanSignedOutEvent {
-	return &HumanSignedOutEvent{
+func NewHumanSignedOutEvent(ctx context.Context) *SignedOutEvent {
+	return &SignedOutEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanSignedOutType,
@@ -330,7 +330,7 @@ func NewHumanSignedOutEvent(ctx context.Context) *HumanSignedOutEvent {
 }
 
 func HumanSignedOutEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &HumanSignedOutEvent{
+	return &SignedOutEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

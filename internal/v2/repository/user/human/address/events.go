@@ -13,7 +13,7 @@ const (
 	HumanAddressChangedType = addressEventPrefix + "changed"
 )
 
-type HumanAddressChangedEvent struct {
+type ChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Country       string `json:"country,omitempty"`
@@ -23,11 +23,11 @@ type HumanAddressChangedEvent struct {
 	StreetAddress string `json:"streetAddress,omitempty"`
 }
 
-func (e *HumanAddressChangedEvent) CheckPrevious() bool {
+func (e *ChangedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *HumanAddressChangedEvent) Data() interface{} {
+func (e *ChangedEvent) Data() interface{} {
 	return e
 }
 
@@ -39,8 +39,8 @@ func NewHumanAddressChangedEvent(
 	postalCode,
 	region,
 	streetAddress string,
-) *HumanAddressChangedEvent {
-	e := &HumanAddressChangedEvent{
+) *ChangedEvent {
+	e := &ChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanAddressChangedType,
@@ -67,7 +67,7 @@ func NewHumanAddressChangedEvent(
 }
 
 func HumanAddressChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	addressChanged := &HumanAddressChangedEvent{
+	addressChanged := &ChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, addressChanged)

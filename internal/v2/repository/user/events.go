@@ -22,20 +22,20 @@ const (
 	UserUserNameChangedType   = userEventTypePrefix + "username.changed"
 )
 
-type UserLockedEvent struct {
+type LockedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *UserLockedEvent) CheckPrevious() bool {
+func (e *LockedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *UserLockedEvent) Data() interface{} {
+func (e *LockedEvent) Data() interface{} {
 	return nil
 }
 
-func NewUserLockedEvent(ctx context.Context) *UserLockedEvent {
-	return &UserLockedEvent{
+func NewUserLockedEvent(ctx context.Context) *LockedEvent {
+	return &LockedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserLockedType,
@@ -44,25 +44,25 @@ func NewUserLockedEvent(ctx context.Context) *UserLockedEvent {
 }
 
 func UserLockedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &UserLockedEvent{
+	return &LockedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type UserUnlockedEvent struct {
+type UnlockedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *UserUnlockedEvent) CheckPrevious() bool {
+func (e *UnlockedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *UserUnlockedEvent) Data() interface{} {
+func (e *UnlockedEvent) Data() interface{} {
 	return nil
 }
 
-func NewUserUnlockedEvent(ctx context.Context) *UserUnlockedEvent {
-	return &UserUnlockedEvent{
+func NewUserUnlockedEvent(ctx context.Context) *UnlockedEvent {
+	return &UnlockedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserUnlockedType,
@@ -71,25 +71,25 @@ func NewUserUnlockedEvent(ctx context.Context) *UserUnlockedEvent {
 }
 
 func UserUnlockedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &UserUnlockedEvent{
+	return &UnlockedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type UserDeactivatedEvent struct {
+type DeactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *UserDeactivatedEvent) CheckPrevious() bool {
+func (e *DeactivatedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *UserDeactivatedEvent) Data() interface{} {
+func (e *DeactivatedEvent) Data() interface{} {
 	return nil
 }
 
-func NewUserDeactivatedEvent(ctx context.Context) *UserDeactivatedEvent {
-	return &UserDeactivatedEvent{
+func NewUserDeactivatedEvent(ctx context.Context) *DeactivatedEvent {
+	return &DeactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserDeactivatedType,
@@ -98,25 +98,25 @@ func NewUserDeactivatedEvent(ctx context.Context) *UserDeactivatedEvent {
 }
 
 func UserDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &UserDeactivatedEvent{
+	return &DeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type UserReactivatedEvent struct {
+type ReactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *UserReactivatedEvent) CheckPrevious() bool {
+func (e *ReactivatedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *UserReactivatedEvent) Data() interface{} {
+func (e *ReactivatedEvent) Data() interface{} {
 	return nil
 }
 
-func NewUserReactivatedEvent(ctx context.Context) *UserReactivatedEvent {
-	return &UserReactivatedEvent{
+func NewUserReactivatedEvent(ctx context.Context) *ReactivatedEvent {
+	return &ReactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserReactivatedType,
@@ -125,25 +125,25 @@ func NewUserReactivatedEvent(ctx context.Context) *UserReactivatedEvent {
 }
 
 func UserReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &UserReactivatedEvent{
+	return &ReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type UserRemovedEvent struct {
+type RemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *UserRemovedEvent) CheckPrevious() bool {
+func (e *RemovedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *UserRemovedEvent) Data() interface{} {
+func (e *RemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewUserRemovedEvent(ctx context.Context) *UserRemovedEvent {
-	return &UserRemovedEvent{
+func NewUserRemovedEvent(ctx context.Context) *RemovedEvent {
+	return &RemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserRemovedType,
@@ -152,12 +152,12 @@ func NewUserRemovedEvent(ctx context.Context) *UserRemovedEvent {
 }
 
 func UserRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &UserRemovedEvent{
+	return &RemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type UserTokenAddedEvent struct {
+type TokenAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	TokenID           string    `json:"tokenId"`
@@ -169,11 +169,11 @@ type UserTokenAddedEvent struct {
 	PreferredLanguage string    `json:"preferredLanguage"`
 }
 
-func (e *UserTokenAddedEvent) CheckPrevious() bool {
+func (e *TokenAddedEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *UserTokenAddedEvent) Data() interface{} {
+func (e *TokenAddedEvent) Data() interface{} {
 	return e
 }
 
@@ -186,8 +186,8 @@ func NewUserTokenAddedEvent(
 	audience,
 	scopes []string,
 	expiration time.Time,
-) *UserTokenAddedEvent {
-	return &UserTokenAddedEvent{
+) *TokenAddedEvent {
+	return &TokenAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserTokenAddedType,
@@ -202,7 +202,7 @@ func NewUserTokenAddedEvent(
 }
 
 func UserTokenAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	tokenAdded := &UserTokenAddedEvent{
+	tokenAdded := &TokenAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, tokenAdded)
@@ -213,25 +213,25 @@ func UserTokenAddedEventMapper(event *repository.Event) (eventstore.EventReader,
 	return tokenAdded, nil
 }
 
-type UserDomainClaimedEvent struct {
+type DomainClaimedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName string `json:"userName"`
 }
 
-func (e *UserDomainClaimedEvent) CheckPrevious() bool {
+func (e *DomainClaimedEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *UserDomainClaimedEvent) Data() interface{} {
+func (e *DomainClaimedEvent) Data() interface{} {
 	return e
 }
 
 func NewUserDomainClaimedEvent(
 	ctx context.Context,
 	userName string,
-) *UserDomainClaimedEvent {
-	return &UserDomainClaimedEvent{
+) *DomainClaimedEvent {
+	return &DomainClaimedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserDomainClaimedType,
@@ -241,7 +241,7 @@ func NewUserDomainClaimedEvent(
 }
 
 func UserDomainClaimedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	domainClaimed := &UserDomainClaimedEvent{
+	domainClaimed := &DomainClaimedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, domainClaimed)
@@ -252,22 +252,22 @@ func UserDomainClaimedEventMapper(event *repository.Event) (eventstore.EventRead
 	return domainClaimed, nil
 }
 
-type UserDomainClaimedSentEvent struct {
+type DomainClaimedSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *UserDomainClaimedSentEvent) CheckPrevious() bool {
+func (e *DomainClaimedSentEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *UserDomainClaimedSentEvent) Data() interface{} {
+func (e *DomainClaimedSentEvent) Data() interface{} {
 	return nil
 }
 
 func NewUserDomainClaimedSentEvent(
 	ctx context.Context,
-) *UserDomainClaimedSentEvent {
-	return &UserDomainClaimedSentEvent{
+) *DomainClaimedSentEvent {
+	return &DomainClaimedSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserDomainClaimedSentType,
@@ -276,30 +276,30 @@ func NewUserDomainClaimedSentEvent(
 }
 
 func UserDomainClaimedSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &UserDomainClaimedSentEvent{
+	return &DomainClaimedSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type UserUsernameChangedEvent struct {
+type UsernameChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName string `json:"userName"`
 }
 
-func (e *UserUsernameChangedEvent) CheckPrevious() bool {
+func (e *UsernameChangedEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *UserUsernameChangedEvent) Data() interface{} {
+func (e *UsernameChangedEvent) Data() interface{} {
 	return e
 }
 
 func NewUserUsernameChangedEvent(
 	ctx context.Context,
 	userName string,
-) *UserUsernameChangedEvent {
-	return &UserUsernameChangedEvent{
+) *UsernameChangedEvent {
+	return &UsernameChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserUserNameChangedType,
@@ -309,7 +309,7 @@ func NewUserUsernameChangedEvent(
 }
 
 func UserUsernameChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	domainClaimed := &UserUsernameChangedEvent{
+	domainClaimed := &UsernameChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, domainClaimed)

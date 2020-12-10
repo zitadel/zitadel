@@ -11,20 +11,20 @@ const (
 	HumanMFAInitSkippedType = mfaEventPrefix + "init.skiped"
 )
 
-type HumanMFAInitSkippedEvent struct {
+type InitSkippedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanMFAInitSkippedEvent) CheckPrevious() bool {
+func (e *InitSkippedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *HumanMFAInitSkippedEvent) Data() interface{} {
+func (e *InitSkippedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanMFAInitSkippedEvent(ctx context.Context) *HumanMFAInitSkippedEvent {
-	return &HumanMFAInitSkippedEvent{
+func NewHumanMFAInitSkippedEvent(ctx context.Context) *InitSkippedEvent {
+	return &InitSkippedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanMFAInitSkippedType,
@@ -33,7 +33,7 @@ func NewHumanMFAInitSkippedEvent(ctx context.Context) *HumanMFAInitSkippedEvent 
 }
 
 func HumanMFAInitSkippedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &HumanMFAInitSkippedEvent{
+	return &InitSkippedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

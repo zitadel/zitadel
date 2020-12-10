@@ -27,7 +27,7 @@ func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 
 func (rm *ReadModel) Reduce() (err error) {
 	for _, event := range rm.Events {
-		switch _ := event.(type) {
+		switch event.(type) {
 		//TODO: implement reduce
 		}
 	}

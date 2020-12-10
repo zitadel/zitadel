@@ -19,24 +19,24 @@ const (
 	HumanMFAOTPCheckFailedType    = otpEventPrefix + "check.failed"
 )
 
-type HumanMFAOTPAddedEvent struct {
+type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Secret *crypto.CryptoValue `json:"otpSecret,omitempty"`
-	State  mfa.MFAState        `json:"-"`
+	State  mfa.State           `json:"-"`
 }
 
-func (e *HumanMFAOTPAddedEvent) CheckPrevious() bool {
+func (e *AddedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *HumanMFAOTPAddedEvent) Data() interface{} {
+func (e *AddedEvent) Data() interface{} {
 	return e
 }
 
 func NewHumanMFAOTPAddedEvent(ctx context.Context,
-	secret *crypto.CryptoValue) *HumanMFAOTPAddedEvent {
-	return &HumanMFAOTPAddedEvent{
+	secret *crypto.CryptoValue) *AddedEvent {
+	return &AddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanMFAOTPAddedType,
@@ -46,9 +46,9 @@ func NewHumanMFAOTPAddedEvent(ctx context.Context,
 }
 
 func HumanMFAOTPAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	otpAdded := &HumanMFAOTPAddedEvent{
+	otpAdded := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-		State:     mfa.MFAStateNotReady,
+		State:     mfa.StateNotReady,
 	}
 	err := json.Unmarshal(event.Data, otpAdded)
 	if err != nil {
@@ -57,21 +57,21 @@ func HumanMFAOTPAddedEventMapper(event *repository.Event) (eventstore.EventReade
 	return otpAdded, nil
 }
 
-type HumanMFAOTPVerifiedEvent struct {
+type VerifiedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-	State                mfa.MFAState `json:"-"`
+	State                mfa.State `json:"-"`
 }
 
-func (e *HumanMFAOTPVerifiedEvent) CheckPrevious() bool {
+func (e *VerifiedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *HumanMFAOTPVerifiedEvent) Data() interface{} {
+func (e *VerifiedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanMFAOTPVerifiedEvent(ctx context.Context) *HumanMFAOTPVerifiedEvent {
-	return &HumanMFAOTPVerifiedEvent{
+func NewHumanMFAOTPVerifiedEvent(ctx context.Context) *VerifiedEvent {
+	return &VerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanMFAOTPVerifiedType,
@@ -80,26 +80,26 @@ func NewHumanMFAOTPVerifiedEvent(ctx context.Context) *HumanMFAOTPVerifiedEvent 
 }
 
 func HumanMFAOTPVerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &HumanMFAOTPVerifiedEvent{
+	return &VerifiedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-		State:     mfa.MFAStateReady,
+		State:     mfa.StateReady,
 	}, nil
 }
 
-type HumanMFAOTPRemovedEvent struct {
+type RemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanMFAOTPRemovedEvent) CheckPrevious() bool {
+func (e *RemovedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *HumanMFAOTPRemovedEvent) Data() interface{} {
+func (e *RemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanMFAOTPRemovedEvent(ctx context.Context) *HumanMFAOTPRemovedEvent {
-	return &HumanMFAOTPRemovedEvent{
+func NewHumanMFAOTPRemovedEvent(ctx context.Context) *RemovedEvent {
+	return &RemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanMFAOTPRemovedType,
@@ -108,25 +108,25 @@ func NewHumanMFAOTPRemovedEvent(ctx context.Context) *HumanMFAOTPRemovedEvent {
 }
 
 func HumanMFAOTPRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &HumanMFAOTPRemovedEvent{
+	return &RemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type HumanMFAOTPCheckSucceededEvent struct {
+type CheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanMFAOTPCheckSucceededEvent) CheckPrevious() bool {
+func (e *CheckSucceededEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *HumanMFAOTPCheckSucceededEvent) Data() interface{} {
+func (e *CheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanMFAOTPCheckSucceededEvent(ctx context.Context) *HumanMFAOTPCheckSucceededEvent {
-	return &HumanMFAOTPCheckSucceededEvent{
+func NewHumanMFAOTPCheckSucceededEvent(ctx context.Context) *CheckSucceededEvent {
+	return &CheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanMFAOTPCheckSucceededType,
@@ -135,25 +135,25 @@ func NewHumanMFAOTPCheckSucceededEvent(ctx context.Context) *HumanMFAOTPCheckSuc
 }
 
 func HumanMFAOTPCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &HumanMFAOTPCheckSucceededEvent{
+	return &CheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type HumanMFAOTPCheckFailedEvent struct {
+type CheckFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanMFAOTPCheckFailedEvent) CheckPrevious() bool {
+func (e *CheckFailedEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *HumanMFAOTPCheckFailedEvent) Data() interface{} {
+func (e *CheckFailedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanMFAOTPCheckFailedEvent(ctx context.Context) *HumanMFAOTPCheckFailedEvent {
-	return &HumanMFAOTPCheckFailedEvent{
+func NewHumanMFAOTPCheckFailedEvent(ctx context.Context) *CheckFailedEvent {
+	return &CheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanMFAOTPCheckFailedType,
@@ -162,7 +162,7 @@ func NewHumanMFAOTPCheckFailedEvent(ctx context.Context) *HumanMFAOTPCheckFailed
 }
 
 func HumanMFAOTPCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &HumanMFAOTPCheckFailedEvent{
+	return &CheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

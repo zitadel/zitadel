@@ -15,7 +15,7 @@ const (
 	HumanProfileChangedType = profileEventPrefix + "changed"
 )
 
-type HumanProfileChangedEvent struct {
+type ChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	FirstName         string       `json:"firstName,omitempty"`
@@ -26,11 +26,11 @@ type HumanProfileChangedEvent struct {
 	Gender            human.Gender `json:"gender,omitempty"`
 }
 
-func (e *HumanProfileChangedEvent) CheckPrevious() bool {
+func (e *ChangedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *HumanProfileChangedEvent) Data() interface{} {
+func (e *ChangedEvent) Data() interface{} {
 	return e
 }
 
@@ -43,8 +43,8 @@ func NewHumanProfileChangedEvent(
 	displayName string,
 	preferredLanguage language.Tag,
 	gender human.Gender,
-) *HumanProfileChangedEvent {
-	e := &HumanProfileChangedEvent{
+) *ChangedEvent {
+	e := &ChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanProfileChangedType,
@@ -72,7 +72,7 @@ func NewHumanProfileChangedEvent(
 }
 
 func HumanProfileChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	profileChanged := &HumanProfileChangedEvent{
+	profileChanged := &ChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, profileChanged)

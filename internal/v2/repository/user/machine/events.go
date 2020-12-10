@@ -14,7 +14,7 @@ const (
 	MachineChangedEventType = machineEventPrefix + "changed"
 )
 
-type MachineAddedEvent struct {
+type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName string `json:"userName"`
@@ -23,11 +23,11 @@ type MachineAddedEvent struct {
 	Description string `json:"description,omitempty"`
 }
 
-func (e *MachineAddedEvent) CheckPrevious() bool {
+func (e *AddedEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *MachineAddedEvent) Data() interface{} {
+func (e *AddedEvent) Data() interface{} {
 	return e
 }
 
@@ -36,8 +36,8 @@ func NewMachineAddedEvent(
 	userName,
 	name,
 	description string,
-) *MachineAddedEvent {
-	return &MachineAddedEvent{
+) *AddedEvent {
+	return &AddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			MachineAddedEventType,
@@ -49,7 +49,7 @@ func NewMachineAddedEvent(
 }
 
 func MachineAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	machineAdded := &MachineAddedEvent{
+	machineAdded := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, machineAdded)
@@ -60,7 +60,7 @@ func MachineAddedEventMapper(event *repository.Event) (eventstore.EventReader, e
 	return machineAdded, nil
 }
 
-type MachineChangedEvent struct {
+type ChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName string `json:"userName"`
@@ -69,11 +69,11 @@ type MachineChangedEvent struct {
 	Description string `json:"description,omitempty"`
 }
 
-func (e *MachineChangedEvent) CheckPrevious() bool {
+func (e *ChangedEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *MachineChangedEvent) Data() interface{} {
+func (e *ChangedEvent) Data() interface{} {
 	return e
 }
 
@@ -82,8 +82,8 @@ func NewMachineChangedEvent(
 	userName,
 	name,
 	description string,
-) *MachineChangedEvent {
-	return &MachineChangedEvent{
+) *ChangedEvent {
+	return &ChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			MachineChangedEventType,
@@ -95,7 +95,7 @@ func NewMachineChangedEvent(
 }
 
 func MachineChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	machineChanged := &MachineChangedEvent{
+	machineChanged := &ChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, machineChanged)

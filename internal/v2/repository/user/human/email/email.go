@@ -19,17 +19,17 @@ const (
 	HumanEmailCodeSentType           = emailEventPrefix + "code.sent"
 )
 
-type HumanEmailChangedEvent struct {
+type ChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	EmailAddress string `json:"email,omitempty"`
 }
 
-func (e *HumanEmailChangedEvent) CheckPrevious() bool {
+func (e *ChangedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *HumanEmailChangedEvent) Data() interface{} {
+func (e *ChangedEvent) Data() interface{} {
 	return e
 }
 
@@ -37,8 +37,8 @@ func NewHumanEmailChangedEvent(
 	ctx context.Context,
 	current *HumanEmailWriteModel,
 	emailAddress string,
-) *HumanEmailChangedEvent {
-	e := &HumanEmailChangedEvent{
+) *ChangedEvent {
+	e := &ChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanEmailChangedType,
@@ -51,7 +51,7 @@ func NewHumanEmailChangedEvent(
 }
 
 func HumanEmailChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	emailChangedEvent := &HumanEmailChangedEvent{
+	emailChangedEvent := &ChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, emailChangedEvent)
@@ -62,22 +62,22 @@ func HumanEmailChangedEventMapper(event *repository.Event) (eventstore.EventRead
 	return emailChangedEvent, nil
 }
 
-type HumanEmailVerifiedEvent struct {
+type VerifiedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	IsEmailVerified bool `json:"-"`
 }
 
-func (e *HumanEmailVerifiedEvent) CheckPrevious() bool {
+func (e *VerifiedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *HumanEmailVerifiedEvent) Data() interface{} {
+func (e *VerifiedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanEmailVerifiedEvent(ctx context.Context) *HumanEmailVerifiedEvent {
-	return &HumanEmailVerifiedEvent{
+func NewHumanEmailVerifiedEvent(ctx context.Context) *VerifiedEvent {
+	return &VerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanEmailVerifiedType,
@@ -86,27 +86,27 @@ func NewHumanEmailVerifiedEvent(ctx context.Context) *HumanEmailVerifiedEvent {
 }
 
 func HumanEmailVerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	emailVerified := &HumanEmailVerifiedEvent{
+	emailVerified := &VerifiedEvent{
 		BaseEvent:       *eventstore.BaseEventFromRepo(event),
 		IsEmailVerified: true,
 	}
 	return emailVerified, nil
 }
 
-type HumanEmailVerificationFailedEvent struct {
+type VerificationFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanEmailVerificationFailedEvent) CheckPrevious() bool {
+func (e *VerificationFailedEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *HumanEmailVerificationFailedEvent) Data() interface{} {
+func (e *VerificationFailedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanEmailVerificationFailedEvent(ctx context.Context) *HumanEmailVerificationFailedEvent {
-	return &HumanEmailVerificationFailedEvent{
+func NewHumanEmailVerificationFailedEvent(ctx context.Context) *VerificationFailedEvent {
+	return &VerificationFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanEmailVerificationFailedType,
@@ -115,31 +115,31 @@ func NewHumanEmailVerificationFailedEvent(ctx context.Context) *HumanEmailVerifi
 }
 
 func HumanEmailVerificationFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &HumanEmailVerificationFailedEvent{
+	return &VerificationFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type HumanEmailCodeAddedEvent struct {
+type CodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Code   *crypto.CryptoValue `json:"code,omitempty"`
 	Expiry time.Duration       `json:"expiry,omitempty"`
 }
 
-func (e *HumanEmailCodeAddedEvent) CheckPrevious() bool {
+func (e *CodeAddedEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *HumanEmailCodeAddedEvent) Data() interface{} {
+func (e *CodeAddedEvent) Data() interface{} {
 	return e
 }
 
 func NewHumanEmailCodeAddedEvent(
 	ctx context.Context,
 	code *crypto.CryptoValue,
-	expiry time.Duration) *HumanEmailCodeAddedEvent {
-	return &HumanEmailCodeAddedEvent{
+	expiry time.Duration) *CodeAddedEvent {
+	return &CodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanEmailCodeAddedType,
@@ -150,7 +150,7 @@ func NewHumanEmailCodeAddedEvent(
 }
 
 func HumanEmailCodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	codeAdded := &HumanEmailCodeAddedEvent{
+	codeAdded := &CodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, codeAdded)
@@ -161,20 +161,20 @@ func HumanEmailCodeAddedEventMapper(event *repository.Event) (eventstore.EventRe
 	return codeAdded, nil
 }
 
-type HumanEmailCodeSentEvent struct {
+type CodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanEmailCodeSentEvent) CheckPrevious() bool {
+func (e *CodeSentEvent) CheckPrevious() bool {
 	return true
 }
 
-func (e *HumanEmailCodeSentEvent) Data() interface{} {
+func (e *CodeSentEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanEmailCodeSentEvent(ctx context.Context) *HumanEmailCodeSentEvent {
-	return &HumanEmailCodeSentEvent{
+func NewHumanEmailCodeSentEvent(ctx context.Context) *CodeSentEvent {
+	return &CodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanEmailCodeSentType,
@@ -183,7 +183,7 @@ func NewHumanEmailCodeSentEvent(ctx context.Context) *HumanEmailCodeSentEvent {
 }
 
 func HumanEmailCodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &HumanEmailCodeSentEvent{
+	return &CodeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

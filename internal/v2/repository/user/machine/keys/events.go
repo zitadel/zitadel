@@ -15,7 +15,7 @@ const (
 	MachineKeyRemovedEventType = machineKeyEventPrefix + "removed"
 )
 
-type MachineKeyAddedEvent struct {
+type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	KeyID          string         `json:"keyId,omitempty"`
@@ -24,11 +24,11 @@ type MachineKeyAddedEvent struct {
 	PublicKey      []byte         `json:"publicKey,omitempty"`
 }
 
-func (e *MachineKeyAddedEvent) CheckPrevious() bool {
+func (e *AddedEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *MachineKeyAddedEvent) Data() interface{} {
+func (e *AddedEvent) Data() interface{} {
 	return e
 }
 
@@ -38,8 +38,8 @@ func NewMachineKeyAddedEvent(
 	keyType MachineKeyType,
 	expirationDate time.Time,
 	publicKey []byte,
-) *MachineKeyAddedEvent {
-	return &MachineKeyAddedEvent{
+) *AddedEvent {
+	return &AddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			MachineKeyAddedEventType,
@@ -52,7 +52,7 @@ func NewMachineKeyAddedEvent(
 }
 
 func MachineKeyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	machineAdded := &MachineKeyAddedEvent{
+	machineAdded := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, machineAdded)
@@ -63,25 +63,25 @@ func MachineKeyAddedEventMapper(event *repository.Event) (eventstore.EventReader
 	return machineAdded, nil
 }
 
-type MachineKeyRemovedEvent struct {
+type RemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	KeyID string `json:"keyId,omitempty"`
 }
 
-func (e *MachineKeyRemovedEvent) CheckPrevious() bool {
+func (e *RemovedEvent) CheckPrevious() bool {
 	return false
 }
 
-func (e *MachineKeyRemovedEvent) Data() interface{} {
+func (e *RemovedEvent) Data() interface{} {
 	return e
 }
 
 func NewMachineKeyRemovedEvent(
 	ctx context.Context,
 	keyID string,
-) *MachineKeyRemovedEvent {
-	return &MachineKeyRemovedEvent{
+) *RemovedEvent {
+	return &RemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			MachineKeyRemovedEventType,
@@ -91,7 +91,7 @@ func NewMachineKeyRemovedEvent(
 }
 
 func MachineKeyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	machineRemoved := &MachineKeyRemovedEvent{
+	machineRemoved := &RemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, machineRemoved)
