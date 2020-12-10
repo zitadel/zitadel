@@ -1,6 +1,7 @@
 package spooler
 
 import (
+	"math/rand"
 	"os"
 
 	"github.com/caos/logging"
@@ -10,10 +11,9 @@ import (
 )
 
 type Config struct {
-	Eventstore        eventstore.Eventstore
-	Locker            Locker
-	ViewHandlers      []query.Handler
-	ConcurrentWorkers int
+	Eventstore   eventstore.Eventstore
+	Locker       Locker
+	ViewHandlers []query.Handler
 }
 
 func (c *Config) New() *Spooler {
@@ -23,12 +23,15 @@ func (c *Config) New() *Spooler {
 		logging.Log("SPOOL-bdO56").OnError(err).Panic("unable to generate lockID")
 	}
 
+	rand.Shuffle(len(c.ViewHandlers), func(i, j int) {
+		c.ViewHandlers[i], c.ViewHandlers[j] = c.ViewHandlers[j], c.ViewHandlers[i]
+	})
+
 	return &Spooler{
 		handlers:   c.ViewHandlers,
 		lockID:     lockID,
 		eventstore: c.Eventstore,
 		locker:     c.Locker,
-		queue:      make(chan *spooledHandler, len(c.ViewHandlers)),
-		workers:    c.ConcurrentWorkers,
+		workers:    len(c.ViewHandlers),
 	}
 }

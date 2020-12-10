@@ -3,9 +3,9 @@ package spooler
 import (
 	"context"
 	"strconv"
-	"sync"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
@@ -15,24 +15,150 @@ import (
 	"time"
 )
 
+const (
+	defaultLockTime = time.Second * 30
+)
+
 type Spooler struct {
 	handlers   []query.Handler
 	locker     Locker
 	lockID     string
 	eventstore eventstore.Eventstore
 	workers    int
-	queue      chan *spooledHandler
 }
 
 type Locker interface {
-	Renew(lockerID, viewModel string, waitTime time.Duration) error
+	Renew(lockerID, viewModel string, waitTime time.Duration) (time.Time, bool, error)
 }
 
-type spooledHandler struct {
-	query.Handler
+type worker struct {
 	locker     Locker
-	queuedAt   time.Time
+	lockID     string
 	eventstore eventstore.Eventstore
+	taskQueue  chan *task
+}
+
+func (w *worker) start() {
+	for t := range w.taskQueue {
+		lockedUntil, isLeaseHolder, err := w.lock(t, defaultLockTime)
+		if err != nil {
+			go w.queueTask(t, time.Now().Add(t.MinimumCycleDuration()))
+			continue
+		} else if !isLeaseHolder {
+			go w.queueTask(t, lockedUntil)
+			continue
+		}
+		ctx, cancel := context.WithCancel(context.Background())
+		errs := make(chan error)
+		defer close(errs)
+
+		go t.execute(ctx, w.eventstore, errs)
+		for {
+			renewTimer := time.After(lockedUntil.Sub(time.Now().Add(5 * time.Second)))
+			select {
+			case <-errs:
+				cancel()
+				go w.queueTask(t, time.Now().Add(defaultLockTime))
+				return
+			case <-renewTimer:
+				lockedUntil, err = w.renewLease(lockedUntil, t)
+				if err != nil {
+					cancel()
+					go w.queueTask(t, time.Now().Add(defaultLockTime))
+					return
+				}
+			}
+		}
+	}
+}
+
+func (w *worker) renewLease(lockedUntil time.Time, task *task) (time.Time, error) {
+	lockedUntil, isLeaseHolder, err := w.lock(task, defaultLockTime)
+	if err != nil || !isLeaseHolder {
+		return time.Time{}, errors.ThrowInternal(err, "SPOOL-pRLxA", "error in renew lease")
+	}
+	return lockedUntil, nil
+}
+
+func (w *worker) lock(task *task, lockDuration time.Duration) (time.Time, bool, error) {
+	return w.locker.Renew(w.lockID, task.ViewModel(), lockDuration)
+}
+
+func (w *worker) queueTask(task *task, lockedUntil time.Time) {
+	time.Sleep(lockedUntil.Sub(time.Now()))
+	logging.Log("SPOOL-VQZko").Debug("requeue task")
+	w.taskQueue <- task
+}
+
+type task struct {
+	query.Handler
+}
+
+func (t *task) execute(ctx context.Context, es eventstore.Eventstore, errs chan<- error) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			if err := t.fillView(ctx, es); err != nil {
+				logging.Log("SPOOL-RuKm3").WithError(err).Info("fill view failed")
+				errs <- err
+				return
+			}
+		}
+	}
+}
+
+func (t *task) fillView(ctx context.Context, es eventstore.Eventstore) error {
+	minDuration := time.After(t.MinimumCycleDuration())
+
+	events, err := t.query(ctx, es)
+	if err != nil || len(events) == 0 {
+		return err
+	}
+	if err = t.process(ctx, events); err != nil {
+		return err
+	}
+
+	<-minDuration
+	return nil
+}
+
+func (t *task) query(ctx context.Context, es eventstore.Eventstore) ([]*models.Event, error) {
+	query, err := t.Handler.EventQuery()
+	if err != nil {
+		return nil, err
+	}
+	factory := models.FactoryFromSearchQuery(query)
+	sequence, err := es.LatestSequence(ctx, factory)
+	logging.Log("SPOOL-7SciK").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to query latest sequence")
+	var processedSequence uint64
+	for _, filter := range query.Filters {
+		if filter.GetField() == models.Field_LatestSequence {
+			processedSequence = filter.GetValue().(uint64)
+		}
+	}
+	if sequence == 0 || processedSequence >= sequence {
+		return nil, nil
+	}
+
+	query.Limit = t.QueryLimit()
+
+	return es.FilterEvents(ctx, query)
+}
+
+func (t *task) process(ctx context.Context, events []*models.Event) error {
+	for _, event := range events {
+		select {
+		case <-ctx.Done():
+			return nil
+		default:
+			if err := t.Handler.Reduce(event); err != nil {
+				return t.OnError(event, err)
+			}
+		}
+	}
+	return nil
 }
 
 func (s *Spooler) Start() {
@@ -41,137 +167,28 @@ func (s *Spooler) Start() {
 		return
 	}
 
+	tasks := make(chan *task)
+
 	for i := 0; i < s.workers; i++ {
-		go func(workerIdx int) {
-			workerID := s.lockID + "--" + strconv.Itoa(workerIdx)
-			for task := range s.queue {
-				lockSuccessful := task.load(workerID)
-				logging.LogWithFields("SPOOL-pvLJw", "successful", lockSuccessful).Info("loaded")
-				go requeueTask(task, s.queue, lockSuccessful)
-			}
-		}(i)
+		w := &worker{locker: s.locker, lockID: s.lockID + "--" + strconv.Itoa(i), eventstore: s.eventstore, taskQueue: tasks}
+		go w.start()
 	}
+
 	go func() {
 		for _, handler := range s.handlers {
-			s.queue <- &spooledHandler{Handler: handler, locker: s.locker, queuedAt: time.Now(), eventstore: s.eventstore}
+			tasks <- &task{Handler: handler}
 		}
 	}()
 }
 
-func requeueTask(task *spooledHandler, queue chan<- *spooledHandler, lockSuccessful bool) {
-	minDuration := task.MinimumCycleDuration()
-	if !lockSuccessful {
-		minDuration = time.Second * 30
-	}
-	time.Sleep(minDuration - time.Since(task.queuedAt))
-	task.queuedAt = time.Now()
-	queue <- task
-}
-
-func (s *spooledHandler) load(workerID string) bool {
-	errs := make(chan error)
-	defer close(errs)
-	ctx, cancel := context.WithCancel(context.Background())
-	go s.awaitError(cancel, errs, workerID)
-	hasLocked := s.lock(ctx, errs, workerID)
-	lockSuccessful := <-hasLocked
-
-	if lockSuccessful {
-		events, err := s.query(ctx)
-		if err != nil {
-			errs <- err
-		} else {
-			errs <- s.process(ctx, events, workerID)
-			logging.Log("SPOOL-0pV8o").WithField("view", s.ViewModel()).WithField("worker", workerID).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("process done")
-		}
-	}
-	<-ctx.Done()
-	return lockSuccessful
-}
-
-func (s *spooledHandler) awaitError(cancel func(), errs chan error, workerID string) {
-	select {
-	case err := <-errs:
-		cancel()
-		logging.Log("SPOOL-OT8di").OnError(err).WithField("view", s.ViewModel()).WithField("worker", workerID).Debug("load canceled")
-	}
-}
-
-func (s *spooledHandler) process(ctx context.Context, events []*models.Event, workerID string) error {
-	for _, event := range events {
-		select {
-		case <-ctx.Done():
-			logging.LogWithFields("SPOOL-FTKwH", "view", s.ViewModel(), "worker", workerID, "traceID", tracing.TraceIDFromCtx(ctx)).Debug("context canceled")
-			return nil
-		default:
-			if err := s.Reduce(event); err != nil {
-				return s.OnError(event, err)
-			}
-		}
-	}
-	return nil
-}
-
-func (s *spooledHandler) query(ctx context.Context) ([]*models.Event, error) {
-	query, err := s.EventQuery()
-	if err != nil {
-		return nil, err
-	}
-	factory := models.FactoryFromSearchQuery(query)
-	sequence, err := s.eventstore.LatestSequence(ctx, factory)
-	logging.Log("SPOOL-7SciK").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to query latest sequence")
-	var processedSequence uint64
-	for _, filter := range query.Filters {
-		if filter.GetField() == models.Field_LatestSequence {
-			processedSequence = filter.GetValue().(uint64)
-		}
-	}
-	if sequence != 0 && processedSequence == sequence {
-		return nil, nil
-	}
-
-	query.Limit = s.QueryLimit()
-	return s.eventstore.FilterEvents(ctx, query)
-}
-
-//lock ensures the lock on the database.
-// the returned channel will be closed if ctx is done or an error occured durring lock
-func (s *spooledHandler) lock(ctx context.Context, errs chan<- error, workerID string) chan bool {
-	renewTimer := time.After(0)
-	locked := make(chan bool)
-
-	go func(locked chan bool) {
-		var firstLock sync.Once
-		defer close(locked)
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-renewTimer:
-				err := s.locker.Renew(workerID, s.ViewModel(), s.MinimumCycleDuration()*2)
-				firstLock.Do(func() {
-					locked <- err == nil
-				})
-				if err == nil {
-					renewTimer = time.After(s.MinimumCycleDuration())
-					continue
-				}
-
-				if ctx.Err() == nil {
-					errs <- err
-				}
-				return
-			}
-		}
-	}(locked)
-
-	return locked
-}
-
-func HandleError(event *models.Event, failedErr error,
+func HandleError(
+	event *models.Event,
+	failedErr error,
 	latestFailedEvent func(sequence uint64) (*repository.FailedEvent, error),
 	processFailedEvent func(*repository.FailedEvent) error,
-	processSequence func(uint64) error, errorCountUntilSkip uint64) error {
+	processSequence func(uint64) error,
+	errorCountUntilSkip uint64,
+) error {
 	failedEvent, err := latestFailedEvent(event.Sequence)
 	if err != nil {
 		return err

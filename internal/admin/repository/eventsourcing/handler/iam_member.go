@@ -109,7 +109,6 @@ func (m *IamMember) processUser(event *models.Event) (err error) {
 	default:
 		return m.view.ProcessedIAMMemberSequence(event.Sequence)
 	}
-	return nil
 }
 
 func (m *IamMember) fillData(member *iam_model.IAMMemberView) (err error) {

@@ -24,6 +24,6 @@ type lock struct {
 	ViewName    string    `gorm:"column:object_type;primary_key"`
 }
 
-func (l *locker) Renew(lockerID, viewModel string, waitTime time.Duration) error {
+func (l *locker) Renew(lockerID, viewModel string, waitTime time.Duration) (lockedUntil time.Time, isLeaseHolder bool, err error) {
 	return es_locker.Renew(l.dbClient, lockTable, lockerID, viewModel, waitTime)
 }

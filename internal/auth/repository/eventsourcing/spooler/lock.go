@@ -2,8 +2,9 @@ package spooler
 
 import (
 	"database/sql"
-	es_locker "github.com/caos/zitadel/internal/eventstore/locker"
 	"time"
+
+	es_locker "github.com/caos/zitadel/internal/eventstore/locker"
 )
 
 const (
@@ -14,6 +15,6 @@ type locker struct {
 	dbClient *sql.DB
 }
 
-func (l *locker) Renew(lockerID, viewModel string, waitTime time.Duration) error {
+func (l *locker) Renew(lockerID, viewModel string, waitTime time.Duration) (lockedUntil time.Time, isLeaseHolder bool, err error) {
 	return es_locker.Renew(l.dbClient, lockTable, lockerID, viewModel, waitTime)
 }
