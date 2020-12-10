@@ -773,8 +773,8 @@
     },
     "IDP":{
         "LIST": {
-            "TITLE":"Multifaktoren",
-            "DESCRIPTION":"Definieren Sie hier Ihre zusätzlichen Multifaktoren, die sie für die Authentifizierung in Ihren Organisationen verwenden können."
+            "TITLE":"Identitäts Provider",
+            "DESCRIPTION":"Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können."
         },
         "CREATE": {
             "TITLE":"Neuer Identitäts Provider",
