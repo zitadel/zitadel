@@ -15,7 +15,6 @@ import (
 type SpoolerConfig struct {
 	BulkLimit             uint64
 	FailureCountUntilSkip uint64
-	ConcurrentWorkers     int
 	Handlers              handler.Configs
 }
 
@@ -23,7 +22,6 @@ func StartSpooler(c SpoolerConfig, es eventstore.Eventstore, view *view.View, sq
 	spoolerConfig := spooler.Config{
 		Eventstore:        es,
 		Locker:            &locker{dbClient: sql},
-		ConcurrentWorkers: c.ConcurrentWorkers,
 		ViewHandlers:      handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, eventstoreRepos, systemDefaults, i18n, dir),
 	}
 	spool := spoolerConfig.New()
