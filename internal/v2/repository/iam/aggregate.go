@@ -5,11 +5,15 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/label"
 	iam_login "github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
+	iam_multi_factor "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/multi_factors"
+	iam_second_factor "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/second_factors"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 	"github.com/caos/zitadel/internal/v2/repository/policy/login"
+	"github.com/caos/zitadel/internal/v2/repository/policy/login/multi_factors"
+	"github.com/caos/zitadel/internal/v2/repository/policy/login/second_factors"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
@@ -176,6 +180,26 @@ func (a *Aggregate) PushLoginPolicyChangedFromExisting(ctx context.Context, curr
 		return a
 	}
 	a.Aggregate = *a.PushEvents(e)
+	return a
+}
+
+func (a *Aggregate) PushLoginPolicySecondFactorAdded(ctx context.Context, mfaType second_factors.SecondFactorType) *Aggregate {
+	a.Aggregate = *a.PushEvents(iam_second_factor.NewLoginPolicySecondFactorAddedEvent(ctx, mfaType))
+	return a
+}
+
+func (a *Aggregate) PushLoginPolicySecondFactorRemoved(ctx context.Context, mfaType second_factors.SecondFactorType) *Aggregate {
+	a.Aggregate = *a.PushEvents(iam_second_factor.NewLoginPolicySecondFactorRemovedEvent(ctx, mfaType))
+	return a
+}
+
+func (a *Aggregate) PushLoginPolicyMultiFactorAdded(ctx context.Context, mfaType multi_factors.MultiFactorType) *Aggregate {
+	a.Aggregate = *a.PushEvents(iam_multi_factor.NewLoginPolicyMultiFactorAddedEvent(ctx, mfaType))
+	return a
+}
+
+func (a *Aggregate) PushLoginPolicyMultiFactorRemoved(ctx context.Context, mfaType multi_factors.MultiFactorType) *Aggregate {
+	a.Aggregate = *a.PushEvents(iam_multi_factor.NewLoginPolicyMultiFactorRemovedEvent(ctx, mfaType))
 	return a
 }
 

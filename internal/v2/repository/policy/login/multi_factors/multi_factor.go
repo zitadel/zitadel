@@ -1,4 +1,4 @@
-package second_factors
+package multi_factors
 
 type MultiFactorType int32
 

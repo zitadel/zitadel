@@ -42,6 +42,14 @@ func SecondFactorAddedEventMapper(event *repository.Event) (eventstore.EventRead
 	return e, nil
 }
 
+func (e *SecondFactorAddedEvent) CheckPrevious() bool {
+	return true
+}
+
+func (e *SecondFactorAddedEvent) Data() interface{} {
+	return e
+}
+
 type SecondFactorRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	MFAType              SecondFactorType `json:"mfaType"`
@@ -68,4 +76,12 @@ func SecondFactorRemovedEventMapper(event *repository.Event) (eventstore.EventRe
 	}
 
 	return e, nil
+}
+
+func (e *SecondFactorRemovedEvent) CheckPrevious() bool {
+	return true
+}
+
+func (e *SecondFactorRemovedEvent) Data() interface{} {
+	return e
 }

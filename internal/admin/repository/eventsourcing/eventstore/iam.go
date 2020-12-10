@@ -360,10 +360,16 @@ func (repo *IAMRepository) SearchDefaultSecondFactors(ctx context.Context) (*iam
 }
 
 func (repo *IAMRepository) AddSecondFactorToLoginPolicy(ctx context.Context, mfa iam_model.SecondFactorType) (iam_model.SecondFactorType, error) {
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.AddSecondFactorToLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
+	}
 	return repo.IAMEventstore.AddSecondFactorToLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
 }
 
 func (repo *IAMRepository) RemoveSecondFactorFromLoginPolicy(ctx context.Context, mfa iam_model.SecondFactorType) error {
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.RemoveSecondFactorFromLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
+	}
 	return repo.IAMEventstore.RemoveSecondFactorFromLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
 }
 
@@ -379,10 +385,16 @@ func (repo *IAMRepository) SearchDefaultMultiFactors(ctx context.Context) (*iam_
 }
 
 func (repo *IAMRepository) AddMultiFactorToLoginPolicy(ctx context.Context, mfa iam_model.MultiFactorType) (iam_model.MultiFactorType, error) {
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.AddMultiFactorToLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
+	}
 	return repo.IAMEventstore.AddMultiFactorToLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
 }
 
 func (repo *IAMRepository) RemoveMultiFactorFromLoginPolicy(ctx context.Context, mfa iam_model.MultiFactorType) error {
+	if repo.IAMV2 != nil {
+		return repo.IAMV2.RemoveMultiFactorFromLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
+	}
 	return repo.IAMEventstore.RemoveMultiFactorFromLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
 }
 
