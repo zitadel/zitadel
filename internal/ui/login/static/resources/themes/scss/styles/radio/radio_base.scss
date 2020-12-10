@@ -1,0 +1,107 @@
+$lgn-radio-font-size: 14px !default;
+$lgn-radio-margin: 0 0 10px;
+$lgn-radio-font-weight: 400;
+$lgn-radio-size: 20px;
+$lgn-radio-checked-size: 10px;
+$lgn-radio-ripple-size: 15px;
+$lgn-radio-label-padding: 0 0 0 ($lgn-radio-size + 10px);
+
+@keyframes ripple {
+    0% {
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0);
+    }
+  
+    50% {
+      box-shadow: 0 0 0 15px rgba(0, 0, 0, .1);
+    }
+  
+    100% {
+      box-shadow: 0 0 0 15px rgba(0, 0, 0, 0);
+    }
+}
+
+@mixin lgn-radio-base {
+    outline: none;
+    margin: 16px 0;
+    display: inline-block;
+
+    label {
+        display: inline-block;
+        height: $lgn-radio-size;
+        position: relative;
+        padding: $lgn-radio-label-padding;
+        margin-bottom: 0;
+        cursor: pointer;
+        vertical-align: middle;
+        padding-top: 2px;
+        outline: none;
+        font-size: $lgn-radio-font-size;
+        line-height: $lgn-radio-font-size;
+
+        &::before,
+        &::after {
+            position: absolute;
+            content: '';
+            border-radius: 50%;
+            transition: all .3s ease;
+            transition-property: transform, border-color;
+        }
+
+        &::before {
+            left: 0;
+            top: 0;
+            width: $lgn-radio-size;
+            height: $lgn-radio-size;
+            border-width: 2px;
+            border-style: solid;
+        }
+
+        &::after {
+            top: $lgn-radio-size / 2 - $lgn-radio-checked-size / 2;
+            left: $lgn-radio-size / 2 - $lgn-radio-checked-size / 2;
+            width: $lgn-radio-checked-size;
+            height: $lgn-radio-checked-size;
+            transform: scale(0);
+        }
+    }
+
+    input[type='radio'] {
+        opacity: 0;
+        margin: 0;
+        width: 0;
+        height: 0;
+        outline: none;
+
+        &:checked + label::before {
+            animation: ripple .2s linear forwards;
+        }
+
+        &:checked + label::after {
+            transform: scale(1);
+        }
+
+        &:focus + label {
+            opacity: 1;
+            // outline-width: 2px;
+            // outline-style: solid;
+            // outline-offset: 2px;
+        }
+
+        &:disabled {
+            + label {
+                cursor: not-allowed;
+                font-style: italic;
+            }
+
+            &:focus {
+                opacity: 0;
+            }
+        }
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+}

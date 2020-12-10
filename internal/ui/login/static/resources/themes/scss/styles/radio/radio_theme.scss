@@ -1,0 +1,62 @@
+@import '../theming/theming.scss';
+@import './radio.scss';
+
+@mixin lgn-radio-theme($theme-or-color-config) {
+    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
+    $color: lgn-get-color-config($theme);
+
+    @if $color != null {
+        @include lgn-radio-color($color);
+    }
+}
+
+@mixin lgn-radio-color($config-or-theme) {
+    $config: lgn-get-color-config($config-or-theme);
+    $primary: map-get($config, primary);
+    $warn: map-get($config, warn);
+    $background: map-get($config, background);
+    $foreground: map-get($config, foreground);
+
+    label {
+        &::before {
+            border-color: lgn-color($foreground, radio-border);
+        }
+
+        &::after {
+            background: lgn-color($primary, default);
+        }
+    }
+
+    input[type='radio'] {
+        opacity: 0;
+
+        &:checked + label::before {
+            border-color: lgn-color($primary, default);
+        }
+
+        &:focus + label {
+            opacity: 1;
+            outline: none;
+        }
+
+        &:disabled {
+            + label::before {
+                border-color: blue;
+            }
+
+            &:checked {
+                + label::before {
+                    color: blue;
+                }
+
+                + label::after {
+                    background:  blue;
+                }
+            }
+
+            &:focus {
+                opacity: 0;
+            }
+        }
+    }
+}

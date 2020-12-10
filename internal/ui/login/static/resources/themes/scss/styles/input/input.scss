@@ -1,6 +1,6 @@
 @import './input_base.scss';
 
-input, .lgn-input {
+input:not([type='radio']), .lgn-input {
   @include lgn-input-base;
 }
 

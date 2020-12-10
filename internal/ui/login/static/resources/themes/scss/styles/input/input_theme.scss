@@ -19,12 +19,12 @@
     $background: map-get($config, background);
     $foreground: map-get($config, foreground);
 
-    input:not([disabled]), .lgn-input:not([disabled]),
+    .lgn-input:not([disabled]),
     select:not([disabled]), .lgn-select:not([disabled]) {
       border-color: lgn-color($foreground, input-border);
     }
   
-    input, .lgn-input,
+    .lgn-input,
     select, .lgn-select {
       color: lgn-color($foreground, text);
       background-color: lgn-color($background, input);
@@ -41,8 +41,7 @@
         @include _lgn-input-theme-property($config, 'border-color', default);
       }
     }
-
-    input::placeholder,
+    
     .lgn-input::placeholder,
     select::placeholder,
     .lgn-select::placeholder {

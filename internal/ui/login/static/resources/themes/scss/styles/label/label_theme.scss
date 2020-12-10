@@ -19,7 +19,7 @@
     $background: map-get($config, background);
     $foreground: map-get($config, foreground);
 
-    label, .lgn-label {
+    .lgn-label {
       color: lgn-color($foreground, label);
     }
 }

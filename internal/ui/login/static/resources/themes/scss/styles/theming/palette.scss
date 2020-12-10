@@ -226,6 +226,7 @@ $lgn-warn: (
     footer-links:      map-get($lgn-light-brand, 500),
     base:              black,
     input-border:      $light-input-border,
+    radio-border:      $light-input-border,
     input-border-hover: $light-input-border-hover,
     input-placeholder: map-get($lgn-grey, 600),
     label:             map-get($lgn-grey, 600),//#697386
@@ -249,6 +250,7 @@ $lgn-warn: (
     footer-links:      map-get($lgn-grey, 500),
     base:              white,
     input-border:      $dark-input-border,
+    radio-border: $dark-input-border,
     input-border-hover: $dark-input-border-hover,
     input-placeholder: map-get($lgn-grey, 600),
     label:             map-get($lgn-grey, 600),// #8795a1,
