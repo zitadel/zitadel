@@ -31,9 +31,9 @@ func (e *ChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanAddressChangedEvent(
+func NewChangedEvent(
 	ctx context.Context,
-	current *HumanAddressWriteModel,
+	current *WriteModel,
 	country,
 	locality,
 	postalCode,
@@ -66,7 +66,7 @@ func NewHumanAddressChangedEvent(
 	return e
 }
 
-func HumanAddressChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	addressChanged := &ChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

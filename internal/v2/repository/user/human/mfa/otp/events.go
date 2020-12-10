@@ -34,7 +34,7 @@ func (e *AddedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanMFAOTPAddedEvent(ctx context.Context,
+func NewAddedEvent(ctx context.Context,
 	secret *crypto.CryptoValue) *AddedEvent {
 	return &AddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -45,7 +45,7 @@ func NewHumanMFAOTPAddedEvent(ctx context.Context,
 	}
 }
 
-func HumanMFAOTPAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	otpAdded := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 		State:     mfa.StateNotReady,
@@ -70,7 +70,7 @@ func (e *VerifiedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanMFAOTPVerifiedEvent(ctx context.Context) *VerifiedEvent {
+func NewVerifiedEvent(ctx context.Context) *VerifiedEvent {
 	return &VerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -79,7 +79,7 @@ func NewHumanMFAOTPVerifiedEvent(ctx context.Context) *VerifiedEvent {
 	}
 }
 
-func HumanMFAOTPVerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func VerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &VerifiedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 		State:     mfa.StateReady,
@@ -98,7 +98,7 @@ func (e *RemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanMFAOTPRemovedEvent(ctx context.Context) *RemovedEvent {
+func NewRemovedEvent(ctx context.Context) *RemovedEvent {
 	return &RemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -107,7 +107,7 @@ func NewHumanMFAOTPRemovedEvent(ctx context.Context) *RemovedEvent {
 	}
 }
 
-func HumanMFAOTPRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &RemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -125,7 +125,7 @@ func (e *CheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanMFAOTPCheckSucceededEvent(ctx context.Context) *CheckSucceededEvent {
+func NewCheckSucceededEvent(ctx context.Context) *CheckSucceededEvent {
 	return &CheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -134,7 +134,7 @@ func NewHumanMFAOTPCheckSucceededEvent(ctx context.Context) *CheckSucceededEvent
 	}
 }
 
-func HumanMFAOTPCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func CheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &CheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -152,7 +152,7 @@ func (e *CheckFailedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanMFAOTPCheckFailedEvent(ctx context.Context) *CheckFailedEvent {
+func NewCheckFailedEvent(ctx context.Context) *CheckFailedEvent {
 	return &CheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -161,7 +161,7 @@ func NewHumanMFAOTPCheckFailedEvent(ctx context.Context) *CheckFailedEvent {
 	}
 }
 
-func HumanMFAOTPCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func CheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &CheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

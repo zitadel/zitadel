@@ -23,7 +23,7 @@ func (e *InitSkippedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanMFAInitSkippedEvent(ctx context.Context) *InitSkippedEvent {
+func NewInitSkippedEvent(ctx context.Context) *InitSkippedEvent {
 	return &InitSkippedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -32,7 +32,7 @@ func NewHumanMFAInitSkippedEvent(ctx context.Context) *InitSkippedEvent {
 	}
 }
 
-func HumanMFAInitSkippedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func InitSkippedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &InitSkippedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

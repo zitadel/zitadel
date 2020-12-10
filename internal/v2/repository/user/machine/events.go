@@ -31,7 +31,7 @@ func (e *AddedEvent) Data() interface{} {
 	return e
 }
 
-func NewMachineAddedEvent(
+func NewAddedEvent(
 	ctx context.Context,
 	userName,
 	name,
@@ -48,7 +48,7 @@ func NewMachineAddedEvent(
 	}
 }
 
-func MachineAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	machineAdded := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -77,7 +77,7 @@ func (e *ChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewMachineChangedEvent(
+func NewChangedEvent(
 	ctx context.Context,
 	userName,
 	name,
@@ -94,7 +94,7 @@ func NewMachineChangedEvent(
 	}
 }
 
-func MachineChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	machineChanged := &ChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

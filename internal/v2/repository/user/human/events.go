@@ -53,7 +53,7 @@ func (e *AddedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanAddedEvent(
+func NewAddedEvent(
 	ctx context.Context,
 	userName,
 	firstName,
@@ -92,7 +92,7 @@ func NewHumanAddedEvent(
 	}
 }
 
-func HumanAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	humanAdded := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -135,7 +135,7 @@ func (e *RegisteredEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanRegisteredEvent(
+func NewRegisteredEvent(
 	ctx context.Context,
 	userName,
 	firstName,
@@ -174,7 +174,7 @@ func NewHumanRegisteredEvent(
 	}
 }
 
-func HumanRegisteredEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func RegisteredEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	humanRegistered := &RegisteredEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -200,7 +200,7 @@ func (e *InitialCodeAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanInitialCodeAddedEvent(
+func NewInitialCodeAddedEvent(
 	ctx context.Context,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
@@ -215,7 +215,7 @@ func NewHumanInitialCodeAddedEvent(
 	}
 }
 
-func HumanInitialCodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func InitialCodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	humanRegistered := &InitialCodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -239,7 +239,7 @@ func (e *InitialCodeSentEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanInitialCodeSentEvent(ctx context.Context) *InitialCodeSentEvent {
+func NewInitialCodeSentEvent(ctx context.Context) *InitialCodeSentEvent {
 	return &InitialCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -248,7 +248,7 @@ func NewHumanInitialCodeSentEvent(ctx context.Context) *InitialCodeSentEvent {
 	}
 }
 
-func HumanInitialCodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func InitialCodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &InitialCodeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -266,7 +266,7 @@ func (e *InitializedCheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanInitializedCheckSucceededEvent(ctx context.Context) *InitializedCheckSucceededEvent {
+func NewInitializedCheckSucceededEvent(ctx context.Context) *InitializedCheckSucceededEvent {
 	return &InitializedCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -275,7 +275,7 @@ func NewHumanInitializedCheckSucceededEvent(ctx context.Context) *InitializedChe
 	}
 }
 
-func HumanInitializedCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func InitializedCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &InitializedCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -293,7 +293,7 @@ func (e *InitializedCheckFailedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanInitializedCheckFailedEvent(ctx context.Context) *InitializedCheckFailedEvent {
+func NewInitializedCheckFailedEvent(ctx context.Context) *InitializedCheckFailedEvent {
 	return &InitializedCheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -302,7 +302,7 @@ func NewHumanInitializedCheckFailedEvent(ctx context.Context) *InitializedCheckF
 	}
 }
 
-func HumanInitializedCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func InitializedCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &InitializedCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -320,7 +320,7 @@ func (e *SignedOutEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanSignedOutEvent(ctx context.Context) *SignedOutEvent {
+func NewSignedOutEvent(ctx context.Context) *SignedOutEvent {
 	return &SignedOutEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -329,7 +329,7 @@ func NewHumanSignedOutEvent(ctx context.Context) *SignedOutEvent {
 	}
 }
 
-func HumanSignedOutEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func SignedOutEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &SignedOutEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

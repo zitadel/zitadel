@@ -45,7 +45,7 @@ func (e *AddedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanWebAuthNU2FAddedEvent(
+func NewU2FAddedEvent(
 	ctx context.Context,
 	webAuthNTokenID,
 	challenge string,
@@ -60,7 +60,7 @@ func NewHumanWebAuthNU2FAddedEvent(
 	}
 }
 
-func NewHumanWebAuthNPasswordlessAddedEvent(
+func NewPasswordlessAddedEvent(
 	ctx context.Context,
 	webAuthNTokenID,
 	challenge string,
@@ -75,7 +75,7 @@ func NewHumanWebAuthNPasswordlessAddedEvent(
 	}
 }
 
-func HumanWebAuthNAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	webAuthNAdded := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 		State:     mfa.StateNotReady,
@@ -108,7 +108,7 @@ func (e *VerifiedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanWebAuthNU2FVerifiedEvent(
+func NewU2FVerifiedEvent(
 	ctx context.Context,
 	webAuthNTokenID,
 	webAuthNTokenName,
@@ -133,7 +133,7 @@ func NewHumanWebAuthNU2FVerifiedEvent(
 	}
 }
 
-func NewHumanWebAuthNPasswordlessVerifiedEvent(
+func NewPasswordlessVerifiedEvent(
 	ctx context.Context,
 	webAuthNTokenID,
 	webAuthNTokenName,
@@ -158,7 +158,7 @@ func NewHumanWebAuthNPasswordlessVerifiedEvent(
 	}
 }
 
-func HumanWebAuthNVerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func VerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	webauthNVerified := &VerifiedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 		State:     mfa.StateReady,
@@ -186,7 +186,7 @@ func (e *SignCountChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanWebAuthNU2FSignCountChangedEvent(
+func NewU2FSignCountChangedEvent(
 	ctx context.Context,
 	webAuthNTokenID string,
 	signCount uint32,
@@ -201,7 +201,7 @@ func NewHumanWebAuthNU2FSignCountChangedEvent(
 	}
 }
 
-func NewHumanWebAuthNPasswordlessSignCountChangedEvent(
+func NewPasswordlessSignCountChangedEvent(
 	ctx context.Context,
 	webAuthNTokenID string,
 	signCount uint32,
@@ -216,7 +216,7 @@ func NewHumanWebAuthNPasswordlessSignCountChangedEvent(
 	}
 }
 
-func HumanWebAuthNSignCountChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func SignCountChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	webauthNVerified := &SignCountChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -242,7 +242,7 @@ func (e *RemovedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanWebAuthNU2FRemovedEvent(
+func NewU2FRemovedEvent(
 	ctx context.Context,
 	webAuthNTokenID string,
 ) *RemovedEvent {
@@ -255,7 +255,7 @@ func NewHumanWebAuthNU2FRemovedEvent(
 	}
 }
 
-func NewHumanWebAuthNPasswordlessRemovedEvent(
+func NewPasswordlessRemovedEvent(
 	ctx context.Context,
 	webAuthNTokenID string,
 ) *RemovedEvent {
@@ -268,7 +268,7 @@ func NewHumanWebAuthNPasswordlessRemovedEvent(
 	}
 }
 
-func HumanWebAuthNRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	webauthNVerified := &RemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -296,7 +296,7 @@ func (e *BeginLoginEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanWebAuthNU2FBeginLoginEvent(
+func NewU2FBeginLoginEvent(
 	ctx context.Context,
 	webAuthNTokenID,
 	challenge string,
@@ -311,7 +311,7 @@ func NewHumanWebAuthNU2FBeginLoginEvent(
 	}
 }
 
-func NewHumanWebAuthNPasswordlessBeginLoginEvent(
+func NewPasswordlessBeginLoginEvent(
 	ctx context.Context,
 	webAuthNTokenID,
 	challenge string,
@@ -326,7 +326,7 @@ func NewHumanWebAuthNPasswordlessBeginLoginEvent(
 	}
 }
 
-func HumanWebAuthNBeginLoginEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func BeginLoginEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	webAuthNAdded := &BeginLoginEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -352,7 +352,7 @@ func (e *CheckSucceededEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanWebAuthNU2FCheckSucceededEvent(ctx context.Context) *CheckSucceededEvent {
+func NewU2FCheckSucceededEvent(ctx context.Context) *CheckSucceededEvent {
 	return &CheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -361,7 +361,7 @@ func NewHumanWebAuthNU2FCheckSucceededEvent(ctx context.Context) *CheckSucceeded
 	}
 }
 
-func NewHumanWebAuthNPasswordlessCheckSucceededEvent(ctx context.Context) *CheckSucceededEvent {
+func NewPasswordlessCheckSucceededEvent(ctx context.Context) *CheckSucceededEvent {
 	return &CheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -370,7 +370,7 @@ func NewHumanWebAuthNPasswordlessCheckSucceededEvent(ctx context.Context) *Check
 	}
 }
 
-func HumanWebAuthNCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func CheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	webAuthNAdded := &CheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -396,7 +396,7 @@ func (e *CheckFailedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanWebAuthNU2FCheckFailedEvent(ctx context.Context) *CheckFailedEvent {
+func NewU2FCheckFailedEvent(ctx context.Context) *CheckFailedEvent {
 	return &CheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -405,7 +405,7 @@ func NewHumanWebAuthNU2FCheckFailedEvent(ctx context.Context) *CheckFailedEvent 
 	}
 }
 
-func NewHumanWebAuthNPasswordlessCheckFailedEvent(ctx context.Context) *CheckFailedEvent {
+func NewPasswordlessCheckFailedEvent(ctx context.Context) *CheckFailedEvent {
 	return &CheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -414,7 +414,7 @@ func NewHumanWebAuthNPasswordlessCheckFailedEvent(ctx context.Context) *CheckFai
 	}
 }
 
-func HumanWebAuthNCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func CheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	webAuthNAdded := &CheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

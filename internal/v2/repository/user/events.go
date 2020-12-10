@@ -34,7 +34,7 @@ func (e *LockedEvent) Data() interface{} {
 	return nil
 }
 
-func NewUserLockedEvent(ctx context.Context) *LockedEvent {
+func NewLockedEvent(ctx context.Context) *LockedEvent {
 	return &LockedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -43,7 +43,7 @@ func NewUserLockedEvent(ctx context.Context) *LockedEvent {
 	}
 }
 
-func UserLockedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LockedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &LockedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -61,7 +61,7 @@ func (e *UnlockedEvent) Data() interface{} {
 	return nil
 }
 
-func NewUserUnlockedEvent(ctx context.Context) *UnlockedEvent {
+func NewUnlockedEvent(ctx context.Context) *UnlockedEvent {
 	return &UnlockedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -70,7 +70,7 @@ func NewUserUnlockedEvent(ctx context.Context) *UnlockedEvent {
 	}
 }
 
-func UserUnlockedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UnlockedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &UnlockedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -88,7 +88,7 @@ func (e *DeactivatedEvent) Data() interface{} {
 	return nil
 }
 
-func NewUserDeactivatedEvent(ctx context.Context) *DeactivatedEvent {
+func NewDeactivatedEvent(ctx context.Context) *DeactivatedEvent {
 	return &DeactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -97,7 +97,7 @@ func NewUserDeactivatedEvent(ctx context.Context) *DeactivatedEvent {
 	}
 }
 
-func UserDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func DeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &DeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -115,7 +115,7 @@ func (e *ReactivatedEvent) Data() interface{} {
 	return nil
 }
 
-func NewUserReactivatedEvent(ctx context.Context) *ReactivatedEvent {
+func NewReactivatedEvent(ctx context.Context) *ReactivatedEvent {
 	return &ReactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -124,7 +124,7 @@ func NewUserReactivatedEvent(ctx context.Context) *ReactivatedEvent {
 	}
 }
 
-func UserReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &ReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -142,7 +142,7 @@ func (e *RemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewUserRemovedEvent(ctx context.Context) *RemovedEvent {
+func NewRemovedEvent(ctx context.Context) *RemovedEvent {
 	return &RemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -151,7 +151,7 @@ func NewUserRemovedEvent(ctx context.Context) *RemovedEvent {
 	}
 }
 
-func UserRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &RemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -177,7 +177,7 @@ func (e *TokenAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewUserTokenAddedEvent(
+func NewTokenAddedEvent(
 	ctx context.Context,
 	tokenID,
 	applicationID,
@@ -201,7 +201,7 @@ func NewUserTokenAddedEvent(
 	}
 }
 
-func UserTokenAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func TokenAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	tokenAdded := &TokenAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -227,7 +227,7 @@ func (e *DomainClaimedEvent) Data() interface{} {
 	return e
 }
 
-func NewUserDomainClaimedEvent(
+func NewDomainClaimedEvent(
 	ctx context.Context,
 	userName string,
 ) *DomainClaimedEvent {
@@ -240,7 +240,7 @@ func NewUserDomainClaimedEvent(
 	}
 }
 
-func UserDomainClaimedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func DomainClaimedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	domainClaimed := &DomainClaimedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -264,7 +264,7 @@ func (e *DomainClaimedSentEvent) Data() interface{} {
 	return nil
 }
 
-func NewUserDomainClaimedSentEvent(
+func NewDomainClaimedSentEvent(
 	ctx context.Context,
 ) *DomainClaimedSentEvent {
 	return &DomainClaimedSentEvent{
@@ -275,7 +275,7 @@ func NewUserDomainClaimedSentEvent(
 	}
 }
 
-func UserDomainClaimedSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func DomainClaimedSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &DomainClaimedSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -295,7 +295,7 @@ func (e *UsernameChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewUserUsernameChangedEvent(
+func NewUsernameChangedEvent(
 	ctx context.Context,
 	userName string,
 ) *UsernameChangedEvent {
@@ -308,7 +308,7 @@ func NewUserUsernameChangedEvent(
 	}
 }
 
-func UserUsernameChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UsernameChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	domainClaimed := &UsernameChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

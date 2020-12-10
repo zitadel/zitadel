@@ -6,7 +6,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-type HumanProfileWriteModel struct {
+type WriteModel struct {
 	eventstore.WriteModel
 
 	FirstName         string

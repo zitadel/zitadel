@@ -35,7 +35,7 @@ func (e *ChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanPasswordChangedEvent(
+func NewChangedEvent(
 	ctx context.Context,
 	secret *crypto.CryptoValue,
 	changeRequired bool,
@@ -50,7 +50,7 @@ func NewHumanPasswordChangedEvent(
 	}
 }
 
-func HumanPasswordChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	humanAdded := &ChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -78,7 +78,7 @@ func (e *CodeAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanPasswordCodeAddedEvent(
+func NewPasswordCodeAddedEvent(
 	ctx context.Context,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
@@ -95,7 +95,7 @@ func NewHumanPasswordCodeAddedEvent(
 	}
 }
 
-func HumanPasswordCodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func CodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	humanAdded := &CodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -119,7 +119,7 @@ func (e *CodeSentEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanPasswordCodeSentEvent(ctx context.Context) *CodeSentEvent {
+func NewCodeSentEvent(ctx context.Context) *CodeSentEvent {
 	return &CodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -128,7 +128,7 @@ func NewHumanPasswordCodeSentEvent(ctx context.Context) *CodeSentEvent {
 	}
 }
 
-func HumanPasswordCodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func CodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &CodeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -146,7 +146,7 @@ func (e *CheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanPasswordCheckSucceededEvent(ctx context.Context) *CheckSucceededEvent {
+func NewCheckSucceededEvent(ctx context.Context) *CheckSucceededEvent {
 	return &CheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -155,7 +155,7 @@ func NewHumanPasswordCheckSucceededEvent(ctx context.Context) *CheckSucceededEve
 	}
 }
 
-func HumanPasswordCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func CheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &CheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -173,7 +173,7 @@ func (e *CheckFailedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanPasswordCheckFailedEvent(ctx context.Context) *CheckFailedEvent {
+func NewCheckFailedEvent(ctx context.Context) *CheckFailedEvent {
 	return &CheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -182,7 +182,7 @@ func NewHumanPasswordCheckFailedEvent(ctx context.Context) *CheckFailedEvent {
 	}
 }
 
-func HumanPasswordCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func CheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &CheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

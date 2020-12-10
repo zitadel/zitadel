@@ -34,9 +34,9 @@ func (e *ChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanProfileChangedEvent(
+func NewChangedEvent(
 	ctx context.Context,
-	current *HumanProfileWriteModel,
+	current *WriteModel,
 	firstName,
 	lastName,
 	nickName,
@@ -71,7 +71,7 @@ func NewHumanProfileChangedEvent(
 	return e
 }
 
-func HumanProfileChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	profileChanged := &ChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

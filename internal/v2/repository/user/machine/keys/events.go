@@ -32,7 +32,7 @@ func (e *AddedEvent) Data() interface{} {
 	return e
 }
 
-func NewMachineKeyAddedEvent(
+func NewAddedEvent(
 	ctx context.Context,
 	keyID string,
 	keyType MachineKeyType,
@@ -51,7 +51,7 @@ func NewMachineKeyAddedEvent(
 	}
 }
 
-func MachineKeyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	machineAdded := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -77,7 +77,7 @@ func (e *RemovedEvent) Data() interface{} {
 	return e
 }
 
-func NewMachineKeyRemovedEvent(
+func NewRemovedEvent(
 	ctx context.Context,
 	keyID string,
 ) *RemovedEvent {
@@ -90,7 +90,7 @@ func NewMachineKeyRemovedEvent(
 	}
 }
 
-func MachineKeyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	machineRemoved := &RemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

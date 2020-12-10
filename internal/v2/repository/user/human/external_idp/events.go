@@ -35,7 +35,7 @@ func (e *ReservedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanExternalIDPReservedEvent(ctx context.Context) *ReservedEvent {
+func NewReservedEvent(ctx context.Context) *ReservedEvent {
 	return &ReservedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -56,7 +56,7 @@ func (e *ReleasedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanExternalIDPReleasedEvent(ctx context.Context) *ReleasedEvent {
+func NewReleasedEvent(ctx context.Context) *ReleasedEvent {
 	return &ReleasedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -80,7 +80,7 @@ func (e *AddedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanExternalIDPAddedEvent(ctx context.Context, idpConfigID, displayName string) *AddedEvent {
+func NewAddedEvent(ctx context.Context, idpConfigID, displayName string) *AddedEvent {
 	return &AddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -91,7 +91,7 @@ func NewHumanExternalIDPAddedEvent(ctx context.Context, idpConfigID, displayName
 	}
 }
 
-func HumanExternalIDPAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -118,7 +118,7 @@ func (e *RemovedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanExternalIDPRemovedEvent(ctx context.Context, idpConfigID string) *RemovedEvent {
+func NewRemovedEvent(ctx context.Context, idpConfigID string) *RemovedEvent {
 	return &RemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -128,7 +128,7 @@ func NewHumanExternalIDPRemovedEvent(ctx context.Context, idpConfigID string) *R
 	}
 }
 
-func HumanExternalIDPRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &RemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -155,7 +155,7 @@ func (e *CascadeRemovedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanExternalIDPCascadeRemovedEvent(ctx context.Context, idpConfigID string) *CascadeRemovedEvent {
+func NewCascadeRemovedEvent(ctx context.Context, idpConfigID string) *CascadeRemovedEvent {
 	return &CascadeRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -165,7 +165,7 @@ func NewHumanExternalIDPCascadeRemovedEvent(ctx context.Context, idpConfigID str
 	}
 }
 
-func HumanExternalIDPCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func CascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &CascadeRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -190,7 +190,7 @@ func (e *CheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanExternalLoginCheckSucceededEvent(ctx context.Context) *CheckSucceededEvent {
+func NewCheckSucceededEvent(ctx context.Context) *CheckSucceededEvent {
 	return &CheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -199,7 +199,7 @@ func NewHumanExternalLoginCheckSucceededEvent(ctx context.Context) *CheckSucceed
 	}
 }
 
-func HumanExternalLoginCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func CheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &CheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
