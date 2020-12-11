@@ -6,7 +6,7 @@
         <p>{{t "UserSelection.DescriptionLinking"}}</p>
     {{else}}
         <h1>{{t "UserSelection.Title"}}</h1>
-        <p>{{t "UserSelection.Description"}}</p>
+        <p>{{t "UserSelection.Description"}} {{t "Errors.User.MustBeMemberOfOrg" "caos.ch"}}</p>
     {{end}}
 </div>
 
@@ -22,7 +22,7 @@
         <div class="user-selection-list">
             {{ range $user := .Users }}
             {{ $sessionState := (printf "sessionstate-%v" $user.UserSessionState) }}
-            <button type="submit" name="userID" value="{{$user.UserID}}" class="clean user-selection">
+            <button type="submit" name="userID" value="{{$user.UserID}}" class="clean user-selection" {{if not $user.SelectionPossible}}disabled title="{{t "Errors.User.NotAllowedOrg"}}"{{end}}>
                 <div>
                     <div class="profile-image"></div>
                     <div class="sessionstate {{$sessionState}}"></div>

@@ -30,6 +30,7 @@ type AuthRequest struct {
 	LoginName           string
 	DisplayName         string
 	UserOrgID           string
+	RequestedOrgID      string
 	SelectedIDPConfigID string
 	LinkingUsers        []*ExternalUser
 	PossibleSteps       []NextStep
