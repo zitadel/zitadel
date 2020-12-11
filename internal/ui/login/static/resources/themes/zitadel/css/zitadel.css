@@ -319,6 +319,36 @@ i {
   font-size: 1.2rem;
 }
 
+.lgn-account-selection {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.lgn-account-selection .lgn-account {
+  display: flex;
+  align-items: center;
+  border: none;
+}
+.lgn-account-selection .lgn-account .lgn-names {
+  display: block;
+  margin: 0.5rem;
+  text-align: start;
+}
+.lgn-account-selection .lgn-account .lgn-names .lgn-displayname {
+  font-size: 16px;
+  margin: 0.5rem 0;
+}
+.lgn-account-selection .lgn-account .lgn-names .lgn-loginname {
+  font-size: 14px;
+  margin: 0.5rem 0;
+}
+.lgn-account-selection .lgn-account .fill-space {
+  flex: 1;
+}
+.lgn-account-selection .lgn-account i {
+  font-size: 1.2rem;
+}
+
 @font-face {
   font-family: Aileron;
   src: url(../../../fonts/ailerons/ailerons.otf) format("opentype");
@@ -695,6 +725,30 @@ ul li i.lgn-valid {
   color: #85d996;
 }
 
+.lgn-account-selection {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.lgn-account-selection .lgn-account {
+  color: inherit;
+  background: transparent;
+  box-shadow: inset 0 -1px #303131;
+}
+.lgn-account-selection .lgn-account:hover {
+  background-color: rgba(82, 130, 193, 0.1);
+}
+.lgn-account-selection .lgn-account:focus {
+  background-color: rgba(82, 130, 193, 0.2);
+}
+.lgn-account-selection .lgn-account:active {
+  background-color: rgba(82, 130, 193, 0.25);
+}
+.lgn-account-selection .lgn-account .lgn-loginname {
+  font-size: 14px;
+  color: #757575;
+}
+
 .lgn-dark-theme .lgn-app-background, .lgn-dark-theme.lgn-app-background {
   background-color: #212224;
   color: white;
@@ -896,6 +950,29 @@ ul li i.lgn-valid {
 }
 .lgn-dark-theme ul li i.lgn-valid {
   color: #85d996;
+}
+.lgn-dark-theme .lgn-account-selection {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.lgn-dark-theme .lgn-account-selection .lgn-account {
+  color: inherit;
+  background: transparent;
+  box-shadow: inset 0 -1px #303131;
+}
+.lgn-dark-theme .lgn-account-selection .lgn-account:hover {
+  background-color: rgba(82, 130, 193, 0.1);
+}
+.lgn-dark-theme .lgn-account-selection .lgn-account:focus {
+  background-color: rgba(82, 130, 193, 0.2);
+}
+.lgn-dark-theme .lgn-account-selection .lgn-account:active {
+  background-color: rgba(82, 130, 193, 0.25);
+}
+.lgn-dark-theme .lgn-account-selection .lgn-account .lgn-loginname {
+  font-size: 14px;
+  color: #757575;
 }
 
 .lgn-light-theme .lgn-app-background, .lgn-light-theme.lgn-app-background {
@@ -1099,6 +1176,29 @@ ul li i.lgn-valid {
 }
 .lgn-light-theme ul li i.lgn-valid {
   color: #85d996;
+}
+.lgn-light-theme .lgn-account-selection {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.lgn-light-theme .lgn-account-selection .lgn-account {
+  color: inherit;
+  background: transparent;
+  box-shadow: inset 0 -1px #e3e8ee;
+}
+.lgn-light-theme .lgn-account-selection .lgn-account:hover {
+  background-color: rgba(84, 105, 212, 0.1);
+}
+.lgn-light-theme .lgn-account-selection .lgn-account:focus {
+  background-color: rgba(84, 105, 212, 0.2);
+}
+.lgn-light-theme .lgn-account-selection .lgn-account:active {
+  background-color: rgba(84, 105, 212, 0.25);
+}
+.lgn-light-theme .lgn-account-selection .lgn-account .lgn-loginname {
+  font-size: 14px;
+  color: #757575;
 }
 
 /*# sourceMappingURL=zitadel.css.map */

@@ -1,0 +1,47 @@
+@import './account_selection.scss';
+
+@mixin lgn-account-selection-theme($theme-or-color-config) {
+    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
+    $color: lgn-get-color-config($theme);
+
+    @if $color != null {
+    @include lgn-account-selection-color($color);
+    }
+}
+
+@mixin lgn-account-selection-color($config-or-theme) {
+    $config: lgn-get-color-config($config-or-theme);
+    $warn: map-get($config, warn);
+    $primary: map-get($config, primary);
+    $foreground: map-get($config, foreground);
+
+    .lgn-account-selection{
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    
+        .lgn-account {
+            color: inherit;
+            background: transparent;
+            box-shadow: inset 0 -1px lgn-color($foreground, footer-line);
+
+            &:hover {
+                $primary: map-get($config, primary);
+                background-color: rgba(lgn-color($primary, 500), 0.1);
+            }
+
+            &:focus {
+                background-color: rgba(lgn-color($primary, 500), 0.2);
+            }
+
+            &:active {
+                background-color: rgba(lgn-color($primary, 500), 0.25);
+            }
+
+            .lgn-loginname{
+                font-size: 14px;
+                color: lgn-color($foreground, label);
+            }
+        }
+    }
+}

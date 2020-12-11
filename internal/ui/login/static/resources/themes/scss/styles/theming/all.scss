@@ -8,6 +8,7 @@
 @import '../error/error_theme.scss';
 @import '../qrcode/qrcode_theme.scss';
 @import '../container/container_theme.scss';
+@import '../account_selection/account_selection_theme.scss';
 @import '../typography/typography.scss';
 @import './theming';
 
@@ -22,4 +23,5 @@
     @include lgn-error-theme($theme-or-color-config);
     @include lgn-qrcode-theme($theme-or-color-config);
     @include lgn-container-theme($theme-or-color-config);
+    @include lgn-account-selection-theme($theme-or-color-config);
 }

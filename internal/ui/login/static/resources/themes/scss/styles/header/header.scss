@@ -2,6 +2,35 @@ $lgn-header-max-width: 380px;
 $lgn-header-padding: 0;
 $lgn-header-margin: 100px auto .5rem auto;
 
+
+@mixin backlight($x, $y, $spread, $size, $colorA, $colorB, $duration) {
+    &:after {
+      position: absolute;
+      content: "";
+      top: $y;
+      left: $x;
+      right: 0;
+      z-index: -1;
+      height: 100%;
+      width: 100%;
+      margin: 0 auto;
+      transform: scale($size);
+      -webkit-filter: blur($spread);
+      -moz-filter: blur($spread);
+      -ms-filter: blur($spread);
+      filter: blur($spread);
+      background: linear-gradient(270deg, $colorA, $colorB);
+      background-size: 200% 200%;
+      animation: animateGlow $duration ease infinite;
+      
+      @keyframes animateGlow {
+        0%{background-position:0% 50%}
+        50%{background-position:100% 50%}
+        100%{background-position:0% 50%}
+      }
+    }
+  }
+
 .lgn-header {
     display: block;
     margin: $lgn-header-margin;
@@ -14,5 +43,6 @@ $lgn-header-margin: 100px auto .5rem auto;
         display: block;
         margin: 0 auto;
         max-width: 160px;
+        @include backlight(0, 5vw, 5vw, 0.75, #0fffc1, #7e0fff, 10s);
     }
 }

@@ -17,27 +17,33 @@
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
-    <div class="lgn-actions">
+    <div class="lgn-account-selection">
         {{ if .Users }}
-        <div class="user-selection-list">
-            {{ range $user := .Users }}
-            {{ $sessionState := (printf "sessionstate-%v" $user.UserSessionState) }}
-            <button type="submit" name="userID" value="{{$user.UserID}}" class="clean user-selection">
-                <div>
-                    <div class="profile-image"></div>
-                    <div class="sessionstate {{$sessionState}}"></div>
-                </div>
-                <div class="names">
-                    <div class="displayname">{{$user.DisplayName}}</div>
-                    <div class="loginname">{{$user.LoginName}}</div>
-                </div>
-            </button>
-            {{ end }}
-        </div>
+        {{ range $user := .Users }}
+        {{ $sessionState := (printf "sessionstate-%v" $user.UserSessionState) }}
+        <button type="submit" name="userID" value="{{$user.UserID}}" class="lgn-account">
+            <div class="lgn-avatar">
+                <span>A</span>
+            </div>
+            <div class="lgn-names">
+                <p class="lgn-displayname">{{$user.DisplayName}}</p>
+                <p class="lgn-loginname">{{$user.LoginName}}</p>
+                <!-- <div class="sessionstate {{$sessionState}}"></div> -->
+            </div>
+            <span class="fill-space"></span>
+            <i class="las la-angle-right"></i>
+        </button>
         {{ end }}
-        <button type="submit" name="userID" value="0" class="clean other-user">
-            <div class="other-user-image"></div>
-            <div>{{t "UserSelection.OtherUser"}}</div>
+        {{ end }}
+        <button type="submit" name="userID" value="0" class="lgn-account">
+            <div class="lgn-avatar">
+                <i class="las la-user-plus"></i>
+            </div>
+            <div class="lgn-names">
+                <p class="lgn-displayname">{{t "UserSelection.OtherUser"}}</p>
+            </div>
+            <span class="fill-space"></span>
+            <i class="las la-angle-right"></i>
         </button>
     </div>
 </form>
