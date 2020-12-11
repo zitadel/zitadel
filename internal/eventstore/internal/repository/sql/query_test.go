@@ -427,7 +427,7 @@ func Test_buildQuery(t *testing.T) {
 		{
 			name: "with order by desc",
 			args: args{
-				queryFactory: es_models.NewSearchQueryFactory("user").OrderDesc(),
+				queryFactory: es_models.NewSearchQueryFactory("user").OrderDesc().IsPrecondition(),
 			},
 			res: res{
 				query:      "SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC",
@@ -438,7 +438,7 @@ func Test_buildQuery(t *testing.T) {
 		{
 			name: "with limit",
 			args: args{
-				queryFactory: es_models.NewSearchQueryFactory("user").Limit(5),
+				queryFactory: es_models.NewSearchQueryFactory("user").Limit(5).IsPrecondition(),
 			},
 			res: res{
 				query:      "SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence LIMIT $2",
@@ -450,7 +450,7 @@ func Test_buildQuery(t *testing.T) {
 		{
 			name: "with limit and order by desc",
 			args: args{
-				queryFactory: es_models.NewSearchQueryFactory("user").Limit(5).OrderDesc(),
+				queryFactory: es_models.NewSearchQueryFactory("user").Limit(5).OrderDesc().IsPrecondition(),
 			},
 			res: res{
 				query:      "SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC LIMIT $2",

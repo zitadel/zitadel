@@ -119,7 +119,7 @@ func TestSQL_Filter(t *testing.T) {
 			sql := &SQL{
 				client: tt.fields.client.sqlClient,
 			}
-			events, err := sql.Filter(context.Background(), tt.args.searchQuery)
+			events, err := sql.Filter(context.Background(), tt.args.searchQuery.IsPrecondition())
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("SQL.Filter() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
@@ -171,7 +171,7 @@ func TestSQL_LatestSequence(t *testing.T) {
 		{
 			name: "no events for aggregate",
 			args: args{
-				searchQuery: es_models.NewSearchQueryFactory("idiot").Columns(es_models.Columns_Max_Sequence),
+				searchQuery: es_models.NewSearchQueryFactory("idiot").Columns(es_models.Columns_Max_Sequence).IsPrecondition(),
 			},
 			fields: fields{
 				client: mockDB(t).expectLatestSequenceFilterError("idiot", sql.ErrNoRows),
@@ -184,7 +184,7 @@ func TestSQL_LatestSequence(t *testing.T) {
 		{
 			name: "sql query error",
 			args: args{
-				searchQuery: es_models.NewSearchQueryFactory("idiot").Columns(es_models.Columns_Max_Sequence),
+				searchQuery: es_models.NewSearchQueryFactory("idiot").Columns(es_models.Columns_Max_Sequence).IsPrecondition(),
 			},
 			fields: fields{
 				client: mockDB(t).expectLatestSequenceFilterError("idiot", sql.ErrConnDone),
@@ -198,7 +198,7 @@ func TestSQL_LatestSequence(t *testing.T) {
 		{
 			name: "events for aggregate found",
 			args: args{
-				searchQuery: es_models.NewSearchQueryFactory("user").Columns(es_models.Columns_Max_Sequence),
+				searchQuery: es_models.NewSearchQueryFactory("user").Columns(es_models.Columns_Max_Sequence).IsPrecondition(),
 			},
 			fields: fields{
 				client: mockDB(t).expectLatestSequenceFilter("user", math.MaxUint64),
