@@ -28,6 +28,20 @@ const (
 		", aggregate_id" +
 		", aggregate_version" +
 		" FROM eventstore.events"
+	selectWithSystemTimeStmt = "SELECT" +
+		" creation_date" +
+		", event_type" +
+		", event_sequence" +
+		", previous_sequence" +
+		", event_data" +
+		", editor_service" +
+		", editor_user" +
+		", resource_owner" +
+		", aggregate_type" +
+		", aggregate_id" +
+		", aggregate_version" +
+		" FROM eventstore.events" +
+		" AS OF SYSTEM TIME '-50ms'"
 )
 
 func buildQuery(queryFactory *models.SearchQueryFactory) (query string, limit uint64, values []interface{}, rowScanner func(s scan, dest interface{}) error) {
@@ -36,7 +50,7 @@ func buildQuery(queryFactory *models.SearchQueryFactory) (query string, limit ui
 		logging.Log("SQL-cshKu").WithError(err).Warn("search query factory invalid")
 		return "", 0, nil, nil
 	}
-	query, rowScanner = prepareColumns(searchQuery.Columns)
+	query, rowScanner = prepareColumns(searchQuery.Columns, searchQuery.IsPrecondition)
 	where, values := prepareCondition(searchQuery.Filters)
 	if where == "" || query == "" {
 		return "", 0, nil, nil
@@ -85,10 +99,14 @@ func prepareCondition(filters []*models.Filter) (clause string, values []interfa
 
 type scan func(dest ...interface{}) error
 
-func prepareColumns(columns models.Columns) (string, func(s scan, dest interface{}) error) {
+func prepareColumns(columns models.Columns, isPrecondition bool) (string, func(s scan, dest interface{}) error) {
 	switch columns {
 	case models.Columns_Max_Sequence:
-		return "SELECT MAX(event_sequence) FROM eventstore.events", func(row scan, dest interface{}) (err error) {
+		stmt := "SELECT MAX(event_sequence) FROM eventstore.events"
+		if !isPrecondition {
+			stmt = "SELECT MAX(event_sequence) FROM eventstore.events AS OF SYSTEM TIME '-50ms'"
+		}
+		return stmt, func(row scan, dest interface{}) (err error) {
 			sequence, ok := dest.(*Sequence)
 			if !ok {
 				return z_errors.ThrowInvalidArgument(nil, "SQL-NBjA9", "type must be sequence")
@@ -100,7 +118,11 @@ func prepareColumns(columns models.Columns) (string, func(s scan, dest interface
 			return z_errors.ThrowInternal(err, "SQL-bN5xg", "something went wrong")
 		}
 	case models.Columns_Event:
-		return selectStmt, func(row scan, dest interface{}) (err error) {
+		stmt := selectStmt
+		if !isPrecondition {
+			stmt = selectWithSystemTimeStmt
+		}
+		return stmt, func(row scan, dest interface{}) (err error) {
 			event, ok := dest.(*models.Event)
 			if !ok {
 				return z_errors.ThrowInvalidArgument(nil, "SQL-4GP6F", "type must be event")

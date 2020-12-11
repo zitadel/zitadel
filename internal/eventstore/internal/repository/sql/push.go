@@ -56,7 +56,7 @@ func precondtion(tx *sql.Tx, aggregate *models.Aggregate) error {
 	if aggregate.Precondition == nil {
 		return nil
 	}
-	events, err := filter(tx, models.FactoryFromSearchQuery(aggregate.Precondition.Query))
+	events, err := filter(tx, models.FactoryFromSearchQuery(aggregate.Precondition.Query).IsPrecondition())
 	if err != nil {
 		return caos_errs.ThrowPreconditionFailed(err, "SQL-oBPxB", "filter failed")
 	}

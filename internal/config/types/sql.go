@@ -59,7 +59,8 @@ func (s *SQL) connectionString() string {
 func (s *SQL) Start() (*sql.DB, error) {
 	s.checkSSL()
 	client, err := sql.Open("postgres", s.connectionString())
-	client.SetMaxOpenConns(5)
+	client.SetMaxOpenConns(3)
+	client.SetMaxIdleConns(3)
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(err, "TYPES-9qBtr", "unable to open database connection")
 	}

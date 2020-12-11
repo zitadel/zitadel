@@ -266,7 +266,7 @@ func Test_prepareColumns(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			query, rowScanner := prepareColumns(tt.args.columns)
+			query, rowScanner := prepareColumns(tt.args.columns, true)
 			if query != tt.res.query {
 				t.Errorf("prepareColumns() got = %v, want %v", query, tt.res.query)
 			}

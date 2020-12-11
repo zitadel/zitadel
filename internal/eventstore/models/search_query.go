@@ -14,13 +14,16 @@ type SearchQueryFactory struct {
 	eventSequence  uint64
 	eventTypes     []EventType
 	resourceOwner  string
+
+	isPrecondition bool
 }
 
 type searchQuery struct {
-	Columns Columns
-	Limit   uint64
-	Desc    bool
-	Filters []*Filter
+	Columns        Columns
+	Limit          uint64
+	Desc           bool
+	Filters        []*Filter
+	IsPrecondition bool
 }
 
 type Columns int32
@@ -116,6 +119,11 @@ func (factory *SearchQueryFactory) OrderAsc() *SearchQueryFactory {
 	return factory
 }
 
+func (factory *SearchQueryFactory) IsPrecondition() *SearchQueryFactory {
+	factory.isPrecondition = true
+	return factory
+}
+
 func (factory *SearchQueryFactory) Build() (*searchQuery, error) {
 	if factory == nil ||
 		len(factory.aggregateTypes) < 1 ||
@@ -138,10 +146,11 @@ func (factory *SearchQueryFactory) Build() (*searchQuery, error) {
 	}
 
 	return &searchQuery{
-		Columns: factory.columns,
-		Limit:   factory.limit,
-		Desc:    factory.desc,
-		Filters: filters,
+		Columns:        factory.columns,
+		Limit:          factory.limit,
+		Desc:           factory.desc,
+		Filters:        filters,
+		IsPrecondition: factory.isPrecondition,
 	}, nil
 }
 
