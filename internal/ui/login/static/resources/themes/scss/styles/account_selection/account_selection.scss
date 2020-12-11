@@ -12,6 +12,10 @@ $lgn-container-margin: 0px auto 50px auto;
         align-items: center;
         border: none;
 
+        .left {
+            padding: .5rem 1rem;
+        }
+
         .lgn-names {
             display: block;
             margin: .5rem; 
@@ -20,11 +24,13 @@ $lgn-container-margin: 0px auto 50px auto;
             .lgn-displayname{
                 font-size: 16px;
                 margin: .5rem 0;
+                margin-bottom: 0;
             }
 
             .lgn-loginname{
                 font-size: 14px;
                 margin: .5rem 0;
+                margin-top: 0;
             }
         }
 

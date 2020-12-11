@@ -329,6 +329,9 @@ i {
   align-items: center;
   border: none;
 }
+.lgn-account-selection .lgn-account .left {
+  padding: 0.5rem 1rem;
+}
 .lgn-account-selection .lgn-account .lgn-names {
   display: block;
   margin: 0.5rem;
@@ -337,16 +340,33 @@ i {
 .lgn-account-selection .lgn-account .lgn-names .lgn-displayname {
   font-size: 16px;
   margin: 0.5rem 0;
+  margin-bottom: 0;
 }
 .lgn-account-selection .lgn-account .lgn-names .lgn-loginname {
   font-size: 14px;
   margin: 0.5rem 0;
+  margin-top: 0;
 }
 .lgn-account-selection .lgn-account .fill-space {
   flex: 1;
 }
 .lgn-account-selection .lgn-account i {
   font-size: 1.2rem;
+}
+
+.lgn-avatar {
+  height: 32px;
+  width: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  box-sizing: border-box;
+  letter-spacing: 0.05em;
+  font-size: 14px;
+  outline: none;
+  font-weight: bold;
 }
 
 @font-face {
@@ -751,6 +771,9 @@ i {
   align-items: center;
   border: none;
 }
+.lgn-account-selection .lgn-account .left {
+  padding: 0.5rem 1rem;
+}
 .lgn-account-selection .lgn-account .lgn-names {
   display: block;
   margin: 0.5rem;
@@ -759,16 +782,33 @@ i {
 .lgn-account-selection .lgn-account .lgn-names .lgn-displayname {
   font-size: 16px;
   margin: 0.5rem 0;
+  margin-bottom: 0;
 }
 .lgn-account-selection .lgn-account .lgn-names .lgn-loginname {
   font-size: 14px;
   margin: 0.5rem 0;
+  margin-top: 0;
 }
 .lgn-account-selection .lgn-account .fill-space {
   flex: 1;
 }
 .lgn-account-selection .lgn-account i {
   font-size: 1.2rem;
+}
+
+.lgn-avatar {
+  height: 32px;
+  width: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  box-sizing: border-box;
+  letter-spacing: 0.05em;
+  font-size: 14px;
+  outline: none;
+  font-weight: bold;
 }
 
 @font-face {
@@ -980,6 +1020,7 @@ i {
 
 .lgn-header {
   display: block;
+  position: relative;
   margin: 100px auto 0.5rem auto;
   max-width: 380px;
   padding: 0;
@@ -990,36 +1031,6 @@ i {
   display: block;
   margin: 0 auto;
   max-width: 160px;
-}
-.lgn-header img:after {
-  position: absolute;
-  content: "";
-  top: 5vw;
-  left: 0;
-  right: 0;
-  z-index: -1;
-  height: 100%;
-  width: 100%;
-  margin: 0 auto;
-  transform: scale(0.75);
-  -webkit-filter: blur(5vw);
-  -moz-filter: blur(5vw);
-  -ms-filter: blur(5vw);
-  filter: blur(5vw);
-  background: linear-gradient(270deg, #0fffc1, #7e0fff);
-  background-size: 200% 200%;
-  animation: animateGlow 10s ease infinite;
-}
-@keyframes animateGlow {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
 }
 
 /*# sourceMappingURL=bundle.css.map */

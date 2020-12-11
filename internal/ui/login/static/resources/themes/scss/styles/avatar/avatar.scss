@@ -1,0 +1,18 @@
+$lgn-container-max-width: 380px;
+$lgn-container-padding: 20px;
+$lgn-avatar-size: 32px;
+
+.lgn-avatar {
+    height: $lgn-avatar-size;
+    width: $lgn-avatar-size;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    box-sizing: border-box;
+    letter-spacing: .05em;
+    font-size: 14px;
+    outline: none;
+    font-weight: bold;
+  }

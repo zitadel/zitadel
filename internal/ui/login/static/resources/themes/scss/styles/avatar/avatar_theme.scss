@@ -1,0 +1,24 @@
+@import './avatar.scss';
+
+@mixin lgn-avatar-theme($theme-or-color-config) {
+    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
+    $color: lgn-get-color-config($theme);
+
+    @if $color != null {
+    @include lgn-avatar-color($color);
+    }
+}
+
+@mixin lgn-avatar-color($config-or-theme) {
+    $config: lgn-get-color-config($config-or-theme);
+    $warn: map-get($config, warn);
+    $primary: map-get($config, primary);
+
+    .lgn-avatar:not(.transparent) {
+        background-color: lgn-color($primary, default); // default color -> gets overwritten by script using the initial letters of the name
+    }
+
+    .lgn-avatar {
+        color: white;
+    }
+}

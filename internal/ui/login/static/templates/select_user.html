@@ -22,8 +22,10 @@
         {{ range $user := .Users }}
         {{ $sessionState := (printf "sessionstate-%v" $user.UserSessionState) }}
         <button type="submit" name="userID" value="{{$user.UserID}}" class="lgn-account">
-            <div class="lgn-avatar">
-                <span>A</span>
+            <div class="left">
+                <div class="lgn-avatar">
+                    <span>A</span>
+                </div>
             </div>
             <div class="lgn-names">
                 <p class="lgn-displayname">{{$user.DisplayName}}</p>
@@ -36,11 +38,13 @@
         {{ end }}
         {{ end }}
         <button type="submit" name="userID" value="0" class="lgn-account">
-            <div class="lgn-avatar">
-                <i class="las la-user-plus"></i>
+            <div class="left">
+                <div class="lgn-avatar transparent">
+                    <i class="las la-user-plus"></i>
+                </div>
             </div>
             <div class="lgn-names">
-                <p class="lgn-displayname">{{t "UserSelection.OtherUser"}}</p>
+                <p>{{t "UserSelection.OtherUser"}}</p>
             </div>
             <span class="fill-space"></span>
             <i class="las la-angle-right"></i>
