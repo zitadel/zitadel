@@ -2,33 +2,33 @@ package org
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/repository/policy"
+	"github.com/caos/zitadel/internal/v2/repository/policy/login"
 )
 
 var (
-	LoginPolicyAddedEventType   = orgEventTypePrefix + policy.LoginPolicyAddedEventType
-	LoginPolicyChangedEventType = orgEventTypePrefix + policy.LoginPolicyChangedEventType
+	LoginPolicyAddedEventType   = orgEventTypePrefix + login.LoginPolicyAddedEventType
+	LoginPolicyChangedEventType = orgEventTypePrefix + login.LoginPolicyChangedEventType
 )
 
-type LoginPolicyReadModel struct{ policy.LoginPolicyReadModel }
+type LoginPolicyReadModel struct{ login.ReadModel }
 
 func (rm *LoginPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *LoginPolicyAddedEvent:
-			rm.ReadModel.AppendEvents(&e.LoginPolicyAddedEvent)
+			rm.ReadModel.AppendEvents(&e.AddedEvent)
 		case *LoginPolicyChangedEvent:
-			rm.ReadModel.AppendEvents(&e.LoginPolicyChangedEvent)
-		case *policy.LoginPolicyAddedEvent, *policy.LoginPolicyChangedEvent:
+			rm.ReadModel.AppendEvents(&e.ChangedEvent)
+		case *login.AddedEvent, *login.ChangedEvent:
 			rm.ReadModel.AppendEvents(e)
 		}
 	}
 }
 
 type LoginPolicyAddedEvent struct {
-	policy.LoginPolicyAddedEvent
+	login.AddedEvent
 }
 
 type LoginPolicyChangedEvent struct {
-	policy.LoginPolicyChangedEvent
+	login.ChangedEvent
 }

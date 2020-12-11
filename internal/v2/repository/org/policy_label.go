@@ -2,45 +2,45 @@ package org
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/repository/policy"
+	"github.com/caos/zitadel/internal/v2/repository/policy/label"
 )
 
 var (
-	LabelPolicyAddedEventType   = orgEventTypePrefix + policy.LabelPolicyAddedEventType
-	LabelPolicyChangedEventType = orgEventTypePrefix + policy.LabelPolicyChangedEventType
+	LabelPolicyAddedEventType   = orgEventTypePrefix + label.LabelPolicyAddedEventType
+	LabelPolicyChangedEventType = orgEventTypePrefix + label.LabelPolicyChangedEventType
 )
 
-type LabelPolicyReadModel struct{ policy.LabelPolicyReadModel }
+type LabelPolicyReadModel struct{ label.ReadModel }
 
 func (rm *LabelPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *LabelPolicyAddedEvent:
-			rm.ReadModel.AppendEvents(&e.LabelPolicyAddedEvent)
+			rm.ReadModel.AppendEvents(&e.AddedEvent)
 		case *LabelPolicyChangedEvent:
-			rm.ReadModel.AppendEvents(&e.LabelPolicyChangedEvent)
-		case *policy.LabelPolicyAddedEvent, *policy.LabelPolicyChangedEvent:
+			rm.ReadModel.AppendEvents(&e.ChangedEvent)
+		case *label.AddedEvent, *label.ChangedEvent:
 			rm.ReadModel.AppendEvents(e)
 		}
 	}
 }
 
 type LabelPolicyAddedEvent struct {
-	policy.LabelPolicyAddedEvent
+	label.AddedEvent
 }
 
 type LabelPolicyChangedEvent struct {
-	policy.LabelPolicyChangedEvent
+	label.ChangedEvent
 }
 
-// func NewLabelPolicyAddedEvent(
+// func NewAddedEvent(
 // 	ctx context.Context,
 // 	primaryColor,
 // 	secondaryColor string,
-// ) *LabelPolicyAddedEvent {
+// ) *AddedEvent {
 
-// 	return &LabelPolicyAddedEvent{
-// 		LabelPolicyAddedEvent: *policy.NewLabelPolicyAddedEvent(
+// 	return &AddedEvent{
+// 		AddedEvent: *policy.NewAddedEvent(
 // 			ctx,
 // 			primaryColor,
 // 			secondaryColor,
@@ -48,14 +48,14 @@ type LabelPolicyChangedEvent struct {
 // 	}
 // }
 
-// func NewLabelPolicyChangedEvent(
+// func NewChangedEvent(
 // 	ctx context.Context,
 // 	primaryColor,
 // 	secondaryColor string,
 // ) *MemberChangedEvent {
 
-// 	return &LabelPolicyChangedEvent{
-// 		LabelPolicyChangedEvent: *policy.NewLabelPolicyChangedEvent(
+// 	return &ChangedEvent{
+// 		ChangedEvent: *policy.NewChangedEvent(
 // 			ctx,
 // 			primaryColor,
 // 			secondaryColor,

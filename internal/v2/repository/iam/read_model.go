@@ -2,8 +2,19 @@ package iam
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	iam_label "github.com/caos/zitadel/internal/v2/repository/iam/policy/label"
+	iam_login "github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
+	iam_org_iam "github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
+	iam_password_age "github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
+	iam_password_complexity "github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
+	iam_password_lockout "github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 	"github.com/caos/zitadel/internal/v2/repository/member"
-	"github.com/caos/zitadel/internal/v2/repository/policy"
+	"github.com/caos/zitadel/internal/v2/repository/policy/label"
+	"github.com/caos/zitadel/internal/v2/repository/policy/login"
+	"github.com/caos/zitadel/internal/v2/repository/policy/org_iam"
+	"github.com/caos/zitadel/internal/v2/repository/policy/password_age"
+	"github.com/caos/zitadel/internal/v2/repository/policy/password_complexity"
+	"github.com/caos/zitadel/internal/v2/repository/policy/password_lockout"
 )
 
 type ReadModel struct {
@@ -18,12 +29,12 @@ type ReadModel struct {
 	GlobalOrgID string
 	ProjectID   string
 
-	DefaultLoginPolicy              LoginPolicyReadModel
-	DefaultLabelPolicy              LabelPolicyReadModel
-	DefaultOrgIAMPolicy             OrgIAMPolicyReadModel
-	DefaultPasswordComplexityPolicy PasswordComplexityPolicyReadModel
-	DefaultPasswordAgePolicy        PasswordAgePolicyReadModel
-	DefaultPasswordLockoutPolicy    PasswordLockoutPolicyReadModel
+	DefaultLoginPolicy              iam_login.ReadModel
+	DefaultLabelPolicy              iam_label.ReadModel
+	DefaultOrgIAMPolicy             iam_org_iam.ReadModel
+	DefaultPasswordComplexityPolicy iam_password_complexity.ReadModel
+	DefaultPasswordAgePolicy        iam_password_age.ReadModel
+	DefaultPasswordLockoutPolicy    iam_password_lockout.ReadModel
 }
 
 func NewReadModel(id string) *ReadModel {
@@ -60,26 +71,26 @@ func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 			*IDPOIDCConfigChangedEvent:
 
 			rm.IDPs.AppendEvents(event)
-		case *policy.LabelPolicyAddedEvent,
-			*policy.LabelPolicyChangedEvent:
+		case *label.AddedEvent,
+			*label.ChangedEvent:
 
 			rm.DefaultLabelPolicy.AppendEvents(event)
-		case *policy.LoginPolicyAddedEvent,
-			*policy.LoginPolicyChangedEvent:
+		case *login.AddedEvent,
+			*login.ChangedEvent:
 
 			rm.DefaultLoginPolicy.AppendEvents(event)
-		case *policy.OrgIAMPolicyAddedEvent:
+		case *org_iam.AddedEvent:
 			rm.DefaultOrgIAMPolicy.AppendEvents(event)
-		case *policy.PasswordComplexityPolicyAddedEvent,
-			*policy.PasswordComplexityPolicyChangedEvent:
+		case *password_complexity.AddedEvent,
+			*password_complexity.ChangedEvent:
 
 			rm.DefaultPasswordComplexityPolicy.AppendEvents(event)
-		case *policy.PasswordAgePolicyAddedEvent,
-			*policy.PasswordAgePolicyChangedEvent:
+		case *password_age.AddedEvent,
+			*password_age.ChangedEvent:
 
 			rm.DefaultPasswordAgePolicy.AppendEvents(event)
-		case *policy.PasswordLockoutPolicyAddedEvent,
-			*policy.PasswordLockoutPolicyChangedEvent:
+		case *password_lockout.AddedEvent,
+			*password_lockout.ChangedEvent:
 
 			rm.DefaultPasswordLockoutPolicy.AppendEvents(event)
 		}

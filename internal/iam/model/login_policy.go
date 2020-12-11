@@ -22,7 +22,7 @@ type LoginPolicy struct {
 type IDPProvider struct {
 	models.ObjectRoot
 	Type        IDPProviderType
-	IdpConfigID string
+	IDPConfigID string
 }
 
 type PolicyState int32
@@ -66,12 +66,12 @@ func (p *LoginPolicy) IsValid() bool {
 }
 
 func (p *IDPProvider) IsValid() bool {
-	return p.ObjectRoot.AggregateID != "" && p.IdpConfigID != ""
+	return p.ObjectRoot.AggregateID != "" && p.IDPConfigID != ""
 }
 
 func (p *LoginPolicy) GetIdpProvider(id string) (int, *IDPProvider) {
 	for i, m := range p.IDPProviders {
-		if m.IdpConfigID == id {
+		if m.IDPConfigID == id {
 			return i, m
 		}
 	}

@@ -1494,12 +1494,12 @@ func TestAddIdpProviderToLoginPolicy(t *testing.T) {
 				ctx: authz.NewMockContext("orgID", "userID"),
 				provider: &iam_model.IDPProvider{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-					IdpConfigID: "IdpConfigID2",
+					IDPConfigID: "IdpConfigID2",
 					Type:        iam_model.IDPProviderTypeSystem,
 				},
 			},
 			res: res{
-				result: &iam_model.IDPProvider{IdpConfigID: "IdpConfigID2"},
+				result: &iam_model.IDPProvider{IDPConfigID: "IdpConfigID2"},
 			},
 		},
 		{
@@ -1509,7 +1509,7 @@ func TestAddIdpProviderToLoginPolicy(t *testing.T) {
 				ctx: authz.NewMockContext("orgID", "userID"),
 				provider: &iam_model.IDPProvider{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-					IdpConfigID: "IDPConfigID",
+					IDPConfigID: "IDPConfigID",
 					Type:        iam_model.IDPProviderTypeSystem,
 				},
 			},
@@ -1539,7 +1539,7 @@ func TestAddIdpProviderToLoginPolicy(t *testing.T) {
 				ctx: authz.NewMockContext("orgID", "userID"),
 				provider: &iam_model.IDPProvider{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-					IdpConfigID: "IdpConfigID2",
+					IDPConfigID: "IdpConfigID2",
 				},
 			},
 			res: res{
@@ -1558,8 +1558,8 @@ func TestAddIdpProviderToLoginPolicy(t *testing.T) {
 			if tt.res.wantErr && tt.res.errFunc(err) {
 				return
 			}
-			if result.IdpConfigID != tt.res.result.IdpConfigID {
-				t.Errorf("got wrong result IDPConfigID: expected: %v, actual: %v ", tt.res.result.IdpConfigID, result.IdpConfigID)
+			if result.IDPConfigID != tt.res.result.IDPConfigID {
+				t.Errorf("got wrong result IDPConfigID: expected: %v, actual: %v ", tt.res.result.IDPConfigID, result.IDPConfigID)
 			}
 			if result.Type != tt.res.result.Type {
 				t.Errorf("got wrong result Type: expected: %v, actual: %v ", tt.res.result.Type, result.Type)
@@ -1591,7 +1591,7 @@ func TestRemoveIdpProviderFromLoginPolicy(t *testing.T) {
 				ctx: authz.NewMockContext("orgID", "userID"),
 				provider: &iam_model.IDPProvider{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-					IdpConfigID: "IDPConfigID",
+					IDPConfigID: "IDPConfigID",
 					Type:        iam_model.IDPProviderTypeSystem,
 				},
 			},
@@ -1604,7 +1604,7 @@ func TestRemoveIdpProviderFromLoginPolicy(t *testing.T) {
 				ctx: authz.NewMockContext("orgID", "userID"),
 				provider: &iam_model.IDPProvider{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-					IdpConfigID: "IdpConfigID2",
+					IDPConfigID: "IdpConfigID2",
 					Type:        iam_model.IDPProviderTypeSystem,
 				},
 			},
@@ -1634,7 +1634,7 @@ func TestRemoveIdpProviderFromLoginPolicy(t *testing.T) {
 				ctx: authz.NewMockContext("orgID", "userID"),
 				provider: &iam_model.IDPProvider{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-					IdpConfigID: "IdpConfigID2",
+					IDPConfigID: "IdpConfigID2",
 				},
 			},
 			res: res{

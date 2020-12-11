@@ -2,26 +2,26 @@ package org
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/repository/policy"
+	"github.com/caos/zitadel/internal/v2/repository/policy/org_iam"
 )
 
 var (
-	OrgIAMPolicyAddedEventType = orgEventTypePrefix + policy.OrgIAMPolicyAddedEventType
+	OrgIAMPolicyAddedEventType = orgEventTypePrefix + org_iam.OrgIAMPolicyAddedEventType
 )
 
-type OrgIAMPolicyReadModel struct{ policy.OrgIAMPolicyReadModel }
+type OrgIAMPolicyReadModel struct{ org_iam.ReadModel }
 
 func (rm *OrgIAMPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *OrgIAMPolicyAddedEvent:
-			rm.ReadModel.AppendEvents(&e.OrgIAMPolicyAddedEvent)
-		case *policy.OrgIAMPolicyAddedEvent:
+			rm.ReadModel.AppendEvents(&e.AddedEvent)
+		case *org_iam.AddedEvent:
 			rm.ReadModel.AppendEvents(e)
 		}
 	}
 }
 
 type OrgIAMPolicyAddedEvent struct {
-	policy.OrgIAMPolicyAddedEvent
+	org_iam.AddedEvent
 }

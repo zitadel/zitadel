@@ -71,14 +71,14 @@ func idpProviderSearchResponseFromModel(response *iam_model.IDPProviderSearchRes
 
 func idpProviderToModel(provider *admin.IdpProviderID) *iam_model.IDPProvider {
 	return &iam_model.IDPProvider{
-		IdpConfigID: provider.IdpConfigId,
+		IDPConfigID: provider.IdpConfigId,
 		Type:        iam_model.IDPProviderTypeSystem,
 	}
 }
 
 func idpProviderFromModel(provider *iam_model.IDPProvider) *admin.IdpProviderID {
 	return &admin.IdpProviderID{
-		IdpConfigId: provider.IdpConfigID,
+		IdpConfigId: provider.IDPConfigID,
 	}
 }
 
