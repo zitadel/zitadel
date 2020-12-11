@@ -14,9 +14,11 @@
 @mixin lgn-footer-color($config-or-theme) {
     $config: lgn-get-color-config($config-or-theme);
     $background: map-get($config, background);
+    $foreground: map-get($config, foreground);
   
     footer {
       background-color: lgn-color($background, footer);
+      border-top: 1px solid lgn-color($foreground, footer-line);
 
       a {
         color: lgn-color($background, footer-links);

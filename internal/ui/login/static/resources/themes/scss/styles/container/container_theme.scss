@@ -14,6 +14,7 @@
 @mixin lgn-container-color($config-or-theme) {
     $config: lgn-get-color-config($config-or-theme);
     $warn: map-get($config, warn);
+    $primary: map-get($config, primary);
   
     .lgn-error {
         .lgn-error-message {
@@ -25,6 +26,20 @@
         .lgn-names {
             $foreground: map-get($config, foreground);
             border-color: lgn-color($foreground, divider);
+        }
+    }
+
+    ul li::before {
+        color: lgn-color($primary, default);
+    }
+
+    ul li i {
+        &.lgn-warn {
+            color: lgn-color($warn, default);
+        }
+
+        &.lgn-valid {
+            color: #85d996;
         }
     }
 }

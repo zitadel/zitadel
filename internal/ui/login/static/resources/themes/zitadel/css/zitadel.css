@@ -1,3 +1,4 @@
+@charset "UTF-8";
 footer {
   position: fixed;
   bottom: 0;
@@ -293,6 +294,25 @@ a {
   position: absolute;
   left: 1rem;
   top: calc(-48px);
+}
+.content-container ul li {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 10px 0;
+  font-style: italic;
+}
+.content-container ul li i {
+  margin-right: 1rem;
+  font-size: 20px;
+}
+.content-container ul li::before {
+  content: "•";
+  font-weight: bold;
+  display: inline-block;
+  width: 20px;
+  margin-left: -20px;
+  font-style: normal;
 }
 
 i {
@@ -633,6 +653,7 @@ input[type=radio]:disabled:focus {
 
 footer {
   background-color: #212224;
+  border-top: 1px solid #303131;
 }
 a {
   color: #5282c1;
@@ -661,6 +682,17 @@ a:hover, a:active {
 
 .lgn-login-profile .lgn-names {
   border-color: rgba(255, 255, 255, 0.12);
+}
+
+ul li::before {
+  color: #5282c1;
+}
+
+ul li i.lgn-warn {
+  color: #f44336;
+}
+ul li i.lgn-valid {
+  color: #85d996;
 }
 
 .lgn-dark-theme .lgn-app-background, .lgn-dark-theme.lgn-app-background {
@@ -830,6 +862,7 @@ a:hover, a:active {
 }
 .lgn-dark-theme footer {
   background-color: #212224;
+  border-top: 1px solid #303131;
 }
 .lgn-dark-theme a {
   color: #5282c1;
@@ -854,6 +887,15 @@ a:hover, a:active {
 }
 .lgn-dark-theme .lgn-login-profile .lgn-names {
   border-color: rgba(255, 255, 255, 0.12);
+}
+.lgn-dark-theme ul li::before {
+  color: #5282c1;
+}
+.lgn-dark-theme ul li i.lgn-warn {
+  color: #f44336;
+}
+.lgn-dark-theme ul li i.lgn-valid {
+  color: #85d996;
 }
 
 .lgn-light-theme .lgn-app-background, .lgn-light-theme.lgn-app-background {
@@ -1023,6 +1065,7 @@ a:hover, a:active {
 }
 .lgn-light-theme footer {
   background-color: #fafafa;
+  border-top: 1px solid #e3e8ee;
 }
 .lgn-light-theme a {
   color: #5469d4;
@@ -1047,6 +1090,15 @@ a:hover, a:active {
 }
 .lgn-light-theme .lgn-login-profile .lgn-names {
   border-color: rgba(0, 0, 0, 0.12);
+}
+.lgn-light-theme ul li::before {
+  color: #5469d4;
+}
+.lgn-light-theme ul li i.lgn-warn {
+  color: #f44336;
+}
+.lgn-light-theme ul li i.lgn-valid {
+  color: #85d996;
 }
 
 /*# sourceMappingURL=zitadel.css.map */

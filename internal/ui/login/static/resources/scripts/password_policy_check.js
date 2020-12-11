@@ -7,7 +7,7 @@ function ComplexityPolicyCheck(policyElement, pwNew) {
 
     let valid = true;
 
-    let minlengthelem = document.getElementById('minlength')
+    let minlengthelem = document.getElementById('minlength');
     if (pwNew.length >= minLength) {
         ValidPolicy(minlengthelem);
         valid = true;
@@ -15,7 +15,7 @@ function ComplexityPolicyCheck(policyElement, pwNew) {
         InvalidPolicy(minlengthelem);
         valid = false;
     }
-    let upper = document.getElementById('uppercase')
+    let upper = document.getElementById('uppercase');
     if (upperRegex !== "") {
         if (RegExp(upperRegex).test(pwNew)) {
             ValidPolicy(upper);
@@ -25,7 +25,7 @@ function ComplexityPolicyCheck(policyElement, pwNew) {
             valid = false;
         }
     }
-    let lower = document.getElementById('lowercase')
+    let lower = document.getElementById('lowercase');
     if (lowerRegex !== "") {
         if (RegExp(lowerRegex).test(pwNew)) {
             ValidPolicy(lower);
@@ -35,20 +35,20 @@ function ComplexityPolicyCheck(policyElement, pwNew) {
             valid = false;
         }
     }
-    let number = document.getElementById('number')
+    let number = document.getElementById('number');
     if (numberRegex != "") {
-       if (RegExp(numberRegex).test(pwNew)) {
-           ValidPolicy(number);
-           valid = true;
+        if (RegExp(numberRegex).test(pwNew)) {
+            ValidPolicy(number);
+            valid = true;
         } else {
-           InvalidPolicy(number);
-           valid = false;
+            InvalidPolicy(number);
+            valid = false;
         }
     }
-    let symbol = document.getElementById('symbol')
+    let symbol = document.getElementById('symbol');
     if (symbolRegex != "") {
         if (RegExp(symbolRegex).test(pwNew)) {
-            ValidPolicy(symbol)
+            ValidPolicy(symbol);
             valid = true;
         } else {
             InvalidPolicy(symbol);
@@ -58,11 +58,22 @@ function ComplexityPolicyCheck(policyElement, pwNew) {
     return valid;
 }
 function ValidPolicy(element) {
-    element.classList.remove('invalid')
-    element.getElementsByTagName('i')[0].innerText = 'check';
+    element.classList.remove('invalid');
+    document.getElementById('change-new-password').setAttribute("color", "primary");
+    element.getElementsByTagName('i')[0].classList.remove('la-times');
+    element.getElementsByTagName('i')[0].classList.remove('lgn-warn');
+    element.getElementsByTagName('i')[0].classList.add('la-check');
+    element.getElementsByTagName('i')[0].classList.add('lgn-valid');
+
+    // element.getElementsByTagName('i')[0].innerText = 'check';
 }
 
 function InvalidPolicy(element) {
-    element.classList.add('invalid')
-    element.getElementsByTagName('i')[0].innerText = 'clear';
+    element.classList.add('invalid');
+    document.getElementById('change-new-password').setAttribute("color", "warn");
+    element.getElementsByTagName('i')[0].classList.remove('lgn-valid');
+    element.getElementsByTagName('i')[0].classList.remove('la-check');
+    element.getElementsByTagName('i')[0].classList.add('lgn-warn');
+    element.getElementsByTagName('i')[0].classList.add('la-times');
+    // element.getElementsByTagName('i')[0].innerText = 'clear';
 }

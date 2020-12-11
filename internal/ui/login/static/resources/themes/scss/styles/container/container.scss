@@ -52,6 +52,31 @@ $lgn-container-margin: 0px auto 50px auto;
         left: 1rem;
         top: calc(-48px);
     }
+
+    ul li {
+        display: flex;
+        align-items: center;
+        list-style: none;
+        margin: 10px 0;
+        font-style: italic;
+
+        i {
+            margin-right: 1rem;
+            font-size: 20px;
+        }
+    }
+
+
+
+    ul li::before {
+        content: "\2022";
+        // color: var(--accent);
+        font-weight: bold;
+        display: inline-block;
+        width: 20px;
+        margin-left: -20px;
+        font-style: normal;
+    }
 }
 
 i {

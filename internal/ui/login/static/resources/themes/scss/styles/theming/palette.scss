@@ -226,6 +226,7 @@ $lgn-warn: (
 
   $lgn-light-theme-foreground: (
     footer-links:      map-get($lgn-light-brand, 500),
+    footer-line:     #e3e8ee,
     base:              black,
     input-border:      $light-input-border,
     radio-border:      $light-input-border,
@@ -251,7 +252,8 @@ $lgn-warn: (
   
   $lgn-dark-theme-foreground: (
     footer-links:      map-get($lgn-grey, 500),
-    base:              white,
+    footer-line:     #303131,
+    base:            white,
     input-border:      $dark-input-border,
     radio-border: $dark-input-border,
     input-border-hover: $dark-input-border-hover,
