@@ -1,8 +1,9 @@
-$lgn-container-max-width: 350px;
+$lgn-container-max-width: 380px;
 $lgn-container-padding: 20px;
 $lgn-container-margin: 0px auto 50px auto;
 
 .content-container {
+    position: relative; // used to position a button element relative to the left upper corner of the content wrapper
     display: block;
     margin: $lgn-container-margin;
     max-width: $lgn-container-max-width;
@@ -44,6 +45,12 @@ $lgn-container-margin: 0px auto 50px auto;
                 }
             }
         }
+    }
+
+    .lgn-left-action {
+        position: absolute;
+        left: 1rem;
+        top: calc(-48px);
     }
 }
 

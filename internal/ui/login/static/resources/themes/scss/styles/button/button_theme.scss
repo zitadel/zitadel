@@ -4,13 +4,11 @@
 
 @mixin lgn-button-theme($theme-or-color-config) {
   $theme: lgn-private-legacy-get-theme($theme-or-color-config);
-  // @include lgn-private-check-duplicate-theme-styles($theme, 'mat-button') {
   $color: lgn-get-color-config($theme);
 
   @if $color != null {
     @include lgn-button-color($color);
   }
-  // }
 }
 
 @mixin lgn-button-color($config-or-theme) {
@@ -22,25 +20,19 @@
   $foreground: map-get($config, foreground);
 
   .lgn-button,
-  .lgn-stroked-button {
-    // Buttons without a background color should inherit the font color. This is necessary to
-    // ensure that the button is readable on custom background colors. It's wrong to always assume
-    // that those buttons are always placed inside of containers with the default background
-    // color of the theme (e.g. themed toolbars).
+  .lgn-stroked-button,
+  .lgn-icon-button {
     color: inherit;
     background: transparent;
 
     @include _lgn-button-theme-property($config, "color", text);
-    //   @include _lgn-button-focus-overlay-color($config);
   }
 
   .lgn-button:focus,
   .lgn-stroked-button:focus {
-    background: map-get($foreground, base);
+    background: map-get($background, base);
   }
 
-  // Note: this needs a bit extra specificity, because we're not guaranteed the inclusion
-  // order of the theme styles and the button reset may end up resetting this as well.
   .lgn-stroked-button:not([disabled]) {
     border-color: lgn-color($foreground, divider);
   }
@@ -149,3 +141,14 @@
 
   @include lgn-elevation($zValue, $elevation-color-or-default, $opacity);
 }
+
+@mixin lgn-button-typography($config-or-theme) {
+    $config: lgn-get-typography-config($config-or-theme);
+    .lgn-button, .lgn-raised-button, .lgn-icon-button, .lgn-stroked-button {
+      font: {
+        family: lgn-font-family($config, button);
+        size: lgn-font-size($config, button);
+        weight: lgn-font-weight($config, button);
+      }
+    }
+  }

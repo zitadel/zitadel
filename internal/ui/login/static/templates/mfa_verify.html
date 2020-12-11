@@ -21,8 +21,10 @@
     {{ template "error-message" .}}
 
     <div class="lgn-actions">
-        <a class="lgn-button" href="{{ loginUrl }}">
-            {{t "Actions.Cancel"}}
+        <!-- position element in header -->
+        <a class="lgn-icon-button lgn-left-action" href="{{ loginUrl }}">
+            <!-- {{t "Actions.Cancel"}} -->
+            <i class="las la-arrow-left"></i>
         </a>
         <span class="fill-space"></span>
         <button class="lgn-raised-button lgn-primary" id="submit-button" type="submit">{{t "Actions.Next"}}</button>

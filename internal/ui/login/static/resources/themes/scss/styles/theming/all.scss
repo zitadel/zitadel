@@ -5,6 +5,7 @@
 @import '../label/label_theme.scss';
 @import '../radio/radio_theme.scss';
 @import '../a/a_theme.scss';
+@import '../error/error_theme.scss';
 @import '../qrcode/qrcode_theme.scss';
 @import '../container/container_theme.scss';
 @import '../typography/typography.scss';
@@ -18,6 +19,7 @@
     @include lgn-label-theme($theme-or-color-config);
     @include lgn-footer-theme($theme-or-color-config);
     @include lgn-a-theme($theme-or-color-config);
+    @include lgn-error-theme($theme-or-color-config);
     @include lgn-qrcode-theme($theme-or-color-config);
     @include lgn-container-theme($theme-or-color-config);
 }

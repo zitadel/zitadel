@@ -1,11 +1,25 @@
 @import './button_base.scss';
 
-.lgn-button, .lgn-stroked-button {
+.lgn-button, .lgn-stroked-button, .lgn-icon-button {
   @include lgn-button-base;
 }
 
 .lgn-raised-button {
   @include lgn-raised-button;
+}
+
+.lgn-icon-button {
+  padding: 0;
+  min-width: 0;
+  width: $lgn-icon-button-size;
+  height: $lgn-icon-button-size;
+  flex-shrink: 0;
+  line-height: $lgn-icon-button-size;
+  border-radius: $lgn-icon-button-border-radius;
+
+  i, .mat-icon {
+    line-height: $lgn-icon-button-line-height;
+  }
 }
 
 .lgn-stroked-button {

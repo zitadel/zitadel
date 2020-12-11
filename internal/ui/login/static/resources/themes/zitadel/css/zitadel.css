@@ -16,7 +16,7 @@ footer a {
   font-size: 12px;
 }
 
-.lgn-button, .lgn-stroked-button {
+.lgn-button, .lgn-stroked-button, .lgn-icon-button {
   box-sizing: border-box;
   position: relative;
   cursor: pointer;
@@ -35,10 +35,10 @@ footer a {
   border-radius: 6px;
   overflow: visible;
 }
-.lgn-button[disabled], .lgn-stroked-button[disabled] {
+.lgn-button[disabled], .lgn-stroked-button[disabled], .lgn-icon-button[disabled] {
   cursor: default;
 }
-.lgn-button::-moz-focus-inner, .lgn-stroked-button::-moz-focus-inner {
+.lgn-button::-moz-focus-inner, .lgn-stroked-button::-moz-focus-inner, .lgn-icon-button::-moz-focus-inner {
   border: 0;
 }
 
@@ -67,6 +67,19 @@ footer a {
 }
 .lgn-raised-button::-moz-focus-inner {
   border: 0;
+}
+
+.lgn-icon-button {
+  padding: 0;
+  min-width: 0;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  line-height: 40px;
+  border-radius: 50%;
+}
+.lgn-icon-button i, .lgn-icon-button .mat-icon {
+  line-height: 24px;
 }
 
 .lgn-stroked-button {
@@ -228,6 +241,10 @@ a {
   outline: none;
 }
 
+.lgn-error {
+  outline: none;
+}
+
 .lgn-qrcode {
   display: block;
   margin: auto;
@@ -239,9 +256,10 @@ a {
 }
 
 .content-container {
+  position: relative;
   display: block;
   margin: 0px auto 50px auto;
-  max-width: 350px;
+  max-width: 380px;
   padding: 20px;
   width: 100%;
 }
@@ -270,6 +288,11 @@ a {
 }
 .content-container .lgn-login-profile .lgn-names .lgn-loginname p {
   margin: 0.5rem 1rem;
+}
+.content-container .lgn-left-action {
+  position: absolute;
+  left: 1rem;
+  top: calc(-48px);
 }
 
 i {
@@ -385,6 +408,11 @@ p p, .lgn-body p, .lgn-body-1 p, .lgn-typography p {
   margin: 0 0 12px;
 }
 
+span {
+  font: 400 14px/20px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: normal;
+}
+
 a, .lgn-a {
   font: 400 14px/20px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: normal;
@@ -435,33 +463,36 @@ label, .lgn-label, .lgn-typography .lgn-label, .lgn-typography label {
 }
 
 .lgn-button,
-.lgn-stroked-button {
+.lgn-stroked-button,
+.lgn-icon-button {
   color: inherit;
   background: transparent;
 }
 .lgn-button.lgn-primary,
-.lgn-stroked-button.lgn-primary {
+.lgn-stroked-button.lgn-primary,
+.lgn-icon-button.lgn-primary {
   color: #5282c1;
 }
 .lgn-button.lgn-accent,
-.lgn-stroked-button.lgn-accent {
+.lgn-stroked-button.lgn-accent,
+.lgn-icon-button.lgn-accent {
   color: #56a392;
 }
 .lgn-button.lgn-warn,
-.lgn-stroked-button.lgn-warn {
+.lgn-stroked-button.lgn-warn,
+.lgn-icon-button.lgn-warn {
   color: #f44336;
 }
 .lgn-button.lgn-primary[disabled], .lgn-button.lgn-accent[disabled], .lgn-button.lgn-warn[disabled], .lgn-button[disabled][disabled],
 .lgn-stroked-button.lgn-primary[disabled],
 .lgn-stroked-button.lgn-accent[disabled],
 .lgn-stroked-button.lgn-warn[disabled],
-.lgn-stroked-button[disabled][disabled] {
+.lgn-stroked-button[disabled][disabled],
+.lgn-icon-button.lgn-primary[disabled],
+.lgn-icon-button.lgn-accent[disabled],
+.lgn-icon-button.lgn-warn[disabled],
+.lgn-icon-button[disabled][disabled] {
   color: rgba(255, 255, 255, 0.3);
-}
-
-.lgn-button:focus,
-.lgn-stroked-button:focus {
-  background: white;
 }
 
 .lgn-stroked-button:not([disabled]) {
@@ -610,6 +641,10 @@ a:hover, a:active {
   color: #6992c9;
 }
 
+.lgn-error {
+  color: #f44336;
+}
+
 .lgn-qrcode svg {
   background: #212224;
 }
@@ -637,32 +672,36 @@ a:hover, a:active {
 }
 
 .lgn-dark-theme .lgn-button,
-.lgn-dark-theme .lgn-stroked-button {
+.lgn-dark-theme .lgn-stroked-button,
+.lgn-dark-theme .lgn-icon-button {
   color: inherit;
   background: transparent;
 }
 .lgn-dark-theme .lgn-button.lgn-primary,
-.lgn-dark-theme .lgn-stroked-button.lgn-primary {
+.lgn-dark-theme .lgn-stroked-button.lgn-primary,
+.lgn-dark-theme .lgn-icon-button.lgn-primary {
   color: #5282c1;
 }
 .lgn-dark-theme .lgn-button.lgn-accent,
-.lgn-dark-theme .lgn-stroked-button.lgn-accent {
+.lgn-dark-theme .lgn-stroked-button.lgn-accent,
+.lgn-dark-theme .lgn-icon-button.lgn-accent {
   color: #56a392;
 }
 .lgn-dark-theme .lgn-button.lgn-warn,
-.lgn-dark-theme .lgn-stroked-button.lgn-warn {
+.lgn-dark-theme .lgn-stroked-button.lgn-warn,
+.lgn-dark-theme .lgn-icon-button.lgn-warn {
   color: #f44336;
 }
 .lgn-dark-theme .lgn-button.lgn-primary[disabled], .lgn-dark-theme .lgn-button.lgn-accent[disabled], .lgn-dark-theme .lgn-button.lgn-warn[disabled], .lgn-dark-theme .lgn-button[disabled][disabled],
 .lgn-dark-theme .lgn-stroked-button.lgn-primary[disabled],
 .lgn-dark-theme .lgn-stroked-button.lgn-accent[disabled],
 .lgn-dark-theme .lgn-stroked-button.lgn-warn[disabled],
-.lgn-dark-theme .lgn-stroked-button[disabled][disabled] {
+.lgn-dark-theme .lgn-stroked-button[disabled][disabled],
+.lgn-dark-theme .lgn-icon-button.lgn-primary[disabled],
+.lgn-dark-theme .lgn-icon-button.lgn-accent[disabled],
+.lgn-dark-theme .lgn-icon-button.lgn-warn[disabled],
+.lgn-dark-theme .lgn-icon-button[disabled][disabled] {
   color: rgba(255, 255, 255, 0.3);
-}
-.lgn-dark-theme .lgn-button:focus,
-.lgn-dark-theme .lgn-stroked-button:focus {
-  background: white;
 }
 .lgn-dark-theme .lgn-stroked-button:not([disabled]) {
   border-color: rgba(255, 255, 255, 0.12);
@@ -798,6 +837,9 @@ a:hover, a:active {
 .lgn-dark-theme a:hover, .lgn-dark-theme a:active {
   color: #6992c9;
 }
+.lgn-dark-theme .lgn-error {
+  color: #f44336;
+}
 .lgn-dark-theme .lgn-qrcode svg {
   background: #212224;
 }
@@ -823,32 +865,36 @@ a:hover, a:active {
 }
 
 .lgn-light-theme .lgn-button,
-.lgn-light-theme .lgn-stroked-button {
+.lgn-light-theme .lgn-stroked-button,
+.lgn-light-theme .lgn-icon-button {
   color: inherit;
   background: transparent;
 }
 .lgn-light-theme .lgn-button.lgn-primary,
-.lgn-light-theme .lgn-stroked-button.lgn-primary {
+.lgn-light-theme .lgn-stroked-button.lgn-primary,
+.lgn-light-theme .lgn-icon-button.lgn-primary {
   color: #5469d4;
 }
 .lgn-light-theme .lgn-button.lgn-accent,
-.lgn-light-theme .lgn-stroked-button.lgn-accent {
+.lgn-light-theme .lgn-stroked-button.lgn-accent,
+.lgn-light-theme .lgn-icon-button.lgn-accent {
   color: #56a392;
 }
 .lgn-light-theme .lgn-button.lgn-warn,
-.lgn-light-theme .lgn-stroked-button.lgn-warn {
+.lgn-light-theme .lgn-stroked-button.lgn-warn,
+.lgn-light-theme .lgn-icon-button.lgn-warn {
   color: #f44336;
 }
 .lgn-light-theme .lgn-button.lgn-primary[disabled], .lgn-light-theme .lgn-button.lgn-accent[disabled], .lgn-light-theme .lgn-button.lgn-warn[disabled], .lgn-light-theme .lgn-button[disabled][disabled],
 .lgn-light-theme .lgn-stroked-button.lgn-primary[disabled],
 .lgn-light-theme .lgn-stroked-button.lgn-accent[disabled],
 .lgn-light-theme .lgn-stroked-button.lgn-warn[disabled],
-.lgn-light-theme .lgn-stroked-button[disabled][disabled] {
+.lgn-light-theme .lgn-stroked-button[disabled][disabled],
+.lgn-light-theme .lgn-icon-button.lgn-primary[disabled],
+.lgn-light-theme .lgn-icon-button.lgn-accent[disabled],
+.lgn-light-theme .lgn-icon-button.lgn-warn[disabled],
+.lgn-light-theme .lgn-icon-button[disabled][disabled] {
   color: rgba(0, 0, 0, 0.26);
-}
-.lgn-light-theme .lgn-button:focus,
-.lgn-light-theme .lgn-stroked-button:focus {
-  background: black;
 }
 .lgn-light-theme .lgn-stroked-button:not([disabled]) {
   border-color: rgba(0, 0, 0, 0.12);
@@ -983,6 +1029,9 @@ a:hover, a:active {
 }
 .lgn-light-theme a:hover, .lgn-light-theme a:active {
   color: #6e80da;
+}
+.lgn-light-theme .lgn-error {
+  color: #f44336;
 }
 .lgn-light-theme .lgn-qrcode svg {
   background: #212224;

@@ -178,6 +178,10 @@
       }
     }
 
+    span {
+        @include lgn-typography-level-to-styles($config, body-1);
+    }
+
     a, .lgn-a {
         @include lgn-typography-level-to-styles($config, body-1);
     }

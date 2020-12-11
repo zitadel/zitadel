@@ -1,8 +1,8 @@
 {{template "main-top" .}}
 
 <div class="lgn-head">
-    {{ .ErrType }}
-    {{ .ErrMessage }}
+    <p class="lgn-error">{{ .ErrType }}</p>
+    <p class="lgn-error">{{ .ErrMessage }}</p>
 </div>
 
 {{template "main-bottom" .}}

@@ -16,7 +16,7 @@ footer a {
   font-size: 12px;
 }
 
-.lgn-button, .lgn-stroked-button {
+.lgn-button, .lgn-stroked-button, .lgn-icon-button {
   box-sizing: border-box;
   position: relative;
   cursor: pointer;
@@ -35,10 +35,10 @@ footer a {
   border-radius: 6px;
   overflow: visible;
 }
-.lgn-button[disabled], .lgn-stroked-button[disabled] {
+.lgn-button[disabled], .lgn-stroked-button[disabled], .lgn-icon-button[disabled] {
   cursor: default;
 }
-.lgn-button::-moz-focus-inner, .lgn-stroked-button::-moz-focus-inner {
+.lgn-button::-moz-focus-inner, .lgn-stroked-button::-moz-focus-inner, .lgn-icon-button::-moz-focus-inner {
   border: 0;
 }
 
@@ -67,6 +67,19 @@ footer a {
 }
 .lgn-raised-button::-moz-focus-inner {
   border: 0;
+}
+
+.lgn-icon-button {
+  padding: 0;
+  min-width: 0;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  line-height: 40px;
+  border-radius: 50%;
+}
+.lgn-icon-button i, .lgn-icon-button .mat-icon {
+  line-height: 24px;
 }
 
 .lgn-stroked-button {
@@ -228,6 +241,10 @@ a {
   outline: none;
 }
 
+.lgn-error {
+  outline: none;
+}
+
 .lgn-qrcode {
   display: block;
   margin: auto;
@@ -239,9 +256,10 @@ a {
 }
 
 .content-container {
+  position: relative;
   display: block;
   margin: 0px auto 50px auto;
-  max-width: 350px;
+  max-width: 380px;
   padding: 20px;
   width: 100%;
 }
@@ -270,6 +288,11 @@ a {
 }
 .content-container .lgn-login-profile .lgn-names .lgn-loginname p {
   margin: 0.5rem 1rem;
+}
+.content-container .lgn-left-action {
+  position: absolute;
+  left: 1rem;
+  top: calc(-48px);
 }
 
 i {
@@ -366,7 +389,7 @@ footer a {
   font-size: 12px;
 }
 
-.lgn-button, .lgn-stroked-button {
+.lgn-button, .lgn-stroked-button, .lgn-icon-button {
   box-sizing: border-box;
   position: relative;
   cursor: pointer;
@@ -385,10 +408,10 @@ footer a {
   border-radius: 6px;
   overflow: visible;
 }
-.lgn-button[disabled], .lgn-stroked-button[disabled] {
+.lgn-button[disabled], .lgn-stroked-button[disabled], .lgn-icon-button[disabled] {
   cursor: default;
 }
-.lgn-button::-moz-focus-inner, .lgn-stroked-button::-moz-focus-inner {
+.lgn-button::-moz-focus-inner, .lgn-stroked-button::-moz-focus-inner, .lgn-icon-button::-moz-focus-inner {
   border: 0;
 }
 
@@ -417,6 +440,19 @@ footer a {
 }
 .lgn-raised-button::-moz-focus-inner {
   border: 0;
+}
+
+.lgn-icon-button {
+  padding: 0;
+  min-width: 0;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  line-height: 40px;
+  border-radius: 50%;
+}
+.lgn-icon-button i, .lgn-icon-button .mat-icon {
+  line-height: 24px;
 }
 
 .lgn-stroked-button {
@@ -578,6 +614,10 @@ a {
   outline: none;
 }
 
+.lgn-error {
+  outline: none;
+}
+
 .lgn-qrcode {
   display: block;
   margin: auto;
@@ -589,9 +629,10 @@ a {
 }
 
 .content-container {
+  position: relative;
   display: block;
   margin: 0px auto 50px auto;
-  max-width: 350px;
+  max-width: 380px;
   padding: 20px;
   width: 100%;
 }
@@ -620,6 +661,11 @@ a {
 }
 .content-container .lgn-login-profile .lgn-names .lgn-loginname p {
   margin: 0.5rem 1rem;
+}
+.content-container .lgn-left-action {
+  position: absolute;
+  left: 1rem;
+  top: calc(-48px);
 }
 
 i {
@@ -771,9 +817,10 @@ i {
   src: local("Material Icons"), local("MaterialIcons-Regular"), url(../../../fonts/material/MaterialIcons-Regular.woff2) format("woff2"), url(../../../fonts/material/MaterialIcons-Regular.woff) format("woff"), url(../../../fonts/material/MaterialIcons-Regular.ttf) format("truetype");
 }
 .content-container {
+  position: relative;
   display: block;
   margin: 0px auto 50px auto;
-  max-width: 350px;
+  max-width: 380px;
   padding: 20px;
   width: 100%;
 }
@@ -803,6 +850,11 @@ i {
 .content-container .lgn-login-profile .lgn-names .lgn-loginname p {
   margin: 0.5rem 1rem;
 }
+.content-container .lgn-left-action {
+  position: absolute;
+  left: 1rem;
+  top: calc(-48px);
+}
 
 i {
   font-size: 1.2rem;
@@ -811,7 +863,7 @@ i {
 .lgn-header {
   display: block;
   margin: 100px auto 0.5rem auto;
-  max-width: 350px;
+  max-width: 380px;
   padding: 0;
   width: 100%;
 }

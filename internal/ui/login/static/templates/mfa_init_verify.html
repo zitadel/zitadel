@@ -26,7 +26,9 @@
             <div class="lgn-actions">
                 <span id="secret"> {{.Secret}} </span>
                 <span class="fill-space"></span>
-                <i data-copy="{{ .Secret }}" class="las la-clipboard"></i>
+                <button data-copy="{{ .Secret }}" class="lgn-icon-button">
+                    <i class="las la-clipboard"></i>
+                </button>
             </div>
         </div>
         <div class="field">
@@ -37,10 +39,12 @@
     {{end}}
 
     <div class="lgn-actions">
-        <a class="lgn-button" href="{{ mfaPromptChangeUrl .AuthReqID .MfaType }}">
-            {{t "Actions.Back"}}
+        <!-- position element in header -->
+        <a class="lgn-icon-button lgn-left-action" href="{{ mfaPromptChangeUrl .AuthReqID .MfaType }}">
+            <!-- {{t "Actions.Back"}} -->
+            <i class="las la-arrow-left"></i>
         </a>
-        <a class="lgn-button" href="{{ loginUrl }}">
+        <a class="lgn-stroked-button lgn-primary" href="{{ loginUrl }}">
             {{t "Actions.Cancel"}}
         </a>
         <span class="fill-space"></span>

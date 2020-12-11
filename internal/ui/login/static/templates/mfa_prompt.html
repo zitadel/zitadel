@@ -23,11 +23,15 @@
     </div>
 
     <div class="lgn-actions">
-        <a class="lgn-button" href="{{ loginUrl }}">
-            {{t "Actions.Cancel"}}
+        <!-- position element in header -->
+        <a class="lgn-icon-button lgn-left-action" href="{{ loginUrl }}">
+            <!-- {{t "Actions.Cancel"}} -->
+            <i class="las la-arrow-left"></i>
         </a>
+
         {{if not .MfaRequired}}
-        <button class="lgn-button" name="skip" value="true" type="submit" formnovalidate>{{t "Actions.Skip"}}</button>
+        <button class="lgn-stroked-button lgn-primary" name="skip" value="true" type="submit"
+            formnovalidate>{{t "Actions.Skip"}}</button>
         {{end}}
         <span class="fill-space"></span>
         <button class="lgn-raised-button lgn-primary" type="submit">{{t "Actions.Next"}}</button>
