@@ -12,7 +12,7 @@ import (
 type CurrentSequence struct {
 	ViewName         string    `gorm:"column:view_name;primary_key"`
 	CurrentSequence  uint64    `gorm:"column:current_sequence"`
-	CurrentTimestamp time.Time `gorm:"column:event_timestamp"`
+	CurrentTimestamp time.Time `gorm:"column:timestamp"`
 }
 
 type SequenceSearchKey int32
