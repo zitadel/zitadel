@@ -27,10 +27,6 @@ type ReservedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *ReservedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *ReservedEvent) Data() interface{} {
 	return nil
 }
@@ -46,10 +42,6 @@ func NewReservedEvent(ctx context.Context) *ReservedEvent {
 
 type ReleasedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-}
-
-func (e *ReleasedEvent) CheckPrevious() bool {
-	return true
 }
 
 func (e *ReleasedEvent) Data() interface{} {
@@ -70,10 +62,6 @@ type AddedEvent struct {
 
 	IDPConfigID string `json:"idpConfigId,omitempty"`
 	DisplayName string `json:"displayName,omitempty"`
-}
-
-func (e *AddedEvent) CheckPrevious() bool {
-	return true
 }
 
 func (e *AddedEvent) Data() interface{} {
@@ -110,10 +98,6 @@ type RemovedEvent struct {
 	IDPConfigID string `json:"idpConfigId"`
 }
 
-func (e *RemovedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *RemovedEvent) Data() interface{} {
 	return e
 }
@@ -147,10 +131,6 @@ type CascadeRemovedEvent struct {
 	IDPConfigID string `json:"idpConfigId"`
 }
 
-func (e *CascadeRemovedEvent) CheckPrevious() bool {
-	return false
-}
-
 func (e *CascadeRemovedEvent) Data() interface{} {
 	return e
 }
@@ -180,10 +160,6 @@ func CascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader,
 
 type CheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
-}
-
-func (e *CheckSucceededEvent) CheckPrevious() bool {
-	return false
 }
 
 func (e *CheckSucceededEvent) Data() interface{} {

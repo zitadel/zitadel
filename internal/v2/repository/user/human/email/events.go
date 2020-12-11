@@ -25,10 +25,6 @@ type ChangedEvent struct {
 	EmailAddress string `json:"email,omitempty"`
 }
 
-func (e *ChangedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *ChangedEvent) Data() interface{} {
 	return e
 }
@@ -68,10 +64,6 @@ type VerifiedEvent struct {
 	IsEmailVerified bool `json:"-"`
 }
 
-func (e *VerifiedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *VerifiedEvent) Data() interface{} {
 	return nil
 }
@@ -95,10 +87,6 @@ func VerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error
 
 type VerificationFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-}
-
-func (e *VerificationFailedEvent) CheckPrevious() bool {
-	return false
 }
 
 func (e *VerificationFailedEvent) Data() interface{} {
@@ -125,10 +113,6 @@ type CodeAddedEvent struct {
 
 	Code   *crypto.CryptoValue `json:"code,omitempty"`
 	Expiry time.Duration       `json:"expiry,omitempty"`
-}
-
-func (e *CodeAddedEvent) CheckPrevious() bool {
-	return true
 }
 
 func (e *CodeAddedEvent) Data() interface{} {
@@ -163,10 +147,6 @@ func CodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, erro
 
 type CodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
-}
-
-func (e *CodeSentEvent) CheckPrevious() bool {
-	return true
 }
 
 func (e *CodeSentEvent) Data() interface{} {

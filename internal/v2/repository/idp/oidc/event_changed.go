@@ -29,10 +29,6 @@ type ConfigChangedEvent struct {
 	UserNameMapping       MappingField `json:"usernameMapping,omitempty"`
 }
 
-func (e *ConfigChangedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *ConfigChangedEvent) Data() interface{} {
 	return e
 }

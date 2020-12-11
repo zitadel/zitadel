@@ -19,10 +19,6 @@ type ProjectSetEvent struct {
 	ProjectID string `json:"iamProjectId"`
 }
 
-func (e *ProjectSetEvent) CheckPrevious() bool {
-	return e.Type() == SetupStartedEventType
-}
-
 func (e *ProjectSetEvent) Data() interface{} {
 	return e
 }

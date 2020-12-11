@@ -19,10 +19,6 @@ type GlobalOrgSetEvent struct {
 	OrgID string `json:"globalOrgId"`
 }
 
-func (e *GlobalOrgSetEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *GlobalOrgSetEvent) Data() interface{} {
 	return e
 }

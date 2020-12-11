@@ -20,10 +20,6 @@ type Event struct {
 	// it implements a linked list
 	PreviousEvent *Event
 
-	//CheckPreviousSequence decides if the event can only be written
-	// if event.PreviousSequence == max(event_sequence) of this aggregate
-	CheckPreviousSequence bool
-
 	//CreationDate is the time the event is created
 	// it's used for human readability.
 	// Don't use it for event ordering,

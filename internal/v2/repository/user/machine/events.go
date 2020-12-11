@@ -23,10 +23,6 @@ type AddedEvent struct {
 	Description string `json:"description,omitempty"`
 }
 
-func (e *AddedEvent) CheckPrevious() bool {
-	return false
-}
-
 func (e *AddedEvent) Data() interface{} {
 	return e
 }
@@ -67,10 +63,6 @@ type ChangedEvent struct {
 
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
-}
-
-func (e *ChangedEvent) CheckPrevious() bool {
-	return false
 }
 
 func (e *ChangedEvent) Data() interface{} {

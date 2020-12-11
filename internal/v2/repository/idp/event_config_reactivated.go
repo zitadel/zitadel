@@ -25,10 +25,6 @@ func NewConfigReactivatedEvent(
 	}
 }
 
-func (e *ConfigReactivatedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *ConfigReactivatedEvent) Data() interface{} {
 	return e
 }

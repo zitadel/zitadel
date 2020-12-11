@@ -23,10 +23,6 @@ type SetupStepEvent struct {
 	Done bool `json:"-"`
 }
 
-func (e *SetupStepEvent) CheckPrevious() bool {
-	return e.Type() == SetupStartedEventType
-}
-
 func (e *SetupStepEvent) Data() interface{} {
 	return e
 }

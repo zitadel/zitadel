@@ -27,10 +27,6 @@ type AddedEvent struct {
 	PasswordlessType      PasswordlessType `json:"passwordlessType"`
 }
 
-func (e *AddedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *AddedEvent) Data() interface{} {
 	return e
 }
@@ -74,10 +70,6 @@ type ChangedEvent struct {
 	AllowExternalIDP      bool             `json:"allowExternalIdp"`
 	ForceMFA              bool             `json:"forceMFA"`
 	PasswordlessType      PasswordlessType `json:"passwordlessType"`
-}
-
-func (e *ChangedEvent) CheckPrevious() bool {
-	return true
 }
 
 func (e *ChangedEvent) Data() interface{} {
@@ -132,10 +124,6 @@ func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error)
 
 type RemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-}
-
-func (e *RemovedEvent) CheckPrevious() bool {
-	return true
 }
 
 func (e *RemovedEvent) Data() interface{} {

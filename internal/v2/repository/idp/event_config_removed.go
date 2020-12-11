@@ -25,10 +25,6 @@ func NewConfigRemovedEvent(
 	}
 }
 
-func (e *ConfigRemovedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *ConfigRemovedEvent) Data() interface{} {
 	return e
 }

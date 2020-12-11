@@ -28,7 +28,6 @@ const (
 		"    editor_service, " +
 		"    resource_owner, " +
 		"    previous_sequence, " +
-		"    check_previous, " +
 		// variables below are calculated
 		"    max_event_seq " +
 		") AS ( " +
@@ -45,7 +44,6 @@ const (
 		"				$8::VARCHAR, " +
 		"				resource_owner, " +
 		"				$10::BIGINT, " +
-		"				$11::BOOLEAN," +
 		"				MAX(event_sequence) AS max_event_seq " +
 		"			FROM eventstore.events " +
 		"			WHERE " +
@@ -65,7 +63,6 @@ const (
 		"				$8::VARCHAR, " +
 		"				$9::VARCHAR, " +
 		"				$10::BIGINT, " +
-		"				$11::BOOLEAN, " +
 		"				NULL::BIGINT " +
 		"			) " +
 		"		) " +
@@ -96,24 +93,8 @@ const (
 		"			editor_user, " +
 		"			editor_service, " +
 		"			resource_owner, " +
-		"			( " +
-		"			    SELECT " +
-		"			        CASE " +
-		"			            WHEN NOT check_previous " +
-		"			                THEN NULL " +
-		"			            	ELSE previous_sequence " +
-		"			        END" +
-		"			) " +
+		"			previous_sequence " +
 		"		FROM input_event " +
-		"		WHERE 1 = " +
-		"		        CASE " +
-		"		            WHEN NOT check_previous " +
-		"		            THEN 1 " +
-		"		            ELSE ( " +
-		"		                SELECT 1 FROM input_event " +
-		"		                    WHERE (max_event_seq IS NULL AND previous_sequence IS NULL) OR (max_event_seq IS NOT NULL AND max_event_seq = previous_sequence) " +
-		"		            ) " +
-		"		        END " +
 		"	) " +
 		"RETURNING id, event_sequence, previous_sequence, creation_date, resource_owner "
 )
@@ -160,7 +141,6 @@ func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
 				event.EditorService,
 				event.ResourceOwner,
 				previousSequence,
-				event.CheckPreviousSequence,
 			).Scan(&event.ID, &event.Sequence, &previousSequence, &event.CreationDate, &event.ResourceOwner)
 
 			event.PreviousSequence = uint64(previousSequence)

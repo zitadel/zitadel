@@ -46,10 +46,6 @@ func SecondFactorAddedEventMapper(event *repository.Event) (eventstore.EventRead
 	return e, nil
 }
 
-func (e *SecondFactorAddedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *SecondFactorAddedEvent) Data() interface{} {
 	return e
 }
@@ -80,10 +76,6 @@ func SecondFactorRemovedEventMapper(event *repository.Event) (eventstore.EventRe
 	}
 
 	return e, nil
-}
-
-func (e *SecondFactorRemovedEvent) CheckPrevious() bool {
-	return true
 }
 
 func (e *SecondFactorRemovedEvent) Data() interface{} {
@@ -119,10 +111,6 @@ func MultiFactorAddedEventMapper(event *repository.Event) (eventstore.EventReade
 	return e, nil
 }
 
-func (e *MultiFactorAddedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *MultiFactorAddedEvent) Data() interface{} {
 	return e
 }
@@ -153,10 +141,6 @@ func MultiFactorRemovedEventMapper(event *repository.Event) (eventstore.EventRea
 	}
 
 	return e, nil
-}
-
-func (e *MultiFactorRemovedEvent) CheckPrevious() bool {
-	return true
 }
 
 func (e *MultiFactorRemovedEvent) Data() interface{} {

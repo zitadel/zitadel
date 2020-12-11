@@ -23,10 +23,6 @@ type AddedEvent struct {
 	HasSymbol    bool   `json:"hasSymbol"`
 }
 
-func (e *AddedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *AddedEvent) Data() interface{} {
 	return e
 }
@@ -70,10 +66,6 @@ type ChangedEvent struct {
 	HasUpperCase bool   `json:"hasUppercase"`
 	HasNumber    bool   `json:"hasNumber"`
 	HasSymbol    bool   `json:"hasSymbol"`
-}
-
-func (e *ChangedEvent) CheckPrevious() bool {
-	return true
 }
 
 func (e *ChangedEvent) Data() interface{} {
@@ -128,10 +120,6 @@ func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error)
 
 type RemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-}
-
-func (e *RemovedEvent) CheckPrevious() bool {
-	return true
 }
 
 func (e *RemovedEvent) Data() interface{} {

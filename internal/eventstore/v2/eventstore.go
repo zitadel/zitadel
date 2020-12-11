@@ -73,17 +73,16 @@ func (es *Eventstore) aggregatesToEvents(aggregates []aggregater) ([]*repository
 				return nil, err
 			}
 			events = append(events, &repository.Event{
-				AggregateID:           aggregate.ID(),
-				AggregateType:         repository.AggregateType(aggregate.Type()),
-				ResourceOwner:         aggregate.ResourceOwner(),
-				EditorService:         event.EditorService(),
-				EditorUser:            event.EditorUser(),
-				Type:                  repository.EventType(event.Type()),
-				Version:               repository.Version(aggregate.Version()),
-				PreviousEvent:         previousEvent,
-				PreviousSequence:      aggregate.PreviousSequence(),
-				Data:                  data,
-				CheckPreviousSequence: event.CheckPrevious(),
+				AggregateID:      aggregate.ID(),
+				AggregateType:    repository.AggregateType(aggregate.Type()),
+				ResourceOwner:    aggregate.ResourceOwner(),
+				EditorService:    event.EditorService(),
+				EditorUser:       event.EditorUser(),
+				Type:             repository.EventType(event.Type()),
+				Version:          repository.Version(aggregate.Version()),
+				PreviousEvent:    previousEvent,
+				PreviousSequence: aggregate.PreviousSequence(),
+				Data:             data,
 			})
 			previousEvent = events[len(events)-1]
 		}

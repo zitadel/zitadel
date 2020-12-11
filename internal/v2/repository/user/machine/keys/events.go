@@ -24,10 +24,6 @@ type AddedEvent struct {
 	PublicKey      []byte         `json:"publicKey,omitempty"`
 }
 
-func (e *AddedEvent) CheckPrevious() bool {
-	return false
-}
-
 func (e *AddedEvent) Data() interface{} {
 	return e
 }
@@ -67,10 +63,6 @@ type RemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	KeyID string `json:"keyId,omitempty"`
-}
-
-func (e *RemovedEvent) CheckPrevious() bool {
-	return false
 }
 
 func (e *RemovedEvent) Data() interface{} {

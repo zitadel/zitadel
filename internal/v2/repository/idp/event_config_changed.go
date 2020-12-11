@@ -45,10 +45,6 @@ func NewConfigChangedEvent(
 	return change, nil
 }
 
-func (e *ConfigChangedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *ConfigChangedEvent) Data() interface{} {
 	return e
 }
