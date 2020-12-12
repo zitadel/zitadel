@@ -2,6 +2,8 @@ package secrets
 
 import (
 	"errors"
+	"strings"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/orb"
@@ -9,7 +11,6 @@ import (
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator/api"
 	zitadelOrb "github.com/caos/zitadel/operator/kinds/orb"
-	"strings"
 )
 
 const (
@@ -31,7 +32,7 @@ func GetAllSecretsFunc(orb *orb.Orb) func(monitor mntr.Monitor, gitClient *git.C
 				return nil, nil, err
 			}
 			allTrees[zitadel] = zitadelYML
-			_, _, zitadelSecrets, err := zitadelOrb.AdaptFunc(orb, "secret", "", "", []string{})(monitor, zitadelYML, &tree.Tree{})
+			_, _, zitadelSecrets, err := zitadelOrb.AdaptFunc(orb, "secret", nil, "", []string{})(monitor, zitadelYML, &tree.Tree{})
 			if err != nil {
 				return nil, nil, err
 			}

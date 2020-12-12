@@ -2,11 +2,12 @@ package main
 
 import (
 	"flag"
+	"io/ioutil"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/zitadel/operator/helpers"
 	"github.com/caos/zitadel/operator/start"
-	"io/ioutil"
 )
 
 func main() {
@@ -31,12 +32,13 @@ func main() {
 		panic(err)
 	}
 
+	version := "unknown"
 	if err := start.Operator(
 		monitor,
 		helpers.PruneHome(*orbconfig),
 		kubernetes.NewK8sClient(monitor, strPtr(string(kc))),
-		"./migrations/cockroach-secure/",
-		"operator",
+		"./migrations/cockroach/",
+		&version,
 	); err != nil {
 		panic(err)
 	}

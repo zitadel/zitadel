@@ -1,13 +1,14 @@
 package cmds
 
 import (
+	"io/ioutil"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/zitadel/operator/api"
 	"github.com/caos/zitadel/operator/kinds/orb"
 	"github.com/spf13/cobra"
-	"io/ioutil"
 )
 
 func TakeoffCommand(rv RootValues) *cobra.Command {
@@ -24,7 +25,7 @@ func TakeoffCommand(rv RootValues) *cobra.Command {
 	flags.StringVar(&kubeconfig, "kubeconfig", "", "Kubeconfig for ZITADEL operator deployment")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		_, monitor, orbConfig, gitClient, version, errFunc := rv()
+		_, monitor, orbConfig, gitClient, _, errFunc := rv()
 		if errFunc != nil {
 			return errFunc(cmd)
 		}
@@ -50,13 +51,12 @@ func TakeoffCommand(rv RootValues) *cobra.Command {
 			monitor,
 			gitClient,
 			&kubeconfigStr,
-			version,
 		)
 	}
 	return cmd
 }
 
-func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *string, version string) error {
+func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *string) error {
 	found, err := api.ExistsZitadelYml(gitClient)
 	if err != nil {
 		return err

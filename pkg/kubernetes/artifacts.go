@@ -2,8 +2,10 @@ package kubernetes
 
 import (
 	"fmt"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
+	"github.com/caos/orbos/pkg/labels"
 	apps "k8s.io/api/apps/v1"
 	core "k8s.io/api/core/v1"
 	rbac "k8s.io/api/rbac/v1"
@@ -13,14 +15,20 @@ import (
 
 func EnsureZitadelOperatorArtifacts(
 	monitor mntr.Monitor,
+	apiLabels *labels.API,
 	client kubernetes.ClientInt,
 	version string,
 	nodeselector map[string]string,
-	tolerations []core.Toleration) error {
+	tolerations []core.Toleration,
+) error {
 
 	monitor.WithFields(map[string]interface{}{
 		"zitadel": version,
 	}).Debug("Ensuring zitadel artifacts")
+
+	nameLabels := labels.MustForName(labels.MustForComponent(apiLabels, "operator"), "zitadel-operator")
+	k8sNameLabels := labels.MustK8sMap(nameLabels)
+	k8sPodSelector := labels.MustK8sMap(labels.DeriveNameSelector(nameLabels, false))
 
 	if version == "" {
 		return nil
@@ -28,7 +36,7 @@ func EnsureZitadelOperatorArtifacts(
 
 	if err := client.ApplyServiceAccount(&core.ServiceAccount{
 		ObjectMeta: mach.ObjectMeta{
-			Name:      "zitadel-operator",
+			Name:      nameLabels.Name(),
 			Namespace: "caos-system",
 		},
 	}); err != nil {
@@ -37,12 +45,8 @@ func EnsureZitadelOperatorArtifacts(
 
 	if err := client.ApplyClusterRole(&rbac.ClusterRole{
 		ObjectMeta: mach.ObjectMeta{
-			Name: "zitadel-operator-clusterrole",
-			Labels: map[string]string{
-				"app.kubernetes.io/instance":  "zitadel-operator",
-				"app.kubernetes.io/part-of":   "zitadel",
-				"app.kubernetes.io/component": "zitadel-operator",
-			},
+			Name:   nameLabels.Name(),
+			Labels: k8sNameLabels,
 		},
 		Rules: []rbac.PolicyRule{{
 			APIGroups: []string{"*"},
@@ -55,58 +59,41 @@ func EnsureZitadelOperatorArtifacts(
 
 	if err := client.ApplyClusterRoleBinding(&rbac.ClusterRoleBinding{
 		ObjectMeta: mach.ObjectMeta{
-			Name: "zitadel-operator-clusterrolebinding",
-			Labels: map[string]string{
-				"app.kubernetes.io/instance":  "zitadel-operator",
-				"app.kubernetes.io/part-of":   "zitadel",
-				"app.kubernetes.io/component": "zitadel-operator",
-			},
+			Name:   nameLabels.Name(),
+			Labels: k8sNameLabels,
 		},
 
 		RoleRef: rbac.RoleRef{
 			APIGroup: "rbac.authorization.k8s.io",
 			Kind:     "ClusterRole",
-			Name:     "zitadel-operator-clusterrole",
+			Name:     nameLabels.Name(),
 		},
 		Subjects: []rbac.Subject{{
 			Kind:      "ServiceAccount",
-			Name:      "zitadel-operator",
+			Name:      nameLabels.Name(),
 			Namespace: "caos-system",
 		}},
 	}); err != nil {
 		return err
 	}
 
-	if err := client.ApplyDeployment(&apps.Deployment{
+	deployment := &apps.Deployment{
 		ObjectMeta: mach.ObjectMeta{
-			Name:      "zitadel-operator",
+			Name:      nameLabels.Name(),
 			Namespace: "caos-system",
-			Labels: map[string]string{
-				"app.kubernetes.io/instance":   "zitadel-operator",
-				"app.kubernetes.io/part-of":    "zitadel",
-				"app.kubernetes.io/component":  "zitadel-operator",
-				"app.kubernetes.io/managed-by": "zitadel.caos.ch",
-			},
+			Labels:    k8sNameLabels,
 		},
 		Spec: apps.DeploymentSpec{
 			Replicas: int32Ptr(1),
 			Selector: &mach.LabelSelector{
-				MatchLabels: map[string]string{
-					"app.kubernetes.io/instance":  "zitadel-operator",
-					"app.kubernetes.io/part-of":   "zitadel",
-					"app.kubernetes.io/component": "zitadel-operator",
-				},
+				MatchLabels: k8sPodSelector,
 			},
 			Template: core.PodTemplateSpec{
 				ObjectMeta: mach.ObjectMeta{
-					Labels: map[string]string{
-						"app.kubernetes.io/instance":  "zitadel-operator",
-						"app.kubernetes.io/part-of":   "zitadel",
-						"app.kubernetes.io/component": "zitadel-operator",
-					},
+					Labels: labels.MustK8sMap(labels.AsSelectable(nameLabels)),
 				},
 				Spec: core.PodSpec{
-					ServiceAccountName: "zitadel-operator",
+					ServiceAccountName: nameLabels.Name(),
 					Containers: []core.Container{{
 						Name:            "zitadel",
 						ImagePullPolicy: core.PullIfNotPresent,
@@ -148,7 +135,8 @@ func EnsureZitadelOperatorArtifacts(
 				},
 			},
 		},
-	}); err != nil {
+	}
+	if err := client.ApplyDeployment(deployment, true); err != nil {
 		return err
 	}
 	monitor.WithFields(map[string]interface{}{

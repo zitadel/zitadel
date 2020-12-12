@@ -4,6 +4,7 @@ import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/ambassador/mapping"
+	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/configuration"
 )
@@ -15,8 +16,8 @@ const (
 
 func AdaptFunc(
 	monitor mntr.Monitor,
+	componentLabels *labels.Component,
 	namespace string,
-	labels map[string]string,
 	uiURL string,
 	dns *configuration.DNS,
 ) (
@@ -53,7 +54,7 @@ func AdaptFunc(
 			queryConsole, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				ConsoleName,
-				labels,
+				labels.MustForNameAsSelectableK8SMap(componentLabels, ConsoleName),
 				false,
 				consoleDomain,
 				"/",
@@ -70,7 +71,7 @@ func AdaptFunc(
 			queryAcc, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				AccountsName,
-				labels,
+				labels.MustForNameAsSelectableK8SMap(componentLabels, AccountsName),
 				false,
 				accountsDomain,
 				"/",
@@ -94,3 +95,4 @@ func AdaptFunc(
 		operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
 		nil
 }
+

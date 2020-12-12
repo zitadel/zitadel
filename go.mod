@@ -2,6 +2,8 @@ module github.com/caos/zitadel
 
 go 1.15
 
+replace github.com/caos/orbos => /home/elio/Code/src/github.com/caos/orbos
+
 require (
 	cloud.google.com/go v0.71.0 // indirect
 	github.com/BurntSushi/toml v0.3.1
@@ -16,7 +18,7 @@ require (
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.13.1
-	github.com/caos/orbos v1.5.1-0.20201123140315-2d2be7cbab29
+	github.com/caos/orbos v1.5.14-0.20201202163746-8fc3d6749052
 	github.com/cockroachdb/cockroach-go/v2 v2.0.8
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
 	github.com/ghodss/yaml v1.0.0

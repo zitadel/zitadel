@@ -1,11 +1,13 @@
 package zitadel
 
 import (
+	"strconv"
+
+	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/orbos/pkg/orb"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/database"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/setup"
-	"strconv"
 
 	core "k8s.io/api/core/v1"
 
@@ -23,6 +25,7 @@ import (
 )
 
 func AdaptFunc(
+	apiLabels *labels.API,
 	nodeselector map[string]string,
 	tolerations []core.Toleration,
 	orbconfig *orb.Orb,
@@ -74,7 +77,7 @@ func AdaptFunc(
 		uiServiceName := "ui-v1"
 		uiPort := 80
 
-		labels := getLabels()
+		//		labels := getLabels()
 		users := getAllUsers(desiredKind)
 		allZitadelUsers := getZitadelUserList()
 		dbClient, err := database.NewClient(monitor, orbconfig.URL, orbconfig.Repokey)
@@ -91,10 +94,14 @@ func AdaptFunc(
 			return nil, nil, allSecrets, err
 		}
 
+		zitadelComponent := labels.MustForComponent(apiLabels, "ZITADEL")
+		zitadelDeploymentName := labels.MustForName(zitadelComponent, "zitadel")
+		zitadelPodSelector := labels.DeriveNameSelector(zitadelDeploymentName, false)
 		queryS, destroyS, err := services.AdaptFunc(
 			internalMonitor,
+			zitadelComponent,
+			zitadelPodSelector,
 			namespaceStr,
-			labels,
 			grpcServiceName,
 			grpcPort,
 			httpServiceName,
@@ -107,8 +114,8 @@ func AdaptFunc(
 
 		queryC, destroyC, getConfigurationHashes, err := configuration.AdaptFunc(
 			internalMonitor,
+			zitadelComponent,
 			namespaceStr,
-			labels,
 			desiredKind.Spec.Configuration,
 			cmName,
 			certPath,
@@ -135,9 +142,9 @@ func AdaptFunc(
 
 		queryM, destroyM, err := migration.AdaptFunc(
 			internalMonitor,
+			labels.MustForComponent(apiLabels, "database"),
 			namespaceStr,
 			action,
-			labels,
 			secretPasswordName,
 			migrationUser,
 			allZitadelUsers,
@@ -151,9 +158,9 @@ func AdaptFunc(
 
 		querySetup, destroySetup, err := setup.AdaptFunc(
 			internalMonitor,
+			zitadelComponent,
 			namespaceStr,
 			action,
-			labels,
 			desiredKind.Spec.NodeSelector,
 			desiredKind.Spec.Tolerations,
 			desiredKind.Spec.Resources,
@@ -173,9 +180,11 @@ func AdaptFunc(
 
 		queryD, destroyD, err := deployment.AdaptFunc(
 			internalMonitor,
+			zitadelDeploymentName,
+			zitadelPodSelector,
+			desiredKind.Spec.Force,
 			version,
 			namespaceStr,
-			labels,
 			desiredKind.Spec.ReplicaCount,
 			desiredKind.Spec.Affinity,
 			cmName,
@@ -200,8 +209,8 @@ func AdaptFunc(
 
 		queryAmbassador, destroyAmbassador, err := ambassador.AdaptFunc(
 			internalMonitor,
+			labels.MustForComponent(apiLabels, "apiGateway"),
 			namespaceStr,
-			labels,
 			grpcServiceName+"."+namespaceStr+":"+strconv.Itoa(grpcPort),
 			"http://"+httpServiceName+"."+namespaceStr+":"+strconv.Itoa(httpPort),
 			"http://"+uiServiceName+"."+namespaceStr,

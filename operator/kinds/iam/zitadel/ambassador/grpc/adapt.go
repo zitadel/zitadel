@@ -4,6 +4,7 @@ import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/ambassador/mapping"
+	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/configuration"
 )
@@ -16,8 +17,8 @@ const (
 
 func AdaptFunc(
 	monitor mntr.Monitor,
+	componentLabels *labels.Component,
 	namespace string,
-	labels map[string]string,
 	grpcURL string,
 	dns *configuration.DNS,
 ) (
@@ -68,7 +69,7 @@ func AdaptFunc(
 			queryAdminG, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				AdminMName,
-				labels,
+				labels.MustForNameAsSelectableK8SMap(componentLabels, AdminMName),
 				true,
 				apiDomain,
 				"/caos.zitadel.admin.api.v1.AdminService/",
@@ -85,7 +86,7 @@ func AdaptFunc(
 			queryAuthG, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				AuthMName,
-				labels,
+				labels.MustForNameAsSelectableK8SMap(componentLabels, AuthMName),
 				true,
 				apiDomain,
 				"/caos.zitadel.auth.api.v1.AuthService/",
@@ -102,7 +103,7 @@ func AdaptFunc(
 			queryMgmtGRPC, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				MgmtMName,
-				labels,
+				labels.MustForNameAsSelectableK8SMap(componentLabels, MgmtMName),
 				true,
 				apiDomain,
 				"/caos.zitadel.management.api.v1.ManagementService/",

@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	Version = "none"
+	Version = "unknown"
 )
 
 func main() {

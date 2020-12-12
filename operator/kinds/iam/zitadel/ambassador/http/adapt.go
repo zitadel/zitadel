@@ -4,6 +4,7 @@ import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/ambassador/mapping"
+	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/configuration"
 )
@@ -20,8 +21,8 @@ const (
 
 func AdaptFunc(
 	monitor mntr.Monitor,
+	componentLabels *labels.Component,
 	namespace string,
-	labels map[string]string,
 	httpUrl string,
 	dns *configuration.DNS,
 ) (
@@ -98,7 +99,7 @@ func AdaptFunc(
 			queryAdminR, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				AdminRName,
-				labels,
+				labels.MustForNameAsSelectableK8SMap(componentLabels, AdminRName),
 				false,
 				apiDomain,
 				"/admin/v1",
@@ -115,7 +116,7 @@ func AdaptFunc(
 			queryMgmtRest, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				MgmtName,
-				labels,
+				labels.MustForNameAsSelectableK8SMap(componentLabels, MgmtName),
 				false,
 				apiDomain,
 				"/management/v1/",
@@ -132,7 +133,7 @@ func AdaptFunc(
 			queryOAuthv2, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				OauthName,
-				labels,
+				labels.MustForNameAsSelectableK8SMap(componentLabels, OauthName),
 				false,
 				apiDomain,
 				"/oauth/v2/",
@@ -149,7 +150,7 @@ func AdaptFunc(
 			queryAuthR, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				AuthRName,
-				labels,
+				labels.MustForNameAsSelectableK8SMap(componentLabels, AuthRName),
 				false,
 				apiDomain,
 				"/auth/v1/",
@@ -166,7 +167,7 @@ func AdaptFunc(
 			queryAuthorize, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				AuthorizeName,
-				labels,
+				labels.MustForNameAsSelectableK8SMap(componentLabels, AuthorizeName),
 				false,
 				accountsDomain,
 				"/oauth/v2/authorize",
@@ -183,7 +184,7 @@ func AdaptFunc(
 			queryEndsession, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				EndsessionName,
-				labels,
+				labels.MustForNameAsSelectableK8SMap(componentLabels, EndsessionName),
 				false,
 				accountsDomain,
 				"/oauth/v2/endsession",
@@ -200,7 +201,7 @@ func AdaptFunc(
 			queryIssuer, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				IssuerName,
-				labels,
+				labels.MustForNameAsSelectableK8SMap(componentLabels, IssuerName),
 				false,
 				issuerDomain,
 				"/.well-known/openid-configuration",
@@ -229,3 +230,4 @@ func AdaptFunc(
 		operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
 		nil
 }
+

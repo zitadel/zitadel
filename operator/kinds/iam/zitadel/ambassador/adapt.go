@@ -3,6 +3,7 @@ package ambassador
 import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
+	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/ambassador/grpc"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/ambassador/hosts"
@@ -13,8 +14,8 @@ import (
 
 func AdaptFunc(
 	monitor mntr.Monitor,
+	componentLabels *labels.Component,
 	namespace string,
-	labels map[string]string,
 	grpcURL string,
 	httpURL string,
 	uiURL string,
@@ -24,30 +25,24 @@ func AdaptFunc(
 	operator.DestroyFunc,
 	error,
 ) {
-	internalMonitor := monitor.WithField("component", "ambassador")
+	internalMonitor := monitor.WithField("type", "ambassador")
 
-	internalLabels := make(map[string]string, 0)
-	for k, v := range labels {
-		internalLabels[k] = v
-	}
-	internalLabels["app.kubernetes.io/component"] = "ambassador"
-
-	queryGRPC, destroyGRPC, err := grpc.AdaptFunc(internalMonitor, namespace, labels, grpcURL, dns)
+	queryGRPC, destroyGRPC, err := grpc.AdaptFunc(internalMonitor,componentLabels, namespace, grpcURL, dns)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	queryUI, destroyHTTP, err := ui.AdaptFunc(internalMonitor, namespace, labels, uiURL, dns)
+	queryUI, destroyHTTP, err := ui.AdaptFunc(internalMonitor,componentLabels, namespace, uiURL, dns)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	queryHTTP, destroyUI, err := http.AdaptFunc(internalMonitor, namespace, labels, httpURL, dns)
+	queryHTTP, destroyUI, err := http.AdaptFunc(internalMonitor,componentLabels, namespace, httpURL, dns)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	queryHosts, destroyHosts, err := hosts.AdaptFunc(internalMonitor, namespace, labels, dns)
+	queryHosts, destroyHosts, err := hosts.AdaptFunc(internalMonitor,componentLabels, namespace, dns)
 	if err != nil {
 		return nil, nil, err
 	}

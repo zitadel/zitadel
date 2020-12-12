@@ -4,6 +4,7 @@ import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/ambassador/host"
+	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/configuration"
 )
@@ -17,8 +18,8 @@ const (
 
 func AdaptFunc(
 	monitor mntr.Monitor,
+	componentLabels *labels.Component,
 	namespace string,
-	labels map[string]string,
 	dns *configuration.DNS,
 ) (
 	operator.QueryFunc,
@@ -69,7 +70,7 @@ func AdaptFunc(
 			accountsSelector := map[string]string{
 				"hostname": accountsDomain,
 			}
-			queryAccounts, err := host.AdaptFuncToEnsure(namespace, AccountsHostName, labels, accountsDomain, "none", "", accountsSelector, originCASecretName)
+			queryAccounts, err := host.AdaptFuncToEnsure(namespace, AccountsHostName, labels.MustForNameAsSelectableK8SMap(componentLabels, AccountsHostName), accountsDomain, "none", "", accountsSelector, originCASecretName)
 			if err != nil {
 				return nil, err
 			}
@@ -77,7 +78,7 @@ func AdaptFunc(
 			apiSelector := map[string]string{
 				"hostname": apiDomain,
 			}
-			queryAPI, err := host.AdaptFuncToEnsure(namespace, ApiHostName, labels, apiDomain, "none", "", apiSelector, originCASecretName)
+			queryAPI, err := host.AdaptFuncToEnsure(namespace, ApiHostName, labels.MustForNameAsSelectableK8SMap(componentLabels, ApiHostName), apiDomain, "none", "", apiSelector, originCASecretName)
 			if err != nil {
 				return nil, err
 			}
@@ -85,7 +86,7 @@ func AdaptFunc(
 			consoleSelector := map[string]string{
 				"hostname": consoleDomain,
 			}
-			queryConsole, err := host.AdaptFuncToEnsure(namespace, ConsoleHostName, labels, consoleDomain, "none", "", consoleSelector, originCASecretName)
+			queryConsole, err := host.AdaptFuncToEnsure(namespace, ConsoleHostName, labels.MustForNameAsSelectableK8SMap(componentLabels, ConsoleHostName), consoleDomain, "none", "", consoleSelector, originCASecretName)
 			if err != nil {
 				return nil, err
 			}
@@ -93,7 +94,7 @@ func AdaptFunc(
 			issuerSelector := map[string]string{
 				"hostname": issuerDomain,
 			}
-			queryIssuer, err := host.AdaptFuncToEnsure(namespace, IssuerHostName, labels, issuerDomain, "none", "", issuerSelector, originCASecretName)
+			queryIssuer, err := host.AdaptFuncToEnsure(namespace, IssuerHostName, labels.MustForNameAsSelectableK8SMap(componentLabels, IssuerHostName), issuerDomain, "none", "", issuerSelector, originCASecretName)
 			if err != nil {
 				return nil, err
 			}

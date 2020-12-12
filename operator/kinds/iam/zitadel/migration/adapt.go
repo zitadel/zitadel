@@ -8,6 +8,7 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/configmap"
 	"github.com/caos/orbos/pkg/kubernetes/resources/job"
+	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/helpers"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/database"
@@ -36,9 +37,9 @@ const (
 
 func AdaptFunc(
 	monitor mntr.Monitor,
+	componentLabels *labels.Component,
 	namespace string,
 	reason string,
-	labels map[string]string,
 	secretPasswordName string,
 	migrationUser string,
 	users []string,
@@ -50,14 +51,15 @@ func AdaptFunc(
 	operator.DestroyFunc,
 	error,
 ) {
-	internalMonitor := monitor.WithField("component", "migration")
+	internalMonitor := monitor.WithField("type", "migration")
+	jobName := getJobName(reason)
 
 	destroyCM, err := configmap.AdaptFuncToDestroy(namespace, migrationConfigmap)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyJ, err := job.AdaptFuncToDestroy(getJobName(reason), namespace)
+	destroyJ, err := job.AdaptFuncToDestroy(jobName, namespace)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -75,22 +77,17 @@ func AdaptFunc(
 			dbHost := dbCurrent.Host
 			dbPort := dbCurrent.Port
 
-			internalLabels := make(map[string]string, 0)
-			for k, v := range labels {
-				internalLabels[k] = v
-			}
-			internalLabels["app.kubernetes.io/component"] = "migration"
-
 			allScripts := getMigrationFiles(localMigrationsPath)
 
 			initContainers := getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName)
 			initContainers = append(initContainers, getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users))
 
+			nameLabels := labels.MustForNameK8SMap(componentLabels, jobName)
 			jobDef := &batchv1.Job{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      getJobName(reason),
+					Name:      jobName,
 					Namespace: namespace,
-					Labels:    internalLabels,
+					Labels:    nameLabels,
 					Annotations: map[string]string{
 						"migrationhash": getHash(allScripts),
 					},
@@ -141,7 +138,7 @@ func AdaptFunc(
 			for _, script := range allScripts {
 				allScriptsMap[script.Filename] = script.Data
 			}
-			queryCM, err := configmap.AdaptFuncToEnsure(namespace, migrationConfigmap, labels, allScriptsMap)
+			queryCM, err := configmap.AdaptFuncToEnsure(namespace, migrationConfigmap, nameLabels, allScriptsMap)
 			if err != nil {
 				return nil, err
 			}

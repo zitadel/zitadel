@@ -1,10 +1,11 @@
 package cmds
 
 import (
+	"os"
+
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/zitadel/operator/secrets"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 func ReadSecretCommand(rv RootValues) *cobra.Command {

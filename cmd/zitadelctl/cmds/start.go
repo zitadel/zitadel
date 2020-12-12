@@ -32,7 +32,7 @@ func StartOperator(rv RootValues) *cobra.Command {
 		}
 
 		if k8sClient.Available() {
-			return start.Operator(monitor, orbConfig.Path, k8sClient, migrationsPath, version)
+			return start.Operator(monitor, orbConfig.Path, k8sClient, migrationsPath, &version)
 		}
 		return nil
 	}

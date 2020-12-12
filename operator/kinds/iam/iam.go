@@ -2,6 +2,7 @@ package iam
 
 import (
 	"fmt"
+	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/orbos/pkg/orb"
 
 	"github.com/caos/orbos/mntr"
@@ -15,6 +16,7 @@ import (
 
 func GetQueryAndDestroyFuncs(
 	monitor mntr.Monitor,
+	operatorLabels *labels.Operator,
 	desiredTree *tree.Tree,
 	currentTree *tree.Tree,
 	nodeselector map[string]string,
@@ -38,8 +40,9 @@ func GetQueryAndDestroyFuncs(
 	}()
 
 	switch desiredTree.Common.Kind {
-	case "zitadel.caos.ch/Zitadel":
-		return zitadel.AdaptFunc(nodeselector, tolerations, orbconfig, action, migrationsPath, version, features)(monitor, desiredTree, currentTree)
+	case "zitadel.caos.ch/ZITADEL":
+		apiLabels := labels.MustForAPI(operatorLabels, "ZITADEL", desiredTree.Common.Version)
+		return zitadel.AdaptFunc(apiLabels, nodeselector, tolerations, orbconfig, action, migrationsPath, version, features)(monitor, desiredTree, currentTree)
 	default:
 		return nil, nil, nil, errors.Errorf("unknown iam kind %s", desiredTree.Common.Kind)
 	}

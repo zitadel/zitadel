@@ -5,6 +5,7 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
 	"github.com/caos/orbos/pkg/kubernetes/resources/job"
+	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/helpers"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/deployment"
@@ -24,9 +25,9 @@ const (
 
 func AdaptFunc(
 	monitor mntr.Monitor,
+	componentLabels *labels.Component,
 	namespace string,
 	reason string,
-	labels map[string]string,
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
 	resources *k8s.Resources,
@@ -78,11 +79,12 @@ func AdaptFunc(
 
 	volumes := deployment.GetVolumes(secretName, secretPasswordsName, consoleCMName, users)
 
+	jobName := getJobName(reason)
 	jobDef := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:        getJobName(reason),
+			Name:        jobName,
 			Namespace:   namespace,
-			Labels:      labels,
+			Labels:      labels.MustForNameK8SMap(componentLabels, jobName),
 			Annotations: map[string]string{},
 		},
 		Spec: batchv1.JobSpec{
@@ -108,7 +110,7 @@ func AdaptFunc(
 		},
 	}
 
-	destroyJ, err := job.AdaptFuncToDestroy(getJobName(reason), namespace)
+	destroyJ, err := job.AdaptFuncToDestroy(jobName, namespace)
 	if err != nil {
 		return nil, nil, err
 	}

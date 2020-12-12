@@ -4,6 +4,7 @@ import (
 	"github.com/caos/orbos/mntr"
 	kubernetes2 "github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
+	"github.com/caos/orbos/pkg/treelabels"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/pkg/kubernetes"
 	"github.com/pkg/errors"
@@ -30,7 +31,7 @@ func Reconcile(monitor mntr.Monitor, desiredTree *tree.Tree, takeoff bool) opera
 		}
 
 		if takeoff || desiredKind.Spec.SelfReconciling {
-			if err := kubernetes.EnsureZitadelOperatorArtifacts(monitor, k8sClient, desiredKind.Spec.Version, desiredKind.Spec.NodeSelector, desiredKind.Spec.Tolerations); err != nil {
+			if err := kubernetes.EnsureZitadelOperatorArtifacts(monitor, treelabels.MustForAPI(desiredTree, mustDatabaseOperator(desiredKind.Spec.Version)), k8sClient, desiredKind.Spec.Version, desiredKind.Spec.NodeSelector, desiredKind.Spec.Tolerations); err != nil {
 				recMonitor.Error(errors.Wrap(err, "Failed to deploy zitadel-operator into k8s-cluster"))
 				return err
 			}

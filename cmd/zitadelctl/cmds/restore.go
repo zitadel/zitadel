@@ -2,12 +2,13 @@ package cmds
 
 import (
 	"errors"
+	"io/ioutil"
+
 	"github.com/caos/orbos/pkg/databases"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/zitadel/operator/start"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
-	"io/ioutil"
 )
 
 func RestoreCommand(rv RootValues) *cobra.Command {
@@ -28,7 +29,7 @@ func RestoreCommand(rv RootValues) *cobra.Command {
 	flags.StringVar(&migrationsPath, "migrations", "./migrations/", "Path to the migration files")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		_, monitor, orbConfig, gitClient, _, errFunc := rv()
+		_, monitor, orbConfig, gitClient, version, errFunc := rv()
 		if errFunc != nil {
 			return errFunc(cmd)
 		}
@@ -75,10 +76,10 @@ func RestoreCommand(rv RootValues) *cobra.Command {
 			}
 
 			if !existing {
-				return errors.New("Choosen Backup is not existing")
+				return errors.New("chosen backup is not existing")
 			}
 
-			return start.Restore(monitor, gitClient, k8sClient, backup, "", migrationsPath)
+			return start.Restore(monitor, gitClient, k8sClient, backup, migrationsPath, &version)
 		}
 		return nil
 	}

@@ -15,6 +15,7 @@ type DesiredV0 struct {
 
 type Spec struct {
 	Verbose       bool
+	Force         bool
 	ReplicaCount  int                          `yaml:"replicaCount,omitempty"`
 	Configuration *configuration.Configuration `yaml:"configuration"`
 	NodeSelector  map[string]string            `yaml:"nodeSelector,omitempty"`

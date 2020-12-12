@@ -2,6 +2,9 @@ package start
 
 import (
 	"context"
+	"runtime/debug"
+	"time"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/databases"
 	"github.com/caos/orbos/pkg/git"
@@ -10,11 +13,9 @@ import (
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/kinds/orb"
 	kubernetes2 "github.com/caos/zitadel/pkg/kubernetes"
-	"runtime/debug"
-	"time"
 )
 
-func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.Client, migrationsPath string, version string) error {
+func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.Client, migrationsPath string, version *string) error {
 	takeoffChan := make(chan struct{})
 	go func() {
 		takeoffChan <- struct{}{}
@@ -51,7 +52,7 @@ func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 	return nil
 }
 
-func Restore(monitor mntr.Monitor, gitClient *git.Client, k8sClient *kubernetes.Client, backup, migrationsPath, version string) error {
+func Restore(monitor mntr.Monitor, gitClient *git.Client, k8sClient *kubernetes.Client, backup, migrationsPath string, version *string) error {
 	databasesList := []string{
 		"notification",
 		"adminapi",

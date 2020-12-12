@@ -4,13 +4,15 @@ import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/service"
+	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator"
 )
 
 func AdaptFunc(
 	monitor mntr.Monitor,
+	componentLabels *labels.Component,
+	zitadelPodSelector *labels.Selector,
 	namespace string,
-	labels map[string]string,
 	grpcServiceName string,
 	grpcPort int,
 	httpServiceName string,
@@ -48,7 +50,7 @@ func AdaptFunc(
 	grpcPorts := []service.Port{
 		{Name: "grpc", Port: grpcPort, TargetPort: "grpc"},
 	}
-	queryGRPC, err := service.AdaptFuncToEnsure(namespace, grpcServiceName, labels, grpcPorts, "", labels, false, "", "")
+	queryGRPC, err := service.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, grpcServiceName), grpcPorts, "", zitadelPodSelector, false, "", "")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -56,7 +58,7 @@ func AdaptFunc(
 	httpPorts := []service.Port{
 		{Name: "http", Port: httpPort, TargetPort: "http"},
 	}
-	queryHTTP, err := service.AdaptFuncToEnsure(namespace, httpServiceName, labels, httpPorts, "", labels, false, "", "")
+	queryHTTP, err := service.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, httpServiceName), httpPorts, "", zitadelPodSelector, false, "", "")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -64,7 +66,7 @@ func AdaptFunc(
 	uiPorts := []service.Port{
 		{Name: "ui", Port: uiPort, TargetPort: "ui"},
 	}
-	queryUI, err := service.AdaptFuncToEnsure(namespace, uiServiceName, labels, uiPorts, "", labels, false, "", "")
+	queryUI, err := service.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, uiServiceName), uiPorts, "", zitadelPodSelector, false, "", "")
 	if err != nil {
 		return nil, nil, err
 	}

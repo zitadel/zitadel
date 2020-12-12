@@ -1,14 +1,16 @@
 package configuration
 
 import (
+	"time"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/configmap"
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
+	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/configuration/users"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/database"
-	"time"
 )
 
 type ConsoleEnv struct {
@@ -26,8 +28,8 @@ const (
 
 func AdaptFunc(
 	monitor mntr.Monitor,
+	componentLabels *labels.Component,
 	namespace string,
-	labels map[string]string,
 	desired *Configuration,
 	cmName string,
 	certPath string,
@@ -90,15 +92,15 @@ func AdaptFunc(
 			if err != nil {
 				return nil, err
 			}
-			queryS, err := secret.AdaptFuncToEnsure(namespace, secretName, labels, literalsSecret)
+			queryS, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, secretName), literalsSecret)
 			if err != nil {
 				return nil, err
 			}
-			querySV, err := secret.AdaptFuncToEnsure(namespace, secretVarsName, labels, literalsSecretVars)
+			querySV, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, secretVarsName), literalsSecretVars)
 			if err != nil {
 				return nil, err
 			}
-			querySP, err := secret.AdaptFuncToEnsure(namespace, secretPasswordName, labels, necessaryUsers)
+			querySP, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, secretPasswordName), necessaryUsers)
 			if err != nil {
 				return nil, err
 			}
@@ -106,7 +108,7 @@ func AdaptFunc(
 			queryCCM, err := configmap.AdaptFuncToEnsure(
 				namespace,
 				consoleCMName,
-				labels,
+				labels.MustForNameK8SMap(componentLabels, consoleCMName),
 				literalsConsoleCM(
 					getClientID(),
 					desired.DNS,
@@ -122,7 +124,7 @@ func AdaptFunc(
 			queryCM, err := configmap.AdaptFuncToEnsure(
 				namespace,
 				cmName,
-				labels,
+				labels.MustForNameK8SMap(componentLabels, cmName),
 				literalsConfigMap(
 					desired,
 					necessaryUsers,
