@@ -2,12 +2,12 @@ package factors
 
 import "github.com/caos/zitadel/internal/eventstore/v2"
 
-type SecondFactoryWriteModel struct {
+type SecondFactorWriteModel struct {
 	eventstore.WriteModel
 	MFAType SecondFactorType
 }
 
-func (wm *SecondFactoryWriteModel) Reduce() error {
+func (wm *SecondFactorWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *SecondFactorAddedEvent:

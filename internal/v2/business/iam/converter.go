@@ -143,7 +143,7 @@ func writeModelToMember(writeModel *iam.MemberWriteModel) *model.IAMMember {
 
 func writeModelToLoginPolicy(wm *login.WriteModel) *model.LoginPolicy {
 	return &model.LoginPolicy{
-		ObjectRoot:            writeModelToObjectRoot(wm.WriteModel),
+		ObjectRoot:            writeModelToObjectRoot(wm.Policy.WriteModel),
 		AllowUsernamePassword: wm.Policy.AllowUserNamePassword,
 		AllowRegister:         wm.Policy.AllowRegister,
 		AllowExternalIdp:      wm.Policy.AllowExternalIDP,
@@ -154,7 +154,7 @@ func writeModelToLoginPolicy(wm *login.WriteModel) *model.LoginPolicy {
 
 func writeModelToLabelPolicy(wm *label.WriteModel) *model.LabelPolicy {
 	return &model.LabelPolicy{
-		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel),
+		ObjectRoot:     writeModelToObjectRoot(wm.Policy.WriteModel),
 		PrimaryColor:   wm.Policy.PrimaryColor,
 		SecondaryColor: wm.Policy.SecondaryColor,
 	}
@@ -162,14 +162,14 @@ func writeModelToLabelPolicy(wm *label.WriteModel) *model.LabelPolicy {
 
 func writeModelToOrgIAMPolicy(wm *org_iam.WriteModel) *model.OrgIAMPolicy {
 	return &model.OrgIAMPolicy{
-		ObjectRoot:            writeModelToObjectRoot(wm.WriteModel),
+		ObjectRoot:            writeModelToObjectRoot(wm.Policy.WriteModel),
 		UserLoginMustBeDomain: wm.Policy.UserLoginMustBeDomain,
 	}
 }
 
 func writeModelToPasswordAgePolicy(wm *password_age.WriteModel) *model.PasswordAgePolicy {
 	return &model.PasswordAgePolicy{
-		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel),
+		ObjectRoot:     writeModelToObjectRoot(wm.Policy.WriteModel),
 		MaxAgeDays:     wm.Policy.MaxAgeDays,
 		ExpireWarnDays: wm.Policy.ExpireWarnDays,
 	}
@@ -177,7 +177,7 @@ func writeModelToPasswordAgePolicy(wm *password_age.WriteModel) *model.PasswordA
 
 func writeModelToPasswordComplexityPolicy(wm *password_complexity.WriteModel) *model.PasswordComplexityPolicy {
 	return &model.PasswordComplexityPolicy{
-		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
+		ObjectRoot:   writeModelToObjectRoot(wm.Policy.WriteModel),
 		MinLength:    wm.Policy.MinLength,
 		HasLowercase: wm.Policy.HasLowercase,
 		HasUppercase: wm.Policy.HasUpperCase,
@@ -188,7 +188,7 @@ func writeModelToPasswordComplexityPolicy(wm *password_complexity.WriteModel) *m
 
 func writeModelToPasswordLockoutPolicy(wm *password_lockout.WriteModel) *model.PasswordLockoutPolicy {
 	return &model.PasswordLockoutPolicy{
-		ObjectRoot:          writeModelToObjectRoot(wm.WriteModel),
+		ObjectRoot:          writeModelToObjectRoot(wm.Policy.WriteModel),
 		MaxAttempts:         wm.Policy.MaxAttempts,
 		ShowLockOutFailures: wm.Policy.ShowLockOutFailures,
 	}

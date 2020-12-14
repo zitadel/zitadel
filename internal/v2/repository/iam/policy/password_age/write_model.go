@@ -10,20 +10,20 @@ const (
 )
 
 type WriteModel struct {
-	eventstore.WriteModel
 	Policy password_age.WriteModel
-
-	iamID string
 }
 
 func NewWriteModel(iamID string) *WriteModel {
 	return &WriteModel{
-		iamID: iamID,
+		Policy: password_age.WriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID: iamID,
+			},
+		},
 	}
 }
 
 func (wm *WriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
 	for _, event := range events {
 		switch e := event.(type) {
 		case *AddedEvent:
@@ -35,13 +35,10 @@ func (wm *WriteModel) AppendEvents(events ...eventstore.EventReader) {
 }
 
 func (wm *WriteModel) Reduce() error {
-	if err := wm.Policy.Reduce(); err != nil {
-		return err
-	}
-	return wm.WriteModel.Reduce()
+	return wm.Policy.Reduce()
 }
 
 func (wm *WriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).
-		AggregateIDs(wm.iamID)
+		AggregateIDs(wm.Policy.AggregateID)
 }
