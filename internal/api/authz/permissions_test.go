@@ -64,7 +64,7 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 		{
 			name: "Empty Context",
 			args: args{
-				ctxData: GetCtxData(getTestCtx("", "")),
+				ctxData: CtxData{},
 				verifier: Start(&testVerifier{grant: &Grant{
 					Roles: []string{"ORG_OWNER"},
 				}}),
@@ -89,7 +89,7 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 		{
 			name: "No Grants",
 			args: args{
-				ctxData:      GetCtxData(getTestCtx("", "")),
+				ctxData:      CtxData{},
 				verifier:     Start(&testVerifier{grant: &Grant{}}),
 				requiredPerm: "project.read",
 				authConfig: Config{
@@ -110,7 +110,7 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 		{
 			name: "Get Permissions",
 			args: args{
-				ctxData: GetCtxData(getTestCtx("userID", "orgID")),
+				ctxData: CtxData{UserID: "userID", OrgID: "orgID"},
 				verifier: Start(&testVerifier{grant: &Grant{
 					Roles: []string{"IAM_OWNER"},
 				}}),
