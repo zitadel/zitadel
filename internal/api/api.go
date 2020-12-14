@@ -5,18 +5,23 @@ import (
 	"net/http"
 
 	"github.com/caos/logging"
-	"google.golang.org/grpc"
-
+	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api/authz"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/api/grpc/server"
 	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/oidc"
+	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	authz_es "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/metrics"
+	"github.com/caos/zitadel/internal/telemetry/metrics/otel"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
+	view_model "github.com/caos/zitadel/internal/view/model"
+	"go.opentelemetry.io/otel/metric"
+	"google.golang.org/grpc"
 )
 
 type Config struct {
@@ -30,19 +35,33 @@ type API struct {
 	verifier       *authz.TokenVerifier
 	serverPort     string
 	health         health
+	auth           auth
+	admin          admin
 }
+
 type health interface {
 	Health(ctx context.Context) error
 	IamByID(ctx context.Context) (*iam_model.IAM, error)
 	VerifierClientID(ctx context.Context, appName string) (string, error)
 }
 
-func Create(config Config, authZ authz.Config, authZRepo *authz_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
+type auth interface {
+	ActiveUserSessionCount() int64
+}
+
+type admin interface {
+	GetViews() ([]*view_model.View, error)
+	GetSpoolerDiv(database, viewName string) int64
+}
+
+func Create(config Config, authZ authz.Config, authZRepo *authz_es.EsRepository, authRepo *auth_es.EsRepository, adminRepo *admin_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
 	api := &API{
 		serverPort: config.GRPC.ServerPort,
 	}
 	api.verifier = authz.Start(authZRepo)
 	api.health = authZRepo
+	api.auth = authRepo
+	api.admin = adminRepo
 	api.grpcServer = server.CreateServer(api.verifier, authZ, sd.DefaultLanguage)
 	api.gatewayHandler = server.CreateGatewayHandler(config.GRPC)
 	api.RegisterHandler("", api.healthHandler())
@@ -92,6 +111,7 @@ func (a *API) healthHandler() http.Handler {
 	handler.HandleFunc("/ready", handleReadiness(checks))
 	handler.HandleFunc("/validate", handleValidate(checks))
 	handler.HandleFunc("/clientID", a.handleClientID)
+	handler.Handle("/metrics", a.handleMetrics())
 
 	return handler
 }
@@ -130,6 +150,48 @@ func (a *API) handleClientID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http_util.MarshalJSON(w, id, nil, http.StatusOK)
+}
+
+func (a *API) handleMetrics() http.Handler {
+	a.registerActiveSessionCounters()
+	a.registerSpoolerDivCounters()
+	return metrics.GetExporter()
+}
+
+func (a *API) registerActiveSessionCounters() {
+	metrics.RegisterValueObserver(
+		metrics.ActiveSessionCounter,
+		metrics.ActiveSessionCounterDescription,
+		func(ctx context.Context, result metric.Int64ObserverResult) {
+			result.Observe(
+				a.auth.ActiveUserSessionCount(),
+			)
+		},
+	)
+}
+
+func (a *API) registerSpoolerDivCounters() {
+	views, err := a.admin.GetViews()
+	if err != nil {
+		logging.Log("API-3M8sd").WithError(err).Error("could not read views for metrics")
+		return
+	}
+	metrics.RegisterValueObserver(
+		metrics.SpoolerDivCounter,
+		metrics.SpoolerDivCounterDescription,
+		func(ctx context.Context, result metric.Int64ObserverResult) {
+			for _, view := range views {
+				labels := map[string]interface{}{
+					metrics.Database: view.Database,
+					metrics.ViewName: view.ViewName,
+				}
+				result.Observe(
+					a.admin.GetSpoolerDiv(view.Database, view.ViewName),
+					otel.MapToKeyValue(labels)...,
+				)
+			}
+		},
+	)
 }
 
 type ValidationFunction func(ctx context.Context) error

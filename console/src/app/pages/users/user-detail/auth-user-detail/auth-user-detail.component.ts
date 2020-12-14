@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
@@ -41,6 +41,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     public UserState: any = UserState;
 
     public USERGRANTCONTEXT: UserGrantContext = UserGrantContext.USER;
+    public refreshChanges$: EventEmitter<void> = new EventEmitter();
 
     constructor(
         public translate: TranslateService,
@@ -53,6 +54,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
 
     refreshUser(): void {
+        this.refreshChanges$.emit();
         this.userService.GetMyUser().then(user => {
             this.user = user.toObject();
             this.loading = false;
@@ -86,6 +88,7 @@ export class AuthUserDetailComponent implements OnDestroy {
                 .then((data: UserProfile) => {
                     this.toast.showInfo('USER.TOAST.SAVED', true);
                     this.user = Object.assign(this.user, data.toObject());
+                    this.refreshChanges$.emit();
                 })
                 .catch(error => {
                     this.toast.showError(error);
@@ -122,6 +125,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     public resendPhoneVerification(): void {
         this.userService.ResendPhoneVerification().then(() => {
             this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
+            this.refreshChanges$.emit();
         }).catch(error => {
             this.toast.showError(error);
         });
@@ -130,6 +134,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     public resendEmailVerification(): void {
         this.userService.ResendMyEmailVerificationMail().then(() => {
             this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
+            this.refreshChanges$.emit();
         }).catch(error => {
             this.toast.showError(error);
         });

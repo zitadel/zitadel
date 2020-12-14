@@ -11,6 +11,7 @@ type Handler interface {
 	EventQuery() (*models.SearchQuery, error)
 	Reduce(*models.Event) error
 	OnError(event *models.Event, err error) error
+	OnSuccess() error
 	MinimumCycleDuration() time.Duration
 	QueryLimit() uint64
 }

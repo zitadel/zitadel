@@ -10,7 +10,7 @@ import (
 )
 
 func (s *Server) GetViews(ctx context.Context, _ *empty.Empty) (_ *admin.Views, err error) {
-	views, err := s.administrator.GetViews(ctx)
+	views, err := s.administrator.GetViews()
 	if err != nil {
 		return nil, err
 	}

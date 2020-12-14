@@ -28,7 +28,7 @@ func (c *Config) New() *Spooler {
 		lockID:     lockID,
 		eventstore: c.Eventstore,
 		locker:     c.Locker,
-		queue:      make(chan *spooledHandler),
+		queue:      make(chan *spooledHandler, len(c.ViewHandlers)),
 		workers:    c.ConcurrentWorkers,
 	}
 }

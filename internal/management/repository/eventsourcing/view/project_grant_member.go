@@ -5,6 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
+	"time"
 )
 
 const (
@@ -27,28 +28,28 @@ func (v *View) ProjectGrantMembersByUserID(userID string) ([]*model.ProjectGrant
 	return view.ProjectGrantMembersByUserID(v.Db, projectGrantMemberTable, userID)
 }
 
-func (v *View) PutProjectGrantMember(member *model.ProjectGrantMemberView, sequence uint64) error {
+func (v *View) PutProjectGrantMember(member *model.ProjectGrantMemberView, sequence uint64, eventTimestamp time.Time) error {
 	err := view.PutProjectGrantMember(v.Db, projectGrantMemberTable, member)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedProjectGrantMemberSequence(sequence)
+	return v.ProcessedProjectGrantMemberSequence(sequence, eventTimestamp)
 }
 
-func (v *View) PutProjectGrantMembers(members []*model.ProjectGrantMemberView, sequence uint64) error {
+func (v *View) PutProjectGrantMembers(members []*model.ProjectGrantMemberView, sequence uint64, eventTimestamp time.Time) error {
 	err := view.PutProjectGrantMembers(v.Db, projectGrantMemberTable, members...)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedProjectGrantMemberSequence(sequence)
+	return v.ProcessedProjectGrantMemberSequence(sequence, eventTimestamp)
 }
 
-func (v *View) DeleteProjectGrantMember(grantID, userID string, eventSequence uint64) error {
+func (v *View) DeleteProjectGrantMember(grantID, userID string, eventSequence uint64, eventTimestamp time.Time) error {
 	err := view.DeleteProjectGrantMember(v.Db, projectGrantMemberTable, grantID, userID)
 	if err != nil {
 		return nil
 	}
-	return v.ProcessedProjectGrantMemberSequence(eventSequence)
+	return v.ProcessedProjectGrantMemberSequence(eventSequence, eventTimestamp)
 }
 
 func (v *View) DeleteProjectGrantMembersByProjectID(projectID string) error {
@@ -59,8 +60,12 @@ func (v *View) GetLatestProjectGrantMemberSequence() (*repository.CurrentSequenc
 	return v.latestSequence(projectGrantMemberTable)
 }
 
-func (v *View) ProcessedProjectGrantMemberSequence(eventSequence uint64) error {
-	return v.saveCurrentSequence(projectGrantMemberTable, eventSequence)
+func (v *View) ProcessedProjectGrantMemberSequence(eventSequence uint64, eventTimestamp time.Time) error {
+	return v.saveCurrentSequence(projectGrantMemberTable, eventSequence, eventTimestamp)
+}
+
+func (v *View) UpdateProjectGrantMemberSpoolerRunTimestamp() error {
+	return v.updateSpoolerRunSequence(projectGrantMemberTable)
 }
 
 func (v *View) GetLatestProjectGrantMemberFailedEvent(sequence uint64) (*repository.FailedEvent, error) {

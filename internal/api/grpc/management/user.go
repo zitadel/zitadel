@@ -214,11 +214,21 @@ func (s *Server) RemoveExternalIDP(ctx context.Context, request *management.Exte
 }
 
 func (s *Server) GetUserMfas(ctx context.Context, userID *management.UserID) (*management.UserMultiFactors, error) {
-	mfas, err := s.user.UserMfas(ctx, userID.Id)
+	mfas, err := s.user.UserMFAs(ctx, userID.Id)
 	if err != nil {
 		return nil, err
 	}
 	return &management.UserMultiFactors{Mfas: mfasFromModel(mfas)}, nil
+}
+
+func (s *Server) RemoveMfaOTP(ctx context.Context, userID *management.UserID) (*empty.Empty, error) {
+	err := s.user.RemoveOTP(ctx, userID.Id)
+	return &empty.Empty{}, err
+}
+
+func (s *Server) RemoveMfaU2F(ctx context.Context, webAuthNTokenID *management.WebAuthNTokenID) (*empty.Empty, error) {
+	err := s.user.RemoveU2F(ctx, webAuthNTokenID.UserId, webAuthNTokenID.Id)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) SearchUserMemberships(ctx context.Context, in *management.UserMembershipSearchRequest) (*management.UserMembershipSearchResponse, error) {

@@ -18,12 +18,12 @@ const (
 	loginPolicyTable = "adminapi.login_policies"
 )
 
-func (m *LoginPolicy) ViewModel() string {
+func (p *LoginPolicy) ViewModel() string {
 	return loginPolicyTable
 }
 
-func (m *LoginPolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestLoginPolicySequence()
+func (p *LoginPolicy) EventQuery() (*models.SearchQuery, error) {
+	sequence, err := p.view.GetLatestLoginPolicySequence()
 	if err != nil {
 		return nil, err
 	}
@@ -32,15 +32,15 @@ func (m *LoginPolicy) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (m *LoginPolicy) Reduce(event *models.Event) (err error) {
+func (p *LoginPolicy) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
 	case model.IAMAggregate:
-		err = m.processLoginPolicy(event)
+		err = p.processLoginPolicy(event)
 	}
 	return err
 }
 
-func (m *LoginPolicy) processLoginPolicy(event *models.Event) (err error) {
+func (p *LoginPolicy) processLoginPolicy(event *models.Event) (err error) {
 	policy := new(iam_model.LoginPolicyView)
 	switch event.Type {
 	case model.LoginPolicyAdded:
@@ -50,21 +50,25 @@ func (m *LoginPolicy) processLoginPolicy(event *models.Event) (err error) {
 		model.LoginPolicySecondFactorRemoved,
 		model.LoginPolicyMultiFactorAdded,
 		model.LoginPolicyMultiFactorRemoved:
-		policy, err = m.view.LoginPolicyByAggregateID(event.AggregateID)
+		policy, err = p.view.LoginPolicyByAggregateID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		err = policy.AppendEvent(event)
 	default:
-		return m.view.ProcessedLoginPolicySequence(event.Sequence)
+		return p.view.ProcessedLoginPolicySequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutLoginPolicy(policy, policy.Sequence)
+	return p.view.PutLoginPolicy(policy, policy.Sequence, event.CreationDate)
 }
 
-func (m *LoginPolicy) OnError(event *models.Event, err error) error {
+func (p *LoginPolicy) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Wj8sf", "id", event.AggregateID).WithError(err).Warn("something went wrong in login policy handler")
-	return spooler.HandleError(event, err, m.view.GetLatestLoginPolicyFailedEvent, m.view.ProcessedLoginPolicyFailedEvent, m.view.ProcessedLoginPolicySequence, m.errorCountUntilSkip)
+	return spooler.HandleError(event, err, p.view.GetLatestLoginPolicyFailedEvent, p.view.ProcessedLoginPolicyFailedEvent, p.view.ProcessedLoginPolicySequence, p.errorCountUntilSkip)
+}
+
+func (p *LoginPolicy) OnSuccess() error {
+	return spooler.HandleSuccess(p.view.UpdateLoginPolicySpoolerRunTimestamp)
 }

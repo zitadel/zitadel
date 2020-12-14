@@ -1,4 +1,4 @@
-<app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam' : '/org']"
+<app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
     [title]="'POLICY.LOGIN_POLICY.TITLE' | translate"
     [description]="(serviceType==PolicyComponentServiceType.MGMT ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEMGMT' : PolicyComponentServiceType.ADMIN ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEADMIN' : '') | translate">
     <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
@@ -44,7 +44,33 @@
             </mat-slide-toggle>
             <p> {{'POLICY.DATA.ALLOWEXTERNALIDP_DESC' | translate}} </p>
         </div>
+        <div class="row">
+            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
+                [(ngModel)]="loginData.forceMfa">
+                {{'POLICY.DATA.FORCEMFA' | translate}}
+            </mat-slide-toggle>
+            <p> {{'POLICY.DATA.FORCEMFA_DESC' | translate}} </p>
+        </div>
     </div>
+
+    <button [disabled]="disabled" class="save-button" (click)="savePolicy()" color="primary" type="submit"
+        mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+
+    <div class="divider"></div>
+
+    <h3 class="subheader">{{ 'MFA.LIST.MULTIFACTORTITLE' | translate }}</h3>
+    <p class="subdesc">{{ 'MFA.LIST.MULTIFACTORDESCRIPTION' | translate }}</p>
+    <app-mfa-table [service]="service" [serviceType]="serviceType"
+        [componentType]="LoginMethodComponentType.MultiFactor"
+        [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.policy.write' : ''] | hasRole | async) == false">
+    </app-mfa-table>
+
+    <h3 class="subheader">{{ 'MFA.LIST.SECONDFACTORTITLE' | translate }}</h3>
+    <p class="subdesc">{{ 'MFA.LIST.SECONDFACTORDESCRIPTION' | translate }}</p>
+    <app-mfa-table [service]="service" [serviceType]="serviceType"
+        [componentType]="LoginMethodComponentType.SecondFactor"
+        [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.policy.write' : ''] | hasRole | async) == false">
+    </app-mfa-table>
 
     <h3 class="subheader">{{'LOGINPOLICY.IDPS' | translate}}</h3>
 
@@ -62,9 +88,6 @@
             <mat-icon>add</mat-icon>
         </div>
     </div>
-
-    <button [disabled]="disabled" class="save-button" (click)="savePolicy()" color="primary" type="submit"
-        mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
 
     <ng-template appHasRole [appHasRole]="['org.idp.read']">
         <h2>{{ 'IDP.LIST.TITLE' | translate }}</h2>

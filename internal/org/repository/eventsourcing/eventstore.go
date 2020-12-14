@@ -429,16 +429,20 @@ func (es *OrgEventstore) ChangeOrgMember(ctx context.Context, member *org_model.
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ara6l", "Errors.Org.InvalidMember")
 	}
 
-	existingMember, err := es.OrgMemberByIDs(ctx, member)
+	org, err := es.OrgByID(ctx, &org_model.Org{ObjectRoot: es_models.ObjectRoot{AggregateID: member.AggregateID, Sequence: member.Sequence}})
 	if err != nil {
 		return nil, err
 	}
+	existingMember, _ := org.MemeberByUserID(member.UserID)
+	if existingMember == nil {
+		return nil, errors.ThrowNotFound(nil, "EVENT-VB2Pn", "Errors.Org.MemberNotExisting")
+	}
 
-	member.ObjectRoot = existingMember.ObjectRoot
+	repoOrg := model.OrgFromModel(org)
 	repoMember := model.OrgMemberFromModel(member)
 	repoExistingMember := model.OrgMemberFromModel(existingMember)
 
-	orgAggregate := orgMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoExistingMember, repoMember)
+	orgAggregate := orgMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoExistingMember, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoMember.AppendEvents, orgAggregate)
 	if err != nil {
 		return nil, err
@@ -452,18 +456,19 @@ func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.
 		return errors.ThrowInvalidArgument(nil, "EVENT-d43fs", "Errors.Org.UserIDMissing")
 	}
 
-	existingMember, err := es.OrgMemberByIDs(ctx, member)
-	if errors.IsNotFound(err) {
-		return nil
-	}
+	org, err := es.OrgByID(ctx, &org_model.Org{ObjectRoot: es_models.ObjectRoot{AggregateID: member.AggregateID, Sequence: member.Sequence}})
 	if err != nil {
 		return err
 	}
+	existingMember, _ := org.MemeberByUserID(member.UserID)
+	if existingMember == nil {
+		return nil
+	}
 
-	member.ObjectRoot = existingMember.ObjectRoot
+	repoOrg := model.OrgFromModel(org)
 	repoMember := model.OrgMemberFromModel(member)
 
-	orgAggregate := orgMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoMember)
+	orgAggregate := orgMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMember)
 	return es_sdk.Push(ctx, es.PushAggregates, repoMember.AppendEvents, orgAggregate)
 }
 
@@ -900,7 +905,7 @@ func (es *OrgEventstore) AddSecondFactorToLoginPolicy(ctx context.Context, aggre
 	if err != nil {
 		return 0, err
 	}
-	if _, m := iam_es_model.GetMFA(repoOrg.LoginPolicy.SecondFactors, repoMFA.MfaType); m != 0 {
+	if _, m := iam_es_model.GetMFA(repoOrg.LoginPolicy.SecondFactors, repoMFA.MFAType); m != 0 {
 		return iam_model.SecondFactorType(m), nil
 	}
 	return 0, errors.ThrowInternal(nil, "EVENT-rM9so", "Errors.Internal")
@@ -945,7 +950,7 @@ func (es *OrgEventstore) AddMultiFactorToLoginPolicy(ctx context.Context, aggreg
 	if err != nil {
 		return 0, err
 	}
-	if _, m := iam_es_model.GetMFA(repoOrg.LoginPolicy.MultiFactors, repoMFA.MfaType); m != 0 {
+	if _, m := iam_es_model.GetMFA(repoOrg.LoginPolicy.MultiFactors, repoMFA.MFAType); m != 0 {
 		return iam_model.MultiFactorType(m), nil
 	}
 	return 0, errors.ThrowInternal(nil, "EVENT-2fMo0", "Errors.Internal")

@@ -19,12 +19,12 @@ const (
 	idpConfigTable = "adminapi.idp_configs"
 )
 
-func (m *IDPConfig) ViewModel() string {
+func (i *IDPConfig) ViewModel() string {
 	return idpConfigTable
 }
 
-func (m *IDPConfig) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestIDPConfigSequence()
+func (i *IDPConfig) EventQuery() (*models.SearchQuery, error) {
+	sequence, err := i.view.GetLatestIDPConfigSequence()
 	if err != nil {
 		return nil, err
 	}
@@ -33,15 +33,15 @@ func (m *IDPConfig) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (m *IDPConfig) Reduce(event *models.Event) (err error) {
+func (i *IDPConfig) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
 	case model.IAMAggregate:
-		err = m.processIDPConfig(event)
+		err = i.processIDPConfig(event)
 	}
 	return err
 }
 
-func (m *IDPConfig) processIDPConfig(event *models.Event) (err error) {
+func (i *IDPConfig) processIDPConfig(event *models.Event) (err error) {
 	idp := new(iam_view_model.IDPConfigView)
 	switch event.Type {
 	case model.IDPConfigAdded:
@@ -53,7 +53,7 @@ func (m *IDPConfig) processIDPConfig(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		idp, err = m.view.IDPConfigByID(idp.IDPConfigID)
+		idp, err = i.view.IDPConfigByID(idp.IDPConfigID)
 		if err != nil {
 			return err
 		}
@@ -63,17 +63,21 @@ func (m *IDPConfig) processIDPConfig(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return m.view.DeleteIDPConfig(idp.IDPConfigID, event.Sequence)
+		return i.view.DeleteIDPConfig(idp.IDPConfigID, event.Sequence, event.CreationDate)
 	default:
-		return m.view.ProcessedIDPConfigSequence(event.Sequence)
+		return i.view.ProcessedIDPConfigSequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutIDPConfig(idp, idp.Sequence)
+	return i.view.PutIDPConfig(idp, idp.Sequence, event.CreationDate)
 }
 
-func (m *IDPConfig) OnError(event *models.Event, err error) error {
+func (i *IDPConfig) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Mslo9", "id", event.AggregateID).WithError(err).Warn("something went wrong in idp config handler")
-	return spooler.HandleError(event, err, m.view.GetLatestIDPConfigFailedEvent, m.view.ProcessedIDPConfigFailedEvent, m.view.ProcessedIDPConfigSequence, m.errorCountUntilSkip)
+	return spooler.HandleError(event, err, i.view.GetLatestIDPConfigFailedEvent, i.view.ProcessedIDPConfigFailedEvent, i.view.ProcessedIDPConfigSequence, i.errorCountUntilSkip)
+}
+
+func (i *IDPConfig) OnSuccess() error {
+	return spooler.HandleSuccess(i.view.UpdateIDPConfigSpoolerRunTimestamp)
 }

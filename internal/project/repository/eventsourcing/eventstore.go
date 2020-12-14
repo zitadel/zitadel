@@ -20,6 +20,7 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 const (
@@ -788,7 +789,9 @@ func (es *ProjectEventstore) ChangeOIDCConfigSecret(ctx context.Context, project
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-dk87s", "Errors.Internal")
 }
 
-func (es *ProjectEventstore) VerifyOIDCClientSecret(ctx context.Context, projectID, appID string, secret string) error {
+func (es *ProjectEventstore) VerifyOIDCClientSecret(ctx context.Context, projectID, appID string, secret string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	if appID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-H3RT2", "Errors.Project.RequiredFieldsMissing")
 	}
@@ -804,7 +807,10 @@ func (es *ProjectEventstore) VerifyOIDCClientSecret(ctx context.Context, project
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-huywq", "Errors.Project.AppIsNotOIDC")
 	}
 
-	if err := crypto.CompareHash(app.OIDCConfig.ClientSecret, []byte(secret), es.passwordAlg); err == nil {
+	ctx, spanHash := tracing.NewSpan(ctx)
+	err = crypto.CompareHash(app.OIDCConfig.ClientSecret, []byte(secret), es.passwordAlg)
+	spanHash.EndWithError(err)
+	if err == nil {
 		return es.setOIDCClientSecretCheckResult(ctx, existingProject, app.AppID, OIDCClientSecretCheckSucceededAggregate)
 	}
 	if err := es.setOIDCClientSecretCheckResult(ctx, existingProject, app.AppID, OIDCClientSecretCheckFailedAggregate); err != nil {

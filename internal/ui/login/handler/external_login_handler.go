@@ -188,16 +188,10 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 		ObjectRoot: models.ObjectRoot{AggregateID: iam.GlobalOrgID},
 		Roles:      []string{orgProjectCreatorRole},
 	}
-	if authReq.GetScopeOrgPrimaryDomain() != "" {
-		primaryDomain := authReq.GetScopeOrgPrimaryDomain()
-		org, err := l.authRepo.GetOrgByPrimaryDomain(primaryDomain)
-		if err != nil {
-			l.renderExternalNotFoundOption(w, r, authReq, err)
-		}
-		if org.ID != iam.GlobalOrgID {
-			member = nil
-			resourceOwner = org.ID
-		}
+
+	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != iam.GlobalOrgID {
+		member = nil
+		resourceOwner = authReq.RequestedOrgID
 	}
 
 	orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)

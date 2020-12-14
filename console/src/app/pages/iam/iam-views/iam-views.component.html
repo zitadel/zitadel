@@ -18,11 +18,18 @@
                 <td mat-cell *matCellDef="let view"> {{view.processedSequence}} </td>
             </ng-container>
 
-            <ng-container matColumnDef="timestamp">
-                <th mat-header-cell *matHeaderCellDef> {{ 'IAM.VIEWS.TIMESTAMP' | translate }} </th>
+            <ng-container matColumnDef="eventTimestamp">
+                <th mat-header-cell *matHeaderCellDef> {{ 'IAM.VIEWS.EVENTTIMESTAMP' | translate }} </th>
                 <td mat-cell *matCellDef="let view">
-                    <span>{{view?.viewTimestamp | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
+                    <span>{{view?.eventTimestamp | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
                 </td>
+            </ng-container>
+
+            <ng-container matColumnDef="lastSuccessfulSpoolerRun">
+              <th mat-header-cell *matHeaderCellDef> {{ 'IAM.VIEWS.LASTSPOOL' | translate }} </th>
+              <td mat-cell *matCellDef="let view">
+                <span>{{view?.lastSuccessfulSpoolerRun | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
+              </td>
             </ng-container>
 
             <ng-container matColumnDef="actions" stickyEnd>

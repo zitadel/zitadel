@@ -5,6 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
+	"time"
 )
 
 const (
@@ -47,40 +48,44 @@ func (v *View) IsUserUnique(userName, email string) (bool, error) {
 	return view.IsUserUnique(v.Db, userTable, userName, email)
 }
 
-func (v *View) UserMfas(userID string) ([]*usr_model.MultiFactor, error) {
-	return view.UserMfas(v.Db, userTable, userID)
+func (v *View) UserMFAs(userID string) ([]*usr_model.MultiFactor, error) {
+	return view.UserMFAs(v.Db, userTable, userID)
 }
 
-func (v *View) PutUser(user *model.UserView, sequence uint64) error {
+func (v *View) PutUser(user *model.UserView, sequence uint64, eventTimestamp time.Time) error {
 	err := view.PutUser(v.Db, userTable, user)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedUserSequence(sequence)
+	return v.ProcessedUserSequence(sequence, eventTimestamp)
 }
 
-func (v *View) PutUsers(users []*model.UserView, sequence uint64) error {
+func (v *View) PutUsers(users []*model.UserView, sequence uint64, eventTimestamp time.Time) error {
 	err := view.PutUsers(v.Db, userTable, users...)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedUserSequence(sequence)
+	return v.ProcessedUserSequence(sequence, eventTimestamp)
 }
 
-func (v *View) DeleteUser(userID string, eventSequence uint64) error {
+func (v *View) DeleteUser(userID string, eventSequence uint64, eventTimestamp time.Time) error {
 	err := view.DeleteUser(v.Db, userTable, userID)
 	if err != nil {
 		return nil
 	}
-	return v.ProcessedUserSequence(eventSequence)
+	return v.ProcessedUserSequence(eventSequence, eventTimestamp)
 }
 
 func (v *View) GetLatestUserSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(userTable)
 }
 
-func (v *View) ProcessedUserSequence(eventSequence uint64) error {
-	return v.saveCurrentSequence(userTable, eventSequence)
+func (v *View) ProcessedUserSequence(eventSequence uint64, eventTimestamp time.Time) error {
+	return v.saveCurrentSequence(userTable, eventSequence, eventTimestamp)
+}
+
+func (v *View) UpdateUserSpoolerRunTimestamp() error {
+	return v.updateSpoolerRunSequence(userTable)
 }
 
 func (v *View) GetLatestUserFailedEvent(sequence uint64) (*repository.FailedEvent, error) {

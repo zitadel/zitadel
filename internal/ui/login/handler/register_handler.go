@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"golang.org/x/text/language"
 	"net/http"
+
+	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -71,17 +72,9 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		ObjectRoot: models.ObjectRoot{AggregateID: iam.GlobalOrgID},
 		Roles:      []string{orgProjectCreatorRole},
 	}
-	if authRequest.GetScopeOrgPrimaryDomain() != "" {
-		primaryDomain := authRequest.GetScopeOrgPrimaryDomain()
-		org, err := l.authRepo.GetOrgByPrimaryDomain(primaryDomain)
-		if err != nil {
-			l.renderRegisterOption(w, r, authRequest, err)
-			return
-		}
-		if org.ID != iam.GlobalOrgID {
-			member = nil
-			resourceOwner = org.ID
-		}
+	if authRequest.RequestedOrgID != "" && authRequest.RequestedOrgID != iam.GlobalOrgID {
+		member = nil
+		resourceOwner = authRequest.RequestedOrgID
 	}
 	user, err := l.authRepo.Register(setContext(r.Context(), resourceOwner), data.toUserModel(), member, resourceOwner)
 	if err != nil {

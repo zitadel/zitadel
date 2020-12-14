@@ -1,8 +1,8 @@
 <form>
-    <mat-form-field *ngIf="target && target == UserTarget.SELF" appearance="outline" class="full-width">
-        <mat-label>Organizations User Loginname</mat-label>
+    <cnsl-form-field *ngIf="target && target == UserTarget.SELF" appearance="outline" class="full-width more-space">
+        <cnsl-label>Organizations User Loginname</cnsl-label>
 
-        <input matInput *ngIf="singleOutput" type="text" placeholder="Search for the user loginname" #usernameInput
+        <input cnslInput *ngIf="singleOutput" type="text" placeholder="Search for the user loginname" #usernameInput
             [formControl]="myControl" [matAutocomplete]="auto" />
 
         <mat-chip-list *ngIf="!singleOutput" #chipList aria-label="loginname selection">
@@ -13,8 +13,8 @@
                     {{selecteduser.preferredLoginName}}</small>
                 <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
             </mat-chip>
-            <input placeholder="{{'ORG_DETAIL.MEMBER.LOGINNAME' | translate}}" #usernameInput [formControl]="myControl"
-                [matAutocomplete]="auto" [matChipInputFor]="chipList"
+            <input cnslInput placeholder="{{'ORG_DETAIL.MEMBER.LOGINNAME' | translate}}" #usernameInput
+                [formControl]="myControl" [matAutocomplete]="auto" [matChipInputFor]="chipList"
                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
                 (matChipInputTokenEnd)="add($event)" />
         </mat-chip-list>
@@ -29,21 +29,21 @@
             </mat-option>
         </mat-autocomplete>
 
-        <mat-hint class="target-desc">
+        <span class="target-desc">
             {{'USER.TARGET.SELF'| translate}}
             <a (click)="changeTarget()">{{'USER.TARGET.CLICKHERE' | translate}}</a>
-        </mat-hint>
-    </mat-form-field>
+        </span>
+    </cnsl-form-field>
 
     <div *ngIf="target && target == UserTarget.EXTERNAL" class="line">
-        <mat-form-field class="form-field" appearance="outline">
-            <mat-label>Global User Loginname</mat-label>
-            <input matInput type="text" [formControl]="globalLoginNameControl" />
-            <mat-hint class="target-desc">
+        <cnsl-form-field class="form-field" appearance="outline">
+            <cnsl-label>Global User Loginname</cnsl-label>
+            <input cnslInput type="text" [formControl]="globalLoginNameControl" />
+            <span class="target-desc">
                 {{(target == UserTarget.SELF ? 'USER.TARGET.SELF' : 'USER.TARGET.EXTERNAL') | translate}}
                 <a (click)="changeTarget()">{{'USER.TARGET.CLICKHERE' | translate}}</a>
-            </mat-hint>
-        </mat-form-field>
+            </span>
+        </cnsl-form-field>
 
         <button color="primary" mat-icon-button (click)="getGlobalUser()">
             <i class="las la-search"></i>

@@ -36,9 +36,12 @@
     },
     "MENU": {
         "PERSONAL_INFO": "Persönliche Informationen",
-        "IAM":"Administration",
+        "DOCUMENTATION":"Dokumentation",
+        "IAMPOLICIES":"IAM",
+        "IAMEVENTSTORE":"Speicher",
         "ORGANIZATION": "Organisation",
-        "ADMINSECTION":"Administration",
+        "ADMINSECTION":"ZITADEL Administration",
+        "ORGSECTION":"Organisation",
         "PROJECTSSECTION":"Projektsektion",
         "PROJECT": "Projekte",
         "GRANTEDPROJECT":"Berechtigte Projekte",
@@ -50,7 +53,18 @@
         "IAMADMIN":"Du bist ein IAM-Administrator. Beachte, dass Du erhöhte Rechte besitzt.",
         "SHOWORGS":"Alle Organisationen anzeigen",
         "GRANTSECTION":"Berechtigungssektion",
-        "GRANTS":"Berechtigungen"
+        "GRANTS":"Berechtigungen",
+        "TOOLTIP": {
+            "PERSONAL":"Verwalte deinen persönlichen Account, deine IDPs, Login Methoden, Faktoren und Berechtigungen",
+            "IAMPOLICIES":"Verwalte ZITADELs globale Zugangsrichtlinien und verwalte ZITADEL Manager",
+            "IAMEVENTSTORE":"Bereinige views und fehlerhafte Events",
+            "ORG":"Verwalte die Zugangsrichtlinien und Domains deiner Organisation ",
+            "SELFPROJECTS":"Verwalte die Projekte deiner Organisation",
+            "GRANTEDPROJECTS":"Verwalte die berechtigten Projekte von anderen Organisationen",
+            "HUMANUSERS":"Verwalte die Menschlichen Benutzer deiner Organisation",
+            "MACHINEUSERS":"Verwalte die  Service Benutzer deiner Organisation",
+            "AUTHZ":"Verwalte die Berechtigungen deiner Organisationsbenutzer"
+        }
     },
     "ACTIONS": {
         "SAVE": "Speichern",
@@ -80,6 +94,10 @@
         "CONFIGURE":"Konfigurieren",
         "SEND":"Senden",
         "NEWVALUE":"Neuer Wert"
+    },
+    "RESOURCEID":"Ressourcen-ID",
+    "TABLE": {
+        "NOROWS":"Keine Daten"
     },
     "ERRORS": {
         "REQUIRED": "Bitte fülle alle benötigten Felder aus.",
@@ -131,11 +149,13 @@
                 "6":"Nach Email filtern",
                 "10":"Nach Organisationsname filtern",
                 "12":"Project Name"
-            }
+            },
+            "EMPTY":"Keine Einträge"
         },
         "MFA": {
             "TABLETYPE":"Typ",
             "TABLESTATE":"Status",
+            "ATTRIBUTE":"Attribut",
             "TABLEACTIONS":"Aktionen",
             "TITLE": "Multifaktor-Authentisierung",
             "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um Dein Konto optimal zu schützen.",
@@ -143,10 +163,16 @@
             "OTP": "OTP konfigurieren",
             "OTP_DIALOG_TITLE": "OTP hinzufügen",
             "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator App und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
+            "U2F":"U2F hinzufügen",
+            "U2F_DIALOG_TITLE": "U2F hinzufügen",
+            "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Universellen Multifaktor an.",
+            "U2F_SUCCESS":"U2F erfolgreich erstellt!",
+            "U2F_ERROR":"Ein Fehler ist aufgetreten!",
+            "U2F_NAME":"U2F Name",
             "TYPE": {
                 "0":"Keine MFA definiert",
-                "1":"SMS",
-                "2":"OTP"
+                "1":"OTP",
+                "2":"U2F"
             },
             "STATE": {
                 "0": "Kein Status",
@@ -155,8 +181,8 @@
                 "3": "Gelöscht"
             },
             "DIALOG": {
-                "OTP_DELETE_TITLE":"OTP Faktor entfernen",
-                "OTP_DELETE_DESCRIPTION":"Sie sind im Begriff OTP als Zweitfaktormethode zu entfernen. Sind sie sicher?"
+                "MFA_DELETE_TITLE":"Zweiten Faktor entfernen",
+                "MFA_DELETE_DESCRIPTION":"Sie sind im Begriff eine Zweitfaktormethode zu entfernen. Sind sie sicher?"
             }
         },
         "EXTERNALIDP": {
@@ -217,7 +243,8 @@
             "KEYSDESC":"Definiere Deine Schlüssel mit einem optionalen Ablaufdatum.",
             "ID":"Schlüssel-ID",
             "TYPE":"Typ",
-            "EXPIRYDATE":"Ablaufdatum",
+            "EXPIRATIONDATE":"Ablaufdatum",
+            "CHOOSEDATEAFTER":"Geben Sie ein valides Ablaufdatum an. Ab",
             "CHOOSEEXPIRY":"Definiere ein Ablaufdatum",
             "CREATIONDATE":"Erstelldatum",
             "KEYDETAILS":"Schlüssel Details",
@@ -286,6 +313,7 @@
         },
         "VALIDATION": {
             "INVALIDPATTERN": "Das Passwort erfüllt nicht die vorgegebenen Regeln.",
+            "NOTANEMAIL":"Der eingegebene Wert ist keine E-Mail Adresse.",
             "REQUIRED": "Das Eingagefeld ist leer.",
             "MINLENGTH":"Das Password muss mindestens {{requiredLength}} Zeichen lang sein.",
             "NOEMAIL":"Benutzername darf keine E-Mail-Adresse sein.",
@@ -324,6 +352,7 @@
             "PHONEVERIFICATIONSENT":"Bestätigungscode per Telefonnummer gesendet.",
             "EMAILVERIFICATIONSENT":"Bestätigungscode per E-Mail gesendet.",
             "OTPREMOVED":"OTP entfernt.",
+            "U2FREMOVED":"U2F entfernt.",
             "INITIALPASSWORDSET":"Initiales Passwort gesetzt.",
             "PASSWORDNOTIFICATIONSENT":"Passwortänderung mittgeteilt.",
             "PASSWORDCHANGED":"Passwort geändert.",
@@ -353,9 +382,13 @@
         }
     },
     "IAM": {
-        "DETAIL": {
-            "TITLE":"Administration Identity- und Access-Management Administration",
-            "DESCRIPTION":"Verwalte die Einstellungen von ZITADEL."
+        "POLICIES": {
+            "TITLE":"IAM Administration",
+            "DESCRIPTION":"Verwalte Richtlinen und Zugangseinstellungen von ZITADEL."
+        },
+        "EVENTSTORE": {
+            "TITLE":"IAM Speicher Administration",
+            "DESCRIPTION":"Verwalte Speicher Einstellungen von ZITADEL."
         },
         "MEMBER": {
             "TITLE":"Manager",
@@ -367,7 +400,8 @@
             "VIEWNAME":"Name",
             "DATABASE":"Datenbank",
             "SEQUENCE":"Sequenz",
-            "TIMESTAMP":"Zeitstempel",
+            "EVENTTIMESTAMP":"Event Zeitstempel",
+            "LASTSPOOL": "Erfolgreicher Durchlauf",
             "ACTIONS":"Aktionen",
             "CLEAR":"Aufräumen",
             "CLEARED":"View wurde erfolgreich zurückgesetzt!",
@@ -410,6 +444,7 @@
             "ACTIVE":"Aktiv",
             "CREATE":"Organisation erstellen",
             "ORGDETAIL_TITLE":"Gebe den Namen und die Domain für die neue Organisation ein.",
+            "ORGDETAIL_TITLE_WITHOUT_DOMAIN":"Geben Sie den Namen der neuen Organisation ein.",
             "ORGDETAILUSER_TITLE":"Organisationsbesitzer hinzufügen",
             "ORGDOMAIN": {
                 "TITLE":"Verifikation der Domain der Organisation",
@@ -524,7 +559,9 @@
             "ALLOWREGISTER":"Registrieren erlaubt",
             "ALLOWUSERNAMEPASSWORD_DESC":"Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
             "ALLOWEXTERNALIDP_DESC":"Der Login wird für die darunter liegenden Identity Provider erlaubt.",
-            "ALLOWREGISTER_DESC":"Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers."
+            "ALLOWREGISTER_DESC":"Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers.",
+            "FORCEMFA":"Mfa erzwingen",
+            "FORCEMFA_DESC":"Ist die Option gewählt, müssen Benutzer einen zweiten Faktor für den Login verwenden."
         },
         "RESET":"Richtlinie zurücksetzen",
         "CREATECUSTOM":"Benutzerdefinierte Richtlinie erstellen",
@@ -558,7 +595,7 @@
             "ADDDESCRIPTION": "Gebe die E-Mail-Adressen der hinzuzufügenden Benutzer ein."
         },
         "TABLE": {
-            "TOTAL": "Einträge gesamt:",
+            "TOTAL": "Einträge gesamt",
             "SELECTION": "Ausgewählte Elemente",
             "DEACTIVATE": "Benutzer deaktivieren",
             "ACTIVATE": "Benutzer aktivieren",
@@ -626,6 +663,7 @@
             "USERID": "Benutzer-ID"
         },
         "GRANT": {
+            "EMPTY":"Noch keine Organisation berechtigt",
             "TITLE": "Berechtigte Organisationen",
             "DESCRIPTION": "Gewähre einer anderen Organisation Zugriff auf dieses Projekt.",
             "CREATE": {
@@ -661,6 +699,7 @@
             "GRANTEDORGNAME":"Name der Organisation",
             "CREATIONDATE": "Erstelldatum",
             "CHANGEDATE": "Letzte Änderung",
+            "DATES":"Datum",
             "ROLENAMESLIST": "Rollen",
             "NOROLES":"Keine Rollen",
             "TOAST":{
@@ -679,6 +718,7 @@
             "NAMEREQUIRED":"Der Name ist erforderlich."
         },
         "ROLE": {
+            "EMPTY":"Noch keine Rollen erstellt!",
             "ADDNEWLINE":"Zusätzliche Rolle hinzufügen",
             "KEY":"Key",
             "TITLE": "Rollen",
@@ -712,7 +752,10 @@
             "TYPE":"Typ",
             "CREATIONDATE":"Erstelldatum",
             "CHANGEDATE":"Letzte Änderung",
-            "RESOURCEOWNER":"Besitzer"
+            "RESOURCEOWNER":"Besitzer",
+            "SHOWTABLE":"Tabellendarstellung",
+            "SHOWGRID":"Rasterdarstellung",
+            "EMPTY":"Kein Projekt gefunden"
         },
         "TOAST":{
             "MEMBERREMOVED":"Manager entfernt.",
@@ -730,7 +773,7 @@
     },
     "IDP":{
         "LIST": {
-            "TITLE":"Identitäts Providers",
+            "TITLE":"Identitäts Provider",
             "DESCRIPTION":"Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können."
         },
         "CREATE": {
@@ -793,6 +836,37 @@
             "DELETED":"Idp erfolgreich gelöscht!"
         }
     },
+    "MFA":{
+        "LIST": {
+            "MULTIFACTORTITLE":"Multifaktoren",
+            "MULTIFACTORDESCRIPTION":"Definieren Sie hier Ihre Multifaktoren, die sie für die Authentifizierung verwenden können.",
+            "SECONDFACTORTITLE":"Zweitfaktoren",
+            "SECONDFACTORDESCRIPTION":"Definieren Sie hier Ihre Zweitfaktoren, die sie für die Authentifizierung verwenden können."
+        },
+        "CREATE": {
+            "TITLE":"Neuer Faktor",
+            "DESCRIPTION":"Definieren Sie hier den gewünschten Typ."
+        },
+        "DELETE": {
+            "TITLE":"Faktor löschen",
+            "DESCRIPTION":"Sie sind im Begriff einen Faktor zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?"
+        },
+        "TOAST": {
+            "ADDED":"Erfolgreich hinzugefügt.",
+            "SAVED": "Erfolgreich gespeichert.",
+            "DELETED":"Mfa erfolgreich gelöscht!"
+        },
+        "TYPE":"Typ",
+        "MULTIFACTORTYPES": {
+            "0":"Unknown",
+            "1":"U2F with Pin"
+        },
+        "SECONDFACTORTYPES": {
+            "0":"Unknown",
+            "1":"OTP",
+            "2":"U2F"
+        }
+    },
     "LOGINPOLICY": {
         "CREATE": {
             "TITLE":"Login Policy",
@@ -836,6 +910,7 @@
             "REDIRECTDESCRIPTIONWEB":"Die Weiterleitung muss mit https:// beginnen. http:// ist nur im Entwicklermodus zulässig.",
             "REDIRECTDESCRIPTIONNATIVE":"Die Weiterleitung muss mit einem eigenen Protokoll oder http://localhost beginnen.",
             "REDIRECTNOTVALID":"Diese Weiterleitung ist nicht zulässig.",
+            "COMMAORENTERSEPERATION":"mit ↵ trennen",
             "POSTREDIRECTTITLE":"Das ist die Weiterleitung nach einem Log-out.",
             "TYPEREQUIRED":"Der Typ ist notwendig.",
             "TITLE": "OIDC-Konfiguration",
@@ -912,6 +987,7 @@
         "TITLE":"Berechtigungen",
         "DESC":"Hier kannst Du die Berechtigungen Deiner Organisation verwalten.",
         "DELETE":"Berechtigung löschen",
+        "EMPTY":"Keine Berechtigungen gefunden",
         "ADD":"Berechtigung erstellen",
         "ADD_BTN":"Neu",
         "PROJECT": {

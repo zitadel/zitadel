@@ -40,14 +40,19 @@ h1 {
         padding-right: 0;
       }
     }
-
-    .selection {
-      width: 50px;
-      max-width: 50px;
-    }
   }
 }
 
 tr {
   outline: none;
+
+  .dlt-button {
+    visibility: hidden;
+  }
+
+  &:hover {
+    .dlt-button {
+      visibility: visible;
+    }
+  }
 }

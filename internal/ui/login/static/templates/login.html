@@ -4,10 +4,10 @@
 <div class="head">
     {{if .Linking}}
         <h1>{{t "Login.TitleLinking"}}</h1>
-        <p>{{t "Login.DescriptionLinking"}}</p>
+        <p>{{t "Login.DescriptionLinking"}}{{if .OrgName}} {{t "Login.MustBeMemberOfOrg" "OrgName" .OrgName}}{{end}}</p>
     {{else}}
         <h1>{{t "Login.Title"}}</h1>
-        <p>{{t "Login.Description"}}</p>
+        <p>{{t "Login.Description"}}{{if .OrgName}} {{t "Login.MustBeMemberOfOrg" "OrgName" .OrgName}}{{end}}</p>
     {{end}}
 </div>
 

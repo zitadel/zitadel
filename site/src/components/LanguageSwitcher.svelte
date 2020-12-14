@@ -31,7 +31,6 @@
         display: flex;
         align-items: center;
         z-index: 1;
-        width: var(--sidebar-w);
         justify-content: center;
     }
 

@@ -5,6 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
+	"time"
 )
 
 const (
@@ -23,39 +24,43 @@ func (v *View) SearchMachineKeys(request *usr_model.MachineKeySearchRequest) ([]
 	return view.SearchMachineKeys(v.Db, machineKeyTable, request)
 }
 
-func (v *View) PutMachineKey(org *model.MachineKeyView, sequence uint64) error {
+func (v *View) PutMachineKey(org *model.MachineKeyView, sequence uint64, eventTimestamp time.Time) error {
 	err := view.PutMachineKey(v.Db, machineKeyTable, org)
 	if err != nil {
 		return err
 	}
 	if sequence != 0 {
-		return v.ProcessedMachineKeySequence(sequence)
+		return v.ProcessedMachineKeySequence(sequence, eventTimestamp)
 	}
 	return nil
 }
 
-func (v *View) DeleteMachineKey(keyID string, eventSequence uint64) error {
+func (v *View) DeleteMachineKey(keyID string, eventSequence uint64, eventTimestamp time.Time) error {
 	err := view.DeleteMachineKey(v.Db, machineKeyTable, keyID)
 	if err != nil {
 		return nil
 	}
-	return v.ProcessedMachineKeySequence(eventSequence)
+	return v.ProcessedMachineKeySequence(eventSequence, eventTimestamp)
 }
 
-func (v *View) DeleteMachineKeysByUserID(userID string, eventSequence uint64) error {
+func (v *View) DeleteMachineKeysByUserID(userID string, eventSequence uint64, eventTimestamp time.Time) error {
 	err := view.DeleteMachineKey(v.Db, machineKeyTable, userID)
 	if err != nil {
 		return nil
 	}
-	return v.ProcessedMachineKeySequence(eventSequence)
+	return v.ProcessedMachineKeySequence(eventSequence, eventTimestamp)
 }
 
 func (v *View) GetLatestMachineKeySequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(machineKeyTable)
 }
 
-func (v *View) ProcessedMachineKeySequence(eventSequence uint64) error {
-	return v.saveCurrentSequence(machineKeyTable, eventSequence)
+func (v *View) ProcessedMachineKeySequence(eventSequence uint64, eventTimestamp time.Time) error {
+	return v.saveCurrentSequence(machineKeyTable, eventSequence, eventTimestamp)
+}
+
+func (v *View) UpdateMachineKeySpoolerRunTimestamp() error {
+	return v.updateSpoolerRunSequence(machineKeyTable)
 }
 
 func (v *View) GetLatestMachineKeyFailedEvent(sequence uint64) (*repository.FailedEvent, error) {

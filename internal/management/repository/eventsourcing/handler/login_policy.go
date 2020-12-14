@@ -57,17 +57,21 @@ func (m *LoginPolicy) processLoginPolicy(event *models.Event) (err error) {
 		}
 		err = policy.AppendEvent(event)
 	case model.LoginPolicyRemoved:
-		return m.view.DeleteLoginPolicy(event.AggregateID, event.Sequence)
+		return m.view.DeleteLoginPolicy(event.AggregateID, event.Sequence, event.CreationDate)
 	default:
-		return m.view.ProcessedLoginPolicySequence(event.Sequence)
+		return m.view.ProcessedLoginPolicySequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutLoginPolicy(policy, policy.Sequence)
+	return m.view.PutLoginPolicy(policy, policy.Sequence, event.CreationDate)
 }
 
 func (m *LoginPolicy) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-4Djo9", "id", event.AggregateID).WithError(err).Warn("something went wrong in login policy handler")
 	return spooler.HandleError(event, err, m.view.GetLatestLoginPolicyFailedEvent, m.view.ProcessedLoginPolicyFailedEvent, m.view.ProcessedLoginPolicySequence, m.errorCountUntilSkip)
+}
+
+func (m *LoginPolicy) OnSuccess() error {
+	return spooler.HandleSuccess(m.view.UpdateLoginPolicySpoolerRunTimestamp)
 }
