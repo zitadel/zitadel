@@ -50,12 +50,12 @@ func (rm *MemberReadModel) Query() *eventstore.SearchQueryBuilder {
 }
 
 type MemberWriteModel struct {
-	Member member.WriteModel
+	member.WriteModel
 }
 
 func NewMemberWriteModel(iamID, userID string) *MemberWriteModel {
 	return &MemberWriteModel{
-		Member: member.WriteModel{
+		member.WriteModel{
 			WriteModel: eventstore.WriteModel{
 				AggregateID: iamID,
 			},
@@ -68,31 +68,31 @@ func (wm *MemberWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *MemberAddedEvent:
-			if e.UserID != wm.Member.UserID {
+			if e.UserID != wm.WriteModel.UserID {
 				continue
 			}
-			wm.Member.AppendEvents(&e.AddedEvent)
+			wm.WriteModel.AppendEvents(&e.AddedEvent)
 		case *MemberChangedEvent:
-			if e.UserID != wm.Member.UserID {
+			if e.UserID != wm.WriteModel.UserID {
 				continue
 			}
-			wm.Member.AppendEvents(&e.ChangedEvent)
+			wm.WriteModel.AppendEvents(&e.ChangedEvent)
 		case *MemberRemovedEvent:
-			if e.UserID != wm.Member.UserID {
+			if e.UserID != wm.WriteModel.UserID {
 				continue
 			}
-			wm.Member.AppendEvents(&e.RemovedEvent)
+			wm.WriteModel.AppendEvents(&e.RemovedEvent)
 		}
 	}
 }
 
 func (wm *MemberWriteModel) Reduce() error {
-	return wm.Member.Reduce()
+	return wm.WriteModel.Reduce()
 }
 
 func (wm *MemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).
-		AggregateIDs(wm.Member.AggregateID)
+		AggregateIDs(wm.WriteModel.AggregateID)
 }
 
 type MemberAddedEvent struct {
@@ -141,7 +141,7 @@ func MemberChangedEventFromExisting(
 			ctx,
 			MemberChangedEventType,
 		),
-		&current.Member,
+		&current.WriteModel,
 		roles...,
 	)
 	if err != nil {
