@@ -51,12 +51,12 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.1.0
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.14.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.14.0
-	go.opentelemetry.io/otel v0.14.0
-	go.opentelemetry.io/otel/exporters/otlp v0.14.0
-	go.opentelemetry.io/otel/exporters/stdout v0.14.0
-	go.opentelemetry.io/otel/sdk v0.14.0
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.15.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.15.0
+	go.opentelemetry.io/otel v0.15.0
+	go.opentelemetry.io/otel/exporters/otlp v0.15.0
+	go.opentelemetry.io/otel/exporters/stdout v0.15.0
+	go.opentelemetry.io/otel/sdk v0.15.0
 	golang.org/x/crypto v0.0.0-20201117144127-c1f2f97bffc9
 	golang.org/x/net v0.0.0-20201110031124-69a78807bb2b // indirect
 	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect
@@ -64,7 +64,7 @@ require (
 	golang.org/x/tools v0.0.0-20201123215933-b5535b156a1e
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20201119123407-9b1e624d6bc4
-	google.golang.org/grpc v1.33.2
+	google.golang.org/grpc v1.34.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/square/go-jose.v2 v2.5.1
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
