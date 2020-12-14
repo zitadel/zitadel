@@ -52,6 +52,8 @@ func (m *MailTemplate) processMailTemplate(event *models.Event) (err error) {
 			return err
 		}
 		err = template.AppendEvent(event)
+	case model.MailTemplateRemoved:
+		return m.view.DeleteMailTemplate(event.AggregateID, event.Sequence)
 	default:
 		return m.view.ProcessedMailTemplateSequence(event.Sequence)
 	}

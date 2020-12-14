@@ -1094,20 +1094,6 @@
       }
     },
     "/orgs/me/policies/mailtext": {
-      "delete": {
-        "operationId": "RemoveMailText",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          }
-        },
-        "tags": [
-          "ManagementService"
-        ]
-      },
       "post": {
         "operationId": "CreateMailText",
         "responses": {
@@ -1150,6 +1136,36 @@
             "schema": {
               "$ref": "#/definitions/v1MailTextUpdate"
             }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/policies/mailtext/type/{mail_text_type}/language/{language}": {
+      "delete": {
+        "operationId": "RemoveMailText",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "mail_text_type",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "language",
+            "in": "path",
+            "required": true,
+            "type": "string"
           }
         ],
         "tags": [
@@ -7230,6 +7246,10 @@
           "type": "string"
         },
         "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
           "type": "string",
           "format": "date-time"
         },

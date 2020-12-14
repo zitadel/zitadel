@@ -1918,7 +1918,7 @@ func (mr *MockManagementServiceClientMockRecorder) RemoveMailTemplate(arg0, arg1
 }
 
 // RemoveMailText mocks base method
-func (m *MockManagementServiceClient) RemoveMailText(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+func (m *MockManagementServiceClient) RemoveMailText(arg0 context.Context, arg1 *management.MailTextRemove, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {

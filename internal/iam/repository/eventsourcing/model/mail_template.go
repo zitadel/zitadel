@@ -3,6 +3,7 @@ package model
 import (
 	b64 "encoding/base64"
 	"encoding/json"
+	"fmt"
 
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -16,25 +17,27 @@ type MailTemplate struct {
 	Template []byte
 }
 
-func MailTemplateToModel(policy *MailTemplate) *iam_model.MailTemplate {
+func MailTemplateToModel(template *MailTemplate) *iam_model.MailTemplate {
+	fmt.Println(string(template.Template))
 	return &iam_model.MailTemplate{
-		ObjectRoot: policy.ObjectRoot,
-		State:      iam_model.PolicyState(policy.State),
-		Template:   policy.Template,
+		ObjectRoot: template.ObjectRoot,
+		State:      iam_model.PolicyState(template.State),
+		Template:   template.Template,
 	}
 }
 
-func MailTemplateFromModel(policy *iam_model.MailTemplate) *MailTemplate {
+func MailTemplateFromModel(template *iam_model.MailTemplate) *MailTemplate {
 	return &MailTemplate{
-		ObjectRoot: policy.ObjectRoot,
-		State:      int32(policy.State),
-		Template:   policy.Template,
+		ObjectRoot: template.ObjectRoot,
+		State:      int32(template.State),
+		Template:   template.Template,
 	}
 }
 
 func (p *MailTemplate) Changes(changed *MailTemplate) map[string]interface{} {
 	changes := make(map[string]interface{}, 2)
-
+	fmt.Println(string(changed.Template))
+	fmt.Println(string(p.Template))
 	if b64.StdEncoding.EncodeToString(changed.Template) != b64.StdEncoding.EncodeToString(p.Template) {
 		changes["mailTemplate"] = b64.StdEncoding.EncodeToString(changed.Template)
 	}

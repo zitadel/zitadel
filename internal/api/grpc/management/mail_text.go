@@ -23,23 +23,23 @@ func (s *Server) GetDefaultMailTexts(ctx context.Context, _ *empty.Empty) (*mana
 	return mailTextsViewFromModel(result.Texts), nil
 }
 
-func (s *Server) CreateMailText(ctx context.Context, template *management.MailTextUpdate) (*management.MailText, error) {
-	result, err := s.org.AddMailText(ctx, mailTextRequestToModel(template))
+func (s *Server) CreateMailText(ctx context.Context, mailText *management.MailTextUpdate) (*management.MailText, error) {
+	result, err := s.org.AddMailText(ctx, mailTextRequestToModel(mailText))
 	if err != nil {
 		return nil, err
 	}
 	return mailTextFromModel(result), nil
 }
 
-func (s *Server) UpdateMailText(ctx context.Context, template *management.MailTextUpdate) (*management.MailText, error) {
-	result, err := s.org.ChangeMailText(ctx, mailTextRequestToModel(template))
+func (s *Server) UpdateMailText(ctx context.Context, mailText *management.MailTextUpdate) (*management.MailText, error) {
+	result, err := s.org.ChangeMailText(ctx, mailTextRequestToModel(mailText))
 	if err != nil {
 		return nil, err
 	}
 	return mailTextFromModel(result), nil
 }
 
-func (s *Server) RemoveMailText(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
-	err := s.org.RemoveMailText(ctx)
+func (s *Server) RemoveMailText(ctx context.Context, mailText *management.MailTextRemove) (*empty.Empty, error) {
+	err := s.org.RemoveMailText(ctx, mailTextRemoveToModel(mailText))
 	return &empty.Empty{}, err
 }

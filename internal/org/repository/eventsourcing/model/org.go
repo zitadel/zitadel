@@ -79,6 +79,7 @@ func OrgToModel(org *Org) *org_model.Org {
 		State:      org_model.OrgState(org.State),
 		Domains:    OrgDomainsToModel(org.Domains),
 		Members:    OrgMembersToModel(org.Members),
+		MailTexts:  iam_es_model.MailTextsToModel(org.MailTexts),
 		IDPs:       iam_es_model.IDPConfigsToModel(org.IDPs),
 	}
 	if org.OrgIAMPolicy != nil {
@@ -89,6 +90,9 @@ func OrgToModel(org *Org) *org_model.Org {
 	}
 	if org.LabelPolicy != nil {
 		converted.LabelPolicy = iam_es_model.LabelPolicyToModel(org.LabelPolicy)
+	}
+	if org.MailTemplate != nil {
+		converted.MailTemplate = iam_es_model.MailTemplateToModel(org.MailTemplate)
 	}
 	if org.PasswordComplexityPolicy != nil {
 		converted.PasswordComplexityPolicy = iam_es_model.PasswordComplexityPolicyToModel(org.PasswordComplexityPolicy)
@@ -206,6 +210,18 @@ func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 		err = o.appendAddIdpProviderToLoginPolicyEvent(event)
 	case LoginPolicyIDPProviderRemoved:
 		err = o.appendRemoveIdpProviderFromLoginPolicyEvent(event)
+	case MailTemplateAdded:
+		err = o.appendAddMailTemplateEvent(event)
+	case MailTemplateChanged:
+		err = o.appendChangeMailTemplateEvent(event)
+	case MailTemplateRemoved:
+		o.appendRemoveMailTemplateEvent(event)
+	case MailTextAdded:
+		err = o.appendAddMailTextEvent(event)
+	case MailTextChanged:
+		err = o.appendChangeMailTextEvent(event)
+	case MailTextRemoved:
+		o.appendRemoveMailTextEvent(event)
 	case PasswordComplexityPolicyAdded:
 		err = o.appendAddPasswordComplexityPolicyEvent(event)
 	case PasswordComplexityPolicyChanged:

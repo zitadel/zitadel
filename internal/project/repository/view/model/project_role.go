@@ -2,12 +2,13 @@ package model
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"time"
 )
 
 const (
@@ -27,6 +28,7 @@ type ProjectRoleView struct {
 
 	ResourceOwner string    `json:"-" gorm:"resource_owner"`
 	CreationDate  time.Time `json:"-" gorm:"column:creation_date"`
+	ChangeDate    time.Time `json:"-" gorm:"column:change_date"`
 }
 
 func ProjectRoleViewFromModel(role *model.ProjectRoleView) *ProjectRoleView {
@@ -39,6 +41,7 @@ func ProjectRoleViewFromModel(role *model.ProjectRoleView) *ProjectRoleView {
 		Group:         role.Group,
 		Sequence:      role.Sequence,
 		CreationDate:  role.CreationDate,
+		ChangeDate:    role.ChangeDate,
 	}
 }
 
@@ -52,6 +55,7 @@ func ProjectRoleToModel(role *ProjectRoleView) *model.ProjectRoleView {
 		Group:         role.Group,
 		Sequence:      role.Sequence,
 		CreationDate:  role.CreationDate,
+		ChangeDate:    role.ChangeDate,
 	}
 }
 

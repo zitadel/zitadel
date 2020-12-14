@@ -79,5 +79,5 @@ type OrgRepository interface {
 	GetMailTexts(ctx context.Context) (*iam_model.MailTextsView, error)
 	AddMailText(ctx context.Context, mailText *iam_model.MailText) (*iam_model.MailText, error)
 	ChangeMailText(ctx context.Context, mailText *iam_model.MailText) (*iam_model.MailText, error)
-	RemoveMailText(ctx context.Context) error
+	RemoveMailText(ctx context.Context, mailText *iam_model.MailText) error
 }

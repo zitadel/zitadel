@@ -44,8 +44,10 @@ func PutMailText(db *gorm.DB, table string, mailText *model.MailTextView) error 
 	return save(db, mailText)
 }
 
-func DeleteMailText(db *gorm.DB, table, aggregateID string) error {
-	delete := repository.PrepareDeleteByKey(table, model.MailTextSearchKey(iam_model.MailTextSearchKeyAggregateID), aggregateID)
-
+func DeleteMailText(db *gorm.DB, table, aggregateID string, textType string, language string) error {
+	aggregateIDSearch := repository.Key{Key: model.MailTextSearchKey(iam_model.MailTextSearchKeyAggregateID), Value: aggregateID}
+	textTypeSearch := repository.Key{Key: model.MailTextSearchKey(iam_model.MailTextSearchKeyMailTextType), Value: textType}
+	languageSearch := repository.Key{Key: model.MailTextSearchKey(iam_model.MailTextSearchKeyLanguage), Value: language}
+	delete := repository.PrepareDeleteByKeys(table, aggregateIDSearch, textTypeSearch, languageSearch)
 	return delete(db)
 }

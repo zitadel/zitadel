@@ -9,10 +9,10 @@ import (
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
-func MailTextAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, policy *iam_es_model.MailText) func(ctx context.Context) (*es_models.Aggregate, error) {
+func MailTextAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, mailText *iam_es_model.MailText) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if policy == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-4BeRi", "Errors.Internal")
+		if mailText == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Gk3Cn", "Errors.Internal")
 		}
 		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
 		if err != nil {
@@ -22,57 +22,72 @@ func MailTextAddedAggregate(aggCreator *es_models.AggregateCreator, existing *mo
 			AggregateTypeFilter(model.OrgAggregate).
 			AggregateIDFilter(existing.AggregateID)
 
-		validation := checkExistingMailTextValidation()
+		validation := checkExistingMailTextValidation(mailText, existing.MailTexts)
 		agg.SetPrecondition(validationQuery, validation)
-		return agg.AppendEvent(model.MailTextAdded, policy)
+		return agg.AppendEvent(model.MailTextAdded, mailText)
 	}
 }
 
-// ToDo Michi
-func MailTextChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, policy *iam_es_model.MailText) func(ctx context.Context) (*es_models.Aggregate, error) {
+func MailTextChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, mailText *iam_es_model.MailText) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if policy == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-yzXO0", "Errors.Internal")
+		if mailText == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Hog8a", "Errors.Internal")
 		}
 		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
 		if err != nil {
 			return nil, err
 		}
-		// ToDo Michi
-		changes := existing.MailTexts[0].Changes(policy)
-		if len(changes) == 0 {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-erTCI", "Errors.NoChangesFound")
+		changes := make(map[string]interface{}, 2)
+		for _, exMailText := range existing.MailTexts {
+			if exMailText.MailTextType == mailText.MailTextType && exMailText.Language == mailText.Language {
+				changes = exMailText.Changes(mailText)
+				if len(changes) == 0 {
+					return nil, errors.ThrowPreconditionFailed(nil, "EVENT-DuRxA", "Errors.NoChangesFound")
+				}
+			}
 		}
 		return agg.AppendEvent(model.MailTextChanged, changes)
 	}
 }
 
-func MailTextRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org) func(ctx context.Context) (*es_models.Aggregate, error) {
+func MailTextRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, mailText *iam_es_model.MailText) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if existing == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-2jVit", "Errors.Internal")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-cJ5Wp", "Errors.Internal")
 		}
 		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.MailTextRemoved, nil)
+		changes := make(map[string]interface{}, 2)
+		for _, exMailText := range existing.MailTexts {
+			if exMailText.MailTextType == mailText.MailTextType && exMailText.Language == mailText.Language {
+				mailText.ButtonText = exMailText.ButtonText
+				mailText.Greeting = exMailText.Greeting
+				mailText.Text = exMailText.Text
+				mailText.Title = exMailText.Title
+				mailText.Subject = exMailText.Subject
+				mailText.PreHeader = exMailText.PreHeader
+				changes = exMailText.Changes(mailText)
+				if len(changes) == 0 {
+					return nil, errors.ThrowPreconditionFailed(nil, "EVENT-DuRxA", "Errors.NoChangesFound")
+				}
+			}
+		}
+		return agg.AppendEvent(model.MailTextRemoved, changes)
 	}
 }
 
-func checkExistingMailTextValidation() func(...*es_models.Event) error {
+func checkExistingMailTextValidation(mailText *iam_es_model.MailText, existingMailTexts []*iam_es_model.MailText) func(...*es_models.Event) error {
 	return func(events ...*es_models.Event) error {
 		existing := false
-		for _, event := range events {
-			switch event.Type {
-			case model.MailTextAdded:
+		for _, text := range existingMailTexts {
+			if text.MailTextType == mailText.MailTextType && text.Language == mailText.Language {
 				existing = true
-			case model.MailTextRemoved:
-				existing = false
 			}
 		}
 		if existing {
-			return errors.ThrowPreconditionFailed(nil, "EVENT-aUH4D", "Errors.Org.MailText.AlreadyExists")
+			return errors.ThrowPreconditionFailed(nil, "EVENT-zEZh7", "Errors.Org.MailText.AlreadyExists")
 		}
 		return nil
 	}

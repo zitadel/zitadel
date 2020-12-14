@@ -22,7 +22,7 @@ type MailText struct {
 	ButtonText   string
 }
 
-func GetDefaultMailText(mailTexts []*MailText, mailTextType string, language string) (int, *MailText) {
+func GetMailText(mailTexts []*MailText, mailTextType string, language string) (int, *MailText) {
 	for i, m := range mailTexts {
 		if m.MailTextType == mailTextType && m.Language == language {
 			return i, m
@@ -80,13 +80,9 @@ func MailTextFromModel(mailText *iam_model.MailText) *MailText {
 func (p *MailText) Changes(changed *MailText) map[string]interface{} {
 	changes := make(map[string]interface{}, 2)
 
-	if changed.MailTextType != p.MailTextType {
-		changes["mailTextType"] = changed.MailTextType
-	}
+	changes["mailTextType"] = changed.MailTextType
 
-	if changed.Language != p.Language {
-		changes["language"] = changed.Language
-	}
+	changes["language"] = changed.Language
 
 	if changed.Title != p.Title {
 		changes["title"] = changed.Title
@@ -132,7 +128,7 @@ func (i *IAM) appendChangeMailTextEvent(event *es_models.Event) error {
 	if err != nil {
 		return err
 	}
-	if n, m := GetDefaultMailText(i.DefaultMailTexts, mailText.MailTextType, mailText.Language); m != nil {
+	if n, m := GetMailText(i.DefaultMailTexts, mailText.MailTextType, mailText.Language); m != nil {
 		i.DefaultMailTexts[n] = mailText
 	}
 	return nil
@@ -144,7 +140,7 @@ func (i *IAM) appendRemoveMailTextEvent(event *es_models.Event) error {
 	if err != nil {
 		return err
 	}
-	if n, m := GetDefaultMailText(i.DefaultMailTexts, mailText.MailTextType, mailText.Language); m != nil {
+	if n, m := GetMailText(i.DefaultMailTexts, mailText.MailTextType, mailText.Language); m != nil {
 		i.DefaultMailTexts[n] = i.DefaultMailTexts[len(i.DefaultMailTexts)-1]
 		i.DefaultMailTexts[len(i.DefaultMailTexts)-1] = nil
 		i.DefaultMailTexts = i.DefaultMailTexts[:len(i.DefaultMailTexts)-1]

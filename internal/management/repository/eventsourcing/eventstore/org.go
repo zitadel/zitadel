@@ -599,10 +599,10 @@ func (repo *OrgRepository) GetDefaultMailTexts(ctx context.Context) (*iam_model.
 }
 
 func (repo *OrgRepository) GetMailTexts(ctx context.Context) (*iam_model.MailTextsView, error) {
-	text, err := repo.View.MailTextsByAggregateID(authz.GetCtxData(ctx).OrgID)
 	defaultIn := false
-	if errors.IsNotFound(err) {
-		text, err = repo.View.MailTextsByAggregateID(repo.SystemDefaults.IamID)
+	texts, err := repo.View.MailTextsByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if errors.IsNotFound(err) || len(texts) == 0 {
+		texts, err = repo.View.MailTextsByAggregateID(repo.SystemDefaults.IamID)
 		if err != nil {
 			return nil, err
 		}
@@ -611,25 +611,20 @@ func (repo *OrgRepository) GetMailTexts(ctx context.Context) (*iam_model.MailTex
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.MailTextsViewToModel(text, defaultIn), err
+	return iam_es_model.MailTextsViewToModel(texts, defaultIn), err
 }
 
-func (repo *OrgRepository) AddMailTexts(ctx context.Context, text *iam_model.MailTexts) (*iam_model.MailTexts, error) {
-	// text.AggregateID = authz.GetCtxData(ctx).OrgID
-	// return repo.OrgEventstore.AddMailTexts(ctx, text)
-	return nil, nil
+func (repo *OrgRepository) AddMailText(ctx context.Context, text *iam_model.MailText) (*iam_model.MailText, error) {
+	text.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.AddMailText(ctx, text)
 }
 
-func (repo *OrgRepository) ChangeMailTexts(ctx context.Context, text *iam_model.MailTexts) (*iam_model.MailTexts, error) {
-	// text.AggregateID = authz.GetCtxData(ctx).OrgID
-	// return repo.OrgEventstore.ChangeMailTexts(ctx, text)
-	return nil, nil
+func (repo *OrgRepository) ChangeMailText(ctx context.Context, text *iam_model.MailText) (*iam_model.MailText, error) {
+	text.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.ChangeMailText(ctx, text)
 }
 
-func (repo *OrgRepository) RemoveMailText(ctx context.Context) error {
-	// text := &iam_model.MailTexts{ObjectRoot: models.ObjectRoot{
-	// 	AggregateID: authz.GetCtxData(ctx).OrgID,
-	// }}
-	// return repo.OrgEventstore.RemoveMailTexts(ctx, text)
-	return nil
+func (repo *OrgRepository) RemoveMailText(ctx context.Context, text *iam_model.MailText) error {
+	text.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.RemoveMailText(ctx, text)
 }

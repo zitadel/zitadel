@@ -72,3 +72,7 @@ CREATE TABLE management.mail_texts (
 
 GRANT SELECT ON TABLE adminapi.mail_texts TO notification;
 GRANT SELECT ON TABLE management.mail_texts TO notification;
+
+
+ALTER TABLE management.project_roles ADD COLUMN change_date TIMESTAMPTZ;
+ALTER TABLE auth.project_roles ADD COLUMN change_date TIMESTAMPTZ;

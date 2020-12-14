@@ -3,6 +3,7 @@ package eventsourcing
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/caos/logging"
 	http_utils "github.com/caos/zitadel/internal/api/http"
@@ -1080,6 +1081,10 @@ func (es *OrgEventstore) ChangeMailTemplate(ctx context.Context, template *iam_m
 		return nil, err
 	}
 
+	//	sDec, _ := b64.StdEncoding.DecodeString(string(template.Template))
+	fmt.Println(string(template.Template))
+	//	return template, err
+
 	repoOrg := model.OrgFromModel(org)
 	repoMailTemplate := iam_es_model.MailTemplateFromModel(template)
 
@@ -1091,7 +1096,20 @@ func (es *OrgEventstore) ChangeMailTemplate(ctx context.Context, template *iam_m
 	return iam_es_model.MailTemplateToModel(repoOrg.MailTemplate), nil
 }
 
-// ToDo Michi
+func (es *OrgEventstore) RemoveMailTemplate(ctx context.Context, template *iam_model.MailTemplate) error {
+	if template == nil || !template.IsValid() {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-LulaW", "Errors.Org.MailTemplate.Invalid")
+	}
+	org, err := es.OrgByID(ctx, org_model.NewOrg(template.AggregateID))
+	if err != nil {
+		return err
+	}
+	repoOrg := model.OrgFromModel(org)
+
+	addAggregate := MailTemplateRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg)
+	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+}
+
 func (es *OrgEventstore) AddMailText(ctx context.Context, mailtext *iam_model.MailText) (*iam_model.MailText, error) {
 	if mailtext == nil || !mailtext.IsValid() {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-108Iz", "Errors.Org.MailTextInvalid")
@@ -1109,8 +1127,11 @@ func (es *OrgEventstore) AddMailText(ctx context.Context, mailtext *iam_model.Ma
 	if err != nil {
 		return nil, err
 	}
-	// ToDo Michi
-	return iam_es_model.MailTextToModel(repoOrg.MailTexts[0]), nil
+
+	if _, r := iam_es_model.GetMailText(repoOrg.MailTexts, repoMailText.MailTextType, repoMailText.Language); r != nil {
+		return iam_es_model.MailTextToModel(r), nil
+	}
+	return nil, errors.ThrowInternal(nil, "EVENT-oc1GN", "Errors.Internal")
 }
 
 func (es *OrgEventstore) ChangeMailText(ctx context.Context, mailtext *iam_model.MailText) (*iam_model.MailText, error) {
@@ -1130,20 +1151,24 @@ func (es *OrgEventstore) ChangeMailText(ctx context.Context, mailtext *iam_model
 	if err != nil {
 		return nil, err
 	}
-	// ToDo Michi
-	return iam_es_model.MailTextToModel(repoOrg.MailTexts[0]), nil
+
+	if _, r := iam_es_model.GetMailText(repoOrg.MailTexts, mailtext.MailTextType, mailtext.Language); r != nil {
+		return iam_es_model.MailTextToModel(r), nil
+	}
+	return nil, errors.ThrowInternal(nil, "EVENT-F2whI", "Errors.Internal")
 }
 
-func (es *OrgEventstore) RemoveMailTemplate(ctx context.Context, policy *iam_model.MailTemplate) error {
-	if policy == nil || !policy.IsValid() {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-LulaW", "Errors.Org.MailTemplate.Invalid")
+func (es *OrgEventstore) RemoveMailText(ctx context.Context, mailtext *iam_model.MailText) error {
+	if mailtext == nil || !mailtext.IsValid() {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-LulaW", "Errors.Org.MailText.Invalid")
 	}
-	org, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	org, err := es.OrgByID(ctx, org_model.NewOrg(mailtext.AggregateID))
 	if err != nil {
 		return err
 	}
 	repoOrg := model.OrgFromModel(org)
+	repoMailText := iam_es_model.MailTextFromModel(mailtext)
 
-	addAggregate := MailTemplateRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg)
+	addAggregate := MailTextRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMailText)
 	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
 }

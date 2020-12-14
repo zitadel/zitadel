@@ -7985,8 +7985,37 @@ func local_request_ManagementService_UpdateMailText_0(ctx context.Context, marsh
 }
 
 func request_ManagementService_RemoveMailText_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq empty.Empty
+	var protoReq MailTextRemove
 	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["mail_text_type"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "mail_text_type")
+	}
+
+	protoReq.MailTextType, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "mail_text_type", err)
+	}
+
+	val, ok = pathParams["language"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "language")
+	}
+
+	protoReq.Language, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "language", err)
+	}
 
 	msg, err := client.RemoveMailText(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -7994,8 +8023,37 @@ func request_ManagementService_RemoveMailText_0(ctx context.Context, marshaler r
 }
 
 func local_request_ManagementService_RemoveMailText_0(ctx context.Context, marshaler runtime.Marshaler, server ManagementServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq empty.Empty
+	var protoReq MailTextRemove
 	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["mail_text_type"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "mail_text_type")
+	}
+
+	protoReq.MailTextType, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "mail_text_type", err)
+	}
+
+	val, ok = pathParams["language"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "language")
+	}
+
+	protoReq.Language, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "language", err)
+	}
 
 	msg, err := server.RemoveMailText(ctx, &protoReq)
 	return msg, metadata, err
@@ -14266,7 +14324,7 @@ var (
 
 	pattern_ManagementService_UpdateMailText_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"orgs", "me", "policies", "mailtext"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ManagementService_RemoveMailText_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"orgs", "me", "policies", "mailtext"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_RemoveMailText_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 6}, []string{"orgs", "me", "policies", "mailtext", "type", "mail_text_type", "language"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

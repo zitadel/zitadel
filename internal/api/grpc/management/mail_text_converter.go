@@ -20,6 +20,13 @@ func mailTextRequestToModel(mailText *management.MailTextUpdate) *iam_model.Mail
 	}
 }
 
+func mailTextRemoveToModel(mailText *management.MailTextRemove) *iam_model.MailText {
+	return &iam_model.MailText{
+		MailTextType: mailText.MailTextType,
+		Language:     mailText.Language,
+	}
+}
+
 func mailTextFromModel(mailText *iam_model.MailText) *management.MailText {
 	creationDate, err := ptypes.TimestampProto(mailText.CreationDate)
 	logging.Log("MANAG-ULKZ6").OnError(err).Debug("date parse failed")

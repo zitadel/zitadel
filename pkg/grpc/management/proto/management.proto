@@ -1614,9 +1614,9 @@ rpc GetUserByID(UserID) returns (UserView) {
     };
   }
 
-  rpc RemoveMailText(google.protobuf.Empty) returns (google.protobuf.Empty) {
+  rpc RemoveMailText(MailTextRemove) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/orgs/me/policies/mailtext"
+      delete: "/orgs/me/policies/mailtext/type/{mail_text_type}/language/{language}"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
@@ -2419,6 +2419,7 @@ message ProjectRoleView {
   string key = 2;
   string display_name = 3;
   google.protobuf.Timestamp creation_date = 4;
+  google.protobuf.Timestamp change_date = 5;
   string group = 6;
   uint64 sequence = 7;
 }
@@ -3292,6 +3293,11 @@ message MailTextUpdate {
 	string greeting = 6;
 	string text = 7;
 	string button_text = 8;
+}
+
+message MailTextRemove {   
+	string mail_text_type = 1;
+	string language = 2;
 }
 
 message MailTextsView{

@@ -925,7 +925,7 @@ func (es *IAMEventstore) AddMailText(ctx context.Context, text *iam_model.MailTe
 	}
 	es.iamCache.cacheIAM(repoIam)
 
-	if _, m := model.GetDefaultMailText(repoIam.DefaultMailTexts, text.MailTextType, text.Language); m != nil {
+	if _, m := model.GetMailText(repoIam.DefaultMailTexts, text.MailTextType, text.Language); m != nil {
 		return model.MailTextToModel(m), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-9AwUm", "Errors.Internal")
@@ -949,7 +949,7 @@ func (es *IAMEventstore) ChangeMailText(ctx context.Context, text *iam_model.Mai
 	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, projectAggregate)
 	es.iamCache.cacheIAM(repoIam)
 
-	if _, m := model.GetDefaultMailText(repoIam.DefaultMailTexts, text.MailTextType, text.Language); m != nil {
+	if _, m := model.GetMailText(repoIam.DefaultMailTexts, text.MailTextType, text.Language); m != nil {
 		return model.MailTextToModel(m), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-HawVx", "Errors.Internal")

@@ -46,6 +46,10 @@ func (m *MailText) processMailText(event *models.Event) (err error) {
 	case model.MailTextAdded:
 		err = mailText.AppendEvent(event)
 	case model.MailTextChanged:
+		err = mailText.SetData(event)
+		if err != nil {
+			return err
+		}
 		mailText, err = m.view.MailTextByIDs(event.AggregateID, mailText.MailTextType, mailText.Language)
 		if err != nil {
 			return err

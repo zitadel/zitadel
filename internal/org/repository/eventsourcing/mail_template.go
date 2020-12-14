@@ -28,16 +28,16 @@ func MailTemplateAddedAggregate(aggCreator *es_models.AggregateCreator, existing
 	}
 }
 
-func MailTemplateChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, policy *iam_es_model.MailTemplate) func(ctx context.Context) (*es_models.Aggregate, error) {
+func MailTemplateChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, template *iam_es_model.MailTemplate) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if policy == nil {
+		if template == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-yzXO0", "Errors.Internal")
 		}
 		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
 		if err != nil {
 			return nil, err
 		}
-		changes := existing.MailTemplate.Changes(policy)
+		changes := existing.MailTemplate.Changes(template)
 		if len(changes) == 0 {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-erTCI", "Errors.NoChangesFound")
 		}

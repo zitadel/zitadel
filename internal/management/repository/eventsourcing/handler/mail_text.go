@@ -47,12 +47,18 @@ func (m *MailText) processMailText(event *models.Event) (err error) {
 	case iam_es_model.MailTextAdded, model.MailTextAdded:
 		err = text.AppendEvent(event)
 	case iam_es_model.MailTextChanged, model.MailTextChanged:
-		// ToDo Michi
-		text, err = m.view.MailTextByIDs(event.AggregateID, "", "")
+		err = text.SetData(event)
+		if err != nil {
+			return err
+		}
+		text, err = m.view.MailTextByIDs(event.AggregateID, text.MailTextType, text.Language)
 		if err != nil {
 			return err
 		}
 		err = text.AppendEvent(event)
+	case model.MailTextRemoved:
+		err = text.SetData(event)
+		return m.view.DeleteMailText(event.AggregateID, text.MailTextType, text.Language, event.Sequence)
 	default:
 		return m.view.ProcessedMailTextSequence(event.Sequence)
 	}

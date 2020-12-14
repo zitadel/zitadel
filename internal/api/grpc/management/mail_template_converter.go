@@ -1,42 +1,44 @@
 package management
 
 import (
+	"fmt"
+
 	"github.com/caos/logging"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/golang/protobuf/ptypes"
 )
 
-func mailTemplateRequestToModel(MtemplateailTemplate *management.MailTemplateUpdate) *iam_model.MailTemplate {
+func mailTemplateRequestToModel(mailTemplate *management.MailTemplateUpdate) *iam_model.MailTemplate {
 	return &iam_model.MailTemplate{
-		Template: MtemplateailTemplate.Template,
+		Template: mailTemplate.Template,
 	}
 }
 
-func mailTemplateFromModel(MtemplateailTemplate *iam_model.MailTemplate) *management.MailTemplate {
-	creationDate, err := ptypes.TimestampProto(MtemplateailTemplate.CreationDate)
+func mailTemplateFromModel(mailTemplate *iam_model.MailTemplate) *management.MailTemplate {
+	creationDate, err := ptypes.TimestampProto(mailTemplate.CreationDate)
 	logging.Log("MANAG-ULKZ6").OnError(err).Debug("date parse failed")
 
-	changeDate, err := ptypes.TimestampProto(MtemplateailTemplate.ChangeDate)
+	changeDate, err := ptypes.TimestampProto(mailTemplate.ChangeDate)
 	logging.Log("MANAG-451rI").OnError(err).Debug("date parse failed")
-
+	fmt.Println(string(mailTemplate.Template))
 	return &management.MailTemplate{
-		Template:     MtemplateailTemplate.Template,
+		Template:     mailTemplate.Template,
 		CreationDate: creationDate,
 		ChangeDate:   changeDate,
 	}
 }
 
-func mailTemplateViewFromModel(MtemplateailTemplate *iam_model.MailTemplateView) *management.MailTemplateView {
-	creationDate, err := ptypes.TimestampProto(MtemplateailTemplate.CreationDate)
+func mailTemplateViewFromModel(mailTemplate *iam_model.MailTemplateView) *management.MailTemplateView {
+	creationDate, err := ptypes.TimestampProto(mailTemplate.CreationDate)
 	logging.Log("MANAG-koQnB").OnError(err).Debug("date parse failed")
 
-	changeDate, err := ptypes.TimestampProto(MtemplateailTemplate.ChangeDate)
+	changeDate, err := ptypes.TimestampProto(mailTemplate.ChangeDate)
 	logging.Log("MANAG-ToDhD").OnError(err).Debug("date parse failed")
 
 	return &management.MailTemplateView{
-		Default:      MtemplateailTemplate.Default,
-		Template:     MtemplateailTemplate.Template,
+		Default:      mailTemplate.Default,
+		Template:     mailTemplate.Template,
 		CreationDate: creationDate,
 		ChangeDate:   changeDate,
 	}

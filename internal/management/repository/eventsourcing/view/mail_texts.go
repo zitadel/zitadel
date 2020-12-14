@@ -27,8 +27,8 @@ func (v *View) PutMailText(template *model.MailTextView, sequence uint64) error 
 	return v.ProcessedMailTextSequence(sequence)
 }
 
-func (v *View) DeleteMailText(aggregateID string, eventSequence uint64) error {
-	err := view.DeleteMailText(v.Db, mailTextTable, aggregateID)
+func (v *View) DeleteMailText(aggregateID string, textType string, language string, eventSequence uint64) error {
+	err := view.DeleteMailText(v.Db, mailTextTable, aggregateID, textType, language)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}

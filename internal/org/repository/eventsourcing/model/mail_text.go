@@ -1,25 +1,43 @@
 package model
 
-// ToDo Michi
-// import (
-// 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-// 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-// )
+import (
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+)
 
-// func (o *Org) appendAddMailTextEvent(event *es_models.Event) error {
-// 	o.MailText = new(iam_es_model.MailText)
-// 	err := o.MailText.SetDataLabel(event)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	o.MailText.ObjectRoot.CreationDate = event.CreationDate
-// 	return nil
-// }
+func (o *Org) appendAddMailTextEvent(event *es_models.Event) error {
+	mailText := &iam_es_model.MailText{}
+	err := mailText.SetDataLabel(event)
+	if err != nil {
+		return err
+	}
+	mailText.ObjectRoot.CreationDate = event.CreationDate
+	o.MailTexts = append(o.MailTexts, mailText)
+	return nil
+}
 
-// func (o *Org) appendChangeMailTextEvent(event *es_models.Event) error {
-// 	return o.MailText.SetDataLabel(event)
-// }
+func (o *Org) appendChangeMailTextEvent(event *es_models.Event) error {
+	mailText := &iam_es_model.MailText{}
+	err := mailText.SetDataLabel(event)
+	if err != nil {
+		return err
+	}
+	if n, m := iam_es_model.GetMailText(o.MailTexts, mailText.MailTextType, mailText.Language); m != nil {
+		o.MailTexts[n] = mailText
+	}
+	return nil
+}
 
-// func (o *Org) appendRemoveMailTextEvent(event *es_models.Event) {
-// 	o.MailText = nil
-// }
+func (o *Org) appendRemoveMailTextEvent(event *es_models.Event) error {
+	mailText := &iam_es_model.MailText{}
+	err := mailText.SetDataLabel(event)
+	if err != nil {
+		return err
+	}
+	if n, m := iam_es_model.GetMailText(o.MailTexts, mailText.MailTextType, mailText.Language); m != nil {
+		o.MailTexts[n] = o.MailTexts[len(o.MailTexts)-1]
+		o.MailTexts[len(o.MailTexts)-1] = nil
+		o.MailTexts = o.MailTexts[:len(o.MailTexts)-1]
+	}
+	return nil
+}

@@ -41,10 +41,6 @@ func textFromModel(text *iam_model.MailText) *admin.DefaultMailText {
 	}
 }
 
-// func textsViewFromModel(text *iam_model.MailTextsView) *admin.DefaultMailTextsView {
-
-// }
-
 func textsViewFromModel(textsin *iam_model.MailTextsView) *admin.DefaultMailTextsView {
 	return &admin.DefaultMailTextsView{
 		Texts: textsViewToModel(textsin.Texts),
