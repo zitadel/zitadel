@@ -5,6 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	view_model "github.com/caos/zitadel/internal/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
+	"time"
 )
 
 var dbList = []string{"management", "auth", "authz", "adminapi", "notification"}
@@ -31,7 +32,7 @@ func (repo *AdministratorRepo) RemoveFailedEvent(ctx context.Context, failedEven
 	return repo.View.RemoveFailedEvent(failedEvent.Database, repository.FailedEventFromModel(failedEvent))
 }
 
-func (repo *AdministratorRepo) GetViews(ctx context.Context) ([]*view_model.View, error) {
+func (repo *AdministratorRepo) GetViews() ([]*view_model.View, error) {
 	views := make([]*view_model.View, 0)
 	for _, db := range dbList {
 		sequences, err := repo.View.AllCurrentSequences(db)
@@ -43,6 +44,16 @@ func (repo *AdministratorRepo) GetViews(ctx context.Context) ([]*view_model.View
 		}
 	}
 	return views, nil
+}
+
+func (repo *AdministratorRepo) GetSpoolerDiv(database, view string) int64 {
+	sequence, err := repo.View.GetCurrentSequence(database, view)
+	if err != nil {
+
+		return 0
+	}
+	divDuration := time.Now().Sub(sequence.LastSuccessfulSpoolerRun)
+	return divDuration.Milliseconds()
 }
 
 func (repo *AdministratorRepo) ClearView(ctx context.Context, database, view string) error {

@@ -1,0 +1,15 @@
+
+@import '~@angular/material/theming';
+
+@mixin cnsl-error-theme($theme) {
+  $warn: map-get($theme, warn);
+  $warn-color: mat-color($warn, 500);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  .cnsl-error {
+    display: block;
+    font-size: 12px;
+    color: $warn-color;
+    margin-bottom: 5px;
+  }
+}

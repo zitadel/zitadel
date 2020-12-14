@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 const (

@@ -1,5 +1,7 @@
-h1 {
+h2 {
   font-size: 1.2rem;
+  letter-spacing: .05em;
+  text-transform: uppercase;
 }
 
 .top-desc {
@@ -28,7 +30,7 @@ h1 {
       height: 60px;
       width: 60px;
       border-radius: 50%;
-      background: linear-gradient(40deg, rgb(129, 85, 185) 30%, #8983f7);
+      background: linear-gradient(40deg, rgb(129, 85, 185) 30%, #5469d4);
       display: flex;
       align-items: center;
       justify-content: center;

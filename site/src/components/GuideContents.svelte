@@ -44,7 +44,7 @@
 	.reference-toc li {
 		display: block;
 		line-height: 1.2;
-		margin: 0 0 4rem 0;
+        margin: 0 0 4rem 0;
 	}
 
 	a {

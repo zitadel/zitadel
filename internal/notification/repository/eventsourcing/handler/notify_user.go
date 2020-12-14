@@ -93,14 +93,14 @@ func (u *NotifyUser) ProcessUser(event *models.Event) (err error) {
 		}
 		u.fillLoginNames(user)
 	case es_model.UserRemoved:
-		return u.view.DeleteNotifyUser(event.AggregateID, event.Sequence)
+		return u.view.DeleteNotifyUser(event.AggregateID, event.Sequence, event.CreationDate)
 	default:
-		return u.view.ProcessedNotifyUserSequence(event.Sequence)
+		return u.view.ProcessedNotifyUserSequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return u.view.PutNotifyUser(user, user.Sequence)
+	return u.view.PutNotifyUser(user, user.Sequence, event.CreationDate)
 }
 
 func (u *NotifyUser) ProcessOrg(event *models.Event) (err error) {
@@ -114,7 +114,7 @@ func (u *NotifyUser) ProcessOrg(event *models.Event) (err error) {
 	case org_es_model.OrgDomainPrimarySet:
 		return u.fillPreferredLoginNamesOnOrgUsers(event)
 	default:
-		return u.view.ProcessedNotifyUserSequence(event.Sequence)
+		return u.view.ProcessedNotifyUserSequence(event.Sequence, event.CreationDate)
 	}
 }
 
@@ -136,12 +136,12 @@ func (u *NotifyUser) fillLoginNamesOnOrgUsers(event *models.Event) error {
 	}
 	for _, user := range users {
 		user.SetLoginNames(policy, org.Domains)
-		err := u.view.PutNotifyUser(user, 0)
+		err := u.view.PutNotifyUser(user, 0, event.CreationDate)
 		if err != nil {
 			return err
 		}
 	}
-	return u.view.ProcessedNotifyUserSequence(event.Sequence)
+	return u.view.ProcessedNotifyUserSequence(event.Sequence, event.CreationDate)
 }
 
 func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
@@ -165,7 +165,7 @@ func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *models.Event) erro
 	}
 	for _, user := range users {
 		user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
-		err := u.view.PutNotifyUser(user, 0)
+		err := u.view.PutNotifyUser(user, 0, event.CreationDate)
 		if err != nil {
 			return err
 		}
@@ -193,4 +193,8 @@ func (u *NotifyUser) fillLoginNames(user *view_model.NotifyUser) (err error) {
 func (p *NotifyUser) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-9spwf", "id", event.AggregateID).WithError(err).Warn("something went wrong in notify user handler")
 	return spooler.HandleError(event, err, p.view.GetLatestNotifyUserFailedEvent, p.view.ProcessedNotifyUserFailedEvent, p.view.ProcessedNotifyUserSequence, p.errorCountUntilSkip)
+}
+
+func (u *NotifyUser) OnSuccess() error {
+	return spooler.HandleSuccess(u.view.UpdateNotifyUserSpoolerRunTimestamp)
 }

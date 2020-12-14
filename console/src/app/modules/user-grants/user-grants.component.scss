@@ -23,20 +23,20 @@
 
     th {
       .search-button {
-        display: none;
+        visibility: hidden;
+        width: 30px;
+
+        .icon {
+          font-size: 1.2rem;
+        }
       }
 
       &:hover,
       &.search-active {
         .search-button {
-          display: inline-block;
+          visibility: visible;
         }
       }
-    }
-
-    .selection {
-      width: 50px;
-      max-width: 50px;
     }
   }
 }
@@ -68,7 +68,9 @@
 
   button {
     margin: .5rem 0;
+    display: block;
     max-width: 120px;
+    box-sizing: border-box;
 
     i {
       font-size: 1.2rem;
@@ -77,8 +79,33 @@
   }
 }
 
+.row-form {
+  display: flex;
+  align-items: center;
+
+  .form-field {
+    flex: 1;
+  }
+}
+
 .fill-space {
   flex: 1;
+}
+
+.role-data {
+  min-width: 180px;
+}
+
+.date-block {
+  margin: .5rem 0;
+  display: block;
+  min-width: 120px;
+
+  .date-sub {
+    font-size: 13px;
+    color: var(--grey);
+    display: block;
+  }
 }
 
 .filtername {

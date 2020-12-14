@@ -11,6 +11,11 @@ Tracing:
     Fraction: $ZITADEL_TRACING_FRACTION
     Endpoint: $ZITADEL_TRACING_ENDPOINT
 
+Metrics:
+  Type: 'otel'
+  Config:
+    MeterName: 'github.com/caos/zitadel'
+
 AuthZ:
   Repository:
     Eventstore:
@@ -224,7 +229,7 @@ UI:
   Login:
     Handler:
       BaseURL: '$ZITADEL_ACCOUNTS'
-      OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/'
+      OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/callback?id='
       ZitadelURL: '$ZITADEL_CONSOLE'
       LanguageCookieName: 'caos.zitadel.login.lang'
       DefaultLanguage: 'de'

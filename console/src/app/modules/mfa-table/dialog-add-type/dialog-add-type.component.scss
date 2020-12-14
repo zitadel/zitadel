@@ -1,0 +1,22 @@
+.title {
+  font-size: 1.5rem;
+}
+
+.desc {
+  font-size: 14px;
+  color: var(--grey);
+}
+
+.form-field {
+  width: 100%;
+}
+
+.action {
+  display: flex;
+  justify-content: flex-end;
+
+  button {
+    margin-left: .5rem;
+    border-radius: .5rem;
+  }
+}

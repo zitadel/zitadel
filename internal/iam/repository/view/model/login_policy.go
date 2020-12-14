@@ -28,6 +28,7 @@ type LoginPolicyView struct {
 	AllowUsernamePassword bool          `json:"allowUsernamePassword" gorm:"column:allow_username_password"`
 	AllowExternalIDP      bool          `json:"allowExternalIdp" gorm:"column:allow_external_idp"`
 	ForceMFA              bool          `json:"forceMFA" gorm:"column:force_mfa"`
+	PasswordlessType      int32         `json:"passwordlessType" gorm:"column:passwordless_type"`
 	SecondFactors         pq.Int64Array `json:"-" gorm:"column:second_factors"`
 	MultiFactors          pq.Int64Array `json:"-" gorm:"column:multi_factors"`
 	Default               bool          `json:"-" gorm:"-"`
@@ -45,6 +46,7 @@ func LoginPolicyViewFromModel(policy *model.LoginPolicyView) *LoginPolicyView {
 		AllowExternalIDP:      policy.AllowExternalIDP,
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		ForceMFA:              policy.ForceMFA,
+		PasswordlessType:      int32(policy.PasswordlessType),
 		SecondFactors:         secondFactorsFromModel(policy.SecondFactors),
 		MultiFactors:          multiFactorsFromModel(policy.MultiFactors),
 		Default:               policy.Default,
@@ -77,6 +79,7 @@ func LoginPolicyViewToModel(policy *LoginPolicyView) *model.LoginPolicyView {
 		AllowExternalIDP:      policy.AllowExternalIDP,
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		ForceMFA:              policy.ForceMFA,
+		PasswordlessType:      model.PasswordlessType(policy.PasswordlessType),
 		SecondFactors:         secondFactorsToModel(policy.SecondFactors),
 		MultiFactors:          multiFactorsToToModel(policy.MultiFactors),
 		Default:               policy.Default,
@@ -115,7 +118,7 @@ func (p *LoginPolicyView) AppendEvent(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		p.SecondFactors = append(p.SecondFactors, int64(mfa.MfaType))
+		p.SecondFactors = append(p.SecondFactors, int64(mfa.MFAType))
 	case es_model.LoginPolicySecondFactorRemoved, org_es_model.LoginPolicySecondFactorRemoved:
 		err = p.removeSecondFactor(event)
 	case es_model.LoginPolicyMultiFactorAdded, org_es_model.LoginPolicyMultiFactorAdded:
@@ -124,7 +127,7 @@ func (p *LoginPolicyView) AppendEvent(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		p.MultiFactors = append(p.MultiFactors, int64(mfa.MfaType))
+		p.MultiFactors = append(p.MultiFactors, int64(mfa.MFAType))
 	case es_model.LoginPolicyMultiFactorRemoved, org_es_model.LoginPolicyMultiFactorRemoved:
 		err = p.removeMultiFactor(event)
 	}
@@ -150,7 +153,7 @@ func (p *LoginPolicyView) removeSecondFactor(event *models.Event) error {
 		return err
 	}
 	for i := len(p.SecondFactors) - 1; i >= 0; i-- {
-		if p.SecondFactors[i] == int64(mfa.MfaType) {
+		if p.SecondFactors[i] == int64(mfa.MFAType) {
 			copy(p.SecondFactors[i:], p.SecondFactors[i+1:])
 			p.SecondFactors[len(p.SecondFactors)-1] = 0
 			p.SecondFactors = p.SecondFactors[:len(p.SecondFactors)-1]
@@ -167,7 +170,7 @@ func (p *LoginPolicyView) removeMultiFactor(event *models.Event) error {
 		return err
 	}
 	for i := len(p.MultiFactors) - 1; i >= 0; i-- {
-		if p.MultiFactors[i] == int64(mfa.MfaType) {
+		if p.MultiFactors[i] == int64(mfa.MFAType) {
 			copy(p.MultiFactors[i:], p.MultiFactors[i+1:])
 			p.MultiFactors[len(p.MultiFactors)-1] = 0
 			p.MultiFactors = p.MultiFactors[:len(p.MultiFactors)-1]

@@ -160,7 +160,7 @@ $custom-typography:
 .mat-dialog-container,
 .mat-raised-button,
 .mat-stroked-button {
-  border-radius: .5rem !important;
+  border-radius: 6px !important;
 }
 
 .light-theme {
@@ -168,7 +168,6 @@ $custom-typography:
   @include angular-material-theme($light-theme);
 
   --grey: #697386;
-  --table-row-back: #e7ebf0;
   --color-main: #5469d4;
 
   .sidenav,
@@ -179,8 +178,8 @@ $custom-typography:
   }
 
   ::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .1);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, .1);
     background-color: #fafafa;
     border-radius: 8px;
   }
@@ -206,7 +205,6 @@ $custom-typography:
   @include component-themes($dark-theme);
   @include angular-material-theme($dark-theme);
 
-  --table-row-back: #292a2b;
   --color-main: #5282c1;
 
   .sidenav,
@@ -265,10 +263,18 @@ body {
     sans-serif;
 }
 
+h2 {
+  font-size: 1.3rem;
+}
+
+.mat-paginator .mat-select {
+  border: none;
+}
+
 .max-width-container {
   max-width: 1350px;
   padding: 0 1.5rem;
-  padding-top: 4rem;
+  padding-top: 2rem;
   padding-left: 4rem;
 
   @media only screen and (min-width: 1024px) {
@@ -280,17 +286,19 @@ body {
   }
 
   @media only screen and (max-width: 500px) {
-    padding-left: 1.5rem;
+    padding-left: .5rem;
+    padding-right: .5rem;
   }
 }
 
 .enlarged-container {
   padding: 0 1.5rem;
-  padding-top: 4rem;
+  padding-top: 2rem;
   padding-left: 4rem;
 
   @media only screen and (max-width: 500px) {
-    padding-left: 1.5rem;
+    padding-left: .5rem;
+    padding-right: .5rem;
   }
 }
 

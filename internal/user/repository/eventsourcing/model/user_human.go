@@ -19,12 +19,16 @@ type Human struct {
 	*Email
 	*Phone
 	*Address
-	ExternalIDPs []*ExternalIDP `json:"-"`
-	InitCode     *InitUserCode  `json:"-"`
-	EmailCode    *EmailCode     `json:"-"`
-	PhoneCode    *PhoneCode     `json:"-"`
-	PasswordCode *PasswordCode  `json:"-"`
-	OTP          *OTP           `json:"-"`
+	ExternalIDPs       []*ExternalIDP   `json:"-"`
+	InitCode           *InitUserCode    `json:"-"`
+	EmailCode          *EmailCode       `json:"-"`
+	PhoneCode          *PhoneCode       `json:"-"`
+	PasswordCode       *PasswordCode    `json:"-"`
+	OTP                *OTP             `json:"-"`
+	U2FTokens          []*WebAuthNToken `json:"-"`
+	PasswordlessTokens []*WebAuthNToken `json:"-"`
+	U2FLogins          []*WebAuthNLogin `json:"-"`
+	PasswordlessLogins []*WebAuthNLogin `json:"-"`
 }
 
 type InitUserCode struct {
@@ -55,6 +59,15 @@ func HumanFromModel(user *model.Human) *Human {
 	}
 	if user.ExternalIDPs != nil {
 		human.ExternalIDPs = ExternalIDPsFromModel(user.ExternalIDPs)
+	}
+	if user.U2FTokens != nil {
+		human.U2FTokens = WebAuthNsFromModel(user.U2FTokens)
+	}
+	if user.PasswordlessTokens != nil {
+		human.PasswordlessTokens = WebAuthNsFromModel(user.PasswordlessTokens)
+	}
+	if user.U2FLogins != nil {
+		human.U2FLogins = WebAuthNLoginsFromModel(user.U2FLogins)
 	}
 	return human
 }
@@ -93,6 +106,15 @@ func HumanToModel(user *Human) *model.Human {
 	}
 	if user.OTP != nil {
 		human.OTP = OTPToModel(user.OTP)
+	}
+	if user.U2FTokens != nil {
+		human.U2FTokens = WebAuthNsToModel(user.U2FTokens)
+	}
+	if user.PasswordlessTokens != nil {
+		human.PasswordlessTokens = WebAuthNsToModel(user.PasswordlessTokens)
+	}
+	if user.U2FLogins != nil {
+		human.U2FLogins = WebAuthNLoginsToModel(user.U2FLogins)
 	}
 	return human
 }
@@ -133,10 +155,10 @@ func (h *Human) AppendEvent(event *es_models.Event) (err error) {
 		HumanAdded,
 		HumanRegistered,
 		HumanProfileChanged:
-		h.setData(event)
+		err = h.setData(event)
 	case InitializedUserCodeAdded,
 		InitializedHumanCodeAdded:
-		h.appendInitUsercodeCreatedEvent(event)
+		err = h.appendInitUsercodeCreatedEvent(event)
 	case UserPasswordChanged,
 		HumanPasswordChanged:
 		err = h.appendUserPasswordChangedEvent(event)
@@ -180,6 +202,26 @@ func (h *Human) AppendEvent(event *es_models.Event) (err error) {
 		err = h.appendExternalIDPAddedEvent(event)
 	case HumanExternalIDPRemoved, HumanExternalIDPCascadeRemoved:
 		err = h.appendExternalIDPRemovedEvent(event)
+	case HumanMFAU2FTokenAdded:
+		err = h.appendU2FAddedEvent(event)
+	case HumanMFAU2FTokenVerified:
+		err = h.appendU2FVerifiedEvent(event)
+	case HumanMFAU2FTokenSignCountChanged:
+		err = h.appendU2FChangeSignCountEvent(event)
+	case HumanMFAU2FTokenRemoved:
+		err = h.appendU2FRemovedEvent(event)
+	case HumanPasswordlessTokenAdded:
+		err = h.appendPasswordlessAddedEvent(event)
+	case HumanPasswordlessTokenVerified:
+		err = h.appendPasswordlessVerifiedEvent(event)
+	case HumanPasswordlessTokenChangeSignCount:
+		err = h.appendPasswordlessChangeSignCountEvent(event)
+	case HumanPasswordlessTokenRemoved:
+		err = h.appendPasswordlessRemovedEvent(event)
+	case HumanMFAU2FTokenBeginLogin:
+		err = h.appendU2FLoginEvent(event)
+	case HumanPasswordlessTokenBeginLogin:
+		err = h.appendPasswordlessLoginEvent(event)
 	}
 	if err != nil {
 		return err

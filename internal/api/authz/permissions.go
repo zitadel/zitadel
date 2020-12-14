@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 func getUserMethodPermissions(ctx context.Context, t *TokenVerifier, requiredPerm string, authConfig Config, ctxData CtxData) (requestedPermissions, allPermissions []string, err error) {

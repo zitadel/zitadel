@@ -4,6 +4,8 @@ Errors:
   OriginNotAllowed: This "Origin" is not allowed
   User:
     NotFound: User could not be found
+    NotFoundOnOrg: User could not be found on chosen organisation
+    NotAllowedOrg: User is no member of the required organisation
     UserIDMissing: User ID missing
     OrgIamPolicyNil: Organisation Policy is empty
     EmailAsUsernameNotAllowed: Email is not allowed as username
@@ -53,12 +55,25 @@ Errors:
       IDPConfigNotExisting: IDP provider invalid for this organisation
       NotAllowed: External IDP not allowed on this organisation
       MinimumExternalIDPNeeded: At least one IDP must be added
-    Mfa:
-      Otp:
+    MFA:
+      OTP:
         AlreadyReady: Multifactor OTP (OneTimePassword) is already set up
         NotExisting: Multifactor OTP (OneTimePassword) doesn't exist
         NotReady: Multifactor OTP (OneTimePassword) isn't ready
         InvalidCode: Invalid code
+      U2F:
+        NotExisting: U2F does not exist
+      Passwordless:
+        NotExisting: Passwordless does not exist
+    WebAuthN:
+      NotFound: WebAuthN Token could not be found
+      BeginRegisterFailed: WebAuthN begin registration failed
+      MarshalError: Error on marshal data
+      ErrorOnParseCredential: Error on parse credential data
+      CreateCredentialFailed: Error on create credentials
+      BeginLoginFailed: WebAuthN begin login failed
+      ValidateLoginFailed: Error on validate login credentials
+      CloneWarning: Credentials may be cloned
   Org:
     Invalid: Organisation is invalid
     AlreadyDeactivated: Organisation is already deactivated
@@ -88,6 +103,7 @@ Errors:
     IDP:
       InvalidSearchQuery: Ungültiger Suchparameter
     LoginPolicy:
+      NotFound: Login Policy not found
       Invalid: Login Policy is invalid
       NotExisting: Login Policy not existig
       AlreadyExists: Login Policy already exists
@@ -98,9 +114,20 @@ Errors:
         NotExisting: Multifactor not existing
         Unspecified: Multifactor invalid
     PasswordComplexity:
-      Empty: Passwort Complexity Policy is empty
-      NotExisting: Passwort Complexity Policy doesn't exist
-      AlreadyExists: Passwort Complexity Policy already exists
+      NotFound: Password  Complexity Policy not found
+      Empty: Password Complexity Policy is empty
+      NotExisting: Password Complexity Policy doesn't exist
+      AlreadyExists: Password Complexity Policy already exists
+    PasswordLockout:
+      NotFound: Password Lockout Policy not found
+      Empty: Passwort Lockout Policy is empty
+      NotExisting: Passwort Lockout Policy doesn't exist
+      AlreadyExists: Passwort Lockout Policy already exists
+    PasswordAge:
+      NotFound: Password Age Policy not found
+      Empty: Password Age Policy is empty
+      NotExisting: Password Age Policy doesn't exist
+      AlreadyExists: Password Age Policy already exists
     OrgIAM:
       Empty: Org IAM Policy is empty
       NotExisting: Org IAM Policy doesn't exist
@@ -282,6 +309,7 @@ EventTypes:
         code:
           added: Phone number code generated
           sent: Phone number code sent
+        removed: Phone number removed
       profile:
         changed: User profile changed
       address:
@@ -294,8 +322,32 @@ EventTypes:
           check:
             succeeded: Multifactor OTP check succeeded
             failed: Multifactor OTP check failed
+        u2f:
+          token:
+            added: Multifactor U2F Token added
+            verified: Multifactor U2F Token verified
+            removed: Multifactor U2F Token removed
+            begin:
+              login: Multifactor U2F check started
+            check:
+              succeeded: Multifactor U2F check succeeded
+              failed: Multifactor U2F check failed
+            signcount:
+              changed: Checksum of the Multifactor U2F Token has been changed
         init:
           skipped: Multifactor initialisation skipped
+      passwordless:
+        token:
+          added: Token for Passwordless Login added
+          verified: Token for Passwordless Login verified
+          removed: Token for Passwordless Login removed
+          begin:
+            login: Passwordless Login check started
+          check:
+            succeeded: Passwordless Login check succeeded
+            failed: Passwordless Login check failed
+          signcount:
+            changed: Checksum of the Passwordless Login Token has been changed
       signed:
         out: User signed out
     locked: User locked

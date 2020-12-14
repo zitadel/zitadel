@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 
 	auth_model "github.com/caos/zitadel/internal/auth/model"
 	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
@@ -50,7 +50,7 @@ func (repo *OrgRepository) SearchOrgs(ctx context.Context, request *org_model.Or
 	}
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }

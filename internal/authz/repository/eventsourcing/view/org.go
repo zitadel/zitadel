@@ -5,6 +5,7 @@ import (
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
+	"time"
 )
 
 const (
@@ -19,12 +20,12 @@ func (v *View) SearchOrgs(req *model.OrgSearchRequest) ([]*org_model.OrgView, ui
 	return org_view.SearchOrgs(v.Db, orgTable, req)
 }
 
-func (v *View) PutOrg(org *org_model.OrgView) error {
+func (v *View) PutOrg(org *org_model.OrgView, eventTimestamp time.Time) error {
 	err := org_view.PutOrg(v.Db, orgTable, org)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedOrgSequence(org.Sequence)
+	return v.ProcessedOrgSequence(org.Sequence, eventTimestamp)
 }
 
 func (v *View) GetLatestOrgFailedEvent(sequence uint64) (*repository.FailedEvent, error) {
@@ -39,6 +40,10 @@ func (v *View) GetLatestOrgSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(orgTable)
 }
 
-func (v *View) ProcessedOrgSequence(eventSequence uint64) error {
-	return v.saveCurrentSequence(orgTable, eventSequence)
+func (v *View) ProcessedOrgSequence(eventSequence uint64, eventTimestamp time.Time) error {
+	return v.saveCurrentSequence(orgTable, eventSequence, eventTimestamp)
+}
+
+func (v *View) UpdateOrgSpoolerRunTimestamp() error {
+	return v.updateSpoolerRunSequence(orgTable)
 }

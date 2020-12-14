@@ -19,6 +19,7 @@ type UserSessionView struct {
 	DisplayName                  string
 	SelectedIDPConfigID          string
 	PasswordVerification         time.Time
+	PasswordlessVerification     time.Time
 	ExternalLoginVerification    time.Time
 	SecondFactorVerification     time.Time
 	SecondFactorVerificationType req_model.MFAType

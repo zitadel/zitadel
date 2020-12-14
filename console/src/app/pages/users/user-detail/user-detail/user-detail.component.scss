@@ -29,33 +29,6 @@
 }
 
 .side {
-  .details {
-    margin-bottom: 1rem;
-    border-bottom: 1px solid #81868a40;
-    padding-bottom: 1rem;
-
-    .row {
-      display: flex;
-      margin-bottom: .5rem;
-      align-items: center;
-
-      .first {
-        flex: 1;
-        font-size: .8rem;
-        margin-right: .5rem;
-        white-space: nowrap;
-      }
-
-      .second {
-        font-size: .8rem;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        margin-left: 1rem;
-        text-align: right;
-      }
-    }
-  }
-
   .changes {
     flex: 1;
     min-height: 0;

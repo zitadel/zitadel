@@ -2,21 +2,20 @@ package oidc
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/auth_request/model"
 	"strings"
-
-	"golang.org/x/text/language"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
+	"golang.org/x/text/language"
+	"gopkg.in/square/go-jose.v2"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	proj_model "github.com/caos/zitadel/internal/project/model"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 )
@@ -155,7 +154,7 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID, applicati
 				roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
 			}
 			if strings.HasPrefix(scope, model.OrgDomainPrimaryScope) {
-				userInfo.AppendClaims(model.OrgDomainPrimaryScope, strings.TrimPrefix(scope, model.OrgDomainPrimaryScope))
+				userInfo.AppendClaims(model.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, model.OrgDomainPrimaryScope))
 			}
 		}
 	}
@@ -180,7 +179,7 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 			roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
 		} else if strings.HasPrefix(scope, model.OrgDomainPrimaryScope) {
-			claims = map[string]interface{}{model.OrgDomainPrimaryScope: strings.TrimPrefix(scope, model.OrgDomainPrimaryScope)}
+			claims = appendClaim(claims, model.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, model.OrgDomainPrimaryScope))
 		}
 	}
 	if len(roles) == 0 || clientID == "" {
@@ -191,7 +190,7 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 		return nil, err
 	}
 	if len(projectRoles) > 0 {
-		claims = map[string]interface{}{ClaimProjectRoles: projectRoles}
+		claims = appendClaim(claims, ClaimProjectRoles, projectRoles)
 	}
 	return claims, err
 }
@@ -239,4 +238,12 @@ func getGender(gender user_model.Gender) string {
 		return "diverse"
 	}
 	return ""
+}
+
+func appendClaim(claims map[string]interface{}, claim string, value interface{}) map[string]interface{} {
+	if claims == nil {
+		claims = make(map[string]interface{})
+	}
+	claims[claim] = value
+	return claims
 }

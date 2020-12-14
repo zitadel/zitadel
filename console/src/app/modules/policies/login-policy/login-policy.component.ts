@@ -22,6 +22,7 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component';
+import { LoginMethodComponentType } from 'src/app/modules/mfa-table/mfa-table.component';
 
 @Component({
     selector: 'app-login-policy',
@@ -29,6 +30,7 @@ import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component
     styleUrls: ['./login-policy.component.scss'],
 })
 export class LoginPolicyComponent implements OnDestroy {
+    public LoginMethodComponentType: any = LoginMethodComponentType;
     public loginData!: LoginPolicyView.AsObject | DefaultLoginPolicyView.AsObject;
 
     private sub: Subscription = new Subscription();
@@ -112,6 +114,8 @@ export class LoginPolicyComponent implements OnDestroy {
                 mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
                 mgmtreq.setAllowRegister(this.loginData.allowRegister);
                 mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
+                mgmtreq.setForceMfa(this.loginData.forceMfa);
+                // console.log(mgmtreq.toObject());
                 if ((this.loginData as LoginPolicyView.AsObject).pb_default) {
                     return (this.service as ManagementService).CreateLoginPolicy(mgmtreq);
                 } else {
@@ -122,6 +126,9 @@ export class LoginPolicyComponent implements OnDestroy {
                 adminreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
                 adminreq.setAllowRegister(this.loginData.allowRegister);
                 adminreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
+                adminreq.setForceMfa(this.loginData.forceMfa);
+                // console.log(adminreq.toObject());
+
                 return (this.service as AdminService).UpdateDefaultLoginPolicy(adminreq);
         }
     }
