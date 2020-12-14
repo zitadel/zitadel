@@ -2,14 +2,15 @@ package management
 
 import (
 	"encoding/json"
+
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/model"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/caos/zitadel/pkg/grpc/message"
@@ -504,6 +505,7 @@ func mfaFromModel(mfa *usr_model.MultiFactor) *management.UserMultiFactor {
 		State:     mfaStateFromModel(mfa.State),
 		Type:      mfaTypeFromModel(mfa.Type),
 		Attribute: mfa.Attribute,
+		Id:        mfa.ID,
 	}
 }
 

@@ -155,6 +155,7 @@
         "MFA": {
             "TABLETYPE":"Type",
             "TABLESTATE":"Status",
+            "ATTRIBUTE":"Attribut",
             "TABLEACTIONS":"Actions",
             "TITLE": "Multifactor Authentication",
             "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
@@ -162,6 +163,12 @@
             "OTP": "Configure OTP",
             "OTP_DIALOG_TITLE": "Add OTP",
             "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
+            "U2F":"Add U2F",
+            "U2F_DIALOG_TITLE": "Verify U2F",
+            "U2F_DIALOG_DESCRIPTION": "Enter a name for your used universal Multifactor.",
+            "U2F_SUCCESS":"U2F created successfully!",
+            "U2F_ERROR":"An error during U2F setup occurred!",
+            "U2F_NAME":"U2F Name",
             "TYPE": {
                 "0": "No MFA defined",
                 "1": "OTP",
@@ -174,8 +181,8 @@
                 "3": "Deleted"
             },
             "DIALOG": {
-                "OTP_DELETE_TITLE":"Remove OTP Factor",
-                "OTP_DELETE_DESCRIPTION":"You are about to delete OTP as second factor. Are you sure?"
+                "MFA_DELETE_TITLE":"Remove Secondfactor",
+                "MFA_DELETE_DESCRIPTION":"You are about to delete a second factor. Are you sure?"
             }
         },
         "EXTERNALIDP": {
@@ -345,6 +352,7 @@
             "PHONEVERIFICATIONSENT":"Phone verification code sent.",
             "EMAILVERIFICATIONSENT":"E-mail verification code sent.",
             "OTPREMOVED":"OTP removed.",
+            "U2FREMOVED":"U2F removed.",
             "INITIALPASSWORDSET":"Initial password set.",
             "PASSWORDNOTIFICATIONSENT":"Password change notification sent.",
             "PASSWORDCHANGED":"Password changed successfully.",
@@ -551,7 +559,9 @@
             "ALLOWREGISTER":"Register allowed",
             "ALLOWUSERNAMEPASSWORD_DESC":"The conventional login with user name and password is allowed.",
             "ALLOWEXTERNALIDP_DESC":"The login is allowed for the underlying identity providers",
-            "ALLOWREGISTER_DESC":"If the option is selected, an additional step for registering a user appears in the login."
+            "ALLOWREGISTER_DESC":"If the option is selected, an additional step for registering a user appears in the login.",
+            "FORCEMFA":"Force MFA",
+            "FORCEMFA_DESC":"If the option is selected, users have to configure a second factor for login."
         },
         "RESET":"Reset Policy",
         "CREATECUSTOM":"Create Custom Policy",
@@ -824,6 +834,37 @@
             "SELECTEDDEACTIVATED":"Selected idps deactivated.",
             "SELECTEDKEYSDELETED":"Selected idps deleted.",
             "DELETED":"Idp removed successfully!"
+        }
+    },
+    "MFA":{
+        "LIST": {
+            "MULTIFACTORTITLE":"Multifactors",
+            "MULTIFACTORDESCRIPTION":"Define your Multifactors for Authentication here.",
+            "SECONDFACTORTITLE":"Secondfactors",
+            "SECONDFACTORDESCRIPTION":"Define your Secondfactors for Authentication here."
+        },
+        "CREATE": {
+            "TITLE":"New Factor",
+            "DESCRIPTION":"Select your new Factor type."
+        },
+        "DELETE": {
+            "TITLE":"Delete Factor",
+            "DESCRIPTION":"You are about to delete a Factor from Login Policy. Are you sure?"
+        },
+        "TOAST": {
+            "ADDED":"Added successfully.",
+            "SAVED": "Saved successfully.",
+            "DELETED":"Removed successfully"
+        },
+        "TYPE":"Type",
+        "MULTIFACTORTYPES": {
+            "0":"Unknown",
+            "1":"U2F with Pin"
+        },
+        "SECONDFACTORTYPES": {
+            "0":"Unknown",
+            "1":"OTP",
+            "2":"U2F"
         }
     },
     "LOGINPOLICY": {

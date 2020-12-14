@@ -155,6 +155,7 @@
         "MFA": {
             "TABLETYPE":"Typ",
             "TABLESTATE":"Status",
+            "ATTRIBUTE":"Attribut",
             "TABLEACTIONS":"Aktionen",
             "TITLE": "Multifaktor-Authentisierung",
             "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um Dein Konto optimal zu schützen.",
@@ -162,6 +163,12 @@
             "OTP": "OTP konfigurieren",
             "OTP_DIALOG_TITLE": "OTP hinzufügen",
             "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator App und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
+            "U2F":"U2F hinzufügen",
+            "U2F_DIALOG_TITLE": "U2F hinzufügen",
+            "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Universellen Multifaktor an.",
+            "U2F_SUCCESS":"U2F erfolgreich erstellt!",
+            "U2F_ERROR":"Ein Fehler ist aufgetreten!",
+            "U2F_NAME":"U2F Name",
             "TYPE": {
                 "0":"Keine MFA definiert",
                 "1":"OTP",
@@ -174,8 +181,8 @@
                 "3": "Gelöscht"
             },
             "DIALOG": {
-                "OTP_DELETE_TITLE":"OTP Faktor entfernen",
-                "OTP_DELETE_DESCRIPTION":"Sie sind im Begriff OTP als Zweitfaktormethode zu entfernen. Sind sie sicher?"
+                "MFA_DELETE_TITLE":"Zweiten Faktor entfernen",
+                "MFA_DELETE_DESCRIPTION":"Sie sind im Begriff eine Zweitfaktormethode zu entfernen. Sind sie sicher?"
             }
         },
         "EXTERNALIDP": {
@@ -345,6 +352,7 @@
             "PHONEVERIFICATIONSENT":"Bestätigungscode per Telefonnummer gesendet.",
             "EMAILVERIFICATIONSENT":"Bestätigungscode per E-Mail gesendet.",
             "OTPREMOVED":"OTP entfernt.",
+            "U2FREMOVED":"U2F entfernt.",
             "INITIALPASSWORDSET":"Initiales Passwort gesetzt.",
             "PASSWORDNOTIFICATIONSENT":"Passwortänderung mittgeteilt.",
             "PASSWORDCHANGED":"Passwort geändert.",
@@ -551,7 +559,9 @@
             "ALLOWREGISTER":"Registrieren erlaubt",
             "ALLOWUSERNAMEPASSWORD_DESC":"Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
             "ALLOWEXTERNALIDP_DESC":"Der Login wird für die darunter liegenden Identity Provider erlaubt.",
-            "ALLOWREGISTER_DESC":"Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers."
+            "ALLOWREGISTER_DESC":"Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers.",
+            "FORCEMFA":"Mfa erzwingen",
+            "FORCEMFA_DESC":"Ist die Option gewählt, müssen Benutzer einen zweiten Faktor für den Login verwenden."
         },
         "RESET":"Richtlinie zurücksetzen",
         "CREATECUSTOM":"Benutzerdefinierte Richtlinie erstellen",
@@ -763,7 +773,7 @@
     },
     "IDP":{
         "LIST": {
-            "TITLE":"Identitäts Providers",
+            "TITLE":"Identitäts Provider",
             "DESCRIPTION":"Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können."
         },
         "CREATE": {
@@ -824,6 +834,37 @@
             "SELECTEDDEACTIVATED":"Selektierte Idps deaktiviert.",
             "SELECTEDKEYSDELETED":"Selektierte Idps gelöscht.",
             "DELETED":"Idp erfolgreich gelöscht!"
+        }
+    },
+    "MFA":{
+        "LIST": {
+            "MULTIFACTORTITLE":"Multifaktoren",
+            "MULTIFACTORDESCRIPTION":"Definieren Sie hier Ihre Multifaktoren, die sie für die Authentifizierung verwenden können.",
+            "SECONDFACTORTITLE":"Zweitfaktoren",
+            "SECONDFACTORDESCRIPTION":"Definieren Sie hier Ihre Zweitfaktoren, die sie für die Authentifizierung verwenden können."
+        },
+        "CREATE": {
+            "TITLE":"Neuer Faktor",
+            "DESCRIPTION":"Definieren Sie hier den gewünschten Typ."
+        },
+        "DELETE": {
+            "TITLE":"Faktor löschen",
+            "DESCRIPTION":"Sie sind im Begriff einen Faktor zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?"
+        },
+        "TOAST": {
+            "ADDED":"Erfolgreich hinzugefügt.",
+            "SAVED": "Erfolgreich gespeichert.",
+            "DELETED":"Mfa erfolgreich gelöscht!"
+        },
+        "TYPE":"Typ",
+        "MULTIFACTORTYPES": {
+            "0":"Unknown",
+            "1":"U2F with Pin"
+        },
+        "SECONDFACTORTYPES": {
+            "0":"Unknown",
+            "1":"OTP",
+            "2":"U2F"
         }
     },
     "LOGINPOLICY": {

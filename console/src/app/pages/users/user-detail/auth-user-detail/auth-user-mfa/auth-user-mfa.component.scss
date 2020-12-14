@@ -2,6 +2,7 @@
 .add-row {
   display: flex;
   margin: -.5rem;
+  flex-wrap: wrap;
 
   .button {
     margin: .5rem;

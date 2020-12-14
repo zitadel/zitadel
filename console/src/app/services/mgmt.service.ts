@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject } from 'rxjs';
+import { MultiFactorsResult } from '../proto/generated/admin_pb';
 
 import {
     AddMachineKeyRequest,
@@ -50,6 +51,7 @@ import {
     MachineKeySearchResponse,
     MachineKeyType,
     MachineResponse,
+    MultiFactor,
     NotificationType,
     OIDCApplicationCreate,
     OIDCConfig,
@@ -122,6 +124,8 @@ import {
     ProjectView,
     RemoveOrgDomainRequest,
     RemoveOrgMemberRequest,
+    SecondFactor,
+    SecondFactorsResult,
     SetPasswordNotificationRequest,
     UpdateMachineRequest,
     UpdateUserAddressRequest,
@@ -152,6 +156,7 @@ import {
     UserSearchResponse,
     UserView,
     ValidateOrgDomainRequest,
+    WebAuthNTokenID,
     ZitadelDocs,
 } from '../proto/generated/management_pb';
 import { GrpcService } from './grpc.service';
@@ -183,6 +188,32 @@ export class ManagementService {
             req.setQueriesList(queryList);
         }
         return this.grpcService.mgmt.searchIdps(req);
+    }
+
+    public GetLoginPolicyMultiFactors(): Promise<MultiFactorsResult> {
+        const req = new Empty();
+        return this.grpcService.mgmt.getLoginPolicyMultiFactors(req);
+    }
+
+    public AddMultiFactorToLoginPolicy(req: MultiFactor): Promise<MultiFactor> {
+        return this.grpcService.mgmt.addMultiFactorToLoginPolicy(req);
+    }
+
+    public RemoveMultiFactorFromLoginPolicy(req: MultiFactor): Promise<Empty> {
+        return this.grpcService.mgmt.removeMultiFactorFromLoginPolicy(req);
+    }
+
+    public GetLoginPolicySecondFactors(): Promise<SecondFactorsResult> {
+        const req = new Empty();
+        return this.grpcService.mgmt.getLoginPolicySecondFactors(req);
+    }
+
+    public AddSecondFactorToLoginPolicy(req: SecondFactor): Promise<SecondFactor> {
+        return this.grpcService.mgmt.addSecondFactorToLoginPolicy(req);
+    }
+
+    public RemoveSecondFactorFromLoginPolicy(req: SecondFactor): Promise<Empty> {
+        return this.grpcService.mgmt.removeSecondFactorFromLoginPolicy(req);
     }
 
     public GetLoginPolicy(): Promise<LoginPolicyView> {
@@ -681,6 +712,12 @@ export class ManagementService {
         const req = new UserID();
         req.setId(id);
         return this.grpcService.mgmt.removeMfaOTP(req);
+    }
+
+    public RemoveMfaU2F(id: string): Promise<Empty> {
+        const req = new WebAuthNTokenID();
+        req.setId(id);
+        return this.grpcService.mgmt.removeMfaU2F(req);
     }
 
     public SaveUserProfile(
