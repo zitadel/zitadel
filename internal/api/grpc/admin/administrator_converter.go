@@ -29,7 +29,7 @@ func viewFromModel(view *view_model.View) *admin.View {
 	eventTimestamp, err := ptypes.TimestampProto(view.EventTimestamp)
 	logging.Log("GRPC-KSo03").OnError(err).Debug("unable to parse timestamp")
 	lastSpool, err := ptypes.TimestampProto(view.LastSuccessfulSpoolerRun)
-	logging.Log("GRPC-KSo03").OnError(err).Debug("unable to parse timestamp")
+	logging.Log("GRPC-0oP87").OnError(err).Debug("unable to parse timestamp")
 
 	return &admin.View{
 		Database:                 view.Database,
