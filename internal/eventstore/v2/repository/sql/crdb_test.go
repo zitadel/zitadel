@@ -595,10 +595,10 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 				},
 			},
 			res: res{
-				errCount: 0,
+				errCount: 2,
 				eventsRes: eventsRes{
 					aggIDs:            []string{"210"},
-					pushedEventsCount: 6,
+					pushedEventsCount: 2,
 					aggTypes:          []repository.AggregateType{repository.AggregateType(t.Name())},
 				},
 			},
