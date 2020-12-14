@@ -69,7 +69,7 @@
     <p class="subdesc">{{ 'MFA.LIST.SECONDFACTORDESCRIPTION' | translate }}</p>
     <app-mfa-table [service]="service" [serviceType]="serviceType"
         [componentType]="LoginMethodComponentType.SecondFactor"
-        [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false">
+        [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.policy.write' : ''] | hasRole | async) == false">
     </app-mfa-table>
 
     <h3 class="subheader">{{'LOGINPOLICY.IDPS' | translate}}</h3>
