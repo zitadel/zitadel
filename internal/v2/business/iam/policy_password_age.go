@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -19,7 +20,7 @@ func (r *Repository) AddPasswordAgePolicy(ctx context.Context, policy *iam_model
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-6L0pd", "Errors.IAM.PasswordAgePolicy.AlreadyExists")
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&addedPolicy.Policy.WriteModel).
+	iamAgg := iam_repo.AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
 		PushPasswordAgePolicyAddedEvent(ctx, policy.ExpireWarnDays, policy.MaxAgeDays)
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
@@ -36,7 +37,7 @@ func (r *Repository) ChangePasswordAgePolicy(ctx context.Context, policy *iam_mo
 		return nil, err
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&existingPolicy.Policy.WriteModel).
+	iamAgg := iam_repo.AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
 		PushPasswordAgePolicyChangedFromExisting(ctx, existingPolicy, policy.ExpireWarnDays, policy.MaxAgeDays)
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)

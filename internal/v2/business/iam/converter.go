@@ -135,62 +135,62 @@ func readModelToMember(readModel *member.ReadModel) *model.IAMMember {
 
 func writeModelToMember(writeModel *iam.MemberWriteModel) *model.IAMMember {
 	return &model.IAMMember{
-		ObjectRoot: writeModelToObjectRoot(writeModel.Member.WriteModel),
-		Roles:      writeModel.Member.Roles,
-		UserID:     writeModel.Member.UserID,
+		ObjectRoot: writeModelToObjectRoot(writeModel.WriteModel.WriteModel),
+		Roles:      writeModel.Roles,
+		UserID:     writeModel.UserID,
 	}
 }
 
 func writeModelToLoginPolicy(wm *login.WriteModel) *model.LoginPolicy {
 	return &model.LoginPolicy{
-		ObjectRoot:            writeModelToObjectRoot(wm.Policy.WriteModel),
-		AllowUsernamePassword: wm.Policy.AllowUserNamePassword,
-		AllowRegister:         wm.Policy.AllowRegister,
-		AllowExternalIdp:      wm.Policy.AllowExternalIDP,
-		ForceMFA:              wm.Policy.ForceMFA,
-		PasswordlessType:      model.PasswordlessType(wm.Policy.PasswordlessType),
+		ObjectRoot:            writeModelToObjectRoot(wm.WriteModel.WriteModel),
+		AllowUsernamePassword: wm.AllowUserNamePassword,
+		AllowRegister:         wm.AllowRegister,
+		AllowExternalIdp:      wm.AllowExternalIDP,
+		ForceMFA:              wm.ForceMFA,
+		PasswordlessType:      model.PasswordlessType(wm.PasswordlessType),
 	}
 }
 
 func writeModelToLabelPolicy(wm *label.WriteModel) *model.LabelPolicy {
 	return &model.LabelPolicy{
-		ObjectRoot:     writeModelToObjectRoot(wm.Policy.WriteModel),
-		PrimaryColor:   wm.Policy.PrimaryColor,
-		SecondaryColor: wm.Policy.SecondaryColor,
+		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel.WriteModel),
+		PrimaryColor:   wm.PrimaryColor,
+		SecondaryColor: wm.SecondaryColor,
 	}
 }
 
 func writeModelToOrgIAMPolicy(wm *org_iam.WriteModel) *model.OrgIAMPolicy {
 	return &model.OrgIAMPolicy{
-		ObjectRoot:            writeModelToObjectRoot(wm.Policy.WriteModel),
-		UserLoginMustBeDomain: wm.Policy.UserLoginMustBeDomain,
+		ObjectRoot:            writeModelToObjectRoot(wm.WriteModel.WriteModel),
+		UserLoginMustBeDomain: wm.UserLoginMustBeDomain,
 	}
 }
 
 func writeModelToPasswordAgePolicy(wm *password_age.WriteModel) *model.PasswordAgePolicy {
 	return &model.PasswordAgePolicy{
-		ObjectRoot:     writeModelToObjectRoot(wm.Policy.WriteModel),
-		MaxAgeDays:     wm.Policy.MaxAgeDays,
-		ExpireWarnDays: wm.Policy.ExpireWarnDays,
+		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel.WriteModel),
+		MaxAgeDays:     wm.MaxAgeDays,
+		ExpireWarnDays: wm.ExpireWarnDays,
 	}
 }
 
 func writeModelToPasswordComplexityPolicy(wm *password_complexity.WriteModel) *model.PasswordComplexityPolicy {
 	return &model.PasswordComplexityPolicy{
-		ObjectRoot:   writeModelToObjectRoot(wm.Policy.WriteModel),
-		MinLength:    wm.Policy.MinLength,
-		HasLowercase: wm.Policy.HasLowercase,
-		HasUppercase: wm.Policy.HasUpperCase,
-		HasNumber:    wm.Policy.HasNumber,
-		HasSymbol:    wm.Policy.HasSymbol,
+		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel.WriteModel),
+		MinLength:    wm.MinLength,
+		HasLowercase: wm.HasLowercase,
+		HasUppercase: wm.HasUpperCase,
+		HasNumber:    wm.HasNumber,
+		HasSymbol:    wm.HasSymbol,
 	}
 }
 
 func writeModelToPasswordLockoutPolicy(wm *password_lockout.WriteModel) *model.PasswordLockoutPolicy {
 	return &model.PasswordLockoutPolicy{
-		ObjectRoot:          writeModelToObjectRoot(wm.Policy.WriteModel),
-		MaxAttempts:         wm.Policy.MaxAttempts,
-		ShowLockOutFailures: wm.Policy.ShowLockOutFailures,
+		ObjectRoot:          writeModelToObjectRoot(wm.WriteModel.WriteModel),
+		MaxAttempts:         wm.MaxAttempts,
+		ShowLockOutFailures: wm.ShowLockOutFailures,
 	}
 }
 

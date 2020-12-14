@@ -2,6 +2,7 @@ package label
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/repository/policy/label"
@@ -54,7 +55,7 @@ func ChangedEventFromExisting(
 			ctx,
 			LabelPolicyChangedEventType,
 		),
-		&current.Policy,
+		&current.WriteModel,
 		primaryColor,
 		secondaryColor,
 	)

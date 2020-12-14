@@ -22,11 +22,11 @@ func (r *Repository) AddMember(ctx context.Context, member *iam_model.IAMMember)
 	if err != nil {
 		return nil, err
 	}
-	if addedMember.Member.IsActive {
+	if addedMember.IsActive {
 		return nil, errors.ThrowAlreadyExists(nil, "IAM-PtXi1", "Errors.IAM.Member.AlreadyExists")
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&addedMember.Member.WriteModel).
+	iamAgg := iam_repo.AggregateFromWriteModel(&addedMember.WriteModel.WriteModel).
 		PushMemberAdded(ctx, member.UserID, member.Roles...)
 
 	err = r.eventstore.PushAggregate(ctx, addedMember, iamAgg)
@@ -50,7 +50,7 @@ func (r *Repository) ChangeMember(ctx context.Context, member *iam_model.IAMMemb
 		return nil, err
 	}
 
-	iam := iam_repo.AggregateFromWriteModel(&existingMember.Member.WriteModel).
+	iam := iam_repo.AggregateFromWriteModel(&existingMember.WriteModel.WriteModel).
 		PushMemberChangedFromExisting(ctx, existingMember, member.Roles...)
 
 	events, err := r.eventstore.PushAggregates(ctx, iam)
@@ -75,7 +75,7 @@ func (r *Repository) RemoveMember(ctx context.Context, member *iam_model.IAMMemb
 		return nil
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&m.Member.WriteModel).
+	iamAgg := iam_repo.AggregateFromWriteModel(&m.WriteModel.WriteModel).
 		PushEvents(iam_repo.NewMemberRemovedEvent(ctx, member.UserID))
 
 	return r.eventstore.PushAggregate(ctx, m, iamAgg)
@@ -104,7 +104,7 @@ func (r *Repository) memberWriteModelByID(ctx context.Context, iamID, userID str
 		return nil, err
 	}
 
-	if !writeModel.Member.IsActive {
+	if !writeModel.IsActive {
 		return nil, errors.ThrowNotFound(nil, "IAM-D8JxR", "Errors.NotFound")
 	}
 

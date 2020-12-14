@@ -2,6 +2,7 @@ package password_age
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/repository/policy/password_age"
@@ -54,7 +55,7 @@ func ChangedEventFromExisting(
 			ctx,
 			PasswordAgePolicyChangedEventType,
 		),
-		&current.Policy,
+		&current.WriteModel,
 		expireWarnDays,
 		maxAgeDays,
 	)

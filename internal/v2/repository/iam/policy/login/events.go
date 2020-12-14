@@ -2,6 +2,7 @@ package login
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/repository/policy/login"
@@ -67,7 +68,7 @@ func ChangedEventFromExisting(
 			ctx,
 			LoginPolicyChangedEventType,
 		),
-		&current.Policy,
+		&current.WriteModel,
 		allowUsernamePassword,
 		allowRegister,
 		allowExternalIDP,

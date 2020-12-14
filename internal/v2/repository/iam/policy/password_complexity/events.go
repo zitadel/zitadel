@@ -2,6 +2,7 @@ package password_complexity
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/repository/policy/password_complexity"
@@ -63,7 +64,7 @@ func ChangedEventFromExisting(
 			ctx,
 			PasswordComplexityPolicyChangedEventType,
 		),
-		&current.Policy,
+		&current.WriteModel,
 		minLength,
 		hasLowerCase,
 		hasUpperCase,
