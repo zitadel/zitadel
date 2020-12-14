@@ -267,6 +267,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 		Theme:     l.getTheme(r),
 		ThemeMode: l.getThemeMode(r),
 		OrgID:     l.getOrgID(authReq),
+		OrgName:   l.getOrgName(authReq),
 		AuthReqID: getRequestID(authReq, r),
 		CSRF:      csrf.TemplateField(r),
 		Nonce:     http_mw.GetNonce(r),
@@ -318,6 +319,13 @@ func (l *Login) getOrgID(authReq *model.AuthRequest) string {
 	return authReq.UserOrgID
 }
 
+func (l *Login) getOrgName(authReq *model.AuthRequest) string {
+	if authReq == nil {
+		return ""
+	}
+	return authReq.RequestedOrgName
+}
+
 func getRequestID(authReq *model.AuthRequest, r *http.Request) string {
 	if authReq != nil {
 		return authReq.ID
@@ -345,6 +353,7 @@ type baseData struct {
 	Theme        string
 	ThemeMode    string
 	OrgID        string
+	OrgName      string
 	AuthReqID    string
 	CSRF         template.HTML
 	Nonce        string

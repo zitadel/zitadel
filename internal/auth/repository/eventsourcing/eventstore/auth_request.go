@@ -740,6 +740,7 @@ func setOrgID(orgViewProvider orgViewProvider, request *model.AuthRequest) error
 		return err
 	}
 	request.RequestedOrgID = org.ID
+	request.RequestedOrgName = org.Name
 	return nil
 }
 

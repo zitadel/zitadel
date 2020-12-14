@@ -1,10 +1,12 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/iam/model"
-	"golang.org/x/text/language"
 	"strings"
 	"time"
+
+	"golang.org/x/text/language"
+
+	"github.com/caos/zitadel/internal/iam/model"
 
 	"github.com/caos/zitadel/internal/errors"
 )
@@ -31,6 +33,7 @@ type AuthRequest struct {
 	DisplayName         string
 	UserOrgID           string
 	RequestedOrgID      string
+	RequestedOrgName    string
 	SelectedIDPConfigID string
 	LinkingUsers        []*ExternalUser
 	PossibleSteps       []NextStep

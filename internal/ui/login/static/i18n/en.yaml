@@ -6,6 +6,7 @@ Login:
   Loginname: Loginname
   LoginnamePlaceHolder: username@domain
   ExternalLogin: Login with an external user.
+  MustBeMemberOfOrg: The user must be mermber of the {{.OrgDomain}} organisation.
 
 UserSelection:
   Title: Select account
@@ -15,6 +16,7 @@ UserSelection:
   OtherUser: Other User
   SessionState0: active
   SessionState1: inactive
+  MustBeMemberOfOrg: The user must be mermber of the {{.OrgDomain}} organisation.
 
 Password:
   Title: Password
