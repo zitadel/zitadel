@@ -4,6 +4,8 @@ Errors:
   OriginNotAllowed: This "Origin" is not allowed
   User:
     NotFound: User could not be found
+    NotFoundOnOrg: User could not be found on chosen organisation
+    NotAllowedOrg: User is no member of the required organisation
     UserIDMissing: User ID missing
     OrgIamPolicyNil: Organisation Policy is empty
     EmailAsUsernameNotAllowed: Email is not allowed as username
