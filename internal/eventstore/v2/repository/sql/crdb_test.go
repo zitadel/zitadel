@@ -284,11 +284,11 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "push 1 event with check previous",
+			name: "push 1 event",
 			args: args{
 				ctx: context.Background(),
 				events: []*repository.Event{
-					generateEvent(t, "1", true, 0),
+					generateEvent(t, "1"),
 				},
 			},
 			res: res{
@@ -300,82 +300,13 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				}},
 		},
 		{
-			name: "fail push 1 event with check previous wrong sequence",
+			name: "push two events on agg",
 			args: args{
 				ctx: context.Background(),
 				events: []*repository.Event{
-					generateEvent(t, "2", true, 5),
+					generateEvent(t, "6"),
+					generateEvent(t, "6"),
 				},
-			},
-			res: res{
-				wantErr: true,
-				eventsRes: eventsRes{
-					pushedEventsCount: 0,
-					aggID:             []string{"2"},
-					aggType:           repository.AggregateType(t.Name()),
-				},
-			},
-		},
-		{
-			name: "push 1 event without check previous",
-			args: args{
-				ctx: context.Background(),
-				events: []*repository.Event{
-					generateEvent(t, "3", false, 0),
-				},
-			},
-			res: res{
-				wantErr: false,
-				eventsRes: eventsRes{
-					pushedEventsCount: 1,
-					aggID:             []string{"3"},
-					aggType:           repository.AggregateType(t.Name()),
-				},
-			},
-		},
-		{
-			name: "push 1 event without check previous wrong sequence",
-			args: args{
-				ctx: context.Background(),
-				events: []*repository.Event{
-					generateEvent(t, "4", false, 5),
-				},
-			},
-			res: res{
-				wantErr: false,
-				eventsRes: eventsRes{
-					pushedEventsCount: 1,
-					aggID:             []string{"4"},
-					aggType:           repository.AggregateType(t.Name()),
-				},
-			},
-		},
-		{
-			name: "fail on push two events on agg without linking",
-			args: args{
-				ctx: context.Background(),
-				events: []*repository.Event{
-					generateEvent(t, "5", true, 0),
-					generateEvent(t, "5", true, 0),
-				},
-			},
-			res: res{
-				wantErr: true,
-				eventsRes: eventsRes{
-					pushedEventsCount: 0,
-					aggID:             []string{"5"},
-					aggType:           repository.AggregateType(t.Name()),
-				},
-			},
-		},
-		{
-			name: "push two events on agg with linking",
-			args: args{
-				ctx: context.Background(),
-				events: linkEvents(
-					generateEvent(t, "6", true, 0),
-					generateEvent(t, "6", true, 0),
-				),
 			},
 			res: res{
 				wantErr: false,
@@ -387,50 +318,11 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 			},
 		},
 		{
-			name: "push two events on agg with linking without check previous",
-			args: args{
-				ctx: context.Background(),
-				events: linkEvents(
-					generateEvent(t, "7", false, 0),
-					generateEvent(t, "7", false, 0),
-				),
-			},
-			res: res{
-				wantErr: false,
-				eventsRes: eventsRes{
-					pushedEventsCount: 2,
-					aggID:             []string{"7"},
-					aggType:           repository.AggregateType(t.Name()),
-				},
-			},
-		},
-		{
-			name: "push two events on agg with linking mixed check previous",
-			args: args{
-				ctx: context.Background(),
-				events: linkEvents(
-					generateEvent(t, "8", false, 0),
-					generateEvent(t, "8", true, 0),
-					generateEvent(t, "8", false, 0),
-					generateEvent(t, "8", true, 0),
-					generateEvent(t, "8", true, 0),
-				),
-			},
-			res: res{
-				wantErr: false,
-				eventsRes: eventsRes{
-					pushedEventsCount: 5,
-					aggID:             []string{"8"},
-					aggType:           repository.AggregateType(t.Name()),
-				},
-			},
-		},
-		{
 			name: "failed push because context canceled",
 			args: args{
 				ctx: canceledCtx(),
 				events: []*repository.Event{
-					generateEvent(t, "9", true, 0),
+					generateEvent(t, "9"),
 				},
 			},
 			res: res{
@@ -485,11 +377,11 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "push two aggregates both check previous",
+			name: "push two aggregates",
 			args: args{
 				events: []*repository.Event{
-					generateEvent(t, "100", true, 0),
-					generateEvent(t, "101", true, 0),
+					generateEvent(t, "100"),
+					generateEvent(t, "101"),
 				},
 			},
 			res: res{
@@ -502,18 +394,14 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 			},
 		},
 		{
-			name: "push two aggregates both check previous multiple events",
+			name: "push two aggregates both multiple events",
 			args: args{
-				events: combineEventLists(
-					linkEvents(
-						generateEvent(t, "102", true, 0),
-						generateEvent(t, "102", true, 0),
-					),
-					linkEvents(
-						generateEvent(t, "103", true, 0),
-						generateEvent(t, "103", true, 0),
-					),
-				),
+				events: []*repository.Event{
+					generateEvent(t, "102"),
+					generateEvent(t, "102"),
+					generateEvent(t, "103"),
+					generateEvent(t, "103"),
+				},
 			},
 			res: res{
 				wantErr: false,
@@ -525,64 +413,28 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 			},
 		},
 		{
-			name: "fail push linked events of different aggregates",
+			name: "push two aggregates mixed multiple events",
 			args: args{
-				events: linkEvents(
-					generateEvent(t, "104", false, 0),
-					generateEvent(t, "105", false, 0),
-				),
-			},
-			res: res{
-				wantErr: true,
-				eventsRes: eventsRes{
-					pushedEventsCount: 0,
-					aggID:             []string{"104", "105"},
-					aggType:           []repository.AggregateType{repository.AggregateType(t.Name())},
+				events: []*repository.Event{
+					generateEvent(t, "106"),
+					generateEvent(t, "106"),
+					generateEvent(t, "106"),
+					generateEvent(t, "106"),
+					generateEvent(t, "107"),
+					generateEvent(t, "107"),
+					generateEvent(t, "107"),
+					generateEvent(t, "107"),
+					generateEvent(t, "108"),
+					generateEvent(t, "108"),
+					generateEvent(t, "108"),
+					generateEvent(t, "108"),
 				},
 			},
-		},
-		{
-			name: "push two aggregates mixed check previous multiple events",
-			args: args{
-				events: combineEventLists(
-					linkEvents(
-						generateEvent(t, "106", true, 0),
-						generateEvent(t, "106", false, 0),
-						generateEvent(t, "106", false, 0),
-						generateEvent(t, "106", true, 0),
-					),
-					linkEvents(
-						generateEvent(t, "107", false, 0),
-						generateEvent(t, "107", true, 0),
-						generateEvent(t, "107", false, 0),
-						generateEvent(t, "107", true, 0),
-					),
-					linkEvents(
-						generateEvent(t, "108", true, 0),
-						generateEvent(t, "108", false, 0),
-						generateEvent(t, "108", false, 0),
-						generateEvent(t, "108", true, 0),
-					),
-				),
-			},
-		},
-		{
-			name: "failed push same aggregate in two transactions",
-			args: args{
-				events: combineEventLists(
-					linkEvents(
-						generateEvent(t, "109", true, 0),
-					),
-					linkEvents(
-						generateEvent(t, "109", true, 0),
-					),
-				),
-			},
 			res: res{
-				wantErr: true,
+				wantErr: false,
 				eventsRes: eventsRes{
-					pushedEventsCount: 0,
-					aggID:             []string{"109"},
+					pushedEventsCount: 12,
+					aggID:             []string{"106", "107", "108"},
 					aggType:           []repository.AggregateType{repository.AggregateType(t.Name())},
 				},
 			},
@@ -633,25 +485,19 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 			name: "clients push different aggregates",
 			args: args{
 				events: [][]*repository.Event{
-					linkEvents(
-						generateEvent(t, "200", false, 0),
-						generateEvent(t, "200", true, 0),
-						generateEvent(t, "200", false, 0),
-					),
-					linkEvents(
-						generateEvent(t, "201", false, 0),
-						generateEvent(t, "201", true, 0),
-						generateEvent(t, "201", false, 0),
-					),
-					combineEventLists(
-						linkEvents(
-							generateEvent(t, "202", false, 0),
-						),
-						linkEvents(
-							generateEvent(t, "203", true, 0),
-							generateEvent(t, "203", false, 0),
-						),
-					),
+					{
+						generateEvent(t, "200"),
+						generateEvent(t, "200"),
+						generateEvent(t, "200"),
+						generateEvent(t, "201"),
+						generateEvent(t, "201"),
+						generateEvent(t, "201"),
+					},
+					{
+						generateEvent(t, "202"),
+						generateEvent(t, "203"),
+						generateEvent(t, "203"),
+					},
 				},
 			},
 			res: res{
@@ -664,41 +510,31 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 			},
 		},
 		{
-			name: "clients push same aggregates no check previous",
+			name: "clients push same aggregates",
 			args: args{
 				events: [][]*repository.Event{
-					linkEvents(
-						generateEvent(t, "204", false, 0),
-						generateEvent(t, "204", false, 0),
-					),
-					linkEvents(
-						generateEvent(t, "204", false, 0),
-						generateEvent(t, "204", false, 0),
-					),
-					combineEventLists(
-						linkEvents(
-							generateEvent(t, "205", false, 0),
-							generateEvent(t, "205", false, 0),
-							generateEvent(t, "205", false, 0),
-						),
-						linkEvents(
-							generateEvent(t, "206", false, 0),
-							generateEvent(t, "206", false, 0),
-							generateEvent(t, "206", false, 0),
-						),
-					),
-					combineEventLists(
-						linkEvents(
-							generateEvent(t, "204", false, 0),
-						),
-						linkEvents(
-							generateEvent(t, "205", false, 0),
-							generateEvent(t, "205", false, 0),
-						),
-						linkEvents(
-							generateEvent(t, "206", false, 0),
-						),
-					),
+					{
+						generateEvent(t, "204"),
+						generateEvent(t, "204"),
+					},
+					{
+						generateEvent(t, "204"),
+						generateEvent(t, "204"),
+					},
+					{
+						generateEvent(t, "205"),
+						generateEvent(t, "205"),
+						generateEvent(t, "205"),
+						generateEvent(t, "206"),
+						generateEvent(t, "206"),
+						generateEvent(t, "206"),
+					},
+					{
+						generateEvent(t, "204"),
+						generateEvent(t, "205"),
+						generateEvent(t, "205"),
+						generateEvent(t, "206"),
+					},
 				},
 			},
 			res: res{
@@ -711,24 +547,24 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 			},
 		},
 		{
-			name: "clients push different aggregates one with check previous",
+			name: "clients push different aggregates",
 			args: args{
 				events: [][]*repository.Event{
-					linkEvents(
-						generateEvent(t, "207", false, 0),
-						generateEvent(t, "207", false, 0),
-						generateEvent(t, "207", false, 0),
-						generateEvent(t, "207", false, 0),
-						generateEvent(t, "207", false, 0),
-						generateEvent(t, "207", false, 0),
-					),
-					linkEvents(
-						generateEvent(t, "208", true, 0),
-						generateEvent(t, "208", true, 0),
-						generateEvent(t, "208", true, 0),
-						generateEvent(t, "208", true, 0),
-						generateEvent(t, "208", true, 0),
-					),
+					{
+						generateEvent(t, "207"),
+						generateEvent(t, "207"),
+						generateEvent(t, "207"),
+						generateEvent(t, "207"),
+						generateEvent(t, "207"),
+						generateEvent(t, "207"),
+					},
+					{
+						generateEvent(t, "208"),
+						generateEvent(t, "208"),
+						generateEvent(t, "208"),
+						generateEvent(t, "208"),
+						generateEvent(t, "208"),
+					},
 				},
 			},
 			res: res{
@@ -741,28 +577,28 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 			},
 		},
 		{
-			name: "clients push different aggregates all with check previous on first event fail",
+			name: "clients push same aggregates",
 			args: args{
 				events: [][]*repository.Event{
-					linkEvents(
-						generateEventWithData(t, "210", true, 0, []byte(`{ "transaction": 1 }`)),
-						generateEventWithData(t, "210", false, 0, []byte(`{ "transaction": 1.1 }`)),
-					),
-					linkEvents(
-						generateEventWithData(t, "210", true, 0, []byte(`{ "transaction": 2 }`)),
-						generateEventWithData(t, "210", false, 0, []byte(`{ "transaction": 2.1 }`)),
-					),
-					linkEvents(
-						generateEventWithData(t, "210", true, 0, []byte(`{ "transaction": 3 }`)),
-						generateEventWithData(t, "210", false, 0, []byte(`{ "transaction": 30.1 }`)),
-					),
+					{
+						generateEventWithData(t, "210", []byte(`{ "transaction": 1 }`)),
+						generateEventWithData(t, "210", []byte(`{ "transaction": 1.1 }`)),
+					},
+					{
+						generateEventWithData(t, "210", []byte(`{ "transaction": 2 }`)),
+						generateEventWithData(t, "210", []byte(`{ "transaction": 2.1 }`)),
+					},
+					{
+						generateEventWithData(t, "210", []byte(`{ "transaction": 3 }`)),
+						generateEventWithData(t, "210", []byte(`{ "transaction": 30.1 }`)),
+					},
 				},
 			},
 			res: res{
-				errCount: 2,
+				errCount: 0,
 				eventsRes: eventsRes{
 					aggIDs:            []string{"210"},
-					pushedEventsCount: 2,
+					pushedEventsCount: 6,
 					aggTypes:          []repository.AggregateType{repository.AggregateType(t.Name())},
 				},
 			},
@@ -850,9 +686,9 @@ func TestCRDB_Filter(t *testing.T) {
 			},
 			fields: fields{
 				existingEvents: []*repository.Event{
-					generateEvent(t, "300", false, 0),
-					generateEvent(t, "300", false, 0),
-					generateEvent(t, "300", false, 0),
+					generateEvent(t, "300"),
+					generateEvent(t, "300"),
+					generateEvent(t, "300"),
 				},
 			},
 			res: res{
@@ -873,10 +709,10 @@ func TestCRDB_Filter(t *testing.T) {
 			},
 			fields: fields{
 				existingEvents: []*repository.Event{
-					generateEvent(t, "303", false, 0),
-					generateEvent(t, "303", false, 0),
-					generateEvent(t, "303", false, 0),
-					generateEvent(t, "305", false, 0),
+					generateEvent(t, "303"),
+					generateEvent(t, "303"),
+					generateEvent(t, "303"),
+					generateEvent(t, "305"),
 				},
 			},
 			res: res{
@@ -938,9 +774,9 @@ func TestCRDB_LatestSequence(t *testing.T) {
 			},
 			fields: fields{
 				existingEvents: []*repository.Event{
-					generateEvent(t, "400", false, 0),
-					generateEvent(t, "400", false, 0),
-					generateEvent(t, "400", false, 0),
+					generateEvent(t, "400"),
+					generateEvent(t, "400"),
+					generateEvent(t, "400"),
 				},
 			},
 			res: res{
@@ -960,9 +796,9 @@ func TestCRDB_LatestSequence(t *testing.T) {
 			},
 			fields: fields{
 				existingEvents: []*repository.Event{
-					generateEvent(t, "401", false, 0),
-					generateEvent(t, "401", false, 0),
-					generateEvent(t, "401", false, 0),
+					generateEvent(t, "401"),
+					generateEvent(t, "401"),
+					generateEvent(t, "401"),
 				},
 			},
 			res: res{
@@ -1016,8 +852,8 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "two events of same aggregate same resource owner",
 			args: args{
 				events: []*repository.Event{
-					generateEvent(t, "500", false, 0, func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "500", false, 0, func(e *repository.Event) { e.ResourceOwner = "caos" }),
+					generateEvent(t, "500", func(e *repository.Event) { e.ResourceOwner = "caos" }),
+					generateEvent(t, "500", func(e *repository.Event) { e.ResourceOwner = "caos" }),
 				},
 			},
 			fields: fields{
@@ -1032,8 +868,8 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "two events of different aggregate same resource owner",
 			args: args{
 				events: []*repository.Event{
-					generateEvent(t, "501", false, 0, func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "502", false, 0, func(e *repository.Event) { e.ResourceOwner = "caos" }),
+					generateEvent(t, "501", func(e *repository.Event) { e.ResourceOwner = "caos" }),
+					generateEvent(t, "502", func(e *repository.Event) { e.ResourceOwner = "caos" }),
 				},
 			},
 			fields: fields{
@@ -1048,8 +884,8 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "two events of different aggregate different resource owner",
 			args: args{
 				events: []*repository.Event{
-					generateEvent(t, "503", false, 0, func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "504", false, 0, func(e *repository.Event) { e.ResourceOwner = "zitadel" }),
+					generateEvent(t, "503", func(e *repository.Event) { e.ResourceOwner = "caos" }),
+					generateEvent(t, "504", func(e *repository.Event) { e.ResourceOwner = "zitadel" }),
 				},
 			},
 			fields: fields{
@@ -1063,16 +899,12 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 		{
 			name: "events of different aggregate different resource owner",
 			args: args{
-				events: combineEventLists(
-					linkEvents(
-						generateEvent(t, "505", false, 0, func(e *repository.Event) { e.ResourceOwner = "caos" }),
-						generateEvent(t, "505", false, 0, func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					),
-					linkEvents(
-						generateEvent(t, "506", false, 0, func(e *repository.Event) { e.ResourceOwner = "zitadel" }),
-						generateEvent(t, "506", false, 0, func(e *repository.Event) { e.ResourceOwner = "zitadel" }),
-					),
-				),
+				events: []*repository.Event{
+					generateEvent(t, "505", func(e *repository.Event) { e.ResourceOwner = "caos" }),
+					generateEvent(t, "505", func(e *repository.Event) { e.ResourceOwner = "caos" }),
+					generateEvent(t, "506", func(e *repository.Event) { e.ResourceOwner = "zitadel" }),
+					generateEvent(t, "506", func(e *repository.Event) { e.ResourceOwner = "zitadel" }),
+				},
 			},
 			fields: fields{
 				aggregateIDs:  []string{"505", "506"},
@@ -1085,16 +917,12 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 		{
 			name: "events of different aggregate different resource owner per event",
 			args: args{
-				events: combineEventLists(
-					linkEvents(
-						generateEvent(t, "507", false, 0, func(e *repository.Event) { e.ResourceOwner = "caos" }),
-						generateEvent(t, "507", false, 0, func(e *repository.Event) { e.ResourceOwner = "ignored" }),
-					),
-					linkEvents(
-						generateEvent(t, "508", false, 0, func(e *repository.Event) { e.ResourceOwner = "zitadel" }),
-						generateEvent(t, "508", false, 0, func(e *repository.Event) { e.ResourceOwner = "ignored" }),
-					),
-				),
+				events: []*repository.Event{
+					generateEvent(t, "507", func(e *repository.Event) { e.ResourceOwner = "caos" }),
+					generateEvent(t, "507", func(e *repository.Event) { e.ResourceOwner = "ignored" }),
+					generateEvent(t, "508", func(e *repository.Event) { e.ResourceOwner = "zitadel" }),
+					generateEvent(t, "508", func(e *repository.Event) { e.ResourceOwner = "ignored" }),
+				},
 			},
 			fields: fields{
 				aggregateIDs:  []string{"507", "508"},
@@ -1107,16 +935,12 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 		{
 			name: "events of one aggregate different resource owner per event",
 			args: args{
-				events: combineEventLists(
-					linkEvents(
-						generateEvent(t, "509", false, 0, func(e *repository.Event) { e.ResourceOwner = "caos" }),
-						generateEvent(t, "509", false, 0, func(e *repository.Event) { e.ResourceOwner = "ignored" }),
-					),
-					linkEvents(
-						generateEvent(t, "509", false, 0, func(e *repository.Event) { e.ResourceOwner = "ignored" }),
-						generateEvent(t, "509", false, 0, func(e *repository.Event) { e.ResourceOwner = "ignored" }),
-					),
-				),
+				events: []*repository.Event{
+					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = "caos" }),
+					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = "ignored" }),
+					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = "ignored" }),
+					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = "ignored" }),
+				},
 			},
 			fields: fields{
 				aggregateIDs:  []string{"509"},
@@ -1180,34 +1004,16 @@ func canceledCtx() context.Context {
 	return ctx
 }
 
-func combineEventLists(lists ...[]*repository.Event) []*repository.Event {
-	combined := make([]*repository.Event, 0)
-	for _, list := range lists {
-		combined = append(combined, list...)
-	}
-	return combined
-}
-
-func linkEvents(events ...*repository.Event) []*repository.Event {
-	for i := 1; i < len(events); i++ {
-		events[i].PreviousEvent = events[i-1]
-	}
-	return events
-}
-
-func generateEvent(t *testing.T, aggregateID string, checkPrevious bool, previousSeq uint64, opts ...func(*repository.Event)) *repository.Event {
+func generateEvent(t *testing.T, aggregateID string, opts ...func(*repository.Event)) *repository.Event {
 	t.Helper()
 	e := &repository.Event{
-		AggregateID:           aggregateID,
-		AggregateType:         repository.AggregateType(t.Name()),
-		CheckPreviousSequence: checkPrevious,
-		EditorService:         "svc",
-		EditorUser:            "user",
-		PreviousEvent:         nil,
-		PreviousSequence:      previousSeq,
-		ResourceOwner:         "ro",
-		Type:                  "test.created",
-		Version:               "v1",
+		AggregateID:   aggregateID,
+		AggregateType: repository.AggregateType(t.Name()),
+		EditorService: "svc",
+		EditorUser:    "user",
+		ResourceOwner: "ro",
+		Type:          "test.created",
+		Version:       "v1",
 	}
 
 	for _, opt := range opts {
@@ -1217,19 +1023,16 @@ func generateEvent(t *testing.T, aggregateID string, checkPrevious bool, previou
 	return e
 }
 
-func generateEventWithData(t *testing.T, aggregateID string, checkPrevious bool, previousSeq uint64, data []byte) *repository.Event {
+func generateEventWithData(t *testing.T, aggregateID string, data []byte) *repository.Event {
 	t.Helper()
 	return &repository.Event{
-		AggregateID:           aggregateID,
-		AggregateType:         repository.AggregateType(t.Name()),
-		CheckPreviousSequence: checkPrevious,
-		EditorService:         "svc",
-		EditorUser:            "user",
-		PreviousEvent:         nil,
-		PreviousSequence:      previousSeq,
-		ResourceOwner:         "ro",
-		Type:                  "test.created",
-		Version:               "v1",
-		Data:                  data,
+		AggregateID:   aggregateID,
+		AggregateType: repository.AggregateType(t.Name()),
+		EditorService: "svc",
+		EditorUser:    "user",
+		ResourceOwner: "ro",
+		Type:          "test.created",
+		Version:       "v1",
+		Data:          data,
 	}
 }

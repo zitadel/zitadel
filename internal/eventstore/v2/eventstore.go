@@ -66,7 +66,6 @@ func (es *Eventstore) PushAggregates(ctx context.Context, aggregates ...aggregat
 func (es *Eventstore) aggregatesToEvents(aggregates []aggregater) ([]*repository.Event, error) {
 	events := make([]*repository.Event, 0, len(aggregates))
 	for _, aggregate := range aggregates {
-		var previousEvent *repository.Event
 		for _, event := range aggregate.Events() {
 			data, err := eventData(event)
 			if err != nil {
@@ -80,11 +79,9 @@ func (es *Eventstore) aggregatesToEvents(aggregates []aggregater) ([]*repository
 				EditorUser:       event.EditorUser(),
 				Type:             repository.EventType(event.Type()),
 				Version:          repository.Version(aggregate.Version()),
-				PreviousEvent:    previousEvent,
 				PreviousSequence: aggregate.PreviousSequence(),
 				Data:             data,
 			})
-			previousEvent = events[len(events)-1]
 		}
 	}
 	return events, nil

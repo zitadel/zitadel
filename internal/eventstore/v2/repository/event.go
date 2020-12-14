@@ -16,10 +16,6 @@ type Event struct {
 	// if it's 0 then it's the first event of this aggregate
 	PreviousSequence uint64
 
-	//PreviousEvent is needed in push to update PreviousSequence
-	// it implements a linked list
-	PreviousEvent *Event
-
 	//CreationDate is the time the event is created
 	// it's used for human readability.
 	// Don't use it for event ordering,

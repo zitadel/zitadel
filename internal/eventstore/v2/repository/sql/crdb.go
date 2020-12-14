@@ -17,7 +17,10 @@ import (
 )
 
 const (
-	crdbInsert = "WITH input_event ( " +
+	//as soon as stored procedures are possible in crdb
+	// we could move the code to migrations and coll the procedure
+	// traking issue: https://github.com/cockroachdb/cockroach/issues/17511
+	crdbInsert = "WITH data ( " +
 		"    event_type, " +
 		"    aggregate_type, " +
 		"    aggregate_id, " +
@@ -27,47 +30,35 @@ const (
 		"    editor_user, " +
 		"    editor_service, " +
 		"    resource_owner, " +
-		"    previous_sequence, " +
 		// variables below are calculated
-		"    max_event_seq " +
-		") AS ( " +
-		"		( " +
-		//the following select will return no row if no previous event defined
-		"			SELECT " +
-		"				$1::VARCHAR, " +
-		"				$2::VARCHAR, " +
-		"				$3::VARCHAR, " +
-		"				$4::VARCHAR, " +
-		"				COALESCE($5::TIMESTAMPTZ, NOW()), " +
-		"				$6::JSONB, " +
-		"				$7::VARCHAR, " +
-		"				$8::VARCHAR, " +
-		"				resource_owner, " +
-		"				$10::BIGINT, " +
-		"				MAX(event_sequence) AS max_event_seq " +
-		"			FROM eventstore.events " +
-		"			WHERE " +
-		"				aggregate_type = $2::VARCHAR " +
-		"				AND aggregate_id = $3::VARCHAR " +
-		"			GROUP BY resource_owner " +
-		"		) UNION (" +
-		// if no previous event we use the given data
-		"			VALUES (" +
-		"				$1::VARCHAR, " +
-		"				$2::VARCHAR, " +
-		"				$3::VARCHAR, " +
-		"				$4::VARCHAR, " +
-		"				COALESCE($5::TIMESTAMPTZ, NOW()), " +
-		"				$6::JSONB, " +
-		"				$7::VARCHAR, " +
-		"				$8::VARCHAR, " +
-		"				$9::VARCHAR, " +
-		"				$10::BIGINT, " +
-		"				NULL::BIGINT " +
-		"			) " +
-		"		) " +
-		// ensure only 1 row in input_event
-		"		LIMIT 1 " +
+		"    previous_sequence" +
+		") AS (" +
+		//previous_data selects the needed data of the latest event of the aggregate
+		// and buffers it (crdb inmemory)
+		"    WITH previous_data AS (" +
+		"        SELECT MAX(event_sequence) AS seq, resource_owner " +
+		"        FROM eventstore.events " +
+		//TODO: remove LIMIT 1 as soon as data cleaned up (only 1 resource_owner per aggregate)
+		"        WHERE aggregate_type = $2 AND aggregate_id = $3 GROUP BY resource_owner LIMIT 1" +
+		"    )" +
+		// defines the data to be inserted
+		"    SELECT " +
+		"        $1::VARCHAR AS event_type, " +
+		"        $2::VARCHAR AS aggregate_type, " +
+		"        $3::VARCHAR AS aggregate_id, " +
+		"        $4::VARCHAR AS aggregate_version, " +
+		"        NOW() AS creation_date, " +
+		"        $5::JSONB AS event_data, " +
+		"        $6::VARCHAR AS editor_user, " +
+		"        $7::VARCHAR AS editor_service, " +
+		"        CASE WHEN EXISTS (SELECT * FROM previous_data) " +
+		"            THEN (SELECT resource_owner FROM previous_data) " +
+		"            ELSE $8::VARCHAR " +
+		"        end AS resource_owner, " +
+		"        CASE WHEN EXISTS (SELECT * FROM previous_data) " +
+		"            THEN (SELECT seq FROM previous_data) " +
+		"            ELSE NULL " +
+		"        end AS previous_sequence" +
 		") " +
 		"INSERT INTO eventstore.events " +
 		"	( " +
@@ -94,9 +85,9 @@ const (
 		"			editor_service, " +
 		"			resource_owner, " +
 		"			previous_sequence " +
-		"		FROM input_event " +
+		"		FROM data " +
 		"	) " +
-		"RETURNING id, event_sequence, previous_sequence, creation_date, resource_owner "
+		"RETURNING id, event_sequence, previous_sequence, creation_date, resource_owner"
 )
 
 type CRDB struct {
@@ -120,27 +111,16 @@ func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
 		}
 
 		for _, event := range events {
-			previousSequence := Sequence(event.PreviousSequence)
-			if event.PreviousEvent != nil {
-				if event.PreviousEvent.AggregateType != event.AggregateType || event.PreviousEvent.AggregateID != event.AggregateID {
-					return caos_errs.ThrowPreconditionFailed(nil, "SQL-J55uR", "aggregate of linked events unequal")
-				}
-				previousSequence = Sequence(event.PreviousEvent.Sequence)
-			}
+			var previousSequence Sequence
 			err = stmt.QueryRowContext(ctx,
 				event.Type,
 				event.AggregateType,
 				event.AggregateID,
 				event.Version,
-				&sql.NullTime{
-					Time:  event.CreationDate,
-					Valid: !event.CreationDate.IsZero(),
-				},
 				Data(event.Data),
 				event.EditorUser,
 				event.EditorService,
 				event.ResourceOwner,
-				previousSequence,
 			).Scan(&event.ID, &event.Sequence, &previousSequence, &event.CreationDate, &event.ResourceOwner)
 
 			event.PreviousSequence = uint64(previousSequence)
